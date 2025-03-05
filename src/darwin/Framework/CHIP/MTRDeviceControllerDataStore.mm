@@ -228,22 +228,36 @@ static bool IsValidCATNumber(id _Nullable value)
     // Can we do less dispatch?  We would need to have a version of
     // _findResumptionInfoWithKey that assumes we are already on the right queue.
     for (NSNumber * nodeID in _nodesWithResumptionInfo) {
-        auto * oldInfo = [self findResumptionInfoByNodeID:nodeID];
-        if (oldInfo != nil) {
-            dispatch_sync(_storageDelegateQueue, ^{
-                [_storageDelegate controller:controller
-                           removeValueForKey:ResumptionByResumptionIDKey(oldInfo.resumptionID)
-                               securityLevel:MTRStorageSecurityLevelSecure
-                                 sharingType:MTRStorageSharingTypeNotShared];
-                [_storageDelegate controller:controller
-                           removeValueForKey:ResumptionByNodeIDKey(oldInfo.nodeID)
-                               securityLevel:MTRStorageSecurityLevelSecure
-                                 sharingType:MTRStorageSharingTypeNotShared];
-            });
-        }
+        [self _clearResumptionInfoForNodeID:nodeID controller:controller];
     }
 
     [_nodesWithResumptionInfo removeAllObjects];
+}
+
+- (void)clearResumptionInfoForNodeID:(NSNumber *)nodeID
+{
+    MTRDeviceController * controller = _controller;
+    VerifyOrReturn(controller != nil); // No way to call delegate without controller.
+
+    [self _clearResumptionInfoForNodeID:nodeID controller:controller];
+    [_nodesWithResumptionInfo removeObject:nodeID];
+}
+
+- (void)_clearResumptionInfoForNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
+{
+    auto * oldInfo = [self findResumptionInfoByNodeID:nodeID];
+    if (oldInfo != nil) {
+        dispatch_sync(_storageDelegateQueue, ^{
+            [_storageDelegate controller:controller
+                       removeValueForKey:ResumptionByResumptionIDKey(oldInfo.resumptionID)
+                           securityLevel:MTRStorageSecurityLevelSecure
+                             sharingType:MTRStorageSharingTypeNotShared];
+            [_storageDelegate controller:controller
+                       removeValueForKey:ResumptionByNodeIDKey(oldInfo.nodeID)
+                           securityLevel:MTRStorageSecurityLevelSecure
+                             sharingType:MTRStorageSharingTypeNotShared];
+        });
+    }
 }
 
 - (CHIP_ERROR)storeLastLocallyUsedNOC:(MTRCertificateTLVBytes)noc
@@ -1164,6 +1178,20 @@ static NSString * sDeviceDataKeyPrefix = @"deviceData";
         [self->_storageDelegate controller:controller
                                 storeValue:data
                                     forKey:[self _deviceDataKeyForNodeID:nodeID]
+                             securityLevel:MTRStorageSecurityLevelSecure
+                               sharingType:MTRStorageSharingTypeNotShared];
+    });
+}
+
+- (void)clearDeviceDataForNodeID:(NSNumber *)nodeID
+{
+    dispatch_async(_storageDelegateQueue, ^{
+        MTRDeviceController * controller = self->_controller;
+        VerifyOrReturn(controller != nil); // No way to call delegate without controller.
+
+        // Ignore store failures, since they are not actionable for us here.
+        [self->_storageDelegate controller:controller
+                         removeValueForKey:[self _deviceDataKeyForNodeID:nodeID]
                              securityLevel:MTRStorageSecurityLevelSecure
                                sharingType:MTRStorageSharingTypeNotShared];
     });

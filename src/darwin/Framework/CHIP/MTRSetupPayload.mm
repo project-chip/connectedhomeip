@@ -476,6 +476,17 @@ MTR_DIRECT_MEMBERS
     return [self qrCodeStringSkippingValidation:NO];
 }
 
++ (BOOL)isValidSetupPasscode:(NSNumber *)setupPasscode
+{
+    using namespace chip;
+
+    uint64_t passCode = setupPasscode.unsignedLongLongValue;
+    if (!CanCastTo<uint32_t>(passCode)) {
+        return NO;
+    }
+    return SetupPayload::IsValidSetupPIN(static_cast<uint32_t>(passCode));
+}
+
 - (nullable NSString *)qrCodeStringSkippingValidation:(BOOL)allowInvalid
 {
     chip::QRCodeSetupPayloadGenerator generator(_payload);

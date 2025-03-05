@@ -27,8 +27,8 @@
 
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model-provider/Context.h>
-#include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/OperationTypes.h>
+#include <app/data-model-provider/ProviderMetadataTree.h>
 
 namespace chip {
 namespace app {

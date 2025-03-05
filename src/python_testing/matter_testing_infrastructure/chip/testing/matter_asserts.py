@@ -106,6 +106,14 @@ def assert_valid_int8(value: Any, description: str) -> None:
                         f"{description} must be a valid int8 integer")
 
 
+def assert_valid_bool(value: Any, description: str) -> None:
+    """
+    Asserts that the value is a valid bool (True/False).
+    """
+    asserts.assert_true(is_valid_bool_value(value),
+                        f"{description} must be a valid bool (True/False)")
+
+
 def assert_int_in_range(value: Any, min_value: int, max_value: int, description: str) -> None:
     """
     Asserts that the value is an integer within the specified range (inclusive).

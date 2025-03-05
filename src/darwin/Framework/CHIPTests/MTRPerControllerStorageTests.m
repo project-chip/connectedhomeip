@@ -1764,6 +1764,22 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     }
     XCTAssertTrue(totalAttributes > 300);
 
+    // Now try forgetting this device and make sure all the info we had for it
+    // goes away.
+    NSNumber * deviceID = @(17);
+    __auto_type * dataStore = controller.controllerDataStore;
+    XCTAssertNotNil(deviceAttributeCounts[deviceID]);
+    XCTAssertNotNil([dataStore findResumptionInfoByNodeID:deviceID]);
+    XCTAssertNotNil([dataStore getStoredDeviceDataForNodeID:deviceID]);
+    XCTAssertNotNil([dataStore getStoredClusterDataForNodeID:deviceID]);
+
+    [controller forgetDeviceWithNodeID:deviceID];
+    deviceAttributeCounts = [controller unitTestGetDeviceAttributeCounts];
+    XCTAssertNil(deviceAttributeCounts[deviceID]);
+    XCTAssertNil([dataStore findResumptionInfoByNodeID:deviceID]);
+    XCTAssertNil([dataStore getStoredDeviceDataForNodeID:deviceID]);
+    XCTAssertNil([dataStore getStoredClusterDataForNodeID:deviceID]);
+
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
 }
