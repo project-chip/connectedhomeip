@@ -112,14 +112,14 @@ void ESP32Diagnostics::LogMetricEvent(const MetricEvent & event)
     {
     case ValueType::kInt32: {
         ChipLogProgress(DeviceLayer, "The value of %s is %" PRId32, event.key(), event.ValueInt32());
-        Diagnostic<int32_t> metric(event.key(), event.ValueInt32(), esp_log_timestamp());
+        Diagnostic<int32_t> metric(const_cast<char *>(event.key()), event.ValueInt32(), esp_log_timestamp());
         ReturnOnFailure(mStorageInstance->Store(metric));
     }
     break;
 
     case ValueType::kUInt32: {
         ChipLogProgress(DeviceLayer, "The value of %s is %" PRId32, event.key(), event.ValueUInt32());
-        Diagnostic<uint32_t> metric(event.key(), event.ValueUInt32(), esp_log_timestamp());
+        Diagnostic<uint32_t> metric(const_cast<char *>(event.key()), event.ValueUInt32(), esp_log_timestamp());
         ReturnOnFailure(mStorageInstance->Store(metric));
     }
     break;
@@ -161,7 +161,7 @@ CHIP_ERROR ESP32Diagnostics::StoreDiagnostics(const char * label, const char * g
 {
     VerifyOrReturnError(mStorageInstance != nullptr, CHIP_ERROR_INCORRECT_STATE,
                         ChipLogError(DeviceLayer, "Diagnostic Storage Instance cannot be NULL"));
-    Diagnostic<const char *> trace(label, group, esp_log_timestamp());
+    Diagnostic<char *> trace(const_cast<char *>(label), const_cast<char *>(group), esp_log_timestamp());
     return mStorageInstance->Store(trace);
 }
 
