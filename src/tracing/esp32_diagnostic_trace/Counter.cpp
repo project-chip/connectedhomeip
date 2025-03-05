@@ -46,7 +46,7 @@ CHIP_ERROR ESPDiagnosticCounter::ReportMetrics(const char * label, DiagnosticSto
 {
     VerifyOrReturnError(storageInstance != nullptr, CHIP_ERROR_INCORRECT_STATE,
                         ChipLogError(DeviceLayer, "Diagnostic Storage Instance cannot be NULL"));
-    Diagnostic<uint32_t> counter(label, GetInstanceCount(label), esp_log_timestamp());
+    Diagnostic<uint32_t> counter(const_cast<char *>(label), GetInstanceCount(label), esp_log_timestamp());
     return storageInstance->Store(counter);
 }
 

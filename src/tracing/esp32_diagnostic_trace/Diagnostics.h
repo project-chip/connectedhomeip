@@ -19,6 +19,7 @@
 #pragma once
 
 #include <lib/core/TLVCircularBuffer.h>
+#define kMaxStringValueSize 128
 
 namespace chip {
 namespace Tracing {
@@ -30,7 +31,7 @@ enum class DiagTag : uint8_t
 {
     TIMESTAMP = 0,
     LABEL,
-    VALUE
+    VALUE,
 };
 
 /**
@@ -55,28 +56,65 @@ public:
      *                    failure of the encoding operation.
      */
     virtual CHIP_ERROR Encode(chip::TLV::CircularTLVWriter & writer) const = 0;
+
+    virtual CHIP_ERROR Decode(chip::TLV::TLVReader & reader) = 0;
 };
 
 template <typename T>
 class Diagnostic : public DiagnosticEntry
 {
 public:
-    Diagnostic(const char * label, T value, uint32_t timestamp) : label_(label), value_(value), timestamp_(timestamp) {}
+    Diagnostic(char * label = nullptr, T value = T{}, uint32_t timestamp = 0) : label_(label), value_(value), timestamp_(timestamp)
+    {}
 
     CHIP_ERROR Encode(chip::TLV::CircularTLVWriter & writer) const override
     {
         chip::TLV::TLVType DiagnosticOuterContainer = chip::TLV::kTLVType_NotSpecified;
         ReturnErrorOnFailure(
             writer.StartContainer(chip::TLV::AnonymousTag(), chip::TLV::kTLVType_Structure, DiagnosticOuterContainer));
+
+        // Write timestamp
         ReturnErrorOnFailure(writer.Put(chip::TLV::ContextTag(DiagTag::TIMESTAMP), timestamp_));
-        ReturnErrorOnFailure(writer.PutString(chip::TLV::ContextTag(DiagTag::LABEL), label_));
-        if constexpr (std::is_same_v<T, const char *>)
+
+        // Write label
+        if (strlen(label_) > kMaxStringValueSize)
         {
-            ReturnErrorOnFailure(writer.PutString(chip::TLV::ContextTag(DiagTag::VALUE), value_));
+            char labelBuffer[kMaxStringValueSize + 1];
+            memcpy(labelBuffer, label_, kMaxStringValueSize);
+            labelBuffer[kMaxStringValueSize] = '\0';
+            ReturnErrorOnFailure(writer.PutString(chip::TLV::ContextTag(DiagTag::LABEL), labelBuffer));
         }
         else
         {
+            ReturnErrorOnFailure(writer.PutString(chip::TLV::ContextTag(DiagTag::LABEL), label_));
+        }
+
+        // Write value
+        if constexpr (std::is_same_v<T, char *>)
+        {
+            if (strlen(value_) > kMaxStringValueSize)
+            {
+                char valueBuffer[kMaxStringValueSize + 1];
+                memcpy(valueBuffer, value_, kMaxStringValueSize);
+                valueBuffer[kMaxStringValueSize] = '\0';
+                ReturnErrorOnFailure(writer.PutString(chip::TLV::ContextTag(DiagTag::VALUE), valueBuffer));
+            }
+            else
+            {
+                ReturnErrorOnFailure(writer.PutString(chip::TLV::ContextTag(DiagTag::VALUE), value_));
+            }
+        }
+        else if constexpr (std::is_same_v<T, uint32_t>)
+        {
             ReturnErrorOnFailure(writer.Put(chip::TLV::ContextTag(DiagTag::VALUE), value_));
+        }
+        else if constexpr (std::is_same_v<T, int32_t>)
+        {
+            ReturnErrorOnFailure(writer.Put(chip::TLV::ContextTag(DiagTag::VALUE), value_));
+        }
+        else
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
         }
         ReturnErrorOnFailure(writer.EndContainer(DiagnosticOuterContainer));
         ReturnErrorOnFailure(writer.Finalize());
@@ -84,10 +122,56 @@ public:
         return CHIP_NO_ERROR;
     }
 
+    CHIP_ERROR Decode(chip::TLV::TLVReader & reader) override
+    {
+        TLV::TLVType containerType;
+        ReturnErrorOnFailure(reader.EnterContainer(containerType));
+        // Read timestamp
+        ReturnErrorOnFailure(reader.Next(TLV::ContextTag(DiagTag::TIMESTAMP)));
+        ReturnErrorOnFailure(reader.Get(timestamp_));
+
+        // Read label
+        ReturnErrorOnFailure(reader.Next(TLV::ContextTag(DiagTag::LABEL)));
+        uint32_t labelSize = reader.GetLength();
+        char labelBuffer[kMaxStringValueSize + 1];
+        ReturnErrorOnFailure(reader.GetString(labelBuffer, kMaxStringValueSize + 1));
+        memcpy(label_, labelBuffer, labelSize + 1);
+
+        // Read value
+        ReturnErrorOnFailure(reader.Next());
+        if constexpr (std::is_same_v<T, char *>)
+        {
+            uint32_t valueSize = reader.GetLength();
+            char valueBuffer[kMaxStringValueSize + 1];
+            ReturnErrorOnFailure(reader.GetString(valueBuffer, kMaxStringValueSize + 1));
+            memcpy(value_, valueBuffer, valueSize + 1);
+        }
+        else if constexpr (std::is_same_v<T, uint32_t>)
+        {
+            ReturnErrorOnFailure(reader.Get(value_));
+        }
+        else if constexpr (std::is_same_v<T, int32_t>)
+        {
+            ReturnErrorOnFailure(reader.Get(value_));
+        }
+        else
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+
+        ReturnErrorOnFailure(reader.ExitContainer(containerType));
+        return CHIP_NO_ERROR;
+    }
+
+    // Getters
+    char * GetLabel() const { return label_; }
+    T GetValue() const { return value_; }
+    uint32_t GetTimestamp() const { return timestamp_; }
+
 private:
-    const char * label_;
-    T value_;
-    uint32_t timestamp_;
+    char * label_ = nullptr;
+    T value_{};
+    uint32_t timestamp_ = 0;
 };
 
 /**
