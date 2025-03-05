@@ -72,7 +72,7 @@ osThreadAttr_t kDrvTaskAttr = { .name       = "drv_rsi",
 
 osMessageQueueId_t sWifiEventQueue = NULL;
 
-// Polling interval for the IPv4/IPv6
+//  DHCP Polling interval for the IPv4/IPv6
 constexpr uint32_t kDhcpPollIntervalMs = 250;
 
 uint8_t wfx_rsi_drv_buf[WFX_RSI_BUF_SZ];
