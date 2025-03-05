@@ -10,16 +10,10 @@
 
 using namespace chip::Tracing::Diagnostics;
 
+static const char * TAG = "Diagnostic";
+
 namespace chip {
 namespace Diagnostics {
-
-enum class ValueType : uint8_t
-{
-    kUndefined,    // Value is not valid
-    kInt32,        // int32_t
-    kUInt32,       // uint32_t
-    kChipErrorCode // chip::ChipError
-};
 
 // Make implementation class public so it can be used in static_cast
 class DiagnosticDataDelegateImpl : public DiagnosticDataDelegate
@@ -41,7 +35,6 @@ public:
 
     CHIP_ERROR StartPeriodicDiagnostics(chip::System::Clock::Timeout aTimeout) override
     {
-        printf("Starting periodic diagnostic timer\n");
         if (aTimeout == System::Clock::kZero)
         {
             return CHIP_ERROR_INVALID_ARGUMENT;
@@ -74,67 +67,74 @@ public:
 #ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
     CHIP_ERROR EnableDiagnostics() override
     {
-        printf("inside enable diagnostics\n");
         VerifyOrReturnError(mStorageInstance != nullptr, CHIP_ERROR_INCORRECT_STATE);
         if (IsDiagnosticBufferEmpty())
         {
-            printf("diagnostic buffer is empty\n");
             return CHIP_ERROR_NOT_FOUND;
         }
 
-        // First try as trace data
-        Diagnostic<const char*> trace("", "", 0);
-        CHIP_ERROR traceErr = mStorageInstance->RetrieveDecodedEntry(trace);
-        if (traceErr == CHIP_NO_ERROR)
+        // Get the TLV data
+        MutableByteSpan encodedSpan(mRetrievalBuffer, CONFIG_RETRIEVAL_BUFFER_SIZE);
+        uint32_t readEntries = 0;
+
+        // Retrieve encoded data
+        CHIP_ERROR err = mStorageInstance->Retrieve(encodedSpan, readEntries);
+        if (err != CHIP_NO_ERROR)
         {
-            printf("Retrieved trace data - Label: %s, Value: %s\n", 
-                   trace.GetLabel(), trace.GetValue());
-            LogTraceData(trace.GetLabel(), trace.GetValue());
+            ESP_LOGE(TAG, "Failed to retrieve data");
+            return err;
         }
-        else
+
+        chip::TLV::TLVReader mReader;
+        mReader.Init(encodedSpan.data(), encodedSpan.size());
+        while ((err = mReader.Next()) == CHIP_NO_ERROR)
         {
-            printf("Failed to retrieve trace data: %s\n", chip::ErrorStr(traceErr));
-            
-            // If trace retrieval failed, try as uint32
-            Diagnostic<uint32_t> metricUint("", 0, 0);
-            CHIP_ERROR metricUintErr = mStorageInstance->RetrieveDecodedEntry(metricUint);
-            if (metricUintErr == CHIP_NO_ERROR)
+            if (mReader.GetType() == chip::TLV::kTLVType_Structure && mReader.GetTag() == chip::TLV::AnonymousTag())
             {
-                printf("Retrieved uint32 metric - Label: %s, Value: %lu\n", 
-                       metricUint.GetLabel(), metricUint.GetValue());
-                LogMetricData(metricUint.GetLabel(), ValueType::kUInt32, metricUint.GetValue());
+                chip::TLV::TLVReader tempReader(mReader);
+                char label[128];
+                char value[128];
+                Diagnostic<char *> trace(label, value, 0);
+                err = trace.Decode(tempReader);
+                if (err == CHIP_NO_ERROR)
+                {
+                    LogTraceData(trace.GetLabel(), trace.GetValue(), trace.GetTimestamp());
+                    continue;
+                }
+
+                chip::TLV::TLVReader tempReader2(mReader);
+
+                Diagnostic<int32_t> metricInt32(label, 0, 0);
+                err = metricInt32.Decode(tempReader2);
+                if (err == CHIP_NO_ERROR)
+                {
+                    LogMetricData(metricInt32.GetLabel(), ValueType::kInt32, metricInt32.GetValue());
+                    continue;
+                }
+
+                chip::TLV::TLVReader tempReader3(mReader);
+
+                Diagnostic<uint32_t> metricUint32(label, 0, 0);
+                err = metricUint32.Decode(tempReader3);
+                if (err == CHIP_NO_ERROR)
+                {
+                    LogMetricData(metricUint32.GetLabel(), ValueType::kUInt32, metricUint32.GetValue());
+                    continue;
+                }
+
+                ESP_LOGE(TAG, "Failed to decode diagnostic");
             }
             else
             {
-                printf("Failed to retrieve uint32 metric: %s\n", chip::ErrorStr(metricUintErr));
-                
-                // Try as int32
-                Diagnostic<int32_t> metricInt("", 0, 0);
-                CHIP_ERROR metricIntErr = mStorageInstance->RetrieveDecodedEntry(metricInt);
-                if (metricIntErr == CHIP_NO_ERROR)
-                {
-                    printf("Retrieved int32 metric - Label: %s, Value: %ld\n", 
-                           metricInt.GetLabel(), metricInt.GetValue());
-                    LogMetricData(metricInt.GetLabel(), ValueType::kInt32, 
-                                static_cast<uint32_t>(metricInt.GetValue()));
-                }
-                else
-                {
-                    printf("Failed to retrieve int32 metric: %s\n", chip::ErrorStr(metricIntErr));
-                    return metricIntErr;
-                }
+                ESP_LOGW(TAG, "Skipping unexpected TLV element.");
             }
         }
-
         // Clear buffer after successful processing
-        mStorageInstance->ClearBuffer(1);
+        mStorageInstance->ClearBuffer(readEntries);
         return CHIP_NO_ERROR;
     }
 #else
-    CHIP_ERROR EnableDiagnostics() override
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
+    CHIP_ERROR EnableDiagnostics() override { return CHIP_ERROR_NOT_IMPLEMENTED; }
 #endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
 
 private:
@@ -147,17 +147,12 @@ private:
 
     bool IsDiagnosticBufferEmpty() override { return (mStorageInstance == nullptr) ? true : mStorageInstance->IsBufferEmpty(); }
 
-    void LogTraceData(const char * label, const char * group)
+    void LogTraceData(const char * label, const char * group, uint32_t timestamp)
     {
-        printf("Writing trace data to ESP_DIAG\n");
+        ESP_LOGI(TAG, "Log Trace Data");
         const char * tag    = "MTR_TRC";
         const char * format = "EV (%" PRIu32 ") %s: %s";
-        esp_err_t err       = ESP_OK;
-        err                 = esp_diag_log_event(tag, format, esp_log_timestamp(), label, group);
-        if (err == ESP_OK)
-        {
-            printf("Send data to insights successfully\n");
-        }
+        esp_diag_log_event(tag, format, timestamp, label, group);
     }
 
     void RegisterMetric(const char * key, ValueType type)
@@ -199,7 +194,7 @@ private:
 
     void LogMetricData(const char * key, ValueType type, uint32_t value)
     {
-        printf("Writing metric data to ESP_DIAG\n");
+        ESP_LOGI(TAG, "Log Metric Data");
         if (key == nullptr)
         {
             ESP_LOGE("mtr", "Invalid null pointer for metric key");
@@ -247,14 +242,14 @@ private:
 
     static void DiagnosticSamplingHandler(System::Layer * systemLayer, void * context)
     {
-        printf("DiagnosticSamplingHandler\n");
         auto * instance = static_cast<DiagnosticDataDelegateImpl *>(context);
         VerifyOrReturn(instance != nullptr);
         VerifyOrReturn(instance->mStorageInstance != nullptr);
-        
-        while(!instance->mStorageInstance->IsBufferEmpty()) {
+
+        while (!instance->mStorageInstance->IsBufferEmpty())
+        {
             // Retrieve and send diagnostics
-            instance->EnableDiagnostics();   
+            instance->EnableDiagnostics();
         }
 
         // Schedule next sampling

@@ -9,6 +9,14 @@
 namespace chip {
 namespace Diagnostics {
 
+enum class ValueType : uint8_t
+{
+    kUndefined,    // Value is not valid
+    kInt32,        // int32_t
+    kUInt32,       // uint32_t
+    kChipErrorCode // chip::ChipError
+};
+
 /**
  * @brief Delegate interface for handling diagnostic data operations
  */

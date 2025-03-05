@@ -64,12 +64,8 @@
 #include <tracing/esp32_diagnostic_trace/DiagnosticTracing.h>
 #include <tracing/esp32_diagnostic_trace/DiagnosticStorageManager.h>
 #include <DiagnosticDataDelegate.h>
-
-#if CONFIG_ENABLE_ESP_INSIGHTS_TRACE
 #include <esp_insights.h>
 #define START_TIMEOUT_MS 10000
-#endif // CONFIG_ENABLE_ESP_INSIGHTS_TRACE
-
 #endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
 
 using namespace ::chip;
@@ -83,10 +79,8 @@ using namespace ::chip::Tracing::Diagnostics;
 static uint8_t endUserBuffer[CONFIG_END_USER_BUFFER_SIZE]; // Global static buffer used to store diagnostics
 CircularDiagnosticBuffer diagnosticStorage(endUserBuffer, CONFIG_END_USER_BUFFER_SIZE);
 
-#if CONFIG_ENABLE_ESP_INSIGHTS_TRACE
 extern const char insights_auth_key_start[] asm("_binary_insights_auth_key_txt_start");
 extern const char insights_auth_key_end[] asm("_binary_insights_auth_key_txt_end");
-#endif // CONFIG_ENABLE_ESP_INSIGHTS_TRACE
 #endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
 
 static const char TAG[] = "light-app";
@@ -144,7 +138,6 @@ static void InitServer(intptr_t context)
 
 
 #ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
-#if CONFIG_ENABLE_ESP_INSIGHTS_TRACE
     esp_insights_config_t config = {
         .log_type = ESP_DIAG_LOG_TYPE_ERROR | ESP_DIAG_LOG_TYPE_WARNING | ESP_DIAG_LOG_TYPE_EVENT,
         .auth_key = insights_auth_key_start
@@ -164,7 +157,6 @@ static void InitServer(intptr_t context)
     chip::Diagnostics::DiagnosticDataDelegate::GetInstance(&diagnosticStorage);
     
     diagnosticDelegate.StartPeriodicDiagnostics(chip::System::Clock::Timeout(START_TIMEOUT_MS));
-#endif // CONFIG_ENABLE_ESP_INSIGHTS_TRACE
 #endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
 }
 
