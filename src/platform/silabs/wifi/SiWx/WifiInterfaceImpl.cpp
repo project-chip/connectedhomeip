@@ -372,6 +372,7 @@ sl_status_t SetWifiConfigurations()
     VerifyOrReturnError(status == SL_STATUS_OK, status,
                         ChipLogError(DeviceLayer, "sl_wifi_set_listen_interval failed: 0x%lx", status));
 
+    // This is be triggered on the disconnect use case, providing the amount of TA tries
     // Setting the TA retry to 1 and giving the control to the M4 for improved power efficiency
     // When max_retry_attempts is set to 0, TA will retry indefinitely.
     sl_wifi_advanced_client_configuration_t client_config = { .max_retry_attempts = 1 };
