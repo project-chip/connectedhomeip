@@ -39,6 +39,56 @@ ThermostatDelegate::ThermostatDelegate()
 
     memset(mActivePresetHandleData, 0, sizeof(mActivePresetHandleData));
     mActivePresetHandleDataSize = 0;
+
+    mNumberOfSchedules                   = kMaxNumberOfSchedulesSupported;
+    mNumberOfScheduleTransitions         = kMaxNumberOfScheduleTransitionsSupported;
+    mNumberOfScheduleTransitionPerDay    = DataModel::MakeNullable(kMaxNumberOfScheduleTransitionPerDaySupported);
+    mNextFreeIndexInSchedulesList        = 0;
+    mNextFreeIndexInPendingSchedulesList = 0;
+
+    for (int i = 0; i < kMaxNumberOfScheduleTypes * kMaxNumberOfSchedulesOfEachType; i++)
+    {
+        mSchedules[i].SetTransitionData(mScheduleTransitionData[i], kMaxNumberOfScheduleTransitionsSupported);
+        mPendingSchedules[i].SetTransitionData(mPendingScheduleTransitionData[i], kMaxNumberOfScheduleTransitionsSupported);
+    }
+
+    InitializeSchedules();
+
+    memset(mActiveScheduleHandleData, 0, sizeof(mActiveScheduleHandleData));
+    mActiveScheduleHandleDataSize = 0;
+}
+
+std::optional<System::Clock::Milliseconds16> ThermostatDelegate::GetMaxAtomicWriteTimeout(chip::AttributeId attributeId)
+{
+    switch (attributeId)
+    {
+    case Attributes::Presets::Id:
+        // If the client expects to edit the presets, then we'll give it 3 seconds to do so
+        return std::chrono::milliseconds(3000);
+    case Attributes::Schedules::Id:
+        // If the client expects to edit the schedules, then we'll give it 9 seconds to do so
+        return std::chrono::milliseconds(9000);
+    default:
+        return std::nullopt;
+    }
+}
+
+/**
+ * Thermostat Delegate codes for Presets feature
+ */
+
+CHIP_ERROR ThermostatDelegate::GetUniquePresetHandle(DataModel::Nullable<chip::ByteSpan> & presetHandle, uint8_t seed)
+{
+    // TODO: generate unique handle in octstr max 16 bytes
+    static uint8_t handle[kPresetHandleSize];
+    size_t handleSize;
+
+    handle[0]  = seed;
+    handleSize = 1;
+
+    presetHandle = DataModel::MakeNullable(ByteSpan(handle, handleSize));
+
+    return CHIP_NO_ERROR;
 }
 
 void ThermostatDelegate::InitializePresets()
@@ -50,11 +100,12 @@ void ThermostatDelegate::InitializePresets()
     uint8_t index = 0;
     for (PresetScenarioEnum presetScenario : presetScenarioEnumArray)
     {
-        mPresets[index].SetPresetScenario(presetScenario);
+        DataModel::Nullable<chip::ByteSpan> presetHandle;
 
-        // Set the preset handle to the preset scenario value as a unique id.
-        const uint8_t handle[] = { static_cast<uint8_t>(presetScenario) };
-        mPresets[index].SetPresetHandle(DataModel::MakeNullable(ByteSpan(handle)));
+        GetUniquePresetHandle(presetHandle, static_cast<uint8_t>(presetScenario));
+
+        mPresets[index].SetPresetScenario(presetScenario);
+        mPresets[index].SetPresetHandle(presetHandle);
         mPresets[index].SetName(NullOptional);
         int16_t coolingSetpointValue = static_cast<int16_t>(2500 + (index * 100));
         mPresets[index].SetCoolingSetpoint(MakeOptional(coolingSetpointValue));
@@ -155,21 +206,6 @@ CHIP_ERROR ThermostatDelegate::SetActivePresetHandle(const DataModel::Nullable<B
     return CHIP_NO_ERROR;
 }
 
-std::optional<System::Clock::Milliseconds16> ThermostatDelegate::GetMaxAtomicWriteTimeout(chip::AttributeId attributeId)
-{
-    switch (attributeId)
-    {
-    case Attributes::Presets::Id:
-        // If the client expects to edit the presets, then we'll give it 3 seconds to do so
-        return std::chrono::milliseconds(3000);
-    case Attributes::Schedules::Id:
-        // If the client expects to edit the schedules, then we'll give it 9 seconds to do so
-        return std::chrono::milliseconds(9000);
-    default:
-        return std::nullopt;
-    }
-}
-
 void ThermostatDelegate::InitializePendingPresets()
 {
     mNextFreeIndexInPendingPresetsList = 0;
@@ -190,8 +226,17 @@ CHIP_ERROR ThermostatDelegate::AppendToPendingPresetList(const PresetStructWithO
             // TODO: #34556 Since we support only one preset of each type, using the octet string containing the preset scenario
             // suffices as the unique preset handle. Need to fix this to actually provide unique handles once multiple presets of
             // each type are supported.
-            const uint8_t handle[] = { static_cast<uint8_t>(preset.GetPresetScenario()) };
-            mPendingPresets[mNextFreeIndexInPendingPresetsList].SetPresetHandle(DataModel::MakeNullable(ByteSpan(handle)));
+            CHIP_ERROR err;
+
+            DataModel::Nullable<chip::ByteSpan> presetHandle;
+
+            err = GetUniquePresetHandle(presetHandle, static_cast<uint8_t>(preset.GetPresetScenario()));
+            if (err != CHIP_NO_ERROR)
+            {
+                return err;
+            }
+
+            mPendingPresets[mNextFreeIndexInPendingPresetsList].SetPresetHandle(presetHandle);
         }
         mNextFreeIndexInPendingPresetsList++;
         return CHIP_NO_ERROR;
@@ -224,4 +269,235 @@ CHIP_ERROR ThermostatDelegate::CommitPendingPresets()
 void ThermostatDelegate::ClearPendingPresetList()
 {
     mNextFreeIndexInPendingPresetsList = 0;
+}
+
+CHIP_ERROR ThermostatDelegate::GetUniqueScheduleHandle(DataModel::Nullable<chip::ByteSpan> & scheduleHandle, uint8_t seed)
+{
+    // TODO: generate unique handle in octstr max 16 bytes
+    static uint8_t handle[kScheduleHandleSize];
+    size_t handleSize;
+
+    handle[0]  = seed;
+    handleSize = 1;
+
+    scheduleHandle = DataModel::MakeNullable(ByteSpan(handle, handleSize));
+
+    return CHIP_NO_ERROR;
+}
+
+void ThermostatDelegate::InitializeSchedules()
+{
+    // Initialize the system mode with 2 built in system modes - cool and heat.
+    SystemModeEnum systemModeEnumArray[2] = { SystemModeEnum::kCool, SystemModeEnum::kHeat };
+
+    // Initialize the transition list
+    Structs::ScheduleTransitionStruct::Type transitionMonday          = { .dayOfWeek       = ScheduleDayOfWeekBitmap::kMonday,
+                                                                          .transitionTime  = 1000,
+                                                                          .presetHandle    = NullOptional,
+                                                                          .systemMode      = Optional<SystemModeEnum>(SystemModeEnum::kCool),
+                                                                          .coolingSetpoint = Optional<int16_t>(2100),
+                                                                          .heatingSetpoint = Optional<int16_t>(2500) };
+    Structs::ScheduleTransitionStruct::Type transitionSunday          = { .dayOfWeek       = ScheduleDayOfWeekBitmap::kSunday,
+                                                                          .transitionTime  = 1000,
+                                                                          .presetHandle    = NullOptional,
+                                                                          .systemMode      = Optional<SystemModeEnum>(SystemModeEnum::kHeat),
+                                                                          .coolingSetpoint = Optional<int16_t>(2100),
+                                                                          .heatingSetpoint = Optional<int16_t>(2500) };
+    Structs::ScheduleTransitionStruct::Type scheduleTransitions[2][2] = {
+        { transitionMonday, transitionSunday },
+        { transitionSunday, transitionMonday },
+    };
+    static_assert(MATTER_ARRAY_SIZE(systemModeEnumArray) <= MATTER_ARRAY_SIZE(mSchedules));
+
+    uint8_t index = 0;
+    for (SystemModeEnum systemMode : systemModeEnumArray)
+    {
+        DataModel::Nullable<chip::ByteSpan> scheduleHandle;
+
+        // Set the schedule handle to the system mode value as a unique id.
+        GetUniqueScheduleHandle(scheduleHandle, static_cast<uint8_t>(systemMode));
+
+        mSchedules[index].SetSystemMode(systemMode);
+        mSchedules[index].SetScheduleHandle(scheduleHandle);
+        mSchedules[index].SetName(NullOptional);
+        mSchedules[index].SetPresetHandle(scheduleTransitions[index][0].presetHandle); // use presetHandle from the first transition
+        mSchedules[index].SetTransitions(
+            DataModel::List<const Structs::ScheduleTransitionStruct::Type>(scheduleTransitions[index]));
+        mSchedules[index].SetBuiltIn(DataModel::MakeNullable(true));
+        index++;
+    }
+
+    // Set the value of the next free index in the schedules list.
+    mNextFreeIndexInSchedulesList = index;
+}
+
+CHIP_ERROR ThermostatDelegate::GetScheduleTypeAtIndex(size_t index, Structs::ScheduleTypeStruct::Type & scheduleType)
+{
+    static ScheduleTypeStruct::Type scheduleTypes[] = {
+        { .systemMode           = SystemModeEnum::kOff,
+          .numberOfSchedules    = kMaxNumberOfSchedulesOfEachType,
+          .scheduleTypeFeatures = to_underlying(ScheduleTypeFeaturesBitmap::kSupportsOff) },
+        { .systemMode           = SystemModeEnum::kAuto,
+          .numberOfSchedules    = kMaxNumberOfSchedulesOfEachType,
+          .scheduleTypeFeatures = to_underlying(ScheduleTypeFeaturesBitmap::kSupportsPresets) },
+        { .systemMode           = SystemModeEnum::kCool,
+          .numberOfSchedules    = kMaxNumberOfSchedulesOfEachType,
+          .scheduleTypeFeatures = to_underlying(ScheduleTypeFeaturesBitmap::kSupportsSetpoints) },
+        { .systemMode           = SystemModeEnum::kHeat,
+          .numberOfSchedules    = kMaxNumberOfSchedulesOfEachType,
+          .scheduleTypeFeatures = to_underlying(ScheduleTypeFeaturesBitmap::kSupportsSetpoints) },
+        { .systemMode           = SystemModeEnum::kEmergencyHeat,
+          .numberOfSchedules    = kMaxNumberOfSchedulesOfEachType,
+          .scheduleTypeFeatures = to_underlying(ScheduleTypeFeaturesBitmap::kSupportsSetpoints) },
+        { .systemMode           = SystemModeEnum::kPrecooling,
+          .numberOfSchedules    = kMaxNumberOfSchedulesOfEachType,
+          .scheduleTypeFeatures = to_underlying(ScheduleTypeFeaturesBitmap::kSupportsSetpoints) },
+        { .systemMode           = SystemModeEnum::kFanOnly,
+          .numberOfSchedules    = kMaxNumberOfSchedulesOfEachType,
+          .scheduleTypeFeatures = to_underlying(ScheduleTypeFeaturesBitmap::kSupportsSetpoints) },
+        { .systemMode           = SystemModeEnum::kDry,
+          .numberOfSchedules    = kMaxNumberOfSchedulesOfEachType,
+          .scheduleTypeFeatures = to_underlying(ScheduleTypeFeaturesBitmap::kSupportsSetpoints) },
+        { .systemMode           = SystemModeEnum::kSleep,
+          .numberOfSchedules    = kMaxNumberOfSchedulesOfEachType,
+          .scheduleTypeFeatures = to_underlying(ScheduleTypeFeaturesBitmap::kSupportsSetpoints) },
+    };
+    if (index < MATTER_ARRAY_SIZE(scheduleTypes))
+    {
+        scheduleType = scheduleTypes[index];
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+}
+
+uint8_t ThermostatDelegate::GetNumberOfSchedules()
+{
+    return mNumberOfSchedules;
+}
+
+uint8_t ThermostatDelegate::GetNumberOfScheduleTransitions()
+{
+    return mNumberOfScheduleTransitions;
+}
+
+DataModel::Nullable<uint8_t> ThermostatDelegate::GetNumberOfScheduleTransitionPerDay()
+{
+    return mNumberOfScheduleTransitionPerDay;
+}
+
+CHIP_ERROR ThermostatDelegate::GetScheduleAtIndex(size_t index, ScheduleStructWithOwnedMembers & schedule)
+{
+    if (index < mNextFreeIndexInSchedulesList)
+    {
+        schedule = mSchedules[index];
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+}
+
+CHIP_ERROR ThermostatDelegate::GetActiveScheduleHandle(DataModel::Nullable<MutableByteSpan> & activeScheduleHandle)
+{
+    if (mActiveScheduleHandleDataSize != 0)
+    {
+        ReturnErrorOnFailure(CopySpanToMutableSpan(ByteSpan(mActiveScheduleHandleData, mActiveScheduleHandleDataSize),
+                                                   activeScheduleHandle.Value()));
+        activeScheduleHandle.Value().reduce_size(mActiveScheduleHandleDataSize);
+    }
+    else
+    {
+        activeScheduleHandle.SetNull();
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ThermostatDelegate::SetActiveScheduleHandle(const DataModel::Nullable<ByteSpan> & newActiveScheduleHandle)
+{
+    if (!newActiveScheduleHandle.IsNull())
+    {
+        size_t newActiveScheduleHandleSize = newActiveScheduleHandle.Value().size();
+        if (newActiveScheduleHandleSize > sizeof(mActiveScheduleHandleData))
+        {
+            ChipLogError(
+                NotSpecified,
+                "Failed to set ActiveScheduleHandle. newActiveScheduleHandle size %u is larger than schedule handle size %u",
+                static_cast<uint8_t>(newActiveScheduleHandleSize), static_cast<uint8_t>(kScheduleHandleSize));
+            return CHIP_ERROR_NO_MEMORY;
+        }
+        memcpy(mActiveScheduleHandleData, newActiveScheduleHandle.Value().data(), newActiveScheduleHandleSize);
+        mActiveScheduleHandleDataSize = newActiveScheduleHandleSize;
+        ChipLogDetail(NotSpecified, "Set ActiveScheduleHandle to ");
+        ChipLogByteSpan(NotSpecified, newActiveScheduleHandle.Value());
+    }
+    else
+    {
+        memset(mActiveScheduleHandleData, 0, sizeof(mActiveScheduleHandleData));
+        mActiveScheduleHandleDataSize = 0;
+        ChipLogDetail(NotSpecified, "Clear ActiveScheduleHandle");
+    }
+    return CHIP_NO_ERROR;
+}
+
+void ThermostatDelegate::InitializePendingSchedules()
+{
+    mNextFreeIndexInPendingSchedulesList = 0;
+    for (uint8_t indexInSchedules = 0; indexInSchedules < mNextFreeIndexInSchedulesList; indexInSchedules++)
+    {
+        mPendingSchedules[mNextFreeIndexInPendingSchedulesList] = mSchedules[indexInSchedules];
+        mNextFreeIndexInPendingSchedulesList++;
+    }
+}
+
+CHIP_ERROR ThermostatDelegate::AppendToPendingScheduleList(const ScheduleStructWithOwnedMembers & schedule)
+{
+    if (mNextFreeIndexInPendingSchedulesList < MATTER_ARRAY_SIZE(mPendingSchedules))
+    {
+        mPendingSchedules[mNextFreeIndexInPendingSchedulesList] = schedule;
+        if (schedule.GetScheduleHandle().IsNull())
+        {
+            // TODO: #34556 Since we support only one schedule of each type, using the octet string containing the preset scenario
+            // suffices as the unique schedule handle. Need to fix this to actually provide unique handles once multiple presets of
+            // each type are supported.
+            CHIP_ERROR err;
+            DataModel::Nullable<chip::ByteSpan> scheduleHandle;
+
+            err = GetUniqueScheduleHandle(scheduleHandle, static_cast<uint8_t>(schedule.GetSystemMode()));
+            if (err != CHIP_NO_ERROR)
+            {
+                return err;
+            }
+
+            mPendingSchedules[mNextFreeIndexInPendingSchedulesList].SetScheduleHandle(scheduleHandle);
+        }
+        mNextFreeIndexInPendingSchedulesList++;
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_ERROR_WRITE_FAILED;
+}
+
+CHIP_ERROR ThermostatDelegate::GetPendingScheduleAtIndex(size_t index, ScheduleStructWithOwnedMembers & schedule)
+{
+    if (index < mNextFreeIndexInPendingSchedulesList)
+    {
+        schedule = mPendingSchedules[index];
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+}
+
+CHIP_ERROR ThermostatDelegate::CommitPendingSchedules()
+{
+    mNextFreeIndexInSchedulesList = 0;
+    for (uint8_t indexInPendingSchedules = 0; indexInPendingSchedules < mNextFreeIndexInPendingSchedulesList;
+         indexInPendingSchedules++)
+    {
+        const ScheduleStructWithOwnedMembers & pendingSchedule = mPendingSchedules[indexInPendingSchedules];
+        mSchedules[mNextFreeIndexInSchedulesList]              = pendingSchedule;
+        mNextFreeIndexInSchedulesList++;
+    }
+    return CHIP_NO_ERROR;
+}
+
+void ThermostatDelegate::ClearPendingScheduleList()
+{
+    mNextFreeIndexInPendingSchedulesList = 0;
 }
