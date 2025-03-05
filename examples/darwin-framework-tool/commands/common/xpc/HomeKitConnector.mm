@@ -17,7 +17,7 @@
  */
 
 #import "HomeKitConnector.h"
-#import "../CHIPCommandBridge.h"
+#import "../CommissionerInfos.h"
 #import <lib/support/logging/CHIPLogging.h>
 
 #import <HomeKit/HomeKit.h>
@@ -89,7 +89,7 @@ NSString * kControllerIdPrefixStr = @(kControllerIdPrefix);
         __auto_type * fabricIdString = [controllerID substringFromIndex:kControllerIdPrefixStr.length];
         fabricId = @([fabricIdString integerValue]);
     } else {
-        fabricId = CHIPCommandBridge::GetCommissionerFabricId([controllerID UTF8String]);
+        fabricId = GetCommissionerFabricId([controllerID UTF8String]);
     }
 
     // When multiple homes exist, the first controller corresponds to the first home, the second controller to the second home, etc.
