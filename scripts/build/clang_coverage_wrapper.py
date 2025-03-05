@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import logging
+import os
+import sys
 
 import click
 import coloredlogs
@@ -80,9 +82,16 @@ def main(log_level, no_log_timestamps, output, raw_profile_filename):
         log_fmt = "%(levelname)-7s %(message)s"
     coloredlogs.install(level=__LOG_LEVELS__[log_level], fmt=log_fmt)
 
+    expected_output = jinja2.Template(_CPP_TEMPLATE).render(raw_profile_filename=raw_profile_filename)
+    if os.path.exists(output):
+        with open(output, 'rt') as f:
+            if f.read() == expected_output:
+                logging.info("File %s is already as expected. Will not re-write", output)
+                sys.exit(0)
+
     logging.info("Writing output to %s (profile name: %s)", output, raw_profile_filename)
     with open(output, "wt") as f:
-        f.write(jinja2.Template(_CPP_TEMPLATE).render(raw_profile_filename=raw_profile_filename))
+        f.write(expected_output)
 
     logging.debug("Writing completed")
 

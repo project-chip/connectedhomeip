@@ -4242,8 +4242,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "CurrentFrameRate";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::HDRModeEnabled::Id:
             return "HDRModeEnabled";
-        case chip::app::Clusters::CameraAvStreamManagement::Attributes::FabricsUsingCamera::Id:
-            return "FabricsUsingCamera";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::SupportedStreamUsages::Id:
+            return "SupportedStreamUsages";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::AllocatedVideoStreams::Id:
             return "AllocatedVideoStreams";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::AllocatedAudioStreams::Id:
@@ -5821,6 +5821,8 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "VideoStreamDeallocate";
         case chip::app::Clusters::CameraAvStreamManagement::Commands::SnapshotStreamAllocate::Id:
             return "SnapshotStreamAllocate";
+        case chip::app::Clusters::CameraAvStreamManagement::Commands::SnapshotStreamModify::Id:
+            return "SnapshotStreamModify";
         case chip::app::Clusters::CameraAvStreamManagement::Commands::SnapshotStreamDeallocate::Id:
             return "SnapshotStreamDeallocate";
         case chip::app::Clusters::CameraAvStreamManagement::Commands::SetStreamPriorities::Id:

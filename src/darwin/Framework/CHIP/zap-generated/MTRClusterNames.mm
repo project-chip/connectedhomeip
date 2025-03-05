@@ -7834,8 +7834,8 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"HDRModeEnabled";
             break;
 
-        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeFabricsUsingCameraID:
-            result = @"FabricsUsingCamera";
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeSupportedStreamUsagesID:
+            result = @"SupportedStreamUsages";
             break;
 
         case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeAllocatedVideoStreamsID:
@@ -11032,6 +11032,10 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
 
         case MTRCommandIDTypeClusterCameraAVStreamManagementCommandSnapshotStreamAllocateID:
             result = @"SnapshotStreamAllocate";
+            break;
+
+        case MTRCommandIDTypeClusterCameraAVStreamManagementCommandSnapshotStreamModifyID:
+            result = @"SnapshotStreamModify";
             break;
 
         case MTRCommandIDTypeClusterCameraAVStreamManagementCommandSnapshotStreamDeallocateID:
@@ -14783,19 +14787,6 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
     case MTRClusterIDTypeCameraAVStreamManagementID:
 
         switch (eventID) {
-
-            // Cluster CameraAVStreamManagement events
-        case MTREventIDTypeClusterCameraAVStreamManagementEventVideoStreamChangedID:
-            result = @"VideoStreamChanged";
-            break;
-
-        case MTREventIDTypeClusterCameraAVStreamManagementEventAudioStreamChangedID:
-            result = @"AudioStreamChanged";
-            break;
-
-        case MTREventIDTypeClusterCameraAVStreamManagementEventSnapshotStreamChangedID:
-            result = @"SnapshotStreamChanged";
-            break;
 
         default:
             result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
