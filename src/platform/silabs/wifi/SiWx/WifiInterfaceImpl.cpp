@@ -594,17 +594,17 @@ void WifiInterfaceImpl::ProcessEvent(WiseconnectWifiInterface::WifiPlatformEvent
 
     case WiseconnectWifiInterface::WifiPlatformEvent::kStationNetworkEvent:
         ChipLogDetail(DeviceLayer, "WifiPlatformEvent::kStationNetworkEvent");
-        HandleNotifyConnectivity();
+        UpdateAppConnectivityStatus();
 
     default:
         break;
     }
 }
 
-void WifiInterfaceImpl::HandleNotifyConnectivity(void)
+void WifiInterfaceImpl::UpdateAppConnectivityStatus(void)
 {
     struct netif * sta_netif = &wifi_client_context.netif;
-    VerifyOrReturn(sta_netif != nullptr, ChipLogError(DeviceLayer, "HandleNotifyConnectivity: failed to get STA netif"));
+    VerifyOrReturn(sta_netif != nullptr, ChipLogError(DeviceLayer, "UpdateAppConnectivityStatus: failed to get STA netif"));
 
 #if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
     GotIPv4Address((uint32_t) sta_netif->ip_addr.u_addr.ip4.addr);

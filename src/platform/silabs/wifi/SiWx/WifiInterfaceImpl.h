@@ -100,7 +100,7 @@ private:
      * @brief Processing function responsible for notifying the app about connectivity
      *
      */
-    void HandleNotifyConnectivity();
+    void UpdateAppConnectivityStatus();
 
     static WifiInterfaceImpl mInstance;
 };
