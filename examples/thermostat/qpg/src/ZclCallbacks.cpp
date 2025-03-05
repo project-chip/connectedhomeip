@@ -20,8 +20,10 @@
 
 #include "AppTask.h"
 #include "ThermostaticRadiatorValveManager.h"
+#include "thermostat-delegate-impl.h"
 
 #include <app-common/zap-generated/attribute-type.h>
+#include <app/clusters/thermostat-server/thermostat-server.h>
 #include <app/util/attribute-storage.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -54,6 +56,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 
 void emberAfThermostatClusterInitCallback(EndpointId endpoint)
 {
+    Thermostat::SetDefaultDelegate(endpoint, &Thermostat::ThermostatDelegate::GetInstance());
 
     // Temp. code for testing purpose, need to be updated
     const auto logOnFailure = [](Protocols::InteractionModel::Status status, const char * attributeName) {
