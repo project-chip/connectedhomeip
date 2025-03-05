@@ -64,13 +64,13 @@ typedef NS_ENUM(uint8_t, BleConnectionMode) {
 @property (nonatomic, readonly, nullable) dispatch_source_t timer;
 @property (nonatomic, readonly) BleConnectionMode currentMode;
 @property (strong, nonatomic) NSMutableDictionary<CBPeripheral *, NSDictionary *> * cachedPeripherals;
-@property (unsafe_unretained, nonatomic) bool found;
-@property (unsafe_unretained, nonatomic) chip::SetupDiscriminator deviceDiscriminator;
-@property (unsafe_unretained, nonatomic) void * appState;
-@property (unsafe_unretained, nonatomic) BleConnectionDelegate::OnConnectionCompleteFunct onConnectionComplete;
-@property (unsafe_unretained, nonatomic) BleConnectionDelegate::OnConnectionErrorFunct onConnectionError;
-@property (unsafe_unretained, nonatomic) chip::DeviceLayer::BleScannerDelegate * scannerDelegate;
-@property (unsafe_unretained, nonatomic) chip::Ble::BleLayer * mBleLayer;
+@property (assign, nonatomic) bool found;
+@property (assign, nonatomic) chip::SetupDiscriminator deviceDiscriminator;
+@property (assign, nonatomic) void * appState;
+@property (assign, nonatomic) BleConnectionDelegate::OnConnectionCompleteFunct onConnectionComplete;
+@property (assign, nonatomic) BleConnectionDelegate::OnConnectionErrorFunct onConnectionError;
+@property (assign, nonatomic) chip::DeviceLayer::BleScannerDelegate * scannerDelegate;
+@property (assign, nonatomic) chip::Ble::BleLayer * mBleLayer;
 
 - (instancetype)initWithDelegate:(chip::DeviceLayer::BleScannerDelegate *)delegate prewarm:(bool)prewarm;
 - (instancetype)initWithDiscriminator:(const chip::SetupDiscriminator &)deviceDiscriminator;
@@ -129,7 +129,7 @@ namespace DeviceLayer {
             ChipLogProgress(Ble, "ConnectionDelegate NewConnection with conn obj: %p", connObj);
             CBPeripheral * peripheral = CBPeripheralFromBleConnObject(connObj);
 
-            // The BLE_CONNECTION_OBJECT represent a CBPeripheral object. In order for it to be valid the central
+            // The BLE_CONNECTION_OBJECT represents a CBPeripheral object. In order for it to be valid the central
             // manager needs to still be running.
             if (!ble || [ble isConnecting]) {
                 if (OnConnectionError) {
@@ -308,6 +308,7 @@ namespace DeviceLayer {
 
 - (void)centralManagerDidUpdateState:(CBCentralManager *)central
 {
+    assertChipStackLockedByCurrentThread();
     MATTER_LOG_METRIC(kMetricBLECentralManagerState, static_cast<uint32_t>(central.state));
 
     switch (central.state) {
@@ -340,6 +341,8 @@ namespace DeviceLayer {
         advertisementData:(NSDictionary *)advertisementData
                      RSSI:(NSNumber *)RSSI
 {
+    assertChipStackLockedByCurrentThread();
+
     NSData * serviceData = advertisementData[CBAdvertisementDataServiceDataKey][_chipServiceUUID];
     if (!serviceData) {
         return;
@@ -405,8 +408,10 @@ namespace DeviceLayer {
 
 - (void)centralManager:(CBCentralManager *)central didConnectPeripheral:(CBPeripheral *)peripheral
 {
+    assertChipStackLockedByCurrentThread();
     MATTER_LOG_METRIC_END(kMetricBLEConnectPeripheral);
     MATTER_LOG_METRIC_BEGIN(kMetricBLEDiscoveredServices);
+
     [peripheral setDelegate:self];
     [peripheral discoverServices:nil];
     [self stopScanning];
@@ -418,6 +423,8 @@ namespace DeviceLayer {
 
 - (void)peripheral:(CBPeripheral *)peripheral didDiscoverServices:(NSError *)error
 {
+    assertChipStackLockedByCurrentThread();
+
     if (nil != error) {
         ChipLogError(Ble, "BLE:Error finding Chip Service in the device: [%s]", [error.localizedDescription UTF8String]);
     }
@@ -442,6 +449,7 @@ namespace DeviceLayer {
 
 - (void)peripheral:(CBPeripheral *)peripheral didDiscoverCharacteristicsForService:(CBService *)service error:(NSError *)error
 {
+    assertChipStackLockedByCurrentThread();
     MATTER_LOG_METRIC_END(kMetricBLEDiscoveredCharacteristics, CHIP_ERROR(chip::ChipError::Range::kOS, static_cast<uint32_t>(error.code)));
 
     if (nil != error) {
@@ -457,6 +465,8 @@ namespace DeviceLayer {
     didWriteValueForCharacteristic:(CBCharacteristic *)characteristic
                              error:(NSError *)error
 {
+    assertChipStackLockedByCurrentThread();
+
     if (nil == error) {
         ChipBleUUID svcId = BleUUIDFromCBUUD(characteristic.service.UUID);
         ChipBleUUID charId = BleUUIDFromCBUUD(characteristic.UUID);
@@ -473,6 +483,8 @@ namespace DeviceLayer {
     didUpdateNotificationStateForCharacteristic:(CBCharacteristic *)characteristic
                                           error:(NSError *)error
 {
+    assertChipStackLockedByCurrentThread();
+
     bool isNotifying = characteristic.isNotifying;
 
     if (nil == error) {
@@ -503,6 +515,8 @@ namespace DeviceLayer {
     didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic
                               error:(NSError *)error
 {
+    assertChipStackLockedByCurrentThread();
+
     if (nil == error) {
         ChipBleUUID svcId = BleUUIDFromCBUUD(characteristic.service.UUID);
         ChipBleUUID charId = BleUUIDFromCBUUD(characteristic.UUID);
@@ -550,28 +564,19 @@ namespace DeviceLayer {
     [self stopScanning];
     [self removePeripheralsFromCache];
 
-    if (!_centralManager && !_peripheral) {
-        return;
+    if (_peripheral) {
+        // Close all BLE connections before we release CB objects
+        _mBleLayer->CloseAllBleConnections();
+        _peripheral = nil;
     }
 
-    // Properly closing the underlying ble connections needs to happens
-    // on the chip work queue. At the same time the SDK is trying to
-    // properly unsubscribe and shutdown the connection, so if we nullify
-    // the centralManager and the peripheral members too early it won't be
-    // able to reach those.
-    // This is why closing connections happens as 2 async steps.
-    {
-        if (_peripheral) {
-            // Close all BLE connections before we release CB objects
-            _mBleLayer->CloseAllBleConnections();
-        }
-
+    if (_centralManager) {
         _centralManager.delegate = nil;
         _centralManager = nil;
-        _peripheral = nil;
-        if (chip::DeviceLayer::Internal::ble == self) {
-            chip::DeviceLayer::Internal::ble = nil;
-        }
+    }
+
+    if (chip::DeviceLayer::Internal::ble == self) {
+        chip::DeviceLayer::Internal::ble = nil;
     }
 }
 
