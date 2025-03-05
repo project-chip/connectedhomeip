@@ -84,7 +84,10 @@ public:
     /// Return the interface registered for the given cluster path or nullptr if one does not exist
     ServerClusterInterface * Get(const ConcreteClusterPath & path);
 
-    /// ClustersList is valid as a snapshot only and should not be saved.
+    /// Provides a list of clusters that are registered for the given endpoint.
+    ///
+    /// As ClustersList points inside the internal registrations of the registry,
+    /// the list is only valid as long as the registry is not modified.
     ClustersList ClustersOnEndpoint(EndpointId endpointId);
 
     /// Unregister all registrations for the given endpoint.
