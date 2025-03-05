@@ -49,7 +49,7 @@ public:
 
 protected:
     size_t mInterfaceCount                                         = 0;
-    char mInterfaceName[chip::Inet::InterfaceId::kMaxIfNameLength] = {};
+    char mInterfaceName[Inet::InterfaceId::kMaxIfNameLength] = {};
     bool mInterfaceStatus                                          = false;
 };
 
