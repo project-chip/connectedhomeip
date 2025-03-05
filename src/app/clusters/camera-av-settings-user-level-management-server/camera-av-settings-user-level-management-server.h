@@ -42,11 +42,52 @@ enum class OptionalAttributes : uint32_t
     kMptzPresets       = 0x0004,
     kDptzRelativeMove  = 0x0008,
     kZoomMax           = 0x0010,
-    kTltMin            = 0x0020,
+    kTiltMin           = 0x0020,
     kTiltMax           = 0x0040,
     kPanMin            = 0x0080,
     kPanMax            = 0x0100,
 };
+
+struct MPTZPresetHelper
+{
+private:
+    uint8_t presetID;
+    std::string name;
+    MPTZStructType mptzPosition;
+public:
+    virtual ~MPTZPresetHelper()   = default;
+    MPTZPresetHelper() {}
+    MPTZPresetHelper(uint8_t aPreset,
+                     chip::CharSpan aName,
+                     MPTZStructType aPosition)
+    {
+        SetPresetID(aPreset);
+        SetName(aName);
+        SetMptzPosition(aPosition);
+    }
+
+    // Accessors and Mutators
+    //
+    std::string GetName() const { return name; }
+    void SetName(chip::CharSpan aName) 
+    {
+        name = std::string(aName.begin(),aName.end());
+    }
+
+    uint8_t GetPresetID() const { return presetID; }
+    void SetPresetID(uint8_t aPreset)
+    {
+        presetID = aPreset;
+    }
+
+    MPTZStructType GetMptzPosition() const { return mptzPosition; }
+    void SetMptzPosition(MPTZStructType aPosition)
+    {
+        mptzPosition = aPosition;
+    }
+
+};
+
 
 class CameraAvSettingsUserLevelMgmtServer : public AttributeAccessInterface, public CommandHandlerInterface
 {
@@ -58,7 +99,8 @@ public:
      * @param aDelegate A reference to the delegate to be used by this server.
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
-    CameraAvSettingsUserLevelMgmtServer(EndpointId endpointId, Delegate * delegate, BitMask<Feature> aFeature);
+    CameraAvSettingsUserLevelMgmtServer(EndpointId endpointId, Delegate * delegate, BitMask<Feature> aFeature, uint8_t aMaxPresets,
+       uint16_t aPanMin, uint16_t aPanMax, uint16_t aTiltMin, uint16_t aTiltMax, uint8_t aZoomMax);
     ~CameraAvSettingsUserLevelMgmtServer() override;
 
     CHIP_ERROR Init();
@@ -68,13 +110,14 @@ public:
 
     bool SupportsOptAttr(OptionalAttributes aOptionalAttrs) const;
 
-    // None of the Attributes are Settable
-    // Attribute Getters
+    // Attribute Accessors and Mutators
     const MPTZStructType & GetMptzPosition() const { return mMptzPosition; }
+    void setPan(Optional<int16_t>);
+    void setTilt(Optional<int16_t>);
+    void setZoom(Optional<uint8_t>);
+
 
     uint8_t GetMaxPresets() const { return mMaxPresets; }
-
-    const std::vector<MPTZPresetStructType> & GetMptzPresets() const { return mMptzPresets; }
 
     const std::vector<uint16_t> GetDptzRelativeMove() const { return mDptzRelativeMove; }
 
@@ -100,25 +143,29 @@ private:
     const Optional<int16_t> defaultTilt = Optional(static_cast<int16_t>(0));
     const Optional<uint8_t> defaultZoom = Optional(static_cast<uint8_t>(1));
 
+    uint8_t currentPresetID = 0;
+
     // Attributes local storage
     MPTZStructType mMptzPosition;
 
-    const uint8_t mMaxPresets                          = 1;
-    std::vector<MPTZPresetStructType> mMptzPresets;
-    const std::vector<uint16_t> mDptzRelativeMove;
-    const uint8_t mZoomMax                             = 100;
-    const int16_t mTiltMin                             = -90;
-    const int16_t mTiltMax                             = 90;
-    const int16_t mPanMin                              = -180;
-    const int16_t mPanMax                              = 180;
+    // Note, spec defaults, overwritten on construction 
+    uint8_t mMaxPresets   = 5; 
+    int16_t mPanMin       = -180;
+    int16_t mPanMax       = 180;
+    int16_t mTiltMin      = -90;
+    int16_t mTiltMax      = 90;
+    uint8_t mZoomMax      = 100;
 
+    std::vector<MPTZPresetHelper> mMptzPresetHelper;
+    std::vector<uint16_t> mDptzRelativeMove;
+ 
+ 
     // Attribute handler interface
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
     // Helper Read functions for complex attribute types
-    CHIP_ERROR ReadAndEncodeMPTZPosition(const AttributeValueEncoder::ListEncodeHelper & encoder);
-    CHIP_ERROR ReadAndEncodeMPTZPresets(const AttributeValueEncoder::ListEncodeHelper & encoder);
-    CHIP_ERROR ReadAndEncodeDPTZRelativeMove(const AttributeValueEncoder::ListEncodeHelper & encoder);
+    CHIP_ERROR ReadAndEncodeMPTZPresets(AttributeValueEncoder & encoder);
+    CHIP_ERROR ReadAndEncodeDPTZRelativeMove(AttributeValueEncoder & encoder);
 
     // Command handler interface
     void InvokeCommand(HandlerContext & ctx) override;
@@ -134,6 +181,12 @@ private:
      * Helper function that loads all the persistent attributes from the KVS.
      */
     void LoadPersistentAttributes();
+
+    /**
+     * Helper function that manages preset IDs
+     */
+    void UpdatePresetID();
+
 };
 
 /** @brief
@@ -153,9 +206,14 @@ public:
     virtual Protocols::InteractionModel::Status PersistentAttributesLoadedCallback() { return Status::Success; };
 
     /**
+     * Allows the delegate to determine whether a change in MPTZ is possible given current device status
+     */
+    virtual bool CanChangeMPTZ() = 0;
+
+    /**
      * delegate command handlers
      */
-    virtual Protocols::InteractionModel::Status MPTZSetPosition() = 0;
+    virtual Protocols::InteractionModel::Status MPTZSetPosition(Optional<int16_t> pan, Optional<int16_t> tilt, Optional<uint8_t> zoom) = 0;
     virtual Protocols::InteractionModel::Status MPTZRelativeMove() = 0;
     virtual Protocols::InteractionModel::Status MPTZMoveToPreset() = 0;
     virtual Protocols::InteractionModel::Status MPTZSavePreset() = 0;

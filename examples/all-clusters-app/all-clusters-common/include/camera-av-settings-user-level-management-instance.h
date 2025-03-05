@@ -19,10 +19,12 @@ public:
      */
     Protocols::InteractionModel::Status PersistentAttributesLoadedCallback() override;
 
+    bool CanChangeMPTZ() override;
+
     /**
      * delegate command handlers
      */
-    Protocols::InteractionModel::Status MPTZSetPosition() override;
+    Protocols::InteractionModel::Status MPTZSetPosition(Optional<int16_t> pan, Optional<int16_t> tilt, Optional<uint8_t> zoom) override;
     Protocols::InteractionModel::Status MPTZRelativeMove() override;
     Protocols::InteractionModel::Status MPTZMoveToPreset() override;
     Protocols::InteractionModel::Status MPTZSavePreset() override;
