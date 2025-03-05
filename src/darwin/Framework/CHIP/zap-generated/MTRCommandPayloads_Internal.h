@@ -2158,6 +2158,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTRCameraAVStreamManagementClusterSnapshotStreamModifyParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
 @interface MTRCameraAVStreamManagementClusterSnapshotStreamDeallocateParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;

@@ -228,11 +228,6 @@ exit:
 
 CHIP_ERROR CastingPlayer::StopConnecting()
 {
-    VerifyOrReturnValue(
-        mIdOptions.mCommissionerPasscode, CHIP_ERROR_INCORRECT_STATE,
-        ChipLogError(AppServer,
-                     "CastingPlayer::StopConnecting() mIdOptions.mCommissionerPasscode == false, ContinueConnecting() should only "
-                     "be called when the CastingPlayer/Commissioner-Generated passcode commissioning flow is in progress."););
     // Calling the internal StopConnecting() API with the shouldSendIdentificationDeclarationMessage set to true to notify the
     // CastingPlayer/Commissioner that the commissioning session was cancelled by the Casting Client/Commissionee user. This will
     // result in the Casting Client/Commissionee sending a CancelPasscode IdentificationDeclaration message to the CastingPlayer.
