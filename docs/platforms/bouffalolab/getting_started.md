@@ -17,24 +17,34 @@ git clone --recurse-submodules https://github.com/project-chip/connectedhomeip.g
     git clone --depth=1 https://github.com/project-chip/connectedhomeip.git
     ```
 
--   check out `Bouffalo Lab` platform support repos as follows:
+-   Check out necessary submodules
+
+    Checkout `BL_IOT_SDK` for `BL602`, `BL702` and `BL702L` platform:
 
     ```
-    scripts/checkout_submodules.py --shallow --recursive --platform bouffalolab
+    ./scripts/checkout_submodules.py --shallow --recursive --platform bouffalolab
     ```
+
+    Checkout `bouffalo_sdk` for `BL616` platform:
+
+    ```
+    ./scripts/checkout_submodules.py --shallow --recursive --platform bouffalo_sdk
+    ```
+
+    > Please contact `Bouffalo Lab` for `BL616` SDK access.
 
     If you want to checkout Matter Linux example and development tools, please
     try as follows:
 
     ```
-    scripts/checkout_submodules.py --shallow --recursive --platform linux bouffalolab
+    ./scripts/checkout_submodules.py --shallow --recursive --platform linux bouffalolab
     ```
 
     Or if you want to checkout Matter Darwin example and development tools,
     please try as follows:
 
     ```
-    scripts/checkout_submodules.py --shallow --recursive --platform darwin bouffalolab
+    ./scripts/checkout_submodules.py --shallow --recursive --platform darwin bouffalolab
     ```
 
 # Setup build environment

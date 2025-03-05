@@ -837,7 +837,16 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_TLV_CONTAINER_OPEN                          CHIP_CORE_ERROR(0x27)
 
-// AVAILABLE: 0x28
+/**
+ *  @def CHIP_ERROR_IN_USE
+ *
+ *  @brief
+ *    A value is already used. Generally indicates an unavailable resource.
+ *    As opposed to CHIP_ERROR_BUSY, the use is not considered transient/temporary.
+ *
+ */
+#define CHIP_ERROR_IN_USE                                      CHIP_CORE_ERROR(0x28)
+
 // AVAILABLE: 0x29
 
 /**
@@ -1821,6 +1830,7 @@ using CHIP_ERROR = ::chip::ChipError;
 namespace chip {
 
 extern void RegisterCHIPLayerErrorFormatter();
+extern void DeregisterCHIPLayerErrorFormatter();
 extern bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err);
 
 } // namespace chip

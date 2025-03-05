@@ -21,6 +21,7 @@ import("${chip_root}/src/lib/lib.gni")
 declare_args() {
   bl_iot_sdk_root = "${chip_root}/third_party/bouffalolab/repo"
 
+  enable_lwip_pbuf_ram = false
   enable_pds = false
   enable_debug_coredump = false
   coredump_binary_id = 0

@@ -291,11 +291,6 @@ CHIP_ERROR TransferSession::PrepareBlockQuery()
 
     ReturnErrorOnFailure(WriteToPacketBuffer(queryMsg, mPendingMsgHandle));
 
-#if CHIP_AUTOMATION_LOGGING
-    ChipLogAutomation("Sending BDX Message");
-    queryMsg.LogMessage(msgType);
-#endif // CHIP_AUTOMATION_LOGGING
-
     mAwaitingResponse = true;
     mLastQueryNum     = mNextQueryNum++;
 
@@ -318,11 +313,6 @@ CHIP_ERROR TransferSession::PrepareBlockQueryWithSkip(const uint64_t & bytesToSk
     queryMsg.BytesToSkip  = bytesToSkip;
 
     ReturnErrorOnFailure(WriteToPacketBuffer(queryMsg, mPendingMsgHandle));
-
-#if CHIP_AUTOMATION_LOGGING
-    ChipLogAutomation("Sending BDX Message");
-    queryMsg.LogMessage(msgType);
-#endif // CHIP_AUTOMATION_LOGGING
 
     mAwaitingResponse = true;
     mLastQueryNum     = mNextQueryNum++;
@@ -351,13 +341,12 @@ CHIP_ERROR TransferSession::PrepareBlock(const BlockData & inData)
 
     const MessageType msgType = inData.IsEof ? MessageType::BlockEOF : MessageType::Block;
 
-#if CHIP_AUTOMATION_LOGGING
-    ChipLogAutomation("Sending BDX Message");
-    blockMsg.LogMessage(msgType);
-#endif // CHIP_AUTOMATION_LOGGING
-
     if (msgType == MessageType::BlockEOF)
     {
+#if CHIP_AUTOMATION_LOGGING
+        ChipLogAutomation("Sending BDX Message");
+        blockMsg.LogMessage(msgType);
+#endif // CHIP_AUTOMATION_LOGGING
         mState = TransferState::kAwaitingEOFAck;
     }
 
@@ -382,11 +371,6 @@ CHIP_ERROR TransferSession::PrepareBlockAck()
 
     ReturnErrorOnFailure(WriteToPacketBuffer(ackMsg, mPendingMsgHandle));
 
-#if CHIP_AUTOMATION_LOGGING
-    ChipLogAutomation("Sending BDX Message");
-    ackMsg.LogMessage(msgType);
-#endif // CHIP_AUTOMATION_LOGGING
-
     if (mState == TransferState::kTransferInProgress)
     {
         if (mControlMode == TransferControlFlags::kSenderDrive)
@@ -399,6 +383,10 @@ CHIP_ERROR TransferSession::PrepareBlockAck()
     }
     else if (mState == TransferState::kReceivedEOF)
     {
+#if CHIP_AUTOMATION_LOGGING
+        ChipLogAutomation("Sending BDX Message");
+        ackMsg.LogMessage(msgType);
+#endif // CHIP_AUTOMATION_LOGGING
         mState            = TransferState::kTransferDone;
         mAwaitingResponse = false;
     }
@@ -475,20 +463,25 @@ CHIP_ERROR TransferSession::HandleBdxMessage(const PayloadHeader & header, Syste
 
     const MessageType msgType = static_cast<MessageType>(header.GetMessageType());
 
-#if CHIP_AUTOMATION_LOGGING
-    ChipLogAutomation("Handling received BDX Message");
-#endif // CHIP_AUTOMATION_LOGGING
-
     switch (msgType)
     {
     case MessageType::SendInit:
     case MessageType::ReceiveInit:
+#if CHIP_AUTOMATION_LOGGING
+        ChipLogAutomation("Handling received BDX Message");
+#endif // CHIP_AUTOMATION_LOGGING
         HandleTransferInit(msgType, std::move(msg));
         break;
     case MessageType::SendAccept:
+#if CHIP_AUTOMATION_LOGGING
+        ChipLogAutomation("Handling received BDX Message");
+#endif // CHIP_AUTOMATION_LOGGING
         HandleSendAccept(std::move(msg));
         break;
     case MessageType::ReceiveAccept:
+#if CHIP_AUTOMATION_LOGGING
+        ChipLogAutomation("Handling received BDX Message");
+#endif // CHIP_AUTOMATION_LOGGING
         HandleReceiveAccept(std::move(msg));
         break;
     case MessageType::BlockQuery:
@@ -672,10 +665,6 @@ void TransferSession::HandleBlockQuery(System::PacketBufferHandle msgData)
 
     mAwaitingResponse = false;
     mLastQueryNum     = query.BlockCounter;
-
-#if CHIP_AUTOMATION_LOGGING
-    query.LogMessage(MessageType::BlockQuery);
-#endif // CHIP_AUTOMATION_LOGGING
 }
 
 void TransferSession::HandleBlockQueryWithSkip(System::PacketBufferHandle msgData)
@@ -695,10 +684,6 @@ void TransferSession::HandleBlockQueryWithSkip(System::PacketBufferHandle msgDat
     mAwaitingResponse        = false;
     mLastQueryNum            = query.BlockCounter;
     mBytesToSkip.BytesToSkip = query.BytesToSkip;
-
-#if CHIP_AUTOMATION_LOGGING
-    query.LogMessage(MessageType::BlockQueryWithSkip);
-#endif // CHIP_AUTOMATION_LOGGING
 }
 
 void TransferSession::HandleBlock(System::PacketBufferHandle msgData)
@@ -733,10 +718,6 @@ void TransferSession::HandleBlock(System::PacketBufferHandle msgData)
     mLastBlockNum = blockMsg.BlockCounter;
 
     mAwaitingResponse = false;
-
-#if CHIP_AUTOMATION_LOGGING
-    blockMsg.LogMessage(MessageType::Block);
-#endif // CHIP_AUTOMATION_LOGGING
 }
 
 void TransferSession::HandleBlockEOF(System::PacketBufferHandle msgData)
@@ -787,10 +768,6 @@ void TransferSession::HandleBlockAck(System::PacketBufferHandle msgData)
     // In Receiver Drive, the Receiver can send a BlockAck to indicate receipt of the message and reset the timeout.
     // In this case, the Sender should wait to receive a BlockQuery next.
     mAwaitingResponse = (mControlMode == TransferControlFlags::kReceiverDrive);
-
-#if CHIP_AUTOMATION_LOGGING
-    ackMsg.LogMessage(MessageType::BlockAck);
-#endif // CHIP_AUTOMATION_LOGGING
 }
 
 void TransferSession::HandleBlockAckEOF(System::PacketBufferHandle msgData)

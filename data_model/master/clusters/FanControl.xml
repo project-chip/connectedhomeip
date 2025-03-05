@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -55,14 +55,15 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 
-:xrefstyle: short
+:xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0202" name="Fan Control Cluster" revision="4">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0202" name="Fan Control Cluster" revision="5">
   <revisionHistory>
     <revision revision="1" summary="Mandatory global ClusterRevision attribute added"/>
     <revision revision="2" summary="New data model format and notation; Percent, speed and motion settings; General cleanup"/>
     <revision revision="3" summary="Addition of AirflowDirection and Step command"/>
     <revision revision="4" summary="Change conformance for FanModeSequenceEnum"/>
+    <revision revision="5" summary="Clarified attribute usage, added conformance column"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0202" name="Fan Control"/>
@@ -101,8 +102,14 @@ Davis, CA 95616, USA
       <item value="0" name="Off" summary="Fan is off">
         <mandatoryConform/>
       </item>
-      <item value="1" name="Low" summary="Fan using low speed"/>
-      <item value="2" name="Medium" summary="Fan using medium speed"/>
+      <item value="1" name="Low" summary="Fan using low speed">
+        <optionalConform/>
+      </item>
+      <item value="2" name="Medium" summary="Fan using medium speed">
+        <optionalConform>
+          <value name="Low"/>
+        </optionalConform>
+      </item>
       <item value="3" name="High" summary="Fan using high speed">
         <mandatoryConform/>
       </item>
@@ -134,17 +141,17 @@ Davis, CA 95616, USA
         </optionalConform>
       </item>
       <item value="2" name="OffLowMedHighAuto" summary="Fan is capable of off, low, medium, high and auto modes">
-        <optionalConform choice="a">
+        <optionalConform choice="b">
           <feature name="AUT"/>
         </optionalConform>
       </item>
       <item value="3" name="OffLowHighAuto" summary="Fan is capable of off, low, high and auto modes">
-        <optionalConform choice="a">
+        <optionalConform choice="b">
           <feature name="AUT"/>
         </optionalConform>
       </item>
       <item value="4" name="OffHighAuto" summary="Fan is capable of off, high and auto modes">
-        <optionalConform choice="a">
+        <optionalConform choice="b">
           <feature name="AUT"/>
         </optionalConform>
       </item>
@@ -187,95 +194,118 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="FanMode" type="FanModeEnum" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform/>
-    </attribute>
-    <attribute id="0x0001" name="FanModeSequence" type="FanModeSequenceEnum" default="MS">
-      <access read="true" write="optional" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
-      <mandatoryConform>
-        <condition name="Zigbee"/>
-      </mandatoryConform>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0001" name="FanModeSequence" type="FanModeSequenceEnum" default="MS">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0002" name="PercentSetting" type="percent" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <mandatoryConform/>
-      <constraint type="max" value="100"/>
+      <constraint>
+        <max value="100"/>
+      </constraint>
     </attribute>
     <attribute id="0x0003" name="PercentCurrent" type="percent" default="desc">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
-      <constraint type="max" value="100"/>
+      <constraint>
+        <max value="100"/>
+      </constraint>
     </attribute>
     <attribute id="0x0004" name="SpeedMax" type="uint8" default="MS">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="SPD"/>
       </mandatoryConform>
-      <constraint type="between" from="1" to="100"/>
+      <constraint>
+        <between>
+          <from value="1"/>
+          <to value="100"/>
+        </between>
+      </constraint>
     </attribute>
     <attribute id="0x0005" name="SpeedSetting" type="uint8" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <mandatoryConform>
         <feature name="SPD"/>
       </mandatoryConform>
-      <constraint type="max" value="SpeedMax"/>
+      <constraint>
+        <max>
+          <attribute name="SpeedMax"/>
+        </max>
+      </constraint>
     </attribute>
     <attribute id="0x0006" name="SpeedCurrent" type="uint8" default="desc">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
+      <quality reportable="true"/>
       <mandatoryConform>
         <feature name="SPD"/>
       </mandatoryConform>
-      <constraint type="max" value="SpeedMax"/>
+      <constraint>
+        <max>
+          <attribute name="SpeedMax"/>
+        </max>
+      </constraint>
     </attribute>
     <attribute id="0x0007" name="RockSupport" type="RockBitmap" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="RCK"/>
       </mandatoryConform>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0008" name="RockSetting" type="RockBitmap" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
+      <quality reportable="true"/>
       <mandatoryConform>
         <feature name="RCK"/>
       </mandatoryConform>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0009" name="WindSupport" type="WindBitmap" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="WND"/>
       </mandatoryConform>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x000A" name="WindSetting" type="WindBitmap" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
+      <quality reportable="true"/>
       <mandatoryConform>
         <feature name="WND"/>
       </mandatoryConform>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x000B" name="AirflowDirection" type="AirflowDirectionEnum" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
+      <quality reportable="true"/>
       <mandatoryConform>
         <feature name="DIR"/>
       </mandatoryConform>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
   </attributes>
   <commands>

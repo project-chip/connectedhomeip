@@ -20,7 +20,6 @@ source_set("ember_extra_files") {
     # This IS TERRIBLE, however we want to pretend AAI exists for global
     # items and we need a shared IO storage to reduce overhead between
     # data-model access and ember-compatibility (we share the same buffer)
-    "${chip_root}/src/app/util/ember-global-attribute-access-interface.cpp",
     "${chip_root}/src/app/util/ember-io-storage.cpp",
     "EmberInvokeOverride.cpp",
     "EmberInvokeOverride.h",

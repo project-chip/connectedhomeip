@@ -86,13 +86,14 @@ typedef struct {} variable_hidden_by_mtr_hide;
                                                                                                        \
         @try {                                                                                         \
             [[xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) { \
-                MTR_LOG_ERROR("Error: %@", error);                                                     \
+                MTR_LOG_ERROR("%@ Error in %@ getter: %@", self, NSStringFromSelector(_cmd), error);   \
             }] PREFIX                                                                                  \
                 GETTER_NAME:^(TYPE returnValue) {                                                      \
                     outValue = returnValue;                                                            \
                 }];                                                                                    \
         } @catch (NSException * exception) {                                                           \
-            MTR_LOG_ERROR("Exception sending XPC messsage: %@", exception);                            \
+            MTR_LOG_ERROR("%@ Exception sending XPC messsage for %@ getter: %@", self,                 \
+                NSStringFromSelector(_cmd), exception);                                                \
             outValue = DEFAULT_VALUE;                                                                  \
         }                                                                                              \
         return outValue;                                                                               \
@@ -106,10 +107,11 @@ typedef struct {} variable_hidden_by_mtr_hide;
                                                                                                       \
         @try {                                                                                        \
             [[xpcConnection remoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {           \
-                MTR_LOG_ERROR("Error: %@", error);                                                    \
+                MTR_LOG_ERROR("%@ Error in %@: %@", self, NSStringFromSelector(_cmd), error);         \
             }] PREFIX ADDITIONAL_ARGUMENTS];                                                          \
         } @catch (NSException * exception) {                                                          \
-            MTR_LOG_ERROR("Exception sending XPC messsage: %@", exception);                           \
+            MTR_LOG_ERROR("%@ Exception sending XPC messsage for %@: %@", self,                       \
+                NSStringFromSelector(_cmd), exception);                                               \
         }                                                                                             \
     }
 
@@ -122,12 +124,13 @@ typedef struct {} variable_hidden_by_mtr_hide;
                                                                                                                     \
         @try {                                                                                                      \
             [[xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {              \
-                MTR_LOG_ERROR("Error: %@", error);                                                                  \
+                MTR_LOG_ERROR("%@ Error in %@: %@", self, NSStringFromSelector(_cmd), error);                       \
             }] PREFIX ADDITIONAL_ARGUMENTS:^(TYPE returnValue) {                                                    \
                 outValue = returnValue;                                                                             \
             }];                                                                                                     \
         } @catch (NSException * exception) {                                                                        \
-            MTR_LOG_ERROR("Exception sending XPC messsage: %@", exception);                                         \
+            MTR_LOG_ERROR("%@ Exception sending XPC messsage for %@: %@", self, NSStringFromSelector(_cmd),         \
+                exception);                                                                                         \
             outValue = DEFAULT_VALUE;                                                                               \
         }                                                                                                           \
                                                                                                                     \

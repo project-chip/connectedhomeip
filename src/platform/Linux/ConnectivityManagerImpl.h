@@ -86,13 +86,13 @@ struct GDBusWpaSupplicant
         SCANNING,
     };
 
-    WpaState state                          = WpaState::INIT;
-    WpaScanningState scanState              = WpaScanningState::IDLE;
-    WpaFiW1Wpa_supplicant1 * proxy          = nullptr;
-    WpaFiW1Wpa_supplicant1Interface * iface = nullptr;
-    WpaFiW1Wpa_supplicant1BSS * bss         = nullptr;
-    gchar * interfacePath                   = nullptr;
-    gchar * networkPath                     = nullptr;
+    WpaState state                  = WpaState::INIT;
+    WpaScanningState scanState      = WpaScanningState::IDLE;
+    WpaSupplicant1 * proxy          = nullptr;
+    WpaSupplicant1Interface * iface = nullptr;
+    WpaSupplicant1BSS * bss         = nullptr;
+    gchar * interfacePath           = nullptr;
+    gchar * networkPath             = nullptr;
 };
 #endif
 
@@ -222,10 +222,10 @@ private:
     CHIP_ERROR StopAutoScan();
 
     void _OnWpaProxyReady(GObject * sourceObject, GAsyncResult * res);
-    void _OnWpaInterfaceRemoved(WpaFiW1Wpa_supplicant1 * proxy, const char * path, GVariant * properties);
-    void _OnWpaInterfaceAdded(WpaFiW1Wpa_supplicant1 * proxy, const char * path, GVariant * properties);
-    void _OnWpaPropertiesChanged(WpaFiW1Wpa_supplicant1Interface * proxy, GVariant * properties);
-    void _OnWpaInterfaceScanDone(WpaFiW1Wpa_supplicant1Interface * proxy, gboolean success);
+    void _OnWpaInterfaceRemoved(WpaSupplicant1 * proxy, const char * path, GVariant * properties);
+    void _OnWpaInterfaceAdded(WpaSupplicant1 * proxy, const char * path, GVariant * properties);
+    void _OnWpaPropertiesChanged(WpaSupplicant1Interface * proxy, GVariant * properties);
+    void _OnWpaInterfaceScanDone(WpaSupplicant1Interface * proxy, gboolean success);
     void _OnWpaInterfaceReady(GObject * sourceObject, GAsyncResult * res);
     void _OnWpaInterfaceProxyReady(GObject * sourceObject, GAsyncResult * res);
     void _OnWpaBssProxyReady(GObject * sourceObject, GAsyncResult * res);
@@ -289,7 +289,7 @@ private:
 
     // ===== Private members reserved for use by this class only.
 
-    char mEthIfName[IFNAMSIZ];
+    char mEthIfName[chip::Inet::InterfaceId::kMaxIfNameLength];
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     ConnectivityManager::WiFiStationMode mWiFiStationMode;
@@ -301,7 +301,7 @@ private:
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    char sWiFiIfName[IFNAMSIZ];
+    char sWiFiIfName[chip::Inet::InterfaceId::kMaxIfNameLength];
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA

@@ -35,11 +35,11 @@
 #include <app/clusters/general-diagnostics-server/general-diagnostics-server.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/on-off-server/on-off-server.h>
-#include <app/server/OnboardingCodesUtil.h>
 #include <app/util/persistence/DefaultAttributePersistenceProvider.h>
 #include <data-model-providers/codegen/Instance.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
@@ -247,7 +247,8 @@ CHIP_ERROR AppTask::StartAppTask()
     }
 
     // Start App task.
-    sAppTaskHandle = xTaskCreateStatic(AppTaskMain, APP_TASK_NAME, ArraySize(appStack), nullptr, 1, appStack, &appTaskStruct);
+    sAppTaskHandle =
+        xTaskCreateStatic(AppTaskMain, APP_TASK_NAME, MATTER_ARRAY_SIZE(appStack), nullptr, 1, appStack, &appTaskStruct);
     if (sAppTaskHandle == nullptr)
     {
         return CHIP_ERROR_NO_MEMORY;

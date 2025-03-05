@@ -63,13 +63,7 @@ Davis, CA 95616, USA
     <revision revision="2" summary="Physical Contact Occupancy feature with mandatory OccupancySensorTypeBitmap"/>
     <revision revision="3" summary="New data model format and notation"/>
     <revision revision="4" summary="Remove nullable from PhysicalContact delay attributes and ability to not report transitions"/>
-    <revision revision="5" summary="Rework to
-             add modalities: radar-, ambient-sensing- and vision-based sensors;
-             add sensitivity setting (via co-located BooleanStateConfiguration cluster on same endpoint);
-             add new attribute for tuning the sensor's reporting;
-             add event OccupancyChanged;
-             add `N` quality for HoldTime and other timing attributes;
-             describe how to accommodate legacy clients"/>
+    <revision revision="5" summary="Rework to add modalities: radar-, ambient-sensing- and vision-based sensors; add sensitivity setting (via co-located BooleanStateConfiguration cluster on same endpoint); add new attribute for tuning the sensor&apos;s reporting; add event OccupancyChanged; add N quality for HoldTime and other timing attributes; describe how to accommodate legacy clients"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0406" name="Occupancy Sensing"/>
@@ -77,28 +71,28 @@ Davis, CA 95616, USA
   <classification hierarchy="base" role="application" picsCode="OCC" scope="Endpoint"/>
   <features>
     <feature bit="0" code="OTHER" name="Other" summary="Supports sensing using a modality not listed in the other bits">
-      <optionalConform choice="a" more="true"/>
+      <optionalConform choice="a" more="true" min="1"/>
     </feature>
     <feature bit="1" code="PIR" name="PassiveInfrared" summary="Supports sensing using PIR (Passive InfraRed)">
-      <optionalConform choice="a" more="true"/>
+      <optionalConform choice="a" more="true" min="1"/>
     </feature>
     <feature bit="2" code="US" name="Ultrasonic" summary="Supports sensing using UltraSound">
-      <optionalConform choice="a" more="true"/>
+      <optionalConform choice="a" more="true" min="1"/>
     </feature>
     <feature bit="3" code="PHY" name="PhysicalContact" summary="Supports sensing using a physical contact">
-      <optionalConform choice="a" more="true"/>
+      <optionalConform choice="a" more="true" min="1"/>
     </feature>
     <feature bit="4" code="AIR" name="ActiveInfrared" summary="Supports sensing using Active InfraRed measurement (e.g. time-of-flight or transflective/reflective IR sensing)">
-      <optionalConform choice="a" more="true"/>
+      <optionalConform choice="a" more="true" min="1"/>
     </feature>
     <feature bit="5" code="RAD" name="Radar" summary="Supports sensing using radar waves (microwave)">
-      <optionalConform choice="a" more="true"/>
+      <optionalConform choice="a" more="true" min="1"/>
     </feature>
     <feature bit="6" code="RFS" name="RFSensing" summary="Supports sensing based on RF signal analysis">
-      <optionalConform choice="a" more="true"/>
+      <optionalConform choice="a" more="true" min="1"/>
     </feature>
     <feature bit="7" code="VIS" name="Vision" summary="Supports sensing based on analyzing images">
-      <optionalConform choice="a" more="true"/>
+      <optionalConform choice="a" more="true" min="1"/>
     </feature>
   </features>
   <dataTypes>
@@ -151,13 +145,13 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="Occupancy" type="OccupancyBitmap">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
+      <quality reportable="true"/>
       <mandatoryConform/>
       <constraint type="between" from="0" to="1"/>
     </attribute>
     <attribute id="0x0001" name="OccupancySensorType" type="OccupancySensorTypeEnum">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <otherwiseConform>
         <mandatoryConform/>
         <deprecateConform/>
@@ -166,7 +160,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0002" name="OccupancySensorTypeBitmap" type="OccupancySensorTypeBitmap">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <otherwiseConform>
         <mandatoryConform/>
         <deprecateConform/>
@@ -175,20 +169,20 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0003" name="HoldTime" type="uint16">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <optionalConform/>
       <constraint type="desc"/>
     </attribute>
     <attribute id="0x0004" name="HoldTimeLimits" type="HoldTimeLimitsStruct">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
         <attribute name="HoldTime"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0010" name="PIROccupiedToUnoccupiedDelay" type="uint16" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <otherwiseConform>
         <optionalConform>
           <andTerm>
@@ -214,7 +208,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0011" name="PIRUnoccupiedToOccupiedDelay" type="uint16" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <otherwiseConform>
         <mandatoryConform>
           <andTerm>
@@ -262,7 +256,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0012" name="PIRUnoccupiedToOccupiedThreshold" type="uint8" default="1">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <otherwiseConform>
         <mandatoryConform>
           <andTerm>
@@ -311,7 +305,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0020" name="UltrasonicOccupiedToUnoccupiedDelay" type="uint16" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <otherwiseConform>
         <optionalConform>
           <andTerm>
@@ -324,7 +318,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0021" name="UltrasonicUnoccupiedToOccupiedDelay" type="uint16" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <otherwiseConform>
         <mandatoryConform>
           <andTerm>
@@ -344,7 +338,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0022" name="UltrasonicUnoccupiedToOccupiedThreshold" type="uint8" default="1">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <otherwiseConform>
         <mandatoryConform>
           <andTerm>
@@ -365,7 +359,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0030" name="PhysicalContactOccupiedToUnoccupiedDelay" type="uint16" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <otherwiseConform>
         <optionalConform>
           <andTerm>
@@ -378,7 +372,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0031" name="PhysicalContactUnoccupiedToOccupiedDelay" type="uint16" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <otherwiseConform>
         <mandatoryConform>
           <andTerm>
@@ -398,7 +392,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0032" name="PhysicalContactUnoccupiedToOccupiedThreshold" type="uint8" default="1">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <otherwiseConform>
         <mandatoryConform>
           <andTerm>

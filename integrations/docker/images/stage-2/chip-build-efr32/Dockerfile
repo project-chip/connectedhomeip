@@ -12,9 +12,8 @@ RUN set -x \
     && rm -rf /var/lib/apt/lists/ \
     && : # last line
 
-
-# Download Simplicity SDK v2024.12.0 (8627f84)
-RUN wget https://github.com/SiliconLabs/simplicity_sdk/releases/download/v2024.12.0/gecko-sdk.zip -O /tmp/simplicity_sdk.zip \
+# Download Simplicity SDK v2024.12.1-0 (da66128)
+RUN wget https://github.com/SiliconLabs/simplicity_sdk/releases/download/v2024.12.1-0/simplicity-sdk.zip -O /tmp/simplicity_sdk.zip \
     && unzip /tmp/simplicity_sdk.zip -d /tmp/simplicity_sdk \
     && rm -rf /tmp/simplicity_sdk.zip \
     # Deleting files that are not needed to save space
@@ -29,14 +28,14 @@ RUN wget https://github.com/SiliconLabs/simplicity_sdk/releases/download/v2024.1
     && find /tmp/simplicity_sdk/platform/Device/SiliconLabs  -mindepth 1 -maxdepth 1 -type d ! \( -name 'EFR32MG24' -o -name 'EFR32MG26' -o -name 'MGM24' -o -name 'MGM26' \) -exec rm -rf {} + \
     && : # last line
 
-# Clone WiSeConnect Wi-Fi and Bluetooth Software 2.10.3 (b6d6cb5)
-RUN git clone --depth=1 --single-branch --branch=2.10.3 https://github.com/SiliconLabs/wiseconnect-wifi-bt-sdk.git /tmp/wiseconnect-wifi-bt-sdk && \
+# Clone WiSeConnect Wi-Fi and Bluetooth Software 2.11.2 (3dbc243)
+RUN git clone --depth=1 --single-branch --branch=2.11.2 https://github.com/SiliconLabs/wiseconnect-wifi-bt-sdk.git /tmp/wiseconnect-wifi-bt-sdk && \
     cd /tmp/wiseconnect-wifi-bt-sdk && \
     rm -rf .git examples \
     && : # last line
 
-# Clone WiSeConnect SDK v3.4.0 (9f6db89)
-RUN git clone --depth=1 --single-branch --branch=v3.4.0 https://github.com/SiliconLabs/wiseconnect.git /tmp/wifi_sdk && \
+# Clone WiSeConnect SDK v3.4.1 (f675628)
+RUN git clone --depth=1 --single-branch --branch=v3.4.1 https://github.com/SiliconLabs/wiseconnect.git /tmp/wifi_sdk && \
     cd /tmp/wifi_sdk && \
     rm -rf .git examples components/device/stm32 \
     && : # last line

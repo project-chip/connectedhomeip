@@ -69,8 +69,8 @@ namespace app {
 namespace Clusters {
 namespace CommissionerControl {
 
-CommissionerControlServer::CommissionerControlServer(Delegate * delegate, EndpointId endpointId, ClusterId clusterId) :
-    CommandHandlerInterface(MakeOptional(endpointId), clusterId)
+CommissionerControlServer::CommissionerControlServer(Delegate * delegate, EndpointId endpointId) :
+    CommandHandlerInterface(MakeOptional(endpointId), Id)
 {
     mDelegate = delegate;
 }

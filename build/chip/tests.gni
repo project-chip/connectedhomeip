@@ -27,6 +27,11 @@ declare_args() {
   # Enable building tests.
   chip_build_tests = current_os != "freertos"
 
+  # Enable building all platform specific tests.
+  # This argument should set the default value for platform specific tests build arguments.
+  # See src/platform/silabs/tests/args.gni as an example.
+  chip_build_all_platform_tests = false
+
   # Enabling useful support functions when building using GoogleTest framework (used in unit tests and pw_fuzzer FuzzTests)
   # For unit tests: this should only be enabled through build_examples.py, see PR #36268
   chip_build_tests_googletest = false

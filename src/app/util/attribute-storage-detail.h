@@ -23,7 +23,6 @@
 #include <app/util/endpoint-config-api.h>
 #include <lib/support/CodeUtils.h>
 
-#include <app/util/att-storage.h>
 #include <app/util/attribute-metadata.h>
 #include <zap-generated/endpoint_config.h>
 

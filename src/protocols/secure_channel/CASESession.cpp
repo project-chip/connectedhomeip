@@ -110,6 +110,8 @@ constexpr chip::TLV::Tag AsTlvContextTag(Enum e)
     return chip::TLV::ContextTag(chip::to_underlying(e));
 }
 
+constexpr size_t kCaseOverheadForFutureTBEData = 128;
+
 } // namespace
 
 namespace chip {
@@ -347,48 +349,6 @@ private:
 public:
     // Data passed to `mWorkCallback` and `mAfterWorkCallback`.
     DATA mData;
-};
-
-struct CASESession::SendSigma3Data
-{
-    FabricIndex fabricIndex;
-
-    // Use one or the other
-    const FabricTable * fabricTable;
-    const Crypto::OperationalKeystore * keystore;
-
-    chip::Platform::ScopedMemoryBuffer<uint8_t> msg_R3_Signed;
-    size_t msg_r3_signed_len;
-
-    chip::Platform::ScopedMemoryBuffer<uint8_t> msg_R3_Encrypted;
-    size_t msg_r3_encrypted_len;
-
-    chip::Platform::ScopedMemoryBuffer<uint8_t> icacBuf;
-    MutableByteSpan icaCert;
-
-    chip::Platform::ScopedMemoryBuffer<uint8_t> nocBuf;
-    MutableByteSpan nocCert;
-
-    P256ECDSASignature tbsData3Signature;
-};
-
-struct CASESession::HandleSigma3Data
-{
-    chip::Platform::ScopedMemoryBuffer<uint8_t> msg_R3_Signed;
-    size_t msg_r3_signed_len;
-
-    ByteSpan initiatorNOC;
-    ByteSpan initiatorICAC;
-
-    uint8_t rootCertBuf[kMaxCHIPCertLength];
-    ByteSpan fabricRCAC;
-
-    P256ECDSASignature tbsData3Signature;
-
-    FabricId fabricId;
-    NodeId initiatorNodeId;
-
-    ValidationContext validContext;
 };
 
 CASESession::~CASESession()
@@ -1094,7 +1054,7 @@ CASESession::NextStep CASESession::HandleSigma1(System::PacketBufferHandle && ms
 
     ReturnErrorVariantOnFailure(NextStep, ParseSigma1(tlvReader, parsedSigma1));
 
-    ChipLogDetail(SecureChannel, "Peer assigned session key ID %d", parsedSigma1.initiatorSessionId);
+    ChipLogDetail(SecureChannel, "Peer (Initiator) assigned session ID %d", parsedSigma1.initiatorSessionId);
     SetPeerSessionId(parsedSigma1.initiatorSessionId);
 
     // Set the Session parameters provided in the Sigma1 message
@@ -1163,7 +1123,7 @@ CHIP_ERROR CASESession::PrepareSigma2Resume(EncodeSigma2ResumeInputs & outSigma2
     outSigma2ResData.resumptionId = mNewResumptionId;
 
     ReturnErrorOnFailure(GenerateSigmaResumeMIC(ByteSpan(mInitiatorRandom), mNewResumptionId, ByteSpan(kKDFS2RKeyInfo),
-                                                ByteSpan(kResume2MIC_Nonce), outSigma2ResData.resumeMIC));
+                                                ByteSpan(kResume2MIC_Nonce), outSigma2ResData.sigma2ResumeMIC));
 
     outSigma2ResData.responderMrpConfig = &mLocalMRPConfig.Value();
 
@@ -1192,7 +1152,7 @@ CHIP_ERROR CASESession::EncodeSigma2Resume(System::PacketBufferHandle & msgR2Res
 
     ReturnErrorOnFailure(tlvWriter.StartContainer(AnonymousTag(), kTLVType_Structure, outerContainerType));
     ReturnErrorOnFailure(tlvWriter.Put(AsTlvContextTag(Sigma2ResumeTags::kResumptionID), input.resumptionId));
-    ReturnErrorOnFailure(tlvWriter.Put(AsTlvContextTag(Sigma2ResumeTags::kSigma2ResumeMIC), input.resumeMIC));
+    ReturnErrorOnFailure(tlvWriter.Put(AsTlvContextTag(Sigma2ResumeTags::kSigma2ResumeMIC), input.sigma2ResumeMIC));
     ReturnErrorOnFailure(tlvWriter.Put(AsTlvContextTag(Sigma2ResumeTags::kResponderSessionID), input.responderSessionId));
 
     ReturnErrorOnFailure(
@@ -1262,23 +1222,23 @@ CHIP_ERROR CASESession::PrepareSigma2(EncodeSigma2Inputs & outSigma2Data)
     ReturnErrorOnFailure(DeriveSigmaKey(saltSpan, ByteSpan(kKDFSR2Info), sr2k));
 
     // Construct Sigma2 TBS Data
-    size_t msgR2SignedLen = EstimateStructOverhead(kMaxCHIPCertLength,     // responderNoc
-                                                   kMaxCHIPCertLength,     // responderICAC
-                                                   kP256_PublicKey_Length, // responderEphPubKey
-                                                   kP256_PublicKey_Length  // InitiatorEphPubKey
-    );
-
     P256ECDSASignature tbsData2Signature;
     {
+        size_t msgR2SignedLen = EstimateStructOverhead(kMaxCHIPCertLength,     // responderNoc
+                                                       kMaxCHIPCertLength,     // responderICAC
+                                                       kP256_PublicKey_Length, // responderEphPubKey
+                                                       kP256_PublicKey_Length  // InitiatorEphPubKey
+        );
+
         chip::Platform::ScopedMemoryBuffer<uint8_t> msgR2Signed;
         VerifyOrReturnError(msgR2Signed.Alloc(msgR2SignedLen), CHIP_ERROR_NO_MEMORY);
+        MutableByteSpan msgR2SignedSpan{ msgR2Signed.Get(), msgR2SignedLen };
 
         ReturnErrorOnFailure(ConstructTBSData(nocCert, icaCert, ByteSpan(mEphemeralKey->Pubkey(), mEphemeralKey->Pubkey().Length()),
-                                              ByteSpan(mRemotePubKey, mRemotePubKey.Length()), msgR2Signed.Get(), msgR2SignedLen));
+                                              ByteSpan(mRemotePubKey, mRemotePubKey.Length()), msgR2SignedSpan));
 
         // Generate a Signature
-        ReturnErrorOnFailure(
-            mFabricsTable->SignWithOpKeypair(mFabricIndex, ByteSpan{ msgR2Signed.Get(), msgR2SignedLen }, tbsData2Signature));
+        ReturnErrorOnFailure(mFabricsTable->SignWithOpKeypair(mFabricIndex, msgR2SignedSpan, tbsData2Signature));
     }
     // Construct Sigma2 TBE Data
     size_t msgR2SignedEncLen = EstimateStructOverhead(nocCert.size(),                             // responderNoc
@@ -1400,54 +1360,36 @@ CHIP_ERROR CASESession::HandleSigma2Resume(System::PacketBufferHandle && msg)
 {
     MATTER_TRACE_SCOPE("HandleSigma2Resume", "CASESession");
     CHIP_ERROR err = CHIP_NO_ERROR;
-    System::PacketBufferTLVReader tlvReader;
-    TLV::TLVType containerType = TLV::kTLVType_Structure;
-
-    uint16_t responderSessionId;
-
-    uint32_t decodeTagIdSeq = 0;
 
     ChipLogDetail(SecureChannel, "Received Sigma2Resume msg");
     MATTER_TRACE_COUNTER("Sigma2Resume");
     MATTER_LOG_METRIC_END(kMetricDeviceCASESessionSigma1, err);
 
-    uint8_t sigma2ResumeMIC[CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES];
-
+    System::PacketBufferTLVReader tlvReader;
     tlvReader.Init(std::move(msg));
-    SuccessOrExit(err = tlvReader.Next(containerType, TLV::AnonymousTag()));
-    SuccessOrExit(err = tlvReader.EnterContainer(containerType));
+    ParsedSigma2Resume parsedSigma2Resume;
+    SuccessOrExit(err = ParseSigma2Resume(tlvReader, parsedSigma2Resume));
 
-    SuccessOrExit(err = tlvReader.Next());
-    VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);
-    SessionResumptionStorage::ResumptionIdStorage resumptionId;
-    VerifyOrExit(tlvReader.GetLength() == resumptionId.size(), err = CHIP_ERROR_INVALID_TLV_ELEMENT);
-    SuccessOrExit(err = tlvReader.GetBytes(resumptionId.data(), resumptionId.size()));
+    SuccessOrExit(err = ValidateSigmaResumeMIC(parsedSigma2Resume.sigma2ResumeMIC, ByteSpan(mInitiatorRandom),
+                                               parsedSigma2Resume.resumptionId, ByteSpan(kKDFS2RKeyInfo),
+                                               ByteSpan(kResume2MIC_Nonce)));
 
-    SuccessOrExit(err = tlvReader.Next());
-    VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);
-    VerifyOrExit(tlvReader.GetLength() == CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES, err = CHIP_ERROR_INVALID_TLV_ELEMENT);
-    SuccessOrExit(err = tlvReader.GetBytes(sigma2ResumeMIC, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES));
-
-    SuccessOrExit(err = ValidateSigmaResumeMIC(ByteSpan(sigma2ResumeMIC), ByteSpan(mInitiatorRandom), resumptionId,
-                                               ByteSpan(kKDFS2RKeyInfo), ByteSpan(kResume2MIC_Nonce)));
-
-    SuccessOrExit(err = tlvReader.Next());
-    VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);
-    SuccessOrExit(err = tlvReader.Get(responderSessionId));
-
-    if (tlvReader.Next() != CHIP_END_OF_TLV)
+    if (parsedSigma2Resume.responderSessionParamStructPresent)
     {
-        SuccessOrExit(err = DecodeSessionParametersIfPresent(TLV::ContextTag(4), tlvReader, mRemoteSessionParams));
+        SetRemoteSessionParameters(parsedSigma2Resume.responderSessionParams);
         mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(
             GetRemoteSessionParameters());
     }
 
-    ChipLogDetail(SecureChannel, "Peer assigned session session ID %d", responderSessionId);
-    SetPeerSessionId(responderSessionId);
+    ChipLogDetail(SecureChannel, "Peer " ChipLogFormatScopedNodeId " assigned session ID %d", ChipLogValueScopedNodeId(GetPeer()),
+                  parsedSigma2Resume.responderSessionId);
+    SetPeerSessionId(parsedSigma2Resume.responderSessionId);
 
     if (mSessionResumptionStorage != nullptr)
     {
-        CHIP_ERROR err2 = mSessionResumptionStorage->Save(GetPeer(), resumptionId, mSharedSecret, mPeerCATs);
+        CHIP_ERROR err2 = mSessionResumptionStorage->Save(
+            GetPeer(), SessionResumptionStorage::ConstResumptionIdView(parsedSigma2Resume.resumptionId.data()), mSharedSecret,
+            mPeerCATs);
         if (err2 != CHIP_NO_ERROR)
             ChipLogError(SecureChannel, "Unable to save session resumption state: %" CHIP_ERROR_FORMAT, err2.Format());
     }
@@ -1466,12 +1408,52 @@ exit:
     return err;
 }
 
+CHIP_ERROR CASESession::ParseSigma2Resume(ContiguousBufferTLVReader & tlvReader, ParsedSigma2Resume & outParsedSigma2Resume)
+{
+    TLVType containerType = kTLVType_Structure;
+
+    ReturnErrorOnFailure(tlvReader.Next(containerType, AnonymousTag()));
+    ReturnErrorOnFailure(tlvReader.EnterContainer(containerType));
+
+    ReturnErrorOnFailure(tlvReader.Next(AsTlvContextTag(Sigma2ResumeTags::kResumptionID)));
+    ReturnErrorOnFailure(tlvReader.GetByteView(outParsedSigma2Resume.resumptionId));
+    VerifyOrReturnError(outParsedSigma2Resume.resumptionId.size() == SessionResumptionStorage::kResumptionIdSize,
+                        CHIP_ERROR_INVALID_CASE_PARAMETER);
+
+    ReturnErrorOnFailure(tlvReader.Next(AsTlvContextTag(Sigma2ResumeTags::kSigma2ResumeMIC)));
+    ReturnErrorOnFailure(tlvReader.GetByteView(outParsedSigma2Resume.sigma2ResumeMIC));
+    VerifyOrReturnError(outParsedSigma2Resume.sigma2ResumeMIC.size() == CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES,
+                        CHIP_ERROR_INVALID_CASE_PARAMETER);
+
+    ReturnErrorOnFailure(tlvReader.Next(AsTlvContextTag(Sigma2ResumeTags::kResponderSessionID)));
+    ReturnErrorOnFailure(tlvReader.Get(outParsedSigma2Resume.responderSessionId));
+
+    CHIP_ERROR err = tlvReader.Next();
+    if (err == CHIP_NO_ERROR && tlvReader.GetTag() == AsTlvContextTag(Sigma2ResumeTags::kResponderSessionParams))
+    {
+        ReturnErrorOnFailure(DecodeSessionParametersIfPresent(AsTlvContextTag(Sigma2ResumeTags::kResponderSessionParams), tlvReader,
+                                                              outParsedSigma2Resume.responderSessionParams));
+        outParsedSigma2Resume.responderSessionParamStructPresent = true;
+
+        err = tlvReader.Next();
+    }
+
+    // Future-proofing: CHIP_NO_ERROR will be returned by Next() if we have additional non-parsed TLV Elements, which could
+    // happen in the future if additional elements are added to the specification.
+    VerifyOrReturnError(err == CHIP_END_OF_TLV || err == CHIP_NO_ERROR, err);
+    // Exit Container will fail (return CHIP_END_OF_TLV) if the received encoded message is not properly terminated with an
+    // EndOfContainer TLV Element.
+    ReturnErrorOnFailure(tlvReader.ExitContainer(containerType));
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR CASESession::HandleSigma2_and_SendSigma3(System::PacketBufferHandle && msg)
 {
     MATTER_TRACE_SCOPE("HandleSigma2_and_SendSigma3", "CASESession");
     CHIP_ERROR err = HandleSigma2(std::move(msg));
     MATTER_LOG_METRIC_END(kMetricDeviceCASESessionSigma1, err);
-    ReturnErrorOnFailure(err);
+    SuccessOrExit(err);
 
     MATTER_LOG_METRIC_BEGIN(kMetricDeviceCASESessionSigma3);
     err = SendSigma3a();
@@ -1479,200 +1461,254 @@ CHIP_ERROR CASESession::HandleSigma2_and_SendSigma3(System::PacketBufferHandle &
     {
         MATTER_LOG_METRIC_END(kMetricDeviceCASESessionSigma3, err);
     }
+
+exit:
+    if (CHIP_NO_ERROR != err)
+    {
+        SendStatusReport(mExchangeCtxt, kProtocolCodeInvalidParam);
+        mState = State::kInitialized;
+    }
     return err;
 }
 
 CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
 {
     MATTER_TRACE_SCOPE("HandleSigma2", "CASESession");
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    System::PacketBufferTLVReader tlvReader;
-    TLV::TLVReader decryptedDataTlvReader;
-    TLV::TLVType containerType = TLV::kTLVType_Structure;
+    ChipLogProgress(SecureChannel, "Received Sigma2 msg");
+
+    VerifyOrReturnError(mEphemeralKey != nullptr, CHIP_ERROR_INTERNAL);
 
     const uint8_t * buf = msg->Start();
     size_t buflen       = msg->DataLength();
-
-    uint8_t msg_salt[kIPKSize + kSigmaParamRandomNumberSize + kP256_PublicKey_Length + kSHA256_Hash_Length];
-
-    chip::Platform::ScopedMemoryBuffer<uint8_t> msg_R2_Encrypted;
-    size_t msg_r2_encrypted_len          = 0;
-    size_t msg_r2_encrypted_len_with_tag = 0;
-
-    chip::Platform::ScopedMemoryBuffer<uint8_t> msg_R2_Signed;
-    size_t msg_r2_signed_len;
-    size_t max_msg_r2_signed_enc_len;
-    constexpr size_t kCaseOverheadForFutureTbeData = 128;
-
-    AutoReleaseSessionKey sr2k(*mSessionManager->GetSessionKeystore());
-
-    P256ECDSASignature tbsData2Signature;
-
-    NodeId responderNodeId;
-    P256PublicKey responderPublicKey;
-
-    uint8_t responderRandom[kSigmaParamRandomNumberSize];
-    ByteSpan responderNOC;
-    ByteSpan responderICAC;
-
-    uint16_t responderSessionId;
-
-    ChipLogProgress(SecureChannel, "Received Sigma2 msg");
+    VerifyOrReturnError(buf != nullptr, CHIP_ERROR_MESSAGE_INCOMPLETE);
 
     FabricId fabricId = kUndefinedFabricId;
     {
-        VerifyOrExit(mFabricsTable != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(mFabricsTable != nullptr, CHIP_ERROR_INCORRECT_STATE);
         const auto * fabricInfo = mFabricsTable->FindFabricWithIndex(mFabricIndex);
-        VerifyOrExit(fabricInfo != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_INCORRECT_STATE);
         fabricId = fabricInfo->GetFabricId();
     }
 
-    VerifyOrExit(mEphemeralKey != nullptr, err = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(buf != nullptr, err = CHIP_ERROR_MESSAGE_INCOMPLETE);
-
+    System::PacketBufferTLVReader tlvReader;
     tlvReader.Init(std::move(msg));
-    SuccessOrExit(err = tlvReader.Next(containerType, TLV::AnonymousTag()));
-    SuccessOrExit(err = tlvReader.EnterContainer(containerType));
+    ParsedSigma2 parsedSigma2;
+    ReturnErrorOnFailure(ParseSigma2(tlvReader, parsedSigma2));
 
-    // Retrieve Responder's Random value
-    SuccessOrExit(err = tlvReader.Next(TLV::kTLVType_ByteString, AsTlvContextTag(Sigma2Tags::kResponderRandom)));
-    SuccessOrExit(err = tlvReader.GetBytes(responderRandom, sizeof(responderRandom)));
-
-    // Assign Session ID
-    SuccessOrExit(err = tlvReader.Next(TLV::kTLVType_UnsignedInteger, AsTlvContextTag(Sigma2Tags::kResponderSessionId)));
-    SuccessOrExit(err = tlvReader.Get(responderSessionId));
-
-    ChipLogDetail(SecureChannel, "Peer assigned session session ID %d", responderSessionId);
-    SetPeerSessionId(responderSessionId);
-
-    // Retrieve Responder's Ephemeral Pubkey
-    SuccessOrExit(err = tlvReader.Next(TLV::kTLVType_ByteString, AsTlvContextTag(Sigma2Tags::kResponderEphPubKey)));
-    SuccessOrExit(err = tlvReader.GetBytes(mRemotePubKey, static_cast<uint32_t>(mRemotePubKey.Length())));
+    //  ParseSigma2 ensures that:
+    //  mRemotePubKey.Length() == responderEphPubKey.size() == kP256_PublicKey_Length.
+    memcpy(mRemotePubKey.Bytes(), parsedSigma2.responderEphPubKey.data(), mRemotePubKey.Length());
 
     // Generate a Shared Secret
-    SuccessOrExit(err = mEphemeralKey->ECDH_derive_secret(mRemotePubKey, mSharedSecret));
+    ReturnErrorOnFailure(mEphemeralKey->ECDH_derive_secret(mRemotePubKey, mSharedSecret));
 
     // Generate the S2K key
+    AutoReleaseSessionKey sr2k(*mSessionManager->GetSessionKeystore());
     {
+        uint8_t msg_salt[kIPKSize + kSigmaParamRandomNumberSize + kP256_PublicKey_Length + kSHA256_Hash_Length];
         MutableByteSpan saltSpan(msg_salt);
-        SuccessOrExit(err = ConstructSaltSigma2(ByteSpan(responderRandom), mRemotePubKey, ByteSpan(mIPK), saltSpan));
-        SuccessOrExit(err = DeriveSigmaKey(saltSpan, ByteSpan(kKDFSR2Info), sr2k));
+        ReturnErrorOnFailure(ConstructSaltSigma2(parsedSigma2.responderRandom, mRemotePubKey, ByteSpan(mIPK), saltSpan));
+        ReturnErrorOnFailure(DeriveSigmaKey(saltSpan, ByteSpan(kKDFSR2Info), sr2k));
     }
+    // Msg2 should only be added to MessageDigest after we construct SaltSigma2 that is used to derive S2K,
+    // Because constructing SaltSigma2 uses the MessageDigest at a point when it should only include Msg1.
+    ReturnErrorOnFailure(mCommissioningHash.AddData(ByteSpan{ buf, buflen }));
 
-    SuccessOrExit(err = mCommissioningHash.AddData(ByteSpan{ buf, buflen }));
+    ReturnErrorOnFailure(AES_CCM_decrypt(parsedSigma2.msgR2EncryptedPayload.data(), parsedSigma2.msgR2EncryptedPayload.size(),
+                                         nullptr, 0, parsedSigma2.msgR2MIC.data(), parsedSigma2.msgR2MIC.size(), sr2k.KeyHandle(),
+                                         kTBEData2_Nonce, kTBEDataNonceLength, parsedSigma2.msgR2EncryptedPayload.data()));
 
-    // Generate decrypted data
-    SuccessOrExit(err = tlvReader.Next(TLV::kTLVType_ByteString, AsTlvContextTag(Sigma2Tags::kEncrypted2)));
+    parsedSigma2.msgR2Decrypted = std::move(parsedSigma2.msgR2Encrypted);
+    size_t msgR2DecryptedLength = parsedSigma2.msgR2EncryptedPayload.size();
 
-    max_msg_r2_signed_enc_len =
-        TLV::EstimateStructOverhead(Credentials::kMaxCHIPCertLength, Credentials::kMaxCHIPCertLength, tbsData2Signature.Length(),
-                                    SessionResumptionStorage::kResumptionIdSize, kCaseOverheadForFutureTbeData);
-    msg_r2_encrypted_len_with_tag = tlvReader.GetLength();
+    ContiguousBufferTLVReader decryptedDataTlvReader;
+    decryptedDataTlvReader.Init(parsedSigma2.msgR2Decrypted.Get(), msgR2DecryptedLength);
+    ParsedSigma2TBEData parsedSigma2TBEData;
+    ReturnErrorOnFailure(ParseSigma2TBEData(decryptedDataTlvReader, parsedSigma2TBEData));
 
-    // Validate we did not receive a buffer larger than legal
-    VerifyOrExit(msg_r2_encrypted_len_with_tag <= max_msg_r2_signed_enc_len, err = CHIP_ERROR_INVALID_TLV_ELEMENT);
-    VerifyOrExit(msg_r2_encrypted_len_with_tag > CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES, err = CHIP_ERROR_INVALID_TLV_ELEMENT);
-    VerifyOrExit(msg_R2_Encrypted.Alloc(msg_r2_encrypted_len_with_tag), err = CHIP_ERROR_NO_MEMORY);
-
-    SuccessOrExit(err = tlvReader.GetBytes(msg_R2_Encrypted.Get(), static_cast<uint32_t>(msg_r2_encrypted_len_with_tag)));
-    msg_r2_encrypted_len = msg_r2_encrypted_len_with_tag - CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES;
-
-    SuccessOrExit(err = AES_CCM_decrypt(msg_R2_Encrypted.Get(), msg_r2_encrypted_len, nullptr, 0,
-                                        msg_R2_Encrypted.Get() + msg_r2_encrypted_len, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES,
-                                        sr2k.KeyHandle(), kTBEData2_Nonce, kTBEDataNonceLength, msg_R2_Encrypted.Get()));
-
-    decryptedDataTlvReader.Init(msg_R2_Encrypted.Get(), msg_r2_encrypted_len);
-    containerType = TLV::kTLVType_Structure;
-    SuccessOrExit(err = decryptedDataTlvReader.Next(containerType, TLV::AnonymousTag()));
-    SuccessOrExit(err = decryptedDataTlvReader.EnterContainer(containerType));
-
-    SuccessOrExit(err = decryptedDataTlvReader.Next(TLV::kTLVType_ByteString, AsTlvContextTag(TBEDataTags::kSenderNOC)));
-    SuccessOrExit(err = decryptedDataTlvReader.Get(responderNOC));
-
-    SuccessOrExit(err = decryptedDataTlvReader.Next());
-    if (decryptedDataTlvReader.GetTag() == AsTlvContextTag(TBEDataTags::kSenderICAC))
-    {
-        VerifyOrExit(decryptedDataTlvReader.GetType() == TLV::kTLVType_ByteString, err = CHIP_ERROR_WRONG_TLV_TYPE);
-        SuccessOrExit(err = decryptedDataTlvReader.Get(responderICAC));
-        SuccessOrExit(err = decryptedDataTlvReader.Next(TLV::kTLVType_ByteString, AsTlvContextTag(TBEDataTags::kSignature)));
-    }
-
-    // Validate responder identity located in msg_r2_encrypted
+    // Validate responder identity located in msgR2Decrypted
     // Constructing responder identity
+    P256PublicKey responderPublicKey;
     {
+        NodeId responderNodeId;
+
         CompressedFabricId unused;
         FabricId responderFabricId;
-        SuccessOrExit(err = SetEffectiveTime());
-        SuccessOrExit(err = mFabricsTable->VerifyCredentials(mFabricIndex, responderNOC, responderICAC, mValidContext, unused,
-                                                             responderFabricId, responderNodeId, responderPublicKey));
-        VerifyOrExit(fabricId == responderFabricId, err = CHIP_ERROR_INVALID_CASE_PARAMETER);
+        ReturnErrorOnFailure(SetEffectiveTime());
+        ReturnErrorOnFailure(mFabricsTable->VerifyCredentials(mFabricIndex, parsedSigma2TBEData.responderNOC,
+                                                              parsedSigma2TBEData.responderICAC, mValidContext, unused,
+                                                              responderFabricId, responderNodeId, responderPublicKey));
+        VerifyOrReturnError(fabricId == responderFabricId, CHIP_ERROR_INVALID_CASE_PARAMETER);
         // Verify that responderNodeId (from responderNOC) matches one that was included
         // in the computation of the Destination Identifier when generating Sigma1.
-        VerifyOrExit(mPeerNodeId == responderNodeId, err = CHIP_ERROR_INVALID_CASE_PARAMETER);
+        VerifyOrReturnError(mPeerNodeId == responderNodeId, CHIP_ERROR_INVALID_CASE_PARAMETER);
     }
 
-    // Construct msg_R2_Signed and validate the signature in msg_r2_encrypted
-    msg_r2_signed_len = TLV::EstimateStructOverhead(sizeof(uint16_t), responderNOC.size(), responderICAC.size(),
-                                                    kP256_PublicKey_Length, kP256_PublicKey_Length);
+    // Construct msgR2Signed and validate the signature in msgR2Decrypted.
+    size_t msgR2SignedLen = EstimateStructOverhead(parsedSigma2TBEData.responderNOC.size(),  // resonderNOC
+                                                   parsedSigma2TBEData.responderICAC.size(), // responderICAC
+                                                   kP256_PublicKey_Length,                   // responderEphPubKey
+                                                   kP256_PublicKey_Length                    // initiatorEphPubKey
+    );
 
-    VerifyOrExit(msg_R2_Signed.Alloc(msg_r2_signed_len), err = CHIP_ERROR_NO_MEMORY);
+    chip::Platform::ScopedMemoryBuffer<uint8_t> msgR2Signed;
+    VerifyOrReturnError(msgR2Signed.Alloc(msgR2SignedLen), CHIP_ERROR_NO_MEMORY);
+    MutableByteSpan msgR2SignedSpan{ msgR2Signed.Get(), msgR2SignedLen };
 
-    SuccessOrExit(err = ConstructTBSData(responderNOC, responderICAC, ByteSpan(mRemotePubKey, mRemotePubKey.Length()),
-                                         ByteSpan(mEphemeralKey->Pubkey(), mEphemeralKey->Pubkey().Length()), msg_R2_Signed.Get(),
-                                         msg_r2_signed_len));
-
-    VerifyOrExit(decryptedDataTlvReader.GetTag() == AsTlvContextTag(TBEDataTags::kSignature), err = CHIP_ERROR_INVALID_TLV_TAG);
-    VerifyOrExit(tbsData2Signature.Capacity() >= decryptedDataTlvReader.GetLength(), err = CHIP_ERROR_INVALID_TLV_ELEMENT);
-    tbsData2Signature.SetLength(decryptedDataTlvReader.GetLength());
-    SuccessOrExit(err = decryptedDataTlvReader.GetBytes(tbsData2Signature.Bytes(), tbsData2Signature.Length()));
+    ReturnErrorOnFailure(ConstructTBSData(parsedSigma2TBEData.responderNOC, parsedSigma2TBEData.responderICAC,
+                                          ByteSpan(mRemotePubKey, mRemotePubKey.Length()),
+                                          ByteSpan(mEphemeralKey->Pubkey(), mEphemeralKey->Pubkey().Length()), msgR2SignedSpan));
 
     // Validate signature
-    SuccessOrExit(err = responderPublicKey.ECDSA_validate_msg_signature(msg_R2_Signed.Get(), msg_r2_signed_len, tbsData2Signature));
+    ReturnErrorOnFailure(responderPublicKey.ECDSA_validate_msg_signature(msgR2SignedSpan.data(), msgR2SignedSpan.size(),
+                                                                         parsedSigma2TBEData.tbsData2Signature));
 
-    // Retrieve session resumption ID
-    SuccessOrExit(err = decryptedDataTlvReader.Next(TLV::kTLVType_ByteString, AsTlvContextTag(TBEDataTags::kResumptionID)));
-    SuccessOrExit(err = decryptedDataTlvReader.GetBytes(mNewResumptionId.data(), mNewResumptionId.size()));
+    ChipLogDetail(SecureChannel, "Peer " ChipLogFormatScopedNodeId " assigned session ID %d", ChipLogValueScopedNodeId(GetPeer()),
+                  parsedSigma2.responderSessionId);
+    SetPeerSessionId(parsedSigma2.responderSessionId);
+
+    std::copy(parsedSigma2TBEData.resumptionId.begin(), parsedSigma2TBEData.resumptionId.end(), mNewResumptionId.begin());
 
     // Retrieve peer CASE Authenticated Tags (CATs) from peer's NOC.
-    SuccessOrExit(err = ExtractCATsFromOpCert(responderNOC, mPeerCATs));
+    ReturnErrorOnFailure(ExtractCATsFromOpCert(parsedSigma2TBEData.responderNOC, mPeerCATs));
 
-    // Retrieve responderMRPParams if present
-    if (tlvReader.Next() != CHIP_END_OF_TLV)
+    if (parsedSigma2.responderSessionParamStructPresent)
     {
-        SuccessOrExit(err = DecodeSessionParametersIfPresent(AsTlvContextTag(Sigma2Tags::kResponderSessionParams), tlvReader,
-                                                             mRemoteSessionParams));
+        SetRemoteSessionParameters(parsedSigma2.responderSessionParams);
         mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(
             GetRemoteSessionParameters());
     }
 
-exit:
-    if (err != CHIP_NO_ERROR)
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CASESession::ParseSigma2(ContiguousBufferTLVReader & tlvReader, ParsedSigma2 & outParsedSigma2)
+{
+    TLVType containerType = kTLVType_Structure;
+
+    ReturnErrorOnFailure(tlvReader.Next(containerType, AnonymousTag()));
+    ReturnErrorOnFailure(tlvReader.EnterContainer(containerType));
+
+    // Retrieve Responder's Random value
+    ReturnErrorOnFailure(tlvReader.Next(AsTlvContextTag(Sigma2Tags::kResponderRandom)));
+    ReturnErrorOnFailure(tlvReader.GetByteView(outParsedSigma2.responderRandom));
+    VerifyOrReturnError(outParsedSigma2.responderRandom.size() == kSigmaParamRandomNumberSize, CHIP_ERROR_INVALID_CASE_PARAMETER);
+
+    // Assign Session ID
+    ReturnErrorOnFailure(tlvReader.Next(AsTlvContextTag(Sigma2Tags::kResponderSessionId)));
+    ReturnErrorOnFailure(tlvReader.Get(outParsedSigma2.responderSessionId));
+
+    // Retrieve Responder's Ephemeral Pubkey
+    ReturnErrorOnFailure(tlvReader.Next(AsTlvContextTag(Sigma2Tags::kResponderEphPubKey)));
+    ReturnErrorOnFailure(tlvReader.GetByteView(outParsedSigma2.responderEphPubKey));
+    VerifyOrReturnError(outParsedSigma2.responderEphPubKey.size() == kP256_PublicKey_Length, CHIP_ERROR_INVALID_CASE_PARAMETER);
+
+    // Generate decrypted data
+    ReturnErrorOnFailure(tlvReader.Next(AsTlvContextTag(Sigma2Tags::kEncrypted2)));
+
+    size_t maxMsgR2SignedEncLen = EstimateStructOverhead(kMaxCHIPCertLength,                          // responderNOC
+                                                         kMaxCHIPCertLength,                          // responderICAC
+                                                         kMax_ECDSA_Signature_Length,                 // signature
+                                                         SessionResumptionStorage::kResumptionIdSize, // resumptionID
+                                                         kCaseOverheadForFutureTBEData // extra bytes for future-proofing
+    );
+
+    size_t msgR2EncryptedLenWithTag = tlvReader.GetLength();
+
+    // Validate we did not receive a buffer larger than legal
+    VerifyOrReturnError(msgR2EncryptedLenWithTag <= maxMsgR2SignedEncLen, CHIP_ERROR_INVALID_TLV_ELEMENT);
+    VerifyOrReturnError(msgR2EncryptedLenWithTag > CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES, CHIP_ERROR_INVALID_TLV_ELEMENT);
+    VerifyOrReturnError(outParsedSigma2.msgR2Encrypted.Alloc(msgR2EncryptedLenWithTag), CHIP_ERROR_NO_MEMORY);
+    ReturnErrorOnFailure(tlvReader.GetBytes(outParsedSigma2.msgR2Encrypted.Get(), outParsedSigma2.msgR2Encrypted.AllocatedSize()));
+
+    size_t msgR2EncryptedPayloadLen       = msgR2EncryptedLenWithTag - CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES;
+    outParsedSigma2.msgR2EncryptedPayload = MutableByteSpan(outParsedSigma2.msgR2Encrypted.Get(), msgR2EncryptedPayloadLen);
+    outParsedSigma2.msgR2MIC =
+        ByteSpan(outParsedSigma2.msgR2Encrypted.Get() + msgR2EncryptedPayloadLen, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES);
+
+    // Retrieve responderSessionParams if present
+    CHIP_ERROR err = tlvReader.Next();
+    if (err == CHIP_NO_ERROR && tlvReader.GetTag() == AsTlvContextTag(Sigma2Tags::kResponderSessionParams))
     {
-        SendStatusReport(mExchangeCtxt, kProtocolCodeInvalidParam);
+        ReturnErrorOnFailure(DecodeSessionParametersIfPresent(AsTlvContextTag(Sigma2Tags::kResponderSessionParams), tlvReader,
+                                                              outParsedSigma2.responderSessionParams));
+        outParsedSigma2.responderSessionParamStructPresent = true;
+
+        err = tlvReader.Next();
     }
-    return err;
+
+    // Future-proofing: CHIP_NO_ERROR will be returned by Next() if we have additional non-parsed TLV Elements, which could
+    // happen in the future if additional elements are added to the specification.
+    VerifyOrReturnError(err == CHIP_END_OF_TLV || err == CHIP_NO_ERROR, err);
+
+    // Exit Container will fail (return CHIP_END_OF_TLV) if the received encoded message is not properly terminated with an
+    // EndOfContainer TLV Element.
+    ReturnErrorOnFailure(tlvReader.ExitContainer(containerType));
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CASESession::ParseSigma2TBEData(ContiguousBufferTLVReader & decryptedDataTlvReader,
+                                           ParsedSigma2TBEData & outParsedSigma2TBE)
+{
+    TLVType containerType = kTLVType_Structure;
+
+    ReturnErrorOnFailure(decryptedDataTlvReader.Next(containerType, AnonymousTag()));
+    ReturnErrorOnFailure(decryptedDataTlvReader.EnterContainer(containerType));
+
+    ReturnErrorOnFailure(decryptedDataTlvReader.Next(AsTlvContextTag(TBEDataTags::kSenderNOC)));
+    ReturnErrorOnFailure(decryptedDataTlvReader.GetByteView(outParsedSigma2TBE.responderNOC));
+    VerifyOrReturnError(outParsedSigma2TBE.responderNOC.size() <= kMaxCHIPCertLength, CHIP_ERROR_INVALID_CASE_PARAMETER);
+
+    ReturnErrorOnFailure(decryptedDataTlvReader.Next());
+    if (decryptedDataTlvReader.GetTag() == AsTlvContextTag(TBEDataTags::kSenderICAC))
+    {
+        ReturnErrorOnFailure(decryptedDataTlvReader.GetByteView(outParsedSigma2TBE.responderICAC));
+        VerifyOrReturnError(outParsedSigma2TBE.responderICAC.size() <= kMaxCHIPCertLength, CHIP_ERROR_INVALID_CASE_PARAMETER);
+
+        ReturnErrorOnFailure(decryptedDataTlvReader.Next(kTLVType_ByteString, AsTlvContextTag(TBEDataTags::kSignature)));
+    }
+
+    VerifyOrReturnError(decryptedDataTlvReader.GetTag() == AsTlvContextTag(TBEDataTags::kSignature), CHIP_ERROR_INVALID_TLV_TAG);
+    // tbsData2Signature's length should equal kMax_ECDSA_Signature_Length as per the Specification
+    size_t signatureLen = decryptedDataTlvReader.GetLength();
+    VerifyOrReturnError(outParsedSigma2TBE.tbsData2Signature.Capacity() == signatureLen, CHIP_ERROR_INVALID_TLV_ELEMENT);
+    outParsedSigma2TBE.tbsData2Signature.SetLength(signatureLen);
+    ReturnErrorOnFailure(decryptedDataTlvReader.GetBytes(outParsedSigma2TBE.tbsData2Signature.Bytes(),
+                                                         outParsedSigma2TBE.tbsData2Signature.Length()));
+
+    // Retrieve session resumption ID
+    ReturnErrorOnFailure(decryptedDataTlvReader.Next(AsTlvContextTag(TBEDataTags::kResumptionID)));
+    ReturnErrorOnFailure(decryptedDataTlvReader.GetByteView(outParsedSigma2TBE.resumptionId));
+    VerifyOrReturnError(outParsedSigma2TBE.resumptionId.size() == SessionResumptionStorage::kResumptionIdSize,
+                        CHIP_ERROR_INVALID_CASE_PARAMETER);
+
+    // Exit Container will fail (return CHIP_END_OF_TLV) if the received encoded message is not properly terminated with an
+    // EndOfContainer TLV Element.
+    ReturnErrorOnFailure(decryptedDataTlvReader.ExitContainer(containerType));
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CASESession::SendSigma3a()
 {
     MATTER_TRACE_SCOPE("SendSigma3", "CASESession");
-    CHIP_ERROR err = CHIP_NO_ERROR;
 
     ChipLogDetail(SecureChannel, "Sending Sigma3");
 
     auto helper = WorkHelper<SendSigma3Data>::Create(*this, &SendSigma3b, &CASESession::SendSigma3c);
-    VerifyOrExit(helper, err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(helper, CHIP_ERROR_NO_MEMORY);
     {
         auto & data = helper->mData;
 
-        VerifyOrExit(mFabricsTable != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(mFabricsTable != nullptr, CHIP_ERROR_INCORRECT_STATE);
         data.fabricIndex = mFabricIndex;
         data.fabricTable = nullptr;
         data.keystore    = nullptr;
 
         {
             const FabricInfo * fabricInfo = mFabricsTable->FindFabricWithIndex(mFabricIndex);
-            VerifyOrExit(fabricInfo != nullptr, err = CHIP_ERROR_KEY_NOT_FOUND);
+            VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_KEY_NOT_FOUND);
             auto * keystore = mFabricsTable->GetOperationalKeystore();
             if (!fabricInfo->HasOperationalKey() && keystore != nullptr && keystore->SupportsSignWithOpKeypairInBackground())
             {
@@ -1686,48 +1722,45 @@ CHIP_ERROR CASESession::SendSigma3a()
             }
         }
 
-        VerifyOrExit(mEphemeralKey != nullptr, err = CHIP_ERROR_INTERNAL);
+        VerifyOrReturnError(mEphemeralKey != nullptr, CHIP_ERROR_INTERNAL);
 
-        VerifyOrExit(data.icacBuf.Alloc(kMaxCHIPCertLength), err = CHIP_ERROR_NO_MEMORY);
+        VerifyOrReturnError(data.icacBuf.Alloc(kMaxCHIPCertLength), CHIP_ERROR_NO_MEMORY);
         data.icaCert = MutableByteSpan{ data.icacBuf.Get(), kMaxCHIPCertLength };
 
-        VerifyOrExit(data.nocBuf.Alloc(kMaxCHIPCertLength), err = CHIP_ERROR_NO_MEMORY);
+        VerifyOrReturnError(data.nocBuf.Alloc(kMaxCHIPCertLength), CHIP_ERROR_NO_MEMORY);
         data.nocCert = MutableByteSpan{ data.nocBuf.Get(), kMaxCHIPCertLength };
 
-        SuccessOrExit(err = mFabricsTable->FetchICACert(mFabricIndex, data.icaCert));
-        SuccessOrExit(err = mFabricsTable->FetchNOCCert(mFabricIndex, data.nocCert));
+        ReturnErrorOnFailure(mFabricsTable->FetchICACert(mFabricIndex, data.icaCert));
+        ReturnErrorOnFailure(mFabricsTable->FetchNOCCert(mFabricIndex, data.nocCert));
 
         // Prepare Sigma3 TBS Data Blob
-        data.msg_r3_signed_len =
-            TLV::EstimateStructOverhead(data.icaCert.size(), data.nocCert.size(), kP256_PublicKey_Length, kP256_PublicKey_Length);
+        size_t msgR3SignedLen = EstimateStructOverhead(data.nocCert.size(),    // initiatorNOC
+                                                       data.icaCert.size(),    // initiatorICAC
+                                                       kP256_PublicKey_Length, // initiatorEphPubKey
+                                                       kP256_PublicKey_Length  // responderEphPubKey
+        );
 
-        VerifyOrExit(data.msg_R3_Signed.Alloc(data.msg_r3_signed_len), err = CHIP_ERROR_NO_MEMORY);
+        VerifyOrReturnError(data.msgR3Signed.Alloc(msgR3SignedLen), CHIP_ERROR_NO_MEMORY);
+        data.msgR3SignedSpan = MutableByteSpan{ data.msgR3Signed.Get(), msgR3SignedLen };
 
-        SuccessOrExit(err = ConstructTBSData(
-                          data.nocCert, data.icaCert, ByteSpan(mEphemeralKey->Pubkey(), mEphemeralKey->Pubkey().Length()),
-                          ByteSpan(mRemotePubKey, mRemotePubKey.Length()), data.msg_R3_Signed.Get(), data.msg_r3_signed_len));
+        ReturnErrorOnFailure(ConstructTBSData(data.nocCert, data.icaCert,
+                                              ByteSpan(mEphemeralKey->Pubkey(), mEphemeralKey->Pubkey().Length()),
+                                              ByteSpan(mRemotePubKey, mRemotePubKey.Length()), data.msgR3SignedSpan));
 
         if (data.keystore != nullptr)
         {
-            SuccessOrExit(err = helper->ScheduleWork());
+            ReturnErrorOnFailure(helper->ScheduleWork());
             mSendSigma3Helper = helper;
             mExchangeCtxt.Value()->WillSendMessage();
             mState = State::kSendSigma3Pending;
         }
         else
         {
-            SuccessOrExit(err = helper->DoWork());
+            ReturnErrorOnFailure(helper->DoWork());
         }
     }
 
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        SendStatusReport(mExchangeCtxt, kProtocolCodeInvalidParam);
-        mState = State::kInitialized;
-    }
-
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CASESession::SendSigma3b(SendSigma3Data & data, bool & cancel)
@@ -1736,14 +1769,12 @@ CHIP_ERROR CASESession::SendSigma3b(SendSigma3Data & data, bool & cancel)
     if (data.keystore != nullptr)
     {
         // Recommended case: delegate to operational keystore
-        ReturnErrorOnFailure(data.keystore->SignWithOpKeypair(
-            data.fabricIndex, ByteSpan{ data.msg_R3_Signed.Get(), data.msg_r3_signed_len }, data.tbsData3Signature));
+        ReturnErrorOnFailure(data.keystore->SignWithOpKeypair(data.fabricIndex, data.msgR3SignedSpan, data.tbsData3Signature));
     }
     else
     {
         // Legacy case: delegate to fabric table fabric info
-        ReturnErrorOnFailure(data.fabricTable->SignWithOpKeypair(
-            data.fabricIndex, ByteSpan{ data.msg_R3_Signed.Get(), data.msg_r3_signed_len }, data.tbsData3Signature));
+        ReturnErrorOnFailure(data.fabricTable->SignWithOpKeypair(data.fabricIndex, data.msgR3SignedSpan, data.tbsData3Signature));
     }
 
     // Prepare Sigma3 TBE Data Blob
@@ -1754,11 +1785,11 @@ CHIP_ERROR CASESession::SendSigma3b(SendSigma3Data & data, bool & cancel)
                         CHIP_ERROR_NO_MEMORY);
 
     {
-        TLV::TLVWriter tlvWriter;
-        TLV::TLVType outerContainerType = TLV::kTLVType_NotSpecified;
+        TLVWriter tlvWriter;
+        TLVType outerContainerType = kTLVType_NotSpecified;
 
         tlvWriter.Init(data.msg_R3_Encrypted.Get(), data.msg_r3_encrypted_len);
-        ReturnErrorOnFailure(tlvWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainerType));
+        ReturnErrorOnFailure(tlvWriter.StartContainer(AnonymousTag(), kTLVType_Structure, outerContainerType));
         ReturnErrorOnFailure(tlvWriter.Put(AsTlvContextTag(TBEDataTags::kSenderNOC), data.nocCert));
         if (!data.icaCert.empty())
         {
@@ -1823,9 +1854,9 @@ CHIP_ERROR CASESession::SendSigma3c(SendSigma3Data & data, CHIP_ERROR status)
         TLV::TLVType outerContainerType = TLV::kTLVType_NotSpecified;
 
         tlvWriter.Init(std::move(msg_R3));
-        err = tlvWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainerType);
+        err = tlvWriter.StartContainer(AnonymousTag(), kTLVType_Structure, outerContainerType);
         SuccessOrExit(err);
-        err = tlvWriter.PutBytes(TLV::ContextTag(1), data.msg_R3_Encrypted.Get(),
+        err = tlvWriter.PutBytes(AsTlvContextTag(Sigma3Tags::kEncrypted3), data.msg_R3_Encrypted.Get(),
                                  static_cast<uint32_t>(data.msg_r3_encrypted_len + CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES));
         SuccessOrExit(err);
         err = tlvWriter.EndContainer(outerContainerType);
@@ -1871,19 +1902,11 @@ CHIP_ERROR CASESession::HandleSigma3a(System::PacketBufferHandle && msg)
 {
     MATTER_TRACE_SCOPE("HandleSigma3", "CASESession");
     CHIP_ERROR err = CHIP_NO_ERROR;
-    System::PacketBufferTLVReader tlvReader;
-    TLV::TLVReader decryptedDataTlvReader;
-    TLV::TLVType containerType = TLV::kTLVType_Structure;
+    ContiguousBufferTLVReader decryptedDataTlvReader;
+    TLVType containerType = kTLVType_Structure;
 
     const uint8_t * buf = msg->Start();
     const size_t bufLen = msg->DataLength();
-
-    constexpr size_t kCaseOverheadForFutureTbeData = 128;
-
-    chip::Platform::ScopedMemoryBuffer<uint8_t> msg_R3_Encrypted;
-    size_t msg_r3_encrypted_len          = 0;
-    size_t msg_r3_encrypted_len_with_tag = 0;
-    size_t max_msg_r3_signed_enc_len;
 
     AutoReleaseSessionKey sr3k(*mSessionManager->GetSessionKeystore());
 
@@ -1907,72 +1930,48 @@ CHIP_ERROR CASESession::HandleSigma3a(System::PacketBufferHandle && msg)
 
         VerifyOrExit(mEphemeralKey != nullptr, err = CHIP_ERROR_INTERNAL);
 
-        tlvReader.Init(std::move(msg));
-        SuccessOrExit(err = tlvReader.Next(containerType, TLV::AnonymousTag()));
-        SuccessOrExit(err = tlvReader.EnterContainer(containerType));
-
-        // Fetch encrypted data
-        max_msg_r3_signed_enc_len = TLV::EstimateStructOverhead(Credentials::kMaxCHIPCertLength, Credentials::kMaxCHIPCertLength,
-                                                                data.tbsData3Signature.Length(), kCaseOverheadForFutureTbeData);
-
-        SuccessOrExit(err = tlvReader.Next(TLV::kTLVType_ByteString, AsTlvContextTag(Sigma3Tags::kEncrypted3)));
-
-        msg_r3_encrypted_len_with_tag = tlvReader.GetLength();
-
-        // Validate we did not receive a buffer larger than legal
-        VerifyOrExit(msg_r3_encrypted_len_with_tag <= max_msg_r3_signed_enc_len, err = CHIP_ERROR_INVALID_TLV_ELEMENT);
-        VerifyOrExit(msg_r3_encrypted_len_with_tag > CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES, err = CHIP_ERROR_INVALID_TLV_ELEMENT);
-
-        VerifyOrExit(msg_R3_Encrypted.Alloc(msg_r3_encrypted_len_with_tag), err = CHIP_ERROR_NO_MEMORY);
-        SuccessOrExit(err = tlvReader.GetBytes(msg_R3_Encrypted.Get(), static_cast<uint32_t>(msg_r3_encrypted_len_with_tag)));
-        msg_r3_encrypted_len = msg_r3_encrypted_len_with_tag - CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES;
-
         // Step 1
+        // msgR3Encrypted will be allocated and initialised within ParseSigma3()
+        Platform::ScopedMemoryBufferWithSize<uint8_t> msgR3Encrypted;
+        // both msgR3EncryptedPayload and msgR3MIC will become backed by msgR3Encrypted in ParseSigma3()
+        MutableByteSpan msgR3EncryptedPayload;
+        ByteSpan msgR3MIC;
         {
+            System::PacketBufferTLVReader tlvReader;
+            tlvReader.Init(std::move(msg));
+            SuccessOrExit(err = ParseSigma3(tlvReader, msgR3Encrypted, msgR3EncryptedPayload, msgR3MIC));
+
+            // Generate the S3K key
             MutableByteSpan saltSpan(msg_salt);
             SuccessOrExit(err = ConstructSaltSigma3(ByteSpan(mIPK), saltSpan));
             SuccessOrExit(err = DeriveSigmaKey(saltSpan, ByteSpan(kKDFSR3Info), sr3k));
+
+            // Add Sigma3 to the TranscriptHash which will be used to generate the Session Encryption Keys
+            SuccessOrExit(err = mCommissioningHash.AddData(ByteSpan{ buf, bufLen }));
         }
-
-        SuccessOrExit(err = mCommissioningHash.AddData(ByteSpan{ buf, bufLen }));
-
         // Step 2 - Decrypt data blob
-        SuccessOrExit(err = AES_CCM_decrypt(msg_R3_Encrypted.Get(), msg_r3_encrypted_len, nullptr, 0,
-                                            msg_R3_Encrypted.Get() + msg_r3_encrypted_len, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES,
-                                            sr3k.KeyHandle(), kTBEData3_Nonce, kTBEDataNonceLength, msg_R3_Encrypted.Get()));
+        SuccessOrExit(err = AES_CCM_decrypt(msgR3EncryptedPayload.data(), msgR3EncryptedPayload.size(), nullptr, 0, msgR3MIC.data(),
+                                            msgR3MIC.size(), sr3k.KeyHandle(), kTBEData3_Nonce, kTBEDataNonceLength,
+                                            msgR3EncryptedPayload.data()));
 
-        decryptedDataTlvReader.Init(msg_R3_Encrypted.Get(), msg_r3_encrypted_len);
-        containerType = TLV::kTLVType_Structure;
-        SuccessOrExit(err = decryptedDataTlvReader.Next(containerType, TLV::AnonymousTag()));
-        SuccessOrExit(err = decryptedDataTlvReader.EnterContainer(containerType));
+        decryptedDataTlvReader.Init(msgR3EncryptedPayload.data(), msgR3EncryptedPayload.size());
+        SuccessOrExit(err = ParseSigma3TBEData(decryptedDataTlvReader, data));
 
-        SuccessOrExit(err = decryptedDataTlvReader.Next(TLV::kTLVType_ByteString, AsTlvContextTag(TBEDataTags::kSenderNOC)));
-        SuccessOrExit(err = decryptedDataTlvReader.Get(data.initiatorNOC));
+        // Step 3 - Construct Sigma3 TBS Data
+        size_t msgR3SignedLen = TLV::EstimateStructOverhead(data.initiatorNOC.size(),  // initiatorNOC
+                                                            data.initiatorICAC.size(), // initiatorICAC
+                                                            kP256_PublicKey_Length,    // initiatorEphPubKey
+                                                            kP256_PublicKey_Length     // responderEphPubKey
+        );
 
-        SuccessOrExit(err = decryptedDataTlvReader.Next());
-        if (decryptedDataTlvReader.GetTag() == AsTlvContextTag(TBEDataTags::kSenderICAC))
-        {
-            VerifyOrExit(decryptedDataTlvReader.GetType() == TLV::kTLVType_ByteString, err = CHIP_ERROR_WRONG_TLV_TYPE);
-            SuccessOrExit(err = decryptedDataTlvReader.Get(data.initiatorICAC));
-            SuccessOrExit(err = decryptedDataTlvReader.Next(TLV::kTLVType_ByteString, AsTlvContextTag(TBEDataTags::kSignature)));
-        }
-
-        // Step 4 - Construct Sigma3 TBS Data
-        data.msg_r3_signed_len = TLV::EstimateStructOverhead(sizeof(uint16_t), data.initiatorNOC.size(), data.initiatorICAC.size(),
-                                                             kP256_PublicKey_Length, kP256_PublicKey_Length);
-
-        VerifyOrExit(data.msg_R3_Signed.Alloc(data.msg_r3_signed_len), err = CHIP_ERROR_NO_MEMORY);
+        VerifyOrExit(data.msgR3Signed.Alloc(msgR3SignedLen), err = CHIP_ERROR_NO_MEMORY);
+        data.msgR3SignedSpan = MutableByteSpan{ data.msgR3Signed.Get(), msgR3SignedLen };
 
         SuccessOrExit(err = ConstructTBSData(data.initiatorNOC, data.initiatorICAC, ByteSpan(mRemotePubKey, mRemotePubKey.Length()),
                                              ByteSpan(mEphemeralKey->Pubkey(), mEphemeralKey->Pubkey().Length()),
-                                             data.msg_R3_Signed.Get(), data.msg_r3_signed_len));
+                                             data.msgR3SignedSpan));
 
-        VerifyOrExit(decryptedDataTlvReader.GetTag() == AsTlvContextTag(TBEDataTags::kSignature), err = CHIP_ERROR_INVALID_TLV_TAG);
-        VerifyOrExit(data.tbsData3Signature.Capacity() >= decryptedDataTlvReader.GetLength(), err = CHIP_ERROR_INVALID_TLV_ELEMENT);
-        data.tbsData3Signature.SetLength(decryptedDataTlvReader.GetLength());
-        SuccessOrExit(err = decryptedDataTlvReader.GetBytes(data.tbsData3Signature.Bytes(), data.tbsData3Signature.Length()));
-
-        // Prepare for Step 5/6
+        // Prepare for Step 4/5
         {
             MutableByteSpan fabricRCAC{ data.rootCertBuf };
             SuccessOrExit(err = mFabricsTable->FetchRootCert(mFabricIndex, fabricRCAC));
@@ -1985,22 +1984,24 @@ CHIP_ERROR CASESession::HandleSigma3a(System::PacketBufferHandle && msg)
         {
             data.validContext = mValidContext;
 
-            // initiatorNOC and initiatorICAC are spans into msg_R3_Encrypted
+            // initiatorNOC and initiatorICAC are spans into msgR3Encrypted
             // which is going away, so to save memory, redirect them to their
-            // copies in msg_R3_signed, which is staying around
-            TLV::TLVReader signedDataTlvReader;
-            signedDataTlvReader.Init(data.msg_R3_Signed.Get(), data.msg_r3_signed_len);
-            SuccessOrExit(err = signedDataTlvReader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
+            // copies in msgR3Signed, which is staying around
+            TLV::ContiguousBufferTLVReader signedDataTlvReader;
+            signedDataTlvReader.Init(data.msgR3SignedSpan);
+            SuccessOrExit(err = signedDataTlvReader.Next(containerType, AnonymousTag()));
             SuccessOrExit(err = signedDataTlvReader.EnterContainer(containerType));
 
-            SuccessOrExit(err = signedDataTlvReader.Next(TLV::kTLVType_ByteString, AsTlvContextTag(TBSDataTags::kSenderNOC)));
-            SuccessOrExit(err = signedDataTlvReader.Get(data.initiatorNOC));
+            SuccessOrExit(err = signedDataTlvReader.Next(AsTlvContextTag(TBSDataTags::kSenderNOC)));
+            SuccessOrExit(err = signedDataTlvReader.GetByteView(data.initiatorNOC));
 
             if (!data.initiatorICAC.empty())
             {
-                SuccessOrExit(err = signedDataTlvReader.Next(TLV::kTLVType_ByteString, AsTlvContextTag(TBSDataTags::kSenderICAC)));
-                SuccessOrExit(err = signedDataTlvReader.Get(data.initiatorICAC));
+                SuccessOrExit(err = signedDataTlvReader.Next(AsTlvContextTag(TBSDataTags::kSenderICAC)));
+                SuccessOrExit(err = signedDataTlvReader.GetByteView(data.initiatorICAC));
             }
+
+            SuccessOrExit(err = signedDataTlvReader.ExitContainer(containerType));
         }
 
         SuccessOrExit(err = helper->ScheduleWork());
@@ -2018,6 +2019,73 @@ exit:
     return err;
 }
 
+CHIP_ERROR CASESession::ParseSigma3(ContiguousBufferTLVReader & tlvReader,
+                                    Platform::ScopedMemoryBufferWithSize<uint8_t> & outMsgR3Encrypted,
+                                    MutableByteSpan & outMsgR3EncryptedPayload, ByteSpan & outMsgR3MIC)
+{
+    TLVType containerType = kTLVType_Structure;
+
+    ReturnErrorOnFailure(tlvReader.Next(containerType, AnonymousTag()));
+    ReturnErrorOnFailure(tlvReader.EnterContainer(containerType));
+
+    // Fetch encrypted data
+    ReturnErrorOnFailure(tlvReader.Next(AsTlvContextTag(Sigma3Tags::kEncrypted3)));
+
+    size_t maxMsgR3SignedEncLen = EstimateStructOverhead(kMaxCHIPCertLength,           // initiatorNOC
+                                                         kMaxCHIPCertLength,           // initiatorICAC
+                                                         kMax_ECDSA_Signature_Length,  // signature
+                                                         kCaseOverheadForFutureTBEData // extra bytes for future-proofing
+    );
+
+    size_t msgR3EncryptedLenWithTag = tlvReader.GetLength();
+
+    // Validate we did not receive a buffer larger than legal
+    VerifyOrReturnError(msgR3EncryptedLenWithTag <= maxMsgR3SignedEncLen, CHIP_ERROR_INVALID_TLV_ELEMENT);
+    VerifyOrReturnError(msgR3EncryptedLenWithTag > CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES, CHIP_ERROR_INVALID_TLV_ELEMENT);
+    VerifyOrReturnError(outMsgR3Encrypted.Alloc(msgR3EncryptedLenWithTag), CHIP_ERROR_NO_MEMORY);
+    ReturnErrorOnFailure(tlvReader.GetBytes(outMsgR3Encrypted.Get(), outMsgR3Encrypted.AllocatedSize()));
+
+    size_t msgR3EncryptedPayloadLen = msgR3EncryptedLenWithTag - CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES;
+    outMsgR3EncryptedPayload        = MutableByteSpan(outMsgR3Encrypted.Get(), msgR3EncryptedPayloadLen);
+    outMsgR3MIC = ByteSpan(outMsgR3Encrypted.Get() + msgR3EncryptedPayloadLen, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES);
+
+    ReturnErrorOnFailure(tlvReader.ExitContainer(containerType));
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CASESession::ParseSigma3TBEData(ContiguousBufferTLVReader & decryptedDataTlvReader,
+                                           HandleSigma3Data & outHandleSigma3TBEData)
+{
+
+    TLVType containerType = kTLVType_Structure;
+    ReturnErrorOnFailure(decryptedDataTlvReader.Next(containerType, TLV::AnonymousTag()));
+    ReturnErrorOnFailure(decryptedDataTlvReader.EnterContainer(containerType));
+
+    ReturnErrorOnFailure(decryptedDataTlvReader.Next(AsTlvContextTag(TBEDataTags::kSenderNOC)));
+    ReturnErrorOnFailure(decryptedDataTlvReader.GetByteView(outHandleSigma3TBEData.initiatorNOC));
+    VerifyOrReturnError(outHandleSigma3TBEData.initiatorNOC.size() <= kMaxCHIPCertLength, CHIP_ERROR_INVALID_CASE_PARAMETER);
+
+    ReturnErrorOnFailure(decryptedDataTlvReader.Next());
+    if (decryptedDataTlvReader.GetTag() == AsTlvContextTag(TBEDataTags::kSenderICAC))
+    {
+        ReturnErrorOnFailure(decryptedDataTlvReader.GetByteView(outHandleSigma3TBEData.initiatorICAC));
+        VerifyOrReturnError(outHandleSigma3TBEData.initiatorICAC.size() <= kMaxCHIPCertLength, CHIP_ERROR_INVALID_CASE_PARAMETER);
+        ReturnErrorOnFailure(decryptedDataTlvReader.Next(TLV::kTLVType_ByteString, AsTlvContextTag(TBEDataTags::kSignature)));
+    }
+
+    VerifyOrReturnError(decryptedDataTlvReader.GetTag() == AsTlvContextTag(TBEDataTags::kSignature), CHIP_ERROR_INVALID_TLV_TAG);
+    size_t signatureLen = decryptedDataTlvReader.GetLength();
+    VerifyOrReturnError(outHandleSigma3TBEData.tbsData3Signature.Capacity() == signatureLen, CHIP_ERROR_INVALID_TLV_ELEMENT);
+    outHandleSigma3TBEData.tbsData3Signature.SetLength(signatureLen);
+    ReturnErrorOnFailure(decryptedDataTlvReader.GetBytes(outHandleSigma3TBEData.tbsData3Signature.Bytes(),
+                                                         outHandleSigma3TBEData.tbsData3Signature.Length()));
+
+    ReturnErrorOnFailure(decryptedDataTlvReader.ExitContainer(containerType));
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR CASESession::HandleSigma3b(HandleSigma3Data & data, bool & cancel)
 {
     // Step 5/6
@@ -2030,14 +2098,9 @@ CHIP_ERROR CASESession::HandleSigma3b(HandleSigma3Data & data, bool & cancel)
                                                         unused, initiatorFabricId, data.initiatorNodeId, initiatorPublicKey));
     VerifyOrReturnError(data.fabricId == initiatorFabricId, CHIP_ERROR_INVALID_CASE_PARAMETER);
 
-    // TODO - Validate message signature prior to validating the received operational credentials.
-    //        The op cert check requires traversal of cert chain, that is a more expensive operation.
-    //        If message signature check fails, the cert chain check will be unnecessary, but with the
-    //        current flow of code, a malicious node can trigger a DoS style attack on the device.
-    //        The same change should be made in Sigma2 processing.
     // Step 7 - Validate Signature
-    ReturnErrorOnFailure(
-        initiatorPublicKey.ECDSA_validate_msg_signature(data.msg_R3_Signed.Get(), data.msg_r3_signed_len, data.tbsData3Signature));
+    ReturnErrorOnFailure(initiatorPublicKey.ECDSA_validate_msg_signature(data.msgR3SignedSpan.data(), data.msgR3SignedSpan.size(),
+                                                                         data.tbsData3Signature));
 
     return CHIP_NO_ERROR;
 }
@@ -2182,13 +2245,13 @@ CHIP_ERROR CASESession::ValidateSigmaResumeMIC(const ByteSpan & resumeMIC, const
 }
 
 CHIP_ERROR CASESession::ConstructTBSData(const ByteSpan & senderNOC, const ByteSpan & senderICAC, const ByteSpan & senderPubKey,
-                                         const ByteSpan & receiverPubKey, uint8_t * tbsData, size_t & tbsDataLen)
+                                         const ByteSpan & receiverPubKey, MutableByteSpan & outTbsData)
 {
-    TLV::TLVWriter tlvWriter;
-    TLV::TLVType outerContainerType = TLV::kTLVType_NotSpecified;
+    TLVWriter tlvWriter;
+    TLVType outerContainerType = kTLVType_NotSpecified;
 
-    tlvWriter.Init(tbsData, tbsDataLen);
-    ReturnErrorOnFailure(tlvWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainerType));
+    tlvWriter.Init(outTbsData);
+    ReturnErrorOnFailure(tlvWriter.StartContainer(AnonymousTag(), kTLVType_Structure, outerContainerType));
     ReturnErrorOnFailure(tlvWriter.Put(AsTlvContextTag(TBSDataTags::kSenderNOC), senderNOC));
     if (!senderICAC.empty())
     {
@@ -2198,7 +2261,7 @@ CHIP_ERROR CASESession::ConstructTBSData(const ByteSpan & senderNOC, const ByteS
     ReturnErrorOnFailure(tlvWriter.Put(AsTlvContextTag(TBSDataTags::kReceiverPubKey), receiverPubKey));
     ReturnErrorOnFailure(tlvWriter.EndContainer(outerContainerType));
     ReturnErrorOnFailure(tlvWriter.Finalize());
-    tbsDataLen = static_cast<size_t>(tlvWriter.GetLengthWritten());
+    outTbsData.reduce_size(static_cast<size_t>(tlvWriter.GetLengthWritten()));
 
     return CHIP_NO_ERROR;
 }
@@ -2514,7 +2577,8 @@ CHIP_ERROR CASESession::OnMessageReceived(ExchangeContext * ec, const PayloadHea
     case State::kSentSigma2Resume:
         if (msgType == Protocols::SecureChannel::MsgType::StatusReport)
         {
-            // Need to capture before invoking status report since 'this' might be deallocated on successful completion of sigma3
+            // Need to capture before invoking status report since 'this' might be deallocated on successful completion of
+            // sigma3
             MetricKey key = (mState == State::kSentSigma3) ? kMetricDeviceCASESessionSigma3 : kMetricDeviceCASESessionSigma2Resume;
             err           = HandleStatusReport(std::move(msg), /* successExpected*/ true);
             MATTER_LOG_METRIC_END(key, err);

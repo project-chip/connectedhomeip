@@ -45,7 +45,7 @@ jobs:
       #       })
 
       - name: Fail if PR instructions were not deleted
-        if: steps.check-instructions.outcome == 'failure'
+        if: (steps.check-instructions.outcome == 'failure') && (github.event.pull_request.user.login != 'dependabot[bot]')
         run: |
           python -c 'import sys; print("PR instructions were not replaced"); sys.exit(1)'
 
@@ -63,7 +63,8 @@ jobs:
       #       })
 
       - name: Fail if `### Testing` section not in PR
-        if: steps.check-testing.outcome == 'failure'
+        if: (steps.check-testing.outcome == 'failure') && (github.event.pull_request.user.login != 'dependabot[bot]')
+
         run: |
           python -c 'import sys; print("Testing section missing (test failed)"); sys.exit(1)'
 
