@@ -97,7 +97,7 @@ private:
     sl_status_t JoinWifiNetwork();
 
     /**
-     * @brief Processing function responsible for notifying the app about connectivity
+     * @brief Processing function responsible for notifying the upper layers of a succesful connection attempt.
      *
      */
     void UpdateAppConnectivityStatus();
