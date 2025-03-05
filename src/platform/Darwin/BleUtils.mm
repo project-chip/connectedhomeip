@@ -35,6 +35,7 @@ namespace DeviceLayer {
             // CBUUID handles the expansion to 128 bit automatically internally,
             // but doesn't expose the expanded UUID in the `data` property, so
             // we have to re-implement the expansion here.
+            // The Base UUID 00000000-0000-1000-8000-00805F9B34FB is defined in the BLE spec.
             constexpr ChipBleUUID baseUuid = { { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x00, 0x80, 0x00, 0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB } };
             NSData * uuidData = uuid.data;
             switch (uuidData.length) {
