@@ -142,12 +142,7 @@ void WiseconnectWifiInterface::ResetConnectivityNotificationFlags(void)
     ResetIPNotificationStates();
     mHasNotifiedWifiConnectivity = false;
 
-#if SLI_SI917
-    // Setting the notify since 917 device got the IP already
     WifiPlatformEvent event = WifiPlatformEvent::kStationNetworkEvent;
-#else
-    WifiPlatformEvent event = WifiPlatformEvent::kStationNetworkEvent;
-#endif
     PostWifiPlatformEvent(event);
 }
 

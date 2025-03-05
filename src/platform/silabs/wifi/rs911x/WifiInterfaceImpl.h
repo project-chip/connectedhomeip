@@ -28,7 +28,6 @@ namespace Silabs {
 class WifiInterfaceImpl final : public WiseconnectWifiInterface
 {
 public:
-    static constexpr uint32_t kDhcpPollIntervalMs = 250;
     static WifiInterfaceImpl & GetInstance() { return mInstance; }
 
     WifiInterfaceImpl(const WifiInterfaceImpl &)             = delete;
