@@ -152,6 +152,8 @@ class TC_CADMIN_1_5(MatterBaseTest):
                                 "Cluster status must be 4 to pass this step as window should be reported as not open")
 
         self.step(9)
+        # Used following command to generate PAKE verifier for this test step:
+        # ./scripts/tools/spake2p/spake2p.py gen-verifier -p 20202021 -s U1BBS0UyUCBLZXkgU2FsdA== -i 999
         iter999 = b"hex:/q9Xque1iokBVf/SGwjfzJWY0vgmFapUoIcgR+4rXdEEHBELKQ2VYwF9XjZiIrfYztJo2adB8O9MtQ/LWlfJMqMUt8jYcuQtYTc2NQIOZWFiKXbT5K7ipt4svYVEs1rmLA=="
         try:
             cmd = Clusters.AdministratorCommissioning.Commands.OpenCommissioningWindow(
@@ -162,6 +164,8 @@ class TC_CADMIN_1_5(MatterBaseTest):
                                  f'Failed to open commissioning window due to an unexpected error code of {e.clusterStatus}')
 
         self.step(10)
+        # Used following command to generate PAKE verifier for this test step:
+        # ./scripts/tools/spake2p/spake2p.py gen-verifier -p 20202021 -s U1BBS0UyUCBLZXkgU2FsdA== -i 100001
         iter100001 = b"hex:CUhS9rS2NKjXGYwK0CCG80d6XkC1QSCAfs8++IcOCRcEwM4DlA/wxlm/B7w4G/7tZJmLycmdRLJGlYF2+HDsYdGmoxj0ENNuXTmXsoOhkZUmmTXThAak3U9vGFWbKUHXCQ=="
         try:
             cmd = Clusters.AdministratorCommissioning.Commands.OpenCommissioningWindow(
@@ -172,6 +176,8 @@ class TC_CADMIN_1_5(MatterBaseTest):
                                  f'Failed to open commissioning window due to an unexpected error code of {e.clusterStatus}')
 
         self.step(11)
+        # Used following command to generate PAKE verifier for this test step:
+        # ./scripts/tools/spake2p/spake2p.py gen-verifier -p 20202021 -s dG9vX3Nob3J0 -i 1000
         short_salt = b"hex:c8StVjueM851ZnKA+/0m83PHeVIhfhhWvGVCGcAnDD8EbCiPuKb1Z18I7l3TvxTbVkvzS2KPjKPOCZt1GW80ZoVDP48NAewqEXfl6lY7nmDG9ZzMIhfa8f1EIiBY0/7eJA=="
         try:
             cmd = Clusters.AdministratorCommissioning.Commands.OpenCommissioningWindow(
@@ -182,6 +188,8 @@ class TC_CADMIN_1_5(MatterBaseTest):
                                  f'Failed to open commissioning window due to an unexpected error code of {e.clusterStatus}')
 
         self.step(12)
+        # Used following command to generate PAKE verifier for this test step:
+        # ./scripts/tools/spake2p/spake2p.py gen-verifier -p 20202021 -s dGhpcyBwYWtlIHNhbHQgdmVyeSB2ZXJ5IHZlcnkgbG9uZw== -i 1000
         long_salt = b"hex:nwkb2VD3OTPflW2sAChSwpfkaajErERg/XrhvWPPJL4EM6cSCY/h9lz5SgKy7WB5s1nn1u75amcumZrxnVCXbI0vRrM74BV20p0VyOhpOMBaoHpT2Tvev8pc0JDYCjn6wg=="
         try:
             cmd = Clusters.AdministratorCommissioning.Commands.OpenCommissioningWindow(
