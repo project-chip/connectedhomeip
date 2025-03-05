@@ -252,6 +252,11 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     {
         ChipLogProgress(Zcl, "OnOff attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u", ChipLogValueMEI(attributeId),
                         type, *value, size);
+#ifdef MATTER_DM_PLUGIN_FAN_CONTROL_SERVER // Handle OnOff for fan
+#ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER
+        HandleOnOffAttributeChangeForFan(attributePath.mEndpointId, bool(*value));
+#endif // MATTER_DM_PLUGIN_ON_OFF_SERVER
+#endif // MATTER_DM_PLUGIN_FAN_CONTROL_SERVER
     }
     else if (clusterId == LevelControl::Id)
     {
