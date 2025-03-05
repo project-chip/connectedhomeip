@@ -40,7 +40,7 @@ import chip.clusters as Clusters
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from modebase_cluster_check import ModeBaseClusterChecks
 
-cluster_otccm = Clusters.OvenMode
+cluster_otccm_mode = Clusters.OvenMode
 
 
 class TC_OTCCM_1_2(MatterBaseTest, ModeBaseClusterChecks):
@@ -81,8 +81,8 @@ class TC_OTCCM_1_2(MatterBaseTest, ModeBaseClusterChecks):
         # According to the spec, there should be at least one like
         # Bake, Convection, Grill, Roast, Clean, Convection Bake, Convection Roast, Warming, Proofing
         # tag in the ones supported.
-        additional_tags = [cluster_otccm.Enums.ModeTag.kBake,
-                           cluster_otccm.Enums.ModeTag.kConvection]
+        additional_tags = [cluster_otccm_mode.Enums.ModeTag.kBake,
+                           cluster_otccm_mode.Enums.ModeTag.kConvection]
         self.check_tags_in_lists(supported_modes=supported_modes, required_tags=additional_tags)
 
         self.step(3)
