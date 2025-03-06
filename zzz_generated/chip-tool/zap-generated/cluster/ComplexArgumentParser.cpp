@@ -7222,17 +7222,25 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     Json::Value valueCopy(value);
 
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("TLSCertStruct.caid", "caid", value.isMember("caid")));
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("TLSCertStruct.certificate", "certificate", value.isMember("certificate")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "caid");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.caid, value["caid"]));
     valueCopy.removeMember("caid");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "certificate");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.certificate, value["certificate"]));
+    if (value.isMember("certificate"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "certificate");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.certificate, value["certificate"]));
+    }
     valueCopy.removeMember("certificate");
+
+    if (value.isMember("fabricIndex"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricIndex, value["fabricIndex"]));
+    }
+    valueCopy.removeMember("fabricIndex");
 
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
@@ -7241,6 +7249,7 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::TlsCertificateManageme
 {
     ComplexArgumentParser::Finalize(request.caid);
     ComplexArgumentParser::Finalize(request.certificate);
+    ComplexArgumentParser::Finalize(request.fabricIndex);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(
@@ -7254,25 +7263,33 @@ CHIP_ERROR ComplexArgumentParser::Setup(
 
     ReturnErrorOnFailure(
         ComplexArgumentParser::EnsureMemberExist("TLSClientCertificateDetailStruct.ccdid", "ccdid", value.isMember("ccdid")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("TLSClientCertificateDetailStruct.clientCertificate",
-                                                                  "clientCertificate", value.isMember("clientCertificate")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("TLSClientCertificateDetailStruct.intermediateCertificates",
-                                                                  "intermediateCertificates",
-                                                                  value.isMember("intermediateCertificates")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "ccdid");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.ccdid, value["ccdid"]));
     valueCopy.removeMember("ccdid");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "clientCertificate");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.clientCertificate, value["clientCertificate"]));
+    if (value.isMember("clientCertificate"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "clientCertificate");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.clientCertificate, value["clientCertificate"]));
+    }
     valueCopy.removeMember("clientCertificate");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "intermediateCertificates");
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::Setup(labelWithMember, request.intermediateCertificates, value["intermediateCertificates"]));
+    if (value.isMember("intermediateCertificates"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "intermediateCertificates");
+        ReturnErrorOnFailure(
+            ComplexArgumentParser::Setup(labelWithMember, request.intermediateCertificates, value["intermediateCertificates"]));
+    }
     valueCopy.removeMember("intermediateCertificates");
+
+    if (value.isMember("fabricIndex"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricIndex, value["fabricIndex"]));
+    }
+    valueCopy.removeMember("fabricIndex");
 
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
@@ -7283,6 +7300,7 @@ void ComplexArgumentParser::Finalize(
     ComplexArgumentParser::Finalize(request.ccdid);
     ComplexArgumentParser::Finalize(request.clientCertificate);
     ComplexArgumentParser::Finalize(request.intermediateCertificates);
+    ComplexArgumentParser::Finalize(request.fabricIndex);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters::UnitTesting::Structs::SimpleStruct::Type & request,

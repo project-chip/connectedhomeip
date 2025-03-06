@@ -6003,13 +6003,13 @@ static BOOL AttributeIsSpecifiedInTLSCertificateManagementCluster(AttributeId aA
     case Attributes::MaxRootCertificates::Id: {
         return YES;
     }
-    case Attributes::CurrentRootCertificates::Id: {
+    case Attributes::ProvisionedRootCertificates::Id: {
         return YES;
     }
     case Attributes::MaxClientCertificates::Id: {
         return YES;
     }
-    case Attributes::CurrentClientCertificates::Id: {
+    case Attributes::ProvisionedClientCertificates::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
