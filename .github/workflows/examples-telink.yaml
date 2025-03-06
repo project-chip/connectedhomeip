@@ -349,8 +349,8 @@ jobs:
               with:
                 platform-name: Telink
 
-    zephyr_3.3:
-        name: Zephyr 3.3
+    zephyr_3_3:
+        name: Zephyr v3.3
         env:
             BUILD_TYPE: telink
 
