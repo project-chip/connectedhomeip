@@ -43,7 +43,12 @@ public:
     virtual ~ServerClusterInterface() = default;
 
     ///////////////////////////////////// Cluster Metadata Support //////////////////////////////////////////////////
-    [[nodiscard]] virtual ClusterId GetClusterId() const = 0;
+
+    /// The path where this cluster operates on.
+    ///
+    /// This path (endpointid,clusterid) is expected to be fixed once the server
+    /// cluster interface is in use.
+    [[nodiscard]] virtual ConcreteClusterPath GetPath() const = 0;
 
     /// Gets the data version for this cluster instance.
     ///

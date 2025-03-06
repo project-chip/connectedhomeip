@@ -26,86 +26,52 @@
 namespace chip {
 namespace app {
 
-void ServerClusterInterfaceRegistry::ClearSingleLinkedList(RegisteredServerClusterInterface * clusters)
-{
-    while (clusters != nullptr)
-    {
-        RegisteredServerClusterInterface * next = clusters->next;
-        Platform::Delete(clusters);
-        clusters = next;
-    }
-}
-
 ServerClusterInterfaceRegistry::~ServerClusterInterfaceRegistry()
 {
-    while (mEndpoints != nullptr)
+    while (mRegistrations != nullptr)
     {
-        UnregisterAllFromEndpoint(mEndpoints->endpointId);
+        ServerClusterRegistration * next = mRegistrations->next;
+        mRegistrations->next             = nullptr;
+        mRegistrations                   = next;
     }
 }
 
-CHIP_ERROR ServerClusterInterfaceRegistry::AllocateNewEndpointClusters(EndpointId endpointId, EndpointClusters *& dest)
+CHIP_ERROR ServerClusterInterfaceRegistry::Register(ServerClusterRegistration & entry)
 {
-    auto result = Platform::New<EndpointClusters>();
-    VerifyOrReturnError(result != nullptr, CHIP_ERROR_NO_MEMORY);
+    // we have no strong way to check if entry is already registered somewhere else, so we use "next" as some
+    // form of double-check
+    VerifyOrReturnError(entry.next == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(entry.serverClusterInterface != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    result->endpointId   = endpointId;
-    result->firstCluster = nullptr;
-    result->next         = mEndpoints;
-    mEndpoints           = result;
-    dest                 = result;
+    ConcreteClusterPath path = entry.serverClusterInterface->GetPath();
 
-    return CHIP_NO_ERROR;
-}
+    VerifyOrReturnError(path.HasValidIds(), CHIP_ERROR_INVALID_ARGUMENT);
 
-CHIP_ERROR ServerClusterInterfaceRegistry::Register(EndpointId endpointId, ServerClusterInterface * cluster)
-{
-    VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(endpointId != kInvalidEndpointId, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(cluster->GetClusterId() != kInvalidClusterId, CHIP_ERROR_INVALID_ARGUMENT);
+    // Double-checking for duplicates makes the checks O(n^2) on the total number of registered
+    // items. We preserve this however we may want to make this optional at some point in time.
+    VerifyOrReturnError(Get(path) == nullptr, CHIP_ERROR_DUPLICATE_KEY_ID);
 
-    // duplicate registrations are disallowed
-    VerifyOrReturnError(Get(ConcreteClusterPath(endpointId, cluster->GetClusterId())) == nullptr, CHIP_ERROR_DUPLICATE_KEY_ID);
-
-    EndpointClusters * endpointClusters = FindClusters(endpointId);
-    if (endpointClusters == nullptr)
-    {
-        ReturnErrorOnFailure(AllocateNewEndpointClusters(endpointId, endpointClusters));
-    }
-
-    auto entry = Platform::New<RegisteredServerClusterInterface>(cluster, endpointClusters->firstCluster);
-
-    // If this fails, we still have the `AllocateNewEndpointClusters` succeeding,
-    // so an empty list for this cluster exists. No cleanup for now (smaller code)
-    // as an empty list will probably not cause problems (this is the same as all
-    // clusters on an endpoint getting unregistered - we do not clean mEndpoints except
-    // in UnregisterAllFromEndpoint)
-    VerifyOrReturnError(entry != nullptr, CHIP_ERROR_NO_MEMORY);
-
-    endpointClusters->firstCluster = entry;
+    entry.next     = mRegistrations;
+    mRegistrations = &entry;
 
     return CHIP_NO_ERROR;
 }
 
 ServerClusterInterface * ServerClusterInterfaceRegistry::Unregister(const ConcreteClusterPath & path)
 {
-    EndpointClusters * endpointClusters = FindClusters(path.mEndpointId);
-    VerifyOrReturnValue(endpointClusters != nullptr, nullptr);
-    VerifyOrReturnValue(endpointClusters->firstCluster != nullptr, nullptr);
-
-    RegisteredServerClusterInterface * prev    = nullptr;
-    RegisteredServerClusterInterface * current = endpointClusters->firstCluster;
+    ServerClusterRegistration * prev    = nullptr;
+    ServerClusterRegistration * current = mRegistrations;
 
     while (current != nullptr)
     {
-        if (current->serverClusterInterface->GetClusterId() == path.mClusterId)
+        if (current->serverClusterInterface->GetPath() == path)
         {
             // take the item out of the current list and return it.
-            RegisteredServerClusterInterface * next = current->next;
+            ServerClusterRegistration * next = current->next;
 
             if (prev == nullptr)
             {
-                endpointClusters->firstCluster = next;
+                mRegistrations = next;
             }
             else
             {
@@ -114,14 +80,11 @@ ServerClusterInterface * ServerClusterInterfaceRegistry::Unregister(const Concre
 
             if (mCachedInterface == current->serverClusterInterface)
             {
-                mCachedClusterEndpointId = kInvalidEndpointId;
-                mCachedInterface         = nullptr;
+                mCachedInterface = nullptr;
             }
 
-            ServerClusterInterface * result = current->serverClusterInterface;
-            Platform::MemoryFree(current);
-
-            return result;
+            current->next = nullptr; // some clearing
+            return current->serverClusterInterface;
         }
 
         prev    = current;
@@ -134,71 +97,57 @@ ServerClusterInterface * ServerClusterInterfaceRegistry::Unregister(const Concre
 
 ServerClusterInterfaceRegistry::ClustersList ServerClusterInterfaceRegistry::ClustersOnEndpoint(EndpointId endpointId)
 {
-    EndpointClusters * clusters = FindClusters(endpointId);
-
-    if (clusters == nullptr)
-    {
-        return nullptr;
-    }
-
-    return clusters->firstCluster;
+    return { mRegistrations, endpointId };
 }
 
 void ServerClusterInterfaceRegistry::UnregisterAllFromEndpoint(EndpointId endpointId)
 {
-    if (mCachedClusterEndpointId == endpointId)
-    {
-        // all clusters on the given endpoint will be unregistered.
-        mCachedInterface         = nullptr;
-        mCachedClusterEndpointId = kInvalidEndpointId;
-    }
-
-    EndpointClusters * prev    = nullptr;
-    EndpointClusters * current = mEndpoints;
+    ServerClusterRegistration * prev    = nullptr;
+    ServerClusterRegistration * current = mRegistrations;
     while (current != nullptr)
     {
-        if (current->endpointId == endpointId)
+        if (current->serverClusterInterface->GetPath().mEndpointId == endpointId)
         {
+            if (mCachedInterface == current->serverClusterInterface)
+            {
+                mCachedInterface = nullptr;
+            }
             if (prev == nullptr)
             {
-                mEndpoints = current->next;
+                mRegistrations = current->next;
             }
             else
             {
                 prev->next = current->next;
             }
-            ClearSingleLinkedList(current->firstCluster);
-            Platform::Delete(current);
-            return;
+            ServerClusterRegistration * actual_next = current->next;
+            current->next                           = nullptr; // some clearing
+            current                                 = actual_next;
         }
-
-        prev    = current;
-        current = current->next;
+        else
+        {
+            prev    = current;
+            current = current->next;
+        }
     }
 }
 
 ServerClusterInterface * ServerClusterInterfaceRegistry::Get(const ConcreteClusterPath & path)
 {
-    EndpointClusters * endpointClusters = FindClusters(path.mEndpointId);
-    VerifyOrReturnValue(endpointClusters != nullptr, nullptr);
-    VerifyOrReturnValue(endpointClusters->firstCluster != nullptr, nullptr);
-
     // Check the cache to speed things up
-    if ((mCachedClusterEndpointId == path.mEndpointId) && (mCachedInterface != nullptr) &&
-        (mCachedInterface->GetClusterId() == path.mClusterId))
+    if ((mCachedInterface != nullptr) && (mCachedInterface->GetPath() == path))
     {
         return mCachedInterface;
     }
 
     // The cluster searched for is not cached, do a linear search for it
-    RegisteredServerClusterInterface * current = endpointClusters->firstCluster;
+    ServerClusterRegistration * current = mRegistrations;
 
     while (current != nullptr)
     {
-        if (current->serverClusterInterface->GetClusterId() == path.mClusterId)
+        if (current->serverClusterInterface->GetPath() == path)
         {
-            mCachedClusterEndpointId = path.mEndpointId;
-            mCachedInterface         = current->serverClusterInterface;
+            mCachedInterface = current->serverClusterInterface;
             return mCachedInterface;
         }
 
@@ -206,19 +155,6 @@ ServerClusterInterface * ServerClusterInterfaceRegistry::Get(const ConcreteClust
     }
 
     // not found
-    return nullptr;
-}
-
-ServerClusterInterfaceRegistry::EndpointClusters * ServerClusterInterfaceRegistry::FindClusters(EndpointId endpointId)
-{
-    for (EndpointClusters * p = mEndpoints; p != nullptr; p = p->next)
-    {
-        if (p->endpointId == endpointId)
-        {
-            return p;
-        }
-    }
-
     return nullptr;
 }
 

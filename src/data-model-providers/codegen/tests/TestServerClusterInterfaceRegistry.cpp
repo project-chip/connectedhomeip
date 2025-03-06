@@ -45,9 +45,10 @@ constexpr chip::ClusterId kCluster3 = 3;
 class FakeServerClusterInterface : public DefaultServerCluster
 {
 public:
-    FakeServerClusterInterface(ClusterId id) : mClusterId(id) {}
+    FakeServerClusterInterface(EndpointId endpoint, ClusterId cluster) : mPath({ endpoint, cluster }) {}
+    FakeServerClusterInterface(const ConcreteClusterPath & path) : mPath(path) {}
 
-    ClusterId GetClusterId() const override { return mClusterId; }
+    [[nodiscard]] ConcreteClusterPath GetPath() const override { return mPath; }
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override
@@ -63,7 +64,7 @@ public:
     }
 
 private:
-    ClusterId mClusterId;
+    ConcreteClusterPath mPath;
 };
 
 struct TestServerClusterInterfaceRegistry : public ::testing::Test
@@ -76,42 +77,55 @@ struct TestServerClusterInterfaceRegistry : public ::testing::Test
 
 TEST_F(TestServerClusterInterfaceRegistry, BasicTest)
 {
-    // NOTE: tests DO NOT use the global registry and validate implementation
-    //       details.
-
     ServerClusterInterfaceRegistry registry;
 
-    FakeServerClusterInterface cluster1(kCluster1);
-    FakeServerClusterInterface cluster2(kCluster2);
-    FakeServerClusterInterface cluster3(kCluster3);
+    FakeServerClusterInterface cluster1(kEp1, kCluster1);
+    FakeServerClusterInterface cluster2(kEp2, kCluster2);
+    FakeServerClusterInterface cluster3(kEp2, kCluster3);
 
     // there should be nothing registered to start with.
-    EXPECT_EQ(registry.Get(ConcreteClusterPath(kEp1, kCluster1)), nullptr);
-    EXPECT_EQ(registry.Get(ConcreteClusterPath(kEp1, kCluster2)), nullptr);
-    EXPECT_EQ(registry.Get(ConcreteClusterPath(kEp2, kCluster2)), nullptr);
-    EXPECT_EQ(registry.Get(ConcreteClusterPath(kEp2, kCluster3)), nullptr);
-    EXPECT_EQ(registry.Get(ConcreteClusterPath(kInvalidEndpointId, kCluster2)), nullptr);
-    EXPECT_EQ(registry.Get(ConcreteClusterPath(kEp1, kInvalidClusterId)), nullptr);
+    EXPECT_EQ(registry.Get({ kEp1, kCluster1 }), nullptr);
+    EXPECT_EQ(registry.Get({ kEp1, kCluster2 }), nullptr);
+    EXPECT_EQ(registry.Get({ kEp2, kCluster2 }), nullptr);
+    EXPECT_EQ(registry.Get({ kEp2, kCluster3 }), nullptr);
+    EXPECT_EQ(registry.Get({ kInvalidEndpointId, kCluster2 }), nullptr);
+    EXPECT_EQ(registry.Get({ kEp1, kInvalidClusterId }), nullptr);
 
     // registration of invalid values is not acceptable
-    EXPECT_EQ(registry.Register(kEp1, nullptr), CHIP_ERROR_INVALID_ARGUMENT);
-    EXPECT_EQ(registry.Register(kInvalidEndpointId, nullptr), CHIP_ERROR_INVALID_ARGUMENT);
-    EXPECT_EQ(registry.Register(kInvalidEndpointId, &cluster1), CHIP_ERROR_INVALID_ARGUMENT);
-    EXPECT_EQ(registry.Register(kInvalidEndpointId, &cluster2), CHIP_ERROR_INVALID_ARGUMENT);
     {
-        FakeServerClusterInterface badCluster(kInvalidClusterId);
-        EXPECT_EQ(registry.Register(kInvalidEndpointId, &badCluster), CHIP_ERROR_INVALID_ARGUMENT);
+        // registration has NULL interface
+        ServerClusterRegistration registration;
+        EXPECT_EQ(registry.Register(registration), CHIP_ERROR_INVALID_ARGUMENT);
+
+        // next is not null (meaning registration2 looks like already registered)
+        ServerClusterRegistration registration2(&cluster1, &registration);
+        EXPECT_EQ(registry.Register(registration2), CHIP_ERROR_INVALID_ARGUMENT);
+
+        // invalid path in cluster
+        FakeServerClusterInterface invalidPathInterface(kInvalidEndpointId, kCluster1);
+        ServerClusterRegistration registration3(&invalidPathInterface);
+        EXPECT_EQ(registry.Register(registration3), CHIP_ERROR_INVALID_ARGUMENT);
+
+        // invalid path in cluster
+        FakeServerClusterInterface invalidPathInterface2(kEp1, kInvalidClusterId);
+        ServerClusterRegistration registration4(&invalidPathInterface);
+        EXPECT_EQ(registry.Register(registration4), CHIP_ERROR_INVALID_ARGUMENT);
     }
 
+    ServerClusterRegistration registration1(&cluster1);
+    ServerClusterRegistration registration2(&cluster2);
+    ServerClusterRegistration registration3(&cluster3);
+
     // should be able to register
-    EXPECT_EQ(registry.Register(kEp1, &cluster1), CHIP_NO_ERROR);
-    EXPECT_EQ(registry.Register(kEp2, &cluster2), CHIP_NO_ERROR);
-    EXPECT_EQ(registry.Register(kEp2, &cluster3), CHIP_NO_ERROR);
+    EXPECT_EQ(registry.Register(registration1), CHIP_NO_ERROR);
+    EXPECT_EQ(registry.Register(registration2), CHIP_NO_ERROR);
+    EXPECT_EQ(registry.Register(registration3), CHIP_NO_ERROR);
 
     // cannot register two implementations on the same path
     {
-        FakeServerClusterInterface another1(kCluster1);
-        EXPECT_EQ(registry.Register(kEp1, &another1), CHIP_ERROR_DUPLICATE_KEY_ID);
+        FakeServerClusterInterface another1(kEp1, kCluster1);
+        ServerClusterRegistration anotherRegisration1(&another1);
+        EXPECT_EQ(registry.Register(anotherRegisration1), CHIP_ERROR_DUPLICATE_KEY_ID);
     }
 
     // Items can be found back
@@ -121,6 +135,7 @@ TEST_F(TestServerClusterInterfaceRegistry, BasicTest)
 
     EXPECT_EQ(registry.Get({ kEp2, kCluster1 }), nullptr);
     EXPECT_EQ(registry.Get({ kEp1, kCluster2 }), nullptr);
+    EXPECT_EQ(registry.Get({ kEp3, kCluster2 }), nullptr);
 
     // repeated calls work
     EXPECT_EQ(registry.Get({ kEp1, kCluster2 }), nullptr);
@@ -134,28 +149,19 @@ TEST_F(TestServerClusterInterfaceRegistry, BasicTest)
     EXPECT_EQ(registry.Unregister({ kEp2, kCluster2 }), &cluster2);
     EXPECT_EQ(registry.Unregister({ kEp2, kCluster2 }), nullptr);
 
-    // Re-adding works exactly once.
+    // Re-adding works
     EXPECT_EQ(registry.Get({ kEp2, kCluster2 }), nullptr);
-    EXPECT_EQ(registry.Register(kEp3, &cluster2), CHIP_NO_ERROR);
-    EXPECT_EQ(registry.Get({ kEp3, kCluster2 }), &cluster2);
-    EXPECT_EQ(registry.Unregister({ kEp3, kCluster2 }), &cluster2);
-    EXPECT_EQ(registry.Get({ kEp2, kCluster2 }), nullptr);
-    EXPECT_EQ(registry.Unregister({ kEp3, kCluster2 }), nullptr);
-    EXPECT_EQ(registry.Get({ kEp2, kCluster2 }), nullptr);
-
-    // cannot get it anymore once removed, others are still valid
-    EXPECT_EQ(registry.Get({ kEp2, kCluster2 }), nullptr);
-    EXPECT_EQ(registry.Get({ kEp2, kCluster3 }), &cluster3);
+    EXPECT_EQ(registry.Register(registration2), CHIP_NO_ERROR);
+    EXPECT_EQ(registry.Get({ kEp2, kCluster2 }), &cluster2);
 
     // clean of an entire endpoint works
+    EXPECT_EQ(registry.Get({ kEp2, kCluster3 }), &cluster3);
     registry.UnregisterAllFromEndpoint(kEp2);
     EXPECT_EQ(registry.Get({ kEp1, kCluster1 }), &cluster1);
-    EXPECT_EQ(registry.Get({ kEp2, kCluster2 }), nullptr);
     EXPECT_EQ(registry.Get({ kEp2, kCluster3 }), nullptr);
 
     registry.UnregisterAllFromEndpoint(kEp1);
     EXPECT_EQ(registry.Get({ kEp1, kCluster1 }), nullptr);
-    EXPECT_EQ(registry.Get({ kEp2, kCluster2 }), nullptr);
     EXPECT_EQ(registry.Get({ kEp2, kCluster3 }), nullptr);
 }
 
@@ -165,6 +171,7 @@ TEST_F(TestServerClusterInterfaceRegistry, StressTest)
     srand(1234);
 
     std::vector<FakeServerClusterInterface> items;
+    std::vector<ServerClusterRegistration> registrations;
 
     static constexpr ClusterId kClusterTestCount   = 200;
     static constexpr EndpointId kEndpointTestCount = 10;
@@ -176,21 +183,23 @@ TEST_F(TestServerClusterInterfaceRegistry, StressTest)
     items.reserve(kClusterTestCount);
     for (ClusterId i = 0; i < kClusterTestCount; i++)
     {
-        items.emplace_back(i);
+        auto endpointId = static_cast<EndpointId>(rand() % kEndpointTestCount);
+        items.emplace_back(endpointId, i);
+    }
+
+    registrations.reserve(kClusterTestCount);
+    for (ClusterId i = 0; i < kClusterTestCount; i++)
+    {
+        registrations.emplace_back(&items[i]);
     }
 
     ServerClusterInterfaceRegistry registry;
 
     for (size_t test = 0; test < kTestIterations; test++)
     {
-        std::vector<EndpointId> endpoint_placement;
-        endpoint_placement.reserve(kClusterTestCount);
-
         for (ClusterId i = 0; i < kClusterTestCount; i++)
         {
-            auto endpointId = static_cast<EndpointId>(rand() % kEndpointTestCount);
-            endpoint_placement.push_back(endpointId);
-            ASSERT_EQ(registry.Register(endpointId, &items[i]), CHIP_NO_ERROR);
+            ASSERT_EQ(registry.Register(registrations[i]), CHIP_NO_ERROR);
         }
 
         // test that getters work
@@ -198,7 +207,7 @@ TEST_F(TestServerClusterInterfaceRegistry, StressTest)
         {
             for (EndpointId ep = 0; ep < kEndpointTestCount; ep++)
             {
-                if (endpoint_placement[cluster] == ep)
+                if (items[cluster].GetPath().mEndpointId == ep)
                 {
                     ASSERT_EQ(registry.Get({ ep, cluster }), &items[cluster]);
                 }
@@ -227,12 +236,12 @@ TEST_F(TestServerClusterInterfaceRegistry, StressTest)
             for (auto cluster : unregister_order)
             {
                 // item MUST exist and be accessible
-                ASSERT_EQ(registry.Get({ endpoint_placement[cluster], static_cast<ClusterId>(cluster) }), &items[cluster]);
-                ASSERT_EQ(registry.Unregister({ endpoint_placement[cluster], static_cast<ClusterId>(cluster) }), &items[cluster]);
+                ASSERT_EQ(registry.Get(items[cluster].GetPath()), &items[cluster]);
+                ASSERT_EQ(registry.Unregister(items[cluster].GetPath()), &items[cluster]);
 
                 // once unregistered, it is not there anymore
-                ASSERT_EQ(registry.Get({ endpoint_placement[cluster], static_cast<ClusterId>(cluster) }), nullptr);
-                ASSERT_EQ(registry.Unregister({ endpoint_placement[cluster], static_cast<ClusterId>(cluster) }), nullptr);
+                ASSERT_EQ(registry.Get(items[cluster].GetPath()), nullptr);
+                ASSERT_EQ(registry.Unregister(items[cluster].GetPath()), nullptr);
             }
         }
         else
@@ -258,6 +267,7 @@ TEST_F(TestServerClusterInterfaceRegistry, StressTest)
 TEST_F(TestServerClusterInterfaceRegistry, ClustersOnEndpoint)
 {
     std::vector<FakeServerClusterInterface> items;
+    std::vector<ServerClusterRegistration> registrations;
 
     static constexpr ClusterId kClusterTestCount   = 200;
     static constexpr EndpointId kEndpointTestCount = 10;
@@ -267,7 +277,12 @@ TEST_F(TestServerClusterInterfaceRegistry, ClustersOnEndpoint)
     items.reserve(kClusterTestCount);
     for (ClusterId i = 0; i < kClusterTestCount; i++)
     {
-        items.emplace_back(i);
+        items.emplace_back(static_cast<EndpointId>(i % kEndpointTestCount), i);
+    }
+    registrations.reserve(kClusterTestCount);
+    for (ClusterId i = 0; i < kClusterTestCount; i++)
+    {
+        registrations.emplace_back(&items[i]);
     }
 
     ServerClusterInterfaceRegistry registry;
@@ -275,7 +290,7 @@ TEST_F(TestServerClusterInterfaceRegistry, ClustersOnEndpoint)
     // place the clusters on the respecitve endpoints
     for (ClusterId i = 0; i < kClusterTestCount; i++)
     {
-        ASSERT_EQ(registry.Register(static_cast<EndpointId>(i % kEndpointTestCount), &items[i]), CHIP_NO_ERROR);
+        ASSERT_EQ(registry.Register(registrations[i]), CHIP_NO_ERROR);
     }
 
     // this IS implementation defined: we always register at "HEAD" so the listing is in
@@ -293,7 +308,7 @@ TEST_F(TestServerClusterInterfaceRegistry, ClustersOnEndpoint)
         for (auto cluster : registry.ClustersOnEndpoint(ep))
         {
             ASSERT_LT(expectedClusterId, kClusterTestCount);
-            ASSERT_EQ(cluster->GetClusterId(), expectedClusterId);
+            ASSERT_EQ(cluster->GetPath(), ConcreteClusterPath(ep, expectedClusterId));
             expectedClusterId -= kEndpointTestCount; // next expected/registered cluster
         }
 

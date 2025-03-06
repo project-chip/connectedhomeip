@@ -24,12 +24,25 @@
 namespace chip {
 namespace app {
 
+/// Represents an entry in the server cluster interface registry for
+/// a specific interface.
+///
+/// A single-linked list element
+struct ServerClusterRegistration
+{
+    // A single-linked list of clusters registered for the given `endpointId`
+    ServerClusterInterface * serverClusterInterface = nullptr;
+    ServerClusterRegistration * next                = nullptr;
+
+    constexpr ServerClusterRegistration() = default;
+    constexpr ServerClusterRegistration(ServerClusterInterface * interface, ServerClusterRegistration * next_item = nullptr) :
+        serverClusterInterface(interface), next(next_item)
+    {}
+};
+
 /// Allows registering and retrieving ServerClusterInterface instances for specific cluster paths.
 class ServerClusterInterfaceRegistry
 {
-private:
-    struct RegisteredServerClusterInterface;
-
 public:
     /// represents an iterable list of clusters
     class ClustersList
@@ -38,42 +51,57 @@ public:
         class Iterator
         {
         public:
-            Iterator(RegisteredServerClusterInterface * interface) : mInterface(interface) {}
+            constexpr Iterator(ServerClusterRegistration * interface, EndpointId endpoint) :
+                mRegistration(interface), mEndpointId(endpoint)
+            {
+                AdvanceUntilMatchingEndpoint();
+            }
 
             Iterator & operator++()
             {
-                if (mInterface != nullptr)
+                if (mRegistration != nullptr)
                 {
-                    mInterface = mInterface->next;
+                    mRegistration = mRegistration->next;
                 }
+                AdvanceUntilMatchingEndpoint();
                 return *this;
             }
-            bool operator==(const Iterator & other) const { return mInterface == other.mInterface; }
-            bool operator!=(const Iterator & other) const { return mInterface != other.mInterface; }
-            ServerClusterInterface * operator*() { return mInterface->serverClusterInterface; }
+            bool operator==(const Iterator & other) const { return mRegistration == other.mRegistration; }
+            bool operator!=(const Iterator & other) const { return mRegistration != other.mRegistration; }
+            ServerClusterInterface * operator*() { return mRegistration->serverClusterInterface; }
 
         private:
-            RegisteredServerClusterInterface * mInterface;
+            ServerClusterRegistration * mRegistration;
+            EndpointId mEndpointId;
+
+            void AdvanceUntilMatchingEndpoint()
+            {
+                while ((mRegistration != nullptr) && (mRegistration->serverClusterInterface->GetPath().mEndpointId != mEndpointId))
+                {
+                    mRegistration = mRegistration->next;
+                }
+            }
         };
 
-        ClustersList(RegisteredServerClusterInterface * start) : mStart(start) {}
-        Iterator begin() { return mStart; }
-        Iterator end() { return nullptr; }
+        constexpr ClustersList(ServerClusterRegistration * start, EndpointId endpointId) : mStart(start), mEndpointId(endpointId) {}
+        Iterator begin() { return { mStart, mEndpointId }; }
+        Iterator end() { return { nullptr, mEndpointId }; }
 
     private:
-        RegisteredServerClusterInterface * mStart;
+        ServerClusterRegistration * mStart;
+        EndpointId mEndpointId;
     };
 
     ~ServerClusterInterfaceRegistry();
 
-    /// Associate a specific interface with the given endpoint.
+    /// Add the given entry to the registry.
+    ///
+    /// Requirements:
+    ///   - entry MUST NOT be part of any other registration
+    ///   - LIFETIME of entry must outlive the Registry (or entry must be unregistered)
     ///
     /// There can be only a single registration for a given `endpointId/clusterId` path.
-    /// A registration will return an error if a registration already exists on
-    /// the given `endpointId/cluster->GetClusterID()` already exists
-    ///
-    /// Registrations need a valid `endpointId` and `cluster->GetClusterID()` MUST be a valid cluster id.
-    [[nodiscard]] CHIP_ERROR Register(EndpointId endpointId, ServerClusterInterface * cluster);
+    [[nodiscard]] CHIP_ERROR Register(ServerClusterRegistration & entry);
 
     /// Remove an existing registration for a given endpoint/cluster path.
     ///
@@ -94,48 +122,10 @@ public:
     void UnregisterAllFromEndpoint(EndpointId endpointId);
 
 private:
-    /// A single-linked list of registered server cluster interfaces
-    struct RegisteredServerClusterInterface
-    {
-        // A single-linked list of clusters registered for the given `endpointId`
-        ServerClusterInterface * serverClusterInterface = nullptr;
-        RegisteredServerClusterInterface * next         = nullptr;
-
-        constexpr RegisteredServerClusterInterface(ServerClusterInterface * cluster, RegisteredServerClusterInterface * n) :
-            serverClusterInterface(cluster), next(n)
-        {}
-    };
-
-    /// tracks clusters registered to a particular endpoint
-    struct EndpointClusters
-    {
-        // The endpointId for this registration. kInvalidEndpointId means
-        // not allocated/used
-        EndpointId endpointId = kInvalidEndpointId;
-
-        // A single-linked list of clusters registered for the given `endpointId`
-        RegisteredServerClusterInterface * firstCluster = nullptr;
-
-        /// A single-linked list of endpoint clusters that is dynamically
-        /// allocated.
-        EndpointClusters * next;
-    };
-
-    /// returns nullptr if not found
-    EndpointClusters * FindClusters(EndpointId endpointId);
-
-    /// Get a new usable endpoint cluster
-    CHIP_ERROR AllocateNewEndpointClusters(EndpointId endpointId, EndpointClusters *& dest);
-
-    /// Clear and free memory for the given linked list
-    static void ClearSingleLinkedList(RegisteredServerClusterInterface * clusters);
-
-    // Dynamic allocated endpoint cluters.
-    EndpointClusters * mEndpoints = nullptr;
+    ServerClusterRegistration * mRegistrations = nullptr;
 
     // A one-element cache to speed up finding a cluster within an endpoint.
     // The endpointId specifies which endpoint the cache belongs to.
-    ClusterId mCachedClusterEndpointId        = kInvalidEndpointId;
     ServerClusterInterface * mCachedInterface = nullptr;
 };
 

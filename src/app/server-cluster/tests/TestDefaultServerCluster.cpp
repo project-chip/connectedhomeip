@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "app/ConcreteClusterPath.h"
 #include <pw_unit_test/framework.h>
 
 #include <access/Privilege.h>
@@ -44,9 +45,9 @@ namespace {
 class FakeDefaultServerCluster : public DefaultServerCluster
 {
 public:
-    FakeDefaultServerCluster(ClusterId id) : mClusterId(id) {}
+    FakeDefaultServerCluster(ConcreteClusterPath path) : mPath(path) {}
 
-    ClusterId GetClusterId() const override { return mClusterId; }
+    [[nodiscard]] ConcreteClusterPath GetPath() const override { return mPath; }
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override
@@ -64,14 +65,14 @@ public:
     void TestIncreaseDataVersion() { IncreaseDataVersion(); }
 
 private:
-    ClusterId mClusterId;
+    ConcreteClusterPath mPath;
 };
 
 } // namespace
 
 TEST(TestDefaultServerCluster, TestDataVersion)
 {
-    FakeDefaultServerCluster cluster(1);
+    FakeDefaultServerCluster cluster({ 1, 2 });
 
     DataVersion v1 = cluster.GetDataVersion();
     cluster.TestIncreaseDataVersion();
@@ -80,13 +81,13 @@ TEST(TestDefaultServerCluster, TestDataVersion)
 
 TEST(TestDefaultServerCluster, TestFlagsDefault)
 {
-    FakeDefaultServerCluster cluster(1);
+    FakeDefaultServerCluster cluster({ 1, 2 });
     ASSERT_EQ(cluster.GetClusterFlags().Raw(), 0u);
 }
 
 TEST(TestDefaultServerCluster, AttributesDefault)
 {
-    FakeDefaultServerCluster cluster(1);
+    FakeDefaultServerCluster cluster({ 1, 2 });
 
     DataModel::ListBuilder<AttributeEntry> attributes;
 
@@ -114,7 +115,7 @@ TEST(TestDefaultServerCluster, AttributesDefault)
 
 TEST(TestDefaultServerCluster, CommandsDefault)
 {
-    FakeDefaultServerCluster cluster(1);
+    FakeDefaultServerCluster cluster({ 1, 2 });
 
     DataModel::ListBuilder<AcceptedCommandEntry> acceptedCommands;
     ASSERT_EQ(cluster.AcceptedCommands({ 1, 1 }, acceptedCommands), CHIP_NO_ERROR);
@@ -127,7 +128,7 @@ TEST(TestDefaultServerCluster, CommandsDefault)
 
 TEST(TestDefaultServerCluster, WriteAttributeDefault)
 {
-    FakeDefaultServerCluster cluster(1);
+    FakeDefaultServerCluster cluster({ 1, 2 });
 
     WriteOperation test(0 /* endpoint */, 1 /* cluster */, 1234 /* attribute */);
     test.SetSubjectDescriptor(kAdminSubjectDescriptor);
@@ -140,7 +141,7 @@ TEST(TestDefaultServerCluster, WriteAttributeDefault)
 
 TEST(TestDefaultServerCluster, InvokeDefault)
 {
-    FakeDefaultServerCluster cluster(1);
+    FakeDefaultServerCluster cluster({ 1, 2 });
 
     TLV::TLVReader tlvReader;
     InvokeRequest request;
