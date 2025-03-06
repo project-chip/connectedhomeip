@@ -16,10 +16,12 @@
 
 #import "MTRMockCB.h"
 
-#import <CoreBluetooth/CoreBluetooth.h>
+#import "MTRDefines_Internal.h"
+
 #import <XCTest/XCTest.h>
 #import <objc/runtime.h>
 #import <os/log.h>
+#import <stdatomic.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -147,11 +149,6 @@ static void InterceptClassMethod(__strong os_block_t * inOutCleanup, Class cls, 
         @throw [NSException exceptionWithName:NSInternalInconsistencyException reason:reason userInfo:nil];
     }
     IMP originalImp = method_getImplementation(method);
-    if (imp_getBlock(originalImp)) {
-        NSString * reason = [NSString stringWithFormat:@"+[%@ %@] was already intercepted",
-                                      NSStringFromClass(cls), NSStringFromSelector(sel)];
-        @throw [NSException exceptionWithName:NSInternalInconsistencyException reason:reason userInfo:nil];
-    }
 
     // Try to add the method first, in case it came from a super class.
     // Note we need to pass the meta-class to class_addMethod().
@@ -169,9 +166,8 @@ static void InterceptClassMethod(__strong os_block_t * inOutCleanup, Class cls, 
         // inherited implementation; this is good enough for our purposes here.
         method_setImplementation(method, originalImp);
         imp_removeBlock(newImp); // otherwise the block might leak
-        if (nextCleanup) {
-            nextCleanup();
-        }
+        (void) block; // keep an obvious reference to avoid `leaks` false positives before cleanup
+        nextCleanup();
     };
 }
 
@@ -179,6 +175,20 @@ static void InterceptClassMethod(__strong os_block_t * inOutCleanup, Class cls, 
 {
     self = [super init];
     _log = os_log_create("com.csa.matter", "mock");
+
+    static atomic_flag sInitialized = ATOMIC_FLAG_INIT;
+    if (atomic_flag_test_and_set(&sInitialized)) {
+        os_log_error(_log, "CoreBluetooth mocking is already enabled");
+        return nil;
+    }
+
+    mtr_weakify(self);
+    _invalidate = ^{
+        mtr_strongify(self);
+        self->_invalidate = nil;
+        atomic_flag_clear(&sInitialized);
+    };
+
     _queue = dispatch_queue_create("mock.cb", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
     dispatch_queue_set_specific(_queue, (__bridge void *) self, @YES, nil); // mark our queue
 
@@ -191,7 +201,8 @@ static void InterceptClassMethod(__strong os_block_t * inOutCleanup, Class cls, 
     // Replace implementations of class methods we need to mock. We don't need to intercept
     // any instance methods directly, because we're returning a mock object from `alloc`.
     InterceptClassMethod(&_invalidate, CBCentralManager.class, @selector(alloc), ^id NS_RETURNS_RETAINED(void) {
-        return [[MTRMockCBCentralManager alloc] _initWithMock:self];
+        mtr_strongify(self);
+        return self ? [[MTRMockCBCentralManager alloc] _initWithMock:self] : nil;
     });
     InterceptClassMethod(&_invalidate, CBCentralManager.class, @selector(supportsFeatures:), ^BOOL(CBCentralManagerFeature features) {
         return [MTRMockCBCentralManager supportsFeatures:features];
