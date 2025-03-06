@@ -27,7 +27,7 @@ namespace app {
 /// Represents an entry in the server cluster interface registry for
 /// a specific interface.
 ///
-/// A single-linked list element
+/// In practice this is a single-linked list element.
 struct ServerClusterRegistration
 {
     // A single-linked list of clusters registered for the given `endpointId`
