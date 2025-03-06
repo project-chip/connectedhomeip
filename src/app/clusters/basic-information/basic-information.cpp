@@ -416,7 +416,7 @@ class PlatformMgrDelegate : public DeviceLayer::PlatformManagerDelegate
         // The StartUp event SHALL be emitted by a Node after completing a boot or reboot process
         ChipLogDetail(Zcl, "Emitting StartUp event");
 
-        DataModel::ListBuilder<DataModel::EndpointEntry> endpointsList;
+        DataModel::ListBuilder<EndpointId> endpointsList;
         InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(BasicInformation::Id,
                                                                                                   endpointsList);
 
@@ -426,7 +426,7 @@ class PlatformMgrDelegate : public DeviceLayer::PlatformManagerDelegate
             Events::StartUp::Type event{ softwareVersion };
             EventNumber eventNumber;
 
-            CHIP_ERROR err = LogEvent(event, endpoint.id, eventNumber);
+            CHIP_ERROR err = LogEvent(event, endpoint, eventNumber);
             if (CHIP_NO_ERROR != err)
             {
                 ChipLogError(Zcl, "Failed to emit StartUp event: %" CHIP_ERROR_FORMAT, err.Format());
@@ -440,7 +440,7 @@ class PlatformMgrDelegate : public DeviceLayer::PlatformManagerDelegate
         // The ShutDown event SHOULD be emitted on a best-effort basis by a Node prior to any orderly shutdown sequence.
         ChipLogDetail(Zcl, "Emitting ShutDown event");
 
-        DataModel::ListBuilder<DataModel::EndpointEntry> endpointsList;
+        DataModel::ListBuilder<EndpointId> endpointsList;
         InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(BasicInformation::Id,
                                                                                                   endpointsList);
 
@@ -450,7 +450,7 @@ class PlatformMgrDelegate : public DeviceLayer::PlatformManagerDelegate
             Events::ShutDown::Type event;
             EventNumber eventNumber;
 
-            CHIP_ERROR err = LogEvent(event, endpoint.id, eventNumber);
+            CHIP_ERROR err = LogEvent(event, endpoint, eventNumber);
             if (CHIP_NO_ERROR != err)
             {
                 ChipLogError(Zcl, "Failed to emit ShutDown event: %" CHIP_ERROR_FORMAT, err.Format());

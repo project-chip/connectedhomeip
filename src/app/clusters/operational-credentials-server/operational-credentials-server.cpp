@@ -328,7 +328,7 @@ public:
     // Gets called when a fabric is about to be deleted
     void FabricWillBeRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override
     {
-        DataModel::ListBuilder<DataModel::EndpointEntry> endpointsList;
+        DataModel::ListBuilder<EndpointId> endpointsList;
         InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(BasicInformation::Id,
                                                                                                   endpointsList);
 
@@ -340,7 +340,7 @@ public:
             event.fabricIndex = fabricIndex;
             EventNumber eventNumber;
 
-            if (CHIP_NO_ERROR != LogEvent(event, endpoint.id, eventNumber))
+            if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
             {
                 ChipLogError(Zcl, "OpCredsFabricTableDelegate: Failed to record Leave event");
             }

@@ -55,17 +55,17 @@ class DoorLockClusterFabricDelegate : public chip::FabricTable::Delegate
     void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override
     {
         // Find all endpoints that have DoorLock implemented
-        DataModel::ListBuilder<DataModel::EndpointEntry> endpointsList;
+        DataModel::ListBuilder<EndpointId> endpointsList;
         InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(Clusters::DoorLock::Id,
                                                                                                   endpointsList);
 
         for (auto endpoint : endpointsList.TakeBuffer())
         {
-            if (!DoorLockServer::Instance().OnFabricRemoved(endpoint.id, fabricIndex))
+            if (!DoorLockServer::Instance().OnFabricRemoved(endpoint, fabricIndex))
             {
                 ChipLogError(Zcl,
                              "Unable to handle fabric removal from the Door Lock Server instance [endpointId=%d,fabricIndex=%d]",
-                             endpoint.id, fabricIndex);
+                             endpoint, fabricIndex);
             }
         }
     }

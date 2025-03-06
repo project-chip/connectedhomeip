@@ -210,16 +210,16 @@ public:
             if (provider)
             {
                 // Find all endpoints that have UserLabel implemented
-                DataModel::ListBuilder<DataModel::EndpointEntry> endpointsList;
+                DataModel::ListBuilder<EndpointId> endpointsList;
                 InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(UserLabel::Id,
                                                                                                           endpointsList);
 
                 for (auto endpoint : endpointsList.TakeBuffer())
                 {
                     // If UserLabel cluster is implemented on this endpoint
-                    if (CHIP_NO_ERROR != provider->ClearUserLabelList(endpoint.id))
+                    if (CHIP_NO_ERROR != provider->ClearUserLabelList(endpoint))
                     {
-                        ChipLogError(Zcl, "UserLabel::Failed to clear UserLabelList for endpoint:%d", endpoint.id);
+                        ChipLogError(Zcl, "UserLabel::Failed to clear UserLabelList for endpoint:%d", endpoint);
                     }
                 }
             }

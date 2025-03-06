@@ -100,7 +100,7 @@ public:
     ReadOnlyBuffer<ServerClusterEntry> ServerClustersIgnoreError(EndpointId endpointId);
     ReadOnlyBuffer<AttributeEntry> AttributesIgnoreError(const ConcreteClusterPath & path);
 
-    CHIP_ERROR EndpointsWithServerCluster(ClusterId clusterId, DataModel::ListBuilder<DataModel::EndpointEntry> & out);
+    CHIP_ERROR EndpointsWithServerCluster(ClusterId clusterId, DataModel::ListBuilder<EndpointId> & out);
 };
 
 } // namespace DataModel

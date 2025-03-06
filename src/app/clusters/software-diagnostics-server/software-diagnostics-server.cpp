@@ -205,7 +205,7 @@ void SoftwareDiagnosticsServer::OnSoftwareFaultDetect(const SoftwareDiagnostics:
     ChipLogDetail(Zcl, "SoftwareDiagnosticsDelegate: OnSoftwareFaultDetected");
 
     // Find all endpoints that have SoftwareDiagnostics implemented
-    DataModel::ListBuilder<DataModel::EndpointEntry> endpointsList;
+    DataModel::ListBuilder<EndpointId> endpointsList;
     InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(SoftwareDiagnostics::Id,
                                                                                               endpointsList);
 
@@ -214,7 +214,7 @@ void SoftwareDiagnosticsServer::OnSoftwareFaultDetect(const SoftwareDiagnostics:
         // If Software Diagnostics cluster is implemented on this endpoint
         EventNumber eventNumber;
 
-        if (CHIP_NO_ERROR != LogEvent(softwareFault, endpoint.id, eventNumber))
+        if (CHIP_NO_ERROR != LogEvent(softwareFault, endpoint, eventNumber))
         {
             ChipLogError(Zcl, "SoftwareDiagnosticsDelegate: Failed to record SoftwareFault event");
         }

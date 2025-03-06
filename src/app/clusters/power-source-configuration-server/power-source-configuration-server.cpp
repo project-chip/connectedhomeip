@@ -67,7 +67,7 @@ CHIP_ERROR PowerSourceConfigurationAttrAccess::Read(const ConcreteReadAttributeP
             uint8_t idx = 0;
 
             // Find all endpoints that have PowerSource cluster implemented
-            DataModel::ListBuilder<DataModel::EndpointEntry> endpointsList;
+            DataModel::ListBuilder<EndpointId> endpointsList;
             InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(PowerSource::Id,
                                                                                                       endpointsList);
 
@@ -76,8 +76,8 @@ CHIP_ERROR PowerSourceConfigurationAttrAccess::Read(const ConcreteReadAttributeP
                 uint8_t order = 0;
                 if (idx >= kMaxPowerSources)
                     break;
-                PowerSource::Attributes::Order::Get(endpoint.id, &order);
-                orderEpPair[idx] = std::make_pair(endpoint.id, order);
+                PowerSource::Attributes::Order::Get(endpoint, &order);
+                orderEpPair[idx] = std::make_pair(endpoint, order);
                 idx++;
             }
 

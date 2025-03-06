@@ -57,7 +57,7 @@ namespace Silabs {
 void OnSoftwareFaultEventHandler(const char * faultRecordString)
 {
 #ifdef MATTER_DM_PLUGIN_SOFTWARE_DIAGNOSTICS_SERVER
-    DataModel::ListBuilder<DataModel::EndpointEntry> endpointsList;
+    DataModel::ListBuilder<EndpointId> endpointsList;
     InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(SoftwareDiagnostics::Id,
                                                                                               endpointsList);
     VerifyOrReturn(endpointsList.Size() > 0);
