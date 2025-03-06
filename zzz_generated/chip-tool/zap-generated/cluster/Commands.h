@@ -22790,8 +22790,8 @@ void registerClusterElectricalPowerMeasurement(Commands & commands, CredentialIs
         make_unique<WriteAttribute<uint8_t>>(Id, "number-of-measurement-types", 0, UINT8_MAX,
                                              Attributes::NumberOfMeasurementTypes::Id, WriteCommandType::kForceWrite,
                                              credsIssuerConfig), //
-        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<
-            const chip::app::Clusters::ElectricalPowerMeasurement::Structs::MeasurementAccuracyStruct::Type>>>(
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::Globals::Structs::MeasurementAccuracyStruct::Type>>>(
             Id, "accuracy", Attributes::Accuracy::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<
             const chip::app::Clusters::ElectricalPowerMeasurement::Structs::MeasurementRangeStruct::Type>>>(
@@ -22915,8 +22915,7 @@ void registerClusterElectricalEnergyMeasurement(Commands & commands, CredentialI
         make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                          //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                //
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                                  //
-        make_unique<
-            WriteAttributeAsComplex<chip::app::Clusters::ElectricalEnergyMeasurement::Structs::MeasurementAccuracyStruct::Type>>(
+        make_unique<WriteAttributeAsComplex<chip::app::Clusters::Globals::Structs::MeasurementAccuracyStruct::Type>>(
             Id, "accuracy", Attributes::Accuracy::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::Nullable<
             chip::app::Clusters::ElectricalEnergyMeasurement::Structs::EnergyMeasurementStruct::Type>>>(
@@ -29465,7 +29464,7 @@ void registerClusterCommodityMetering(Commands & commands, CredentialIssuerComma
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "metered-quantity-timestamp", 0, UINT32_MAX,
                                                                               Attributes::MeteredQuantityTimestamp::Id,
                                                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::app::Clusters::CommodityMetering::MeasurementTypeEnum>>>(
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::app::Clusters::Globals::MeasurementTypeEnum>>>(
             Id, "measurement-type", 0, UINT16_MAX, Attributes::MeasurementType::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(

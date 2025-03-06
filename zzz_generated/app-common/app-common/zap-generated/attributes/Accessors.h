@@ -2446,42 +2446,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters
                                         MarkAttributeDirty markDirty);
 } // namespace TariffUnit
 
-namespace Currency {
-Protocols::InteractionModel::Status
-Get(EndpointId endpoint,
-    DataModel::Nullable<chip::app::Clusters::Globals::Structs::CurrencyStruct::Type> & value); // CurrencyStruct
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::Globals::Structs::CurrencyStruct::Type value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::Globals::Structs::CurrencyStruct::Type value,
-                                        MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint, const chip::app::DataModel::Nullable<chip::app::Clusters::Globals::Structs::CurrencyStruct::Type> & value);
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint, const chip::app::DataModel::Nullable<chip::app::Clusters::Globals::Structs::CurrencyStruct::Type> & value,
-    MarkAttributeDirty markDirty);
-} // namespace Currency
-
-namespace CurrentPrice {
-Protocols::InteractionModel::Status
-Get(EndpointId endpoint,
-    DataModel::Nullable<chip::app::Clusters::CommodityPrice::Structs::CommodityPriceStruct::Type> & value); // CommodityPriceStruct
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        chip::app::Clusters::CommodityPrice::Structs::CommodityPriceStruct::Type value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        chip::app::Clusters::CommodityPrice::Structs::CommodityPriceStruct::Type value,
-                                        MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::CommodityPrice::Structs::CommodityPriceStruct::Type> & value);
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::CommodityPrice::Structs::CommodityPriceStruct::Type> & value,
-    MarkAttributeDirty markDirty);
-} // namespace CurrentPrice
-
 namespace FeatureMap {
 Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // bitmap32
 Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
@@ -6054,27 +6018,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, Mar
 namespace CommodityTariff {
 namespace Attributes {
 
-namespace TariffInfo {
-Protocols::InteractionModel::Status
-Get(EndpointId endpoint,
-    DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::TariffInformationStruct::Type> &
-        value); // TariffInformationStruct
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        chip::app::Clusters::CommodityTariff::Structs::TariffInformationStruct::Type value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        chip::app::Clusters::CommodityTariff::Structs::TariffInformationStruct::Type value,
-                                        MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::TariffInformationStruct::Type> & value);
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::TariffInformationStruct::Type> & value,
-    MarkAttributeDirty markDirty);
-} // namespace TariffInfo
-
 namespace TariffUnit {
 Protocols::InteractionModel::Status
 Get(EndpointId endpoint, DataModel::Nullable<chip::app::Clusters::Globals::TariffUnitEnum> & value); // TariffUnitEnum
@@ -6101,59 +6044,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
                                         MarkAttributeDirty markDirty);
 } // namespace StartDate
 
-namespace CurrentDay {
-Protocols::InteractionModel::Status
-Get(EndpointId endpoint, DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::DayStruct::Type> & value); // DayStruct
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::CommodityTariff::Structs::DayStruct::Type value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::CommodityTariff::Structs::DayStruct::Type value,
-                                        MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::DayStruct::Type> & value);
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::DayStruct::Type> & value,
-    MarkAttributeDirty markDirty);
-} // namespace CurrentDay
-
-namespace NextDay {
-Protocols::InteractionModel::Status
-Get(EndpointId endpoint, DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::DayStruct::Type> & value); // DayStruct
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::CommodityTariff::Structs::DayStruct::Type value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::CommodityTariff::Structs::DayStruct::Type value,
-                                        MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::DayStruct::Type> & value);
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::DayStruct::Type> & value,
-    MarkAttributeDirty markDirty);
-} // namespace NextDay
-
-namespace CurrentDayEntry {
-Protocols::InteractionModel::Status
-Get(EndpointId endpoint,
-    DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::DayEntryStruct::Type> & value); // DayEntryStruct
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        chip::app::Clusters::CommodityTariff::Structs::DayEntryStruct::Type value);
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint, chip::app::Clusters::CommodityTariff::Structs::DayEntryStruct::Type value, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::DayEntryStruct::Type> & value);
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::DayEntryStruct::Type> & value,
-    MarkAttributeDirty markDirty);
-} // namespace CurrentDayEntry
-
 namespace CurrentDayEntryDate {
 Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint32_t> & value); // epoch_s
 Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
@@ -6164,25 +6054,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value,
                                         MarkAttributeDirty markDirty);
 } // namespace CurrentDayEntryDate
-
-namespace NextDayEntry {
-Protocols::InteractionModel::Status
-Get(EndpointId endpoint,
-    DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::DayEntryStruct::Type> & value); // DayEntryStruct
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        chip::app::Clusters::CommodityTariff::Structs::DayEntryStruct::Type value);
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint, chip::app::Clusters::CommodityTariff::Structs::DayEntryStruct::Type value, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::DayEntryStruct::Type> & value);
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::DayEntryStruct::Type> & value,
-    MarkAttributeDirty markDirty);
-} // namespace NextDayEntry
 
 namespace NextDayEntryDate {
 Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint32_t> & value); // epoch_s
@@ -6380,25 +6251,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
                                         MarkAttributeDirty markDirty);
 } // namespace ProtocolVersion
 
-namespace PowerThreshold {
-Protocols::InteractionModel::Status
-Get(EndpointId endpoint,
-    DataModel::Nullable<chip::app::Clusters::Globals::Structs::PowerThresholdStruct::Type> & value); // PowerThresholdStruct
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        chip::app::Clusters::Globals::Structs::PowerThresholdStruct::Type value);
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint, chip::app::Clusters::Globals::Structs::PowerThresholdStruct::Type value, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::Globals::Structs::PowerThresholdStruct::Type> & value);
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::Globals::Structs::PowerThresholdStruct::Type> & value,
-    MarkAttributeDirty markDirty);
-} // namespace PowerThreshold
-
 namespace FeatureMap {
 Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // bitmap32
 Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
@@ -6430,17 +6282,16 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 
 namespace MeasurementType {
 Protocols::InteractionModel::Status
-Get(EndpointId endpoint,
-    DataModel::Nullable<chip::app::Clusters::CommodityMetering::MeasurementTypeEnum> & value); // MeasurementTypeEnum
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::CommodityMetering::MeasurementTypeEnum value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::CommodityMetering::MeasurementTypeEnum value,
+Get(EndpointId endpoint, DataModel::Nullable<chip::app::Clusters::Globals::MeasurementTypeEnum> & value); // MeasurementTypeEnum
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::Globals::MeasurementTypeEnum value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::Globals::MeasurementTypeEnum value,
                                         MarkAttributeDirty markDirty);
 Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
 Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
 Protocols::InteractionModel::Status
-Set(EndpointId endpoint, const chip::app::DataModel::Nullable<chip::app::Clusters::CommodityMetering::MeasurementTypeEnum> & value);
+Set(EndpointId endpoint, const chip::app::DataModel::Nullable<chip::app::Clusters::Globals::MeasurementTypeEnum> & value);
 Protocols::InteractionModel::Status
-Set(EndpointId endpoint, const chip::app::DataModel::Nullable<chip::app::Clusters::CommodityMetering::MeasurementTypeEnum> & value,
+Set(EndpointId endpoint, const chip::app::DataModel::Nullable<chip::app::Clusters::Globals::MeasurementTypeEnum> & value,
     MarkAttributeDirty markDirty);
 } // namespace MeasurementType
 

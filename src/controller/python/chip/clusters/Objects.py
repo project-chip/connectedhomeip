@@ -381,6 +381,30 @@ class Globals:
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 51
 
+        class MeasurementTypeEnum(MatterIntEnum):
+            kUnspecified = 0x00
+            kVoltage = 0x01
+            kActiveCurrent = 0x02
+            kReactiveCurrent = 0x03
+            kApparentCurrent = 0x04
+            kActivePower = 0x05
+            kReactivePower = 0x06
+            kApparentPower = 0x07
+            kRMSVoltage = 0x08
+            kRMSCurrent = 0x09
+            kRMSPower = 0x0A
+            kFrequency = 0x0B
+            kPowerFactor = 0x0C
+            kNeutralCurrent = 0x0D
+            kElectricalEnergy = 0x0E
+            kReactiveEnergy = 0x0F
+            kApparentEnergy = 0x10
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 17
+
         class PositionTag(MatterIntEnum):
             kLeft = 0x00
             kRight = 0x01
@@ -509,6 +533,50 @@ class Globals:
             name: 'str' = ""
             myBitmap: 'typing.Union[Nullable, uint]' = NullValue
             myEnum: 'typing.Union[None, Nullable, Globals.Enums.TestGlobalEnum]' = None
+
+        @dataclass
+        class MeasurementAccuracyRangeStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="rangeMin", Tag=0, Type=int),
+                        ClusterObjectFieldDescriptor(Label="rangeMax", Tag=1, Type=int),
+                        ClusterObjectFieldDescriptor(Label="percentMax", Tag=2, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="percentMin", Tag=3, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="percentTypical", Tag=4, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="fixedMax", Tag=5, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="fixedMin", Tag=6, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="fixedTypical", Tag=7, Type=typing.Optional[uint]),
+                    ])
+
+            rangeMin: 'int' = 0
+            rangeMax: 'int' = 0
+            percentMax: 'typing.Optional[uint]' = None
+            percentMin: 'typing.Optional[uint]' = None
+            percentTypical: 'typing.Optional[uint]' = None
+            fixedMax: 'typing.Optional[uint]' = None
+            fixedMin: 'typing.Optional[uint]' = None
+            fixedTypical: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class MeasurementAccuracyStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="measurementType", Tag=0, Type=Globals.Enums.MeasurementTypeEnum),
+                        ClusterObjectFieldDescriptor(Label="measured", Tag=1, Type=bool),
+                        ClusterObjectFieldDescriptor(Label="minMeasuredValue", Tag=2, Type=int),
+                        ClusterObjectFieldDescriptor(Label="maxMeasuredValue", Tag=3, Type=int),
+                        ClusterObjectFieldDescriptor(Label="accuracyRanges", Tag=4, Type=typing.List[Globals.Structs.MeasurementAccuracyRangeStruct]),
+                    ])
+
+            measurementType: 'Globals.Enums.MeasurementTypeEnum' = 0
+            measured: 'bool' = False
+            minMeasuredValue: 'int' = 0
+            maxMeasuredValue: 'int' = 0
+            accuracyRanges: 'typing.List[Globals.Structs.MeasurementAccuracyRangeStruct]' = field(default_factory=lambda: [])
 
         @dataclass
         class LocationDescriptorStruct(ClusterObject):
@@ -21665,7 +21733,7 @@ class ElectricalPowerMeasurement(Cluster):
             Fields=[
                 ClusterObjectFieldDescriptor(Label="powerMode", Tag=0x00000000, Type=ElectricalPowerMeasurement.Enums.PowerModeEnum),
                 ClusterObjectFieldDescriptor(Label="numberOfMeasurementTypes", Tag=0x00000001, Type=uint),
-                ClusterObjectFieldDescriptor(Label="accuracy", Tag=0x00000002, Type=typing.List[ElectricalPowerMeasurement.Structs.MeasurementAccuracyStruct]),
+                ClusterObjectFieldDescriptor(Label="accuracy", Tag=0x00000002, Type=typing.List[Globals.Structs.MeasurementAccuracyStruct]),
                 ClusterObjectFieldDescriptor(Label="ranges", Tag=0x00000003, Type=typing.Optional[typing.List[ElectricalPowerMeasurement.Structs.MeasurementRangeStruct]]),
                 ClusterObjectFieldDescriptor(Label="voltage", Tag=0x00000004, Type=typing.Union[None, Nullable, int]),
                 ClusterObjectFieldDescriptor(Label="activeCurrent", Tag=0x00000005, Type=typing.Union[None, Nullable, int]),
@@ -21691,7 +21759,7 @@ class ElectricalPowerMeasurement(Cluster):
 
     powerMode: ElectricalPowerMeasurement.Enums.PowerModeEnum = 0
     numberOfMeasurementTypes: uint = 0
-    accuracy: typing.List[ElectricalPowerMeasurement.Structs.MeasurementAccuracyStruct] = field(default_factory=lambda: [])
+    accuracy: typing.List[Globals.Structs.MeasurementAccuracyStruct] = field(default_factory=lambda: [])
     ranges: typing.Optional[typing.List[ElectricalPowerMeasurement.Structs.MeasurementRangeStruct]] = None
     voltage: typing.Union[None, Nullable, int] = None
     activeCurrent: typing.Union[None, Nullable, int] = None
@@ -21715,28 +21783,6 @@ class ElectricalPowerMeasurement(Cluster):
     clusterRevision: uint = 0
 
     class Enums:
-        class MeasurementTypeEnum(MatterIntEnum):
-            kUnspecified = 0x00
-            kVoltage = 0x01
-            kActiveCurrent = 0x02
-            kReactiveCurrent = 0x03
-            kApparentCurrent = 0x04
-            kActivePower = 0x05
-            kReactivePower = 0x06
-            kApparentPower = 0x07
-            kRMSVoltage = 0x08
-            kRMSCurrent = 0x09
-            kRMSPower = 0x0A
-            kFrequency = 0x0B
-            kPowerFactor = 0x0C
-            kNeutralCurrent = 0x0D
-            kElectricalEnergy = 0x0E
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving an unknown
-            # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 15
-
         class PowerModeEnum(MatterIntEnum):
             kUnknown = 0x00
             kDc = 0x01
@@ -21757,50 +21803,6 @@ class ElectricalPowerMeasurement(Cluster):
 
     class Structs:
         @dataclass
-        class MeasurementAccuracyRangeStruct(ClusterObject):
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="rangeMin", Tag=0, Type=int),
-                        ClusterObjectFieldDescriptor(Label="rangeMax", Tag=1, Type=int),
-                        ClusterObjectFieldDescriptor(Label="percentMax", Tag=2, Type=typing.Optional[uint]),
-                        ClusterObjectFieldDescriptor(Label="percentMin", Tag=3, Type=typing.Optional[uint]),
-                        ClusterObjectFieldDescriptor(Label="percentTypical", Tag=4, Type=typing.Optional[uint]),
-                        ClusterObjectFieldDescriptor(Label="fixedMax", Tag=5, Type=typing.Optional[uint]),
-                        ClusterObjectFieldDescriptor(Label="fixedMin", Tag=6, Type=typing.Optional[uint]),
-                        ClusterObjectFieldDescriptor(Label="fixedTypical", Tag=7, Type=typing.Optional[uint]),
-                    ])
-
-            rangeMin: 'int' = 0
-            rangeMax: 'int' = 0
-            percentMax: 'typing.Optional[uint]' = None
-            percentMin: 'typing.Optional[uint]' = None
-            percentTypical: 'typing.Optional[uint]' = None
-            fixedMax: 'typing.Optional[uint]' = None
-            fixedMin: 'typing.Optional[uint]' = None
-            fixedTypical: 'typing.Optional[uint]' = None
-
-        @dataclass
-        class MeasurementAccuracyStruct(ClusterObject):
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="measurementType", Tag=0, Type=ElectricalPowerMeasurement.Enums.MeasurementTypeEnum),
-                        ClusterObjectFieldDescriptor(Label="measured", Tag=1, Type=bool),
-                        ClusterObjectFieldDescriptor(Label="minMeasuredValue", Tag=2, Type=int),
-                        ClusterObjectFieldDescriptor(Label="maxMeasuredValue", Tag=3, Type=int),
-                        ClusterObjectFieldDescriptor(Label="accuracyRanges", Tag=4, Type=typing.List[ElectricalPowerMeasurement.Structs.MeasurementAccuracyRangeStruct]),
-                    ])
-
-            measurementType: 'ElectricalPowerMeasurement.Enums.MeasurementTypeEnum' = 0
-            measured: 'bool' = False
-            minMeasuredValue: 'int' = 0
-            maxMeasuredValue: 'int' = 0
-            accuracyRanges: 'typing.List[ElectricalPowerMeasurement.Structs.MeasurementAccuracyRangeStruct]' = field(default_factory=lambda: [])
-
-        @dataclass
         class HarmonicMeasurementStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -21819,7 +21821,7 @@ class ElectricalPowerMeasurement(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="measurementType", Tag=0, Type=ElectricalPowerMeasurement.Enums.MeasurementTypeEnum),
+                        ClusterObjectFieldDescriptor(Label="measurementType", Tag=0, Type=Globals.Enums.MeasurementTypeEnum),
                         ClusterObjectFieldDescriptor(Label="min", Tag=1, Type=int),
                         ClusterObjectFieldDescriptor(Label="max", Tag=2, Type=int),
                         ClusterObjectFieldDescriptor(Label="startTimestamp", Tag=3, Type=typing.Optional[uint]),
@@ -21832,7 +21834,7 @@ class ElectricalPowerMeasurement(Cluster):
                         ClusterObjectFieldDescriptor(Label="maxSystime", Tag=10, Type=typing.Optional[uint]),
                     ])
 
-            measurementType: 'ElectricalPowerMeasurement.Enums.MeasurementTypeEnum' = 0
+            measurementType: 'Globals.Enums.MeasurementTypeEnum' = 0
             min: 'int' = 0
             max: 'int' = 0
             startTimestamp: 'typing.Optional[uint]' = None
@@ -21889,9 +21891,9 @@ class ElectricalPowerMeasurement(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.List[ElectricalPowerMeasurement.Structs.MeasurementAccuracyStruct])
+                return ClusterObjectFieldDescriptor(Type=typing.List[Globals.Structs.MeasurementAccuracyStruct])
 
-            value: typing.List[ElectricalPowerMeasurement.Structs.MeasurementAccuracyStruct] = field(default_factory=lambda: [])
+            value: typing.List[Globals.Structs.MeasurementAccuracyStruct] = field(default_factory=lambda: [])
 
         @dataclass
         class Ranges(ClusterAttributeDescriptor):
@@ -22258,7 +22260,7 @@ class ElectricalEnergyMeasurement(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields=[
-                ClusterObjectFieldDescriptor(Label="accuracy", Tag=0x00000000, Type=ElectricalEnergyMeasurement.Structs.MeasurementAccuracyStruct),
+                ClusterObjectFieldDescriptor(Label="accuracy", Tag=0x00000000, Type=Globals.Structs.MeasurementAccuracyStruct),
                 ClusterObjectFieldDescriptor(Label="cumulativeEnergyImported", Tag=0x00000001, Type=typing.Union[None, Nullable, ElectricalEnergyMeasurement.Structs.EnergyMeasurementStruct]),
                 ClusterObjectFieldDescriptor(Label="cumulativeEnergyExported", Tag=0x00000002, Type=typing.Union[None, Nullable, ElectricalEnergyMeasurement.Structs.EnergyMeasurementStruct]),
                 ClusterObjectFieldDescriptor(Label="periodicEnergyImported", Tag=0x00000003, Type=typing.Union[None, Nullable, ElectricalEnergyMeasurement.Structs.EnergyMeasurementStruct]),
@@ -22271,7 +22273,7 @@ class ElectricalEnergyMeasurement(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    accuracy: ElectricalEnergyMeasurement.Structs.MeasurementAccuracyStruct = field(default_factory=lambda: ElectricalEnergyMeasurement.Structs.MeasurementAccuracyStruct())
+    accuracy: Globals.Structs.MeasurementAccuracyStruct = field(default_factory=lambda: Globals.Structs.MeasurementAccuracyStruct())
     cumulativeEnergyImported: typing.Union[None, Nullable, ElectricalEnergyMeasurement.Structs.EnergyMeasurementStruct] = None
     cumulativeEnergyExported: typing.Union[None, Nullable, ElectricalEnergyMeasurement.Structs.EnergyMeasurementStruct] = None
     periodicEnergyImported: typing.Union[None, Nullable, ElectricalEnergyMeasurement.Structs.EnergyMeasurementStruct] = None
@@ -22283,29 +22285,6 @@ class ElectricalEnergyMeasurement(Cluster):
     featureMap: uint = 0
     clusterRevision: uint = 0
 
-    class Enums:
-        class MeasurementTypeEnum(MatterIntEnum):
-            kUnspecified = 0x00
-            kVoltage = 0x01
-            kActiveCurrent = 0x02
-            kReactiveCurrent = 0x03
-            kApparentCurrent = 0x04
-            kActivePower = 0x05
-            kReactivePower = 0x06
-            kApparentPower = 0x07
-            kRMSVoltage = 0x08
-            kRMSCurrent = 0x09
-            kRMSPower = 0x0A
-            kFrequency = 0x0B
-            kPowerFactor = 0x0C
-            kNeutralCurrent = 0x0D
-            kElectricalEnergy = 0x0E
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving an unknown
-            # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 15
-
     class Bitmaps:
         class Feature(IntFlag):
             kImportedEnergy = 0x1
@@ -22314,50 +22293,6 @@ class ElectricalEnergyMeasurement(Cluster):
             kPeriodicEnergy = 0x8
 
     class Structs:
-        @dataclass
-        class MeasurementAccuracyRangeStruct(ClusterObject):
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="rangeMin", Tag=0, Type=int),
-                        ClusterObjectFieldDescriptor(Label="rangeMax", Tag=1, Type=int),
-                        ClusterObjectFieldDescriptor(Label="percentMax", Tag=2, Type=typing.Optional[uint]),
-                        ClusterObjectFieldDescriptor(Label="percentMin", Tag=3, Type=typing.Optional[uint]),
-                        ClusterObjectFieldDescriptor(Label="percentTypical", Tag=4, Type=typing.Optional[uint]),
-                        ClusterObjectFieldDescriptor(Label="fixedMax", Tag=5, Type=typing.Optional[uint]),
-                        ClusterObjectFieldDescriptor(Label="fixedMin", Tag=6, Type=typing.Optional[uint]),
-                        ClusterObjectFieldDescriptor(Label="fixedTypical", Tag=7, Type=typing.Optional[uint]),
-                    ])
-
-            rangeMin: 'int' = 0
-            rangeMax: 'int' = 0
-            percentMax: 'typing.Optional[uint]' = None
-            percentMin: 'typing.Optional[uint]' = None
-            percentTypical: 'typing.Optional[uint]' = None
-            fixedMax: 'typing.Optional[uint]' = None
-            fixedMin: 'typing.Optional[uint]' = None
-            fixedTypical: 'typing.Optional[uint]' = None
-
-        @dataclass
-        class MeasurementAccuracyStruct(ClusterObject):
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="measurementType", Tag=0, Type=ElectricalEnergyMeasurement.Enums.MeasurementTypeEnum),
-                        ClusterObjectFieldDescriptor(Label="measured", Tag=1, Type=bool),
-                        ClusterObjectFieldDescriptor(Label="minMeasuredValue", Tag=2, Type=int),
-                        ClusterObjectFieldDescriptor(Label="maxMeasuredValue", Tag=3, Type=int),
-                        ClusterObjectFieldDescriptor(Label="accuracyRanges", Tag=4, Type=typing.List[ElectricalEnergyMeasurement.Structs.MeasurementAccuracyRangeStruct]),
-                    ])
-
-            measurementType: 'ElectricalEnergyMeasurement.Enums.MeasurementTypeEnum' = 0
-            measured: 'bool' = False
-            minMeasuredValue: 'int' = 0
-            maxMeasuredValue: 'int' = 0
-            accuracyRanges: 'typing.List[ElectricalEnergyMeasurement.Structs.MeasurementAccuracyRangeStruct]' = field(default_factory=lambda: [])
-
         @dataclass
         class CumulativeEnergyResetStruct(ClusterObject):
             @ChipUtility.classproperty
@@ -22407,9 +22342,9 @@ class ElectricalEnergyMeasurement(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=ElectricalEnergyMeasurement.Structs.MeasurementAccuracyStruct)
+                return ClusterObjectFieldDescriptor(Type=Globals.Structs.MeasurementAccuracyStruct)
 
-            value: ElectricalEnergyMeasurement.Structs.MeasurementAccuracyStruct = field(default_factory=lambda: ElectricalEnergyMeasurement.Structs.MeasurementAccuracyStruct())
+            value: Globals.Structs.MeasurementAccuracyStruct = field(default_factory=lambda: Globals.Structs.MeasurementAccuracyStruct())
 
         @dataclass
         class CumulativeEnergyImported(ClusterAttributeDescriptor):
@@ -50893,7 +50828,7 @@ class CommodityMetering(Cluster):
             Fields=[
                 ClusterObjectFieldDescriptor(Label="meteredQuantity", Tag=0x00000000, Type=typing.Union[Nullable, typing.List[CommodityMetering.Structs.MeteredQuantityStruct]]),
                 ClusterObjectFieldDescriptor(Label="meteredQuantityTimestamp", Tag=0x00000001, Type=typing.Union[Nullable, uint]),
-                ClusterObjectFieldDescriptor(Label="measurementType", Tag=0x00000002, Type=typing.Union[Nullable, CommodityMetering.Enums.MeasurementTypeEnum]),
+                ClusterObjectFieldDescriptor(Label="measurementType", Tag=0x00000002, Type=typing.Union[Nullable, Globals.Enums.MeasurementTypeEnum]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -50903,7 +50838,7 @@ class CommodityMetering(Cluster):
 
     meteredQuantity: typing.Union[Nullable, typing.List[CommodityMetering.Structs.MeteredQuantityStruct]] = NullValue
     meteredQuantityTimestamp: typing.Union[Nullable, uint] = NullValue
-    measurementType: typing.Union[Nullable, CommodityMetering.Enums.MeasurementTypeEnum] = NullValue
+    measurementType: typing.Union[Nullable, Globals.Enums.MeasurementTypeEnum] = NullValue
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -50969,9 +50904,9 @@ class CommodityMetering(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, CommodityMetering.Enums.MeasurementTypeEnum])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, Globals.Enums.MeasurementTypeEnum])
 
-            value: typing.Union[Nullable, CommodityMetering.Enums.MeasurementTypeEnum] = NullValue
+            value: typing.Union[Nullable, Globals.Enums.MeasurementTypeEnum] = NullValue
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):

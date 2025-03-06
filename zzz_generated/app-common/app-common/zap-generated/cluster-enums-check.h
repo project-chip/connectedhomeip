@@ -294,9 +294,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(detail::MeasurementMedi
         return EnumType::kUnknownEnumValue;
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(detail::MeasurementTypeEnum val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::MeasurementTypeEnum val)
 {
-    using EnumType = detail::MeasurementTypeEnum;
+    using EnumType = Globals::MeasurementTypeEnum;
     switch (val)
     {
     case EnumType::kUnspecified:
@@ -314,11 +314,14 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(detail::MeasurementType
     case EnumType::kPowerFactor:
     case EnumType::kNeutralCurrent:
     case EnumType::kElectricalEnergy:
+    case EnumType::kReactiveEnergy:
+    case EnumType::kApparentEnergy:
         return val;
     default:
         return EnumType::kUnknownEnumValue;
     }
 }
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(detail::MeasurementUnitEnum val)
 {
     using EnumType = detail::MeasurementUnitEnum;

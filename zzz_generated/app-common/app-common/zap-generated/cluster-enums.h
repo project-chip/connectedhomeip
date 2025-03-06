@@ -81,31 +81,6 @@ enum class MeasurementMediumEnum : uint8_t
     kUnknownEnumValue = 3,
 };
 
-// Enum for MeasurementTypeEnum
-enum class MeasurementTypeEnum : uint16_t
-{
-    kUnspecified      = 0x00,
-    kVoltage          = 0x01,
-    kActiveCurrent    = 0x02,
-    kReactiveCurrent  = 0x03,
-    kApparentCurrent  = 0x04,
-    kActivePower      = 0x05,
-    kReactivePower    = 0x06,
-    kApparentPower    = 0x07,
-    kRMSVoltage       = 0x08,
-    kRMSCurrent       = 0x09,
-    kRMSPower         = 0x0A,
-    kFrequency        = 0x0B,
-    kPowerFactor      = 0x0C,
-    kNeutralCurrent   = 0x0D,
-    kElectricalEnergy = 0x0E,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 15,
-};
-
 // Enum for MeasurementUnitEnum
 enum class MeasurementUnitEnum : uint8_t
 {
@@ -399,6 +374,33 @@ enum class LandmarkTag : uint8_t
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 51,
+};
+
+// Enum for MeasurementTypeEnum
+enum class MeasurementTypeEnum : uint16_t
+{
+    kUnspecified      = 0x00,
+    kVoltage          = 0x01,
+    kActiveCurrent    = 0x02,
+    kReactiveCurrent  = 0x03,
+    kApparentCurrent  = 0x04,
+    kActivePower      = 0x05,
+    kReactivePower    = 0x06,
+    kApparentPower    = 0x07,
+    kRMSVoltage       = 0x08,
+    kRMSCurrent       = 0x09,
+    kRMSPower         = 0x0A,
+    kFrequency        = 0x0B,
+    kPowerFactor      = 0x0C,
+    kNeutralCurrent   = 0x0D,
+    kElectricalEnergy = 0x0E,
+    kReactiveEnergy   = 0x0F,
+    kApparentEnergy   = 0x10,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 17,
 };
 
 // Enum for PositionTag
@@ -2760,8 +2762,6 @@ enum class ValveFaultBitmap : uint16_t
 
 namespace ElectricalPowerMeasurement {
 
-using MeasurementTypeEnum = Clusters::detail::MeasurementTypeEnum;
-
 // Enum for PowerModeEnum
 enum class PowerModeEnum : uint8_t
 {
@@ -2787,8 +2787,6 @@ enum class Feature : uint32_t
 } // namespace ElectricalPowerMeasurement
 
 namespace ElectricalEnergyMeasurement {
-
-using MeasurementTypeEnum = Clusters::detail::MeasurementTypeEnum;
 
 // Bitmap for Feature
 enum class Feature : uint32_t

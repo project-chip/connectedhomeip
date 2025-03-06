@@ -22820,9 +22820,9 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(@Nullable Object value) {
+    public void onSuccess(@Nullable Integer value) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Object");
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
       responseValues.put(commandResponseInfo, value);
       callback.onSuccess(responseValues);
     }

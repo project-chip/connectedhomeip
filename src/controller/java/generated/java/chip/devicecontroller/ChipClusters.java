@@ -67224,7 +67224,7 @@ public class ChipClusters {
     }
 
     public interface MeasurementTypeAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable Object value);
+      void onSuccess(@Nullable Integer value);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -67302,7 +67302,7 @@ public class ChipClusters {
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable Object value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, MEASUREMENT_TYPE_ATTRIBUTE_ID, true);
@@ -67315,7 +67315,7 @@ public class ChipClusters {
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable Object value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, MEASUREMENT_TYPE_ATTRIBUTE_ID, minInterval, maxInterval);

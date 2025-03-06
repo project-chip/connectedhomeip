@@ -15305,200 +15305,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters
 
 } // namespace TariffUnit
 
-#error Attribute "Currency" in cluster "Commodity Price" is struct-typed and must be added to the attributeAccessInterfaceAttributes object in src/app/zap-templates/zcl/zcl.json and src/app/zap-templates/zcl/zcl-with-test-extensions.json
-namespace Currency {
-
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        DataModel::Nullable<chip::app::Clusters::Globals::Structs::CurrencyStruct::Type> & value)
-{
-    using Traits = NumericAttributeTraits<chip::app::Clusters::Globals::Structs::CurrencyStruct::Type>;
-    Traits::StorageType temp;
-    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
-    Protocols::InteractionModel::Status status =
-        emberAfReadAttribute(endpoint, Clusters::CommodityPrice::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    if (Traits::IsNullValue(temp))
-    {
-        value.SetNull();
-    }
-    else
-    {
-        value.SetNonNull() = Traits::StorageToWorking(temp);
-    }
-    return status;
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::Globals::Structs::CurrencyStruct::Type value,
-                                        MarkAttributeDirty markDirty)
-{
-    using Traits = NumericAttributeTraits<chip::app::Clusters::Globals::Structs::CurrencyStruct::Type>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::CommodityPrice::Id, Id),
-                                 EmberAfWriteDataInput(writable, ZCL__ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::Globals::Structs::CurrencyStruct::Type value)
-{
-    using Traits = NumericAttributeTraits<chip::app::Clusters::Globals::Structs::CurrencyStruct::Type>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::CommodityPrice::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
-}
-
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty)
-{
-    using Traits = NumericAttributeTraits<chip::app::Clusters::Globals::Structs::CurrencyStruct::Type>;
-    Traits::StorageType value;
-    Traits::SetNull(value);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::CommodityPrice::Id, Id),
-                                 EmberAfWriteDataInput(writable, ZCL__ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
-}
-
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint)
-{
-    using Traits = NumericAttributeTraits<chip::app::Clusters::Globals::Structs::CurrencyStruct::Type>;
-    Traits::StorageType value;
-    Traits::SetNull(value);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteAttribute(endpoint, Clusters::CommodityPrice::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
-}
-
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint, const chip::app::DataModel::Nullable<chip::app::Clusters::Globals::Structs::CurrencyStruct::Type> & value,
-    MarkAttributeDirty markDirty)
-{
-    if (value.IsNull())
-    {
-        return SetNull(endpoint, markDirty);
-    }
-
-    return Set(endpoint, value.Value(), markDirty);
-}
-
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint, const chip::app::DataModel::Nullable<chip::app::Clusters::Globals::Structs::CurrencyStruct::Type> & value)
-{
-    if (value.IsNull())
-    {
-        return SetNull(endpoint);
-    }
-
-    return Set(endpoint, value.Value());
-}
-
-} // namespace Currency
-
-#error Attribute "CurrentPrice" in cluster "Commodity Price" is struct-typed and must be added to the attributeAccessInterfaceAttributes object in src/app/zap-templates/zcl/zcl.json and src/app/zap-templates/zcl/zcl-with-test-extensions.json
-namespace CurrentPrice {
-
-Protocols::InteractionModel::Status
-Get(EndpointId endpoint, DataModel::Nullable<chip::app::Clusters::CommodityPrice::Structs::CommodityPriceStruct::Type> & value)
-{
-    using Traits = NumericAttributeTraits<chip::app::Clusters::CommodityPrice::Structs::CommodityPriceStruct::Type>;
-    Traits::StorageType temp;
-    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
-    Protocols::InteractionModel::Status status =
-        emberAfReadAttribute(endpoint, Clusters::CommodityPrice::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    if (Traits::IsNullValue(temp))
-    {
-        value.SetNull();
-    }
-    else
-    {
-        value.SetNonNull() = Traits::StorageToWorking(temp);
-    }
-    return status;
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        chip::app::Clusters::CommodityPrice::Structs::CommodityPriceStruct::Type value,
-                                        MarkAttributeDirty markDirty)
-{
-    using Traits = NumericAttributeTraits<chip::app::Clusters::CommodityPrice::Structs::CommodityPriceStruct::Type>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::CommodityPrice::Id, Id),
-                                 EmberAfWriteDataInput(writable, ZCL__ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        chip::app::Clusters::CommodityPrice::Structs::CommodityPriceStruct::Type value)
-{
-    using Traits = NumericAttributeTraits<chip::app::Clusters::CommodityPrice::Structs::CommodityPriceStruct::Type>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::CommodityPrice::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
-}
-
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty)
-{
-    using Traits = NumericAttributeTraits<chip::app::Clusters::CommodityPrice::Structs::CommodityPriceStruct::Type>;
-    Traits::StorageType value;
-    Traits::SetNull(value);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::CommodityPrice::Id, Id),
-                                 EmberAfWriteDataInput(writable, ZCL__ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
-}
-
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint)
-{
-    using Traits = NumericAttributeTraits<chip::app::Clusters::CommodityPrice::Structs::CommodityPriceStruct::Type>;
-    Traits::StorageType value;
-    Traits::SetNull(value);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteAttribute(endpoint, Clusters::CommodityPrice::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
-}
-
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::CommodityPrice::Structs::CommodityPriceStruct::Type> & value,
-    MarkAttributeDirty markDirty)
-{
-    if (value.IsNull())
-    {
-        return SetNull(endpoint, markDirty);
-    }
-
-    return Set(endpoint, value.Value(), markDirty);
-}
-
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::CommodityPrice::Structs::CommodityPriceStruct::Type> & value)
-{
-    if (value.IsNull())
-    {
-        return SetNull(endpoint);
-    }
-
-    return Set(endpoint, value.Value());
-}
-
-} // namespace CurrentPrice
-
 namespace FeatureMap {
 
 Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value)
@@ -39859,105 +39665,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value)
 namespace CommodityTariff {
 namespace Attributes {
 
-#error Attribute "TariffInfo" in cluster "Commodity Tariff" is struct-typed and must be added to the attributeAccessInterfaceAttributes object in src/app/zap-templates/zcl/zcl.json and src/app/zap-templates/zcl/zcl-with-test-extensions.json
-namespace TariffInfo {
-
-Protocols::InteractionModel::Status
-Get(EndpointId endpoint, DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::TariffInformationStruct::Type> & value)
-{
-    using Traits = NumericAttributeTraits<chip::app::Clusters::CommodityTariff::Structs::TariffInformationStruct::Type>;
-    Traits::StorageType temp;
-    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
-    Protocols::InteractionModel::Status status =
-        emberAfReadAttribute(endpoint, Clusters::CommodityTariff::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    if (Traits::IsNullValue(temp))
-    {
-        value.SetNull();
-    }
-    else
-    {
-        value.SetNonNull() = Traits::StorageToWorking(temp);
-    }
-    return status;
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        chip::app::Clusters::CommodityTariff::Structs::TariffInformationStruct::Type value,
-                                        MarkAttributeDirty markDirty)
-{
-    using Traits = NumericAttributeTraits<chip::app::Clusters::CommodityTariff::Structs::TariffInformationStruct::Type>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::CommodityTariff::Id, Id),
-                                 EmberAfWriteDataInput(writable, ZCL__ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        chip::app::Clusters::CommodityTariff::Structs::TariffInformationStruct::Type value)
-{
-    using Traits = NumericAttributeTraits<chip::app::Clusters::CommodityTariff::Structs::TariffInformationStruct::Type>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::CommodityTariff::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
-}
-
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty)
-{
-    using Traits = NumericAttributeTraits<chip::app::Clusters::CommodityTariff::Structs::TariffInformationStruct::Type>;
-    Traits::StorageType value;
-    Traits::SetNull(value);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::CommodityTariff::Id, Id),
-                                 EmberAfWriteDataInput(writable, ZCL__ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
-}
-
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint)
-{
-    using Traits = NumericAttributeTraits<chip::app::Clusters::CommodityTariff::Structs::TariffInformationStruct::Type>;
-    Traits::StorageType value;
-    Traits::SetNull(value);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteAttribute(endpoint, Clusters::CommodityTariff::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
-}
-
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::TariffInformationStruct::Type> & value,
-    MarkAttributeDirty markDirty)
-{
-    if (value.IsNull())
-    {
-        return SetNull(endpoint, markDirty);
-    }
-
-    return Set(endpoint, value.Value(), markDirty);
-}
-
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::TariffInformationStruct::Type> & value)
-{
-    if (value.IsNull())
-    {
-        return SetNull(endpoint);
-    }
-
-    return Set(endpoint, value.Value());
-}
-
-} // namespace TariffInfo
-
 namespace TariffUnit {
 
 Protocols::InteractionModel::Status Get(EndpointId endpoint,
@@ -40142,298 +39849,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 
 } // namespace StartDate
 
-#error Attribute "CurrentDay" in cluster "Commodity Tariff" is struct-typed and must be added to the attributeAccessInterfaceAttributes object in src/app/zap-templates/zcl/zcl.json and src/app/zap-templates/zcl/zcl-with-test-extensions.json
-namespace CurrentDay {
-
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::DayStruct::Type> & value)
-{
-    using Traits = NumericAttributeTraits<chip::app::Clusters::CommodityTariff::Structs::DayStruct::Type>;
-    Traits::StorageType temp;
-    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
-    Protocols::InteractionModel::Status status =
-        emberAfReadAttribute(endpoint, Clusters::CommodityTariff::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    if (Traits::IsNullValue(temp))
-    {
-        value.SetNull();
-    }
-    else
-    {
-        value.SetNonNull() = Traits::StorageToWorking(temp);
-    }
-    return status;
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::CommodityTariff::Structs::DayStruct::Type value,
-                                        MarkAttributeDirty markDirty)
-{
-    using Traits = NumericAttributeTraits<chip::app::Clusters::CommodityTariff::Structs::DayStruct::Type>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::CommodityTariff::Id, Id),
-                                 EmberAfWriteDataInput(writable, ZCL__ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::CommodityTariff::Structs::DayStruct::Type value)
-{
-    using Traits = NumericAttributeTraits<chip::app::Clusters::CommodityTariff::Structs::DayStruct::Type>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::CommodityTariff::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
-}
-
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty)
-{
-    using Traits = NumericAttributeTraits<chip::app::Clusters::CommodityTariff::Structs::DayStruct::Type>;
-    Traits::StorageType value;
-    Traits::SetNull(value);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::CommodityTariff::Id, Id),
-                                 EmberAfWriteDataInput(writable, ZCL__ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
-}
-
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint)
-{
-    using Traits = NumericAttributeTraits<chip::app::Clusters::CommodityTariff::Structs::DayStruct::Type>;
-    Traits::StorageType value;
-    Traits::SetNull(value);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteAttribute(endpoint, Clusters::CommodityTariff::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
-}
-
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::DayStruct::Type> & value,
-    MarkAttributeDirty markDirty)
-{
-    if (value.IsNull())
-    {
-        return SetNull(endpoint, markDirty);
-    }
-
-    return Set(endpoint, value.Value(), markDirty);
-}
-
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::DayStruct::Type> & value)
-{
-    if (value.IsNull())
-    {
-        return SetNull(endpoint);
-    }
-
-    return Set(endpoint, value.Value());
-}
-
-} // namespace CurrentDay
-
-#error Attribute "NextDay" in cluster "Commodity Tariff" is struct-typed and must be added to the attributeAccessInterfaceAttributes object in src/app/zap-templates/zcl/zcl.json and src/app/zap-templates/zcl/zcl-with-test-extensions.json
-namespace NextDay {
-
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::DayStruct::Type> & value)
-{
-    using Traits = NumericAttributeTraits<chip::app::Clusters::CommodityTariff::Structs::DayStruct::Type>;
-    Traits::StorageType temp;
-    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
-    Protocols::InteractionModel::Status status =
-        emberAfReadAttribute(endpoint, Clusters::CommodityTariff::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    if (Traits::IsNullValue(temp))
-    {
-        value.SetNull();
-    }
-    else
-    {
-        value.SetNonNull() = Traits::StorageToWorking(temp);
-    }
-    return status;
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::CommodityTariff::Structs::DayStruct::Type value,
-                                        MarkAttributeDirty markDirty)
-{
-    using Traits = NumericAttributeTraits<chip::app::Clusters::CommodityTariff::Structs::DayStruct::Type>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::CommodityTariff::Id, Id),
-                                 EmberAfWriteDataInput(writable, ZCL__ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::CommodityTariff::Structs::DayStruct::Type value)
-{
-    using Traits = NumericAttributeTraits<chip::app::Clusters::CommodityTariff::Structs::DayStruct::Type>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::CommodityTariff::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
-}
-
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty)
-{
-    using Traits = NumericAttributeTraits<chip::app::Clusters::CommodityTariff::Structs::DayStruct::Type>;
-    Traits::StorageType value;
-    Traits::SetNull(value);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::CommodityTariff::Id, Id),
-                                 EmberAfWriteDataInput(writable, ZCL__ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
-}
-
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint)
-{
-    using Traits = NumericAttributeTraits<chip::app::Clusters::CommodityTariff::Structs::DayStruct::Type>;
-    Traits::StorageType value;
-    Traits::SetNull(value);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteAttribute(endpoint, Clusters::CommodityTariff::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
-}
-
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::DayStruct::Type> & value,
-    MarkAttributeDirty markDirty)
-{
-    if (value.IsNull())
-    {
-        return SetNull(endpoint, markDirty);
-    }
-
-    return Set(endpoint, value.Value(), markDirty);
-}
-
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::DayStruct::Type> & value)
-{
-    if (value.IsNull())
-    {
-        return SetNull(endpoint);
-    }
-
-    return Set(endpoint, value.Value());
-}
-
-} // namespace NextDay
-
-#error Attribute "CurrentDayEntry" in cluster "Commodity Tariff" is struct-typed and must be added to the attributeAccessInterfaceAttributes object in src/app/zap-templates/zcl/zcl.json and src/app/zap-templates/zcl/zcl-with-test-extensions.json
-namespace CurrentDayEntry {
-
-Protocols::InteractionModel::Status
-Get(EndpointId endpoint, DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::DayEntryStruct::Type> & value)
-{
-    using Traits = NumericAttributeTraits<chip::app::Clusters::CommodityTariff::Structs::DayEntryStruct::Type>;
-    Traits::StorageType temp;
-    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
-    Protocols::InteractionModel::Status status =
-        emberAfReadAttribute(endpoint, Clusters::CommodityTariff::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    if (Traits::IsNullValue(temp))
-    {
-        value.SetNull();
-    }
-    else
-    {
-        value.SetNonNull() = Traits::StorageToWorking(temp);
-    }
-    return status;
-}
-
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint, chip::app::Clusters::CommodityTariff::Structs::DayEntryStruct::Type value, MarkAttributeDirty markDirty)
-{
-    using Traits = NumericAttributeTraits<chip::app::Clusters::CommodityTariff::Structs::DayEntryStruct::Type>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::CommodityTariff::Id, Id),
-                                 EmberAfWriteDataInput(writable, ZCL__ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        chip::app::Clusters::CommodityTariff::Structs::DayEntryStruct::Type value)
-{
-    using Traits = NumericAttributeTraits<chip::app::Clusters::CommodityTariff::Structs::DayEntryStruct::Type>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::CommodityTariff::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
-}
-
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty)
-{
-    using Traits = NumericAttributeTraits<chip::app::Clusters::CommodityTariff::Structs::DayEntryStruct::Type>;
-    Traits::StorageType value;
-    Traits::SetNull(value);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::CommodityTariff::Id, Id),
-                                 EmberAfWriteDataInput(writable, ZCL__ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
-}
-
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint)
-{
-    using Traits = NumericAttributeTraits<chip::app::Clusters::CommodityTariff::Structs::DayEntryStruct::Type>;
-    Traits::StorageType value;
-    Traits::SetNull(value);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteAttribute(endpoint, Clusters::CommodityTariff::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
-}
-
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::DayEntryStruct::Type> & value,
-    MarkAttributeDirty markDirty)
-{
-    if (value.IsNull())
-    {
-        return SetNull(endpoint, markDirty);
-    }
-
-    return Set(endpoint, value.Value(), markDirty);
-}
-
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::DayEntryStruct::Type> & value)
-{
-    if (value.IsNull())
-    {
-        return SetNull(endpoint);
-    }
-
-    return Set(endpoint, value.Value());
-}
-
-} // namespace CurrentDayEntry
-
 namespace CurrentDayEntryDate {
 
 Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint32_t> & value)
@@ -40523,104 +39938,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 }
 
 } // namespace CurrentDayEntryDate
-
-#error Attribute "NextDayEntry" in cluster "Commodity Tariff" is struct-typed and must be added to the attributeAccessInterfaceAttributes object in src/app/zap-templates/zcl/zcl.json and src/app/zap-templates/zcl/zcl-with-test-extensions.json
-namespace NextDayEntry {
-
-Protocols::InteractionModel::Status
-Get(EndpointId endpoint, DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::DayEntryStruct::Type> & value)
-{
-    using Traits = NumericAttributeTraits<chip::app::Clusters::CommodityTariff::Structs::DayEntryStruct::Type>;
-    Traits::StorageType temp;
-    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
-    Protocols::InteractionModel::Status status =
-        emberAfReadAttribute(endpoint, Clusters::CommodityTariff::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    if (Traits::IsNullValue(temp))
-    {
-        value.SetNull();
-    }
-    else
-    {
-        value.SetNonNull() = Traits::StorageToWorking(temp);
-    }
-    return status;
-}
-
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint, chip::app::Clusters::CommodityTariff::Structs::DayEntryStruct::Type value, MarkAttributeDirty markDirty)
-{
-    using Traits = NumericAttributeTraits<chip::app::Clusters::CommodityTariff::Structs::DayEntryStruct::Type>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::CommodityTariff::Id, Id),
-                                 EmberAfWriteDataInput(writable, ZCL__ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        chip::app::Clusters::CommodityTariff::Structs::DayEntryStruct::Type value)
-{
-    using Traits = NumericAttributeTraits<chip::app::Clusters::CommodityTariff::Structs::DayEntryStruct::Type>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::CommodityTariff::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
-}
-
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty)
-{
-    using Traits = NumericAttributeTraits<chip::app::Clusters::CommodityTariff::Structs::DayEntryStruct::Type>;
-    Traits::StorageType value;
-    Traits::SetNull(value);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::CommodityTariff::Id, Id),
-                                 EmberAfWriteDataInput(writable, ZCL__ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
-}
-
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint)
-{
-    using Traits = NumericAttributeTraits<chip::app::Clusters::CommodityTariff::Structs::DayEntryStruct::Type>;
-    Traits::StorageType value;
-    Traits::SetNull(value);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteAttribute(endpoint, Clusters::CommodityTariff::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
-}
-
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::DayEntryStruct::Type> & value,
-    MarkAttributeDirty markDirty)
-{
-    if (value.IsNull())
-    {
-        return SetNull(endpoint, markDirty);
-    }
-
-    return Set(endpoint, value.Value(), markDirty);
-}
-
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::DayEntryStruct::Type> & value)
-{
-    if (value.IsNull())
-    {
-        return SetNull(endpoint);
-    }
-
-    return Set(endpoint, value.Value());
-}
-
-} // namespace NextDayEntry
 
 namespace NextDayEntryDate {
 
@@ -41899,104 +41216,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 
 } // namespace ProtocolVersion
 
-#error Attribute "PowerThreshold" in cluster "Meter Identification" is struct-typed and must be added to the attributeAccessInterfaceAttributes object in src/app/zap-templates/zcl/zcl.json and src/app/zap-templates/zcl/zcl-with-test-extensions.json
-namespace PowerThreshold {
-
-Protocols::InteractionModel::Status
-Get(EndpointId endpoint, DataModel::Nullable<chip::app::Clusters::Globals::Structs::PowerThresholdStruct::Type> & value)
-{
-    using Traits = NumericAttributeTraits<chip::app::Clusters::Globals::Structs::PowerThresholdStruct::Type>;
-    Traits::StorageType temp;
-    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
-    Protocols::InteractionModel::Status status =
-        emberAfReadAttribute(endpoint, Clusters::MeterIdentification::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    if (Traits::IsNullValue(temp))
-    {
-        value.SetNull();
-    }
-    else
-    {
-        value.SetNonNull() = Traits::StorageToWorking(temp);
-    }
-    return status;
-}
-
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint, chip::app::Clusters::Globals::Structs::PowerThresholdStruct::Type value, MarkAttributeDirty markDirty)
-{
-    using Traits = NumericAttributeTraits<chip::app::Clusters::Globals::Structs::PowerThresholdStruct::Type>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::MeterIdentification::Id, Id),
-                                 EmberAfWriteDataInput(writable, ZCL__ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        chip::app::Clusters::Globals::Structs::PowerThresholdStruct::Type value)
-{
-    using Traits = NumericAttributeTraits<chip::app::Clusters::Globals::Structs::PowerThresholdStruct::Type>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::MeterIdentification::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
-}
-
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty)
-{
-    using Traits = NumericAttributeTraits<chip::app::Clusters::Globals::Structs::PowerThresholdStruct::Type>;
-    Traits::StorageType value;
-    Traits::SetNull(value);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::MeterIdentification::Id, Id),
-                                 EmberAfWriteDataInput(writable, ZCL__ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
-}
-
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint)
-{
-    using Traits = NumericAttributeTraits<chip::app::Clusters::Globals::Structs::PowerThresholdStruct::Type>;
-    Traits::StorageType value;
-    Traits::SetNull(value);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteAttribute(endpoint, Clusters::MeterIdentification::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
-}
-
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::Globals::Structs::PowerThresholdStruct::Type> & value,
-    MarkAttributeDirty markDirty)
-{
-    if (value.IsNull())
-    {
-        return SetNull(endpoint, markDirty);
-    }
-
-    return Set(endpoint, value.Value(), markDirty);
-}
-
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::Globals::Structs::PowerThresholdStruct::Type> & value)
-{
-    if (value.IsNull())
-    {
-        return SetNull(endpoint);
-    }
-
-    return Set(endpoint, value.Value());
-}
-
-} // namespace PowerThreshold
-
 namespace FeatureMap {
 
 Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value)
@@ -42190,9 +41409,9 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 namespace MeasurementType {
 
 Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        DataModel::Nullable<chip::app::Clusters::CommodityMetering::MeasurementTypeEnum> & value)
+                                        DataModel::Nullable<chip::app::Clusters::Globals::MeasurementTypeEnum> & value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::CommodityMetering::MeasurementTypeEnum>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::Globals::MeasurementTypeEnum>;
     Traits::StorageType temp;
     uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
     Protocols::InteractionModel::Status status =
@@ -42209,10 +41428,10 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint,
     return status;
 }
 
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::CommodityMetering::MeasurementTypeEnum value,
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::Globals::MeasurementTypeEnum value,
                                         MarkAttributeDirty markDirty)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::CommodityMetering::MeasurementTypeEnum>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::Globals::MeasurementTypeEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
         return Protocols::InteractionModel::Status::ConstraintError;
@@ -42224,9 +41443,9 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters
                                  EmberAfWriteDataInput(writable, ZCL_ENUM16_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::CommodityMetering::MeasurementTypeEnum value)
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::Globals::MeasurementTypeEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::CommodityMetering::MeasurementTypeEnum>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::Globals::MeasurementTypeEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
         return Protocols::InteractionModel::Status::ConstraintError;
@@ -42239,7 +41458,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters
 
 Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::CommodityMetering::MeasurementTypeEnum>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::Globals::MeasurementTypeEnum>;
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
@@ -42249,7 +41468,7 @@ Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDi
 
 Protocols::InteractionModel::Status SetNull(EndpointId endpoint)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::CommodityMetering::MeasurementTypeEnum>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::Globals::MeasurementTypeEnum>;
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
@@ -42257,7 +41476,7 @@ Protocols::InteractionModel::Status SetNull(EndpointId endpoint)
 }
 
 Protocols::InteractionModel::Status
-Set(EndpointId endpoint, const chip::app::DataModel::Nullable<chip::app::Clusters::CommodityMetering::MeasurementTypeEnum> & value,
+Set(EndpointId endpoint, const chip::app::DataModel::Nullable<chip::app::Clusters::Globals::MeasurementTypeEnum> & value,
     MarkAttributeDirty markDirty)
 {
     if (value.IsNull())
@@ -42269,7 +41488,7 @@ Set(EndpointId endpoint, const chip::app::DataModel::Nullable<chip::app::Cluster
 }
 
 Protocols::InteractionModel::Status
-Set(EndpointId endpoint, const chip::app::DataModel::Nullable<chip::app::Clusters::CommodityMetering::MeasurementTypeEnum> & value)
+Set(EndpointId endpoint, const chip::app::DataModel::Nullable<chip::app::Clusters::Globals::MeasurementTypeEnum> & value)
 {
     if (value.IsNull())
     {

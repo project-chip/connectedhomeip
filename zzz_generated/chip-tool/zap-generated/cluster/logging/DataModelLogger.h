@@ -36,10 +36,10 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::detail::Structs::ModeOptionStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::detail::Structs::MeasurementAccuracyRangeStruct::DecodableType & value);
+                           const chip::app::Clusters::Globals::Structs::MeasurementAccuracyRangeStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::detail::Structs::MeasurementAccuracyStruct::DecodableType & value);
+                           const chip::app::Clusters::Globals::Structs::MeasurementAccuracyStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::Globals::Structs::LocationDescriptorStruct::DecodableType & value);
