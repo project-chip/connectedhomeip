@@ -83,7 +83,7 @@ ServerClusterInterface * ServerClusterInterfaceRegistry::Unregister(const Concre
                 mCachedInterface = nullptr;
             }
 
-            current->next = nullptr; // some clearing
+            current->next = nullptr; // Make sure current does not look like part of a list.
             return current->serverClusterInterface;
         }
 
