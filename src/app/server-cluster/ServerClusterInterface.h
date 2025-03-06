@@ -46,7 +46,7 @@ public:
 
     /// The path to this cluster instance.
     ///
-    /// This path (endpointid,clusterid) is expected to be fixed once the server
+    /// This path (endpointid,clusterid) is expected to remain constant once the server
     /// cluster interface is in use.
     [[nodiscard]] virtual ConcreteClusterPath GetPath() const = 0;
 
