@@ -92,15 +92,14 @@ public:
 
     bool AllowsLargePayload() const override { return GetPeerAddress().GetTransportType() == Transport::Type::kTcp; }
 
-    System::Clock::Milliseconds32 GetAckTimeout() const override
+    System::Clock::Milliseconds32 GetAckTimeout(bool isFirstMessageOnExchange) const override
     {
         switch (mPeerAddress.GetTransportType())
         {
         case Transport::Type::kUdp: {
             const ReliableMessageProtocolConfig & remoteMRPConfig = mRemoteSessionParams.GetMRPConfig();
             return GetRetransmissionTimeout(remoteMRPConfig.mActiveRetransTimeout, remoteMRPConfig.mIdleRetransTimeout,
-                                            GetLastPeerActivityTime(), remoteMRPConfig.mActiveThresholdTime, false /*isInitial*/);
-            // Treat that we are considering non-initial message and the peer is active regardless
+                                            GetLastPeerActivityTime(), remoteMRPConfig.mActiveThresholdTime, isFirstMessageOnExchange);
         }
         case Transport::Type::kTcp:
             return System::Clock::Seconds16(30);
@@ -112,7 +111,7 @@ public:
         return System::Clock::Timeout();
     }
 
-    System::Clock::Milliseconds32 GetMessageReceiptTimeout(System::Clock::Timestamp ourLastActivity, bool isInitial) const override
+    System::Clock::Milliseconds32 GetMessageReceiptTimeout(System::Clock::Timestamp ourLastActivity) const override
     {
         switch (mPeerAddress.GetTransportType())
         {
@@ -121,7 +120,7 @@ public:
             const auto & defaultMRRPConfig   = GetDefaultMRPConfig();
             const auto & localMRPConfig      = maybeLocalMRPConfig.ValueOr(defaultMRRPConfig);
             return GetRetransmissionTimeout(localMRPConfig.mActiveRetransTimeout, localMRPConfig.mIdleRetransTimeout,
-                                            ourLastActivity, localMRPConfig.mActiveThresholdTime, isInitial /*isInitial*/);
+                                            ourLastActivity, localMRPConfig.mActiveThresholdTime, ourLastActivity == System::Clock::kZero /*isFirstMessageOnExchange*/);
         }
         case Transport::Type::kTcp:
             return System::Clock::Seconds16(30);

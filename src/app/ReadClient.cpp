@@ -988,12 +988,12 @@ CHIP_ERROR ReadClient::ComputeLivenessCheckTimerTimeout(System::Clock::Timeout *
     auto & peerMRPConfig = mReadPrepareParams.mSessionHolder->GetRemoteMRPConfig();
     // Peer will assume we are idle and will send initial message(hence we pass kZero to GetMessageReceiptTimeout()), but will
     // treat it as active for the response, so to match the retransmission timeout computation for the message back to the
-    // peer, and further set isInitial as false for GetRetransmissionTimeout
-    auto roundTripTimeout = mReadPrepareParams.mSessionHolder->GetMessageReceiptTimeout(System::Clock::kZero, true /*isInitial*/) +
+    // peer
+    auto roundTripTimeout = mReadPrepareParams.mSessionHolder->GetMessageReceiptTimeout(System::Clock::kZero) +
         kExpectedIMProcessingTime +
         GetRetransmissionTimeout(peerMRPConfig.mActiveRetransTimeout, peerMRPConfig.mIdleRetransTimeout,
                                  System::SystemClock().GetMonotonicTimestamp(), peerMRPConfig.mActiveThresholdTime,
-                                 false /*isInitial*/);
+                                 false /*isFirstMessageOnExchange*/);
     *aTimeout = System::Clock::Seconds16(mMaxInterval) + roundTripTimeout;
     return CHIP_NO_ERROR;
 }

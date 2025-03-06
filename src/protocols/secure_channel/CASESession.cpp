@@ -2611,7 +2611,7 @@ exit:
 
 namespace {
 System::Clock::Timeout ComputeRoundTripTimeout(ExchangeContext::Timeout serverProcessingTime,
-                                               const ReliableMessageProtocolConfig & remoteMrpConfig, bool isInitial)
+                                               const ReliableMessageProtocolConfig & remoteMrpConfig, bool isFirstMessageOnExchange)
 {
     // TODO: This is duplicating logic from Session::ComputeRoundTripTimeout.  Unfortunately, it's called by
     // consumers who do not have a session.
@@ -2622,26 +2622,26 @@ System::Clock::Timeout ComputeRoundTripTimeout(ExchangeContext::Timeout serverPr
                                     // Assume peer is idle, as a worst-case assumption (probably true for
                                     // Sigma1, since that will be our initial message on the session, but less
                                     // so for Sigma2).
-                                    System::Clock::kZero, remoteMrpConfig.mActiveThresholdTime, true /*isInitial*/) +
+                                    System::Clock::kZero, remoteMrpConfig.mActiveThresholdTime, isFirstMessageOnExchange) +
         serverProcessingTime +
         GetRetransmissionTimeout(localMRPConfig.mActiveRetransTimeout, localMRPConfig.mIdleRetransTimeout,
                                  // Peer will assume we are active, since it's
-                                 // responding to our message, isInitial should be set as false.
+                                 // responding to our message, isFirstMessageOnExchange should be set as false.
                                  System::SystemClock().GetMonotonicTimestamp(), localMRPConfig.mActiveThresholdTime,
-                                 false /*isInitial*/);
+                                 false /*isFirstMessageOnExchange*/);
 }
 } // anonymous namespace
 
 System::Clock::Timeout CASESession::ComputeSigma1ResponseTimeout(const ReliableMessageProtocolConfig & remoteMrpConfig)
 {
     // Assume it is the initial message on the session, and treat peer as idle for Sigma1
-    return ComputeRoundTripTimeout(kExpectedSigma1ProcessingTime, remoteMrpConfig, false /*isInitial*/);
+    return ComputeRoundTripTimeout(kExpectedSigma1ProcessingTime, remoteMrpConfig, false /*isFirstMessageOnExchange*/);
 }
 
 System::Clock::Timeout CASESession::ComputeSigma2ResponseTimeout(const ReliableMessageProtocolConfig & remoteMrpConfig)
 {
     // Assume it is the response message on the session, and treat peer as active for Sigma2
-    return ComputeRoundTripTimeout(kExpectedHighProcessingTime, remoteMrpConfig, true /*isInitial*/);
+    return ComputeRoundTripTimeout(kExpectedHighProcessingTime, remoteMrpConfig, true /*isFirstMessageOnExchange*/);
 }
 
 bool CASESession::InvokeBackgroundWorkWatchdog()

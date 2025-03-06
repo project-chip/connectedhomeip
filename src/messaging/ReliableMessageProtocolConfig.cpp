@@ -127,7 +127,7 @@ Optional<ReliableMessageProtocolConfig> GetLocalMRPConfig()
 
 System::Clock::Timeout GetRetransmissionTimeout(System::Clock::Timeout activeInterval, System::Clock::Timeout idleInterval,
                                                 System::Clock::Timeout lastActivityTime, System::Clock::Timeout activityThreshold,
-                                                bool isInitial)
+                                                bool isFirstMessageOnExchange)
 {
     auto timeSinceLastActivity = (System::SystemClock().GetMonotonicTimestamp() - lastActivityTime);
 
@@ -140,7 +140,7 @@ System::Clock::Timeout GetRetransmissionTimeout(System::Clock::Timeout activeInt
         // If we are calculating the timeout for the initial message, we never know whether the peer is active or not, choose
         // active/idle interval from PeerActiveMode of session per 4.11.2.1. Retransmissions.
         // if we are calculating the timeout for response message, we know the peer is active, always choose active interval
-        if (isInitial)
+        if (isFirstMessageOnExchange)
         {
             baseInterval = ((timeSinceLastActivity + timeout) < activityThreshold) ? activeInterval : idleInterval;
         }

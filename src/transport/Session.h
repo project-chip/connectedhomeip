@@ -254,7 +254,8 @@ public:
     // GetAckTimeout is the estimate for how long it could take for the other
     // side to receive our message (accounting for our MRP retransmits if it
     // gets lost) and send a response.
-    virtual System::Clock::Milliseconds32 GetAckTimeout() const = 0;
+    // This need to know whether we are talking about an initial message we send or not via isFirstMessageOnExchange
+    virtual System::Clock::Milliseconds32 GetAckTimeout(bool isFirstMessageOnExchange) const = 0;
 
     // GetReceiptTimeout is the estimate for how long it could take for us to
     // receive a message after the other side sends it, accounting for the MRP
@@ -265,9 +266,7 @@ public:
     // System::SystemClock().GetMonotonicTimestamp() (to indicate "peer is
     // responding to a message it just received") and System::Clock::kZero (to
     // indicate "peer is reaching out to us, not in response to anything").
-    // isInitial indicates whether the other side treats us as initial message.
-    virtual System::Clock::Milliseconds32 GetMessageReceiptTimeout(System::Clock::Timestamp ourLastActivity,
-                                                                   bool isInitial) const = 0;
+    virtual System::Clock::Milliseconds32 GetMessageReceiptTimeout(System::Clock::Timestamp ourLastActivity) const = 0;
 
     const ReliableMessageProtocolConfig & GetRemoteMRPConfig() const { return GetRemoteSessionParameters().GetMRPConfig(); }
 

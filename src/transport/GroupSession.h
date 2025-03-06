@@ -69,13 +69,13 @@ public:
 
     System::Clock::Timestamp GetMRPBaseTimeout() const override { return System::Clock::kZero; }
 
-    System::Clock::Milliseconds32 GetAckTimeout() const override
+    System::Clock::Milliseconds32 GetAckTimeout(bool isFirstMessageOnExchange) const override
     {
         VerifyOrDie(false);
         return System::Clock::Timeout();
     }
 
-    System::Clock::Milliseconds32 GetMessageReceiptTimeout(System::Clock::Timestamp ourLastActivity, bool isInitial) const override
+    System::Clock::Milliseconds32 GetMessageReceiptTimeout(System::Clock::Timestamp ourLastActivity) const override
     {
         // There are no timeouts for group sessions.
         VerifyOrDie(false);
@@ -128,13 +128,13 @@ public:
 
     System::Clock::Timestamp GetMRPBaseTimeout() const override { return System::Clock::kZero; }
 
-    System::Clock::Milliseconds32 GetAckTimeout() const override
+    System::Clock::Milliseconds32 GetAckTimeout(bool isFirstMessageOnExchange) const override
     {
         VerifyOrDie(false);
         return System::Clock::Timeout();
     }
 
-    System::Clock::Milliseconds32 GetMessageReceiptTimeout(System::Clock::Timestamp ourLastActivity, bool isInitial) const override
+    System::Clock::Milliseconds32 GetMessageReceiptTimeout(System::Clock::Timestamp ourLastActivity) const override
     {
         // There are no timeouts for group sessions.
         VerifyOrDie(false);
