@@ -22,13 +22,13 @@ Git: 0.7-summer-2025-308-g2f23be841
 -->
 <configurator xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../zcl.xsd">
   <domain name="General"/>
-  <struct name="TLSCertStruct" apiMaturity="provisional" isFabricScoped="true">
+  <struct name="TLSCertStruct" apiMaturity="provisional">
     <cluster code="0x0801"/>
     <item fieldId="0" name="CAID" type="int16u"/>
     <item fieldId="1" name="Certificate" type="long_octet_string" length="3000" optional="true"/>
   </struct>
 
-  <struct name="TLSClientCertificateDetailStruct" apiMaturity="provisional" isFabricScoped="true">
+  <struct name="TLSClientCertificateDetailStruct" apiMaturity="provisional">
     <cluster code="0x0801"/>
     <item fieldId="0" name="CCDID" type="int16u"/>
     <item fieldId="1" name="ClientCertificate" type="long_octet_string" length="3000" optional="true"/>
@@ -109,7 +109,7 @@ Git: 0.7-summer-2025-308-g2f23be841
       <arg id="2" name="Nonce" type="octet_string"/>
     </command>
 
-    <command code="0x09" source="client" name="ProvisionClientCertificate" optional="false" isFabricScoped="true">
+    <command code="0x09" source="client" name="ProvisionClientCertificate" optional="false">
       <description>This command SHALL be generated to request the Node provisions newly provided Client Certificate Details, or rotate an existing client certificate.</description>
       <access op="invoke" privilege="administer"/>
       <quality largeMessage="true"/>
