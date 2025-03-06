@@ -52,6 +52,7 @@
         "drlc-cluster.xml",
         "microwave-oven-mode-cluster.xml",
         "microwave-oven-control-cluster.xml",
+        "meter-identification-cluster.xml",
         "door-lock-cluster.xml",
         "ecosystem-information-cluster.xml",
         "energy-preference-cluster.xml",
