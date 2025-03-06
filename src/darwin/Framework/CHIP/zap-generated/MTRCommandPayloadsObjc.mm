@@ -37607,7 +37607,11 @@ NS_ASSUME_NONNULL_BEGIN
                 MTRTLSCertificateManagementClusterTLSCertStruct * newElement_0;
                 newElement_0 = [MTRTLSCertificateManagementClusterTLSCertStruct new];
                 newElement_0.caid = [NSNumber numberWithUnsignedShort:entry_0.caid];
-                newElement_0.certificate = AsData(entry_0.certificate);
+                if (entry_0.certificate.HasValue()) {
+                    newElement_0.certificate = AsData(entry_0.certificate.Value());
+                } else {
+                    newElement_0.certificate = nil;
+                }
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
@@ -38074,28 +38078,34 @@ NS_ASSUME_NONNULL_BEGIN
     }
     {
         encodableStruct.clientCertificateDetails.ccdid = self.clientCertificateDetails.ccdid.unsignedShortValue;
-        encodableStruct.clientCertificateDetails.clientCertificate = AsByteSpan(self.clientCertificateDetails.clientCertificate);
-        {
-            using ListType_1 = std::remove_reference_t<decltype(encodableStruct.clientCertificateDetails.intermediateCertificates)>;
-            using ListMemberType_1 = ListMemberTypeGetter<ListType_1>::Type;
-            if (self.clientCertificateDetails.intermediateCertificates.count != 0) {
-                auto * listHolder_1 = new ListHolder<ListMemberType_1>(self.clientCertificateDetails.intermediateCertificates.count);
-                if (listHolder_1 == nullptr || listHolder_1->mList == nullptr) {
-                    return CHIP_ERROR_INVALID_ARGUMENT;
-                }
-                listFreer.add(listHolder_1);
-                for (size_t i_1 = 0; i_1 < self.clientCertificateDetails.intermediateCertificates.count; ++i_1) {
-                    auto element_1 = MTR_SAFE_CAST(self.clientCertificateDetails.intermediateCertificates[i_1], NSData);
-                    if (!element_1) {
-                        // Wrong kind of value.
-                        MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.clientCertificateDetails.intermediateCertificates[i_1], NSStringFromClass(NSData.class));
+        if (self.clientCertificateDetails.clientCertificate != nil) {
+            auto & definedValue_1 = encodableStruct.clientCertificateDetails.clientCertificate.Emplace();
+            definedValue_1 = AsByteSpan(self.clientCertificateDetails.clientCertificate);
+        }
+        if (self.clientCertificateDetails.intermediateCertificates != nil) {
+            auto & definedValue_1 = encodableStruct.clientCertificateDetails.intermediateCertificates.Emplace();
+            {
+                using ListType_2 = std::remove_reference_t<decltype(definedValue_1)>;
+                using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
+                if (self.clientCertificateDetails.intermediateCertificates.count != 0) {
+                    auto * listHolder_2 = new ListHolder<ListMemberType_2>(self.clientCertificateDetails.intermediateCertificates.count);
+                    if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
-                    listHolder_1->mList[i_1] = AsByteSpan(element_1);
+                    listFreer.add(listHolder_2);
+                    for (size_t i_2 = 0; i_2 < self.clientCertificateDetails.intermediateCertificates.count; ++i_2) {
+                        auto element_2 = MTR_SAFE_CAST(self.clientCertificateDetails.intermediateCertificates[i_2], NSData);
+                        if (!element_2) {
+                            // Wrong kind of value.
+                            MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.clientCertificateDetails.intermediateCertificates[i_2], NSStringFromClass(NSData.class));
+                            return CHIP_ERROR_INVALID_ARGUMENT;
+                        }
+                        listHolder_2->mList[i_2] = AsByteSpan(element_2);
+                    }
+                    definedValue_1 = ListType_2(listHolder_2->mList, self.clientCertificateDetails.intermediateCertificates.count);
+                } else {
+                    definedValue_1 = ListType_2();
                 }
-                encodableStruct.clientCertificateDetails.intermediateCertificates = ListType_1(listHolder_1->mList, self.clientCertificateDetails.intermediateCertificates.count);
-            } else {
-                encodableStruct.clientCertificateDetails.intermediateCertificates = ListType_1();
             }
         }
     }
@@ -38138,91 +38148,12 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTRTLSCertificateManagementClusterProvisionClientCertificateResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _ccdid = @(0);
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRTLSCertificateManagementClusterProvisionClientCertificateResponseParams alloc] init];
-
-    other.ccdid = self.ccdid;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: ccdid:%@; >", NSStringFromClass([self class]), _ccdid];
-    return descriptionString;
-}
-
-- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
-                                         error:(NSError * __autoreleasing *)error
-{
-    if (!(self = [super init])) {
-        return nil;
-    }
-
-    using DecodableType = chip::app::Clusters::TlsCertificateManagement::Commands::ProvisionClientCertificateResponse::DecodableType;
-    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
-                                                                           clusterID:DecodableType::GetClusterId()
-                                                                           commandID:DecodableType::GetCommandId()
-                                                                               error:error];
-    if (buffer.IsNull()) {
-        return nil;
-    }
-
-    chip::TLV::TLVReader reader;
-    reader.Init(buffer->Start(), buffer->DataLength());
-
-    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
-    if (err == CHIP_NO_ERROR) {
-        DecodableType decodedStruct;
-        err = chip::app::DataModel::Decode(reader, decodedStruct);
-        if (err == CHIP_NO_ERROR) {
-            err = [self _setFieldsFromDecodableStruct:decodedStruct];
-            if (err == CHIP_NO_ERROR) {
-                return self;
-            }
-        }
-    }
-
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
-    return nil;
-}
-
-@end
-
-@implementation MTRTLSCertificateManagementClusterProvisionClientCertificateResponseParams (InternalMethods)
-
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::TlsCertificateManagement::Commands::ProvisionClientCertificateResponse::DecodableType &)decodableStruct
-{
-    {
-        self.ccdid = [NSNumber numberWithUnsignedShort:decodableStruct.ccdid];
-    }
-    return CHIP_NO_ERROR;
-}
-
-@end
-
 @implementation MTRTLSCertificateManagementClusterFindClientCertificateParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _ccdid = @(0);
+        _ccdid = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -38255,7 +38186,12 @@ NS_ASSUME_NONNULL_BEGIN
     chip::app::Clusters::TlsCertificateManagement::Commands::FindClientCertificate::Type encodableStruct;
     ListFreer listFreer;
     {
-        encodableStruct.ccdid = self.ccdid.unsignedShortValue;
+        if (self.ccdid == nil) {
+            encodableStruct.ccdid.SetNull();
+        } else {
+            auto & nonNullValue_0 = encodableStruct.ccdid.SetNonNull();
+            nonNullValue_0 = self.ccdid.unsignedShortValue;
+        }
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -38376,21 +38312,29 @@ NS_ASSUME_NONNULL_BEGIN
                 MTRTLSCertificateManagementClusterTLSClientCertificateDetailStruct * newElement_0;
                 newElement_0 = [MTRTLSCertificateManagementClusterTLSClientCertificateDetailStruct new];
                 newElement_0.ccdid = [NSNumber numberWithUnsignedShort:entry_0.ccdid];
-                newElement_0.clientCertificate = AsData(entry_0.clientCertificate);
-                { // Scope for our temporary variables
-                    auto * array_2 = [NSMutableArray new];
-                    auto iter_2 = entry_0.intermediateCertificates.begin();
-                    while (iter_2.Next()) {
-                        auto & entry_2 = iter_2.GetValue();
-                        NSData * newElement_2;
-                        newElement_2 = AsData(entry_2);
-                        [array_2 addObject:newElement_2];
+                if (entry_0.clientCertificate.HasValue()) {
+                    newElement_0.clientCertificate = AsData(entry_0.clientCertificate.Value());
+                } else {
+                    newElement_0.clientCertificate = nil;
+                }
+                if (entry_0.intermediateCertificates.HasValue()) {
+                    { // Scope for our temporary variables
+                        auto * array_3 = [NSMutableArray new];
+                        auto iter_3 = entry_0.intermediateCertificates.Value().begin();
+                        while (iter_3.Next()) {
+                            auto & entry_3 = iter_3.GetValue();
+                            NSData * newElement_3;
+                            newElement_3 = AsData(entry_3);
+                            [array_3 addObject:newElement_3];
+                        }
+                        CHIP_ERROR err = iter_3.GetStatus();
+                        if (err != CHIP_NO_ERROR) {
+                            return err;
+                        }
+                        newElement_0.intermediateCertificates = array_3;
                     }
-                    CHIP_ERROR err = iter_2.GetStatus();
-                    if (err != CHIP_NO_ERROR) {
-                        return err;
-                    }
-                    newElement_0.intermediateCertificates = array_2;
+                } else {
+                    newElement_0.intermediateCertificates = nil;
                 }
                 [array_0 addObject:newElement_0];
             }

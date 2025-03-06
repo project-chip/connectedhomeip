@@ -44974,7 +44974,7 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace InstalledChimeSounds
-namespace ActiveChimeID {
+namespace SelectedChime {
 struct TypeInfo
 {
     using Type             = uint8_t;
@@ -44982,10 +44982,10 @@ struct TypeInfo
     using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Chime::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ActiveChimeID::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SelectedChime::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace ActiveChimeID
+} // namespace SelectedChime
 namespace Enabled {
 struct TypeInfo
 {
@@ -45038,7 +45038,7 @@ struct TypeInfo
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
         Attributes::InstalledChimeSounds::TypeInfo::DecodableType installedChimeSounds;
-        Attributes::ActiveChimeID::TypeInfo::DecodableType activeChimeID = static_cast<uint8_t>(0);
+        Attributes::SelectedChime::TypeInfo::DecodableType selectedChime = static_cast<uint8_t>(0);
         Attributes::Enabled::TypeInfo::DecodableType enabled             = static_cast<bool>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
@@ -45498,7 +45498,7 @@ struct Type
 {
 public:
     uint16_t caid = static_cast<uint16_t>(0);
-    chip::ByteSpan certificate;
+    Optional<chip::ByteSpan> certificate;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -45522,8 +45522,8 @@ struct Type
 {
 public:
     uint16_t ccdid = static_cast<uint16_t>(0);
-    chip::ByteSpan clientCertificate;
-    DataModel::List<const chip::ByteSpan> intermediateCertificates;
+    Optional<chip::ByteSpan> clientCertificate;
+    Optional<DataModel::List<const chip::ByteSpan>> intermediateCertificates;
 
     static constexpr bool kIsFabricScoped = false;
 
@@ -45534,8 +45534,8 @@ struct DecodableType
 {
 public:
     uint16_t ccdid = static_cast<uint16_t>(0);
-    chip::ByteSpan clientCertificate;
-    DataModel::DecodableList<chip::ByteSpan> intermediateCertificates;
+    Optional<chip::ByteSpan> clientCertificate;
+    Optional<DataModel::DecodableList<chip::ByteSpan>> intermediateCertificates;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -45597,11 +45597,6 @@ namespace ProvisionClientCertificate {
 struct Type;
 struct DecodableType;
 } // namespace ProvisionClientCertificate
-
-namespace ProvisionClientCertificateResponse {
-struct Type;
-struct DecodableType;
-} // namespace ProvisionClientCertificateResponse
 
 namespace FindClientCertificate {
 struct Type;
@@ -45947,7 +45942,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
-    using ResponseType = Clusters::TlsCertificateManagement::Commands::ProvisionClientCertificateResponse::DecodableType;
+    using ResponseType = DataModel::NullObjectType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -45963,38 +45958,6 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ProvisionClientCertificate
-namespace ProvisionClientCertificateResponse {
-enum class Fields : uint8_t
-{
-    kCcdid = 0,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::ProvisionClientCertificateResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::TlsCertificateManagement::Id; }
-
-    uint16_t ccdid = static_cast<uint16_t>(0);
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::ProvisionClientCertificateResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::TlsCertificateManagement::Id; }
-
-    uint16_t ccdid = static_cast<uint16_t>(0);
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace ProvisionClientCertificateResponse
 namespace FindClientCertificate {
 enum class Fields : uint8_t
 {
@@ -46008,7 +45971,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::FindClientCertificate::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TlsCertificateManagement::Id; }
 
-    uint16_t ccdid = static_cast<uint16_t>(0);
+    DataModel::Nullable<uint16_t> ccdid;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -46023,7 +45986,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::FindClientCertificate::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TlsCertificateManagement::Id; }
 
-    uint16_t ccdid = static_cast<uint16_t>(0);
+    DataModel::Nullable<uint16_t> ccdid;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace FindClientCertificate
@@ -46171,18 +46134,20 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxRootCertificates
-namespace CurrentRootCertificates {
+namespace ProvisionedRootCertificates {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::TlsCertificateManagement::Structs::TLSCertStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::TlsCertificateManagement::Structs::TLSCertStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::TlsCertificateManagement::Structs::TLSCertStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TlsCertificateManagement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentRootCertificates::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ProvisionedRootCertificates::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace CurrentRootCertificates
+} // namespace ProvisionedRootCertificates
 namespace MaxClientCertificates {
 struct TypeInfo
 {
@@ -46195,18 +46160,21 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxClientCertificates
-namespace CurrentClientCertificates {
+namespace ProvisionedClientCertificates {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type = chip::app::DataModel::List<
+        const chip::app::Clusters::TlsCertificateManagement::Structs::TLSClientCertificateDetailStruct::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<
+        chip::app::Clusters::TlsCertificateManagement::Structs::TLSClientCertificateDetailStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::TlsCertificateManagement::Structs::TLSClientCertificateDetailStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TlsCertificateManagement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentClientCertificates::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ProvisionedClientCertificates::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace CurrentClientCertificates
+} // namespace ProvisionedClientCertificates
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -46246,10 +46214,10 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::MaxRootCertificates::TypeInfo::DecodableType maxRootCertificates             = static_cast<uint8_t>(0);
-        Attributes::CurrentRootCertificates::TypeInfo::DecodableType currentRootCertificates     = static_cast<uint8_t>(0);
-        Attributes::MaxClientCertificates::TypeInfo::DecodableType maxClientCertificates         = static_cast<uint8_t>(0);
-        Attributes::CurrentClientCertificates::TypeInfo::DecodableType currentClientCertificates = static_cast<uint8_t>(0);
+        Attributes::MaxRootCertificates::TypeInfo::DecodableType maxRootCertificates = static_cast<uint8_t>(0);
+        Attributes::ProvisionedRootCertificates::TypeInfo::DecodableType provisionedRootCertificates;
+        Attributes::MaxClientCertificates::TypeInfo::DecodableType maxClientCertificates = static_cast<uint8_t>(0);
+        Attributes::ProvisionedClientCertificates::TypeInfo::DecodableType provisionedClientCertificates;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
