@@ -124,12 +124,24 @@ public:
     /// Unregister all registrations for the given endpoint.
     void UnregisterAllFromEndpoint(EndpointId endpointId);
 
+    // Set up the underlying context for all clusters that are managed by this registry.
+    //
+    // The values within context will be copied and used.
+    CHIP_ERROR SetContext(const ServerClusterContext & context);
+
+    // Invalidates current context.
+    void ClearContext();
+
 private:
     ServerClusterRegistration * mRegistrations = nullptr;
 
     // A one-element cache to speed up finding a cluster within an endpoint.
     // The endpointId specifies which endpoint the cache belongs to.
     ServerClusterInterface * mCachedInterface = nullptr;
+
+    // Managing context for this registry
+    bool mContextIsValid = false;
+    ServerClusterContext mContext;
 };
 
 } // namespace app

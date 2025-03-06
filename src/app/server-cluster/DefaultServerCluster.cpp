@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "app/ConcreteClusterPath.h"
 #include <app/server-cluster/DefaultServerCluster.h>
 
 #include <access/Privilege.h>
@@ -66,6 +67,11 @@ constexpr std::array<AttributeEntry, 5> kGlobalAttributeEntries{ {
 
 } // namespace
 
+Span<const DataModel::AttributeEntry> DefaultServerCluster::GlobalAttributes()
+{
+    return { kGlobalAttributeEntries.data(), kGlobalAttributeEntries.size() };
+}
+
 DefaultServerCluster::DefaultServerCluster()
 {
     // SPEC - 7.10.3. Cluster Data Version
@@ -76,7 +82,37 @@ DefaultServerCluster::DefaultServerCluster()
 CHIP_ERROR DefaultServerCluster::Attributes(const ConcreteClusterPath & path, DataModel::ListBuilder<AttributeEntry> & builder)
 {
 
-    return builder.ReferenceExisting(kGlobalAttributeEntries);
+    return builder.ReferenceExisting(GlobalAttributes());
+}
+
+CHIP_ERROR DefaultServerCluster::Startup(ServerClusterContext * context)
+{
+    VerifyOrReturnError(mContext == nullptr, CHIP_ERROR_ALREADY_INITIALIZED);
+    mContext = context;
+    return CHIP_NO_ERROR;
+}
+
+void DefaultServerCluster::Shutdown()
+{
+    mContext = nullptr;
+}
+
+void DefaultServerCluster::NotifyAttributeChanged(AttributeId attributeId)
+{
+    IncreaseDataVersion();
+
+    VerifyOrReturn(mContext != nullptr);
+    const ConcreteClusterPath path = GetPath();
+    mContext->interactionContext->dataModelChangeListener->MarkDirty({ path.mEndpointId, path.mClusterId, attributeId });
+}
+
+void DefaultServerCluster::NotifyAllAttributesChanged()
+{
+    IncreaseDataVersion();
+
+    VerifyOrReturn(mContext != nullptr);
+    const ConcreteClusterPath path = GetPath();
+    mContext->interactionContext->dataModelChangeListener->MarkDirty({ path.mEndpointId, path.mClusterId });
 }
 
 BitFlags<ClusterQualityFlags> DefaultServerCluster::GetClusterFlags() const
