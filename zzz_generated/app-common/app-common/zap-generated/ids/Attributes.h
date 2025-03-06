@@ -3519,6 +3519,48 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace WaterHeaterManagement
 
+namespace CommodityPrice {
+namespace Attributes {
+
+namespace TariffUnit {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace TariffUnit
+
+namespace Currency {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace Currency
+
+namespace CurrentPrice {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace CurrentPrice
+
+namespace PriceForecast {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace PriceForecast
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace CommodityPrice
+
 namespace DemandResponseLoadControl {
 namespace Attributes {
 
@@ -7317,6 +7359,108 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace Chime
 
+namespace CommodityTariff {
+namespace Attributes {
+
+namespace TariffInfo {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace TariffInfo
+
+namespace TariffUnit {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace TariffUnit
+
+namespace StartDate {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace StartDate
+
+namespace DayEntries {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace DayEntries
+
+namespace DayPatterns {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace DayPatterns
+
+namespace CalendarPeriods {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace CalendarPeriods
+
+namespace IndividualDays {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace IndividualDays
+
+namespace CurrentDay {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace CurrentDay
+
+namespace NextDay {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace NextDay
+
+namespace CurrentDayEntry {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace CurrentDayEntry
+
+namespace CurrentDayEntryDate {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace CurrentDayEntryDate
+
+namespace NextDayEntry {
+static constexpr AttributeId Id = 0x0000000B;
+} // namespace NextDayEntry
+
+namespace NextDayEntryDate {
+static constexpr AttributeId Id = 0x0000000C;
+} // namespace NextDayEntryDate
+
+namespace TariffComponents {
+static constexpr AttributeId Id = 0x0000000D;
+} // namespace TariffComponents
+
+namespace TariffPeriods {
+static constexpr AttributeId Id = 0x0000000E;
+} // namespace TariffPeriods
+
+namespace CurrentTariffComponents {
+static constexpr AttributeId Id = 0x0000000F;
+} // namespace CurrentTariffComponents
+
+namespace NextTariffComponents {
+static constexpr AttributeId Id = 0x00000010;
+} // namespace NextTariffComponents
+
+namespace DefaultRandomizationOffset {
+static constexpr AttributeId Id = 0x00000011;
+} // namespace DefaultRandomizationOffset
+
+namespace DefaultRandomizationType {
+static constexpr AttributeId Id = 0x00000012;
+} // namespace DefaultRandomizationType
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace CommodityTariff
+
 namespace EcosystemInformation {
 namespace Attributes {
 
@@ -7422,6 +7566,90 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 
 } // namespace Attributes
 } // namespace TlsCertificateManagement
+
+namespace MeterIdentification {
+namespace Attributes {
+
+namespace MeterType {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeterType
+
+namespace PointOfDelivery {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace PointOfDelivery
+
+namespace MeterSerialNumber {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MeterSerialNumber
+
+namespace ProtocolVersion {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace ProtocolVersion
+
+namespace PowerThreshold {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace PowerThreshold
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace MeterIdentification
+
+namespace CommodityMetering {
+namespace Attributes {
+
+namespace MeteredQuantity {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeteredQuantity
+
+namespace MeteredQuantityTimestamp {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MeteredQuantityTimestamp
+
+namespace MeasurementType {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MeasurementType
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace CommodityMetering
 
 namespace UnitTesting {
 namespace Attributes {

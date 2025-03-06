@@ -78,6 +78,7 @@ Generally regenerate using one of:
 |        144 |       0x90 | ElectricalPowerMeasurement                              |
 |        145 |       0x91 | ElectricalEnergyMeasurement                             |
 |        148 |       0x94 | WaterHeaterManagement                                   |
+|        149 |       0x95 | CommodityPrice                                          |
 |        150 |       0x96 | DemandResponseLoadControl                               |
 |        151 |       0x97 | Messages                                                |
 |        152 |       0x98 | DeviceEnergyManagement                                  |
@@ -137,9 +138,12 @@ Generally regenerate using one of:
 |       1364 |      0x554 | WebRTCTransportRequestor                                |
 |       1365 |      0x555 | PushAvStreamTransport                                   |
 |       1366 |      0x556 | Chime                                                   |
+|       1792 |      0x700 | CommodityTariff                                         |
 |       1872 |      0x750 | EcosystemInformation                                    |
 |       1873 |      0x751 | CommissionerControl                                     |
 |       2049 |      0x801 | TlsCertificateManagement                                |
+|       2822 |      0xB06 | MeterIdentification                                     |
+|       2823 |      0xB07 | CommodityMetering                                       |
 | 4294048773 | 0xFFF1FC05 | UnitTesting                                             |
 | 4294048774 | 0xFFF1FC06 | FaultInjection                                          |
 | 4294048800 | 0xFFF1FC20 | SampleMei                                               |
