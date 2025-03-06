@@ -841,7 +841,7 @@ using CHIP_ERROR = ::chip::ChipError;
  *  @def CHIP_ERROR_IN_USE
  *
  *  @brief
- *    A value is already used. Generally indicates an unavailable resrouce.
+ *    A value is already used. Generally indicates an unavailable resource.
  *    As opposed to CHIP_ERROR_BUSY, the use is not considered transient/temporary.
  *
  */
