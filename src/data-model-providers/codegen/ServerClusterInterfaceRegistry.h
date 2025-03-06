@@ -51,8 +51,7 @@ public:
         class Iterator
         {
         public:
-            Iterator(ServerClusterRegistration * interface, EndpointId endpoint) :
-                mRegistration(interface), mEndpointId(endpoint)
+            Iterator(ServerClusterRegistration * interface, EndpointId endpoint) : mRegistration(interface), mEndpointId(endpoint)
             {
                 AdvanceUntilMatchingEndpoint();
             }
