@@ -14,11 +14,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "app/ConcreteClusterPath.h"
 #include <app/server-cluster/DefaultServerCluster.h>
 
 #include <access/Privilege.h>
 #include <app-common/zap-generated/ids/Attributes.h>
+#include <app/ConcreteClusterPath.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <crypto/RandUtils.h>
 #include <lib/support/BitFlags.h>
