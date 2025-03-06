@@ -1846,8 +1846,8 @@ void CameraAVStreamMgmtServer::HandleCaptureSnapshot(HandlerContext & ctx,
         return;
     }
 
-    // copy the image data into the response
-    memcpy(&response.data, image.data.data(), image.data.size());
+    // Populate the response
+    response.data       = ByteSpan(image.data.data(), image.data.size());
     response.resolution = image.imageRes;
     response.imageCodec = image.imageCodec;
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
