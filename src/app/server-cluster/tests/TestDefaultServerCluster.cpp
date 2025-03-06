@@ -90,10 +90,9 @@ TEST(TestDefaultServerCluster, ListWriteNotification)
     FakeDefaultServerCluster cluster({ 1, 2 });
 
     // this does not test anything really, except we get 100% coverage and we see that we do not crash
-    cluster.ListAttributeWriteNotification({1,2,3}, DataModel::ListWriteOperation::kListWriteBegin);
-    cluster.ListAttributeWriteNotification({1,2,3}, DataModel::ListWriteOperation::kListWriteFailure);
+    cluster.ListAttributeWriteNotification({ 1, 2, 3 }, DataModel::ListWriteOperation::kListWriteBegin);
+    cluster.ListAttributeWriteNotification({ 1, 2, 3 }, DataModel::ListWriteOperation::kListWriteFailure);
 }
-
 
 TEST(TestDefaultServerCluster, AttributesDefault)
 {
