@@ -5750,15 +5750,16 @@ enum class VideoCodecEnum : uint8_t
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
-    kAudio           = 0x1,
-    kVideo           = 0x2,
-    kSnapshot        = 0x4,
-    kPrivacy         = 0x8,
-    kSpeaker         = 0x10,
-    kImageControl    = 0x20,
-    kWatermark       = 0x40,
-    kOnScreenDisplay = 0x80,
-    kLocalStorage    = 0x100,
+    kAudio            = 0x1,
+    kVideo            = 0x2,
+    kSnapshot         = 0x4,
+    kPrivacy          = 0x8,
+    kSpeaker          = 0x10,
+    kImageControl     = 0x20,
+    kWatermark        = 0x40,
+    kOnScreenDisplay  = 0x80,
+    kLocalStorage     = 0x100,
+    kHighDynamicRange = 0x200,
 };
 } // namespace CameraAvStreamManagement
 
