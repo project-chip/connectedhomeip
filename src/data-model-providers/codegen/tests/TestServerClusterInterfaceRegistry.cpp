@@ -94,27 +94,26 @@ TEST_F(TestServerClusterInterfaceRegistry, BasicTest)
     // registration of invalid values is not acceptable
     {
         // registration has NULL interface
-        ServerClusterRegistration registration;
-        EXPECT_EQ(registry.Register(registration), CHIP_ERROR_INVALID_ARGUMENT);
-
         // next is not null (meaning registration2 looks like already registered)
-        ServerClusterRegistration registration2(&cluster1, &registration);
+        ServerClusterRegistration registration1(cluster1);
+        ServerClusterRegistration registration2(cluster2);
+        registration2.next = &registration1;
         EXPECT_EQ(registry.Register(registration2), CHIP_ERROR_INVALID_ARGUMENT);
 
         // invalid path in cluster
         FakeServerClusterInterface invalidPathInterface(kInvalidEndpointId, kCluster1);
-        ServerClusterRegistration registration3(&invalidPathInterface);
+        ServerClusterRegistration registration3(invalidPathInterface);
         EXPECT_EQ(registry.Register(registration3), CHIP_ERROR_INVALID_ARGUMENT);
 
         // invalid path in cluster
         FakeServerClusterInterface invalidPathInterface2(kEp1, kInvalidClusterId);
-        ServerClusterRegistration registration4(&invalidPathInterface);
+        ServerClusterRegistration registration4(invalidPathInterface);
         EXPECT_EQ(registry.Register(registration4), CHIP_ERROR_INVALID_ARGUMENT);
     }
 
-    ServerClusterRegistration registration1(&cluster1);
-    ServerClusterRegistration registration2(&cluster2);
-    ServerClusterRegistration registration3(&cluster3);
+    ServerClusterRegistration registration1(cluster1);
+    ServerClusterRegistration registration2(cluster2);
+    ServerClusterRegistration registration3(cluster3);
 
     // should be able to register
     EXPECT_EQ(registry.Register(registration1), CHIP_NO_ERROR);
@@ -124,7 +123,7 @@ TEST_F(TestServerClusterInterfaceRegistry, BasicTest)
     // cannot register two implementations on the same path
     {
         FakeServerClusterInterface another1(kEp1, kCluster1);
-        ServerClusterRegistration anotherRegisration1(&another1);
+        ServerClusterRegistration anotherRegisration1(another1);
         EXPECT_EQ(registry.Register(anotherRegisration1), CHIP_ERROR_DUPLICATE_KEY_ID);
     }
 
@@ -187,10 +186,9 @@ TEST_F(TestServerClusterInterfaceRegistry, StressTest)
         items.emplace_back(endpointId, i);
     }
 
-    registrations.reserve(kClusterTestCount);
     for (ClusterId i = 0; i < kClusterTestCount; i++)
     {
-        registrations.emplace_back(&items[i]);
+        registrations.emplace_back(items[i]);
     }
 
     ServerClusterInterfaceRegistry registry;
@@ -279,10 +277,9 @@ TEST_F(TestServerClusterInterfaceRegistry, ClustersOnEndpoint)
     {
         items.emplace_back(static_cast<EndpointId>(i % kEndpointTestCount), i);
     }
-    registrations.reserve(kClusterTestCount);
     for (ClusterId i = 0; i < kClusterTestCount; i++)
     {
-        registrations.emplace_back(&items[i]);
+        registrations.emplace_back(items[i]);
     }
 
     ServerClusterInterfaceRegistry registry;
