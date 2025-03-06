@@ -1873,6 +1873,11 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         return;
     }
 
+    // Do not persist partial data in the middle of receiving a report. _handleReportEnd will schedule next persistence
+    if (_receivingReport) {
+        return;
+    }
+
     NSDate * lastReportTime = [_mostRecentReportTimes lastObject];
     NSTimeInterval intervalSinceLastReport = -[lastReportTime timeIntervalSinceNow];
     if (intervalSinceLastReport < [self _reportToPersistenceDelayTimeAfterMutiplier]) {
@@ -2072,6 +2077,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     _receivingPrimingReport = NO;
     _estimatedStartTimeFromGeneralDiagnosticsUpTime = nil;
 
+    [self _commitPendingDataVersions];
     [self _scheduleClusterDataPersistence];
 
     // After the handling of the report, if we detected a device configuration change, notify the delegate
@@ -2562,6 +2568,30 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     MTR_LOG_DEBUG("%@ _getCachedDataVersions dataVersions count: %lu", self, static_cast<unsigned long>(dataVersions.count));
 
     return dataVersions;
+}
+
+- (void)_commitPendingDataVersionsForClusterPath:(MTRClusterPath *)path
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+    MTRDeviceClusterData * clusterData = _clusterDataToPersist[path];
+    if (clusterData.pendingDataVersion) {
+        clusterData.dataVersion = clusterData.pendingDataVersion;
+        clusterData.pendingDataVersion = nil;
+    }
+}
+
+- (void)_commitPendingDataVersions
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+
+    if (!_clusterDataToPersist) {
+        // nothing to do
+        return;
+    }
+
+    for (MTRClusterPath * path in _clusterDataToPersist) {
+        [self _commitPendingDataVersionsForClusterPath:path];
+    }
 }
 
 - (MTRDeviceDataValueDictionary _Nullable)_cachedAttributeValueForPath:(MTRAttributePath *)path
@@ -3976,7 +4006,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         clusterData = [[MTRDeviceClusterData alloc] initWithDataVersion:dataVersion attributes:nil];
         dataVersionChanged = YES;
     } else if (![clusterData.dataVersion isEqualToNumber:dataVersion]) {
-        clusterData.dataVersion = dataVersion;
+        clusterData.pendingDataVersion = dataVersion;
         dataVersionChanged = YES;
     }
 
