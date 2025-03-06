@@ -2173,6 +2173,16 @@ bool DoorLockServer::clearFabricFromUsers(chip::EndpointId endpointId, chip::Fab
             user.lastModifiedBy = kUndefinedFabricIndex;
         }
 
+        if (user.createdBy == kUndefinedFabricIndex && user.lastModifiedBy == kUndefinedFabricIndex)
+        {
+            user.userName       = ""_span;
+            user.userUniqueId   = 0;
+            user.userStatus     = UserStatusEnum::kAvailable;
+            user.userType       = UserTypeEnum::kUnrestrictedUser;
+            user.credentialRule = CredentialRuleEnum::kSingle;
+            user.credentials    = {};
+        }
+
         if (!emberAfPluginDoorLockSetUser(endpointId, userIndex, user.createdBy, user.lastModifiedBy, user.userName,
                                           user.userUniqueId, user.userStatus, user.userType, user.credentialRule,
                                           user.credentials.data(), user.credentials.size()))
@@ -3307,6 +3317,12 @@ bool DoorLockServer::clearFabricFromCredentials(chip::EndpointId endpointId, Cre
         if (credential.lastModifiedBy == fabricToRemove)
         {
             credential.lastModifiedBy = kUndefinedFabricIndex;
+        }
+
+        if (credential.createdBy == kUndefinedFabricIndex && credential.lastModifiedBy == kUndefinedFabricIndex)
+        {
+            credential.status         = DlCredentialStatus::kAvailable;
+            credential.credentialData = {};
         }
 
         if (!emberAfPluginDoorLockSetCredential(endpointId, credentialIndex, credential.createdBy, credential.lastModifiedBy,
