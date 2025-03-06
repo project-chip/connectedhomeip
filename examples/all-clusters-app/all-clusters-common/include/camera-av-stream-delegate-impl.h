@@ -59,7 +59,6 @@ struct SnapshotStream
  */
 class CameraAVStreamManager : public CameraAVStreamMgmtDelegate
 {
-
 public:
     Protocols::InteractionModel::Status VideoStreamAllocate(const VideoStreamStruct & allocateArgs, uint16_t & outStreamID);
 
@@ -72,12 +71,13 @@ public:
 
     Protocols::InteractionModel::Status AudioStreamDeallocate(const uint16_t streamID);
 
-    Protocols::InteractionModel::Status SnapshotStreamAllocate(const SnapshotStreamStruct & allocateArgs,
-                                                               uint16_t & outStreamID) = 0;
+    Protocols::InteractionModel::Status SnapshotStreamAllocate(const SnapshotStreamStruct & allocateArgs, uint16_t & outStreamID);
 
     Protocols::InteractionModel::Status SnapshotStreamDeallocate(const uint16_t streamID);
 
     void OnRankedStreamPrioritiesChanged();
+
+    void OnAttributeChanged(AttributeId attributeId);
 
     Protocols::InteractionModel::Status CaptureSnapshot(const uint16_t streamID, const VideoResolutionStruct & resolution,
                                                         ImageSnapshot & outImageSnapshot);
@@ -97,6 +97,8 @@ public:
 
     CameraAVStreamManager()  = default;
     ~CameraAVStreamManager() = default;
+
+    // static inline CameraAVStreamManager & GetInstance() { return sCameraAVStreamMgrInstance; }
 
 private:
     std::vector<VideoStream> videoStreams;       // Vector to hold available video streams

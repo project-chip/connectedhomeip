@@ -461,7 +461,7 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
           "${_app_root}/clusters/${cluster}/${cluster}.h",
           "${_app_root}/clusters/${cluster}/closure-control-cluster-objects.h",
-		]
+        ]
       } else if (cluster == "camera-av-stream-management-server") {
         sources += [
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",

@@ -703,7 +703,7 @@
             "MaxNetworkBandwidth",
             "CurrentFrameRate",
             "HDRModeEnabled",
-            "FabricsUsingCamera",
+            "SupportedStreamUsages",
             "AllocatedVideoStreams",
             "AllocatedAudioStreams",
             "AllocatedSnapshotStreams",

@@ -28,7 +28,6 @@
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/TypeTraits.h>
 #include <protocols/interaction_model/StatusCode.h>
-#include <unordered_set>
 #include <vector>
 
 namespace chip {
@@ -281,9 +280,8 @@ public:
      * @param aFeatures                         The bitflags value that identifies which features are supported by this instance.
      * @param aOptionalAttrs                    The bitflags value that identifies the optional attributes supported by this
      *                                          instance.
-     * @param aPersistentStorage                The storage delegate to use to persist attributes.
      * @param aMaxConcurrentVideoEncoders       The maximum number of video encoders supported by camera.
-     * @param aMaxEncodedPixelRate              The maximum data rate (encoded pixels/dec) supported by camera.
+     * @param aMaxEncodedPixelRate              The maximum data rate (encoded pixels/sec) supported by camera.
      * @param aVideoSensorParams                The set of video sensor parameters for the camera.
      * @param aNightVisionCapable               Indicates whether the camera supports night vision.
      * @param aMinViewPort                      Indicates minimum resolution (width/height) in pixels allowed for camera viewport.
@@ -304,10 +302,9 @@ public:
      *
      */
     CameraAVStreamMgmtServer(CameraAVStreamMgmtDelegate & aDelegate, EndpointId aEndpointId, const BitFlags<Feature> aFeatures,
-                             const BitFlags<OptionalAttribute> aOptionalAttrs, PersistentStorageDelegate & aPersistentStorage,
-                             uint8_t aMaxConcurrentVideoEncoders, uint32_t aMaxEncodedPixelRate,
-                             const VideoSensorParamsStruct & aVideoSensorParams, bool aNightVisionCapable,
-                             const VideoResolutionStruct & aMinViewPort,
+                             const BitFlags<OptionalAttribute> aOptionalAttrs, uint8_t aMaxConcurrentVideoEncoders,
+                             uint32_t aMaxEncodedPixelRate, const VideoSensorParamsStruct & aVideoSensorParams,
+                             bool aNightVisionCapable, const VideoResolutionStruct & aMinViewPort,
                              const std::vector<RateDistortionTradeOffStruct> & aRateDistortionTradeOffPoints,
                              uint32_t aMaxContentBufferSize, const AudioCapabilitiesStruct & aMicrophoneCapabilities,
                              const AudioCapabilitiesStruct & aSpkrCapabilities, TwoWayTalkSupportTypeEnum aTwoWayTalkSupport,
@@ -487,7 +484,7 @@ public:
 private:
     CameraAVStreamMgmtDelegate & mDelegate;
     EndpointId mEndpointId;
-    const BitFlags<Feature> mFeature;
+    const BitFlags<Feature> mFeatures;
     const BitFlags<OptionalAttribute> mOptionalAttrs;
 
     // Attributes

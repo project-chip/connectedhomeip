@@ -2214,6 +2214,7 @@ provisional cluster CameraAvStreamManagement = 1361 {
     kWatermark = 0x40;
     kOnScreenDisplay = 0x80;
     kLocalStorage = 0x100;
+    kHighDynamicRange = 0x200;
   }
 
   struct VideoResolutionStruct {
@@ -2282,9 +2283,8 @@ provisional cluster CameraAvStreamManagement = 1361 {
   struct VideoSensorParamsStruct {
     int16u sensorWidth = 0;
     int16u sensorHeight = 1;
-    boolean HDRCapable = 2;
-    int16u maxFPS = 3;
-    int16u maxHDRFPS = 4;
+    int16u maxFPS = 2;
+    optional int16u maxHDRFPS = 3;
   }
 
   struct ViewportStruct {
@@ -2294,47 +2294,13 @@ provisional cluster CameraAvStreamManagement = 1361 {
     int16u y2 = 3;
   }
 
-  info event VideoStreamChanged = 0 {
-    int16u videoStreamID = 0;
-    optional StreamUsageEnum streamUsage = 1;
-    optional VideoCodecEnum videoCodec = 2;
-    optional int16u minFrameRate = 3;
-    optional int16u maxFrameRate = 4;
-    optional VideoResolutionStruct minResolution = 5;
-    optional VideoResolutionStruct maxResolution = 6;
-    optional int32u minBitRate = 7;
-    optional int32u maxBitRate = 8;
-    optional int16u minFragmentLen = 9;
-    optional int16u maxFragmentLen = 10;
-  }
-
-  info event AudioStreamChanged = 1 {
-    int16u audioStreamID = 0;
-    optional StreamUsageEnum streamUsage = 1;
-    optional AudioCodecEnum audioCodec = 2;
-    optional int8u channelCount = 3;
-    optional int32u sampleRate = 4;
-    optional int32u bitRate = 5;
-    optional int8u bitDepth = 6;
-  }
-
-  info event SnapshotStreamChanged = 2 {
-    int16u snapshotStreamID = 0;
-    optional ImageCodecEnum imageCodec = 1;
-    optional int16u frameRate = 2;
-    optional int32u bitRate = 3;
-    optional VideoResolutionStruct minResolution = 4;
-    optional VideoResolutionStruct maxResolution = 5;
-    optional int8u quality = 6;
-  }
-
   readonly attribute optional int8u maxConcurrentVideoEncoders = 0;
   readonly attribute optional int32u maxEncodedPixelRate = 1;
   readonly attribute optional VideoSensorParamsStruct videoSensorParams = 2;
   readonly attribute optional boolean nightVisionCapable = 3;
   readonly attribute optional VideoResolutionStruct minViewport = 4;
   readonly attribute optional RateDistortionTradeOffPointsStruct rateDistortionTradeOffPoints[] = 5;
-  readonly attribute optional int32u maxContentBufferSize = 6;
+  readonly attribute int32u maxContentBufferSize = 6;
   readonly attribute optional AudioCapabilitiesStruct microphoneCapabilities = 7;
   readonly attribute optional AudioCapabilitiesStruct speakerCapabilities = 8;
   readonly attribute optional TwoWayTalkSupportTypeEnum twoWayTalkSupport = 9;
@@ -2490,10 +2456,18 @@ provisional cluster CameraAvStreamManagement = 1361 {
     VideoResolutionStruct minResolution = 3;
     VideoResolutionStruct maxResolution = 4;
     int8u quality = 5;
+    optional boolean watermarkEnabled = 6;
+    optional boolean OSDEnabled = 7;
   }
 
   response struct SnapshotStreamAllocateResponse = 8 {
     int16u snapshotStreamID = 0;
+  }
+
+  request struct SnapshotStreamModifyRequest {
+    int16u snapshotStreamID = 0;
+    optional boolean watermarkEnabled = 1;
+    optional boolean OSDEnabled = 2;
   }
 
   request struct SnapshotStreamDeallocateRequest {
@@ -2509,7 +2483,7 @@ provisional cluster CameraAvStreamManagement = 1361 {
     VideoResolutionStruct requestedResolution = 1;
   }
 
-  response struct CaptureSnapshotResponse = 12 {
+  response struct CaptureSnapshotResponse = 13 {
     octet_string data = 0;
     ImageCodecEnum imageCodec = 1;
     VideoResolutionStruct resolution = 2;
@@ -2527,13 +2501,19 @@ provisional cluster CameraAvStreamManagement = 1361 {
   command access(invoke: manage) VideoStreamDeallocate(VideoStreamDeallocateRequest): DefaultSuccess = 6;
   /** This command SHALL allocate a snapshot stream on the device and return an allocated snapshot stream identifier. */
   command access(invoke: manage) SnapshotStreamAllocate(SnapshotStreamAllocateRequest): SnapshotStreamAllocateResponse = 7;
+  /** This command SHALL be used to modify a stream specified by the VideoStreamID. */
+  command access(invoke: manage) SnapshotStreamModify(SnapshotStreamModifyRequest): DefaultSuccess = 9;
   /** This command SHALL deallocate an snapshot stream on the camera, corresponding to the given snapshot stream identifier. */
-  command access(invoke: manage) SnapshotStreamDeallocate(SnapshotStreamDeallocateRequest): DefaultSuccess = 9;
+  command access(invoke: manage) SnapshotStreamDeallocate(SnapshotStreamDeallocateRequest): DefaultSuccess = 10;
   /** This command SHALL set the relative priorities of the various stream usages on the camera. */
-  command access(invoke: administer) SetStreamPriorities(SetStreamPrioritiesRequest): DefaultSuccess = 10;
+  command access(invoke: administer) SetStreamPriorities(SetStreamPrioritiesRequest): DefaultSuccess = 11;
   /** This command SHALL return a Snapshot from the camera. */
+<<<<<<< HEAD
   command CaptureSnapshot(CaptureSnapshotRequest): CaptureSnapshotResponse = 11;
 >>>>>>> e9f61cff81 (Add CameraAVStreamMgmt cluster to EP1 of camera-app.zap.)
+=======
+  command CaptureSnapshot(CaptureSnapshotRequest): CaptureSnapshotResponse = 12;
+>>>>>>> 903fe48729 (Updates to CameraAVStreamMgmt delegate.)
 }
 
 /** This cluster provides facilities to configure and play Chime sounds, such as those used in a doorbell. */
@@ -3028,7 +3008,7 @@ endpoint 1 {
     callback attribute maxNetworkBandwidth;
     callback attribute currentFrameRate;
     callback attribute HDRModeEnabled;
-    callback attribute fabricsUsingCamera;
+    callback attribute supportedStreamUsages;
     callback attribute allocatedVideoStreams;
     callback attribute allocatedAudioStreams;
     callback attribute allocatedSnapshotStreams;
@@ -3055,6 +3035,7 @@ endpoint 1 {
     handle command VideoStreamDeallocate;
     handle command SnapshotStreamAllocate;
     handle command SnapshotStreamAllocateResponse;
+    handle command SnapshotStreamModify;
     handle command SnapshotStreamDeallocate;
     handle command SetStreamPriorities;
     handle command CaptureSnapshot;
