@@ -20,6 +20,7 @@
 #include <commands/common/Commands.h>
 #include <commands/interactive/Commands.h>
 #include <commands/pairing/Commands.h>
+#include <commands/webrtc/Commands.h>
 #include <zap-generated/cluster/Commands.h>
 
 #include <iostream>
@@ -51,6 +52,7 @@ int main(int argc, char * argv[])
     registerCommandsPairing(commands, &credIssuerCommands);
     registerClusters(commands, &credIssuerCommands);
     registerCommandsSubscriptions(commands, &credIssuerCommands);
+    registerCommandsWebRTC(commands, &credIssuerCommands);
 
     std::vector<char *> c_args;
     for (auto & arg : args)

@@ -69,6 +69,10 @@ static_library("camera-controller-utils") {
     "commands/pairing/OpenCommissioningWindowCommand.h",
     "commands/pairing/PairingCommand.cpp",
     "commands/pairing/ToTLVCert.cpp",
+    "commands/webrtc/AnswerCommand.cpp",
+    "commands/webrtc/AnswerCommand.h",
+    "commands/webrtc/ProviderCommand.cpp",
+    "commands/webrtc/ProviderCommand.h",
   ]
 
   deps = [ "${chip_root}/src/app:events" ]

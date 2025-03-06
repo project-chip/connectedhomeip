@@ -1,44 +1,41 @@
 /*
- *    Copyright (c) 2025 Project CHIP Authors
- *    All rights reserved.
+ *   Copyright (c) 2025 Project CHIP Authors
+ *   All rights reserved.
  *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ *       http://www.apache.org/licenses/LICENSE-2.0
  *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ *
  */
 
-#include "camera-app.h"
-#include "camera-device.h"
-#include <AppMain.h>
-#include <platform/CHIPDeviceConfig.h>
-
+#include "ProviderCommand.h"
+#include <commands/common/RemoteDataModelLogger.h>
+#include <commands/interactive/InteractiveCommands.h>
 #include <rtc/rtc.hpp>
 #include <thread>
+#include <unistd.h>
 
-using namespace chip;
-using namespace chip::app;
-using namespace chip::app::Clusters;
-using namespace Camera;
+using namespace ::chip;
 using namespace std::chrono_literals;
 
-CameraDevice cameraDevice;
+namespace webrtc {
 
-void RunCommandThread()
+CHIP_ERROR ProviderCommand::RunCommand()
 {
-    std::this_thread::sleep_for(1s);
+    // print to console
+    fprintf(stderr, "Run ProviderCommand.\n");
 
     rtc::InitLogger(rtc::LogLevel::Warning);
 
     rtc::Configuration config;
-    // config.iceServers.emplace_back("stun.l.google.com:19302");
 
     auto pc = std::make_shared<rtc::PeerConnection>(config);
 
@@ -53,23 +50,26 @@ void RunCommandThread()
     });
 
     pc->onStateChange([](rtc::PeerConnection::State state) { std::cout << "[State: " << state << "]" << std::endl; });
+
     pc->onGatheringStateChange(
         [](rtc::PeerConnection::GatheringState state) { std::cout << "[Gathering State: " << state << "]" << std::endl; });
 
-    std::shared_ptr<rtc::DataChannel> dc;
-    pc->onDataChannel([&](std::shared_ptr<rtc::DataChannel> _dc) {
-        std::cout << "[Got a DataChannel with label: " << _dc->label() << "]" << std::endl;
-        dc = _dc;
+    auto dc = pc->createDataChannel("test"); // this is the offerer, so create a data channel
 
-        dc->onClosed([&]() { std::cout << "[DataChannel closed: " << dc->label() << "]" << std::endl; });
+    dc->onOpen([&]() { std::cout << "[DataChannel open: " << dc->label() << "]" << std::endl; });
 
-        dc->onMessage([](auto data) {
-            if (std::holds_alternative<std::string>(data))
-            {
-                std::cout << "[Received message: " << std::get<std::string>(data) << "]" << std::endl;
-            }
-        });
+    dc->onClosed([&]() { std::cout << "[DataChannel closed: " << dc->label() << "]" << std::endl; });
+
+    dc->onMessage([](auto data) {
+        if (std::holds_alternative<std::string>(data))
+        {
+            std::cout << "[Received: " << std::get<std::string>(data) << "]" << std::endl;
+        }
     });
+
+    StopReadCommandThread();
+
+    std::this_thread::sleep_for(1s);
 
     bool exit = false;
     while (!exit)
@@ -93,6 +93,7 @@ void RunCommandThread()
         {
         case 0: {
             exit = true;
+            StartReadCommandThread();
             break;
         }
         case 1: {
@@ -119,7 +120,7 @@ void RunCommandThread()
         }
         case 3: {
             // Send Message
-            if (!dc || !dc->isOpen())
+            if (!dc->isOpen())
             {
                 std::cout << "** Channel is not Open ** ";
                 break;
@@ -158,7 +159,7 @@ void RunCommandThread()
             break;
         }
         default: {
-            std::cout << "** Invalid Command ** " << std::endl;
+            std::cout << "** Invalid Command **" << std::endl;
             break;
         }
         }
@@ -169,27 +170,8 @@ void RunCommandThread()
 
     if (pc)
         pc->close();
+
+    return CHIP_NO_ERROR;
 }
 
-void ApplicationInit()
-{
-    ChipLogProgress(Zcl, "Matter Camera Linux App: ApplicationInit()");
-    CameraAppInit(&cameraDevice);
-}
-
-void ApplicationShutdown()
-{
-    CameraAppShutdown();
-}
-
-int main(int argc, char * argv[])
-{
-    VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
-
-    std::thread runCommands(RunCommandThread);
-    runCommands.detach();
-
-    ChipLinuxAppMainLoop();
-
-    return 0;
-}
+} // namespace webrtc
