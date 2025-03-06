@@ -30,7 +30,7 @@ Git: 0.7-summer-2025-368-gf4de1d404
 
   <struct name="CommodityPriceComponentStruct" apiMaturity="provisional">
     <cluster code="0x0095"/>
-    <item fieldId="0" name="Price" type="money"/>
+    <item fieldId="0" name="Price" type="int64s"/>
     <item fieldId="1" name="Source" type="TariffPriceTypeEnum" min="0x00" max="0x04"/>
     <item fieldId="2" name="Description" type="char_string" optional="true" length="32"/>
     <item fieldId="3" name="TariffComponentID" type="int32u" optional="true"/>

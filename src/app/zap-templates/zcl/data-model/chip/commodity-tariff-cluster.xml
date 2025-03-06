@@ -144,7 +144,7 @@ Git: 0.7-summer-2025-368-gf4de1d404
   <struct name="TariffPriceStruct" apiMaturity="provisional">
     <cluster code="0x0700"/>
     <item fieldId="0" name="PriceType" type="TariffPriceTypeEnum" min="0x00" max="0x04"/>
-    <item fieldId="1" name="Price" type="money" optional="true"/>
+    <item fieldId="1" name="Price" type="int64s" optional="true"/>
     <item fieldId="2" name="PriceLevel" type="int16s" optional="true"/>
   </struct>
 
