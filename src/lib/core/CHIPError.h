@@ -852,7 +852,7 @@ using CHIP_ERROR = ::chip::ChipError;
  *
  *  @brief
  *    Report a multi-part operation as having had failures.
- *    This is used as an aggregate of a single CHIP_ERROR when several undelying
+ *    This is used as an aggregate of a single CHIP_ERROR when several underlying
  *    calls may have failed and no single point of failure is reported.
  */
 #define CHIP_ERROR_HAD_FAILURES                                CHIP_CORE_ERROR(0x29)
