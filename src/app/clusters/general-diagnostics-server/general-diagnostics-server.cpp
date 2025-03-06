@@ -426,7 +426,7 @@ void GeneralDiagnosticsServer::OnDeviceReboot(BootReasonEnum bootReason)
         Events::BootReason::Type event{ bootReason };
         EventNumber eventNumber;
 
-        CHIP_ERROR err = LogEvent(event, endpoint eventNumber);
+        CHIP_ERROR err = LogEvent(event, endpoint, eventNumber);
         if (CHIP_NO_ERROR != err)
         {
             ChipLogError(Zcl, "GeneralDiagnostics: Failed to record BootReason event: %" CHIP_ERROR_FORMAT, err.Format());
