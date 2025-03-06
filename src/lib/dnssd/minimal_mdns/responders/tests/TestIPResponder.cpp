@@ -21,7 +21,7 @@
 #include <pw_unit_test/framework.h>
 
 #include <lib/core/StringBuilderAdapters.h>
-#include <lib/dnssd/minimal_mdns/AddressPolicy_DefaultImpl.h>
+#include <lib/dnssd/minimal_mdns/AddressPolicy_BuiltinImpl.h>
 #include <lib/support/CHIPMem.h>
 
 namespace {
@@ -61,11 +61,7 @@ InterfaceId FindValidInterfaceId()
 class TestIPResponder : public ::testing::Test
 {
 public:
-    static void SetUpTestSuite()
-    {
-        mdns::Minimal::SetDefaultAddressPolicy();
-        ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
-    }
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 };
 
