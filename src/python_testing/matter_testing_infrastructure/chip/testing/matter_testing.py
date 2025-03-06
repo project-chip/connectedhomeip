@@ -497,6 +497,22 @@ class ClusterAttributeChangeAccumulator:
         _ = self.get_last_report()
         return
 
+    def wait_for_report(self):
+        try:
+            path, transaction = self._output.get(block=True, timeout=10)
+        except queue.Empty:
+            asserts.fail(
+                f"[AttributeChangeCallback] Failed to receive a report for the {self._expected_attribute} attribute change")
+
+        asserts.assert_equal(path.AttributeType, self._expected_attribute,
+                             f"[AttributeChangeCallback] Received incorrect report. Expected: {self._expected_attribute}, received: {path.AttributeType}")
+        try:
+            attribute_value = transaction.GetAttribute(path)
+            logging.debug(
+                f"[AttributeChangeCallback] Got attribute subscription report. Attribute {path.AttributeType}. Updated value: {attribute_value}. SubscriptionId: {transaction.subscriptionId}")
+        except KeyError:
+            asserts.fail("[AttributeChangeCallback] Attribute {expected_attribute} not found in returned report")
+
 
 class InternalTestRunnerHooks(TestRunnerHooks):
 
