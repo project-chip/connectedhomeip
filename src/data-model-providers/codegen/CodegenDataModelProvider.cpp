@@ -275,7 +275,9 @@ CHIP_ERROR CodegenDataModelProvider::ServerClusters(EndpointId endpointId,
     //     however may also not have one (we should accept server clusters registered
     //     completely outside ember).
     //
-    // As a result, we are merging the lists here. The first list is from ember.
+    // As a result, we are merging the lists here. The first list is the registry
+    // as the cluster version from that is authoritative (regardless of what ember
+    // claims). Secondly we add any additional ember clusters.
     //
     // This uses some RAM, however we assume clusters are in the 10s of items only.
     // so this overflow seems ok.
