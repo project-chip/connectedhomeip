@@ -76,7 +76,6 @@
         "level-control-cluster.xml",
         "localization-configuration-cluster.xml",
         "low-power-cluster.xml",
-        "measurement-and-sensing.xml",
         "media-input-cluster.xml",
         "media-playback-cluster.xml",
         "messages-cluster.xml",
@@ -200,6 +199,14 @@
         "Bridged Device Basic Information": ["ProductAppearance"],
         "Chime": ["ActiveChimeID", "Enabled"],
         "Closure Control": ["OverallState", "OverallTarget"],
+        "Commodity Price": ["Currency", "CurrentPrice"],
+        "Commodity Tariff": [
+            "TariffInfo",
+            "CurrentDay",
+            "NextDay",
+            "CurrentDayEntry",
+            "NextDayEntry"
+        ],
         "Descriptor": ["ClusterRevision", "FeatureMap"],
         "Device Energy Management": [
             "ESAType",
@@ -299,6 +306,7 @@
             "OperatingMode",
             "FeatureMap"
         ],
+        "Meter Identification": ["PowerThreshold"],
         "Occupancy Sensing": [
             "HoldTimeLimits",
             "HoldTime",

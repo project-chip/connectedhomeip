@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (c) 2024 Project CHIP Authors
+Copyright (c) 2024-2025 Project CHIP Authors
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -38,8 +38,26 @@ limitations under the License.
     These are test global items (no cluster attached) for testing only.
     Their usage is defined for UnitTestCluster only.
   -->
-  
-   <struct name="PowerThresholdStruct" apiMaturity="provisional">
+  <struct name="MeasurementAccuracyRangeStruct" apiMaturity="provisional">
+    <item fieldId="0" name="RangeMin" type="int64s" min="-4611686018427387904" max="4611686018427387904"/>
+    <item fieldId="1" name="RangeMax" type="int64s" min="-4611686018427387904" max="4611686018427387904"/>
+    <item fieldId="2" name="PercentMax" type="percent100ths" optional="true"/>
+    <item fieldId="3" name="PercentMin" type="percent100ths" optional="true"/>
+    <item fieldId="4" name="PercentTypical" type="percent100ths" optional="true"/>
+    <item fieldId="5" name="FixedMax" type="int64u" optional="true" max="4611686018427387903"/>
+    <item fieldId="6" name="FixedMin" type="int64u" optional="true" max="4611686018427387903"/>
+    <item fieldId="7" name="FixedTypical" type="int64u" optional="true" max="4611686018427387903"/>
+  </struct>
+
+  <struct name="MeasurementAccuracyStruct" apiMaturity="provisional">
+    <item fieldId="0" name="MeasurementType" type="MeasurementTypeEnum" min="0x0000" max="0x0010"/>
+    <item fieldId="1" name="Measured" type="boolean" default="0"/>
+    <item fieldId="2" name="MinMeasuredValue" type="int64s" min="-4611686018427387904" max="4611686018427387904"/>
+    <item fieldId="3" name="MaxMeasuredValue" type="int64s" min="-4611686018427387904" max="4611686018427387904"/>
+    <item fieldId="4" name="AccuracyRanges" array="true" type="MeasurementAccuracyRangeStruct" minLength="1"/>
+  </struct>
+
+  <struct name="PowerThresholdStruct" apiMaturity="provisional">
     <item fieldId="0" name="PowerThreshold" type="power_mw" optional="true"/>
     <item fieldId="1" name="ApparentPowerThreshold" type="power_mw" optional="true"/>
     <item fieldId="2" name="PowerThresholdSource" type="PowerThresholdSourceEnum" isNullable="true" min="0x00" max="0x02"/>
