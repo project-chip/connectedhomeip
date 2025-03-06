@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 55;
+	objectVersion = 56;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -385,6 +385,9 @@
 		B2E0D7B9245B0B5C003C5B48 /* MTRSetupPayload.mm in Sources */ = {isa = PBXBuildFile; fileRef = B2E0D7B0245B0B5C003C5B48 /* MTRSetupPayload.mm */; };
 		B409D0AE2CCFB89600A7ED5A /* DeviceDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = B409D0AC2CCFB89600A7ED5A /* DeviceDelegate.h */; };
 		B409D0AF2CCFB89600A7ED5A /* DeviceDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = B409D0AD2CCFB89600A7ED5A /* DeviceDelegate.mm */; };
+		B4382F882D6E231800F79AFC /* HomeKitConnector.mm in Sources */ = {isa = PBXBuildFile; fileRef = B4382F872D6E231800F79AFC /* HomeKitConnector.mm */; platformFilters = (ios, maccatalyst, ); settings = {COMPILER_FLAGS = " -Wno-error=availability -Wno-nullability-completeness"; }; };
+		B4382F892D6E231800F79AFC /* HomeKitConnector.h in Headers */ = {isa = PBXBuildFile; fileRef = B4382F862D6E231800F79AFC /* HomeKitConnector.h */; platformFilters = (ios, maccatalyst, ); };
+		B4382F8B2D6F554B00F79AFC /* HomeKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B4382F8A2D6F554B00F79AFC /* HomeKit.framework */; platformFilters = (ios, maccatalyst, ); };
 		B43B39EA2CB859A5006AA284 /* DumpMemoryGraphCommand.mm in Sources */ = {isa = PBXBuildFile; fileRef = B43B39E62CB859A5006AA284 /* DumpMemoryGraphCommand.mm */; };
 		B43B39EB2CB859A5006AA284 /* LeaksTool.mm in Sources */ = {isa = PBXBuildFile; fileRef = B43B39E82CB859A5006AA284 /* LeaksTool.mm */; };
 		B43B39EC2CB859A5006AA284 /* DumpMemoryGraphCommand.h in Headers */ = {isa = PBXBuildFile; fileRef = B43B39E52CB859A5006AA284 /* DumpMemoryGraphCommand.h */; };
@@ -442,11 +445,11 @@
 		B4D67A3E2D00DAB700C49965 /* XPCServer.mm in Sources */ = {isa = PBXBuildFile; fileRef = B4D67A372D00DAB700C49965 /* XPCServer.mm */; };
 		B4D67A412D00DD3D00C49965 /* DFTKeypair.h in Headers */ = {isa = PBXBuildFile; fileRef = B4D67A3F2D00DD3D00C49965 /* DFTKeypair.h */; };
 		B4D67A422D00DD3D00C49965 /* DFTKeypair.mm in Sources */ = {isa = PBXBuildFile; fileRef = B4D67A402D00DD3D00C49965 /* DFTKeypair.mm */; };
+		B4D67A462D07021700C49965 /* XPCServerProtocols.h in Headers */ = {isa = PBXBuildFile; fileRef = B4D67A452D07021700C49965 /* XPCServerProtocols.h */; };
 		B4D67A922D527F4A00C49965 /* DCLClient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B4D67A8E2D527F4A00C49965 /* DCLClient.cpp */; };
 		B4D67A932D527F4A00C49965 /* DisplayTermsAndConditions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B4D67A8F2D527F4A00C49965 /* DisplayTermsAndConditions.cpp */; };
 		B4D67A952D527F4A00C49965 /* JsonSchemaMacros.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B4D67A912D527F4A00C49965 /* JsonSchemaMacros.cpp */; };
 		B4D67A9B2D538E9700C49965 /* HTTPSRequest.mm in Sources */ = {isa = PBXBuildFile; fileRef = B4D67A992D538E9700C49965 /* HTTPSRequest.mm */; };
-		B4D67A462D07021700C49965 /* XPCServerProtocols.h in Headers */ = {isa = PBXBuildFile; fileRef = B4D67A452D07021700C49965 /* XPCServerProtocols.h */; };
 		B4E262162AA0CF1C00DBA5BC /* RemoteDataModelLogger.mm in Sources */ = {isa = PBXBuildFile; fileRef = B4E262122AA0C7A300DBA5BC /* RemoteDataModelLogger.mm */; };
 		B4E262172AA0CF2000DBA5BC /* RemoteDataModelLogger.h in Headers */ = {isa = PBXBuildFile; fileRef = B4E262132AA0C7A300DBA5BC /* RemoteDataModelLogger.h */; };
 		B4E2621B2AA0D02000DBA5BC /* SleepCommand.mm in Sources */ = {isa = PBXBuildFile; fileRef = B4E262192AA0D01D00DBA5BC /* SleepCommand.mm */; };
@@ -951,6 +954,9 @@
 		B2E0D7B0245B0B5C003C5B48 /* MTRSetupPayload.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRSetupPayload.mm; sourceTree = "<group>"; };
 		B409D0AC2CCFB89600A7ED5A /* DeviceDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DeviceDelegate.h; sourceTree = "<group>"; };
 		B409D0AD2CCFB89600A7ED5A /* DeviceDelegate.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = DeviceDelegate.mm; sourceTree = "<group>"; };
+		B4382F862D6E231800F79AFC /* HomeKitConnector.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HomeKitConnector.h; sourceTree = "<group>"; };
+		B4382F872D6E231800F79AFC /* HomeKitConnector.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = HomeKitConnector.mm; sourceTree = "<group>"; };
+		B4382F8A2D6F554B00F79AFC /* HomeKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HomeKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.4.sdk/System/iOSSupport/System/Library/Frameworks/HomeKit.framework; sourceTree = DEVELOPER_DIR; };
 		B43B39E42CB859A5006AA284 /* Commands.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Commands.h; sourceTree = "<group>"; };
 		B43B39E52CB859A5006AA284 /* DumpMemoryGraphCommand.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DumpMemoryGraphCommand.h; sourceTree = "<group>"; };
 		B43B39E62CB859A5006AA284 /* DumpMemoryGraphCommand.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = DumpMemoryGraphCommand.mm; sourceTree = "<group>"; };
@@ -1001,6 +1007,7 @@
 		B45373F82A9FEC4F00807602 /* unix-misc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "unix-misc.c"; path = "repo/lib/plat/unix/unix-misc.c"; sourceTree = "<group>"; };
 		B45373F92A9FEC4F00807602 /* unix-init.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "unix-init.c"; path = "repo/lib/plat/unix/unix-init.c"; sourceTree = "<group>"; };
 		B45373FA2A9FEC4F00807602 /* unix-sockets.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "unix-sockets.c"; path = "repo/lib/plat/unix/unix-sockets.c"; sourceTree = "<group>"; };
+		B46C4AA72D6CD2580024F65E /* HomeKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HomeKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.0.sdk/System/iOSSupport/System/Library/Frameworks/HomeKit.framework; sourceTree = DEVELOPER_DIR; };
 		B4C8E6B32B3453AD00FCD54D /* MTRDiagnosticLogsDownloader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRDiagnosticLogsDownloader.h; sourceTree = "<group>"; };
 		B4C8E6B42B3453AD00FCD54D /* MTRDiagnosticLogsDownloader.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRDiagnosticLogsDownloader.mm; sourceTree = "<group>"; };
 		B4D67A362D00DAB700C49965 /* DeviceControllerServer.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = DeviceControllerServer.mm; sourceTree = "<group>"; };
@@ -1009,11 +1016,11 @@
 		B4D67A392D00DAB700C49965 /* XPCServerRegistry.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = XPCServerRegistry.mm; sourceTree = "<group>"; };
 		B4D67A3F2D00DD3D00C49965 /* DFTKeypair.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DFTKeypair.h; sourceTree = "<group>"; };
 		B4D67A402D00DD3D00C49965 /* DFTKeypair.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = DFTKeypair.mm; sourceTree = "<group>"; };
+		B4D67A452D07021700C49965 /* XPCServerProtocols.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XPCServerProtocols.h; sourceTree = "<group>"; };
 		B4D67A8E2D527F4A00C49965 /* DCLClient.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = DCLClient.cpp; path = commands/dcl/DCLClient.cpp; sourceTree = "<group>"; };
 		B4D67A8F2D527F4A00C49965 /* DisplayTermsAndConditions.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = DisplayTermsAndConditions.cpp; path = commands/dcl/DisplayTermsAndConditions.cpp; sourceTree = "<group>"; };
 		B4D67A912D527F4A00C49965 /* JsonSchemaMacros.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = JsonSchemaMacros.cpp; path = commands/dcl/JsonSchemaMacros.cpp; sourceTree = "<group>"; };
 		B4D67A992D538E9700C49965 /* HTTPSRequest.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = HTTPSRequest.mm; sourceTree = "<group>"; };
-		B4D67A452D07021700C49965 /* XPCServerProtocols.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XPCServerProtocols.h; sourceTree = "<group>"; };
 		B4E262122AA0C7A300DBA5BC /* RemoteDataModelLogger.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RemoteDataModelLogger.mm; sourceTree = "<group>"; };
 		B4E262132AA0C7A300DBA5BC /* RemoteDataModelLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RemoteDataModelLogger.h; sourceTree = "<group>"; };
 		B4E262192AA0D01D00DBA5BC /* SleepCommand.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = SleepCommand.mm; sourceTree = "<group>"; };
@@ -1048,6 +1055,7 @@
 				039145F029931B2D00257B3E /* CoreBluetooth.framework in Frameworks */,
 				039145EE29931B2600257B3E /* Network.framework in Frameworks */,
 				039145EC29931ABF00257B3E /* Security.framework in Frameworks */,
+				B4382F8B2D6F554B00F79AFC /* HomeKit.framework in Frameworks */,
 				039145E52993124800257B3E /* SystemConfiguration.framework in Frameworks */,
 				039145E3299311FF00257B3E /* IOKit.framework in Frameworks */,
 				039546962991CEEC006D42A8 /* libCHIP.a in Frameworks */,
@@ -1892,17 +1900,11 @@
 			path = "../common/websocket-server";
 			sourceTree = "<group>";
 		};
-		B4D67A9A2D538E9700C49965 /* dcl */ = {
-			isa = PBXGroup;
-			children = (
-				B4D67A992D538E9700C49965 /* HTTPSRequest.mm */,
-			);
-			path = dcl;
-			sourceTree = "<group>";
-		};
 		B4D67A3A2D00DAB700C49965 /* xpc */ = {
 			isa = PBXGroup;
 			children = (
+				B4382F862D6E231800F79AFC /* HomeKitConnector.h */,
+				B4382F872D6E231800F79AFC /* HomeKitConnector.mm */,
 				B4D67A452D07021700C49965 /* XPCServerProtocols.h */,
 				B4D67A362D00DAB700C49965 /* DeviceControllerServer.mm */,
 				B4D67A372D00DAB700C49965 /* XPCServer.mm */,
@@ -1910,6 +1912,14 @@
 				B4D67A392D00DAB700C49965 /* XPCServerRegistry.mm */,
 			);
 			path = xpc;
+			sourceTree = "<group>";
+		};
+		B4D67A9A2D538E9700C49965 /* dcl */ = {
+			isa = PBXGroup;
+			children = (
+				B4D67A992D538E9700C49965 /* HTTPSRequest.mm */,
+			);
+			path = dcl;
 			sourceTree = "<group>";
 		};
 		B4E262182AA0CFFE00DBA5BC /* delay */ = {
@@ -1943,6 +1953,8 @@
 		BA09EB3E2474762900605257 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				B46C4AA72D6CD2580024F65E /* HomeKit.framework */,
+				B4382F8A2D6F554B00F79AFC /* HomeKit.framework */,
 				039145EF29931B2D00257B3E /* CoreBluetooth.framework */,
 				039145ED29931B2600257B3E /* Network.framework */,
 				039145EA29931A4900257B3E /* Security.framework */,
@@ -2016,6 +2028,7 @@
 				7592BD012CBEE98C00EB74A0 /* EmberMetadata.h in Headers */,
 				7534D17B2CF8CDDF00F64654 /* AttributePersistenceProvider.h in Headers */,
 				7592BD022CBEE98C00EB74A0 /* CodegenDataModelProvider.h in Headers */,
+				B4382F892D6E231800F79AFC /* HomeKitConnector.h in Headers */,
 				037C3DAD2991BD4F00B7EEE2 /* PairingCommandBridge.h in Headers */,
 				037C3DBB2991BD5000B7EEE2 /* Commands.h in Headers */,
 				512431262BA0C8BA000BC136 /* ResetMRPParametersCommand.h in Headers */,
@@ -2346,6 +2359,7 @@
 				03F430AA2994113500166449 /* sysunix.c in Sources */,
 				7592BD0E2CC6BCC300EB74A0 /* EmberAttributeDataBuffer.cpp in Sources */,
 				B45373BF2A9FEA9100807602 /* adopt.c in Sources */,
+				B4382F882D6E231800F79AFC /* HomeKitConnector.mm in Sources */,
 				B4F773CB2CB54B61008C6B23 /* LeakChecker.mm in Sources */,
 				B45373D12A9FEB0C00807602 /* alloc.c in Sources */,
 				B45373DD2A9FEB5300807602 /* base64-decode.c in Sources */,
@@ -2636,9 +2650,14 @@
 				CHIP_BUILD_TOOLS = true;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CODE_SIGN_ENTITLEMENTS = "$(CHIP_ROOT)/examples/darwin-framework-tool/entitlements/darwin-framework-tool.entitlements";
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SDKROOT)/System/iOSSupport/System/Library/Frameworks",
+				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
 					CHIP_HAVE_CONFIG_H,
@@ -2695,6 +2714,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
+				SUPPORTS_MACCATALYST = YES;
 				SYSTEM_HEADER_SEARCH_PATHS = "$(CHIP_ROOT)/src/darwin/Framework/CHIP/";
 				WARNING_CFLAGS = (
 					"-Wformat",
@@ -2712,9 +2732,14 @@
 				CHIP_BUILD_TOOLS = true;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CODE_SIGN_ENTITLEMENTS = "$(CHIP_ROOT)/examples/darwin-framework-tool/entitlements/darwin-framework-tool.entitlements";
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SDKROOT)/System/iOSSupport/System/Library/Frameworks",
+				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
 					CHIP_HAVE_CONFIG_H,
@@ -2772,6 +2797,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
+				SUPPORTS_MACCATALYST = YES;
 				SYSTEM_HEADER_SEARCH_PATHS = "$(CHIP_ROOT)/src/darwin/Framework/CHIP/";
 				WARNING_CFLAGS = (
 					"-Wformat",
