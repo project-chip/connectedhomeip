@@ -302,9 +302,6 @@ private:
 
     LockUserInfo userInStorage;
     LockCredentialInfo credentialInStorage;
-    WeekDayScheduleInfo weekDayScheduleInStorage;
-    YearDayScheduleInfo yearDayScheduleInStorage;
-    HolidayScheduleInfo holidayScheduleInStorage;
     CredentialStruct mCredentials[kMaxCredentialsPerUser];
 };
 

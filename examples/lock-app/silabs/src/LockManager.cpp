@@ -616,6 +616,8 @@ DlStatus LockManager::GetWeekdaySchedule(chip::EndpointId endpointId, uint8_t we
 {
     CHIP_ERROR error;
 
+    WeekDayScheduleInfo weekDayScheduleInStorage;
+
     VerifyOrReturnValue(kInvalidEndpointId != endpointId, DlStatus::kFailure);
 
     VerifyOrReturnValue(weekdayIndex > 0, DlStatus::kFailure); // indices are one-indexed
@@ -667,6 +669,8 @@ DlStatus LockManager::SetWeekdaySchedule(chip::EndpointId endpointId, uint8_t we
 {
     CHIP_ERROR error;
 
+    WeekDayScheduleInfo weekDayScheduleInStorage;
+
     VerifyOrReturnValue(kInvalidEndpointId != endpointId, DlStatus::kFailure);
 
     VerifyOrReturnValue(weekdayIndex > 0, DlStatus::kFailure); // indices are one-indexed
@@ -704,6 +708,8 @@ DlStatus LockManager::GetYeardaySchedule(chip::EndpointId endpointId, uint8_t ye
                                          EmberAfPluginDoorLockYearDaySchedule & schedule)
 {
     CHIP_ERROR error;
+
+    YearDayScheduleInfo yearDayScheduleInStorage;
 
     VerifyOrReturnValue(kInvalidEndpointId != endpointId, DlStatus::kFailure);
 
@@ -755,6 +761,8 @@ DlStatus LockManager::SetYeardaySchedule(chip::EndpointId endpointId, uint8_t ye
 {
     CHIP_ERROR error;
 
+    YearDayScheduleInfo yearDayScheduleInStorage;
+
     VerifyOrReturnValue(kInvalidEndpointId != endpointId, DlStatus::kFailure);
 
     VerifyOrReturnValue(yearDayIndex > 0, DlStatus::kFailure); // indices are one-indexed
@@ -789,6 +797,8 @@ DlStatus LockManager::GetHolidaySchedule(chip::EndpointId endpointId, uint8_t ho
                                          EmberAfPluginDoorLockHolidaySchedule & schedule)
 {
     CHIP_ERROR error;
+
+    HolidayScheduleInfo holidayScheduleInStorage;
 
     VerifyOrReturnValue(kInvalidEndpointId != endpointId, DlStatus::kFailure);
 
@@ -836,6 +846,8 @@ DlStatus LockManager::SetHolidaySchedule(chip::EndpointId endpointId, uint8_t ho
                                          uint32_t localStartTime, uint32_t localEndTime, OperatingModeEnum operatingMode)
 {
     CHIP_ERROR error;
+
+    HolidayScheduleInfo holidayScheduleInStorage;
 
     VerifyOrReturnValue(kInvalidEndpointId != endpointId, DlStatus::kFailure);
 
