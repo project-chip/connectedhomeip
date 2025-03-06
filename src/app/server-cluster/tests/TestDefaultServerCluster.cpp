@@ -14,11 +14,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "app/ConcreteClusterPath.h"
 #include <pw_unit_test/framework.h>
 
 #include <access/Privilege.h>
 #include <app-common/zap-generated/ids/Attributes.h>
+#include <app/ConcreteClusterPath.h>
 #include <app/data-model-provider/MetadataList.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/OperationTypes.h>
