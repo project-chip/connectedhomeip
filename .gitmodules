@@ -354,3 +354,6 @@
 	url = https://github.com/paullouisageneau/libdatachannel.git
 	platforms = linux
 	recursive = true
+[submodule "third_party/libtrustymatter/repo"]
+	path = third_party/libtrustymatter/repo
+	url = https://github.com/nxp-imx/libtrustymatter
