@@ -113,7 +113,7 @@ public:
 
     /// Provides a list of clusters that are registered for the given endpoint.
     ///
-    /// As ClustersList points inside the internal registrations of the registry,
+    /// ClustersList points inside the internal registrations of the registry, so
     /// the list is only valid as long as the registry is not modified.
     ClustersList ClustersOnEndpoint(EndpointId endpointId);
 
