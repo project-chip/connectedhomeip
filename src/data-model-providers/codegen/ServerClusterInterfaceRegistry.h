@@ -34,14 +34,14 @@ struct ServerClusterRegistration
     ServerClusterInterface * const serverClusterInterface;
     ServerClusterRegistration * next;
 
-    constexpr ServerClusterRegistration(ServerClusterInterface &interface, ServerClusterRegistration * next_item = nullptr) :
+    constexpr ServerClusterRegistration(ServerClusterInterface & interface, ServerClusterRegistration * next_item = nullptr) :
         serverClusterInterface(&interface), next(next_item)
     {}
-    ServerClusterRegistration(ServerClusterRegistration &&other) = default;
+    ServerClusterRegistration(ServerClusterRegistration && other) = default;
 
     // we generally do not want to allow copies as those may have different "next" entries.
-    ServerClusterRegistration(const ServerClusterRegistration &other) = delete;
-    ServerClusterRegistration& operator=(const ServerClusterRegistration &other) = delete;
+    ServerClusterRegistration(const ServerClusterRegistration & other)             = delete;
+    ServerClusterRegistration & operator=(const ServerClusterRegistration & other) = delete;
 };
 
 /// Allows registering and retrieving ServerClusterInterface instances for specific cluster paths.
