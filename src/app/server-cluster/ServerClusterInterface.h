@@ -44,7 +44,7 @@ public:
 
     ///////////////////////////////////// Cluster Metadata Support //////////////////////////////////////////////////
 
-    /// The path where this cluster operates on.
+    /// The path to this cluster instance.
     ///
     /// This path (endpointid,clusterid) is expected to be fixed once the server
     /// cluster interface is in use.
