@@ -60,16 +60,16 @@ class TC_CNET_4_11(MatterBaseTest):
             TestStep(10, "TH reads Breadcrumb attribute from the General Commissioning cluster of the DUT"),
             TestStep(11, "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 0."),
             # TestStep(12, "TH changes its Wi-Fi connection to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID"),
-            # TestStep(13, "TH discovers and connects to DUT on the PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID operational network"),
+            TestStep(13, "TH discovers and connects to DUT on the PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID operational network"),
             TestStep(14, "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 900"),
-            # TestStep(15, "TH sends RemoveNetwork Command to the DUT with NetworkID field set to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID and Breadcrumb field set to 1"),
-            # TestStep(16, "TH sends AddOrUpdateWiFiNetwork command to the DUT with SSID field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID, Credentials field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS and Breadcrumb field set to 1"),
-            # TestStep(17, "TH sends ConnectNetwork command to the DUT with NetworkID field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID and Breadcrumb field set to 3"),
+            TestStep(15, "TH sends RemoveNetwork Command to the DUT with NetworkID field set to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID and Breadcrumb field set to 1"),
+            TestStep(16, "TH sends AddOrUpdateWiFiNetwork command to the DUT with SSID field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID, Credentials field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS and Breadcrumb field set to 1"),
+            TestStep(17, "TH sends ConnectNetwork command to the DUT with NetworkID field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID and Breadcrumb field set to 3"),
             # TestStep(18, "TH changes its Wi-Fi connection to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID"),
-            # TestStep(19, "TH discovers and connects to DUT on the PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID operational network"),
-            # TestStep(20, "TH reads Breadcrumb attribute from the General Commissioning cluster of the DUT"),
-            # TestStep(21, "TH sends the CommissioningComplete command to the DUT"),
-            # TestStep(22, "TH reads Networks attribute from the DUT"),
+            TestStep(19, "TH discovers and connects to DUT on the PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID operational network"),
+            TestStep(20, "TH reads Breadcrumb attribute from the General Commissioning cluster of the DUT"),
+            TestStep(21, "TH sends the CommissioningComplete command to the DUT"),
+            TestStep(22, "TH reads Networks attribute from the DUT"),
         ]
 
     def def_TC_CNET_4_11(self):
@@ -212,7 +212,7 @@ class TC_CNET_4_11(MatterBaseTest):
         # TH sends ConnectNetwork command to the DUT with NetworkID field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID and Breadcrumb field set to 2
         self.step(7)
 
-        logger.info("Connect to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID")
+        logger.info(f"Connect to {PIXIT_CNET_WIFI_2ND_ACCESSPOINT_SSID}")
         req = Clusters.NetworkCommissioning.Commands.ConnectNetwork(
             networkID=PIXIT_CNET_WIFI_2ND_ACCESSPOINT_SSID.encode(), breadcrumb=2)
         interactionTimeoutMs = commissioner.ComputeRoundTripTimeout(self._nodeid, upperLayerProcessingTimeoutMs=5000)
@@ -264,19 +264,41 @@ class TC_CNET_4_11(MatterBaseTest):
         res = await commissioner.SendCommand(nodeid=nodeid, endpoint=endpoint, payload=req)
         logger.info(f"Received response: {res}")
         # Verify that DUT sends ArmFailSafeResponse command to the TH
+        # TODO: Change above to type_matches
         asserts.assert_true(type_matches(res, cgen.Commands.ArmFailSafeResponse),
                             "Unexpected value returned from ArmFailSafe")
         asserts.assert_equal(res.errorCode, 0, f"Expected Error code to be 0, but got: {res.errorCode}")
 
-        # TODO: replace manual step from yaml
+        # TODO: step 12 is manual step, need to remove from here and from test spec
+        # TH changes its WiFi connection to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID
+        # How does it change? is it automatic or need to use ConnectNetwork? if so, look at step 7
         # self.step(12)
-        # self.step(13)
+
+        # TH discovers and connects to DUT on the PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID operational network
+        self.step(13)
+
+        logger.info("Reading Networks")
+        res = await commissioner.ReadAttribute(nodeid=nodeid, attributes=[(endpoint, attr.Networks)], returnClusterObject=True)
+        logger.info(f"Received response: {res}")
+        networkList = res[endpoint][cnet].networks
+        # Verify that the TH successfully connects to the DUT
+        isPresent = False
+        isConnected = False
+        for network in networkList:
+            if network.networkID == PIXIT_CNET_WIFI_1ST_ACCESSPOINT_SSID:
+                isPresent = True
+                if network.connected:
+                    isConnected = True
+                break
+        asserts.assert_true(isPresent, f"NetworkID: {PIXIT_CNET_WIFI_1ST_ACCESSPOINT_SSID} is not in NetworkList")
+        asserts.assert_true(isConnected, "Expected connected to be True, but got False")
+        logger.info("Device connected to a network.")
 
         # TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 900
         self.step(14)
 
         logger.info("Arming the failsafe")
-        req = cgen.Commands.ArmFailSafe(expiryLengthSeconds=0, breadcrumb=0)
+        req = cgen.Commands.ArmFailSafe(expiryLengthSeconds=900, breadcrumb=0)
         res = await commissioner.SendCommand(nodeid=nodeid, endpoint=endpoint, payload=req)
         logger.info(f"Received response: {res}")
         # Verify that DUT sends ArmFailSafeResponse command to the TH
@@ -284,14 +306,125 @@ class TC_CNET_4_11(MatterBaseTest):
                             "Unexpected value returned from ArmFailSafe")
         asserts.assert_equal(res.errorCode, 0, f"Expected Error code to be 0, but got: {res.errorCode}")
 
-        # self.step(15)
-        # self.step(16)
-        # self.step(17)
+        # TH sends RemoveNetwork Command to the DUT with NetworkID field set to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID and Breadcrumb field set to 1
+        # TODO: almost same as step 4, abstract step away
+        self.step(15)
+
+        logger.info("Sending RemoveNetwork command")
+        req = cnet.Commands.RemoveNetwork(networkID=PIXIT_CNET_WIFI_1ST_ACCESSPOINT_SSID, breadcrumb=1)
+        res = await commissioner.SendCommand(nodeid=nodeid, endpoint=endpoint, payload=req)
+        logger.info(f"Received response: {res}")
+        # Verify that DUT sends NetworkConfigResponse to command with the following fields: NetworkingStatus is success
+        asserts.assert_is_instance(res, cnet.Commands.NetworkConfigResponse.response_type)
+        asserts.assert_equal(res.networkingStatus, cnet.Enums.NetworkCommissioningStatusEnum.kSuccess,
+                             f"Expected kNetworkIDNotFound but got: {res.networkingStatus}")
+        # Verify NetworkIndex matches previously saved 'userwifi_netidx'
+        asserts.assert_equal(res.networkIndex == userwifi_netidx,
+                             f"Expected NetworkIndex to be: {userwifi_netidx}, but got: {res.networkIndex}")
+
+        # TH sends AddOrUpdateWiFiNetwork command to the DUT with SSID field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID,
+        # Credentials field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS and Breadcrumb field set to 1
+        # TODO: same as step 5, abstract step away
+        self.step(16)
+
+        # Add second network
+        logger.info("Adding second wifi test network")
+        req = cnet.Commands.AddOrUpdateWiFiNetwork(
+            ssid=PIXIT_CNET_WIFI_2ND_ACCESSPOINT_SSID.encode(), credentials=PIXIT_CNET_WIFI_2ND_ACCESSPOINT_CREDENTIALS.encode(), breadcrumb=1)
+        res = await commissioner.SendCommand(nodeid=nodeid, endpoint=endpoint, payload=req)
+        logger.info(f"Received response: {res}")
+        # Verify that DUT sends the NetworkConfigResponse command to the TH with the following response fields:
+        # 1. NetworkingStatus is success which is "0"
+        asserts.assert_is_instance(res, cnet.Commands.NetworkConfigResponse.response_type)
+        asserts.assert_equal(res.networkingStatus, cnet.Enums.NetworkCommissioningStatusEnum.kSuccess,
+                             f"Expected Success, but got: {res.networkingStatus}")
+        asserts.assert_equal(res.networkIndex, 0, f"Expected NetworkIndex to be 0, but got: {res.networkIndex}")
+        # 2. DebugText is of type string with max length 512 or empty
+        asserts.assert_true(type(res.debugText), str, f"Expected debugText to be of type string, but got: {type(res.debugText)}")
+        asserts.assert_less_equal(len(res.debugText), 512,
+                                  f"Expected length of debugText to be less than or equal to 512, but got: {len(res.debugText)}")
+
+        # TH sends ConnectNetwork command to the DUT with NetworkID field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID and Breadcrumb field set to 3
+        # TODO: same as step 7, abstract step away
+        self.step(17)
+
+        logger.info(f"Connect to {PIXIT_CNET_WIFI_2ND_ACCESSPOINT_SSID}")
+        req = Clusters.NetworkCommissioning.Commands.ConnectNetwork(
+            networkID=PIXIT_CNET_WIFI_2ND_ACCESSPOINT_SSID.encode(), breadcrumb=3)
+        interactionTimeoutMs = commissioner.ComputeRoundTripTimeout(self._nodeid, upperLayerProcessingTimeoutMs=5000)
+        res = await commissioner.SendCommand(nodeid=nodeid, endpoint=endpoint, payload=req, interactionTimeoutMs=interactionTimeoutMs)
+        logger.info(f"Got response: {res}")
+        asserts.assert_true(res.networkingStatus, cnet.Enums.NetworkCommissioningStatusEnum.kSuccess,
+                            f"Expected NetworkingStatus to be success but got: {res.networkingStatus}")
+        assert_valid_int32(res.errorValue, "ErrorValue")
+
+        # TODO: same as step 8, remove from here and from spec
+        # TH changes its Wi-Fi connection to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID
         # self.step(18)
-        # self.step(19)
-        # self.step(20)
-        # self.step(21)
-        # self.step(22)
+
+        # TH discovers and connects to DUT on the PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID operational network
+        # TODO: same as step 9, abstract step away
+        self.step(19)
+
+        logger.info("Reading Networks")
+        res = await commissioner.ReadAttribute(nodeid=nodeid, attributes=[(endpoint, attr.Networks)], returnClusterObject=True)
+        logger.info(f"Received response: {res}")
+        networkList = res[endpoint][cnet].networks
+        # Verify that the TH successfully connects to the DUT
+        isPresent = False
+        isConnected = False
+        for network in networkList:
+            if network.networkID == PIXIT_CNET_WIFI_2ND_ACCESSPOINT_SSID:
+                isPresent = True
+                if network.connected:
+                    isConnected = True
+                break
+        asserts.assert_true(isPresent, f"NetworkID: {PIXIT_CNET_WIFI_2ND_ACCESSPOINT_SSID} is not in NetworkList")
+        asserts.assert_true(isConnected, "Expected connected to be True, but got False")
+        logger.info("Device connected to a network.")
+
+        # TH reads Breadcrumb attribute from the General Commissioning cluster of the DUT
+        # TODO: same as step 10, abstract step away
+        self.step(20)
+
+        # Verify that the breadcrumb value is set to 3
+        res = await commissioner.ReadAttribute(nodeid=nodeid, attributes=[(endpoint, cgen.Attributes.Breadcrumb)], returnClusterObject=True)
+        breadcrumb = res[0][cgen].breadcrumb
+        asserts.assert_equal(breadcrumb, 3, f"Expected breadcrumb to be 2, but got: {breadcrumb}")
+
+        # TH sends the CommissioningComplete command to the DUT
+        self.step(21)
+
+        # Disarm the failsafe
+        logger.info("Disarming the failsafe")
+        req = cgen.Commands.CommissioningComplete()
+        res = await commissioner.SendCommand(nodeid=nodeid, endpoint=endpoint, payload=req)
+        # Verify that DUT sends CommissioningCompleteResponse with the ErrorCode field set to OK (0)
+        logger.info(f"Received response: {res}")
+        asserts.assert_true(res.errorCode, cgen.Enums.CommissioningErrorEnum.kOk,
+                            f"Expected CommissioningCompleteResponse to be 0, but got {res.errorCode}")
+
+        # TH reads Networks attribute from the DUT
+        # TODO: same as step 6, abstract step away
+        self.step(22)
+
+        # Verify that the Networks attribute list has an entry with the following fields:
+        logger.info("Reading Networks")
+        res = await commissioner.ReadAttribute(nodeid=nodeid, attributes=[(endpoint, attr.Networks)], returnClusterObject=True)
+        logger.info(f"Received response: {res}")
+        networkList = res[endpoint][cnet].networks
+        # 1. NetworkID is the hex representation of the ASCII values for PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID
+        isPresent = False
+        isConnected = False
+        for network in networkList:
+            if network.networkID == PIXIT_CNET_WIFI_2ND_ACCESSPOINT_SSID:
+                isPresent = True
+                if network.connected:
+                    isConnected = True
+                break
+        asserts.assert_true(isPresent, f"NetworkID: {PIXIT_CNET_WIFI_2ND_ACCESSPOINT_SSID} is not in NetworkList")
+        # 2. Connected is of type bool and is TRUE
+        asserts.assert_true(isConnected, "Expected isConnected to be False, but got True")
 
 
 if __name__ == "__main__":
