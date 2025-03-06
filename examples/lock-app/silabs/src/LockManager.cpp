@@ -327,6 +327,8 @@ bool LockManager::GetUser(chip::EndpointId endpointId, uint16_t userIndex, Ember
 
     VerifyOrReturnValue(IsValidUserIndex(userIndex), false);
 
+    VerifyOrReturnValue(kInvalidEndpointId != endpointId, false);
+
     ChipLogProgress(Zcl, "Door Lock App: LockManager::GetUser [endpoint=%d,userIndex=%hu]", endpointId, userIndex);
 
     chip::StorageKeyName userKey = LockUserEndpoint(userIndex, endpointId);
@@ -419,13 +421,13 @@ bool LockManager::SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip:
                     endpointId, userIndex, creator, modifier, userName.data(), uniqueId, to_underlying(userStatus),
                     to_underlying(usertype), to_underlying(credentialRule), credentials, totalCredentials);
 
+    VerifyOrReturnValue(kInvalidEndpointId != endpointId, false);
+
     VerifyOrReturnValue(userIndex > 0, false); // indices are one-indexed
 
     userIndex--;
 
     VerifyOrReturnValue(IsValidUserIndex(userIndex), false);
-
-    VerifyOrReturnValue(kInvalidEndpointId != endpointId, false);
 
     if (userName.size() > DOOR_LOCK_MAX_USER_NAME_SIZE)
     {
@@ -484,6 +486,8 @@ bool LockManager::GetCredential(chip::EndpointId endpointId, uint16_t credential
                                 EmberAfPluginDoorLockCredentialInfo & credential)
 {
     CHIP_ERROR error;
+
+    VerifyOrReturnValue(kInvalidEndpointId != endpointId, false);
 
     VerifyOrReturnValue(IsValidCredentialType(credentialType), false);
 
@@ -552,6 +556,8 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credential
 {
     CHIP_ERROR error;
 
+    VerifyOrReturnValue(kInvalidEndpointId != endpointId, false);
+
     VerifyOrReturnValue(IsValidCredentialType(credentialType), false);
 
     if (CredentialTypeEnum::kProgrammingPIN == credentialType)
@@ -588,6 +594,9 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credential
     chip::Server::GetInstance().GetPersistentStorage().SyncSetKeyValue(key.KeyName(), &credentialInStorage,
                                                                        static_cast<uint16_t>(sizeof(LockCredentialInfo)));
 
+    // Clear credentialInStorage.credentialData
+    memset(credentialInStorage.credentialData, 0, sizeof(uint8_t)*kMaxCredentialSize);
+
     if ((error != CHIP_NO_ERROR))
     {
         ChipLogError(Zcl, "Error reading from KVS key");
@@ -603,6 +612,8 @@ DlStatus LockManager::GetWeekdaySchedule(chip::EndpointId endpointId, uint8_t we
                                          EmberAfPluginDoorLockWeekDaySchedule & schedule)
 {
     CHIP_ERROR error;
+
+    VerifyOrReturnValue(kInvalidEndpointId != endpointId, DlStatus::kFailure);
 
     VerifyOrReturnValue(weekdayIndex > 0, DlStatus::kFailure); // indices are one-indexed
     VerifyOrReturnValue(userIndex > 0, DlStatus::kFailure);    // indices are one-indexed
@@ -653,6 +664,8 @@ DlStatus LockManager::SetWeekdaySchedule(chip::EndpointId endpointId, uint8_t we
 {
     CHIP_ERROR error;
 
+    VerifyOrReturnValue(kInvalidEndpointId != endpointId, DlStatus::kFailure);
+
     VerifyOrReturnValue(weekdayIndex > 0, DlStatus::kFailure); // indices are one-indexed
     VerifyOrReturnValue(userIndex > 0, DlStatus::kFailure);    // indices are one-indexed
 
@@ -688,6 +701,8 @@ DlStatus LockManager::GetYeardaySchedule(chip::EndpointId endpointId, uint8_t ye
                                          EmberAfPluginDoorLockYearDaySchedule & schedule)
 {
     CHIP_ERROR error;
+
+    VerifyOrReturnValue(kInvalidEndpointId != endpointId, DlStatus::kFailure);
 
     VerifyOrReturnValue(yearDayIndex > 0, DlStatus::kFailure); // indices are one-indexed
     VerifyOrReturnValue(userIndex > 0, DlStatus::kFailure);    // indices are one-indexed
@@ -737,6 +752,8 @@ DlStatus LockManager::SetYeardaySchedule(chip::EndpointId endpointId, uint8_t ye
 {
     CHIP_ERROR error;
 
+    VerifyOrReturnValue(kInvalidEndpointId != endpointId, DlStatus::kFailure);
+
     VerifyOrReturnValue(yearDayIndex > 0, DlStatus::kFailure); // indices are one-indexed
     VerifyOrReturnValue(userIndex > 0, DlStatus::kFailure);    // indices are one-indexed
 
@@ -769,6 +786,8 @@ DlStatus LockManager::GetHolidaySchedule(chip::EndpointId endpointId, uint8_t ho
                                          EmberAfPluginDoorLockHolidaySchedule & schedule)
 {
     CHIP_ERROR error;
+
+    VerifyOrReturnValue(kInvalidEndpointId != endpointId, DlStatus::kFailure);
 
     VerifyOrReturnValue(holidayIndex > 0, DlStatus::kFailure); // indices are one-indexed
 
@@ -814,6 +833,8 @@ DlStatus LockManager::SetHolidaySchedule(chip::EndpointId endpointId, uint8_t ho
                                          uint32_t localStartTime, uint32_t localEndTime, OperatingModeEnum operatingMode)
 {
     CHIP_ERROR error;
+
+    VerifyOrReturnValue(kInvalidEndpointId != endpointId, DlStatus::kFailure);
 
     VerifyOrReturnValue(holidayIndex > 0, DlStatus::kFailure); // indices are one-indexed
 
@@ -866,6 +887,8 @@ bool LockManager::setLockState(chip::EndpointId endpointId, const Nullable<chip:
 {
 
     CHIP_ERROR error;
+
+    VerifyOrReturnValue(kInvalidEndpointId != endpointId, false);
 
     // Assume pin is required until told otherwise
     bool requirePin = true;
