@@ -51,7 +51,7 @@ public:
         class Iterator
         {
         public:
-            constexpr Iterator(ServerClusterRegistration * interface, EndpointId endpoint) :
+            Iterator(ServerClusterRegistration * interface, EndpointId endpoint) :
                 mRegistration(interface), mEndpointId(endpoint)
             {
                 AdvanceUntilMatchingEndpoint();
