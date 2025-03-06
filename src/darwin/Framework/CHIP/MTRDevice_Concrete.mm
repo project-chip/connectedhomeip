@@ -4003,7 +4003,8 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     // Update data version used for subscription filtering
     MTRDeviceClusterData * clusterData = [self _clusterDataForPath:clusterPath];
     if (!clusterData) {
-        clusterData = [[MTRDeviceClusterData alloc] initWithDataVersion:dataVersion attributes:nil];
+        clusterData = [[MTRDeviceClusterData alloc] init];
+        clusterData.pendingDataVersion = dataVersion;
         dataVersionChanged = YES;
     } else if (![clusterData.dataVersion isEqualToNumber:dataVersion]) {
         clusterData.pendingDataVersion = dataVersion;
