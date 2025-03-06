@@ -28,7 +28,7 @@ Git: 0.7-summer-2025-308-g2f23be841
     <item name="InUse" value="0x01"/>
   </enum>
 
-  <struct name="TLSEndpointStruct" apiMaturity="provisional" isFabricScoped="true">
+  <struct name="TLSEndpointStruct" apiMaturity="provisional">
     <cluster code="0x0802"/>
     <item fieldId="0" name="EndpointID" type="int16u"/>
     <item fieldId="1" name="Hostname" type="octet_string" length="253"/>
