@@ -267,8 +267,6 @@ CHIP_ERROR CodegenDataModelProvider::ServerClusters(EndpointId endpointId,
     VerifyOrReturnValue(endpoint->clusterCount > 0, CHIP_NO_ERROR);
     VerifyOrReturnValue(endpoint->cluster != nullptr, CHIP_NO_ERROR);
 
-    ReturnErrorOnFailure(builder.EnsureAppendCapacity(emberAfClusterCountForEndpointType(endpoint, /* server = */ true)));
-
     // We have 2 managed lists:
     //   - ember clusters, that have ember metadata AND ember version
     //   - `ServerClusterInterfaceRegistry` clusters which MAY have an ember version
@@ -282,7 +280,17 @@ CHIP_ERROR CodegenDataModelProvider::ServerClusters(EndpointId endpointId,
     // This uses some RAM, however we assume clusters are in the 10s of items only.
     // so this overflow seems ok.
 
+    // assume the clusters on endpoint does not change in between these two loops
+    size_t registryClusterCount = 0;
+    for (auto * _ : mRegistry.ClustersOnEndpoint(endpointId))
+    {
+        registryClusterCount++;
+    }
+
+    ReturnErrorOnFailure(builder.EnsureAppendCapacity(registryClusterCount));
+
     DataModel::ListBuilder<ClusterId> knownClustersBuilder;
+    ReturnErrorOnFailure(knownClustersBuilder.EnsureAppendCapacity(registryClusterCount));
     for (auto * cluster : mRegistry.ClustersOnEndpoint(endpointId))
     {
         const ConcreteClusterPath path = cluster->GetPath();
@@ -291,11 +299,12 @@ CHIP_ERROR CodegenDataModelProvider::ServerClusters(EndpointId endpointId,
             .dataVersion = cluster->GetDataVersion(),
             .flags       = cluster->GetClusterFlags(),
         }));
-        knownClustersBuilder.EnsureAppendCapacity(1);
         knownClustersBuilder.Append(path.mClusterId);
     }
 
     DataModel::ReadOnlyBuffer<ClusterId> knownClusters = knownClustersBuilder.TakeBuffer();
+
+    ReturnErrorOnFailure(builder.EnsureAppendCapacity(emberAfClusterCountForEndpointType(endpoint, /* server = */ true)));
 
     const EmberAfCluster * begin = endpoint->cluster;
     const EmberAfCluster * end   = endpoint->cluster + endpoint->clusterCount;
