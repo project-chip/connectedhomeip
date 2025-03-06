@@ -1329,11 +1329,15 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         try:
             # GeneralDiagnostics cluster is meant to be on Endpoint 0 (Root)
-            await self.send_single_cmd(endpoint=0,
-                                       cmd=Clusters.GeneralDiagnostics.Commands.TestEventTrigger(
-                                           enableKey,
-                                           eventTrigger)
-                                       )
+            general_diagnosis_result = await self.send_single_cmd(endpoint=0,
+                                                                  cmd=Clusters.GeneralDiagnostics.Commands.TestEventTrigger(
+                                                                      enableKey,
+                                                                      eventTrigger)
+                                                                  )
+
+            print("")
+            logger.info(general_diagnosis_result)
+            print("")
 
         except InteractionModelError as e:
             asserts.fail(
