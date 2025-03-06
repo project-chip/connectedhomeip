@@ -106,6 +106,10 @@ public:
             break;
         case PairingMode::Code:
             AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
+            AddArgument("dcl-hostname", &mDCLHostName,
+                        "Hostname of the DCL server to fetch information from. Defaults to 'on.dcl.csa-iot.org'.");
+            AddArgument("dcl-port", 0, UINT16_MAX, &mDCLPort, "Port number for connecting to the DCL server. Defaults to '443'.");
+            AddArgument("use-dcl", 0, 1, &mUseDCL, "Use DCL to fetch onboarding information");
             FALLTHROUGH;
         case PairingMode::CodePaseOnly:
             AddArgument("payload", &mOnboardingPayload);
@@ -247,6 +251,7 @@ private:
     CHIP_ERROR PairWithMdnsOrBleByIndexWithCode(NodeId remoteId, uint16_t index);
     CHIP_ERROR Unpair(NodeId remoteId);
     chip::Controller::CommissioningParameters GetCommissioningParameters();
+    CHIP_ERROR MaybeDisplayTermsAndConditions(chip::Controller::CommissioningParameters & params);
 
     const PairingMode mPairingMode;
     const PairingNetworkType mNetworkType;
@@ -269,6 +274,9 @@ private:
     chip::Optional<uint32_t> mICDStayActiveDurationMsec;
     chip::Optional<uint16_t> mTCAcknowledgements;
     chip::Optional<uint16_t> mTCAcknowledgementVersion;
+    chip::Optional<char *> mDCLHostName;
+    chip::Optional<uint16_t> mDCLPort;
+    chip::Optional<bool> mUseDCL;
     chip::app::DataModel::List<chip::app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type> mTimeZoneList;
     TypedComplexArgument<chip::app::DataModel::List<chip::app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type>>
         mComplex_TimeZones;

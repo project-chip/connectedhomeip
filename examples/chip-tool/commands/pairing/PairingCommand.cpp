@@ -28,6 +28,9 @@
 #include <setup_payload/ManualSetupPayloadParser.h>
 #include <setup_payload/QRCodeSetupPayloadParser.h>
 
+#include "../dcl/DCLClient.h"
+#include "../dcl/DisplayTermsAndConditions.h"
+
 #include <string>
 
 using namespace ::chip;
@@ -232,6 +235,7 @@ CHIP_ERROR PairingCommand::PairWithCode(NodeId remoteId)
         discoveryType = DiscoveryType::kDiscoveryNetworkOnlyWithoutPASEAutoRetry;
     }
 
+    ReturnErrorOnFailure(MaybeDisplayTermsAndConditions(commissioningParams));
     return CurrentCommissioner().PairDevice(remoteId, mOnboardingPayload, commissioningParams, discoveryType);
 }
 
@@ -584,4 +588,27 @@ void PairingCommand::OnDeviceAttestationCompleted(Controller::DeviceCommissioner
     {
         SetCommandExitStatus(err);
     }
+}
+
+CHIP_ERROR PairingCommand::MaybeDisplayTermsAndConditions(CommissioningParameters & params)
+{
+    VerifyOrReturnError(mUseDCL.ValueOr(false), CHIP_NO_ERROR);
+
+    Json::Value tc;
+    auto client = tool::dcl::DCLClient(mDCLHostName, mDCLPort);
+    ReturnErrorOnFailure(client.TermsAndConditions(mOnboardingPayload, tc));
+    if (tc != Json::nullValue)
+    {
+        uint16_t version      = 0;
+        uint16_t userResponse = 0;
+        ReturnErrorOnFailure(tool::dcl::DisplayTermsAndConditions(tc, version, userResponse, mCountryCode));
+
+        TermsAndConditionsAcknowledgement termsAndConditionsAcknowledgement = {
+            .acceptedTermsAndConditions        = userResponse,
+            .acceptedTermsAndConditionsVersion = version,
+        };
+        params.SetTermsAndConditionsAcknowledgement(termsAndConditionsAcknowledgement);
+    }
+
+    return CHIP_NO_ERROR;
 }

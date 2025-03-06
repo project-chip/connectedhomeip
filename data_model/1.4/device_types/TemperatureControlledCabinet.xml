@@ -51,9 +51,11 @@ are the sole property of their respective owners.
 
 This notice and disclaimer must be included on all copies of this document.
 
-Connectivity Standards Alliance +
-508 Second Street, Suite 206 +
+Connectivity Standards Alliance
+508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0071" name="Temperature Controlled Cabinet" revision="3">
   <revisionHistory>
@@ -62,16 +64,20 @@ Davis, CA 95616, USA
     <revision revision="3" summary="Added exclusivity for conditions"/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
+  <conditions>
+    <condition name="Cooler" summary="The device has cooling functionality."/>
+    <condition name="Heater" summary="The device has heating functionality."/>
+  </conditions>
   <clusters>
     <cluster id="0x0048" name="Oven Cavity Operational State" side="server">
       <optionalConform>
         <attribute name="Heater"/>
       </optionalConform>
       <commands>
-        <command id="" name="Pause">
+        <command id="0x0000" name="Pause">
           <disallowConform/>
         </command>
-        <command id="" name="Resume">
+        <command id="0x0003" name="Resume">
           <disallowConform/>
         </command>
       </commands>
@@ -86,7 +92,7 @@ Davis, CA 95616, USA
         </feature>
       </features>
       <attributes>
-        <attribute code="" name="StartUpMode">
+        <attribute code="0x0002" name="StartUpMode">
           <disallowConform/>
         </attribute>
       </attributes>
@@ -101,7 +107,7 @@ Davis, CA 95616, USA
         </feature>
       </features>
       <attributes>
-        <attribute code="" name="StartUpMode">
+        <attribute code="0x0002" name="StartUpMode">
           <disallowConform/>
         </attribute>
       </attributes>

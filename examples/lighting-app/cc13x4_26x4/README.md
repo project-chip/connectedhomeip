@@ -264,7 +264,7 @@ On
 
 ```
 ./chip-tool onoff on <nodeID> 1
-./chip-tool onoff toggee <nodeID> 1 (assuming the light is off)
+./chip-tool onoff toggle <nodeID> 1 (assuming the light is off)
 
 ```
 

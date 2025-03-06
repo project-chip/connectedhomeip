@@ -34,7 +34,7 @@ menuconfig CHIP
 	imply HWINFO
 	imply FLASH
 	imply FLASH_MAP
-	imply NVS
+	imply NVS if !CHIP_NRF_PLATFORM
 	imply SETTINGS
 	help
 	  Enables Matter libraries required for the Matter protocol stack to work.
@@ -398,11 +398,11 @@ config CHIP_ICD_ACTIVE_MODE_THRESHOLD
 
 config CHIP_ICD_LIT_SUPPORT
 	bool "Intermittently Connected Device Long Idle Time support"
-	imply CHIP_ICD_CHECK_IN_SUPPORT
-	imply CHIP_ICD_UAT_SUPPORT
+	select CHIP_ICD_CHECK_IN_SUPPORT
+	select CHIP_ICD_UAT_SUPPORT
 	help
 	  Enables the Intermittently Connected Device Long Idle Time support in Matter.
-	  It also implies the ICD Check-In and UAT features support that are mandatory for LIT device.
+	  It also selects the ICD Check-In and UAT features support that are mandatory for LIT device.
 
 config CHIP_ICD_CHECK_IN_SUPPORT
 	bool "Intermittently Connected Device Check-In protocol support"
@@ -417,7 +417,7 @@ config CHIP_ICD_UAT_SUPPORT
 	  means (e.g. button press) to trigger an ICD device to enter the active mode and become responsive.
 
 config CHIP_ICD_DSLS_SUPPORT
-	bool "Intermittenttly Connected Device Dynamic SIT LIT support"
+	bool "Intermittently Connected Device Dynamic SIT LIT support"
 	depends on CHIP_ICD_LIT_SUPPORT
 	help
 	  Enables the Dynamic SIT LIT support in Matter. It allows the application to dynamically switch between
@@ -430,6 +430,11 @@ config CHIP_ICD_CLIENTS_PER_FABRIC
 	help
 	  Provides the Intermittently Connected Device number of clients per fabric. It determines the maximum number
 	  of clients per fabric that can be registered to receive notification from a device if their subscription is lost.
+
+config CHIP_ICD_REPORT_ON_ACTIVE_MODE
+	bool "Intermittently Connected Device report on active mode"
+	help
+	  Enables an ICD to send data report to the subscribers on entering the active mode.
 
 endif # CHIP_ENABLE_ICD_SUPPORT
 
@@ -470,11 +475,11 @@ config CHIP_CERTIFiCATION_DECLARATION_OTA_IMAGE_ID
 
 endif
 
-config CHIP_FACTORY_RESET_ERASE_NVS
+config CHIP_FACTORY_RESET_ERASE_SETTINGS
 	bool "Erase NVS flash pages on factory reset"
-	depends on SETTINGS_NVS
+	depends on SETTINGS_NVS || SETTINGS_ZMS
 	help
-	  Erases flash pages occupied by non-volatile storage when a factory reset
+	  Erases non-volatile pages occupied by non-volatile storage when a factory reset
 	  is requested, instead of removing Matter-related settings only. Enabling
 	  this option provides a more robust factory reset mechanism and allows to
 	  regain the original storage performance if any firmware issue has brought

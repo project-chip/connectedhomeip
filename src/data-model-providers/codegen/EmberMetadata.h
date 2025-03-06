@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include "app/ConcreteClusterPath.h"
 #include <app/util/af-types.h>
 #include <lib/core/CHIPError.h>
 #include <protocols/interaction_model/StatusCode.h>
@@ -30,14 +31,12 @@ namespace Ember {
 /// path.
 ///
 /// Possible return values:
-///    - EmberAfCluster (NEVER null)           - Only for GlobalAttributesNotInMetaData
 ///    - EmberAfAttributeMetadata (NEVER null) - if the attribute is known to ember datastore
 ///    - Status, only specifically for unknown attributes, may only be one of:
 ///        - Status::UnsupportedEndpoint
 ///        - Status::UnsupportedCluster
 ///        - Status::UnsupportedAttribute
-std::variant<const EmberAfCluster *,             // global attribute, data from a cluster
-             const EmberAfAttributeMetadata *,   // a specific attribute stored by ember
+std::variant<const EmberAfAttributeMetadata *,   // a specific attribute stored by ember
              Protocols::InteractionModel::Status // one of Status::Unsupported*
              >
 FindAttributeMetadata(const ConcreteAttributePath & aPath);

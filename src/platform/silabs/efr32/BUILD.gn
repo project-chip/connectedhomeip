@@ -17,9 +17,9 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/build/chip/buildconfig_header.gni")
 import("${chip_root}/src/crypto/crypto.gni")
 import("${chip_root}/src/platform/device.gni")
-import("${chip_root}/src/platform/silabs/provision/args.gni")
 import("${chip_root}/third_party/silabs/efr32_sdk.gni")
 import("${chip_root}/third_party/silabs/silabs_board.gni")
+import("${matter_support_root}/provision/args.gni")
 
 assert(chip_device_platform == "efr32")
 
@@ -115,7 +115,7 @@ static_library("efr32") {
     "${chip_root}/src/platform:platform_base",
     "${chip_root}/src/platform/logging:headers",
   ]
-  deps = [ "${sl_provision_root}:provision-headers" ]
+  deps = [ "${sl_provision_root}:headers" ]
   public_configs = []
 
   # Add platform crypto implementation

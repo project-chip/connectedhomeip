@@ -203,7 +203,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
 
     def desc_TC_TSTAT_4_2(self) -> str:
         """Returns a description of this test"""
-        return "3.2.4 [TC-TSTAT-4-2] Preset write and command attributes test case with server as DUT"
+        return "3.2.4 [TC-TSTAT-4-2] Test cases to read/write attributes and invoke commands for Preset feature with server as DUT"
 
     def pics_TC_TSTAT_4_2(self):
         """ This function returns a list of PICS for this test case that must be True for the test to be run"""

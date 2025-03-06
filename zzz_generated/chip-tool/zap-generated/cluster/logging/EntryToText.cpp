@@ -179,6 +179,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "DoorLock";
     case chip::app::Clusters::WindowCovering::Id:
         return "WindowCovering";
+    case chip::app::Clusters::ClosureControl::Id:
+        return "ClosureControl";
     case chip::app::Clusters::ServiceArea::Id:
         return "ServiceArea";
     case chip::app::Clusters::PumpConfigurationAndControl::Id:
@@ -2709,6 +2711,43 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Unknown";
         }
     }
+    case chip::app::Clusters::ClosureControl::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ClosureControl::Attributes::CountdownTime::Id:
+            return "CountdownTime";
+        case chip::app::Clusters::ClosureControl::Attributes::MainState::Id:
+            return "MainState";
+        case chip::app::Clusters::ClosureControl::Attributes::CurrentErrorList::Id:
+            return "CurrentErrorList";
+        case chip::app::Clusters::ClosureControl::Attributes::OverallState::Id:
+            return "OverallState";
+        case chip::app::Clusters::ClosureControl::Attributes::OverallTarget::Id:
+            return "OverallTarget";
+        case chip::app::Clusters::ClosureControl::Attributes::RestingProcedure::Id:
+            return "RestingProcedure";
+        case chip::app::Clusters::ClosureControl::Attributes::TriggerCondition::Id:
+            return "TriggerCondition";
+        case chip::app::Clusters::ClosureControl::Attributes::TriggerPosition::Id:
+            return "TriggerPosition";
+        case chip::app::Clusters::ClosureControl::Attributes::WaitingDelay::Id:
+            return "WaitingDelay";
+        case chip::app::Clusters::ClosureControl::Attributes::KickoffTimer::Id:
+            return "KickoffTimer";
+        case chip::app::Clusters::ClosureControl::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::ClosureControl::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::ClosureControl::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::ClosureControl::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::ClosureControl::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::ServiceArea::Id: {
         switch (id)
         {
@@ -4191,8 +4230,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "CurrentFrameRate";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::HDRModeEnabled::Id:
             return "HDRModeEnabled";
-        case chip::app::Clusters::CameraAvStreamManagement::Attributes::FabricsUsingCamera::Id:
-            return "FabricsUsingCamera";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::SupportedStreamUsages::Id:
+            return "SupportedStreamUsages";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::AllocatedVideoStreams::Id:
             return "AllocatedVideoStreams";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::AllocatedAudioStreams::Id:
@@ -4980,6 +5019,10 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "RemoveFabric";
         case chip::app::Clusters::OperationalCredentials::Commands::AddTrustedRootCertificate::Id:
             return "AddTrustedRootCertificate";
+        case chip::app::Clusters::OperationalCredentials::Commands::SetVidVerificationStatement::Id:
+            return "SetVidVerificationStatement";
+        case chip::app::Clusters::OperationalCredentials::Commands::SignVidVerificationRequest::Id:
+            return "SignVidVerificationRequest";
         default:
             return "Unknown";
         }
@@ -5412,6 +5455,23 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "Unknown";
         }
     }
+    case chip::app::Clusters::ClosureControl::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ClosureControl::Commands::Stop::Id:
+            return "Stop";
+        case chip::app::Clusters::ClosureControl::Commands::MoveTo::Id:
+            return "MoveTo";
+        case chip::app::Clusters::ClosureControl::Commands::Calibrate::Id:
+            return "Calibrate";
+        case chip::app::Clusters::ClosureControl::Commands::ConfigureFallback::Id:
+            return "ConfigureFallback";
+        case chip::app::Clusters::ClosureControl::Commands::CancelFallback::Id:
+            return "CancelFallback";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::ServiceArea::Id: {
         switch (id)
         {
@@ -5745,6 +5805,8 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "VideoStreamDeallocate";
         case chip::app::Clusters::CameraAvStreamManagement::Commands::SnapshotStreamAllocate::Id:
             return "SnapshotStreamAllocate";
+        case chip::app::Clusters::CameraAvStreamManagement::Commands::SnapshotStreamModify::Id:
+            return "SnapshotStreamModify";
         case chip::app::Clusters::CameraAvStreamManagement::Commands::SnapshotStreamDeallocate::Id:
             return "SnapshotStreamDeallocate";
         case chip::app::Clusters::CameraAvStreamManagement::Commands::SetStreamPriorities::Id:
@@ -5785,8 +5847,8 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "ProvideOffer";
         case chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideAnswer::Id:
             return "ProvideAnswer";
-        case chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideICECandidate::Id:
-            return "ProvideICECandidate";
+        case chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideICECandidates::Id:
+            return "ProvideICECandidates";
         case chip::app::Clusters::WebRTCTransportProvider::Commands::EndSession::Id:
             return "EndSession";
         default:
@@ -5800,8 +5862,8 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "Offer";
         case chip::app::Clusters::WebRTCTransportRequestor::Commands::Answer::Id:
             return "Answer";
-        case chip::app::Clusters::WebRTCTransportRequestor::Commands::ICECandidate::Id:
-            return "ICECandidate";
+        case chip::app::Clusters::WebRTCTransportRequestor::Commands::ICECandidates::Id:
+            return "ICECandidates";
         case chip::app::Clusters::WebRTCTransportRequestor::Commands::End::Id:
             return "End";
         default:
@@ -6069,6 +6131,8 @@ char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId i
             return "CSRResponse";
         case chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::Id:
             return "NOCResponse";
+        case chip::app::Clusters::OperationalCredentials::Commands::SignVidVerificationResponse::Id:
+            return "SignVidVerificationResponse";
         default:
             return "Unknown";
         }
@@ -6625,10 +6689,44 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Color Temperature Light";
     case 0x0000010D:
         return "Extended Color Light";
+    case 0x0000010F:
+        return "Mounted On/Off Control";
+    case 0x00000110:
+        return "Mounted Dimmable Load Control";
+    case 0x00000142:
+        return "Camera";
     case 0x00000202:
         return "Window Covering";
     case 0x00000203:
         return "Window Covering Controller";
+    case 0x00000230:
+        return "ClosureBase";
+    case 0x00000231:
+        return "Window";
+    case 0x00000232:
+        return "Shutter";
+    case 0x00000233:
+        return "Shade";
+    case 0x00000234:
+        return "Curtain";
+    case 0x00000235:
+        return "Blind";
+    case 0x00000236:
+        return "Screen";
+    case 0x00000237:
+        return "Awning";
+    case 0x00000238:
+        return "Pergola";
+    case 0x00000239:
+        return "Door";
+    case 0x0000023A:
+        return "GarageDoor";
+    case 0x0000023B:
+        return "Gate";
+    case 0x0000023C:
+        return "Barrier";
+    case 0x0000023D:
+        return "Cabinet";
     case 0x00000300:
         return "Heating/Cooling Unit";
     case 0x00000301:
@@ -6647,6 +6745,8 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Humidity Sensor";
     case 0x00000309:
         return "Heat Pump";
+    case 0x0000030A:
+        return "Thermostat Controller";
     case 0x0000050C:
         return "EVSE";
     case 0x0000050D:

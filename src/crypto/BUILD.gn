@@ -141,6 +141,7 @@ if (chip_crypto == "openssl") {
       "CHIPCryptoPALPSA.h",
       "CHIPCryptoPALmbedTLS.h",
       "CHIPCryptoPALmbedTLSCert.cpp",
+      "PSAKeyAllocator.h",
     ]
     public_deps = [ ":public_headers" ]
 

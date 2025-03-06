@@ -113,6 +113,8 @@ configuration:
 - {name: SL_BT_RTOS_LINK_LAYER_TASK_STACK_SIZE, value: 1024}
 - {name: SL_BT_RTOS_HOST_STACK_TASK_STACK_SIZE, value: 2048}
 - {name: SL_BT_RTOS_EVENT_HANDLER_STACK_SIZE, value: 1536}
+- {name: SL_MBEDTLS_PSA_ASSUME_EXCLUSIVE_BUFFERS, value: 1}
+- {name: SL_OPENTHREAD_ENABLE_SERIAL_TASK, value: 0}
 
 template_contribution:
   - name: mbedtls_ssl_content_len_in_requirement

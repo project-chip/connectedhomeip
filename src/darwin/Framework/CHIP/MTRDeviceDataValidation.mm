@@ -165,51 +165,68 @@ BOOL MTREventReportIsWellFormed(NSArray<MTRDeviceResponseValueDictionary> * repo
 
 BOOL MTRInvokeResponseIsWellFormed(NSArray<MTRDeviceResponseValueDictionary> * response)
 {
-    if (!MTR_SAFE_CAST(response, NSArray)) {
-        MTR_LOG_ERROR("Invoke response is not an array: %@", response);
+    if (!MTRInvokeResponsesAreWellFormed(response)) {
         return NO;
     }
 
-    // Input is an array with a single value that must have MTRCommandPathKey.
+    // Input is an array with a single value.
     if (response.count != 1) {
         MTR_LOG_ERROR("Invoke response is not an array with exactly one entry: %@", response);
         return NO;
     }
 
-    MTRDeviceResponseValueDictionary responseValue = response[0];
+    return YES;
+}
 
-    if (!MTR_SAFE_CAST(responseValue, NSDictionary) || !MTR_SAFE_CAST(responseValue[MTRCommandPathKey], MTRCommandPath)) {
-        MTR_LOG_ERROR("Invoke response is not an array with the right things in it: %@", response);
+BOOL MTRInvokeResponsesAreWellFormed(NSArray<MTRDeviceResponseValueDictionary> * responses)
+{
+    if (!MTR_SAFE_CAST(responses, NSArray)) {
+        MTR_LOG_ERROR("Invoke responses are not an array: %@", responses);
         return NO;
     }
 
-    MTRDeviceDataValueDictionary _Nullable data = responseValue[MTRDataKey];
-    NSError * _Nullable error = responseValue[MTRErrorKey];
+    for (MTRDeviceResponseValueDictionary responseValue in responses) {
+        // Each entry must be a dictionary that has MTRCommandPathKey.
 
-    if (data != nil && error != nil) {
-        MTR_LOG_ERROR("Invoke response claims to have both data and error: %@", responseValue);
-        return NO;
-    }
+        if (!MTR_SAFE_CAST(responseValue, NSDictionary) || !MTR_SAFE_CAST(responseValue[MTRCommandPathKey], MTRCommandPath)) {
+            MTR_LOG_ERROR("Invoke response has an invalid array entry: %@", responseValue);
+            return NO;
+        }
 
-    if (error != nil) {
-        return MTR_SAFE_CAST(error, NSError) != nil;
-    }
+        MTRDeviceDataValueDictionary _Nullable data = responseValue[MTRDataKey];
+        NSError * _Nullable error = responseValue[MTRErrorKey];
 
-    if (data == nil) {
-        // This is valid: indicates a success status response.
-        return YES;
-    }
+        if (data != nil && error != nil) {
+            MTR_LOG_ERROR("Invoke response claims to have both data and error: %@", responseValue);
+            return NO;
+        }
 
-    if (!MTRDataValueDictionaryIsWellFormed(data)) {
-        MTR_LOG_ERROR("Invoke response claims to have data that is not a data-value: %@", data);
-        return NO;
-    }
+        if (error != nil) {
+            if (!MTR_SAFE_CAST(error, NSError)) {
+                MTR_LOG_ERROR("Invoke response %@ has %@ instead of an NSError", responseValue, error);
+                return NO;
+            }
 
-    // Now we know data is a dictionary (in fact a data-value).  The only thing
-    // we promise about it is that it has type MTRStructureValueType.
-    if (![MTRStructureValueType isEqual:data[MTRTypeKey]]) {
-        MTR_LOG_ERROR("Invoke response data is not of structure type: %@", data);
-        return NO;
+            // Valid error response.
+            continue;
+        }
+
+        if (data == nil) {
+            // This is valid: indicates a success status response.
+            continue;
+        }
+
+        if (!MTRDataValueDictionaryIsWellFormed(data)) {
+            MTR_LOG_ERROR("Invoke response claims to have data that is not a data-value: %@", data);
+            return NO;
+        }
+
+        // Now we know data is a dictionary (in fact a data-value).  The only thing
+        // we promise about it is that it has type MTRStructureValueType.
+        if (![MTRStructureValueType isEqual:data[MTRTypeKey]]) {
+            MTR_LOG_ERROR("Invoke response data is not of structure type: %@", data);
+            return NO;
+        }
     }
 
     return YES;
