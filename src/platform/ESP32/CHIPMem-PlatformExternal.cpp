@@ -59,6 +59,7 @@ void MemoryFree(void * p)
 
 bool MemoryInternalCheckPointer(const void * p, size_t min_size)
 {
+    // We don't have a way to know if p is allocated from the heap, just do a null check here.
     return (p != nullptr);
 }
 
