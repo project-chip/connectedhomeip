@@ -31,14 +31,13 @@ namespace app {
 struct ServerClusterRegistration
 {
     // A single-linked list of clusters registered for the given `endpointId`
-    ServerClusterInterface * serverClusterInterface;
+    ServerClusterInterface * const serverClusterInterface;
     ServerClusterRegistration * next;
 
     constexpr ServerClusterRegistration(ServerClusterInterface &interface, ServerClusterRegistration * next_item = nullptr) :
         serverClusterInterface(&interface), next(next_item)
     {}
     ServerClusterRegistration(ServerClusterRegistration &&other) = default;
-    ServerClusterRegistration& operator=(ServerClusterRegistration &&other) = default;
 
     // we generally do not want to allow copies as those may have different "next" entries.
     ServerClusterRegistration(const ServerClusterRegistration &other) = delete;
@@ -118,7 +117,7 @@ public:
 
     /// Provides a list of clusters that are registered for the given endpoint.
     ///
-    /// As ClustersList points inside the internal registrations of the registry,
+    /// ClustersList points inside the internal registrations of the registry, so
     /// the list is only valid as long as the registry is not modified.
     ClustersList ClustersOnEndpoint(EndpointId endpointId);
 

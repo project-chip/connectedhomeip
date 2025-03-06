@@ -83,7 +83,7 @@ ServerClusterInterface * ServerClusterInterfaceRegistry::Unregister(const Concre
                 mCachedInterface = nullptr;
             }
 
-            current->next = nullptr; // some clearing
+            current->next = nullptr; // Make sure current does not look like part of a list.
             return current->serverClusterInterface;
         }
 
@@ -121,7 +121,7 @@ void ServerClusterInterfaceRegistry::UnregisterAllFromEndpoint(EndpointId endpoi
                 prev->next = current->next;
             }
             ServerClusterRegistration * actual_next = current->next;
-            current->next                           = nullptr; // some clearing
+            current->next                           = nullptr; // Make sure current does not look like part of a list.
             current                                 = actual_next;
         }
         else
