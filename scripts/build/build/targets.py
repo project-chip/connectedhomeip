@@ -150,6 +150,7 @@ def BuildHostTarget():
         TargetPart('water-leak-detector', app=HostApp.WATER_LEAK_DETECTOR),
         TargetPart('terms-and-conditions', app=HostApp.TERMS_AND_CONDITIONS),
         TargetPart('camera', app=HostApp.CAMERA),
+        TargetPart('camera-controller', app=HostApp.CAMERA_CONTROLLER),
     ]
 
     if (HostBoard.NATIVE.PlatformName() == 'darwin'):

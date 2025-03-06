@@ -14023,9 +14023,10 @@ private:
 | * VideoStreamModify                                                 |   0x05 |
 | * VideoStreamDeallocate                                             |   0x06 |
 | * SnapshotStreamAllocate                                            |   0x07 |
-| * SnapshotStreamDeallocate                                          |   0x09 |
-| * SetStreamPriorities                                               |   0x0A |
-| * CaptureSnapshot                                                   |   0x0B |
+| * SnapshotStreamModify                                              |   0x09 |
+| * SnapshotStreamDeallocate                                          |   0x0A |
+| * SetStreamPriorities                                               |   0x0B |
+| * CaptureSnapshot                                                   |   0x0C |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * MaxConcurrentVideoEncoders                                        | 0x0000 |
@@ -14042,7 +14043,7 @@ private:
 | * MaxNetworkBandwidth                                               | 0x000B |
 | * CurrentFrameRate                                                  | 0x000C |
 | * HDRModeEnabled                                                    | 0x000D |
-| * FabricsUsingCamera                                                | 0x000E |
+| * SupportedStreamUsages                                             | 0x000E |
 | * AllocatedVideoStreams                                             | 0x000F |
 | * AllocatedAudioStreams                                             | 0x0010 |
 | * AllocatedSnapshotStreams                                          | 0x0011 |
@@ -14076,9 +14077,6 @@ private:
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
-| * VideoStreamChanged                                                | 0x0000 |
-| * AudioStreamChanged                                                | 0x0001 |
-| * SnapshotStreamChanged                                             | 0x0002 |
 \*----------------------------------------------------------------------------*/
 
 /*
@@ -14310,6 +14308,8 @@ public:
         AddArgument("MinResolution", &mComplex_MinResolution);
         AddArgument("MaxResolution", &mComplex_MaxResolution);
         AddArgument("Quality", 0, UINT8_MAX, &mRequest.quality);
+        AddArgument("WatermarkEnabled", 0, 1, &mRequest.watermarkEnabled);
+        AddArgument("OSDEnabled", 0, 1, &mRequest.OSDEnabled);
         ClusterCommand::AddArguments();
     }
 
@@ -14340,6 +14340,46 @@ private:
         mComplex_MinResolution;
     TypedComplexArgument<chip::app::Clusters::CameraAvStreamManagement::Structs::VideoResolutionStruct::Type>
         mComplex_MaxResolution;
+};
+
+/*
+ * Command SnapshotStreamModify
+ */
+class CameraAvStreamManagementSnapshotStreamModify : public ClusterCommand
+{
+public:
+    CameraAvStreamManagementSnapshotStreamModify(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("snapshot-stream-modify", credsIssuerConfig)
+    {
+        AddArgument("SnapshotStreamID", 0, UINT16_MAX, &mRequest.snapshotStreamID);
+        AddArgument("WatermarkEnabled", 0, 1, &mRequest.watermarkEnabled);
+        AddArgument("OSDEnabled", 0, 1, &mRequest.OSDEnabled);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::CameraAvStreamManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::CameraAvStreamManagement::Commands::SnapshotStreamModify::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::CameraAvStreamManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::CameraAvStreamManagement::Commands::SnapshotStreamModify::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::CameraAvStreamManagement::Commands::SnapshotStreamModify::Type mRequest;
 };
 
 /*
@@ -28113,6 +28153,7 @@ void registerClusterCameraAvStreamManagement(Commands & commands, CredentialIssu
         make_unique<CameraAvStreamManagementVideoStreamModify>(credsIssuerConfig),        //
         make_unique<CameraAvStreamManagementVideoStreamDeallocate>(credsIssuerConfig),    //
         make_unique<CameraAvStreamManagementSnapshotStreamAllocate>(credsIssuerConfig),   //
+        make_unique<CameraAvStreamManagementSnapshotStreamModify>(credsIssuerConfig),     //
         make_unique<CameraAvStreamManagementSnapshotStreamDeallocate>(credsIssuerConfig), //
         make_unique<CameraAvStreamManagementSetStreamPriorities>(credsIssuerConfig),      //
         make_unique<CameraAvStreamManagementCaptureSnapshot>(credsIssuerConfig),          //
@@ -28136,7 +28177,7 @@ void registerClusterCameraAvStreamManagement(Commands & commands, CredentialIssu
         make_unique<ReadAttribute>(Id, "max-network-bandwidth", Attributes::MaxNetworkBandwidth::Id, credsIssuerConfig),         //
         make_unique<ReadAttribute>(Id, "current-frame-rate", Attributes::CurrentFrameRate::Id, credsIssuerConfig),               //
         make_unique<ReadAttribute>(Id, "hdrmode-enabled", Attributes::HDRModeEnabled::Id, credsIssuerConfig),                    //
-        make_unique<ReadAttribute>(Id, "fabrics-using-camera", Attributes::FabricsUsingCamera::Id, credsIssuerConfig),           //
+        make_unique<ReadAttribute>(Id, "supported-stream-usages", Attributes::SupportedStreamUsages::Id, credsIssuerConfig),     //
         make_unique<ReadAttribute>(Id, "allocated-video-streams", Attributes::AllocatedVideoStreams::Id, credsIssuerConfig),     //
         make_unique<ReadAttribute>(Id, "allocated-audio-streams", Attributes::AllocatedAudioStreams::Id, credsIssuerConfig),     //
         make_unique<ReadAttribute>(Id, "allocated-snapshot-streams", Attributes::AllocatedSnapshotStreams::Id,
@@ -28210,8 +28251,10 @@ void registerClusterCameraAvStreamManagement(Commands & commands, CredentialIssu
                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<bool>>(Id, "hdrmode-enabled", 0, 1, Attributes::HDRModeEnabled::Id, WriteCommandType::kWrite,
                                           credsIssuerConfig), //
-        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::FabricIndex>>>(
-            Id, "fabrics-using-camera", Attributes::FabricsUsingCamera::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::CameraAvStreamManagement::StreamUsageEnum>>>(
+            Id, "supported-stream-usages", Attributes::SupportedStreamUsages::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<
             chip::app::DataModel::List<const chip::app::Clusters::CameraAvStreamManagement::Structs::VideoStreamStruct::Type>>>(
             Id, "allocated-video-streams", Attributes::AllocatedVideoStreams::Id, WriteCommandType::kForceWrite,
@@ -28307,7 +28350,7 @@ void registerClusterCameraAvStreamManagement(Commands & commands, CredentialIssu
         make_unique<SubscribeAttribute>(Id, "max-network-bandwidth", Attributes::MaxNetworkBandwidth::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "current-frame-rate", Attributes::CurrentFrameRate::Id, credsIssuerConfig),           //
         make_unique<SubscribeAttribute>(Id, "hdrmode-enabled", Attributes::HDRModeEnabled::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "fabrics-using-camera", Attributes::FabricsUsingCamera::Id, credsIssuerConfig),       //
+        make_unique<SubscribeAttribute>(Id, "supported-stream-usages", Attributes::SupportedStreamUsages::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "allocated-video-streams", Attributes::AllocatedVideoStreams::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "allocated-audio-streams", Attributes::AllocatedAudioStreams::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "allocated-snapshot-streams", Attributes::AllocatedSnapshotStreams::Id,
@@ -28348,14 +28391,8 @@ void registerClusterCameraAvStreamManagement(Commands & commands, CredentialIssu
         //
         // Events
         //
-        make_unique<ReadEvent>(Id, credsIssuerConfig),                                                                    //
-        make_unique<ReadEvent>(Id, "video-stream-changed", Events::VideoStreamChanged::Id, credsIssuerConfig),            //
-        make_unique<ReadEvent>(Id, "audio-stream-changed", Events::AudioStreamChanged::Id, credsIssuerConfig),            //
-        make_unique<ReadEvent>(Id, "snapshot-stream-changed", Events::SnapshotStreamChanged::Id, credsIssuerConfig),      //
-        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                               //
-        make_unique<SubscribeEvent>(Id, "video-stream-changed", Events::VideoStreamChanged::Id, credsIssuerConfig),       //
-        make_unique<SubscribeEvent>(Id, "audio-stream-changed", Events::AudioStreamChanged::Id, credsIssuerConfig),       //
-        make_unique<SubscribeEvent>(Id, "snapshot-stream-changed", Events::SnapshotStreamChanged::Id, credsIssuerConfig), //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
     commands.RegisterCluster(clusterName, clusterCommands);

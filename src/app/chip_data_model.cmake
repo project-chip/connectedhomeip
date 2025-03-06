@@ -16,6 +16,10 @@
 
 set(CHIP_APP_BASE_DIR ${CMAKE_CURRENT_LIST_DIR})
 
+if (NOT CHIP_APP_ZAP_DIR)
+    get_filename_component(CHIP_APP_ZAP_DIR ${CHIP_ROOT}/zzz_generated/app-common REALPATH)
+endif()
+
 include("${CHIP_ROOT}/build/chip/chip_codegen.cmake")
 include("${CHIP_ROOT}/src/data-model-providers/codegen/model.cmake")
 
@@ -144,7 +148,7 @@ function(chip_configure_data_model APP_TARGET)
     add_dependencies(${APP_TARGET} ${APP_TARGET}-zapgen)
 
     target_sources(${APP_TARGET} ${SCOPE}
-        ${CHIP_APP_BASE_DIR}/../../zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp
+        ${CHIP_APP_ZAP_DIR}/app-common/zap-generated/attributes/Accessors.cpp
         ${CHIP_APP_BASE_DIR}/reporting/reporting.cpp
         ${CHIP_APP_BASE_DIR}/util/attribute-storage.cpp
         ${CHIP_APP_BASE_DIR}/util/attribute-table.cpp
