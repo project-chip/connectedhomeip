@@ -92,16 +92,16 @@ class RealtekBuilder(Builder):
 
         self.ot_src_dir = os.path.join(os.getcwd(), 'third_party/openthread/ot-realtek')
 
-    def CmakeBuildFlags(self):
-        flags = []
-
-        flags.append("-DCMAKE_BUILD_TYPE=Release")
-        flags.append("-DCMAKE_TOOLCHAIN_FILE=src/bee4/arm-none-eabi.cmake")
-        flags.append("-DBUILD_TYPE=sdk")
-        flags.append(f"-DBUILD_TARGET={self.board.BoardName}")
-        flags.append(f"-DBUILD_BOARD_TARGET={self.board.BoardName}")
-        flags.append(f"-DOT_CMAKE_NINJA_TARGET={self.app.TargetName}")
-        flags.append(f"-DMATTER_EXAMPLE_PATH={self.root}/examples/{self.app.ExampleName}/realtek_bee")
+    def CmakeBuildFlags(self) -> str:
+        flags = [
+            "-DCMAKE_BUILD_TYPE=Release",
+            "-DCMAKE_TOOLCHAIN_FILE=src/bee4/arm-none-eabi.cmake",
+            "-DBUILD_TYPE=sdk",
+            f"-DBUILD_TARGET={self.board.BoardName}",
+            f"-DBUILD_BOARD_TARGET={self.board.BoardName}",
+            f"-DOT_CMAKE_NINJA_TARGET={self.app.TargetName}",
+            f"-DMATTER_EXAMPLE_PATH={self.root}/examples/{self.app.ExampleName}/realtek_bee"
+        ]
 
         if self.enable_cli:
             flags.append("-DENABLE_CLI=ON")
@@ -118,9 +118,7 @@ class RealtekBuilder(Builder):
         else:
             flags.append("-DENABLE_SHELL=OFF")
 
-        build_flags = " ".join(flags)
-
-        return build_flags
+        return " ".join(flags)
 
     def generate(self):
         cmd = 'arm-none-eabi-gcc -D BUILD_BANK=0 -E -P -x c {ot_src_dir}/src/bee4/{board_name}/app.ld -o {ot_src_dir}/src/bee4/{board_name}/app.ld.gen'.format(
@@ -132,7 +130,6 @@ class RealtekBuilder(Builder):
             build_flags=self.CmakeBuildFlags(),
             example_folder=self.ot_src_dir,
             out_folder=self.output_dir)
-
         self._Execute(['bash', '-c', cmd], title='Generating ' + self.identifier)
 
     def _build(self):
@@ -145,7 +142,9 @@ class RealtekBuilder(Builder):
 
         self._Execute(cmd, title='Building ' + self.identifier)
 
-        os.system(f"rm -rf {self.root}/third_party/openthread/ot-realtek/src/bee4/{self.board.BoardName}/*.gen")
+        cleanup_cmd = ['rm', '-rf', f"{self.root}/third_party/openthread/ot-realtek/src/bee4/{self.board.BoardName}/*.gen"]
+
+        self._Execute(cleanup_cmd, title='Cleaning up generated files')
 
     def build_outputs(self):
         logging.info('build_outputs %s', self.output_dir)
