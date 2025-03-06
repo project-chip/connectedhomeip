@@ -130,8 +130,7 @@ public:
      *
      *   @param streamID       Indicates the streamID to deallocate.
      *
-     *   @return Success if the stream deallocation is successful; otherwise, the command SHALL be rejected with an appropriate
-     *   error.
+     *   @return Success       Stream shall be de-allocated, if found.
      *
      */
     virtual Protocols::InteractionModel::Status VideoStreamDeallocate(const uint16_t streamID) = 0;
@@ -155,8 +154,7 @@ public:
      *
      *   @param streamID       Indicates the streamID to deallocate.
      *
-     *   @return Success if the stream deallocation is successful; otherwise, the command SHALL be rejected with an appropriate
-     *   error.
+     *   @return Success       Stream shall be de-allocated, if found.
      */
     virtual Protocols::InteractionModel::Status AudioStreamDeallocate(const uint16_t streamID) = 0;
 
@@ -180,8 +178,7 @@ public:
      *
      *   @param streamID       Indicates the streamID to deallocate.
      *
-     *   @return Success if the stream deallocation is successful; otherwise, the command SHALL be rejected with an appropriate
-     *   error.
+     *   @return Success       Stream shall be de-allocated, if found.
      */
     virtual Protocols::InteractionModel::Status SnapshotStreamDeallocate(const uint16_t streamID) = 0;
 
