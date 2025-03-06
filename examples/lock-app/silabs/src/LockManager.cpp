@@ -372,6 +372,9 @@ bool LockManager::GetUser(chip::EndpointId endpointId, uint16_t userIndex, Ember
     user.modificationSource = DlAssetSource::kMatterIM;
     user.lastModifiedBy     = userInStorage.lastModifiedBy;
 
+    // Ensure userInStorage.currentCredentialCount <= kMaxCredentialsPerUser to avoid buffer overflow
+    VerifyOrReturnValue(userInStorage.currentCredentialCount <= kMaxCredentialsPerUser, false);
+
     // Get credential struct from nvm3
     chip::StorageKeyName credentialKey = LockUserCredentialMap(userIndex);
 
@@ -595,7 +598,7 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credential
                                                                        static_cast<uint16_t>(sizeof(LockCredentialInfo)));
 
     // Clear credentialInStorage.credentialData
-    memset(credentialInStorage.credentialData, 0, sizeof(uint8_t)*kMaxCredentialSize);
+    memset(credentialInStorage.credentialData, 0, sizeof(uint8_t) * kMaxCredentialSize);
 
     if ((error != CHIP_NO_ERROR))
     {
