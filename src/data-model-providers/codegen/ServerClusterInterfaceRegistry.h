@@ -31,7 +31,7 @@ namespace app {
 struct ServerClusterRegistration
 {
     // A single-linked list of clusters registered for the given `endpointId`
-    ServerClusterInterface * serverClusterInterface = nullptr;
+    ServerClusterInterface * const serverClusterInterface = nullptr;
     ServerClusterRegistration * next                = nullptr;
 
     constexpr ServerClusterRegistration() = default;
