@@ -299,7 +299,7 @@ CHIP_ERROR CodegenDataModelProvider::ServerClusters(EndpointId endpointId,
             .dataVersion = cluster->GetDataVersion(),
             .flags       = cluster->GetClusterFlags(),
         }));
-        knownClustersBuilder.Append(path.mClusterId);
+        ReturnErrorOnFailure(knownClustersBuilder.Append(path.mClusterId));
     }
 
     DataModel::ReadOnlyBuffer<ClusterId> knownClusters = knownClustersBuilder.TakeBuffer();
