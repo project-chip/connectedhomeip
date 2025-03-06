@@ -160,13 +160,7 @@ function install_tizen_sdk_common() {
         'certificate-generator_0.1.4_ubuntu-64.zip'
         'new-common-cli_2.5.64_ubuntu-64.zip'
         'new-native-cli_2.5.64_ubuntu-64.zip'
-        'sdb_4.2.23_ubuntu-64.zip')
-    download "$URL" "${PKG_ARR[@]}"
-
-    # Base sysroot
-    # Different versions of Tizen have different rootstrap versions
-    URL="http://download.tizen.org/sdk/tizenstudio/official/binary/"
-    PKG_ARR=(
+        'sdb_4.2.23_ubuntu-64.zip'
         "tizen-$TIZEN_VERSION-core-add-ons_*_ubuntu-64.zip")
     download "$URL" "${PKG_ARR[@]}"
 
