@@ -49,7 +49,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Thread Network Directory
     - Water Heater Management
     - Water Heater Mode
-    - WebRTC Requestor Server
+    - WebRTC Transport Requestor
     - General Commissioning
     - General Diagnostics
     - Software Diagnostics
