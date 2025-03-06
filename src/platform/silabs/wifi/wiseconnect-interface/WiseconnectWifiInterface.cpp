@@ -142,7 +142,7 @@ void WiseconnectWifiInterface::ResetConnectivityNotificationFlags(void)
     ResetIPNotificationStates();
     mHasNotifiedWifiConnectivity = false;
 
-    WifiPlatformEvent event = WifiPlatformEvent::kStationNetworkEvent;
+    WifiPlatformEvent event = WifiPlatformEvent::kConnectionComplete;
     PostWifiPlatformEvent(event);
 }
 

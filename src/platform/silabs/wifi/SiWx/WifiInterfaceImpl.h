@@ -100,7 +100,7 @@ private:
      * @brief Processing function responsible for notifying the upper layers of a succesful connection attempt.
      *
      */
-    void UpdateAppConnectivityStatus();
+    void NotifySuccessfulConnection();
 
     static WifiInterfaceImpl mInstance;
 };
