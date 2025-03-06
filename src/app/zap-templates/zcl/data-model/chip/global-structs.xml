@@ -23,6 +23,11 @@ limitations under the License.
     <item fieldId="1" name="StatusCode" type="status"/>
   </struct>
 
+  <struct name="CurrencyStruct" apiMaturity="provisional">
+    <item fieldId="0" name="Currency" type="int16u" max="999"/>
+    <item fieldId="1" name="DecimalPoints" type="int8u"/>
+  </struct>
+
   <struct name="LocationDescriptorStruct">
     <item fieldId="0" name="LocationName"    type="char_string" length="128" isNullable="false" optional="false"/>
     <item fieldId="1" name="FloorNumber"     type="int16s"                   isNullable="true"  optional="false"/>
@@ -34,6 +39,17 @@ limitations under the License.
     Their usage is defined for UnitTestCluster only.
   -->
   
+   <struct name="PowerThresholdStruct" apiMaturity="provisional">
+    <item fieldId="0" name="PowerThreshold" type="power_mw" optional="true"/>
+    <item fieldId="1" name="ApparentPowerThreshold" type="power_mw" optional="true"/>
+    <item fieldId="2" name="PowerThresholdSource" type="PowerThresholdSourceEnum" isNullable="true" min="0x00" max="0x02"/>
+  </struct>
+
+  <struct name="PriceStruct" apiMaturity="provisional">
+    <item fieldId="0" name="Amount" type="int64s"/>
+    <item fieldId="1" name="Currency" type="CurrencyStruct"/>
+  </struct>
+
   <struct name="TestGlobalStruct">
     <item fieldId="0" name="Name" type="char_string" length="128" isNullable="false" optional="false"/>
     <item fieldId="1" name="MyBitmap" type="TestGlobalBitmap" isNullable="true" optional="false"/>
