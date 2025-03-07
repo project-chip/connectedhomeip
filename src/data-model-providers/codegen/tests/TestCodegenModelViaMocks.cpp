@@ -19,6 +19,7 @@
 #include <data-model-providers/codegen/tests/EmberInvokeOverride.h>
 #include <data-model-providers/codegen/tests/EmberReadWriteOverride.h>
 
+#include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <access/AccessControl.h>
 #include <access/SubjectDescriptor.h>
 #include <app-common/zap-generated/attribute-type.h>
@@ -2599,8 +2600,14 @@ static CHIP_ERROR ReadU32Attribute(DataModel::Provider & provider, const Concret
 
 TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesRegistration)
 {
+    TestServerClusterContext testContext;
+
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
+
+
+    model.SetPersistentStorageDelegate(&testContext.StorageDelegate());
+    ASSERT_EQ(model.Startup(testContext.ImContext()), CHIP_NO_ERROR);
 
     const ConcreteClusterPath kTestClusterPath(kMockEndpoint1, MockClusterId(2));
 
@@ -2670,12 +2677,20 @@ TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesRegistration)
         std::optional<ActionReturnStatus> result = model.WriteAttribute(test.GetRequest(), decoder);
         ASSERT_TRUE(result.has_value() && result->GetUnderlyingError() == CHIP_ERROR_INCORRECT_STATE);
     }
+
+    model.Registry().Unregister(kTestClusterPath);
+    model.Shutdown();
 }
 
 TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesListClusters)
 {
+    TestServerClusterContext testContext;
+
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
+
+    model.SetPersistentStorageDelegate(&testContext.StorageDelegate());
+    ASSERT_EQ(model.Startup(testContext.ImContext()), CHIP_NO_ERROR);
 
     // will register a fake cluster server which overrides the cluster data version
     // once registered
@@ -2743,4 +2758,7 @@ TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesListClusters)
         }
     }
     EXPECT_TRUE(updatedClusterFound);
+
+    model.Registry().Unregister(kTestClusterPath);
+    model.Shutdown();
 }

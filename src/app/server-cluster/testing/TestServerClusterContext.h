@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include "app/data-model-provider/Context.h"
 #include <app/data-model-provider/ActionContext.h>
 #include <app/data-model-provider/Provider.h>
 #include <app/server-cluster/ServerClusterContext.h>
@@ -74,6 +75,8 @@ public:
     LogOnlyEvents & EventsGenerator() { return mTestEventsGenerator; }
     TestProviderChangeListener & ChangeListener() { return mTestDataModelChangeListener; }
     TestPersistentStorageDelegate & StorageDelegate() { return mTestStorage; }
+    app::DataModel::InteractionModelContext &ImContext() { return mTestContext; }
+
 
 private:
     NullActionContext mNullActionContext;
