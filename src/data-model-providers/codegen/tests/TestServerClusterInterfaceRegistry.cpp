@@ -424,12 +424,6 @@ TEST_F(TestServerClusterInterfaceRegistry, MultiPathRegistration)
     ASSERT_EQ(registry.Get({ 3, 200 }), nullptr);
     ASSERT_EQ(registry.Get({ 4, 33 }), nullptr);
 
-    ASSERT_EQ(registry.Unregister(&cluster), CHIP_NO_ERROR);
-    for (auto & p : kTestPaths)
-    {
-        ASSERT_EQ(registry.Get(p), nullptr);
-    }
-
     // Verify listing works
     ServerClusterInterfaceRegistry::ClustersList clusters = registry.ClustersOnEndpoint(15);
     auto it                                               = clusters.begin();
@@ -440,6 +434,13 @@ TEST_F(TestServerClusterInterfaceRegistry, MultiPathRegistration)
     ASSERT_EQ(*it, 33u);
     ++it;
     ASSERT_EQ(it, clusters.end());
+
+    ASSERT_EQ(registry.Unregister(&cluster), CHIP_NO_ERROR);
+    for (auto & p : kTestPaths)
+    {
+        ASSERT_EQ(registry.Get(p), nullptr);
+    }
+
 }
 
 TEST_F(TestServerClusterInterfaceRegistry, StartupErrors)
