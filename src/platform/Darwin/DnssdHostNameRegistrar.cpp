@@ -154,7 +154,7 @@ void LogDetails(InetInterfacesVector inetInterfaces, Inet6InterfacesVector inet6
 
     for (auto interfaceId : interfaceIds)
     {
-        char interfaceName[IFNAMSIZ] = {};
+        char interfaceName[Inet::InterfaceId::kMaxIfNameLength] = {};
         if_indextoname(interfaceId, interfaceName);
         ChipLogProgress(Discovery, "\t%s (%u)", interfaceName, interfaceId);
         LogDetails(interfaceId, inetInterfaces, inet6Interfaces);

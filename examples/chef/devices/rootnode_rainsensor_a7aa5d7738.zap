@@ -1584,30 +1584,6 @@
               "source": "client",
               "isIncoming": 1,
               "isEnabled": 1
-            },
-            {
-              "name": "SetVidVerificationStatement",
-              "code": 12,
-              "mfgCode": null,
-              "source": "client",
-              "isIncoming": 1,
-              "isEnabled": 1
-            },
-            {
-              "name": "SignVidVerificationRequest",
-              "code": 13,
-              "mfgCode": null,
-              "source": "client",
-              "isIncoming": 1,
-              "isEnabled": 1
-            },
-            {
-              "name": "SignVidVerificationResponse",
-              "code": 14,
-              "mfgCode": null,
-              "source": "server",
-              "isIncoming": 0,
-              "isEnabled": 1
             }
           ],
           "attributes": [

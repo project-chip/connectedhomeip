@@ -149,6 +149,7 @@ def BuildHostTarget():
         TargetPart('water-leak-detector', app=HostApp.WATER_LEAK_DETECTOR),
         TargetPart('terms-and-conditions', app=HostApp.TERMS_AND_CONDITIONS),
         TargetPart('camera', app=HostApp.CAMERA),
+        TargetPart('camera-controller', app=HostApp.CAMERA_CONTROLLER),
     ]
 
     if (HostBoard.NATIVE.PlatformName() == 'darwin'):
@@ -778,6 +779,7 @@ def BuildTelinkTarget():
         TargetPart('tlsr9528a', board=TelinkBoard.TLSR9528A),
         TargetPart('tlsr9528a_retention', board=TelinkBoard.TLSR9528A_RETENTION),
         TargetPart('tl3218x', board=TelinkBoard.TL3218X),
+        TargetPart('tl3218x_retention', board=TelinkBoard.TL3218X_RETENTION),
         TargetPart('tl7218x', board=TelinkBoard.TL7218X),
         TargetPart('tl7218x_retention', board=TelinkBoard.TL7218X_RETENTION),
     ])

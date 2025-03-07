@@ -145,7 +145,7 @@
     "ServerDirectories": {
         "ACCESS_CONTROL_CLUSTER": ["access-control-server"],
         "ACCOUNT_LOGIN_CLUSTER": ["account-login-server"],
-        "ACTIONS_CLUSTER": [],
+        "ACTIONS_CLUSTER": ["actions-server"],
         "ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER": [
             "resource-monitoring-server"
         ],
@@ -177,7 +177,7 @@
         ],
         "CHANNEL_CLUSTER": ["channel-server"],
         "CHIME_CLUSTER": ["chime-server"],
-        "CLOSURE_CONTROL_CLUSTER": [],
+        "CLOSURE_CONTROL_CLUSTER": ["closure-control-server"],
         "COLOR_CONTROL_CLUSTER": ["color-control-server"],
         "COMMISSIONER_CONTROL_CLUSTER": ["commissioner-control-server"],
         "COMMISSIONING_CLUSTER": [],
