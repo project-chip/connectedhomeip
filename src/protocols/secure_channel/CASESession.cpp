@@ -2634,7 +2634,7 @@ System::Clock::Timeout ComputeRoundTripTimeout(ExchangeContext::Timeout serverPr
 
 System::Clock::Timeout CASESession::ComputeSigma1ResponseTimeout(const ReliableMessageProtocolConfig & remoteMrpConfig)
 {
-    // Assume it is the initial message on the session, and treat peer as idle for Sigma1
+    // Sigma1 is the first message on the exchange.
     return ComputeRoundTripTimeout(kExpectedSigma1ProcessingTime, remoteMrpConfig, true /*isFirstMessageOnExchange*/);
 }
 
