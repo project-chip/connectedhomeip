@@ -986,7 +986,7 @@ CHIP_ERROR ReadClient::ComputeLivenessCheckTimerTimeout(System::Clock::Timeout *
     //
     // So recompute the round-trip timeout directly.  Assume MRP, since in practice that is likely what is happening.
     auto & peerMRPConfig = mReadPrepareParams.mSessionHolder->GetRemoteMRPConfig();
-    // Peer will assume we are idle and will send initial message(hence we pass kZero to GetMessageReceiptTimeout()), but will
+    // Peer will assume we are idle and will send initial message (hence we pass kZero to GetMessageReceiptTimeout()), but will
     // treat it as active for the response, so to match the retransmission timeout computation for the message back to the
     // peer
     auto roundTripTimeout = mReadPrepareParams.mSessionHolder->GetMessageReceiptTimeout(System::Clock::kZero) +
