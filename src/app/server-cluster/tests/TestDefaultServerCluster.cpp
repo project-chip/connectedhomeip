@@ -18,6 +18,7 @@
 
 #include <access/Privilege.h>
 #include <app-common/zap-generated/ids/Attributes.h>
+#include <app/ConcreteClusterPath.h>
 #include <app/data-model-provider/MetadataList.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/OperationTypes.h>
@@ -44,9 +45,9 @@ namespace {
 class FakeDefaultServerCluster : public DefaultServerCluster
 {
 public:
-    FakeDefaultServerCluster(ClusterId id) : mClusterId(id) {}
+    FakeDefaultServerCluster(ConcreteClusterPath path) : mPath(path) {}
 
-    ClusterId GetClusterId() const override { return mClusterId; }
+    [[nodiscard]] ConcreteClusterPath GetPath() const override { return mPath; }
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override
@@ -64,14 +65,14 @@ public:
     void TestIncreaseDataVersion() { IncreaseDataVersion(); }
 
 private:
-    ClusterId mClusterId;
+    ConcreteClusterPath mPath;
 };
 
 } // namespace
 
 TEST(TestDefaultServerCluster, TestDataVersion)
 {
-    FakeDefaultServerCluster cluster(1);
+    FakeDefaultServerCluster cluster({ 1, 2 });
 
     DataVersion v1 = cluster.GetDataVersion();
     cluster.TestIncreaseDataVersion();
@@ -80,13 +81,22 @@ TEST(TestDefaultServerCluster, TestDataVersion)
 
 TEST(TestDefaultServerCluster, TestFlagsDefault)
 {
-    FakeDefaultServerCluster cluster(1);
+    FakeDefaultServerCluster cluster({ 1, 2 });
     ASSERT_EQ(cluster.GetClusterFlags().Raw(), 0u);
+}
+
+TEST(TestDefaultServerCluster, ListWriteNotification)
+{
+    FakeDefaultServerCluster cluster({ 1, 2 });
+
+    // this does not test anything really, except we get 100% coverage and we see that we do not crash
+    cluster.ListAttributeWriteNotification({ 1, 2, 3 }, DataModel::ListWriteOperation::kListWriteBegin);
+    cluster.ListAttributeWriteNotification({ 1, 2, 3 }, DataModel::ListWriteOperation::kListWriteFailure);
 }
 
 TEST(TestDefaultServerCluster, AttributesDefault)
 {
-    FakeDefaultServerCluster cluster(1);
+    FakeDefaultServerCluster cluster({ 1, 2 });
 
     DataModel::ListBuilder<AttributeEntry> attributes;
 
@@ -114,7 +124,7 @@ TEST(TestDefaultServerCluster, AttributesDefault)
 
 TEST(TestDefaultServerCluster, CommandsDefault)
 {
-    FakeDefaultServerCluster cluster(1);
+    FakeDefaultServerCluster cluster({ 1, 2 });
 
     DataModel::ListBuilder<AcceptedCommandEntry> acceptedCommands;
     ASSERT_EQ(cluster.AcceptedCommands({ 1, 1 }, acceptedCommands), CHIP_NO_ERROR);
@@ -127,7 +137,7 @@ TEST(TestDefaultServerCluster, CommandsDefault)
 
 TEST(TestDefaultServerCluster, WriteAttributeDefault)
 {
-    FakeDefaultServerCluster cluster(1);
+    FakeDefaultServerCluster cluster({ 1, 2 });
 
     WriteOperation test(0 /* endpoint */, 1 /* cluster */, 1234 /* attribute */);
     test.SetSubjectDescriptor(kAdminSubjectDescriptor);
@@ -140,7 +150,7 @@ TEST(TestDefaultServerCluster, WriteAttributeDefault)
 
 TEST(TestDefaultServerCluster, InvokeDefault)
 {
-    FakeDefaultServerCluster cluster(1);
+    FakeDefaultServerCluster cluster({ 1, 2 });
 
     TLV::TLVReader tlvReader;
     InvokeRequest request;
