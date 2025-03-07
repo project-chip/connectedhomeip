@@ -16,7 +16,6 @@
  */
 #pragma once
 
-#include <algorithm>
 #include <app/AttributeValueDecoder.h>
 #include <app/AttributeValueEncoder.h>
 #include <app/CommandHandler.h>
