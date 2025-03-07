@@ -2621,7 +2621,7 @@ System::Clock::Timeout ComputeRoundTripTimeout(ExchangeContext::Timeout serverPr
     const auto & localMRPConfig      = maybeLocalMRPConfig.ValueOr(defaultMRRPConfig);
     return GetRetransmissionTimeout(remoteMrpConfig.mActiveRetransTimeout, remoteMrpConfig.mIdleRetransTimeout,
                                     // The activity time only matters when isFirstMessageOnExchange is false,
-                                    // which only happens for Sigma1.  In that case, assume peer is idle, 
+                                    // which only happens for Sigma1.  In that case, assume peer is idle,
                                     // as a worst-case assumption, and pass System::Clock::kZero.
                                     System::Clock::kZero, remoteMrpConfig.mActiveThresholdTime, isFirstMessageOnExchange) +
         serverProcessingTime +
