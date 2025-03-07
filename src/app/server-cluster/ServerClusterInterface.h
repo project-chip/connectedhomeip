@@ -200,7 +200,7 @@ public:
     /// Returns if `GetPaths` contains the given path
     bool PathsContains(const ConcreteClusterPath & path)
     {
-        for (auto & myPath : GetPaths())
+        for (const auto & myPath : GetPaths())
         {
             if (path == myPath)
             {
