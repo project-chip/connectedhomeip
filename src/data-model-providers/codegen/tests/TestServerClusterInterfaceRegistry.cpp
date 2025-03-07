@@ -307,11 +307,11 @@ TEST_F(TestServerClusterInterfaceRegistry, ClustersOnEndpoint)
         }
 
         // ensure that iteration happens exactly as we expect: reverse order and complete
-        for (const auto &clusterId : registry.ClustersOnEndpoint(ep))
+        for (const auto & clusterId : registry.ClustersOnEndpoint(ep))
         {
             ASSERT_LT(expectedClusterId, kClusterTestCount);
 
-            ServerClusterInterface *cluster = registry.Get({ep, clusterId});
+            ServerClusterInterface * cluster = registry.Get({ ep, clusterId });
             ASSERT_NE(cluster, nullptr);
             ASSERT_TRUE(cluster->PathsContains(ConcreteClusterPath(ep, expectedClusterId)));
             expectedClusterId -= kEndpointTestCount; // next expected/registered cluster
