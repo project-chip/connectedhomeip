@@ -100,9 +100,15 @@ private:
     inline static AirPurifierManager * mInstance;
 
     EndpointId mEndpointId;
+    EndpointId mAirQualitySensorEndpointId;
+    EndpointId mTemperatureSensorEndpointId;
+    EndpointId mHumiditySensorEndpointId;
+    EndpointId mThermostatEndpointId;
 
     uint8_t percentCurrent;
     uint8_t speedCurrent;
+
+    bool fanWasStartedByUser = false;
 
     // Set up for Activated Carbon Filter Monitoring
     ActivatedCarbonFilterMonitoringDelegate activatedCarbonFilterDelegate;
