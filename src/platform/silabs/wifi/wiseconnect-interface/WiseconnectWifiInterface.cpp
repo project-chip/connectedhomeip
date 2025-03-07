@@ -237,12 +237,16 @@ CHIP_ERROR WiseconnectWifiInterface::ConnectToAccessPoint()
     return CHIP_NO_ERROR;
 }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_IPV4
 bool WiseconnectWifiInterface::HasAnIPv4Address()
 {
-    return wfx_rsi.dev_state.Has(WifiState::kStationDhcpDone);
+    bool hasIPv4 = false;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_IPV4
+    hasIPv4 = wfx_rsi.dev_state.Has(WifiState::kStationDhcpDone);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_IPV4
+
+    return hasIPv4;
 }
-#endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
 
 bool WiseconnectWifiInterface::HasAnIPv6Address()
 {

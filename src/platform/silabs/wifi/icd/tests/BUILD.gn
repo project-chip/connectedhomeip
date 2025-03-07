@@ -17,15 +17,16 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/pigweed.gni")
 import("${chip_root}/build/chip/chip_test_group.gni")
 import("${chip_root}/build/chip/chip_test_suite.gni")
-import("${chip_root}/src/platform/silabs/tests/args.gni")
 
-chip_test_group("silabs_platform_tests") {
-  tests = []
+chip_test_suite("wifi_icd_tests") {
+  output_name = "libSilabsWifiICDPlatformTests"
 
-  if (sl_build_unit_tests) {
-    tests += [
-      "${chip_root}/examples/platform/silabs/tests:examples_tests",
-      "${chip_root}/src/platform/silabs/wifi/icd/tests:wifi_icd_tests",
-    ]
-  }
+  test_sources = [ "TestWifiSleepManager.cpp" ]
+
+  public_deps = [
+    "${chip_root}/src/lib/core:string-builder-adapters",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/lib/support:testing",
+    "${chip_root}/src/platform/silabs/wifi/icd:wifi-sleep-manager",
+  ]
 }

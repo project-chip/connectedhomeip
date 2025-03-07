@@ -830,12 +830,19 @@ CHIP_ERROR WifiInterfaceImpl::ConnectToAccessPoint(void)
     return CHIP_NO_ERROR;
 }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_IPV4
 bool WifiInterfaceImpl::HasAnIPv4Address()
 {
-    return (sta_ip == STA_IP_FAIL) ? false : true;
-}
+    bool hasIPv4 = false;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_IPV4
+    if (sta_ip != STA_IP_FAIL)
+    {
+        hasIPv4 = true;
+    }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_IPV4
+
+    return hasIPv4;
+}
 
 bool WifiInterfaceImpl::HasAnIPv6Address()
 {
