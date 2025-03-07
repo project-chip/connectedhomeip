@@ -147,6 +147,23 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamAllocat
     return Status::Failure;
 }
 
+Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamModify(const uint16_t streamID,
+                                                                                const chip::Optional<bool> waterMarkEnabled,
+                                                                                const chip::Optional<bool> osdEnabled)
+{
+    for (SnapshotStream & stream : snapshotStreams)
+    {
+        if (stream.id == streamID && stream.isAllocated)
+        {
+            ChipLogError(Zcl, "Modified snapshot stream with ID: %d", streamID);
+            return Status::Success;
+        }
+    }
+
+    ChipLogError(Zcl, "Allocated snapshot stream with ID: %d not found", streamID);
+    return Status::Failure;
+}
+
 Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamDeallocate(const uint16_t streamID)
 {
     for (SnapshotStream & stream : snapshotStreams)

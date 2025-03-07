@@ -73,6 +73,9 @@ public:
 
     Protocols::InteractionModel::Status SnapshotStreamAllocate(const SnapshotStreamStruct & allocateArgs, uint16_t & outStreamID);
 
+    Protocols::InteractionModel::Status SnapshotStreamModify(const uint16_t streamID, const chip::Optional<bool> waterMarkEnabled,
+                                                             const chip::Optional<bool> osdEnabled);
+
     Protocols::InteractionModel::Status SnapshotStreamDeallocate(const uint16_t streamID);
 
     void OnRankedStreamPrioritiesChanged();

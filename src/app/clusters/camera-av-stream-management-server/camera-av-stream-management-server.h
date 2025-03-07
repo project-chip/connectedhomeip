@@ -174,6 +174,24 @@ public:
                                                                        uint16_t & outStreamID) = 0;
 
     /**
+     *   @brief Handle Command Delegate for Snapshot stream modification.
+     *
+     *   @param streamID           Indicates the streamID of the snapshot stream to modify.
+     *
+     *   @param waterMarkEnabled   Indicates  whether a watermark can be applied on the snapshot stream.
+     *                             Value defaults to false if feature unsupported.
+     *
+     *   @param osdEnabled         Indicates  whether the on-screen display can be applied on the snapshot stream.
+     *                             Value defaults to false if feature unsupported.
+     *
+     *   @return Success if the stream modification is successful; otherwise, the command SHALL be rejected with an appropriate
+     *   error.
+     */
+    virtual Protocols::InteractionModel::Status SnapshotStreamModify(const uint16_t streamID,
+                                                                     const chip::Optional<bool> waterMarkEnabled,
+                                                                     const chip::Optional<bool> osdEnabled) = 0;
+
+    /**
      *   @brief Handle Command Delegate for Snapshot stream deallocation.
      *
      *   @param streamID       Indicates the streamID to deallocate.
@@ -602,6 +620,8 @@ private:
     void HandleAudioStreamDeallocate(HandlerContext & ctx, const Commands::AudioStreamDeallocate::DecodableType & req);
 
     void HandleSnapshotStreamAllocate(HandlerContext & ctx, const Commands::SnapshotStreamAllocate::DecodableType & req);
+
+    void HandleSnapshotStreamModify(HandlerContext & ctx, const Commands::SnapshotStreamModify::DecodableType & req);
 
     void HandleSnapshotStreamDeallocate(HandlerContext & ctx, const Commands::SnapshotStreamDeallocate::DecodableType & req);
 

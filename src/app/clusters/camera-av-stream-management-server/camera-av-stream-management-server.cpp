@@ -1461,6 +1461,19 @@ void CameraAVStreamMgmtServer::InvokeCommand(HandlerContext & handlerContext)
         }
         return;
 
+    case Commands::SnapshotStreamModify::Id:
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Modifying Snapshot Stream", mEndpointId);
+
+        // SnapshotStreamModify should have either the WMARK or OSD feature supported
+        VerifyOrReturn(HasFeature(Feature::kSnapshot) && (HasFeature(Feature::kWatermark) || HasFeature(Feature::kOnScreenDisplay)),
+                       handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::UnsupportedCommand));
+
+        HandleCommand<Commands::SnapshotStreamModify::DecodableType>(
+            handlerContext,
+            [this](HandlerContext & ctx, const auto & commandData) { HandleSnapshotStreamModify(ctx, commandData); });
+
+        return;
+
     case Commands::SnapshotStreamDeallocate::Id:
         ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Deallocating Snapshot Stream", mEndpointId);
 
@@ -1762,6 +1775,32 @@ void CameraAVStreamMgmtServer::HandleSnapshotStreamAllocate(HandlerContext & ctx
 
     response.snapshotStreamID = snapshotStreamID;
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+}
+
+void CameraAVStreamMgmtServer::HandleSnapshotStreamModify(HandlerContext & ctx,
+                                                          const Commands::SnapshotStreamModify::DecodableType & commandData)
+{
+    Status status             = Status::Success;
+    auto & isWaterMarkEnabled = commandData.watermarkEnabled;
+    auto & isOSDEnabled       = commandData.OSDEnabled;
+    auto & snapshotStreamID   = commandData.snapshotStreamID;
+
+    // If Watermark feature is supported, then command should have the
+    // isWaterMarkEnabled param. Or, if it is not supported, then command should
+    // not have the param.
+    VerifyOrReturn((HasFeature(Feature::kWatermark) == commandData.watermarkEnabled.HasValue()),
+                   ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand));
+
+    // If OSD feature is supported, then command should have the
+    // isOSDEnabled param. Or, if it is not supported, then command should
+    // not have the param.
+    VerifyOrReturn((HasFeature(Feature::kOnScreenDisplay) == commandData.OSDEnabled.HasValue()),
+                   ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand));
+
+    // Call the delegate
+    status = mDelegate.SnapshotStreamModify(snapshotStreamID, isWaterMarkEnabled, isOSDEnabled);
+
+    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
 void CameraAVStreamMgmtServer::HandleSnapshotStreamDeallocate(HandlerContext & ctx,
