@@ -747,7 +747,7 @@ CHIP_ERROR WifiInterfaceImpl::GetAccessPointExtendedInfo(wfx_wifi_scan_ext_t & i
 }
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-CHIP_ERROR WifiInterfaceImpl::ConfigurePowerSave()
+CHIP_ERROR WifiInterfaceImpl::ConfigurePowerSave(PowerSaveInterface::PowerSaveConfiguration configuration, uint32_t listenInterval)
 {
     // TODO: Implement Power save configuration. We do a silent failure to avoid causing problems in higher layers.
     return CHIP_NO_ERROR;
