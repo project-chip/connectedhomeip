@@ -281,6 +281,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "CommissionerControl";
     case chip::app::Clusters::TlsCertificateManagement::Id:
         return "TlsCertificateManagement";
+    case chip::app::Clusters::TlsClientManagement::Id:
+        return "TlsClientManagement";
     case chip::app::Clusters::UnitTesting::Id:
         return "UnitTesting";
     case chip::app::Clusters::FaultInjection::Id:
@@ -4494,6 +4496,27 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Unknown";
         }
     }
+    case chip::app::Clusters::TlsClientManagement::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::TlsClientManagement::Attributes::MaxProvisioned::Id:
+            return "MaxProvisioned";
+        case chip::app::Clusters::TlsClientManagement::Attributes::ProvisionedEndpoints::Id:
+            return "ProvisionedEndpoints";
+        case chip::app::Clusters::TlsClientManagement::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::TlsClientManagement::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::TlsClientManagement::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::TlsClientManagement::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::TlsClientManagement::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::UnitTesting::Id: {
         switch (id)
         {
@@ -5950,6 +5973,19 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "Unknown";
         }
     }
+    case chip::app::Clusters::TlsClientManagement::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::TlsClientManagement::Commands::ProvisionEndpoint::Id:
+            return "ProvisionEndpoint";
+        case chip::app::Clusters::TlsClientManagement::Commands::FindEndpoint::Id:
+            return "FindEndpoint";
+        case chip::app::Clusters::TlsClientManagement::Commands::RemoveEndpoint::Id:
+            return "RemoveEndpoint";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::UnitTesting::Id: {
         switch (id)
         {
@@ -6538,6 +6574,17 @@ char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId i
             return "FindClientCertificateResponse";
         case chip::app::Clusters::TlsCertificateManagement::Commands::LookupClientCertificateResponse::Id:
             return "LookupClientCertificateResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::TlsClientManagement::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::TlsClientManagement::Commands::ProvisionEndpointResponse::Id:
+            return "ProvisionEndpointResponse";
+        case chip::app::Clusters::TlsClientManagement::Commands::FindEndpointResponse::Id:
+            return "FindEndpointResponse";
         default:
             return "Unknown";
         }

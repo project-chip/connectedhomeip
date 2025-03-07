@@ -56,7 +56,7 @@ public:
 
     // During the transition phase, we expect a large subset of code to require access to
     // event emitting, path marking and other operations
-    virtual InteractionModelContext CurrentContext() const { return mContext; }
+    [[nodiscard]] const InteractionModelContext & CurrentContext() const { return mContext; }
 
     /// NOTE: this code is NOT required to handle `List` global attributes:
     ///       AcceptedCommandsList, GeneratedCommandsList OR AttributeList
@@ -117,7 +117,7 @@ public:
     virtual std::optional<ActionReturnStatus> InvokeCommand(const InvokeRequest & request, chip::TLV::TLVReader & input_arguments,
                                                             CommandHandler * handler) = 0;
 
-private:
+protected:
     InteractionModelContext mContext = { nullptr };
 };
 

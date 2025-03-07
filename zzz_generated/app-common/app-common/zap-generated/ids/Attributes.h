@@ -7423,6 +7423,40 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace TlsCertificateManagement
 
+namespace TlsClientManagement {
+namespace Attributes {
+
+namespace MaxProvisioned {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MaxProvisioned
+
+namespace ProvisionedEndpoints {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace ProvisionedEndpoints
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace TlsClientManagement
+
 namespace UnitTesting {
 namespace Attributes {
 
