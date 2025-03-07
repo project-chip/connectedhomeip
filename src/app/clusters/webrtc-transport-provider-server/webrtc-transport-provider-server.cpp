@@ -265,8 +265,7 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
     WebRTCSessionStruct outSession;
     bool deferredOffer = false;
 
-    auto status =
-        Protocols::InteractionModel::ClusterStatusCode(mDelegate.HandleSolicitOffer(args, outSession, deferredOffer));
+    auto status = Protocols::InteractionModel::ClusterStatusCode(mDelegate.HandleSolicitOffer(args, outSession, deferredOffer));
     if (!status.IsSuccess())
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
