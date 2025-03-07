@@ -1208,6 +1208,20 @@ class MatterBaseTest(base_test.BaseTestClass):
                                             payloadCapability=payloadCapability)
         return result
 
+    async def check_legacy_test_event_triggers(self, eventTrigger: int) -> int:
+        target_endpoint = 0
+
+        if self.matter_test_config.legacy:
+            logger.info("Legacy test event trigger activated")
+        else:
+            logger.info("Legacy test event trigger deactivated")
+            target_endpoint = self.get_endpoint()
+
+        # Sets endpoint in eventTrigger
+        eventTrigger = eventTrigger | (target_endpoint << 32)
+
+        return eventTrigger
+
     async def send_test_event_triggers(self, eventTrigger: int, enableKey: bytes = None):
         """This helper function sends a test event trigger to the General Diagnostics cluster on endpoint 0
 
@@ -1224,16 +1238,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             else:
                 enableKey = self.matter_test_config.global_test_params['enableKey']
 
-        target_endpoint = 0
-
-        if self.matter_test_config.legacy:
-            logger.info("Legacy test event trigger activated")
-        else:
-            logger.info("Legacy test event trigger deactivated")
-            target_endpoint = self.get_endpoint()
-
-        # Sets endpoint in eventTrigger
-        eventTrigger = eventTrigger | (target_endpoint << 32)
+        eventTrigger = await self.check_legacy_test_event_triggers(eventTrigger)
 
         try:
             # GeneralDiagnostics cluster is meant to be on Endpoint 0 (Root)
