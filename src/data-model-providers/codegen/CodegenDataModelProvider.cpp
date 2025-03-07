@@ -277,7 +277,7 @@ CHIP_ERROR CodegenDataModelProvider::ServerClusters(EndpointId endpointId,
     // in the data versions for the rest via the out-of-band mechanism.
 
     // assume the clusters on endpoint does not change in between these two loops
-    auto clusters = mRegistry.ClustersOnEndpoint(endpointId);
+    auto clusters               = mRegistry.ClustersOnEndpoint(endpointId);
     size_t registryClusterCount = std::distance(clusters.begin(), clusters.end());
 
     ReturnErrorOnFailure(builder.EnsureAppendCapacity(registryClusterCount));
