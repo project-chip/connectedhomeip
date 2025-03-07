@@ -40,6 +40,10 @@ _DEVICE_LIST = [file[:-4]
                 for file in os.listdir(_DEVICE_FOLDER) if file.endswith(".zap") and file != 'template.zap']
 _CICD_CONFIG_FILE_NAME = os.path.join(_CHEF_SCRIPT_PATH, "cicd_config.json")
 _CD_STAGING_DIR = os.path.join(_CHEF_SCRIPT_PATH, "staging")
+_EXCLUDE_DEVICE_FROM_LINUX_CI = [
+    "noip_rootnode_dimmablelight_bCwGYSDpoe",
+    "rootnode_refrigerator_temperaturecontrolledcabinet_temperaturecontrolledcabinet_ffdb696680",
+]
 
 gen_dir = ""  # Filled in after sample app type is read from args.
 
@@ -382,6 +386,10 @@ def main() -> int:
                       help=("Builds Chef examples defined in cicd_config. "
                             "Uses specified target from -t. Chef exits after completion."),
                       dest="ci", action="store_true")
+    parser.add_option("", "--ci_linux",
+                      help=("Builds Chef Examples defined in cicd_config under ci_allow_list_linux. "
+                            "Devices are built without -c for faster compilation."),
+                      dest="ci_linux", action="store_true")
     parser.add_option(
         "", "--enable_ipv4", help="Enable IPv4 mDNS. Only applicable to platforms that can support IPV4 (e.g, Linux, ESP32)",
         action="store_true", default=False)
@@ -407,6 +415,21 @@ def main() -> int:
             flush_print(f"Building {command}", with_border=True)
             shell.run_cmd(command)
             bundle(options.build_target, device_name)
+        exit(0)
+
+    #
+    # CI Linux
+    #
+
+    if options.ci_linux:
+        for device_name in _DEVICE_LIST:
+            if device_name in _EXCLUDE_DEVICE_FROM_LINUX_CI:
+                continue
+            shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
+            command = f"./chef.py -br -d {device_name} -t linux"
+            flush_print(f"Building {command}", with_border=True)
+            shell.run_cmd(command)
+            bundle("linux", device_name)
         exit(0)
 
     #

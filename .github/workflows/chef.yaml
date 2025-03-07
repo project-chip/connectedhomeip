@@ -51,6 +51,27 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh "./examples/chef/chef.py --ci -t linux"
 
+    chef_linux_all_devices:
+        name: Chef - Linux CI Examples (All chef devices)
+        runs-on: ubuntu-latest
+        if: github.actor != 'restyled-io[bot]'
+
+        container:
+            image: ghcr.io/project-chip/chip-build:119
+            options: --user root
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
+              with:
+                platform: linux
+            - name: CI Examples Linux
+              shell: bash
+              run: |
+                  ./scripts/run_in_build_env.sh "./examples/chef/chef.py --ci_linux"
+
     chef_esp32:
         name: Chef - ESP32 CI Examples
         runs-on: ubuntu-latest
