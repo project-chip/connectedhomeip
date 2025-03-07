@@ -21134,14 +21134,6 @@
             },
             {
               "name": "SnapshotStreamDeallocate",
-              "code": 9,
-              "mfgCode": null,
-              "source": "client",
-              "isIncoming": 1,
-              "isEnabled": 1
-            },
-            {
-              "name": "SetStreamPriorities",
               "code": 10,
               "mfgCode": null,
               "source": "client",
@@ -21149,7 +21141,7 @@
               "isEnabled": 1
             },
             {
-              "name": "CaptureSnapshot",
+              "name": "SetStreamPriorities",
               "code": 11,
               "mfgCode": null,
               "source": "client",
@@ -21157,8 +21149,16 @@
               "isEnabled": 1
             },
             {
-              "name": "CaptureSnapshotResponse",
+              "name": "CaptureSnapshot",
               "code": 12,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
+              "name": "CaptureSnapshotResponse",
+              "code": 13,
               "mfgCode": null,
               "source": "server",
               "isIncoming": 0,

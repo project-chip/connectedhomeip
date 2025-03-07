@@ -9633,9 +9633,10 @@ endpoint 1 {
 
     handle command SnapshotStreamAllocate;
     handle command SnapshotStreamAllocateResponse;
-    handle command SnapshotStreamModify;
     handle command SnapshotStreamDeallocate;
     handle command SetStreamPriorities;
+    handle command CaptureSnapshot;
+    handle command CaptureSnapshotResponse;
   }
 
   server cluster Chime {

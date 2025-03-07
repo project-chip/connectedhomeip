@@ -25,7 +25,7 @@
 #include <iostream>
 #include <lib/support/logging/CHIPLogging.h>
 
-#define SNAPSHOT_FILE_PATH "../capture_snapshot_test.jpg"
+#define SNAPSHOT_FILE_PATH "./capture_snapshot_test.jpg"
 #define SNAPSHOT_FILE_RES_WIDTH (168)
 #define SNAPSHOT_FILE_RES_HEIGHT (112)
 
