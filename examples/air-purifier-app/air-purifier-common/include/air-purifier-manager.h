@@ -100,15 +100,9 @@ private:
     inline static AirPurifierManager * mInstance;
 
     EndpointId mEndpointId;
-    EndpointId mAirQualitySensorEndpointId;
-    EndpointId mTemperatureSensorEndpointId;
-    EndpointId mHumiditySensorEndpointId;
-    EndpointId mThermostatEndpointId;
 
     uint8_t percentCurrent;
     uint8_t speedCurrent;
-
-    bool fanWasStartedByUser = false;
 
     // Set up for Activated Carbon Filter Monitoring
     ActivatedCarbonFilterMonitoringDelegate activatedCarbonFilterDelegate;
@@ -141,8 +135,7 @@ private:
      */
     AirPurifierManager(EndpointId aEndpointId, EndpointId aAirQualitySensorEndpointId, EndpointId aTemperatureSensorEndpointId,
                        EndpointId aHumiditySensorEndpointId, EndpointId aThermostatEndpointId) :
-        FanControl::Delegate(aEndpointId),
-        mEndpointId(aEndpointId),
+        FanControl::Delegate(aEndpointId), mEndpointId(aEndpointId),
         activatedCarbonFilterInstance(&activatedCarbonFilterDelegate, mEndpointId, ActivatedCarbonFilterMonitoring::Id,
                                       static_cast<uint32_t>(gActivatedCarbonFeatureMap.to_ulong()),
                                       ResourceMonitoring::DegradationDirectionEnum::kDown, true),
