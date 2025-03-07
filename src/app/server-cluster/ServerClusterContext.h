@@ -34,9 +34,11 @@ namespace app {
 /// for every cluster maintaining such a context.
 struct ServerClusterContext
 {
-    DataModel::Provider * provider                          = nullptr; /// underlying provider that the cluster operates in
-    PersistentStorageDelegate * storage                     = nullptr; /// read/write persistent storage
-    DataModel::InteractionModelContext * interactionContext = nullptr; /// outside-world communication
+    DataModel::Provider * const provider                          = nullptr; /// underlying provider that the cluster operates in
+    PersistentStorageDelegate * const storage                     = nullptr; /// read/write persistent storage
+    DataModel::InteractionModelContext * const interactionContext = nullptr; /// outside-world communication
+
+    ServerClusterContext(ServerClusterContext &&) = default;
 
     bool operator!=(const ServerClusterContext & other) const
     {

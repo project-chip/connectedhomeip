@@ -164,16 +164,11 @@ CHIP_ERROR CodegenDataModelProvider::Startup(DataModel::InteractionModelContext 
 
     InitDataModelForTesting();
 
-    {
-        ServerClusterContext clusterContext;
-        clusterContext.provider           = this;
-        clusterContext.storage            = mPersistentStorageDelegate;
-        clusterContext.interactionContext = &mContext;
-
-        ReturnErrorOnFailure(mRegistry.SetContext(clusterContext));
-    }
-
-    return CHIP_NO_ERROR;
+    return mRegistry.SetContext(ServerClusterContext{
+        .provider           = this,
+        .storage            = mPersistentStorageDelegate,
+        .interactionContext = &mContext,
+    });
 }
 
 std::optional<DataModel::ActionReturnStatus> CodegenDataModelProvider::InvokeCommand(const DataModel::InvokeRequest & request,

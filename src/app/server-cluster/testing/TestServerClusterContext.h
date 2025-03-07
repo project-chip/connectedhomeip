@@ -42,19 +42,34 @@ public:
 ///   At thist time, `interactionContext::actionContext::CurrentExchange` WILL return nullptr
 ///   in the existing implementation as the exchange is too heavy of an object
 ///   to create for testing
-class TestServerClusterContext : public app::ServerClusterContext
+class TestServerClusterContext
 {
 public:
-    TestServerClusterContext()
+    TestServerClusterContext() :
+        mContext{
+            .provider           = &mTestProvider,
+            .storage            = &mTestStorage,
+            .interactionContext = &mTestContext,
+        }
     {
         mTestContext.eventsGenerator         = &mTestEventsGenerator;
         mTestContext.dataModelChangeListener = &mTestDataModelChangeListener;
         mTestContext.actionContext           = &mNullActionContext;
-
-        provider           = &mTestProvider;
-        storage            = &mTestStorage;
-        interactionContext = &mTestContext;
     }
+
+    /// Get a stable pointer to the underlying context
+    app::ServerClusterContext * Get() { return &mContext; }
+
+    /// Create a new context bound to this test context
+    app::ServerClusterContext Create()
+    {
+        return {
+            .provider           = &mTestProvider,
+            .storage            = &mTestStorage,
+            .interactionContext = &mTestContext,
+
+        };
+    };
 
     LogOnlyEvents & EventsGenerator() { return mTestEventsGenerator; }
     TestProviderChangeListener & ChangeListener() { return mTestDataModelChangeListener; }
@@ -68,6 +83,8 @@ private:
     TestPersistentStorageDelegate mTestStorage;
 
     app::DataModel::InteractionModelContext mTestContext;
+
+    app::ServerClusterContext mContext;
 };
 
 } // namespace Test

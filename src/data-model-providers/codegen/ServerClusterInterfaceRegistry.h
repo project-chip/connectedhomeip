@@ -127,7 +127,7 @@ public:
     // Set up the underlying context for all clusters that are managed by this registry.
     //
     // The values within context will be copied and used.
-    CHIP_ERROR SetContext(const ServerClusterContext & context);
+    CHIP_ERROR SetContext(ServerClusterContext && context);
 
     // Invalidates current context.
     void ClearContext();
@@ -140,8 +140,7 @@ private:
     ServerClusterInterface * mCachedInterface = nullptr;
 
     // Managing context for this registry
-    bool mContextIsValid = false;
-    ServerClusterContext mContext;
+    std::optional<ServerClusterContext> mContext;
 };
 
 } // namespace app

@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "app/server-cluster/ServerClusterContext.h"
 #include <pw_unit_test/framework.h>
 
 #include <access/Privilege.h>
@@ -190,7 +191,7 @@ TEST(TestDefaultServerCluster, NotifyAttributeChanged)
 
     // Create a ServerClusterContext and verify that attribute change notifications are processed.
     TestServerClusterContext context;
-    ASSERT_EQ(cluster.Startup(&context), CHIP_NO_ERROR);
+    ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     oldVersion = cluster.GetDataVersion();
     cluster.TestNotifyAttributeChanged(234);
@@ -214,7 +215,7 @@ TEST(TestDefaultServerCluster, NotifyAllAttributesChanged)
 
     // Create a ServerClusterContext and verify that attribute change notifications are processed.
     TestServerClusterContext context;
-    ASSERT_EQ(cluster.Startup(&context), CHIP_NO_ERROR);
+    ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     oldVersion = cluster.GetDataVersion();
     cluster.TestNotifyAllAttributesChanged();

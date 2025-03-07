@@ -19,6 +19,8 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app/ConcreteClusterPath.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/ServerClusterContext.h>
+#include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <data-model-providers/codegen/ServerClusterInterfaceRegistry.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
@@ -29,6 +31,7 @@
 #include <random>
 
 using namespace chip;
+using namespace chip::Test;
 using namespace chip::app;
 using namespace chip::app::DataModel;
 using namespace chip::app::Clusters;
@@ -348,8 +351,8 @@ TEST_F(TestServerClusterInterfaceRegistry, Context)
         EXPECT_FALSE(cluster1.HasContext());
 
         // set up the registry
-        ServerClusterContext nullContext; // not valid, however we do not care
-        EXPECT_EQ(registry.SetContext(nullContext), CHIP_NO_ERROR);
+        TestServerClusterContext context;
+        EXPECT_EQ(registry.SetContext(context.Create()), CHIP_NO_ERROR);
 
         EXPECT_TRUE(cluster1.HasContext());
         EXPECT_FALSE(cluster2.HasContext());
@@ -365,7 +368,7 @@ TEST_F(TestServerClusterInterfaceRegistry, Context)
         EXPECT_FALSE(cluster2.HasContext());
         EXPECT_FALSE(cluster3.HasContext());
 
-        EXPECT_EQ(registry.SetContext(nullContext), CHIP_NO_ERROR);
+        EXPECT_EQ(registry.SetContext(context.Create()), CHIP_NO_ERROR);
         EXPECT_TRUE(cluster1.HasContext());
         EXPECT_TRUE(cluster2.HasContext());
         EXPECT_FALSE(cluster3.HasContext());
@@ -380,17 +383,15 @@ TEST_F(TestServerClusterInterfaceRegistry, Context)
         EXPECT_TRUE(cluster3.HasContext());
 
         // re-setting context works
-        EXPECT_EQ(registry.SetContext(nullContext), CHIP_NO_ERROR);
+        EXPECT_EQ(registry.SetContext(context.Create()), CHIP_NO_ERROR);
         EXPECT_TRUE(cluster1.HasContext());
         EXPECT_FALSE(cluster2.HasContext());
         EXPECT_TRUE(cluster3.HasContext());
 
         // also not valid, but different
-        ServerClusterContext otherContext;
-        InteractionModelContext modelContext;
-        otherContext.interactionContext = &modelContext;
+        TestServerClusterContext otherContext;
 
-        EXPECT_EQ(registry.SetContext(otherContext), CHIP_NO_ERROR);
+        EXPECT_EQ(registry.SetContext(otherContext.Create()), CHIP_NO_ERROR);
         EXPECT_TRUE(cluster1.HasContext());
         EXPECT_FALSE(cluster2.HasContext());
         EXPECT_TRUE(cluster3.HasContext());
@@ -412,7 +413,6 @@ TEST_F(TestServerClusterInterfaceRegistry, StartupErrors)
 
     {
         ServerClusterInterfaceRegistry registry;
-
         EXPECT_FALSE(cluster1.HasContext());
         EXPECT_FALSE(cluster2.HasContext());
 
@@ -423,8 +423,8 @@ TEST_F(TestServerClusterInterfaceRegistry, StartupErrors)
         EXPECT_FALSE(cluster1.HasContext());
         EXPECT_FALSE(cluster2.HasContext());
 
-        ServerClusterContext nullContext; // not valid, however we do not care
-        EXPECT_EQ(registry.SetContext(nullContext), CHIP_ERROR_HAD_FAILURES);
+        TestServerClusterContext context;
+        EXPECT_EQ(registry.SetContext(context.Create()), CHIP_ERROR_HAD_FAILURES);
         EXPECT_TRUE(cluster1.HasContext());
         EXPECT_FALSE(cluster2.HasContext());
 

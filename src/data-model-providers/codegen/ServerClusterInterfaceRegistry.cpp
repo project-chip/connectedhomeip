@@ -22,6 +22,7 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
+#include <optional>
 
 namespace chip {
 namespace app {
@@ -31,7 +32,7 @@ ServerClusterInterfaceRegistry::~ServerClusterInterfaceRegistry()
     while (mRegistrations != nullptr)
     {
         ServerClusterRegistration * next = mRegistrations->next;
-        if (mContextIsValid)
+        if (mContext.has_value())
         {
             mRegistrations->serverClusterInterface->Shutdown();
         }
@@ -55,9 +56,9 @@ CHIP_ERROR ServerClusterInterfaceRegistry::Register(ServerClusterRegistration & 
     // items. We preserve this however we may want to make this optional at some point in time.
     VerifyOrReturnError(Get(path) == nullptr, CHIP_ERROR_DUPLICATE_KEY_ID);
 
-    if (mContextIsValid)
+    if (mContext.has_value())
     {
-        ReturnErrorOnFailure(entry.serverClusterInterface->Startup(&mContext));
+        ReturnErrorOnFailure(entry.serverClusterInterface->Startup(&*mContext));
     }
 
     entry.next     = mRegistrations;
@@ -93,7 +94,7 @@ ServerClusterInterface * ServerClusterInterfaceRegistry::Unregister(const Concre
             }
 
             current->next = nullptr; // Make sure current does not look like part of a list.
-            if (mContextIsValid)
+            if (mContext.has_value())
             {
                 current->serverClusterInterface->Shutdown();
             }
@@ -137,7 +138,7 @@ void ServerClusterInterfaceRegistry::UnregisterAllFromEndpoint(EndpointId endpoi
             ServerClusterRegistration * actual_next = current->next;
 
             current->next = nullptr; // Make sure current does not look like part of a list.
-            if (mContextIsValid)
+            if (mContext.has_value())
             {
                 current->serverClusterInterface->Shutdown();
             }
@@ -178,22 +179,21 @@ ServerClusterInterface * ServerClusterInterfaceRegistry::Get(const ConcreteClust
     return nullptr;
 }
 
-CHIP_ERROR ServerClusterInterfaceRegistry::SetContext(const ServerClusterContext & context)
+CHIP_ERROR ServerClusterInterfaceRegistry::SetContext(ServerClusterContext && context)
 {
-    if (mContextIsValid)
+    if (mContext.has_value())
     {
         // if there is no difference, do not re-initialize.
-        VerifyOrReturnError(mContext != context, CHIP_NO_ERROR);
+        VerifyOrReturnError(*mContext != context, CHIP_NO_ERROR);
         ClearContext();
     }
 
-    mContext         = context;
-    mContextIsValid  = true;
+    mContext.emplace(std::move(context));
     bool had_failure = false;
 
     for (ServerClusterRegistration * registration = mRegistrations; registration != nullptr; registration = registration->next)
     {
-        CHIP_ERROR err = registration->serverClusterInterface->Startup(&mContext);
+        CHIP_ERROR err = registration->serverClusterInterface->Startup(&*mContext);
         if (err != CHIP_NO_ERROR)
         {
 #if CHIP_ERROR_LOGGING
@@ -219,7 +219,7 @@ CHIP_ERROR ServerClusterInterfaceRegistry::SetContext(const ServerClusterContext
 
 void ServerClusterInterfaceRegistry::ClearContext()
 {
-    if (!mContextIsValid)
+    if (!mContext.has_value())
     {
         return;
     }
@@ -228,8 +228,7 @@ void ServerClusterInterfaceRegistry::ClearContext()
         registration->serverClusterInterface->Shutdown();
     }
 
-    mContext        = ServerClusterContext{};
-    mContextIsValid = false;
+    mContext.reset();
 }
 
 } // namespace app
