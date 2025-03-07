@@ -16,7 +16,7 @@
  */
 #pragma once
 
-#include "app/ConcreteClusterPath.h"
+#include <app/ConcreteClusterPath.h>
 #include <app/server-cluster/ServerClusterInterface.h>
 
 namespace chip {
