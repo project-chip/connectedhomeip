@@ -754,6 +754,12 @@ public:
     static constexpr uint32_t kFakeFeatureMap      = 0x35;
     static constexpr uint32_t kFakeClusterRevision = 1234;
 
+    static constexpr CommandId kGeneratedCommands[]           = { 1, 2, 3, 100, 200 };
+    static constexpr AcceptedCommandEntry kAcceptedCommands[] = {
+        { 101 },
+        { 102 },
+    };
+
     FakeDefaultServerCluster(ConcreteClusterPath path) : mPath(path) {}
 
     [[nodiscard]] ConcreteClusterPath GetPath() const override { return mPath; }
@@ -761,6 +767,30 @@ public:
     [[nodiscard]] BitFlags<DataModel::ClusterQualityFlags> GetClusterFlags() const override
     {
         return DataModel::ClusterQualityFlags::kDiagnosticsData;
+    }
+
+    CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
+                                DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder) override
+    {
+        return builder.ReferenceExisting(Span<const AcceptedCommandEntry>(kAcceptedCommands));
+    }
+
+    CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, DataModel::ListBuilder<CommandId> & builder) override
+    {
+        return builder.ReferenceExisting(Span<const CommandId>(kGeneratedCommands));
+    }
+
+    std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
+                                                               chip::TLV::TLVReader & input_arguments,
+                                                               CommandHandler * handler) override
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
+                                                 AttributeValueDecoder & decoder) override
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
     }
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -2567,7 +2597,7 @@ static CHIP_ERROR ReadU32Attribute(DataModel::Provider & provider, const Concret
     return chip::app::DataModel::Decode<uint32_t>(encodedData.dataReader, value);
 }
 
-TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesReadAttribute)
+TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesRegistration)
 {
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
@@ -2595,6 +2625,51 @@ TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesReadAttribute)
                   revision),
               CHIP_NO_ERROR);
     EXPECT_EQ(revision, FakeDefaultServerCluster::kFakeClusterRevision);
+
+    // now that registration looks ok and DIFFERENT from ember, invoke various methods on the registered cluster
+    // to ensure behavior is redirected correctly
+    {
+        DataModel::ListBuilder<AttributeEntry> builder;
+        ASSERT_EQ(model.Attributes(kTestClusterPath, builder), CHIP_NO_ERROR);
+
+        // Attributes will be just global attributes
+        ASSERT_TRUE(DefaultServerCluster::GlobalAttributes().data_equal(builder.TakeBuffer()));
+    }
+
+    {
+        DataModel::ListBuilder<AcceptedCommandEntry> builder;
+        ASSERT_EQ(model.AcceptedCommands(kTestClusterPath, builder), CHIP_NO_ERROR);
+        ASSERT_TRUE(Span<const AcceptedCommandEntry>(FakeDefaultServerCluster::kAcceptedCommands).data_equal(builder.TakeBuffer()));
+    }
+
+    {
+        DataModel::ListBuilder<CommandId> builder;
+        ASSERT_EQ(model.GeneratedCommands(kTestClusterPath, builder), CHIP_NO_ERROR);
+        ASSERT_TRUE(Span<const CommandId>(FakeDefaultServerCluster::kGeneratedCommands).data_equal(builder.TakeBuffer()));
+    }
+
+    // Invoke specifically on the fake server returns a unique (and non-spec really) error
+    // so we can see the right method is called.
+    {
+        const ConcreteCommandPath kCommandPath(kTestClusterPath.mEndpointId, kTestClusterPath.mClusterId, kMockCommandId1);
+        const InvokeRequest kInvokeRequest{ .path = kCommandPath };
+        chip::TLV::TLVReader tlvReader;
+
+        // Using a handler set to nullptr as it is not used by the impl
+        std::optional<ActionReturnStatus> result = model.InvokeCommand(kInvokeRequest, tlvReader, /* handler = */ nullptr);
+        ASSERT_TRUE(result.has_value() && result->GetUnderlyingError() == CHIP_ERROR_INCORRECT_STATE);
+    }
+
+    // Write attribute also has a specific error to know the right code is called
+    {
+        WriteOperation test(kTestClusterPath.mEndpointId, kTestClusterPath.mClusterId, kAttributeIdReadOnly);
+        test.SetSubjectDescriptor(kAdminSubjectDescriptor);
+
+        AttributeValueDecoder decoder = test.DecoderFor<uint32_t>(1234);
+
+        std::optional<ActionReturnStatus> result = model.WriteAttribute(test.GetRequest(), decoder);
+        ASSERT_TRUE(result.has_value() && result->GetUnderlyingError() == CHIP_ERROR_INCORRECT_STATE);
+    }
 }
 
 TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesListClusters)
