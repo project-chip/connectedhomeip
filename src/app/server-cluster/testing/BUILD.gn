@@ -11,26 +11,21 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+import("${chip_root}/build/chip/chip_test_suite.gni")
 
-source_set("server-cluster") {
+source_set("testing") {
   sources = [
-    "DefaultServerCluster.cpp",
-    "DefaultServerCluster.h",
-    "ServerClusterContext.h",
-    "ServerClusterInterface.h",
+    "EmptyProvider.cpp",
+    "EmptyProvider.h",
+    "TestEventGenerator.h",
+    "TestProviderChangeListener.h",
+    "TestServerClusterContext.h",
   ]
 
   public_deps = [
-    "${chip_root}/src/app:attribute-access",
-    "${chip_root}/src/app:command-handler-interface",
-    "${chip_root}/src/app:paths",
-    "${chip_root}/src/app/common:ids",
-    "${chip_root}/src/app/data-model-provider",
-    "${chip_root}/src/app/data-model-provider:metadata",
-    "${chip_root}/src/crypto",
-    "${chip_root}/src/lib/core:error",
-    "${chip_root}/src/lib/core:types",
-    "${chip_root}/src/lib/support",
+    "${chip_root}/src/app/server-cluster",
+    "${chip_root}/src/lib/support:testing",
   ]
 }
