@@ -609,6 +609,8 @@ class MatterTestConfig:
     # path to device attestation revocation set json file
     dac_revocation_set_path: Optional[pathlib.Path] = None
 
+    legacy: Optional[bool] = None
+
 
 class ClusterMapper:
     """Describe clusters/attributes using schema names."""
@@ -1222,13 +1224,37 @@ class MatterBaseTest(base_test.BaseTestClass):
             else:
                 enableKey = self.matter_test_config.global_test_params['enableKey']
 
+        # What about --endpoing != 0 and legacy = True? Right now target endpoint is set to 0
+
+        target_endpoint = 0
+        if not self.matter_test_config.legacy and self.matter_test_config.endpoint is not None:
+            target_endpoint = self.matter_test_config.endpoint
+
+        print("")
+        print("Target endpoint: ", target_endpoint)
+        print("")
+
+        print("")
+        print("Event trigger: ", hex(eventTrigger))
+        print("")
+
+        eventTrigger = eventTrigger | (target_endpoint << 32)
+
+        print("")
+        print("Event trigger: ", hex(eventTrigger))
+        print("")
+
         try:
             # GeneralDiagnostics cluster is meant to be on Endpoint 0 (Root)
-            await self.send_single_cmd(endpoint=0,
-                                       cmd=Clusters.GeneralDiagnostics.Commands.TestEventTrigger(
-                                           enableKey,
-                                           eventTrigger)
-                                       )
+            general_diagnostics_result = await self.send_single_cmd(endpoint=0,
+                                                                    cmd=Clusters.GeneralDiagnostics.Commands.TestEventTrigger(
+                                                                        enableKey,
+                                                                        eventTrigger)
+                                                                    )
+
+            print("")
+            logger.info(general_diagnostics_result)
+            print("")
 
         except InteractionModelError as e:
             asserts.fail(
@@ -1862,6 +1888,8 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
     config.app_pid = 0 if args.app_pid is None else args.app_pid
     config.fail_on_skipped_tests = args.fail_on_skipped
 
+    config.legacy = True if args.use_legacy_test_event_triggers else args.use_legacy_test_event_triggers
+
     config.controller_node_id = args.controller_node_id
     config.trace_to = args.trace_to
 
@@ -1919,6 +1947,9 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
     basic_group.add_argument('--app-pid', type=int, default=0, help="The PID of the app against which the test is going to run")
     basic_group.add_argument('--timeout', type=int, help="Test timeout in seconds")
     basic_group.add_argument("--PICS", help="PICS file path", type=str)
+
+    basic_group.add_argument("--use-legacy-test-event-triggers", action="store_true", default=False,
+                             help="Send test event triggers with endpoint 0 for older devices")
 
     commission_group = parser.add_argument_group(title="Commissioning", description="Arguments to commission a node")
 
