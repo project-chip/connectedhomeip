@@ -40,7 +40,7 @@ _DEVICE_LIST = [file[:-4]
                 for file in os.listdir(_DEVICE_FOLDER) if file.endswith(".zap") and file != 'template.zap']
 _CICD_CONFIG_FILE_NAME = os.path.join(_CHEF_SCRIPT_PATH, "cicd_config.json")
 _CD_STAGING_DIR = os.path.join(_CHEF_SCRIPT_PATH, "staging")
-_EXCLUDE_DEVICE_FROM_LINUX_CI = [
+_EXCLUDE_DEVICE_FROM_LINUX_CI = [ # These do not compile / deprecated.
     "noip_rootnode_dimmablelight_bCwGYSDpoe",
     "rootnode_refrigerator_temperaturecontrolledcabinet_temperaturecontrolledcabinet_ffdb696680",
 ]
