@@ -267,7 +267,7 @@ CHIP_ERROR PASESession::Pair(SessionManager & sessionManager, uint32_t peerSetUp
     // When commissioning starts, the peer is assumed to be active.
     mExchangeCtxt.Value()->GetSessionHandle()->AsUnauthenticatedSession()->MarkActiveRx();
 
-    mExchangeCtxt.Value()->UseSuggestedResponseTimeout(kExpectedLowProcessingTime, true /*isFirstMessageOnExchange*/);
+    mExchangeCtxt.Value()->UseSuggestedResponseTimeout(kExpectedLowProcessingTime);
 
     mLocalMRPConfig = MakeOptional(mrpLocalConfig.ValueOr(GetDefaultMRPConfig()));
 
@@ -899,7 +899,7 @@ CHIP_ERROR PASESession::ValidateReceivedMessage(ExchangeContext * exchange, cons
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    mExchangeCtxt.Value()->UseSuggestedResponseTimeout(kExpectedHighProcessingTime, false /*isFirstMessageOnExchange*/);
+    mExchangeCtxt.Value()->UseSuggestedResponseTimeout(kExpectedHighProcessingTime);
 
     VerifyOrReturnError(!msg.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError((mNextExpectedMsg.HasValue() && payloadHeader.HasMessageType(mNextExpectedMsg.Value())) ||
