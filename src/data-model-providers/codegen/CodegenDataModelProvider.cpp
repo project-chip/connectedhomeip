@@ -40,7 +40,6 @@
 #include <app/util/persistence/AttributePersistenceProvider.h>
 #include <app/util/persistence/DefaultAttributePersistenceProvider.h>
 #include <data-model-providers/codegen/EmberMetadata.h>
-#include <iterator>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
@@ -48,7 +47,6 @@
 #include <lib/support/SpanSearchValue.h>
 
 #include <cstdint>
-#include <iterator>
 #include <optional>
 
 namespace chip {
@@ -278,7 +276,11 @@ CHIP_ERROR CodegenDataModelProvider::ServerClusters(EndpointId endpointId,
 
     // assume the clusters on endpoint does not change in between these two loops
     auto clusters               = mRegistry.ClustersOnEndpoint(endpointId);
-    size_t registryClusterCount = std::distance(clusters.begin(), clusters.end());
+    size_t registryClusterCount = 0;
+    for ([[maybe_unused]] auto _ : clusters)
+    {
+        registryClusterCount++;
+    }
 
     ReturnErrorOnFailure(builder.EnsureAppendCapacity(registryClusterCount));
 
