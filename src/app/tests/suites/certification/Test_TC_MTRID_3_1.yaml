@@ -88,9 +88,9 @@ tests:
     command: "waitForReport"
     attribute: "PowerThreshold"
     response:
-      notValue: Saved
       constraints:
         type: PowerThresholdStruct
+        notValue: Saved
 
   - label: "Step 7: TH reads the PowerThreshold attribute from the DUT"
     PICS: MTRID.S.A0004
@@ -119,9 +119,9 @@ tests:
     command: "waitForReport"
     attribute: "PowerThreshold"
     response:
-      notValue: Saved
       constraints:
         type: PowerThresholdStruct
+        notValue: Saved
 
   - label: "Step 10: TH reads the PowerThreshold attribute from the DUT"
     PICS: MTRID.S.A0004
@@ -150,6 +150,6 @@ tests:
     command: "waitForReport"
     attribute: "PowerThreshold"
     response:
-      notValue: Saved
       constraints:
         type: PowerThresholdStruct
+        notValue: Saved
