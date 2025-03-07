@@ -75,8 +75,7 @@ public:
     LogOnlyEvents & EventsGenerator() { return mTestEventsGenerator; }
     TestProviderChangeListener & ChangeListener() { return mTestDataModelChangeListener; }
     TestPersistentStorageDelegate & StorageDelegate() { return mTestStorage; }
-    app::DataModel::InteractionModelContext &ImContext() { return mTestContext; }
-
+    app::DataModel::InteractionModelContext & ImContext() { return mTestContext; }
 
 private:
     NullActionContext mNullActionContext;

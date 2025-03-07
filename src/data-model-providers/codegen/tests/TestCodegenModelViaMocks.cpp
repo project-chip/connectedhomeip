@@ -19,7 +19,6 @@
 #include <data-model-providers/codegen/tests/EmberInvokeOverride.h>
 #include <data-model-providers/codegen/tests/EmberReadWriteOverride.h>
 
-#include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <access/AccessControl.h>
 #include <access/SubjectDescriptor.h>
 #include <app-common/zap-generated/attribute-type.h>
@@ -48,6 +47,7 @@
 #include <app/data-model/List.h>
 #include <app/data-model/Nullable.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <app/util/attribute-metadata.h>
 #include <app/util/attribute-storage-null-handling.h>
 #include <app/util/ember-io-storage.h>
@@ -2604,7 +2604,6 @@ TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesRegistration)
 
     UseMockNodeConfig config(gTestNodeConfig);
     CodegenDataModelProviderWithContext model;
-
 
     model.SetPersistentStorageDelegate(&testContext.StorageDelegate());
     ASSERT_EQ(model.Startup(testContext.ImContext()), CHIP_NO_ERROR);
