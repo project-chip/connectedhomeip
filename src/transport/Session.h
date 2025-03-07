@@ -254,7 +254,8 @@ public:
     // GetAckTimeout is the estimate for how long it could take for the other
     // side to receive our message (accounting for our MRP retransmits if it
     // gets lost) and send a response.
-    // This need to know whether we are talking about an initial message we send or not via isFirstMessageOnExchange
+    //
+    // The MRP retransmit delay computation depends on whether this is the first message on the exchange.
     virtual System::Clock::Milliseconds32 GetAckTimeout(bool isFirstMessageOnExchange) const = 0;
 
     // GetReceiptTimeout is the estimate for how long it could take for us to
