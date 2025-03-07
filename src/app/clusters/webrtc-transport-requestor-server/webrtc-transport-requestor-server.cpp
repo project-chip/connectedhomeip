@@ -188,7 +188,7 @@ bool WebRTCTransportRequestorServer::IsPeerNodeSessionValid(uint16_t sessionId, 
 
     // Also check that the existing session belongs to the same PeerNodeID / Fabric
     // If it doesn’t match, respond with CONSTRAINT_ERROR
-    if (peerNodeId != existingSession->peerNodeID || peerFabricIndex != existingSession->peerFabricIndex)
+    if (peerNodeId != existingSession->peerNodeID || peerFabricIndex != existingSession->GetFabricIndex())
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
         return false;
@@ -221,7 +221,7 @@ void WebRTCTransportRequestorServer::HandleOffer(HandlerContext & ctx, const Com
     {
         // Also check that the existing session belongs to the same PeerNodeID / Fabric
         // If it doesn’t match, respond with CONSTRAINT_ERROR
-        if (peerNodeId != existingSession->peerNodeID || peerFabricIndex != existingSession->peerFabricIndex)
+        if (peerNodeId != existingSession->peerNodeID || peerFabricIndex != existingSession->GetFabricIndex())
         {
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
             return;

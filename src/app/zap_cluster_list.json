@@ -324,7 +324,9 @@
         "LAUNDRY_WASHER_CONTROLS_CLUSTER": ["laundry-washer-controls-server"],
         "LAUNDRY_DRYER_CONTROLS_CLUSTER": ["laundry-dryer-controls-server"],
         "WEB_RTC_TRANSPORT_PROVIDER_CLUSTER": [],
-        "WEB_RTC_TRANSPORT_REQUESTOR_CLUSTER": ["webrtc-transport-requestor-server"],
+        "WEB_RTC_TRANSPORT_REQUESTOR_CLUSTER": [
+            "webrtc-transport-requestor-server"
+	],
         "WIFI_NETWORK_DIAGNOSTICS_CLUSTER": ["wifi-network-diagnostics-server"],
         "WIFI_NETWORK_MANAGEMENT_CLUSTER": ["wifi-network-management-server"],
         "WINDOW_COVERING_CLUSTER": ["window-covering-server"],
