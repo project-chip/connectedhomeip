@@ -21858,6 +21858,156 @@ public class ClusterInfoMapping {
   }
 
 
+  public static class DelegatedTlsClientManagementClusterProvisionEndpointResponseCallback implements ChipClusters.TlsClientManagementCluster.ProvisionEndpointResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Integer endpointID) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo endpointIDResponseValue = new CommandResponseInfo("endpointID", "Integer");
+      responseValues.put(endpointIDResponseValue, endpointID);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedTlsClientManagementClusterFindEndpointResponseCallback implements ChipClusters.TlsClientManagementCluster.FindEndpointResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(ArrayList<ChipStructs.TlsClientManagementClusterTLSEndpointStruct> endpoints) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      // endpoints: TLSEndpointStruct
+      // Conversion from this type to Java is not properly implemented yet
+
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+  public static class DelegatedTlsClientManagementClusterProvisionedEndpointsAttributeCallback implements ChipClusters.TlsClientManagementCluster.ProvisionedEndpointsAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.TlsClientManagementClusterTLSEndpointStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.TlsClientManagementClusterTLSEndpointStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedTlsClientManagementClusterGeneratedCommandListAttributeCallback implements ChipClusters.TlsClientManagementCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedTlsClientManagementClusterAcceptedCommandListAttributeCallback implements ChipClusters.TlsClientManagementCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedTlsClientManagementClusterEventListAttributeCallback implements ChipClusters.TlsClientManagementCluster.EventListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedTlsClientManagementClusterAttributeListAttributeCallback implements ChipClusters.TlsClientManagementCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+
   public static class DelegatedUnitTestingClusterTestSpecificResponseCallback implements ChipClusters.UnitTestingCluster.TestSpecificResponseCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -23997,6 +24147,10 @@ public class ClusterInfoMapping {
       (ptr, endpointId) -> new ChipClusters.TlsCertificateManagementCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("tlsCertificateManagement", tlsCertificateManagementClusterInfo);
 
+    ClusterInfo tlsClientManagementClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.TlsClientManagementCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("tlsClientManagement", tlsClientManagementClusterInfo);
+
     ClusterInfo unitTestingClusterInfo = new ClusterInfo(
       (ptr, endpointId) -> new ChipClusters.UnitTestingCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("unitTesting", unitTestingClusterInfo);
@@ -24141,6 +24295,7 @@ public class ClusterInfoMapping {
     destination.get("ecosystemInformation").combineCommands(source.get("ecosystemInformation"));
     destination.get("commissionerControl").combineCommands(source.get("commissionerControl"));
     destination.get("tlsCertificateManagement").combineCommands(source.get("tlsCertificateManagement"));
+    destination.get("tlsClientManagement").combineCommands(source.get("tlsClientManagement"));
     destination.get("unitTesting").combineCommands(source.get("unitTesting"));
     destination.get("faultInjection").combineCommands(source.get("faultInjection"));
     destination.get("sampleMei").combineCommands(source.get("sampleMei"));
@@ -31669,6 +31824,87 @@ public class ClusterInfoMapping {
     tlsCertificateManagementClusterInteractionInfoMap.put("removeClientCertificate", tlsCertificateManagementremoveClientCertificateInteractionInfo);
 
     commandMap.put("tlsCertificateManagement", tlsCertificateManagementClusterInteractionInfoMap);
+
+    Map<String, InteractionInfo> tlsClientManagementClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    Map<String, CommandParameterInfo> tlsClientManagementprovisionEndpointCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo tlsClientManagementprovisionEndpointhostnameCommandParameterInfo = new CommandParameterInfo("hostname", byte[].class, byte[].class);
+    tlsClientManagementprovisionEndpointCommandParams.put("hostname",tlsClientManagementprovisionEndpointhostnameCommandParameterInfo);
+
+    CommandParameterInfo tlsClientManagementprovisionEndpointportCommandParameterInfo = new CommandParameterInfo("port", Integer.class, Integer.class);
+    tlsClientManagementprovisionEndpointCommandParams.put("port",tlsClientManagementprovisionEndpointportCommandParameterInfo);
+
+    CommandParameterInfo tlsClientManagementprovisionEndpointcaidCommandParameterInfo = new CommandParameterInfo("caid", Integer.class, Integer.class);
+    tlsClientManagementprovisionEndpointCommandParams.put("caid",tlsClientManagementprovisionEndpointcaidCommandParameterInfo);
+
+    CommandParameterInfo tlsClientManagementprovisionEndpointccdidCommandParameterInfo = new CommandParameterInfo("ccdid", Integer.class, Integer.class);
+    tlsClientManagementprovisionEndpointCommandParams.put("ccdid",tlsClientManagementprovisionEndpointccdidCommandParameterInfo);
+
+    CommandParameterInfo tlsClientManagementprovisionEndpointendpointIDCommandParameterInfo = new CommandParameterInfo("endpointID", Integer.class, Integer.class);
+    tlsClientManagementprovisionEndpointCommandParams.put("endpointID",tlsClientManagementprovisionEndpointendpointIDCommandParameterInfo);
+    InteractionInfo tlsClientManagementprovisionEndpointInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.TlsClientManagementCluster) cluster)
+          .provisionEndpoint((ChipClusters.TlsClientManagementCluster.ProvisionEndpointResponseCallback) callback
+           , (byte[])
+             commandArguments.get("hostname")
+
+           , (Integer)
+             commandArguments.get("port")
+
+           , (Integer)
+             commandArguments.get("caid")
+
+           , (Integer)
+             commandArguments.get("ccdid")
+
+           , (Integer)
+             commandArguments.get("endpointID")
+
+            );
+        },
+        () -> new DelegatedTlsClientManagementClusterProvisionEndpointResponseCallback(),
+        tlsClientManagementprovisionEndpointCommandParams
+      );
+    tlsClientManagementClusterInteractionInfoMap.put("provisionEndpoint", tlsClientManagementprovisionEndpointInteractionInfo);
+
+    Map<String, CommandParameterInfo> tlsClientManagementfindEndpointCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo tlsClientManagementfindEndpointendpointIDCommandParameterInfo = new CommandParameterInfo("endpointID", Integer.class, Integer.class);
+    tlsClientManagementfindEndpointCommandParams.put("endpointID",tlsClientManagementfindEndpointendpointIDCommandParameterInfo);
+    InteractionInfo tlsClientManagementfindEndpointInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.TlsClientManagementCluster) cluster)
+          .findEndpoint((ChipClusters.TlsClientManagementCluster.FindEndpointResponseCallback) callback
+           , (Integer)
+             commandArguments.get("endpointID")
+
+            );
+        },
+        () -> new DelegatedTlsClientManagementClusterFindEndpointResponseCallback(),
+        tlsClientManagementfindEndpointCommandParams
+      );
+    tlsClientManagementClusterInteractionInfoMap.put("findEndpoint", tlsClientManagementfindEndpointInteractionInfo);
+
+    Map<String, CommandParameterInfo> tlsClientManagementremoveEndpointCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo tlsClientManagementremoveEndpointendpointIDCommandParameterInfo = new CommandParameterInfo("endpointID", Integer.class, Integer.class);
+    tlsClientManagementremoveEndpointCommandParams.put("endpointID",tlsClientManagementremoveEndpointendpointIDCommandParameterInfo);
+    InteractionInfo tlsClientManagementremoveEndpointInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.TlsClientManagementCluster) cluster)
+        .removeEndpoint((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("endpointID")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        tlsClientManagementremoveEndpointCommandParams
+    );
+    tlsClientManagementClusterInteractionInfoMap.put("removeEndpoint", tlsClientManagementremoveEndpointInteractionInfo);
+
+    commandMap.put("tlsClientManagement", tlsClientManagementClusterInteractionInfoMap);
 
     Map<String, InteractionInfo> unitTestingClusterInteractionInfoMap = new LinkedHashMap<>();
 

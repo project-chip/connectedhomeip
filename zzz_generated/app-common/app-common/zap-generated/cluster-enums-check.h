@@ -3928,6 +3928,19 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(PushAvStreamTransport::
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(TlsClientManagement::TLSEndpointStatusEnum val)
+{
+    using EnumType = TlsClientManagement::TLSEndpointStatusEnum;
+    switch (val)
+    {
+    case EnumType::kProvisioned:
+    case EnumType::kInUse:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(UnitTesting::SimpleEnum val)
 {
     using EnumType = UnitTesting::SimpleEnum;
