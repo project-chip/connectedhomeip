@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2020-2022 Project CHIP Authors
+#    Copyright (c) 2020-2025 Project CHIP Authors
 #    Copyright (c) 2019-2020 Google, LLC.
 #    Copyright (c) 2013-2018 Nest Labs, Inc.
 #    All rights reserved.
@@ -702,12 +702,52 @@ class ChipDeviceControllerBase():
 
         self._ChipStack.Call(lambda: self._dmLib.pychip_ExpireSessions(self.devCtrl, nodeid)).raise_on_error()
 
-    # TODO: This needs to be called MarkSessionDefunct
-    def CloseSession(self, nodeid):
+    def MarkSessionDefunct(self, nodeid):
+        '''
+        Marks a previously active session with the specified node as defunct to temporarily prevent it
+        from being used with new exchanges to send or receive messages. This should be called when there
+        is suspicion of a loss-of-sync with the session state on the associated peer, such as evidence
+        of transport failure.
+
+        If messages are received thereafter on this session, the session will be put back into the Active state.
+
+        This function should only be called on an active session.
+        This will NOT detach any existing SessionHolders.
+
+        Parameters:
+            nodeid (int): The node ID of the device whose session should be marked as defunct.
+
+        Raises:
+            RuntimeError: If the controller is not active.
+            PyChipError: If the operation fails.
+        '''
         self.CheckIsActive()
 
         self._ChipStack.Call(
-            lambda: self._dmLib.pychip_DeviceController_CloseSession(
+            lambda: self._dmLib.pychip_DeviceController_MarkSessionDefunct(
+                self.devCtrl, nodeid)
+        ).raise_on_error()
+
+    def MarkSessionForEviction(self, nodeid):
+        '''
+        Marks the session with the specified node for eviction. It will first detach all SessionHolders
+        attached to this session by calling 'OnSessionReleased' on each of them. This will force them
+        to release their reference to the session. If there are no more references left, the session
+        will then be de-allocated.
+
+        Once marked for eviction, the session SHALL NOT ever become active again.
+
+        Parameters:
+            nodeid (int): The node ID of the device whose session should be marked for eviction.
+
+        Raises:
+            RuntimeError: If the controller is not active.
+            PyChipError: If the operation fails.
+        '''
+        self.CheckIsActive()
+
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_MarkSessionForEviction(
                 self.devCtrl, nodeid)
         ).raise_on_error()
 
@@ -1873,9 +1913,13 @@ class ChipDeviceControllerBase():
                 c_void_p, c_uint64, _DeviceUnpairingCompleteFunct]
             self._dmLib.pychip_DeviceController_UnpairDevice.restype = PyChipError
 
-            self._dmLib.pychip_DeviceController_CloseSession.argtypes = [
+            self._dmLib.pychip_DeviceController_MarkSessionDefunct.argtypes = [
                 c_void_p, c_uint64]
-            self._dmLib.pychip_DeviceController_CloseSession.restype = PyChipError
+            self._dmLib.pychip_DeviceController_MarkSessionDefunct.restype = PyChipError
+
+            self._dmLib.pychip_DeviceController_MarkSessionForEviction.argtypes = [
+                c_void_p, c_uint64]
+            self._dmLib.pychip_DeviceController_MarkSessionForEviction.restype = PyChipError
 
             self._dmLib.pychip_DeviceController_GetAddressAndPort.argtypes = [
                 c_void_p, c_uint64, c_char_p, c_uint64, POINTER(c_uint16)]
@@ -2261,7 +2305,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
             return await asyncio.futures.wrap_future(ctx.future)
 
     def get_rcac(self):
-        ''' 
+        '''
         Passes captured RCAC data back to Python test modules for validation
         - Setting buffer size to max size mentioned in spec:
         - Ref: https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/06c4d55962954546ecf093c221fe1dab57645028/policies/matter_certificate_policy.adoc#615-key-sizes
