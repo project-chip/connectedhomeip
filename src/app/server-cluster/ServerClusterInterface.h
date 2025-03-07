@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <algorithm>
 #include <app/AttributeValueDecoder.h>
 #include <app/AttributeValueEncoder.h>
 #include <app/CommandHandler.h>
@@ -54,11 +55,12 @@ public:
 
     ///////////////////////////////////// Cluster Metadata Support //////////////////////////////////////////////////
 
-    /// The path to this cluster instance.
+    /// The paths that this cluster interfaces handles.
     ///
-    /// This path (endpointid,clusterid) is expected to remain constant once the server
-    /// cluster interface is in use.
-    [[nodiscard]] virtual ConcreteClusterPath GetPath() const = 0;
+    /// - MUST contain at least one element
+    /// - MUST remain constant once the server cluster interface is in use.
+    ///
+    [[nodiscard]] virtual Span<const ConcreteClusterPath> GetPaths() const = 0;
 
     /// Gets the data version for this cluster instance.
     ///
@@ -71,9 +73,14 @@ public:
     ///   maximum value. A cluster data version SHALL be maintained for each cluster instance.
     ///   [...]
     ///   A cluster data version SHALL be incremented if any attribute data changes.
-    [[nodiscard]] virtual DataVersion GetDataVersion() const = 0;
+    ///
+    /// Precondition:
+    ///   - `path` parameter MUST be part of `GetPaths` returned values.
+    [[nodiscard]] virtual DataVersion GetDataVersion(const ConcreteClusterPath & path) const = 0;
 
-    [[nodiscard]] virtual BitFlags<DataModel::ClusterQualityFlags> GetClusterFlags() const = 0;
+    /// Precondition:
+    ///   - `path` parameter MUST be part of `GetPaths` returned values.
+    [[nodiscard]] virtual BitFlags<DataModel::ClusterQualityFlags> GetClusterFlags(const ConcreteClusterPath &) const = 0;
 
     ///////////////////////////////////// Attribute Support ////////////////////////////////////////////////////////
 
@@ -84,7 +91,10 @@ public:
     ///   2) This function will only be called at the beginning and end of a series of consecutive attribute data
     ///   blocks for the same attribute, no matter what list operations those data blocks represent.
     ///   3) The opType argument indicates the type of notification (Start, Failure, Success).
-    virtual void ListAttributeWriteNotification(const ConcreteAttributePath & aPath, DataModel::ListWriteOperation opType) {}
+    ///
+    /// Precondition:
+    ///   - `path` cluster part MUST be a path that is part of `GetPaths` returned values.
+    virtual void ListAttributeWriteNotification(const ConcreteAttributePath & path, DataModel::ListWriteOperation opType) {}
 
     /// Reads the value of an existing attribute.
     ///
@@ -105,6 +115,9 @@ public:
     ///     - AcceptedCommandList::Id
     ///     - AttributeList::Id
     ///     - GeneratedCommandList::Id
+    ///
+    /// Precondition:
+    ///   - `request.path` cluster part MUST be a path that is part of `GetPaths` returned values.
     virtual DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                         AttributeValueEncoder & encoder) = 0;
 
@@ -116,6 +129,9 @@ public:
     ///
     /// `request.path` is expected to have `GetClusterId` as the cluster id as well as an attribute that is
     /// included in a `Attributes` call.
+    ///
+    /// Precondition:
+    ///   - `request.path` cluster part MUST be a path that is part of `GetPaths` returned values.
     virtual DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                          AttributeValueDecoder & decoder) = 0;
 
@@ -130,6 +146,9 @@ public:
     ///     - AttributeList::Id
     ///     - GeneratedCommandList::Id
     /// See SPEC 7.13 Global Elements: `Global Attributes` table
+    ///
+    /// Precondition:
+    ///   - `path` cluster part MUST be a path that is part of `GetPaths` returned values.
     virtual CHIP_ERROR Attributes(const ConcreteClusterPath & path,
                                   DataModel::ListBuilder<DataModel::AttributeEntry> & builder) = 0;
 
@@ -153,6 +172,9 @@ public:
     ///   - if a value is returned (not nullopt) then the handler response MUST NOT be filled. The caller
     ///     will then issue `handler->AddStatus(request.path, <return_value>->GetStatusCode())`. This is a
     ///     convenience to make writing Invoke calls easier.
+    ///
+    /// Precondition:
+    ///   - `request.path` cluster part MUST be a path that is part of `GetPaths` returned values.
     virtual std::optional<DataModel::ActionReturnStatus>
     InvokeCommand(const DataModel::InvokeRequest & request, chip::TLV::TLVReader & input_arguments, CommandHandler * handler) = 0;
 
@@ -160,6 +182,9 @@ public:
     ///
     /// Returning `CHIP_NO_ERROR` without adding anything to the `builder` list is expected
     /// if no commands are supported by the cluster.
+    ///
+    /// Precondition:
+    ///   - `path` cluster part MUST be a path that is part of `GetPaths` returned values.
     virtual CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
                                         DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder) = 0;
 
@@ -167,7 +192,23 @@ public:
     ///
     /// Returning `CHIP_NO_ERROR` without adding anything to the `builder` list is expected
     /// if no commands are generated by processing accepted commands.
+    ///
+    /// Precondition:
+    ///   - `path` cluster part MUST be a path that is part of `GetPaths` returned values.
     virtual CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, DataModel::ListBuilder<CommandId> & builder) = 0;
+
+    /// Returns if `GetPaths` contains the given path
+    bool PathsContains(const ConcreteClusterPath & path)
+    {
+        for (auto & myPath : GetPaths())
+        {
+            if (path == myPath)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 };
 
 } // namespace app

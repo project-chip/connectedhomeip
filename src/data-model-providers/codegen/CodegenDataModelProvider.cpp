@@ -277,9 +277,15 @@ CHIP_ERROR CodegenDataModelProvider::ServerClusters(EndpointId endpointId,
     // assume the clusters on endpoint does not change in between these two loops
     auto clusters               = mRegistry.ClustersOnEndpoint(endpointId);
     size_t registryClusterCount = 0;
-    for ([[maybe_unused]] auto _ : clusters)
+    for (auto cluster : clusters)
     {
-        registryClusterCount++;
+        for (auto path : cluster->GetPaths())
+        {
+            if (path.mEndpointId == endpointId)
+            {
+                registryClusterCount++;
+            }
+        }
     }
 
     ReturnErrorOnFailure(builder.EnsureAppendCapacity(registryClusterCount));
@@ -288,13 +294,19 @@ CHIP_ERROR CodegenDataModelProvider::ServerClusters(EndpointId endpointId,
     ReturnErrorOnFailure(knownClustersBuilder.EnsureAppendCapacity(registryClusterCount));
     for (auto * cluster : mRegistry.ClustersOnEndpoint(endpointId))
     {
-        const ConcreteClusterPath path = cluster->GetPath();
-        ReturnErrorOnFailure(builder.Append({
-            .clusterId   = path.mClusterId,
-            .dataVersion = cluster->GetDataVersion(),
-            .flags       = cluster->GetClusterFlags(),
-        }));
-        ReturnErrorOnFailure(knownClustersBuilder.Append(path.mClusterId));
+        for (auto path : cluster->GetPaths())
+        {
+            if (path.mEndpointId != endpointId)
+            {
+                continue;
+            }
+            ReturnErrorOnFailure(builder.Append({
+                .clusterId   = path.mClusterId,
+                .dataVersion = cluster->GetDataVersion(path),
+                .flags       = cluster->GetClusterFlags(path),
+            }));
+            ReturnErrorOnFailure(knownClustersBuilder.Append(path.mClusterId));
+        }
     }
 
     DataModel::ReadOnlyBuffer<ClusterId> knownClusters = knownClustersBuilder.TakeBuffer();

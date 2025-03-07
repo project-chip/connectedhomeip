@@ -48,10 +48,8 @@ constexpr chip::ClusterId kCluster3 = 3;
 class FakeServerClusterInterface : public DefaultServerCluster
 {
 public:
-    FakeServerClusterInterface(EndpointId endpoint, ClusterId cluster) : mPath({ endpoint, cluster }) {}
-    FakeServerClusterInterface(const ConcreteClusterPath & path) : mPath(path) {}
-
-    [[nodiscard]] ConcreteClusterPath GetPath() const override { return mPath; }
+    FakeServerClusterInterface(const ConcreteClusterPath & path) : DefaultServerCluster(path) {}
+    FakeServerClusterInterface(EndpointId endpoint, ClusterId cluster) : DefaultServerCluster({ endpoint, cluster }) {}
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override
@@ -68,8 +66,7 @@ public:
 
     bool HasContext() { return mContext != nullptr; }
 
-private:
-    ConcreteClusterPath mPath;
+    const ConcreteClusterPath &GetPath() const { return mPath; }
 };
 
 class CannotStartUpCluster : public FakeServerClusterInterface
@@ -157,23 +154,13 @@ TEST_F(TestServerClusterInterfaceRegistry, BasicTest)
     EXPECT_EQ(registry.Get({ kEp2, kCluster1 }), nullptr);
 
     // remove registrations
-    EXPECT_EQ(registry.Unregister({ kEp2, kCluster2 }), &cluster2);
-    EXPECT_EQ(registry.Unregister({ kEp2, kCluster2 }), nullptr);
+    EXPECT_EQ(registry.Unregister(&cluster2), CHIP_NO_ERROR);
+    EXPECT_EQ(registry.Unregister(&cluster2), CHIP_ERROR_NOT_FOUND);
 
     // Re-adding works
     EXPECT_EQ(registry.Get({ kEp2, kCluster2 }), nullptr);
     EXPECT_EQ(registry.Register(registration2), CHIP_NO_ERROR);
     EXPECT_EQ(registry.Get({ kEp2, kCluster2 }), &cluster2);
-
-    // clean of an entire endpoint works
-    EXPECT_EQ(registry.Get({ kEp2, kCluster3 }), &cluster3);
-    registry.UnregisterAllFromEndpoint(kEp2);
-    EXPECT_EQ(registry.Get({ kEp1, kCluster1 }), &cluster1);
-    EXPECT_EQ(registry.Get({ kEp2, kCluster3 }), nullptr);
-
-    registry.UnregisterAllFromEndpoint(kEp1);
-    EXPECT_EQ(registry.Get({ kEp1, kCluster1 }), nullptr);
-    EXPECT_EQ(registry.Get({ kEp2, kCluster3 }), nullptr);
 }
 
 TEST_F(TestServerClusterInterfaceRegistry, StressTest)
@@ -228,39 +215,27 @@ TEST_F(TestServerClusterInterfaceRegistry, StressTest)
             }
         }
 
-        // clear endpoints. Stress test, unregister in different ways (bulk vs individual)
-        if (test % 2 == 1)
+        // shuffle unregister
+        std::vector<size_t> unregister_order;
+        unregister_order.reserve(kClusterTestCount);
+        for (size_t i = 0; i < kClusterTestCount; i++)
         {
-            // shuffle unregister
-            std::vector<size_t> unregister_order;
-            unregister_order.reserve(kClusterTestCount);
-            for (size_t i = 0; i < kClusterTestCount; i++)
-            {
-                unregister_order.push_back(i);
-            }
-
-            std::default_random_engine eng(static_cast<std::default_random_engine::result_type>(rand()));
-            std::shuffle(unregister_order.begin(), unregister_order.end(), eng);
-
-            // unregister
-            for (auto cluster : unregister_order)
-            {
-                // item MUST exist and be accessible
-                ASSERT_EQ(registry.Get(items[cluster].GetPath()), &items[cluster]);
-                ASSERT_EQ(registry.Unregister(items[cluster].GetPath()), &items[cluster]);
-
-                // once unregistered, it is not there anymore
-                ASSERT_EQ(registry.Get(items[cluster].GetPath()), nullptr);
-                ASSERT_EQ(registry.Unregister(items[cluster].GetPath()), nullptr);
-            }
+            unregister_order.push_back(i);
         }
-        else
+
+        std::default_random_engine eng(static_cast<std::default_random_engine::result_type>(rand()));
+        std::shuffle(unregister_order.begin(), unregister_order.end(), eng);
+
+        // unregister
+        for (auto cluster : unregister_order)
         {
-            // bulk unregister
-            for (EndpointId ep = 0; ep < kEndpointTestCount; ep++)
-            {
-                registry.UnregisterAllFromEndpoint(ep);
-            }
+            // item MUST exist and be accessible
+            ASSERT_EQ(registry.Get(items[cluster].GetPath()), &items[cluster]);
+            ASSERT_EQ(registry.Unregister(&items[cluster]), CHIP_NO_ERROR);
+
+            // once unregistered, it is not there anymore
+            ASSERT_EQ(registry.Get(items[cluster].GetPath()), nullptr);
+            ASSERT_EQ(registry.Unregister(&items[cluster]), CHIP_ERROR_NOT_FOUND);
         }
 
         // all endpoints should be clear
@@ -317,7 +292,7 @@ TEST_F(TestServerClusterInterfaceRegistry, ClustersOnEndpoint)
         for (auto cluster : registry.ClustersOnEndpoint(ep))
         {
             ASSERT_LT(expectedClusterId, kClusterTestCount);
-            ASSERT_EQ(cluster->GetPath(), ConcreteClusterPath(ep, expectedClusterId));
+            ASSERT_TRUE(cluster->PathsContains(ConcreteClusterPath(ep, expectedClusterId)));
             expectedClusterId -= kEndpointTestCount; // next expected/registered cluster
         }
 
@@ -377,7 +352,7 @@ TEST_F(TestServerClusterInterfaceRegistry, Context)
         EXPECT_TRUE(cluster3.HasContext());
 
         // removing clears the context/shuts clusters down
-        EXPECT_EQ(registry.Unregister(cluster2.GetPath()), &cluster2);
+        EXPECT_EQ(registry.Unregister(&cluster2), CHIP_NO_ERROR);
         EXPECT_TRUE(cluster1.HasContext());
         EXPECT_FALSE(cluster2.HasContext());
         EXPECT_TRUE(cluster3.HasContext());

@@ -63,16 +63,20 @@ public:
             using reference         = ServerClusterInterface *&;
             using iterator_category = std::forward_iterator_tag;
 
-            Iterator(ServerClusterRegistration * interface, EndpointId endpoint) : mRegistration(interface), mEndpointId(endpoint)
+            Iterator(ServerClusterRegistration * interface, EndpointId endpoint) : mEndpointId(endpoint), mRegistration(interface)
             {
+                if (mRegistration != nullptr)
+                {
+                    mSpan = interface->serverClusterInterface->GetPaths();
+                }
                 AdvanceUntilMatchingEndpoint();
             }
 
             Iterator & operator++()
             {
-                if (mRegistration != nullptr)
+                if (!mSpan.empty())
                 {
-                    mRegistration = mRegistration->next;
+                    mSpan = mSpan.SubSpan(1);
                 }
                 AdvanceUntilMatchingEndpoint();
                 return *this;
@@ -82,25 +86,41 @@ public:
             ServerClusterInterface * operator*() { return mRegistration->serverClusterInterface; }
 
         private:
+            const EndpointId mEndpointId;
             ServerClusterRegistration * mRegistration;
-            EndpointId mEndpointId;
+            Span<const ConcreteClusterPath> mSpan;
 
             void AdvanceUntilMatchingEndpoint()
             {
-                while ((mRegistration != nullptr) && (mRegistration->serverClusterInterface->GetPath().mEndpointId != mEndpointId))
+                while (mRegistration != nullptr)
                 {
-                    mRegistration = mRegistration->next;
+                    if (mSpan.empty())
+                    {
+                        mRegistration = mRegistration->next;
+                        if (mRegistration != nullptr)
+                        {
+                            mSpan = mRegistration->serverClusterInterface->GetPaths();
+                        }
+                        continue;
+                    }
+                    if (mSpan.begin()->mEndpointId == mEndpointId)
+                    {
+                        return;
+                    }
+
+                    // need to keep searching
+                    mSpan = mSpan.SubSpan(1);
                 }
             }
         };
 
-        constexpr ClustersList(ServerClusterRegistration * start, EndpointId endpointId) : mStart(start), mEndpointId(endpointId) {}
+        constexpr ClustersList(ServerClusterRegistration * start, EndpointId endpointId) : mEndpointId(endpointId), mStart(start) {}
         Iterator begin() { return { mStart, mEndpointId }; }
         Iterator end() { return { nullptr, mEndpointId }; }
 
     private:
+        const EndpointId mEndpointId;
         ServerClusterRegistration * mStart;
-        EndpointId mEndpointId;
     };
 
     ~ServerClusterInterfaceRegistry();
@@ -114,11 +134,10 @@ public:
     /// There can be only a single registration for a given `endpointId/clusterId` path.
     [[nodiscard]] CHIP_ERROR Register(ServerClusterRegistration & entry);
 
-    /// Remove an existing registration for a given endpoint/cluster path.
+    /// Remove an existing registration
     ///
-    /// Returns the previous registration if any exists (or nullptr if nothing
-    /// to unregister)
-    ServerClusterInterface * Unregister(const ConcreteClusterPath & path);
+    /// Will return CHIP_ERROR_NOT_FOUND if the given registration is not found.
+    CHIP_ERROR Unregister(ServerClusterInterface *);
 
     /// Return the interface registered for the given cluster path or nullptr if one does not exist
     ServerClusterInterface * Get(const ConcreteClusterPath & path);
@@ -128,9 +147,6 @@ public:
     /// ClustersList points inside the internal registrations of the registry, so
     /// the list is only valid as long as the registry is not modified.
     ClustersList ClustersOnEndpoint(EndpointId endpointId);
-
-    /// Unregister all registrations for the given endpoint.
-    void UnregisterAllFromEndpoint(EndpointId endpointId);
 
     // Set up the underlying context for all clusters that are managed by this registry.
     //
