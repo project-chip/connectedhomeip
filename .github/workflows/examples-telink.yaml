@@ -31,7 +31,7 @@ env:
 
 jobs:
     zephyr_latest:
-        name: Zephyr latest
+        name: Telink
         env:
             BUILD_TYPE: telink
 
@@ -350,7 +350,7 @@ jobs:
                 platform-name: Telink
 
     zephyr_3_3:
-        name: Zephyr v3.3
+        name: Telink
         env:
             BUILD_TYPE: telink
 
