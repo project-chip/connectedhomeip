@@ -12,27 +12,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: X.2.3. [TC-ET-2.3] Commands with Client as DUT
+name: X.2.3. [TC-SETRF-2.3] Commands with Client as DUT
 
 PICS:
-  - ET.C
+  - SETRF.C
 
 config:
   nodeId: 0x12344321
-  cluster: "Energy Tariff"
+  cluster: "Commodity Tariff"
   endpoint: 1
 
 tests:
-    - label: "Step 1: Commission DUT to TH"
-      cluster: "DelayCommands"
-      command: "WaitForCommissionee"
-      arguments:
-        values:
-          - name: "nodeId"
-            value: nodeId
+  - label: "Step 1: Commission DUT to TH"
+    cluster: "DelayCommands"
+    command: "WaitForCommissionee"
+    arguments:
+      values:
+        - name: "nodeId"
+          value: nodeId
 
-    - label: "Step 2: DUT sends GetTariffComponent command to TH."
-      wait: "GetTariffComponent"
+  - label: "Step 2: DUT sends GetTariffComponent command to TH."
+    wait: "GetTariffComponent"
 
-    - label: "Step 3: DUT sends GetCalendarTransition command to TH."
-      wait: "GetCalendarTransition"
+  - label: "Step 3: DUT sends GetDayEntry command to TH."
+    wait: "GetDayEntry"

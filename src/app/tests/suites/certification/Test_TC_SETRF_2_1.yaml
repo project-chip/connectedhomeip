@@ -12,14 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: X.2.1. [TC-ET-2.1] Attributes with DUT as Server
+name: X.2.1. [TC-SETRF-2.1] Attributes with DUT as Server
 
 PICS:
-  - ET.S
+  - SETRF.S
 
 config:
   nodeId: 0x12344321
-  cluster: "Energy Tariff"
+  cluster: "Commodity Tariff"
   endpoint: 1
   TEST_EVENT_TRIGGER_KEY:
     type: octet_string
@@ -46,9 +46,9 @@ tests:
     response:
       value: null
 
-  - label: "Step 3: TH reads the MeteringUnit attribute from the DUT"
+  - label: "Step 3: TH reads the TariffUnit attribute from the DUT"
     command: "readAttribute"
-    attribute: "MeteringUnit"
+    attribute: "TariffUnit"
     response:
       value: null
 
@@ -58,9 +58,9 @@ tests:
     response:
       value: null
 
-  - label: "Step 5: TH reads the Transitions attribute from the DUT"
+  - label: "Step 5: TH reads the DayEntries attribute from the DUT"
     command: "readAttribute"
-    attribute: "Transitions"
+    attribute: "DayEntries"
     response:
       value: null
 
@@ -94,27 +94,27 @@ tests:
     response:
       value: null
 
-  - label: "Step 11: TH reads the CurrentTransition attribute from the DUT"
+  - label: "Step 11: TH reads the CurrentDayEntry attribute from the DUT"
     command: "readAttribute"
-    attribute: "CurrentTransition"
+    attribute: "CurrentDayEntry"
     response:
       value: null
 
-  - label: "Step 12: TH reads the CurrentTransitionDate attribute from the DUT"
+  - label: "Step 12: TH reads the CurrentDayEntryDate attribute from the DUT"
     command: "readAttribute"
-    attribute: "CurrentTransitionDate"
+    attribute: "CurrentDayEntryDate"
     response:
       value: null
 
-  - label: "Step 13: TH reads the NextTransition attribute from the DUT"
+  - label: "Step 13: TH reads the NextDayEntry attribute from the DUT"
     command: "readAttribute"
-    attribute: "NextTransition"
+    attribute: "NextDayEntry"
     response:
       value: null
 
-  - label: "Step 14: TH reads the NextTransitionDate attribute from the DUT"
+  - label: "Step 14: TH reads the NextDayEntryDate attribute from the DUT"
     command: "readAttribute"
-    attribute: "NextTransitionDate"
+    attribute: "NextDayEntryDate"
     response:
       value: null
 
@@ -143,14 +143,14 @@ tests:
       value: null
 
   - label: "Step 19: TH reads the DefaultRandomizationOffset attribute from the DUT"
-    PICS: ET.S.A0011
+    PICS: SETRF.S.A0011
     command: "readAttribute"
     attribute: "DefaultRandomizationOffset"
     response:
       value: null
 
   - label: "Step 20: TH reads the DefaultRandomizationType attribute from the DUT"
-    PICS: ET.S.A0012
+    PICS: SETRF.S.A0012
     command: "readAttribute"
     attribute: "DefaultRandomizationType"
     response:
@@ -168,8 +168,8 @@ tests:
 
   - label: "Step 22: TH sends TestEventTrigger command to General Diagnostics
       Cluster on Endpoint 0 with EnableKey field set to
-      PIXIT.ET.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
-      PIXIT.ET.TEST_EVENT_TRIGGER for Attributes Value Update Test Event"
+      PIXIT.SETRF.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+      PIXIT.SETRF.TEST_EVENT_TRIGGER for Attributes Value Update Test Event"
     PICS: DGGEN.S.C00.Rsp
     cluster: "General Diagnostics"
     endpoint: 0
@@ -188,12 +188,12 @@ tests:
       constraints:
         type: "TariffInformationStruct"
 
-  - label: "Step 24: TH reads the MeteringUnit attribute from the DUT"
+  - label: "Step 24: TH reads the TariffUnit attribute from the DUT"
     command: "readAttribute"
-    attribute: "MeteringUnit"
+    attribute: "TariffUnit"
     response:
       constraints:
-        type: "MeteringUnitEnum"
+        type: "TariffUnitEnum"
         anyOf: [0, 1, 2, 3, 4, 5, 6, 7, 8]
 
   - label: "Step 25: TH reads the StartDate attribute from the DUT"
@@ -203,9 +203,9 @@ tests:
       constraints:
         type: epoch-s
 
-  - label: "Step 26: TH reads the Transitions attribute from the DUT"
+  - label: "Step 26: TH reads the DayEntries attribute from the DUT"
     command: "readAttribute"
-    attribute: "Transitions"
+    attribute: "DayEntries"
     response:
       constraints:
         type: list
@@ -248,30 +248,30 @@ tests:
       constraints:
         type: "DayStruct"
 
-  - label: "Step 32: TH reads the CurrentTransition attribute from the DUT"
+  - label: "Step 32: TH reads the CurrentDayEntry attribute from the DUT"
     command: "readAttribute"
-    attribute: "CurrentTransition"
+    attribute: "CurrentDayEntry"
     response:
       constraints:
-        type: "CalendarTransitionStruct"
+        type: "DayEntryStruct"
 
-  - label: "Step 33: TH reads the CurrentTransitionDate attribute from the DUT"
+  - label: "Step 33: TH reads the CurrentDayEntryDate attribute from the DUT"
     command: "readAttribute"
-    attribute: "CurrentTransitionDate"
+    attribute: "CurrentDayEntryDate"
     response:
       constraints:
         type: epoch-s
 
-  - label: "Step 34: TH reads the NextTransition attribute from the DUT"
+  - label: "Step 34: TH reads the NextDayEntry attribute from the DUT"
     command: "readAttribute"
-    attribute: "NextTransition"
+    attribute: "NextDayEntry"
     response:
       constraints:
-        type: "CalendarTransitionStruct"
+        type: "DayEntryStruct"
 
-  - label: "Step 35: TH reads the NextTransitionDate attribute from the DUT"
+  - label: "Step 35: TH reads the NextDayEntryDate attribute from the DUT"
     command: "readAttribute"
-    attribute: "NextTransitionDate"
+    attribute: "NextDayEntryDate"
     response:
       constraints:
         type: epoch-s
@@ -307,7 +307,7 @@ tests:
         type: list
 
   - label: "Step 40: TH reads the DefaultRandomizationOffset attribute from the DUT"
-    PICS: ET.S.A0011
+    PICS: SETRF.S.A0011
     command: "readAttribute"
     attribute: "DefaultRandomizationOffset"
     response:
@@ -315,7 +315,7 @@ tests:
         type: int16s
 
   - label: "Step 41: TH reads the DefaultRandomizationType attribute from the DUT"
-    PICS: ET.S.A0012
+    PICS: SETRF.S.A0012
     command: "readAttribute"
     attribute: "DefaultRandomizationType"
     response:
