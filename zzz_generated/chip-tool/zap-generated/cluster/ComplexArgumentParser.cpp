@@ -7285,6 +7285,62 @@ void ComplexArgumentParser::Finalize(
     ComplexArgumentParser::Finalize(request.intermediateCertificates);
 }
 
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::TlsClientManagement::Structs::TLSEndpointStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("TLSEndpointStruct.endpointID", "endpointID", value.isMember("endpointID")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("TLSEndpointStruct.hostname", "hostname", value.isMember("hostname")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("TLSEndpointStruct.port", "port", value.isMember("port")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("TLSEndpointStruct.caid", "caid", value.isMember("caid")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("TLSEndpointStruct.ccdid", "ccdid", value.isMember("ccdid")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("TLSEndpointStruct.status", "status", value.isMember("status")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "endpointID");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.endpointID, value["endpointID"]));
+    valueCopy.removeMember("endpointID");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "hostname");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.hostname, value["hostname"]));
+    valueCopy.removeMember("hostname");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "port");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.port, value["port"]));
+    valueCopy.removeMember("port");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "caid");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.caid, value["caid"]));
+    valueCopy.removeMember("caid");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "ccdid");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.ccdid, value["ccdid"]));
+    valueCopy.removeMember("ccdid");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "status");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.status, value["status"]));
+    valueCopy.removeMember("status");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::TlsClientManagement::Structs::TLSEndpointStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.endpointID);
+    ComplexArgumentParser::Finalize(request.hostname);
+    ComplexArgumentParser::Finalize(request.port);
+    ComplexArgumentParser::Finalize(request.caid);
+    ComplexArgumentParser::Finalize(request.ccdid);
+    ComplexArgumentParser::Finalize(request.status);
+}
+
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters::UnitTesting::Structs::SimpleStruct::Type & request,
                                         Json::Value & value)
 {

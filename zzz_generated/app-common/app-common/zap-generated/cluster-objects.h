@@ -46259,6 +46259,324 @@ struct TypeInfo
 };
 } // namespace Attributes
 } // namespace TlsCertificateManagement
+namespace TlsClientManagement {
+namespace Structs {
+namespace TLSEndpointStruct {
+enum class Fields : uint8_t
+{
+    kEndpointID = 0,
+    kHostname   = 1,
+    kPort       = 2,
+    kCaid       = 3,
+    kCcdid      = 4,
+    kStatus     = 5,
+};
+
+struct Type
+{
+public:
+    uint16_t endpointID = static_cast<uint16_t>(0);
+    chip::ByteSpan hostname;
+    uint16_t port = static_cast<uint16_t>(0);
+    uint16_t caid = static_cast<uint16_t>(0);
+    DataModel::Nullable<uint16_t> ccdid;
+    TLSEndpointStatusEnum status = static_cast<TLSEndpointStatusEnum>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace TLSEndpointStruct
+} // namespace Structs
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace ProvisionEndpoint {
+struct Type;
+struct DecodableType;
+} // namespace ProvisionEndpoint
+
+namespace ProvisionEndpointResponse {
+struct Type;
+struct DecodableType;
+} // namespace ProvisionEndpointResponse
+
+namespace FindEndpoint {
+struct Type;
+struct DecodableType;
+} // namespace FindEndpoint
+
+namespace FindEndpointResponse {
+struct Type;
+struct DecodableType;
+} // namespace FindEndpointResponse
+
+namespace RemoveEndpoint {
+struct Type;
+struct DecodableType;
+} // namespace RemoveEndpoint
+
+} // namespace Commands
+
+namespace Commands {
+namespace ProvisionEndpoint {
+enum class Fields : uint8_t
+{
+    kHostname   = 0,
+    kPort       = 1,
+    kCaid       = 2,
+    kCcdid      = 3,
+    kEndpointID = 4,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ProvisionEndpoint::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TlsClientManagement::Id; }
+
+    chip::ByteSpan hostname;
+    uint16_t port = static_cast<uint16_t>(0);
+    uint16_t caid = static_cast<uint16_t>(0);
+    DataModel::Nullable<uint16_t> ccdid;
+    DataModel::Nullable<uint16_t> endpointID;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = Clusters::TlsClientManagement::Commands::ProvisionEndpointResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ProvisionEndpoint::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TlsClientManagement::Id; }
+
+    chip::ByteSpan hostname;
+    uint16_t port = static_cast<uint16_t>(0);
+    uint16_t caid = static_cast<uint16_t>(0);
+    DataModel::Nullable<uint16_t> ccdid;
+    DataModel::Nullable<uint16_t> endpointID;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ProvisionEndpoint
+namespace ProvisionEndpointResponse {
+enum class Fields : uint8_t
+{
+    kEndpointID = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ProvisionEndpointResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TlsClientManagement::Id; }
+
+    uint16_t endpointID = static_cast<uint16_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ProvisionEndpointResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TlsClientManagement::Id; }
+
+    uint16_t endpointID = static_cast<uint16_t>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ProvisionEndpointResponse
+namespace FindEndpoint {
+enum class Fields : uint8_t
+{
+    kEndpointID = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::FindEndpoint::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TlsClientManagement::Id; }
+
+    DataModel::Nullable<uint16_t> endpointID;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = Clusters::TlsClientManagement::Commands::FindEndpointResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::FindEndpoint::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TlsClientManagement::Id; }
+
+    DataModel::Nullable<uint16_t> endpointID;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace FindEndpoint
+namespace FindEndpointResponse {
+enum class Fields : uint8_t
+{
+    kEndpoints = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::FindEndpointResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TlsClientManagement::Id; }
+
+    DataModel::List<const Structs::TLSEndpointStruct::Type> endpoints;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::FindEndpointResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TlsClientManagement::Id; }
+
+    DataModel::DecodableList<Structs::TLSEndpointStruct::DecodableType> endpoints;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace FindEndpointResponse
+namespace RemoveEndpoint {
+enum class Fields : uint8_t
+{
+    kEndpointID = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::RemoveEndpoint::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TlsClientManagement::Id; }
+
+    uint16_t endpointID = static_cast<uint16_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::RemoveEndpoint::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TlsClientManagement::Id; }
+
+    uint16_t endpointID = static_cast<uint16_t>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace RemoveEndpoint
+} // namespace Commands
+
+namespace Attributes {
+
+namespace MaxProvisioned {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TlsClientManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxProvisioned::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MaxProvisioned
+namespace ProvisionedEndpoints {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::TlsClientManagement::Structs::TLSEndpointStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::TlsClientManagement::Structs::TLSEndpointStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::TlsClientManagement::Structs::TLSEndpointStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TlsClientManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ProvisionedEndpoints::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ProvisionedEndpoints
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::TlsClientManagement::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::TlsClientManagement::Id; }
+};
+} // namespace AcceptedCommandList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::TlsClientManagement::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::TlsClientManagement::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::TlsClientManagement::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::TlsClientManagement::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::MaxProvisioned::TypeInfo::DecodableType maxProvisioned = static_cast<uint8_t>(0);
+        Attributes::ProvisionedEndpoints::TypeInfo::DecodableType provisionedEndpoints;
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace TlsClientManagement
 namespace UnitTesting {
 namespace Structs {
 namespace SimpleStruct {

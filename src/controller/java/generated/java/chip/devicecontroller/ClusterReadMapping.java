@@ -19732,6 +19732,98 @@ public class ClusterReadMapping {
      
        return result;
     }
+    private static Map<String, InteractionInfo> readTlsClientManagementInteractionInfo() {
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readTlsClientManagementMaxProvisionedCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readTlsClientManagementMaxProvisionedAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.TlsClientManagementCluster) cluster).readMaxProvisionedAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readTlsClientManagementMaxProvisionedCommandParams
+        );
+        result.put("readMaxProvisionedAttribute", readTlsClientManagementMaxProvisionedAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readTlsClientManagementProvisionedEndpointsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readTlsClientManagementProvisionedEndpointsAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.TlsClientManagementCluster) cluster).readProvisionedEndpointsAttribute(
+              (ChipClusters.TlsClientManagementCluster.ProvisionedEndpointsAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedTlsClientManagementClusterProvisionedEndpointsAttributeCallback(),
+          readTlsClientManagementProvisionedEndpointsCommandParams
+        );
+        result.put("readProvisionedEndpointsAttribute", readTlsClientManagementProvisionedEndpointsAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readTlsClientManagementGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readTlsClientManagementGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.TlsClientManagementCluster) cluster).readGeneratedCommandListAttribute(
+              (ChipClusters.TlsClientManagementCluster.GeneratedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedTlsClientManagementClusterGeneratedCommandListAttributeCallback(),
+          readTlsClientManagementGeneratedCommandListCommandParams
+        );
+        result.put("readGeneratedCommandListAttribute", readTlsClientManagementGeneratedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readTlsClientManagementAcceptedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readTlsClientManagementAcceptedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.TlsClientManagementCluster) cluster).readAcceptedCommandListAttribute(
+              (ChipClusters.TlsClientManagementCluster.AcceptedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedTlsClientManagementClusterAcceptedCommandListAttributeCallback(),
+          readTlsClientManagementAcceptedCommandListCommandParams
+        );
+        result.put("readAcceptedCommandListAttribute", readTlsClientManagementAcceptedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readTlsClientManagementEventListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readTlsClientManagementEventListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.TlsClientManagementCluster) cluster).readEventListAttribute(
+              (ChipClusters.TlsClientManagementCluster.EventListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedTlsClientManagementClusterEventListAttributeCallback(),
+          readTlsClientManagementEventListCommandParams
+        );
+        result.put("readEventListAttribute", readTlsClientManagementEventListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readTlsClientManagementAttributeListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readTlsClientManagementAttributeListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.TlsClientManagementCluster) cluster).readAttributeListAttribute(
+              (ChipClusters.TlsClientManagementCluster.AttributeListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedTlsClientManagementClusterAttributeListAttributeCallback(),
+          readTlsClientManagementAttributeListCommandParams
+        );
+        result.put("readAttributeListAttribute", readTlsClientManagementAttributeListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readTlsClientManagementFeatureMapCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readTlsClientManagementFeatureMapAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.TlsClientManagementCluster) cluster).readFeatureMapAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readTlsClientManagementFeatureMapCommandParams
+        );
+        result.put("readFeatureMapAttribute", readTlsClientManagementFeatureMapAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readTlsClientManagementClusterRevisionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readTlsClientManagementClusterRevisionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.TlsClientManagementCluster) cluster).readClusterRevisionAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readTlsClientManagementClusterRevisionCommandParams
+        );
+        result.put("readClusterRevisionAttribute", readTlsClientManagementClusterRevisionAttributeInteractionInfo);
+     
+       return result;
+    }
     private static Map<String, InteractionInfo> readUnitTestingInteractionInfo() {
        Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readUnitTestingBooleanCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readUnitTestingBooleanAttributeInteractionInfo = new InteractionInfo(
@@ -21020,6 +21112,7 @@ public class ClusterReadMapping {
             put("ecosystemInformation", readEcosystemInformationInteractionInfo());
             put("commissionerControl", readCommissionerControlInteractionInfo());
             put("tlsCertificateManagement", readTlsCertificateManagementInteractionInfo());
+            put("tlsClientManagement", readTlsClientManagementInteractionInfo());
             put("unitTesting", readUnitTestingInteractionInfo());
             put("faultInjection", readFaultInjectionInteractionInfo());
             put("sampleMei", readSampleMeiInteractionInfo());}};

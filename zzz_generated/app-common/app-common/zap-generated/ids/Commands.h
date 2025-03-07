@@ -2159,6 +2159,32 @@ static constexpr CommandId Id = 0x0000000F;
 } // namespace Commands
 } // namespace TlsCertificateManagement
 
+namespace TlsClientManagement {
+namespace Commands {
+
+namespace ProvisionEndpoint {
+static constexpr CommandId Id = 0x00000000;
+} // namespace ProvisionEndpoint
+
+namespace ProvisionEndpointResponse {
+static constexpr CommandId Id = 0x00000001;
+} // namespace ProvisionEndpointResponse
+
+namespace FindEndpoint {
+static constexpr CommandId Id = 0x00000002;
+} // namespace FindEndpoint
+
+namespace FindEndpointResponse {
+static constexpr CommandId Id = 0x00000003;
+} // namespace FindEndpointResponse
+
+namespace RemoveEndpoint {
+static constexpr CommandId Id = 0x00000004;
+} // namespace RemoveEndpoint
+
+} // namespace Commands
+} // namespace TlsClientManagement
+
 namespace UnitTesting {
 namespace Commands {
 
