@@ -85,7 +85,7 @@ CHIP_ERROR DefaultServerCluster::Attributes(const ConcreteClusterPath & path, Da
     return builder.ReferenceExisting(GlobalAttributes());
 }
 
-CHIP_ERROR DefaultServerCluster::Startup(ServerClusterContext &context)
+CHIP_ERROR DefaultServerCluster::Startup(ServerClusterContext & context)
 {
     VerifyOrReturnError(mContext == nullptr, CHIP_ERROR_ALREADY_INITIALIZED);
     mContext = &context;
