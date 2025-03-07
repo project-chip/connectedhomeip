@@ -1,5 +1,5 @@
 #include "DiagnosticDataDelegate.h"
-#include <esp_diagnostics_metrics.h>
+#include <esp_heap_caps.h>
 #include <esp_log.h>
 #include <lib/core/TLVReader.h>
 #include <lib/support/CodeUtils.h>
@@ -8,9 +8,13 @@
 #include <tracing/esp32_diagnostic_trace/Diagnostics.h>
 #include <unordered_map>
 
-using namespace chip::Tracing::Diagnostics;
+#ifdef CONFIG_ENABLE_ESP_INSIGHTS
+#include <esp_diagnostics_metrics.h>
+#endif // CONFIG_ENABLE_ESP_INSIGHTS
 
-static const char * TAG = "Diagnostic";
+#define kMaxStringValueSize 128
+
+using namespace chip::Tracing::Diagnostics;
 
 namespace chip {
 namespace Diagnostics {
@@ -81,19 +85,19 @@ public:
         CHIP_ERROR err = mStorageInstance->Retrieve(encodedSpan, readEntries);
         if (err != CHIP_NO_ERROR)
         {
-            ESP_LOGE(TAG, "Failed to retrieve data");
+            ESP_LOGE("Diagnostics", "Failed to retrieve data");
             return err;
         }
 
         chip::TLV::TLVReader mReader;
+        char label[kMaxStringValueSize];
+        char value[kMaxStringValueSize];
         mReader.Init(encodedSpan.data(), encodedSpan.size());
         while ((err = mReader.Next()) == CHIP_NO_ERROR)
         {
             if (mReader.GetType() == chip::TLV::kTLVType_Structure && mReader.GetTag() == chip::TLV::AnonymousTag())
             {
                 chip::TLV::TLVReader tempReader(mReader);
-                char label[128];
-                char value[128];
                 Diagnostic<char *> trace(label, value, 0);
                 err = trace.Decode(tempReader);
                 if (err == CHIP_NO_ERROR)
@@ -122,11 +126,11 @@ public:
                     continue;
                 }
 
-                ESP_LOGE(TAG, "Failed to decode diagnostic");
+                ESP_LOGE("Diagnostics", "Failed to decode diagnostic");
             }
             else
             {
-                ESP_LOGW(TAG, "Skipping unexpected TLV element.");
+                ESP_LOGW("Diagnostics", "Skipping unexpected TLV element.");
             }
         }
         // Clear buffer after successful processing
@@ -149,12 +153,15 @@ private:
 
     void LogTraceData(const char * label, const char * group, uint32_t timestamp)
     {
-        ESP_LOGI(TAG, "Log Trace Data");
+#ifdef CONFIG_ENABLE_ESP_INSIGHTS
+        ESP_LOGI("Diagnostics", "Log Trace Data");
         const char * tag    = "MTR_TRC";
         const char * format = "EV (%" PRIu32 ") %s: %s";
         esp_diag_log_event(tag, format, timestamp, label, group);
+#endif // CONFIG_ENABLE_ESP_INSIGHTS
     }
 
+#ifdef CONFIG_ENABLE_ESP_INSIGHTS
     void RegisterMetric(const char * key, ValueType type)
     {
         // Check for the same key will not have two different types.
@@ -191,10 +198,11 @@ private:
 
         mRegisteredMetrics[key] = type;
     }
-
+#endif // CONFIG_ENABLE_ESP_INSIGHTS
     void LogMetricData(const char * key, ValueType type, uint32_t value)
     {
-        ESP_LOGI(TAG, "Log Metric Data");
+#ifdef CONFIG_ENABLE_ESP_INSIGHTS
+        ESP_LOGI("Diagnostics", "Log Metric Data");
         if (key == nullptr)
         {
             ESP_LOGE("mtr", "Invalid null pointer for metric key");
@@ -238,6 +246,7 @@ private:
             ESP_LOGI("mtr", "The value of %s is of an UNKNOWN TYPE", key);
             break;
         }
+#endif // CONFIG_ENABLE_ESP_INSIGHTS
     }
 
     static void DiagnosticSamplingHandler(System::Layer * systemLayer, void * context)
@@ -254,6 +263,7 @@ private:
 
         // Schedule next sampling
         DeviceLayer::SystemLayer().StartTimer(instance->mTimeout, DiagnosticSamplingHandler, instance);
+        ESP_LOGI("Diagnostics", "Free heap Memory: %ld\n", esp_get_free_heap_size());
     }
 };
 
