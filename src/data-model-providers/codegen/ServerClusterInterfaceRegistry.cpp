@@ -115,10 +115,10 @@ ServerClusterInterfaceRegistry::ClustersList ServerClusterInterfaceRegistry::Clu
     return { mRegistrations, endpointId };
 }
 
-ServerClusterInterface * ServerClusterInterfaceRegistry::Get(const ConcreteClusterPath & path)
+ServerClusterInterface * ServerClusterInterfaceRegistry::Get(const ConcreteClusterPath & clusterPath)
 {
     // Check the cache to speed things up
-    if ((mCachedInterface != nullptr) && mCachedInterface->PathsContains(path))
+    if ((mCachedInterface != nullptr) && mCachedInterface->PathsContains(clusterPath))
     {
         return mCachedInterface;
     }
@@ -128,7 +128,7 @@ ServerClusterInterface * ServerClusterInterfaceRegistry::Get(const ConcreteClust
 
     while (current != nullptr)
     {
-        if (current->serverClusterInterface->PathsContains(path))
+        if (current->serverClusterInterface->PathsContains(clusterPath))
         {
             mCachedInterface = current->serverClusterInterface;
             return mCachedInterface;
