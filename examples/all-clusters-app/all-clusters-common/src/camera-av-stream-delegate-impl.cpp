@@ -42,10 +42,6 @@ std::unique_ptr<CameraAVStreamManager> sCameraAVStreamMgrInstance;
 // Global pointer to Camera AVStream Mgmt Server SDK cluster;
 std::unique_ptr<CameraAVStreamMgmtServer> sCameraAVStreamMgmtClusterServerInstance;
 
-// CameraAVStreamManager CameraAVStreamManager::sCameraAVStreamMgrInstance;
-
-// CameraAVStreamMgmtServer sCameraAVStreamMgmtClusterServerInstance;
-
 Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamAllocate(const VideoStreamStruct & allocateArgs,
                                                                                uint16_t & outStreamID)
 {
