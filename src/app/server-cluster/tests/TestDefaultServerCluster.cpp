@@ -67,7 +67,6 @@ public:
 
     void TestIncreaseDataVersion() { IncreaseDataVersion(); }
     void TestNotifyAttributeChanged(AttributeId attributeId) { NotifyAttributeChanged(attributeId); }
-    void TestNotifyAllAttributesChanged() { NotifyAllAttributesChanged(); }
 
 private:
     ConcreteClusterPath mPath;
@@ -199,29 +198,4 @@ TEST(TestDefaultServerCluster, NotifyAttributeChanged)
 
     ASSERT_EQ(context.ChangeListener().DirtyList().size(), 1u);
     ASSERT_EQ(context.ChangeListener().DirtyList()[0], AttributePathParams(kEndpointId, kClusterId, 234));
-}
-
-TEST(TestDefaultServerCluster, NotifyAllAttributesChanged)
-{
-    constexpr EndpointId kEndpointId = 321;
-    constexpr ClusterId kClusterId   = 1122;
-    FakeDefaultServerCluster cluster({ kEndpointId, kClusterId });
-
-    // When no ServerClusterContext is set, only the data version should change.
-    DataVersion oldVersion = cluster.GetDataVersion();
-
-    cluster.TestNotifyAllAttributesChanged();
-    ASSERT_NE(cluster.GetDataVersion(), oldVersion);
-
-    // Create a ServerClusterContext and verify that attribute change notifications are processed.
-    TestServerClusterContext context;
-    ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
-
-    oldVersion = cluster.GetDataVersion();
-    cluster.TestNotifyAllAttributesChanged();
-    ASSERT_NE(cluster.GetDataVersion(), oldVersion);
-
-    // When all attributes are changed, a wildcard should be used in the list.
-    ASSERT_EQ(context.ChangeListener().DirtyList().size(), 1u);
-    ASSERT_EQ(context.ChangeListener().DirtyList()[0], AttributePathParams(kEndpointId, kClusterId));
 }

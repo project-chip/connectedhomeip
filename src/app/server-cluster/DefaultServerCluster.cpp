@@ -106,15 +106,6 @@ void DefaultServerCluster::NotifyAttributeChanged(AttributeId attributeId)
     mContext->interactionContext->dataModelChangeListener->MarkDirty({ path.mEndpointId, path.mClusterId, attributeId });
 }
 
-void DefaultServerCluster::NotifyAllAttributesChanged()
-{
-    IncreaseDataVersion();
-
-    VerifyOrReturn(mContext != nullptr);
-    const ConcreteClusterPath path = GetPath();
-    mContext->interactionContext->dataModelChangeListener->MarkDirty({ path.mEndpointId, path.mClusterId });
-}
-
 BitFlags<ClusterQualityFlags> DefaultServerCluster::GetClusterFlags() const
 {
     return {};

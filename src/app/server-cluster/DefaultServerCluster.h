@@ -95,12 +95,6 @@ protected:
     /// notify that the attribute has changed.
     void NotifyAttributeChanged(AttributeId attributeId);
 
-    /// A "bulk update" notification, that notifies a wildcard attribute change.
-    ///
-    /// Increases cluster data version and if a cluster context is available, it will notify
-    /// that the cluster has changed.
-    void NotifyAllAttributesChanged();
-
 private:
     DataVersion mDataVersion; // will be random-initialized as per spec
 };
