@@ -57,12 +57,6 @@ public:
         class Iterator
         {
         public:
-            using difference_type   = size_t;
-            using value_type        = ServerClusterInterface *;
-            using pointer           = ServerClusterInterface **;
-            using reference         = ServerClusterInterface *&;
-            using iterator_category = std::forward_iterator_tag;
-
             Iterator(ServerClusterRegistration * interface, EndpointId endpoint) : mEndpointId(endpoint), mRegistration(interface)
             {
                 if (mRegistration != nullptr)
@@ -83,7 +77,7 @@ public:
             }
             bool operator==(const Iterator & other) const { return mRegistration == other.mRegistration; }
             bool operator!=(const Iterator & other) const { return mRegistration != other.mRegistration; }
-            ServerClusterInterface * operator*() { return mRegistration->serverClusterInterface; }
+            ClusterId operator*() { return mSpan.begin()->mClusterId; }
 
         private:
             const EndpointId mEndpointId;

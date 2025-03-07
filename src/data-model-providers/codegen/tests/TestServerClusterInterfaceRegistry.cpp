@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "app/server-cluster/ServerClusterInterface.h"
 #include <pw_unit_test/framework.h>
 
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -306,9 +307,12 @@ TEST_F(TestServerClusterInterfaceRegistry, ClustersOnEndpoint)
         }
 
         // ensure that iteration happens exactly as we expect: reverse order and complete
-        for (auto cluster : registry.ClustersOnEndpoint(ep))
+        for (const auto &clusterId : registry.ClustersOnEndpoint(ep))
         {
             ASSERT_LT(expectedClusterId, kClusterTestCount);
+
+            ServerClusterInterface *cluster = registry.Get({ep, clusterId});
+            ASSERT_NE(cluster, nullptr);
             ASSERT_TRUE(cluster->PathsContains(ConcreteClusterPath(ep, expectedClusterId)));
             expectedClusterId -= kEndpointTestCount; // next expected/registered cluster
         }

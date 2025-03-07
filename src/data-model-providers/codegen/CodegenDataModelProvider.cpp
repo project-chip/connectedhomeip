@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "app/server-cluster/ServerClusterInterface.h"
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
 #include <access/AccessControl.h>
@@ -277,36 +278,29 @@ CHIP_ERROR CodegenDataModelProvider::ServerClusters(EndpointId endpointId,
     // assume the clusters on endpoint does not change in between these two loops
     auto clusters               = mRegistry.ClustersOnEndpoint(endpointId);
     size_t registryClusterCount = 0;
-    for (auto cluster : clusters)
+    for ([[maybe_unused]] auto _ : clusters)
     {
-        for (auto path : cluster->GetPaths())
-        {
-            if (path.mEndpointId == endpointId)
-            {
-                registryClusterCount++;
-            }
-        }
+        registryClusterCount++;
     }
 
     ReturnErrorOnFailure(builder.EnsureAppendCapacity(registryClusterCount));
 
     DataModel::ListBuilder<ClusterId> knownClustersBuilder;
     ReturnErrorOnFailure(knownClustersBuilder.EnsureAppendCapacity(registryClusterCount));
-    for (auto * cluster : mRegistry.ClustersOnEndpoint(endpointId))
+    for (const auto & clusterId : mRegistry.ClustersOnEndpoint(endpointId))
     {
-        for (auto path : cluster->GetPaths())
-        {
-            if (path.mEndpointId != endpointId)
-            {
-                continue;
-            }
-            ReturnErrorOnFailure(builder.Append({
-                .clusterId   = path.mClusterId,
-                .dataVersion = cluster->GetDataVersion(path),
-                .flags       = cluster->GetClusterFlags(path),
-            }));
-            ReturnErrorOnFailure(knownClustersBuilder.Append(path.mClusterId));
-        }
+        ConcreteClusterPath path(endpointId, clusterId);
+        ServerClusterInterface * cluster = mRegistry.Get(path);
+
+        // path MUST be valid: we just requested for it by iteration...
+        VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_INTERNAL);
+
+        ReturnErrorOnFailure(builder.Append({
+            .clusterId   = path.mClusterId,
+            .dataVersion = cluster->GetDataVersion(path),
+            .flags       = cluster->GetClusterFlags(path),
+        }));
+        ReturnErrorOnFailure(knownClustersBuilder.Append(path.mClusterId));
     }
 
     DataModel::ReadOnlyBuffer<ClusterId> knownClusters = knownClustersBuilder.TakeBuffer();
