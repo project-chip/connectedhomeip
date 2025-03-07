@@ -502,7 +502,7 @@ void WebRTCTransportProviderServer::HandleEndSession(HandlerContext & ctx, const
     // Validate the reason field against the allowed enum values.
     if (reason == WebRTCEndReasonEnum::kUnknownEnumValue)
     {
-        ChipLogError(Zcl, "HandleEndSession: Invalid reason value %u.", static_cast<uint8_t>(reason));
+        ChipLogError(Zcl, "HandleEndSession: Invalid reason value %u.", to_underlying(reason));
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidCommand);
         return;
     }
