@@ -85,11 +85,12 @@
 @implementation MTRDevice_XPC
 
 @synthesize _internalState;
+@synthesize queue = _queue;
 
 - (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController_XPC *)controller
 {
     if (self = [super initForSubclassesWithNodeID:nodeID controller:controller]) {
-        // Nothing else to do, all set.
+        _queue = dispatch_queue_create("org.csa-iot.matter.framework.devicexpc.workqueue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
     }
 
     return self;

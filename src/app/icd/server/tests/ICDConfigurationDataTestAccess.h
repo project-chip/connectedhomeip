@@ -26,20 +26,12 @@ namespace Test {
 /**
  * @brief Class acts as an accessor to private methods of the ICDConfigurationData class without needing to give friend access to
  *        each individual test.
- *        This design is necessary because certain tests validate specific edge cases around specific configurations.
- *        See ICDConfigurationData.h for more details why SetModeDurations cannot be a public API.
  */
 class ICDConfigurationDataTestAccess
 {
 public:
     ICDConfigurationDataTestAccess() = delete;
     ICDConfigurationDataTestAccess(ICDConfigurationData * data) : mData(data) {}
-
-    CHIP_ERROR SetModeDurations(Optional<System::Clock::Milliseconds32> activeModeDuration,
-                                Optional<System::Clock::Milliseconds32> idleModeDuration)
-    {
-        return mData->SetModeDurations(activeModeDuration, idleModeDuration);
-    }
 
     void SetFeatureMap(BitFlags<app::Clusters::IcdManagement::Feature> featureMap) { mData->SetFeatureMap(featureMap); }
 

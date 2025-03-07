@@ -550,6 +550,18 @@ namespace AddTrustedRootCertificate {
 static constexpr CommandId Id = 0x0000000B;
 } // namespace AddTrustedRootCertificate
 
+namespace SetVidVerificationStatement {
+static constexpr CommandId Id = 0x0000000C;
+} // namespace SetVidVerificationStatement
+
+namespace SignVidVerificationRequest {
+static constexpr CommandId Id = 0x0000000D;
+} // namespace SignVidVerificationRequest
+
+namespace SignVidVerificationResponse {
+static constexpr CommandId Id = 0x0000000E;
+} // namespace SignVidVerificationResponse
+
 } // namespace Commands
 } // namespace OperationalCredentials
 
@@ -1898,20 +1910,24 @@ namespace SnapshotStreamAllocateResponse {
 static constexpr CommandId Id = 0x00000008;
 } // namespace SnapshotStreamAllocateResponse
 
-namespace SnapshotStreamDeallocate {
+namespace SnapshotStreamModify {
 static constexpr CommandId Id = 0x00000009;
+} // namespace SnapshotStreamModify
+
+namespace SnapshotStreamDeallocate {
+static constexpr CommandId Id = 0x0000000A;
 } // namespace SnapshotStreamDeallocate
 
 namespace SetStreamPriorities {
-static constexpr CommandId Id = 0x0000000A;
+static constexpr CommandId Id = 0x0000000B;
 } // namespace SetStreamPriorities
 
 namespace CaptureSnapshot {
-static constexpr CommandId Id = 0x0000000B;
+static constexpr CommandId Id = 0x0000000C;
 } // namespace CaptureSnapshot
 
 namespace CaptureSnapshotResponse {
-static constexpr CommandId Id = 0x0000000C;
+static constexpr CommandId Id = 0x0000000D;
 } // namespace CaptureSnapshotResponse
 
 } // namespace Commands
@@ -1974,9 +1990,9 @@ namespace ProvideAnswer {
 static constexpr CommandId Id = 0x00000005;
 } // namespace ProvideAnswer
 
-namespace ProvideICECandidate {
+namespace ProvideICECandidates {
 static constexpr CommandId Id = 0x00000006;
-} // namespace ProvideICECandidate
+} // namespace ProvideICECandidates
 
 namespace EndSession {
 static constexpr CommandId Id = 0x00000007;

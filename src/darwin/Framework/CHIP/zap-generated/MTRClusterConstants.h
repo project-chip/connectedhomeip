@@ -4662,7 +4662,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeMaxNetworkBandwidthID MTR_PROVISIONALLY_AVAILABLE = 0x0000000B,
     MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeCurrentFrameRateID MTR_PROVISIONALLY_AVAILABLE = 0x0000000C,
     MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeHDRModeEnabledID MTR_PROVISIONALLY_AVAILABLE = 0x0000000D,
-    MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeFabricsUsingCameraID MTR_PROVISIONALLY_AVAILABLE = 0x0000000E,
+    MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeSupportedStreamUsagesID MTR_PROVISIONALLY_AVAILABLE = 0x0000000E,
     MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeAllocatedVideoStreamsID MTR_PROVISIONALLY_AVAILABLE = 0x0000000F,
     MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeAllocatedAudioStreamsID MTR_PROVISIONALLY_AVAILABLE = 0x00000010,
     MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeAllocatedSnapshotStreamsID MTR_PROVISIONALLY_AVAILABLE = 0x00000011,
@@ -6274,6 +6274,9 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterOperationalCredentialsCommandUpdateFabricLabelID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000009,
     MTRCommandIDTypeClusterOperationalCredentialsCommandRemoveFabricID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x0000000A,
     MTRCommandIDTypeClusterOperationalCredentialsCommandAddTrustedRootCertificateID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x0000000B,
+    MTRCommandIDTypeClusterOperationalCredentialsCommandSetVidVerificationStatementID MTR_PROVISIONALLY_AVAILABLE = 0x0000000C,
+    MTRCommandIDTypeClusterOperationalCredentialsCommandSignVidVerificationRequestID MTR_PROVISIONALLY_AVAILABLE = 0x0000000D,
+    MTRCommandIDTypeClusterOperationalCredentialsCommandSignVidVerificationResponseID MTR_PROVISIONALLY_AVAILABLE = 0x0000000E,
 
     // Cluster GroupKeyManagement deprecated command id names
     MTRClusterGroupKeyManagementCommandKeySetWriteID
@@ -6970,10 +6973,11 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterCameraAVStreamManagementCommandVideoStreamDeallocateID MTR_PROVISIONALLY_AVAILABLE = 0x00000006,
     MTRCommandIDTypeClusterCameraAVStreamManagementCommandSnapshotStreamAllocateID MTR_PROVISIONALLY_AVAILABLE = 0x00000007,
     MTRCommandIDTypeClusterCameraAVStreamManagementCommandSnapshotStreamAllocateResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000008,
-    MTRCommandIDTypeClusterCameraAVStreamManagementCommandSnapshotStreamDeallocateID MTR_PROVISIONALLY_AVAILABLE = 0x00000009,
-    MTRCommandIDTypeClusterCameraAVStreamManagementCommandSetStreamPrioritiesID MTR_PROVISIONALLY_AVAILABLE = 0x0000000A,
-    MTRCommandIDTypeClusterCameraAVStreamManagementCommandCaptureSnapshotID MTR_PROVISIONALLY_AVAILABLE = 0x0000000B,
-    MTRCommandIDTypeClusterCameraAVStreamManagementCommandCaptureSnapshotResponseID MTR_PROVISIONALLY_AVAILABLE = 0x0000000C,
+    MTRCommandIDTypeClusterCameraAVStreamManagementCommandSnapshotStreamModifyID MTR_PROVISIONALLY_AVAILABLE = 0x00000009,
+    MTRCommandIDTypeClusterCameraAVStreamManagementCommandSnapshotStreamDeallocateID MTR_PROVISIONALLY_AVAILABLE = 0x0000000A,
+    MTRCommandIDTypeClusterCameraAVStreamManagementCommandSetStreamPrioritiesID MTR_PROVISIONALLY_AVAILABLE = 0x0000000B,
+    MTRCommandIDTypeClusterCameraAVStreamManagementCommandCaptureSnapshotID MTR_PROVISIONALLY_AVAILABLE = 0x0000000C,
+    MTRCommandIDTypeClusterCameraAVStreamManagementCommandCaptureSnapshotResponseID MTR_PROVISIONALLY_AVAILABLE = 0x0000000D,
 
     // Cluster CameraAVSettingsUserLevelManagement commands
     MTRCommandIDTypeClusterCameraAVSettingsUserLevelManagementCommandMPTZSetPositionID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
@@ -6990,7 +6994,7 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterWebRTCTransportProviderCommandProvideOfferID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
     MTRCommandIDTypeClusterWebRTCTransportProviderCommandProvideOfferResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
     MTRCommandIDTypeClusterWebRTCTransportProviderCommandProvideAnswerID MTR_PROVISIONALLY_AVAILABLE = 0x00000005,
-    MTRCommandIDTypeClusterWebRTCTransportProviderCommandProvideICECandidateID MTR_PROVISIONALLY_AVAILABLE = 0x00000006,
+    MTRCommandIDTypeClusterWebRTCTransportProviderCommandProvideICECandidatesID MTR_PROVISIONALLY_AVAILABLE = 0x00000006,
     MTRCommandIDTypeClusterWebRTCTransportProviderCommandEndSessionID MTR_PROVISIONALLY_AVAILABLE = 0x00000007,
 
     // Cluster WebRTCTransportRequestor commands
@@ -7615,11 +7619,6 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
     MTREventIDTypeClusterZoneManagementEventZoneTriggeredID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
     MTREventIDTypeClusterZoneManagementEventZoneStoppedID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
 
-    // Cluster CameraAVStreamManagement events
-    MTREventIDTypeClusterCameraAVStreamManagementEventVideoStreamChangedID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
-    MTREventIDTypeClusterCameraAVStreamManagementEventAudioStreamChangedID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
-    MTREventIDTypeClusterCameraAVStreamManagementEventSnapshotStreamChangedID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
-
     // Cluster PushAVStreamTransport events
     MTREventIDTypeClusterPushAVStreamTransportEventPushTransportBeginID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
     MTREventIDTypeClusterPushAVStreamTransportEventPushTransportEndID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
@@ -7702,9 +7701,24 @@ typedef NS_ENUM(uint32_t, MTRDeviceTypeIDType) {
     MTRDeviceTypeIDTypeColorTemperatureLightID MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) = 0x0000010C,
     MTRDeviceTypeIDTypeExtendedColorLightID MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) = 0x0000010D,
     MTRDeviceTypeIDTypeMountedOnOffControlID MTR_PROVISIONALLY_AVAILABLE = 0x0000010F,
+    MTRDeviceTypeIDTypeMountedDimmableLoadControlID MTR_PROVISIONALLY_AVAILABLE = 0x00000110,
     MTRDeviceTypeIDTypeCameraID MTR_PROVISIONALLY_AVAILABLE = 0x00000142,
     MTRDeviceTypeIDTypeWindowCoveringID MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) = 0x00000202,
     MTRDeviceTypeIDTypeWindowCoveringControllerID MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) = 0x00000203,
+    MTRDeviceTypeIDTypeClosureBaseID MTR_PROVISIONALLY_AVAILABLE = 0x00000230,
+    MTRDeviceTypeIDTypeWindowID MTR_PROVISIONALLY_AVAILABLE = 0x00000231,
+    MTRDeviceTypeIDTypeShutterID MTR_PROVISIONALLY_AVAILABLE = 0x00000232,
+    MTRDeviceTypeIDTypeShadeID MTR_PROVISIONALLY_AVAILABLE = 0x00000233,
+    MTRDeviceTypeIDTypeCurtainID MTR_PROVISIONALLY_AVAILABLE = 0x00000234,
+    MTRDeviceTypeIDTypeBlindID MTR_PROVISIONALLY_AVAILABLE = 0x00000235,
+    MTRDeviceTypeIDTypeScreenID MTR_PROVISIONALLY_AVAILABLE = 0x00000236,
+    MTRDeviceTypeIDTypeAwningID MTR_PROVISIONALLY_AVAILABLE = 0x00000237,
+    MTRDeviceTypeIDTypePergolaID MTR_PROVISIONALLY_AVAILABLE = 0x00000238,
+    MTRDeviceTypeIDTypeDoorID MTR_PROVISIONALLY_AVAILABLE = 0x00000239,
+    MTRDeviceTypeIDTypeGarageDoorID MTR_PROVISIONALLY_AVAILABLE = 0x0000023A,
+    MTRDeviceTypeIDTypeGateID MTR_PROVISIONALLY_AVAILABLE = 0x0000023B,
+    MTRDeviceTypeIDTypeBarrierID MTR_PROVISIONALLY_AVAILABLE = 0x0000023C,
+    MTRDeviceTypeIDTypeCabinetID MTR_PROVISIONALLY_AVAILABLE = 0x0000023D,
     MTRDeviceTypeIDTypeHeatingCoolingUnitID MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) = 0x00000300,
     MTRDeviceTypeIDTypeThermostatID MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) = 0x00000301,
     MTRDeviceTypeIDTypeTemperatureSensorID MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) = 0x00000302,

@@ -16117,6 +16117,82 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
+    public void setVidVerificationStatement(DefaultClusterCallback callback, Optional<Integer> vendorID, Optional<byte[]> vidVerificationStatement, Optional<byte[]> vvsc) {
+      setVidVerificationStatement(callback, vendorID, vidVerificationStatement, vvsc, 0);
+    }
+
+    public void setVidVerificationStatement(DefaultClusterCallback callback, Optional<Integer> vendorID, Optional<byte[]> vidVerificationStatement, Optional<byte[]> vvsc, int timedInvokeTimeoutMs) {
+      final long commandId = 12L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long vendorIDFieldID = 0L;
+      BaseTLVType vendorIDtlvValue = vendorID.<BaseTLVType>map((nonOptionalvendorID) -> new UIntType(nonOptionalvendorID)).orElse(new EmptyType());
+      elements.add(new StructElement(vendorIDFieldID, vendorIDtlvValue));
+
+      final long vidVerificationStatementFieldID = 1L;
+      BaseTLVType vidVerificationStatementtlvValue = vidVerificationStatement.<BaseTLVType>map((nonOptionalvidVerificationStatement) -> new ByteArrayType(nonOptionalvidVerificationStatement)).orElse(new EmptyType());
+      elements.add(new StructElement(vidVerificationStatementFieldID, vidVerificationStatementtlvValue));
+
+      final long vvscFieldID = 2L;
+      BaseTLVType vvsctlvValue = vvsc.<BaseTLVType>map((nonOptionalvvsc) -> new ByteArrayType(nonOptionalvvsc)).orElse(new EmptyType());
+      elements.add(new StructElement(vvscFieldID, vvsctlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void signVidVerificationRequest(SignVidVerificationResponseCallback callback, Integer fabricIndex, byte[] clientChallenge) {
+      signVidVerificationRequest(callback, fabricIndex, clientChallenge, 0);
+    }
+
+    public void signVidVerificationRequest(SignVidVerificationResponseCallback callback, Integer fabricIndex, byte[] clientChallenge, int timedInvokeTimeoutMs) {
+      final long commandId = 13L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long fabricIndexFieldID = 0L;
+      BaseTLVType fabricIndextlvValue = new UIntType(fabricIndex);
+      elements.add(new StructElement(fabricIndexFieldID, fabricIndextlvValue));
+
+      final long clientChallengeFieldID = 1L;
+      BaseTLVType clientChallengetlvValue = new ByteArrayType(clientChallenge);
+      elements.add(new StructElement(clientChallengeFieldID, clientChallengetlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          final long fabricIndexFieldID = 0L;
+          Integer fabricIndex = null;
+          final long fabricBindingVersionFieldID = 1L;
+          Integer fabricBindingVersion = null;
+          final long signatureFieldID = 2L;
+          byte[] signature = null;
+          for (StructElement element: invokeStructValue.value()) {
+            if (element.contextTagNum() == fabricIndexFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                fabricIndex = castingValue.value(Integer.class);
+              }
+            } else if (element.contextTagNum() == fabricBindingVersionFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                fabricBindingVersion = castingValue.value(Integer.class);
+              }
+            } else if (element.contextTagNum() == signatureFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+                ByteArrayType castingValue = element.value(ByteArrayType.class);
+                signature = castingValue.value(byte[].class);
+              }
+            }
+          }
+          callback.onSuccess(fabricIndex, fabricBindingVersion, signature);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
     public interface AttestationResponseCallback extends BaseClusterCallback {
       void onSuccess(byte[] attestationElements, byte[] attestationSignature);
     }
@@ -16131,6 +16207,10 @@ public class ChipClusters {
 
     public interface NOCResponseCallback extends BaseClusterCallback {
       void onSuccess(Integer statusCode, Optional<Integer> fabricIndex, Optional<String> debugText);
+    }
+
+    public interface SignVidVerificationResponseCallback extends BaseClusterCallback {
+      void onSuccess(Integer fabricIndex, Integer fabricBindingVersion, byte[] signature);
     }
 
     public interface NOCsAttributeCallback extends BaseAttributeCallback {
@@ -60329,7 +60409,7 @@ public class ChipClusters {
     private static final long MAX_NETWORK_BANDWIDTH_ATTRIBUTE_ID = 11L;
     private static final long CURRENT_FRAME_RATE_ATTRIBUTE_ID = 12L;
     private static final long HDR_MODE_ENABLED_ATTRIBUTE_ID = 13L;
-    private static final long FABRICS_USING_CAMERA_ATTRIBUTE_ID = 14L;
+    private static final long SUPPORTED_STREAM_USAGES_ATTRIBUTE_ID = 14L;
     private static final long ALLOCATED_VIDEO_STREAMS_ATTRIBUTE_ID = 15L;
     private static final long ALLOCATED_AUDIO_STREAMS_ATTRIBUTE_ID = 16L;
     private static final long ALLOCATED_SNAPSHOT_STREAMS_ATTRIBUTE_ID = 17L;
@@ -60565,11 +60645,11 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void snapshotStreamAllocate(SnapshotStreamAllocateResponseCallback callback, Integer imageCodec, Integer maxFrameRate, Long bitRate, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct minResolution, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct maxResolution, Integer quality) {
-      snapshotStreamAllocate(callback, imageCodec, maxFrameRate, bitRate, minResolution, maxResolution, quality, 0);
+    public void snapshotStreamAllocate(SnapshotStreamAllocateResponseCallback callback, Integer imageCodec, Integer maxFrameRate, Long bitRate, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct minResolution, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct maxResolution, Integer quality, Optional<Boolean> watermarkEnabled, Optional<Boolean> OSDEnabled) {
+      snapshotStreamAllocate(callback, imageCodec, maxFrameRate, bitRate, minResolution, maxResolution, quality, watermarkEnabled, OSDEnabled, 0);
     }
 
-    public void snapshotStreamAllocate(SnapshotStreamAllocateResponseCallback callback, Integer imageCodec, Integer maxFrameRate, Long bitRate, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct minResolution, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct maxResolution, Integer quality, int timedInvokeTimeoutMs) {
+    public void snapshotStreamAllocate(SnapshotStreamAllocateResponseCallback callback, Integer imageCodec, Integer maxFrameRate, Long bitRate, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct minResolution, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct maxResolution, Integer quality, Optional<Boolean> watermarkEnabled, Optional<Boolean> OSDEnabled, int timedInvokeTimeoutMs) {
       final long commandId = 7L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -60597,6 +60677,14 @@ public class ChipClusters {
       BaseTLVType qualitytlvValue = new UIntType(quality);
       elements.add(new StructElement(qualityFieldID, qualitytlvValue));
 
+      final long watermarkEnabledFieldID = 6L;
+      BaseTLVType watermarkEnabledtlvValue = watermarkEnabled.<BaseTLVType>map((nonOptionalwatermarkEnabled) -> new BooleanType(nonOptionalwatermarkEnabled)).orElse(new EmptyType());
+      elements.add(new StructElement(watermarkEnabledFieldID, watermarkEnabledtlvValue));
+
+      final long OSDEnabledFieldID = 7L;
+      BaseTLVType OSDEnabledtlvValue = OSDEnabled.<BaseTLVType>map((nonOptionalOSDEnabled) -> new BooleanType(nonOptionalOSDEnabled)).orElse(new EmptyType());
+      elements.add(new StructElement(OSDEnabledFieldID, OSDEnabledtlvValue));
+
       StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
@@ -60615,12 +60703,40 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
+    public void snapshotStreamModify(DefaultClusterCallback callback, Integer snapshotStreamID, Optional<Boolean> watermarkEnabled, Optional<Boolean> OSDEnabled) {
+      snapshotStreamModify(callback, snapshotStreamID, watermarkEnabled, OSDEnabled, 0);
+    }
+
+    public void snapshotStreamModify(DefaultClusterCallback callback, Integer snapshotStreamID, Optional<Boolean> watermarkEnabled, Optional<Boolean> OSDEnabled, int timedInvokeTimeoutMs) {
+      final long commandId = 9L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long snapshotStreamIDFieldID = 0L;
+      BaseTLVType snapshotStreamIDtlvValue = new UIntType(snapshotStreamID);
+      elements.add(new StructElement(snapshotStreamIDFieldID, snapshotStreamIDtlvValue));
+
+      final long watermarkEnabledFieldID = 1L;
+      BaseTLVType watermarkEnabledtlvValue = watermarkEnabled.<BaseTLVType>map((nonOptionalwatermarkEnabled) -> new BooleanType(nonOptionalwatermarkEnabled)).orElse(new EmptyType());
+      elements.add(new StructElement(watermarkEnabledFieldID, watermarkEnabledtlvValue));
+
+      final long OSDEnabledFieldID = 2L;
+      BaseTLVType OSDEnabledtlvValue = OSDEnabled.<BaseTLVType>map((nonOptionalOSDEnabled) -> new BooleanType(nonOptionalOSDEnabled)).orElse(new EmptyType());
+      elements.add(new StructElement(OSDEnabledFieldID, OSDEnabledtlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
     public void snapshotStreamDeallocate(DefaultClusterCallback callback, Integer snapshotStreamID) {
       snapshotStreamDeallocate(callback, snapshotStreamID, 0);
     }
 
     public void snapshotStreamDeallocate(DefaultClusterCallback callback, Integer snapshotStreamID, int timedInvokeTimeoutMs) {
-      final long commandId = 9L;
+      final long commandId = 10L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
       final long snapshotStreamIDFieldID = 0L;
@@ -60640,7 +60756,7 @@ public class ChipClusters {
     }
 
     public void setStreamPriorities(DefaultClusterCallback callback, ArrayList<Integer> streamPriorities, int timedInvokeTimeoutMs) {
-      final long commandId = 10L;
+      final long commandId = 11L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
       final long streamPrioritiesFieldID = 0L;
@@ -60660,7 +60776,7 @@ public class ChipClusters {
     }
 
     public void captureSnapshot(CaptureSnapshotResponseCallback callback, Integer snapshotStreamID, ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct requestedResolution, int timedInvokeTimeoutMs) {
-      final long commandId = 11L;
+      final long commandId = 12L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
       final long snapshotStreamIDFieldID = 0L;
@@ -60743,7 +60859,7 @@ public class ChipClusters {
       void onSuccess(List<ChipStructs.CameraAvStreamManagementClusterSnapshotParamsStruct> value);
     }
 
-    public interface FabricsUsingCameraAttributeCallback extends BaseAttributeCallback {
+    public interface SupportedStreamUsagesAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Integer> value);
     }
 
@@ -61156,9 +61272,9 @@ public class ChipClusters {
         }, HDR_MODE_ENABLED_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readFabricsUsingCameraAttribute(
-        FabricsUsingCameraAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, FABRICS_USING_CAMERA_ATTRIBUTE_ID);
+    public void readSupportedStreamUsagesAttribute(
+        SupportedStreamUsagesAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SUPPORTED_STREAM_USAGES_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -61166,12 +61282,12 @@ public class ChipClusters {
             List<Integer> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, FABRICS_USING_CAMERA_ATTRIBUTE_ID, true);
+        }, SUPPORTED_STREAM_USAGES_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeFabricsUsingCameraAttribute(
-        FabricsUsingCameraAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, FABRICS_USING_CAMERA_ATTRIBUTE_ID);
+    public void subscribeSupportedStreamUsagesAttribute(
+        SupportedStreamUsagesAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SUPPORTED_STREAM_USAGES_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -61179,7 +61295,7 @@ public class ChipClusters {
             List<Integer> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, FABRICS_USING_CAMERA_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, SUPPORTED_STREAM_USAGES_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readAllocatedVideoStreamsAttribute(
@@ -62931,9 +63047,9 @@ public class ChipClusters {
           final long webRTCSessionIDFieldID = 0L;
           Integer webRTCSessionID = null;
           final long videoStreamIDFieldID = 1L;
-          Integer videoStreamID = null;
+          @Nullable Optional<Integer> videoStreamID = null;
           final long audioStreamIDFieldID = 2L;
-          Integer audioStreamID = null;
+          @Nullable Optional<Integer> audioStreamID = null;
           for (StructElement element: invokeStructValue.value()) {
             if (element.contextTagNum() == webRTCSessionIDFieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -62943,12 +63059,12 @@ public class ChipClusters {
             } else if (element.contextTagNum() == videoStreamIDFieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
                 UIntType castingValue = element.value(UIntType.class);
-                videoStreamID = castingValue.value(Integer.class);
+                videoStreamID = Optional.of(castingValue.value(Integer.class));
               }
             } else if (element.contextTagNum() == audioStreamIDFieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
                 UIntType castingValue = element.value(UIntType.class);
-                audioStreamID = castingValue.value(Integer.class);
+                audioStreamID = Optional.of(castingValue.value(Integer.class));
               }
             }
           }
@@ -62980,11 +63096,11 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void provideICECandidate(DefaultClusterCallback callback, Integer webRTCSessionID, String ICECandidate) {
-      provideICECandidate(callback, webRTCSessionID, ICECandidate, 0);
+    public void provideICECandidates(DefaultClusterCallback callback, Integer webRTCSessionID, ArrayList<String> ICECandidates) {
+      provideICECandidates(callback, webRTCSessionID, ICECandidates, 0);
     }
 
-    public void provideICECandidate(DefaultClusterCallback callback, Integer webRTCSessionID, String ICECandidate, int timedInvokeTimeoutMs) {
+    public void provideICECandidates(DefaultClusterCallback callback, Integer webRTCSessionID, ArrayList<String> ICECandidates, int timedInvokeTimeoutMs) {
       final long commandId = 6L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -62992,9 +63108,9 @@ public class ChipClusters {
       BaseTLVType webRTCSessionIDtlvValue = new UIntType(webRTCSessionID);
       elements.add(new StructElement(webRTCSessionIDFieldID, webRTCSessionIDtlvValue));
 
-      final long ICECandidateFieldID = 1L;
-      BaseTLVType ICECandidatetlvValue = new StringType(ICECandidate);
-      elements.add(new StructElement(ICECandidateFieldID, ICECandidatetlvValue));
+      final long ICECandidatesFieldID = 1L;
+      BaseTLVType ICECandidatestlvValue = ArrayType.generateArrayType(ICECandidates, (elementICECandidates) -> new StringType(elementICECandidates));
+      elements.add(new StructElement(ICECandidatesFieldID, ICECandidatestlvValue));
 
       StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
@@ -63033,7 +63149,7 @@ public class ChipClusters {
     }
 
     public interface ProvideOfferResponseCallback extends BaseClusterCallback {
-      void onSuccess(Integer webRTCSessionID, Integer videoStreamID, Integer audioStreamID);
+      void onSuccess(Integer webRTCSessionID, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID);
     }
 
     public interface CurrentSessionsAttributeCallback extends BaseAttributeCallback {
@@ -63058,6 +63174,11 @@ public class ChipClusters {
 
     public void readCurrentSessionsAttribute(
         CurrentSessionsAttributeCallback callback) {
+      readCurrentSessionsAttributeWithFabricFilter(callback, true);
+    }
+
+    public void readCurrentSessionsAttributeWithFabricFilter(
+        CurrentSessionsAttributeCallback callback, boolean isFabricFiltered) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CURRENT_SESSIONS_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
@@ -63066,7 +63187,7 @@ public class ChipClusters {
             List<ChipStructs.WebRTCTransportProviderClusterWebRTCSessionStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, CURRENT_SESSIONS_ATTRIBUTE_ID, true);
+        }, CURRENT_SESSIONS_ATTRIBUTE_ID, isFabricFiltered);
     }
 
     public void subscribeCurrentSessionsAttribute(
@@ -63386,6 +63507,11 @@ public class ChipClusters {
 
     public void readCurrentSessionsAttribute(
         CurrentSessionsAttributeCallback callback) {
+      readCurrentSessionsAttributeWithFabricFilter(callback, true);
+    }
+
+    public void readCurrentSessionsAttributeWithFabricFilter(
+        CurrentSessionsAttributeCallback callback, boolean isFabricFiltered) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CURRENT_SESSIONS_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
@@ -63394,7 +63520,7 @@ public class ChipClusters {
             List<ChipStructs.WebRTCTransportRequestorClusterWebRTCSessionStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, CURRENT_SESSIONS_ATTRIBUTE_ID, true);
+        }, CURRENT_SESSIONS_ATTRIBUTE_ID, isFabricFiltered);
     }
 
     public void subscribeCurrentSessionsAttribute(

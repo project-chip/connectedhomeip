@@ -158,9 +158,9 @@ CHIP_ERROR CodegenDataModelProvider::Startup(DataModel::InteractionModelContext 
     return CHIP_NO_ERROR;
 }
 
-std::optional<DataModel::ActionReturnStatus> CodegenDataModelProvider::Invoke(const DataModel::InvokeRequest & request,
-                                                                              TLV::TLVReader & input_arguments,
-                                                                              CommandHandler * handler)
+std::optional<DataModel::ActionReturnStatus> CodegenDataModelProvider::InvokeCommand(const DataModel::InvokeRequest & request,
+                                                                                     TLV::TLVReader & input_arguments,
+                                                                                     CommandHandler * handler)
 {
     CommandHandlerInterface * handler_interface =
         CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(request.path.mEndpointId, request.path.mClusterId);
@@ -274,7 +274,7 @@ CHIP_ERROR CodegenDataModelProvider::Attributes(const ConcreteClusterPath & path
     //
     // We have Attributes from ember + global attributes that are NOT in ember metadata.
     // We have to report them all
-    constexpr size_t kGlobalAttributeNotInMetadataCount = ArraySize(GlobalAttributesNotInMetadata);
+    constexpr size_t kGlobalAttributeNotInMetadataCount = MATTER_ARRAY_SIZE(GlobalAttributesNotInMetadata);
 
     ReturnErrorOnFailure(builder.EnsureAppendCapacity(cluster->attributeCount + kGlobalAttributeNotInMetadataCount));
 

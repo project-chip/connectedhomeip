@@ -3750,6 +3750,20 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * This command SHALL add a Trusted Root CA Certificate, provided as its CHIP Certificate representation.
  */
 - (void)addTrustedRootCertificateWithParams:(MTROperationalCredentialsClusterAddTrustedRootCertificateParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+/**
+ * Command SetVidVerificationStatement
+ *
+ * This command SHALL be used to update any of the accessing fabric's associated VendorID, VidVerificatioNStatement or VVSC (Vendor Verification Signing Certificate).
+ */
+- (void)setVidVerificationStatementWithParams:(MTROperationalCredentialsClusterSetVidVerificationStatementParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)setVidVerificationStatementWithCompletion:(MTRStatusCompletion)completion
+    MTR_PROVISIONALLY_AVAILABLE;
+/**
+ * Command SignVidVerificationRequest
+ *
+ * This command SHALL be used to request that the server authenticate the fabric associated with the FabricIndex given.
+ */
+- (void)signVidVerificationRequestWithParams:(MTROperationalCredentialsClusterSignVidVerificationRequestParams *)params completion:(void (^)(MTROperationalCredentialsClusterSignVidVerificationResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeNOCsWithParams:(MTRReadParams * _Nullable)params completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)subscribeAttributeNOCsWithParams:(MTRSubscribeParams *)params
@@ -5111,7 +5125,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
 /**
  * Command SetTemperature
  *
- * Set Temperature
+ * The SetTemperature command SHALL have the following data fields:
  */
 - (void)setTemperatureWithParams:(MTRTemperatureControlClusterSetTemperatureParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 - (void)setTemperatureWithCompletion:(MTRStatusCompletion)completion
@@ -5564,13 +5578,13 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
 /**
  * Command Reset
  *
- * Reset alarm
+ * This command resets active and latched alarms (if possible).
  */
 - (void)resetWithParams:(MTRDishwasherAlarmClusterResetParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 /**
  * Command ModifyEnabledAlarms
  *
- * Modify enabled alarms
+ * This command allows a client to request that an alarm be enabled or suppressed at the server.
  */
 - (void)modifyEnabledAlarmsWithParams:(MTRDishwasherAlarmClusterModifyEnabledAlarmsParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
@@ -9758,7 +9772,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command Step
  *
- * The Step command speeds up or slows down the fan, in steps.
+ * This command speeds up or slows down the fan, in steps, without a client having to know the fan speed.
  */
 - (void)stepWithParams:(MTRFanControlClusterStepParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 
@@ -14258,6 +14272,12 @@ MTR_PROVISIONALLY_AVAILABLE
  */
 - (void)snapshotStreamAllocateWithParams:(MTRCameraAVStreamManagementClusterSnapshotStreamAllocateParams *)params completion:(void (^)(MTRCameraAVStreamManagementClusterSnapshotStreamAllocateResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 /**
+ * Command SnapshotStreamModify
+ *
+ * This command SHALL be used to modify a stream specified by the VideoStreamID.
+ */
+- (void)snapshotStreamModifyWithParams:(MTRCameraAVStreamManagementClusterSnapshotStreamModifyParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+/**
  * Command SnapshotStreamDeallocate
  *
  * This command SHALL deallocate an snapshot stream on the camera, corresponding to the given snapshot stream identifier.
@@ -14362,11 +14382,11 @@ MTR_PROVISIONALLY_AVAILABLE
                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
 + (void)readAttributeHDRModeEnabledWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
-- (void)readAttributeFabricsUsingCameraWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)subscribeAttributeFabricsUsingCameraWithParams:(MTRSubscribeParams *)params
-                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                         reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
-+ (void)readAttributeFabricsUsingCameraWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)readAttributeSupportedStreamUsagesWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeSupportedStreamUsagesWithParams:(MTRSubscribeParams *)params
+                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                            reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeSupportedStreamUsagesWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeAllocatedVideoStreamsWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeAllocatedVideoStreamsWithParams:(MTRSubscribeParams *)params
@@ -14788,11 +14808,11 @@ MTR_PROVISIONALLY_AVAILABLE
  */
 - (void)provideAnswerWithParams:(MTRWebRTCTransportProviderClusterProvideAnswerParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**
- * Command ProvideICECandidate
+ * Command ProvideICECandidates
  *
- * This command allows for https://www.rfc-editor.org/rfc/rfc8839#section-4.2.1.2 nominated after the initial Offer / Answer exchange to be added to a session during the gathering phase.
+ * This command allows for string based https://rfc-editor.org/rfc/rfc8839#section-5.1 generated after the initial Offer / Answer exchange, via a JSEP https://datatracker.ietf.org/doc/html/rfc9429#section-4.1.20 event, a DOM https://www.w3.org/TR/webrtc/#dom-rtcpeerconnectioniceevent event, or other WebRTC compliant implementations, to be added to a session during the gathering phase.
  */
-- (void)provideICECandidateWithParams:(MTRWebRTCTransportProviderClusterProvideICECandidateParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)provideICECandidatesWithParams:(MTRWebRTCTransportProviderClusterProvideICECandidatesParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Command EndSession
  *
@@ -14800,7 +14820,7 @@ MTR_PROVISIONALLY_AVAILABLE
  */
 - (void)endSessionWithParams:(MTRWebRTCTransportProviderClusterEndSessionParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 
-- (void)readAttributeCurrentSessionsWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)readAttributeCurrentSessionsWithParams:(MTRReadParams * _Nullable)params completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeCurrentSessionsWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
@@ -14886,7 +14906,7 @@ MTR_PROVISIONALLY_AVAILABLE
  */
 - (void)endWithParams:(MTRWebRTCTransportRequestorClusterEndParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 
-- (void)readAttributeCurrentSessionsWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)readAttributeCurrentSessionsWithParams:(MTRReadParams * _Nullable)params completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeCurrentSessionsWithParams:(MTRSubscribeParams *)params
                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                       reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
@@ -20657,6 +20677,7 @@ typedef NS_OPTIONS(uint32_t, MTRCameraAVStreamManagementFeature) {
     MTRCameraAVStreamManagementFeatureWatermark MTR_PROVISIONALLY_AVAILABLE = 0x40,
     MTRCameraAVStreamManagementFeatureOnScreenDisplay MTR_PROVISIONALLY_AVAILABLE = 0x80,
     MTRCameraAVStreamManagementFeatureLocalStorage MTR_PROVISIONALLY_AVAILABLE = 0x100,
+    MTRCameraAVStreamManagementFeatureHighDynamicRange MTR_PROVISIONALLY_AVAILABLE = 0x200,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_OPTIONS(uint32_t, MTRCameraAVSettingsUserLevelManagementFeature) {
@@ -20689,8 +20710,8 @@ typedef NS_ENUM(uint8_t, MTRWebRTCTransportProviderWebRTCEndReason) {
     MTRWebRTCTransportProviderWebRTCEndReasonUnknownReason MTR_PROVISIONALLY_AVAILABLE = 0x0B,
 } MTR_PROVISIONALLY_AVAILABLE;
 
-typedef NS_OPTIONS(uint8_t, MTRWebRTCTransportProviderWebRTCMetadataOptions) {
-    MTRWebRTCTransportProviderWebRTCMetadataOptionsDataTLV MTR_PROVISIONALLY_AVAILABLE = 0x1,
+typedef NS_OPTIONS(uint8_t, MTRWebRTCTransportProviderWebRTCMetadataOptionsBitmap) {
+    MTRWebRTCTransportProviderWebRTCMetadataOptionsBitmapDataTLV MTR_PROVISIONALLY_AVAILABLE = 0x1,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRWebRTCTransportRequestorStreamUsage) {
@@ -20715,8 +20736,8 @@ typedef NS_ENUM(uint8_t, MTRWebRTCTransportRequestorWebRTCEndReason) {
     MTRWebRTCTransportRequestorWebRTCEndReasonUnknownReason MTR_PROVISIONALLY_AVAILABLE = 0x0B,
 } MTR_PROVISIONALLY_AVAILABLE;
 
-typedef NS_OPTIONS(uint8_t, MTRWebRTCTransportRequestorWebRTCMetadataOptions) {
-    MTRWebRTCTransportRequestorWebRTCMetadataOptionsDataTLV MTR_PROVISIONALLY_AVAILABLE = 0x1,
+typedef NS_OPTIONS(uint8_t, MTRWebRTCTransportRequestorWebRTCMetadataOptionsBitmap) {
+    MTRWebRTCTransportRequestorWebRTCMetadataOptionsBitmapDataTLV MTR_PROVISIONALLY_AVAILABLE = 0x1,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRPushAVStreamTransportContainerFormat) {

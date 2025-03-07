@@ -177,8 +177,8 @@ enum class WebRTCEndReasonEnum : uint8_t
 
 // Bitmaps shared across multiple clusters.
 
-// Bitmap for WebRTCMetadataOptions
-enum class WebRTCMetadataOptions : uint8_t
+// Bitmap for WebRTCMetadataOptionsBitmap
+enum class WebRTCMetadataOptionsBitmap : uint8_t
 {
     kDataTLV = 0x1,
 };
@@ -5750,15 +5750,16 @@ enum class VideoCodecEnum : uint8_t
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
-    kAudio           = 0x1,
-    kVideo           = 0x2,
-    kSnapshot        = 0x4,
-    kPrivacy         = 0x8,
-    kSpeaker         = 0x10,
-    kImageControl    = 0x20,
-    kWatermark       = 0x40,
-    kOnScreenDisplay = 0x80,
-    kLocalStorage    = 0x100,
+    kAudio            = 0x1,
+    kVideo            = 0x2,
+    kSnapshot         = 0x4,
+    kPrivacy          = 0x8,
+    kSpeaker          = 0x10,
+    kImageControl     = 0x20,
+    kWatermark        = 0x40,
+    kOnScreenDisplay  = 0x80,
+    kLocalStorage     = 0x100,
+    kHighDynamicRange = 0x200,
 };
 } // namespace CameraAvStreamManagement
 
@@ -5781,7 +5782,7 @@ using StreamUsageEnum = Clusters::detail::StreamUsageEnum;
 
 using WebRTCEndReasonEnum = Clusters::detail::WebRTCEndReasonEnum;
 
-using WebRTCMetadataOptions = Clusters::detail::WebRTCMetadataOptions;
+using WebRTCMetadataOptionsBitmap = Clusters::detail::WebRTCMetadataOptionsBitmap;
 } // namespace WebRTCTransportProvider
 
 namespace WebRTCTransportRequestor {
@@ -5790,7 +5791,7 @@ using StreamUsageEnum = Clusters::detail::StreamUsageEnum;
 
 using WebRTCEndReasonEnum = Clusters::detail::WebRTCEndReasonEnum;
 
-using WebRTCMetadataOptions = Clusters::detail::WebRTCMetadataOptions;
+using WebRTCMetadataOptionsBitmap = Clusters::detail::WebRTCMetadataOptionsBitmap;
 } // namespace WebRTCTransportRequestor
 
 namespace PushAvStreamTransport {

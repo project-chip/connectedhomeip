@@ -3333,6 +3333,23 @@ class ChipClusters:
                     "rootCACertificate": "bytes",
                 },
             },
+            0x0000000C: {
+                "commandId": 0x0000000C,
+                "commandName": "SetVidVerificationStatement",
+                "args": {
+                    "vendorID": "int",
+                    "vidVerificationStatement": "bytes",
+                    "vvsc": "bytes",
+                },
+            },
+            0x0000000D: {
+                "commandId": 0x0000000D,
+                "commandName": "SignVidVerificationRequest",
+                "args": {
+                    "fabricIndex": "int",
+                    "clientChallenge": "bytes",
+                },
+            },
         },
         "attributes": {
             0x00000000: {
@@ -12586,24 +12603,35 @@ class ChipClusters:
                     "minResolution": "VideoResolutionStruct",
                     "maxResolution": "VideoResolutionStruct",
                     "quality": "int",
+                    "watermarkEnabled": "bool",
+                    "OSDEnabled": "bool",
                 },
             },
             0x00000009: {
                 "commandId": 0x00000009,
+                "commandName": "SnapshotStreamModify",
+                "args": {
+                    "snapshotStreamID": "int",
+                    "watermarkEnabled": "bool",
+                    "OSDEnabled": "bool",
+                },
+            },
+            0x0000000A: {
+                "commandId": 0x0000000A,
                 "commandName": "SnapshotStreamDeallocate",
                 "args": {
                     "snapshotStreamID": "int",
                 },
             },
-            0x0000000A: {
-                "commandId": 0x0000000A,
+            0x0000000B: {
+                "commandId": 0x0000000B,
                 "commandName": "SetStreamPriorities",
                 "args": {
                     "streamPriorities": "int",
                 },
             },
-            0x0000000B: {
-                "commandId": 0x0000000B,
+            0x0000000C: {
+                "commandId": 0x0000000C,
                 "commandName": "CaptureSnapshot",
                 "args": {
                     "snapshotStreamID": "int",
@@ -12698,7 +12726,7 @@ class ChipClusters:
                 "writable": True,
             },
             0x0000000E: {
-                "attributeName": "FabricsUsingCamera",
+                "attributeName": "SupportedStreamUsages",
                 "attributeId": 0x0000000E,
                 "type": "int",
                 "reportable": True,
@@ -13098,10 +13126,10 @@ class ChipClusters:
             },
             0x00000006: {
                 "commandId": 0x00000006,
-                "commandName": "ProvideICECandidate",
+                "commandName": "ProvideICECandidates",
                 "args": {
                     "webRTCSessionID": "int",
-                    "ICECandidate": "str",
+                    "ICECandidates": "str",
                 },
             },
             0x00000007: {

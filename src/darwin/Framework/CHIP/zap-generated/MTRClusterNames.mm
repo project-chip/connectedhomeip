@@ -7834,8 +7834,8 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"HDRModeEnabled";
             break;
 
-        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeFabricsUsingCameraID:
-            result = @"FabricsUsingCamera";
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeSupportedStreamUsagesID:
+            result = @"SupportedStreamUsages";
             break;
 
         case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeAllocatedVideoStreamsID:
@@ -9346,6 +9346,14 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
 
         case MTRCommandIDTypeClusterOperationalCredentialsCommandAddTrustedRootCertificateID:
             result = @"AddTrustedRootCertificate";
+            break;
+
+        case MTRCommandIDTypeClusterOperationalCredentialsCommandSetVidVerificationStatementID:
+            result = @"SetVidVerificationStatement";
+            break;
+
+        case MTRCommandIDTypeClusterOperationalCredentialsCommandSignVidVerificationRequestID:
+            result = @"SignVidVerificationRequest";
             break;
 
         default:
@@ -11026,6 +11034,10 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
             result = @"SnapshotStreamAllocate";
             break;
 
+        case MTRCommandIDTypeClusterCameraAVStreamManagementCommandSnapshotStreamModifyID:
+            result = @"SnapshotStreamModify";
+            break;
+
         case MTRCommandIDTypeClusterCameraAVStreamManagementCommandSnapshotStreamDeallocateID:
             result = @"SnapshotStreamDeallocate";
             break;
@@ -11098,8 +11110,8 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
             result = @"ProvideAnswer";
             break;
 
-        case MTRCommandIDTypeClusterWebRTCTransportProviderCommandProvideICECandidateID:
-            result = @"ProvideICECandidate";
+        case MTRCommandIDTypeClusterWebRTCTransportProviderCommandProvideICECandidatesID:
+            result = @"ProvideICECandidates";
             break;
 
         case MTRCommandIDTypeClusterWebRTCTransportProviderCommandEndSessionID:
@@ -11794,6 +11806,10 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
 
         case MTRCommandIDTypeClusterOperationalCredentialsCommandNOCResponseID:
             result = @"NOCResponse";
+            break;
+
+        case MTRCommandIDTypeClusterOperationalCredentialsCommandSignVidVerificationResponseID:
+            result = @"SignVidVerificationResponse";
             break;
 
         default:
@@ -14771,19 +14787,6 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
     case MTRClusterIDTypeCameraAVStreamManagementID:
 
         switch (eventID) {
-
-            // Cluster CameraAVStreamManagement events
-        case MTREventIDTypeClusterCameraAVStreamManagementEventVideoStreamChangedID:
-            result = @"VideoStreamChanged";
-            break;
-
-        case MTREventIDTypeClusterCameraAVStreamManagementEventAudioStreamChangedID:
-            result = @"AudioStreamChanged";
-            break;
-
-        case MTREventIDTypeClusterCameraAVStreamManagementEventSnapshotStreamChangedID:
-            result = @"SnapshotStreamChanged";
-            break;
 
         default:
             result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];

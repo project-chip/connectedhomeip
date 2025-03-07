@@ -110,7 +110,7 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     mpConnectCallback = nullptr;
     mpScanCallback    = nullptr;
 
-    if (ConnectivityUtils::GetEthInterfaceName(mEthIfName, IFNAMSIZ) == CHIP_NO_ERROR)
+    if (ConnectivityUtils::GetEthInterfaceName(mEthIfName, chip::Inet::InterfaceId::kMaxIfNameLength) == CHIP_NO_ERROR)
     {
         ChipLogProgress(DeviceLayer, "Got Ethernet interface: %s", mEthIfName);
     }
@@ -131,7 +131,7 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    if (ConnectivityUtils::GetWiFiInterfaceName(sWiFiIfName, IFNAMSIZ) == CHIP_NO_ERROR)
+    if (ConnectivityUtils::GetWiFiInterfaceName(sWiFiIfName, chip::Inet::InterfaceId::kMaxIfNameLength) == CHIP_NO_ERROR)
     {
         ChipLogProgress(DeviceLayer, "Got WiFi interface: %s", sWiFiIfName);
     }
@@ -529,11 +529,12 @@ void ConnectivityManagerImpl::_OnWpaInterfaceProxyReady(GObject * sourceObject, 
         mWpaSupplicant.state = GDBusWpaSupplicant::WpaState::INTERFACE_CONNECTED;
         ChipLogProgress(DeviceLayer, "wpa_supplicant: connected to wpa_supplicant interface proxy");
 
-        g_signal_connect(mWpaSupplicant.iface, "properties-changed",
-                         G_CALLBACK(+[](WpaSupplicant1Interface * proxy, GVariant * properties, ConnectivityManagerImpl * self) {
-                             return self->_OnWpaPropertiesChanged(proxy, properties);
-                         }),
-                         this);
+        g_signal_connect(
+            mWpaSupplicant.iface, "g-properties-changed",
+            G_CALLBACK(+[](WpaSupplicant1Interface * proxy, GVariant * properties, const char * const * invalidatedProps,
+                           ConnectivityManagerImpl * self) { return self->_OnWpaPropertiesChanged(proxy, properties); }),
+            this);
+
         g_signal_connect(mWpaSupplicant.iface, "scan-done",
                          G_CALLBACK(+[](WpaSupplicant1Interface * proxy, gboolean success, ConnectivityManagerImpl * self) {
                              return self->_OnWpaInterfaceScanDone(proxy, success);
