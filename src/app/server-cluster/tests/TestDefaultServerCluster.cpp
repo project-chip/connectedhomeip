@@ -189,7 +189,7 @@ TEST(TestDefaultServerCluster, NotifyAttributeChanged)
 
     oldVersion = cluster.GetDataVersion({ kEndpointId, kClusterId });
     cluster.TestNotifyAttributeChanged(234);
-    ASSERT_NE(cluster.GetDataVersion({kEndpointId, kClusterId}), oldVersion);
+    ASSERT_NE(cluster.GetDataVersion({ kEndpointId, kClusterId }), oldVersion);
 
     ASSERT_EQ(context.ChangeListener().DirtyList().size(), 1u);
     ASSERT_EQ(context.ChangeListener().DirtyList()[0], AttributePathParams(kEndpointId, kClusterId, 234));

@@ -66,7 +66,24 @@ public:
 
     bool HasContext() { return mContext != nullptr; }
 
-    const ConcreteClusterPath &GetPath() const { return mPath; }
+    const ConcreteClusterPath & GetPath() const { return mPath; }
+};
+
+class MultiPathCluster : public DefaultServerCluster
+{
+public:
+    MultiPathCluster(Span<const ConcreteClusterPath> paths) : DefaultServerCluster(paths[0]), mActualPaths(paths) {}
+
+    DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                AttributeValueEncoder & encoder) override
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    Span<const ConcreteClusterPath> GetPaths() const override { return mActualPaths; }
+
+private:
+    Span<const ConcreteClusterPath> mActualPaths;
 };
 
 class CannotStartUpCluster : public FakeServerClusterInterface
@@ -376,6 +393,37 @@ TEST_F(TestServerClusterInterfaceRegistry, Context)
     EXPECT_FALSE(cluster1.HasContext());
     EXPECT_FALSE(cluster2.HasContext());
     EXPECT_FALSE(cluster3.HasContext());
+}
+
+TEST_F(TestServerClusterInterfaceRegistry, MultiPathRegistration)
+{
+    const std::array<ConcreteClusterPath, 3> kTestPaths{ {
+        { 1, 100 },
+        { 0, 20 },
+        { 15, 33 },
+    } };
+    MultiPathCluster cluster(kTestPaths);
+    ServerClusterRegistration registration(cluster);
+
+    ServerClusterInterfaceRegistry registry;
+    ASSERT_EQ(registry.Register(registration), CHIP_NO_ERROR);
+
+    for (auto & p : kTestPaths)
+    {
+        ASSERT_EQ(registry.Get(p), &cluster);
+    }
+
+    // some things not there...
+    ASSERT_EQ(registry.Get({ 1, 20 }), nullptr);
+    ASSERT_EQ(registry.Get({ 1, 200 }), nullptr);
+    ASSERT_EQ(registry.Get({ 3, 200 }), nullptr);
+    ASSERT_EQ(registry.Get({ 4, 33 }), nullptr);
+
+    ASSERT_EQ(registry.Unregister(&cluster), CHIP_NO_ERROR);
+    for (auto & p : kTestPaths)
+    {
+        ASSERT_EQ(registry.Get(p), nullptr);
+    }
 }
 
 TEST_F(TestServerClusterInterfaceRegistry, StartupErrors)
