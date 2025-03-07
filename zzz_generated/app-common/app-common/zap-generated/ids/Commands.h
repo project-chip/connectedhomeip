@@ -1910,20 +1910,24 @@ namespace SnapshotStreamAllocateResponse {
 static constexpr CommandId Id = 0x00000008;
 } // namespace SnapshotStreamAllocateResponse
 
-namespace SnapshotStreamDeallocate {
+namespace SnapshotStreamModify {
 static constexpr CommandId Id = 0x00000009;
+} // namespace SnapshotStreamModify
+
+namespace SnapshotStreamDeallocate {
+static constexpr CommandId Id = 0x0000000A;
 } // namespace SnapshotStreamDeallocate
 
 namespace SetStreamPriorities {
-static constexpr CommandId Id = 0x0000000A;
+static constexpr CommandId Id = 0x0000000B;
 } // namespace SetStreamPriorities
 
 namespace CaptureSnapshot {
-static constexpr CommandId Id = 0x0000000B;
+static constexpr CommandId Id = 0x0000000C;
 } // namespace CaptureSnapshot
 
 namespace CaptureSnapshotResponse {
-static constexpr CommandId Id = 0x0000000C;
+static constexpr CommandId Id = 0x0000000D;
 } // namespace CaptureSnapshotResponse
 
 } // namespace Commands
@@ -2154,6 +2158,32 @@ static constexpr CommandId Id = 0x0000000F;
 
 } // namespace Commands
 } // namespace TlsCertificateManagement
+
+namespace TlsClientManagement {
+namespace Commands {
+
+namespace ProvisionEndpoint {
+static constexpr CommandId Id = 0x00000000;
+} // namespace ProvisionEndpoint
+
+namespace ProvisionEndpointResponse {
+static constexpr CommandId Id = 0x00000001;
+} // namespace ProvisionEndpointResponse
+
+namespace FindEndpoint {
+static constexpr CommandId Id = 0x00000002;
+} // namespace FindEndpoint
+
+namespace FindEndpointResponse {
+static constexpr CommandId Id = 0x00000003;
+} // namespace FindEndpointResponse
+
+namespace RemoveEndpoint {
+static constexpr CommandId Id = 0x00000004;
+} // namespace RemoveEndpoint
+
+} // namespace Commands
+} // namespace TlsClientManagement
 
 namespace UnitTesting {
 namespace Commands {

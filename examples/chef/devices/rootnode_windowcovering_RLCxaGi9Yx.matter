@@ -2014,7 +2014,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0x1f;
+    ram      attribute featureMap default = 0x17;
     ram      attribute clusterRevision default = 5;
 
     handle command UpOrOpen;

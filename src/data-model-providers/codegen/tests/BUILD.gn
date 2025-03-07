@@ -54,6 +54,7 @@ chip_test_suite("tests") {
   test_sources = [
     "TestCodegenModelViaMocks.cpp",
     "TestEmberAttributeDataBuffer.cpp",
+    "TestServerClusterInterfaceRegistry.cpp",
   ]
 
   cflags = [ "-Wconversion" ]
@@ -61,5 +62,6 @@ chip_test_suite("tests") {
   public_deps = [
     ":mock_model",
     "${chip_root}/src/app/data-model-provider:string-builder-adapters",
+    "${chip_root}/src/app/server-cluster/testing",
   ]
 }
