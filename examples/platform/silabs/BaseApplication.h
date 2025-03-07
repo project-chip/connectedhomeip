@@ -176,6 +176,8 @@ public:
 
 protected:
     CHIP_ERROR Init();
+    CHIP_ERROR BaseInit();
+    virtual CHIP_ERROR AppInit() { return CHIP_NO_ERROR; }
 
     /**
      * @brief Function called to start the function timer
