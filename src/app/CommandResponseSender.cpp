@@ -154,7 +154,7 @@ CHIP_ERROR CommandResponseSender::SendCommandResponse()
     if (HasMoreToSend())
     {
         sendFlag = Messaging::SendMessageFlags::kExpectResponse;
-        mExchangeCtx->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime,  false /*isFirstMessageOnExchange*/);
+        mExchangeCtx->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime, false /*isFirstMessageOnExchange*/);
     }
 
     ReturnErrorOnFailure(mExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::InvokeCommandResponse,

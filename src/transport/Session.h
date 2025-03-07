@@ -276,7 +276,8 @@ public:
     // characteristics of the target and a caller-provided value for the time it takes to process a message at the upper layer on
     // the target For group sessions, this function will always return 0.
     // isFirstMessageOnExchange parameter indicates whether this ComputeRoundTripTimeout() call is for an initial message or not.
-    System::Clock::Timeout ComputeRoundTripTimeout(System::Clock::Timeout upperlayerProcessingTimeout, bool isFirstMessageOnExchange);
+    System::Clock::Timeout ComputeRoundTripTimeout(System::Clock::Timeout upperlayerProcessingTimeout,
+                                                   bool isFirstMessageOnExchange);
 
     FabricIndex GetFabricIndex() const { return mFabricIndex; }
 

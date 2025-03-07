@@ -64,7 +64,8 @@ const OutgoingGroupSession * Session::AsConstOutgoingGroupSession() const
     return static_cast<const OutgoingGroupSession *>(this);
 }
 
-System::Clock::Timeout Session::ComputeRoundTripTimeout(System::Clock::Timeout upperlayerProcessingTimeout, bool isFirstMessageOnExchange)
+System::Clock::Timeout Session::ComputeRoundTripTimeout(System::Clock::Timeout upperlayerProcessingTimeout,
+                                                        bool isFirstMessageOnExchange)
 {
     if (IsGroupSession())
     {

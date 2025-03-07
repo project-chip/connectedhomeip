@@ -178,7 +178,8 @@ public:
     // Applies a suggested response timeout value based on the session type and the given upper layer processing time for
     // the next message to the exchange. The exchange context must have a valid session when calling this function.
     // isFirstMessageOnExchange parameter indicated whether this function call is for an initial message or not.
-    // This function is an equivalent of SetResponseTimeout(mSession->ComputeRoundTripTimeout(applicationProcessingTimeout, isFirstMessageOnExchange))
+    // This function is an equivalent of SetResponseTimeout(mSession->ComputeRoundTripTimeout(applicationProcessingTimeout,
+    // isFirstMessageOnExchange))
     void UseSuggestedResponseTimeout(Timeout applicationProcessingTimeout, bool isFirstMessageOnExchange);
 
     // Set the response timeout for the exchange context, regardless of the underlying session type. Using

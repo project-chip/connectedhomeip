@@ -337,7 +337,7 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
     SetStateFlag(ReadHandlerFlags::ChunkedReport, aMoreChunks);
     bool responseExpected = IsType(InteractionType::Subscribe) || aMoreChunks;
 
-    mExchangeCtx->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime,  isFirstMessageOnExchange);
+    mExchangeCtx->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime, isFirstMessageOnExchange);
     CHIP_ERROR err = mExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReportData, std::move(aPayload),
                                                responseExpected ? Messaging::SendMessageFlags::kExpectResponse
                                                                 : Messaging::SendMessageFlags::kNone);
