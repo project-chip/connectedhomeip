@@ -21,6 +21,8 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 
+#include <iterator>
+
 namespace chip {
 namespace app {
 
@@ -55,6 +57,12 @@ public:
         class Iterator
         {
         public:
+            using difference_type   = size_t;
+            using value_type        = ServerClusterInterface *;
+            using pointer           = ServerClusterInterface **;
+            using reference         = ServerClusterInterface *&;
+            using iterator_category = std::forward_iterator_tag;
+
             Iterator(ServerClusterRegistration * interface, EndpointId endpoint) : mRegistration(interface), mEndpointId(endpoint)
             {
                 AdvanceUntilMatchingEndpoint();

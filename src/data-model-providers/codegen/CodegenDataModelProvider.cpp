@@ -40,6 +40,7 @@
 #include <app/util/persistence/AttributePersistenceProvider.h>
 #include <app/util/persistence/DefaultAttributePersistenceProvider.h>
 #include <data-model-providers/codegen/EmberMetadata.h>
+#include <iterator>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
@@ -47,6 +48,7 @@
 #include <lib/support/SpanSearchValue.h>
 
 #include <cstdint>
+#include <iterator>
 #include <optional>
 
 namespace chip {
@@ -262,25 +264,21 @@ CHIP_ERROR CodegenDataModelProvider::ServerClusters(EndpointId endpointId,
     VerifyOrReturnValue(endpoint->clusterCount > 0, CHIP_NO_ERROR);
     VerifyOrReturnValue(endpoint->cluster != nullptr, CHIP_NO_ERROR);
 
-    // We have 2 managed lists:
-    //   - ember clusters, that have ember metadata AND ember version
-    //   - `ServerClusterInterfaceRegistry` clusters which MAY have an ember version
-    //     however may also not have one (we should accept server clusters registered
-    //     completely outside ember).
+    // We build the cluster list by merging two lists:
+    //   - mRegistry items from ServerClusterInterfaces
+    //   - ember metadata clusters
     //
-    // As a result, we are merging the lists here. The first list is the registry
-    // as the cluster version from that is authoritative (regardless of what ember
-    // claims). Secondly we add any additional ember clusters.
+    // This is done because `ServerClusterInterface` allows full control for all its metadata,
+    // in particular `data version` and `flags`.
     //
-    // This uses some RAM, however we assume clusters are in the 10s of items only.
-    // so this overflow seems ok.
+    // To allow cluster implementations to be incrementally converted to storing their own data versions,
+    // instead of relying on the out-of-band emberAfDataVersionStorage, first check for clusters that are
+    // using the new data version storage and are registered via ServerClusterInterfaceRegistry, then fill
+    // in the data versions for the rest via the out-of-band mechanism.
 
     // assume the clusters on endpoint does not change in between these two loops
-    size_t registryClusterCount = 0;
-    for (auto * _ : mRegistry.ClustersOnEndpoint(endpointId))
-    {
-        registryClusterCount++;
-    }
+    auto clusters = mRegistry.ClustersOnEndpoint(endpointId);
+    size_t registryClusterCount = std::distance(clusters.begin(), clusters.end());
 
     ReturnErrorOnFailure(builder.EnsureAppendCapacity(registryClusterCount));
 
