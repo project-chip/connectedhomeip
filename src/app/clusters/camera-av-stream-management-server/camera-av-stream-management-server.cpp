@@ -1289,24 +1289,27 @@ void CameraAVStreamMgmtServer::LoadPersistentAttributes()
 CHIP_ERROR CameraAVStreamMgmtServer::StoreViewport(const ViewportStruct & viewport)
 {
     uint8_t buffer[kViewportStructMaxSerializedSize];
+    uint16_t size = static_cast<uint16_t>(sizeof(buffer));
+    MutableByteSpan bufferSpan(buffer, size);
     TLV::TLVWriter writer;
 
-    writer.Init(buffer);
+    writer.Init(bufferSpan);
     ReturnErrorOnFailure(viewport.Encode(writer, TLV::AnonymousTag()));
 
     auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::Viewport::Id);
-    return GetSafeAttributePersistenceProvider()->SafeWriteValue(path, ByteSpan(buffer));
+    bufferSpan.reduce_size(writer.GetLengthWritten());
+
+    return GetSafeAttributePersistenceProvider()->SafeWriteValue(path, bufferSpan);
 }
 
 CHIP_ERROR CameraAVStreamMgmtServer::LoadViewport(ViewportStruct & viewport)
 {
     uint8_t buffer[kViewportStructMaxSerializedSize];
-    MutableByteSpan bufferSpan(buffer);
-    uint16_t size = static_cast<uint16_t>(bufferSpan.size());
+    uint16_t size = static_cast<uint16_t>(sizeof(buffer));
+    MutableByteSpan bufferSpan(buffer, size);
 
     auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::Viewport::Id);
     ReturnErrorOnFailure(GetSafeAttributePersistenceProvider()->SafeReadValue(path, bufferSpan));
-    bufferSpan.reduce_size(size);
 
     TLV::TLVReader reader;
 
@@ -1320,7 +1323,8 @@ CHIP_ERROR CameraAVStreamMgmtServer::LoadViewport(ViewportStruct & viewport)
 CHIP_ERROR CameraAVStreamMgmtServer::StoreRankedVideoStreamPriorities()
 {
     uint8_t buffer[kRankedVideoStreamPrioritiesTlvSize];
-    MutableByteSpan bufferSpan(buffer);
+    uint16_t size = static_cast<uint16_t>(sizeof(buffer));
+    MutableByteSpan bufferSpan(buffer, size);
     TLV::TLVWriter writer;
     writer.Init(bufferSpan);
 
@@ -1342,12 +1346,11 @@ CHIP_ERROR CameraAVStreamMgmtServer::StoreRankedVideoStreamPriorities()
 CHIP_ERROR CameraAVStreamMgmtServer::LoadRankedVideoStreamPriorities()
 {
     uint8_t buffer[kRankedVideoStreamPrioritiesTlvSize];
-    MutableByteSpan bufferSpan(buffer);
-    uint16_t size = static_cast<uint16_t>(bufferSpan.size());
+    uint16_t size = static_cast<uint16_t>(sizeof(buffer));
+    MutableByteSpan bufferSpan(buffer, size);
 
     auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::RankedVideoStreamPrioritiesList::Id);
     ReturnErrorOnFailure(GetSafeAttributePersistenceProvider()->SafeReadValue(path, bufferSpan));
-    bufferSpan.reduce_size(size);
 
     TLV::TLVReader reader;
     reader.Init(bufferSpan);
@@ -1356,15 +1359,15 @@ CHIP_ERROR CameraAVStreamMgmtServer::LoadRankedVideoStreamPriorities()
     TLV::TLVType arrayType;
     ReturnErrorOnFailure(reader.EnterContainer(arrayType));
 
+    mRankedVideoStreamPriorities.clear();
     uint8_t i = 0;
     CHIP_ERROR err;
-    while ((err = reader.Next(TLV::kTLVType_UnsignedInteger, TLV::AnonymousTag())) == CHIP_NO_ERROR && i < kNumOfStreamUsageTypes)
+    while ((err = reader.Next(TLV::kTLVType_UnsignedInteger, TLV::AnonymousTag())) == CHIP_NO_ERROR)
     {
         ReturnErrorOnFailure(reader.Get(mRankedVideoStreamPriorities[i]));
         i++;
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(arrayType));
     return reader.VerifyEndOfContainer();
 }
