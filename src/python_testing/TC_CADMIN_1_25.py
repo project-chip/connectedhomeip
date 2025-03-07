@@ -33,18 +33,18 @@
 
 import asyncio
 import logging
-import random
 import queue
-from queue import Empty
+import random
 import time
+from queue import Empty
 from time import sleep
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.ChipDeviceCtrl import CommissioningParameters
+from chip.clusters.Types import Nullable
 from chip.exceptions import ChipStackError
 from chip.native import PyChipError
-from chip.clusters.Types import Nullable
 from chip.testing.matter_testing import AttributeChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from TC_SC_3_6 import AttributeChangeAccumulator
