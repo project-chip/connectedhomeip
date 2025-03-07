@@ -99,7 +99,8 @@ public:
         case Transport::Type::kUdp: {
             const ReliableMessageProtocolConfig & remoteMRPConfig = mRemoteSessionParams.GetMRPConfig();
             return GetRetransmissionTimeout(remoteMRPConfig.mActiveRetransTimeout, remoteMRPConfig.mIdleRetransTimeout,
-                                            GetLastPeerActivityTime(), remoteMRPConfig.mActiveThresholdTime, isFirstMessageOnExchange);
+                                            GetLastPeerActivityTime(), remoteMRPConfig.mActiveThresholdTime,
+                                            isFirstMessageOnExchange);
         }
         case Transport::Type::kTcp:
             return System::Clock::Seconds16(30);
@@ -120,7 +121,8 @@ public:
             const auto & defaultMRRPConfig   = GetDefaultMRPConfig();
             const auto & localMRPConfig      = maybeLocalMRPConfig.ValueOr(defaultMRRPConfig);
             return GetRetransmissionTimeout(localMRPConfig.mActiveRetransTimeout, localMRPConfig.mIdleRetransTimeout,
-                                            ourLastActivity, localMRPConfig.mActiveThresholdTime, ourLastActivity == System::Clock::kZero /*isFirstMessageOnExchange*/);
+                                            ourLastActivity, localMRPConfig.mActiveThresholdTime,
+                                            ourLastActivity == System::Clock::kZero /*isFirstMessageOnExchange*/);
         }
         case Transport::Type::kTcp:
             return System::Clock::Seconds16(30);
