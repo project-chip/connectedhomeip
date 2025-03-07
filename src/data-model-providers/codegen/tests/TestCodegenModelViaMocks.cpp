@@ -30,6 +30,7 @@
 #include <app/CommandHandlerInterface.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/ConcreteClusterPath.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/GlobalAttributes.h>
 #include <app/MessageDef/ReportDataMessage.h>
@@ -45,6 +46,7 @@
 #include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/Nullable.h>
+#include <app/server-cluster/DefaultServerCluster.h>
 #include <app/util/attribute-metadata.h>
 #include <app/util/attribute-storage-null-handling.h>
 #include <app/util/ember-io-storage.h>
@@ -744,6 +746,47 @@ public:
 
 private:
     T mData;
+};
+
+class FakeDefaultServerCluster : public DefaultServerCluster
+{
+public:
+    static constexpr uint32_t kFakeFeatureMap      = 0x35;
+    static constexpr uint32_t kFakeClusterRevision = 1234;
+
+    FakeDefaultServerCluster(ConcreteClusterPath path) : mPath(path) {}
+
+    [[nodiscard]] ConcreteClusterPath GetPath() const override { return mPath; }
+
+    [[nodiscard]] BitFlags<DataModel::ClusterQualityFlags> GetClusterFlags() const override
+    {
+        return DataModel::ClusterQualityFlags::kDiagnosticsData;
+    }
+
+    DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                AttributeValueEncoder & encoder) override
+    {
+        using namespace chip::app::Clusters;
+
+        switch (request.path.mAttributeId)
+        {
+        case Globals::Attributes::FeatureMap::Id: {
+            uint32_t value = kFakeFeatureMap;
+            return encoder.Encode<uint32_t>(std::move(value));
+        }
+        case Globals::Attributes::ClusterRevision::Id: {
+            uint32_t value = kFakeClusterRevision;
+            return encoder.Encode<uint32_t>(std::move(value));
+        }
+        }
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    void TestIncreaseDataVersion() { IncreaseDataVersion(); }
+    void TestNotifyAttributeChanged(AttributeId attributeId) { NotifyAttributeChanged(attributeId); }
+
+private:
+    ConcreteClusterPath mPath;
 };
 
 template <typename T, EmberAfAttributeType ZclType>
@@ -2499,4 +2542,130 @@ TEST_F(TestCodegenModelViaMocks, SemanticTagIteration)
     EXPECT_EQ(tag.namespaceID, kNamespaceID3);
     EXPECT_EQ(tag.tag, kTag3);
     EXPECT_FALSE(tag.label.HasValue());
+}
+
+// reading attributes is a LOT of boilerplate. This just makes tests more readable.
+static CHIP_ERROR ReadU32Attribute(DataModel::Provider & provider, const ConcreteAttributePath & path, uint32_t & value)
+{
+
+    ReadOperation testRequest(path);
+    testRequest.SetSubjectDescriptor(kAdminSubjectDescriptor);
+
+    std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding();
+    ReturnErrorOnFailure(provider.ReadAttribute(testRequest.GetRequest(), *encoder).GetUnderlyingError());
+    ReturnErrorOnFailure(testRequest.FinishEncoding());
+
+    std::vector<DecodedAttributeData> attribute_data;
+
+    ReturnErrorOnFailure(testRequest.GetEncodedIBs().Decode(attribute_data));
+    VerifyOrReturnError(attribute_data.size() == 1u, CHIP_ERROR_INCORRECT_STATE);
+
+    DecodedAttributeData & encodedData = attribute_data[0];
+
+    VerifyOrReturnError(encodedData.attributePath == testRequest.GetRequest().path, CHIP_ERROR_INCORRECT_STATE);
+
+    return chip::app::DataModel::Decode<uint32_t>(encodedData.dataReader, value);
+}
+
+TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesReadAttribute)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    CodegenDataModelProviderWithContext model;
+
+    const ConcreteClusterPath kTestClusterPath(kMockEndpoint1, MockClusterId(2));
+
+    FakeDefaultServerCluster fakeClusterServer(kTestClusterPath);
+    ServerClusterRegistration registration(fakeClusterServer);
+
+    uint32_t revisionEmber;
+    ASSERT_EQ(ReadU32Attribute(
+                  model,
+                  { kTestClusterPath.mEndpointId, kTestClusterPath.mClusterId, Clusters::Globals::Attributes::ClusterRevision::Id },
+                  revisionEmber),
+              CHIP_NO_ERROR);
+    EXPECT_EQ(revisionEmber, 0u);
+    static_assert(FakeDefaultServerCluster::kFakeClusterRevision != 0);
+
+    ASSERT_EQ(model.Registry().Register(registration), CHIP_NO_ERROR);
+
+    uint32_t revision;
+    ASSERT_EQ(ReadU32Attribute(
+                  model,
+                  { kTestClusterPath.mEndpointId, kTestClusterPath.mClusterId, Clusters::Globals::Attributes::ClusterRevision::Id },
+                  revision),
+              CHIP_NO_ERROR);
+    EXPECT_EQ(revision, FakeDefaultServerCluster::kFakeClusterRevision);
+}
+
+TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesListClusters)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    CodegenDataModelProviderWithContext model;
+
+    // will register a fake cluster server which overrides the cluster data version
+    // once registered
+    const ConcreteClusterPath kTestClusterPath(kMockEndpoint1, MockClusterId(2));
+    FakeDefaultServerCluster fakeClusterServer(kTestClusterPath);
+    ServerClusterRegistration registration(fakeClusterServer);
+
+    // ensure ember and fake server do not ramdomly point to the same data
+    // version as we use this data version to differentiate between the two
+    DataVersion * versionPtr = emberAfDataVersionStorage(kTestClusterPath);
+    ASSERT_NE(versionPtr, nullptr);
+    if (*versionPtr == fakeClusterServer.GetDataVersion())
+    {
+        fakeClusterServer.TestIncreaseDataVersion();
+    }
+
+    DataModel::ListBuilder<DataModel::ServerClusterEntry> builder;
+
+    ASSERT_EQ(model.ServerClusters(kTestClusterPath.mEndpointId, builder), CHIP_NO_ERROR);
+    std::vector<ServerClusterEntry> originalClusters;
+    for (auto entry : builder.TakeBuffer())
+    {
+        originalClusters.push_back(entry);
+    }
+
+    ASSERT_EQ(model.Registry().Register(registration), CHIP_NO_ERROR);
+
+    ASSERT_EQ(model.ServerClusters(kTestClusterPath.mEndpointId, builder), CHIP_NO_ERROR);
+    std::vector<ServerClusterEntry> afterRegistrationClusters;
+    for (auto entry : builder.TakeBuffer())
+    {
+        afterRegistrationClusters.push_back(entry);
+    }
+
+    // lists MUST be identical EXCEPT data version will be different
+    // EMBER has one data version, clusters have a random (different) one
+    EXPECT_EQ(originalClusters.size(), afterRegistrationClusters.size());
+    std::sort(originalClusters.begin(), originalClusters.end(),
+              [](const ServerClusterEntry & a, const ServerClusterEntry & b) { return a.clusterId < b.clusterId; });
+    std::sort(afterRegistrationClusters.begin(), afterRegistrationClusters.end(),
+              [](const ServerClusterEntry & a, const ServerClusterEntry & b) { return a.clusterId < b.clusterId; });
+
+    bool updatedClusterFound = false;
+
+    for (size_t i = 0; i < originalClusters.size(); i++)
+    {
+        const ServerClusterEntry & original   = originalClusters[i];
+        const ServerClusterEntry & registered = afterRegistrationClusters[i];
+
+        if (original.clusterId == kTestClusterPath.mClusterId)
+        {
+            updatedClusterFound = true;
+            EXPECT_EQ(registered.clusterId, original.clusterId);
+            EXPECT_EQ(registered.dataVersion, fakeClusterServer.GetDataVersion());
+            EXPECT_EQ(registered.flags, fakeClusterServer.GetClusterFlags());
+
+            // version MUST be different for ember for the test to make sense
+            EXPECT_NE(original.dataVersion, registered.dataVersion);
+        }
+        else
+        {
+            EXPECT_EQ(original.clusterId, registered.clusterId);
+            EXPECT_EQ(original.dataVersion, registered.dataVersion);
+            EXPECT_EQ(original.flags, registered.flags);
+        }
+    }
+    EXPECT_TRUE(updatedClusterFound);
 }
