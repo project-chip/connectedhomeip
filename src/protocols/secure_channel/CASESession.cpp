@@ -2640,8 +2640,8 @@ System::Clock::Timeout CASESession::ComputeSigma1ResponseTimeout(const ReliableM
 
 System::Clock::Timeout CASESession::ComputeSigma2ResponseTimeout(const ReliableMessageProtocolConfig & remoteMrpConfig)
 {
-    // Assume it is the response message on the session, and treat peer as active for Sigma2
-    return ComputeRoundTripTimeout(kExpectedHighProcessingTime, remoteMrpConfig, true /*isFirstMessageOnExchange*/);
+    // Sigma2 is never the first message on the exchange.
+    return ComputeRoundTripTimeout(kExpectedHighProcessingTime, remoteMrpConfig, false /*isFirstMessageOnExchange*/);
 }
 
 bool CASESession::InvokeBackgroundWorkWatchdog()
