@@ -35,34 +35,36 @@ CHIP_ERROR EmptyProvider::Endpoints(ListBuilder<app::DataModel::EndpointEntry> &
 
 CHIP_ERROR EmptyProvider::SemanticTags(EndpointId endpointId, ListBuilder<SemanticTag> & builder)
 {
-    return CHIP_NO_ERROR;
+    return CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint);
 }
 CHIP_ERROR EmptyProvider::DeviceTypes(EndpointId endpointId, ListBuilder<app::DataModel::DeviceTypeEntry> & builder)
 {
-    return CHIP_NO_ERROR;
+    return CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint);
 }
 
 CHIP_ERROR EmptyProvider::ClientClusters(EndpointId endpointId, ListBuilder<ClusterId> & builder)
 {
-    return CHIP_NO_ERROR;
+    return CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint);
 }
 CHIP_ERROR EmptyProvider::ServerClusters(EndpointId endpointId, ListBuilder<app::DataModel::ServerClusterEntry> & builder)
 {
-    return CHIP_NO_ERROR;
+    return CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint);
 }
 
 CHIP_ERROR EmptyProvider::Attributes(const app::ConcreteClusterPath & path, ListBuilder<app::DataModel::AttributeEntry> & builder)
 {
-    return CHIP_NO_ERROR;
+    return CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint);
 }
+
 CHIP_ERROR EmptyProvider::GeneratedCommands(const app::ConcreteClusterPath & path, ListBuilder<CommandId> & builder)
 {
-    return CHIP_NO_ERROR;
+    return CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint);
 }
+
 CHIP_ERROR EmptyProvider::AcceptedCommands(const app::ConcreteClusterPath & path,
                                            ListBuilder<app::DataModel::AcceptedCommandEntry> & builder)
 {
-    return CHIP_NO_ERROR;
+    return CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint);
 }
 
 void EmptyProvider::Temporary_ReportAttributeChanged(const app::AttributePathParams & path) {}

@@ -22,10 +22,12 @@
 namespace chip {
 namespace Test {
 
-/// A provider that is emtpy - everything returns null
+/// A provider that is emtpy - it contains no endpoints and most
+/// calls fail with `Unsupported Endpoint`
 ///
-/// Over time this should be replaced with some code-generated/controllable provider
-/// to allow for better testing.
+/// This is a bare minimum implentation to have somethign that claims to be a `Provider`
+/// however it has no real implementation that is useful. Over time this should be replaced
+/// with some code-generated/controllable provider to allow for better testing.
 class EmptyProvider : public app::DataModel::Provider
 {
 public:
