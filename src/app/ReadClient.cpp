@@ -355,7 +355,7 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
 
     if (aReadPrepareParams.mTimeout == System::Clock::kZero)
     {
-        mExchange->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime);
+        mExchange->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime, true /*isFirstMessageOnExchange*/);
     }
     else
     {
@@ -986,9 +986,9 @@ CHIP_ERROR ReadClient::ComputeLivenessCheckTimerTimeout(System::Clock::Timeout *
     //
     // So recompute the round-trip timeout directly.  Assume MRP, since in practice that is likely what is happening.
     auto & peerMRPConfig = mReadPrepareParams.mSessionHolder->GetRemoteMRPConfig();
-    // Peer will assume we are idle and will send initial message (hence we pass kZero to GetMessageReceiptTimeout()), but will
-    // treat it as active for the response, so to match the retransmission timeout computation for the message back to the
-    // peer
+    // Peer will assume we are idle (hence we pass kZero to GetMessageReceiptTimeout()), but will assume we treat it as active
+    // for the response, so to match the retransmission timeout computation for the message back to the peer, we should treat
+    // it as active and handling non-initial message, isFirstMessageOnExchange needs to be set as false for GetRetransmissionTimeout.
     auto roundTripTimeout = mReadPrepareParams.mSessionHolder->GetMessageReceiptTimeout(System::Clock::kZero) +
         kExpectedIMProcessingTime +
         GetRetransmissionTimeout(peerMRPConfig.mActiveRetransTimeout, peerMRPConfig.mIdleRetransTimeout,
@@ -1248,7 +1248,7 @@ CHIP_ERROR ReadClient::SendSubscribeRequestImpl(const ReadPrepareParams & aReadP
 
     if (aReadPrepareParams.mTimeout == System::Clock::kZero)
     {
-        mExchange->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime);
+        mExchange->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime, false /*isFirstMessageOnExchange*/);
     }
     else
     {

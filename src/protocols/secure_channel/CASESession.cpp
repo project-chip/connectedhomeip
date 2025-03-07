@@ -546,7 +546,8 @@ CHIP_ERROR CASESession::EstablishSession(SessionManager & sessionManager, Fabric
     mSessionResumptionStorage = sessionResumptionStorage;
     mLocalMRPConfig           = MakeOptional(mrpLocalConfig.ValueOr(GetDefaultMRPConfig()));
 
-    mExchangeCtxt.Value()->UseSuggestedResponseTimeout(kExpectedSigma1ProcessingTime);
+    // Sigma1 is the first message on the exchange.
+    mExchangeCtxt.Value()->UseSuggestedResponseTimeout(kExpectedSigma1ProcessingTime, true /*isFirstMessageOnExchange*/);
     mPeerNodeId  = peerScopedNodeId.GetNodeId();
     mLocalNodeId = fabricInfo->GetNodeId();
 
@@ -2461,7 +2462,7 @@ CHIP_ERROR CASESession::ValidateReceivedMessage(ExchangeContext * ec, const Payl
     {
         mExchangeCtxt.Emplace(*ec);
     }
-    mExchangeCtxt.Value()->UseSuggestedResponseTimeout(kExpectedHighProcessingTime);
+    mExchangeCtxt.Value()->UseSuggestedResponseTimeout(kExpectedHighProcessingTime, false /*isFirstMessageOnExchange*/);
 
     VerifyOrReturnError(!msg.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
     return CHIP_NO_ERROR;

@@ -64,7 +64,7 @@ const OutgoingGroupSession * Session::AsConstOutgoingGroupSession() const
     return static_cast<const OutgoingGroupSession *>(this);
 }
 
-System::Clock::Timeout Session::ComputeRoundTripTimeout(System::Clock::Timeout upperlayerProcessingTimeout)
+System::Clock::Timeout Session::ComputeRoundTripTimeout(System::Clock::Timeout upperlayerProcessingTimeout, bool isFirstMessageOnExchange)
 {
     if (IsGroupSession())
     {
@@ -73,7 +73,7 @@ System::Clock::Timeout Session::ComputeRoundTripTimeout(System::Clock::Timeout u
 
     // Treat us as active for purposes of GetMessageReceiptTimeout(), pass false into GetAckTimeout to
     // indicate we are processing non-initial message since the other side would be responding to our message.
-    return GetAckTimeout(false /*isFirstMessageOnExchange*/) + upperlayerProcessingTimeout +
+    return GetAckTimeout(isFirstMessageOnExchange) + upperlayerProcessingTimeout +
         GetMessageReceiptTimeout(System::SystemClock().GetMonotonicTimestamp());
 }
 

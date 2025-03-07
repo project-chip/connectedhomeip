@@ -75,9 +75,9 @@ void ExchangeContext::SetResponseExpected(bool inResponseExpected)
     SetWaitingForResponseOrAck(inResponseExpected);
 }
 
-void ExchangeContext::UseSuggestedResponseTimeout(Timeout applicationProcessingTimeout)
+void ExchangeContext::UseSuggestedResponseTimeout(Timeout applicationProcessingTimeout, bool isFirstMessageOnExchange)
 {
-    SetResponseTimeout(mSession->ComputeRoundTripTimeout(applicationProcessingTimeout));
+    SetResponseTimeout(mSession->ComputeRoundTripTimeout(applicationProcessingTimeout, isFirstMessageOnExchange));
 }
 
 void ExchangeContext::SetResponseTimeout(Timeout timeout)

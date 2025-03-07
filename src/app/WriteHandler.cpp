@@ -244,7 +244,7 @@ CHIP_ERROR WriteHandler::SendWriteResponse(System::PacketBufferTLVWriter && aMes
     SuccessOrExit(err);
 
     VerifyOrExit(mExchangeCtx, err = CHIP_ERROR_INCORRECT_STATE);
-    mExchangeCtx->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime);
+    mExchangeCtx->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime, false /*isFirstMessageOnExchange*/);
     err = mExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::WriteResponse, std::move(packet),
                                     mStateFlags.Has(StateBits::kHasMoreChunks) ? Messaging::SendMessageFlags::kExpectResponse
                                                                                : Messaging::SendMessageFlags::kNone);
