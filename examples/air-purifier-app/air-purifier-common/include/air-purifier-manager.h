@@ -136,7 +136,7 @@ private:
     AirPurifierManager(EndpointId aEndpointId, EndpointId aAirQualitySensorEndpointId, EndpointId aTemperatureSensorEndpointId,
                        EndpointId aHumiditySensorEndpointId, EndpointId aThermostatEndpointId) :
         FanControl::Delegate(aEndpointId),
-	mEndpointId(aEndpointId),
+	 mEndpointId(aEndpointId),
         activatedCarbonFilterInstance(&activatedCarbonFilterDelegate, mEndpointId, ActivatedCarbonFilterMonitoring::Id,
                                       static_cast<uint32_t>(gActivatedCarbonFeatureMap.to_ulong()),
                                       ResourceMonitoring::DegradationDirectionEnum::kDown, true),
