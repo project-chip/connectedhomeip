@@ -159,7 +159,7 @@ void SensorManager::SensorTimerEventHandler(void * arg)
     static uint8_t simulatedIndex = 0;
 
     // Ensure the simulatedIndex wraps around the array size to avoid out-of-bounds access
-    simulatedIndex = simulatedIndex % ArraySize(mSimulatedAirQuality);
+    simulatedIndex = simulatedIndex % MATTER_ARRAY_SIZE(mSimulatedAirQuality);
     // Retrieve the current air quality value from the simulated data array using the simulatedIndex
     air_quality = mSimulatedAirQuality[simulatedIndex];
 

@@ -85,11 +85,12 @@
 @implementation MTRDevice_XPC
 
 @synthesize _internalState;
+@synthesize queue = _queue;
 
 - (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController_XPC *)controller
 {
     if (self = [super initForSubclassesWithNodeID:nodeID controller:controller]) {
-        // Nothing else to do, all set.
+        _queue = dispatch_queue_create("org.csa-iot.matter.framework.devicexpc.workqueue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
     }
 
     return self;
@@ -151,16 +152,28 @@
 
 - (void)_delegateAdded:(id<MTRDeviceDelegate>)delegate
 {
+    os_unfair_lock_assert_owner(&self->_lock);
+
     [super _delegateAdded:delegate];
     MTR_LOG("%@ delegate added: %@", self, delegate);
-    [(MTRDeviceController_XPC *) [self deviceController] _updateRegistrationInfo];
+
+    // dispatch to own queue so we're not holding our lock while calling out to the controller code.
+    dispatch_async(self.queue, ^{
+        [(MTRDeviceController_XPC *) [self deviceController] _updateRegistrationInfo];
+    });
 }
 
 - (void)_delegateRemoved:(id<MTRDeviceDelegate>)delegate
 {
+    os_unfair_lock_assert_owner(&self->_lock);
+
     [super _delegateRemoved:delegate];
     MTR_LOG("%@ delegate removed: %@", self, delegate);
-    [(MTRDeviceController_XPC *) [self deviceController] _updateRegistrationInfo];
+
+    // dispatch to own queue so we're not holding our lock while calling out to the controller code.
+    dispatch_async(self.queue, ^{
+        [(MTRDeviceController_XPC *) [self deviceController] _updateRegistrationInfo];
+    });
 }
 
 #pragma mark - Client Callbacks (MTRDeviceDelegate)

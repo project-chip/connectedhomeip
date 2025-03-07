@@ -281,6 +281,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "CommissionerControl";
     case chip::app::Clusters::TlsCertificateManagement::Id:
         return "TlsCertificateManagement";
+    case chip::app::Clusters::TlsClientManagement::Id:
+        return "TlsClientManagement";
     case chip::app::Clusters::UnitTesting::Id:
         return "UnitTesting";
     case chip::app::Clusters::FaultInjection::Id:
@@ -4242,8 +4244,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "CurrentFrameRate";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::HDRModeEnabled::Id:
             return "HDRModeEnabled";
-        case chip::app::Clusters::CameraAvStreamManagement::Attributes::FabricsUsingCamera::Id:
-            return "FabricsUsingCamera";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::SupportedStreamUsages::Id:
+            return "SupportedStreamUsages";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::AllocatedVideoStreams::Id:
             return "AllocatedVideoStreams";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::AllocatedAudioStreams::Id:
@@ -4411,8 +4413,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         {
         case chip::app::Clusters::Chime::Attributes::InstalledChimeSounds::Id:
             return "InstalledChimeSounds";
-        case chip::app::Clusters::Chime::Attributes::ActiveChimeID::Id:
-            return "ActiveChimeID";
+        case chip::app::Clusters::Chime::Attributes::SelectedChime::Id:
+            return "SelectedChime";
         case chip::app::Clusters::Chime::Attributes::Enabled::Id:
             return "Enabled";
         case chip::app::Clusters::Chime::Attributes::GeneratedCommandList::Id:
@@ -4474,12 +4476,12 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         {
         case chip::app::Clusters::TlsCertificateManagement::Attributes::MaxRootCertificates::Id:
             return "MaxRootCertificates";
-        case chip::app::Clusters::TlsCertificateManagement::Attributes::CurrentRootCertificates::Id:
-            return "CurrentRootCertificates";
+        case chip::app::Clusters::TlsCertificateManagement::Attributes::ProvisionedRootCertificates::Id:
+            return "ProvisionedRootCertificates";
         case chip::app::Clusters::TlsCertificateManagement::Attributes::MaxClientCertificates::Id:
             return "MaxClientCertificates";
-        case chip::app::Clusters::TlsCertificateManagement::Attributes::CurrentClientCertificates::Id:
-            return "CurrentClientCertificates";
+        case chip::app::Clusters::TlsCertificateManagement::Attributes::ProvisionedClientCertificates::Id:
+            return "ProvisionedClientCertificates";
         case chip::app::Clusters::TlsCertificateManagement::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::TlsCertificateManagement::Attributes::AcceptedCommandList::Id:
@@ -4489,6 +4491,27 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         case chip::app::Clusters::TlsCertificateManagement::Attributes::FeatureMap::Id:
             return "FeatureMap";
         case chip::app::Clusters::TlsCertificateManagement::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::TlsClientManagement::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::TlsClientManagement::Attributes::MaxProvisioned::Id:
+            return "MaxProvisioned";
+        case chip::app::Clusters::TlsClientManagement::Attributes::ProvisionedEndpoints::Id:
+            return "ProvisionedEndpoints";
+        case chip::app::Clusters::TlsClientManagement::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::TlsClientManagement::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::TlsClientManagement::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::TlsClientManagement::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::TlsClientManagement::Attributes::ClusterRevision::Id:
             return "ClusterRevision";
         default:
             return "Unknown";
@@ -5031,6 +5054,10 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "RemoveFabric";
         case chip::app::Clusters::OperationalCredentials::Commands::AddTrustedRootCertificate::Id:
             return "AddTrustedRootCertificate";
+        case chip::app::Clusters::OperationalCredentials::Commands::SetVidVerificationStatement::Id:
+            return "SetVidVerificationStatement";
+        case chip::app::Clusters::OperationalCredentials::Commands::SignVidVerificationRequest::Id:
+            return "SignVidVerificationRequest";
         default:
             return "Unknown";
         }
@@ -5817,6 +5844,8 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "VideoStreamDeallocate";
         case chip::app::Clusters::CameraAvStreamManagement::Commands::SnapshotStreamAllocate::Id:
             return "SnapshotStreamAllocate";
+        case chip::app::Clusters::CameraAvStreamManagement::Commands::SnapshotStreamModify::Id:
+            return "SnapshotStreamModify";
         case chip::app::Clusters::CameraAvStreamManagement::Commands::SnapshotStreamDeallocate::Id:
             return "SnapshotStreamDeallocate";
         case chip::app::Clusters::CameraAvStreamManagement::Commands::SetStreamPriorities::Id:
@@ -5857,8 +5886,8 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "ProvideOffer";
         case chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideAnswer::Id:
             return "ProvideAnswer";
-        case chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideICECandidate::Id:
-            return "ProvideICECandidate";
+        case chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideICECandidates::Id:
+            return "ProvideICECandidates";
         case chip::app::Clusters::WebRTCTransportProvider::Commands::EndSession::Id:
             return "EndSession";
         default:
@@ -5872,8 +5901,8 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "Offer";
         case chip::app::Clusters::WebRTCTransportRequestor::Commands::Answer::Id:
             return "Answer";
-        case chip::app::Clusters::WebRTCTransportRequestor::Commands::ICECandidate::Id:
-            return "ICECandidate";
+        case chip::app::Clusters::WebRTCTransportRequestor::Commands::ICECandidates::Id:
+            return "ICECandidates";
         case chip::app::Clusters::WebRTCTransportRequestor::Commands::End::Id:
             return "End";
         default:
@@ -5940,6 +5969,19 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "LookupClientCertificate";
         case chip::app::Clusters::TlsCertificateManagement::Commands::RemoveClientCertificate::Id:
             return "RemoveClientCertificate";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::TlsClientManagement::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::TlsClientManagement::Commands::ProvisionEndpoint::Id:
+            return "ProvisionEndpoint";
+        case chip::app::Clusters::TlsClientManagement::Commands::FindEndpoint::Id:
+            return "FindEndpoint";
+        case chip::app::Clusters::TlsClientManagement::Commands::RemoveEndpoint::Id:
+            return "RemoveEndpoint";
         default:
             return "Unknown";
         }
@@ -6141,6 +6183,8 @@ char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId i
             return "CSRResponse";
         case chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::Id:
             return "NOCResponse";
+        case chip::app::Clusters::OperationalCredentials::Commands::SignVidVerificationResponse::Id:
+            return "SignVidVerificationResponse";
         default:
             return "Unknown";
         }
@@ -6524,12 +6568,21 @@ char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId i
             return "LookupRootCertificateResponse";
         case chip::app::Clusters::TlsCertificateManagement::Commands::TLSClientCSRResponse::Id:
             return "TLSClientCSRResponse";
-        case chip::app::Clusters::TlsCertificateManagement::Commands::ProvisionClientCertificateResponse::Id:
-            return "ProvisionClientCertificateResponse";
         case chip::app::Clusters::TlsCertificateManagement::Commands::FindClientCertificateResponse::Id:
             return "FindClientCertificateResponse";
         case chip::app::Clusters::TlsCertificateManagement::Commands::LookupClientCertificateResponse::Id:
             return "LookupClientCertificateResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::TlsClientManagement::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::TlsClientManagement::Commands::ProvisionEndpointResponse::Id:
+            return "ProvisionEndpointResponse";
+        case chip::app::Clusters::TlsClientManagement::Commands::FindEndpointResponse::Id:
+            return "FindEndpointResponse";
         default:
             return "Unknown";
         }
@@ -6699,12 +6752,42 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Extended Color Light";
     case 0x0000010F:
         return "Mounted On/Off Control";
+    case 0x00000110:
+        return "Mounted Dimmable Load Control";
     case 0x00000142:
         return "Camera";
     case 0x00000202:
         return "Window Covering";
     case 0x00000203:
         return "Window Covering Controller";
+    case 0x00000230:
+        return "ClosureBase";
+    case 0x00000231:
+        return "Window";
+    case 0x00000232:
+        return "Shutter";
+    case 0x00000233:
+        return "Shade";
+    case 0x00000234:
+        return "Curtain";
+    case 0x00000235:
+        return "Blind";
+    case 0x00000236:
+        return "Screen";
+    case 0x00000237:
+        return "Awning";
+    case 0x00000238:
+        return "Pergola";
+    case 0x00000239:
+        return "Door";
+    case 0x0000023A:
+        return "GarageDoor";
+    case 0x0000023B:
+        return "Gate";
+    case 0x0000023C:
+        return "Barrier";
+    case 0x0000023D:
+        return "Cabinet";
     case 0x00000300:
         return "Heating/Cooling Unit";
     case 0x00000301:

@@ -213,10 +213,10 @@ enum TestGlobalEnum : enum8 {
 }
 
 enum ThreeLevelAutoEnum : enum8 {
-  kLow = 0;
-  kMedium = 1;
-  kHigh = 2;
-  kAutomatic = 3;
+  kAuto = 0;
+  kLow = 1;
+  kMedium = 2;
+  kHigh = 3;
 }
 
 bitmap TestGlobalBitmap : bitmap32 {
@@ -622,82 +622,21 @@ cluster OtaSoftwareUpdateProvider = 41 {
   command NotifyUpdateApplied(NotifyUpdateAppliedRequest): DefaultSuccess = 4;
 }
 
-/** Provides an interface for downloading and applying OTA software updates */
-cluster OtaSoftwareUpdateRequestor = 42 {
+/** Nodes should be expected to be deployed to any and all regions of the world. These global regions
+      may have differing common languages, units of measurements, and numerical formatting
+      standards. As such, Nodes that visually or audibly convey information need a mechanism by which
+      they can be configured to use a user’s preferred language, units, etc */
+cluster LocalizationConfiguration = 43 {
   revision 1; // NOTE: Default/not specifically set
 
-  enum AnnouncementReasonEnum : enum8 {
-    kSimpleAnnouncement = 0;
-    kUpdateAvailable = 1;
-    kUrgentUpdateAvailable = 2;
-  }
-
-  enum ChangeReasonEnum : enum8 {
-    kUnknown = 0;
-    kSuccess = 1;
-    kFailure = 2;
-    kTimeOut = 3;
-    kDelayByProvider = 4;
-  }
-
-  enum UpdateStateEnum : enum8 {
-    kUnknown = 0;
-    kIdle = 1;
-    kQuerying = 2;
-    kDelayedOnQuery = 3;
-    kDownloading = 4;
-    kApplying = 5;
-    kDelayedOnApply = 6;
-    kRollingBack = 7;
-    kDelayedOnUserConsent = 8;
-  }
-
-  fabric_scoped struct ProviderLocation {
-    node_id providerNodeID = 1;
-    endpoint_no endpoint = 2;
-    fabric_idx fabricIndex = 254;
-  }
-
-  info event StateTransition = 0 {
-    UpdateStateEnum previousState = 0;
-    UpdateStateEnum newState = 1;
-    ChangeReasonEnum reason = 2;
-    nullable int32u targetSoftwareVersion = 3;
-  }
-
-  critical event VersionApplied = 1 {
-    int32u softwareVersion = 0;
-    int16u productID = 1;
-  }
-
-  info event DownloadError = 2 {
-    int32u softwareVersion = 0;
-    int64u bytesDownloaded = 1;
-    nullable int8u progressPercent = 2;
-    nullable int64s platformCode = 3;
-  }
-
-  attribute access(write: administer) ProviderLocation defaultOTAProviders[] = 0;
-  readonly attribute boolean updatePossible = 1;
-  readonly attribute UpdateStateEnum updateState = 2;
-  readonly attribute nullable int8u updateStateProgress = 3;
+  attribute access(write: manage) char_string<35> activeLocale = 0;
+  readonly attribute char_string supportedLocales[] = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
-  request struct AnnounceOTAProviderRequest {
-    node_id providerNodeID = 0;
-    vendor_id vendorID = 1;
-    AnnouncementReasonEnum announcementReason = 2;
-    optional octet_string<512> metadataForNode = 3;
-    endpoint_no endpoint = 4;
-  }
-
-  /** Announce the presence of an OTA Provider */
-  command AnnounceOTAProvider(AnnounceOTAProviderRequest): DefaultSuccess = 0;
 }
 
 /** Nodes should be expected to be deployed to any and all regions of the world. These global regions
@@ -718,6 +657,265 @@ cluster UnitLocalization = 45 {
   }
 
   attribute access(write: manage) optional TempUnitEnum temperatureUnit = 0;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+/** This cluster is used to describe the configuration and capabilities of a physical power source that provides power to the Node. */
+cluster PowerSource = 47 {
+  revision 1; // NOTE: Default/not specifically set
+
+  enum BatApprovedChemistryEnum : enum16 {
+    kUnspecified = 0;
+    kAlkaline = 1;
+    kLithiumCarbonFluoride = 2;
+    kLithiumChromiumOxide = 3;
+    kLithiumCopperOxide = 4;
+    kLithiumIronDisulfide = 5;
+    kLithiumManganeseDioxide = 6;
+    kLithiumThionylChloride = 7;
+    kMagnesium = 8;
+    kMercuryOxide = 9;
+    kNickelOxyhydride = 10;
+    kSilverOxide = 11;
+    kZincAir = 12;
+    kZincCarbon = 13;
+    kZincChloride = 14;
+    kZincManganeseDioxide = 15;
+    kLeadAcid = 16;
+    kLithiumCobaltOxide = 17;
+    kLithiumIon = 18;
+    kLithiumIonPolymer = 19;
+    kLithiumIronPhosphate = 20;
+    kLithiumSulfur = 21;
+    kLithiumTitanate = 22;
+    kNickelCadmium = 23;
+    kNickelHydrogen = 24;
+    kNickelIron = 25;
+    kNickelMetalHydride = 26;
+    kNickelZinc = 27;
+    kSilverZinc = 28;
+    kSodiumIon = 29;
+    kSodiumSulfur = 30;
+    kZincBromide = 31;
+    kZincCerium = 32;
+  }
+
+  enum BatChargeFaultEnum : enum8 {
+    kUnspecified = 0;
+    kAmbientTooHot = 1;
+    kAmbientTooCold = 2;
+    kBatteryTooHot = 3;
+    kBatteryTooCold = 4;
+    kBatteryAbsent = 5;
+    kBatteryOverVoltage = 6;
+    kBatteryUnderVoltage = 7;
+    kChargerOverVoltage = 8;
+    kChargerUnderVoltage = 9;
+    kSafetyTimeout = 10;
+  }
+
+  enum BatChargeLevelEnum : enum8 {
+    kOK = 0;
+    kWarning = 1;
+    kCritical = 2;
+  }
+
+  enum BatChargeStateEnum : enum8 {
+    kUnknown = 0;
+    kIsCharging = 1;
+    kIsAtFullCharge = 2;
+    kIsNotCharging = 3;
+  }
+
+  enum BatCommonDesignationEnum : enum16 {
+    kUnspecified = 0;
+    kAAA = 1;
+    kAA = 2;
+    kC = 3;
+    kD = 4;
+    k4v5 = 5;
+    k6v0 = 6;
+    k9v0 = 7;
+    k12AA = 8;
+    kAAAA = 9;
+    kA = 10;
+    kB = 11;
+    kF = 12;
+    kN = 13;
+    kNo6 = 14;
+    kSubC = 15;
+    kA23 = 16;
+    kA27 = 17;
+    kBA5800 = 18;
+    kDuplex = 19;
+    k4SR44 = 20;
+    k523 = 21;
+    k531 = 22;
+    k15v0 = 23;
+    k22v5 = 24;
+    k30v0 = 25;
+    k45v0 = 26;
+    k67v5 = 27;
+    kJ = 28;
+    kCR123A = 29;
+    kCR2 = 30;
+    k2CR5 = 31;
+    kCRP2 = 32;
+    kCRV3 = 33;
+    kSR41 = 34;
+    kSR43 = 35;
+    kSR44 = 36;
+    kSR45 = 37;
+    kSR48 = 38;
+    kSR54 = 39;
+    kSR55 = 40;
+    kSR57 = 41;
+    kSR58 = 42;
+    kSR59 = 43;
+    kSR60 = 44;
+    kSR63 = 45;
+    kSR64 = 46;
+    kSR65 = 47;
+    kSR66 = 48;
+    kSR67 = 49;
+    kSR68 = 50;
+    kSR69 = 51;
+    kSR516 = 52;
+    kSR731 = 53;
+    kSR712 = 54;
+    kLR932 = 55;
+    kA5 = 56;
+    kA10 = 57;
+    kA13 = 58;
+    kA312 = 59;
+    kA675 = 60;
+    kAC41E = 61;
+    k10180 = 62;
+    k10280 = 63;
+    k10440 = 64;
+    k14250 = 65;
+    k14430 = 66;
+    k14500 = 67;
+    k14650 = 68;
+    k15270 = 69;
+    k16340 = 70;
+    kRCR123A = 71;
+    k17500 = 72;
+    k17670 = 73;
+    k18350 = 74;
+    k18500 = 75;
+    k18650 = 76;
+    k19670 = 77;
+    k25500 = 78;
+    k26650 = 79;
+    k32600 = 80;
+  }
+
+  enum BatFaultEnum : enum8 {
+    kUnspecified = 0;
+    kOverTemp = 1;
+    kUnderTemp = 2;
+  }
+
+  enum BatReplaceabilityEnum : enum8 {
+    kUnspecified = 0;
+    kNotReplaceable = 1;
+    kUserReplaceable = 2;
+    kFactoryReplaceable = 3;
+  }
+
+  enum PowerSourceStatusEnum : enum8 {
+    kUnspecified = 0;
+    kActive = 1;
+    kStandby = 2;
+    kUnavailable = 3;
+  }
+
+  enum WiredCurrentTypeEnum : enum8 {
+    kAC = 0;
+    kDC = 1;
+  }
+
+  enum WiredFaultEnum : enum8 {
+    kUnspecified = 0;
+    kOverVoltage = 1;
+    kUnderVoltage = 2;
+  }
+
+  bitmap Feature : bitmap32 {
+    kWired = 0x1;
+    kBattery = 0x2;
+    kRechargeable = 0x4;
+    kReplaceable = 0x8;
+  }
+
+  struct BatChargeFaultChangeType {
+    BatChargeFaultEnum current[] = 0;
+    BatChargeFaultEnum previous[] = 1;
+  }
+
+  struct BatFaultChangeType {
+    BatFaultEnum current[] = 0;
+    BatFaultEnum previous[] = 1;
+  }
+
+  struct WiredFaultChangeType {
+    WiredFaultEnum current[] = 0;
+    WiredFaultEnum previous[] = 1;
+  }
+
+  info event WiredFaultChange = 0 {
+    WiredFaultEnum current[] = 0;
+    WiredFaultEnum previous[] = 1;
+  }
+
+  info event BatFaultChange = 1 {
+    BatFaultEnum current[] = 0;
+    BatFaultEnum previous[] = 1;
+  }
+
+  info event BatChargeFaultChange = 2 {
+    BatChargeFaultEnum current[] = 0;
+    BatChargeFaultEnum previous[] = 1;
+  }
+
+  readonly attribute PowerSourceStatusEnum status = 0;
+  readonly attribute int8u order = 1;
+  readonly attribute char_string<60> description = 2;
+  readonly attribute optional nullable int32u wiredAssessedInputVoltage = 3;
+  readonly attribute optional nullable int16u wiredAssessedInputFrequency = 4;
+  readonly attribute optional WiredCurrentTypeEnum wiredCurrentType = 5;
+  readonly attribute optional nullable int32u wiredAssessedCurrent = 6;
+  readonly attribute optional int32u wiredNominalVoltage = 7;
+  readonly attribute optional int32u wiredMaximumCurrent = 8;
+  readonly attribute optional boolean wiredPresent = 9;
+  readonly attribute optional WiredFaultEnum activeWiredFaults[] = 10;
+  readonly attribute optional nullable int32u batVoltage = 11;
+  readonly attribute optional nullable int8u batPercentRemaining = 12;
+  readonly attribute optional nullable int32u batTimeRemaining = 13;
+  readonly attribute optional BatChargeLevelEnum batChargeLevel = 14;
+  readonly attribute optional boolean batReplacementNeeded = 15;
+  readonly attribute optional BatReplaceabilityEnum batReplaceability = 16;
+  readonly attribute optional boolean batPresent = 17;
+  readonly attribute optional BatFaultEnum activeBatFaults[] = 18;
+  readonly attribute optional char_string<60> batReplacementDescription = 19;
+  readonly attribute optional BatCommonDesignationEnum batCommonDesignation = 20;
+  readonly attribute optional char_string<20> batANSIDesignation = 21;
+  readonly attribute optional char_string<20> batIECDesignation = 22;
+  readonly attribute optional BatApprovedChemistryEnum batApprovedChemistry = 23;
+  readonly attribute optional int32u batCapacity = 24;
+  readonly attribute optional int8u batQuantity = 25;
+  readonly attribute optional BatChargeStateEnum batChargeState = 26;
+  readonly attribute optional nullable int32u batTimeToFullCharge = 27;
+  readonly attribute optional boolean batFunctionalWhileCharging = 28;
+  readonly attribute optional nullable int32u batChargingCurrent = 29;
+  readonly attribute optional BatChargeFaultEnum activeBatChargeFaults[] = 30;
+  readonly attribute endpoint_no endpointList[] = 31;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1492,12 +1690,14 @@ cluster OperationalCredentials = 62 {
     fabric_id fabricID = 3;
     node_id nodeID = 4;
     char_string<32> label = 5;
+    optional octet_string<85> vidVerificationStatement = 6;
     fabric_idx fabricIndex = 254;
   }
 
   fabric_scoped struct NOCStruct {
-    fabric_sensitive octet_string noc = 1;
-    nullable fabric_sensitive octet_string icac = 2;
+    octet_string noc = 1;
+    nullable octet_string icac = 2;
+    optional octet_string vvsc = 3;
     fabric_idx fabricIndex = 254;
   }
 
@@ -1572,6 +1772,23 @@ cluster OperationalCredentials = 62 {
     octet_string rootCACertificate = 0;
   }
 
+  request struct SetVidVerificationStatementRequest {
+    optional vendor_id vendorID = 0;
+    optional octet_string vidVerificationStatement = 1;
+    optional octet_string vvsc = 2;
+  }
+
+  request struct SignVidVerificationRequestRequest {
+    fabric_idx fabricIndex = 0;
+    octet_string<32> clientChallenge = 1;
+  }
+
+  response struct SignVidVerificationResponse = 14 {
+    fabric_idx fabricIndex = 0;
+    int8u fabricBindingVersion = 1;
+    octet_string signature = 2;
+  }
+
   /** Sender is requesting attestation information from the receiver. */
   command access(invoke: administer) AttestationRequest(AttestationRequestRequest): AttestationResponse = 0;
   /** Sender is requesting a device attestation certificate from the receiver. */
@@ -1588,6 +1805,10 @@ cluster OperationalCredentials = 62 {
   command access(invoke: administer) RemoveFabric(RemoveFabricRequest): NOCResponse = 10;
   /** This command SHALL add a Trusted Root CA Certificate, provided as its CHIP Certificate representation. */
   command access(invoke: administer) AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
+  /** This command SHALL be used to update any of the accessing fabric's associated VendorID, VidVerificatioNStatement or VVSC (Vendor Verification Signing Certificate). */
+  fabric command access(invoke: administer) SetVidVerificationStatement(SetVidVerificationStatementRequest): DefaultSuccess = 12;
+  /** This command SHALL be used to request that the server authenticate the fabric associated with the FabricIndex given. */
+  command access(invoke: administer) SignVidVerificationRequest(SignVidVerificationRequestRequest): SignVidVerificationResponse = 13;
 }
 
 /** The Group Key Management Cluster is the mechanism by which group keys are managed. */
@@ -1821,7 +2042,7 @@ cluster IcdManagement = 70 {
 }
 
 endpoint 0 {
-  device type ma_rootdevice = 22, version 1;
+  device type ma_rootdevice = 22, version 3;
   device type ma_powersource = 17, version 1;
 
   binding cluster OtaSoftwareUpdateProvider;
@@ -1841,7 +2062,6 @@ endpoint 0 {
   server cluster AccessControl {
     emits event AccessControlEntryChanged;
     callback attribute acl;
-    callback attribute extension;
     callback attribute subjectsPerAccessControlEntry;
     callback attribute targetsPerAccessControlEntry;
     callback attribute accessControlEntriesPerFabric;
@@ -1873,21 +2093,17 @@ endpoint 0 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 4;
   }
 
-  server cluster OtaSoftwareUpdateRequestor {
-    emits event StateTransition;
-    emits event VersionApplied;
-    emits event DownloadError;
-    callback attribute defaultOTAProviders;
-    ram      attribute updatePossible default = 1;
-    ram      attribute updateState default = 0;
-    ram      attribute updateStateProgress default = 0;
+  server cluster LocalizationConfiguration {
+    ram      attribute activeLocale;
+    callback attribute supportedLocales;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
-
-    handle command AnnounceOTAProvider;
   }
 
   server cluster UnitLocalization {
@@ -1896,6 +2112,21 @@ endpoint 0 {
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster PowerSource {
+    ram      attribute status;
+    ram      attribute order;
+    ram      attribute description;
+    ram      attribute batChargeLevel;
+    ram      attribute batReplacementNeeded;
+    ram      attribute batReplaceability;
+    callback attribute endpointList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 2;
+    ram      attribute clusterRevision default = 3;
   }
 
   server cluster GeneralCommissioning {
@@ -1908,7 +2139,7 @@ endpoint 0 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
 
     handle command ArmFailSafe;
     handle command ArmFailSafeResponse;
@@ -1979,7 +2210,7 @@ endpoint 0 {
     callback attribute operationalDatasetComponents;
     callback attribute activeNetworkFaultsList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 3;
   }
 
   server cluster WiFiNetworkDiagnostics {
@@ -2105,7 +2336,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_contactsensor = 21, version 1;
+  device type ma_contactsensor = 21, version 2;
 
 
   server cluster Identify {
@@ -2115,7 +2346,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 5;
 
     handle command Identify;
     handle command TriggerEffect;

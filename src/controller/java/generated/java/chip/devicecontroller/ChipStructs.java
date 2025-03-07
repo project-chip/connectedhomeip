@@ -3077,12 +3077,14 @@ public static class OperationalCredentialsClusterFabricDescriptorStruct {
   public Long fabricID;
   public Long nodeID;
   public String label;
+  public Optional<byte[]> vidVerificationStatement;
   public Integer fabricIndex;
   private static final long ROOT_PUBLIC_KEY_ID = 1L;
   private static final long VENDOR_ID_ID = 2L;
   private static final long FABRIC_ID_ID = 3L;
   private static final long NODE_ID_ID = 4L;
   private static final long LABEL_ID = 5L;
+  private static final long VID_VERIFICATION_STATEMENT_ID = 6L;
   private static final long FABRIC_INDEX_ID = 254L;
 
   public OperationalCredentialsClusterFabricDescriptorStruct(
@@ -3091,6 +3093,7 @@ public static class OperationalCredentialsClusterFabricDescriptorStruct {
     Long fabricID,
     Long nodeID,
     String label,
+    Optional<byte[]> vidVerificationStatement,
     Integer fabricIndex
   ) {
     this.rootPublicKey = rootPublicKey;
@@ -3098,6 +3101,7 @@ public static class OperationalCredentialsClusterFabricDescriptorStruct {
     this.fabricID = fabricID;
     this.nodeID = nodeID;
     this.label = label;
+    this.vidVerificationStatement = vidVerificationStatement;
     this.fabricIndex = fabricIndex;
   }
 
@@ -3108,6 +3112,7 @@ public static class OperationalCredentialsClusterFabricDescriptorStruct {
     values.add(new StructElement(FABRIC_ID_ID, new UIntType(fabricID)));
     values.add(new StructElement(NODE_ID_ID, new UIntType(nodeID)));
     values.add(new StructElement(LABEL_ID, new StringType(label)));
+    values.add(new StructElement(VID_VERIFICATION_STATEMENT_ID, vidVerificationStatement.<BaseTLVType>map((nonOptionalvidVerificationStatement) -> new ByteArrayType(nonOptionalvidVerificationStatement)).orElse(new EmptyType())));
     values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
 
     return new StructType(values);
@@ -3122,6 +3127,7 @@ public static class OperationalCredentialsClusterFabricDescriptorStruct {
     Long fabricID = null;
     Long nodeID = null;
     String label = null;
+    Optional<byte[]> vidVerificationStatement = Optional.empty();
     Integer fabricIndex = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == ROOT_PUBLIC_KEY_ID) {
@@ -3149,6 +3155,11 @@ public static class OperationalCredentialsClusterFabricDescriptorStruct {
           StringType castingValue = element.value(StringType.class);
           label = castingValue.value(String.class);
         }
+      } else if (element.contextTagNum() == VID_VERIFICATION_STATEMENT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          vidVerificationStatement = Optional.of(castingValue.value(byte[].class));
+        }
       } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
@@ -3162,6 +3173,7 @@ public static class OperationalCredentialsClusterFabricDescriptorStruct {
       fabricID,
       nodeID,
       label,
+      vidVerificationStatement,
       fabricIndex
     );
   }
@@ -3185,6 +3197,9 @@ public static class OperationalCredentialsClusterFabricDescriptorStruct {
     output.append("\tlabel: ");
     output.append(label);
     output.append("\n");
+    output.append("\tvidVerificationStatement: ");
+    output.append(vidVerificationStatement.isPresent() ? Arrays.toString(vidVerificationStatement.get()) : "");
+    output.append("\n");
     output.append("\tfabricIndex: ");
     output.append(fabricIndex);
     output.append("\n");
@@ -3195,18 +3210,22 @@ public static class OperationalCredentialsClusterFabricDescriptorStruct {
 public static class OperationalCredentialsClusterNOCStruct {
   public byte[] noc;
   public @Nullable byte[] icac;
+  public Optional<byte[]> vvsc;
   public Integer fabricIndex;
   private static final long NOC_ID = 1L;
   private static final long ICAC_ID = 2L;
+  private static final long VVSC_ID = 3L;
   private static final long FABRIC_INDEX_ID = 254L;
 
   public OperationalCredentialsClusterNOCStruct(
     byte[] noc,
     @Nullable byte[] icac,
+    Optional<byte[]> vvsc,
     Integer fabricIndex
   ) {
     this.noc = noc;
     this.icac = icac;
+    this.vvsc = vvsc;
     this.fabricIndex = fabricIndex;
   }
 
@@ -3214,6 +3233,7 @@ public static class OperationalCredentialsClusterNOCStruct {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(NOC_ID, new ByteArrayType(noc)));
     values.add(new StructElement(ICAC_ID, icac != null ? new ByteArrayType(icac) : new NullType()));
+    values.add(new StructElement(VVSC_ID, vvsc.<BaseTLVType>map((nonOptionalvvsc) -> new ByteArrayType(nonOptionalvvsc)).orElse(new EmptyType())));
     values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
 
     return new StructType(values);
@@ -3225,6 +3245,7 @@ public static class OperationalCredentialsClusterNOCStruct {
     }
     byte[] noc = null;
     @Nullable byte[] icac = null;
+    Optional<byte[]> vvsc = Optional.empty();
     Integer fabricIndex = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == NOC_ID) {
@@ -3237,6 +3258,11 @@ public static class OperationalCredentialsClusterNOCStruct {
           ByteArrayType castingValue = element.value(ByteArrayType.class);
           icac = castingValue.value(byte[].class);
         }
+      } else if (element.contextTagNum() == VVSC_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          vvsc = Optional.of(castingValue.value(byte[].class));
+        }
       } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
@@ -3247,6 +3273,7 @@ public static class OperationalCredentialsClusterNOCStruct {
     return new OperationalCredentialsClusterNOCStruct(
       noc,
       icac,
+      vvsc,
       fabricIndex
     );
   }
@@ -3260,6 +3287,9 @@ public static class OperationalCredentialsClusterNOCStruct {
     output.append("\n");
     output.append("\ticac: ");
     output.append(Arrays.toString(icac));
+    output.append("\n");
+    output.append("\tvvsc: ");
+    output.append(vvsc.isPresent() ? Arrays.toString(vvsc.get()) : "");
     output.append("\n");
     output.append("\tfabricIndex: ");
     output.append(fabricIndex);
@@ -14075,25 +14105,21 @@ public static class CameraAvStreamManagementClusterAudioStreamStruct {
 public static class CameraAvStreamManagementClusterVideoSensorParamsStruct {
   public Integer sensorWidth;
   public Integer sensorHeight;
-  public Boolean HDRCapable;
   public Integer maxFPS;
-  public Integer maxHDRFPS;
+  public Optional<Integer> maxHDRFPS;
   private static final long SENSOR_WIDTH_ID = 0L;
   private static final long SENSOR_HEIGHT_ID = 1L;
-  private static final long HDR_CAPABLE_ID = 2L;
-  private static final long MAX_FPS_ID = 3L;
-  private static final long MAX_HDRFPS_ID = 4L;
+  private static final long MAX_FPS_ID = 2L;
+  private static final long MAX_HDRFPS_ID = 3L;
 
   public CameraAvStreamManagementClusterVideoSensorParamsStruct(
     Integer sensorWidth,
     Integer sensorHeight,
-    Boolean HDRCapable,
     Integer maxFPS,
-    Integer maxHDRFPS
+    Optional<Integer> maxHDRFPS
   ) {
     this.sensorWidth = sensorWidth;
     this.sensorHeight = sensorHeight;
-    this.HDRCapable = HDRCapable;
     this.maxFPS = maxFPS;
     this.maxHDRFPS = maxHDRFPS;
   }
@@ -14102,9 +14128,8 @@ public static class CameraAvStreamManagementClusterVideoSensorParamsStruct {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(SENSOR_WIDTH_ID, new UIntType(sensorWidth)));
     values.add(new StructElement(SENSOR_HEIGHT_ID, new UIntType(sensorHeight)));
-    values.add(new StructElement(HDR_CAPABLE_ID, new BooleanType(HDRCapable)));
     values.add(new StructElement(MAX_FPS_ID, new UIntType(maxFPS)));
-    values.add(new StructElement(MAX_HDRFPS_ID, new UIntType(maxHDRFPS)));
+    values.add(new StructElement(MAX_HDRFPS_ID, maxHDRFPS.<BaseTLVType>map((nonOptionalmaxHDRFPS) -> new UIntType(nonOptionalmaxHDRFPS)).orElse(new EmptyType())));
 
     return new StructType(values);
   }
@@ -14115,9 +14140,8 @@ public static class CameraAvStreamManagementClusterVideoSensorParamsStruct {
     }
     Integer sensorWidth = null;
     Integer sensorHeight = null;
-    Boolean HDRCapable = null;
     Integer maxFPS = null;
-    Integer maxHDRFPS = null;
+    Optional<Integer> maxHDRFPS = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == SENSOR_WIDTH_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -14129,11 +14153,6 @@ public static class CameraAvStreamManagementClusterVideoSensorParamsStruct {
           UIntType castingValue = element.value(UIntType.class);
           sensorHeight = castingValue.value(Integer.class);
         }
-      } else if (element.contextTagNum() == HDR_CAPABLE_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
-          BooleanType castingValue = element.value(BooleanType.class);
-          HDRCapable = castingValue.value(Boolean.class);
-        }
       } else if (element.contextTagNum() == MAX_FPS_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
@@ -14142,14 +14161,13 @@ public static class CameraAvStreamManagementClusterVideoSensorParamsStruct {
       } else if (element.contextTagNum() == MAX_HDRFPS_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          maxHDRFPS = castingValue.value(Integer.class);
+          maxHDRFPS = Optional.of(castingValue.value(Integer.class));
         }
       }
     }
     return new CameraAvStreamManagementClusterVideoSensorParamsStruct(
       sensorWidth,
       sensorHeight,
-      HDRCapable,
       maxFPS,
       maxHDRFPS
     );
@@ -14164,9 +14182,6 @@ public static class CameraAvStreamManagementClusterVideoSensorParamsStruct {
     output.append("\n");
     output.append("\tsensorHeight: ");
     output.append(sensorHeight);
-    output.append("\n");
-    output.append("\tHDRCapable: ");
-    output.append(HDRCapable);
     output.append("\n");
     output.append("\tmaxFPS: ");
     output.append(maxFPS);
@@ -14606,46 +14621,46 @@ public static class WebRTCTransportProviderClusterICEServerStruct {
 public static class WebRTCTransportProviderClusterWebRTCSessionStruct {
   public Integer id;
   public Long peerNodeID;
-  public Integer peerFabricIndex;
   public Integer streamUsage;
   public @Nullable Integer videoStreamID;
   public @Nullable Integer audioStreamID;
   public Integer metadataOptions;
+  public Integer fabricIndex;
   private static final long ID_ID = 1L;
   private static final long PEER_NODE_ID_ID = 2L;
-  private static final long PEER_FABRIC_INDEX_ID = 3L;
-  private static final long STREAM_USAGE_ID = 4L;
-  private static final long VIDEO_STREAM_ID_ID = 5L;
-  private static final long AUDIO_STREAM_ID_ID = 6L;
-  private static final long METADATA_OPTIONS_ID = 7L;
+  private static final long STREAM_USAGE_ID = 3L;
+  private static final long VIDEO_STREAM_ID_ID = 4L;
+  private static final long AUDIO_STREAM_ID_ID = 5L;
+  private static final long METADATA_OPTIONS_ID = 6L;
+  private static final long FABRIC_INDEX_ID = 254L;
 
   public WebRTCTransportProviderClusterWebRTCSessionStruct(
     Integer id,
     Long peerNodeID,
-    Integer peerFabricIndex,
     Integer streamUsage,
     @Nullable Integer videoStreamID,
     @Nullable Integer audioStreamID,
-    Integer metadataOptions
+    Integer metadataOptions,
+    Integer fabricIndex
   ) {
     this.id = id;
     this.peerNodeID = peerNodeID;
-    this.peerFabricIndex = peerFabricIndex;
     this.streamUsage = streamUsage;
     this.videoStreamID = videoStreamID;
     this.audioStreamID = audioStreamID;
     this.metadataOptions = metadataOptions;
+    this.fabricIndex = fabricIndex;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(ID_ID, new UIntType(id)));
     values.add(new StructElement(PEER_NODE_ID_ID, new UIntType(peerNodeID)));
-    values.add(new StructElement(PEER_FABRIC_INDEX_ID, new UIntType(peerFabricIndex)));
     values.add(new StructElement(STREAM_USAGE_ID, new UIntType(streamUsage)));
     values.add(new StructElement(VIDEO_STREAM_ID_ID, videoStreamID != null ? new UIntType(videoStreamID) : new NullType()));
     values.add(new StructElement(AUDIO_STREAM_ID_ID, audioStreamID != null ? new UIntType(audioStreamID) : new NullType()));
     values.add(new StructElement(METADATA_OPTIONS_ID, new UIntType(metadataOptions)));
+    values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
 
     return new StructType(values);
   }
@@ -14656,11 +14671,11 @@ public static class WebRTCTransportProviderClusterWebRTCSessionStruct {
     }
     Integer id = null;
     Long peerNodeID = null;
-    Integer peerFabricIndex = null;
     Integer streamUsage = null;
     @Nullable Integer videoStreamID = null;
     @Nullable Integer audioStreamID = null;
     Integer metadataOptions = null;
+    Integer fabricIndex = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -14671,11 +14686,6 @@ public static class WebRTCTransportProviderClusterWebRTCSessionStruct {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
           peerNodeID = castingValue.value(Long.class);
-        }
-      } else if (element.contextTagNum() == PEER_FABRIC_INDEX_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          peerFabricIndex = castingValue.value(Integer.class);
         }
       } else if (element.contextTagNum() == STREAM_USAGE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -14697,16 +14707,21 @@ public static class WebRTCTransportProviderClusterWebRTCSessionStruct {
           UIntType castingValue = element.value(UIntType.class);
           metadataOptions = castingValue.value(Integer.class);
         }
+      } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          fabricIndex = castingValue.value(Integer.class);
+        }
       }
     }
     return new WebRTCTransportProviderClusterWebRTCSessionStruct(
       id,
       peerNodeID,
-      peerFabricIndex,
       streamUsage,
       videoStreamID,
       audioStreamID,
-      metadataOptions
+      metadataOptions,
+      fabricIndex
     );
   }
 
@@ -14720,9 +14735,6 @@ public static class WebRTCTransportProviderClusterWebRTCSessionStruct {
     output.append("\tpeerNodeID: ");
     output.append(peerNodeID);
     output.append("\n");
-    output.append("\tpeerFabricIndex: ");
-    output.append(peerFabricIndex);
-    output.append("\n");
     output.append("\tstreamUsage: ");
     output.append(streamUsage);
     output.append("\n");
@@ -14734,6 +14746,9 @@ public static class WebRTCTransportProviderClusterWebRTCSessionStruct {
     output.append("\n");
     output.append("\tmetadataOptions: ");
     output.append(metadataOptions);
+    output.append("\n");
+    output.append("\tfabricIndex: ");
+    output.append(fabricIndex);
     output.append("\n");
     output.append("}\n");
     return output.toString();
@@ -14833,46 +14848,46 @@ public static class WebRTCTransportRequestorClusterICEServerStruct {
 public static class WebRTCTransportRequestorClusterWebRTCSessionStruct {
   public Integer id;
   public Long peerNodeID;
-  public Integer peerFabricIndex;
   public Integer streamUsage;
   public @Nullable Integer videoStreamID;
   public @Nullable Integer audioStreamID;
   public Integer metadataOptions;
+  public Integer fabricIndex;
   private static final long ID_ID = 1L;
   private static final long PEER_NODE_ID_ID = 2L;
-  private static final long PEER_FABRIC_INDEX_ID = 3L;
-  private static final long STREAM_USAGE_ID = 4L;
-  private static final long VIDEO_STREAM_ID_ID = 5L;
-  private static final long AUDIO_STREAM_ID_ID = 6L;
-  private static final long METADATA_OPTIONS_ID = 7L;
+  private static final long STREAM_USAGE_ID = 3L;
+  private static final long VIDEO_STREAM_ID_ID = 4L;
+  private static final long AUDIO_STREAM_ID_ID = 5L;
+  private static final long METADATA_OPTIONS_ID = 6L;
+  private static final long FABRIC_INDEX_ID = 254L;
 
   public WebRTCTransportRequestorClusterWebRTCSessionStruct(
     Integer id,
     Long peerNodeID,
-    Integer peerFabricIndex,
     Integer streamUsage,
     @Nullable Integer videoStreamID,
     @Nullable Integer audioStreamID,
-    Integer metadataOptions
+    Integer metadataOptions,
+    Integer fabricIndex
   ) {
     this.id = id;
     this.peerNodeID = peerNodeID;
-    this.peerFabricIndex = peerFabricIndex;
     this.streamUsage = streamUsage;
     this.videoStreamID = videoStreamID;
     this.audioStreamID = audioStreamID;
     this.metadataOptions = metadataOptions;
+    this.fabricIndex = fabricIndex;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(ID_ID, new UIntType(id)));
     values.add(new StructElement(PEER_NODE_ID_ID, new UIntType(peerNodeID)));
-    values.add(new StructElement(PEER_FABRIC_INDEX_ID, new UIntType(peerFabricIndex)));
     values.add(new StructElement(STREAM_USAGE_ID, new UIntType(streamUsage)));
     values.add(new StructElement(VIDEO_STREAM_ID_ID, videoStreamID != null ? new UIntType(videoStreamID) : new NullType()));
     values.add(new StructElement(AUDIO_STREAM_ID_ID, audioStreamID != null ? new UIntType(audioStreamID) : new NullType()));
     values.add(new StructElement(METADATA_OPTIONS_ID, new UIntType(metadataOptions)));
+    values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
 
     return new StructType(values);
   }
@@ -14883,11 +14898,11 @@ public static class WebRTCTransportRequestorClusterWebRTCSessionStruct {
     }
     Integer id = null;
     Long peerNodeID = null;
-    Integer peerFabricIndex = null;
     Integer streamUsage = null;
     @Nullable Integer videoStreamID = null;
     @Nullable Integer audioStreamID = null;
     Integer metadataOptions = null;
+    Integer fabricIndex = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -14898,11 +14913,6 @@ public static class WebRTCTransportRequestorClusterWebRTCSessionStruct {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
           peerNodeID = castingValue.value(Long.class);
-        }
-      } else if (element.contextTagNum() == PEER_FABRIC_INDEX_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          peerFabricIndex = castingValue.value(Integer.class);
         }
       } else if (element.contextTagNum() == STREAM_USAGE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -14924,16 +14934,21 @@ public static class WebRTCTransportRequestorClusterWebRTCSessionStruct {
           UIntType castingValue = element.value(UIntType.class);
           metadataOptions = castingValue.value(Integer.class);
         }
+      } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          fabricIndex = castingValue.value(Integer.class);
+        }
       }
     }
     return new WebRTCTransportRequestorClusterWebRTCSessionStruct(
       id,
       peerNodeID,
-      peerFabricIndex,
       streamUsage,
       videoStreamID,
       audioStreamID,
-      metadataOptions
+      metadataOptions,
+      fabricIndex
     );
   }
 
@@ -14947,9 +14962,6 @@ public static class WebRTCTransportRequestorClusterWebRTCSessionStruct {
     output.append("\tpeerNodeID: ");
     output.append(peerNodeID);
     output.append("\n");
-    output.append("\tpeerFabricIndex: ");
-    output.append(peerFabricIndex);
-    output.append("\n");
     output.append("\tstreamUsage: ");
     output.append(streamUsage);
     output.append("\n");
@@ -14961,6 +14973,9 @@ public static class WebRTCTransportRequestorClusterWebRTCSessionStruct {
     output.append("\n");
     output.append("\tmetadataOptions: ");
     output.append(metadataOptions);
+    output.append("\n");
+    output.append("\tfabricIndex: ");
+    output.append(fabricIndex);
     output.append("\n");
     output.append("}\n");
     return output.toString();
@@ -16136,13 +16151,13 @@ public static class EcosystemInformationClusterLocationDescriptorStruct {
 }
 public static class TlsCertificateManagementClusterTLSCertStruct {
   public Integer caid;
-  public byte[] certificate;
+  public Optional<byte[]> certificate;
   private static final long CAID_ID = 0L;
   private static final long CERTIFICATE_ID = 1L;
 
   public TlsCertificateManagementClusterTLSCertStruct(
     Integer caid,
-    byte[] certificate
+    Optional<byte[]> certificate
   ) {
     this.caid = caid;
     this.certificate = certificate;
@@ -16151,7 +16166,7 @@ public static class TlsCertificateManagementClusterTLSCertStruct {
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(CAID_ID, new UIntType(caid)));
-    values.add(new StructElement(CERTIFICATE_ID, new ByteArrayType(certificate)));
+    values.add(new StructElement(CERTIFICATE_ID, certificate.<BaseTLVType>map((nonOptionalcertificate) -> new ByteArrayType(nonOptionalcertificate)).orElse(new EmptyType())));
 
     return new StructType(values);
   }
@@ -16161,7 +16176,7 @@ public static class TlsCertificateManagementClusterTLSCertStruct {
       return null;
     }
     Integer caid = null;
-    byte[] certificate = null;
+    Optional<byte[]> certificate = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == CAID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -16171,7 +16186,7 @@ public static class TlsCertificateManagementClusterTLSCertStruct {
       } else if (element.contextTagNum() == CERTIFICATE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
           ByteArrayType castingValue = element.value(ByteArrayType.class);
-          certificate = castingValue.value(byte[].class);
+          certificate = Optional.of(castingValue.value(byte[].class));
         }
       }
     }
@@ -16189,7 +16204,7 @@ public static class TlsCertificateManagementClusterTLSCertStruct {
     output.append(caid);
     output.append("\n");
     output.append("\tcertificate: ");
-    output.append(Arrays.toString(certificate));
+    output.append(certificate.isPresent() ? Arrays.toString(certificate.get()) : "");
     output.append("\n");
     output.append("}\n");
     return output.toString();
@@ -16197,16 +16212,16 @@ public static class TlsCertificateManagementClusterTLSCertStruct {
 }
 public static class TlsCertificateManagementClusterTLSClientCertificateDetailStruct {
   public Integer ccdid;
-  public byte[] clientCertificate;
-  public ArrayList<byte[]> intermediateCertificates;
+  public Optional<byte[]> clientCertificate;
+  public Optional<ArrayList<byte[]>> intermediateCertificates;
   private static final long CCDID_ID = 0L;
   private static final long CLIENT_CERTIFICATE_ID = 1L;
   private static final long INTERMEDIATE_CERTIFICATES_ID = 2L;
 
   public TlsCertificateManagementClusterTLSClientCertificateDetailStruct(
     Integer ccdid,
-    byte[] clientCertificate,
-    ArrayList<byte[]> intermediateCertificates
+    Optional<byte[]> clientCertificate,
+    Optional<ArrayList<byte[]>> intermediateCertificates
   ) {
     this.ccdid = ccdid;
     this.clientCertificate = clientCertificate;
@@ -16216,8 +16231,8 @@ public static class TlsCertificateManagementClusterTLSClientCertificateDetailStr
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(CCDID_ID, new UIntType(ccdid)));
-    values.add(new StructElement(CLIENT_CERTIFICATE_ID, new ByteArrayType(clientCertificate)));
-    values.add(new StructElement(INTERMEDIATE_CERTIFICATES_ID, ArrayType.generateArrayType(intermediateCertificates, (elementintermediateCertificates) -> new ByteArrayType(elementintermediateCertificates))));
+    values.add(new StructElement(CLIENT_CERTIFICATE_ID, clientCertificate.<BaseTLVType>map((nonOptionalclientCertificate) -> new ByteArrayType(nonOptionalclientCertificate)).orElse(new EmptyType())));
+    values.add(new StructElement(INTERMEDIATE_CERTIFICATES_ID, intermediateCertificates.<BaseTLVType>map((nonOptionalintermediateCertificates) -> ArrayType.generateArrayType(nonOptionalintermediateCertificates, (elementnonOptionalintermediateCertificates) -> new ByteArrayType(elementnonOptionalintermediateCertificates))).orElse(new EmptyType())));
 
     return new StructType(values);
   }
@@ -16227,8 +16242,8 @@ public static class TlsCertificateManagementClusterTLSClientCertificateDetailStr
       return null;
     }
     Integer ccdid = null;
-    byte[] clientCertificate = null;
-    ArrayList<byte[]> intermediateCertificates = null;
+    Optional<byte[]> clientCertificate = Optional.empty();
+    Optional<ArrayList<byte[]>> intermediateCertificates = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == CCDID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -16238,12 +16253,12 @@ public static class TlsCertificateManagementClusterTLSClientCertificateDetailStr
       } else if (element.contextTagNum() == CLIENT_CERTIFICATE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
           ByteArrayType castingValue = element.value(ByteArrayType.class);
-          clientCertificate = castingValue.value(byte[].class);
+          clientCertificate = Optional.of(castingValue.value(byte[].class));
         }
       } else if (element.contextTagNum() == INTERMEDIATE_CERTIFICATES_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Array) {
           ArrayType castingValue = element.value(ArrayType.class);
-          intermediateCertificates = castingValue.map((elementcastingValue) -> elementcastingValue.value(byte[].class));
+          intermediateCertificates = Optional.of(castingValue.map((elementcastingValue) -> elementcastingValue.value(byte[].class)));
         }
       }
     }
@@ -16262,10 +16277,131 @@ public static class TlsCertificateManagementClusterTLSClientCertificateDetailStr
     output.append(ccdid);
     output.append("\n");
     output.append("\tclientCertificate: ");
-    output.append(Arrays.toString(clientCertificate));
+    output.append(clientCertificate.isPresent() ? Arrays.toString(clientCertificate.get()) : "");
     output.append("\n");
     output.append("\tintermediateCertificates: ");
     output.append(intermediateCertificates);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class TlsClientManagementClusterTLSEndpointStruct {
+  public Integer endpointID;
+  public byte[] hostname;
+  public Integer port;
+  public Integer caid;
+  public @Nullable Integer ccdid;
+  public Integer status;
+  private static final long ENDPOINT_ID_ID = 0L;
+  private static final long HOSTNAME_ID = 1L;
+  private static final long PORT_ID = 2L;
+  private static final long CAID_ID = 3L;
+  private static final long CCDID_ID = 4L;
+  private static final long STATUS_ID = 5L;
+
+  public TlsClientManagementClusterTLSEndpointStruct(
+    Integer endpointID,
+    byte[] hostname,
+    Integer port,
+    Integer caid,
+    @Nullable Integer ccdid,
+    Integer status
+  ) {
+    this.endpointID = endpointID;
+    this.hostname = hostname;
+    this.port = port;
+    this.caid = caid;
+    this.ccdid = ccdid;
+    this.status = status;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(ENDPOINT_ID_ID, new UIntType(endpointID)));
+    values.add(new StructElement(HOSTNAME_ID, new ByteArrayType(hostname)));
+    values.add(new StructElement(PORT_ID, new UIntType(port)));
+    values.add(new StructElement(CAID_ID, new UIntType(caid)));
+    values.add(new StructElement(CCDID_ID, ccdid != null ? new UIntType(ccdid) : new NullType()));
+    values.add(new StructElement(STATUS_ID, new UIntType(status)));
+
+    return new StructType(values);
+  }
+
+  public static TlsClientManagementClusterTLSEndpointStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer endpointID = null;
+    byte[] hostname = null;
+    Integer port = null;
+    Integer caid = null;
+    @Nullable Integer ccdid = null;
+    Integer status = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == ENDPOINT_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          endpointID = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == HOSTNAME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          hostname = castingValue.value(byte[].class);
+        }
+      } else if (element.contextTagNum() == PORT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          port = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == CAID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          caid = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == CCDID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          ccdid = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == STATUS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          status = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new TlsClientManagementClusterTLSEndpointStruct(
+      endpointID,
+      hostname,
+      port,
+      caid,
+      ccdid,
+      status
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("TlsClientManagementClusterTLSEndpointStruct {\n");
+    output.append("\tendpointID: ");
+    output.append(endpointID);
+    output.append("\n");
+    output.append("\thostname: ");
+    output.append(Arrays.toString(hostname));
+    output.append("\n");
+    output.append("\tport: ");
+    output.append(port);
+    output.append("\n");
+    output.append("\tcaid: ");
+    output.append(caid);
+    output.append("\n");
+    output.append("\tccdid: ");
+    output.append(ccdid);
+    output.append("\n");
+    output.append("\tstatus: ");
+    output.append(status);
     output.append("\n");
     output.append("}\n");
     return output.toString();

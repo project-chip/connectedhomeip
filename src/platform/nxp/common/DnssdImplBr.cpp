@@ -579,7 +579,7 @@ CHIP_ERROR FromSrpCacheToMdnsData(const otSrpServerService * service, const otSr
         tmpName = otSrpServerServiceGetInstanceName(service);
         // Extract from the <instance>.<type>.<protocol>.<domain-name>. the <instance> part
         size_t substringSize = strchr(tmpName, '.') - tmpName;
-        if (substringSize >= ArraySize(mdnsService.mName))
+        if (substringSize >= MATTER_ARRAY_SIZE(mdnsService.mName))
         {
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
@@ -588,7 +588,7 @@ CHIP_ERROR FromSrpCacheToMdnsData(const otSrpServerService * service, const otSr
         // Extract from the <instance>.<type>.<protocol>.<domain-name>. the <type> part.
         tmpName       = tmpName + substringSize + 1;
         substringSize = strchr(tmpName, '.') - tmpName;
-        if (substringSize >= ArraySize(mdnsService.mType))
+        if (substringSize >= MATTER_ARRAY_SIZE(mdnsService.mType))
         {
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
@@ -618,7 +618,7 @@ CHIP_ERROR FromSrpCacheToMdnsData(const otSrpServerService * service, const otSr
     // Extract from the <hostname>.<domain-name>. the <hostname> part.
     tmpName       = otSrpServerHostGetFullName(host);
     substringSize = strchr(tmpName, '.') - tmpName;
-    if (substringSize >= ArraySize(mdnsService.mHostName))
+    if (substringSize >= MATTER_ARRAY_SIZE(mdnsService.mHostName))
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -677,11 +677,11 @@ static CHIP_ERROR FromServiceTypeToMdnsData(chip::Dnssd::DnssdService & mdnsServ
 
     // Extract from the <type>.<protocol> the <type> part.
     substringSize = strchr(aServiceType, '.') - aServiceType;
-    if (substringSize >= ArraySize(mdnsService.mType))
+    if (substringSize >= MATTER_ARRAY_SIZE(mdnsService.mType))
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    Platform::CopyString(mdnsService.mType, ArraySize(mdnsService.mType), aServiceType);
+    Platform::CopyString(mdnsService.mType, MATTER_ARRAY_SIZE(mdnsService.mType), aServiceType);
 
     // Extract from the <type>.<protocol>. the .<protocol> part.
     protocolSubstringStart = aServiceType + substringSize;
@@ -694,11 +694,11 @@ static CHIP_ERROR FromServiceTypeToMdnsData(chip::Dnssd::DnssdService & mdnsServ
 
     // Jump over '.' in protocolSubstringStart and substract the string terminator from the size
     substringSize = strlen(++protocolSubstringStart) - 1;
-    if (substringSize >= ArraySize(protocol))
+    if (substringSize >= MATTER_ARRAY_SIZE(protocol))
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    Platform::CopyString(protocol, ArraySize(protocol), protocolSubstringStart);
+    Platform::CopyString(protocol, MATTER_ARRAY_SIZE(protocol), protocolSubstringStart);
 
     if (strncmp(protocol, "_udp", chip::Dnssd::kDnssdProtocolTextMaxSize) == 0)
     {
