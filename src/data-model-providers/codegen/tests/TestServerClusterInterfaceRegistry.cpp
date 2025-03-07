@@ -401,8 +401,9 @@ TEST_F(TestServerClusterInterfaceRegistry, Context)
 
 TEST_F(TestServerClusterInterfaceRegistry, MultiPathRegistration)
 {
-    const std::array<ConcreteClusterPath, 3> kTestPaths{ {
+    const std::array<ConcreteClusterPath, 4> kTestPaths{ {
         { 1, 100 },
+        { 15, 88 },
         { 0, 20 },
         { 15, 33 },
     } };
@@ -428,6 +429,17 @@ TEST_F(TestServerClusterInterfaceRegistry, MultiPathRegistration)
     {
         ASSERT_EQ(registry.Get(p), nullptr);
     }
+
+    // Verify listing works
+    ServerClusterInterfaceRegistry::ClustersList clusters = registry.ClustersOnEndpoint(15);
+    auto it                                               = clusters.begin();
+    ASSERT_NE(it, clusters.end());
+    ASSERT_EQ(*it, 88u);
+    ++it;
+    ASSERT_NE(it, clusters.end());
+    ASSERT_EQ(*it, 33u);
+    ++it;
+    ASSERT_EQ(it, clusters.end());
 }
 
 TEST_F(TestServerClusterInterfaceRegistry, StartupErrors)
