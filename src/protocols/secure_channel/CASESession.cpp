@@ -2619,9 +2619,9 @@ System::Clock::Timeout ComputeRoundTripTimeout(ExchangeContext::Timeout serverPr
     const auto & defaultMRRPConfig   = GetDefaultMRPConfig();
     const auto & localMRPConfig      = maybeLocalMRPConfig.ValueOr(defaultMRRPConfig);
     return GetRetransmissionTimeout(remoteMrpConfig.mActiveRetransTimeout, remoteMrpConfig.mIdleRetransTimeout,
-                                    // Assume peer is idle, as a worst-case assumption (probably true for
-                                    // Sigma1, since that will be our initial message on the session, but less
-                                    // so for Sigma2).
+                                    // The activity time only matters when isFirstMessageOnExchange is false,
+                                    // which only happens for Sigma1.  In that case, assume peer is idle, 
+                                    // as a worst-case assumption, and pass System::Clock::kZero.
                                     System::Clock::kZero, remoteMrpConfig.mActiveThresholdTime, isFirstMessageOnExchange) +
         serverProcessingTime +
         GetRetransmissionTimeout(localMRPConfig.mActiveRetransTimeout, localMRPConfig.mIdleRetransTimeout,
