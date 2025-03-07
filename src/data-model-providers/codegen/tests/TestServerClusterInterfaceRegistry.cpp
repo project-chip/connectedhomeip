@@ -440,7 +440,6 @@ TEST_F(TestServerClusterInterfaceRegistry, MultiPathRegistration)
     {
         ASSERT_EQ(registry.Get(p), nullptr);
     }
-
 }
 
 TEST_F(TestServerClusterInterfaceRegistry, StartupErrors)
