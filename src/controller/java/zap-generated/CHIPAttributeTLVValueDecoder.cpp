@@ -40413,12 +40413,6 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             chip::JniReferences::GetInstance().CreateBoxedObject<jint>(value_sensorHeightClassName.c_str(),
                                                                        value_sensorHeightCtorSignature.c_str(),
                                                                        jnivalue_sensorHeight, value_sensorHeight);
-            jobject value_HDRCapable;
-            std::string value_HDRCapableClassName     = "java/lang/Boolean";
-            std::string value_HDRCapableCtorSignature = "(Z)V";
-            jboolean jnivalue_HDRCapable              = static_cast<jboolean>(cppValue.HDRCapable);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jboolean>(
-                value_HDRCapableClassName.c_str(), value_HDRCapableCtorSignature.c_str(), jnivalue_HDRCapable, value_HDRCapable);
             jobject value_maxFPS;
             std::string value_maxFPSClassName     = "java/lang/Integer";
             std::string value_maxFPSCtorSignature = "(I)V";
@@ -40426,11 +40420,21 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
                 value_maxFPSClassName.c_str(), value_maxFPSCtorSignature.c_str(), jnivalue_maxFPS, value_maxFPS);
             jobject value_maxHDRFPS;
-            std::string value_maxHDRFPSClassName     = "java/lang/Integer";
-            std::string value_maxHDRFPSCtorSignature = "(I)V";
-            jint jnivalue_maxHDRFPS                  = static_cast<jint>(cppValue.maxHDRFPS);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                value_maxHDRFPSClassName.c_str(), value_maxHDRFPSCtorSignature.c_str(), jnivalue_maxHDRFPS, value_maxHDRFPS);
+            if (!cppValue.maxHDRFPS.HasValue())
+            {
+                chip::JniReferences::GetInstance().CreateOptional(nullptr, value_maxHDRFPS);
+            }
+            else
+            {
+                jobject value_maxHDRFPSInsideOptional;
+                std::string value_maxHDRFPSInsideOptionalClassName     = "java/lang/Integer";
+                std::string value_maxHDRFPSInsideOptionalCtorSignature = "(I)V";
+                jint jnivalue_maxHDRFPSInsideOptional                  = static_cast<jint>(cppValue.maxHDRFPS.Value());
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    value_maxHDRFPSInsideOptionalClassName.c_str(), value_maxHDRFPSInsideOptionalCtorSignature.c_str(),
+                    jnivalue_maxHDRFPSInsideOptional, value_maxHDRFPSInsideOptional);
+                chip::JniReferences::GetInstance().CreateOptional(value_maxHDRFPSInsideOptional, value_maxHDRFPS);
+            }
 
             {
                 jclass videoSensorParamsStructStructClass_0;
@@ -40446,7 +40450,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 jmethodID videoSensorParamsStructStructCtor_0;
                 err = chip::JniReferences::GetInstance().FindMethod(
                     env, videoSensorParamsStructStructClass_0, "<init>",
-                    "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Boolean;Ljava/lang/Integer;Ljava/lang/Integer;)V",
+                    "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/util/Optional;)V",
                     &videoSensorParamsStructStructCtor_0);
                 if (err != CHIP_NO_ERROR || videoSensorParamsStructStructCtor_0 == nullptr)
                 {
@@ -40456,7 +40460,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
 
                 value = env->NewObject(videoSensorParamsStructStructClass_0, videoSensorParamsStructStructCtor_0, value_sensorWidth,
-                                       value_sensorHeight, value_HDRCapable, value_maxFPS, value_maxHDRFPS);
+                                       value_sensorHeight, value_maxFPS, value_maxHDRFPS);
             }
             return value;
         }
@@ -40997,8 +41001,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                            jnivalue, value);
             return value;
         }
-        case Attributes::FabricsUsingCamera::Id: {
-            using TypeInfo = Attributes::FabricsUsingCamera::TypeInfo;
+        case Attributes::SupportedStreamUsages::Id: {
+            using TypeInfo = Attributes::SupportedStreamUsages::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -42580,13 +42584,6 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(newElement_0_peerNodeIDClassName.c_str(),
                                                                             newElement_0_peerNodeIDCtorSignature.c_str(),
                                                                             jninewElement_0_peerNodeID, newElement_0_peerNodeID);
-                jobject newElement_0_peerFabricIndex;
-                std::string newElement_0_peerFabricIndexClassName     = "java/lang/Integer";
-                std::string newElement_0_peerFabricIndexCtorSignature = "(I)V";
-                jint jninewElement_0_peerFabricIndex                  = static_cast<jint>(entry_0.peerFabricIndex);
-                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                    newElement_0_peerFabricIndexClassName.c_str(), newElement_0_peerFabricIndexCtorSignature.c_str(),
-                    jninewElement_0_peerFabricIndex, newElement_0_peerFabricIndex);
                 jobject newElement_0_streamUsage;
                 std::string newElement_0_streamUsageClassName     = "java/lang/Integer";
                 std::string newElement_0_streamUsageCtorSignature = "(I)V";
@@ -42629,6 +42626,13 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
                     newElement_0_metadataOptionsClassName.c_str(), newElement_0_metadataOptionsCtorSignature.c_str(),
                     jninewElement_0_metadataOptions, newElement_0_metadataOptions);
+                jobject newElement_0_fabricIndex;
+                std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
+                std::string newElement_0_fabricIndexCtorSignature = "(I)V";
+                jint jninewElement_0_fabricIndex                  = static_cast<jint>(entry_0.fabricIndex);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_fabricIndexClassName.c_str(),
+                                                                           newElement_0_fabricIndexCtorSignature.c_str(),
+                                                                           jninewElement_0_fabricIndex, newElement_0_fabricIndex);
 
                 {
                     jclass webRTCSessionStructStructClass_1;
@@ -42656,8 +42660,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
                     newElement_0 =
                         env->NewObject(webRTCSessionStructStructClass_1, webRTCSessionStructStructCtor_1, newElement_0_id,
-                                       newElement_0_peerNodeID, newElement_0_peerFabricIndex, newElement_0_streamUsage,
-                                       newElement_0_videoStreamID, newElement_0_audioStreamID, newElement_0_metadataOptions);
+                                       newElement_0_peerNodeID, newElement_0_streamUsage, newElement_0_videoStreamID,
+                                       newElement_0_audioStreamID, newElement_0_metadataOptions, newElement_0_fabricIndex);
                 }
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
@@ -42809,13 +42813,6 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(newElement_0_peerNodeIDClassName.c_str(),
                                                                             newElement_0_peerNodeIDCtorSignature.c_str(),
                                                                             jninewElement_0_peerNodeID, newElement_0_peerNodeID);
-                jobject newElement_0_peerFabricIndex;
-                std::string newElement_0_peerFabricIndexClassName     = "java/lang/Integer";
-                std::string newElement_0_peerFabricIndexCtorSignature = "(I)V";
-                jint jninewElement_0_peerFabricIndex                  = static_cast<jint>(entry_0.peerFabricIndex);
-                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                    newElement_0_peerFabricIndexClassName.c_str(), newElement_0_peerFabricIndexCtorSignature.c_str(),
-                    jninewElement_0_peerFabricIndex, newElement_0_peerFabricIndex);
                 jobject newElement_0_streamUsage;
                 std::string newElement_0_streamUsageClassName     = "java/lang/Integer";
                 std::string newElement_0_streamUsageCtorSignature = "(I)V";
@@ -42858,6 +42855,13 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
                     newElement_0_metadataOptionsClassName.c_str(), newElement_0_metadataOptionsCtorSignature.c_str(),
                     jninewElement_0_metadataOptions, newElement_0_metadataOptions);
+                jobject newElement_0_fabricIndex;
+                std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
+                std::string newElement_0_fabricIndexCtorSignature = "(I)V";
+                jint jninewElement_0_fabricIndex                  = static_cast<jint>(entry_0.fabricIndex);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_fabricIndexClassName.c_str(),
+                                                                           newElement_0_fabricIndexCtorSignature.c_str(),
+                                                                           jninewElement_0_fabricIndex, newElement_0_fabricIndex);
 
                 {
                     jclass webRTCSessionStructStructClass_1;
@@ -42885,8 +42889,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
                     newElement_0 =
                         env->NewObject(webRTCSessionStructStructClass_1, webRTCSessionStructStructCtor_1, newElement_0_id,
-                                       newElement_0_peerNodeID, newElement_0_peerFabricIndex, newElement_0_streamUsage,
-                                       newElement_0_videoStreamID, newElement_0_audioStreamID, newElement_0_metadataOptions);
+                                       newElement_0_peerNodeID, newElement_0_streamUsage, newElement_0_videoStreamID,
+                                       newElement_0_audioStreamID, newElement_0_metadataOptions, newElement_0_fabricIndex);
                 }
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
@@ -43999,6 +44003,233 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             jint jnivalue                  = static_cast<jint>(cppValue);
             chip::JniReferences::GetInstance().CreateBoxedObject<jint>(valueClassName.c_str(), valueCtorSignature.c_str(), jnivalue,
                                                                        value);
+            return value;
+        }
+        case Attributes::GeneratedCommandList::Id: {
+            using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            chip::JniReferences::GetInstance().CreateArrayList(value);
+
+            auto iter_value_0 = cppValue.begin();
+            while (iter_value_0.Next())
+            {
+                auto & entry_0 = iter_value_0.GetValue();
+                jobject newElement_0;
+                std::string newElement_0ClassName     = "java/lang/Long";
+                std::string newElement_0CtorSignature = "(J)V";
+                jlong jninewElement_0                 = static_cast<jlong>(entry_0);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                    newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), jninewElement_0, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
+            }
+            return value;
+        }
+        case Attributes::AcceptedCommandList::Id: {
+            using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            chip::JniReferences::GetInstance().CreateArrayList(value);
+
+            auto iter_value_0 = cppValue.begin();
+            while (iter_value_0.Next())
+            {
+                auto & entry_0 = iter_value_0.GetValue();
+                jobject newElement_0;
+                std::string newElement_0ClassName     = "java/lang/Long";
+                std::string newElement_0CtorSignature = "(J)V";
+                jlong jninewElement_0                 = static_cast<jlong>(entry_0);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                    newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), jninewElement_0, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
+            }
+            return value;
+        }
+        case Attributes::AttributeList::Id: {
+            using TypeInfo = Attributes::AttributeList::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            chip::JniReferences::GetInstance().CreateArrayList(value);
+
+            auto iter_value_0 = cppValue.begin();
+            while (iter_value_0.Next())
+            {
+                auto & entry_0 = iter_value_0.GetValue();
+                jobject newElement_0;
+                std::string newElement_0ClassName     = "java/lang/Long";
+                std::string newElement_0CtorSignature = "(J)V";
+                jlong jninewElement_0                 = static_cast<jlong>(entry_0);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                    newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), jninewElement_0, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
+            }
+            return value;
+        }
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Long";
+            std::string valueCtorSignature = "(J)V";
+            jlong jnivalue                 = static_cast<jlong>(cppValue);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                        jnivalue, value);
+            return value;
+        }
+        case Attributes::ClusterRevision::Id: {
+            using TypeInfo = Attributes::ClusterRevision::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Integer";
+            std::string valueCtorSignature = "(I)V";
+            jint jnivalue                  = static_cast<jint>(cppValue);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(valueClassName.c_str(), valueCtorSignature.c_str(), jnivalue,
+                                                                       value);
+            return value;
+        }
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::TlsClientManagement::Id: {
+        using namespace app::Clusters::TlsClientManagement;
+        switch (aPath.mAttributeId)
+        {
+        case Attributes::MaxProvisioned::Id: {
+            using TypeInfo = Attributes::MaxProvisioned::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Integer";
+            std::string valueCtorSignature = "(I)V";
+            jint jnivalue                  = static_cast<jint>(cppValue);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(valueClassName.c_str(), valueCtorSignature.c_str(), jnivalue,
+                                                                       value);
+            return value;
+        }
+        case Attributes::ProvisionedEndpoints::Id: {
+            using TypeInfo = Attributes::ProvisionedEndpoints::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            chip::JniReferences::GetInstance().CreateArrayList(value);
+
+            auto iter_value_0 = cppValue.begin();
+            while (iter_value_0.Next())
+            {
+                auto & entry_0 = iter_value_0.GetValue();
+                jobject newElement_0;
+                jobject newElement_0_endpointID;
+                std::string newElement_0_endpointIDClassName     = "java/lang/Integer";
+                std::string newElement_0_endpointIDCtorSignature = "(I)V";
+                jint jninewElement_0_endpointID                  = static_cast<jint>(entry_0.endpointID);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_endpointIDClassName.c_str(),
+                                                                           newElement_0_endpointIDCtorSignature.c_str(),
+                                                                           jninewElement_0_endpointID, newElement_0_endpointID);
+                jobject newElement_0_hostname;
+                jbyteArray newElement_0_hostnameByteArray = env->NewByteArray(static_cast<jsize>(entry_0.hostname.size()));
+                env->SetByteArrayRegion(newElement_0_hostnameByteArray, 0, static_cast<jsize>(entry_0.hostname.size()),
+                                        reinterpret_cast<const jbyte *>(entry_0.hostname.data()));
+                newElement_0_hostname = newElement_0_hostnameByteArray;
+                jobject newElement_0_port;
+                std::string newElement_0_portClassName     = "java/lang/Integer";
+                std::string newElement_0_portCtorSignature = "(I)V";
+                jint jninewElement_0_port                  = static_cast<jint>(entry_0.port);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_portClassName.c_str(),
+                                                                           newElement_0_portCtorSignature.c_str(),
+                                                                           jninewElement_0_port, newElement_0_port);
+                jobject newElement_0_caid;
+                std::string newElement_0_caidClassName     = "java/lang/Integer";
+                std::string newElement_0_caidCtorSignature = "(I)V";
+                jint jninewElement_0_caid                  = static_cast<jint>(entry_0.caid);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_caidClassName.c_str(),
+                                                                           newElement_0_caidCtorSignature.c_str(),
+                                                                           jninewElement_0_caid, newElement_0_caid);
+                jobject newElement_0_ccdid;
+                if (entry_0.ccdid.IsNull())
+                {
+                    newElement_0_ccdid = nullptr;
+                }
+                else
+                {
+                    std::string newElement_0_ccdidClassName     = "java/lang/Integer";
+                    std::string newElement_0_ccdidCtorSignature = "(I)V";
+                    jint jninewElement_0_ccdid                  = static_cast<jint>(entry_0.ccdid.Value());
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_ccdidClassName.c_str(),
+                                                                               newElement_0_ccdidCtorSignature.c_str(),
+                                                                               jninewElement_0_ccdid, newElement_0_ccdid);
+                }
+                jobject newElement_0_status;
+                std::string newElement_0_statusClassName     = "java/lang/Integer";
+                std::string newElement_0_statusCtorSignature = "(I)V";
+                jint jninewElement_0_status                  = static_cast<jint>(entry_0.status);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_statusClassName.c_str(),
+                                                                           newElement_0_statusCtorSignature.c_str(),
+                                                                           jninewElement_0_status, newElement_0_status);
+
+                {
+                    jclass TLSEndpointStructStructClass_1;
+                    err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                        env, "chip/devicecontroller/ChipStructs$TlsClientManagementClusterTLSEndpointStruct",
+                        TLSEndpointStructStructClass_1);
+                    if (err != CHIP_NO_ERROR)
+                    {
+                        ChipLogError(Zcl, "Could not find class ChipStructs$TlsClientManagementClusterTLSEndpointStruct");
+                        return nullptr;
+                    }
+
+                    jmethodID TLSEndpointStructStructCtor_1;
+                    err = chip::JniReferences::GetInstance().FindMethod(
+                        env, TLSEndpointStructStructClass_1, "<init>",
+                        "(Ljava/lang/Integer;[BLjava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V",
+                        &TLSEndpointStructStructCtor_1);
+                    if (err != CHIP_NO_ERROR || TLSEndpointStructStructCtor_1 == nullptr)
+                    {
+                        ChipLogError(Zcl, "Could not find ChipStructs$TlsClientManagementClusterTLSEndpointStruct constructor");
+                        return nullptr;
+                    }
+
+                    newElement_0 = env->NewObject(TLSEndpointStructStructClass_1, TLSEndpointStructStructCtor_1,
+                                                  newElement_0_endpointID, newElement_0_hostname, newElement_0_port,
+                                                  newElement_0_caid, newElement_0_ccdid, newElement_0_status);
+                }
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
+            }
             return value;
         }
         case Attributes::GeneratedCommandList::Id: {

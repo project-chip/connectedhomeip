@@ -3648,7 +3648,7 @@ cluster SmokeCoAlarm = 92 {
 
 /** Attributes and commands for configuring the Dishwasher alarm. */
 cluster DishwasherAlarm = 93 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   bitmap AlarmBitmap : bitmap32 {
     kInflowError = 0x1;
@@ -3689,9 +3689,9 @@ cluster DishwasherAlarm = 93 {
     AlarmBitmap mask = 0;
   }
 
-  /** Reset alarm */
+  /** This command resets active and latched alarms (if possible). */
   command Reset(ResetRequest): DefaultSuccess = 0;
-  /** Modify enabled alarms */
+  /** This command allows a client to request that an alarm be enabled or suppressed at the server. */
   command ModifyEnabledAlarms(ModifyEnabledAlarmsRequest): DefaultSuccess = 1;
 }
 
@@ -5300,7 +5300,7 @@ cluster WindowCovering = 258 {
 
 /** An interface for configuring and controlling pumps. */
 cluster PumpConfigurationAndControl = 512 {
-  revision 3;
+  revision 4;
 
   enum ControlModeEnum : enum8 {
     kConstantSpeed = 0;
@@ -5779,7 +5779,7 @@ cluster Thermostat = 513 {
 
 /** An interface for controlling a fan in a heating/cooling system. */
 cluster FanControl = 514 {
-  revision 4;
+  revision 5;
 
   enum AirflowDirectionEnum : enum8 {
     kForward = 0;
@@ -5855,7 +5855,7 @@ cluster FanControl = 514 {
     optional boolean lowestOff = 2;
   }
 
-  /** The Step command speeds up or slows down the fan, in steps. */
+  /** This command speeds up or slows down the fan, in steps, without a client having to know the fan speed. */
   command Step(StepRequest): DefaultSuccess = 0;
 }
 

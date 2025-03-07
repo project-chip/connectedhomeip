@@ -163,6 +163,7 @@
 | EcosystemInformation                                                | 0x0750 |
 | CommissionerControl                                                 | 0x0751 |
 | TlsCertificateManagement                                            | 0x0801 |
+| TlsClientManagement                                                 | 0x0802 |
 | UnitTesting                                                         | 0xFFF1FC05|
 | FaultInjection                                                      | 0xFFF1FC06|
 | SampleMei                                                           | 0xFFF1FC20|
@@ -14023,9 +14024,10 @@ private:
 | * VideoStreamModify                                                 |   0x05 |
 | * VideoStreamDeallocate                                             |   0x06 |
 | * SnapshotStreamAllocate                                            |   0x07 |
-| * SnapshotStreamDeallocate                                          |   0x09 |
-| * SetStreamPriorities                                               |   0x0A |
-| * CaptureSnapshot                                                   |   0x0B |
+| * SnapshotStreamModify                                              |   0x09 |
+| * SnapshotStreamDeallocate                                          |   0x0A |
+| * SetStreamPriorities                                               |   0x0B |
+| * CaptureSnapshot                                                   |   0x0C |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * MaxConcurrentVideoEncoders                                        | 0x0000 |
@@ -14042,7 +14044,7 @@ private:
 | * MaxNetworkBandwidth                                               | 0x000B |
 | * CurrentFrameRate                                                  | 0x000C |
 | * HDRModeEnabled                                                    | 0x000D |
-| * FabricsUsingCamera                                                | 0x000E |
+| * SupportedStreamUsages                                             | 0x000E |
 | * AllocatedVideoStreams                                             | 0x000F |
 | * AllocatedAudioStreams                                             | 0x0010 |
 | * AllocatedSnapshotStreams                                          | 0x0011 |
@@ -14076,9 +14078,6 @@ private:
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
-| * VideoStreamChanged                                                | 0x0000 |
-| * AudioStreamChanged                                                | 0x0001 |
-| * SnapshotStreamChanged                                             | 0x0002 |
 \*----------------------------------------------------------------------------*/
 
 /*
@@ -14310,6 +14309,8 @@ public:
         AddArgument("MinResolution", &mComplex_MinResolution);
         AddArgument("MaxResolution", &mComplex_MaxResolution);
         AddArgument("Quality", 0, UINT8_MAX, &mRequest.quality);
+        AddArgument("WatermarkEnabled", 0, 1, &mRequest.watermarkEnabled);
+        AddArgument("OSDEnabled", 0, 1, &mRequest.OSDEnabled);
         ClusterCommand::AddArguments();
     }
 
@@ -14340,6 +14341,46 @@ private:
         mComplex_MinResolution;
     TypedComplexArgument<chip::app::Clusters::CameraAvStreamManagement::Structs::VideoResolutionStruct::Type>
         mComplex_MaxResolution;
+};
+
+/*
+ * Command SnapshotStreamModify
+ */
+class CameraAvStreamManagementSnapshotStreamModify : public ClusterCommand
+{
+public:
+    CameraAvStreamManagementSnapshotStreamModify(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("snapshot-stream-modify", credsIssuerConfig)
+    {
+        AddArgument("SnapshotStreamID", 0, UINT16_MAX, &mRequest.snapshotStreamID);
+        AddArgument("WatermarkEnabled", 0, 1, &mRequest.watermarkEnabled);
+        AddArgument("OSDEnabled", 0, 1, &mRequest.OSDEnabled);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::CameraAvStreamManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::CameraAvStreamManagement::Commands::SnapshotStreamModify::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::CameraAvStreamManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::CameraAvStreamManagement::Commands::SnapshotStreamModify::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::CameraAvStreamManagement::Commands::SnapshotStreamModify::Type mRequest;
 };
 
 /*
@@ -16006,6 +16047,144 @@ public:
 
 private:
     chip::app::Clusters::TlsCertificateManagement::Commands::RemoveClientCertificate::Type mRequest;
+};
+
+/*----------------------------------------------------------------------------*\
+| Cluster TlsClientManagement                                         | 0x0802 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * ProvisionEndpoint                                                 |   0x00 |
+| * FindEndpoint                                                      |   0x02 |
+| * RemoveEndpoint                                                    |   0x04 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MaxProvisioned                                                    | 0x0000 |
+| * ProvisionedEndpoints                                              | 0x0001 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command ProvisionEndpoint
+ */
+class TlsClientManagementProvisionEndpoint : public ClusterCommand
+{
+public:
+    TlsClientManagementProvisionEndpoint(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("provision-endpoint", credsIssuerConfig)
+    {
+        AddArgument("Hostname", &mRequest.hostname);
+        AddArgument("Port", 0, UINT16_MAX, &mRequest.port);
+        AddArgument("Caid", 0, UINT16_MAX, &mRequest.caid);
+        AddArgument("Ccdid", 0, UINT16_MAX, &mRequest.ccdid);
+        AddArgument("EndpointID", 0, UINT16_MAX, &mRequest.endpointID);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::TlsClientManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::TlsClientManagement::Commands::ProvisionEndpoint::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::TlsClientManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::TlsClientManagement::Commands::ProvisionEndpoint::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::TlsClientManagement::Commands::ProvisionEndpoint::Type mRequest;
+};
+
+/*
+ * Command FindEndpoint
+ */
+class TlsClientManagementFindEndpoint : public ClusterCommand
+{
+public:
+    TlsClientManagementFindEndpoint(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("find-endpoint", credsIssuerConfig)
+    {
+        AddArgument("EndpointID", 0, UINT16_MAX, &mRequest.endpointID);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::TlsClientManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::TlsClientManagement::Commands::FindEndpoint::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::TlsClientManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::TlsClientManagement::Commands::FindEndpoint::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::TlsClientManagement::Commands::FindEndpoint::Type mRequest;
+};
+
+/*
+ * Command RemoveEndpoint
+ */
+class TlsClientManagementRemoveEndpoint : public ClusterCommand
+{
+public:
+    TlsClientManagementRemoveEndpoint(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("remove-endpoint", credsIssuerConfig)
+    {
+        AddArgument("EndpointID", 0, UINT16_MAX, &mRequest.endpointID);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::TlsClientManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::TlsClientManagement::Commands::RemoveEndpoint::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::TlsClientManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::TlsClientManagement::Commands::RemoveEndpoint::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::TlsClientManagement::Commands::RemoveEndpoint::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -28113,6 +28292,7 @@ void registerClusterCameraAvStreamManagement(Commands & commands, CredentialIssu
         make_unique<CameraAvStreamManagementVideoStreamModify>(credsIssuerConfig),        //
         make_unique<CameraAvStreamManagementVideoStreamDeallocate>(credsIssuerConfig),    //
         make_unique<CameraAvStreamManagementSnapshotStreamAllocate>(credsIssuerConfig),   //
+        make_unique<CameraAvStreamManagementSnapshotStreamModify>(credsIssuerConfig),     //
         make_unique<CameraAvStreamManagementSnapshotStreamDeallocate>(credsIssuerConfig), //
         make_unique<CameraAvStreamManagementSetStreamPriorities>(credsIssuerConfig),      //
         make_unique<CameraAvStreamManagementCaptureSnapshot>(credsIssuerConfig),          //
@@ -28136,7 +28316,7 @@ void registerClusterCameraAvStreamManagement(Commands & commands, CredentialIssu
         make_unique<ReadAttribute>(Id, "max-network-bandwidth", Attributes::MaxNetworkBandwidth::Id, credsIssuerConfig),         //
         make_unique<ReadAttribute>(Id, "current-frame-rate", Attributes::CurrentFrameRate::Id, credsIssuerConfig),               //
         make_unique<ReadAttribute>(Id, "hdrmode-enabled", Attributes::HDRModeEnabled::Id, credsIssuerConfig),                    //
-        make_unique<ReadAttribute>(Id, "fabrics-using-camera", Attributes::FabricsUsingCamera::Id, credsIssuerConfig),           //
+        make_unique<ReadAttribute>(Id, "supported-stream-usages", Attributes::SupportedStreamUsages::Id, credsIssuerConfig),     //
         make_unique<ReadAttribute>(Id, "allocated-video-streams", Attributes::AllocatedVideoStreams::Id, credsIssuerConfig),     //
         make_unique<ReadAttribute>(Id, "allocated-audio-streams", Attributes::AllocatedAudioStreams::Id, credsIssuerConfig),     //
         make_unique<ReadAttribute>(Id, "allocated-snapshot-streams", Attributes::AllocatedSnapshotStreams::Id,
@@ -28210,8 +28390,10 @@ void registerClusterCameraAvStreamManagement(Commands & commands, CredentialIssu
                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<bool>>(Id, "hdrmode-enabled", 0, 1, Attributes::HDRModeEnabled::Id, WriteCommandType::kWrite,
                                           credsIssuerConfig), //
-        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::FabricIndex>>>(
-            Id, "fabrics-using-camera", Attributes::FabricsUsingCamera::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::CameraAvStreamManagement::StreamUsageEnum>>>(
+            Id, "supported-stream-usages", Attributes::SupportedStreamUsages::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<
             chip::app::DataModel::List<const chip::app::Clusters::CameraAvStreamManagement::Structs::VideoStreamStruct::Type>>>(
             Id, "allocated-video-streams", Attributes::AllocatedVideoStreams::Id, WriteCommandType::kForceWrite,
@@ -28307,7 +28489,7 @@ void registerClusterCameraAvStreamManagement(Commands & commands, CredentialIssu
         make_unique<SubscribeAttribute>(Id, "max-network-bandwidth", Attributes::MaxNetworkBandwidth::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "current-frame-rate", Attributes::CurrentFrameRate::Id, credsIssuerConfig),           //
         make_unique<SubscribeAttribute>(Id, "hdrmode-enabled", Attributes::HDRModeEnabled::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "fabrics-using-camera", Attributes::FabricsUsingCamera::Id, credsIssuerConfig),       //
+        make_unique<SubscribeAttribute>(Id, "supported-stream-usages", Attributes::SupportedStreamUsages::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "allocated-video-streams", Attributes::AllocatedVideoStreams::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "allocated-audio-streams", Attributes::AllocatedAudioStreams::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "allocated-snapshot-streams", Attributes::AllocatedSnapshotStreams::Id,
@@ -28348,14 +28530,8 @@ void registerClusterCameraAvStreamManagement(Commands & commands, CredentialIssu
         //
         // Events
         //
-        make_unique<ReadEvent>(Id, credsIssuerConfig),                                                                    //
-        make_unique<ReadEvent>(Id, "video-stream-changed", Events::VideoStreamChanged::Id, credsIssuerConfig),            //
-        make_unique<ReadEvent>(Id, "audio-stream-changed", Events::AudioStreamChanged::Id, credsIssuerConfig),            //
-        make_unique<ReadEvent>(Id, "snapshot-stream-changed", Events::SnapshotStreamChanged::Id, credsIssuerConfig),      //
-        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                               //
-        make_unique<SubscribeEvent>(Id, "video-stream-changed", Events::VideoStreamChanged::Id, credsIssuerConfig),       //
-        make_unique<SubscribeEvent>(Id, "audio-stream-changed", Events::AudioStreamChanged::Id, credsIssuerConfig),       //
-        make_unique<SubscribeEvent>(Id, "snapshot-stream-changed", Events::SnapshotStreamChanged::Id, credsIssuerConfig), //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
     commands.RegisterCluster(clusterName, clusterCommands);
@@ -28878,6 +29054,65 @@ void registerClusterTlsCertificateManagement(Commands & commands, CredentialIssu
         make_unique<SubscribeAttribute>(Id, "max-client-certificates", Attributes::MaxClientCertificates::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "current-client-certificates", Attributes::CurrentClientCertificates::Id,
                                         credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.RegisterCluster(clusterName, clusterCommands);
+}
+void registerClusterTlsClientManagement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::TlsClientManagement;
+
+    const char * clusterName = "TlsClientManagement";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                   //
+        make_unique<TlsClientManagementProvisionEndpoint>(credsIssuerConfig), //
+        make_unique<TlsClientManagementFindEndpoint>(credsIssuerConfig),      //
+        make_unique<TlsClientManagementRemoveEndpoint>(credsIssuerConfig),    //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
+        make_unique<ReadAttribute>(Id, "max-provisioned", Attributes::MaxProvisioned::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "provisioned-endpoints", Attributes::ProvisionedEndpoints::Id, credsIssuerConfig),  //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttribute<uint8_t>>(Id, "max-provisioned", 0, UINT8_MAX, Attributes::MaxProvisioned::Id,
+                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::TlsClientManagement::Structs::TLSEndpointStruct::Type>>>(
+            Id, "provisioned-endpoints", Attributes::ProvisionedEndpoints::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                                //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
+        make_unique<SubscribeAttribute>(Id, "max-provisioned", Attributes::MaxProvisioned::Id, credsIssuerConfig),              //
+        make_unique<SubscribeAttribute>(Id, "provisioned-endpoints", Attributes::ProvisionedEndpoints::Id, credsIssuerConfig),  //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -29629,6 +29864,7 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterEcosystemInformation(commands, credsIssuerConfig);
     registerClusterCommissionerControl(commands, credsIssuerConfig);
     registerClusterTlsCertificateManagement(commands, credsIssuerConfig);
+    registerClusterTlsClientManagement(commands, credsIssuerConfig);
     registerClusterUnitTesting(commands, credsIssuerConfig);
     registerClusterFaultInjection(commands, credsIssuerConfig);
     registerClusterSampleMei(commands, credsIssuerConfig);

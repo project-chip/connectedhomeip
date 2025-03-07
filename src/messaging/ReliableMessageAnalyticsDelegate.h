@@ -68,7 +68,8 @@ public:
         // this value will be 0.
         uint32_t messageCounter = 0;
         // If the eventType is kRetransmission, this value will be populated with the number of the
-        // retransmission attempt
+        // retransmission attempt. A value of 1 indicates the first retransmission (i.e. the second
+        // transmission of the message). This value should never be 0.
         std::optional<uint8_t> retransmissionCount;
     };
 

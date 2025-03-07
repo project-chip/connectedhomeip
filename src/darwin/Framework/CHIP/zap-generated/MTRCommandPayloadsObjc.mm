@@ -33206,6 +33206,10 @@ NS_ASSUME_NONNULL_BEGIN
         _maxResolution = [MTRCameraAVStreamManagementClusterVideoResolutionStruct new];
 
         _quality = @(0);
+
+        _watermarkEnabled = nil;
+
+        _osdEnabled = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -33222,6 +33226,8 @@ NS_ASSUME_NONNULL_BEGIN
     other.minResolution = self.minResolution;
     other.maxResolution = self.maxResolution;
     other.quality = self.quality;
+    other.watermarkEnabled = self.watermarkEnabled;
+    other.osdEnabled = self.osdEnabled;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -33230,7 +33236,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: imageCodec:%@; maxFrameRate:%@; bitRate:%@; minResolution:%@; maxResolution:%@; quality:%@; >", NSStringFromClass([self class]), _imageCodec, _maxFrameRate, _bitRate, _minResolution, _maxResolution, _quality];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: imageCodec:%@; maxFrameRate:%@; bitRate:%@; minResolution:%@; maxResolution:%@; quality:%@; watermarkEnabled:%@; osdEnabled:%@; >", NSStringFromClass([self class]), _imageCodec, _maxFrameRate, _bitRate, _minResolution, _maxResolution, _quality, _watermarkEnabled, _osdEnabled];
     return descriptionString;
 }
 
@@ -33261,6 +33267,18 @@ NS_ASSUME_NONNULL_BEGIN
     }
     {
         encodableStruct.quality = self.quality.unsignedCharValue;
+    }
+    {
+        if (self.watermarkEnabled != nil) {
+            auto & definedValue_0 = encodableStruct.watermarkEnabled.Emplace();
+            definedValue_0 = self.watermarkEnabled.boolValue;
+        }
+    }
+    {
+        if (self.osdEnabled != nil) {
+            auto & definedValue_0 = encodableStruct.OSDEnabled.Emplace();
+            definedValue_0 = self.osdEnabled.boolValue;
+        }
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -33378,6 +33396,103 @@ NS_ASSUME_NONNULL_BEGIN
     return CHIP_NO_ERROR;
 }
 
+@end
+
+@implementation MTRCameraAVStreamManagementClusterSnapshotStreamModifyParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _snapshotStreamID = @(0);
+
+        _watermarkEnabled = nil;
+
+        _osdEnabled = nil;
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRCameraAVStreamManagementClusterSnapshotStreamModifyParams alloc] init];
+
+    other.snapshotStreamID = self.snapshotStreamID;
+    other.watermarkEnabled = self.watermarkEnabled;
+    other.osdEnabled = self.osdEnabled;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: snapshotStreamID:%@; watermarkEnabled:%@; osdEnabled:%@; >", NSStringFromClass([self class]), _snapshotStreamID, _watermarkEnabled, _osdEnabled];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRCameraAVStreamManagementClusterSnapshotStreamModifyParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::CameraAvStreamManagement::Commands::SnapshotStreamModify::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.snapshotStreamID = self.snapshotStreamID.unsignedShortValue;
+    }
+    {
+        if (self.watermarkEnabled != nil) {
+            auto & definedValue_0 = encodableStruct.watermarkEnabled.Emplace();
+            definedValue_0 = self.watermarkEnabled.boolValue;
+        }
+    }
+    {
+        if (self.osdEnabled != nil) {
+            auto & definedValue_0 = encodableStruct.OSDEnabled.Emplace();
+            definedValue_0 = self.osdEnabled.boolValue;
+        }
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
 @end
 
 @implementation MTRCameraAVStreamManagementClusterSnapshotStreamDeallocateParams
@@ -38488,6 +38603,464 @@ NS_ASSUME_NONNULL_BEGIN
     ListFreer listFreer;
     {
         encodableStruct.ccdid = self.ccdid.unsignedShortValue;
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRTLSClientManagementClusterProvisionEndpointParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _hostname = [NSData data];
+
+        _port = @(0);
+
+        _caid = @(0);
+
+        _ccdid = nil;
+
+        _endpointID = nil;
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRTLSClientManagementClusterProvisionEndpointParams alloc] init];
+
+    other.hostname = self.hostname;
+    other.port = self.port;
+    other.caid = self.caid;
+    other.ccdid = self.ccdid;
+    other.endpointID = self.endpointID;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: hostname:%@; port:%@; caid:%@; ccdid:%@; endpointID:%@; >", NSStringFromClass([self class]), [_hostname base64EncodedStringWithOptions:0], _port, _caid, _ccdid, _endpointID];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRTLSClientManagementClusterProvisionEndpointParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::TlsClientManagement::Commands::ProvisionEndpoint::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.hostname = AsByteSpan(self.hostname);
+    }
+    {
+        encodableStruct.port = self.port.unsignedShortValue;
+    }
+    {
+        encodableStruct.caid = self.caid.unsignedShortValue;
+    }
+    {
+        if (self.ccdid == nil) {
+            encodableStruct.ccdid.SetNull();
+        } else {
+            auto & nonNullValue_0 = encodableStruct.ccdid.SetNonNull();
+            nonNullValue_0 = self.ccdid.unsignedShortValue;
+        }
+    }
+    {
+        if (self.endpointID == nil) {
+            encodableStruct.endpointID.SetNull();
+        } else {
+            auto & nonNullValue_0 = encodableStruct.endpointID.SetNonNull();
+            nonNullValue_0 = self.endpointID.unsignedShortValue;
+        }
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRTLSClientManagementClusterProvisionEndpointResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _endpointID = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRTLSClientManagementClusterProvisionEndpointResponseParams alloc] init];
+
+    other.endpointID = self.endpointID;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: endpointID:%@; >", NSStringFromClass([self class]), _endpointID];
+    return descriptionString;
+}
+
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::TlsClientManagement::Commands::ProvisionEndpointResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRTLSClientManagementClusterProvisionEndpointResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::TlsClientManagement::Commands::ProvisionEndpointResponse::DecodableType &)decodableStruct
+{
+    {
+        self.endpointID = [NSNumber numberWithUnsignedShort:decodableStruct.endpointID];
+    }
+    return CHIP_NO_ERROR;
+}
+
+@end
+
+@implementation MTRTLSClientManagementClusterFindEndpointParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _endpointID = nil;
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRTLSClientManagementClusterFindEndpointParams alloc] init];
+
+    other.endpointID = self.endpointID;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: endpointID:%@; >", NSStringFromClass([self class]), _endpointID];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRTLSClientManagementClusterFindEndpointParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::TlsClientManagement::Commands::FindEndpoint::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        if (self.endpointID == nil) {
+            encodableStruct.endpointID.SetNull();
+        } else {
+            auto & nonNullValue_0 = encodableStruct.endpointID.SetNonNull();
+            nonNullValue_0 = self.endpointID.unsignedShortValue;
+        }
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRTLSClientManagementClusterFindEndpointResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _endpoints = [NSArray array];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRTLSClientManagementClusterFindEndpointResponseParams alloc] init];
+
+    other.endpoints = self.endpoints;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: endpoints:%@; >", NSStringFromClass([self class]), _endpoints];
+    return descriptionString;
+}
+
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::TlsClientManagement::Commands::FindEndpointResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRTLSClientManagementClusterFindEndpointResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::TlsClientManagement::Commands::FindEndpointResponse::DecodableType &)decodableStruct
+{
+    {
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = decodableStruct.endpoints.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                MTRTLSClientManagementClusterTLSEndpointStruct * newElement_0;
+                newElement_0 = [MTRTLSClientManagementClusterTLSEndpointStruct new];
+                newElement_0.endpointID = [NSNumber numberWithUnsignedShort:entry_0.endpointID];
+                newElement_0.hostname = AsData(entry_0.hostname);
+                newElement_0.port = [NSNumber numberWithUnsignedShort:entry_0.port];
+                newElement_0.caid = [NSNumber numberWithUnsignedShort:entry_0.caid];
+                if (entry_0.ccdid.IsNull()) {
+                    newElement_0.ccdid = nil;
+                } else {
+                    newElement_0.ccdid = [NSNumber numberWithUnsignedShort:entry_0.ccdid.Value()];
+                }
+                newElement_0.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.status)];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                return err;
+            }
+            self.endpoints = array_0;
+        }
+    }
+    return CHIP_NO_ERROR;
+}
+
+@end
+
+@implementation MTRTLSClientManagementClusterRemoveEndpointParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _endpointID = @(0);
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRTLSClientManagementClusterRemoveEndpointParams alloc] init];
+
+    other.endpointID = self.endpointID;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: endpointID:%@; >", NSStringFromClass([self class]), _endpointID];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRTLSClientManagementClusterRemoveEndpointParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::TlsClientManagement::Commands::RemoveEndpoint::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.endpointID = self.endpointID.unsignedShortValue;
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
