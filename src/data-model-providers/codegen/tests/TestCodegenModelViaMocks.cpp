@@ -959,7 +959,7 @@ TEST_F(TestCodegenModelViaMocks, IterateOverEndpoints)
     CodegenDataModelProviderWithContext model;
 
     // This iteration relies on the hard-coding that occurs when mock_ember is used
-    DataModel::ListBuilder<EndpointId> endpointsBuilder;
+    DataModel::ListBuilder<EndpointEntry> endpointsBuilder;
 
     ASSERT_EQ(model.Endpoints(endpointsBuilder), CHIP_NO_ERROR);
 
