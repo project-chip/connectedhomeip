@@ -45,7 +45,7 @@ public:
 
     /// Starts up the server cluster interface.
     ///
-    /// The `context` lifetime is guaranteed to be valid
+    /// The `context` lifetime must be guaranteed to last
     /// until `Shutdown` is called.
     virtual CHIP_ERROR Startup(ServerClusterContext * context) = 0;
 
