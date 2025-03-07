@@ -196,7 +196,7 @@ public:
             const auto & localMRPConfig      = maybeLocalMRPConfig.ValueOr(defaultMRRPConfig);
             return GetRetransmissionTimeout(localMRPConfig.mActiveRetransTimeout, localMRPConfig.mIdleRetransTimeout,
                                             ourLastActivity, localMRPConfig.mActiveThresholdTime,
-                                            ourLastActivity == System::Clock::kZero /*isFirstMessageOnExchange*/);
+                                            false /*isFirstMessageOnExchange*/);
         }
         case Transport::Type::kTcp:
             return System::Clock::Seconds16(30);
