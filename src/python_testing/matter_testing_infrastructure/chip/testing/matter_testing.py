@@ -609,7 +609,7 @@ class MatterTestConfig:
     # path to device attestation revocation set json file
     dac_revocation_set_path: Optional[pathlib.Path] = None
 
-    legacy: Optional[bool] = None
+    legacy: bool = False
 
 
 class ClusterMapper:
@@ -1224,25 +1224,16 @@ class MatterBaseTest(base_test.BaseTestClass):
             else:
                 enableKey = self.matter_test_config.global_test_params['enableKey']
 
-        # What about --endpoing != 0 and legacy = True? Right now target endpoint is set to 0
-
         target_endpoint = 0
-        if not self.matter_test_config.legacy and self.matter_test_config.endpoint is not None:
-            target_endpoint = self.matter_test_config.endpoint
 
-        print("")
-        print("Target endpoint: ", target_endpoint)
-        print("")
+        if self.matter_test_config.legacy:
+            logger.info("Legacy test event trigger activated")
+        else:
+            logger.info("Legacy test event trigger deactivated")
+            target_endpoint = self.get_endpoint()
 
-        print("")
-        print("Event trigger: ", hex(eventTrigger))
-        print("")
-
+        # Sets endpoint in eventTrigger
         eventTrigger = eventTrigger | (target_endpoint << 32)
-
-        print("")
-        print("Event trigger: ", hex(eventTrigger))
-        print("")
 
         try:
             # GeneralDiagnostics cluster is meant to be on Endpoint 0 (Root)
@@ -1251,10 +1242,6 @@ class MatterBaseTest(base_test.BaseTestClass):
                                                                         enableKey,
                                                                         eventTrigger)
                                                                     )
-
-            print("")
-            logger.info(general_diagnostics_result)
-            print("")
 
         except InteractionModelError as e:
             asserts.fail(
