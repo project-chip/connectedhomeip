@@ -257,7 +257,7 @@ Optional<ReliableMessageProtocolConfig> GetLocalMRPConfig();
  * @param[in] idleInterval      The idle interval to use for the backoff calculation.
  * @param[in] lastActivityTime  The last time some activity has been recorded.
  * @param[in] activityThreshold The activity threshold for a node to be considered active.
- * @param[in] isFirstMessageOnExchange indicate whether this is for initial message on this exchange
+ * @param[in] isFirstMessageOnExchange Indicates whether this is for the initial message on an exchange.
  * @return The maximum transmission time
  */
 System::Clock::Timeout GetRetransmissionTimeout(System::Clock::Timeout activeInterval, System::Clock::Timeout idleInterval,
