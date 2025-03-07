@@ -53,6 +53,7 @@ jobs:
 
     chef_linux_all_devices:
         name: Chef - Linux CI Examples (All chef devices)
+        timeout-minutes: 60
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
 
