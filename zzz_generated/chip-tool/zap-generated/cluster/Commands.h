@@ -15509,7 +15509,7 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * InstalledChimeSounds                                              | 0x0000 |
-| * ActiveChimeID                                                     | 0x0001 |
+| * SelectedChime                                                     | 0x0001 |
 | * Enabled                                                           | 0x0002 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
@@ -15682,15 +15682,15 @@ private:
 | * RemoveRootCertificate                                             |   0x06 |
 | * TLSClientCSR                                                      |   0x07 |
 | * ProvisionClientCertificate                                        |   0x09 |
-| * FindClientCertificate                                             |   0x0B |
-| * LookupClientCertificate                                           |   0x0D |
-| * RemoveClientCertificate                                           |   0x0F |
+| * FindClientCertificate                                             |   0x0A |
+| * LookupClientCertificate                                           |   0x0C |
+| * RemoveClientCertificate                                           |   0x0E |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * MaxRootCertificates                                               | 0x0000 |
-| * CurrentRootCertificates                                           | 0x0001 |
+| * ProvisionedRootCertificates                                       | 0x0001 |
 | * MaxClientCertificates                                             | 0x0002 |
-| * CurrentClientCertificates                                         | 0x0003 |
+| * ProvisionedClientCertificates                                     | 0x0003 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -28831,7 +28831,7 @@ void registerClusterChime(Commands & commands, CredentialIssuerCommands * credsI
         //
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<ReadAttribute>(Id, "installed-chime-sounds", Attributes::InstalledChimeSounds::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "active-chime-id", Attributes::ActiveChimeID::Id, credsIssuerConfig),               //
+        make_unique<ReadAttribute>(Id, "selected-chime", Attributes::SelectedChime::Id, credsIssuerConfig),                //
         make_unique<ReadAttribute>(Id, "enabled", Attributes::Enabled::Id, credsIssuerConfig),                             //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
@@ -28843,7 +28843,7 @@ void registerClusterChime(Commands & commands, CredentialIssuerCommands * credsI
             WriteAttributeAsComplex<chip::app::DataModel::List<const chip::app::Clusters::Chime::Structs::ChimeSoundStruct::Type>>>(
             Id, "installed-chime-sounds", Attributes::InstalledChimeSounds::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<uint8_t>>(Id, "active-chime-id", 0, UINT8_MAX, Attributes::ActiveChimeID::Id,
+        make_unique<WriteAttribute<uint8_t>>(Id, "selected-chime", 0, UINT8_MAX, Attributes::SelectedChime::Id,
                                              WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<bool>>(Id, "enabled", 0, 1, Attributes::Enabled::Id, WriteCommandType::kWrite,
                                           credsIssuerConfig), //
@@ -28860,7 +28860,7 @@ void registerClusterChime(Commands & commands, CredentialIssuerCommands * credsI
                                               WriteCommandType::kForceWrite, credsIssuerConfig),                                //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<SubscribeAttribute>(Id, "installed-chime-sounds", Attributes::InstalledChimeSounds::Id, credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "active-chime-id", Attributes::ActiveChimeID::Id, credsIssuerConfig),               //
+        make_unique<SubscribeAttribute>(Id, "selected-chime", Attributes::SelectedChime::Id, credsIssuerConfig),                //
         make_unique<SubscribeAttribute>(Id, "enabled", Attributes::Enabled::Id, credsIssuerConfig),                             //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
@@ -29015,11 +29015,12 @@ void registerClusterTlsCertificateManagement(Commands & commands, CredentialIssu
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                       //
-        make_unique<ReadAttribute>(Id, "max-root-certificates", Attributes::MaxRootCertificates::Id, credsIssuerConfig),         //
-        make_unique<ReadAttribute>(Id, "current-root-certificates", Attributes::CurrentRootCertificates::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "max-client-certificates", Attributes::MaxClientCertificates::Id, credsIssuerConfig),     //
-        make_unique<ReadAttribute>(Id, "current-client-certificates", Attributes::CurrentClientCertificates::Id,
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                               //
+        make_unique<ReadAttribute>(Id, "max-root-certificates", Attributes::MaxRootCertificates::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "provisioned-root-certificates", Attributes::ProvisionedRootCertificates::Id,
+                                   credsIssuerConfig),                                                                       //
+        make_unique<ReadAttribute>(Id, "max-client-certificates", Attributes::MaxClientCertificates::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "provisioned-client-certificates", Attributes::ProvisionedClientCertificates::Id,
                                    credsIssuerConfig),                                                                     //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
@@ -29029,13 +29030,16 @@ void registerClusterTlsCertificateManagement(Commands & commands, CredentialIssu
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
         make_unique<WriteAttribute<uint8_t>>(Id, "max-root-certificates", 0, UINT8_MAX, Attributes::MaxRootCertificates::Id,
                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<uint8_t>>(Id, "current-root-certificates", 0, UINT8_MAX, Attributes::CurrentRootCertificates::Id,
-                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::TlsCertificateManagement::Structs::TLSCertStruct::Type>>>(
+            Id, "provisioned-root-certificates", Attributes::ProvisionedRootCertificates::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "max-client-certificates", 0, UINT8_MAX, Attributes::MaxClientCertificates::Id,
                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<uint8_t>>(Id, "current-client-certificates", 0, UINT8_MAX,
-                                             Attributes::CurrentClientCertificates::Id, WriteCommandType::kForceWrite,
-                                             credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<
+            const chip::app::Clusters::TlsCertificateManagement::Structs::TLSClientCertificateDetailStruct::Type>>>(
+            Id, "provisioned-client-certificates", Attributes::ProvisionedClientCertificates::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -29049,10 +29053,10 @@ void registerClusterTlsCertificateManagement(Commands & commands, CredentialIssu
                                               WriteCommandType::kForceWrite, credsIssuerConfig),                              //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                               //
         make_unique<SubscribeAttribute>(Id, "max-root-certificates", Attributes::MaxRootCertificates::Id, credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "current-root-certificates", Attributes::CurrentRootCertificates::Id,
+        make_unique<SubscribeAttribute>(Id, "provisioned-root-certificates", Attributes::ProvisionedRootCertificates::Id,
                                         credsIssuerConfig),                                                                       //
         make_unique<SubscribeAttribute>(Id, "max-client-certificates", Attributes::MaxClientCertificates::Id, credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "current-client-certificates", Attributes::CurrentClientCertificates::Id,
+        make_unique<SubscribeAttribute>(Id, "provisioned-client-certificates", Attributes::ProvisionedClientCertificates::Id,
                                         credsIssuerConfig),                                                                     //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
