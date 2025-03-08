@@ -287,7 +287,7 @@ CHIP_ERROR CodegenDataModelProvider::ServerClusters(EndpointId endpointId,
 
     DataModel::ListBuilder<ClusterId> knownClustersBuilder;
     ReturnErrorOnFailure(knownClustersBuilder.EnsureAppendCapacity(registryClusterCount));
-    for (const auto & clusterId : mRegistry.ClustersOnEndpoint(endpointId))
+    for (const auto clusterId : mRegistry.ClustersOnEndpoint(endpointId))
     {
         ConcreteClusterPath path(endpointId, clusterId);
         ServerClusterInterface * cluster = mRegistry.Get(path);
