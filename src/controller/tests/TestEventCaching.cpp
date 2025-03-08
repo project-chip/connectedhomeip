@@ -74,7 +74,7 @@ protected:
         VerifyOrReturn(!HasFailure()); // Stop if parent had a failure.
 
         ASSERT_EQ(mEventCounter.Init(0), CHIP_NO_ERROR);
-        chip::app::EventManagement::CreateEventManagement(&GetExchangeManager(), ArraySize(logStorageResources),
+        chip::app::EventManagement::CreateEventManagement(&GetExchangeManager(), MATTER_ARRAY_SIZE(logStorageResources),
                                                           gCircularEventBuffer, logStorageResources, &mEventCounter);
     }
 
@@ -158,7 +158,7 @@ TEST_F(TestEventCaching, TestBasicCaching)
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
-    DataVersion dataVersionStorage[ArraySize(testEndpointClusters)];
+    DataVersion dataVersionStorage[MATTER_ARRAY_SIZE(testEndpointClusters)];
     emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
 
     chip::EventNumber firstEventNumber;

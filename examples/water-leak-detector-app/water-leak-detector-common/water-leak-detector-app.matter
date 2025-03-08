@@ -213,10 +213,10 @@ enum TestGlobalEnum : enum8 {
 }
 
 enum ThreeLevelAutoEnum : enum8 {
-  kLow = 0;
-  kMedium = 1;
-  kHigh = 2;
-  kAutomatic = 3;
+  kAuto = 0;
+  kLow = 1;
+  kMedium = 2;
+  kHigh = 3;
 }
 
 bitmap TestGlobalBitmap : bitmap32 {
@@ -289,83 +289,6 @@ cluster Identify = 3 {
   command access(invoke: manage) Identify(IdentifyRequest): DefaultSuccess = 0;
   /** Command description for TriggerEffect */
   command access(invoke: manage) TriggerEffect(TriggerEffectRequest): DefaultSuccess = 64;
-}
-
-/** Attributes and commands for group configuration and manipulation. */
-cluster Groups = 4 {
-  revision 4;
-
-  bitmap Feature : bitmap32 {
-    kGroupNames = 0x1;
-  }
-
-  bitmap NameSupportBitmap : bitmap8 {
-    kGroupNames = 0x80;
-  }
-
-  readonly attribute NameSupportBitmap nameSupport = 0;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct AddGroupRequest {
-    group_id groupID = 0;
-    char_string<16> groupName = 1;
-  }
-
-  response struct AddGroupResponse = 0 {
-    enum8 status = 0;
-    group_id groupID = 1;
-  }
-
-  request struct ViewGroupRequest {
-    group_id groupID = 0;
-  }
-
-  response struct ViewGroupResponse = 1 {
-    enum8 status = 0;
-    group_id groupID = 1;
-    char_string<16> groupName = 2;
-  }
-
-  request struct GetGroupMembershipRequest {
-    group_id groupList[] = 0;
-  }
-
-  response struct GetGroupMembershipResponse = 2 {
-    nullable int8u capacity = 0;
-    group_id groupList[] = 1;
-  }
-
-  request struct RemoveGroupRequest {
-    group_id groupID = 0;
-  }
-
-  response struct RemoveGroupResponse = 3 {
-    enum8 status = 0;
-    group_id groupID = 1;
-  }
-
-  request struct AddGroupIfIdentifyingRequest {
-    group_id groupID = 0;
-    char_string<16> groupName = 1;
-  }
-
-  /** Command description for AddGroup */
-  fabric command access(invoke: manage) AddGroup(AddGroupRequest): AddGroupResponse = 0;
-  /** Command description for ViewGroup */
-  fabric command ViewGroup(ViewGroupRequest): ViewGroupResponse = 1;
-  /** Command description for GetGroupMembership */
-  fabric command GetGroupMembership(GetGroupMembershipRequest): GetGroupMembershipResponse = 2;
-  /** Command description for RemoveGroup */
-  fabric command access(invoke: manage) RemoveGroup(RemoveGroupRequest): RemoveGroupResponse = 3;
-  /** Command description for RemoveAllGroups */
-  fabric command access(invoke: manage) RemoveAllGroups(): DefaultSuccess = 4;
-  /** Command description for AddGroupIfIdentifying */
-  fabric command access(invoke: manage) AddGroupIfIdentifying(AddGroupIfIdentifyingRequest): DefaultSuccess = 5;
 }
 
 /** The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters. */
@@ -1427,12 +1350,14 @@ cluster OperationalCredentials = 62 {
     fabric_id fabricID = 3;
     node_id nodeID = 4;
     char_string<32> label = 5;
+    optional octet_string<85> vidVerificationStatement = 6;
     fabric_idx fabricIndex = 254;
   }
 
   fabric_scoped struct NOCStruct {
-    fabric_sensitive octet_string noc = 1;
-    nullable fabric_sensitive octet_string icac = 2;
+    octet_string noc = 1;
+    nullable octet_string icac = 2;
+    optional octet_string vvsc = 3;
     fabric_idx fabricIndex = 254;
   }
 
@@ -1507,6 +1432,23 @@ cluster OperationalCredentials = 62 {
     octet_string rootCACertificate = 0;
   }
 
+  request struct SetVidVerificationStatementRequest {
+    optional vendor_id vendorID = 0;
+    optional octet_string vidVerificationStatement = 1;
+    optional octet_string vvsc = 2;
+  }
+
+  request struct SignVidVerificationRequestRequest {
+    fabric_idx fabricIndex = 0;
+    octet_string<32> clientChallenge = 1;
+  }
+
+  response struct SignVidVerificationResponse = 14 {
+    fabric_idx fabricIndex = 0;
+    int8u fabricBindingVersion = 1;
+    octet_string signature = 2;
+  }
+
   /** Sender is requesting attestation information from the receiver. */
   command access(invoke: administer) AttestationRequest(AttestationRequestRequest): AttestationResponse = 0;
   /** Sender is requesting a device attestation certificate from the receiver. */
@@ -1523,6 +1465,10 @@ cluster OperationalCredentials = 62 {
   command access(invoke: administer) RemoveFabric(RemoveFabricRequest): NOCResponse = 10;
   /** This command SHALL add a Trusted Root CA Certificate, provided as its CHIP Certificate representation. */
   command access(invoke: administer) AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
+  /** This command SHALL be used to update any of the accessing fabric's associated VendorID, VidVerificatioNStatement or VVSC (Vendor Verification Signing Certificate). */
+  fabric command access(invoke: administer) SetVidVerificationStatement(SetVidVerificationStatementRequest): DefaultSuccess = 12;
+  /** This command SHALL be used to request that the server authenticate the fabric associated with the FabricIndex given. */
+  command access(invoke: administer) SignVidVerificationRequest(SignVidVerificationRequestRequest): SignVidVerificationResponse = 13;
 }
 
 /** The Group Key Management Cluster is the mechanism by which group keys are managed. */
@@ -1679,7 +1625,7 @@ cluster BooleanStateConfiguration = 128 {
 }
 
 endpoint 0 {
-  device type ma_rootdevice = 22, version 1;
+  device type ma_rootdevice = 22, version 3;
 
 
   server cluster Descriptor {
@@ -1695,7 +1641,6 @@ endpoint 0 {
     emits event AccessControlEntryChanged;
     emits event AccessControlExtensionChanged;
     callback attribute acl;
-    callback attribute extension;
     callback attribute subjectsPerAccessControlEntry;
     callback attribute targetsPerAccessControlEntry;
     callback attribute accessControlEntriesPerFabric;
@@ -1730,7 +1675,7 @@ endpoint 0 {
     callback attribute specificationVersion;
     callback attribute maxPathsPerInvoke;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 4;
   }
 
   server cluster LocalizationConfiguration {
@@ -1750,7 +1695,7 @@ endpoint 0 {
     callback attribute locationCapability;
     callback attribute supportsConcurrentConnection;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0001;
+    ram      attribute clusterRevision default = 0x0002;
 
     handle command ArmFailSafe;
     handle command ArmFailSafeResponse;
@@ -1763,8 +1708,6 @@ endpoint 0 {
   server cluster NetworkCommissioning {
     ram      attribute maxNetworks;
     callback attribute networks;
-    ram      attribute scanMaxTimeSeconds;
-    ram      attribute connectMaxTimeSeconds;
     ram      attribute interfaceEnabled;
     ram      attribute lastNetworkingStatus;
     ram      attribute lastNetworkID;
@@ -1818,7 +1761,6 @@ endpoint 0 {
     ram      attribute clusterRevision default = 0x0001;
 
     handle command OpenCommissioningWindow;
-    handle command OpenBasicCommissioningWindow;
     handle command RevokeCommissioning;
   }
 
@@ -1874,30 +1816,10 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 5;
 
     handle command Identify;
     handle command TriggerEffect;
-  }
-
-  server cluster Groups {
-    ram      attribute nameSupport;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
-
-    handle command AddGroup;
-    handle command AddGroupResponse;
-    handle command ViewGroup;
-    handle command ViewGroupResponse;
-    handle command GetGroupMembership;
-    handle command GetGroupMembershipResponse;
-    handle command RemoveGroup;
-    handle command RemoveGroupResponse;
-    handle command RemoveAllGroups;
-    handle command AddGroupIfIdentifying;
   }
 
   server cluster Descriptor {
@@ -1916,22 +1838,13 @@ endpoint 1 {
     ram      attribute status default = 1;
     ram      attribute order default = 1;
     ram      attribute description default = "Primary Battery";
-    ram      attribute batVoltage default = 4100;
-    ram      attribute batPercentRemaining default = 95;
-    ram      attribute batTimeRemaining default = 518400;
-    ram      attribute batChargeLevel default = 0;
-    ram      attribute batReplacementNeeded default = 0;
-    ram      attribute batReplaceability default = 1;
-    ram      attribute batPresent default = 1;
-    ram      attribute batCapacity default = 350;
-    ram      attribute batChargeState default = 4;
-    ram      attribute batFunctionalWhileCharging default = 1;
+    ram      attribute wiredCurrentType default = 1;
     callback attribute endpointList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute featureMap default = 1;
+    ram      attribute clusterRevision default = 3;
   }
 
   server cluster BooleanState {

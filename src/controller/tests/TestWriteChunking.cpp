@@ -107,7 +107,7 @@ DECLARE_DYNAMIC_CLUSTER(Clusters::UnitTesting::Id, testClusterAttrsOnEndpoint, Z
 
 DECLARE_DYNAMIC_ENDPOINT(testEndpoint, testEndpointClusters);
 
-DataVersion dataVersionStorage[ArraySize(testEndpointClusters)];
+DataVersion dataVersionStorage[MATTER_ARRAY_SIZE(testEndpointClusters)];
 
 //clang-format on
 

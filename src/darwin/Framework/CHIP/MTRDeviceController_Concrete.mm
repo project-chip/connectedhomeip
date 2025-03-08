@@ -1760,7 +1760,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         return @[];
     }
 
-    return [self.controllerDataStore nodesWithStoredData];
+    return self.controllerDataStore.nodesWithStoredData;
 }
 
 @end

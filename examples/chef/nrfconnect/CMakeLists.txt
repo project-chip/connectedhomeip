@@ -104,6 +104,7 @@ target_sources(app PRIVATE
     ${CHEF}/common/clusters/temperature-control/static-supported-temperature-levels.cpp
     ${CHEF}/common/clusters/target-navigator/TargetNavigatorManager.cpp
     ${CHEF}/common/clusters/wake-on-lan/WakeOnLanManager.cpp
+    ${CHEF}/common/clusters/window-covering/chef-window-covering.cpp
     ${CHEF}/common/stubs.cpp
     ${CHEF}/nrfconnect/main.cpp
 )
