@@ -180,7 +180,6 @@ TEST_F(TestServerClusterInterfaceRegistry, BasicTest)
     EXPECT_EQ(registry.Register(registration2), CHIP_NO_ERROR);
     EXPECT_EQ(registry.Get({ kEp2, kCluster2 }), &cluster2);
 
-
     // cleanup
     (void) registry.Unregister(&cluster1);
     (void) registry.Unregister(&cluster2);
