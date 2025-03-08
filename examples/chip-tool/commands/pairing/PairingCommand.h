@@ -85,6 +85,7 @@ public:
         switch (networkType)
         {
         case PairingNetworkType::None:
+            AddArgument("thread-dataset", &mThreadDataset, "Thread operational dataset");
             break;
         case PairingNetworkType::WiFi:
             AddArgument("ssid", &mSSID);
@@ -277,6 +278,7 @@ private:
     chip::Optional<char *> mDCLHostName;
     chip::Optional<uint16_t> mDCLPort;
     chip::Optional<bool> mUseDCL;
+    chip::Optional<chip::ByteSpan> mThreadDataset;
     chip::app::DataModel::List<chip::app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type> mTimeZoneList;
     TypedComplexArgument<chip::app::DataModel::List<chip::app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type>>
         mComplex_TimeZones;

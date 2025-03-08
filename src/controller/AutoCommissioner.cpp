@@ -1001,5 +1001,10 @@ CHIP_ERROR AutoCommissioner::SetPAI(const chip::ByteSpan & pai)
     return CHIP_NO_ERROR;
 }
 
+void AutoCommissioner::SetThreadNetworkProvisionNeeded(bool needed)
+{
+    mNeedsNetworkSetup = mNeedsNetworkSetup || needed;
+}
+
 } // namespace Controller
 } // namespace chip
