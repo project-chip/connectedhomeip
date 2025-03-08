@@ -37,6 +37,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Sample MEI
     - Microwave Oven Control
     - Chime
+    - Push AV Stream Transport
     - Commissioner Control
     - Energy EVSE
     - Energy EVSE Mode
