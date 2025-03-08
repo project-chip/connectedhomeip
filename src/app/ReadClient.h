@@ -509,6 +509,12 @@ public:
      */
     Optional<System::Clock::Timeout> GetSubscriptionTimeout();
 
+    Optional<Access::SubjectDescriptor> GetSubjectDescriptor() const
+    {
+        VerifyOrReturnValue(mReadPrepareParams.mSessionHolder, NullOptional);
+        return MakeOptional(mReadPrepareParams.mSessionHolder->AsSecureSession()->GetSubjectDescriptor());
+    }
+
 private:
     friend class TestReadInteraction;
     friend class InteractionModelEngine;
