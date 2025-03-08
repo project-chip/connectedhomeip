@@ -1079,8 +1079,8 @@ void InteractionModelEngine::OnActiveModeNotification(ScopedNodeId aPeer, uint64
         // If caseTag for current subscription does not match with the one set in ICDManagementCluster::RegisterClient for check-in,
         // when receiving check-in message, OnActiveModeNotification would do nothing for current subscription.
         if (ScopedNodeId(pListItem->GetPeerNodeId(), pListItem->GetFabricIndex()) == aPeer &&
-           pListItem->GetSubjectDescriptor().HasValue() && pListItem->GetSubjectDescriptor().cats.CheckSubjectAgainstCATs(aMonitoredSubject) &&
-           pListItem->GetSubjectDescriptor().subject == aMonitoredSubject)
+           pListItem->GetSubjectDescriptor().HasValue() && pListItem->GetSubjectDescriptor().Value().cats.CheckSubjectAgainstCATs(aMonitoredSubject) &&
+           pListItem->GetSubjectDescriptor().Value().subject == aMonitoredSubject)
         {
             pListItem->OnActiveModeNotification();
         }
