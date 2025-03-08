@@ -43,15 +43,15 @@ net_if * GetInterface(Inet::InterfaceId ifaceId)
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 net_if * GetWiFiInterface()
 {
-// TODO: Remove dependency after Telink Zephyr update
-// net_if_get_first_wifi() is not available in Zephyr 3.3.99
-#if !defined(CONFIG_SOC_RISCV_TELINK_W91)
-    return net_if_get_first_wifi();
-#else
+// TODO: Remove dependency after Telink Zephyr 3.3 support is removed
+// net_if_get_first_wifi() is not available in Zephyr 3.3
+#if defined(CONFIG_SOC_RISCV_TELINK_W91) && defined(CONFIG_ZEPHYR_VERSION_3_3)
     return GetInterface();
+#else
+    return net_if_get_first_wifi();
 #endif
 }
-#endif
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
 } // namespace InetUtils
 } // namespace DeviceLayer

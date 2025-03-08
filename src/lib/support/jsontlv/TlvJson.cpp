@@ -68,7 +68,7 @@ struct KeyContext
 static constexpr uint16_t kMaxStringLen = 1280;
 
 constexpr char kBase64Header[]    = "base64:";
-constexpr size_t kBase64HeaderLen = ArraySize(kBase64Header) - 1;
+constexpr size_t kBase64HeaderLen = MATTER_ARRAY_SIZE(kBase64Header) - 1;
 
 namespace chip {
 
