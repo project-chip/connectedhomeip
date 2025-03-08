@@ -42,6 +42,7 @@ from chip.clusters import ClusterObjects as ClusterObjects
 from chip.interaction_model import Status
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+from chip.testing.matter_asserts import is_valid_uint_value
 
 logger = logging.getLogger(__name__)
 
@@ -86,7 +87,7 @@ class TC_FAN_2_1(MatterBaseTest):
 
         # Verify response is of expected type
         if type is Uint8Type:
-            asserts.assert_true(self.is_valid_uint8_value(value),
+            asserts.assert_true(is_valid_uint_value(value),
                                 f"[FC] {attribute.__name__} result ({value}) isn't of type {type.__name__}")
         else:
             asserts.assert_is_instance(value, type,
@@ -108,10 +109,6 @@ class TC_FAN_2_1(MatterBaseTest):
         if fan_mode == fm_enum.kAuto:
             asserts.assert_in(fan_mode_sequence, fms_auto_values,
                               f"[FC] FanModeSequence value ({fan_mode_sequence}:{fan_mode_sequence.name}) must support Auto FanMode")
-
-    @staticmethod
-    def is_valid_uint8_value(var) -> bool:
-        return isinstance(var, int) and 0 <= var <= 0xFF
 
     def pics_TC_FAN_2_1(self) -> list[str]:
         return ["FAN.S"]
