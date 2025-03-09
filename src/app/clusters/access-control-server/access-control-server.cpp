@@ -105,7 +105,8 @@ private:
     CHIP_ERROR IsValidAclEntryList(const DataModel::DecodableList<AclStorage::DecodableEntry> & list);
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
-    CHIP_ERROR ReadCommissioningArl(AttributeValueEncoder & aEncoder);
+    CHIP_ERROR
+    ReadCommissioningArl(AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadArl(AttributeValueEncoder & aEncoder);
 #endif
 } sAttribute;

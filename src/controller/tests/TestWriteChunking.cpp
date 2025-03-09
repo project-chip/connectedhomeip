@@ -349,7 +349,7 @@ TEST_F(TestWriteChunking, TestListChunking)
 
 /*
  * A Variant of TestListChunking above, that tests the Code Path where we encode a Non-Replace All List in WriteRequests, this
- * happens with the ACL Cluster (this would be generalised to all relevant Attributes after issue #38270 is resolved)
+ * happens with the ACL Attribute
  */
 TEST_F(TestWriteChunking, TestListChunking_NonEmptyReplaceAllList)
 {
@@ -367,38 +367,30 @@ TEST_F(TestWriteChunking, TestListChunking_NonEmptyReplaceAllList)
 
     app::AttributePathParams attributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id);
 
-    // We've empirically determined that by reserving all but 65 bytes in the packet buffer, we can fit a Single AttributeDataIB
-    // into the packet with a List of 8/9 ByteSpans with empty items. So if we have a ByteSpan List of 20 items, our initial
-    // ReplaceAll list will contain 8/9 items, and the remaining items are chunked as appropriate.
-    constexpr size_t maxReservationSize = kMaxSecureSduLengthBytes - 65;
+    // We've empirically determined that by reserving all but 65 bytes in the packet buffer, we can fit 1
+    // AttributeDataIB into the packet with a List of 5/6 ByteSpans with empty items. So if we have a ByteSpan List of 20 items, our
+    // initial ReplaceAll list will contain 5/6 items, and the remaining items are chunked.
+    constexpr size_t minReservationSize = kMaxSecureSduLengthBytes - 65 - 20;
 
     constexpr uint8_t kTestListLength2 = 20;
 
-    // Start with a high reservation (maxReservationSize) to force chunking, then decrease the reservation in 1-byte steps.
-    // This increases the buffer space available for encoding, gradually reducing the need for chunking, until chunking would not
-    // occur anymore. This helps validate various edge cases.
-    for (uint32_t reservationReduction = 0; reservationReduction < 40; reservationReduction++)
+    for (uint32_t i = 20; i > 0; i--)
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
         TestWriteCallback writeCallback;
 
-        ChipLogDetail(DataManagement, "Running iteration %d\n", static_cast<int>(reservationReduction));
+        ChipLogDetail(DataManagement, "Running iteration %d\n", static_cast<int>(i));
 
-        app::WriteClient writeClient(&GetExchangeManager(), &writeCallback, NullOptional,
-                                     static_cast<uint16_t>(maxReservationSize - reservationReduction) /* reserved buffer size */);
+        gIterationCount = i;
+
+        app::WriteClient writeClient(&GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing(),
+                                     static_cast<uint16_t>(minReservationSize + i) /* reserved buffer size */);
 
         ByteSpan list[kTestListLength2];
 
         err = writeClient.EncodeAttribute(attributePath, app::DataModel::List<ByteSpan>(list, kTestListLength2));
 
         EXPECT_EQ(err, CHIP_NO_ERROR);
-
-        // Ensure that chunking actually occurred in the first iteration. We will iteratively chunk less and less, until chunking
-        // would not occur anymore. Thus, this check is only needed at start.
-        if (reservationReduction == 0)
-        {
-            ASSERT_TRUE(writeClient.IsWriteRequestChunked());
-        }
 
         err = writeClient.SendWriteRequest(sessionHandle);
         EXPECT_EQ(err, CHIP_NO_ERROR);
@@ -412,6 +404,10 @@ TEST_F(TestWriteChunking, TestListChunking_NonEmptyReplaceAllList)
         {
             DrainAndServiceIO();
         }
+
+        // Ensure that chunking actually occurred. Since chunking is dynamic, it's easy to unintentionally avoid it.
+        // This check guarantees that the test is validating chunked behavior as intended.
+        EXPECT_TRUE(writeClient.IsWriteRequestChunked());
 
         // Due to Write Chunking being done dynamically (fitting as many items as possible into an initial ReplaceAll List, before
         // starting to chunk), it is fragile to try to predict mSuccessCount. It all depends on how much was packed into the initial
@@ -517,7 +513,7 @@ TEST_F(TestWriteChunking, TestBadChunking)
 
 /*
  * A Variant of TestBadChunking above, that tests the Code Path where we encode a Non-Replace All List in WriteRequests, this
- * happens with the ACL Cluster.
+ * happens with the ACL Attribute
  */
 TEST_F(TestWriteChunking, TestBadChunking_NonEmptyReplaceAllList)
 {
@@ -540,19 +536,21 @@ TEST_F(TestWriteChunking, TestBadChunking_NonEmptyReplaceAllList)
 
     constexpr uint8_t kTestListLengthBadChunking = 5;
 
-    for (int bufferSize = 850; bufferSize < static_cast<int>(chip::app::kMaxSecureSduLengthBytes); bufferSize++)
+    for (int i = 850; i < static_cast<int>(chip::app::kMaxSecureSduLengthBytes); i++)
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
         TestWriteCallback writeCallback;
 
-        ChipLogDetail(DataManagement, "Running iteration with OCTET_STRING length = %d\n", bufferSize);
+        ChipLogDetail(DataManagement, "Running iteration with OCTET_STRING length = %d\n", i);
 
-        app::WriteClient writeClient(&GetExchangeManager(), &writeCallback, NullOptional);
+        gIterationCount = (uint32_t) i;
+
+        app::WriteClient writeClient(&GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing());
 
         ByteSpan list[kTestListLengthBadChunking];
         for (auto & item : list)
         {
-            item = ByteSpan(sByteSpanData, static_cast<uint32_t>(bufferSize));
+            item = ByteSpan(sByteSpanData, static_cast<uint32_t>(i));
         }
 
         err = writeClient.EncodeAttribute(attributePath, app::DataModel::List<ByteSpan>(list, kTestListLengthBadChunking));
@@ -564,10 +562,6 @@ TEST_F(TestWriteChunking, TestBadChunking_NonEmptyReplaceAllList)
         }
 
         atLeastOneRequestSent = true;
-
-        // Ensure that chunking actually occurred. Since chunking is dynamic, it's easy to unintentionally avoid it.
-        // This check guarantees that the test is validating chunked behavior as intended.
-        EXPECT_TRUE(writeClient.IsWriteRequestChunked());
 
         // If we successfully encoded the attribute, then we must be able to send the message.
         err = writeClient.SendWriteRequest(sessionHandle);
@@ -582,6 +576,10 @@ TEST_F(TestWriteChunking, TestBadChunking_NonEmptyReplaceAllList)
         {
             DrainAndServiceIO();
         }
+
+        // Ensure that chunking actually occurred. Since chunking is dynamic, it's easy to unintentionally avoid it.
+        // This check guarantees that the test is validating chunked behavior as intended.
+        EXPECT_TRUE(writeClient.IsWriteRequestChunked());
 
         // Due to the way Write Chunking is done, it is difficult to predict mSuccessCount. It all depends on how much was
         // packed into the initial ReplaceAll List.
@@ -604,8 +602,8 @@ TEST_F(TestWriteChunking, TestBadChunking_NonEmptyReplaceAllList)
 }
 
 /*
- * When chunked write is enabled, it is dangerous to handle multiple write requests at the same time. In this case, we will
- * reject the latter write requests to the same attribute.
+ * When chunked write is enabled, it is dangerious to handle multiple write requests at the same time. In this case, we will reject
+ * the latter write requests to the same attribute.
  */
 TEST_F(TestWriteChunking, TestConflictWrite)
 {
@@ -680,7 +678,7 @@ TEST_F(TestWriteChunking, TestConflictWrite)
 
 /*
  * A Variant of TestConflictWrite above, that tests the Code Path where we encode a Non-Replace All List in WriteRequests, this
- * happens with the ACL Cluster.
+ * happens with the ACL Attribute
  */
 TEST_F(TestWriteChunking, TestConflictWrite_NonEmptyReplaceAllList)
 {
@@ -698,19 +696,21 @@ TEST_F(TestWriteChunking, TestConflictWrite_NonEmptyReplaceAllList)
 
     app::AttributePathParams attributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id);
 
-    // To ensure that chunking is triggered: We've empirically determined that by reserving all but 60 bytes in the packet
-    // buffer, we can fit 1 AttributeDataIB into the packet with a List of 5/6 ByteSpans with empty items. So if we have a
-    // ByteSpan List of 10 items, our initial ReplaceAll list will contain 5/6 items, and the remaining items are chunked.
+    // To ensure that chunking is triggered: We've empirically determined that by reserving all but 60 bytes in the packet buffer,
+    // we can fit 1 AttributeDataIB into the packet with a List of 5/6 ByteSpans with empty items. So if we have a ByteSpan List of
+    // 10 items, our initial ReplaceAll list will contain 5/6 items, and the remaining items are chunked.
     constexpr size_t kReserveSize      = kMaxSecureSduLengthBytes - 60;
     constexpr uint8_t kTestListLength2 = 10;
 
     ByteSpan list[kTestListLength2];
 
     TestWriteCallback writeCallback1;
-    app::WriteClient writeClient1(&GetExchangeManager(), &writeCallback1, NullOptional, static_cast<uint16_t>(kReserveSize));
+    app::WriteClient writeClient1(&GetExchangeManager(), &writeCallback1, Optional<uint16_t>::Missing(),
+                                  static_cast<uint16_t>(kReserveSize));
 
     TestWriteCallback writeCallback2;
-    app::WriteClient writeClient2(&GetExchangeManager(), &writeCallback2, NullOptional, static_cast<uint16_t>(kReserveSize));
+    app::WriteClient writeClient2(&GetExchangeManager(), &writeCallback2, Optional<uint16_t>::Missing(),
+                                  static_cast<uint16_t>(kReserveSize));
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -718,11 +718,6 @@ TEST_F(TestWriteChunking, TestConflictWrite_NonEmptyReplaceAllList)
     EXPECT_EQ(err, CHIP_NO_ERROR);
     err = writeClient2.EncodeAttribute(attributePath, app::DataModel::List<ByteSpan>(list, kTestListLength2));
     EXPECT_EQ(err, CHIP_NO_ERROR);
-
-    // Ensure that chunking actually occurred. Since chunking is dynamic, it's easy to unintentionally avoid it.
-    // This check guarantees that the test is validating chunked behavior as intended.
-    EXPECT_TRUE(writeClient1.IsWriteRequestChunked());
-    EXPECT_TRUE(writeClient2.IsWriteRequestChunked());
 
     err = writeClient1.SendWriteRequest(sessionHandle);
     EXPECT_EQ(err, CHIP_NO_ERROR);
@@ -744,10 +739,15 @@ TEST_F(TestWriteChunking, TestConflictWrite_NonEmptyReplaceAllList)
             writeCallbackRef1 = &writeCallback2;
         }
 
-        // Due to Write Chunking being done dynamically (fitting as many items as possible into an initial ReplaceAll List,
-        // before starting to chunk), it is fragile to try to predict mSuccessCount. It all depends on how much was packed into
-        // the initial ReplaceAll List. However, we know for sure that writeCallbackRef1 should NEVER fail, and that
-        // writeCallbackRef2 should NEVER Succeed.
+        // Ensure that chunking actually occurred. Since chunking is dynamic, it's easy to unintentionally avoid it.
+        // This check guarantees that the test is validating chunked behavior as intended.
+        EXPECT_TRUE(writeClient1.IsWriteRequestChunked());
+        EXPECT_TRUE(writeClient2.IsWriteRequestChunked());
+
+        // Due to Write Chunking being done dynamically (fitting as many items as possible into an initial ReplaceAll List, before
+        // starting to chunk), it is fragile to try to predict mSuccessCount. It all depends on how much was packed into the initial
+        // ReplaceAll List. However, we know for sure that writeCallbackRef1 should NEVER fail, and that writeCallbackRef2 should
+        // NEVER Succeed.
         EXPECT_EQ(writeCallbackRef1->mErrorCount, 0u);
         EXPECT_EQ(writeCallbackRef2->mSuccessCount, 0u);
 
@@ -763,8 +763,8 @@ TEST_F(TestWriteChunking, TestConflictWrite_NonEmptyReplaceAllList)
 }
 
 /*
- * When chunked write is enabled, it is dangerous to handle multiple write requests at the same time. However, we will allow
- * such change when writing to different attributes in parallel.
+ * When chunked write is enabled, it is dangerious to handle multiple write requests at the same time. However, we will allow such
+ * change when writing to different attributes in parallel.
  */
 TEST_F(TestWriteChunking, TestNonConflictWrite)
 {
@@ -827,8 +827,8 @@ TEST_F(TestWriteChunking, TestNonConflictWrite)
 }
 
 /*
- * A Variant of TestNonConflictWrite above, that tests the Code Path where we encode a Non-Replace All List in WriteRequests,
- * this happens with the ACL Cluster.
+ * A Variant of TestNonConflictWrite above, that tests the Code Path where we encode a Non-Replace All List in WriteRequests, this
+ * happens with the ACL Attribute
  */
 TEST_F(TestWriteChunking, TestNonConflictWrite_NonEmptyReplaceAllList)
 {
@@ -847,17 +847,19 @@ TEST_F(TestWriteChunking, TestNonConflictWrite_NonEmptyReplaceAllList)
     app::AttributePathParams attributePath1(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id);
     app::AttributePathParams attributePath2(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Extension::Id);
 
-    // To ensure that chunking is triggered: We've empirically determined that by reserving all but 60 bytes in the packet
-    // buffer, we can fit 1 AttributeDataIB into the packet with a List of 5/6 ByteSpans with empty items. So if we have a
-    // ByteSpan List of 10 items, our initial ReplaceAll list will contain 5/6 items, and the remaining items are chunked.
+    // To ensure that chunking is triggered: We've empirically determined that by reserving all but 60 bytes in the packet buffer,
+    // we can fit 1 AttributeDataIB into the packet with a List of 5/6 ByteSpans with empty items. So if we have a ByteSpan List of
+    // 10 items, our initial ReplaceAll list will contain 5/6 items, and the remaining items are chunked.
     constexpr size_t kReserveSize      = kMaxSecureSduLengthBytes - 65;
     constexpr uint8_t kTestListLength2 = 10;
 
     TestWriteCallback writeCallback1;
-    app::WriteClient writeClient1(&GetExchangeManager(), &writeCallback1, NullOptional, static_cast<uint16_t>(kReserveSize));
+    app::WriteClient writeClient1(&GetExchangeManager(), &writeCallback1, Optional<uint16_t>::Missing(),
+                                  static_cast<uint16_t>(kReserveSize));
 
     TestWriteCallback writeCallback2;
-    app::WriteClient writeClient2(&GetExchangeManager(), &writeCallback2, NullOptional, static_cast<uint16_t>(kReserveSize));
+    app::WriteClient writeClient2(&GetExchangeManager(), &writeCallback2, Optional<uint16_t>::Missing(),
+                                  static_cast<uint16_t>(kReserveSize));
 
     ByteSpan list[kTestListLength2];
 
@@ -865,14 +867,8 @@ TEST_F(TestWriteChunking, TestNonConflictWrite_NonEmptyReplaceAllList)
 
     err = writeClient1.EncodeAttribute(attributePath1, app::DataModel::List<ByteSpan>(list, kTestListLength2));
     EXPECT_EQ(err, CHIP_NO_ERROR);
-
     err = writeClient2.EncodeAttribute(attributePath2, app::DataModel::List<ByteSpan>(list, kTestListLength2));
     EXPECT_EQ(err, CHIP_NO_ERROR);
-
-    // Ensure that chunking actually occurred. Since chunking is dynamic, it's easy to unintentionally avoid it.
-    // This check guarantees that the test is validating chunked behavior as intended.
-    EXPECT_TRUE(writeClient1.IsWriteRequestChunked());
-    EXPECT_TRUE(writeClient2.IsWriteRequestChunked());
 
     err = writeClient1.SendWriteRequest(sessionHandle);
     EXPECT_EQ(err, CHIP_NO_ERROR);
@@ -884,9 +880,14 @@ TEST_F(TestWriteChunking, TestNonConflictWrite_NonEmptyReplaceAllList)
 
     {
 
-        // Due to Write Chunking being done dynamically, it is fragile to try to predict mSuccessCount. It all depends on how
-        // much was packed into the initial ReplaceAll List. However, we know for sure that writeCallback1 and writeCallback2
-        // should NEVER fail.
+        // Ensure that chunking actually occurred. Since chunking is dynamic, it's easy to unintentionally avoid it.
+        // This check guarantees that the test is validating chunked behavior as intended.
+        EXPECT_TRUE(writeClient1.IsWriteRequestChunked());
+        EXPECT_TRUE(writeClient2.IsWriteRequestChunked());
+
+        // Due to Write Chunking being done dynamically, it is fragile to try to predict mSuccessCount. It all depends on how much
+        // was packed into the initial ReplaceAll List.
+        // However, we know for sure that writeCallback1 and writeCallback2 should NEVER fail.
         EXPECT_EQ(writeCallback1.mErrorCount, 0u);
         EXPECT_EQ(writeCallback2.mErrorCount, 0u);
 
@@ -1093,7 +1094,7 @@ TEST_F(TestWriteChunking, TestTransactionalList)
 
 /*
  * A Variant of RunTest above, that tests the Code Path where we encode a Non-Replace All List in WriteRequests, this
- * happens with the ACL Cluster.
+ * happens with the ACL Attribute
  */
 void TestWriteChunking::RunTest_NonEmptyReplaceAll(Instructions instructions)
 {
@@ -1102,7 +1103,7 @@ void TestWriteChunking::RunTest_NonEmptyReplaceAll(Instructions instructions)
 
     TestWriteCallback writeCallback;
     std::unique_ptr<WriteClient> writeClient = std::make_unique<WriteClient>(
-        &GetExchangeManager(), &writeCallback, NullOptional,
+        &GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing(),
         static_cast<uint16_t>(kMaxSecureSduLengthBytes -
                               66) /* use a smaller chunk so we only need a few attributes in the write request. */);
 
@@ -1191,7 +1192,7 @@ void TestWriteChunking::RunTest_NonEmptyReplaceAll(Instructions instructions)
 
 TEST_F(TestWriteChunking, TestTransactionalList_NonEmptyReplaceAllList)
 {
-    // Initialize the ember side server logic.
+    // Initialize the ember side server logic
     app::InteractionModelEngine::GetInstance()->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
     InitDataModelHandler();
 
@@ -1283,30 +1284,6 @@ TEST_F(TestWriteChunking, TestTransactionalList_NonEmptyReplaceAllList)
         .data           = { ListData::kBadValue },
         .expectedStatus = { false },
     });
-
-    // This TestCase tests corner cases when we Encode many attributes into the same WriteRequest, up to 10 Attributes will be
-    // Encoded.
-    for (int nullableListCount = 1; nullableListCount <= 10; nullableListCount++)
-    {
-        ChipLogProgress(Zcl, "Test 10.%d: Encoding %d nullable lists following a single non-nullable list", nullableListCount,
-                        nullableListCount);
-
-        Instructions test;
-
-        // Add the single non-nullable list
-        test.paths.push_back(ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id));
-        test.data.push_back(ListData::kList);
-
-        // Add the nullable lists
-        for (int i = 0; i < nullableListCount; i++)
-        {
-            test.paths.push_back(ConcreteAttributePath(kTestEndpointId, AccessControl::Id, AccessControl::Attributes::Acl::Id));
-            test.data.push_back(ListData::kNull);
-        }
-
-        test.expectedStatus = { true };
-        RunTest_NonEmptyReplaceAll(test);
-    }
 
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 
