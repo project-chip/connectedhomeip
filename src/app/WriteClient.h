@@ -330,28 +330,23 @@ private:
     /**
      *  Encode an attribute value that can be directly encoded using DataModel::Encode.
      */
-    template <class T, std::enable_if_t<!DataModel::IsFabricScoped<T>::value, int> = 0>
+    template <class T>
     CHIP_ERROR TryEncodeSingleAttributeDataIB(const ConcreteDataAttributePath & attributePath, const T & value)
     {
         chip::TLV::TLVWriter * writer = nullptr;
 
         ReturnErrorOnFailure(PrepareAttributeIB(attributePath));
         VerifyOrReturnError((writer = GetAttributeDataIBTLVWriter()) != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        ReturnErrorOnFailure(DataModel::Encode(*writer, chip::TLV::ContextTag(chip::app::AttributeDataIB::Tag::kData), value));
-        ReturnErrorOnFailure(FinishAttributeIB());
-
-        return CHIP_NO_ERROR;
-    }
-
-    template <class T, std::enable_if_t<DataModel::IsFabricScoped<T>::value, int> = 0>
-    CHIP_ERROR TryEncodeSingleAttributeDataIB(const ConcreteDataAttributePath & attributePath, const T & value)
-    {
-        chip::TLV::TLVWriter * writer = nullptr;
-
-        ReturnErrorOnFailure(PrepareAttributeIB(attributePath));
-        VerifyOrReturnError((writer = GetAttributeDataIBTLVWriter()) != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        ReturnErrorOnFailure(
-            DataModel::EncodeForWrite(*writer, chip::TLV::ContextTag(chip::app::AttributeDataIB::Tag::kData), value));
+        // Use if constexpr to make compile-time decision on which encoding method to use
+        if constexpr (DataModel::IsFabricScoped<T>::value)
+        {
+            ReturnErrorOnFailure(
+                DataModel::EncodeForWrite(*writer, chip::TLV::ContextTag(chip::app::AttributeDataIB::Tag::kData), value));
+        }
+        else
+        {
+            ReturnErrorOnFailure(DataModel::Encode(*writer, chip::TLV::ContextTag(chip::app::AttributeDataIB::Tag::kData), value));
+        }
         ReturnErrorOnFailure(FinishAttributeIB());
 
         return CHIP_NO_ERROR;
