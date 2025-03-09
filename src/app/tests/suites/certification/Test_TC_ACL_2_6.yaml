@@ -186,7 +186,6 @@ tests:
           "Step 7: TH1 reads DUT Endpoint 0 AccessControl cluster
           AccessControlEntryChanged event"
       PICS: PICS_SKIP_SAMPLE_APP && ACL.S.E00
-      disabled: true
       command: "readEvent"
       event: "AccessControlEntryChanged"
       eventNumber: "LastReceivedEventNumber + 1"
