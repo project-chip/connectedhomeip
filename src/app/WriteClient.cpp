@@ -169,6 +169,7 @@ CHIP_ERROR WriteClient::StartNewMessage()
     if (mState == State::AddAttribute)
     {
         ReturnErrorOnFailure(FinalizeMessage(true));
+        mIsWriteRequestChunked = true;
     }
 
     // Do not allow timed request with chunks.
@@ -247,14 +248,49 @@ CHIP_ERROR WriteClient::PutSinglePreencodedAttributeWritePayload(const chip::app
     return err;
 }
 
-// TODO #38287 Add Unit Tests for PutPreencodedAttribute and for TryPutPreencodedAttributeWritePayloadIntoList.
+CHIP_ERROR
+WriteClient::TryPutPreencodedAttributeWritePayloadIntoList(const chip::app::ConcreteDataAttributePath & attributePath,
+                                                           TLV::TLVReader & valueReader, bool & outChunkingNeeded,
+                                                           ListIndex & outEncodedItemCount)
+{
+
+    ReturnErrorOnFailure(EnsureListStarted(attributePath));
+
+    chip::TLV::TLVWriter * writer = nullptr;
+    VerifyOrReturnError((writer = GetAttributeDataIBTLVWriter()) != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    TLV::TLVWriter backupWriter;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    outEncodedItemCount = 0;
+
+    while ((err = valueReader.Next()) == CHIP_NO_ERROR)
+    {
+        mWriteRequestBuilder.GetWriteRequests().Checkpoint(backupWriter);
+        err = writer->CopyElement(TLV::AnonymousTag(), valueReader);
+
+        if (err == CHIP_ERROR_NO_MEMORY || err == CHIP_ERROR_BUFFER_TOO_SMALL)
+        {
+            mWriteRequestBuilder.GetWriteRequests().Rollback(backupWriter);
+            outChunkingNeeded = true;
+            err               = CHIP_NO_ERROR;
+            break;
+        }
+        ReturnErrorOnFailure(err);
+        outEncodedItemCount++;
+    }
+    VerifyOrReturnError(err == CHIP_END_OF_TLV || err == CHIP_NO_ERROR, err);
+
+    return EnsureListEnded();
+}
+
+// TODO Add Unit Tests for PutPreencodedAttribute and for TryPutPreencodedAttributeWritePayloadIntoList
 CHIP_ERROR WriteClient::PutPreencodedAttribute(const ConcreteDataAttributePath & attributePath, const TLV::TLVReader & data)
 {
-    ReturnErrorOnFailure(EnsureMessage());
 
     // ListIndex is missing and the data is an array -- we are writing a whole list.
     if (!attributePath.IsListOperation() && data.GetType() == TLV::TLVType::kTLVType_Array)
     {
+
         TLV::TLVReader dataReader;
         TLV::TLVReader valueReader;
         uint16_t encodedItemCount      = 0;
@@ -268,33 +304,40 @@ CHIP_ERROR WriteClient::PutPreencodedAttribute(const ConcreteDataAttributePath &
         // SOLUTION: we treat ACL as an exception and avoid encoding an empty ReplaceAll list. Instead, we pack as many ACL entries
         // as possible into the ReplaceAll list, and send  any remaining entries in subsequent chunks are part of the AppendItem
         // list operation.
-        // TODO (#38270): Generalize this behavior; send a non-empty ReplaceAll list for all clusters in a later Matter version and
-        // enforce all clusters to support it in testing and in certification.
-        bool encodeEmptyListAsReplaceAll = !(path.mClusterId == Clusters::AccessControl::Id);
+        // TODO: Generalize this behavior; send a non-empty ReplaceAll list for all clusters in Matter 1.5 and enforce all clusters
+        // to support it in testing and in certification.
+        bool encodeEmptyListAsReplaceAll =
+            !(path.mClusterId == Clusters::AccessControl::Id && path.mAttributeId == Clusters::AccessControl::Attributes::Acl::Id);
 
         if (encodeEmptyListAsReplaceAll)
         {
+            ReturnErrorOnFailure(EnsureMessage());
             ReturnErrorOnFailure(EncodeSingleAttributeDataIB(path, DataModel::List<uint8_t>()));
+            encodedItemCount = 0;
         }
         else
         {
+            // We will always start a new chunk when we have a new Attribute to Encode. This might be more efficient since this
+            // first chunk contains the "ReplaceAll List" which will pack as many list items as possible into a single
+            // AttributeDataIB.
+            ReturnErrorOnFailure(StartNewMessage());
 
             dataReader.Init(data);
             dataReader.OpenContainer(valueReader);
             bool chunkingNeeded = false;
 
             // Encode as many list-items as possible into a single AttributeDataIB, which will be included in a single
-            // WriteRequestMessage chunk.
+            // WriteRequestMessage chunk
             ReturnErrorOnFailure(
                 TryPutPreencodedAttributeWritePayloadIntoList(path, valueReader, chunkingNeeded, encodedItemCount));
 
             // If all list items fit perfectly into a single AttributeDataIB, there is no need for any `append-item` or chunking,
-            // and we can exit early.
+            // and we can exit early
             VerifyOrReturnError(chunkingNeeded, CHIP_NO_ERROR);
 
             // Start a new WriteRequest chunk, as there are still remaining list items to encode. These remaining items will be
             // appended one by one, each into its own AttributeDataIB. Unlike the first chunk (which contains only one
-            // AttributeDataIB), subsequent chunks may contain multiple AttributeDataIBs if space allows it.
+            // AttributeDataIB), subsequent chunks may contain multiple AttributeDataIBs if space allows it
             ReturnErrorOnFailure(StartNewMessage());
         }
         path.mListOp = ConcreteDataAttributePath::ListOperation::AppendItem;
@@ -310,13 +353,10 @@ CHIP_ERROR WriteClient::PutPreencodedAttribute(const ConcreteDataAttributePath &
         {
             currentItemCount++;
 
-            if (currentItemCount <= encodedItemCount)
+            if (currentItemCount > encodedItemCount)
             {
-                // Element already encoded via `TryPutPreencodedAttributeWritePayloadIntoList`
-                continue;
+                ReturnErrorOnFailure(PutSinglePreencodedAttributeWritePayload(path, valueReader));
             }
-
-            ReturnErrorOnFailure(PutSinglePreencodedAttributeWritePayload(path, valueReader));
         }
 
         if (err == CHIP_END_OF_TLV)
@@ -327,94 +367,8 @@ CHIP_ERROR WriteClient::PutPreencodedAttribute(const ConcreteDataAttributePath &
     }
 
     // We are writing a non-list attribute, or we are writing a single element of a list.
+    ReturnErrorOnFailure(EnsureMessage());
     return PutSinglePreencodedAttributeWritePayload(attributePath, data);
-}
-
-CHIP_ERROR WriteClient::EnsureListStarted(const ConcreteDataAttributePath & attributePath)
-{
-    TLV::TLVWriter backupWriter;
-    mWriteRequestBuilder.GetWriteRequests().Checkpoint(backupWriter);
-
-    CHIP_ERROR err = TryToStartList(attributePath);
-    if (err == CHIP_ERROR_NO_MEMORY || err == CHIP_ERROR_BUFFER_TOO_SMALL)
-    {
-        // If it failed with no memory, then we create a new chunk for it.
-        mWriteRequestBuilder.GetWriteRequests().Rollback(backupWriter);
-        ReturnErrorOnFailure(StartNewMessage());
-        ReturnErrorOnFailure(TryToStartList(attributePath));
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR WriteClient::TryToStartList(const ConcreteDataAttributePath & attributePath)
-{
-
-    // TODO (#38414) : Move reservation/unreservtion of Buffer for TLV Writing to AttributeDataIB Builder instead of WriteClient
-    ReturnErrorOnFailure(mMessageWriter.ReserveBuffer(kReservedSizeForEndOfListAttributeIB));
-
-    ReturnErrorOnFailure(PrepareAttributeIB(attributePath));
-
-    TLV::TLVWriter * writer = GetAttributeDataIBTLVWriter();
-    VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    TLV::TLVType outerType;
-    ReturnErrorOnFailure(writer->StartContainer(TLV::ContextTag(AttributeDataIB::Tag::kData), TLV::kTLVType_Array, outerType));
-
-    VerifyOrReturnError(outerType == kAttributeDataIBType, CHIP_ERROR_INCORRECT_STATE);
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR WriteClient::EnsureListEnded()
-{
-    TLV::TLVWriter * writer = GetAttributeDataIBTLVWriter();
-    VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    // Undo the reservation made in EnsureListStarted() to free up space for the EndOfContainer TLV Elements
-    // (for both the List and AttributeDataIB).
-    ReturnErrorOnFailure(writer->UnreserveBuffer(kReservedSizeForEndOfListAttributeIB));
-    ReturnErrorOnFailure(writer->EndContainer(kAttributeDataIBType));
-
-    return FinishAttributeIB();
-}
-
-CHIP_ERROR
-WriteClient::TryPutPreencodedAttributeWritePayloadIntoList(const ConcreteDataAttributePath & attributePath,
-                                                           TLV::TLVReader & valueReader, bool & outChunkingNeeded,
-                                                           ListIndex & outEncodedItemCount)
-{
-
-    ReturnErrorOnFailure(EnsureListStarted(attributePath));
-
-    AttributeDataIB::Builder & attributeDataIB = mWriteRequestBuilder.GetWriteRequests().GetAttributeDataIBBuilder();
-    TLV::TLVWriter backupWriter;
-    CHIP_ERROR err      = CHIP_NO_ERROR;
-    outEncodedItemCount = 0;
-
-    while ((err = valueReader.Next()) == CHIP_NO_ERROR)
-    {
-        // Try to put all the list items into the list we just started, until we either run out of items
-        // or run out of space.
-        // Make sure that if we run out of space we don't leave a partially-encoded list item around.
-        attributeDataIB.Checkpoint(backupWriter);
-        err = attributeDataIB.GetWriter()->CopyElement(TLV::AnonymousTag(), valueReader);
-
-        if (err == CHIP_ERROR_NO_MEMORY || err == CHIP_ERROR_BUFFER_TOO_SMALL)
-        {
-            // Rollback through the attributeDataIB, which also resets the Builder's error state.
-            // This returns the object to the state it was in before attempting to copy the element.
-            attributeDataIB.Rollback(backupWriter);
-            outChunkingNeeded = true;
-            err               = CHIP_NO_ERROR;
-            break;
-        }
-        ReturnErrorOnFailure(err);
-        outEncodedItemCount++;
-    }
-    VerifyOrReturnError(err == CHIP_END_OF_TLV || err == CHIP_NO_ERROR, err);
-
-    return EnsureListEnded();
 }
 
 const char * WriteClient::GetStateStr() const
