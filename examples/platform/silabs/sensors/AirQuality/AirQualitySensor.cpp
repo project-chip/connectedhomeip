@@ -22,11 +22,7 @@
 #include <platform/CHIPDeviceLayer.h>
 
 #ifdef USE_SPARKFUN_AIR_QUALITY_SENSOR
-#ifdef __cplusplus
-extern "C" {
-#endif
 #include <sparkfun_sgp40.h>
-}
 #include "sl_i2cspm_instances.h"
 #endif // USE_SPARKFUN_AIR_QUALITY_SENSOR
 
