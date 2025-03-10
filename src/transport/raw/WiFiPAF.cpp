@@ -94,7 +94,7 @@ bool WiFiPAFBase::CanSendToPeer(const Transport::PeerAddress & address)
     return false;
 }
 
-void WiFiPAFBase::OnWiFiPAFMessageReceived(WiFiPAFSession & RxInfo, PacketBufferHandle && buffer)
+CHIP_ERROR WiFiPAFBase::WiFiPAFMessageReceived(WiFiPAFSession & RxInfo, PacketBufferHandle && buffer)
 {
     auto pPafInfo = mWiFiPAFLayer->GetPAFInfo(RxInfo.id);
     if (pPafInfo == nullptr)
@@ -103,7 +103,7 @@ void WiFiPAFBase::OnWiFiPAFMessageReceived(WiFiPAFSession & RxInfo, PacketBuffer
             The session does not exist
         */
         ChipLogError(Inet, "WiFi-PAF: No valid session whose Id: %u", RxInfo.id);
-        return;
+        return CHIP_ERROR_INCORRECT_STATE;
     }
 
     if ((pPafInfo->id != RxInfo.id) || (pPafInfo->peer_id != RxInfo.peer_id) ||
@@ -119,9 +119,10 @@ void WiFiPAFBase::OnWiFiPAFMessageReceived(WiFiPAFSession & RxInfo, PacketBuffer
         ChipLogError(Inet, "pkt: [id: %u, peer_id: %u, [%02x:%02x:%02x:%02x:%02x:%02x]", RxInfo.id, RxInfo.peer_id,
                      RxInfo.peer_addr[0], RxInfo.peer_addr[1], RxInfo.peer_addr[2], RxInfo.peer_addr[3], RxInfo.peer_addr[4],
                      RxInfo.peer_addr[5]);
-        return;
+        return CHIP_ERROR_INCORRECT_STATE;
     }
     HandleMessageReceived(Transport::PeerAddress(Transport::Type::kWiFiPAF, pPafInfo->nodeId), std::move(buffer));
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR WiFiPAFBase::WiFiPAFMessageSend(WiFiPAFSession & TxInfo, PacketBufferHandle && msgBuf)

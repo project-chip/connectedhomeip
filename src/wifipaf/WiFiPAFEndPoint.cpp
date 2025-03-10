@@ -1118,7 +1118,7 @@ CHIP_ERROR WiFiPAFEndPoint::_Receive(PacketBufferHandle && data)
         if (mWiFiPafLayer != nullptr && mState != kState_Closing)
         {
             // Pass received message up the stack.
-            mWiFiPafLayer->OnWiFiPAFMsgRxComplete(mSessionInfo, std::move(full_packet));
+            err = mWiFiPafLayer->OnWiFiPAFMsgRxComplete(mSessionInfo, std::move(full_packet));
         }
     }
 

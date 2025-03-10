@@ -166,7 +166,7 @@ public:
     typedef void (*OnCancelDeviceHandle)(uint32_t id, WiFiPAF::WiFiPafRole role);
     void Shutdown(OnCancelDeviceHandle OnCancelDevice);
     bool OnWiFiPAFMessageReceived(WiFiPAFSession & RxInfo, System::PacketBufferHandle && msg);
-    void OnWiFiPAFMsgRxComplete(WiFiPAFSession & RxInfo, System::PacketBufferHandle && msg);
+    CHIP_ERROR OnWiFiPAFMsgRxComplete(WiFiPAFSession & RxInfo, System::PacketBufferHandle && msg);
     State GetWiFiPAFState() { return mAppState; };
     void SetWiFiPAFState(State state);
     CHIP_ERROR SendMessage(WiFiPAF::WiFiPAFSession & TxInfo, chip::System::PacketBufferHandle && msg);
