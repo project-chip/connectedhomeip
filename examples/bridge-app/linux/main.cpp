@@ -1018,6 +1018,7 @@ void ApplicationShutdown() {}
 
 int main(int argc, char * argv[])
 {
+    std::cout << "Hello Rang Dong" << std::endl;
     if (ChipLinuxAppInit(argc, argv) != 0)
     {
         return -1;
