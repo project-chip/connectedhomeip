@@ -22,7 +22,6 @@
 #       --discriminator 1234
 #       --passcode 20202021
 #       --PICS src/app/tests/suites/certification/ci-pics-values
-#       --int-arg: PIXIT.CNET.ENDPOINT_THREAD:0
 #       --commissioning-method ble-wifi
 #       --int-arg PIXIT.CNET.ENDPOINT_WIFI:0
 #       --wifi-ssid 47524C50726976617465
@@ -60,7 +59,6 @@ async def arm_failsafe(commissioner: ChipDeviceCtrl.ChipDeviceController,
                         "Unexpected value returned from ArmFailSafe")
     asserts.assert_equal(res.errorCode, expectedErrorCode,
                          f"Expected Error code to be {expectedErrorCode}, but got: {res.errorCode}")
-    # asserts.assert_equal(res.debugText, "", f"Exected Debug text to be empty, but got: {res.debugText}")
 
 
 async def read_network_list(commissioner: ChipDeviceCtrl.ChipDeviceController,
@@ -84,9 +82,9 @@ async def connect_to_network(commissioner: ChipDeviceCtrl.ChipDeviceController,
         networkID=ssid.encode(), breadcrumb=breadcrumb)
     interactionTimeoutMs = commissioner.ComputeRoundTripTimeout(nodeid, upperLayerProcessingTimeoutMs=5000)
     res = await commissioner.SendCommand(nodeid=nodeid, endpoint=endpoint, payload=req, interactionTimeoutMs=interactionTimeoutMs)
-    logger.info(f"Got response: {res}")
-    asserts.assert_true(res.networkingStatus, cluster.Enums.NetworkCommissioningStatusEnum.kSuccess,
-                        f"Expected NetworkingStatus to be success but got: {res.networkingStatus}")
+    logger.info(f"Received response: {res}")
+    asserts.assert_equal(res.networkingStatus, cluster.Enums.NetworkCommissioningStatusEnum.kSuccess,
+                         f"Expected NetworkingStatus to be success but got: {res.networkingStatus}")
     assert_valid_int32(res.errorValue, "ErrorValue")
 
 
@@ -107,10 +105,10 @@ async def add_second_network(commissioner: ChipDeviceCtrl.ChipDeviceController,
     asserts.assert_true(type_matches(res, cluster.Commands.NetworkConfigResponse),
                         "Unexpected value returned from AddOrUpdateWiFiNetwork")
     asserts.assert_equal(res.networkingStatus, cluster.Enums.NetworkCommissioningStatusEnum.kSuccess,
-                         f"Expected Success, but got: {res.networkingStatus}")
+                         f"Expected 0 (Success), but got: {res.networkingStatus}")
     asserts.assert_equal(res.networkIndex, 0, f"Expected NetworkIndex to be 0, but got: {res.networkIndex}")
     # 2. DebugText is of type string with max length 512 or empty
-    asserts.assert_true(type(res.debugText), str, f"Expected debugText to be of type string, but got: {type(res.debugText)}")
+    asserts.assert_equal(type(res.debugText), str, f"Expected debugText to be of type string, but got: {type(res.debugText)}")
     asserts.assert_less_equal(len(res.debugText), 512,
                               f"Expected length of debugText to be less than or equal to 512, but got: {len(res.debugText)}")
 
@@ -133,7 +131,7 @@ async def remove_network(commissioner: ChipDeviceCtrl.ChipDeviceController,
     asserts.assert_equal(res.networkingStatus, cluster.Enums.NetworkCommissioningStatusEnum.kSuccess,
                          f"Expected kNetworkIDNotFound but got: {res.networkingStatus}")
     # Verify NetworkIndex matches previously saved 'userwifi_netidx'
-    asserts.assert_equal(res.networkIndex == userwifi_netidx,
+    asserts.assert_equal(res.networkIndex, userwifi_netidx,
                          f"Expected NetworkIndex to be: {userwifi_netidx}, but got: {res.networkIndex}")
 
 
@@ -148,6 +146,7 @@ def verify_ssid_connected(networkList, ssid, connected: bool = True):
             break
     asserts.assert_true(isPresent, f"NetworkID: {ssid} is not in NetworkList")
     asserts.assert_true(isConnected == connected, f"Expected connected to be {connected}, but got {isConnected}")
+    return isConnected
 
 
 class TC_CNET_4_11(MatterBaseTest):
@@ -195,7 +194,6 @@ class TC_CNET_4_11(MatterBaseTest):
 
         cgen = Clusters.GeneralCommissioning
         cnet = Clusters.NetworkCommissioning
-        attr = cnet.Attributes
 
         PIXIT_CNET_WIFI_1ST_ACCESSPOINT_SSID = bytes.fromhex("47524C50726976617465")
         PIXIT_CNET_WIFI_2ND_ACCESSPOINT_SSID = bytes.fromhex("7A6967626565686F6D65")
@@ -205,7 +203,7 @@ class TC_CNET_4_11(MatterBaseTest):
         self.step("precondition")
 
         # Precondition: TH reads FeatureMap attribute from the DUT and verifies if DUT supports WiFi on endpoint
-        feature_map = await self.read_single_attribute_check_success(cluster=cnet, attribute=attr.FeatureMap)
+        feature_map = await self.read_single_attribute_check_success(cluster=cnet, attribute=cnet.Attributes.FeatureMap)
         if not (feature_map & cnet.Bitmaps.Feature.kWiFiNetworkInterface):
             logger.info('Device does not support WiFi on endpoint, skipping remaining steps')
             self.skip_all_remaining_steps(1)
@@ -292,8 +290,9 @@ class TC_CNET_4_11(MatterBaseTest):
 
         networkList = await read_network_list(commissioner=commissioner, cluster=cnet, nodeid=nodeid, endpoint=endpoint)
         # Verify that the TH successfully connects to the DUT
-        verify_ssid_connected(networkList=networkList, ssid=PIXIT_CNET_WIFI_2ND_ACCESSPOINT_SSID)
-        logger.info("Device connected to a network.")
+        isConnected = verify_ssid_connected(networkList=networkList, ssid=PIXIT_CNET_WIFI_2ND_ACCESSPOINT_SSID)
+        if isConnected:
+            logger.info("Device connected to a network.")
 
         # TH reads Breadcrumb attribute from the General Commissioning cluster of the DUT
         self.step(10)
@@ -325,8 +324,9 @@ class TC_CNET_4_11(MatterBaseTest):
 
         networkList = await read_network_list(commissioner=commissioner, cluster=cnet, nodeid=nodeid, endpoint=endpoint)
         # Verify that the TH successfully connects to the DUT
-        verify_ssid_connected(networkList=networkList, ssid=PIXIT_CNET_WIFI_1ST_ACCESSPOINT_SSID)
-        logger.info("Device connected to a network.")
+        isConnected = verify_ssid_connected(networkList=networkList, ssid=PIXIT_CNET_WIFI_1ST_ACCESSPOINT_SSID)
+        if isConnected:
+            logger.info("Device connected to a network.")
 
         # TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 900
         self.step(14)
@@ -379,8 +379,9 @@ class TC_CNET_4_11(MatterBaseTest):
 
         networkList = await read_network_list(commissioner=commissioner, cluster=cnet, nodeid=nodeid, endpoint=endpoint)
         # Verify that the TH successfully connects to the DUT
-        verify_ssid_connected(networkList=networkList, ssid=PIXIT_CNET_WIFI_2ND_ACCESSPOINT_SSID)
-        logger.info("Device connected to a network.")
+        isConnected = verify_ssid_connected(networkList=networkList, ssid=PIXIT_CNET_WIFI_2ND_ACCESSPOINT_SSID)
+        if isConnected:
+            logger.info("Device connected to a network.")
 
         # TH reads Breadcrumb attribute from the General Commissioning cluster of the DUT
         self.step(20)
@@ -399,8 +400,8 @@ class TC_CNET_4_11(MatterBaseTest):
         res = await commissioner.SendCommand(nodeid=nodeid, endpoint=endpoint, payload=req)
         # Verify that DUT sends CommissioningCompleteResponse with the ErrorCode field set to OK (0)
         logger.info(f"Received response: {res}")
-        asserts.assert_true(res.errorCode, cgen.Enums.CommissioningErrorEnum.kOk,
-                            f"Expected CommissioningCompleteResponse to be 0, but got {res.errorCode}")
+        asserts.assert_equal(res.errorCode, cgen.Enums.CommissioningErrorEnum.kOk,
+                             f"Expected CommissioningCompleteResponse to be 0, but got {res.errorCode}")
 
         # TH reads Networks attribute from the DUT
         self.step(22)
