@@ -676,6 +676,11 @@ void emberAfTlsCertificateManagementClusterInitCallback(chip::EndpointId endpoin
 /**
  * @param endpoint    Endpoint that is being initialized
  */
+void emberAfTlsClientManagementClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
 void emberAfUnitTestingClusterInitCallback(chip::EndpointId endpoint);
 
 /**
@@ -5635,6 +5640,44 @@ chip::Protocols::InteractionModel::Status MatterTlsCertificateManagementClusterS
 void emberAfTlsCertificateManagementClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
+// TLS Client Management Cluster
+//
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfTlsClientManagementClusterServerInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterTlsClientManagementClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfTlsClientManagementClusterClientInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterTlsClientManagementClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/**
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterTlsClientManagementClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/**
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfTlsClientManagementClusterServerTickCallback(chip::EndpointId endpoint);
+
+//
 // Unit Testing Cluster
 //
 
@@ -7086,6 +7129,24 @@ bool emberAfTlsCertificateManagementClusterLookupClientCertificateCallback(
 bool emberAfTlsCertificateManagementClusterRemoveClientCertificateCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::TlsCertificateManagement::Commands::RemoveClientCertificate::DecodableType & commandData);
+/**
+ * @brief TLS Client Management Cluster ProvisionEndpoint Command callback (from client)
+ */
+bool emberAfTlsClientManagementClusterProvisionEndpointCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::TlsClientManagement::Commands::ProvisionEndpoint::DecodableType & commandData);
+/**
+ * @brief TLS Client Management Cluster FindEndpoint Command callback (from client)
+ */
+bool emberAfTlsClientManagementClusterFindEndpointCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::TlsClientManagement::Commands::FindEndpoint::DecodableType & commandData);
+/**
+ * @brief TLS Client Management Cluster RemoveEndpoint Command callback (from client)
+ */
+bool emberAfTlsClientManagementClusterRemoveEndpointCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::TlsClientManagement::Commands::RemoveEndpoint::DecodableType & commandData);
 /**
  * @brief Unit Testing Cluster Test Command callback (from client)
  */
