@@ -76,25 +76,6 @@ void PrintOnboardingCodes(const chip::PayloadContents & payload)
 
 void PrintQrCodeURL(const chip::MutableCharSpan qrCode)
 {
-    std::cout << "Hello RangDong " << std::endl;
-    std::cout << "Hello RangDong " << std::endl;
-    std::cout << "Hello RangDong " << std::endl;
-    std::cout << "Hello RangDong " << std::endl;
-    std::cout << "Hello RangDong " << std::endl;
-    std::cout << "Hello RangDong " << std::endl;
-    std::cout << "Hello RangDong " << std::endl;
-    std::cout << "Hello RangDong " << std::endl;
-    std::cout << "Hello RangDong " << std::endl;
-    std::cout << "Hello RangDong " << std::endl;
-    std::cout << "Hello RangDong " << std::endl;
-    std::cout << "Hello RangDong " << std::endl;
-    std::cout << "Hello RangDong " << std::endl;
-    std::cout << "Hello RangDong " << std::endl;
-    std::cout << "Hello RangDong " << std::endl;
-    std::cout << "Hello RangDong " << std::endl;
-    std::cout << "Hello RangDong " << std::endl;
-    std::cout << "Hello RangDong " << std::endl;
-    std::cout << "Hello RangDong " << std::endl;
     chip::Platform::ScopedMemoryBuffer<char> qrCodeBuffer;
     const size_t qrCodeBufferMaxSize = strlen(kQrCodeBaseUrl) + strlen(kUrlDataAssignmentPhrase) + 3 * qrCode.size() + 1;
     qrCodeBuffer.Alloc(qrCodeBufferMaxSize);
