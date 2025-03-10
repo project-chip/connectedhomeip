@@ -115,12 +115,21 @@ Please follow the steps below to generate an application image for OTA upgrades:
         python3 esp_enc_img_gen.py encrypt lighting-app.bin esp_image_encryption_public_key.pem lighting-app-encrypted.bin
         ```
 
-    - Append the Matter OTA header:
+    Optionally, you can use the cmake function `create_esp_enc_img()` to encrypt the OTA image during the build process. Please find the usage below. This is also demonstrated in the `examples/lighting-app/esp32/main/CMakeLists.txt` file.
+
         ```
-        src/app/ota_image_tool.py create --vendor-id 0xFFF1 --product-id 0x8000 --version 2 --version-str "v2.0" -da sha256 lighting-app-encrypted.bin lighting-app-encrypted-ota.bin
+            create_esp_enc_img(${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}.bin
+                                ${project_dir}/esp_image_encryption_public_key.pem
+                                ${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}-encrypted.bin
+                                app)
         ```
 
-3. Use the `lighting-app-encrypted-ota.bin` file with the OTA Provider app.
+3. Append the Matter OTA header
+    ```
+    src/app/ota_image_tool.py create --vendor-id 0xFFF1 --product-id 0x8000 --version 2 --version-str "v2.0" -da sha256 lighting-app-encrypted.bin lighting-app-encrypted-ota.bin
+    ```
+
+4. Use the `lighting-app-encrypted-ota.bin` file with the OTA Provider app.
 
 ## Delta OTA
 
