@@ -92,6 +92,11 @@ std::optional<CHIP_ERROR> TryWriteViaAccessInterface(const ConcreteDataAttribute
 DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                                        AttributeValueDecoder & decoder)
 {
+    if (auto * cluster = mRegistry.Get(request.path); cluster != nullptr)
+    {
+        return cluster->WriteAttribute(request, decoder);
+    }
+
     auto metadata = Ember::FindAttributeMetadata(request.path);
 
     // Explicit failure in finding a suitable metadata
@@ -201,6 +206,12 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
 void CodegenDataModelProvider::ListAttributeWriteNotification(const ConcreteAttributePath & aPath,
                                                               DataModel::ListWriteOperation opType)
 {
+    if (auto * cluster = mRegistry.Get(aPath); cluster != nullptr)
+    {
+        cluster->ListAttributeWriteNotification(aPath, opType);
+        return;
+    }
+
     AttributeAccessInterface * aai = AttributeAccessInterfaceRegistry::Instance().Get(aPath.mEndpointId, aPath.mClusterId);
 
     if (aai != nullptr)
