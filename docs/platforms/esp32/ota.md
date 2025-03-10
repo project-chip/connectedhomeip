@@ -109,23 +109,23 @@ Please follow the steps below to generate an application image for OTA upgrades:
     [esp_enc_img_gen.py](https://github.com/espressif/idf-extra-components/blob/master/esp_encrypted_img/tools/esp_enc_img_gen.py)
     script.
 
-    -   Use the following command to encrypt the OTA image with the public key:
+    Use the following command to encrypt the OTA image with the public key:
 
-        ```
-        python3 esp_enc_img_gen.py encrypt lighting-app.bin esp_image_encryption_public_key.pem lighting-app-encrypted.bin
-        ```
+    ```
+    python3 esp_enc_img_gen.py encrypt lighting-app.bin esp_image_encryption_public_key.pem lighting-app-encrypted.bin
+    ```
 
     Optionally, you can use the cmake function `create_esp_enc_img()` to encrypt
     the OTA image during the build process. Please find the usage below. This is
     also demonstrated in the `examples/lighting-app/esp32/main/CMakeLists.txt`
     file.
 
-        ```
-        create_esp_enc_img(${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}.bin
-                           ${project_dir}/esp_image_encryption_public_key.pem
-                           ${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}-encrypted.bin
-                           app)
-        ```
+    ```
+    create_esp_enc_img(${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}.bin
+                       ${project_dir}/esp_image_encryption_public_key.pem
+                       ${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}-encrypted.bin
+                       app)
+    ```
 
 3.  Append the Matter OTA header
 
