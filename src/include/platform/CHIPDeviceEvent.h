@@ -282,8 +282,10 @@ enum InternalEventTypes
      */
     kCHIPoBLEConnectionError,
     kCHIPoBLENotifyConfirm,
-    kCHIPoWiFiPAFWriteReceived,
+    kCHIPoWiFiPAFReceived,
     kCHIPoWiFiPAFConnected,
+    kCHIPoWiFiPAFCancelConnect,
+    kCHIPoWiFiPAFWriteDone,
 };
 
 static_assert(kEventTypeNotSet == 0, "kEventTypeNotSet must be defined as 0");
@@ -390,6 +392,7 @@ typedef void (*AsyncWorkFunct)(intptr_t arg);
 #include <system/SystemEvent.h>
 #include <system/SystemLayer.h>
 #include <system/SystemPacketBuffer.h>
+#include <wifipaf/WiFiPAFRole.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -502,7 +505,9 @@ struct ChipDeviceEvent final
         struct
         {
             chip::System::PacketBuffer * Data;
-        } CHIPoWiFiPAFWriteReceived;
+            chip::WiFiPAF::WiFiPAFSession SessionInfo;
+            bool result;
+        } CHIPoWiFiPAFReceived;
 #endif
         struct
         {
