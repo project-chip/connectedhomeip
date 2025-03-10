@@ -486,9 +486,9 @@ void ReadClient::OnActiveModeNotification()
 {
     VerifyOrDie(mpImEngine->InActiveReadClientList(this));
 
-    // Note: this API only works when issuing subscription via SendAutoResubscribeRequest, when SendAutoResubscribeRequest is
+    // Note: this API only works when issuing subscription via SendAutoResubscribeRequest. When SendAutoResubscribeRequest is
     // called, either mEventPathParamsListSize or mAttributePathParamsListSize is not 0.
-    VerifyOrDie(mReadPrepareParams.mEventPathParamsListSize != 0 || mReadPrepareParams.mAttributePathParamsListSize != 0);
+    VerifyOrReturn(mReadPrepareParams.mEventPathParamsListSize != 0 || mReadPrepareParams.mAttributePathParamsListSize != 0);
 
     // If mCatsMatchCheckIn is true, it means cats used in icd registration matches with the one in current subscription, OnActiveModeNotification
     // continues to revive the subscription as needed, otherwise, do nothing.
@@ -502,8 +502,8 @@ void ReadClient::OnActiveModeNotification()
         return;
     }
 
-    // If the server sends out check-in message, and there is no reschedule subscription yet in client side at the same time, it
-    // means current client does not realize subscription has gone, and we should forcibly timeout current subscription, and
+    // If the server sends out check-in message, and there is a tracked active subscription in client side at the same time, it
+    // means current client does not realize this tracked subscription has gone, and we should forcibly timeout current subscription, and
     // schedule a new one.
     if (!mIsResubscriptionScheduled)
     {
