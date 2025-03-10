@@ -1851,6 +1851,8 @@ endpoint 1 {
   }
 
   server cluster CommodityPrice {
+    emits event PriceChange;
+    emits event ForecastChange;
     ram      attribute tariffUnit;
     callback attribute currency;
     callback attribute currentPrice;

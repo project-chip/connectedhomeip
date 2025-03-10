@@ -38,24 +38,9 @@ using namespace chip::app::Clusters;
  */
 void ElectricalPriceApplicationInit()
 {
-//     auto endpointId = GetEnergyDeviceEndpointId();
-//     VerifyOrDie(EnergyGatewayCommonClustersInit(endpointId) == CHIP_NO_ERROR);
-//     VerifyOrDie(EnergyEvseInit(endpointId) == CHIP_NO_ERROR);
-//     VerifyOrDie(EVSEManufacturerInit(endpointId, *gEPMInstance.get(), *gPTInstance.get(), *gDEMInstance.get(),
-//                                      *gDEMDelegate.get()) == CHIP_NO_ERROR);
 }
 
 void ElectricalPriceApplicationShutdown()
 {
     ChipLogDetail(AppServer, "Energy Gateway App : ElectricalPriceApplicationShutdown()");
-
-    // /* Shutdown in reverse order that they were created */
-    // EVSEManufacturerShutdown();           /* Free the EVSEManufacturer */
-    // PowerTopologyShutdown();              /* Free the PowerTopology */
-    // ElectricalPowerMeasurementShutdown(); /* Free the Electrical Power Measurement */
-    // EnergyEvseShutdown();                 /* Free the EnergyEvse */
-    // DeviceEnergyManagementShutdown();     /* Free the DEM */
-
-    // Clusters::DeviceEnergyManagementMode::Shutdown();
-    // Clusters::EnergyEvseMode::Shutdown();
 }

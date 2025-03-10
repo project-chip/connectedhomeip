@@ -36,5 +36,6 @@ typedef int64_t Energy_mWh;
 typedef int64_t Amperage_mA;
 typedef int64_t Power_mW;
 typedef int64_t Voltage_mV;
+typedef int16_t Currency;
 
 } // namespace chip

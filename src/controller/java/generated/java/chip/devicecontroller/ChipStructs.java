@@ -7092,67 +7092,6 @@ public static class CommodityPriceClusterCommodityPriceStruct {
     return output.toString();
   }
 }
-public static class CommodityPriceClusterCurrencyStruct {
-  public Integer currency;
-  public Integer decimalPoints;
-  private static final long CURRENCY_ID = 0L;
-  private static final long DECIMAL_POINTS_ID = 1L;
-
-  public CommodityPriceClusterCurrencyStruct(
-    Integer currency,
-    Integer decimalPoints
-  ) {
-    this.currency = currency;
-    this.decimalPoints = decimalPoints;
-  }
-
-  public StructType encodeTlv() {
-    ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(CURRENCY_ID, new UIntType(currency)));
-    values.add(new StructElement(DECIMAL_POINTS_ID, new UIntType(decimalPoints)));
-
-    return new StructType(values);
-  }
-
-  public static CommodityPriceClusterCurrencyStruct decodeTlv(BaseTLVType tlvValue) {
-    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
-      return null;
-    }
-    Integer currency = null;
-    Integer decimalPoints = null;
-    for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == CURRENCY_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          currency = castingValue.value(Integer.class);
-        }
-      } else if (element.contextTagNum() == DECIMAL_POINTS_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          decimalPoints = castingValue.value(Integer.class);
-        }
-      }
-    }
-    return new CommodityPriceClusterCurrencyStruct(
-      currency,
-      decimalPoints
-    );
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder output = new StringBuilder();
-    output.append("CommodityPriceClusterCurrencyStruct {\n");
-    output.append("\tcurrency: ");
-    output.append(currency);
-    output.append("\n");
-    output.append("\tdecimalPoints: ");
-    output.append(decimalPoints);
-    output.append("\n");
-    output.append("}\n");
-    return output.toString();
-  }
-}
 public static class CommodityPriceClusterPriceStruct {
   public Long amount;
   public ChipStructs.CommodityPriceClusterCurrencyStruct currency;
@@ -7209,6 +7148,67 @@ public static class CommodityPriceClusterPriceStruct {
     output.append("\n");
     output.append("\tcurrency: ");
     output.append(currency);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class CommodityPriceClusterCurrencyStruct {
+  public Integer currency;
+  public Integer decimalPoints;
+  private static final long CURRENCY_ID = 0L;
+  private static final long DECIMAL_POINTS_ID = 1L;
+
+  public CommodityPriceClusterCurrencyStruct(
+    Integer currency,
+    Integer decimalPoints
+  ) {
+    this.currency = currency;
+    this.decimalPoints = decimalPoints;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(CURRENCY_ID, new UIntType(currency)));
+    values.add(new StructElement(DECIMAL_POINTS_ID, new UIntType(decimalPoints)));
+
+    return new StructType(values);
+  }
+
+  public static CommodityPriceClusterCurrencyStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer currency = null;
+    Integer decimalPoints = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == CURRENCY_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          currency = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == DECIMAL_POINTS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          decimalPoints = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new CommodityPriceClusterCurrencyStruct(
+      currency,
+      decimalPoints
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("CommodityPriceClusterCurrencyStruct {\n");
+    output.append("\tcurrency: ");
+    output.append(currency);
+    output.append("\n");
+    output.append("\tdecimalPoints: ");
+    output.append(decimalPoints);
     output.append("\n");
     output.append("}\n");
     return output.toString();
