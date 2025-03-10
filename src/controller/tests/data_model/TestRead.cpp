@@ -2355,8 +2355,8 @@ TEST_F(TestRead, TestSubscribe_OnActiveModeNotification)
 }
 
 /**
- * When all tracked subscriptions go away in server, check-in message is received and OnActiveModeNotification is called in client side, the tracked
- * subscription would be torn down and a new one would be rescheduled in client side.
+ * When all tracked subscriptions go away in server, check-in message is received and OnActiveModeNotification is called in client
+ * side, the tracked subscription would be torn down and a new one would be rescheduled in client side.
  */
 TEST_F(TestRead, TestSubscribe_SubGoAwayInserverOnActiveModeNotification)
 {
@@ -2427,8 +2427,8 @@ TEST_F(TestRead, TestSubscribe_SubGoAwayInserverOnActiveModeNotification)
 }
 
 /**
- * When all tracked subscriptions go away in server, check-in message is received and OnActiveModeNotification is called in client side, the
- * untracked subscription would be kept.
+ * When all tracked subscriptions go away in server, check-in message is received and OnActiveModeNotification is called in client
+ * side, the untracked subscription would be kept.
  */
 TEST_F(TestRead, TestSubscribe_MismatchedSubGoAwayInserverOnActiveModeNotification)
 {
@@ -2454,7 +2454,7 @@ TEST_F(TestRead, TestSubscribe_MismatchedSubGoAwayInserverOnActiveModeNotificati
         attributePathParams[0].mClusterId              = Clusters::UnitTesting::Id;
         attributePathParams[0].mAttributeId            = Clusters::UnitTesting::Attributes::Boolean::Id;
         readPrepareParams.mCatsMatchCheckIn            = false;
-        constexpr uint16_t maxIntervalCeilingSeconds = 1;
+        constexpr uint16_t maxIntervalCeilingSeconds   = 1;
 
         readPrepareParams.mMaxIntervalCeilingSeconds = maxIntervalCeilingSeconds;
         readPrepareParams.mIsPeerLIT                 = true;

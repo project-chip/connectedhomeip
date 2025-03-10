@@ -50,7 +50,7 @@ struct ReadPrepareParams
     bool mIsPeerLIT                     = false;
 
     // see ReadClient::OnActiveModeNotification
-    bool mCatsMatchCheckIn              = true;
+    bool mCatsMatchCheckIn = true;
 
     ReadPrepareParams() {}
     ReadPrepareParams(const SessionHandle & sessionHandle) { mSessionHolder.Grab(sessionHandle); }

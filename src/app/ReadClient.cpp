@@ -490,8 +490,8 @@ void ReadClient::OnActiveModeNotification()
     // called, either mEventPathParamsListSize or mAttributePathParamsListSize is not 0.
     VerifyOrReturn(mReadPrepareParams.mEventPathParamsListSize != 0 || mReadPrepareParams.mAttributePathParamsListSize != 0);
 
-    // If mCatsMatchCheckIn is true, it means cats used in icd registration matches with the one in current subscription, OnActiveModeNotification
-    // continues to revive the subscription as needed, otherwise, do nothing.
+    // If mCatsMatchCheckIn is true, it means cats used in icd registration matches with the one in current subscription,
+    // OnActiveModeNotification continues to revive the subscription as needed, otherwise, do nothing.
     VerifyOrReturn(mReadPrepareParams.mCatsMatchCheckIn);
 
     // When we reach here, the subscription definitely exceeded the liveness timeout. Just continue the unfinished resubscription
@@ -503,8 +503,8 @@ void ReadClient::OnActiveModeNotification()
     }
 
     // If the server sends out check-in message, and there is a tracked active subscription in client side at the same time, it
-    // means current client does not realize this tracked subscription has gone, and we should forcibly timeout current subscription, and
-    // schedule a new one.
+    // means current client does not realize this tracked subscription has gone, and we should forcibly timeout current
+    // subscription, and schedule a new one.
     if (!mIsResubscriptionScheduled)
     {
         // Closing will ultimately trigger ScheduleResubscription with the aReestablishCASE argument set to true, effectively
