@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,8 +19,16 @@
 
 #include <ble/Ble.h>
 
-#import <CoreBluetooth/CoreBluetooth.h>
+namespace chip {
+namespace DeviceLayer {
+namespace Internal {
 
-@interface MTRUUIDHelper : NSObject
-+ (CBUUID *)GetShortestServiceUUID:(const chip::Ble::ChipBleUUID *)svcId;
-@end
+class BleApplicationDelegateImpl : public Ble::BleApplicationDelegate
+{
+public:
+    void NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT connObj) override;
+};
+
+} // namespace Internal
+} // namespace DeviceLayer
+} // namespace chip

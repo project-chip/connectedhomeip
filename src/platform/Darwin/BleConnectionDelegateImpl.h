@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,15 +18,24 @@
 #pragma once
 
 #include <ble/Ble.h>
+#include <platform/Darwin/BleScannerDelegate.h>
 
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-class BleApplicationDelegateImpl : public Ble::BleApplicationDelegate
+class BleConnectionDelegateImpl : public Ble::BleConnectionDelegate
 {
 public:
-    virtual void NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT connObj);
+    void StartScan(BleScannerDelegate * delegate, BleScanMode mode = BleScanMode::kDefault);
+    void StopScan();
+
+    void NewConnection(Ble::BleLayer * bleLayer, void * appState, const SetupDiscriminator & connDiscriminator) override;
+    void NewConnection(Ble::BleLayer * bleLayer, void * appState, BLE_CONNECTION_OBJECT connObj) override;
+    CHIP_ERROR CancelConnection() override;
+
+private:
+    CHIP_ERROR DoCancel();
 };
 
 } // namespace Internal

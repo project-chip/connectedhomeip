@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,25 +17,27 @@
 
 #pragma once
 
+#if !__has_feature(objc_arc)
+#error This file must be compiled in ObjC++ mode with ARC.
+#endif
+
 #include <ble/Ble.h>
-#include <platform/Darwin/BleScannerDelegate.h>
+
+#import <CoreBluetooth/CoreBluetooth.h>
 
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-class BleConnectionDelegateImpl : public Ble::BleConnectionDelegate
+// Holds a CBPeripheral and the associated CBCentralManager
+struct BlePeripheral
 {
-public:
-    void StartScan(BleScannerDelegate * delegate, BleScanMode mode = BleScanMode::kDefault);
-    void StopScan();
+    CBPeripheral * const peripheral;
+    CBCentralManager * const centralManager;
 
-    void NewConnection(Ble::BleLayer * bleLayer, void * appState, const SetupDiscriminator & connDiscriminator) override;
-    void NewConnection(Ble::BleLayer * bleLayer, void * appState, BLE_CONNECTION_OBJECT connObj) override;
-    CHIP_ERROR CancelConnection() override;
-
-private:
-    CHIP_ERROR DoCancel();
+    BlePeripheral(CBPeripheral * aPeripheral, CBCentralManager * aCentralManager) :
+        peripheral(aPeripheral), centralManager(aCentralManager)
+    {}
 };
 
 } // namespace Internal
