@@ -116,7 +116,7 @@ using namespace EFR32DoorLock::ResourceRanges;
 
 struct LockUserInfo
 {
-    char userName[DOOR_LOCK_USER_NAME_BUFFER_SIZE];
+    char userName[DOOR_LOCK_MAX_USER_NAME_SIZE];
     size_t userNameSize;
     uint32_t userUniqueId;
     UserStatusEnum userStatus;

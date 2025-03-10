@@ -445,7 +445,7 @@ bool LockManager::SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip:
         return false;
     }
 
-    chip::Platform::CopyString(userInStorage.userName, userName.data());
+    memcpy(userInStorage.userName, userName.data(), userName.size());
     userInStorage.userNameSize   = userName.size();
     userInStorage.userUniqueId   = uniqueId;
     userInStorage.userStatus     = userStatus;
