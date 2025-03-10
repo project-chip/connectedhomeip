@@ -1,5 +1,5 @@
 docutils==0.21.2
-Sphinx==8.2.0
+Sphinx==8.2.3
 sphinx-book-theme
 myst-parser>=2.0.0
 breathe>=4.34

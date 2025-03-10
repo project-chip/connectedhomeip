@@ -105,6 +105,7 @@ jobs:
                     - "-nxp-zephyr"
                     - "-nrf-platform"
                     - "-telink"
+                    - "-telink-zephyr_3_3"
                     - "-ti"
                     - "-tizen"
                     - "-openiotsdk"

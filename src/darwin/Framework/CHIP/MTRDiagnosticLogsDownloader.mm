@@ -419,6 +419,10 @@ private:
 {
     assertChipStackLockedByCurrentThread();
 
+    // Fow now, we only support one download at a time per controller; abort
+    // any existing ones so we can start this new one.
+    [self abortDownloadsForController:controller];
+
     uint16_t timeoutInSeconds = 0;
     if (timeout <= 0) {
         timeoutInSeconds = 0;

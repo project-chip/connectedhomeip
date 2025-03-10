@@ -45,3 +45,17 @@ source_set("instance-header") {
   # generally being unit tests or data_model.gni/data_model.cmake files)
   sources = [ "Instance.h" ]
 }
+
+source_set("registry") {
+  sources = [
+    "ServerClusterInterfaceRegistry.cpp",
+    "ServerClusterInterfaceRegistry.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/app:paths",
+    "${chip_root}/src/app/server-cluster",
+    "${chip_root}/src/lib/core:types",
+    "${chip_root}/src/lib/support",
+  ]
+}

@@ -24,6 +24,11 @@ using namespace chip::app::Clusters::Actions;
 using namespace chip::app::Clusters::Actions::Attributes;
 using namespace chip::Protocols::InteractionModel;
 
+namespace {
+std::unique_ptr<Clusters::Actions::ActionsDelegateImpl> sActionsDelegateImpl;
+std::unique_ptr<Clusters::Actions::ActionsServer> sActionsServer;
+} // namespace
+
 CHIP_ERROR ActionsDelegateImpl::ReadActionAtIndex(uint16_t index, ActionStructStorage & action)
 {
     if (index >= kActionList.size())
@@ -128,4 +133,18 @@ Status ActionsDelegateImpl::HandleDisableActionWithDuration(uint16_t actionId, u
 {
     // Not implemented
     return Status::NotFound;
+}
+
+void emberAfActionsClusterInitCallback(EndpointId endpoint)
+{
+    VerifyOrReturn(endpoint == 1,
+                   ChipLogError(Zcl, "Actions cluster delegate is not implemented for endpoint with id %d.", endpoint));
+    VerifyOrReturn(emberAfContainsServer(endpoint, Actions::Id) == true,
+                   ChipLogError(Zcl, "Endpoint %d does not support Actions cluster.", endpoint));
+    VerifyOrReturn(!sActionsDelegateImpl && !sActionsServer);
+
+    sActionsDelegateImpl = std::make_unique<Actions::ActionsDelegateImpl>();
+    sActionsServer       = std::make_unique<Actions::ActionsServer>(endpoint, *sActionsDelegateImpl.get());
+
+    sActionsServer->Init();
 }

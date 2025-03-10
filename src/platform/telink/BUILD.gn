@@ -96,14 +96,15 @@ static_library("telink") {
   }
 
   if (chip_enable_wifi) {
+    import("$root_build_dir/zephyr_version.gni")
     sources += [
       "OTAImageProcessorImplWiFi.h",
-      "wifi/ConnectivityManagerImplWiFi.cpp",
+      "wifi/" + ZEPHYR_VERSION_STRING + "/ConnectivityManagerImplWiFi.cpp",
       "wifi/ConnectivityManagerImplWiFi.h",
-      "wifi/TelinkWiFiDriver.cpp",
+      "wifi/" + ZEPHYR_VERSION_STRING + "/TelinkWiFiDriver.cpp",
       "wifi/TelinkWiFiDriver.h",
-      "wifi/WiFiManager.cpp",
-      "wifi/WiFiManager.h",
+      "wifi/" + ZEPHYR_VERSION_STRING + "/WiFiManager.cpp",
+      "wifi/" + ZEPHYR_VERSION_STRING + "/WiFiManager.h",
     ]
   }
 

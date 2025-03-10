@@ -23,6 +23,7 @@
 #include <platform/ConnectivityManager.h>
 #include <platform/Zephyr/InetUtils.h>
 #include <platform/internal/BLEManager.h>
+#include <zephyr/net/net_if.h>
 
 #include <platform/internal/GenericConnectivityManagerImpl_UDP.ipp>
 
@@ -76,7 +77,11 @@ CHIP_ERROR JoinLeaveMulticastGroup(net_if * iface, const Inet::IPAddress & addre
 
         if (maddr && !net_if_ipv6_maddr_is_joined(maddr))
         {
+#if defined(CONFIG_ZEPHYR_VERSION_3_3)
             net_if_ipv6_maddr_join(maddr);
+#else
+            net_if_ipv6_maddr_join(iface, maddr);
+#endif
         }
     }
     else if (operation == UDPEndPointImplSockets::MulticastOperation::kLeave)

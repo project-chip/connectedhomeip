@@ -451,10 +451,10 @@ enum class TestGlobalEnum : uint8_t
 // Enum for ThreeLevelAutoEnum
 enum class ThreeLevelAutoEnum : uint8_t
 {
-    kLow       = 0x00,
-    kMedium    = 0x01,
-    kHigh      = 0x02,
-    kAutomatic = 0x03,
+    kAuto   = 0x00,
+    kLow    = 0x01,
+    kMedium = 0x02,
+    kHigh   = 0x03,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
@@ -5750,15 +5750,16 @@ enum class VideoCodecEnum : uint8_t
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
-    kAudio           = 0x1,
-    kVideo           = 0x2,
-    kSnapshot        = 0x4,
-    kPrivacy         = 0x8,
-    kSpeaker         = 0x10,
-    kImageControl    = 0x20,
-    kWatermark       = 0x40,
-    kOnScreenDisplay = 0x80,
-    kLocalStorage    = 0x100,
+    kAudio            = 0x1,
+    kVideo            = 0x2,
+    kSnapshot         = 0x4,
+    kPrivacy          = 0x8,
+    kSpeaker          = 0x10,
+    kImageControl     = 0x20,
+    kWatermark        = 0x40,
+    kOnScreenDisplay  = 0x80,
+    kLocalStorage     = 0x100,
+    kHighDynamicRange = 0x200,
 };
 } // namespace CameraAvStreamManagement
 
@@ -5920,6 +5921,21 @@ enum class SupportedDeviceCategoryBitmap : uint32_t
 } // namespace CommissionerControl
 
 namespace TlsCertificateManagement {} // namespace TlsCertificateManagement
+
+namespace TlsClientManagement {
+
+// Enum for TLSEndpointStatusEnum
+enum class TLSEndpointStatusEnum : uint8_t
+{
+    kProvisioned = 0x00,
+    kInUse       = 0x01,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 2,
+};
+} // namespace TlsClientManagement
 
 namespace UnitTesting {
 

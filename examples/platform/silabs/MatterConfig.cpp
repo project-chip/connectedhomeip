@@ -318,7 +318,7 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 #ifdef SL_WIFI
 CHIP_ERROR SilabsMatterConfig::InitWiFi(void)
 {
-    return InitWiFiStack();
+    return WifiInterface::GetInstance().InitWiFiStack();
 }
 #endif // SL_WIFI
 

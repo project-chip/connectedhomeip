@@ -110,7 +110,7 @@ static void post_network_connect()
     // Iterate on the network interface to see if we already have beed assigned addresses.
     for (chip::Inet::InterfaceAddressIterator it; it.HasCurrent(); it.Next())
     {
-        char ifName[chip::Inet::InterfaceId::kMaxIfNameLength];
+        char ifName[Inet::InterfaceId::kMaxIfNameLength];
         if (it.IsUp() && CHIP_NO_ERROR == it.GetInterfaceName(ifName, sizeof(ifName)))
         {
             chip::Inet::IPAddress addr;

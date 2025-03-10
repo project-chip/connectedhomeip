@@ -85,6 +85,8 @@ void MTROperationalBrowser::EnsureBrowse()
         return;
     }
 
+    mAddedInstanceNames = [[NSMutableSet alloc] init];
+
     mInitialized = true;
 
     for (auto domain : kBrowseDomains) {
@@ -100,6 +102,7 @@ void MTROperationalBrowser::StopBrowse()
 {
     ChipLogProgress(Controller, "%p stopping persistent operational browse", this);
     if (mInitialized) {
+        mAddedInstanceNames = nil;
         DNSServiceRefDeallocate(mBrowseRef);
         mInitialized = false;
     }
@@ -126,22 +129,33 @@ void MTROperationalBrowser::OnBrowse(DNSServiceRef aServiceRef, DNSServiceFlags 
         return;
     }
 
-    chip::PeerId peerId;
-    CHIP_ERROR err = chip::Dnssd::ExtractIdFromInstanceName(aName, &peerId);
-    if (err != CHIP_NO_ERROR) {
-        ChipLogError(Controller, "Invalid instance name: '%s'\n", aName);
-        return;
-    }
-
+    auto * newInstanceName = [NSString stringWithUTF8String:aName];
     if (!(aFlags & kDNSServiceFlagsAdd)) {
-        // We mostly only care about new things appearing, but log it when things
-        // disappear.
-        MTR_LOG("Matter operational instance advertisement removed: '%s'\n", aName);
+        MTR_LOG("Matter operational instance advertisement removed: '%@'\n", newInstanceName);
+        // Make sure that we don't notify about things that appear and then disappear.
+        [self->mAddedInstanceNames removeObject:newInstanceName];
         return;
     }
 
-    ChipLogProgress(Controller, "Notifying controller factory about new operational instance: '%s'", aName);
-    [self->mDeviceControllerFactory operationalInstanceAdded:peerId];
+    [self->mAddedInstanceNames addObject:newInstanceName];
+
+    if (aFlags & kDNSServiceFlagsMoreComing) {
+        // Just wait for those other notifications, so we coalesce everything.
+        return;
+    }
+
+    for (NSString * instanceName in self->mAddedInstanceNames) {
+        chip::PeerId peerId;
+        CHIP_ERROR err = chip::Dnssd::ExtractIdFromInstanceName(instanceName.UTF8String, &peerId);
+        if (err != CHIP_NO_ERROR) {
+            ChipLogError(Controller, "Invalid instance name: '%@'\n", instanceName);
+            continue;
+        }
+
+        ChipLogProgress(Controller, "Notifying controller factory about new operational instance: '%@'", instanceName);
+        [self->mDeviceControllerFactory operationalInstanceAdded:peerId];
+    }
+    [self->mAddedInstanceNames removeAllObjects];
 }
 
 MTROperationalBrowser::~MTROperationalBrowser()
