@@ -266,9 +266,6 @@ void AppTask::AppTaskMain(void * pvParameter)
 
     SILABS_LOG("App Task started");
 
-    // Users and credentials should be checked once from nvm flash on boot
-    LockMgr().ReadConfigValues();
-
     while (true)
     {
         osStatus_t eventReceived = osMessageQueueGet(sAppEventQueue, &event, NULL, osWaitForever);
