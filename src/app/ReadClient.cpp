@@ -485,6 +485,11 @@ CHIP_ERROR ReadClient::GenerateDataVersionFilterList(DataVersionFilterIBs::Build
 void ReadClient::OnActiveModeNotification()
 {
     VerifyOrDie(mpImEngine->InActiveReadClientList(this));
+
+    // Note: this API only works when issuing subscription via SendAutoResubscribeRequest, when SendAutoResubscribeRequest is
+    // called, either mEventPathParamsListSize or mAttributePathParamsListSize is not 0.
+    VerifyOrDie(mReadPrepareParams.mEventPathParamsListSize != 0 || mReadPrepareParams.mAttributePathParamsListSize != 0);
+
     // When we reach here, the subscription definitely exceeded the liveness timeout. Just continue the unfinished resubscription
     // logic in `OnLivenessTimeoutCallback`.
     if (IsInactiveICDSubscription())
@@ -493,6 +498,19 @@ void ReadClient::OnActiveModeNotification()
         return;
     }
 
+    // If the server sends out check-in message, and there is no reschedule subscription yet in client side at the same time, it
+    // means current client does not realize subscription has gone, and we should forcibly timeout current subscription, and
+    // schedule a new one.
+    if (!mIsResubscriptionScheduled)
+    {
+        // Closing will ultimately trigger ScheduleResubscription with the aReestablishCASE argument set to true, effectively
+        // rendering the session defunct.
+        Close(CHIP_ERROR_TIMEOUT);
+        return;
+    }
+
+    // If the server sends a check-in message and a subscription is already scheduled, it indicates a client-side subscription
+    // timeout or failure. Cancel the scheduled subscription and initiate a new one immediately.
     TriggerResubscribeIfScheduled("check-in message");
 }
 
@@ -503,12 +521,6 @@ void ReadClient::OnPeerTypeChange(PeerType aType)
     mIsPeerLIT = (aType == PeerType::kLITICD);
 
     ChipLogProgress(DataManagement, "Peer is now %s LIT ICD.", mIsPeerLIT ? "a" : "not a");
-
-    // If the peer is no longer LIT, try to wake up the subscription and do resubscribe when necessary.
-    if (!mIsPeerLIT)
-    {
-        OnActiveModeNotification();
-    }
 }
 
 CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
