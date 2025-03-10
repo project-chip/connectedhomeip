@@ -348,6 +348,7 @@ CHIP_ERROR FabricTable::ValidateIncomingNOCChain(const ByteSpan & noc, const Byt
                                                     outNocPubkey, &outRootPubkey);
     if (err != CHIP_NO_ERROR && err != CHIP_ERROR_WRONG_NODE_ID)
     {
+        ChipLogError(FabricProvisioning, "VerifyCredentials failed: %" CHIP_ERROR_FORMAT, err.Format());
         err = CHIP_ERROR_UNSUPPORTED_CERT_FORMAT;
     }
     if (err != CHIP_NO_ERROR)
