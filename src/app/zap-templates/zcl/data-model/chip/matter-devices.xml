@@ -53,6 +53,7 @@ limitations under the License.
                 <requireAttribute>HARDWARE_VERSION_STRING</requireAttribute>
                 <requireAttribute>SOFTWARE_VERSION</requireAttribute>
                 <requireAttribute>SOFTWARE_VERSION_STRING</requireAttribute>
+                <requireAttribute>CONFIGURATION_VERSION</requireAttribute>
             </include>
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
