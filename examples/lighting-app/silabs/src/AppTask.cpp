@@ -181,8 +181,10 @@ void AppTask::LightActionEventHandler(AppEvent * aEvent)
 void AppTask::LightControlEventHandler(AppEvent * aEvent)
 {
     uint8_t light_action = aEvent->LightControlEvent.Action;
-    uint32_t value       = *reinterpret_cast<uint32_t *>(aEvent->LightControlEvent.Value);
-    uint8_t brightness   = 1;
+    // uint8_t value        = *reinterpret_cast<uint8_t *>(aEvent->LightControlEvent.Value);
+    // ChipLogProgress(Zcl, "Address of aEvent  %p", aEvent->LightControlEvent.Value);
+    ChipLogProgress(Zcl, "Value = %u", aEvent->LightControlEvent.Value);
+
     PlatformMgr().LockChipStack();
     Protocols::InteractionModel::Status status;
     app::DataModel::Nullable<uint8_t> currentlevel;
@@ -191,37 +193,30 @@ void AppTask::LightControlEventHandler(AppEvent * aEvent)
     PlatformMgr().UnlockChipStack();
     if (status == Protocols::InteractionModel::Status::Success && !currentlevel.IsNull())
     {
-        brightness = currentlevel.Value();
+        sLightLED.SetLevel(currentlevel.Value());
     }
-    SILABS_LOG("brightness : %d ", brightness);
     switch (light_action)
     {
     case LightingManager::COLOR_ACTION_XY: {
-        RgbColor_t rgb;
-        XyColor_t xy = *reinterpret_cast<XyColor_t *>(&value);
-        rgb          = XYToRgb(brightness, xy.x, xy.y);
-        sLightLED.SetColor(rgb.r, rgb.g, rgb.b);
-        ChipLogProgress(Zcl, "XY to RGB: X: %u, Y: %u | R: %u, G: %u, B: %u", xy.x, xy.y, rgb.r, rgb.g, rgb.b);
+        // XyColor_t xy = reinterpret_cast<XyColor_t>(value);
+        XyColor_t xy = *reinterpret_cast<XyColor_t *>(aEvent->LightControlEvent.Value);
+        sLightLED.SetColorFromXY(xy.x, xy.y);
     }
     break;
     case LightingManager::COLOR_ACTION_HSV: {
-        RgbColor_t rgb;
-        HsvColor_t hsv = *reinterpret_cast<HsvColor_t *>(&value);
-        SILABS_LOG("Color hue : %u ", hsv.h);
-        SILABS_LOG("Color Saturation : %u ", hsv.s);
-        hsv.v = brightness;
-        rgb   = HsvToRgb(hsv);
-        sLightLED.SetColor(rgb.r, rgb.g, rgb.b);
-        ChipLogProgress(Zcl, "HSV to RGB: H: %u, S: %u, V: %u | R: %u, G: %u, B: %u", hsv.h, hsv.s, hsv.v, rgb.r, rgb.g, rgb.b);
+        // HsvColor_t hsv = reinterpret_cast<HsvColor_t>(value);
+        ChipLogProgress(Zcl, "HSV color action ");
+        // ChipLogProgress(Zcl, "Value = %u", *reinterpret_cast<uint8_t *>(&aEvent->LightControlEvent.Value));
+        //    / ChipLogProgress(Zcl, "Value ******** = %u", *reinterpret_cast<uint8_t *>(aEvent->LightControlEvent.Value));
+        HsvColor_t hsv = *reinterpret_cast<HsvColor_t *>(&aEvent->LightControlEvent.Value);
+        ChipLogProgress(Zcl, "New HSV color: %u|%u", hsv.h, hsv.s);
+        sLightLED.SetColorFromHSV(hsv.h, hsv.s);
     }
     break;
     case LightingManager::COLOR_ACTION_CT: {
-        RgbColor_t rgb;
         CtColor_t ct;
-        ct.ctMireds = *reinterpret_cast<uint16_t *>(&value);
-        rgb         = CTToRgb(ct);
-        ChipLogProgress(Zcl, "CT to RGB: ct: %u | R: %u, G: %u, B: %u", ct.ctMireds, rgb.r, rgb.g, rgb.b);
-        sLightLED.SetColor(rgb.r, rgb.g, rgb.b);
+        ct.ctMireds = *reinterpret_cast<uint16_t *>(aEvent->LightControlEvent.Value);
+        sLightLED.SetColorFromCT(ct);
     }
     break;
     default:
@@ -296,7 +291,7 @@ void AppTask::PostLightActionRequest(int32_t aActor, LightingManager::Action_t a
     PostEvent(&event);
 }
 #if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
-void AppTask::PostLightControlActionRequest(int32_t aActor, LightingManager::Action_t aAction, uint32_t * aValue)
+void AppTask::PostLightControlActionRequest(int32_t aActor, LightingManager::Action_t aAction, uint16_t aValue)
 {
     AppEvent light_event                 = {};
     light_event.Type                     = AppEvent::kEventType_Light;
@@ -304,6 +299,9 @@ void AppTask::PostLightControlActionRequest(int32_t aActor, LightingManager::Act
     light_event.LightControlEvent.Action = aAction;
     light_event.LightControlEvent.Value  = aValue;
     light_event.Handler                  = LightControlEventHandler;
+    ChipLogProgress(Zcl, "Value in Post event ********** = %u", aValue);
+    ChipLogProgress(Zcl, "Value in Post event = %u", light_event.LightControlEvent.Value);
+    //   ChipLogProgress(Zcl, "Address of light_event  %d", &light_event.LightControlEvent.Value);
     PostEvent(&light_event);
 }
 #endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED)

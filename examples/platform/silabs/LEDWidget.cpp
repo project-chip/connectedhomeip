@@ -91,6 +91,14 @@ bool LEDWidget::GetLEDStatus(uint8_t led)
     return mLedStatus;
 }
 #if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
+void RGBLEDWidget::SetLevel(uint8_t level)
+{
+    mLevel = level;
+}
+uint8_t RGBLEDWidget::GetLevel()
+{
+    return mLevel;
+}
 void RGBLEDWidget::SetColor(uint8_t red, uint8_t blue, uint8_t green)
 {
     if (GetLEDStatus(GetLED()))
@@ -101,5 +109,26 @@ void RGBLEDWidget::SetColor(uint8_t red, uint8_t blue, uint8_t green)
 void RGBLEDWidget::GetColor(uint16_t r, uint16_t g, uint16_t b)
 {
     GetPlatform().GetLedColor(GetLED(), r, g, b);
+}
+void RGBLEDWidget::SetColorFromHSV(uint8_t hue, uint8_t saturation)
+{
+    HsvColor_t hsv;
+    hsv.h          = hue;
+    hsv.s          = saturation;
+    hsv.v          = GetLevel();
+    RgbColor_t rgb = ColorConverter::HsvToRgb(hsv);
+    SetColor(rgb.r, rgb.g, rgb.b);
+}
+
+void RGBLEDWidget::SetColorFromXY(uint16_t currentX, uint16_t currentY)
+{
+    RgbColor_t rgb = ColorConverter::XYToRgb(GetLevel(), currentX, currentY);
+    SetColor(rgb.r, rgb.g, rgb.b);
+}
+
+void RGBLEDWidget::SetColorFromCT(CtColor_t ct)
+{
+    RgbColor_t rgb = ColorConverter::CTToRgb(ct);
+    SetColor(rgb.r, rgb.g, rgb.b);
 }
 #endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)

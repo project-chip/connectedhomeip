@@ -44,7 +44,25 @@ struct CtColor_t
 {
     uint16_t ctMireds;
 };
+class ColorConverter
+{
+public:
+    static RgbColor_t HsvToRgb(HsvColor_t hsv);
+    static RgbColor_t XYToRgb(uint8_t Level, uint16_t currentX, uint16_t currentY);
+    static RgbColor_t CTToRgb(CtColor_t ct);
+    static RgbColor_t RgbClamp(uint8_t r, uint8_t g, uint8_t b, uint8_t min, uint8_t max);
 
-RgbColor_t XYToRgb(uint8_t Level, uint16_t currentX, uint16_t currentY);
-RgbColor_t HsvToRgb(HsvColor_t hsv);
-RgbColor_t CTToRgb(CtColor_t ct);
+private:
+    static RgbColor_t ConvertXYZToRGB(float X, float Y, float Z);
+    static RgbColor_t NormalizeRgb(float r, float g, float b);
+    static float ApplyGammaCorrection(float value);
+    static float CalculateRed(float ctCentiKelvin);
+    static float CalculateGreen(float ctCentiKelvin);
+    static float CalculateBlue(float ctCentiKelvin);
+
+    static uint8_t CalculateP(uint8_t v, uint8_t s);
+    static uint8_t CalculateQ(uint8_t v, uint8_t s, uint32_t remainder);
+    static uint8_t CalculateT(uint8_t v, uint8_t s, uint32_t remainder);
+
+    static void SetRgbByRegion(uint8_t region, uint8_t v, uint8_t p, uint8_t q, uint8_t t, RgbColor_t & rgb);
+};

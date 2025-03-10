@@ -53,7 +53,7 @@ struct AppEvent
         {
             uint8_t Action;
             int32_t Actor;
-            uint32_t *Value;
+            uint16_t Value;
         } LightControlEvent;
     };
 
