@@ -23,6 +23,7 @@
 #include "air-quality-instance.h"
 #include "app-common/zap-generated/ids/Clusters.h"
 #include "camera-av-settings-user-level-management-instance.h"
+#include "meter-identification-instance.h"
 #include "device-energy-management-modes.h"
 #include "dishwasher-mode.h"
 #include "energy-evse-modes.h"
@@ -290,6 +291,7 @@ void ApplicationShutdown()
     Clusters::OvenMode::Shutdown();
     Clusters::OvenCavityOperationalState::Shutdown();
 
+    Clusters::MeterIdentification::Shutdown();
     Clusters::DeviceEnergyManagementMode::Shutdown();
     Clusters::EnergyEvseMode::Shutdown();
     Clusters::WaterHeaterMode::Shutdown();
