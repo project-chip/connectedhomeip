@@ -69,9 +69,12 @@ public:
      *     to fully power resources needed for streaming.
      *
      * @note
-     *     The incoming arguments in @p args include a freshly generated session ID (i.e. args.sessionId)
+     *   - The incoming arguments in args include a freshly generated session ID (i.e. args.sessionId)
      *     that uniquely identifies this session. The delegate implementation MUST use this identifier
      *     for all subsequent processing and tracking of the session.
+     *   - The `args.iceServers` data (including `urls`) is only valid during this method call.
+     *   - The delegate **must** deep-copy any data (e.g., URLs) it needs to retain beyond the lifetime
+     *     of this handler. Storing references to the input data will cause undefined behavior.
      *
      * @param[in]  args
      *     Structure containing all input arguments for the command. In particular, args.sessionId
@@ -99,6 +102,14 @@ public:
     /**
      * @brief
      *   Handles the ProvideOffer command received by the server.
+     *
+     * @note
+     *   - The incoming arguments in args include a freshly generated session ID (i.e. args.sessionId)
+     *     that uniquely identifies this session. The delegate implementation MUST use this identifier
+     *     for all subsequent processing and tracking of the session.
+     *   - The `args.iceServers` data (including `urls`) is only valid during this method call.
+     *   - The delegate **must** deep-copy any data (e.g., URLs) it needs to retain beyond the lifetime
+     *     of this handler. Storing references to the input data will cause undefined behavior.
      *
      * @param[in]  args
      *   Contains all input arguments for the command, including the SDP Offer, session usage, etc.
@@ -241,6 +252,7 @@ private:
     WebRTCSessionStruct * FindSession(uint16_t sessionId);
     UpsertResultEnum UpsertSession(const WebRTCSessionStruct & session);
     void RemoveSession(uint16_t sessionId);
+    CHIP_ERROR ValidateExistingSession(HandlerContext & ctx, uint16_t sessionId, WebRTCSessionStruct *& outSessionPtr);
     uint16_t GenerateSessionId();
 
     // Command Handlers
