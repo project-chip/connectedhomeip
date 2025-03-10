@@ -132,6 +132,7 @@ public:
 
     static void RunConfigUnitTest(void);
 
+private:
     static const char * GetPartitionLabelByNamespace(const char * ns);
 };
 

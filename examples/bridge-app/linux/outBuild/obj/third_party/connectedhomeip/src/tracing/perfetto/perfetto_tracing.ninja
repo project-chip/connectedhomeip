@@ -1,0 +1,7 @@
+defines =
+framework_dirs =
+include_dirs = -I../third_party/connectedhomeip/src/tracing/perfetto/include -I../third_party/connectedhomeip/third_party/perfetto/repo/sdk
+target_output_name = perfetto_tracing
+
+
+build obj/third_party/connectedhomeip/src/tracing/perfetto/perfetto_tracing.stamp: stamp || obj/third_party/connectedhomeip/third_party/perfetto/sdk.stamp

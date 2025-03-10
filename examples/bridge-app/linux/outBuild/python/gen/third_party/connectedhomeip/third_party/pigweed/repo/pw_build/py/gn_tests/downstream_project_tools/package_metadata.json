@@ -1,0 +1,16 @@
+{
+  "gn_target_name": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/gn_tests:downstream_project_tools",
+  "inputs": [
+
+  ],
+  "setup_sources": [
+    "python/obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/gn_tests/downstream_project_tools/pyproject.toml",
+    "python/obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/gn_tests/downstream_project_tools/setup.cfg"
+  ],
+  "sources": [
+
+  ],
+  "tests": [
+
+  ]
+}

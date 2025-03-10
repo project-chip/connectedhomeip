@@ -1,0 +1,6 @@
+[
+  {
+    "file_path": "../third_party/connectedhomeip/third_party/pigweed/repo/pw_tokenizer/py/example_binary_with_tokenized_strings.elf",
+    "symbol_name": "kElfSection"
+  }
+]

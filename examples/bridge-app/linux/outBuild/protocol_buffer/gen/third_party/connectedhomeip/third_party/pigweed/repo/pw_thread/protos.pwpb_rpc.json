@@ -1,0 +1,13 @@
+{
+  "dependencies": [
+    "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_tokenizer/proto.pwpb_rpc.json"
+  ],
+  "label": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_thread:protos.pwpb_rpc",
+  "nested_in_python_package": "",
+  "package": "pw_thread_protos",
+  "protoc_outputs": [
+    "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_thread/protos.proto_library/pwpb_rpc/pw_thread_protos/thread.rpc.pwpb.h",
+    "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_thread/protos.proto_library/pwpb_rpc/pw_thread_protos/thread_snapshot_service.rpc.pwpb.h"
+  ],
+  "root": "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_thread/protos.proto_library/pwpb_rpc"
+}

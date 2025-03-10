@@ -1,0 +1,13 @@
+{
+  "metadata": {
+    "name": "pw_tokenizer",
+    "version": "0.0.1"
+  },
+  "options": {
+    "extras_require": {
+      "serial_detokenizer": [
+        "serial"
+      ]
+    }
+  }
+}

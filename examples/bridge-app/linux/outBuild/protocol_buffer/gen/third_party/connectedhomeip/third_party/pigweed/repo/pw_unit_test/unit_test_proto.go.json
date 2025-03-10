@@ -1,0 +1,12 @@
+{
+  "dependencies": [
+
+  ],
+  "label": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_unit_test:unit_test_proto.go",
+  "nested_in_python_package": "",
+  "package": "pw_unit_test_proto",
+  "protoc_outputs": [
+    "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_unit_test/unit_test_proto.go._gen.pw_pystamp"
+  ],
+  "root": "protocol_buffer/gen/go/src"
+}

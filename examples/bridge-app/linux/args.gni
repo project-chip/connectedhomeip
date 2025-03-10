@@ -24,4 +24,5 @@ chip_project_config_include_dirs =
     [ "${chip_root}/examples/bridge-app/bridge-common/include" ]
 chip_project_config_include_dirs += [ "${chip_root}/config/standalone" ]
 
+chip_enable_ota_requestor = true
 matter_enable_tracing_support = true

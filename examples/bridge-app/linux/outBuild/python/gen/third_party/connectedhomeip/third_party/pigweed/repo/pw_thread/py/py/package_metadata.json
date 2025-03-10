@@ -1,0 +1,23 @@
+{
+  "generate_setup": {
+    "metadata": {
+      "name": "pw_thread",
+      "version": "0.0.1"
+    }
+  },
+  "gn_target_name": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_thread/py:py",
+  "inputs": [
+
+  ],
+  "setup_sources": [
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_thread/py/py.generated_python_package/pyproject.toml",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_thread/py/py.generated_python_package/setup.cfg"
+  ],
+  "sources": [
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_thread/py/py.generated_python_package/pw_thread/__init__.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_thread/py/py.generated_python_package/pw_thread/thread_analyzer.py"
+  ],
+  "tests": [
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_thread/py/py.generated_python_package/thread_analyzer_test.py"
+  ]
+}

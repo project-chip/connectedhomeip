@@ -1,0 +1,7 @@
+defines =
+framework_dirs =
+include_dirs = -I../third_party/connectedhomeip/third_party/pigweed/repo/pw_containers/public
+target_output_name = raw_storage
+
+
+build obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_containers/raw_storage.stamp: stamp

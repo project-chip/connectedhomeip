@@ -1,0 +1,22 @@
+{
+  "gn_target_name": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_hdlc/py:py",
+  "inputs": [
+
+  ],
+  "setup_sources": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_hdlc/py/pyproject.toml",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_hdlc/py/setup.cfg"
+  ],
+  "sources": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_hdlc/py/pw_hdlc/__init__.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_hdlc/py/pw_hdlc/decode.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_hdlc/py/pw_hdlc/encode.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_hdlc/py/pw_hdlc/protocol.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_hdlc/py/pw_hdlc/rpc.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_hdlc/py/pw_hdlc/rpc_console.py"
+  ],
+  "tests": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_hdlc/py/decode_test.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_hdlc/py/encode_test.py"
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "generate_setup": {
+    "metadata": {
+      "name": "pw_tokenizer",
+      "version": "0.0.1"
+    },
+    "options": {
+      "extras_require": {
+        "serial_detokenizer": [
+          "serial"
+        ]
+      }
+    }
+  },
+  "gn_target_name": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_tokenizer/py:py",
+  "inputs": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_tokenizer/py/elf_reader_test_binary.elf",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_tokenizer/py/example_binary_with_tokenized_strings.elf"
+  ],
+  "setup_sources": [
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_tokenizer/py/py.generated_python_package/pyproject.toml",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_tokenizer/py/py.generated_python_package/setup.cfg"
+  ],
+  "sources": [
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_tokenizer/py/py.generated_python_package/generate_argument_types_macro.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_tokenizer/py/py.generated_python_package/generate_hash_macro.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_tokenizer/py/py.generated_python_package/generate_hash_test_data.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_tokenizer/py/py.generated_python_package/pw_tokenizer/__init__.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_tokenizer/py/py.generated_python_package/pw_tokenizer/__main__.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_tokenizer/py/py.generated_python_package/pw_tokenizer/database.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_tokenizer/py/py.generated_python_package/pw_tokenizer/decode.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_tokenizer/py/py.generated_python_package/pw_tokenizer/detokenize.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_tokenizer/py/py.generated_python_package/pw_tokenizer/elf_reader.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_tokenizer/py/py.generated_python_package/pw_tokenizer/encode.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_tokenizer/py/py.generated_python_package/pw_tokenizer/parse_message.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_tokenizer/py/py.generated_python_package/pw_tokenizer/proto/__init__.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_tokenizer/py/py.generated_python_package/pw_tokenizer/serial_detokenizer.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_tokenizer/py/py.generated_python_package/pw_tokenizer/tokens.py"
+  ],
+  "tests": [
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_tokenizer/py/py.generated_python_package/database_test.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_tokenizer/py/py.generated_python_package/decode_test.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_tokenizer/py/py.generated_python_package/detokenize_proto_test.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_tokenizer/py/py.generated_python_package/detokenize_test.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_tokenizer/py/py.generated_python_package/elf_reader_test.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_tokenizer/py/py.generated_python_package/encode_test.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_tokenizer/py/py.generated_python_package/tokenized_string_decoding_test_data.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_tokenizer/py/py.generated_python_package/tokens_test.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_tokenizer/py/py.generated_python_package/varint_test_data.py"
+  ]
+}

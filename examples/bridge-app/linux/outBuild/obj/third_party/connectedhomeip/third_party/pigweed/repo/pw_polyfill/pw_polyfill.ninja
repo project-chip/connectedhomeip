@@ -1,0 +1,7 @@
+defines =
+framework_dirs =
+include_dirs = -I../third_party/connectedhomeip/third_party/pigweed/repo/pw_polyfill/public
+target_output_name = pw_polyfill
+
+
+build obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_polyfill/pw_polyfill.stamp: stamp

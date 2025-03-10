@@ -1,0 +1,18 @@
+defines = -DJSON_USE_EXCEPTION=0 -DJSON_USE_NULLREF=0
+framework_dirs =
+include_dirs = -I../third_party/connectedhomeip/third_party/jsoncpp/repo/src/lib_json -I../third_party/connectedhomeip/third_party/jsoncpp/repo/include
+cflags = -O0 -g2 -fno-common -ffunction-sections -fdata-sections -fno-exceptions -fno-unwind-tables -fno-asynchronous-unwind-tables -fPIC -Wall -Werror -Wextra -Wshadow -Wunreachable-code -Wvla -Wformat -Wformat-nonliteral -Wformat-security -Wundef -Wno-deprecated-declarations -Wno-missing-field-initializers -Wno-unknown-warning-option -Wno-unused-parameter -Wno-cast-function-type -Wno-psabi -Wno-maybe-uninitialized -fdiagnostics-color --sysroot=\~/openwrt/staging_dir/target-aarch64_cortex-a72_musl/usr -fno-strict-aliasing -Wno-implicit-fallthrough
+cflags_cc = -std=gnu++17 -fno-rtti -Wnon-virtual-dtor
+target_output_name = jsoncpp
+
+build obj/third_party/connectedhomeip/third_party/jsoncpp/repo/src/lib_json/jsoncpp.json_reader.cpp.o: cxx ../third_party/connectedhomeip/third_party/jsoncpp/repo/src/lib_json/json_reader.cpp
+  source_file_part = json_reader.cpp
+  source_name_part = json_reader
+build obj/third_party/connectedhomeip/third_party/jsoncpp/repo/src/lib_json/jsoncpp.json_value.cpp.o: cxx ../third_party/connectedhomeip/third_party/jsoncpp/repo/src/lib_json/json_value.cpp
+  source_file_part = json_value.cpp
+  source_name_part = json_value
+build obj/third_party/connectedhomeip/third_party/jsoncpp/repo/src/lib_json/jsoncpp.json_writer.cpp.o: cxx ../third_party/connectedhomeip/third_party/jsoncpp/repo/src/lib_json/json_writer.cpp
+  source_file_part = json_writer.cpp
+  source_name_part = json_writer
+
+build obj/third_party/connectedhomeip/third_party/jsoncpp/jsoncpp.stamp: stamp obj/third_party/connectedhomeip/third_party/jsoncpp/repo/src/lib_json/jsoncpp.json_reader.cpp.o obj/third_party/connectedhomeip/third_party/jsoncpp/repo/src/lib_json/jsoncpp.json_value.cpp.o obj/third_party/connectedhomeip/third_party/jsoncpp/repo/src/lib_json/jsoncpp.json_writer.cpp.o

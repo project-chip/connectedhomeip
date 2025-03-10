@@ -1,0 +1,7 @@
+defines =
+framework_dirs =
+include_dirs = -I../third_party/connectedhomeip/third_party/pigweed/repo/pw_polyfill/standard_library_public
+target_output_name = standard_library
+
+
+build obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_polyfill/standard_library.stamp: stamp

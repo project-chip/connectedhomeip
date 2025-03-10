@@ -1,0 +1,6 @@
+python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_env_setup/py/py/package_metadata.json
+python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_cli/py/py/package_metadata.json
+python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf/codegen_protos.python/package_metadata.json
+python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf/common_protos.python/package_metadata.json
+python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf/py/py/package_metadata.json
+python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf_compiler/py/py/package_metadata.json

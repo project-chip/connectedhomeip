@@ -1,0 +1,16 @@
+{
+  "metadata": {
+    "name": "pw_software_update",
+    "version": "0.0.1"
+  },
+  "options": {
+    "install_requires": [
+      "cryptography",
+      "google-cloud-storage"
+    ],
+    "tests_require": [
+      "cryptography",
+      "google-cloud-storage"
+    ]
+  }
+}

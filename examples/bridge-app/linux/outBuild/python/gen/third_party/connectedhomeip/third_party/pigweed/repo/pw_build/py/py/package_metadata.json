@@ -1,0 +1,63 @@
+{
+  "gn_target_name": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py:py",
+  "inputs": [
+
+  ],
+  "setup_sources": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/pyproject.toml",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/setup.cfg"
+  ],
+  "sources": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/pw_build/__init__.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/pw_build/bazel_query.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/pw_build/bazel_to_gn.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/pw_build/build_recipe.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/pw_build/collect_wheels.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/pw_build/copy_from_cipd.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/pw_build/create_gn_venv.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/pw_build/create_python_tree.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/pw_build/error.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/pw_build/exec.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/pw_build/file_prefix_map.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/pw_build/generate_cc_blob_library.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/pw_build/generate_modules_lists.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/pw_build/generate_python_package.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/pw_build/generate_python_package_gn.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/pw_build/generate_python_requirements.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/pw_build/generate_python_wheel.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/pw_build/generate_python_wheel_cache.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/pw_build/generate_report.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/pw_build/generated_tests.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/pw_build/gn_resolver.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/pw_build/gn_target.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/pw_build/gn_writer.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/pw_build/host_tool.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/pw_build/merge_profraws.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/pw_build/mirror_tree.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/pw_build/nop.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/pw_build/pigweed_upstream_build.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/pw_build/pip_install_python_deps.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/pw_build/project_builder.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/pw_build/project_builder_argparse.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/pw_build/project_builder_context.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/pw_build/project_builder_prefs.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/pw_build/project_builder_presubmit_runner.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/pw_build/python_package.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/pw_build/python_runner.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/pw_build/wrap_ninja.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/pw_build/zip.py"
+  ],
+  "tests": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/bazel_query_test.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/build_recipe_test.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/bazel_to_gn_test.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/create_python_tree_test.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/file_prefix_map_test.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/generate_cc_blob_library_test.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/gn_target_test.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/gn_writer_test.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/project_builder_prefs_test.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/python_runner_test.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/zip_test.py"
+  ]
+}

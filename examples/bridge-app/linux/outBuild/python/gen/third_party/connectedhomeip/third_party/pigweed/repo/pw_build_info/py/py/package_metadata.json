@@ -1,0 +1,20 @@
+{
+  "gn_target_name": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_build_info/py:py",
+  "inputs": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build_info/py/print_build_id.cc",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build_info/build_id.cc",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build_info/add_build_id_to_default_linker_script.ld",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build_info/build_id_linker_snippet.ld"
+  ],
+  "setup_sources": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build_info/py/pyproject.toml",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build_info/py/setup.cfg"
+  ],
+  "sources": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build_info/py/pw_build_info/__init__.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build_info/py/pw_build_info/build_id.py"
+  ],
+  "tests": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build_info/py/build_id_test.py"
+  ]
+}

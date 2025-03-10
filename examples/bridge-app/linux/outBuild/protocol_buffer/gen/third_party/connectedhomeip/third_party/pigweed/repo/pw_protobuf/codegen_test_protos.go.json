@@ -1,0 +1,14 @@
+{
+  "dependencies": [
+    "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf/codegen_test_deps_protos.go.json",
+    "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf/codegen_test_deps_protos_prefix.go.json",
+    "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf/common_protos.go.json"
+  ],
+  "label": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf:codegen_test_protos.go",
+  "nested_in_python_package": "",
+  "package": "pw_protobuf_test_protos",
+  "protoc_outputs": [
+    "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf/codegen_test_protos.go._gen.pw_pystamp"
+  ],
+  "root": "protocol_buffer/gen/go/src"
+}

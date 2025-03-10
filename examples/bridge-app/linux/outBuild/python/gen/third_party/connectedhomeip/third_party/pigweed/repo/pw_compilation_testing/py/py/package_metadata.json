@@ -1,0 +1,18 @@
+{
+  "gn_target_name": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_compilation_testing/py:py",
+  "inputs": [
+
+  ],
+  "setup_sources": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_compilation_testing/py/pyproject.toml",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_compilation_testing/py/setup.cfg"
+  ],
+  "sources": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_compilation_testing/py/pw_compilation_testing/__init__.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_compilation_testing/py/pw_compilation_testing/generator.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_compilation_testing/py/pw_compilation_testing/runner.py"
+  ],
+  "tests": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_compilation_testing/py/generator_test.py"
+  ]
+}

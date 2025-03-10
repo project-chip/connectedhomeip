@@ -1,0 +1,7 @@
+defines =
+framework_dirs =
+include_dirs =
+target_output_name = tracing_features
+
+
+build obj/third_party/connectedhomeip/examples/common/tracing/tracing_features.stamp: stamp || obj/third_party/connectedhomeip/examples/common/tracing/gen_tracing_features.stamp

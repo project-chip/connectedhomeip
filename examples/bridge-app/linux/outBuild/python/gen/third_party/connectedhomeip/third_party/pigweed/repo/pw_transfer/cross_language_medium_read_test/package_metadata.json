@@ -1,0 +1,15 @@
+{
+  "gn_target_name": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_transfer:cross_language_medium_read_test",
+  "inputs": [
+
+  ],
+  "setup_sources": [
+
+  ],
+  "sources": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_transfer/integration_test/cross_language_medium_read_test.py"
+  ],
+  "tests": [
+
+  ]
+}

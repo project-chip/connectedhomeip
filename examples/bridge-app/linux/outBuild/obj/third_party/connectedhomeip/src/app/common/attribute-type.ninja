@@ -1,0 +1,7 @@
+defines =
+framework_dirs =
+include_dirs = -I../third_party/connectedhomeip/zzz_generated/app-common
+target_output_name = attribute-type
+
+
+build obj/third_party/connectedhomeip/src/app/common/attribute-type.stamp: stamp

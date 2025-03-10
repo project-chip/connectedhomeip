@@ -1,0 +1,7 @@
+defines =
+framework_dirs =
+include_dirs =
+target_output_name = delegates
+
+
+build obj/third_party/connectedhomeip/src/controller/delegates.stamp: stamp

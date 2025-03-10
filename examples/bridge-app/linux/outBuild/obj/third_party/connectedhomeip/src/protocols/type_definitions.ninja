@@ -1,0 +1,7 @@
+defines =
+framework_dirs =
+include_dirs =
+target_output_name = type_definitions
+
+
+build obj/third_party/connectedhomeip/src/protocols/type_definitions.stamp: stamp

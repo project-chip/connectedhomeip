@@ -1,0 +1,7 @@
+defines =
+framework_dirs =
+include_dirs = -I../third_party/connectedhomeip/third_party/pigweed/repo/pw_unit_test/public -I../third_party/connectedhomeip/third_party/pigweed/repo/pw_preprocessor/public -I../third_party/connectedhomeip/third_party/pigweed/repo/pw_polyfill/public
+target_output_name = printf_event_handler
+
+
+build obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_unit_test/printf_event_handler.stamp: stamp || obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_unit_test/googletest_style_event_handler.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_preprocessor/pw_preprocessor.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_unit_test/event_handler.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_polyfill/pw_polyfill.stamp

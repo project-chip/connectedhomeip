@@ -1,0 +1,33 @@
+{
+  "gn_target_name": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_ide/py:py",
+  "inputs": [
+
+  ],
+  "setup_sources": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_ide/py/pyproject.toml",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_ide/py/setup.cfg"
+  ],
+  "sources": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_ide/py/pw_ide/__init__.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_ide/py/pw_ide/__main__.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_ide/py/pw_ide/activate.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_ide/py/pw_ide/cli.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_ide/py/pw_ide/commands.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_ide/py/pw_ide/cpp.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_ide/py/pw_ide/editors.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_ide/py/pw_ide/exceptions.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_ide/py/pw_ide/python.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_ide/py/pw_ide/settings.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_ide/py/pw_ide/symlinks.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_ide/py/pw_ide/vscode.py"
+  ],
+  "tests": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_ide/py/activate_tests.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_ide/py/commands_test.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_ide/py/cpp_test.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_ide/py/cpp_test_fake_env.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_ide/py/editors_test.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_ide/py/test_cases.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_ide/py/vscode_test.py"
+  ]
+}

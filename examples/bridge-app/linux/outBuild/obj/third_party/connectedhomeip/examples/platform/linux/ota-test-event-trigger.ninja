@@ -1,0 +1,7 @@
+defines =
+framework_dirs =
+include_dirs =
+target_output_name = ota-test-event-trigger
+
+
+build obj/third_party/connectedhomeip/examples/platform/linux/ota-test-event-trigger.stamp: stamp

@@ -1,0 +1,12 @@
+{
+  "dependencies": [
+
+  ],
+  "label": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_chrono:protos.pwpb",
+  "nested_in_python_package": "",
+  "package": "pw_chrono_protos",
+  "protoc_outputs": [
+    "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_chrono/protos.proto_library/pwpb/pw_chrono_protos/chrono.pwpb.h"
+  ],
+  "root": "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_chrono/protos.proto_library/pwpb"
+}

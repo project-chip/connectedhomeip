@@ -1,0 +1,7 @@
+defines = -DPW_SPAN_ENABLE_ASSERTS=false
+framework_dirs =
+include_dirs = -I../third_party/connectedhomeip/third_party/pigweed/repo/pw_thread/public -I../third_party/connectedhomeip/third_party/pigweed/repo/pw_span/public
+target_output_name = thread_info
+
+
+build obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_thread/thread_info.stamp: stamp || obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_span/pw_span.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_thread/config.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_span/config.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_span/span_asserts.stamp

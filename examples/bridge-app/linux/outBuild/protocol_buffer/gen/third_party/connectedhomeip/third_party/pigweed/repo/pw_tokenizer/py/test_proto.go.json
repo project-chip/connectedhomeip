@@ -1,0 +1,12 @@
+{
+  "dependencies": [
+    "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_tokenizer/proto.go.json"
+  ],
+  "label": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_tokenizer/py:test_proto.go",
+  "nested_in_python_package": "",
+  "package": "pw_tokenizer_tests",
+  "protoc_outputs": [
+    "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_tokenizer/py/test_proto.go._gen.pw_pystamp"
+  ],
+  "root": "protocol_buffer/gen/go/src"
+}

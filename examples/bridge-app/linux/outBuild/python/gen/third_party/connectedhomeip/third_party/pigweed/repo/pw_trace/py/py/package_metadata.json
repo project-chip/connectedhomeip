@@ -1,0 +1,17 @@
+{
+  "gn_target_name": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_trace/py:py",
+  "inputs": [
+
+  ],
+  "setup_sources": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_trace/py/pyproject.toml",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_trace/py/setup.cfg"
+  ],
+  "sources": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_trace/py/pw_trace/__init__.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_trace/py/pw_trace/trace.py"
+  ],
+  "tests": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_trace/py/trace_test.py"
+  ]
+}

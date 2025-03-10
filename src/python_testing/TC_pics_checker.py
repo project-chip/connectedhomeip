@@ -20,9 +20,10 @@ import chip.clusters as Clusters
 from basic_composition_support import BasicCompositionTests
 from global_attribute_ids import GlobalAttributeIds
 from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, FeaturePathLocation,
-                                    MatterBaseTest, TestStep, UnknownProblemLocation, async_test_body, default_matter_test_main)
+                                    MatterBaseTest, ProblemLocation, TestStep, async_test_body, default_matter_test_main)
 from mobly import asserts
 from pics_support import accepted_cmd_pics_str, attribute_pics_str, feature_pics_str, generated_cmd_pics_str
+from spec_parsing_support import build_xml_clusters
 
 
 class TC_PICS_Checker(MatterBaseTest, BasicCompositionTests):
@@ -30,7 +31,10 @@ class TC_PICS_Checker(MatterBaseTest, BasicCompositionTests):
     async def setup_class(self):
         super().setup_class()
         await self.setup_class_helper(False)
-        self.build_spec_xmls()
+        # build_xml_cluster returns a list of issues found when paring the XML
+        # Problems in the XML shouldn't cause test failure, but we want them recorded
+        # so they are added to the list of problems that get output when the test set completes.
+        self.xml_clusters, self.problems = build_xml_clusters()
 
     def _check_and_record_errors(self, location, required, pics):
         if required and not self.check_pics(pics):
@@ -174,7 +178,7 @@ class TC_PICS_Checker(MatterBaseTest, BasicCompositionTests):
 
         self.step(7)
         if self.is_pics_sdk_ci_only:
-            self.record_error("PICS check", location=UnknownProblemLocation(),
+            self.record_error("PICS check", location=ProblemLocation(),
                               problem="PICS PICS_SDK_CI_ONLY found in PICS list. This PICS is disallowed for certification.")
             self.success = False
 

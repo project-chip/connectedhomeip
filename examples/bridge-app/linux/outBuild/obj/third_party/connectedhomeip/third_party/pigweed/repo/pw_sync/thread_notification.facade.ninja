@@ -1,0 +1,7 @@
+defines =
+framework_dirs =
+include_dirs = -I../third_party/connectedhomeip/third_party/pigweed/repo/pw_sync/public
+target_output_name = thread_notification.facade
+
+
+build obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_sync/thread_notification.facade.stamp: stamp

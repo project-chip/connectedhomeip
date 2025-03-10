@@ -1,0 +1,16 @@
+{
+  "compiled_requirements": "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/gn_tests/downstream_tools_build_venv/compiled_requirements.txt",
+  "constraints": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_env_setup/py/pw_env_setup/virtualenv_setup/constraint.list"
+  ],
+  "generated_requirements": "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/gn_tests/downstream_tools_build_venv/generated_requirements.txt",
+  "gn_target_name": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/gn_tests:downstream_tools_build_venv",
+  "interpreter": "python-venv-downstream-tools-test/bin/python",
+  "path": "python-venv-downstream-tools-test",
+  "requirements": [
+
+  ],
+  "source_packages": [
+    "//third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/gn_tests:downstream_project_tools"
+  ]
+}

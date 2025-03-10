@@ -1,0 +1,28 @@
+{
+  "gn_target_name": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_arduino_build/py:py",
+  "inputs": [
+
+  ],
+  "setup_sources": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_arduino_build/py/pyproject.toml",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_arduino_build/py/setup.cfg"
+  ],
+  "sources": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_arduino_build/py/pw_arduino_build/__init__.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_arduino_build/py/pw_arduino_build/__main__.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_arduino_build/py/pw_arduino_build/builder.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_arduino_build/py/pw_arduino_build/core_installer.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_arduino_build/py/pw_arduino_build/core_patches/__init__.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_arduino_build/py/pw_arduino_build/core_patches/teensy/__init__.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_arduino_build/py/pw_arduino_build/file_operations.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_arduino_build/py/pw_arduino_build/log.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_arduino_build/py/pw_arduino_build/teensy_detector.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_arduino_build/py/pw_arduino_build/unit_test_client.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_arduino_build/py/pw_arduino_build/unit_test_runner.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_arduino_build/py/pw_arduino_build/unit_test_server.py"
+  ],
+  "tests": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_arduino_build/py/builder_test.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_arduino_build/py/file_operations_test.py"
+  ]
+}

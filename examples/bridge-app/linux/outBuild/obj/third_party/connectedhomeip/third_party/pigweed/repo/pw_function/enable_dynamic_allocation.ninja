@@ -1,0 +1,7 @@
+defines = -DPW_FUNCTION_ENABLE_DYNAMIC_ALLOCATION=1
+framework_dirs =
+include_dirs =
+target_output_name = enable_dynamic_allocation
+
+
+build obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_function/enable_dynamic_allocation.stamp: stamp

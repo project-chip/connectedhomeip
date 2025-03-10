@@ -1,0 +1,7 @@
+defines =
+framework_dirs =
+include_dirs = -I../third_party/connectedhomeip/third_party/inipp/repo/inipp
+target_output_name = inipp
+
+
+build obj/third_party/connectedhomeip/third_party/inipp/inipp.stamp: stamp

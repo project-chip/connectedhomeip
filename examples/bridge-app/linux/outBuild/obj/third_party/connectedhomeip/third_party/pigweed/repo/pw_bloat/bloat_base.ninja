@@ -1,0 +1,14 @@
+defines =
+framework_dirs =
+include_dirs = -I../third_party/connectedhomeip/third_party/pigweed/repo/pw_bloat/public
+target_output_name = bloat_base
+
+build obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_bloat/bloat_base.inputdeps.stamp: stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_assert/check.NO_BACKEND_SET.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_log/pw_log.NO_BACKEND_SET.stamp
+
+build obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_bloat/bin/bloat_base: link obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_bloat/base_main.base_main.cc.o obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_bloat/bloat_this_binary.bloat_this_binary.cc.o || obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_bloat/base_main.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_bloat/bloat_this_binary.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_build/link_deps.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_assert/assert.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_assert/assert.facade.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_assert/config.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_assert/assert_compatibility_backend.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_preprocessor/pw_preprocessor.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_polyfill/pw_polyfill.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_assert/check.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_assert/check.facade.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_log/pw_log.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_log/pw_log.facade.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_log/config.stamp
+  ldflags = -O0 -fPIC -Werror -Wl,--fatal-warnings -Wl,-z,defs -fdiagnostics-color --sysroot=\~/openwrt/staging_dir/target-aarch64_cortex-a72_musl/usr -L/home/chucuong/openwrt/staging_dir/target-aarch64_cortex-a72_musl/usr/lib -Wl,--gc-sections -pie
+  libs = -latomic -ldl -lpthread -lrt -lmosquittopp -ljsoncpp
+  frameworks =
+  swiftmodules =
+  output_extension = 
+  output_dir = obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_bloat/bin

@@ -1,0 +1,20 @@
+{
+  "gn_target_name": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf_compiler/py:py",
+  "inputs": [
+
+  ],
+  "setup_sources": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf_compiler/py/pyproject.toml",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf_compiler/py/setup.cfg"
+  ],
+  "sources": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf_compiler/py/pw_protobuf_compiler/__init__.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf_compiler/py/pw_protobuf_compiler/generate_protos.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf_compiler/py/pw_protobuf_compiler/proto_target_invalid.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf_compiler/py/pw_protobuf_compiler/python_protos.py"
+  ],
+  "tests": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf_compiler/py/compiled_protos_test.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf_compiler/py/python_protos_test.py"
+  ]
+}

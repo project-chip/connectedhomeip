@@ -1,0 +1,23 @@
+{
+  "generate_setup": {
+    "metadata": {
+      "name": "third_party_connectedhomeip_third_party_pigweed_repo_pw_i2c_protos",
+      "version": "0.0.1"
+    }
+  },
+  "gn_target_name": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_i2c:protos.python",
+  "inputs": [
+
+  ],
+  "setup_sources": [
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_i2c/protos.python.generated_python_package/pyproject.toml",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_i2c/protos.python.generated_python_package/setup.cfg"
+  ],
+  "sources": [
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_i2c/protos.python.generated_python_package/pw_i2c/i2c_pb2.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_i2c/protos.python.generated_python_package/pw_i2c/i2c_pb2.pyi"
+  ],
+  "tests": [
+
+  ]
+}

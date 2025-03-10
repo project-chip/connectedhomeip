@@ -1,0 +1,7 @@
+defines =
+framework_dirs =
+include_dirs =
+target_output_name = attributes
+
+
+build obj/third_party/connectedhomeip/src/lib/support/attributes.stamp: stamp

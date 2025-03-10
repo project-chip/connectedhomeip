@@ -1,0 +1,27 @@
+{
+  "gn_target_name": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_module/py:py",
+  "inputs": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_module/py/pw_module/templates/BUILD.bazel.jinja",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_module/py/pw_module/templates/helpers/bazel.jinja",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_module/py/pw_module/templates/docs.rst.jinja",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_module/py/pw_module/templates/CMakeLists.txt.jinja",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_module/py/pw_module/templates/helpers/cmake.jinja"
+  ],
+  "setup_sources": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_module/py/pyproject.toml",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_module/py/setup.cfg"
+  ],
+  "sources": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_module/py/pw_module/__init__.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_module/py/pw_module/__main__.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_module/py/pw_module/check.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_module/py/pw_module/create.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_module/py/pw_module/seed.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_module/py/pw_module/templates/__init__.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_module/py/pw_module/templates/helpers/__init__.py"
+  ],
+  "tests": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_module/py/check_test.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_module/py/seed_test.py"
+  ]
+}

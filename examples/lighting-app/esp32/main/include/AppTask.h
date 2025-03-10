@@ -20,9 +20,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-
 #include "AppEvent.h"
-#include "Button.h"
 #include "LEDWidget.h"
 #include "freertos/FreeRTOS.h"
 #include <platform/CHIPDeviceLayer.h>
@@ -36,7 +34,7 @@
 #define APP_ERROR_STOP_TIMER_FAILED CHIP_APPLICATION_ERROR(0x06)
 
 extern LEDWidget AppLED;
-extern Button AppButton;
+// extern Button AppButton;
 
 class AppTask
 {
@@ -46,7 +44,7 @@ public:
     static void AppTaskMain(void * pvParameter);
     void PostEvent(const AppEvent * event);
 
-    void ButtonEventHandler(const uint8_t buttonHandle, uint8_t btnAction);
+    // void ButtonEventHandler(const uint8_t buttonHandle, uint8_t btnAction);
 
     void UpdateClusterState();
 
@@ -54,12 +52,12 @@ private:
     friend AppTask & GetAppTask(void);
     CHIP_ERROR Init();
     void DispatchEvent(AppEvent * event);
-    static void SwitchActionEventHandler(AppEvent * aEvent);
+    // static void SwitchActionEventHandler(AppEvent * aEvent);
     static void LightingActionEventHandler(AppEvent * aEvent);
 
-#if CONFIG_DEVICE_TYPE_M5STACK
-    static void ButtonPressedAction(AppEvent * aEvent);
-#endif
+// #if CONFIG_DEVICE_TYPE_M5STACK
+//     static void ButtonPressedAction(AppEvent * aEvent);
+// #endif
 
     static AppTask sAppTask;
 };

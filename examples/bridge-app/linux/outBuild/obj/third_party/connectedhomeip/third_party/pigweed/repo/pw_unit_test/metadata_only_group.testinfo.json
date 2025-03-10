@@ -1,0 +1,19 @@
+[
+  {
+    "build_label": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_unit_test:metadata_only_test",
+    "extra_metadata": {
+      "extra_key": "extra_value"
+    },
+    "test_directory": "obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_unit_test/test",
+    "test_name": "metadata_only_test",
+    "test_type": "unit_test"
+  },
+  {
+    "build_label": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_unit_test:metadata_only_group",
+    "deps": [
+      "//third_party/connectedhomeip/third_party/pigweed/repo/pw_unit_test:metadata_only_test"
+    ],
+    "test_name": "third_party/connectedhomeip/third_party/pigweed/repo/pw_unit_test/metadata_only_group",
+    "test_type": "test_group"
+  }
+]

@@ -1,0 +1,7 @@
+defines =
+framework_dirs =
+include_dirs = -I../third_party/connectedhomeip/third_party/pigweed/repo/pw_unit_test/googletest_public_overrides
+target_output_name = googletest
+
+
+build obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_unit_test/googletest.stamp: stamp || obj/third_party/connectedhomeip/third_party/pigweed/repo/third_party/googletest/googletest.stamp

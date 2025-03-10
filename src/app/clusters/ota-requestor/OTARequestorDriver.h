@@ -77,7 +77,7 @@ public:
     virtual bool CanConsent() = 0;
 
     /// Return maximum supported download block size
-    virtual uint16_t GetMaxDownloadBlockSize() { return 1024; }
+    virtual uint16_t GetMaxDownloadBlockSize() { return 8196;}
 
     /// Set maximum supported download block size
     virtual void SetMaxDownloadBlockSize(uint16_t maxDownloadBlockSize) = 0;

@@ -1,0 +1,12 @@
+defines =
+framework_dirs =
+include_dirs = -I../third_party/connectedhomeip/third_party/pigweed/repo/pw_thread/public -I../third_party/connectedhomeip/third_party/pigweed/repo/pw_preprocessor/public -I../third_party/connectedhomeip/third_party/pigweed/repo/pw_polyfill/public
+cflags = -O0 -g2 -fno-common -ffunction-sections -fdata-sections -fno-exceptions -fno-unwind-tables -fno-asynchronous-unwind-tables -fPIC -Wall -Werror -Wextra -Wshadow -Wunreachable-code -Wvla -Wformat -Wformat-nonliteral -Wformat-security -Wundef -Wno-deprecated-declarations -Wno-missing-field-initializers -Wno-unknown-warning-option -Wno-unused-parameter -Wno-cast-function-type -Wno-psabi -Wno-maybe-uninitialized -fdiagnostics-color --sysroot=\~/openwrt/staging_dir/target-aarch64_cortex-a72_musl/usr -fno-strict-aliasing -I/home/chucuong/openwrt/staging_dir/target-aarch64_cortex-a72_musl/usr/include
+cflags_cc = -std=gnu++17 -fno-rtti -Wnon-virtual-dtor
+target_output_name = yield
+
+build obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_thread/yield.yield.cc.o: cxx ../third_party/connectedhomeip/third_party/pigweed/repo/pw_thread/yield.cc || obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_thread/yield.NO_BACKEND_SET.stamp
+  source_file_part = yield.cc
+  source_name_part = yield
+
+build obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_thread/yield.stamp: stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_thread/yield.yield.cc.o || obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_thread/yield.facade.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_thread/yield.NO_BACKEND_SET.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_preprocessor/pw_preprocessor.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_polyfill/pw_polyfill.stamp

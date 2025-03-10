@@ -23,9 +23,6 @@ if (config_use_interactive_mode) {
   import("//build_overrides/editline.gni")
 }
 
-import("${chip_root}/build_overrides/boringssl.gni")
-import("${chip_root}/src/crypto/crypto.gni")
-
 assert(chip_build_tools)
 
 config("config") {
@@ -70,14 +67,6 @@ static_library("chip-tool-utils") {
     "commands/common/HexConversion.h",
     "commands/common/RemoteDataModelLogger.cpp",
     "commands/common/RemoteDataModelLogger.h",
-    "commands/dcl/DCLClient.cpp",
-    "commands/dcl/DCLClient.h",
-    "commands/dcl/DisplayTermsAndConditions.cpp",
-    "commands/dcl/DisplayTermsAndConditions.h",
-    "commands/dcl/HTTPSRequest.cpp",
-    "commands/dcl/HTTPSRequest.h",
-    "commands/dcl/JsonSchemaMacros.cpp",
-    "commands/dcl/JsonSchemaMacros.h",
     "commands/delay/SleepCommand.cpp",
     "commands/delay/WaitForCommissioneeCommand.cpp",
     "commands/discover/DiscoverCommand.cpp",
@@ -111,10 +100,6 @@ static_library("chip-tool-utils") {
 
   if (chip_device_platform == "darwin") {
     sources += [ "commands/common/DeviceScanner.cpp" ]
-  }
-
-  if (chip_device_platform == "darwin" || chip_crypto == "boringssl") {
-    deps += [ "${boringssl_root}:boringssl_with_ssl_sources" ]
   }
 
   public_deps = [

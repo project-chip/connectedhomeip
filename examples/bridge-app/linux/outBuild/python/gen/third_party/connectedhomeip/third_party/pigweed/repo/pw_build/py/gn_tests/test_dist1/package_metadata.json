@@ -1,0 +1,17 @@
+{
+  "gn_target_name": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/gn_tests:test_dist1",
+  "inputs": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/gn_tests/package_data/empty.csv",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/gn_tests/package_data/empty.csv"
+  ],
+  "setup_sources": [
+    "python/obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/gn_tests/test_dist1/pyproject.toml",
+    "python/obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_build/py/gn_tests/test_dist1/setup.cfg"
+  ],
+  "sources": [
+
+  ],
+  "tests": [
+
+  ]
+}

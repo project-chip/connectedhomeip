@@ -1,0 +1,3 @@
+app/PluginApplicationCallbacks.h
+app/callback-stub.cpp
+app/cluster-init-callback.cpp

@@ -1,0 +1,12 @@
+defines =
+framework_dirs =
+include_dirs = -I../third_party/connectedhomeip/third_party/pigweed/repo/pw_unit_test/public -I../third_party/connectedhomeip/third_party/pigweed/repo/pw_preprocessor/public -I../third_party/connectedhomeip/third_party/pigweed/repo/pw_polyfill/public -I../third_party/connectedhomeip/third_party/pigweed/repo/pw_log/public
+cflags = -O0 -g2 -fno-common -ffunction-sections -fdata-sections -fno-exceptions -fno-unwind-tables -fno-asynchronous-unwind-tables -fPIC -Wall -Werror -Wextra -Wshadow -Wunreachable-code -Wvla -Wformat -Wformat-nonliteral -Wformat-security -Wundef -Wno-deprecated-declarations -Wno-missing-field-initializers -Wno-unknown-warning-option -Wno-unused-parameter -Wno-cast-function-type -Wno-psabi -Wno-maybe-uninitialized -fdiagnostics-color --sysroot=\~/openwrt/staging_dir/target-aarch64_cortex-a72_musl/usr -fno-strict-aliasing
+cflags_cc = -std=gnu++17 -fno-rtti -Wnon-virtual-dtor
+target_output_name = logging_event_handler
+
+build obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_unit_test/logging_event_handler.logging_event_handler.cc.o: cxx ../third_party/connectedhomeip/third_party/pigweed/repo/pw_unit_test/logging_event_handler.cc || obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_log/pw_log.NO_BACKEND_SET.stamp
+  source_file_part = logging_event_handler.cc
+  source_name_part = logging_event_handler
+
+build obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_unit_test/logging_event_handler.stamp: stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_unit_test/logging_event_handler.logging_event_handler.cc.o || obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_unit_test/googletest_style_event_handler.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_log/pw_log.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_unit_test/event_handler.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_preprocessor/pw_preprocessor.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_polyfill/pw_polyfill.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_log/pw_log.facade.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_log/config.stamp

@@ -1,0 +1,16 @@
+{
+  "gn_target_name": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_env_setup:target_support_package_distribution",
+  "inputs": [
+
+  ],
+  "setup_sources": [
+    "python/obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_env_setup/target_support_package_distribution/pyproject.toml",
+    "python/obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_env_setup/target_support_package_distribution/setup.cfg"
+  ],
+  "sources": [
+
+  ],
+  "tests": [
+
+  ]
+}

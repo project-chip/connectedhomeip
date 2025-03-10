@@ -1,0 +1,20 @@
+{
+  "gn_target_name": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_build_mcuxpresso/py:py",
+  "inputs": [
+
+  ],
+  "setup_sources": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build_mcuxpresso/py/pyproject.toml",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build_mcuxpresso/py/setup.cfg"
+  ],
+  "sources": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build_mcuxpresso/py/pw_build_mcuxpresso/__init__.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build_mcuxpresso/py/pw_build_mcuxpresso/__main__.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build_mcuxpresso/py/pw_build_mcuxpresso/bazel.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build_mcuxpresso/py/pw_build_mcuxpresso/components.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build_mcuxpresso/py/pw_build_mcuxpresso/gn.py"
+  ],
+  "tests": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_build_mcuxpresso/py/tests/components_test.py"
+  ]
+}

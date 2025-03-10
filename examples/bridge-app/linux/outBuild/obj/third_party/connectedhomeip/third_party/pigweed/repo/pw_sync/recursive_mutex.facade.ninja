@@ -1,0 +1,7 @@
+defines =
+framework_dirs =
+include_dirs = -I../third_party/connectedhomeip/third_party/pigweed/repo/pw_sync/public -I../third_party/connectedhomeip/third_party/pigweed/repo/pw_preprocessor/public -I../third_party/connectedhomeip/third_party/pigweed/repo/pw_polyfill/public
+target_output_name = recursive_mutex.facade
+
+
+build obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_sync/recursive_mutex.facade.stamp: stamp || obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_sync/lock_annotations.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_preprocessor/pw_preprocessor.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_polyfill/pw_polyfill.stamp

@@ -1,0 +1,7 @@
+defines =
+framework_dirs =
+include_dirs =
+target_output_name = chip_buildconfig
+
+
+build obj/third_party/connectedhomeip/src/lib/core/chip_buildconfig.stamp: stamp || obj/third_party/connectedhomeip/src/lib/core/gen_chip_buildconfig.stamp

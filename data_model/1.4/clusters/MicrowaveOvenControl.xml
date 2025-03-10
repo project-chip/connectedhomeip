@@ -85,14 +85,11 @@ Davis, CA 95616, USA
     <attribute id="0x0000" name="CookTime" type="elapsed-s" default="30">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
-      <constraint type="between">
-        <from value="1"/>
-        <to attribute="MaxCookTime"/>
-      </constraint>
+      <constraint type="between" from="1" to="MaxCookTime"/>
     </attribute>
     <attribute id="0x0001" name="MaxCookTime" type="elapsed-s" default="MS">
       <access read="true" readPrivilege="view"/>
-      <quality persistence="fixed"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="between" from="1" to="86400"/>
     </attribute>
@@ -105,7 +102,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0003" name="MinPower" type="uint8" default="10">
       <access read="true" readPrivilege="view"/>
-      <quality persistence="fixed"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="PWRLMTS"/>
       </mandatoryConform>
@@ -113,7 +110,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0004" name="MaxPower" type="uint8" default="100">
       <access read="true" readPrivilege="view"/>
-      <quality persistence="fixed"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="PWRLMTS"/>
       </mandatoryConform>
@@ -121,7 +118,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0005" name="PowerStep" type="uint8" default="10">
       <access read="true" readPrivilege="view"/>
-      <quality persistence="fixed"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="PWRLMTS"/>
       </mandatoryConform>
@@ -130,7 +127,7 @@ Davis, CA 95616, USA
     <attribute id="0x0006" name="SupportedWatts" type="list" default="MS">
       <entry type="uint16"/>
       <access read="true" readPrivilege="view"/>
-      <quality persistence="fixed"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <otherwiseConform>
         <provisionalConform/>
         <mandatoryConform>
@@ -151,7 +148,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0008" name="WattRating" type="uint16" default="MS">
       <access read="true" readPrivilege="view"/>
-      <quality persistence="fixed"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>
     </attribute>
   </attributes>
@@ -160,27 +157,21 @@ Davis, CA 95616, USA
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="CookMode" type="uint8" default="desc">
-        <optionalConform choice="b" more="true" min="1"/>
+        <optionalConform choice="b" more="true"/>
         <constraint type="desc"/>
       </field>
       <field id="1" name="CookTime" type="elapsed-s" default="30">
-        <optionalConform choice="b" more="true" min="1"/>
-        <constraint type="between">
-          <from value="1"/>
-          <to attribute="MaxCookTime"/>
-        </constraint>
+        <optionalConform choice="b" more="true"/>
+        <constraint type="between" from="1" to="MaxCookTime"/>
       </field>
       <field id="2" name="PowerSetting" type="uint8" default="MaxPower">
-        <optionalConform choice="b" more="true" min="1">
+        <optionalConform choice="b" more="true">
           <feature name="PWRNUM"/>
         </optionalConform>
-        <constraint type="between">
-          <from attribute="MinPower"/>
-          <to attribute="MaxPower"/>
-        </constraint>
+        <constraint type="between" from="MinPower" to="MaxPower"/>
       </field>
       <field id="3" name="WattSettingIndex" type="uint8" default="MS">
-        <optionalConform choice="b" more="true" min="1">
+        <optionalConform choice="b" more="true">
           <feature name="WATTS"/>
         </optionalConform>
         <constraint type="desc"/>
@@ -194,10 +185,7 @@ Davis, CA 95616, USA
       <optionalConform/>
       <field id="0" name="TimeToAdd" type="elapsed-s">
         <mandatoryConform/>
-        <constraint type="between">
-          <from value="1"/>
-          <to attribute="MaxCookTime"/>
-        </constraint>
+        <constraint type="between" from="1" to="MaxCookTime"/>
       </field>
     </command>
   </commands>

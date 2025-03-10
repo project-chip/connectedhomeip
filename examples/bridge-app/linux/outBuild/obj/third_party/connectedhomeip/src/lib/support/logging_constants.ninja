@@ -1,0 +1,7 @@
+defines =
+framework_dirs =
+include_dirs =
+target_output_name = logging_constants
+
+
+build obj/third_party/connectedhomeip/src/lib/support/logging_constants.stamp: stamp

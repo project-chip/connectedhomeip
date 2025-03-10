@@ -70,9 +70,6 @@
 #include "services/gap/ble_svc_gap.h"
 #include "services/gatt/ble_svc_gatt.h"
 
-// Not declared in any header file, hence requires a forward declaration.
-extern "C" void ble_store_config_init(void);
-
 #define MAX_ADV_DATA_LEN 31
 #define CHIP_ADV_DATA_TYPE_FLAGS 0x01
 #define CHIP_ADV_DATA_FLAGS 0x06
@@ -247,12 +244,6 @@ exit:
 
 void BLEManagerImpl::_Shutdown()
 {
-    if (mFlags.Has(Flags::kBleDeinitAndMemReleased))
-    {
-        ChipLogProgress(DeviceLayer, "Ble already deinitialized, returning from ShutDown flow");
-        return;
-    }
-
     CancelBleAdvTimeoutTimer();
 
     BleLayer::Shutdown();
@@ -721,7 +712,6 @@ CHIP_ERROR BLEManagerImpl::MapBLEError(int bleErr)
         return CHIP_ERROR(ChipError::Range::kPlatform, CHIP_DEVICE_CONFIG_ESP32_BLE_ERROR_MIN + bleErr);
     }
 }
-
 void BLEManagerImpl::CancelBleAdvTimeoutTimer(void)
 {
     if (SystemLayer().IsTimerActive(BleAdvTimeoutHandler, nullptr))
@@ -729,7 +719,6 @@ void BLEManagerImpl::CancelBleAdvTimeoutTimer(void)
         SystemLayer().CancelTimer(BleAdvTimeoutHandler, nullptr);
     }
 }
-
 void BLEManagerImpl::StartBleAdvTimeoutTimer(uint32_t aTimeoutInMs)
 {
     CancelBleAdvTimeoutTimer();
@@ -740,7 +729,6 @@ void BLEManagerImpl::StartBleAdvTimeoutTimer(uint32_t aTimeoutInMs)
         ChipLogError(DeviceLayer, "Failed to start BledAdv timeout timer");
     }
 }
-
 void BLEManagerImpl::DriveBLEState(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -749,11 +737,6 @@ void BLEManagerImpl::DriveBLEState(void)
     if (!mFlags.Has(Flags::kAsyncInitCompleted))
     {
         mFlags.Set(Flags::kAsyncInitCompleted);
-    }
-
-    if (mFlags.Has(Flags::kBleDeinitAndMemReleased))
-    {
-        return;
     }
 
     // Initializes the ESP BLE layer if needed.
@@ -861,7 +844,7 @@ void BLEManagerImpl::DriveBLEState(void)
     if (mServiceMode != ConnectivityManager::kCHIPoBLEServiceMode_Enabled && mFlags.Has(Flags::kGATTServiceStarted))
     {
         DeinitESPBleLayer();
-        mFlags.ClearAll().Set(Flags::kBleDeinitAndMemReleased);
+        mFlags.ClearAll();
     }
 
 exit:
@@ -973,7 +956,6 @@ CHIP_ERROR BLEManagerImpl::InitESPBleLayer(void)
         }
     }
 
-    ble_store_config_init();
     nimble_port_freertos_init(bleprph_host_task);
 
     xSemaphoreTake(semaphoreHandle, portMAX_DELAY);

@@ -1,0 +1,8 @@
+defines =
+framework_dirs =
+include_dirs = -I../third_party/connectedhomeip/third_party/pigweed/repo/pw_chrono/public -I../third_party/connectedhomeip/third_party/pigweed/repo/pw_preprocessor/public -I../third_party/connectedhomeip/third_party/pigweed/repo/pw_polyfill/public -I../third_party/connectedhomeip/third_party/pigweed/repo/pw_sync/public
+target_output_name = simulated_system_clock
+
+build obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_chrono/simulated_system_clock.inputdeps.stamp: stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_chrono/system_clock.NO_BACKEND_SET.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_sync/interrupt_spin_lock.NO_BACKEND_SET.stamp
+
+build obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_chrono/simulated_system_clock.stamp: stamp || obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_chrono/system_clock.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_sync/interrupt_spin_lock.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_chrono/system_clock.facade.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_chrono/epoch.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_chrono/virtual_clock.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_preprocessor/pw_preprocessor.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_polyfill/pw_polyfill.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_sync/interrupt_spin_lock.facade.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_sync/lock_annotations.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_sync/virtual_basic_lockable.stamp

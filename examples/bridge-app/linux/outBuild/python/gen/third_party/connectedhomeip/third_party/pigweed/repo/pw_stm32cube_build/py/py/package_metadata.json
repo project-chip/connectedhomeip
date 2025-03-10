@@ -1,0 +1,23 @@
+{
+  "gn_target_name": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_stm32cube_build/py:py",
+  "inputs": [
+
+  ],
+  "setup_sources": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_stm32cube_build/py/pyproject.toml",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_stm32cube_build/py/setup.cfg"
+  ],
+  "sources": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_stm32cube_build/py/pw_stm32cube_build/__init__.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_stm32cube_build/py/pw_stm32cube_build/__main__.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_stm32cube_build/py/pw_stm32cube_build/find_files.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_stm32cube_build/py/pw_stm32cube_build/gen_file_list.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_stm32cube_build/py/pw_stm32cube_build/icf_to_ld.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_stm32cube_build/py/pw_stm32cube_build/inject_init.py"
+  ],
+  "tests": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_stm32cube_build/py/tests/find_files_test.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_stm32cube_build/py/tests/icf_to_ld_test.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_stm32cube_build/py/tests/inject_init_test.py"
+  ]
+}

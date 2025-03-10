@@ -1,0 +1,12 @@
+defines =
+framework_dirs =
+include_dirs = -Igen/third_party/connectedhomeip/third_party/pigweed/repo/pw_tokenizer/detokenizer_elf_test_blob/public -I../third_party/connectedhomeip/third_party/pigweed/repo/pw_preprocessor/public -I../third_party/connectedhomeip/third_party/pigweed/repo/pw_polyfill/public
+cflags = -O0 -g2 -fno-common -ffunction-sections -fdata-sections -fno-exceptions -fno-unwind-tables -fno-asynchronous-unwind-tables -fPIC -Wall -Werror -Wextra -Wshadow -Wunreachable-code -Wvla -Wformat -Wformat-nonliteral -Wformat-security -Wundef -Wno-deprecated-declarations -Wno-missing-field-initializers -Wno-unknown-warning-option -Wno-unused-parameter -Wno-cast-function-type -Wno-psabi -Wno-maybe-uninitialized -fdiagnostics-color --sysroot=\~/openwrt/staging_dir/target-aarch64_cortex-a72_musl/usr -fno-strict-aliasing -I/home/chucuong/openwrt/staging_dir/target-aarch64_cortex-a72_musl/usr/include
+cflags_cc = -std=gnu++17 -fno-rtti -Wnon-virtual-dtor
+target_output_name = detokenizer_elf_test_blob
+
+build obj/BUILD_DIR/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_tokenizer/detokenizer_elf_test_blob/detokenizer_elf_test_blob.example_binary_with_tokenized_strings.cc.o: cxx gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_tokenizer/detokenizer_elf_test_blob/example_binary_with_tokenized_strings.cc || obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_tokenizer/detokenizer_elf_test_blob._gen.stamp
+  source_file_part = example_binary_with_tokenized_strings.cc
+  source_name_part = example_binary_with_tokenized_strings
+
+build obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_tokenizer/detokenizer_elf_test_blob.stamp: stamp obj/BUILD_DIR/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_tokenizer/detokenizer_elf_test_blob/detokenizer_elf_test_blob.example_binary_with_tokenized_strings.cc.o || obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_tokenizer/detokenizer_elf_test_blob._gen.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_preprocessor/pw_preprocessor.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_polyfill/pw_polyfill.stamp

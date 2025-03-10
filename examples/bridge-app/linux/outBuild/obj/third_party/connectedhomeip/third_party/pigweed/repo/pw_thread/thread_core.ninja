@@ -1,0 +1,7 @@
+defines =
+framework_dirs =
+include_dirs = -I../third_party/connectedhomeip/third_party/pigweed/repo/pw_thread/public
+target_output_name = thread_core
+
+
+build obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_thread/thread_core.stamp: stamp

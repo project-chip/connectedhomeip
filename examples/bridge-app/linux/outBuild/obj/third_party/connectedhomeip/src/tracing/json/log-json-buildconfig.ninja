@@ -1,0 +1,7 @@
+defines =
+framework_dirs =
+include_dirs =
+target_output_name = log-json-buildconfig
+
+
+build obj/third_party/connectedhomeip/src/tracing/json/log-json-buildconfig.stamp: stamp || obj/third_party/connectedhomeip/src/tracing/json/gen_log-json-buildconfig.stamp

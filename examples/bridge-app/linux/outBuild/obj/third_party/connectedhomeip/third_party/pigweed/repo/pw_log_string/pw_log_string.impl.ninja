@@ -1,0 +1,7 @@
+defines =
+framework_dirs =
+include_dirs =
+target_output_name = pw_log_string.impl
+
+
+build obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_log_string/pw_log_string.impl.stamp: stamp || obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_log_string/handler.impl.stamp

@@ -1,0 +1,7 @@
+defines =
+framework_dirs =
+include_dirs = -I../third_party/connectedhomeip/third_party/pigweed/repo/pw_containers/public -I../third_party/connectedhomeip/third_party/pigweed/repo/pw_polyfill/public
+target_output_name = iterator
+
+
+build obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_containers/iterator.stamp: stamp || obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_polyfill/pw_polyfill.stamp

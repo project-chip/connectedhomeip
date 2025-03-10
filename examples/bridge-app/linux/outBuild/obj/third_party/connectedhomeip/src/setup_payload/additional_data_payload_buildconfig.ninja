@@ -1,0 +1,7 @@
+defines =
+framework_dirs =
+include_dirs =
+target_output_name = additional_data_payload_buildconfig
+
+
+build obj/third_party/connectedhomeip/src/setup_payload/additional_data_payload_buildconfig.stamp: stamp || obj/third_party/connectedhomeip/src/setup_payload/gen_additional_data_payload_buildconfig.stamp

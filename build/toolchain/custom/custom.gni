@@ -11,17 +11,3 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-declare_args() {
-  # C compiler to use for target build.
-  # Only relevant with custom_toolchain = "custom".
-  target_cc = ""
-
-  # C++ compiler to use for target build.
-  # Only relevant with custom_toolchain = "custom".
-  target_cxx = ""
-
-  # Archive tool to use for target build.
-  # Only relevant with custom_toolchain = "custom".
-  target_ar = ""
-}

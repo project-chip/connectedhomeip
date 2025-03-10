@@ -1,0 +1,21 @@
+{
+  "gn_target_name": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_toolchain/py:py",
+  "inputs": [
+
+  ],
+  "setup_sources": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_toolchain/py/pyproject.toml",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_toolchain/py/setup.cfg"
+  ],
+  "sources": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_toolchain/py/pw_toolchain/__init__.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_toolchain/py/pw_toolchain/bad_toolchain.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_toolchain/py/pw_toolchain/clang_apply_replacements.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_toolchain/py/pw_toolchain/clang_arm_toolchain.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_toolchain/py/pw_toolchain/clang_tidy.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_toolchain/py/pw_toolchain/copy_with_metadata.py"
+  ],
+  "tests": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_toolchain/py/clang_tidy_test.py"
+  ]
+}

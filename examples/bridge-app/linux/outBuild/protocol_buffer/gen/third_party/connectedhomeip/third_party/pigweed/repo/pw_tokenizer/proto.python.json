@@ -1,0 +1,13 @@
+{
+  "dependencies": [
+
+  ],
+  "label": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_tokenizer:proto.python",
+  "nested_in_python_package": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_tokenizer/py:py",
+  "package": "pw_tokenizer_proto",
+  "protoc_outputs": [
+    "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_tokenizer/proto.proto_library/python/pw_tokenizer_proto/options_pb2.py",
+    "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_tokenizer/proto.proto_library/python/pw_tokenizer_proto/options_pb2.pyi"
+  ],
+  "root": "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_tokenizer/proto.proto_library/python"
+}

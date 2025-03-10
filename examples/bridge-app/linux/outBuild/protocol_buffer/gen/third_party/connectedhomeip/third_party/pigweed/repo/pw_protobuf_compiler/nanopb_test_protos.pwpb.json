@@ -1,0 +1,12 @@
+{
+  "dependencies": [
+
+  ],
+  "label": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf_compiler:nanopb_test_protos.pwpb",
+  "nested_in_python_package": "",
+  "package": "pw_protobuf_compiler",
+  "protoc_outputs": [
+    "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf_compiler/nanopb_test_protos.proto_library/pwpb/pw_protobuf_compiler/nanopb_test_protos/nanopb_test.pwpb.h"
+  ],
+  "root": "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf_compiler/nanopb_test_protos.proto_library/pwpb"
+}

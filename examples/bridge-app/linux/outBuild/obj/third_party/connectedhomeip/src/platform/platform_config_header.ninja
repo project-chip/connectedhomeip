@@ -1,0 +1,7 @@
+defines =
+framework_dirs =
+include_dirs =
+target_output_name = platform_config_header
+
+
+build obj/third_party/connectedhomeip/src/platform/platform_config_header.stamp: stamp || obj/third_party/connectedhomeip/src/platform/platform_buildconfig.stamp obj/third_party/connectedhomeip/src/app/icd/server/icd-server-config.stamp obj/third_party/connectedhomeip/src/app/icd/server/icd-server-buildconfig.stamp

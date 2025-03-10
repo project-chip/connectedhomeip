@@ -1,0 +1,12 @@
+defines =
+framework_dirs =
+include_dirs = -Igen/third_party/connectedhomeip/third_party/pigweed/repo/pw_chrono
+cflags = -O0 -g2 -fno-common -ffunction-sections -fdata-sections -fno-exceptions -fno-unwind-tables -fno-asynchronous-unwind-tables -fPIC -Wall -Werror -Wextra -Wshadow -Wunreachable-code -Wvla -Wformat -Wformat-nonliteral -Wformat-security -Wundef -Wno-deprecated-declarations -Wno-missing-field-initializers -Wno-unknown-warning-option -Wno-unused-parameter -Wno-cast-function-type -Wno-psabi -Wno-maybe-uninitialized -fdiagnostics-color --sysroot=\~/openwrt/staging_dir/target-aarch64_cortex-a72_musl/usr -fno-strict-aliasing -I/home/chucuong/openwrt/staging_dir/target-aarch64_cortex-a72_musl/usr/include
+cflags_cc = -std=gnu++17 -fno-rtti -Wnon-virtual-dtor
+target_output_name = wrap_time_build_time
+
+build obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_chrono/wrap_time_build_time.wrap_time_build_time.cc.o: cxx ../third_party/connectedhomeip/third_party/pigweed/repo/pw_chrono/wrap_time_build_time.cc || obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_chrono/generate_build_time_header.stamp
+  source_file_part = wrap_time_build_time.cc
+  source_name_part = wrap_time_build_time
+
+build obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_chrono/wrap_time_build_time.stamp: stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_chrono/wrap_time_build_time.wrap_time_build_time.cc.o || obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_chrono/generate_build_time_header.stamp

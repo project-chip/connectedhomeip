@@ -402,6 +402,8 @@ config("runtime_default") {
       "dl",
       "pthread",
       "rt",
+      "mosquittopp",
+      "jsoncpp"
     ]
   }
 

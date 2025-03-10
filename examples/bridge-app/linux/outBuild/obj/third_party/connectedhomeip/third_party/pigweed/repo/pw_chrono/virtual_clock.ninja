@@ -1,0 +1,7 @@
+defines =
+framework_dirs =
+include_dirs = -I../third_party/connectedhomeip/third_party/pigweed/repo/pw_chrono/public
+target_output_name = virtual_clock
+
+
+build obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_chrono/virtual_clock.stamp: stamp

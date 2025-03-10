@@ -1,0 +1,28 @@
+{
+  "gn_target_name": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_docgen/py:py",
+  "inputs": [
+
+  ],
+  "setup_sources": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_docgen/py/pyproject.toml",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_docgen/py/setup.cfg"
+  ],
+  "sources": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_docgen/py/pw_docgen/__init__.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_docgen/py/pw_docgen/docgen.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_docgen/py/pw_docgen/docserver.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_docgen/py/pw_docgen/seed.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_docgen/py/pw_docgen/sphinx/__init__.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_docgen/py/pw_docgen/sphinx/bug.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_docgen/py/pw_docgen/sphinx/google_analytics.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_docgen/py/pw_docgen/sphinx/kconfig.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_docgen/py/pw_docgen/sphinx/module_metadata.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_docgen/py/pw_docgen/sphinx/modules_index.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_docgen/py/pw_docgen/sphinx/pigweed_live.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_docgen/py/pw_docgen/sphinx/pw_status_codes.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_docgen/py/pw_docgen/sphinx/seed_metadata.py"
+  ],
+  "tests": [
+
+  ]
+}

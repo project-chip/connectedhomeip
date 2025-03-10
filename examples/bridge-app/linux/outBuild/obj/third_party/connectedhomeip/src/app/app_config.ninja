@@ -1,0 +1,7 @@
+defines =
+framework_dirs =
+include_dirs =
+target_output_name = app_config
+
+
+build obj/third_party/connectedhomeip/src/app/app_config.stamp: stamp || obj/third_party/connectedhomeip/src/app/app_buildconfig.stamp

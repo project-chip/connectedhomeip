@@ -1,0 +1,16 @@
+defines = -DPW_SPAN_ENABLE_ASSERTS=false
+framework_dirs =
+include_dirs = -I../third_party/connectedhomeip/third_party/pigweed/repo/pw_varint/public -I../third_party/connectedhomeip/third_party/pigweed/repo/third_party/fuchsia/repo/sdk/lib/stdcompat/include -I../third_party/connectedhomeip/third_party/pigweed/repo/pw_preprocessor/public -I../third_party/connectedhomeip/third_party/pigweed/repo/pw_polyfill/public -I../third_party/connectedhomeip/third_party/pigweed/repo/pw_span/public
+cflags = -O0 -g2 -fno-common -ffunction-sections -fdata-sections -fno-exceptions -fno-unwind-tables -fno-asynchronous-unwind-tables -fPIC -Wall -Werror -Wextra -Wshadow -Wunreachable-code -Wvla -Wformat -Wformat-nonliteral -Wformat-security -Wundef -Wno-deprecated-declarations -Wno-missing-field-initializers -Wno-unknown-warning-option -Wno-unused-parameter -Wno-cast-function-type -Wno-psabi -Wno-maybe-uninitialized -fdiagnostics-color --sysroot=\~/openwrt/staging_dir/target-aarch64_cortex-a72_musl/usr -fno-strict-aliasing -Wconversion
+cflags_c = -std=gnu11
+cflags_cc = -std=gnu++17 -fno-rtti -Wnon-virtual-dtor
+target_output_name = pw_varint
+
+build obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_varint/pw_varint.varint.cc.o: cxx ../third_party/connectedhomeip/third_party/pigweed/repo/pw_varint/varint.cc
+  source_file_part = varint.cc
+  source_name_part = varint
+build obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_varint/pw_varint.varint_c.c.o: cc ../third_party/connectedhomeip/third_party/pigweed/repo/pw_varint/varint_c.c
+  source_file_part = varint_c.c
+  source_name_part = varint_c
+
+build obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_varint/pw_varint.stamp: stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_varint/pw_varint.varint.cc.o obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_varint/pw_varint.varint_c.c.o || obj/third_party/connectedhomeip/third_party/pigweed/repo/third_party/fuchsia/stdcompat.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_preprocessor/pw_preprocessor.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_span/pw_span.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/third_party/fuchsia/repo/sdk/lib/stdcompat/stdcompat.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_polyfill/pw_polyfill.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_span/config.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_span/span_asserts.stamp

@@ -1,0 +1,16 @@
+{
+  "compiled_requirements": "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_env_setup/pigweed_build_venv/compiled_requirements.txt",
+  "constraints": [
+    "../third_party/connectedhomeip/scripts/setup/constraints.txt"
+  ],
+  "generated_requirements": "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_env_setup/pigweed_build_venv/generated_requirements.txt",
+  "gn_target_name": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_env_setup:pigweed_build_venv",
+  "interpreter": "python-venv/bin/python",
+  "path": "python-venv",
+  "requirements": [
+    "../third_party/connectedhomeip/scripts/setup/requirements.build.txt"
+  ],
+  "source_packages": [
+    "//third_party/connectedhomeip/third_party/pigweed/repo/pw_env_setup:core_pigweed_python_packages"
+  ]
+}

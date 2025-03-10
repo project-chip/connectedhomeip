@@ -1,0 +1,7 @@
+defines =
+framework_dirs =
+include_dirs = -I../third_party/connectedhomeip/third_party/pigweed/repo/pw_perf_test/public
+target_output_name = timer_interface
+
+
+build obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_perf_test/timer_interface.stamp: stamp || obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_perf_test/timer_interface.facade.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_perf_test/timer_interface.NO_BACKEND_SET.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_perf_test/duration_unit.stamp

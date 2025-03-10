@@ -1,0 +1,7 @@
+defines =
+framework_dirs =
+include_dirs =
+target_output_name = energy-evse-test-event-trigger
+
+
+build obj/third_party/connectedhomeip/examples/platform/linux/energy-evse-test-event-trigger.stamp: stamp

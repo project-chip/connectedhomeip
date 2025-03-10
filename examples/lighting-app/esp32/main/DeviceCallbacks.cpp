@@ -16,13 +16,11 @@
  *    limitations under the License.
  */
 #include "AppTask.h"
-
 #include "DeviceCallbacks.h"
-#include "Globals.h"
+// #include "Globals.h"
 #include "LEDWidget.h"
 
 #include <app/util/util.h>
-
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -54,11 +52,11 @@ void AppDeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, Clus
         OnLevelControlAttributeChangeCallback(endpointId, attributeId, value);
         break;
 
-#if CONFIG_LED_TYPE_RMT
+// #if CONFIG_LED_TYPE_RMT
     case ColorControl::Id:
         OnColorControlAttributeChangeCallback(endpointId, attributeId, value);
         break;
-#endif
+// #endif
 
     default:
         ESP_LOGI(TAG, "Unhandled cluster ID: %" PRIu32, clusterId);
@@ -93,7 +91,6 @@ exit:
 }
 
 // Currently ColorControl cluster is supported for ESP32C3_DEVKITM and ESP32S3_DEVKITM which have an on-board RGB-LED
-#if CONFIG_LED_TYPE_RMT
 void AppDeviceCallbacks::OnColorControlAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
 {
     using namespace ColorControl::Attributes;
@@ -114,12 +111,11 @@ void AppDeviceCallbacks::OnColorControlAttributeChangeCallback(EndpointId endpoi
         saturation = *value;
         CurrentHue::Get(endpointId, &hue);
     }
-    AppLED.SetColor(hue, saturation);
+    // AppLED.SetColor(hue, saturation);
 
 exit:
     return;
 }
-#endif // CONFIG_LED_TYPE_RMT
 
 /** @brief OnOff Cluster Init
  *
@@ -137,16 +133,16 @@ exit:
  */
 void emberAfOnOffClusterInitCallback(EndpointId endpoint)
 {
-    ESP_LOGI(TAG, "emberAfOnOffClusterInitCallback");
+    ESP_LOGI(TAG, "----------------------------emberAfOnOffClusterInitCallback------------------------");
     GetAppTask().UpdateClusterState();
 }
 
-void AppDeviceCallbacksDelegate::OnIPv4ConnectivityEstablished()
-{
-    wifiLED.Set(true);
-}
+// void AppDeviceCallbacksDelegate::OnIPv4ConnectivityEstablished()
+// {
+//     wifiLED.Set(true);
+// }
 
-void AppDeviceCallbacksDelegate::OnIPv4ConnectivityLost()
-{
-    wifiLED.Set(false);
-}
+// void AppDeviceCallbacksDelegate::OnIPv4ConnectivityLost()
+// {
+//     wifiLED.Set(false);
+// }

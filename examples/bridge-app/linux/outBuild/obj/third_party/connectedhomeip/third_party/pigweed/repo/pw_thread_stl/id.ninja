@@ -1,0 +1,7 @@
+defines =
+framework_dirs =
+include_dirs = -I../third_party/connectedhomeip/third_party/pigweed/repo/pw_thread_stl/public -I../third_party/connectedhomeip/third_party/pigweed/repo/pw_thread_stl/id_public_overrides -I../third_party/connectedhomeip/third_party/pigweed/repo/pw_thread/public
+target_output_name = id
+
+
+build obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_thread_stl/id.stamp: stamp || obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_thread/id.facade.stamp

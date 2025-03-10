@@ -1,0 +1,27 @@
+{
+  "gn_target_name": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_emu/py:py",
+  "inputs": [
+
+  ],
+  "setup_sources": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_emu/py/pyproject.toml",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_emu/py/setup.cfg"
+  ],
+  "sources": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_emu/py/pw_emu/__init__.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_emu/py/pw_emu/__main__.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_emu/py/pw_emu/core.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_emu/py/pw_emu/frontend.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_emu/py/pw_emu/pigweed_emulators.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_emu/py/pw_emu/qemu.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_emu/py/pw_emu/renode.py"
+  ],
+  "tests": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_emu/py/tests/cli_test.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_emu/py/tests/config_helper.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_emu/py/tests/core_test.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_emu/py/tests/frontend_test.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_emu/py/tests/qemu_test.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_emu/py/tests/renode_test.py"
+  ]
+}

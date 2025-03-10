@@ -1,0 +1,7 @@
+defines =
+framework_dirs =
+include_dirs = -I../third_party/connectedhomeip/third_party/pigweed/repo/pw_containers/public
+target_output_name = legacy_intrusive_list
+
+
+build obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_containers/legacy_intrusive_list.stamp: stamp || obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_containers/intrusive_forward_list.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_containers/config.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_containers/intrusive_list_common.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_assert/assert.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_assert/assert.facade.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_assert/config.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_assert/assert_compatibility_backend.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_preprocessor/pw_preprocessor.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_polyfill/pw_polyfill.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_assert/check.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_assert/check.facade.stamp

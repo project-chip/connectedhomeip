@@ -1,0 +1,7 @@
+defines =
+framework_dirs =
+include_dirs = -I../third_party/connectedhomeip/third_party/pigweed/repo/pw_sync/public
+target_output_name = yield_core
+
+
+build obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_sync/yield_core.stamp: stamp

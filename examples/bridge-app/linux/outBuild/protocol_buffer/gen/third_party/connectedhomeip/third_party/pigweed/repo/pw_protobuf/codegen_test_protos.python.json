@@ -1,0 +1,31 @@
+{
+  "dependencies": [
+    "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf/codegen_test_deps_protos.python.json",
+    "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf/codegen_test_deps_protos_prefix.python.json",
+    "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf/common_protos.python.json"
+  ],
+  "label": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf:codegen_test_protos.python",
+  "nested_in_python_package": "",
+  "package": "pw_protobuf_test_protos",
+  "protoc_outputs": [
+    "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf/codegen_test_protos.proto_library/python/pw_protobuf_test_protos/edition_pb2.py",
+    "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf/codegen_test_protos.proto_library/python/pw_protobuf_test_protos/edition_pb2.pyi",
+    "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf/codegen_test_protos.proto_library/python/pw_protobuf_test_protos/full_test_pb2.py",
+    "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf/codegen_test_protos.proto_library/python/pw_protobuf_test_protos/full_test_pb2.pyi",
+    "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf/codegen_test_protos.proto_library/python/pw_protobuf_test_protos/imported_pb2.py",
+    "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf/codegen_test_protos.proto_library/python/pw_protobuf_test_protos/imported_pb2.pyi",
+    "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf/codegen_test_protos.proto_library/python/pw_protobuf_test_protos/importer_pb2.py",
+    "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf/codegen_test_protos.proto_library/python/pw_protobuf_test_protos/importer_pb2.pyi",
+    "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf/codegen_test_protos.proto_library/python/pw_protobuf_test_protos/non_pw_package_pb2.py",
+    "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf/codegen_test_protos.proto_library/python/pw_protobuf_test_protos/non_pw_package_pb2.pyi",
+    "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf/codegen_test_protos.proto_library/python/pw_protobuf_test_protos/optional_pb2.py",
+    "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf/codegen_test_protos.proto_library/python/pw_protobuf_test_protos/optional_pb2.pyi",
+    "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf/codegen_test_protos.proto_library/python/pw_protobuf_test_protos/proto2_pb2.py",
+    "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf/codegen_test_protos.proto_library/python/pw_protobuf_test_protos/proto2_pb2.pyi",
+    "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf/codegen_test_protos.proto_library/python/pw_protobuf_test_protos/repeated_pb2.py",
+    "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf/codegen_test_protos.proto_library/python/pw_protobuf_test_protos/repeated_pb2.pyi",
+    "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf/codegen_test_protos.proto_library/python/pw_protobuf_test_protos/size_report_pb2.py",
+    "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf/codegen_test_protos.proto_library/python/pw_protobuf_test_protos/size_report_pb2.pyi"
+  ],
+  "root": "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf/codegen_test_protos.proto_library/python"
+}

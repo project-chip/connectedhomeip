@@ -1,0 +1,7 @@
+defines =
+framework_dirs =
+include_dirs = -I../third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/public
+target_output_name = log_config
+
+
+build obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/log_config.stamp: stamp || obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/config.stamp

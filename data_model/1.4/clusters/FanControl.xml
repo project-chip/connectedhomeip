@@ -55,7 +55,7 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 
-:xrefstyle: basic
+:xrefstyle: short
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0202" name="Fan Control Cluster" revision="4">
   <revisionHistory>
@@ -187,17 +187,24 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="FanMode" type="FanModeEnum" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality persistence="nonVolatile"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0001" name="FanModeSequence" type="FanModeSequenceEnum" default="MS">
+      <access read="true" write="optional" readPrivilege="view" writePrivilege="operate"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <mandatoryConform>
+        <condition name="Zigbee"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0001" name="FanModeSequence" type="FanModeSequenceEnum" default="MS">
       <access read="true" readPrivilege="view"/>
-      <quality persistence="fixed"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0002" name="PercentSetting" type="percent" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality nullable="true"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="max" value="100"/>
     </attribute>
@@ -208,7 +215,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0004" name="SpeedMax" type="uint8" default="MS">
       <access read="true" readPrivilege="view"/>
-      <quality persistence="fixed"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="SPD"/>
       </mandatoryConform>
@@ -216,27 +223,23 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0005" name="SpeedSetting" type="uint8" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality nullable="true"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="SPD"/>
       </mandatoryConform>
-      <constraint type="max">
-        <value attribute="SpeedMax"/>
-      </constraint>
+      <constraint type="max" value="SpeedMax"/>
     </attribute>
     <attribute id="0x0006" name="SpeedCurrent" type="uint8" default="desc">
       <access read="true" readPrivilege="view"/>
-      <quality reportable="true"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="SPD"/>
       </mandatoryConform>
-      <constraint type="max">
-        <value attribute="SpeedMax"/>
-      </constraint>
+      <constraint type="max" value="SpeedMax"/>
     </attribute>
     <attribute id="0x0007" name="RockSupport" type="RockBitmap" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality persistence="fixed"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="RCK"/>
       </mandatoryConform>
@@ -244,7 +247,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0008" name="RockSetting" type="RockBitmap" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality reportable="true"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="RCK"/>
       </mandatoryConform>
@@ -252,7 +255,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0009" name="WindSupport" type="WindBitmap" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality persistence="fixed"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="WND"/>
       </mandatoryConform>
@@ -260,7 +263,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x000A" name="WindSetting" type="WindBitmap" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality reportable="true"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="WND"/>
       </mandatoryConform>
@@ -268,7 +271,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x000B" name="AirflowDirection" type="AirflowDirectionEnum" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality reportable="true"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform>
         <feature name="DIR"/>
       </mandatoryConform>

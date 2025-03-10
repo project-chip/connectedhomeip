@@ -1,0 +1,7 @@
+defines =
+framework_dirs =
+include_dirs =
+target_output_name = types
+
+
+build obj/third_party/connectedhomeip/src/lib/dnssd/types.stamp: stamp

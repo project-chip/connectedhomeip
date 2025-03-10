@@ -998,19 +998,19 @@ TEST_F(TestSessionManager, TestFindSecureSessionForNode)
     CHIP_ERROR err = sessionManager.InjectCaseSessionWithTestKey(aliceToBobSession, 2, 1, aliceNodeId, bobNodeId, aliceFabricIndex,
                                                                  peer, CryptoContext::SessionRole::kInitiator);
     EXPECT_EQ(err, CHIP_NO_ERROR);
-    aliceToBobSession->AsSecureSession()->MarkActiveRx();
+    aliceToBobSession->AsSecureSession()->MarkActive();
 
     SessionHolder newAliceToBobSession;
     err = sessionManager.InjectCaseSessionWithTestKey(newAliceToBobSession, 3, 4, aliceNodeId, bobNodeId, aliceFabricIndex, peer,
                                                       CryptoContext::SessionRole::kInitiator);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    while (System::SystemClock().GetMonotonicTimestamp() <= aliceToBobSession->AsSecureSession()->GetLastPeerActivityTime())
+    while (System::SystemClock().GetMonotonicTimestamp() <= aliceToBobSession->AsSecureSession()->GetLastActivityTime())
     {
         // Wait for the clock to advance so the new session is
         // more-recently-active.
     }
-    newAliceToBobSession->AsSecureSession()->MarkActiveRx();
+    newAliceToBobSession->AsSecureSession()->MarkActive();
 
     auto foundSession = sessionManager.FindSecureSessionForNode(ScopedNodeId(bobNodeId, aliceFabricIndex),
                                                                 MakeOptional(SecureSession::Type::kCASE));

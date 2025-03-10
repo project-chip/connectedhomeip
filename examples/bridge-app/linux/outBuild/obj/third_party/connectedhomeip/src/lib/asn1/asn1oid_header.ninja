@@ -1,0 +1,7 @@
+defines =
+framework_dirs =
+include_dirs =
+target_output_name = asn1oid_header
+
+
+build obj/third_party/connectedhomeip/src/lib/asn1/asn1oid_header.stamp: stamp || obj/third_party/connectedhomeip/src/lib/asn1/gen_asn1oid.stamp

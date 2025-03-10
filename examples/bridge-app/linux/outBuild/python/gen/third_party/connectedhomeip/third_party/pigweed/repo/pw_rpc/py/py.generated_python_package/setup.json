@@ -1,0 +1,12 @@
+{
+  "metadata": {
+    "name": "pw_rpc",
+    "version": "0.0.1"
+  },
+  "options": {
+    "install_requires": [
+      "protobuf",
+      "pyserial"
+    ]
+  }
+}

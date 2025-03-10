@@ -19,8 +19,7 @@
 #include "AppTask.h"
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
-
-#include "DeviceWithDisplay.h"
+// #include "DeviceWithDisplay.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 
@@ -40,9 +39,9 @@ static const char TAG[] = "app-task";
 LEDWidget AppLED;
 
 namespace {
-constexpr EndpointId kLightEndpointId = 1;
-QueueHandle_t sAppEventQueue;
-TaskHandle_t sAppTaskHandle;
+    constexpr EndpointId kLightEndpointId = 1;
+    QueueHandle_t sAppEventQueue;
+    TaskHandle_t sAppTaskHandle;
 } // namespace
 
 AppTask AppTask::sAppTask;
@@ -62,47 +61,26 @@ CHIP_ERROR AppTask::StartAppTask()
     return (xReturned == pdPASS) ? CHIP_NO_ERROR : APP_ERROR_CREATE_TASK_FAILED;
 }
 
-void AppTask::ButtonEventHandler(const uint8_t buttonHandle, uint8_t btnAction)
-{
-    if (btnAction != APP_BUTTON_PRESSED)
-    {
-        return;
-    }
+// void AppTask::ButtonEventHandler(const uint8_t buttonHandle, uint8_t btnAction)
+// {
+//     if (btnAction != APP_BUTTON_PRESSED)
+//     {
+//         return;
+//     }
 
-    AppEvent button_event = {};
-    button_event.Type     = AppEvent::kEventType_Button;
+//     AppEvent button_event = {};
+//     button_event.Type     = AppEvent::kEventType_Button;
 
-#if CONFIG_HAVE_DISPLAY
-    button_event.ButtonEvent.PinNo  = buttonHandle;
-    button_event.ButtonEvent.Action = btnAction;
-    button_event.mHandler           = ButtonPressedAction;
-#else
-    button_event.mHandler = AppTask::LightingActionEventHandler;
-#endif
+// #if CONFIG_HAVE_DISPLAY
+//     button_event.ButtonEvent.PinNo  = buttonHandle;
+//     button_event.ButtonEvent.Action = btnAction;
+//     button_event.mHandler           = ButtonPressedAction;
+// #else
+//     button_event.mHandler = AppTask::LightingActionEventHandler;
+// #endif
 
-    sAppTask.PostEvent(&button_event);
-}
-
-#if CONFIG_DEVICE_TYPE_M5STACK
-void AppTask::ButtonPressedAction(AppEvent * aEvent)
-{
-    uint32_t io_num = aEvent->ButtonEvent.PinNo;
-    int level       = gpio_get_level((gpio_num_t) io_num);
-    if (level == 0)
-    {
-        bool woken = WakeDisplay();
-        if (woken)
-        {
-            return;
-        }
-        // Button 1 is connected to the pin 39
-        // Button 2 is connected to the pin 38
-        // Button 3 is connected to the pin 37
-        // So we use 40 - io_num to map the pin number to button number
-        ScreenManager::ButtonPressed(40 - io_num);
-    }
-}
-#endif
+//     sAppTask.PostEvent(&button_event);
+// }
 
 CHIP_ERROR AppTask::Init()
 {

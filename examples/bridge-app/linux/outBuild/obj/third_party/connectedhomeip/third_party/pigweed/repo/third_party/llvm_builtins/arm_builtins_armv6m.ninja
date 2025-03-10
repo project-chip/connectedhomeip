@@ -1,0 +1,7 @@
+defines =
+framework_dirs =
+include_dirs =
+target_output_name = arm_builtins_armv6m
+
+
+build obj/third_party/connectedhomeip/third_party/pigweed/repo/third_party/llvm_builtins/arm_builtins_armv6m.stamp: stamp

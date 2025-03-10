@@ -1,0 +1,17 @@
+{
+  "gn_target_name": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_doctor/py:py",
+  "inputs": [
+
+  ],
+  "setup_sources": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_doctor/py/pyproject.toml",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_doctor/py/setup.cfg"
+  ],
+  "sources": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_doctor/py/pw_doctor/__init__.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_doctor/py/pw_doctor/doctor.py"
+  ],
+  "tests": [
+
+  ]
+}

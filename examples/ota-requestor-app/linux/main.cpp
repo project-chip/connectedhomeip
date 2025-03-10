@@ -61,7 +61,8 @@ public:
 
 DefaultOTARequestor gRequestorCore;
 DefaultOTARequestorStorage gRequestorStorage;
-CustomOTARequestorDriver gRequestorUser;
+// CustomOTARequestorDriver gRequestorUser;
+DefaultOTARequestorDriver gRequestorUser;
 BDXDownloader gDownloader;
 OTAImageProcessorImpl gImageProcessor;
 chip::ota::DefaultOTARequestorUserConsent gUserConsentProvider;
@@ -78,6 +79,7 @@ constexpr uint16_t kOptionUserConsentState     = 'u';
 constexpr uint16_t kOptionWatchdogTimeout      = 'w';
 constexpr uint16_t kSkipExecImageFile          = 's';
 constexpr size_t kMaxFilePathSize              = 256;
+constexpr uint16_t requestedOtaBlockSize = 8192;
 
 uint32_t gPeriodicQueryTimeoutSec = 0;
 uint32_t gWatchdogTimeoutSec      = 0;
@@ -206,6 +208,7 @@ static void InitOTARequestor(void)
     // Watchdog timeout can be set any time before a query image is sent
     gRequestorUser.SetWatchdogTimeout(gWatchdogTimeoutSec);
     gRequestorUser.SetSendNotifyUpdateApplied(gSendNotifyUpdateApplied);
+    gRequestorUser.SetMaxDownloadBlockSize(10240);
 
     gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
     gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
@@ -220,7 +223,7 @@ static void InitOTARequestor(void)
     if (gUserConsentState != chip::ota::UserConsentState::kUnknown)
     {
         gUserConsentProvider.SetUserConsentState(gUserConsentState);
-        gRequestorUser.SetUserConsentDelegate(&gUserConsentProvider);
+        // gRequestorUser.SetUserConsentDelegate(&gUserConsentProvider);
     }
 }
 

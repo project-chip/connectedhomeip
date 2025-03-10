@@ -1,0 +1,15 @@
+defines = -DPW_SPAN_ENABLE_ASSERTS=false
+framework_dirs =
+include_dirs = -I../third_party/connectedhomeip/third_party/pigweed/repo/pw_checksum/public -I../third_party/connectedhomeip/third_party/pigweed/repo/pw_bytes/public -I../third_party/connectedhomeip/third_party/pigweed/repo/third_party/fuchsia/repo/sdk/lib/stdcompat/include -I../third_party/connectedhomeip/third_party/pigweed/repo/pw_containers/public -I../third_party/connectedhomeip/third_party/pigweed/repo/pw_polyfill/public -I../third_party/connectedhomeip/third_party/pigweed/repo/pw_preprocessor/public -I../third_party/connectedhomeip/third_party/pigweed/repo/pw_span/public -I../third_party/connectedhomeip/third_party/pigweed/repo/pw_status/public
+cflags = -O0 -g2 -fno-common -ffunction-sections -fdata-sections -fno-exceptions -fno-unwind-tables -fno-asynchronous-unwind-tables -fPIC -Wall -Werror -Wextra -Wshadow -Wunreachable-code -Wvla -Wformat -Wformat-nonliteral -Wformat-security -Wundef -Wno-deprecated-declarations -Wno-missing-field-initializers -Wno-unknown-warning-option -Wno-unused-parameter -Wno-cast-function-type -Wno-psabi -Wno-maybe-uninitialized -fdiagnostics-color --sysroot=\~/openwrt/staging_dir/target-aarch64_cortex-a72_musl/usr -fno-strict-aliasing -I/home/chucuong/openwrt/staging_dir/target-aarch64_cortex-a72_musl/usr/include -Wconversion
+cflags_cc = -std=gnu++17 -fno-rtti -Wnon-virtual-dtor
+target_output_name = pw_checksum
+
+build obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_checksum/pw_checksum.crc16_ccitt.cc.o: cxx ../third_party/connectedhomeip/third_party/pigweed/repo/pw_checksum/crc16_ccitt.cc
+  source_file_part = crc16_ccitt.cc
+  source_name_part = crc16_ccitt
+build obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_checksum/pw_checksum.crc32.cc.o: cxx ../third_party/connectedhomeip/third_party/pigweed/repo/pw_checksum/crc32.cc
+  source_file_part = crc32.cc
+  source_name_part = crc32
+
+build obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_checksum/pw_checksum.stamp: stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_checksum/pw_checksum.crc16_ccitt.cc.o obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_checksum/pw_checksum.crc32.cc.o || obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_checksum/config.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_bytes/pw_bytes.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_span/pw_span.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_bytes/bit.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/third_party/fuchsia/repo/sdk/lib/stdcompat/stdcompat.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_containers/iterator.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_polyfill/pw_polyfill.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_preprocessor/pw_preprocessor.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_span/config.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_span/span_asserts.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_status/pw_status.stamp

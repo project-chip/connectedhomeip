@@ -1,0 +1,7 @@
+defines =
+framework_dirs =
+include_dirs =
+target_output_name = icd-server-config
+
+
+build obj/third_party/connectedhomeip/src/app/icd/server/icd-server-config.stamp: stamp || obj/third_party/connectedhomeip/src/app/icd/server/icd-server-buildconfig.stamp

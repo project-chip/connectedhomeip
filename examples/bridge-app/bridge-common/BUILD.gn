@@ -20,6 +20,7 @@ chip_data_model("bridge-common") {
   zap_file = "bridge-app.zap"
 
   is_server = true
+  deps = [ "${chip_root}/src/lib" ]
 
   # TODO: the definition of DYNAMIC_ENDPOINT_COUNT needs find a common home!
   cflags = [ "-DDYNAMIC_ENDPOINT_COUNT=16" ]

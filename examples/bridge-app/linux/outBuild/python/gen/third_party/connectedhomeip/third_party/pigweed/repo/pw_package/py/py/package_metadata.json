@@ -1,0 +1,42 @@
+{
+  "gn_target_name": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_package/py:py",
+  "inputs": [
+
+  ],
+  "setup_sources": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_package/py/pyproject.toml",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_package/py/setup.cfg"
+  ],
+  "sources": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_package/py/pw_package/__init__.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_package/py/pw_package/git_repo.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_package/py/pw_package/package_manager.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_package/py/pw_package/packages/__init__.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_package/py/pw_package/packages/abseil_cpp.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_package/py/pw_package/packages/arduino_core.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_package/py/pw_package/packages/boringssl.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_package/py/pw_package/packages/chre.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_package/py/pw_package/packages/chromium_verifier.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_package/py/pw_package/packages/crlset.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_package/py/pw_package/packages/emboss.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_package/py/pw_package/packages/freertos.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_package/py/pw_package/packages/fuzztest.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_package/py/pw_package/packages/googletest.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_package/py/pw_package/packages/mbedtls.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_package/py/pw_package/packages/mcuxpresso.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_package/py/pw_package/packages/micro_ecc.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_package/py/pw_package/packages/nanopb.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_package/py/pw_package/packages/pico_sdk.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_package/py/pw_package/packages/picotool.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_package/py/pw_package/packages/pigweed_examples_repo.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_package/py/pw_package/packages/protobuf.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_package/py/pw_package/packages/re2.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_package/py/pw_package/packages/smartfusion_mss.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_package/py/pw_package/packages/stm32cube.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_package/py/pw_package/packages/zephyr.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_package/py/pw_package/pigweed_packages.py"
+  ],
+  "tests": [
+
+  ]
+}

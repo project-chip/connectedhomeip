@@ -1,0 +1,19 @@
+{
+  "gn_target_name": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_config_loader/py:py",
+  "inputs": [
+
+  ],
+  "setup_sources": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_config_loader/py/pyproject.toml",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_config_loader/py/setup.cfg"
+  ],
+  "sources": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_config_loader/py/pw_config_loader/__init__.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_config_loader/py/pw_config_loader/json_config_loader_mixin.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_config_loader/py/pw_config_loader/toml_config_loader_mixin.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_config_loader/py/pw_config_loader/yaml_config_loader_mixin.py"
+  ],
+  "tests": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_config_loader/py/yaml_config_loader_mixin_test.py"
+  ]
+}

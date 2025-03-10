@@ -1,0 +1,13 @@
+{
+  "dependencies": [
+
+  ],
+  "label": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_metric:metric_service_proto.python",
+  "nested_in_python_package": "",
+  "package": "pw_metric_proto",
+  "protoc_outputs": [
+    "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_metric/metric_service_proto.proto_library/python/pw_metric_proto/metric_service_pb2.py",
+    "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_metric/metric_service_proto.proto_library/python/pw_metric_proto/metric_service_pb2.pyi"
+  ],
+  "root": "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_metric/metric_service_proto.proto_library/python"
+}

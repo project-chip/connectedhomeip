@@ -1,0 +1,15 @@
+{
+  "gn_target_name": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/py:python_client_cpp_server_test.script",
+  "inputs": [
+
+  ],
+  "setup_sources": [
+
+  ],
+  "sources": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/py/tests/python_client_cpp_server_test.py"
+  ],
+  "tests": [
+
+  ]
+}

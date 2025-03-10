@@ -1,0 +1,15 @@
+defines =
+framework_dirs =
+include_dirs = -Igen/include
+cflags = -O0 -g2 -fno-common -ffunction-sections -fdata-sections -fno-exceptions -fno-unwind-tables -fno-asynchronous-unwind-tables -fPIC -Wall -Werror -Wextra -Wshadow -Wunreachable-code -Wvla -Wformat -Wformat-nonliteral -Wformat-security -Wundef -Wno-deprecated-declarations -Wno-missing-field-initializers -Wno-unknown-warning-option -Wno-unused-parameter -Wno-cast-function-type -Wno-psabi -Wno-maybe-uninitialized -fdiagnostics-color --sysroot=\~/openwrt/staging_dir/target-aarch64_cortex-a72_musl/usr -fno-strict-aliasing -I/home/chucuong/openwrt/staging_dir/target-aarch64_cortex-a72_musl/usr/include -Wno-unreachable-code -I\~/openwrt/staging_dir/target-aarch64_cortex-a72_musl/usr/usr/include/gio-unix-2.0 -I\~/openwrt/staging_dir/target-aarch64_cortex-a72_musl/usr/usr/include/glib-2.0 -I\~/openwrt/staging_dir/target-aarch64_cortex-a72_musl/usr/usr/lib/glib-2.0/include
+cflags_c = -std=gnu11
+target_output_name = openthread
+
+build obj/BUILD_DIR/gen/include/platform/Linux/dbus/openthread/openthread.introspect.c.o: cc gen/include/platform/Linux/dbus/openthread/introspect.c || obj/third_party/connectedhomeip/src/platform/Linux/dbus/openthread/openthread_gen.stamp
+  source_file_part = introspect.c
+  source_name_part = introspect
+
+build obj/third_party/connectedhomeip/src/platform/Linux/dbus/openthread/lib/openthread.a: alink obj/BUILD_DIR/gen/include/platform/Linux/dbus/openthread/openthread.introspect.c.o || obj/third_party/connectedhomeip/src/platform/Linux/dbus/openthread/openthread_gen.stamp
+  arflags =
+  output_extension = .a
+  output_dir = obj/third_party/connectedhomeip/src/platform/Linux/dbus/openthread/lib

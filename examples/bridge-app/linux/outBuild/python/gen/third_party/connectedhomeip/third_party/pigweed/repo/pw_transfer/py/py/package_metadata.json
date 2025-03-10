@@ -1,0 +1,25 @@
+{
+  "generate_setup": {
+    "metadata": {
+      "name": "pw_transfer",
+      "version": "0.1.0"
+    }
+  },
+  "gn_target_name": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_transfer/py:py",
+  "inputs": [
+
+  ],
+  "setup_sources": [
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_transfer/py/py.generated_python_package/pyproject.toml",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_transfer/py/py.generated_python_package/setup.cfg"
+  ],
+  "sources": [
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_transfer/py/py.generated_python_package/pw_transfer/__init__.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_transfer/py/py.generated_python_package/pw_transfer/chunk.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_transfer/py/py.generated_python_package/pw_transfer/client.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_transfer/py/py.generated_python_package/pw_transfer/transfer.py"
+  ],
+  "tests": [
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_transfer/py/py.generated_python_package/tests/transfer_test.py"
+  ]
+}

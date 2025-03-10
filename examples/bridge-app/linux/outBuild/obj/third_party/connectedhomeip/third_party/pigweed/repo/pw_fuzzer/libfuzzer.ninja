@@ -1,0 +1,7 @@
+defines =
+framework_dirs =
+include_dirs = -I../third_party/connectedhomeip/third_party/pigweed/repo/pw_fuzzer/public -I../third_party/connectedhomeip/third_party/pigweed/repo/pw_log/public
+target_output_name = libfuzzer
+
+
+build obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_fuzzer/libfuzzer.stamp: stamp || obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_log/pw_log.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_log/pw_log.facade.stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_log/config.stamp

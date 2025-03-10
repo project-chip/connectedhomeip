@@ -1,0 +1,7 @@
+defines =
+framework_dirs =
+include_dirs = -I../third_party/connectedhomeip/third_party/nlassert/repo/include
+target_output_name = verifymacros_no_logging
+
+
+build obj/third_party/connectedhomeip/src/lib/support/verifymacros_no_logging.stamp: stamp || obj/third_party/connectedhomeip/third_party/nlassert/nlassert.stamp

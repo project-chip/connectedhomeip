@@ -1,0 +1,12 @@
+{
+  "dependencies": [
+
+  ],
+  "label": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc_transport:test_protos.pwpb",
+  "nested_in_python_package": "",
+  "package": "pw_rpc_transport",
+  "protoc_outputs": [
+    "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc_transport/test_protos.proto_library/pwpb/pw_rpc_transport/internal/test.pwpb.h"
+  ],
+  "root": "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc_transport/test_protos.proto_library/pwpb"
+}

@@ -1,0 +1,7 @@
+defines =
+framework_dirs =
+include_dirs = -I../third_party/connectedhomeip/third_party/nlio/repo/include
+target_output_name = encoding
+
+
+build obj/third_party/connectedhomeip/src/lib/core/encoding.stamp: stamp || obj/third_party/connectedhomeip/third_party/nlio/nlio.stamp

@@ -1,0 +1,25 @@
+{
+  "generate_setup": {
+    "metadata": {
+      "name": "pw_snapshot",
+      "version": "0.0.1"
+    }
+  },
+  "gn_target_name": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_snapshot/py:pw_snapshot",
+  "inputs": [
+
+  ],
+  "setup_sources": [
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_snapshot/py/pw_snapshot.generated_python_package/pyproject.toml",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_snapshot/py/pw_snapshot.generated_python_package/setup.cfg"
+  ],
+  "sources": [
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_snapshot/py/pw_snapshot.generated_python_package/generate_example_snapshot.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_snapshot/py/pw_snapshot.generated_python_package/pw_snapshot/__init__.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_snapshot/py/pw_snapshot.generated_python_package/pw_snapshot/processor.py"
+  ],
+  "tests": [
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_snapshot/py/pw_snapshot.generated_python_package/metadata_test.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_snapshot/py/pw_snapshot.generated_python_package/processor_test.py"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "dependencies": [
+
+  ],
+  "label": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf_compiler:test_protos.pwpb_rpc",
+  "nested_in_python_package": "",
+  "package": "pw_protobuf_compiler_protos",
+  "protoc_outputs": [
+    "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf_compiler/test_protos.proto_library/pwpb_rpc/pw_protobuf_compiler_protos/nested/more_nesting/test.rpc.pwpb.h",
+    "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf_compiler/test_protos.proto_library/pwpb_rpc/pw_protobuf_compiler_protos/test.rpc.pwpb.h"
+  ],
+  "root": "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf_compiler/test_protos.proto_library/pwpb_rpc"
+}

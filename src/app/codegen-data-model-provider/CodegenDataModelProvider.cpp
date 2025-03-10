@@ -31,7 +31,6 @@
 #include <app/util/endpoint-config-api.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
-#include <protocols/interaction_model/StatusCode.h>
 
 // separated out for code-reuse
 #include <app/ember_coupling/EventPathValidity.mixin.h>
@@ -418,17 +417,6 @@ std::optional<DataModel::ActionReturnStatus> CodegenDataModelProvider::Invoke(co
                                                                               TLV::TLVReader & input_arguments,
                                                                               CommandHandler * handler)
 {
-    // As some CommandHandlerInterface commands are registered on wildcard interfaces,
-    // the valid endpoint/cluster check is done BEFORE attempting command handler interface handling
-    const EmberAfCluster * cluster = FindServerCluster(request.path);
-    if (cluster == nullptr)
-    {
-        // The path `endpoint/cluster` is not valid. Determine what failed: endpoint id or cluster id.
-        return TryFindEndpointIndex(request.path.mEndpointId).has_value()
-            ? Protocols::InteractionModel::Status::UnsupportedCluster
-            : Protocols::InteractionModel::Status::UnsupportedEndpoint;
-    }
-
     CommandHandlerInterface * handler_interface =
         CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(request.path.mEndpointId, request.path.mClusterId);
 
@@ -692,11 +680,6 @@ std::optional<DataModel::AttributeInfo> CodegenDataModelProvider::GetAttributeIn
 
 DataModel::CommandEntry CodegenDataModelProvider::FirstAcceptedCommand(const ConcreteClusterPath & path)
 {
-    // As some CommandHandlerInterface commands are registered on wildcard interfaces,
-    // the valid endpoint/cluster check is done BEFORE attempting command handler interface handling
-    const EmberAfCluster * cluster = FindServerCluster(path);
-    VerifyOrReturnValue(cluster != nullptr, DataModel::CommandEntry::kInvalid);
-
     auto handlerInterfaceValue = EnumeratorCommandFinder(&CommandHandlerInterface::EnumerateAcceptedCommands)
                                      .FindCommandEntry(EnumeratorCommandFinder::Operation::kFindFirst,
                                                        ConcreteCommandPath(path.mEndpointId, path.mClusterId, kInvalidCommandId));
@@ -706,6 +689,10 @@ DataModel::CommandEntry CodegenDataModelProvider::FirstAcceptedCommand(const Con
         return *handlerInterfaceValue;
     }
 
+    const EmberAfCluster * cluster = FindServerCluster(path);
+
+    VerifyOrReturnValue(cluster != nullptr, DataModel::CommandEntry::kInvalid);
+
     std::optional<CommandId> commandId = mAcceptedCommandsIterator.First(cluster->acceptedCommandList);
     VerifyOrReturnValue(commandId.has_value(), DataModel::CommandEntry::kInvalid);
 
@@ -714,11 +701,6 @@ DataModel::CommandEntry CodegenDataModelProvider::FirstAcceptedCommand(const Con
 
 DataModel::CommandEntry CodegenDataModelProvider::NextAcceptedCommand(const ConcreteCommandPath & before)
 {
-    // As some CommandHandlerInterface commands are registered on wildcard interfaces,
-    // the valid endpoint/cluster check is done BEFORE attempting command handler interface handling
-    const EmberAfCluster * cluster = FindServerCluster(before);
-    VerifyOrReturnValue(cluster != nullptr, DataModel::CommandEntry::kInvalid);
-
     // TODO: `Next` redirecting to a callback is slow O(n^2).
     //       see https://github.com/project-chip/connectedhomeip/issues/35790
     auto handlerInterfaceValue = EnumeratorCommandFinder(&CommandHandlerInterface::EnumerateAcceptedCommands)
@@ -729,6 +711,10 @@ DataModel::CommandEntry CodegenDataModelProvider::NextAcceptedCommand(const Conc
         return *handlerInterfaceValue;
     }
 
+    const EmberAfCluster * cluster = FindServerCluster(before);
+
+    VerifyOrReturnValue(cluster != nullptr, DataModel::CommandEntry::kInvalid);
+
     std::optional<CommandId> commandId = mAcceptedCommandsIterator.Next(cluster->acceptedCommandList, before.mCommandId);
     VerifyOrReturnValue(commandId.has_value(), DataModel::CommandEntry::kInvalid);
 
@@ -737,13 +723,6 @@ DataModel::CommandEntry CodegenDataModelProvider::NextAcceptedCommand(const Conc
 
 std::optional<DataModel::CommandInfo> CodegenDataModelProvider::GetAcceptedCommandInfo(const ConcreteCommandPath & path)
 {
-    // As some CommandHandlerInterface commands are registered on wildcard interfaces,
-    // the valid endpoint/cluster check is done BEFORE attemptiong command handler interface handling
-    const EmberAfCluster * cluster = FindServerCluster(path);
-
-    VerifyOrReturnValue(cluster != nullptr, std::nullopt);
-
-    // This is a valid endpoint/cluster, can use CommandHandlerInterface to check for it.
     auto handlerInterfaceValue = EnumeratorCommandFinder(&CommandHandlerInterface::EnumerateAcceptedCommands)
                                      .FindCommandEntry(EnumeratorCommandFinder::Operation::kFindExact, path);
 
@@ -752,18 +731,16 @@ std::optional<DataModel::CommandInfo> CodegenDataModelProvider::GetAcceptedComma
         return handlerInterfaceValue->IsValid() ? std::make_optional(handlerInterfaceValue->info) : std::nullopt;
     }
 
-    // CommandHandlerInterface did not handle it, so check within ember.
+    const EmberAfCluster * cluster = FindServerCluster(path);
+
+    VerifyOrReturnValue(cluster != nullptr, std::nullopt);
     VerifyOrReturnValue(mAcceptedCommandsIterator.Exists(cluster->acceptedCommandList, path.mCommandId), std::nullopt);
+
     return CommandEntryFrom(path, path.mCommandId).info;
 }
 
 ConcreteCommandPath CodegenDataModelProvider::FirstGeneratedCommand(const ConcreteClusterPath & path)
 {
-    // As some CommandHandlerInterface commands are registered on wildcard interfaces,
-    // the valid endpoint/cluster check is done BEFORE attempting command handler interface handling
-    const EmberAfCluster * cluster = FindServerCluster(path);
-    VerifyOrReturnValue(cluster != nullptr, kInvalidCommandPath);
-
     std::optional<CommandId> commandId =
         EnumeratorCommandFinder(&CommandHandlerInterface::EnumerateGeneratedCommands)
             .FindCommandId(EnumeratorCommandFinder::Operation::kFindFirst,
@@ -774,6 +751,9 @@ ConcreteCommandPath CodegenDataModelProvider::FirstGeneratedCommand(const Concre
                                                : ConcreteCommandPath(path.mEndpointId, path.mClusterId, *commandId);
     }
 
+    const EmberAfCluster * cluster = FindServerCluster(path);
+    VerifyOrReturnValue(cluster != nullptr, kInvalidCommandPath);
+
     commandId = mGeneratedCommandsIterator.First(cluster->generatedCommandList);
     VerifyOrReturnValue(commandId.has_value(), kInvalidCommandPath);
     return ConcreteCommandPath(path.mEndpointId, path.mClusterId, *commandId);
@@ -781,11 +761,6 @@ ConcreteCommandPath CodegenDataModelProvider::FirstGeneratedCommand(const Concre
 
 ConcreteCommandPath CodegenDataModelProvider::NextGeneratedCommand(const ConcreteCommandPath & before)
 {
-    // As some CommandHandlerInterface commands are registered on wildcard interfaces,
-    // the valid endpoint/cluster check is done BEFORE attempting command handler interface handling
-    const EmberAfCluster * cluster = FindServerCluster(before);
-    VerifyOrReturnValue(cluster != nullptr, kInvalidCommandPath);
-
     // TODO: `Next` redirecting to a callback is slow O(n^2).
     //       see https://github.com/project-chip/connectedhomeip/issues/35790
     auto nextId = EnumeratorCommandFinder(&CommandHandlerInterface::EnumerateGeneratedCommands)
@@ -796,6 +771,10 @@ ConcreteCommandPath CodegenDataModelProvider::NextGeneratedCommand(const Concret
         return (*nextId == kInvalidCommandId) ? kInvalidCommandPath
                                               : ConcreteCommandPath(before.mEndpointId, before.mClusterId, *nextId);
     }
+
+    const EmberAfCluster * cluster = FindServerCluster(before);
+
+    VerifyOrReturnValue(cluster != nullptr, kInvalidCommandPath);
 
     std::optional<CommandId> commandId = mGeneratedCommandsIterator.Next(cluster->generatedCommandList, before.mCommandId);
     VerifyOrReturnValue(commandId.has_value(), kInvalidCommandPath);

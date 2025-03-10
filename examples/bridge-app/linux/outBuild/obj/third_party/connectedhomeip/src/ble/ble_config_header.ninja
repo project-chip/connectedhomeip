@@ -1,0 +1,7 @@
+defines = -DCHIP_HAVE_CONFIG_H=1
+framework_dirs =
+include_dirs = -I../third_party/connectedhomeip/src/include -I../third_party/connectedhomeip/src -Igen/include -I../third_party/connectedhomeip/examples/bridge-app/bridge-common/include -I../third_party/connectedhomeip/config/standalone
+target_output_name = ble_config_header
+
+
+build obj/third_party/connectedhomeip/src/ble/ble_config_header.stamp: stamp || obj/third_party/connectedhomeip/src/system/system_config_header.stamp obj/third_party/connectedhomeip/src/ble/ble_buildconfig.stamp obj/third_party/connectedhomeip/src/platform/platform_buildconfig.stamp obj/third_party/connectedhomeip/src/system/system_buildconfig.stamp obj/third_party/connectedhomeip/src/app/icd/server/icd-server-config.stamp obj/third_party/connectedhomeip/src/app/icd/server/icd-server-buildconfig.stamp

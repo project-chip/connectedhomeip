@@ -1,0 +1,17 @@
+{
+  "gn_target_name": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_tls_client/py:py",
+  "inputs": [
+
+  ],
+  "setup_sources": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_tls_client/py/pyproject.toml",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_tls_client/py/setup.cfg"
+  ],
+  "sources": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_tls_client/py/pw_tls_client/__init__.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_tls_client/py/pw_tls_client/generate_test_data.py"
+  ],
+  "tests": [
+
+  ]
+}

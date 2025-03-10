@@ -1,0 +1,13 @@
+{
+  "dependencies": [
+    "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_tokenizer/proto.python.json"
+  ],
+  "label": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_tokenizer/py:test_proto.python",
+  "nested_in_python_package": "",
+  "package": "pw_tokenizer_tests",
+  "protoc_outputs": [
+    "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_tokenizer/py/test_proto.proto_library/python/pw_tokenizer_tests/detokenize_proto_test_pb2.py",
+    "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_tokenizer/py/test_proto.proto_library/python/pw_tokenizer_tests/detokenize_proto_test_pb2.pyi"
+  ],
+  "root": "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_tokenizer/py/test_proto.proto_library/python"
+}

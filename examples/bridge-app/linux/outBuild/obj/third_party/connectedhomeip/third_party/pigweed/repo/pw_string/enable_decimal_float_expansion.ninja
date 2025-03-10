@@ -1,0 +1,7 @@
+defines = -DPW_STRING_ENABLE_DECIMAL_FLOAT_EXPANSION=1
+framework_dirs =
+include_dirs =
+target_output_name = enable_decimal_float_expansion
+
+
+build obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_string/enable_decimal_float_expansion.stamp: stamp

@@ -1,0 +1,24 @@
+{
+  "generate_setup": {
+    "metadata": {
+      "name": "pw_trace_tokenized",
+      "version": "0.0.1"
+    }
+  },
+  "gn_target_name": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_trace_tokenized/py:py",
+  "inputs": [
+
+  ],
+  "setup_sources": [
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_trace_tokenized/py/py.generated_python_package/pyproject.toml",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_trace_tokenized/py/py.generated_python_package/setup.cfg"
+  ],
+  "sources": [
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_trace_tokenized/py/py.generated_python_package/pw_trace_tokenized/__init__.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_trace_tokenized/py/py.generated_python_package/pw_trace_tokenized/get_trace.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_trace_tokenized/py/py.generated_python_package/pw_trace_tokenized/trace_tokenized.py"
+  ],
+  "tests": [
+
+  ]
+}

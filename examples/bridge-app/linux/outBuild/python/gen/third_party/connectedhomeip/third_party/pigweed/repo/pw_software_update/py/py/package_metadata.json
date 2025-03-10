@@ -1,0 +1,48 @@
+{
+  "generate_setup": {
+    "metadata": {
+      "name": "pw_software_update",
+      "version": "0.0.1"
+    },
+    "options": {
+      "install_requires": [
+        "cryptography",
+        "google-cloud-storage"
+      ],
+      "tests_require": [
+        "cryptography",
+        "google-cloud-storage"
+      ]
+    }
+  },
+  "gn_target_name": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_software_update/py:py",
+  "inputs": [
+
+  ],
+  "setup_sources": [
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_software_update/py/py.generated_python_package/pyproject.toml",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_software_update/py/py.generated_python_package/setup.cfg"
+  ],
+  "sources": [
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_software_update/py/py.generated_python_package/pw_software_update/__init__.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_software_update/py/py.generated_python_package/pw_software_update/cli.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_software_update/py/py.generated_python_package/pw_software_update/dev_sign.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_software_update/py/py.generated_python_package/pw_software_update/generate_test_bundle.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_software_update/py/py.generated_python_package/pw_software_update/keys.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_software_update/py/py.generated_python_package/pw_software_update/metadata.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_software_update/py/py.generated_python_package/pw_software_update/remote_sign.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_software_update/py/py.generated_python_package/pw_software_update/root_metadata.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_software_update/py/py.generated_python_package/pw_software_update/update_bundle.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_software_update/py/py.generated_python_package/pw_software_update/verify.py"
+  ],
+  "tests": [
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_software_update/py/py.generated_python_package/cli_test.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_software_update/py/py.generated_python_package/dev_sign_test.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_software_update/py/py.generated_python_package/keys_test.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_software_update/py/py.generated_python_package/metadata_test.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_software_update/py/py.generated_python_package/remote_sign_test.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_software_update/py/py.generated_python_package/root_metadata_test.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_software_update/py/py.generated_python_package/update_bundle_test.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_software_update/py/py.generated_python_package/verify_test.py"
+  ]
+}

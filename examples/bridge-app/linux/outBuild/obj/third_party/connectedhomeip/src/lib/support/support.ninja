@@ -1,0 +1,76 @@
+defines = -DCHIP_HAVE_CONFIG_H=1
+framework_dirs =
+include_dirs = -I../third_party/connectedhomeip/src/include -I../third_party/connectedhomeip/src -Igen/include -I../third_party/connectedhomeip/examples/bridge-app/bridge-common/include -I../third_party/connectedhomeip/config/standalone -I../third_party/connectedhomeip/third_party/nlassert/repo/include -I../third_party/connectedhomeip/third_party/nlio/repo/include -I../third_party/connectedhomeip/third_party/nlfaultinjection/include
+cflags = -Wconversion -O0 -g2 -fno-common -ffunction-sections -fdata-sections -fno-exceptions -fno-unwind-tables -fno-asynchronous-unwind-tables -fPIC -Wall -Werror -Wextra -Wshadow -Wunreachable-code -Wvla -Wformat -Wformat-nonliteral -Wformat-security -Wundef -Wno-deprecated-declarations -Wno-missing-field-initializers -Wno-unknown-warning-option -Wno-unused-parameter -Wno-cast-function-type -Wno-psabi -Wno-maybe-uninitialized -fdiagnostics-color --sysroot=\~/openwrt/staging_dir/target-aarch64_cortex-a72_musl/usr -fno-strict-aliasing -fmacro-prefix-map=../third_party/connectedhomeip/=
+cflags_cc = -std=gnu++17 -fno-rtti -Wnon-virtual-dtor
+target_output_name = libSupportLayer
+
+build obj/third_party/connectedhomeip/src/lib/support/support.inputdeps.stamp: stamp obj/third_party/connectedhomeip/src/app/icd/server/gen_icd-server-buildconfig.stamp obj/third_party/connectedhomeip/src/ble/gen_ble_buildconfig.stamp obj/third_party/connectedhomeip/src/inet/gen_inet_buildconfig.stamp obj/third_party/connectedhomeip/src/lib/core/gen_chip_buildconfig.stamp obj/third_party/connectedhomeip/src/lib/support/gen_chip_version.stamp obj/third_party/connectedhomeip/src/platform/gen_platform_buildconfig.stamp obj/third_party/connectedhomeip/src/system/gen_system_buildconfig.stamp
+build obj/third_party/connectedhomeip/src/lib/support/libSupportLayer.Base64.cpp.o: cxx ../third_party/connectedhomeip/src/lib/support/Base64.cpp || obj/third_party/connectedhomeip/src/lib/support/support.inputdeps.stamp
+  source_file_part = Base64.cpp
+  source_name_part = Base64
+build obj/third_party/connectedhomeip/src/lib/support/libSupportLayer.BufferReader.cpp.o: cxx ../third_party/connectedhomeip/src/lib/support/BufferReader.cpp || obj/third_party/connectedhomeip/src/lib/support/support.inputdeps.stamp
+  source_file_part = BufferReader.cpp
+  source_name_part = BufferReader
+build obj/third_party/connectedhomeip/src/lib/support/libSupportLayer.BufferWriter.cpp.o: cxx ../third_party/connectedhomeip/src/lib/support/BufferWriter.cpp || obj/third_party/connectedhomeip/src/lib/support/support.inputdeps.stamp
+  source_file_part = BufferWriter.cpp
+  source_name_part = BufferWriter
+build obj/third_party/connectedhomeip/src/lib/support/libSupportLayer.BytesCircularBuffer.cpp.o: cxx ../third_party/connectedhomeip/src/lib/support/BytesCircularBuffer.cpp || obj/third_party/connectedhomeip/src/lib/support/support.inputdeps.stamp
+  source_file_part = BytesCircularBuffer.cpp
+  source_name_part = BytesCircularBuffer
+build obj/third_party/connectedhomeip/src/lib/support/libSupportLayer.BytesToHex.cpp.o: cxx ../third_party/connectedhomeip/src/lib/support/BytesToHex.cpp || obj/third_party/connectedhomeip/src/lib/support/support.inputdeps.stamp
+  source_file_part = BytesToHex.cpp
+  source_name_part = BytesToHex
+build obj/third_party/connectedhomeip/src/lib/support/libSupportLayer.CHIPArgParser.cpp.o: cxx ../third_party/connectedhomeip/src/lib/support/CHIPArgParser.cpp || obj/third_party/connectedhomeip/src/lib/support/support.inputdeps.stamp
+  source_file_part = CHIPArgParser.cpp
+  source_name_part = CHIPArgParser
+build obj/third_party/connectedhomeip/src/lib/support/libSupportLayer.FibonacciUtils.cpp.o: cxx ../third_party/connectedhomeip/src/lib/support/FibonacciUtils.cpp || obj/third_party/connectedhomeip/src/lib/support/support.inputdeps.stamp
+  source_file_part = FibonacciUtils.cpp
+  source_name_part = FibonacciUtils
+build obj/third_party/connectedhomeip/src/lib/support/libSupportLayer.FixedBufferAllocator.cpp.o: cxx ../third_party/connectedhomeip/src/lib/support/FixedBufferAllocator.cpp || obj/third_party/connectedhomeip/src/lib/support/support.inputdeps.stamp
+  source_file_part = FixedBufferAllocator.cpp
+  source_name_part = FixedBufferAllocator
+build obj/third_party/connectedhomeip/src/lib/support/libSupportLayer.IniEscaping.cpp.o: cxx ../third_party/connectedhomeip/src/lib/support/IniEscaping.cpp || obj/third_party/connectedhomeip/src/lib/support/support.inputdeps.stamp
+  source_file_part = IniEscaping.cpp
+  source_name_part = IniEscaping
+build obj/third_party/connectedhomeip/src/lib/support/libSupportLayer.PersistentStorageAudit.cpp.o: cxx ../third_party/connectedhomeip/src/lib/support/PersistentStorageAudit.cpp || obj/third_party/connectedhomeip/src/lib/support/support.inputdeps.stamp
+  source_file_part = PersistentStorageAudit.cpp
+  source_name_part = PersistentStorageAudit
+build obj/third_party/connectedhomeip/src/lib/support/libSupportLayer.Pool.cpp.o: cxx ../third_party/connectedhomeip/src/lib/support/Pool.cpp || obj/third_party/connectedhomeip/src/lib/support/support.inputdeps.stamp
+  source_file_part = Pool.cpp
+  source_name_part = Pool
+build obj/third_party/connectedhomeip/src/lib/support/libSupportLayer.PrivateHeap.cpp.o: cxx ../third_party/connectedhomeip/src/lib/support/PrivateHeap.cpp || obj/third_party/connectedhomeip/src/lib/support/support.inputdeps.stamp
+  source_file_part = PrivateHeap.cpp
+  source_name_part = PrivateHeap
+build obj/third_party/connectedhomeip/src/lib/support/libSupportLayer.StringBuilder.cpp.o: cxx ../third_party/connectedhomeip/src/lib/support/StringBuilder.cpp || obj/third_party/connectedhomeip/src/lib/support/support.inputdeps.stamp
+  source_file_part = StringBuilder.cpp
+  source_name_part = StringBuilder
+build obj/third_party/connectedhomeip/src/lib/support/libSupportLayer.ThreadOperationalDataset.cpp.o: cxx ../third_party/connectedhomeip/src/lib/support/ThreadOperationalDataset.cpp || obj/third_party/connectedhomeip/src/lib/support/support.inputdeps.stamp
+  source_file_part = ThreadOperationalDataset.cpp
+  source_name_part = ThreadOperationalDataset
+build obj/third_party/connectedhomeip/src/lib/support/libSupportLayer.TimeUtils.cpp.o: cxx ../third_party/connectedhomeip/src/lib/support/TimeUtils.cpp || obj/third_party/connectedhomeip/src/lib/support/support.inputdeps.stamp
+  source_file_part = TimeUtils.cpp
+  source_name_part = TimeUtils
+build obj/third_party/connectedhomeip/src/lib/support/libSupportLayer.ZclString.cpp.o: cxx ../third_party/connectedhomeip/src/lib/support/ZclString.cpp || obj/third_party/connectedhomeip/src/lib/support/support.inputdeps.stamp
+  source_file_part = ZclString.cpp
+  source_name_part = ZclString
+build obj/third_party/connectedhomeip/src/lib/support/logging/libSupportLayer.BinaryLogging.cpp.o: cxx ../third_party/connectedhomeip/src/lib/support/logging/BinaryLogging.cpp || obj/third_party/connectedhomeip/src/lib/support/support.inputdeps.stamp
+  source_file_part = BinaryLogging.cpp
+  source_name_part = BinaryLogging
+build obj/third_party/connectedhomeip/src/lib/support/libSupportLayer.utf8.cpp.o: cxx ../third_party/connectedhomeip/src/lib/support/utf8.cpp || obj/third_party/connectedhomeip/src/lib/support/support.inputdeps.stamp
+  source_file_part = utf8.cpp
+  source_name_part = utf8
+build obj/third_party/connectedhomeip/src/lib/support/verhoeff/libSupportLayer.Verhoeff.cpp.o: cxx ../third_party/connectedhomeip/src/lib/support/verhoeff/Verhoeff.cpp || obj/third_party/connectedhomeip/src/lib/support/support.inputdeps.stamp
+  source_file_part = Verhoeff.cpp
+  source_name_part = Verhoeff
+build obj/third_party/connectedhomeip/src/lib/support/verhoeff/libSupportLayer.Verhoeff10.cpp.o: cxx ../third_party/connectedhomeip/src/lib/support/verhoeff/Verhoeff10.cpp || obj/third_party/connectedhomeip/src/lib/support/support.inputdeps.stamp
+  source_file_part = Verhoeff10.cpp
+  source_name_part = Verhoeff10
+build obj/third_party/connectedhomeip/src/lib/support/libSupportLayer.CHIPFaultInjection.cpp.o: cxx ../third_party/connectedhomeip/src/lib/support/CHIPFaultInjection.cpp || obj/third_party/connectedhomeip/src/lib/support/support.inputdeps.stamp
+  source_file_part = CHIPFaultInjection.cpp
+  source_name_part = CHIPFaultInjection
+
+build obj/third_party/connectedhomeip/src/lib/support/lib/libSupportLayer.a: alink obj/third_party/connectedhomeip/src/lib/support/libSupportLayer.Base64.cpp.o obj/third_party/connectedhomeip/src/lib/support/libSupportLayer.BufferReader.cpp.o obj/third_party/connectedhomeip/src/lib/support/libSupportLayer.BufferWriter.cpp.o obj/third_party/connectedhomeip/src/lib/support/libSupportLayer.BytesCircularBuffer.cpp.o obj/third_party/connectedhomeip/src/lib/support/libSupportLayer.BytesToHex.cpp.o obj/third_party/connectedhomeip/src/lib/support/libSupportLayer.CHIPArgParser.cpp.o obj/third_party/connectedhomeip/src/lib/support/libSupportLayer.FibonacciUtils.cpp.o obj/third_party/connectedhomeip/src/lib/support/libSupportLayer.FixedBufferAllocator.cpp.o obj/third_party/connectedhomeip/src/lib/support/libSupportLayer.IniEscaping.cpp.o obj/third_party/connectedhomeip/src/lib/support/libSupportLayer.PersistentStorageAudit.cpp.o obj/third_party/connectedhomeip/src/lib/support/libSupportLayer.Pool.cpp.o obj/third_party/connectedhomeip/src/lib/support/libSupportLayer.PrivateHeap.cpp.o obj/third_party/connectedhomeip/src/lib/support/libSupportLayer.StringBuilder.cpp.o obj/third_party/connectedhomeip/src/lib/support/libSupportLayer.ThreadOperationalDataset.cpp.o obj/third_party/connectedhomeip/src/lib/support/libSupportLayer.TimeUtils.cpp.o obj/third_party/connectedhomeip/src/lib/support/libSupportLayer.ZclString.cpp.o obj/third_party/connectedhomeip/src/lib/support/logging/libSupportLayer.BinaryLogging.cpp.o obj/third_party/connectedhomeip/src/lib/support/libSupportLayer.utf8.cpp.o obj/third_party/connectedhomeip/src/lib/support/verhoeff/libSupportLayer.Verhoeff.cpp.o obj/third_party/connectedhomeip/src/lib/support/verhoeff/libSupportLayer.Verhoeff10.cpp.o obj/third_party/connectedhomeip/src/lib/support/libSupportLayer.CHIPFaultInjection.cpp.o || obj/third_party/connectedhomeip/src/lib/support/attributes.stamp obj/third_party/connectedhomeip/src/lib/support/chip_version_header.stamp obj/third_party/connectedhomeip/src/lib/support/logging_constants.stamp obj/third_party/connectedhomeip/src/lib/support/memory.stamp obj/third_party/connectedhomeip/src/lib/support/safeint.stamp obj/third_party/connectedhomeip/src/lib/support/span.stamp obj/third_party/connectedhomeip/src/lib/support/text_only_logging.stamp obj/third_party/connectedhomeip/src/lib/support/type-traits.stamp obj/third_party/connectedhomeip/src/lib/support/verifymacros.stamp obj/third_party/connectedhomeip/src/lib/support/verifymacros_no_logging.stamp obj/third_party/connectedhomeip/src/lib/core/chip_config_header.stamp obj/third_party/connectedhomeip/src/lib/core/encoding.stamp obj/third_party/connectedhomeip/src/lib/core/error.stamp obj/third_party/connectedhomeip/src/lib/core/types.stamp obj/third_party/connectedhomeip/src/platform/platform_config_header.stamp obj/third_party/connectedhomeip/src/system/system_config_header.stamp obj/third_party/connectedhomeip/third_party/nlassert/nlassert.stamp obj/third_party/connectedhomeip/src/ble/ble_config_header.stamp obj/third_party/connectedhomeip/src/inet/inet_config_header.stamp lib/libnlfaultinjection.a obj/third_party/connectedhomeip/src/system/system_buildconfig.stamp obj/third_party/connectedhomeip/src/platform/platform_buildconfig.stamp obj/third_party/connectedhomeip/src/app/icd/server/icd-server-config.stamp obj/third_party/connectedhomeip/src/app/icd/server/icd-server-buildconfig.stamp obj/third_party/connectedhomeip/src/ble/ble_buildconfig.stamp obj/third_party/connectedhomeip/src/inet/inet_buildconfig.stamp obj/third_party/connectedhomeip/src/lib/core/chip_buildconfig.stamp obj/third_party/connectedhomeip/src/platform/logging/headers.stamp obj/third_party/connectedhomeip/third_party/nlio/nlio.stamp
+  arflags =
+  output_extension = .a
+  output_dir = obj/third_party/connectedhomeip/src/lib/support/lib

@@ -1,0 +1,7 @@
+defines = -DPW_STATUS_CFG_CHECK_IF_USED=1
+framework_dirs =
+include_dirs =
+target_output_name = check_if_used
+
+
+build obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_status/check_if_used.stamp: stamp

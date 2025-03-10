@@ -55,8 +55,14 @@ constexpr int kListenBacklogSize = 2;
 
 TCPBase::~TCPBase()
 {
-    // Call Close to free the listening socket and close all active connections.
-    Close();
+    if (mListenSocket != nullptr)
+    {
+        // endpoint is only non null if it is initialized and listening
+        mListenSocket->Free();
+        mListenSocket = nullptr;
+    }
+
+    CloseActiveConnections();
 }
 
 void TCPBase::CloseActiveConnections()
@@ -119,9 +125,6 @@ void TCPBase::Close()
         mListenSocket->Free();
         mListenSocket = nullptr;
     }
-
-    CloseActiveConnections();
-
     mState = TCPState::kNotReady;
 }
 

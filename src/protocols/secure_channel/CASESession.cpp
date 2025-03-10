@@ -428,20 +428,12 @@ void CASESession::Clear()
     mTCPConnCbCtxt.connClosedCb   = nullptr;
     mTCPConnCbCtxt.connReceivedCb = nullptr;
 
-    if (mPeerConnState)
+    if (mPeerConnState && mPeerConnState->mConnectionState != Transport::TCPState::kConnected)
     {
-        // Set the app state callback object in the Connection state to null
-        // to prevent any dangling pointer to memory(mTCPConnCbCtxt) owned
-        // by the CASESession object, that is now getting cleared.
-        mPeerConnState->mAppState = nullptr;
-
-        if (mPeerConnState->mConnectionState != Transport::TCPState::kConnected)
-        {
-            // Abort the connection if the CASESession is being destroyed and the
-            // connection is in the middle of being set up.
-            mSessionManager->TCPDisconnect(mPeerConnState, /* shouldAbort = */ true);
-            mPeerConnState = nullptr;
-        }
+        // Abort the connection if the CASESession is being destroyed and the
+        // connection is in the middle of being set up.
+        mSessionManager->TCPDisconnect(mPeerConnState, /* shouldAbort = */ true);
+        mPeerConnState = nullptr;
     }
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 }

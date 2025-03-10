@@ -1,0 +1,25 @@
+{
+  "generate_setup": {
+    "metadata": {
+      "name": "third_party_connectedhomeip_third_party_pigweed_repo_pw_rpc_test_protos",
+      "version": "0.0.1"
+    }
+  },
+  "gn_target_name": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc:test_protos.python",
+  "inputs": [
+
+  ],
+  "setup_sources": [
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/test_protos.python.generated_python_package/pyproject.toml",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/test_protos.python.generated_python_package/setup.cfg"
+  ],
+  "sources": [
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/test_protos.python.generated_python_package/pw_rpc_test_protos/no_package_pb2.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/test_protos.python.generated_python_package/pw_rpc_test_protos/no_package_pb2.pyi",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/test_protos.python.generated_python_package/pw_rpc_test_protos/test_pb2.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/test_protos.python.generated_python_package/pw_rpc_test_protos/test_pb2.pyi"
+  ],
+  "tests": [
+
+  ]
+}

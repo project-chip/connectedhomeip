@@ -1,0 +1,17 @@
+{
+  "gn_target_name": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_thread_freertos/py:py",
+  "inputs": [
+
+  ],
+  "setup_sources": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_thread_freertos/py/pyproject.toml",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_thread_freertos/py/setup.cfg"
+  ],
+  "sources": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_thread_freertos/py/pw_thread_freertos/__init__.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_thread_freertos/py/pw_thread_freertos/generate_freertos_tsktcb.py"
+  ],
+  "tests": [
+
+  ]
+}

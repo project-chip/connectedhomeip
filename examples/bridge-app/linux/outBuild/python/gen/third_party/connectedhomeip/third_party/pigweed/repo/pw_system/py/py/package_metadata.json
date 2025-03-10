@@ -1,0 +1,24 @@
+{
+  "gn_target_name": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_system/py:py",
+  "inputs": [
+
+  ],
+  "setup_sources": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_system/py/pyproject.toml",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_system/py/setup.cfg"
+  ],
+  "sources": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_system/py/pw_system/__init__.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_system/py/pw_system/console.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_system/py/pw_system/device.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_system/py/pw_system/device_connection.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_system/py/pw_system/device_sim.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_system/py/pw_system/device_tracing.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_system/py/pw_system/find_serial_port.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_system/py/pw_system/snapshot.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_system/py/pw_system/trace_client.py"
+  ],
+  "tests": [
+
+  ]
+}

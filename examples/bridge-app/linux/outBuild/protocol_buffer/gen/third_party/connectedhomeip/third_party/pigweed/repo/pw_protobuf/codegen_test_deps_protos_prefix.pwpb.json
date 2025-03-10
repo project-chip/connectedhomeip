@@ -1,0 +1,12 @@
+{
+  "dependencies": [
+
+  ],
+  "label": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf:codegen_test_deps_protos_prefix.pwpb",
+  "nested_in_python_package": "",
+  "package": "test_prefix",
+  "protoc_outputs": [
+    "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf/codegen_test_deps_protos_prefix.proto_library/pwpb/test_prefix/test_prefix_imported.pwpb.h"
+  ],
+  "root": "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf/codegen_test_deps_protos_prefix.proto_library/pwpb"
+}

@@ -343,7 +343,7 @@ CHIP_ERROR BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const C
 
 void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
 {
-    CloseConnection(conId);
+    // Nothing to do
 }
 
 CHIP_ERROR BLEManagerImpl::MapBLEError(int bleErr)

@@ -52,7 +52,7 @@
 #include "Rpc.h"
 #endif
 
-#include "DeviceWithDisplay.h"
+// #include "DeviceWithDisplay.h"
 
 #if CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
 #include <platform/ESP32/ESP32DeviceInfoProvider.h>
@@ -83,7 +83,7 @@ extern const char insights_auth_key_end[] asm("_binary_insights_auth_key_txt_end
 static const char TAG[] = "light-app";
 
 static AppDeviceCallbacks EchoCallbacks;
-static AppDeviceCallbacksDelegate sAppDeviceCallbacksDelegate;
+// static AppDeviceCallbacksDelegate sAppDeviceCallbacksDelegate;
 
 namespace {
 #if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
@@ -130,7 +130,7 @@ static void InitServer(intptr_t context)
     // Print QR Code URL
     PrintOnboardingCodes(chip::RendezvousInformationFlags(CONFIG_RENDEZVOUS_MODE));
 
-    DeviceCallbacksDelegate::Instance().SetAppDelegate(&sAppDeviceCallbacksDelegate);
+    // DeviceCallbacksDelegate::Instance().SetAppDelegate(&sAppDeviceCallbacksDelegate);
     Esp32AppServer::Init(); // Init ZCL Data Model and CHIP App Server AND Initialize device attestation config
 
 #if CONFIG_ENABLE_ESP_INSIGHTS_TRACE

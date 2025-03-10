@@ -117,6 +117,29 @@ Davis, CA 95616, USA
         <constraint type="desc"/>
       </field>
     </struct>
+    <struct name="Logical Scene Table">
+      <field id="0" name="SceneGroupID" type="group-id">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="SceneID" type="uint8">
+        <mandatoryConform/>
+        <constraint type="max" value="254"/>
+      </field>
+      <field id="2" name="SceneName" type="string">
+        <mandatoryConform>
+          <feature name="SN"/>
+        </mandatoryConform>
+        <constraint type="maxLength" value="16"/>
+      </field>
+      <field id="3" name="SceneTransitionTime" type="uint32" default="0">
+        <mandatoryConform/>
+        <constraint type="max" value="60000000"/>
+      </field>
+      <field id="4" name="ExtensionFields" type="list" default="empty">
+        <entry type="ExtensionFieldSetStruct"/>
+        <mandatoryConform/>
+      </field>
+    </struct>
     <struct name="SceneInfoStruct">
       <field id="0" name="SceneCount" type="uint8" default="0">
         <mandatoryConform/>
@@ -130,7 +153,7 @@ Davis, CA 95616, USA
         <access fabricSensitive="true"/>
         <mandatoryConform/>
       </field>
-      <field id="3" name="SceneValid" type="bool" default="false">
+      <field id="3" name="SceneValid" type="bool" default="False">
         <access fabricSensitive="true"/>
         <mandatoryConform/>
       </field>
@@ -144,12 +167,12 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="LastConfiguredBy" type="node-id" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality nullable="true"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0001" name="SceneTableSize" type="uint16" default="16">
       <access read="true" readPrivilege="view"/>
-      <quality persistence="fixed"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
       <mandatoryConform/>
       <constraint type="desc"/>
     </attribute>
@@ -338,12 +361,6 @@ Davis, CA 95616, USA
       </field>
       <field id="3" name="SceneList" type="list">
         <entry type="uint8"/>
-        <mandatoryConform>
-          <equalTerm>
-            <field name="Status"/>
-            <condition name="Success"/>
-          </equalTerm>
-        </mandatoryConform>
       </field>
     </command>
     <command id="0x40" name="CopyScene" direction="commandToServer" response="CopySceneResponse">

@@ -1,0 +1,15 @@
+{
+  "gn_target_name": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_transfer:integration_test_proxy",
+  "inputs": [
+
+  ],
+  "setup_sources": [
+
+  ],
+  "sources": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_transfer/integration_test/proxy.py"
+  ],
+  "tests": [
+
+  ]
+}

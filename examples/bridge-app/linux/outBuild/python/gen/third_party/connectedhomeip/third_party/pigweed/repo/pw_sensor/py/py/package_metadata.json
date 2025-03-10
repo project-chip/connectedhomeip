@@ -1,0 +1,21 @@
+{
+  "gn_target_name": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_sensor/py:py",
+  "inputs": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_sensor/py/pw_sensor/dependency_schema.json",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_sensor/py/pw_sensor/metadata_schema.json",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_sensor/py/pw_sensor/resolved_schema.json"
+  ],
+  "setup_sources": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_sensor/py/pyproject.toml",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_sensor/py/setup.cfg"
+  ],
+  "sources": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_sensor/py/pw_sensor/__init__.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_sensor/py/pw_sensor/constants_generator.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_sensor/py/pw_sensor/sensor_desc.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_sensor/py/pw_sensor/validator.py"
+  ],
+  "tests": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_sensor/py/validator_test.py"
+  ]
+}

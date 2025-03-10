@@ -36,6 +36,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 #include <tracing/macros.h>
+#include <iostream>
 
 #ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
 #include <app/clusters/scenes-server/scenes-server.h>
@@ -909,8 +910,16 @@ static Status moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8
 
     state->commandId = commandId;
 
+    state->maxLevel = 100;
+    state->minLevel = 0;
+
     // Move To Level commands cause the device to move from its current level to
     // the specified level at the specified rate.
+    std::cout << "Move to level from " << (int)currentLevel.Value() << " to " << (int)level << std::endl;
+    std::cout << "Max level: " << (int)(state->maxLevel) << std::endl;
+    std::cout << "Min level: " << (int)(state->minLevel) << std::endl;
+    std::cout << "level: " << (int)(level) << std::endl;
+
     if (state->maxLevel <= level)
     {
         state->moveToLevel = state->maxLevel;

@@ -1,0 +1,16 @@
+defines = -DCHIP_HAVE_CONFIG_H=1
+framework_dirs =
+include_dirs = -I../third_party/connectedhomeip/src/include -I../third_party/connectedhomeip/src -Igen/include -I../third_party/connectedhomeip/examples/bridge-app/bridge-common/include -I../third_party/connectedhomeip/config/standalone
+cflags = -O0 -g2 -fno-common -ffunction-sections -fdata-sections -fno-exceptions -fno-unwind-tables -fno-asynchronous-unwind-tables -fPIC -Wall -Werror -Wextra -Wshadow -Wunreachable-code -Wvla -Wformat -Wformat-nonliteral -Wformat-security -Wundef -Wno-deprecated-declarations -Wno-missing-field-initializers -Wno-unknown-warning-option -Wno-unused-parameter -Wno-cast-function-type -Wno-psabi -Wno-maybe-uninitialized -fdiagnostics-color --sysroot=\~/openwrt/staging_dir/target-aarch64_cortex-a72_musl/usr -fno-strict-aliasing -fmacro-prefix-map=../third_party/connectedhomeip/=
+cflags_cc = -std=gnu++17 -fno-rtti -Wnon-virtual-dtor
+target_output_name = error
+
+build obj/third_party/connectedhomeip/src/lib/core/error.inputdeps.stamp: stamp obj/third_party/connectedhomeip/src/app/icd/server/gen_icd-server-buildconfig.stamp obj/third_party/connectedhomeip/src/ble/gen_ble_buildconfig.stamp obj/third_party/connectedhomeip/src/inet/gen_inet_buildconfig.stamp obj/third_party/connectedhomeip/src/lib/core/gen_chip_buildconfig.stamp obj/third_party/connectedhomeip/src/platform/gen_platform_buildconfig.stamp obj/third_party/connectedhomeip/src/system/gen_system_buildconfig.stamp
+build obj/third_party/connectedhomeip/src/lib/core/error.CHIPError.cpp.o: cxx ../third_party/connectedhomeip/src/lib/core/CHIPError.cpp || obj/third_party/connectedhomeip/src/lib/core/error.inputdeps.stamp
+  source_file_part = CHIPError.cpp
+  source_name_part = CHIPError
+build obj/third_party/connectedhomeip/src/lib/core/error.ErrorStr.cpp.o: cxx ../third_party/connectedhomeip/src/lib/core/ErrorStr.cpp || obj/third_party/connectedhomeip/src/lib/core/error.inputdeps.stamp
+  source_file_part = ErrorStr.cpp
+  source_name_part = ErrorStr
+
+build obj/third_party/connectedhomeip/src/lib/core/error.stamp: stamp obj/third_party/connectedhomeip/src/lib/core/error.CHIPError.cpp.o obj/third_party/connectedhomeip/src/lib/core/error.ErrorStr.cpp.o || obj/third_party/connectedhomeip/src/lib/core/chip_config_header.stamp obj/third_party/connectedhomeip/src/lib/support/attributes.stamp obj/third_party/connectedhomeip/src/lib/support/type-traits.stamp obj/third_party/connectedhomeip/src/ble/ble_config_header.stamp obj/third_party/connectedhomeip/src/system/system_config_header.stamp obj/third_party/connectedhomeip/src/system/system_buildconfig.stamp obj/third_party/connectedhomeip/src/platform/platform_buildconfig.stamp obj/third_party/connectedhomeip/src/app/icd/server/icd-server-config.stamp obj/third_party/connectedhomeip/src/app/icd/server/icd-server-buildconfig.stamp obj/third_party/connectedhomeip/src/ble/ble_buildconfig.stamp obj/third_party/connectedhomeip/src/inet/inet_config_header.stamp obj/third_party/connectedhomeip/src/inet/inet_buildconfig.stamp obj/third_party/connectedhomeip/src/lib/core/chip_buildconfig.stamp

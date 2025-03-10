@@ -1,0 +1,15 @@
+{
+  "gn_target_name": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_transfer:multi_transfer_test",
+  "inputs": [
+
+  ],
+  "setup_sources": [
+
+  ],
+  "sources": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_transfer/integration_test/multi_transfer_test.py"
+  ],
+  "tests": [
+
+  ]
+}

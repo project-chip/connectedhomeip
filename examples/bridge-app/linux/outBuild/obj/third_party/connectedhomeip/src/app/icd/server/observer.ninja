@@ -1,0 +1,7 @@
+defines =
+framework_dirs =
+include_dirs =
+target_output_name = observer
+
+
+build obj/third_party/connectedhomeip/src/app/icd/server/observer.stamp: stamp

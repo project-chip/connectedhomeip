@@ -1,0 +1,18 @@
+{
+  "gn_target_name": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_env_setup_zephyr/py:py",
+  "inputs": [
+
+  ],
+  "setup_sources": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_env_setup_zephyr/py/pyproject.toml",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_env_setup_zephyr/py/setup.cfg"
+  ],
+  "sources": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_env_setup_zephyr/py/pw_env_setup_zephyr/__init__.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_env_setup_zephyr/py/pw_env_setup_zephyr/argparser.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_env_setup_zephyr/py/pw_env_setup_zephyr/zephyr.py"
+  ],
+  "tests": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_env_setup_zephyr/py/manifest_test.py"
+  ]
+}

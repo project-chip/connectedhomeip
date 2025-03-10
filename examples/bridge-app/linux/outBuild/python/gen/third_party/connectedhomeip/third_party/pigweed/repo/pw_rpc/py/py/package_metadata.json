@@ -1,0 +1,58 @@
+{
+  "generate_setup": {
+    "metadata": {
+      "name": "pw_rpc",
+      "version": "0.0.1"
+    },
+    "options": {
+      "install_requires": [
+        "protobuf",
+        "pyserial"
+      ]
+    }
+  },
+  "gn_target_name": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/py:py",
+  "inputs": [
+
+  ],
+  "setup_sources": [
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/py/py.generated_python_package/pyproject.toml",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/py/py.generated_python_package/setup.cfg"
+  ],
+  "sources": [
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/py/py.generated_python_package/pw_rpc/__init__.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/py/py.generated_python_package/pw_rpc/callback_client/__init__.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/py/py.generated_python_package/pw_rpc/callback_client/call.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/py/py.generated_python_package/pw_rpc/callback_client/errors.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/py/py.generated_python_package/pw_rpc/callback_client/impl.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/py/py.generated_python_package/pw_rpc/client.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/py/py.generated_python_package/pw_rpc/client_utils.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/py/py.generated_python_package/pw_rpc/codegen.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/py/py.generated_python_package/pw_rpc/codegen_nanopb.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/py/py.generated_python_package/pw_rpc/codegen_pwpb.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/py/py.generated_python_package/pw_rpc/codegen_raw.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/py/py.generated_python_package/pw_rpc/console_tools/__init__.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/py/py.generated_python_package/pw_rpc/console_tools/console.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/py/py.generated_python_package/pw_rpc/console_tools/functions.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/py/py.generated_python_package/pw_rpc/console_tools/watchdog.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/py/py.generated_python_package/pw_rpc/descriptors.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/py/py.generated_python_package/pw_rpc/ids.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/py/py.generated_python_package/pw_rpc/lossy_channel.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/py/py.generated_python_package/pw_rpc/packets.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/py/py.generated_python_package/pw_rpc/plugin.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/py/py.generated_python_package/pw_rpc/plugin_nanopb.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/py/py.generated_python_package/pw_rpc/plugin_pwpb.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/py/py.generated_python_package/pw_rpc/plugin_raw.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/py/py.generated_python_package/pw_rpc/testing.py"
+  ],
+  "tests": [
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/py/py.generated_python_package/tests/callback_client_test.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/py/py.generated_python_package/tests/client_test.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/py/py.generated_python_package/tests/console_tools/console_tools_test.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/py/py.generated_python_package/tests/console_tools/functions_test.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/py/py.generated_python_package/tests/console_tools/watchdog_test.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/py/py.generated_python_package/tests/descriptors_test.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/py/py.generated_python_package/tests/ids_test.py",
+    "python/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/py/py.generated_python_package/tests/packets_test.py"
+  ]
+}

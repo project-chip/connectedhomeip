@@ -63,7 +63,7 @@ DIGEST_ALL_ALGORITHMS = hashlib.algorithms_available.intersection(
 
 # Buffer size used for file reads to ensure large files do not need to be loaded
 # into memory fully before processing.
-PAYLOAD_BUFFER_SIZE = 16 * 1024
+PAYLOAD_BUFFER_SIZE = 16 * 4096
 
 
 class HeaderTag(IntEnum):

@@ -1,0 +1,12 @@
+defines =
+framework_dirs =
+include_dirs =
+cflags = -O0 -g2 -fno-common -ffunction-sections -fdata-sections -fno-exceptions -fno-unwind-tables -fno-asynchronous-unwind-tables -fPIC -Wall -Werror -Wextra -Wshadow -Wunreachable-code -Wvla -Wformat -Wformat-nonliteral -Wformat-security -Wundef -Wno-deprecated-declarations -Wno-missing-field-initializers -Wno-unknown-warning-option -Wno-unused-parameter -Wno-cast-function-type -Wno-psabi -Wno-maybe-uninitialized -fdiagnostics-color --sysroot=\~/openwrt/staging_dir/target-aarch64_cortex-a72_musl/usr -fno-strict-aliasing
+cflags_c = -std=gnu11
+target_output_name = asan_default_options
+
+build obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_fuzzer/asan_default_options.asan_default_options.c.o: cc ../third_party/connectedhomeip/third_party/pigweed/repo/pw_fuzzer/asan_default_options.c
+  source_file_part = asan_default_options.c
+  source_name_part = asan_default_options
+
+build obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_fuzzer/asan_default_options.stamp: stamp obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_fuzzer/asan_default_options.asan_default_options.c.o

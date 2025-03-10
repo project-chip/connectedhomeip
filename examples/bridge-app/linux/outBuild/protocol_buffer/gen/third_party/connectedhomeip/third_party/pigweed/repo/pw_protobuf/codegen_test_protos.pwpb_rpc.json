@@ -1,0 +1,22 @@
+{
+  "dependencies": [
+    "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf/codegen_test_deps_protos.pwpb_rpc.json",
+    "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf/codegen_test_deps_protos_prefix.pwpb_rpc.json",
+    "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf/common_protos.pwpb_rpc.json"
+  ],
+  "label": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf:codegen_test_protos.pwpb_rpc",
+  "nested_in_python_package": "",
+  "package": "pw_protobuf_test_protos",
+  "protoc_outputs": [
+    "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf/codegen_test_protos.proto_library/pwpb_rpc/pw_protobuf_test_protos/edition.rpc.pwpb.h",
+    "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf/codegen_test_protos.proto_library/pwpb_rpc/pw_protobuf_test_protos/full_test.rpc.pwpb.h",
+    "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf/codegen_test_protos.proto_library/pwpb_rpc/pw_protobuf_test_protos/imported.rpc.pwpb.h",
+    "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf/codegen_test_protos.proto_library/pwpb_rpc/pw_protobuf_test_protos/importer.rpc.pwpb.h",
+    "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf/codegen_test_protos.proto_library/pwpb_rpc/pw_protobuf_test_protos/non_pw_package.rpc.pwpb.h",
+    "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf/codegen_test_protos.proto_library/pwpb_rpc/pw_protobuf_test_protos/optional.rpc.pwpb.h",
+    "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf/codegen_test_protos.proto_library/pwpb_rpc/pw_protobuf_test_protos/proto2.rpc.pwpb.h",
+    "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf/codegen_test_protos.proto_library/pwpb_rpc/pw_protobuf_test_protos/repeated.rpc.pwpb.h",
+    "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf/codegen_test_protos.proto_library/pwpb_rpc/pw_protobuf_test_protos/size_report.rpc.pwpb.h"
+  ],
+  "root": "protocol_buffer/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf/codegen_test_protos.proto_library/pwpb_rpc"
+}

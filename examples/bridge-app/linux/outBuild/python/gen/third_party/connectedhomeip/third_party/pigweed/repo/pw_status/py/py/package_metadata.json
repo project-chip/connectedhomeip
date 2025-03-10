@@ -1,0 +1,16 @@
+{
+  "gn_target_name": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_status/py:py",
+  "inputs": [
+
+  ],
+  "setup_sources": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_status/py/pyproject.toml",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_status/py/setup.cfg"
+  ],
+  "sources": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_status/py/pw_status/__init__.py"
+  ],
+  "tests": [
+
+  ]
+}

@@ -1,0 +1,7 @@
+defines =
+framework_dirs =
+include_dirs =
+target_output_name = crypto_buildconfig
+
+
+build obj/third_party/connectedhomeip/src/crypto/crypto_buildconfig.stamp: stamp || obj/third_party/connectedhomeip/src/crypto/gen_crypto_buildconfig.stamp

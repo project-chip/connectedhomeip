@@ -1,0 +1,7 @@
+defines =
+framework_dirs =
+include_dirs =
+target_output_name = system_buildconfig
+
+
+build obj/third_party/connectedhomeip/src/system/system_buildconfig.stamp: stamp || obj/third_party/connectedhomeip/src/system/gen_system_buildconfig.stamp

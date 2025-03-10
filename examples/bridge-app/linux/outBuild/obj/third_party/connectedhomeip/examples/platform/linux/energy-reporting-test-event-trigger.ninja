@@ -1,0 +1,7 @@
+defines =
+framework_dirs =
+include_dirs =
+target_output_name = energy-reporting-test-event-trigger
+
+
+build obj/third_party/connectedhomeip/examples/platform/linux/energy-reporting-test-event-trigger.stamp: stamp

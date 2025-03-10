@@ -1,0 +1,7 @@
+defines =
+framework_dirs =
+include_dirs =
+target_output_name = access_buildconfig
+
+
+build obj/third_party/connectedhomeip/src/access/access_buildconfig.stamp: stamp || obj/third_party/connectedhomeip/src/access/gen_access_buildconfig.stamp

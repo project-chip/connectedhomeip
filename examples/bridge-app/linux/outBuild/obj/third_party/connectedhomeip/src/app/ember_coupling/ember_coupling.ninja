@@ -1,0 +1,7 @@
+defines =
+framework_dirs =
+include_dirs =
+target_output_name = ember_coupling
+
+
+build obj/third_party/connectedhomeip/src/app/ember_coupling/ember_coupling.stamp: stamp

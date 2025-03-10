@@ -1,0 +1,7 @@
+defines = -DPW_PROTOBUF_CFG_MAX_VARINT_SIZE=1
+framework_dirs =
+include_dirs =
+target_output_name = varint_size_test_config
+
+
+build obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_protobuf/varint_size_test_config.stamp: stamp

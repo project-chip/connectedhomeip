@@ -56,7 +56,6 @@ public:
     void SetUpdateNocCommandInvoked() { mUpdateNocCommandHasBeenInvoked = true; }
     void SetAddTrustedRootCertInvoked() { mAddTrustedRootCertHasBeenInvoked = true; }
     void SetCsrRequestForUpdateNoc(bool isForUpdateNoc) { mIsCsrRequestForUpdateNoc = isForUpdateNoc; }
-    void SetUpdateTermsAndConditionsHasBeenInvoked() { mUpdateTermsAndConditionsHasBeenInvoked = true; }
 
     /**
      * @brief
@@ -92,7 +91,6 @@ public:
     bool UpdateNocCommandHasBeenInvoked() const { return mUpdateNocCommandHasBeenInvoked; }
     bool AddTrustedRootCertHasBeenInvoked() const { return mAddTrustedRootCertHasBeenInvoked; }
     bool IsCsrRequestForUpdateNoc() const { return mIsCsrRequestForUpdateNoc; }
-    bool UpdateTermsAndConditionsHasBeenInvoked() { return mUpdateTermsAndConditionsHasBeenInvoked; }
 
     FabricIndex GetFabricIndex() const
     {
@@ -111,9 +109,8 @@ private:
     bool mUpdateNocCommandHasBeenInvoked   = false;
     bool mAddTrustedRootCertHasBeenInvoked = false;
     // The fact of whether a CSR occurred at all is stored elsewhere.
-    bool mIsCsrRequestForUpdateNoc               = false;
-    FabricIndex mFabricIndex                     = kUndefinedFabricIndex;
-    bool mUpdateTermsAndConditionsHasBeenInvoked = false;
+    bool mIsCsrRequestForUpdateNoc = false;
+    FabricIndex mFabricIndex       = kUndefinedFabricIndex;
 
     /**
      * @brief
@@ -143,12 +140,11 @@ private:
     {
         SetFailSafeArmed(false);
 
-        mAddNocCommandHasBeenInvoked            = false;
-        mUpdateNocCommandHasBeenInvoked         = false;
-        mAddTrustedRootCertHasBeenInvoked       = false;
-        mFailSafeBusy                           = false;
-        mIsCsrRequestForUpdateNoc               = false;
-        mUpdateTermsAndConditionsHasBeenInvoked = false;
+        mAddNocCommandHasBeenInvoked      = false;
+        mUpdateNocCommandHasBeenInvoked   = false;
+        mAddTrustedRootCertHasBeenInvoked = false;
+        mFailSafeBusy                     = false;
+        mIsCsrRequestForUpdateNoc         = false;
     }
 
     void FailSafeTimerExpired();

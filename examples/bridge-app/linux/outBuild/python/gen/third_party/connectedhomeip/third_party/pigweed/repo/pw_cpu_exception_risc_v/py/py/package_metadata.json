@@ -1,0 +1,17 @@
+{
+  "gn_target_name": "//third_party/connectedhomeip/third_party/pigweed/repo/pw_cpu_exception_risc_v/py:py",
+  "inputs": [
+
+  ],
+  "setup_sources": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_cpu_exception_risc_v/py/pyproject.toml",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_cpu_exception_risc_v/py/setup.cfg"
+  ],
+  "sources": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_cpu_exception_risc_v/py/pw_cpu_exception_risc_v/__init__.py",
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_cpu_exception_risc_v/py/pw_cpu_exception_risc_v/exception_analyzer.py"
+  ],
+  "tests": [
+    "../third_party/connectedhomeip/third_party/pigweed/repo/pw_cpu_exception_risc_v/py/exception_analyzer_test.py"
+  ]
+}

@@ -1,0 +1,7 @@
+defines =
+framework_dirs =
+include_dirs =
+target_output_name = inet_buildconfig
+
+
+build obj/third_party/connectedhomeip/src/inet/inet_buildconfig.stamp: stamp || obj/third_party/connectedhomeip/src/inet/gen_inet_buildconfig.stamp

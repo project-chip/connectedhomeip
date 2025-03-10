@@ -1,0 +1,7 @@
+defines =
+framework_dirs =
+include_dirs = -I../third_party/connectedhomeip/third_party/pigweed/repo/pw_function/public
+target_output_name = scope_guard
+
+
+build obj/third_party/connectedhomeip/third_party/pigweed/repo/pw_function/scope_guard.stamp: stamp
