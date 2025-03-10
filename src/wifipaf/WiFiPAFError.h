@@ -234,3 +234,13 @@
 /**
  *  @}
  */
+// clang-format on
+
+namespace chip {
+namespace WiFiPAF {
+
+extern void RegisterLayerErrorFormatter();
+extern bool FormatLayerError(char * buf, uint16_t bufSize, CHIP_ERROR err);
+
+} /* namespace WiFiPAF */
+} /* namespace chip */
