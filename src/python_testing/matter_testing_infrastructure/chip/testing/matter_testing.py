@@ -44,6 +44,7 @@ from typing import Any, Iterable, List, Optional, Tuple
 import chip.testing.conversions as conversions
 import chip.testing.matchers as matchers
 import chip.testing.timeoperations as timeoperations
+import chip.testing.runner as runner
 from chip.tlv import uint
 
 # isort: off
@@ -69,17 +70,10 @@ from chip.setup_payload import SetupPayload
 from chip.storage import PersistentStorage
 from chip.testing.commissioning import CommissioningInfo, CustomCommissioningParameters, SetupPayloadInfo, commission_devices
 from chip.testing.global_attribute_ids import GlobalAttributeIds
+from chip.testing.runner import get_test_info, run_tests_no_exit, run_tests, TestStep, TestInfo, TestRunnerHooks
 from chip.testing.pics import read_pics_from_file
 from chip.tracing import TracingContext
 from mobly import asserts, base_test, signals, utils
-from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
-from mobly.test_runner import TestRunner
-
-try:
-    from matter_yamltests.hooks import TestRunnerHooks
-except ImportError:
-    class TestRunnerHooks:
-        pass
 
 
 # TODO: Add utility to commission a device if needed
@@ -498,51 +492,6 @@ class ClusterAttributeChangeAccumulator:
         return
 
 
-class InternalTestRunnerHooks(TestRunnerHooks):
-
-    def start(self, count: int):
-        logging.info(f'Starting test set, running {count} tests')
-
-    def stop(self, duration: int):
-        logging.info(f'Finished test set, ran for {duration}ms')
-
-    def test_start(self, filename: str, name: str, count: int, steps: list[str] = []):
-        logging.info(f'Starting test from {filename}: {name} - {count} steps')
-
-    def test_stop(self, exception: Exception, duration: int):
-        logging.info(f'Finished test in {duration}ms')
-
-    def step_skipped(self, name: str, expression: str):
-        # TODO: Do we really need the expression as a string? We can evaluate this in code very easily
-        logging.info(f'\t\t**** Skipping: {name}')
-
-    def step_start(self, name: str):
-        # The way I'm calling this, the name is already includes the step number, but it seems like it might be good to separate these
-        logging.info(f'\t\t***** Test Step {name}')
-
-    def step_success(self, logger, logs, duration: int, request):
-        pass
-
-    def step_failure(self, logger, logs, duration: int, request, received):
-        # TODO: there's supposed to be some kind of error message here, but I have no idea where it's meant to come from in this API
-        logging.info('\t\t***** Test Failure : ')
-
-    def step_unknown(self):
-        """
-        This method is called when the result of running a step is unknown. For example during a dry-run.
-        """
-        pass
-
-    def show_prompt(self,
-                    msg: str,
-                    placeholder: Optional[str] = None,
-                    default_value: Optional[str] = None) -> None:
-        pass
-
-    def test_skipped(self, filename: str, name: str):
-        logging.info(f"Skipping test from {filename}: {name}")
-
-
 @dataclass
 class MatterTestConfig:
     storage_path: pathlib.Path = pathlib.Path(".")
@@ -838,25 +787,6 @@ class MatterStackState:
     @property
     def stack(self) -> ChipStack:
         return builtins.chipStack
-
-
-@dataclass
-class TestStep:
-    test_plan_number: typing.Union[int, str]
-    description: str
-    expectation: str = ""
-    is_commissioning: bool = False
-
-    def __str__(self):
-        return f'{self.test_plan_number}: {self.description}\tExpected outcome: {self.expectation}'
-
-
-@dataclass
-class TestInfo:
-    function: str
-    desc: str
-    steps: list[TestStep]
-    pics: list[str]
 
 
 class MatterBaseTest(base_test.BaseTestClass):
@@ -1587,26 +1517,6 @@ class MatterBaseTest(base_test.BaseTestClass):
             return None
 
 
-def generate_mobly_test_config(matter_test_config: MatterTestConfig):
-    test_run_config = TestRunConfig()
-    # We use a default name. We don't use Mobly YAML configs, so that we can be
-    # freestanding without relying
-    test_run_config.testbed_name = "MatterTest"
-
-    log_path = matter_test_config.logs_path
-    log_path = _DEFAULT_LOG_PATH if log_path is None else log_path
-    if ENV_MOBLY_LOGPATH in os.environ:
-        log_path = os.environ[ENV_MOBLY_LOGPATH]
-
-    test_run_config.log_path = log_path
-    # TODO: For later, configure controllers
-    test_run_config.controller_configs = {}
-
-    test_run_config.user_params = matter_test_config.global_test_params
-
-    return test_run_config
-
-
 def _find_test_class():
     """Finds the test class in a test script.
     Walk through module members and find the subclass of MatterBaseTest. Only
@@ -2276,156 +2186,6 @@ class CommissionDeviceTest(MatterBaseTest):
             raise signals.TestAbortAll("Failed to commission node(s)")
 
 
-def default_matter_test_main():
-    """Execute the test class in a test module.
-    This is the default entry point for running a test script file directly.
-    In this case, only one test class in a test script is allowed.
-    To make your test script executable, add the following to your file:
-    .. code-block:: python
-      from chip.testing.matter_testing import default_matter_test_main
-      ...
-      if __name__ == '__main__':
-        default_matter_test_main()
-    """
-
-    matter_test_config = parse_matter_test_args()
-
-    # Find the test class in the test script.
-    test_class = _find_test_class()
-
-    hooks = InternalTestRunnerHooks()
-
-    run_tests(test_class, matter_test_config, hooks)
-
-
-def get_test_info(test_class: MatterBaseTest, matter_test_config: MatterTestConfig) -> list[TestInfo]:
-    test_config = generate_mobly_test_config(matter_test_config)
-    base = test_class(test_config)
-
-    if len(matter_test_config.tests) > 0:
-        tests = matter_test_config.tests
-    else:
-        tests = base.get_existing_test_names()
-
-    info = []
-    for t in tests:
-        info.append(TestInfo(t, steps=base.get_test_steps(t), desc=base.get_test_desc(t), pics=base.get_test_pics(t)))
-
-    return info
-
-
-def run_tests_no_exit(test_class: MatterBaseTest, matter_test_config: MatterTestConfig,
-                      event_loop: asyncio.AbstractEventLoop, hooks: TestRunnerHooks,
-                      default_controller=None, external_stack=None) -> bool:
-
-    # NOTE: It's not possible to pass event loop via Mobly TestRunConfig user params, because the
-    #       Mobly deep copies the user params before passing them to the test class and the event
-    #       loop is not serializable. So, we are setting the event loop as a test class member.
-    CommissionDeviceTest.event_loop = event_loop
-    test_class.event_loop = event_loop
-
-    get_test_info(test_class, matter_test_config)
-
-    # Load test config file.
-    test_config = generate_mobly_test_config(matter_test_config)
-
-    # Parse test specifiers if exist.
-    tests = None
-    if len(matter_test_config.tests) > 0:
-        tests = matter_test_config.tests
-
-    if external_stack:
-        stack = external_stack
-    else:
-        stack = MatterStackState(matter_test_config)
-
-    with TracingContext() as tracing_ctx:
-        for destination in matter_test_config.trace_to:
-            tracing_ctx.StartFromString(destination)
-
-        test_config.user_params["matter_stack"] = stash_globally(stack)
-
-        # TODO: Steer to right FabricAdmin!
-        # TODO: If CASE Admin Subject is a CAT tag range, then make sure to issue NOC with that CAT tag
-        if not default_controller:
-            default_controller = stack.certificate_authorities[0].adminList[0].NewController(
-                nodeId=matter_test_config.controller_node_id,
-                paaTrustStorePath=str(matter_test_config.paa_trust_store_path),
-                catTags=matter_test_config.controller_cat_tags,
-                dacRevocationSetPath=str(matter_test_config.dac_revocation_set_path),
-            )
-        test_config.user_params["default_controller"] = stash_globally(default_controller)
-
-        test_config.user_params["matter_test_config"] = stash_globally(matter_test_config)
-        test_config.user_params["hooks"] = stash_globally(hooks)
-
-        # Execute the test class with the config
-        ok = True
-
-        test_config.user_params["certificate_authority_manager"] = stash_globally(stack.certificate_authority_manager)
-
-        # Execute the test class with the config
-        ok = True
-
-        runner = TestRunner(log_dir=test_config.log_path,
-                            testbed_name=test_config.testbed_name)
-
-        with runner.mobly_logger():
-            if matter_test_config.commissioning_method is not None:
-                runner.add_test_class(test_config, CommissionDeviceTest, None)
-
-            # Add the tests selected unless we have a commission-only request
-            if not matter_test_config.commission_only:
-                runner.add_test_class(test_config, test_class, tests)
-
-            if hooks:
-                # Right now, we only support running a single test class at once,
-                # but it's relatively easy to expand that to make the test process faster
-                # TODO: support a list of tests
-                hooks.start(count=1)
-                # Mobly gives the test run time in seconds, lets be a bit more precise
-                runner_start_time = datetime.now(timezone.utc)
-
-            try:
-                runner.run()
-                ok = runner.results.is_all_pass and ok
-                if matter_test_config.fail_on_skipped_tests and runner.results.skipped:
-                    ok = False
-            except TimeoutError:
-                ok = False
-            except signals.TestAbortAll:
-                ok = False
-            except Exception:
-                logging.exception('Exception when executing %s.', test_config.testbed_name)
-                ok = False
-
-    if hooks:
-        duration = (datetime.now(timezone.utc) - runner_start_time) / timedelta(microseconds=1)
-        hooks.stop(duration=duration)
-
-    if not external_stack:
-        async def shutdown():
-            stack.Shutdown()
-        # Shutdown the stack when all done. Use the async runner to ensure that
-        # during the shutdown callbacks can use tha same async context which was used
-        # during the initialization.
-        event_loop.run_until_complete(shutdown())
-
-    if ok:
-        logging.info("Final result: PASS !")
-    else:
-        logging.error("Final result: FAIL !")
-    return ok
-
-
-def run_tests(test_class: MatterBaseTest, matter_test_config: MatterTestConfig,
-              hooks: TestRunnerHooks, default_controller=None, external_stack=None) -> None:
-    with asyncio.Runner() as runner:
-        if not run_tests_no_exit(test_class, matter_test_config, runner.get_loop(),
-                                 hooks, default_controller, external_stack):
-            sys.exit(1)
-
-
 # TODO(#37537): Remove these temporary aliases after transition period
 type_matches = matchers.is_type
 utc_time_in_matter_epoch = timeoperations.utc_time_in_matter_epoch
@@ -2437,3 +2197,5 @@ bytes_from_hex = conversions.bytes_from_hex
 hex_from_bytes = conversions.hex_from_bytes
 id_str = conversions.format_decimal_and_hex
 cluster_id_str = conversions.cluster_id_with_name
+
+default_matter_test_main = runner.default_matter_test_main
