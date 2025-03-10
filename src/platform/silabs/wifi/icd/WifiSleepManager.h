@@ -1,4 +1,3 @@
-
 /*
  *
  *    Copyright (c) 2024 Project CHIP Authors
@@ -19,6 +18,8 @@
 #pragma once
 
 #include <lib/core/CHIPError.h>
+#include <platform/silabs/wifi/WifiStateProvider.h>
+#include <platform/silabs/wifi/icd/PowerSaveInterface.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -49,10 +50,14 @@ public:
      *
      *        Triggers an initial VerifyAndTransitionToLowPowerMode to set the initial sleep mode.
      *
+     * @param[in] platformInterface PowerSaveInterface to configure the sleep modes
+     * @param[in] wifiStateProvider WifiStateProvider to provide the Wi-Fi state information
+     *
      * @return CHIP_ERROR CHIP_NO_ERROR if the device was transitionned to low power
+     *                    CHIP_ERROR_INVALID_ARGUMENT if the platformInterface or wifiStateProvider is nullptr
      *                    CHIP_ERROR_INTERNAL if an error occured
      */
-    CHIP_ERROR Init();
+    CHIP_ERROR Init(PowerSaveInterface * platformInterface, WifiStateProvider * wifiStateProvider);
 
     inline void HandleCommissioningSessionStarted()
     {
@@ -126,10 +131,42 @@ private:
      */
     CHIP_ERROR HandlePowerEvent(PowerEvent event);
 
+    /**
+     * @brief Configures the Wi-Fi chip to go to High Performance.
+     *        Function doesn't change the broad cast filter configuration.
+     *
+     * @return CHIP_ERROR CHIP_NO_ERROR if the configuration of the Wi-Fi chip was successful,
+     *                    CHIP_ERROR_UNINITIALIZED, if the Init function was not called before calling this function,
+     *                    otherwise CHIP_ERROR_INTERNAL
+     */
+    CHIP_ERROR ConfigureHighPerformance();
+
+    /**
+     * @brief Configures the Wi-Fi chip to go Deep Sleep.
+     *        Function doesn't change the state of the broadcast filter.
+     *
+     * @return CHIP_ERROR CHIP_NO_ERROR if the configuration of the Wi-Fi chip was successful,
+     *                    CHIP_ERROR_UNINITIALIZED, if the Init function was not called before calling this function,
+     *                    otherwise CHIP_ERROR_INTERNAL
+     */
+    CHIP_ERROR ConfigureDeepSleep();
+
+    /**
+     * @brief Configures the Wi-Fi Chip to go to DTIM based sleep.
+     *        Function sets the listen interval to be synced with the DTIM beacon and disables the broadcast filter.
+     *
+     * @return CHIP_ERROR CHIP_NO_ERROR if the configuration of the Wi-Fi chip was successful,
+     *                    CHIP_ERROR_UNINITIALIZED, if the Init function was not called before calling this function,
+     *                    otherwise CHIP_ERROR_INTERNAL
+     */
+    CHIP_ERROR ConfigureDTIMBasedSleep();
+
     static WifiSleepManager mInstance;
 
-    bool mIsCommissioningInProgress        = false;
-    uint8_t mHighPerformanceRequestCounter = 0;
+    PowerSaveInterface * mPowerSaveInterface = nullptr;
+    WifiStateProvider * mWifiStateProvider   = nullptr;
+    bool mIsCommissioningInProgress          = false;
+    uint8_t mHighPerformanceRequestCounter   = 0;
 };
 
 } // namespace Silabs

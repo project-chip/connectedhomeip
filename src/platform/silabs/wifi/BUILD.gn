@@ -100,6 +100,12 @@ config("wifi-platform-config") {
   }
 }
 
+source_set("wifi-state-provider") {
+  sources = [ "${silabs_platform_dir}/wifi/WifiStateProvider.h" ]
+
+  public_configs = [ ":wifi-platform-config" ]
+}
+
 source_set("wifi-platform") {
   sources = [
     "${silabs_platform_dir}/wifi/WifiInterface.cpp",
@@ -110,9 +116,11 @@ source_set("wifi-platform") {
   public_configs = [ ":wifi-platform-config" ]
 
   public_deps = [
+    ":wifi-state-provider",
     "${chip_root}/src/app/icd/server:icd-server-config",
     "${chip_root}/src/inet",
     "${chip_root}/src/lib/support",
+    "${silabs_platform_dir}/wifi/icd:power-save-interface",
   ]
 
   if (use_rs9116) {
@@ -153,14 +161,10 @@ source_set("wifi-platform") {
       "${silabs_platform_dir}/wifi/lwip-support/lwip_netif.h",
     ]
   }
-
-  # TODO: Once the WifiInterface refactor is done and becomes a class, we will inject an interface instead of having them in same source_set
   if (chip_enable_icd_server) {
-    public_deps += [ "${chip_root}/src/app/icd/server:configuration-data" ]
-
-    sources += [
-      "${silabs_platform_dir}/wifi/icd/WifiSleepManager.cpp",
-      "${silabs_platform_dir}/wifi/icd/WifiSleepManager.h",
+    public_deps += [
+      "${chip_root}/src/app/icd/server:configuration-data",
+      "${silabs_platform_dir}/wifi/icd:wifi-sleep-manager",
     ]
   }
 }

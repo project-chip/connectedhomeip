@@ -28,8 +28,8 @@
 #include <platform/silabs/wifi/WifiInterface.h>
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-#include <platform/silabs/wifi/icd/WifiSleepManager.h>
-#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+#include <platform/silabs/wifi/icd/WifiSleepManager.h> // nogncheck
+#endif                                                 // CHIP_CONFIG_ENABLE_ICD_SERVER
 
 // TODO: We shouldn't need any platform specific includes in this file
 #if (defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE == 1)
@@ -234,7 +234,8 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     ReturnErrorOnFailure(InitWiFi());
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    ReturnErrorOnFailure(DeviceLayer::Silabs::WifiSleepManager::GetInstance().Init());
+    ReturnErrorOnFailure(DeviceLayer::Silabs::WifiSleepManager::GetInstance().Init(
+        &DeviceLayer::Silabs::WifiInterface::GetInstance(), &DeviceLayer::Silabs::WifiInterface::GetInstance()));
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 #endif
 
