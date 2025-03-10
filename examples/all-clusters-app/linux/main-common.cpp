@@ -283,6 +283,7 @@ void ApplicationShutdown()
     Clusters::OvenMode::Shutdown();
     Clusters::OvenCavityOperationalState::Shutdown();
 
+    Clusters::MeterIdentification::Shutdown();
     Clusters::DeviceEnergyManagementMode::Shutdown();
     Clusters::EnergyEvseMode::Shutdown();
     Clusters::WaterHeaterMode::Shutdown();
