@@ -19,6 +19,7 @@ import argparse
 import os
 import sys
 from pathlib import Path
+
 from pics_generator_support import map_cluster_name_to_pics_xml, pics_xml_file_list_loader
 
 # Add the path to python_testing folder, in order to be able to import from matter_testing_support
