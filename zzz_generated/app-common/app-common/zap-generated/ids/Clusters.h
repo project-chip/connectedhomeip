@@ -412,6 +412,9 @@ static constexpr ClusterId Id = 0x00000801;
 namespace TlsClientManagement {
 static constexpr ClusterId Id = 0x00000802;
 } // namespace TlsClientManagement
+namespace MeterIdentification {
+static constexpr ClusterId Id = 0x00000B06;
+} // namespace MeterIdentification
 namespace UnitTesting {
 static constexpr ClusterId Id = 0xFFF1FC05;
 } // namespace UnitTesting

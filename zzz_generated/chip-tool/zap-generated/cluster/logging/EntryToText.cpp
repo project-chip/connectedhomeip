@@ -283,6 +283,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "TlsCertificateManagement";
     case chip::app::Clusters::TlsClientManagement::Id:
         return "TlsClientManagement";
+    case chip::app::Clusters::MeterIdentification::Id:
+        return "MeterIdentification";
     case chip::app::Clusters::UnitTesting::Id:
         return "UnitTesting";
     case chip::app::Clusters::FaultInjection::Id:
@@ -4510,6 +4512,33 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         case chip::app::Clusters::TlsClientManagement::Attributes::FeatureMap::Id:
             return "FeatureMap";
         case chip::app::Clusters::TlsClientManagement::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::MeterIdentification::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::MeterIdentification::Attributes::MeterType::Id:
+            return "MeterType";
+        case chip::app::Clusters::MeterIdentification::Attributes::PointOfDelivery::Id:
+            return "PointOfDelivery";
+        case chip::app::Clusters::MeterIdentification::Attributes::MeterSerialNumber::Id:
+            return "MeterSerialNumber";
+        case chip::app::Clusters::MeterIdentification::Attributes::ProtocolVersion::Id:
+            return "ProtocolVersion";
+        case chip::app::Clusters::MeterIdentification::Attributes::PowerThreshold::Id:
+            return "PowerThreshold";
+        case chip::app::Clusters::MeterIdentification::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::MeterIdentification::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::MeterIdentification::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::MeterIdentification::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::MeterIdentification::Attributes::ClusterRevision::Id:
             return "ClusterRevision";
         default:
             return "Unknown";

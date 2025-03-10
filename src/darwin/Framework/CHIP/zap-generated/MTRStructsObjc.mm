@@ -115,6 +115,39 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRDataTypePowerThresholdStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _powerThreshold = nil;
+
+        _apparentPowerThreshold = nil;
+
+        _powerThresholdSource = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDataTypePowerThresholdStruct alloc] init];
+
+    other.powerThreshold = self.powerThreshold;
+    other.apparentPowerThreshold = self.apparentPowerThreshold;
+    other.powerThresholdSource = self.powerThresholdSource;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: powerThreshold:%@; apparentPowerThreshold:%@; powerThresholdSource:%@; >", NSStringFromClass([self class]), _powerThreshold, _apparentPowerThreshold, _powerThresholdSource];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRDescriptorClusterDeviceTypeStruct
 - (instancetype)init
 {

@@ -7453,6 +7453,52 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace TlsClientManagement
 
+namespace MeterIdentification {
+namespace Attributes {
+
+namespace MeterType {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MeterType
+
+namespace PointOfDelivery {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace PointOfDelivery
+
+namespace MeterSerialNumber {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MeterSerialNumber
+
+namespace ProtocolVersion {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace ProtocolVersion
+
+namespace PowerThreshold {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace PowerThreshold
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace MeterIdentification
+
 namespace UnitTesting {
 namespace Attributes {
 

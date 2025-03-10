@@ -196,6 +196,12 @@ enum PositionTag : enum8 {
   kColumn = 6;
 }
 
+enum PowerThresholdSourceEnum : enum8 {
+  kContract = 0;
+  kRegulator = 1;
+  kEquipment = 2;
+}
+
 enum RelativePositionTag : enum8 {
   kUnder = 0;
   kNextTo = 1;
@@ -239,6 +245,12 @@ struct LocationDescriptorStruct {
 struct AtomicAttributeStatusStruct {
   attrib_id attributeID = 0;
   status statusCode = 1;
+}
+
+struct PowerThresholdStruct {
+  optional int64s powerThreshold = 0;
+  optional int64s apparentPowerThreshold = 1;
+  nullable PowerThresholdSourceEnum powerThresholdSource = 2;
 }
 
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
@@ -10752,6 +10764,33 @@ provisional cluster TlsClientManagement = 2050 {
   fabric command FindEndpoint(FindEndpointRequest): FindEndpointResponse = 2;
   /** This command SHALL be generated to request the Node remove any TLS Endpoint. */
   fabric command access(invoke: administer) RemoveEndpoint(RemoveEndpointRequest): DefaultSuccess = 4;
+}
+
+/** This Meter Identification Cluster provides attributes for determining advanced information about utility metering device. */
+provisional cluster MeterIdentification = 2822 {
+  revision 1;
+
+  enum MeterTypeEnum : enum8 {
+    kUtility = 0;
+    kPrivate = 1;
+    kGeneric = 2;
+  }
+
+  bitmap Feature : bitmap32 {
+    kPowerThreshold = 0x1;
+  }
+
+  readonly attribute nullable MeterTypeEnum meterType = 0;
+  readonly attribute nullable char_string<64> pointOfDelivery = 1;
+  readonly attribute nullable char_string<64> meterSerialNumber = 2;
+  readonly attribute optional nullable char_string<64> protocolVersion = 3;
+  readonly attribute optional nullable PowerThresholdStruct powerThreshold = 4;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
 }
 
 /** The Test Cluster is meant to validate the generated code */
