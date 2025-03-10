@@ -94,13 +94,13 @@ Please follow the steps below to generate an application image for OTA upgrades:
 
 1.  Generate a new RSA-3072 key pair or use an existing one.
 
-    - To generate a key pair, use the following command:
+    -   To generate a key pair, use the following command:
 
         ```
         openssl genrsa -out esp_image_encryption_key.pem 3072
         ```
 
-    - Extract the public key from the key pair:
+    -   Extract the public key from the key pair:
         ```
         openssl rsa -in esp_image_encryption_key.pem -pubout -out esp_image_encryption_public_key.pem
         ```
@@ -109,7 +109,7 @@ Please follow the steps below to generate an application image for OTA upgrades:
     [esp_enc_img_gen.py](https://github.com/espressif/idf-extra-components/blob/master/esp_encrypted_img/tools/esp_enc_img_gen.py)
     script.
 
-    - Use the following command to encrypt the OTA image with the public key:
+    -   Use the following command to encrypt the OTA image with the public key:
 
         ```
         python3 esp_enc_img_gen.py encrypt lighting-app.bin esp_image_encryption_public_key.pem lighting-app-encrypted.bin
