@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2024 Project CHIP Authors
+#    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,6 +21,7 @@
 #       --storage-path admin_storage.json
 #       --discriminator 1234
 #       --passcode 20202021
+# TODO: remove PICS from here and from test spec
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --int-arg: PIXIT.CNET.ENDPOINT_THREAD:0
 #       --commissioning-method ble-thread
@@ -39,7 +40,7 @@ from mobly import asserts
 from chip import ChipDeviceCtrl
 from matter_testing_infrastructure.chip.testing.matter_asserts import assert_valid_uint8
 
-logger = logging.getLogger('NetworkCommissioning')
+logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 # To be replaced with --thread-dataset-hex <DATASET_HEX> for the CLI
@@ -84,8 +85,9 @@ class TC_CNET_4_16(MatterBaseTest):
     def desc_TC_CNET_4_16(self):
         return '[TC-CNET-4.16] [Thread] NetworkIDNotFound value as LastNetworkingStatus argument validation [DUT-Server]'
 
-    def pics_TC_CNET_4_16(self):
-        return ['CNET.S']
+    # TODO: remove PICS from here and from test spec
+    # def pics_TC_CNET_4_16(self):
+    #     return ['CNET.S']
 
     # @run_if_endpoint_matches(has_feature(Clusters.NetworkCommissioning, Clusters.NetworkCommissioning.Bitmaps.Feature.kThreadNetworkInterface))
     @async_test_body
@@ -105,10 +107,11 @@ class TC_CNET_4_16(MatterBaseTest):
         # Commissioning is already done
         self.step("precondition")
 
+        # TODO: remove PICS from here and from test spec
         # Precondition 1: TH asses DUT supports CNET.S.F01(TH)
         # Precondition 2: DUT has a Network Commissioning cluster on endpoint PIXIT.CNET.ENDPOINT_THREAD with FeatureMap attribute of 2
         feature_map = await self.read_single_attribute_check_success(cluster=cnet, attribute=attr.FeatureMap)
-        if not (self.check_pics("CNET.S.F01") or (feature_map & cnet.Bitmaps.Feature.kThreadNetworkInterface)):
+        if not (feature_map & cnet.Bitmaps.Feature.kThreadNetworkInterface):
             logging.info('Device does not support Thread on endpoint, skipping remaining steps')
             self.skip_all_remaining_steps(1)
             return
@@ -117,7 +120,7 @@ class TC_CNET_4_16(MatterBaseTest):
 
         # Precondition 4: DUT is commissioned on PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET
         logger.info("Adding first test network")
-        req = Clusters.NetworkCommissioning.Commands.AddOrUpdateThreadNetwork(
+        req = cnet.Commands.AddOrUpdateThreadNetwork(
             operationalDataset=TEST_THREAD_NETWORK_DATASET_TLVS[0], breadcrumb=1)
         res = await commissioner.SendCommand(nodeid=TH1_nodeid, endpoint=endpoint, payload=req)
         logger.info(f"Received response: {res}")
@@ -126,9 +129,8 @@ class TC_CNET_4_16(MatterBaseTest):
         # Precondition 6: DUT MaxNetworks attribute value is at least 1 and is saved as 'MaxNetworksValue' for future use
         logger.info("Check MaxNetworkValue")
         maxNetworksValue = 0
-        if self.check_pics("CNET.S.A0000"):
-            res = await commissioner.ReadAttribute(nodeid=TH1_nodeid, attributes=[(endpoint, attr.MaxNetworks.value)], returnClusterObject=True)
-            maxNetworksValue = res[endpoint][cnet].maxNetworks
+        res = await commissioner.ReadAttribute(nodeid=TH1_nodeid, attributes=[(endpoint, attr.MaxNetworks.value)], returnClusterObject=True)
+        maxNetworksValue = res[endpoint][cnet].maxNetworks
         assert_valid_uint8(maxNetworksValue, "MaxNetworksValue range")
         asserts.assert_greater_equal(maxNetworksValue, 1, "MaxNetworksValue not greater or equal to 1")
 
@@ -150,29 +152,23 @@ class TC_CNET_4_16(MatterBaseTest):
         # which does not match the commissioned network, and Breadcrumb field set to 1
         self.step(2)
 
-        if self.check_pics("CNET.S.C04.Rsp"):
-            if self.check_pics("CNET.S.C05.Tx"):
-                logger.info("Check network list")
-                res = await commissioner.ReadAttribute(nodeid=TH1_nodeid, attributes=[(endpoint, cnet.Attributes.Networks)], returnClusterObject=True)
-                networkList = res[endpoint][cnet].networks
-                logger.info(f"Got network list: {networkList}")
-                if len(networkList) != 0:
-                    logger.info("Removing existing network with extended PAN ID of PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET")
-                    req = cnet.Commands.RemoveNetwork(networkID=PIXIT_CNET_THREAD_2ND_OPERATIONALDATASET, breadcrumb=1)
-                    res = await commissioner.SendCommand(nodeid=TH1_nodeid, endpoint=endpoint, payload=req)
-                    logger.info(f"Received response: {res}")
+        logger.info("Check network list")
+        res = await commissioner.ReadAttribute(nodeid=TH1_nodeid, attributes=[(endpoint, cnet.Attributes.Networks)], returnClusterObject=True)
+        networkList = res[endpoint][cnet].networks
+        logger.info(f"Got network list: {networkList}")
+        if len(networkList) != 0:
+            logger.info("Removing existing network with extended PAN ID of PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET")
+            req = cnet.Commands.RemoveNetwork(networkID=PIXIT_CNET_THREAD_2ND_OPERATIONALDATASET, breadcrumb=1)
+            res = await commissioner.SendCommand(nodeid=TH1_nodeid, endpoint=endpoint, payload=req)
+            logger.info(f"Received response: {res}")
 
-                    # Verify that DUT sends NetworkConfigResponse command to the TH1 with NetworkingStatus field set to NetworkIDNotFound
-                    asserts.assert_is_instance(res, cnet.Commands.NetworkConfigResponse.response_type)
-                    asserts.assert_equal(res.networkingStatus,
-                                         cnet.Enums.NetworkCommissioningStatusEnum.kNetworkIDNotFound,
-                                         f"Expected kNetworkIDNotFound but got: {res.networkingStatus}")    # LastNetworkingStatus?
-                else:
-                    asserts.fail(f"NetworkList is Empty")
-            else:
-                asserts.fail("DUT does not invoke/generate the NetworkConfigResponse command")
+            # Verify that DUT sends NetworkConfigResponse command to the TH1 with NetworkingStatus field set to NetworkIDNotFound
+            asserts.assert_is_instance(res, cnet.Commands.NetworkConfigResponse.response_type)
+            asserts.assert_equal(res.networkingStatus,
+                                 cnet.Enums.NetworkCommissioningStatusEnum.kNetworkIDNotFound,
+                                 f"Expected kNetworkIDNotFound but got: {res.networkingStatus}")    # LastNetworkingStatus?
         else:
-            asserts.fail("DUT does not implement receiving the RemoveNetwork command")
+            asserts.fail(f"NetworkList is Empty")
 
         # TH sends ConnectNetwork Command to the DUT with NetworkID value as the extended PAN ID of PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET,
         # which does not match the commissioned network, and Breadcrumb field set to 1
@@ -184,7 +180,7 @@ class TC_CNET_4_16(MatterBaseTest):
         req = cnet.Commands.ConnectNetwork(networkID=networkID, breadcrumb=1)
         interactionTimeoutMs = commissioner.ComputeRoundTripTimeout(nodeid=TH2_nodeid, upperLayerProcessingTimeoutMs=30000)
         res = await commissioner.SendCommand(nodeid=TH1_nodeid, endpoint=endpoint, payload=req, interactionTimeoutMs=interactionTimeoutMs)
-        logger.info(f"Got response: {res}")
+        logger.info(f"Received response: {res}")
 
         # Verify that DUT sends ConnectNetworkResponse command to the TH1 with NetworkingStatus field set to NetworkIDNotFound
         asserts.assert_is_instance(res, cnet.Commands.ConnectNetworkResponse.response_type)
