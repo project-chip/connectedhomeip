@@ -2427,7 +2427,7 @@ TEST_F(TestRead, TestSubscribe_SubGoAwayInserverOnActiveModeNotification)
 }
 
 /**
- * When all tracked subscriptions go away in server, check-in message is received and OnActiveModeNotification is called in client side, the 
+ * When all tracked subscriptions go away in server, check-in message is received and OnActiveModeNotification is called in client side, the
  * untracked subscription would be kept.
  */
 TEST_F(TestRead, TestSubscribe_MismatchedSubGoAwayInserverOnActiveModeNotification)
