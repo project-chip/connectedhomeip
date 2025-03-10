@@ -203,7 +203,8 @@ class TC_CNET_4_11(MatterBaseTest):
         self.step("precondition")
 
         # Precondition: TH reads FeatureMap attribute from the DUT and verifies if DUT supports WiFi on endpoint
-        feature_map = await self.read_single_attribute_check_success(cluster=cnet, attribute=cnet.Attributes.FeatureMap)
+        feature_map = await self.read_single_attribute_check_success(
+            cluster=cnet, attribute=cnet.Attributes.FeatureMap, dev_ctrl=commissioner, node_id=nodeid, endpoint=endpoint)
         if not (feature_map & cnet.Bitmaps.Feature.kWiFiNetworkInterface):
             logger.info('Device does not support WiFi on endpoint, skipping remaining steps')
             self.skip_all_remaining_steps(1)
@@ -237,7 +238,7 @@ class TC_CNET_4_11(MatterBaseTest):
             if network.networkID == PIXIT_CNET_WIFI_1ST_ACCESSPOINT_SSID:
                 userwifi_netidx = idx
                 break
-        asserts.assert_greater_equal(userwifi_netidx == 0, f"Expected idx to be greater or equal to 0, but got: {idx}")
+        asserts.assert_greater_equal(userwifi_netidx, 0, f"Expected idx to be greater or equal to 0, but got: {idx}")
 
         # TH sends RemoveNetwork Command to the DUT with NetworkID field set to PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID and Breadcrumb field set to 1
         self.step(4)
@@ -389,7 +390,7 @@ class TC_CNET_4_11(MatterBaseTest):
         # Verify that the breadcrumb value is set to 3
         res = await commissioner.ReadAttribute(nodeid=nodeid, attributes=[(endpoint, cgen.Attributes.Breadcrumb)], returnClusterObject=True)
         breadcrumb = res[0][cgen].breadcrumb
-        asserts.assert_equal(breadcrumb, 3, f"Expected breadcrumb to be 2, but got: {breadcrumb}")
+        asserts.assert_equal(breadcrumb, 3, f"Expected breadcrumb to be 3, but got: {breadcrumb}")
 
         # TH sends the CommissioningComplete command to the DUT
         self.step(21)
