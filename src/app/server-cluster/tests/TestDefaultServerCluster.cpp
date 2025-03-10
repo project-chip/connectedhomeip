@@ -14,16 +14,19 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "app/server-cluster/ServerClusterContext.h"
 #include <pw_unit_test/framework.h>
 
 #include <access/Privilege.h>
 #include <app-common/zap-generated/ids/Attributes.h>
+#include <app/ConcreteClusterPath.h>
 #include <app/data-model-provider/MetadataList.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/OperationTypes.h>
 #include <app/data-model-provider/tests/ReadTesting.h>
 #include <app/data-model-provider/tests/WriteTesting.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/StringBuilderAdapters.h>
@@ -33,6 +36,7 @@
 #include <optional>
 
 using namespace chip;
+using namespace chip::Test;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::DataModel;
@@ -44,9 +48,9 @@ namespace {
 class FakeDefaultServerCluster : public DefaultServerCluster
 {
 public:
-    FakeDefaultServerCluster(ClusterId id) : mClusterId(id) {}
+    FakeDefaultServerCluster(ConcreteClusterPath path) : mPath(path) {}
 
-    ClusterId GetClusterId() const override { return mClusterId; }
+    [[nodiscard]] ConcreteClusterPath GetPath() const override { return mPath; }
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override
@@ -62,16 +66,17 @@ public:
     }
 
     void TestIncreaseDataVersion() { IncreaseDataVersion(); }
+    void TestNotifyAttributeChanged(AttributeId attributeId) { NotifyAttributeChanged(attributeId); }
 
 private:
-    ClusterId mClusterId;
+    ConcreteClusterPath mPath;
 };
 
 } // namespace
 
 TEST(TestDefaultServerCluster, TestDataVersion)
 {
-    FakeDefaultServerCluster cluster(1);
+    FakeDefaultServerCluster cluster({ 1, 2 });
 
     DataVersion v1 = cluster.GetDataVersion();
     cluster.TestIncreaseDataVersion();
@@ -80,13 +85,22 @@ TEST(TestDefaultServerCluster, TestDataVersion)
 
 TEST(TestDefaultServerCluster, TestFlagsDefault)
 {
-    FakeDefaultServerCluster cluster(1);
+    FakeDefaultServerCluster cluster({ 1, 2 });
     ASSERT_EQ(cluster.GetClusterFlags().Raw(), 0u);
+}
+
+TEST(TestDefaultServerCluster, ListWriteNotification)
+{
+    FakeDefaultServerCluster cluster({ 1, 2 });
+
+    // this does not test anything really, except we get 100% coverage and we see that we do not crash
+    cluster.ListAttributeWriteNotification({ 1, 2, 3 }, DataModel::ListWriteOperation::kListWriteBegin);
+    cluster.ListAttributeWriteNotification({ 1, 2, 3 }, DataModel::ListWriteOperation::kListWriteFailure);
 }
 
 TEST(TestDefaultServerCluster, AttributesDefault)
 {
-    FakeDefaultServerCluster cluster(1);
+    FakeDefaultServerCluster cluster({ 1, 2 });
 
     DataModel::ListBuilder<AttributeEntry> attributes;
 
@@ -112,9 +126,20 @@ TEST(TestDefaultServerCluster, AttributesDefault)
     }
 }
 
+TEST(TestDefaultServerCluster, ListWriteIsANoop)
+{
+    FakeDefaultServerCluster cluster({ 1, 2 });
+
+    // this is really for coverage, we are not calling anything useful
+    cluster.ListAttributeWriteNotification({ 1 /* endpoint */, 2 /* cluster */, 3 /* attribute */ },
+                                           DataModel::ListWriteOperation::kListWriteBegin);
+    cluster.ListAttributeWriteNotification({ 1 /* endpoint */, 2 /* cluster */, 3 /* attribute */ },
+                                           DataModel::ListWriteOperation::kListWriteSuccess);
+}
+
 TEST(TestDefaultServerCluster, CommandsDefault)
 {
-    FakeDefaultServerCluster cluster(1);
+    FakeDefaultServerCluster cluster({ 1, 2 });
 
     DataModel::ListBuilder<AcceptedCommandEntry> acceptedCommands;
     ASSERT_EQ(cluster.AcceptedCommands({ 1, 1 }, acceptedCommands), CHIP_NO_ERROR);
@@ -127,7 +152,7 @@ TEST(TestDefaultServerCluster, CommandsDefault)
 
 TEST(TestDefaultServerCluster, WriteAttributeDefault)
 {
-    FakeDefaultServerCluster cluster(1);
+    FakeDefaultServerCluster cluster({ 1, 2 });
 
     WriteOperation test(0 /* endpoint */, 1 /* cluster */, 1234 /* attribute */);
     test.SetSubjectDescriptor(kAdminSubjectDescriptor);
@@ -140,7 +165,7 @@ TEST(TestDefaultServerCluster, WriteAttributeDefault)
 
 TEST(TestDefaultServerCluster, InvokeDefault)
 {
-    FakeDefaultServerCluster cluster(1);
+    FakeDefaultServerCluster cluster({ 1, 2 });
 
     TLV::TLVReader tlvReader;
     InvokeRequest request;
@@ -149,4 +174,28 @@ TEST(TestDefaultServerCluster, InvokeDefault)
 
     ASSERT_EQ(cluster.InvokeCommand(request, tlvReader, nullptr /* command handler, assumed unused here */),
               Status::UnsupportedCommand);
+}
+
+TEST(TestDefaultServerCluster, NotifyAttributeChanged)
+{
+    constexpr ClusterId kEndpointId = 321;
+    constexpr ClusterId kClusterId  = 1122;
+    FakeDefaultServerCluster cluster({ kEndpointId, kClusterId });
+
+    // When no ServerClusterContext is set, only the data version should change.
+    DataVersion oldVersion = cluster.GetDataVersion();
+
+    cluster.TestNotifyAttributeChanged(123);
+    ASSERT_NE(cluster.GetDataVersion(), oldVersion);
+
+    // Create a ServerClusterContext and verify that attribute change notifications are processed.
+    TestServerClusterContext context;
+    ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    oldVersion = cluster.GetDataVersion();
+    cluster.TestNotifyAttributeChanged(234);
+    ASSERT_NE(cluster.GetDataVersion(), oldVersion);
+
+    ASSERT_EQ(context.ChangeListener().DirtyList().size(), 1u);
+    ASSERT_EQ(context.ChangeListener().DirtyList()[0], AttributePathParams(kEndpointId, kClusterId, 234));
 }

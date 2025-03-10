@@ -362,7 +362,7 @@ void ApplicationInit()
 
 #ifdef MATTER_DM_PLUGIN_WINDOW_COVERING_SERVER
     ChipLogProgress(NotSpecified, "Initializing WindowCovering cluster delegate.");
-    InitChefWindowCoveringCluster();
+    ChefWindowCovering::InitChefWindowCoveringCluster();
 #endif // MATTER_DM_PLUGIN_WINDOW_COVERING_SERVER
 }
 

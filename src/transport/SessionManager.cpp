@@ -469,8 +469,8 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
 
         while (interfaceIt.Next())
         {
-            char name[chip::Inet::InterfaceId::kMaxIfNameLength];
-            interfaceIt.GetInterfaceName(name, chip::Inet::InterfaceId::kMaxIfNameLength);
+            char name[Inet::InterfaceId::kMaxIfNameLength];
+            interfaceIt.GetInterfaceName(name, Inet::InterfaceId::kMaxIfNameLength);
             if (interfaceIt.SupportsMulticast() && interfaceIt.IsUp())
             {
                 interfaceId = interfaceIt.GetInterfaceId();

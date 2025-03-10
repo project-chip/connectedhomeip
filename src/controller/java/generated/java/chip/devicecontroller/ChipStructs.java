@@ -16151,13 +16151,13 @@ public static class EcosystemInformationClusterLocationDescriptorStruct {
 }
 public static class TlsCertificateManagementClusterTLSCertStruct {
   public Integer caid;
-  public byte[] certificate;
+  public Optional<byte[]> certificate;
   private static final long CAID_ID = 0L;
   private static final long CERTIFICATE_ID = 1L;
 
   public TlsCertificateManagementClusterTLSCertStruct(
     Integer caid,
-    byte[] certificate
+    Optional<byte[]> certificate
   ) {
     this.caid = caid;
     this.certificate = certificate;
@@ -16166,7 +16166,7 @@ public static class TlsCertificateManagementClusterTLSCertStruct {
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(CAID_ID, new UIntType(caid)));
-    values.add(new StructElement(CERTIFICATE_ID, new ByteArrayType(certificate)));
+    values.add(new StructElement(CERTIFICATE_ID, certificate.<BaseTLVType>map((nonOptionalcertificate) -> new ByteArrayType(nonOptionalcertificate)).orElse(new EmptyType())));
 
     return new StructType(values);
   }
@@ -16176,7 +16176,7 @@ public static class TlsCertificateManagementClusterTLSCertStruct {
       return null;
     }
     Integer caid = null;
-    byte[] certificate = null;
+    Optional<byte[]> certificate = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == CAID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -16186,7 +16186,7 @@ public static class TlsCertificateManagementClusterTLSCertStruct {
       } else if (element.contextTagNum() == CERTIFICATE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
           ByteArrayType castingValue = element.value(ByteArrayType.class);
-          certificate = castingValue.value(byte[].class);
+          certificate = Optional.of(castingValue.value(byte[].class));
         }
       }
     }
@@ -16204,7 +16204,7 @@ public static class TlsCertificateManagementClusterTLSCertStruct {
     output.append(caid);
     output.append("\n");
     output.append("\tcertificate: ");
-    output.append(Arrays.toString(certificate));
+    output.append(certificate.isPresent() ? Arrays.toString(certificate.get()) : "");
     output.append("\n");
     output.append("}\n");
     return output.toString();
@@ -16212,16 +16212,16 @@ public static class TlsCertificateManagementClusterTLSCertStruct {
 }
 public static class TlsCertificateManagementClusterTLSClientCertificateDetailStruct {
   public Integer ccdid;
-  public byte[] clientCertificate;
-  public ArrayList<byte[]> intermediateCertificates;
+  public Optional<byte[]> clientCertificate;
+  public Optional<ArrayList<byte[]>> intermediateCertificates;
   private static final long CCDID_ID = 0L;
   private static final long CLIENT_CERTIFICATE_ID = 1L;
   private static final long INTERMEDIATE_CERTIFICATES_ID = 2L;
 
   public TlsCertificateManagementClusterTLSClientCertificateDetailStruct(
     Integer ccdid,
-    byte[] clientCertificate,
-    ArrayList<byte[]> intermediateCertificates
+    Optional<byte[]> clientCertificate,
+    Optional<ArrayList<byte[]>> intermediateCertificates
   ) {
     this.ccdid = ccdid;
     this.clientCertificate = clientCertificate;
@@ -16231,8 +16231,8 @@ public static class TlsCertificateManagementClusterTLSClientCertificateDetailStr
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(CCDID_ID, new UIntType(ccdid)));
-    values.add(new StructElement(CLIENT_CERTIFICATE_ID, new ByteArrayType(clientCertificate)));
-    values.add(new StructElement(INTERMEDIATE_CERTIFICATES_ID, ArrayType.generateArrayType(intermediateCertificates, (elementintermediateCertificates) -> new ByteArrayType(elementintermediateCertificates))));
+    values.add(new StructElement(CLIENT_CERTIFICATE_ID, clientCertificate.<BaseTLVType>map((nonOptionalclientCertificate) -> new ByteArrayType(nonOptionalclientCertificate)).orElse(new EmptyType())));
+    values.add(new StructElement(INTERMEDIATE_CERTIFICATES_ID, intermediateCertificates.<BaseTLVType>map((nonOptionalintermediateCertificates) -> ArrayType.generateArrayType(nonOptionalintermediateCertificates, (elementnonOptionalintermediateCertificates) -> new ByteArrayType(elementnonOptionalintermediateCertificates))).orElse(new EmptyType())));
 
     return new StructType(values);
   }
@@ -16242,8 +16242,8 @@ public static class TlsCertificateManagementClusterTLSClientCertificateDetailStr
       return null;
     }
     Integer ccdid = null;
-    byte[] clientCertificate = null;
-    ArrayList<byte[]> intermediateCertificates = null;
+    Optional<byte[]> clientCertificate = Optional.empty();
+    Optional<ArrayList<byte[]>> intermediateCertificates = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == CCDID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -16253,12 +16253,12 @@ public static class TlsCertificateManagementClusterTLSClientCertificateDetailStr
       } else if (element.contextTagNum() == CLIENT_CERTIFICATE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
           ByteArrayType castingValue = element.value(ByteArrayType.class);
-          clientCertificate = castingValue.value(byte[].class);
+          clientCertificate = Optional.of(castingValue.value(byte[].class));
         }
       } else if (element.contextTagNum() == INTERMEDIATE_CERTIFICATES_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Array) {
           ArrayType castingValue = element.value(ArrayType.class);
-          intermediateCertificates = castingValue.map((elementcastingValue) -> elementcastingValue.value(byte[].class));
+          intermediateCertificates = Optional.of(castingValue.map((elementcastingValue) -> elementcastingValue.value(byte[].class)));
         }
       }
     }
@@ -16277,10 +16277,131 @@ public static class TlsCertificateManagementClusterTLSClientCertificateDetailStr
     output.append(ccdid);
     output.append("\n");
     output.append("\tclientCertificate: ");
-    output.append(Arrays.toString(clientCertificate));
+    output.append(clientCertificate.isPresent() ? Arrays.toString(clientCertificate.get()) : "");
     output.append("\n");
     output.append("\tintermediateCertificates: ");
     output.append(intermediateCertificates);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class TlsClientManagementClusterTLSEndpointStruct {
+  public Integer endpointID;
+  public byte[] hostname;
+  public Integer port;
+  public Integer caid;
+  public @Nullable Integer ccdid;
+  public Integer status;
+  private static final long ENDPOINT_ID_ID = 0L;
+  private static final long HOSTNAME_ID = 1L;
+  private static final long PORT_ID = 2L;
+  private static final long CAID_ID = 3L;
+  private static final long CCDID_ID = 4L;
+  private static final long STATUS_ID = 5L;
+
+  public TlsClientManagementClusterTLSEndpointStruct(
+    Integer endpointID,
+    byte[] hostname,
+    Integer port,
+    Integer caid,
+    @Nullable Integer ccdid,
+    Integer status
+  ) {
+    this.endpointID = endpointID;
+    this.hostname = hostname;
+    this.port = port;
+    this.caid = caid;
+    this.ccdid = ccdid;
+    this.status = status;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(ENDPOINT_ID_ID, new UIntType(endpointID)));
+    values.add(new StructElement(HOSTNAME_ID, new ByteArrayType(hostname)));
+    values.add(new StructElement(PORT_ID, new UIntType(port)));
+    values.add(new StructElement(CAID_ID, new UIntType(caid)));
+    values.add(new StructElement(CCDID_ID, ccdid != null ? new UIntType(ccdid) : new NullType()));
+    values.add(new StructElement(STATUS_ID, new UIntType(status)));
+
+    return new StructType(values);
+  }
+
+  public static TlsClientManagementClusterTLSEndpointStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer endpointID = null;
+    byte[] hostname = null;
+    Integer port = null;
+    Integer caid = null;
+    @Nullable Integer ccdid = null;
+    Integer status = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == ENDPOINT_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          endpointID = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == HOSTNAME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          hostname = castingValue.value(byte[].class);
+        }
+      } else if (element.contextTagNum() == PORT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          port = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == CAID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          caid = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == CCDID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          ccdid = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == STATUS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          status = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new TlsClientManagementClusterTLSEndpointStruct(
+      endpointID,
+      hostname,
+      port,
+      caid,
+      ccdid,
+      status
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("TlsClientManagementClusterTLSEndpointStruct {\n");
+    output.append("\tendpointID: ");
+    output.append(endpointID);
+    output.append("\n");
+    output.append("\thostname: ");
+    output.append(Arrays.toString(hostname));
+    output.append("\n");
+    output.append("\tport: ");
+    output.append(port);
+    output.append("\n");
+    output.append("\tcaid: ");
+    output.append(caid);
+    output.append("\n");
+    output.append("\tccdid: ");
+    output.append(ccdid);
+    output.append("\n");
+    output.append("\tstatus: ");
+    output.append(status);
     output.append("\n");
     output.append("}\n");
     return output.toString();

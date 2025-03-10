@@ -942,8 +942,13 @@ CHIP_ERROR BLEManagerImpl::InitESPBleLayer(void)
     SuccessOrExit(err);
 #endif
 
+// For ESP-IDF 5.0.1 and below, nimble_port_init() returns void
+#if ESP_IDF_VERSION <= ESP_IDF_VERSION_VAL(5, 0, 1)
+    nimble_port_init();
+#else
     err = MapBLEError(nimble_port_init());
     SuccessOrExit(err);
+#endif
 
     /* Initialize the NimBLE host configuration. */
     ble_hs_cfg.reset_cb          = bleprph_on_reset;

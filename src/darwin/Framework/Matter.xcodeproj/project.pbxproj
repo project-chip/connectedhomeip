@@ -290,6 +290,10 @@
 		754784672BFE93B00089C372 /* MTRDeviceStorageBehaviorConfiguration.h in Headers */ = {isa = PBXBuildFile; fileRef = 754784632BFE65B70089C372 /* MTRDeviceStorageBehaviorConfiguration.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		754F3DF427FBB94B00E60580 /* MTREventTLVValueDecoder_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 754F3DF327FBB94B00E60580 /* MTREventTLVValueDecoder_Internal.h */; };
 		7560FD1C27FBBD3F005E85B3 /* MTREventTLVValueDecoder.mm in Sources */ = {isa = PBXBuildFile; fileRef = 7560FD1B27FBBD3F005E85B3 /* MTREventTLVValueDecoder.mm */; };
+		7567A2032D7A1FFF00D91529 /* ServerClusterInterfaceRegistry.h in Headers */ = {isa = PBXBuildFile; fileRef = 7567A2012D7A1FFF00D91529 /* ServerClusterInterfaceRegistry.h */; };
+		7567A2042D7A1FFF00D91529 /* ServerClusterInterfaceRegistry.h in Headers */ = {isa = PBXBuildFile; fileRef = 7567A2012D7A1FFF00D91529 /* ServerClusterInterfaceRegistry.h */; };
+		7567A2052D7A1FFF00D91529 /* ServerClusterInterfaceRegistry.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7567A2022D7A1FFF00D91529 /* ServerClusterInterfaceRegistry.cpp */; };
+		7567A2062D7A1FFF00D91529 /* ServerClusterInterfaceRegistry.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7567A2022D7A1FFF00D91529 /* ServerClusterInterfaceRegistry.cpp */; };
 		7592BCF32CBEE98C00EB74A0 /* Instance.h in Headers */ = {isa = PBXBuildFile; fileRef = 7592BCF12CBEE98C00EB74A0 /* Instance.h */; };
 		7592BCF42CBEE98C00EB74A0 /* EmberMetadata.h in Headers */ = {isa = PBXBuildFile; fileRef = 7592BCEF2CBEE98C00EB74A0 /* EmberMetadata.h */; };
 		7592BCF52CBEE98C00EB74A0 /* CodegenDataModelProvider.h in Headers */ = {isa = PBXBuildFile; fileRef = 7592BCEB2CBEE98C00EB74A0 /* CodegenDataModelProvider.h */; };
@@ -442,11 +446,11 @@
 		B4D67A3E2D00DAB700C49965 /* XPCServer.mm in Sources */ = {isa = PBXBuildFile; fileRef = B4D67A372D00DAB700C49965 /* XPCServer.mm */; };
 		B4D67A412D00DD3D00C49965 /* DFTKeypair.h in Headers */ = {isa = PBXBuildFile; fileRef = B4D67A3F2D00DD3D00C49965 /* DFTKeypair.h */; };
 		B4D67A422D00DD3D00C49965 /* DFTKeypair.mm in Sources */ = {isa = PBXBuildFile; fileRef = B4D67A402D00DD3D00C49965 /* DFTKeypair.mm */; };
+		B4D67A462D07021700C49965 /* XPCServerProtocols.h in Headers */ = {isa = PBXBuildFile; fileRef = B4D67A452D07021700C49965 /* XPCServerProtocols.h */; };
 		B4D67A922D527F4A00C49965 /* DCLClient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B4D67A8E2D527F4A00C49965 /* DCLClient.cpp */; };
 		B4D67A932D527F4A00C49965 /* DisplayTermsAndConditions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B4D67A8F2D527F4A00C49965 /* DisplayTermsAndConditions.cpp */; };
 		B4D67A952D527F4A00C49965 /* JsonSchemaMacros.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B4D67A912D527F4A00C49965 /* JsonSchemaMacros.cpp */; };
 		B4D67A9B2D538E9700C49965 /* HTTPSRequest.mm in Sources */ = {isa = PBXBuildFile; fileRef = B4D67A992D538E9700C49965 /* HTTPSRequest.mm */; };
-		B4D67A462D07021700C49965 /* XPCServerProtocols.h in Headers */ = {isa = PBXBuildFile; fileRef = B4D67A452D07021700C49965 /* XPCServerProtocols.h */; };
 		B4E262162AA0CF1C00DBA5BC /* RemoteDataModelLogger.mm in Sources */ = {isa = PBXBuildFile; fileRef = B4E262122AA0C7A300DBA5BC /* RemoteDataModelLogger.mm */; };
 		B4E262172AA0CF2000DBA5BC /* RemoteDataModelLogger.h in Headers */ = {isa = PBXBuildFile; fileRef = B4E262132AA0C7A300DBA5BC /* RemoteDataModelLogger.h */; };
 		B4E2621B2AA0D02000DBA5BC /* SleepCommand.mm in Sources */ = {isa = PBXBuildFile; fileRef = B4E262192AA0D01D00DBA5BC /* SleepCommand.mm */; };
@@ -862,6 +866,8 @@
 		754784662BFE6B890089C372 /* MTRDeviceStorageBehaviorConfiguration_Internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRDeviceStorageBehaviorConfiguration_Internal.h; sourceTree = "<group>"; };
 		754F3DF327FBB94B00E60580 /* MTREventTLVValueDecoder_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTREventTLVValueDecoder_Internal.h; sourceTree = "<group>"; };
 		7560FD1B27FBBD3F005E85B3 /* MTREventTLVValueDecoder.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTREventTLVValueDecoder.mm; sourceTree = "<group>"; };
+		7567A2012D7A1FFF00D91529 /* ServerClusterInterfaceRegistry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServerClusterInterfaceRegistry.h; sourceTree = "<group>"; };
+		7567A2022D7A1FFF00D91529 /* ServerClusterInterfaceRegistry.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ServerClusterInterfaceRegistry.cpp; sourceTree = "<group>"; };
 		7592BCEB2CBEE98C00EB74A0 /* CodegenDataModelProvider.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CodegenDataModelProvider.h; sourceTree = "<group>"; };
 		7592BCEC2CBEE98C00EB74A0 /* CodegenDataModelProvider.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CodegenDataModelProvider.cpp; sourceTree = "<group>"; };
 		7592BCED2CBEE98C00EB74A0 /* CodegenDataModelProvider_Read.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CodegenDataModelProvider_Read.cpp; sourceTree = "<group>"; };
@@ -1009,11 +1015,11 @@
 		B4D67A392D00DAB700C49965 /* XPCServerRegistry.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = XPCServerRegistry.mm; sourceTree = "<group>"; };
 		B4D67A3F2D00DD3D00C49965 /* DFTKeypair.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DFTKeypair.h; sourceTree = "<group>"; };
 		B4D67A402D00DD3D00C49965 /* DFTKeypair.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = DFTKeypair.mm; sourceTree = "<group>"; };
+		B4D67A452D07021700C49965 /* XPCServerProtocols.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XPCServerProtocols.h; sourceTree = "<group>"; };
 		B4D67A8E2D527F4A00C49965 /* DCLClient.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = DCLClient.cpp; path = commands/dcl/DCLClient.cpp; sourceTree = "<group>"; };
 		B4D67A8F2D527F4A00C49965 /* DisplayTermsAndConditions.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = DisplayTermsAndConditions.cpp; path = commands/dcl/DisplayTermsAndConditions.cpp; sourceTree = "<group>"; };
 		B4D67A912D527F4A00C49965 /* JsonSchemaMacros.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = JsonSchemaMacros.cpp; path = commands/dcl/JsonSchemaMacros.cpp; sourceTree = "<group>"; };
 		B4D67A992D538E9700C49965 /* HTTPSRequest.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = HTTPSRequest.mm; sourceTree = "<group>"; };
-		B4D67A452D07021700C49965 /* XPCServerProtocols.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XPCServerProtocols.h; sourceTree = "<group>"; };
 		B4E262122AA0C7A300DBA5BC /* RemoteDataModelLogger.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RemoteDataModelLogger.mm; sourceTree = "<group>"; };
 		B4E262132AA0C7A300DBA5BC /* RemoteDataModelLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RemoteDataModelLogger.h; sourceTree = "<group>"; };
 		B4E262192AA0D01D00DBA5BC /* SleepCommand.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = SleepCommand.mm; sourceTree = "<group>"; };
@@ -1514,6 +1520,8 @@
 		7521D2932CBECE3F00218E16 /* codegen-data-model-provider */ = {
 			isa = PBXGroup;
 			children = (
+				7567A2022D7A1FFF00D91529 /* ServerClusterInterfaceRegistry.cpp */,
+				7567A2012D7A1FFF00D91529 /* ServerClusterInterfaceRegistry.h */,
 				7592BD092CC6BCC300EB74A0 /* EmberAttributeDataBuffer.h */,
 				7592BD0A2CC6BCC300EB74A0 /* EmberAttributeDataBuffer.cpp */,
 				7592BCEB2CBEE98C00EB74A0 /* CodegenDataModelProvider.h */,
@@ -1892,14 +1900,6 @@
 			path = "../common/websocket-server";
 			sourceTree = "<group>";
 		};
-		B4D67A9A2D538E9700C49965 /* dcl */ = {
-			isa = PBXGroup;
-			children = (
-				B4D67A992D538E9700C49965 /* HTTPSRequest.mm */,
-			);
-			path = dcl;
-			sourceTree = "<group>";
-		};
 		B4D67A3A2D00DAB700C49965 /* xpc */ = {
 			isa = PBXGroup;
 			children = (
@@ -1910,6 +1910,14 @@
 				B4D67A392D00DAB700C49965 /* XPCServerRegistry.mm */,
 			);
 			path = xpc;
+			sourceTree = "<group>";
+		};
+		B4D67A9A2D538E9700C49965 /* dcl */ = {
+			isa = PBXGroup;
+			children = (
+				B4D67A992D538E9700C49965 /* HTTPSRequest.mm */,
+			);
+			path = dcl;
 			sourceTree = "<group>";
 		};
 		B4E262182AA0CFFE00DBA5BC /* delay */ = {
@@ -2010,6 +2018,7 @@
 				037C3DD32991BD5200B7EEE2 /* logging.h in Headers */,
 				037C3DB72991BD5000B7EEE2 /* ModelCommandBridge.h in Headers */,
 				B4D67A3B2D00DAB700C49965 /* XPCServerRegistry.h in Headers */,
+				7567A2042D7A1FFF00D91529 /* ServerClusterInterfaceRegistry.h in Headers */,
 				037C3DC52991BD5100B7EEE2 /* StorageManagementCommand.h in Headers */,
 				037C3DCC2991BD5100B7EEE2 /* MTRError_Utils.h in Headers */,
 				7592BD002CBEE98C00EB74A0 /* Instance.h in Headers */,
@@ -2096,6 +2105,7 @@
 				B2E0D7B2245B0B5C003C5B48 /* MTRManualSetupPayloadParser.h in Headers */,
 				5109E9C02CCAD64F0006884B /* MTRDeviceDataValidation.h in Headers */,
 				3CF134A7289D8ADA0017A19E /* MTRCSRInfo.h in Headers */,
+				7567A2032D7A1FFF00D91529 /* ServerClusterInterfaceRegistry.h in Headers */,
 				CF3B63D02CA31E71003C1C87 /* MTROTAUnsolicitedBDXMessageHandler.h in Headers */,
 				88E07D612B9A89A4005FD53E /* MTRMetricKeys.h in Headers */,
 				3D4733B32BE2D1DA003DC19B /* MTRUtilities.h in Headers */,
@@ -2417,6 +2427,7 @@
 				516411312B6BF70300E67C05 /* DataModelHandler.cpp in Sources */,
 				0382FA2C2992F06C00247BBB /* Commands.cpp in Sources */,
 				B4E2621E2AA0D02D00DBA5BC /* WaitForCommissioneeCommand.mm in Sources */,
+				7567A2062D7A1FFF00D91529 /* ServerClusterInterfaceRegistry.cpp in Sources */,
 				03F430A7299410C000166449 /* ExamplePersistentStorage.cpp in Sources */,
 				B45373AA2A9FE73400807602 /* WebSocketServer.cpp in Sources */,
 				B4E262162AA0CF1C00DBA5BC /* RemoteDataModelLogger.mm in Sources */,
@@ -2529,6 +2540,7 @@
 				514C79F02B62ADDA00DD6D7B /* descriptor.cpp in Sources */,
 				5109E9B42CB8B5DF0006884B /* MTRDeviceType.mm in Sources */,
 				3D843757294AD25A0070D20A /* MTRCertificateInfo.mm in Sources */,
+				7567A2052D7A1FFF00D91529 /* ServerClusterInterfaceRegistry.cpp in Sources */,
 				512E8E7A2D52F7B6009407E3 /* MTRCommandWithRequiredResponse.mm in Sources */,
 				3D9F2FCE2D112295003CA2BB /* MTRAttributeTLVValueDecoder_Internal.mm in Sources */,
 				5A7947E427C0129600434CF2 /* MTRDeviceController+XPC.mm in Sources */,
