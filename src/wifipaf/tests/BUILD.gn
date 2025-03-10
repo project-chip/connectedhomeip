@@ -14,34 +14,22 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("${chip_root}/src/platform/device.gni")
 
-if (chip_device_config_enable_wifipaf) {
-  static_library("wifipaf") {
-    output_name = "libWiFiPAFLayer"
+import("${chip_root}/build/chip/chip_test_suite.gni")
 
-    sources = [
-      "WiFiPAFConfig.h",
-      "WiFiPAFEndPoint.cpp",
-      "WiFiPAFEndPoint.h",
-      "WiFiPAFError.cpp",
-      "WiFiPAFError.h",
-      "WiFiPAFLayer.cpp",
-      "WiFiPAFLayer.h",
-      "WiFiPAFLayerDelegate.h",
-      "WiFiPAFRole.h",
-      "WiFiPAFTP.cpp",
-      "WiFiPAFTP.h",
-    ]
+chip_test_suite("tests") {
+  output_name = "libWiFiPAFLayerTests"
 
-    cflags = [ "-Wconversion" ]
+  test_sources = [
+    "TestWiFiPAFErrorStr.cpp",
+    "TestWiFiPAFLayer.cpp",
+  ]
 
-    public_deps = [
-      "${chip_root}/src/lib/core",
-      "${chip_root}/src/lib/support",
-    ]
-  }
-} else {
-  group("wifipaf") {
-  }
+  cflags = [ "-Wconversion" ]
+
+  public_deps = [
+    "${chip_root}/src/lib/core:string-builder-adapters",
+    "${chip_root}/src/platform",
+    "${chip_root}/src/wifipaf",
+  ]
 }
