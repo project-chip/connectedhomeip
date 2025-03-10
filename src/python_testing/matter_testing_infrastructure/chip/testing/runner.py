@@ -17,20 +17,21 @@
 
 import asyncio
 import importlib
-import sys
 import logging
-import typing
 import os
-from typing import Optional
-from pathlib import Path
-from unittest.mock import MagicMock
+import sys
+import typing
 from dataclasses import dataclass
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+from typing import Optional
+from unittest.mock import MagicMock
 
 from chip.clusters import Attribute
+from mobly import signals
 from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
 from mobly.test_runner import TestRunner
-from mobly import signals
+
 try:
     from matter_yamltests.hooks import TestRunnerHooks
 except ImportError:
@@ -50,6 +51,7 @@ except ImportError:
             pass
 
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from chip.testing.matter_testing import MatterTestConfig
 
@@ -152,7 +154,7 @@ def default_matter_test_main():
         default_matter_test_main()
     """
 
-    from chip.testing.matter_testing import parse_matter_test_args, _find_test_class
+    from chip.testing.matter_testing import _find_test_class, parse_matter_test_args
 
     matter_test_config = parse_matter_test_args()
 
@@ -184,10 +186,10 @@ def run_tests_no_exit(test_class, matter_test_config,
                       event_loop: asyncio.AbstractEventLoop, hooks: TestRunnerHooks,
                       default_controller=None, external_stack=None) -> bool:
 
-    from chip.testing.matter_testing import MatterStackState, stash_globally
-
     # Lazy import to avoid circular dependency
     from typing import TYPE_CHECKING
+
+    from chip.testing.matter_testing import MatterStackState, stash_globally
     if TYPE_CHECKING:
         from chip.testing.matter_testing import CommissionDeviceTest
     else:
@@ -315,7 +317,7 @@ class MockTestRunner():
     def __init__(self, abs_filename: str, classname: str, test: str, endpoint: int = None,
                  pics: dict[str, bool] = None, paa_trust_store_path=None):
 
-        from chip.testing.matter_testing import MatterTestConfig, MatterStackState
+        from chip.testing.matter_testing import MatterStackState, MatterTestConfig
 
         self.kvs_storage = 'kvs_admin.json'
         self.config = MatterTestConfig(endpoint=endpoint, paa_trust_store_path=paa_trust_store_path,

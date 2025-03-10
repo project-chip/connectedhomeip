@@ -43,8 +43,8 @@ from typing import Any, Iterable, List, Optional, Tuple
 
 import chip.testing.conversions as conversions
 import chip.testing.matchers as matchers
-import chip.testing.timeoperations as timeoperations
 import chip.testing.runner as runner
+import chip.testing.timeoperations as timeoperations
 from chip.tlv import uint
 
 # isort: off
@@ -70,11 +70,9 @@ from chip.setup_payload import SetupPayload
 from chip.storage import PersistentStorage
 from chip.testing.commissioning import CommissioningInfo, CustomCommissioningParameters, SetupPayloadInfo, commission_devices
 from chip.testing.global_attribute_ids import GlobalAttributeIds
-from chip.testing.runner import get_test_info, run_tests_no_exit, run_tests, TestStep, TestInfo, TestRunnerHooks
 from chip.testing.pics import read_pics_from_file
-from chip.tracing import TracingContext
+from chip.testing.runner import TestRunnerHooks, TestStep
 from mobly import asserts, base_test, signals, utils
-
 
 # TODO: Add utility to commission a device if needed
 # TODO: Add utilities to keep track of controllers/fabrics
@@ -895,7 +893,6 @@ class MatterBaseTest(base_test.BaseTestClass):
         import json
         command = json.dumps(command_dict)
 
-        import os
         dut_ip = os.getenv('LINUX_DUT_IP')
 
         if dut_ip is None:
