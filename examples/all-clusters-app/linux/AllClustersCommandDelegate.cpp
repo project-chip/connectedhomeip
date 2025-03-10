@@ -30,6 +30,7 @@
 #include <platform/PlatformManager.h>
 
 #include "ButtonEventsSimulator.h"
+#include "meter-identification-delegate.h"
 #include <air-quality-instance.h>
 #include <dishwasher-mode.h>
 #include <laundry-washer-mode.h>
@@ -491,6 +492,10 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
     {
         HandleSimulateLatchPosition(self->mJsonValue);
     }
+    else if (name == "MeterIdentification")
+    {
+        self->OnMeterIdentificationHandler(self->mJsonValue);
+    }
     else if (name == "SimulateSwitchIdle")
     {
         HandleSimulateSwitchIdle(self->mJsonValue);
@@ -856,6 +861,16 @@ void AllClustersAppCommandHandler::OnOvenOperationalStateChange(std::string devi
     {
         ChipLogDetail(NotSpecified, "Invalid operation : %s", operation.c_str());
         return;
+    }
+}
+
+void AllClustersAppCommandHandler::OnMeterIdentificationHandler(const Json::Value & param)
+{
+    MeterIdentification::MeterIdentificationDelegate * delegate = MeterIdentification::GetDelegate();
+    const CHIP_ERROR error = delegate->LoadJson(param);
+    if (CHIP_NO_ERROR != error)
+    {
+        ChipLogError(NotSpecified, "Error: %s in the JSON: %s", ErrorStr(error), param.toStyledString().c_str());
     }
 }
 
