@@ -34,6 +34,8 @@
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/DefaultStorageKeyAllocator.h>
+#include <lib/support/TestPersistentStorageDelegate.h>
 #include <platform/CHIPDeviceLayer.h>
 
 using namespace chip;
@@ -66,35 +68,93 @@ public:
 
 TEST_F(TestFailSafeContext, TestFailSafeContext_ArmFailSafe)
 {
+    chip::TestPersistentStorageDelegate testStorage;
     chip::app::FailSafeContext failSafeContext;
+
+    failSafeContext.Init({ &testStorage });
 
     EXPECT_EQ(failSafeContext.ArmFailSafe(kTestAccessingFabricIndex1, System::Clock::Seconds16(1)), CHIP_NO_ERROR);
     EXPECT_TRUE(failSafeContext.IsFailSafeArmed());
     EXPECT_EQ(failSafeContext.GetFabricIndex(), kTestAccessingFabricIndex1);
     EXPECT_TRUE(failSafeContext.IsFailSafeArmed(kTestAccessingFabricIndex1));
     EXPECT_FALSE(failSafeContext.IsFailSafeArmed(kTestAccessingFabricIndex2));
+    EXPECT_FALSE(testStorage.SyncDoesKeyExist(DefaultStorageKeyAllocator::FailSafeAddNOCStartedMarkerKey().KeyName()));
 
     failSafeContext.DisarmFailSafe();
     EXPECT_FALSE(failSafeContext.IsFailSafeArmed());
+    EXPECT_FALSE(testStorage.SyncDoesKeyExist(DefaultStorageKeyAllocator::FailSafeAddNOCStartedMarkerKey().KeyName()));
 }
 
-TEST_F(TestFailSafeContext, TestFailSafeContext_NocCommandInvoked)
+TEST_F(TestFailSafeContext, TestFailSafeContext_AddNocCommandInvoked)
 {
+    chip::TestPersistentStorageDelegate testStorage;
     chip::app::FailSafeContext failSafeContext;
+
+    failSafeContext.Init({ &testStorage });
 
     EXPECT_EQ(failSafeContext.ArmFailSafe(kTestAccessingFabricIndex1, System::Clock::Seconds16(1)), CHIP_NO_ERROR);
     EXPECT_EQ(failSafeContext.GetFabricIndex(), kTestAccessingFabricIndex1);
+    EXPECT_FALSE(testStorage.SyncDoesKeyExist(DefaultStorageKeyAllocator::FailSafeAddNOCStartedMarkerKey().KeyName()));
+
+    failSafeContext.SetAddNocCommandStarted(kTestAccessingFabricIndex2);
+    EXPECT_EQ(failSafeContext.GetFabricIndex(), kTestAccessingFabricIndex2);
+    EXPECT_TRUE(testStorage.SyncDoesKeyExist(DefaultStorageKeyAllocator::FailSafeAddNOCStartedMarkerKey().KeyName()));
 
     failSafeContext.SetAddNocCommandInvoked(kTestAccessingFabricIndex2);
     EXPECT_TRUE(failSafeContext.NocCommandHasBeenInvoked());
     EXPECT_TRUE(failSafeContext.AddNocCommandHasBeenInvoked());
     EXPECT_EQ(failSafeContext.GetFabricIndex(), kTestAccessingFabricIndex2);
 
+    failSafeContext.DisarmFailSafe();
+    EXPECT_FALSE(testStorage.SyncDoesKeyExist(DefaultStorageKeyAllocator::FailSafeAddNOCStartedMarkerKey().KeyName()));
+}
+
+TEST_F(TestFailSafeContext, TestFailSafeContext_UpdateNocCommandInvoked)
+{
+    chip::TestPersistentStorageDelegate testStorage;
+    chip::app::FailSafeContext failSafeContext;
+
+    failSafeContext.Init({ &testStorage });
+
+    EXPECT_EQ(failSafeContext.ArmFailSafe(kTestAccessingFabricIndex1, System::Clock::Seconds16(1)), CHIP_NO_ERROR);
+    EXPECT_EQ(failSafeContext.GetFabricIndex(), kTestAccessingFabricIndex1);
+    EXPECT_FALSE(testStorage.SyncDoesKeyExist(DefaultStorageKeyAllocator::FailSafeAddNOCStartedMarkerKey().KeyName()));
+
     failSafeContext.SetUpdateNocCommandInvoked();
     EXPECT_TRUE(failSafeContext.NocCommandHasBeenInvoked());
     EXPECT_TRUE(failSafeContext.UpdateNocCommandHasBeenInvoked());
+    EXPECT_FALSE(testStorage.SyncDoesKeyExist(DefaultStorageKeyAllocator::FailSafeAddNOCStartedMarkerKey().KeyName()));
 
     failSafeContext.DisarmFailSafe();
+    EXPECT_FALSE(testStorage.SyncDoesKeyExist(DefaultStorageKeyAllocator::FailSafeAddNOCStartedMarkerKey().KeyName()));
+}
+
+TEST_F(TestFailSafeContext, TestFailSafeContext_NocCommandInvokedTimerExpiry)
+{
+    chip::TestPersistentStorageDelegate testStorage;
+    chip::app::FailSafeContext failSafeContext;
+
+    failSafeContext.Init({ &testStorage });
+
+    EXPECT_EQ(failSafeContext.ArmFailSafe(kTestAccessingFabricIndex1, System::Clock::Seconds16(1)), CHIP_NO_ERROR);
+    EXPECT_EQ(failSafeContext.GetFabricIndex(), kTestAccessingFabricIndex1);
+    EXPECT_FALSE(testStorage.SyncDoesKeyExist(DefaultStorageKeyAllocator::FailSafeAddNOCStartedMarkerKey().KeyName()));
+
+    failSafeContext.SetAddNocCommandStarted(kTestAccessingFabricIndex2);
+    EXPECT_EQ(failSafeContext.GetFabricIndex(), kTestAccessingFabricIndex2);
+    EXPECT_TRUE(testStorage.SyncDoesKeyExist(DefaultStorageKeyAllocator::FailSafeAddNOCStartedMarkerKey().KeyName()));
+
+    failSafeContext.SetAddNocCommandInvoked(kTestAccessingFabricIndex2);
+    EXPECT_TRUE(failSafeContext.NocCommandHasBeenInvoked());
+    EXPECT_TRUE(failSafeContext.AddNocCommandHasBeenInvoked());
+    EXPECT_EQ(failSafeContext.GetFabricIndex(), kTestAccessingFabricIndex2);
+
+    failSafeContext.ForceFailSafeTimerExpiry();
+
+    PlatformMgr().ScheduleWork([](intptr_t) -> void { PlatformMgr().StopEventLoopTask(); }, (intptr_t) nullptr);
+    PlatformMgr().RunEventLoop();
+
+    EXPECT_FALSE(testStorage.SyncDoesKeyExist(DefaultStorageKeyAllocator::FailSafeAddNOCStartedMarkerKey().KeyName()));
 }
 
 } // namespace
