@@ -35,9 +35,9 @@ CHIP_ERROR ChimeManager::GetChimeSoundByIndex(uint8_t chimeIndex, uint8_t & chim
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
-    chimeID = mChimeSounds[chimeIndex].chimeID;
-
-    return CopyCharSpanToMutableCharSpan(mChimeSounds[chimeIndex].name, name);
+    auto & selectedChime = mChimeSounds[chimeIndex];
+    chimeID              = selectedChime.chimeID;
+    return chip::CopyCharSpanToMutableCharSpan(selectedChime.name, name);
 }
 
 CHIP_ERROR ChimeManager::GetChimeIDByIndex(uint8_t chimeIndex, uint8_t & chimeID)
@@ -46,8 +46,8 @@ CHIP_ERROR ChimeManager::GetChimeIDByIndex(uint8_t chimeIndex, uint8_t & chimeID
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
-
-    chimeID = mChimeSounds[chimeIndex].chimeID;
+    auto & selectedChime = mChimeSounds[chimeIndex];
+    chimeID              = selectedChime.chimeID;
     return CHIP_NO_ERROR;
 }
 
@@ -60,9 +60,9 @@ Protocols::InteractionModel::Status ChimeManager::PlayChimeSound()
     }
 
     // Get the Active Chime ID
-    auto activeChimeID = mChimeServer->GetActiveChimeID();
+    auto selectedChime = mChimeServer->GetSelectedChime();
 
     // Play chime sound
-    ChipLogDetail(Zcl, "Playing Chime with sound ID: %u", unsigned(activeChimeID));
+    ChipLogDetail(Zcl, "Playing Chime with sound ID: %u", unsigned(selectedChime));
     return Protocols::InteractionModel::Status::Success;
 }
