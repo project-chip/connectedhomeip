@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2024). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -74,31 +74,38 @@ Davis, CA 95616, USA
     <attribute id="0x0000" name="BorderRouterName" type="string">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
-      <constraint type="lengthBetween" from="1" to="63"/>
+      <constraint>
+        <lengthBetween>
+          <from value="1"/>
+          <to value="63"/>
+        </lengthBetween>
+      </constraint>
     </attribute>
     <attribute id="0x0001" name="BorderAgentID" type="octstr">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
-      <constraint type="maxLength" value="16"/>
+      <constraint>
+        <allowed value="16"/>
+      </constraint>
     </attribute>
     <attribute id="0x0002" name="ThreadVersion" type="uint16" default="MS">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0003" name="InterfaceEnabled" type="bool" default="false">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0004" name="ActiveDatasetTimestamp" type="uint64" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="nonVolatile"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0005" name="PendingDatasetTimestamp" type="uint64" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="nonVolatile"/>
       <mandatoryConform/>
     </attribute>
   </attributes>
@@ -115,7 +122,9 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <field id="0" name="Dataset" type="octstr">
         <mandatoryConform/>
-        <constraint type="maxLength" value="254"/>
+        <constraint>
+          <maxLength value="254"/>
+        </constraint>
       </field>
     </command>
     <command id="0x03" name="SetActiveDatasetRequest" direction="commandToServer" response="Y">
@@ -123,7 +132,9 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <field id="0" name="ActiveDataset" type="octstr">
         <mandatoryConform/>
-        <constraint type="maxLength" value="254"/>
+        <constraint>
+          <maxLength value="254"/>
+        </constraint>
       </field>
       <field id="1" name="Breadcrumb" type="uint64">
         <optionalConform/>
@@ -136,7 +147,9 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="PendingDataset" type="octstr">
         <mandatoryConform/>
-        <constraint type="maxLength" value="254"/>
+        <constraint>
+          <maxLength value="254"/>
+        </constraint>
       </field>
     </command>
   </commands>

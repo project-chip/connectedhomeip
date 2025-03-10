@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2023). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -51,16 +51,18 @@ are the sole property of their respective owners.
 
 This notice and disclaimer must be included on all copies of this document.
 
-Connectivity Standards Alliance +
-508 Second Street, Suite 206 +
+Connectivity Standards Alliance
+508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0079" name="Microwave Oven" revision="1">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0079" name="Microwave Oven" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
+    <revision revision="2" summary="Mandate OperationCompletion Event"/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
-  <conditions/>
   <clusters>
     <cluster id="0x0003" name="Identify" side="server">
       <optionalConform/>
@@ -74,10 +76,15 @@ Davis, CA 95616, USA
     <cluster id="0x0060" name="Operational State" side="server">
       <mandatoryConform/>
       <attributes>
-        <attribute code="" name="CountdownTime">
+        <attribute code="0x0002" name="CountdownTime">
           <mandatoryConform/>
         </attribute>
       </attributes>
+      <events>
+        <event id="0x0001" name="OperationCompletion">
+          <mandatoryConform/>
+        </event>
+      </events>
     </cluster>
     <cluster id="0x0202" name="Fan Control" side="server">
       <optionalConform/>

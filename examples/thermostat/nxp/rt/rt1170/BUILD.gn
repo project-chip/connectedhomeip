@@ -70,6 +70,7 @@ rt_sdk("sdk") {
   sources += [ "${example_platform_dir}/board/board.c" ]
   sources += [ "${example_platform_dir}/board/peripherals.c" ]
   sources += [ "${example_platform_dir}/board/sdmmc_config.c" ]
+  sources += [ "${example_platform_dir}/board/wifi_bt_config.c" ]
 
   # Indicate the path to CHIPProjectConfig.h
   include_dirs += [ "include/config" ]
@@ -183,7 +184,10 @@ rt_executable("thermostat") {
     "${common_example_dir}/matter_button/source/ButtonRegistrationEmpty.cpp",
   ]
 
-  deps = [ "${chip_root}/examples/${app_common_folder}" ]
+  deps = [
+    "${chip_root}/examples/${app_common_folder}",
+    "${chip_root}/src/setup_payload:onboarding-codes-utils",
+  ]
 
   if (nxp_enable_matter_cli) {
     defines += [ "ENABLE_CHIP_SHELL" ]

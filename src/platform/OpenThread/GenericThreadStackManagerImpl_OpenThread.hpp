@@ -1518,7 +1518,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AddSrpService(c
     srpService->mService.mName         = alloc.Clone(aName);
     srpService->mService.mPort         = aPort;
 
-    VerifyOrExit(aSubTypes.size() < ArraySize(srpService->mSubTypes), error = CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrExit(aSubTypes.size() < MATTER_ARRAY_SIZE(srpService->mSubTypes), error = CHIP_ERROR_BUFFER_TOO_SMALL);
     entryId = 0;
 
     for (const char * subType : aSubTypes)
@@ -1530,7 +1530,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AddSrpService(c
     srpService->mService.mSubTypeLabels = srpService->mSubTypes;
 
     // Initialize TXT entries
-    VerifyOrExit(aTxtEntries.size() <= ArraySize(srpService->mTxtEntries), error = CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrExit(aTxtEntries.size() <= MATTER_ARRAY_SIZE(srpService->mTxtEntries), error = CHIP_ERROR_BUFFER_TOO_SMALL);
     entryId = 0;
 
     for (const chip::Dnssd::TextEntry & entry : aTxtEntries)
@@ -1547,7 +1547,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AddSrpService(c
     }
 
     using OtNumTxtEntries = decltype(srpService->mService.mNumTxtEntries);
-    static_assert(ArraySize(srpService->mTxtEntries) <= std::numeric_limits<OtNumTxtEntries>::max(),
+    static_assert(MATTER_ARRAY_SIZE(srpService->mTxtEntries) <= std::numeric_limits<OtNumTxtEntries>::max(),
                   "Number of DNS TXT entries may not fit in otSrpClientService structure");
     srpService->mService.mNumTxtEntries = static_cast<OtNumTxtEntries>(aTxtEntries.size());
     srpService->mService.mTxtEntries    = srpService->mTxtEntries;
@@ -1943,7 +1943,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnDnsBrowseResult(otEr
         {
             // Invoke callback for every service one by one instead of for the whole
             // list due to large memory size needed to allocate on stack.
-            static_assert(ArraySize(dnsResult->mMdnsService.mName) >= ArraySize(serviceName),
+            static_assert(MATTER_ARRAY_SIZE(dnsResult->mMdnsService.mName) >= MATTER_ARRAY_SIZE(serviceName),
                           "The target buffer must be big enough");
             Platform::CopyString(dnsResult->mMdnsService.mName, serviceName);
             DeviceLayer::PlatformMgr().ScheduleWork(DispatchBrowse, reinterpret_cast<intptr_t>(dnsResult));

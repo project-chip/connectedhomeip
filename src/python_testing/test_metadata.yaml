@@ -55,6 +55,8 @@ not_automated:
       reason: Unit test - does not run against an app
     - name: TestConformanceTest.py
       reason: Unit test - does not run against an app
+    - name: TestSpecParsingSelection.py
+      reason: Unit test - does not run against an app
     - name: TestMatterTestingSupport.py
       reason: Unit test - does not run against an app
     - name: TestSpecParsingSupport.py

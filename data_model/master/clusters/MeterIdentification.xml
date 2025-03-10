@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -55,7 +55,7 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 
-:xrefstyle: short
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0B06" name="Meter Identification Cluster" revision="1">
   <revisionHistory>
@@ -82,46 +82,40 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </item>
     </enum>
-    <enum name="PowerThresholdSourceEnum">
-      <item value="0x00" name="Contract" summary="The value comes from a signed contract">
-        <mandatoryConform/>
-      </item>
-      <item value="0x01" name="Regulator" summary="The value comes from a legal regulator">
-        <mandatoryConform/>
-      </item>
-      <item value="0x02" name="Equipment" summary="The value comes from a certified limits of the meter">
-        <mandatoryConform/>
-      </item>
-    </enum>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="MeterType" type="MeterTypeEnum" default="null">
+    <attribute id="0x0000" name="MeterType" type="MeterTypeEnum">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0001" name="UtilityName" type="string" default="null">
+    <attribute id="0x0001" name="PointOfDelivery" type="string">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <mandatoryConform/>
-      <constraint type="maxLength" value="16"/>
+      <constraint>
+        <maxLength value="64"/>
+      </constraint>
     </attribute>
-    <attribute id="0x0002" name="PointOfDelivery" type="string" default="null">
+    <attribute id="0x0002" name="MeterSerialNumber" type="string">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <mandatoryConform/>
-      <constraint type="maxLength" value="16"/>
+      <constraint>
+        <maxLength value="64"/>
+      </constraint>
     </attribute>
-    <attribute id="0x0003" name="PowerThreshold" type="power-mW" default="null">
+    <attribute id="0x0003" name="ProtocolVersion" type="string">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
-      <mandatoryConform>
-        <feature name="PWRTHLD"/>
-      </mandatoryConform>
+      <quality nullable="true"/>
+      <optionalConform/>
+      <constraint>
+        <maxLength value="64"/>
+      </constraint>
     </attribute>
-    <attribute id="0x0004" name="PowerThresholdSource" type="PowerThresholdSourceEnum" default="null">
+    <attribute id="0x0004" name="PowerThreshold" type="PowerThresholdStruct">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <mandatoryConform>
         <feature name="PWRTHLD"/>
       </mandatoryConform>

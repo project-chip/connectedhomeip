@@ -46,9 +46,8 @@
 #include "fwk_platform.h"
 #include <openthread/platform/entropy.h>
 
-#include <mbedtls/platform.h>
-
 extern "C" void freertos_mbedtls_mutex_init(void);
+extern "C" int mbedtls_platform_set_calloc_free(void * (*calloc_func)(size_t, size_t), void (*free_func)(void *));
 
 extern uint8_t __data_end__[], m_data0_end[];
 memAreaCfg_t data0Heap = { .start_address = (void *) __data_end__, .end_address = (void *) m_data0_end };

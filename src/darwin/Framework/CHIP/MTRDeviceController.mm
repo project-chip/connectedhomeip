@@ -151,6 +151,11 @@ using namespace chip::Tracing::DarwinFramework;
     return nil;
 }
 
+- (void)dealloc
+{
+    MTR_LOG("%@ dealloc", self);
+}
+
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"<%@: %p, uuid: %@, suspended: %@>", NSStringFromClass(self.class), self, self.uniqueIdentifier, MTR_YES_NO(self.suspended)];
@@ -376,6 +381,11 @@ using namespace chip::Tracing::DarwinFramework;
     MTRDevice * deviceToReturn = [_nodeIDToDeviceMap objectForKey:nodeID];
     if (!deviceToReturn && createIfNeeded) {
         deviceToReturn = [self _setupDeviceForNodeID:nodeID prefetchedClusterData:nil];
+        [self _callDelegatesWithBlock:^(id<MTRDeviceControllerDelegate> delegate) {
+            if ([delegate respondsToSelector:@selector(devicesChangedForController:)]) {
+                [delegate devicesChangedForController:self];
+            }
+        } logString:__PRETTY_FUNCTION__];
     }
 
     return deviceToReturn;
@@ -409,6 +419,27 @@ using namespace chip::Tracing::DarwinFramework;
     } else {
         MTR_LOG_ERROR("%@ Error: Cannot remove device %p with nodeID %llu", self, device, nodeID.unsignedLongLongValue);
     }
+}
+
+- (NSArray<MTRDevice *> *)devices
+{
+    std::lock_guard lock(*self.deviceMapLock);
+    NSMutableArray * devicesToReturn = [NSMutableArray array];
+
+    for (MTRDevice * device in _nodeIDToDeviceMap.objectEnumerator) {
+        [devicesToReturn addObject:device];
+    }
+
+    return devicesToReturn;
+}
+
+- (void)deviceDeallocated
+{
+    [self _callDelegatesWithBlock:^(id<MTRDeviceControllerDelegate> delegate) {
+        if ([delegate respondsToSelector:@selector(devicesChangedForController:)]) {
+            [delegate devicesChangedForController:self];
+        }
+    } logString:__PRETTY_FUNCTION__];
 }
 
 - (BOOL)setOperationalCertificateIssuer:(nullable id<MTROperationalCertificateIssuer>)operationalCertificateIssuer

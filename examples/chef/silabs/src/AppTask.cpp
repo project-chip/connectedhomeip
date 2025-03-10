@@ -30,10 +30,10 @@
 #endif // QR_CODE_ENABLED
 #endif // DISPLAY_ENABLED
 
-#include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 
 #include <assert.h>
 

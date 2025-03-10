@@ -3333,6 +3333,23 @@ class ChipClusters:
                     "rootCACertificate": "bytes",
                 },
             },
+            0x0000000C: {
+                "commandId": 0x0000000C,
+                "commandName": "SetVidVerificationStatement",
+                "args": {
+                    "vendorID": "int",
+                    "vidVerificationStatement": "bytes",
+                    "vvsc": "bytes",
+                },
+            },
+            0x0000000D: {
+                "commandId": 0x0000000D,
+                "commandName": "SignVidVerificationRequest",
+                "args": {
+                    "fabricIndex": "int",
+                    "clientChallenge": "bytes",
+                },
+            },
         },
         "attributes": {
             0x00000000: {
@@ -7735,6 +7752,141 @@ class ChipClusters:
             0x0000001A: {
                 "attributeName": "SafetyStatus",
                 "attributeId": 0x0000001A,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
+    _CLOSURE_CONTROL_CLUSTER_INFO = {
+        "clusterName": "ClosureControl",
+        "clusterId": 0x00000104,
+        "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "Stop",
+                "args": {
+                },
+            },
+            0x00000001: {
+                "commandId": 0x00000001,
+                "commandName": "MoveTo",
+                "args": {
+                    "tag": "int",
+                    "latch": "int",
+                    "speed": "int",
+                },
+            },
+            0x00000002: {
+                "commandId": 0x00000002,
+                "commandName": "Calibrate",
+                "args": {
+                },
+            },
+            0x00000003: {
+                "commandId": 0x00000003,
+                "commandName": "ConfigureFallback",
+                "args": {
+                    "restingProcedure": "int",
+                    "triggerCondition": "int",
+                    "triggerPosition": "int",
+                    "waitingDelay": "int",
+                },
+            },
+            0x00000004: {
+                "commandId": 0x00000004,
+                "commandName": "CancelFallback",
+                "args": {
+                },
+            },
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "CountdownTime",
+                "attributeId": 0x00000000,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "MainState",
+                "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "CurrentErrorList",
+                "attributeId": 0x00000002,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000003: {
+                "attributeName": "OverallState",
+                "attributeId": 0x00000003,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000004: {
+                "attributeName": "OverallTarget",
+                "attributeId": 0x00000004,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000005: {
+                "attributeName": "RestingProcedure",
+                "attributeId": 0x00000005,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000006: {
+                "attributeName": "TriggerCondition",
+                "attributeId": 0x00000006,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000007: {
+                "attributeName": "TriggerPosition",
+                "attributeId": 0x00000007,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000008: {
+                "attributeName": "WaitingDelay",
+                "attributeId": 0x00000008,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000009: {
+                "attributeName": "KickoffTimer",
+                "attributeId": 0x00000009,
                 "type": "int",
                 "reportable": True,
             },
@@ -12451,24 +12603,35 @@ class ChipClusters:
                     "minResolution": "VideoResolutionStruct",
                     "maxResolution": "VideoResolutionStruct",
                     "quality": "int",
+                    "watermarkEnabled": "bool",
+                    "OSDEnabled": "bool",
                 },
             },
             0x00000009: {
                 "commandId": 0x00000009,
+                "commandName": "SnapshotStreamModify",
+                "args": {
+                    "snapshotStreamID": "int",
+                    "watermarkEnabled": "bool",
+                    "OSDEnabled": "bool",
+                },
+            },
+            0x0000000A: {
+                "commandId": 0x0000000A,
                 "commandName": "SnapshotStreamDeallocate",
                 "args": {
                     "snapshotStreamID": "int",
                 },
             },
-            0x0000000A: {
-                "commandId": 0x0000000A,
+            0x0000000B: {
+                "commandId": 0x0000000B,
                 "commandName": "SetStreamPriorities",
                 "args": {
                     "streamPriorities": "int",
                 },
             },
-            0x0000000B: {
-                "commandId": 0x0000000B,
+            0x0000000C: {
+                "commandId": 0x0000000C,
                 "commandName": "CaptureSnapshot",
                 "args": {
                     "snapshotStreamID": "int",
@@ -12563,7 +12726,7 @@ class ChipClusters:
                 "writable": True,
             },
             0x0000000E: {
-                "attributeName": "FabricsUsingCamera",
+                "attributeName": "SupportedStreamUsages",
                 "attributeId": 0x0000000E,
                 "type": "int",
                 "reportable": True,
@@ -12963,10 +13126,10 @@ class ChipClusters:
             },
             0x00000006: {
                 "commandId": 0x00000006,
-                "commandName": "ProvideICECandidate",
+                "commandName": "ProvideICECandidates",
                 "args": {
                     "webRTCSessionID": "int",
-                    "ICECandidate": "str",
+                    "ICECandidates": "str",
                 },
             },
             0x00000007: {
@@ -13041,10 +13204,10 @@ class ChipClusters:
             },
             0x00000003: {
                 "commandId": 0x00000003,
-                "commandName": "ICECandidate",
+                "commandName": "ICECandidates",
                 "args": {
                     "webRTCSessionID": "int",
-                    "ICECandidate": "str",
+                    "ICECandidates": "str",
                 },
             },
             0x00000004: {
@@ -13216,7 +13379,7 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000001: {
-                "attributeName": "ActiveChimeID",
+                "attributeName": "SelectedChime",
                 "attributeId": 0x00000001,
                 "type": "int",
                 "reportable": True,
@@ -13421,22 +13584,22 @@ class ChipClusters:
                     "clientCertificateDetails": "TLSClientCertificateDetailStruct",
                 },
             },
-            0x0000000B: {
-                "commandId": 0x0000000B,
+            0x0000000A: {
+                "commandId": 0x0000000A,
                 "commandName": "FindClientCertificate",
                 "args": {
                     "ccdid": "int",
                 },
             },
-            0x0000000D: {
-                "commandId": 0x0000000D,
+            0x0000000C: {
+                "commandId": 0x0000000C,
                 "commandName": "LookupClientCertificate",
                 "args": {
                     "fingerprint": "bytes",
                 },
             },
-            0x0000000F: {
-                "commandId": 0x0000000F,
+            0x0000000E: {
+                "commandId": 0x0000000E,
                 "commandName": "RemoveClientCertificate",
                 "args": {
                     "ccdid": "int",
@@ -13451,9 +13614,9 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000001: {
-                "attributeName": "CurrentRootCertificates",
+                "attributeName": "ProvisionedRootCertificates",
                 "attributeId": 0x00000001,
-                "type": "int",
+                "type": "",
                 "reportable": True,
             },
             0x00000002: {
@@ -13463,9 +13626,84 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000003: {
-                "attributeName": "CurrentClientCertificates",
+                "attributeName": "ProvisionedClientCertificates",
                 "attributeId": 0x00000003,
+                "type": "",
+                "reportable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
                 "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
+    _TLS_CLIENT_MANAGEMENT_CLUSTER_INFO = {
+        "clusterName": "TlsClientManagement",
+        "clusterId": 0x00000802,
+        "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "ProvisionEndpoint",
+                "args": {
+                    "hostname": "bytes",
+                    "port": "int",
+                    "caid": "int",
+                    "ccdid": "int",
+                    "endpointID": "int",
+                },
+            },
+            0x00000002: {
+                "commandId": 0x00000002,
+                "commandName": "FindEndpoint",
+                "args": {
+                    "endpointID": "int",
+                },
+            },
+            0x00000004: {
+                "commandId": 0x00000004,
+                "commandName": "RemoveEndpoint",
+                "args": {
+                    "endpointID": "int",
+                },
+            },
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "MaxProvisioned",
+                "attributeId": 0x00000000,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "ProvisionedEndpoints",
+                "attributeId": 0x00000001,
+                "type": "",
                 "reportable": True,
             },
             0x0000FFF8: {
@@ -14566,6 +14804,7 @@ class ChipClusters:
         0x0000009F: _DEVICE_ENERGY_MANAGEMENT_MODE_CLUSTER_INFO,
         0x00000101: _DOOR_LOCK_CLUSTER_INFO,
         0x00000102: _WINDOW_COVERING_CLUSTER_INFO,
+        0x00000104: _CLOSURE_CONTROL_CLUSTER_INFO,
         0x00000150: _SERVICE_AREA_CLUSTER_INFO,
         0x00000200: _PUMP_CONFIGURATION_AND_CONTROL_CLUSTER_INFO,
         0x00000201: _THERMOSTAT_CLUSTER_INFO,
@@ -14616,6 +14855,7 @@ class ChipClusters:
         0x00000750: _ECOSYSTEM_INFORMATION_CLUSTER_INFO,
         0x00000751: _COMMISSIONER_CONTROL_CLUSTER_INFO,
         0x00000801: _TLS_CERTIFICATE_MANAGEMENT_CLUSTER_INFO,
+        0x00000802: _TLS_CLIENT_MANAGEMENT_CLUSTER_INFO,
         0xFFF1FC05: _UNIT_TESTING_CLUSTER_INFO,
         0xFFF1FC06: _FAULT_INJECTION_CLUSTER_INFO,
         0xFFF1FC20: _SAMPLE_MEI_CLUSTER_INFO,
@@ -14699,6 +14939,7 @@ class ChipClusters:
         "DeviceEnergyManagementMode": _DEVICE_ENERGY_MANAGEMENT_MODE_CLUSTER_INFO,
         "DoorLock": _DOOR_LOCK_CLUSTER_INFO,
         "WindowCovering": _WINDOW_COVERING_CLUSTER_INFO,
+        "ClosureControl": _CLOSURE_CONTROL_CLUSTER_INFO,
         "ServiceArea": _SERVICE_AREA_CLUSTER_INFO,
         "PumpConfigurationAndControl": _PUMP_CONFIGURATION_AND_CONTROL_CLUSTER_INFO,
         "Thermostat": _THERMOSTAT_CLUSTER_INFO,
@@ -14749,6 +14990,7 @@ class ChipClusters:
         "EcosystemInformation": _ECOSYSTEM_INFORMATION_CLUSTER_INFO,
         "CommissionerControl": _COMMISSIONER_CONTROL_CLUSTER_INFO,
         "TlsCertificateManagement": _TLS_CERTIFICATE_MANAGEMENT_CLUSTER_INFO,
+        "TlsClientManagement": _TLS_CLIENT_MANAGEMENT_CLUSTER_INFO,
         "UnitTesting": _UNIT_TESTING_CLUSTER_INFO,
         "FaultInjection": _FAULT_INJECTION_CLUSTER_INFO,
         "SampleMei": _SAMPLE_MEI_CLUSTER_INFO,

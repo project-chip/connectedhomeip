@@ -19,16 +19,7 @@ import("${chip_root}/src/platform/bouffalolab/BL616/args.gni")
 
 bouffalo_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 
-pw_log_BACKEND = "${chip_root}/src/pw_backends/log"
-pw_assert_BACKEND = "${chip_root}/src/pw_backends/assert"
-pw_rpc_CONFIG = "$dir_pw_rpc:disable_global_mutex"
-
-chip_detail_logging = true
+chip_detail_logging = false
 
 # use -Os instead of -Og
 is_debug = false
-
-pw_build_LINK_DEPS = [
-  "$dir_pw_assert:impl",
-  "$dir_pw_log:impl",
-]

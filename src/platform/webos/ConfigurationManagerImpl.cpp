@@ -133,7 +133,8 @@ CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
     VerifyOrExit(getifaddrs(&addresses) == 0, error = CHIP_ERROR_INTERNAL);
     for (auto addr = addresses; addr != nullptr; addr = addr->ifa_next)
     {
-        if ((addr->ifa_addr) && (addr->ifa_addr->sa_family == AF_PACKET) && strncmp(addr->ifa_name, "lo", IFNAMSIZ) != 0)
+        if ((addr->ifa_addr) && (addr->ifa_addr->sa_family == AF_PACKET) &&
+            strncmp(addr->ifa_name, "lo", Inet::InterfaceId::kMaxIfNameLength) != 0)
         {
             struct sockaddr_ll * mac = (struct sockaddr_ll *) addr->ifa_addr;
             memcpy(buf, mac->sll_addr, mac->sll_halen);

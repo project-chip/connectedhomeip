@@ -26,7 +26,6 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/AttributeValueEncoder.h>
-#include <app/GlobalAttributes.h>
 #include <app/RequiredPrivilege.h>
 #include <app/data-model/FabricScoped.h>
 #include <app/util/af-types.h>
@@ -34,7 +33,6 @@
 #include <app/util/attribute-storage-detail.h>
 #include <app/util/attribute-storage-null-handling.h>
 #include <app/util/attribute-storage.h>
-#include <app/util/ember-global-attribute-access-interface.h>
 #include <app/util/ember-io-storage.h>
 #include <app/util/endpoint-config-api.h>
 #include <app/util/odd-sized-integers.h>
@@ -104,6 +102,11 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::ReadAttribute(const Data
                   ChipLogValueMEI(request.path.mClusterId), request.path.mEndpointId, ChipLogValueMEI(request.path.mAttributeId),
                   request.path.mExpanded);
 
+    if (auto * cluster = mRegistry.Get(request.path); cluster != nullptr)
+    {
+        return cluster->ReadAttribute(request, encoder);
+    }
+
     auto metadata = Ember::FindAttributeMetadata(request.path);
 
     // Explicit failure in finding a suitable metadata
@@ -116,27 +119,13 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::ReadAttribute(const Data
     }
 
     // Read via AAI
-    std::optional<CHIP_ERROR> aai_result;
-    if (const EmberAfCluster ** cluster = std::get_if<const EmberAfCluster *>(&metadata))
-    {
-        Compatibility::GlobalAttributeReader aai(*cluster);
-        aai_result = TryReadViaAccessInterface(request.path, &aai, encoder);
-    }
-    else
-    {
-        aai_result = TryReadViaAccessInterface(
-            request.path, AttributeAccessInterfaceRegistry::Instance().Get(request.path.mEndpointId, request.path.mClusterId),
-            encoder);
-    }
+    std::optional<CHIP_ERROR> aai_result = TryReadViaAccessInterface(
+        request.path, AttributeAccessInterfaceRegistry::Instance().Get(request.path.mEndpointId, request.path.mClusterId), encoder);
     VerifyOrReturnError(!aai_result.has_value(), *aai_result);
 
-    if (!std::holds_alternative<const EmberAfAttributeMetadata *>(metadata))
-    {
-        // if we only got a cluster, this was for a global attribute. We cannot read ember attributes
-        // at this point, so give up (although GlobalAttributeReader should have returned something here).
-        chipDie();
-    }
     const EmberAfAttributeMetadata * attributeMetadata = std::get<const EmberAfAttributeMetadata *>(metadata);
+    // We can only get a status or metadata.
+    VerifyOrDie(attributeMetadata != nullptr);
 
     // At this point, we have to use ember directly to read the data.
     EmberAfAttributeSearchRecord record;

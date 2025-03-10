@@ -550,6 +550,18 @@ namespace AddTrustedRootCertificate {
 static constexpr CommandId Id = 0x0000000B;
 } // namespace AddTrustedRootCertificate
 
+namespace SetVidVerificationStatement {
+static constexpr CommandId Id = 0x0000000C;
+} // namespace SetVidVerificationStatement
+
+namespace SignVidVerificationRequest {
+static constexpr CommandId Id = 0x0000000D;
+} // namespace SignVidVerificationRequest
+
+namespace SignVidVerificationResponse {
+static constexpr CommandId Id = 0x0000000E;
+} // namespace SignVidVerificationResponse
+
 } // namespace Commands
 } // namespace OperationalCredentials
 
@@ -1281,6 +1293,32 @@ static constexpr CommandId Id = 0x00000008;
 } // namespace Commands
 } // namespace WindowCovering
 
+namespace ClosureControl {
+namespace Commands {
+
+namespace Stop {
+static constexpr CommandId Id = 0x00000000;
+} // namespace Stop
+
+namespace MoveTo {
+static constexpr CommandId Id = 0x00000001;
+} // namespace MoveTo
+
+namespace Calibrate {
+static constexpr CommandId Id = 0x00000002;
+} // namespace Calibrate
+
+namespace ConfigureFallback {
+static constexpr CommandId Id = 0x00000003;
+} // namespace ConfigureFallback
+
+namespace CancelFallback {
+static constexpr CommandId Id = 0x00000004;
+} // namespace CancelFallback
+
+} // namespace Commands
+} // namespace ClosureControl
+
 namespace ServiceArea {
 namespace Commands {
 
@@ -1872,20 +1910,24 @@ namespace SnapshotStreamAllocateResponse {
 static constexpr CommandId Id = 0x00000008;
 } // namespace SnapshotStreamAllocateResponse
 
-namespace SnapshotStreamDeallocate {
+namespace SnapshotStreamModify {
 static constexpr CommandId Id = 0x00000009;
+} // namespace SnapshotStreamModify
+
+namespace SnapshotStreamDeallocate {
+static constexpr CommandId Id = 0x0000000A;
 } // namespace SnapshotStreamDeallocate
 
 namespace SetStreamPriorities {
-static constexpr CommandId Id = 0x0000000A;
+static constexpr CommandId Id = 0x0000000B;
 } // namespace SetStreamPriorities
 
 namespace CaptureSnapshot {
-static constexpr CommandId Id = 0x0000000B;
+static constexpr CommandId Id = 0x0000000C;
 } // namespace CaptureSnapshot
 
 namespace CaptureSnapshotResponse {
-static constexpr CommandId Id = 0x0000000C;
+static constexpr CommandId Id = 0x0000000D;
 } // namespace CaptureSnapshotResponse
 
 } // namespace Commands
@@ -1948,9 +1990,9 @@ namespace ProvideAnswer {
 static constexpr CommandId Id = 0x00000005;
 } // namespace ProvideAnswer
 
-namespace ProvideICECandidate {
+namespace ProvideICECandidates {
 static constexpr CommandId Id = 0x00000006;
-} // namespace ProvideICECandidate
+} // namespace ProvideICECandidates
 
 namespace EndSession {
 static constexpr CommandId Id = 0x00000007;
@@ -1970,9 +2012,9 @@ namespace Answer {
 static constexpr CommandId Id = 0x00000002;
 } // namespace Answer
 
-namespace ICECandidate {
+namespace ICECandidates {
 static constexpr CommandId Id = 0x00000003;
-} // namespace ICECandidate
+} // namespace ICECandidates
 
 namespace End {
 static constexpr CommandId Id = 0x00000004;
@@ -2090,32 +2132,54 @@ namespace ProvisionClientCertificate {
 static constexpr CommandId Id = 0x00000009;
 } // namespace ProvisionClientCertificate
 
-namespace ProvisionClientCertificateResponse {
-static constexpr CommandId Id = 0x0000000A;
-} // namespace ProvisionClientCertificateResponse
-
 namespace FindClientCertificate {
-static constexpr CommandId Id = 0x0000000B;
+static constexpr CommandId Id = 0x0000000A;
 } // namespace FindClientCertificate
 
 namespace FindClientCertificateResponse {
-static constexpr CommandId Id = 0x0000000C;
+static constexpr CommandId Id = 0x0000000B;
 } // namespace FindClientCertificateResponse
 
 namespace LookupClientCertificate {
-static constexpr CommandId Id = 0x0000000D;
+static constexpr CommandId Id = 0x0000000C;
 } // namespace LookupClientCertificate
 
 namespace LookupClientCertificateResponse {
-static constexpr CommandId Id = 0x0000000E;
+static constexpr CommandId Id = 0x0000000D;
 } // namespace LookupClientCertificateResponse
 
 namespace RemoveClientCertificate {
-static constexpr CommandId Id = 0x0000000F;
+static constexpr CommandId Id = 0x0000000E;
 } // namespace RemoveClientCertificate
 
 } // namespace Commands
 } // namespace TlsCertificateManagement
+
+namespace TlsClientManagement {
+namespace Commands {
+
+namespace ProvisionEndpoint {
+static constexpr CommandId Id = 0x00000000;
+} // namespace ProvisionEndpoint
+
+namespace ProvisionEndpointResponse {
+static constexpr CommandId Id = 0x00000001;
+} // namespace ProvisionEndpointResponse
+
+namespace FindEndpoint {
+static constexpr CommandId Id = 0x00000002;
+} // namespace FindEndpoint
+
+namespace FindEndpointResponse {
+static constexpr CommandId Id = 0x00000003;
+} // namespace FindEndpointResponse
+
+namespace RemoveEndpoint {
+static constexpr CommandId Id = 0x00000004;
+} // namespace RemoveEndpoint
+
+} // namespace Commands
+} // namespace TlsClientManagement
 
 namespace UnitTesting {
 namespace Commands {

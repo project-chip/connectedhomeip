@@ -505,7 +505,7 @@ public:
         AppContext::SetUp();
 
         ASSERT_EQ(mEventCounter.Init(0), CHIP_NO_ERROR);
-        chip::app::EventManagement::CreateEventManagement(&GetExchangeManager(), ArraySize(logStorageResources),
+        chip::app::EventManagement::CreateEventManagement(&GetExchangeManager(), MATTER_ARRAY_SIZE(logStorageResources),
                                                           gCircularEventBuffer, logStorageResources, &mEventCounter);
         mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&TestImCustomDataModel::Instance());
         chip::Test::SetMockNodeConfig(TestMockNodeConfig());
@@ -1498,7 +1498,16 @@ void TestReadInteraction::TestReadWildcard()
         EXPECT_EQ(readClient.SendRequest(readPrepareParams), CHIP_NO_ERROR);
 
         DrainAndServiceIO();
-        EXPECT_EQ(delegate.mNumAttributeResponse, 5);
+        // Expected attributes:
+        //    - 0xFFFD Cluster revision
+        //    - 0xFFFC Feature map
+        //    - 0xFFF10001
+        //    - 0xFFF10002
+        //    - 0xFFF10003
+        //    - 0xFFF8 / GeneratedCommandList
+        //    - 0xFFF9 / AcceptedCommandList
+        //    - 0xFFFB / AttributeList
+        EXPECT_EQ(delegate.mNumAttributeResponse, 8);
         EXPECT_TRUE(delegate.mGotReport);
         EXPECT_FALSE(delegate.mReadError);
         // By now we should have closed all exchanges and sent all pending acks, so
@@ -2814,17 +2823,17 @@ void TestReadInteraction::TestSubscribeWildcard()
         // Mock attribute storage that is reset and resides in src/app/util/mock/attribute-storage.cpp
         // has the following items:
         // - Endpoint 0xFFFE
-        //    - cluster 0xFFF1'FC01 (2 attributes)
-        //    - cluster 0xFFF1'FC02 (3 attributes)
+        //    - cluster 0xFFF1'FC01 (2 attributes + 3 GlobalNotInMetadata)
+        //    - cluster 0xFFF1'FC02 (3 attributes + 3 GlobalNotInMetadata)
         // - Endpoint 0xFFFD
-        //    - cluster 0xFFF1'FC01 (2 attributes)
-        //    - cluster 0xFFF1'FC02 (4 attributes)
-        //    - cluster 0xFFF1'FC03 (5 attributes)
+        //    - cluster 0xFFF1'FC01 (2 attributes + 3 GlobalNotInMetadata)
+        //    - cluster 0xFFF1'FC02 (4 attributes + 3 GlobalNotInMetadata)
+        //    - cluster 0xFFF1'FC03 (5 attributes + 3 GlobalNotInMetadata)
         // - Endpoint 0xFFFC
-        //    - cluster 0xFFF1'FC01 (3 attributes)
-        //    - cluster 0xFFF1'FC02 (6 attributes)
-        //    - cluster 0xFFF1'FC03 (2 attributes)
-        //    - cluster 0xFFF1'FC04 (2 attributes)
+        //    - cluster 0xFFF1'FC01 (3 attributes + 3 GlobalNotInMetadata)
+        //    - cluster 0xFFF1'FC02 (6 attributes + 3 GlobalNotInMetadata)
+        //    - cluster 0xFFF1'FC03 (2 attributes + 3 GlobalNotInMetadata)
+        //    - cluster 0xFFF1'FC04 (2 attributes + 3 GlobalNotInMetadata)
         //
         //
         // Actual chunk placement is execution defined, however generally
@@ -2841,68 +2850,124 @@ void TestReadInteraction::TestSubscribeWildcard()
         constexpr AttributeCaptureAssertion kExpectedResponses[] = {
             AttributeCaptureAssertion(0xFFFE, 0xFFF1FC01, ClusterRevision::Id),
             AttributeCaptureAssertion(0xFFFE, 0xFFF1FC01, FeatureMap::Id),
+            AttributeCaptureAssertion(0xFFFE, 0xFFF1FC01, GeneratedCommandList::Id, /* listSize = */ 0),
+            AttributeCaptureAssertion(0xFFFE, 0xFFF1FC01, AcceptedCommandList::Id, /* listSize = */ 0),
+            AttributeCaptureAssertion(0xFFFE, 0xFFF1FC01, AttributeList::Id, /* listSize = */ 5),
             AttributeCaptureAssertion(0xFFFE, 0xFFF1FC02, ClusterRevision::Id),
             AttributeCaptureAssertion(0xFFFE, 0xFFF1FC02, FeatureMap::Id),
             AttributeCaptureAssertion(0xFFFE, 0xFFF1FC02, 0xFFF10001),
+            AttributeCaptureAssertion(0xFFFE, 0xFFF1FC02, GeneratedCommandList::Id, /* listSize = */ 0),
+            AttributeCaptureAssertion(0xFFFE, 0xFFF1FC02, AcceptedCommandList::Id, /* listSize = */ 0),
+            AttributeCaptureAssertion(0xFFFE, 0xFFF1FC02, AttributeList::Id, /* listSize = */ 6),
             AttributeCaptureAssertion(0xFFFD, 0xFFF1FC01, ClusterRevision::Id),
             AttributeCaptureAssertion(0xFFFD, 0xFFF1FC01, FeatureMap::Id),
+            AttributeCaptureAssertion(0xFFFD, 0xFFF1FC01, GeneratedCommandList::Id, /* listSize = */ 0),
+            AttributeCaptureAssertion(0xFFFD, 0xFFF1FC01, AcceptedCommandList::Id, /* listSize = */ 0),
+            AttributeCaptureAssertion(0xFFFD, 0xFFF1FC01, AttributeList::Id, /* listSize = */ 5),
             AttributeCaptureAssertion(0xFFFD, 0xFFF1FC02, ClusterRevision::Id),
             AttributeCaptureAssertion(0xFFFD, 0xFFF1FC02, FeatureMap::Id),
             AttributeCaptureAssertion(0xFFFD, 0xFFF1FC02, 0xFFF10001),
             AttributeCaptureAssertion(0xFFFD, 0xFFF1FC02, 0xFFF10002),
+            AttributeCaptureAssertion(0xFFFD, 0xFFF1FC02, GeneratedCommandList::Id, /* listSize = */ 0),
+            AttributeCaptureAssertion(0xFFFD, 0xFFF1FC02, AcceptedCommandList::Id, /* listSize = */ 0),
+            AttributeCaptureAssertion(0xFFFD, 0xFFF1FC02, AttributeList::Id, /* listSize = */ 7),
             AttributeCaptureAssertion(0xFFFD, 0xFFF1FC03, ClusterRevision::Id),
             AttributeCaptureAssertion(0xFFFD, 0xFFF1FC03, FeatureMap::Id),
             AttributeCaptureAssertion(0xFFFD, 0xFFF1FC03, 0xFFF10001),
             AttributeCaptureAssertion(0xFFFD, 0xFFF1FC03, 0xFFF10002),
             AttributeCaptureAssertion(0xFFFD, 0xFFF1FC03, 0xFFF10003),
+            AttributeCaptureAssertion(0xFFFD, 0xFFF1FC03, GeneratedCommandList::Id, /* listSize = */ 0),
+            AttributeCaptureAssertion(0xFFFD, 0xFFF1FC03, AcceptedCommandList::Id, /* listSize = */ 0),
+            AttributeCaptureAssertion(0xFFFD, 0xFFF1FC03, AttributeList::Id, /* listSize = */ 8),
             AttributeCaptureAssertion(0xFFFC, 0xFFF1FC01, ClusterRevision::Id),
             AttributeCaptureAssertion(0xFFFC, 0xFFF1FC01, FeatureMap::Id),
             AttributeCaptureAssertion(0xFFFC, 0xFFF1FC01, 0xFFF10001),
+            AttributeCaptureAssertion(0xFFFC, 0xFFF1FC01, GeneratedCommandList::Id, /* listSize = */ 0),
+            AttributeCaptureAssertion(0xFFFC, 0xFFF1FC01, AcceptedCommandList::Id, /* listSize = */ 0),
+            AttributeCaptureAssertion(0xFFFC, 0xFFF1FC01, AttributeList::Id, /* listSize = */ 6),
             AttributeCaptureAssertion(0xFFFC, 0xFFF1FC02, ClusterRevision::Id),
             AttributeCaptureAssertion(0xFFFC, 0xFFF1FC02, FeatureMap::Id),
             AttributeCaptureAssertion(0xFFFC, 0xFFF1FC02, 0xFFF10001),
             AttributeCaptureAssertion(0xFFFC, 0xFFF1FC02, 0xFFF10002),
             AttributeCaptureAssertion(0xFFFC, 0xFFF1FC02, 0xFFF10003),
-            AttributeCaptureAssertion(0xFFFC, 0xFFF1FC02, 0xFFF10004, /* listSize = */ 4),
+            AttributeCaptureAssertion(0xFFFC, 0xFFF1FC02, 0xFFF10004, /* listSize = */ 3),
             // Chunking here
             AttributeCaptureAssertion(0xFFFC, 0xFFF1FC02, 0xFFF10004, /* listSize = */ 1),
             AttributeCaptureAssertion(0xFFFC, 0xFFF1FC02, 0xFFF10004, /* listSize = */ 1),
+            AttributeCaptureAssertion(0xFFFC, 0xFFF1FC02, 0xFFF10004, /* listSize = */ 1),
+            AttributeCaptureAssertion(0xFFFC, 0xFFF1FC02, GeneratedCommandList::Id, /* listSize = */ 0),
+            AttributeCaptureAssertion(0xFFFC, 0xFFF1FC02, AcceptedCommandList::Id, /* listSize = */ 0),
+            AttributeCaptureAssertion(0xFFFC, 0xFFF1FC02, AttributeList::Id, /* listSize = */ 9),
             AttributeCaptureAssertion(0xFFFC, 0xFFF1FC03, ClusterRevision::Id),
             AttributeCaptureAssertion(0xFFFC, 0xFFF1FC03, FeatureMap::Id),
+            AttributeCaptureAssertion(0xFFFC, 0xFFF1FC03, GeneratedCommandList::Id, /* listSize = */ 0),
+            AttributeCaptureAssertion(0xFFFC, 0xFFF1FC03, AcceptedCommandList::Id, /* listSize = */ 0),
+            AttributeCaptureAssertion(0xFFFC, 0xFFF1FC03, AttributeList::Id, /* listSize = */ 5),
             AttributeCaptureAssertion(0xFFFC, 0xFFF1FC04, ClusterRevision::Id),
             AttributeCaptureAssertion(0xFFFC, 0xFFF1FC04, FeatureMap::Id),
+            AttributeCaptureAssertion(0xFFFC, 0xFFF1FC04, GeneratedCommandList::Id, /* listSize = */ 0),
+            AttributeCaptureAssertion(0xFFFC, 0xFFF1FC04, AcceptedCommandList::Id, /* listSize = */ 0),
+            AttributeCaptureAssertion(0xFFFC, 0xFFF1FC04, AttributeList::Id, /* listSize = */ 5),
             AttributeCaptureAssertion(0xFFFE, 0xFFF1FC01, ClusterRevision::Id),
             AttributeCaptureAssertion(0xFFFE, 0xFFF1FC01, FeatureMap::Id),
+            AttributeCaptureAssertion(0xFFFE, 0xFFF1FC01, GeneratedCommandList::Id, /* listSize = */ 0),
+            AttributeCaptureAssertion(0xFFFE, 0xFFF1FC01, AcceptedCommandList::Id, /* listSize = */ 0),
+            AttributeCaptureAssertion(0xFFFE, 0xFFF1FC01, AttributeList::Id, /* listSize = */ 5),
             AttributeCaptureAssertion(0xFFFE, 0xFFF1FC02, ClusterRevision::Id),
             AttributeCaptureAssertion(0xFFFE, 0xFFF1FC02, FeatureMap::Id),
             AttributeCaptureAssertion(0xFFFE, 0xFFF1FC02, 0xFFF10001),
+            AttributeCaptureAssertion(0xFFFE, 0xFFF1FC02, GeneratedCommandList::Id, /* listSize = */ 0),
+            AttributeCaptureAssertion(0xFFFE, 0xFFF1FC02, AcceptedCommandList::Id, /* listSize = */ 0),
+            AttributeCaptureAssertion(0xFFFE, 0xFFF1FC02, AttributeList::Id, /* listSize = */ 6),
             AttributeCaptureAssertion(0xFFFD, 0xFFF1FC01, ClusterRevision::Id),
             AttributeCaptureAssertion(0xFFFD, 0xFFF1FC01, FeatureMap::Id),
+            AttributeCaptureAssertion(0xFFFD, 0xFFF1FC01, GeneratedCommandList::Id, /* listSize = */ 0),
+            AttributeCaptureAssertion(0xFFFD, 0xFFF1FC01, AcceptedCommandList::Id, /* listSize = */ 0),
+            AttributeCaptureAssertion(0xFFFD, 0xFFF1FC01, AttributeList::Id, /* listSize = */ 5),
             AttributeCaptureAssertion(0xFFFD, 0xFFF1FC02, ClusterRevision::Id),
             AttributeCaptureAssertion(0xFFFD, 0xFFF1FC02, FeatureMap::Id),
             AttributeCaptureAssertion(0xFFFD, 0xFFF1FC02, 0xFFF10001),
             AttributeCaptureAssertion(0xFFFD, 0xFFF1FC02, 0xFFF10002),
+            AttributeCaptureAssertion(0xFFFD, 0xFFF1FC02, GeneratedCommandList::Id, /* listSize = */ 0),
+            AttributeCaptureAssertion(0xFFFD, 0xFFF1FC02, AcceptedCommandList::Id, /* listSize = */ 0),
+            AttributeCaptureAssertion(0xFFFD, 0xFFF1FC02, AttributeList::Id, /* listSize = */ 7),
             AttributeCaptureAssertion(0xFFFD, 0xFFF1FC03, ClusterRevision::Id),
             AttributeCaptureAssertion(0xFFFD, 0xFFF1FC03, FeatureMap::Id),
             AttributeCaptureAssertion(0xFFFD, 0xFFF1FC03, 0xFFF10001),
             AttributeCaptureAssertion(0xFFFD, 0xFFF1FC03, 0xFFF10002),
             AttributeCaptureAssertion(0xFFFD, 0xFFF1FC03, 0xFFF10003),
+            AttributeCaptureAssertion(0xFFFD, 0xFFF1FC03, GeneratedCommandList::Id, /* listSize = */ 0),
+            AttributeCaptureAssertion(0xFFFD, 0xFFF1FC03, AcceptedCommandList::Id, /* listSize = */ 0),
+            AttributeCaptureAssertion(0xFFFD, 0xFFF1FC03, AttributeList::Id, /* listSize = */ 8),
             AttributeCaptureAssertion(0xFFFC, 0xFFF1FC01, ClusterRevision::Id),
             AttributeCaptureAssertion(0xFFFC, 0xFFF1FC01, FeatureMap::Id),
             AttributeCaptureAssertion(0xFFFC, 0xFFF1FC01, 0xFFF10001),
+            AttributeCaptureAssertion(0xFFFC, 0xFFF1FC01, GeneratedCommandList::Id, /* listSize = */ 0),
+            AttributeCaptureAssertion(0xFFFC, 0xFFF1FC01, AcceptedCommandList::Id, /* listSize = */ 0),
+            AttributeCaptureAssertion(0xFFFC, 0xFFF1FC01, AttributeList::Id, /* listSize = */ 6),
             AttributeCaptureAssertion(0xFFFC, 0xFFF1FC02, ClusterRevision::Id),
             AttributeCaptureAssertion(0xFFFC, 0xFFF1FC02, FeatureMap::Id),
             AttributeCaptureAssertion(0xFFFC, 0xFFF1FC02, 0xFFF10001),
             AttributeCaptureAssertion(0xFFFC, 0xFFF1FC02, 0xFFF10002),
             AttributeCaptureAssertion(0xFFFC, 0xFFF1FC02, 0xFFF10003),
-            AttributeCaptureAssertion(0xFFFC, 0xFFF1FC02, 0xFFF10004, /* listSize = */ 4),
+            AttributeCaptureAssertion(0xFFFC, 0xFFF1FC02, 0xFFF10004, /* listSize = */ 3),
             // Chunking here
             AttributeCaptureAssertion(0xFFFC, 0xFFF1FC02, 0xFFF10004, /* listSize = */ 1),
             AttributeCaptureAssertion(0xFFFC, 0xFFF1FC02, 0xFFF10004, /* listSize = */ 1),
+            AttributeCaptureAssertion(0xFFFC, 0xFFF1FC02, 0xFFF10004, /* listSize = */ 1),
+            AttributeCaptureAssertion(0xFFFC, 0xFFF1FC02, GeneratedCommandList::Id, /* listSize = */ 0),
+            AttributeCaptureAssertion(0xFFFC, 0xFFF1FC02, AcceptedCommandList::Id, /* listSize = */ 0),
+            AttributeCaptureAssertion(0xFFFC, 0xFFF1FC02, AttributeList::Id, /* listSize = */ 9),
             AttributeCaptureAssertion(0xFFFC, 0xFFF1FC03, ClusterRevision::Id),
             AttributeCaptureAssertion(0xFFFC, 0xFFF1FC03, FeatureMap::Id),
+            AttributeCaptureAssertion(0xFFFC, 0xFFF1FC03, GeneratedCommandList::Id, /* listSize = */ 0),
+            AttributeCaptureAssertion(0xFFFC, 0xFFF1FC03, AcceptedCommandList::Id, /* listSize = */ 0),
+            AttributeCaptureAssertion(0xFFFC, 0xFFF1FC03, AttributeList::Id, /* listSize = */ 5),
             AttributeCaptureAssertion(0xFFFC, 0xFFF1FC04, ClusterRevision::Id),
             AttributeCaptureAssertion(0xFFFC, 0xFFF1FC04, FeatureMap::Id),
+            AttributeCaptureAssertion(0xFFFC, 0xFFF1FC04, GeneratedCommandList::Id, /* listSize = */ 0),
+            AttributeCaptureAssertion(0xFFFC, 0xFFF1FC04, AcceptedCommandList::Id, /* listSize = */ 0),
+            AttributeCaptureAssertion(0xFFFC, 0xFFF1FC04, AttributeList::Id, /* listSize = */ 5),
         };
 
         ASSERT_TRUE(delegate.CapturesMatchExactly(chip::Span<const AttributeCaptureAssertion>(kExpectedResponses)));
@@ -2956,6 +3021,9 @@ void TestReadInteraction::TestSubscribeWildcard()
                 AttributeCaptureAssertion(0xFFFC, 0xFFF1FC01, ClusterRevision::Id),
                 AttributeCaptureAssertion(0xFFFC, 0xFFF1FC01, FeatureMap::Id),
                 AttributeCaptureAssertion(0xFFFC, 0xFFF1FC01, 0xFFF10001),
+                AttributeCaptureAssertion(0xFFFC, 0xFFF1FC01, GeneratedCommandList::Id, /* listSize = */ 0),
+                AttributeCaptureAssertion(0xFFFC, 0xFFF1FC01, AcceptedCommandList::Id, /* listSize = */ 0),
+                AttributeCaptureAssertion(0xFFFC, 0xFFF1FC01, AttributeList::Id, /* listSize = */ 6),
                 AttributeCaptureAssertion(0xFFFC, 0xFFF1FC02, ClusterRevision::Id),
                 AttributeCaptureAssertion(0xFFFC, 0xFFF1FC02, FeatureMap::Id),
                 AttributeCaptureAssertion(0xFFFC, 0xFFF1FC02, 0xFFF10001),
@@ -2965,13 +3033,25 @@ void TestReadInteraction::TestSubscribeWildcard()
                 AttributeCaptureAssertion(0xFFFC, 0xFFF1FC02, 0xFFF10004, /* listSize = */ 1),
                 AttributeCaptureAssertion(0xFFFC, 0xFFF1FC02, 0xFFF10004, /* listSize = */ 1),
                 AttributeCaptureAssertion(0xFFFC, 0xFFF1FC02, 0xFFF10004, /* listSize = */ 1),
+                AttributeCaptureAssertion(0xFFFC, 0xFFF1FC02, GeneratedCommandList::Id, /* listSize = */ 0),
+                AttributeCaptureAssertion(0xFFFC, 0xFFF1FC02, AcceptedCommandList::Id, /* listSize = */ 0),
+                AttributeCaptureAssertion(0xFFFC, 0xFFF1FC02, AttributeList::Id, /* listSize = */ 9),
                 AttributeCaptureAssertion(0xFFFC, 0xFFF1FC03, ClusterRevision::Id),
                 AttributeCaptureAssertion(0xFFFC, 0xFFF1FC03, FeatureMap::Id),
+                AttributeCaptureAssertion(0xFFFC, 0xFFF1FC03, GeneratedCommandList::Id, /* listSize = */ 0),
+                AttributeCaptureAssertion(0xFFFC, 0xFFF1FC03, AcceptedCommandList::Id, /* listSize = */ 0),
+                AttributeCaptureAssertion(0xFFFC, 0xFFF1FC03, AttributeList::Id, /* listSize = */ 5),
                 AttributeCaptureAssertion(0xFFFC, 0xFFF1FC04, ClusterRevision::Id),
                 AttributeCaptureAssertion(0xFFFC, 0xFFF1FC04, FeatureMap::Id),
+                AttributeCaptureAssertion(0xFFFC, 0xFFF1FC04, GeneratedCommandList::Id, /* listSize = */ 0),
+                AttributeCaptureAssertion(0xFFFC, 0xFFF1FC04, AcceptedCommandList::Id, /* listSize = */ 0),
+                AttributeCaptureAssertion(0xFFFC, 0xFFF1FC04, AttributeList::Id, /* listSize = */ 5),
                 AttributeCaptureAssertion(0xFFFC, 0xFFF1FC01, ClusterRevision::Id),
                 AttributeCaptureAssertion(0xFFFC, 0xFFF1FC01, FeatureMap::Id),
                 AttributeCaptureAssertion(0xFFFC, 0xFFF1FC01, 0xFFF10001),
+                AttributeCaptureAssertion(0xFFFC, 0xFFF1FC01, GeneratedCommandList::Id, /* listSize = */ 0),
+                AttributeCaptureAssertion(0xFFFC, 0xFFF1FC01, AcceptedCommandList::Id, /* listSize = */ 0),
+                AttributeCaptureAssertion(0xFFFC, 0xFFF1FC01, AttributeList::Id, /* listSize = */ 6),
                 AttributeCaptureAssertion(0xFFFC, 0xFFF1FC02, ClusterRevision::Id),
                 AttributeCaptureAssertion(0xFFFC, 0xFFF1FC02, FeatureMap::Id),
                 AttributeCaptureAssertion(0xFFFC, 0xFFF1FC02, 0xFFF10001),
@@ -2982,10 +3062,19 @@ void TestReadInteraction::TestSubscribeWildcard()
                 AttributeCaptureAssertion(0xFFFC, 0xFFF1FC02, 0xFFF10004, /* listSize = */ 1),
                 AttributeCaptureAssertion(0xFFFC, 0xFFF1FC02, 0xFFF10004, /* listSize = */ 1),
                 AttributeCaptureAssertion(0xFFFC, 0xFFF1FC02, 0xFFF10004, /* listSize = */ 1),
+                AttributeCaptureAssertion(0xFFFC, 0xFFF1FC02, GeneratedCommandList::Id, /* listSize = */ 0),
+                AttributeCaptureAssertion(0xFFFC, 0xFFF1FC02, AcceptedCommandList::Id, /* listSize = */ 0),
+                AttributeCaptureAssertion(0xFFFC, 0xFFF1FC02, AttributeList::Id, /* listSize = */ 9),
                 AttributeCaptureAssertion(0xFFFC, 0xFFF1FC03, ClusterRevision::Id),
                 AttributeCaptureAssertion(0xFFFC, 0xFFF1FC03, FeatureMap::Id),
+                AttributeCaptureAssertion(0xFFFC, 0xFFF1FC03, GeneratedCommandList::Id, /* listSize = */ 0),
+                AttributeCaptureAssertion(0xFFFC, 0xFFF1FC03, AcceptedCommandList::Id, /* listSize = */ 0),
+                AttributeCaptureAssertion(0xFFFC, 0xFFF1FC03, AttributeList::Id, /* listSize = */ 5),
                 AttributeCaptureAssertion(0xFFFC, 0xFFF1FC04, ClusterRevision::Id),
                 AttributeCaptureAssertion(0xFFFC, 0xFFF1FC04, FeatureMap::Id),
+                AttributeCaptureAssertion(0xFFFC, 0xFFF1FC04, GeneratedCommandList::Id, /* listSize = */ 0),
+                AttributeCaptureAssertion(0xFFFC, 0xFFF1FC04, AcceptedCommandList::Id, /* listSize = */ 0),
+                AttributeCaptureAssertion(0xFFFC, 0xFFF1FC04, AttributeList::Id, /* listSize = */ 5),
 
             };
 

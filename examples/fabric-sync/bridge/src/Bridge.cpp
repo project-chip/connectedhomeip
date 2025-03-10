@@ -53,8 +53,23 @@ public:
         CommandHandlerInterface(Optional<EndpointId>::Missing(), AdministratorCommissioning::Id)
     {}
 
+    CHIP_ERROR Init();
+
     void InvokeCommand(HandlerContext & handlerContext) override;
+
+private:
+    CommandHandlerInterface * mOriginalCommandHandlerInterface = nullptr;
 };
+
+CHIP_ERROR AdministratorCommissioningCommandHandler::Init()
+{
+    mOriginalCommandHandlerInterface =
+        CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(kRootEndpointId, AdministratorCommissioning::Id);
+    VerifyOrReturnError(mOriginalCommandHandlerInterface, CHIP_ERROR_INTERNAL);
+    ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(mOriginalCommandHandlerInterface));
+    ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
+    return CHIP_NO_ERROR;
+}
 
 void AdministratorCommissioningCommandHandler::InvokeCommand(HandlerContext & handlerContext)
 {
@@ -66,6 +81,7 @@ void AdministratorCommissioningCommandHandler::InvokeCommand(HandlerContext & ha
         endpointId == kRootEndpointId)
     {
         // Proceed with default handling in Administrator Commissioning Server
+        mOriginalCommandHandlerInterface->InvokeCommand(handlerContext);
         return;
     }
 
@@ -200,9 +216,11 @@ BridgedDeviceInformationCommandHandler gBridgedDeviceInformationCommandHandler;
 CHIP_ERROR BridgeInit(FabricAdminDelegate * delegate)
 {
     MatterEcosystemInformationPluginServerInitCallback();
-    CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&gAdministratorCommissioningCommandHandler);
-    CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&gBridgedDeviceInformationCommandHandler);
-    AttributeAccessInterfaceRegistry::Instance().Register(&gBridgedDeviceBasicInformationAttributes);
+    ReturnErrorOnFailure(gAdministratorCommissioningCommandHandler.Init());
+    ReturnErrorOnFailure(
+        CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&gBridgedDeviceInformationCommandHandler));
+    VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(&gBridgedDeviceBasicInformationAttributes),
+                        CHIP_ERROR_INTERNAL);
 
     BridgedDeviceManager::Instance().Init();
     FabricBridge::Instance().SetDelegate(delegate);

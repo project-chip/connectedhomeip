@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2023). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -51,9 +51,11 @@ are the sole property of their respective owners.
 
 This notice and disclaimer must be included on all copies of this document.
 
-Connectivity Standards Alliance +
-508 Second Street, Suite 206 +
+Connectivity Standards Alliance
+508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0060" name="Operational State Cluster" revision="3">
   <revisionHistory>
@@ -67,24 +69,30 @@ Davis, CA 95616, USA
   <classification hierarchy="base" role="application" picsCode="OPSTATE" scope="Endpoint"/>
   <dataTypes>
     <enum name="ErrorStateEnum">
-      <item from="0x00" to="0x3F" name="GeneralErrors" summary="Generally applicable values for error, defined herein">
+      <item value="0x00" name="NoError" summary="The device is not in an error state">
         <mandatoryConform/>
       </item>
-      <item from="0x40" to="0x7F" name="DerivedClusterErrors" summary="Derived Cluster defined errors">
+      <item value="0x01" name="UnableToStartOrResume" summary="The device is unable to start or resume operation">
         <mandatoryConform/>
       </item>
-      <item from="0x80" to="0xBF" name="ManufacturerError" summary="Vendor specific errors">
+      <item value="0x02" name="UnableToCompleteOperation" summary="The device was unable to complete the current operation">
+        <mandatoryConform/>
+      </item>
+      <item value="0x03" name="CommandInvalidInState" summary="The device cannot process the command in its current state">
         <mandatoryConform/>
       </item>
     </enum>
     <enum name="OperationalStateEnum">
-      <item from="0x00" to="0x3F" name="GeneralStates" summary="Generally applicable values for state, defined herein">
+      <item value="0x00" name="Stopped" summary="The device is stopped">
         <mandatoryConform/>
       </item>
-      <item from="0x40" to="0x7F" name="DerivedClusterStates" summary="Derived Cluster defined states">
+      <item value="0x01" name="Running" summary="The device is operating">
         <mandatoryConform/>
       </item>
-      <item from="0x80" to="0xBF" name="ManufacturerStates" summary="Vendor specific states">
+      <item value="0x02" name="Paused" summary="The device is paused during an operation">
+        <mandatoryConform/>
+      </item>
+      <item value="0x03" name="Error" summary="The device is in an error state">
         <mandatoryConform/>
       </item>
     </enum>
@@ -93,11 +101,27 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
       <field id="1" name="ErrorStateLabel" type="string" default="empty">
-        <constraint type="maxLength" value="64"/>
+        <mandatoryConform>
+          <andTerm>
+            <greaterOrEqualTerm>
+              <field name="ErrorStateID"/>
+              <literal value="0x80"/>
+            </greaterOrEqualTerm>
+            <lessOrEqualTerm>
+              <field name="ErrorStateID"/>
+              <literal value="0xBF"/>
+            </lessOrEqualTerm>
+          </andTerm>
+        </mandatoryConform>
+        <constraint>
+          <maxLength value="64"/>
+        </constraint>
       </field>
       <field id="2" name="ErrorStateDetails" type="string" default="empty">
         <optionalConform/>
-        <constraint type="maxLength" value="64"/>
+        <constraint>
+          <maxLength value="64"/>
+        </constraint>
       </field>
     </struct>
     <struct name="OperationalStateStruct">
@@ -105,37 +129,61 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
       <field id="1" name="OperationalStateLabel" type="string">
-        <constraint type="maxLength" value="64"/>
+        <mandatoryConform>
+          <andTerm>
+            <greaterOrEqualTerm>
+              <field name="OperationalStateID"/>
+              <literal value="0x80"/>
+            </greaterOrEqualTerm>
+            <lessOrEqualTerm>
+              <field name="OperationalStateID"/>
+              <literal value="0xBF"/>
+            </lessOrEqualTerm>
+          </andTerm>
+        </mandatoryConform>
+        <constraint>
+          <maxLength value="64"/>
+        </constraint>
       </field>
     </struct>
   </dataTypes>
   <attributes>
     <attribute id="0x0000" name="PhaseList" type="list" default="MS">
       <entry type="string">
-        <constraint type="maxLength" value="64"/>
+        <constraint>
+          <maxLength value="64"/>
+        </constraint>
       </entry>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <mandatoryConform/>
-      <constraint type="maxCount" value="32"/>
+      <constraint>
+        <maxCount value="32"/>
+      </constraint>
     </attribute>
     <attribute id="0x0001" name="CurrentPhase" type="uint8" default="MS">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <mandatoryConform/>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0002" name="CountdownTime" type="elapsed-s" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
+      <quality nullable="true" quieterReporting="true"/>
       <optionalConform/>
-      <constraint type="max" value="259200"/>
+      <constraint>
+        <max value="259200"/>
+      </constraint>
     </attribute>
     <attribute id="0x0003" name="OperationalStateList" type="list" default="MS">
       <entry type="OperationalStateStruct"/>
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0004" name="OperationalState" type="OperationalStateEnum">
       <access read="true" readPrivilege="view"/>
@@ -144,7 +192,9 @@ Davis, CA 95616, USA
     <attribute id="0x0005" name="OperationalError" type="ErrorStateStruct">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
   </attributes>
   <commands>
@@ -203,10 +253,7 @@ Davis, CA 95616, USA
     </event>
     <event id="0x01" name="OperationCompletion" priority="info">
       <access readPrivilege="view"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform/>
-      </otherwiseConform>
+      <optionalConform/>
       <field id="0" name="CompletionErrorCode" type="enum8">
         <mandatoryConform/>
       </field>

@@ -1,6 +1,6 @@
-docutils==0.17.1
-Sphinx>=4.5
+docutils==0.21.2
+Sphinx==8.2.3
 sphinx-book-theme
-myst-parser
+myst-parser>=2.0.0
 breathe>=4.34
-pydata-sphinx-theme==0.14.4
+pydata-sphinx-theme==0.16.1

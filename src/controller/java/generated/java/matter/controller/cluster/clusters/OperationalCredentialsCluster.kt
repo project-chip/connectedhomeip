@@ -55,6 +55,12 @@ class OperationalCredentialsCluster(
 
   class NOCResponse(val statusCode: UByte, val fabricIndex: UByte?, val debugText: String?)
 
+  class SignVidVerificationResponse(
+    val fabricIndex: UByte,
+    val fabricBindingVersion: UByte,
+    val signature: ByteArray,
+  )
+
   class NOCsAttribute(val value: List<OperationalCredentialsClusterNOCStruct>)
 
   sealed class NOCsAttributeSubscriptionState {
@@ -658,6 +664,120 @@ class OperationalCredentialsCluster(
 
     val response: InvokeResponse = controller.invoke(request)
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+  }
+
+  suspend fun setVidVerificationStatement(
+    vendorID: UShort?,
+    vidVerificationStatement: ByteArray?,
+    vvsc: ByteArray?,
+    timedInvokeTimeout: Duration? = null,
+  ) {
+    val commandId: UInt = 12u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_VENDOR_ID_REQ: Int = 0
+    vendorID?.let { tlvWriter.put(ContextSpecificTag(TAG_VENDOR_ID_REQ), vendorID) }
+
+    val TAG_VID_VERIFICATION_STATEMENT_REQ: Int = 1
+    vidVerificationStatement?.let {
+      tlvWriter.put(
+        ContextSpecificTag(TAG_VID_VERIFICATION_STATEMENT_REQ),
+        vidVerificationStatement,
+      )
+    }
+
+    val TAG_VVSC_REQ: Int = 2
+    vvsc?.let { tlvWriter.put(ContextSpecificTag(TAG_VVSC_REQ), vvsc) }
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timedInvokeTimeout,
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+  }
+
+  suspend fun signVidVerificationRequest(
+    fabricIndex: UByte,
+    clientChallenge: ByteArray,
+    timedInvokeTimeout: Duration? = null,
+  ): SignVidVerificationResponse {
+    val commandId: UInt = 13u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_FABRIC_INDEX_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_FABRIC_INDEX_REQ), fabricIndex)
+
+    val TAG_CLIENT_CHALLENGE_REQ: Int = 1
+    tlvWriter.put(ContextSpecificTag(TAG_CLIENT_CHALLENGE_REQ), clientChallenge)
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timedInvokeTimeout,
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+
+    val tlvReader = TlvReader(response.payload)
+    tlvReader.enterStructure(AnonymousTag)
+    val TAG_FABRIC_INDEX: Int = 0
+    var fabricIndex_decoded: UByte? = null
+
+    val TAG_FABRIC_BINDING_VERSION: Int = 1
+    var fabricBindingVersion_decoded: UByte? = null
+
+    val TAG_SIGNATURE: Int = 2
+    var signature_decoded: ByteArray? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_FABRIC_INDEX)) {
+        fabricIndex_decoded = tlvReader.getUByte(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_FABRIC_BINDING_VERSION)) {
+        fabricBindingVersion_decoded = tlvReader.getUByte(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_SIGNATURE)) {
+        signature_decoded = tlvReader.getByteArray(tag)
+      } else {
+        tlvReader.skipElement()
+      }
+    }
+
+    if (fabricIndex_decoded == null) {
+      throw IllegalStateException("fabricIndex not found in TLV")
+    }
+
+    if (fabricBindingVersion_decoded == null) {
+      throw IllegalStateException("fabricBindingVersion not found in TLV")
+    }
+
+    if (signature_decoded == null) {
+      throw IllegalStateException("signature not found in TLV")
+    }
+
+    tlvReader.exitContainer()
+
+    return SignVidVerificationResponse(
+      fabricIndex_decoded,
+      fabricBindingVersion_decoded,
+      signature_decoded,
+    )
   }
 
   suspend fun readNOCsAttribute(): NOCsAttribute {

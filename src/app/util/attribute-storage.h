@@ -18,7 +18,6 @@
 #pragma once
 
 #include <app/util/af-types.h>
-#include <app/util/att-storage.h>
 #include <app/util/attribute-metadata.h>
 #include <app/util/config.h>
 #include <app/util/endpoint-config-defines.h>
@@ -39,7 +38,7 @@ static constexpr uint16_t kEmberInvalidEndpointIndex = 0xFFFF;
 #endif
 
 #define DECLARE_DYNAMIC_ENDPOINT(endpointName, clusterList)                                                                        \
-    EmberAfEndpointType endpointName = { clusterList, ArraySize(clusterList), 0 }
+    EmberAfEndpointType endpointName = { clusterList, MATTER_ARRAY_SIZE(clusterList), 0 }
 
 #define DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(clusterListName) EmberAfCluster clusterListName[] = {
 
@@ -47,7 +46,7 @@ static constexpr uint16_t kEmberInvalidEndpointIndex = 0xFFFF;
 // It can be assigned with the ZAP_CLUSTER_MASK(SERVER) or ZAP_CLUSTER_MASK(CLUSTER) values.
 #define DECLARE_DYNAMIC_CLUSTER(clusterId, clusterAttrs, role, incomingCommands, outgoingCommands)                                 \
     {                                                                                                                              \
-        clusterId, clusterAttrs, ArraySize(clusterAttrs), 0, role, NULL, incomingCommands, outgoingCommands                        \
+        clusterId, clusterAttrs, MATTER_ARRAY_SIZE(clusterAttrs), 0, role, NULL, incomingCommands, outgoingCommands                \
     }
 
 #define DECLARE_DYNAMIC_CLUSTER_LIST_END }
@@ -60,12 +59,12 @@ static constexpr uint16_t kEmberInvalidEndpointIndex = 0xFFFF;
     } /* cluster revision */                                                                                                       \
     }
 
-// The attrMask must contain the relevant ATTRIBUTE_MASK_* bits from
+// The attrMask must contain the relevant MATTER_ATTRIBUTE_FLAG_* bits from
 // attribute-metadata.h.  Specifically:
 //
-// * Writable attributes must have ATTRIBUTE_MASK_WRITABLE
-// * Nullable attributes (have X in the quality column in the spec) must have ATTRIBUTE_MASK_NULLABLE
-// * Attributes that have T in the Access column in the spec must have ATTRIBUTE_MASK_MUST_USE_TIMED_WRITE
+// * Writable attributes must have MATTER_ATTRIBUTE_FLAG_WRITABLE
+// * Nullable attributes (have X in the quality column in the spec) must have MATTER_ATTRIBUTE_FLAG_NULLABLE
+// * Attributes that have T in the Access column in the spec must have MATTER_ATTRIBUTE_FLAG_MUST_USE_TIMED_WRITE
 #define DECLARE_DYNAMIC_ATTRIBUTE(attId, attType, attSizeBytes, attrMask)                                                          \
     {                                                                                                                              \
         ZAP_EMPTY_DEFAULT(), attId, attSizeBytes, ZAP_TYPE(attType), attrMask | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE)               \
@@ -223,8 +222,8 @@ uint8_t emberAfGetClusterCountForEndpoint(chip::EndpointId endpoint);
 // Check if a cluster is implemented or not. If yes, the cluster is returned.
 //
 // mask = 0 -> find either client or server
-// mask = CLUSTER_MASK_CLIENT -> find client
-// mask = CLUSTER_MASK_SERVER -> find server
+// mask = MATTER_CLUSTER_FLAG_CLIENT -> find client
+// mask = MATTER_CLUSTER_FLAG_SERVER -> find server
 //
 // If a pointer to an index is provided, it will be updated to point to the relative index of the cluster
 // within the set of clusters that match the mask criteria.

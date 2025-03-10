@@ -689,7 +689,7 @@ EmberEventControl * ColorControlServer::getEventControl(EndpointId endpoint)
     uint16_t index            = getEndpointIndex(endpoint);
     EmberEventControl * event = nullptr;
 
-    if (index < ArraySize(eventControls))
+    if (index < MATTER_ARRAY_SIZE(eventControls))
     {
         event = &eventControls[index];
     }
@@ -817,7 +817,7 @@ ColorControlServer::ColorHueTransitionState * ColorControlServer::getColorHueTra
 {
     ColorHueTransitionState * state = nullptr;
 
-    if (index < ArraySize(colorHueTransitionStates))
+    if (index < MATTER_ARRAY_SIZE(colorHueTransitionStates))
     {
         state = &colorHueTransitionStates[index];
     }
@@ -845,7 +845,7 @@ ColorControlServer::Color16uTransitionState * ColorControlServer::getSaturationT
 {
     Color16uTransitionState * state = nullptr;
 
-    if (index < ArraySize(colorSatTransitionStates))
+    if (index < MATTER_ARRAY_SIZE(colorSatTransitionStates))
     {
         state = &colorSatTransitionStates[index];
     }
@@ -2071,7 +2071,7 @@ void ColorControlServer::updateHueSatCommand(EndpointId endpoint)
 ColorControlServer::Color16uTransitionState * ColorControlServer::getXTransitionStateByIndex(uint16_t index)
 {
     Color16uTransitionState * state = nullptr;
-    if (index < ArraySize(colorXtransitionStates))
+    if (index < MATTER_ARRAY_SIZE(colorXtransitionStates))
     {
         state = &colorXtransitionStates[index];
     }
@@ -2099,7 +2099,7 @@ ColorControlServer::Color16uTransitionState * ColorControlServer::getXTransition
 ColorControlServer::Color16uTransitionState * ColorControlServer::getYTransitionStateByIndex(uint16_t index)
 {
     Color16uTransitionState * state = nullptr;
-    if (index < ArraySize(colorYtransitionStates))
+    if (index < MATTER_ARRAY_SIZE(colorYtransitionStates))
     {
         state = &colorYtransitionStates[index];
     }
@@ -2447,7 +2447,7 @@ void ColorControlServer::updateXYCommand(EndpointId endpoint)
 ColorControlServer::Color16uTransitionState * ColorControlServer::getTempTransitionStateByIndex(uint16_t index)
 {
     Color16uTransitionState * state = nullptr;
-    if (index < ArraySize(colorTempTransitionStates))
+    if (index < MATTER_ARRAY_SIZE(colorTempTransitionStates))
     {
         state = &colorTempTransitionStates[index];
     }

@@ -35,5 +35,8 @@ source_set("icd") {
 
   public_configs = [ ":icd-shell-config" ]
 
-  deps = [ "${shell_dependency_path}:matter-shell" ]
+  deps = [
+    "${chip_root}/src/app/icd/server:notifier",
+    "${shell_dependency_path}:matter-shell",
+  ]
 }

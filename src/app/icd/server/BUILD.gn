@@ -154,6 +154,8 @@ source_set("configuration-data") {
     "ICDConfigurationData.h",
   ]
 
+  public_deps = [ "${chip_root}/src/app/common:enums" ]
+
   deps = [
     ":icd-server-config",
     "${chip_root}/src/lib/core",

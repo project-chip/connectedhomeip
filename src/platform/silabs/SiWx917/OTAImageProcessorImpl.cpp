@@ -19,9 +19,13 @@
 #include <app/clusters/ota-requestor/OTADownloader.h>
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <platform/silabs/OTAImageProcessorImpl.h>
-
 #include <platform/silabs/SilabsConfig.h>
 #include <platform/silabs/wifi/WifiInterface.h>
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#include <platform/silabs/wifi/icd/WifiSleepManager.h>
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -156,13 +160,9 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
 
     imageProcessor->mHeaderParser.Init();
 
-    // Setting the device is in high performace - no-sleepy mode while OTA tranfer
-#if (CHIP_CONFIG_ENABLE_ICD_SERVER)
-    status = wfx_power_save(RSI_ACTIVE, HIGH_PERFORMANCE);
-    if (status != SL_STATUS_OK)
-    {
-        ChipLogError(DeviceLayer, "Failed to enable the TA Deep Sleep");
-    }
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    // Setting the device in high performance - no-sleep mode during OTA tranfer
+    DeviceLayer::Silabs::WifiSleepManager::GetInstance().RequestHighPerformance();
 #endif /* CHIP_CONFIG_ENABLE_ICD_SERVER*/
 
     imageProcessor->mDownloader->OnPreparedForDownload(CHIP_NO_ERROR);
@@ -199,13 +199,9 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
     }
     imageProcessor->ReleaseBlock();
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
     // Setting the device back to power save mode when transfer is completed successfully
-#if (CHIP_CONFIG_ENABLE_ICD_SERVER)
-    sl_status_t err = wfx_power_save(RSI_SLEEP_MODE_2, ASSOCIATED_POWER_SAVE);
-    if (err != SL_STATUS_OK)
-    {
-        ChipLogError(DeviceLayer, "Power save config for Wifi failed");
-    }
+    DeviceLayer::Silabs::WifiSleepManager::GetInstance().RemoveHighPerformanceRequest();
 #endif /* CHIP_CONFIG_ENABLE_ICD_SERVER*/
 
     ChipLogProgress(SoftwareUpdate, "OTA image downloaded successfully");
@@ -222,13 +218,9 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
 
     ChipLogProgress(SoftwareUpdate, "OTA image downloaded successfully in HandleApply");
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
     // Setting the device is in high performace - no-sleepy mode before soft reset as soft reset is not happening in sleep mode
-#if (CHIP_CONFIG_ENABLE_ICD_SERVER)
-    status = wfx_power_save(RSI_ACTIVE, HIGH_PERFORMANCE);
-    if (status != SL_STATUS_OK)
-    {
-        ChipLogError(DeviceLayer, "Failed to enable the TA Deep Sleep");
-    }
+    DeviceLayer::Silabs::WifiSleepManager::GetInstance().RequestHighPerformance();
 #endif /* CHIP_CONFIG_ENABLE_ICD_SERVER*/
 
     if (mReset)
@@ -249,13 +241,9 @@ void OTAImageProcessorImpl::HandleAbort(intptr_t context)
         return;
     }
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
     // Setting the device back to power save mode when transfer is aborted in the middle
-#if (CHIP_CONFIG_ENABLE_ICD_SERVER)
-    sl_status_t err = wfx_power_save(RSI_SLEEP_MODE_2, ASSOCIATED_POWER_SAVE);
-    if (err != SL_STATUS_OK)
-    {
-        ChipLogError(DeviceLayer, "Power save config for Wifi failed");
-    }
+    DeviceLayer::Silabs::WifiSleepManager::GetInstance().RemoveHighPerformanceRequest();
 #endif /* CHIP_CONFIG_ENABLE_ICD_SERVER*/
 
     // Not clearing the image storage area as it is done during each write
