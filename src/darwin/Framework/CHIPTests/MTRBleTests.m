@@ -137,9 +137,9 @@ MTRDeviceController * sController;
     XCTAssertTrue([sController stopBrowseForCommissionables]);
 
     // Attempt to use the MTRCommissionableBrowserResult after we stopped browsing
-    // TODO: This currently results in a UAF because BLE_CONNECTION_OBJECT is a void*
+    // This used to result in a UAF because BLE_CONNECTION_OBJECT is a void*
     // carrying a CBPeripheral without retaining it. When browsing is stopped,
-    // BleConnectionDelegateImpl release all cached CBPeripherals.
+    // BleConnectionDelegateImpl releases all cached CBPeripherals.
     MTRSetupPayload * payload = [[MTRSetupPayload alloc] initWithSetupPasscode:@54321 discriminator:@0x444];
     [sController setupCommissioningSessionWithDiscoveredDevice:device
                                                        payload:payload
@@ -157,7 +157,7 @@ MTRDeviceController * sController;
     XCTAssertTrue([sController setupCommissioningSessionWithPayload:payload newNodeID:@999 error:&error],
         "setupCommissioningSessionWithPayload failed: %@", error);
 
-    // Create a race between shutdown and a CBManager callback that provokes a UAF
+    // Create a race between shutdown and a CBManager callback that used to provoke a UAF.
     // Note that on the order of 100 iterations can be necessary to reproduce the crash.
     __block atomic_int tasks = 2;
     dispatch_semaphore_t done = dispatch_semaphore_create(0);
