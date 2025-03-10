@@ -13379,7 +13379,7 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000001: {
-                "attributeName": "ActiveChimeID",
+                "attributeName": "SelectedChime",
                 "attributeId": 0x00000001,
                 "type": "int",
                 "reportable": True,
@@ -13584,22 +13584,22 @@ class ChipClusters:
                     "clientCertificateDetails": "TLSClientCertificateDetailStruct",
                 },
             },
-            0x0000000B: {
-                "commandId": 0x0000000B,
+            0x0000000A: {
+                "commandId": 0x0000000A,
                 "commandName": "FindClientCertificate",
                 "args": {
                     "ccdid": "int",
                 },
             },
-            0x0000000D: {
-                "commandId": 0x0000000D,
+            0x0000000C: {
+                "commandId": 0x0000000C,
                 "commandName": "LookupClientCertificate",
                 "args": {
                     "fingerprint": "bytes",
                 },
             },
-            0x0000000F: {
-                "commandId": 0x0000000F,
+            0x0000000E: {
+                "commandId": 0x0000000E,
                 "commandName": "RemoveClientCertificate",
                 "args": {
                     "ccdid": "int",
@@ -13614,9 +13614,9 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000001: {
-                "attributeName": "CurrentRootCertificates",
+                "attributeName": "ProvisionedRootCertificates",
                 "attributeId": 0x00000001,
-                "type": "int",
+                "type": "",
                 "reportable": True,
             },
             0x00000002: {
@@ -13626,9 +13626,9 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000003: {
-                "attributeName": "CurrentClientCertificates",
+                "attributeName": "ProvisionedClientCertificates",
                 "attributeId": 0x00000003,
-                "type": "int",
+                "type": "",
                 "reportable": True,
             },
             0x0000FFF8: {

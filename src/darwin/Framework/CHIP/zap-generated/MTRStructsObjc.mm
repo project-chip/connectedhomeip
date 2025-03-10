@@ -10212,7 +10212,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _caid = @(0);
 
-        _certificate = [NSData data];
+        _certificate = nil;
     }
     return self;
 }
@@ -10242,9 +10242,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _ccdid = @(0);
 
-        _clientCertificate = [NSData data];
+        _clientCertificate = nil;
 
-        _intermediateCertificates = [NSArray array];
+        _intermediateCertificates = nil;
     }
     return self;
 }

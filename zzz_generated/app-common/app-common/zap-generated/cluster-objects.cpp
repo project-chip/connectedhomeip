@@ -32492,8 +32492,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     {
     case Attributes::InstalledChimeSounds::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, installedChimeSounds);
-    case Attributes::ActiveChimeID::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, activeChimeID);
+    case Attributes::SelectedChime::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, selectedChime);
     case Attributes::Enabled::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, enabled);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
@@ -33411,40 +33411,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     }
 }
 } // namespace ProvisionClientCertificate.
-namespace ProvisionClientCertificateResponse {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kCcdid), ccdid);
-    return encoder.Finalize();
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    detail::StructDecodeIterator __iterator(reader);
-    while (true)
-    {
-        auto __element = __iterator.Next();
-        if (std::holds_alternative<CHIP_ERROR>(__element))
-        {
-            return std::get<CHIP_ERROR>(__element);
-        }
-
-        CHIP_ERROR err              = CHIP_NO_ERROR;
-        const uint8_t __context_tag = std::get<uint8_t>(__element);
-
-        if (__context_tag == to_underlying(Fields::kCcdid))
-        {
-            err = DataModel::Decode(reader, ccdid);
-        }
-        else
-        {
-        }
-
-        ReturnErrorOnFailure(err);
-    }
-}
-} // namespace ProvisionClientCertificateResponse.
 namespace FindClientCertificate {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
@@ -33624,12 +33590,12 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     {
     case Attributes::MaxRootCertificates::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, maxRootCertificates);
-    case Attributes::CurrentRootCertificates::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, currentRootCertificates);
+    case Attributes::ProvisionedRootCertificates::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, provisionedRootCertificates);
     case Attributes::MaxClientCertificates::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, maxClientCertificates);
-    case Attributes::CurrentClientCertificates::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, currentClientCertificates);
+    case Attributes::ProvisionedClientCertificates::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, provisionedClientCertificates);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, generatedCommandList);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
@@ -37482,6 +37448,22 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
     case Clusters::TlsCertificateManagement::Id: {
         switch (aCommand)
         {
+        case Clusters::TlsCertificateManagement::Commands::ProvisionRootCertificate::Id:
+            return true;
+        case Clusters::TlsCertificateManagement::Commands::FindRootCertificate::Id:
+            return true;
+        case Clusters::TlsCertificateManagement::Commands::LookupRootCertificate::Id:
+            return true;
+        case Clusters::TlsCertificateManagement::Commands::RemoveRootCertificate::Id:
+            return true;
+        case Clusters::TlsCertificateManagement::Commands::TLSClientCSR::Id:
+            return true;
+        case Clusters::TlsCertificateManagement::Commands::FindClientCertificate::Id:
+            return true;
+        case Clusters::TlsCertificateManagement::Commands::LookupClientCertificate::Id:
+            return true;
+        case Clusters::TlsCertificateManagement::Commands::RemoveClientCertificate::Id:
+            return true;
         default:
             return false;
         }
@@ -37607,6 +37589,81 @@ bool CommandHasLargePayload(ClusterId aCluster, CommandId aCommand)
     }
     if ((aCluster == Clusters::PushAvStreamTransport::Id) &&
         (aCommand == Clusters::PushAvStreamTransport::Commands::FindTransportResponse::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::TlsCertificateManagement::Id) &&
+        (aCommand == Clusters::TlsCertificateManagement::Commands::ProvisionRootCertificate::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::TlsCertificateManagement::Id) &&
+        (aCommand == Clusters::TlsCertificateManagement::Commands::ProvisionRootCertificateResponse::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::TlsCertificateManagement::Id) &&
+        (aCommand == Clusters::TlsCertificateManagement::Commands::FindRootCertificate::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::TlsCertificateManagement::Id) &&
+        (aCommand == Clusters::TlsCertificateManagement::Commands::FindRootCertificateResponse::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::TlsCertificateManagement::Id) &&
+        (aCommand == Clusters::TlsCertificateManagement::Commands::LookupRootCertificate::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::TlsCertificateManagement::Id) &&
+        (aCommand == Clusters::TlsCertificateManagement::Commands::LookupRootCertificateResponse::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::TlsCertificateManagement::Id) &&
+        (aCommand == Clusters::TlsCertificateManagement::Commands::RemoveRootCertificate::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::TlsCertificateManagement::Id) &&
+        (aCommand == Clusters::TlsCertificateManagement::Commands::TLSClientCSR::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::TlsCertificateManagement::Id) &&
+        (aCommand == Clusters::TlsCertificateManagement::Commands::TLSClientCSRResponse::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::TlsCertificateManagement::Id) &&
+        (aCommand == Clusters::TlsCertificateManagement::Commands::ProvisionClientCertificate::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::TlsCertificateManagement::Id) &&
+        (aCommand == Clusters::TlsCertificateManagement::Commands::FindClientCertificate::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::TlsCertificateManagement::Id) &&
+        (aCommand == Clusters::TlsCertificateManagement::Commands::FindClientCertificateResponse::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::TlsCertificateManagement::Id) &&
+        (aCommand == Clusters::TlsCertificateManagement::Commands::LookupClientCertificate::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::TlsCertificateManagement::Id) &&
+        (aCommand == Clusters::TlsCertificateManagement::Commands::LookupClientCertificateResponse::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::TlsCertificateManagement::Id) &&
+        (aCommand == Clusters::TlsCertificateManagement::Commands::RemoveClientCertificate::Id))
     {
         return true;
     }

@@ -2132,28 +2132,24 @@ namespace ProvisionClientCertificate {
 static constexpr CommandId Id = 0x00000009;
 } // namespace ProvisionClientCertificate
 
-namespace ProvisionClientCertificateResponse {
-static constexpr CommandId Id = 0x0000000A;
-} // namespace ProvisionClientCertificateResponse
-
 namespace FindClientCertificate {
-static constexpr CommandId Id = 0x0000000B;
+static constexpr CommandId Id = 0x0000000A;
 } // namespace FindClientCertificate
 
 namespace FindClientCertificateResponse {
-static constexpr CommandId Id = 0x0000000C;
+static constexpr CommandId Id = 0x0000000B;
 } // namespace FindClientCertificateResponse
 
 namespace LookupClientCertificate {
-static constexpr CommandId Id = 0x0000000D;
+static constexpr CommandId Id = 0x0000000C;
 } // namespace LookupClientCertificate
 
 namespace LookupClientCertificateResponse {
-static constexpr CommandId Id = 0x0000000E;
+static constexpr CommandId Id = 0x0000000D;
 } // namespace LookupClientCertificateResponse
 
 namespace RemoveClientCertificate {
-static constexpr CommandId Id = 0x0000000F;
+static constexpr CommandId Id = 0x0000000E;
 } // namespace RemoveClientCertificate
 
 } // namespace Commands

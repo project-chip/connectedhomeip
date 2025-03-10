@@ -4413,8 +4413,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         {
         case chip::app::Clusters::Chime::Attributes::InstalledChimeSounds::Id:
             return "InstalledChimeSounds";
-        case chip::app::Clusters::Chime::Attributes::ActiveChimeID::Id:
-            return "ActiveChimeID";
+        case chip::app::Clusters::Chime::Attributes::SelectedChime::Id:
+            return "SelectedChime";
         case chip::app::Clusters::Chime::Attributes::Enabled::Id:
             return "Enabled";
         case chip::app::Clusters::Chime::Attributes::GeneratedCommandList::Id:
@@ -4476,12 +4476,12 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         {
         case chip::app::Clusters::TlsCertificateManagement::Attributes::MaxRootCertificates::Id:
             return "MaxRootCertificates";
-        case chip::app::Clusters::TlsCertificateManagement::Attributes::CurrentRootCertificates::Id:
-            return "CurrentRootCertificates";
+        case chip::app::Clusters::TlsCertificateManagement::Attributes::ProvisionedRootCertificates::Id:
+            return "ProvisionedRootCertificates";
         case chip::app::Clusters::TlsCertificateManagement::Attributes::MaxClientCertificates::Id:
             return "MaxClientCertificates";
-        case chip::app::Clusters::TlsCertificateManagement::Attributes::CurrentClientCertificates::Id:
-            return "CurrentClientCertificates";
+        case chip::app::Clusters::TlsCertificateManagement::Attributes::ProvisionedClientCertificates::Id:
+            return "ProvisionedClientCertificates";
         case chip::app::Clusters::TlsCertificateManagement::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::TlsCertificateManagement::Attributes::AcceptedCommandList::Id:
@@ -6568,8 +6568,6 @@ char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId i
             return "LookupRootCertificateResponse";
         case chip::app::Clusters::TlsCertificateManagement::Commands::TLSClientCSRResponse::Id:
             return "TLSClientCSRResponse";
-        case chip::app::Clusters::TlsCertificateManagement::Commands::ProvisionClientCertificateResponse::Id:
-            return "ProvisionClientCertificateResponse";
         case chip::app::Clusters::TlsCertificateManagement::Commands::FindClientCertificateResponse::Id:
             return "FindClientCertificateResponse";
         case chip::app::Clusters::TlsCertificateManagement::Commands::LookupClientCertificateResponse::Id:
