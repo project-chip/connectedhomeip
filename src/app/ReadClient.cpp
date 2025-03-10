@@ -490,6 +490,10 @@ void ReadClient::OnActiveModeNotification()
     // called, either mEventPathParamsListSize or mAttributePathParamsListSize is not 0.
     VerifyOrDie(mReadPrepareParams.mEventPathParamsListSize != 0 || mReadPrepareParams.mAttributePathParamsListSize != 0);
 
+    // If mCatsMatchCheckIn is true, it means cats used in icd registration matches with the one in current subscription, OnActiveModeNotification
+    // continues to revive the subscription as needed, otherwise, do nothing.
+    VerifyOrReturn(mReadPrepareParams.mCatsMatchCheckIn);
+
     // When we reach here, the subscription definitely exceeded the liveness timeout. Just continue the unfinished resubscription
     // logic in `OnLivenessTimeoutCallback`.
     if (IsInactiveICDSubscription())

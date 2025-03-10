@@ -1069,18 +1069,14 @@ void InteractionModelEngine::OnResponseTimeout(Messaging::ExchangeContext * ec)
 }
 
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
-void InteractionModelEngine::OnActiveModeNotification(ScopedNodeId aPeer, uint64_t aMonitoredSubject)
+void InteractionModelEngine::OnActiveModeNotification(ScopedNodeId aPeer)
 {
     for (ReadClient * pListItem = mpActiveReadClientList; pListItem != nullptr;)
     {
         auto pNextItem = pListItem->GetNextClient();
         // It is possible that pListItem is destroyed by the app in OnActiveModeNotification.
         // Get the next item before invoking `OnActiveModeNotification`.
-        // If caseTag for current subscription does not match with the one set in ICDManagementCluster::RegisterClient for check-in,
-        // when receiving check-in message, OnActiveModeNotification would do nothing for current subscription.
-        if (ScopedNodeId(pListItem->GetPeerNodeId(), pListItem->GetFabricIndex()) == aPeer &&
-           pListItem->GetSubjectDescriptor().HasValue() && pListItem->GetSubjectDescriptor().Value().cats.CheckSubjectAgainstCATs(aMonitoredSubject) &&
-           pListItem->GetSubjectDescriptor().Value().subject == aMonitoredSubject)
+        if (ScopedNodeId(pListItem->GetPeerNodeId(), pListItem->GetFabricIndex()) == aPeer)
         {
             pListItem->OnActiveModeNotification();
         }

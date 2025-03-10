@@ -238,7 +238,7 @@ public:
      *
      *  See ReadClient::OnActiveModeNotification
      */
-    void OnActiveModeNotification(ScopedNodeId aPeer, uint64_t aMonitoredSubject);
+    void OnActiveModeNotification(ScopedNodeId aPeer);
 
     /**
      *  Used to notify when a peer becomes LIT ICD or vice versa.
