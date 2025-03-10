@@ -33,10 +33,10 @@ namespace WiFiPAF {
 class WiFiPAFLayerDelegate
 {
 public:
-    virtual ~WiFiPAFLayerDelegate()                                                                   = default;
-    virtual void OnWiFiPAFMessageReceived(WiFiPAFSession & RxInfo, System::PacketBufferHandle && msg) = 0;
-    virtual CHIP_ERROR WiFiPAFMessageSend(WiFiPAFSession & TxInfo, System::PacketBufferHandle && msg) = 0;
-    virtual CHIP_ERROR WiFiPAFCloseSession(WiFiPAFSession & SessionInfo)                              = 0;
+    virtual ~WiFiPAFLayerDelegate()                                                                       = default;
+    virtual CHIP_ERROR WiFiPAFMessageReceived(WiFiPAFSession & RxInfo, System::PacketBufferHandle && msg) = 0;
+    virtual CHIP_ERROR WiFiPAFMessageSend(WiFiPAFSession & TxInfo, System::PacketBufferHandle && msg)     = 0;
+    virtual CHIP_ERROR WiFiPAFCloseSession(WiFiPAFSession & SessionInfo)                                  = 0;
 };
 
 } // namespace WiFiPAF

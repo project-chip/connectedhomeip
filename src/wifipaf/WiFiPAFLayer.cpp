@@ -269,12 +269,13 @@ bool WiFiPAFLayer::OnWiFiPAFMessageReceived(WiFiPAFSession & RxInfo, System::Pac
     return true;
 }
 
-void WiFiPAFLayer::OnWiFiPAFMsgRxComplete(WiFiPAFSession & RxInfo, System::PacketBufferHandle && msg)
+CHIP_ERROR WiFiPAFLayer::OnWiFiPAFMsgRxComplete(WiFiPAFSession & RxInfo, System::PacketBufferHandle && msg)
 {
     if (mWiFiPAFTransport != nullptr)
     {
-        mWiFiPAFTransport->OnWiFiPAFMessageReceived(RxInfo, std::move(msg));
+        return mWiFiPAFTransport->WiFiPAFMessageReceived(RxInfo, std::move(msg));
     }
+    return CHIP_ERROR_INCORRECT_STATE;
 }
 
 void WiFiPAFLayer::SetWiFiPAFState(State state)

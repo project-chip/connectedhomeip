@@ -36,18 +36,9 @@
 /**
  *  @name Error Definitions
  *
- *  @{
  */
 
-/**
- *  @def WIFIPAF_ERROR_ADAPTER_UNAVAILABLE
- *
- *  @brief
- *    Bluetooth LE adapter is (currently) unavailable.
- *
- */
-#define WIFIPAF_ERROR_ADAPTER_UNAVAILABLE                      CHIP_WIFIPAF_ERROR(0x01)
-
+// unused                                                  CHIP_WIFIPAF_ERROR(0x01)
 // unused                                                  CHIP_WIFIPAF_ERROR(0x02)
 
 /**
