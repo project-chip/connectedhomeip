@@ -11,12 +11,13 @@ guides to get started.
 
 ---
 
--   [OpenThread Border Router Board](#openthread-border-router-board)
--   [OpenThread RCP](#openthread-rcp)
--   [OpenThread CLI](#openthread-cli)
--   [Setup Thread Network](#setup-thread-network)
--   [Commissioning Thread End Devices](#commissioning-thread-end-devices)
--   [Generate OTA Firmware For BR](#generate-ota-firmware-for-br)
+- [Matter ESP32 Thread Border Router Example](#matter-esp32-thread-border-router-example)
+    - [OpenThread Border Router Board](#openthread-border-router-board)
+    - [OpenThread RCP](#openthread-rcp)
+    - [OpenThread CLI](#openthread-cli)
+    - [Setup Thread Network](#setup-thread-network)
+    - [Commissioning Thread End Devices](#commissioning-thread-end-devices)
+    - [Generate OTA Firmware For BR](#generate-ota-firmware-for-br)
 
 ---
 
@@ -96,12 +97,10 @@ the Thread network.
 
 ### Generate OTA Firmware For BR
 
-Can use this python
-[script](https://github.com/espressif/esp-thread-br/blob/main/components/esp_rcp_update/create_ota_image.py)
-to merge thread border router firmware and the RCP firmware
+After enable the option `CONFIG_CREATE_OTA_IMAGE_WITH_RCP_FW` in menuconfig, will generate
+OTA image with rcp firmware in build process, named `ota_with_rcp_image` in build folder.
 
+Then can add a Matter OTA header for the ota_with_rcp_image file.
 ```
-python create_ota_image.py --rcp-build-dir /path/to/rcp_image/dir --br-firmware /path/to/br_image --target-file ota_target_file.bin
+./ota_image_tool.py create -v 65521 -p 32768 --version 1 --version-str "v1.0" -da sha256 build/ota_with_rcp_image ota_with_rcp_image.ota
 ```
-
-Then can use the generated bin file to create a Matter OTA file normally.

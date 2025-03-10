@@ -156,7 +156,9 @@ static void update_rcp(void)
 {
     // Deinit uart to transfer UART to the serial loader
     esp_openthread_rcp_deinit();
-    if (esp_rcp_update() == ESP_OK)
+
+    esp_err_t err = esp_rcp_update();
+    if (err == ESP_OK)
     {
         esp_rcp_mark_image_verified(true);
     }

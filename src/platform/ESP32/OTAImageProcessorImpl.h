@@ -33,6 +33,12 @@
 #define IMG_HEADER_LEN sizeof(esp_image_header_t)
 #endif // CONFIG_ENABLE_DELTA_OTA
 
+#if defined(CONFIG_AUTO_UPDATE_RCP) && defined(CONFIG_OPENTHREAD_BORDER_ROUTER)
+#include "esp_check.h"
+#include "esp_rcp_update.h"
+#include "esp_rcp_ota.h"
+#endif
+
 namespace chip {
 
 class OTAImageProcessorImpl : public OTAImageProcessorInterface
@@ -101,7 +107,10 @@ private:
 #endif // CONFIG_ENABLE_ENCRYPTED_OTA
 
 #if defined(CONFIG_AUTO_UPDATE_RCP) && defined(CONFIG_OPENTHREAD_BORDER_ROUTER)
-    esp_err_t ProcessRcpImage(esp_ota_handle_t handle, const uint8_t * buffer, uint32_t bufLengthen);
+    esp_rcp_ota_handle_t mRcpOtaHandle;
+    bool mRcpDone;
+    uint32_t mBrFirmwareSize;
+    esp_err_t ProcessRcpImage(intptr_t context, const uint8_t * buffer, uint32_t bufLen);
 #endif
 };
 
