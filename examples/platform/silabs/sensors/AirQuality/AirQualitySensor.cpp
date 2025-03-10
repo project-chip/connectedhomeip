@@ -22,8 +22,8 @@
 #include <platform/CHIPDeviceLayer.h>
 
 #ifdef USE_SPARKFUN_AIR_QUALITY_SENSOR
-#include <sparkfun_sgp40.h>
 #include "sl_i2cspm_instances.h"
+#include <sparkfun_sgp40.h>
 #endif // USE_SPARKFUN_AIR_QUALITY_SENSOR
 
 namespace {
