@@ -117,6 +117,11 @@ private:
     void OnOvenOperationalStateChange(std::string device, std::string operation, Json::Value param);
 
     /**
+     * Should be called when it is necessary to change one or some attributes.
+     */
+    void OnMeterIdentificationHandler(const Json::Value & param);
+
+    /**
      * Should be called when it is necessary to change the Occupancy attribute.
      */
     void HandleSetOccupancyChange(chip::EndpointId endpointId, uint8_t occupancyValue);
