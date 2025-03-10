@@ -3804,6 +3804,8 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("tlsCertificateManagement", writeTlsCertificateManagementInteractionInfo);
     Map<String, InteractionInfo> writeTlsClientManagementInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("tlsClientManagement", writeTlsClientManagementInteractionInfo);
+    Map<String, InteractionInfo> writeMeterIdentificationInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("meterIdentification", writeMeterIdentificationInteractionInfo);
     Map<String, InteractionInfo> writeUnitTestingInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeUnitTestingBooleanCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo unitTestingbooleanCommandParameterInfo =
