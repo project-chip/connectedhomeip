@@ -65,20 +65,25 @@ mcxw71_k32w1_sdk("sdk") {
   include_dirs += [ "${support_common_platform_dir}/ble" ]
 
   include_dirs += [
-    "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1",
-    "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/MCXW716C",
+    "${nxp_sdk_root}/examples/_boards/${nxp_board}/wireless_examples",
+    "${nxp_sdk_root}/examples/_common/project_segments/wireless/wireless_mcu",
+    "${nxp_sdk_root}/examples/_common/project_segments/wireless/wireless_mcu/app_common",
+    "${nxp_sdk_root}/examples/_common/project_segments/wireless/wireless_mcu/components",
+    "${nxp_sdk_root}/examples/_common/project_segments/wireless/wireless_mcu/dcdc",
+    "${nxp_sdk_root}/examples/_common/project_segments/wireless/wireless_mcu/ext_flash",
+    "${nxp_sdk_root}/examples/_common/project_segments/wireless/wireless_mcu/low_power",
   ]
 
   sources += [
-    "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/MCXW716C/clock_config.c",
-    "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/MCXW716C/pin_mux.c",
-    "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/app_services_init.c",
-    "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/board.c",
-    "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/board_comp.c",
-    "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/board_dcdc.c",
-    "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/board_extflash.c",
-    "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/board_lp.c",
-    "${nxp_sdk_root}/middleware/wireless/framework/boards/kw45_k32w1/hardware_init.c",
+    "${nxp_sdk_root}/examples/_boards/${nxp_board}/wireless_examples/clock_config.c",
+    "${nxp_sdk_root}/examples/_boards/${nxp_board}/wireless_examples/pin_mux.c",
+    "${nxp_sdk_root}/examples/_common/project_segments/wireless/wireless_mcu/app_common/app_services_init.c",
+    "${nxp_sdk_root}/examples/_common/project_segments/wireless/wireless_mcu/app_common/hardware_init.c",
+    "${nxp_sdk_root}/examples/_common/project_segments/wireless/wireless_mcu/board.c",
+    "${nxp_sdk_root}/examples/_common/project_segments/wireless/wireless_mcu/components/board_comp.c",
+    "${nxp_sdk_root}/examples/_common/project_segments/wireless/wireless_mcu/dcdc/board_dcdc.c",
+    "${nxp_sdk_root}/examples/_common/project_segments/wireless/wireless_mcu/ext_flash/board_extflash.c",
+    "${nxp_sdk_root}/examples/_common/project_segments/wireless/wireless_mcu/low_power/board_lp.c",
     "${support_common_platform_dir}/ble/ble_function_mux.c",
   ]
 
@@ -244,9 +249,9 @@ mcxw71_k32w1_executable("light_app") {
 
   if (nxp_use_smu2_static) {
     ldscript = "${example_platform_dir}/app/ldscripts/app.ld"
-    base_ldscript_dir = "${nxp_sdk_root}/middleware/wireless/framework/Common/devices/kw45_k32w1/gcc"
+    base_ldscript_dir = "${nxp_sdk_root}/examples/_boards/${nxp_board}/wireless_examples/linker/gcc/"
   } else {
-    ldscript = "${nxp_sdk_root}/middleware/wireless/framework/Common/devices/kw45_k32w1/gcc/connectivity.ld"
+    ldscript = "${nxp_sdk_root}/examples/_boards/${nxp_board}/wireless_examples/linker/gcc/connectivity.ld"
   }
 
   inputs = [ ldscript ]
