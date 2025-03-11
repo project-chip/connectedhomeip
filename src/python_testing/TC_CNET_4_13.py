@@ -171,7 +171,7 @@ class TC_CNET_4_13(MatterBaseTest):
         asserts.assert_true(num_networks > 0, "Error: No networks found")
 
         for cnet in networks:
-            if cnet.networkID.decode('utf-8') == pixit_network_id and cnet.connected == True:
+            if cnet.networkID.decode('utf-8') == pixit_network_id and cnet.connected:
                 network_found = True
                 break
         logger.info(f'Step #2: Found network with ID {pixit_network_id} and connected={network_found}.')
