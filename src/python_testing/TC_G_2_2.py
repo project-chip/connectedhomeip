@@ -148,14 +148,14 @@ class TC_G_2_2(MatterBaseTest):
         asserts.assert_equal(groupTableList[1].groupName, kGroupName2, "Found groupName does not match written value")
 
         self.step("5")
-        group_names = [f"Gp{i}" for i in range(3, 13)] # ["Gp3", "Gp4", ..., "Gp12"]
+        group_names = [f"Gp{i}" for i in range(3, 13)]  # ["Gp3", "Gp4", ..., "Gp12"]
         for i, group_name in enumerate(group_names, start=2):
-             result = await th1.SendCommand(
-                  self.dut_node_id,
-                  self.matter_test_config.endpoint,
-                  Clusters.Groups.Commands.AddGroup(groupKeyMapStruct[i].groupId, group_name)
-             )
-             asserts.assert_equal(result.status, Status.Success, f"Adding Group 0x{groupKeyMapStruct[i].groupId:04X} failed")
+            result = await th1.SendCommand(
+                self.dut_node_id,
+                self.matter_test_config.endpoint,
+                Clusters.Groups.Commands.AddGroup(groupKeyMapStruct[i].groupId, group_name)
+            )
+            asserts.assert_equal(result.status, Status.Success, f"Adding Group 0x{groupKeyMapStruct[i].groupId:04X} failed")
 
         self.step("6")
         groupTableList: List[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute(
