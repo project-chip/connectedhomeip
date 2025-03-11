@@ -1,9 +1,11 @@
 {{> header}}
 
+#include <lib/core/DataModelTypes.h>
 #include <commands/clusters/DataModelLogger.h>
 #include <zap-generated/cluster/logging/EntryToText.h>
 
 using namespace chip::app::Clusters;
+using namespace chip;
 
 {{#zcl_structs}}
 {{#if has_more_than_one_cluster}}
@@ -122,7 +124,7 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             case {{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Id:
             {
                 {{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::DecodableType value;
-                ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+                ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value, kUndefinedFabricIndex));
                 return DataModelLogger::LogValue("{{name}}", 1, value);
             }
 {{#last}}
