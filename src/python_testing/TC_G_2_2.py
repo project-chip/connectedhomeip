@@ -148,45 +148,14 @@ class TC_G_2_2(MatterBaseTest):
         asserts.assert_equal(groupTableList[1].groupName, kGroupName2, "Found groupName does not match written value")
 
         self.step("5")
-        kGroupName3 = "Gp3"
-        result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroup(groupKeyMapStruct[2].groupId, kGroupName3))
-        asserts.assert_equal(result.status, Status.Success, "Adding Group 0x0003 failed")
-
-        kGroupName4 = "Gp4"
-        result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroup(groupKeyMapStruct[3].groupId, kGroupName4))
-        asserts.assert_equal(result.status, Status.Success, "Adding Group 0x0004 failed")
-
-        kGroupName5 = "Gp5"
-        result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroup(groupKeyMapStruct[4].groupId, kGroupName5))
-        asserts.assert_equal(result.status, Status.Success, "Adding Group 0x0005 failed")
-
-        kGroupName6 = "Gp6"
-        result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroup(groupKeyMapStruct[5].groupId, kGroupName6))
-        asserts.assert_equal(result.status, Status.Success, "Adding Group 0x0006 failed")
-
-        kGroupName7 = "Gp7"
-        result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroup(groupKeyMapStruct[6].groupId, kGroupName7))
-        asserts.assert_equal(result.status, Status.Success, "Adding Group 0x0007 failed")
-
-        kGroupName8 = "Gp8"
-        result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroup(groupKeyMapStruct[7].groupId, kGroupName8))
-        asserts.assert_equal(result.status, Status.Success, "Adding Group 0x0008 failed")
-
-        kGroupName9 = "Gp9"
-        result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroup(groupKeyMapStruct[8].groupId, kGroupName9))
-        asserts.assert_equal(result.status, Status.Success, "Adding Group 0x0009 failed")
-
-        kGroupName10 = "Gp10"
-        result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroup(groupKeyMapStruct[9].groupId, kGroupName10))
-        asserts.assert_equal(result.status, Status.Success, "Adding Group 0x000A failed")
-
-        kGroupName11 = "Gp11"
-        result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroup(groupKeyMapStruct[10].groupId, kGroupName11))
-        asserts.assert_equal(result.status, Status.Success, "Adding Group 0x000B failed")
-
-        kGroupName12 = "Gp12"
-        result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroup(groupKeyMapStruct[11].groupId, kGroupName12))
-        asserts.assert_equal(result.status, Status.Success, "Adding Group 0x000C failed")
+        group_names = [f"Gp{i}" for i in range(3, 13)] # ["Gp3", "Gp4", ..., "Gp12"]
+        for i, group_name in enumerate(group_names, start=2):
+             result = await th1.SendCommand(
+                  self.dut_node_id,
+                  self.matter_test_config.endpoint,
+                  Clusters.Groups.Commands.AddGroup(groupKeyMapStruct[i].groupId, group_name)
+             )
+             asserts.assert_equal(result.status, Status.Success, f"Adding Group 0x{groupKeyMapStruct[i].groupId:04X} failed")
 
         self.step("6")
         groupTableList: List[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute(
@@ -217,7 +186,7 @@ class TC_G_2_2(MatterBaseTest):
         asserts.assert_equal(result.status, Status.ConstraintError, "GroupId must be not in the range of 0x0001 to 0xffff")
 
         self.step("10")
-        result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroup(groupKeyMapStruct[4].groupId, kGroupName5))
+        result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroup(groupKeyMapStruct[4].groupId, group_names[2]))
         asserts.assert_equal(result.status, Status.UnsupportedAccess,
                              "Must be get an UNSUPPORTED_ACCESS as groupID in the AddGroup command does not have the security key")
 
