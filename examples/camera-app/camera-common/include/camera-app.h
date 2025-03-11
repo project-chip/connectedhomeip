@@ -41,9 +41,13 @@ public:
     void InitCameraDeviceClusters();
 
 private:
+    chip::EndpointId mEndpoint;
+    CameraDeviceInterface * mCameraDevice;
+
     // SDK cluster servers
-    chip::app::Clusters::ChimeServer mChimeServer;
     chip::app::Clusters::WebRTCTransportProvider::WebRTCTransportProviderServer mWebRTCTransportProvider;
+    std::unique_ptr<chip::app::Clusters::ChimeServer> mChimeServerPtr;
+    std::unique_ptr<chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtServer> mAVStreamMgmtServerPtr;
 };
 
 void CameraAppInit(CameraDeviceInterface * cameraDevice);

@@ -25,8 +25,6 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace Camera;
 
-CameraDevice cameraDevice;
-
 void ApplicationInit()
 {
     ChipLogProgress(Camera, "Matter Camera Linux App: ApplicationInit()");
