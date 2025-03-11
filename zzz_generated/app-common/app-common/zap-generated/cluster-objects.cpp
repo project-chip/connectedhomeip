@@ -992,10 +992,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, identifyTime);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -1031,10 +1027,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, effectVariant);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -1081,7 +1073,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -1103,10 +1095,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, groupName);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -1142,10 +1130,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, groupID);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -1158,7 +1142,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -1176,10 +1160,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, groupID);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -1220,10 +1200,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, groupName);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -1236,7 +1212,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -1254,10 +1230,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, groupList);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -1293,10 +1265,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, groupList);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -1309,7 +1277,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -1327,10 +1295,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, groupID);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -1366,10 +1330,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, groupID);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -1381,7 +1341,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -1403,7 +1363,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -1425,10 +1385,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, groupName);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -1555,10 +1511,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, effectVariant);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -1619,10 +1571,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, offWaitTime);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -1707,10 +1655,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, optionsOverride);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -1756,10 +1700,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, optionsOverride);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -1810,10 +1750,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, optionsOverride);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -1849,10 +1785,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, optionsOverride);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -1898,10 +1830,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, optionsOverride);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -1947,10 +1875,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, optionsOverride);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -2001,10 +1925,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, optionsOverride);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -2040,10 +1960,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, optionsOverride);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -2074,10 +1990,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, frequency);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -2728,7 +2640,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -2746,10 +2658,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, arl);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -2780,10 +2688,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, token);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -3137,10 +3041,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, invokeID);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -3181,10 +3081,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, transitionTime);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -3220,10 +3116,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, invokeID);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -3264,10 +3156,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, duration);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -3303,10 +3191,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, invokeID);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -3342,10 +3226,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, invokeID);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -3386,10 +3266,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, duration);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -3425,10 +3301,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, invokeID);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -3464,10 +3336,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, invokeID);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -3508,10 +3376,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, duration);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -3547,10 +3411,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, invokeID);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -3591,10 +3451,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, duration);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -4097,10 +3953,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, metadataForProvider);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -4166,10 +4018,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, metadataForRequestor);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -4205,10 +4053,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, newVersion);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -4244,10 +4088,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, delayedActionTime);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -4283,10 +4123,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, softwareVersion);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -4430,10 +4266,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, endpoint);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -5154,10 +4986,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, breadcrumb);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -5193,10 +5021,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, debugText);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -5237,10 +5061,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, breadcrumb);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -5276,10 +5096,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, debugText);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -5291,7 +5107,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -5335,10 +5151,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, debugText);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -5374,10 +5186,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, TCUserResponse);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -5408,10 +5216,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, errorCode);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -5681,10 +5485,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, breadcrumb);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -5730,10 +5530,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, threadScanResults);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -5789,10 +5585,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, possessionNonce);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -5828,10 +5620,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, breadcrumb);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -5867,10 +5655,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, breadcrumb);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -5921,10 +5705,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, possessionSignature);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -5960,10 +5740,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, breadcrumb);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -6004,10 +5780,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, errorValue);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -6048,10 +5820,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, breadcrumb);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -6087,10 +5855,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, possessionNonce);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -6126,10 +5890,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, possessionSignature);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -6221,10 +5981,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, transferFileDesignator);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -6270,10 +6026,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, timeSinceBoot);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -6411,10 +6163,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, eventTrigger);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -6470,10 +6218,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, posixTimeMs);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -6514,10 +6258,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, count);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -6548,10 +6288,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, payload);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -7961,10 +7697,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, timeSource);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -7977,7 +7709,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -7995,10 +7727,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, trustedTimeSource);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -8029,10 +7757,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, timeZone);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -8063,10 +7787,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, DSTOffsetRequired);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -8097,10 +7817,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, DSTOffset);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -8131,10 +7847,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, defaultNTP);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -8407,10 +8119,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, timeoutMs);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -8964,10 +8672,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, salt);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -8998,10 +8702,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, commissioningTimeout);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -9238,10 +8938,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, attestationNonce);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -9277,10 +8973,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, attestationSignature);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -9311,10 +9003,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, certificateType);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -9345,10 +9033,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, certificate);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -9384,10 +9068,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, isForUpdateNOC);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -9423,10 +9103,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, attestationSignature);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -9477,10 +9153,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, adminVendorId);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -9494,7 +9166,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -9516,10 +9188,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, ICACValue);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -9560,10 +9228,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, debugText);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -9576,7 +9240,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -9594,10 +9258,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, label);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -9628,10 +9288,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, fabricIndex);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -9662,10 +9318,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, rootCACertificate);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -9680,7 +9332,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -9706,10 +9358,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, vvsc);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -9745,10 +9393,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, clientChallenge);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -9789,10 +9433,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, signature);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -10048,7 +9688,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -10066,10 +9706,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, groupKeySet);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -10082,7 +9718,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -10100,10 +9736,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, groupKeySetID);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -10134,10 +9766,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, groupKeySet);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -10150,7 +9778,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -10168,10 +9796,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, groupKeySetID);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -10183,7 +9807,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -10222,10 +9846,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, groupKeySetIDs);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -10570,7 +10190,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -10604,10 +10224,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, clientType);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -10638,10 +10254,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, ICDCounter);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -10655,7 +10267,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -10677,10 +10289,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, verificationKey);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -10711,10 +10319,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, stayActiveDuration);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -10745,10 +10349,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, promisedActiveDuration);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -10828,10 +10428,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, newTime);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -10882,10 +10478,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, additionalTime);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -10916,10 +10508,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, timeReduction);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -11066,10 +10654,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, commandResponseState);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -11223,10 +10807,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, newMode);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -11262,10 +10842,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, statusText);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -11454,10 +11030,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, newMode);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -11530,10 +11102,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, newMode);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -11569,10 +11137,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, statusText);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -11641,10 +11205,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, newMode);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -11680,10 +11240,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, statusText);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -11788,10 +11344,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, newMode);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -11827,10 +11379,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, statusText);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -11895,10 +11443,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, newMode);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -11934,10 +11478,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, statusText);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -12006,10 +11546,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, targetTemperatureLevel);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -12167,10 +11703,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, newMode);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -12206,10 +11738,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, statusText);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -12684,10 +12212,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, alarms);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -12718,10 +12242,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, mask);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -12893,10 +12413,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, startAfterSetting);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -12927,10 +12443,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, timeToAdd);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -13089,10 +12601,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, commandResponseState);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -13286,10 +12794,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, commandResponseState);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -13654,7 +13158,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -13688,10 +13192,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, extensionFieldSetStructs);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -13732,10 +13232,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, sceneID);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -13749,7 +13245,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -13771,10 +13267,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, sceneID);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -13830,10 +13322,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, extensionFieldSetStructs);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -13847,7 +13335,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -13869,10 +13357,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, sceneID);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -13913,10 +13397,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, sceneID);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -13929,7 +13409,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -13947,10 +13427,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, groupID);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -13986,10 +13462,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, groupID);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -14003,7 +13475,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -14025,10 +13497,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, sceneID);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -14069,10 +13537,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, sceneID);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -14087,7 +13551,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -14113,10 +13577,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, transitionTime);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -14129,7 +13589,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -14147,10 +13607,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, groupID);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -14196,10 +13652,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, sceneList);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -14216,7 +13668,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -14250,10 +13702,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, sceneIdentifierTo);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -14294,10 +13742,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, sceneIdentifierFrom);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -14569,10 +14013,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, alarmsToSuppress);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -14603,10 +14043,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, alarmsToEnableDisable);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -14763,10 +14199,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, targetLevel);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -15468,10 +14900,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, boostInfo);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -15729,10 +15157,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, details);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -15763,10 +15187,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, currentPrice);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -15797,10 +15217,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, details);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -15831,10 +15247,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, priceForecast);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -16363,10 +15775,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, loadControlProgram);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -16397,10 +15805,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, loadControlProgramID);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -16431,10 +15835,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, event);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -16470,10 +15870,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, cancelControl);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -16747,7 +16143,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -16789,10 +16185,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, responses);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -16805,7 +16197,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -16823,10 +16215,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, messageIDs);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -17465,10 +16853,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, cause);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -17524,10 +16908,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, cause);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -17563,10 +16943,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, cause);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -17627,10 +17003,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, cause);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -17666,10 +17038,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, cause);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -17977,10 +17345,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, chargingTargetSchedules);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -18041,10 +17405,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, maximumChargeCurrent);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -18080,10 +17440,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, maximumDischargeCurrent);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -18134,10 +17490,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, chargingTargetSchedules);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -18678,10 +18030,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, newMode);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -18717,10 +18065,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, statusText);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -18785,10 +18129,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, newMode);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -18824,10 +18164,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, statusText);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -18892,10 +18228,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, newMode);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -18931,10 +18263,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, statusText);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -19041,10 +18369,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, PINCode);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -19075,10 +18399,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, PINCode);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -19114,10 +18434,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, PINCode);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -19178,10 +18494,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, endMinute);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -19217,10 +18529,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, userIndex);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -19286,10 +18594,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, endMinute);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -19325,10 +18629,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, userIndex);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -19374,10 +18674,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, localEndTime);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -19413,10 +18709,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, userIndex);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -19467,10 +18759,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, localEndTime);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -19506,10 +18794,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, userIndex);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -19555,10 +18839,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, operatingMode);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -19589,10 +18869,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, holidayIndex);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -19643,10 +18919,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, operatingMode);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -19677,10 +18949,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, holidayIndex);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -19741,10 +19009,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, credentialRule);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -19775,10 +19039,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, userIndex);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -19854,10 +19114,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, nextUserIndex);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -19888,10 +19144,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, userIndex);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -19947,10 +19199,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, userType);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -19991,10 +19239,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, nextCredentialIndex);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -20025,10 +19269,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, credential);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -20084,10 +19324,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, credentialData);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -20118,10 +19354,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, credential);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -20152,10 +19384,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, PINCode);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -20201,10 +19429,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, groupResolvingKey);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -20695,10 +19919,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, liftValue);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -20729,10 +19949,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, liftPercent100thsValue);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -20763,10 +19979,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, tiltValue);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -20797,10 +20009,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, tiltPercent100thsValue);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -21033,10 +20241,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, speed);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -21312,10 +20516,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, speed);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -21356,10 +20556,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, speed);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -21663,10 +20859,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, newAreas);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -21702,10 +20894,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, statusText);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -21736,10 +20924,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, skippedArea);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -21775,10 +20959,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, statusText);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -22610,10 +21790,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, amount);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -22659,10 +21835,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, transitions);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -22708,10 +21880,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, transitions);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -22747,10 +21915,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, modeToReturn);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -22801,10 +21965,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, scheduleHandle);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -22835,10 +21995,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, presetHandle);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -22879,10 +22035,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, timeout);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -22923,10 +22075,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, timeout);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -23116,10 +22264,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, lowestOff);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -23257,10 +22401,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, optionsOverride);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -23306,10 +22446,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, optionsOverride);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -23360,10 +22496,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, optionsOverride);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -23409,10 +22541,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, optionsOverride);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -23458,10 +22586,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, optionsOverride);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -23512,10 +22636,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, optionsOverride);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -23566,10 +22686,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, optionsOverride);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -23620,10 +22736,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, optionsOverride);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -23669,10 +22781,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, optionsOverride);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -23723,10 +22831,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, optionsOverride);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -23772,10 +22876,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, optionsOverride);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -23826,10 +22926,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, optionsOverride);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -23875,10 +22971,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, optionsOverride);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -23929,10 +23021,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, optionsOverride);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -23983,10 +23071,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, optionsOverride);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -24047,10 +23131,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, optionsOverride);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -24086,10 +23166,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, optionsOverride);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -24145,10 +23221,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, optionsOverride);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -24209,10 +23281,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, optionsOverride);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -25284,10 +24352,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, passphrase);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -25391,10 +24455,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, dataset);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -25430,10 +24490,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, breadcrumb);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -25464,10 +24520,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, pendingDataset);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -25592,10 +24644,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, operationalDataset);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -25626,10 +24674,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, extendedPanID);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -25660,10 +24704,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, extendedPanID);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -25694,10 +24734,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, operationalDataset);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -26291,10 +25327,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, match);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -26330,10 +25362,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, data);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -26369,10 +25397,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, minorNumber);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -26403,10 +25427,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, count);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -26467,10 +25487,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, data);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -26506,10 +25522,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, programList);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -26555,10 +25567,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, data);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -26604,10 +25612,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, data);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -26721,10 +25725,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, data);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -26760,10 +25760,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, data);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -27118,10 +26114,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, audioAdvanceUnmuted);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -27152,10 +26144,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, audioAdvanceUnmuted);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -27186,10 +26174,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, deltaPositionMilliseconds);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -27220,10 +26204,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, deltaPositionMilliseconds);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -27259,10 +26239,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, data);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -27293,10 +26269,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, position);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -27332,10 +26304,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, audioOutputIndex);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -27366,10 +26334,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, trackID);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -27600,10 +26564,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, index);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -27679,10 +26639,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, name);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -27795,10 +26751,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, keyCode);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -27829,10 +26781,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, status);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -28282,10 +27230,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, useCurrentContext);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -28326,10 +27270,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, brandingInformation);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -28365,10 +27305,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, data);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -28480,10 +27416,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, index);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -28519,10 +27451,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, name);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -28634,10 +27562,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, data);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -28668,10 +27592,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, application);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -28702,10 +27622,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, application);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -28741,10 +27657,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, data);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -28835,7 +27747,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -28853,16 +27765,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, tempAccountIdentifier);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace GetSetupPIN.
 namespace GetSetupPINResponse {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kSetupPIN), setupPIN);
@@ -28887,10 +27795,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, setupPIN);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -28905,7 +27809,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -28931,10 +27835,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, node);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -28947,7 +27847,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -28965,10 +27865,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, node);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -29117,10 +28013,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, newPIN);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -29171,10 +28063,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, PINCode);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -29250,10 +28138,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, bonusTime);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -29284,10 +28168,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, screenTime);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -29358,10 +28238,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, rating);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -29392,10 +28268,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, rating);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -29498,10 +28370,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, encodingHint);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -29542,10 +28410,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, encodingHint);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -29801,10 +28665,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, zone);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -29835,10 +28695,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, zoneID);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -29874,10 +28730,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, zone);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -29908,10 +28760,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, zoneID);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -29942,10 +28790,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, zones);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -29976,10 +28820,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, zoneID);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -30633,10 +29473,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, bitDepth);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -30667,10 +29503,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, audioStreamID);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -30701,10 +29533,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, audioStreamID);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -30790,10 +29618,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, OSDEnabled);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -30824,10 +29648,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, videoStreamID);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -30868,10 +29688,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, OSDEnabled);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -30902,10 +29718,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, videoStreamID);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -30971,10 +29783,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, OSDEnabled);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -31005,10 +29813,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, snapshotStreamID);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -31049,10 +29853,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, OSDEnabled);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -31083,10 +29883,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, snapshotStreamID);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -31117,10 +29913,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, streamPriorities);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -31156,10 +29948,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, requestedResolution);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -31200,10 +29988,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, resolution);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -31449,10 +30233,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, zoom);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -31493,10 +30273,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, zoomDelta);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -31527,10 +30303,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, presetID);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -31566,10 +30338,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, name);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -31600,10 +30368,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, presetID);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -31639,10 +30403,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, viewport);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -31688,10 +30448,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, zoomDelta);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -31758,7 +30514,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -31800,10 +30556,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, metadataOptions);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -31849,10 +30601,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, audioStreamID);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -31873,7 +30621,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -31923,10 +30671,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, metadataOptions);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -31967,10 +30711,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, audioStreamID);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -31984,7 +30724,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -32006,10 +30746,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, sdp);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -32023,7 +30759,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -32045,10 +30781,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, ICECandidates);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -32062,7 +30794,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -32084,10 +30816,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, reason);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -32165,10 +30893,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, ICETransportPolicy);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -32204,10 +30928,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, sdp);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -32243,10 +30963,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, ICECandidates);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -32282,10 +30998,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, reason);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -32757,10 +31469,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, transportOptions);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -32801,10 +31509,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, transportStatus);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -32835,10 +31539,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, connectionID);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -32874,10 +31574,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, transportOptions);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -32913,10 +31609,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, transportStatus);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -32957,10 +31649,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, timeControl);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -32991,10 +31679,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, connectionID);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -33025,10 +31709,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, streamConfigurations);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -33775,10 +32455,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, tariffComponentID);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -33819,10 +32495,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, tariffComponent);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -33853,10 +32525,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, dayEntryID);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -33887,10 +32555,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, dayEntry);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -34223,10 +32887,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, label);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -34262,10 +32922,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, responseTimeoutSeconds);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -34316,10 +32972,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, salt);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -34407,11 +33059,28 @@ namespace TlsCertificateManagement {
 namespace Structs {
 
 namespace TLSCertStruct {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
+    return DoEncode(aWriter, aTag, NullOptional);
+}
+
+CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
+{
+    return DoEncode(aWriter, aTag, MakeOptional(aAccessingFabricIndex));
+}
+
+CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const
+{
+
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+
     encoder.Encode(to_underlying(Fields::kCaid), caid);
     encoder.Encode(to_underlying(Fields::kCertificate), certificate);
+    if (aAccessingFabricIndex.HasValue())
+    {
+        encoder.Encode(to_underlying(Fields::kFabricIndex), fabricIndex);
+    }
+
     return encoder.Finalize();
 }
 
@@ -34437,6 +33106,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, certificate);
         }
+        else if (__context_tag == to_underlying(Fields::kFabricIndex))
+        {
+            err = DataModel::Decode(reader, fabricIndex);
+        }
         else
         {
         }
@@ -34448,12 +33121,29 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace TLSCertStruct
 
 namespace TLSClientCertificateDetailStruct {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
+    return DoEncode(aWriter, aTag, NullOptional);
+}
+
+CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
+{
+    return DoEncode(aWriter, aTag, MakeOptional(aAccessingFabricIndex));
+}
+
+CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const
+{
+
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+
     encoder.Encode(to_underlying(Fields::kCcdid), ccdid);
     encoder.Encode(to_underlying(Fields::kClientCertificate), clientCertificate);
     encoder.Encode(to_underlying(Fields::kIntermediateCertificates), intermediateCertificates);
+    if (aAccessingFabricIndex.HasValue())
+    {
+        encoder.Encode(to_underlying(Fields::kFabricIndex), fabricIndex);
+    }
+
     return encoder.Finalize();
 }
 
@@ -34483,6 +33173,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, intermediateCertificates);
         }
+        else if (__context_tag == to_underlying(Fields::kFabricIndex))
+        {
+            err = DataModel::Decode(reader, fabricIndex);
+        }
         else
         {
         }
@@ -34504,7 +33198,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -34526,10 +33220,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, caid);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -34560,10 +33250,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, caid);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -34576,7 +33262,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -34594,19 +33280,15 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, caid);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace FindRootCertificate.
 namespace FindRootCertificateResponse {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kCertificateDetails), certificateDetails);
+    encoder.EncodeForRead(to_underlying(Fields::kCertificateDetails), aAccessingFabricIndex, certificateDetails);
     return encoder.Finalize();
 }
 
@@ -34628,10 +33310,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, certificateDetails);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -34644,7 +33322,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -34662,10 +33340,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, fingerprint);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -34696,10 +33370,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, caid);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -34712,7 +33382,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -34730,10 +33400,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, caid);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -34746,7 +33412,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -34764,10 +33430,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, nonce);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -34808,10 +33470,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, nonce);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -34821,11 +33479,11 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kCcdid), ccdid);
-    encoder.Encode(to_underlying(Fields::kClientCertificateDetails), clientCertificateDetails);
+    encoder.EncodeForWrite(to_underlying(Fields::kClientCertificateDetails), clientCertificateDetails);
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -34846,11 +33504,11 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kClientCertificateDetails))
         {
             err = DataModel::Decode(reader, clientCertificateDetails);
+            if (err == CHIP_NO_ERROR)
+            {
+                clientCertificateDetails.SetFabricIndex(aAccessingFabricIndex);
+            }
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -34863,7 +33521,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -34881,19 +33539,15 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, ccdid);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
 } // namespace FindClientCertificate.
 namespace FindClientCertificateResponse {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kCertificateDetails), certificateDetails);
+    encoder.EncodeForRead(to_underlying(Fields::kCertificateDetails), aAccessingFabricIndex, certificateDetails);
     return encoder.Finalize();
 }
 
@@ -34915,10 +33569,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, certificateDetails);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -34931,7 +33581,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -34949,10 +33599,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, fingerprint);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -34983,10 +33629,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, ccdid);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -34999,7 +33641,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -35017,10 +33659,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, ccdid);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -35137,7 +33775,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -35171,10 +33809,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, endpointID);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -35205,10 +33839,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, endpointID);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -35221,7 +33851,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -35239,10 +33869,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, endpointID);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -35273,10 +33899,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, endpoints);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -35289,7 +33911,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     return encoder.Finalize();
 }
 
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex)
 {
     detail::StructDecodeIterator __iterator(reader);
     while (true)
@@ -35307,10 +33929,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, endpointID);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -35981,10 +34599,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, returnValue);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -36035,10 +34649,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, returnValue);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -36089,10 +34699,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, returnValue);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -36168,10 +34774,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, arg6);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -36207,10 +34809,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, arg2);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -36241,10 +34839,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, arg1);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -36275,10 +34869,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, arg1);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -36314,10 +34904,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, arg2);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -36373,10 +34959,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, arg6);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -36422,10 +35004,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, originalValue);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -36456,10 +35034,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, arg1);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -36625,10 +35199,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, nullableOptionalListValue);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -36659,10 +35229,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, arg1);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -36693,10 +35259,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, value);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -36727,10 +35289,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, arg1);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -36761,10 +35319,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, arg1);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -36795,10 +35349,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, arg1);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -36829,10 +35379,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, value);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -36863,10 +35409,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, arg1);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -36897,10 +35439,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, value);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -36931,10 +35469,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, arg1);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -36965,10 +35499,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, buffer);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -36999,10 +35529,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, arg1);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -37033,10 +35559,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, payload);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -37072,10 +35594,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, arg2);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -37111,10 +35629,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, field2);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -37145,10 +35659,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, arg1);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -37234,10 +35744,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, nullableOptionalList);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -37268,10 +35774,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, arg1);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -37322,10 +35824,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, arg1);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -37366,10 +35864,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, arg3);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -37400,10 +35894,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, arg1);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -37444,10 +35934,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, fillCharacter);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -37488,10 +35974,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, fillCharacter);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -37522,10 +36004,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, payload);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -37561,10 +36039,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, field2);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -37595,10 +36069,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, arg1);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -37634,10 +36104,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, eventNumber);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -38026,10 +36492,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, takeMutex);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -38070,10 +36532,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, percentage);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -38153,10 +36611,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, returnValue);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -38192,10 +36646,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, arg2);
         }
-        else
-        {
-        }
-
         ReturnErrorOnFailure(err);
     }
 }
@@ -39034,13 +37484,19 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
             return true;
         case Clusters::TlsCertificateManagement::Commands::FindRootCertificate::Id:
             return true;
+        case Clusters::TlsCertificateManagement::Commands::FindRootCertificateResponse::Id:
+            return true;
         case Clusters::TlsCertificateManagement::Commands::LookupRootCertificate::Id:
             return true;
         case Clusters::TlsCertificateManagement::Commands::RemoveRootCertificate::Id:
             return true;
         case Clusters::TlsCertificateManagement::Commands::TLSClientCSR::Id:
             return true;
+        case Clusters::TlsCertificateManagement::Commands::ProvisionClientCertificate::Id:
+            return true;
         case Clusters::TlsCertificateManagement::Commands::FindClientCertificate::Id:
+            return true;
+        case Clusters::TlsCertificateManagement::Commands::FindClientCertificateResponse::Id:
             return true;
         case Clusters::TlsCertificateManagement::Commands::LookupClientCertificate::Id:
             return true;

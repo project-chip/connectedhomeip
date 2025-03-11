@@ -38530,6 +38530,7 @@ NS_ASSUME_NONNULL_BEGIN
                 } else {
                     newElement_0.certificate = nil;
                 }
+                newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
@@ -39026,6 +39027,7 @@ NS_ASSUME_NONNULL_BEGIN
                 }
             }
         }
+        encodableStruct.clientCertificateDetails.fabricIndex = self.clientCertificateDetails.fabricIndex.unsignedCharValue;
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -39254,6 +39256,7 @@ NS_ASSUME_NONNULL_BEGIN
                 } else {
                     newElement_0.intermediateCertificates = nil;
                 }
+                newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
