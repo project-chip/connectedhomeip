@@ -252,7 +252,7 @@ private:
     WebRTCSessionStruct * FindSession(uint16_t sessionId);
     UpsertResultEnum UpsertSession(const WebRTCSessionStruct & session);
     void RemoveSession(uint16_t sessionId);
-    CHIP_ERROR ValidateExistingSession(HandlerContext & ctx, uint16_t sessionId, WebRTCSessionStruct *& outSessionPtr);
+    CHIP_ERROR CheckForMatchingSession(HandlerContext & ctx, uint16_t sessionId, WebRTCSessionStruct *& outSessionPtr);
     uint16_t GenerateSessionId();
 
     // Command Handlers
