@@ -44,7 +44,7 @@ namespace chip {
 enum class MeterIdentificationTrigger : uint64_t
 {
     // Scenarios
-    // Attributes Value Update Test Event | Increment attribute values
+    // Attributes Value Update Test Event | Increment all attributes values
     kAttributesValueUpdate = 0x0b06000000000000,
     // Attributes Value Test Event Clear | Return the device to pre-test status
     kAttributesValueUpdateClear = 0x0b06000000000001,
