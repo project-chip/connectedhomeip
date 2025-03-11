@@ -124,7 +124,7 @@ CHIP_ERROR SilabsPlatform::Init(void)
     return CHIP_NO_ERROR;
 }
 
-void SilabsPlatform::DoSoftreset()
+void SilabsPlatform::SoftwareReset()
 {
     NVIC_SystemReset();
 }

@@ -210,7 +210,7 @@ uint8_t SilabsPlatform::GetButtonState(uint8_t button)
 }
 #endif // SL_CATALOG_SIMPLE_BUTTON_PRESENT
 
-void SilabsPlatform::DoSoftreset()
+void SilabsPlatform::SoftwareReset()
 {
     sl_si91x_soc_nvic_reset();
 }

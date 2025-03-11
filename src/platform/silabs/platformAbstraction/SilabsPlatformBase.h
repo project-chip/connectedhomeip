@@ -57,7 +57,7 @@ public:
     virtual CHIP_ERROR FlashWritePage(uint32_t addr, const uint8_t * data, size_t size) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
     // soft reset
-    virtual void DoSoftreset(void) {}
+    virtual void SoftwareReset(void) {}
 
     // BLE Specific Method
 
