@@ -93,7 +93,7 @@ class TC_CNET_4_13(MatterBaseTest):
                      NetworkID is a NetworkID value NOT present in 'OriginalNetworkList'
                      NetworkIndex is 'Midpoint'
                      Breadcrumb is 2'''),
-            TestStep(10, '''TH reads Breadcrumb attribute from the General Commissioning Cluster'''),
+            TestStep(10, '''TH reads Breadcrumb attribute from the General Commissioning Cluster''')
         ]
         return steps
 
