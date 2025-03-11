@@ -24,6 +24,7 @@
 #include <app/data-model-provider/MetadataList.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/OperationTypes.h>
+#include <app/server-cluster/ServerClusterContext.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/BitFlags.h>
@@ -42,8 +43,22 @@ class ServerClusterInterface
 public:
     virtual ~ServerClusterInterface() = default;
 
+    /// Starts up the server cluster interface.
+    ///
+    /// The `context` lifetime must be guaranteed to last
+    /// until `Shutdown` is called.
+    virtual CHIP_ERROR Startup(ServerClusterContext * context) = 0;
+
+    /// A shutdown will always be paired with a corresponding Startup.
+    virtual void Shutdown() = 0;
+
     ///////////////////////////////////// Cluster Metadata Support //////////////////////////////////////////////////
-    [[nodiscard]] virtual ClusterId GetClusterId() const = 0;
+
+    /// The path to this cluster instance.
+    ///
+    /// This path (endpointid,clusterid) is expected to remain constant once the server
+    /// cluster interface is in use.
+    [[nodiscard]] virtual ConcreteClusterPath GetPath() const = 0;
 
     /// Gets the data version for this cluster instance.
     ///
