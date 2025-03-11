@@ -976,7 +976,7 @@ static void DispatchResolve(intptr_t context)
     }
 
     // The context will be freed and the resolve operation is stopped. Matter will
-    // try to stop it again on the mDnsResolveCallback but nothing will happen because the 
+    // try to stop it again on the mDnsResolveCallback but nothing will happen because the
     // element is no longer present in the list.
     LIST_RemoveElement(&pResolveContext->link);
 
@@ -990,7 +990,7 @@ static void DispatchResolveError(intptr_t context)
     Span<Inet::IPAddress> ipAddrs;
 
     // The context will be freed and the resolve operation is stopped. Matter will
-    // try to stop it again on the mDnsResolveCallback but nothing will happen because the 
+    // try to stop it again on the mDnsResolveCallback but nothing will happen because the
     // element is no longer present in the list.
     LIST_RemoveElement(&pResolveContext->link);
 
