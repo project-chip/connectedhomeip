@@ -274,8 +274,8 @@ class HostApp(Enum):
             yield 'chip-rvc-app'
             yield 'chip-rvc-app.map'
         elif self == HostApp.AIR_PURIFIER:
-            yield 'air-purifier-app'
-            yield 'air-purifier-app.map'
+            yield 'chip-air-purifier-app'
+            yield 'chip-air-purifier-app.map'
         elif self == HostApp.LIT_ICD:
             yield 'lit-icd-app'
             yield 'lit-icd-app.map'
@@ -703,6 +703,7 @@ class HostBuilder(GnBuilder):
 
     def build_outputs(self):
         for name in self.app.OutputNames():
+            print(f"OutputNames: {name}")
             if not self.options.enable_link_map_file and name.endswith(".map"):
                 continue
             path = os.path.join(self.output_dir, name)
