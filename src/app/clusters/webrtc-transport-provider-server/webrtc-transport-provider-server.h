@@ -189,7 +189,6 @@ public:
      *        and stream priority policies.
      *
      * The implementation SHALL ensure:
-     *  - At least one of videoStreamId or audioStreamId is provided.
      *  - The requested stream usage (streamUsage) is allowed given the current allocation of
      *    camera resources (e.g. CPU, memory, network bandwidth) and the prioritized stream list.
      *
@@ -250,9 +249,9 @@ private:
 
     // Helper functions
     WebRTCSessionStruct * FindSession(uint16_t sessionId);
+    WebRTCSessionStruct * CheckForMatchingSession(HandlerContext & ctx, uint16_t sessionId);
     UpsertResultEnum UpsertSession(const WebRTCSessionStruct & session);
     void RemoveSession(uint16_t sessionId);
-    CHIP_ERROR CheckForMatchingSession(HandlerContext & ctx, uint16_t sessionId, WebRTCSessionStruct *& outSessionPtr);
     uint16_t GenerateSessionId();
 
     // Command Handlers
