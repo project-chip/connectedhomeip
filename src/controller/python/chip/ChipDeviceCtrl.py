@@ -671,6 +671,23 @@ class ChipDeviceControllerBase():
 
             return await asyncio.futures.wrap_future(ctx.future)
 
+    async def ConnectNFC(self, setupPinCode: int, nodeid: int) -> int:
+        """Connect to an NFC device using the given setup pin code.
+
+        Returns:
+            - Effective Node ID of the device (as defined by the assigned NOC)
+        """
+        self.CheckIsActive()
+
+        async with self._commissioning_context as ctx:
+            self._enablePairingCompleteCallback(True)
+            await self._ChipStack.CallAsync(
+                lambda: self._dmLib.pychip_DeviceController_ConnectNFC(
+                    self.devCtrl, setupPinCode, nodeid)
+            )
+
+            return await asyncio.futures.wrap_future(ctx.future)
+
     async def UnpairDevice(self, nodeid: int) -> None:
         self.CheckIsActive()
 
@@ -1831,6 +1848,10 @@ class ChipDeviceControllerBase():
                 c_void_p, c_uint16, c_bool, c_uint32, c_uint64]
             self._dmLib.pychip_DeviceController_ConnectBLE.restype = PyChipError
 
+            self._dmLib.pychip_DeviceController_ConnectNFC.argtypes = [
+                c_void_p, c_uint32, c_uint64]
+            self._dmLib.pychip_DeviceController_ConnectNFC.restype = PyChipError
+
             self._dmLib.pychip_DeviceController_SetThreadOperationalDataset.argtypes = [
                 c_char_p, c_uint32]
             self._dmLib.pychip_DeviceController_SetThreadOperationalDataset.restype = PyChipError
@@ -2147,6 +2168,12 @@ class ChipDeviceController(ChipDeviceControllerBase):
         '''
         self.SetThreadOperationalDataset(threadOperationalDataset)
         return await self.ConnectBLE(discriminator, setupPinCode, nodeId, isShortDiscriminator)
+
+    async def CommissionNfcThread(self, setupPinCode, nodeId, threadOperationalDataset: bytes) -> int:
+        ''' Commissions a Thread device over NFC
+        '''
+        self.SetThreadOperationalDataset(threadOperationalDataset)
+        return await self.ConnectNFC(setupPinCode, nodeId)
 
     async def CommissionWiFi(self, discriminator, setupPinCode, nodeId, ssid: str, credentials: str, isShortDiscriminator: bool = False) -> int:
         ''' Commissions a Wi-Fi device over BLE.

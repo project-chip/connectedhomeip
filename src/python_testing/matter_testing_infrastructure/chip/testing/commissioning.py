@@ -165,6 +165,17 @@ async def commission_device(
         except ChipStackError as e:
             logging.error("Commissioning failed: %s" % e)
             return False
+    elif commissioning_info.commissioning_method == "nfc-thread":
+        try:
+            await dev_ctrl.CommissionNfcThread(
+                info.passcode,
+                node_id,
+                commissioning_info.thread_operational_dataset,
+            )
+            return True
+        except ChipStackError as e:
+            logging.error("Commissioning failed: %s" % e)
+            return False
     elif commissioning_info.commissioning_method == "on-network-ip":
         try:
             logging.warning("==== USING A DIRECT IP COMMISSIONING METHOD NOT SUPPORTED IN THE LONG TERM ====")

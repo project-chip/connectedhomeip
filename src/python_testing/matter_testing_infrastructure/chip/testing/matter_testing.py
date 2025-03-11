@@ -1827,6 +1827,11 @@ def populate_commissioning_args(args: argparse.Namespace, config: MatterTestConf
             print("error: missing --thread-dataset-hex <DATASET_HEX> for --commissioning-method ble-thread!")
             return False
         config.thread_operational_dataset = args.thread_dataset_hex
+    elif config.commissioning_method == "nfc-thread":
+        if args.thread_dataset_hex is None:
+            print("error: missing --thread-dataset-hex <DATASET_HEX> for --commissioning-method nfc-thread!")
+            return False
+        config.thread_operational_dataset = args.thread_dataset_hex
     elif config.commissioning_method == "on-network-ip":
         if args.ip_addr is None:
             print("error: missing --ip-addr <IP_ADDRESS> for --commissioning-method on-network-ip")
@@ -1923,11 +1928,11 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
 
     commission_group.add_argument('-m', '--commissioning-method', type=str,
                                   metavar='METHOD_NAME',
-                                  choices=["on-network", "ble-wifi", "ble-thread", "on-network-ip"],
+                                  choices=["on-network", "ble-wifi", "ble-thread", "on-network-ip", "nfc-thread"],
                                   help='Name of commissioning method to use')
     commission_group.add_argument('--in-test-commissioning-method', type=str,
                                   metavar='METHOD_NAME',
-                                  choices=["on-network", "ble-wifi", "ble-thread", "on-network-ip"],
+                                  choices=["on-network", "ble-wifi", "ble-thread", "on-network-ip", "nfc-thread"],
                                   help='Name of commissioning method to use, for commissioning tests')
     commission_group.add_argument('-d', '--discriminator', type=int_decimal_or_hex,
                                   metavar='LONG_DISCRIMINATOR',
@@ -1952,7 +1957,7 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
 
     commission_group.add_argument('--thread-dataset-hex', type=byte_string_from_hex,
                                   metavar='OPERATIONAL_DATASET_HEX',
-                                  help='Thread operational dataset as a hex string for ble-thread commissioning')
+                                  help='Thread operational dataset as a hex string for ble-thread or nfc-thread commissioning')
 
     commission_group.add_argument('--admin-vendor-id', action="store", type=int_decimal_or_hex, default=_DEFAULT_ADMIN_VENDOR_ID,
                                   metavar="VENDOR_ID",

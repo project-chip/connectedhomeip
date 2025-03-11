@@ -173,6 +173,14 @@ public:
     {}
 };
 
+class PairNfcThread : public PairingCommand
+{
+public:
+    PairNfcThread(CredentialIssuerCommands * credsIssuerConfig) :
+        PairingCommand("nfc-thread", PairingMode::Nfc, PairingNetworkType::Thread, credsIssuerConfig)
+    {}
+};
+
 class PairSoftAP : public PairingCommand
 {
 public:
