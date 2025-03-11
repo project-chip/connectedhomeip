@@ -697,6 +697,23 @@ class ChipDeviceControllerBase():
 
             return await asyncio.futures.wrap_future(ctx.future)
 
+    async def ConnectNFC(self, discriminator: int, setupPinCode: int, nodeid: int, isShortDiscriminator: bool = False) -> int:
+        """Connect to a NFC device using the given discriminator and setup pin code.
+
+        Returns:
+            - Effective Node ID of the device (as defined by the assigned NOC)
+        """
+        self.CheckIsActive()
+
+        async with self._commissioning_context as ctx:
+            self._enablePairingCompleteCallback(True)
+            await self._ChipStack.CallAsync(
+                lambda: self._dmLib.pychip_DeviceController_ConnectNFC(
+                    self.devCtrl, discriminator, isShortDiscriminator, setupPinCode, nodeid)
+            )
+
+            return await asyncio.futures.wrap_future(ctx.future)
+
     async def UnpairDevice(self, nodeid: int) -> None:
         '''
         Unpairs the device with the specified node ID.
@@ -2036,6 +2053,10 @@ class ChipDeviceControllerBase():
                 c_void_p, c_uint16, c_bool, c_uint32, c_uint64]
             self._dmLib.pychip_DeviceController_ConnectBLE.restype = PyChipError
 
+            self._dmLib.pychip_DeviceController_ConnectNFC.argtypes = [
+                c_void_p, c_uint16, c_bool, c_uint32, c_uint64]
+            self._dmLib.pychip_DeviceController_ConnectNFC.restype = PyChipError
+
             self._dmLib.pychip_DeviceController_SetThreadOperationalDataset.argtypes = [
                 c_char_p, c_uint32]
             self._dmLib.pychip_DeviceController_SetThreadOperationalDataset.restype = PyChipError
@@ -2357,6 +2378,12 @@ class ChipDeviceController(ChipDeviceControllerBase):
         '''
         self.SetThreadOperationalDataset(threadOperationalDataset)
         return await self.ConnectBLE(discriminator, setupPinCode, nodeId, isShortDiscriminator)
+
+    async def CommissionNfcThread(self, discriminator, setupPinCode, nodeId, threadOperationalDataset: bytes, isShortDiscriminator: bool = False) -> int:
+        ''' Commissions a Thread device over NFC
+        '''
+        self.SetThreadOperationalDataset(threadOperationalDataset)
+        return await self.ConnectNFC(discriminator, setupPinCode, nodeId, isShortDiscriminator)
 
     async def CommissionWiFi(self, discriminator, setupPinCode, nodeId, ssid: str, credentials: str, isShortDiscriminator: bool = False) -> int:
         '''

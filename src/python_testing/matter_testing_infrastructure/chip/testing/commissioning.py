@@ -106,7 +106,7 @@ async def commission_device(
     Starts the commissioning process of a chip device.
 
     This function handles different commissioning methods based on the specified method.
-    It supports various commissioning techniques such as "on-network", "ble-wifi", and "ble-thread".
+    It supports various commissioning techniques such as "on-network", "ble-wifi", "ble-thread" and "nfc-thread".
 
     Parameters:
         dev_ctrl: The chip device controller instance.
@@ -151,6 +151,19 @@ async def commission_device(
     elif commissioning_info.commissioning_method == "ble-thread":
         try:
             await dev_ctrl.CommissionThread(
+                info.filter_value,
+                info.passcode,
+                node_id,
+                commissioning_info.thread_operational_dataset,
+                isShortDiscriminator=(info.filter_type == DiscoveryFilterType.SHORT_DISCRIMINATOR),
+            )
+            return True
+        except ChipStackError as e:
+            logging.error("Commissioning failed: %s" % e)
+            return False
+    elif commissioning_info.commissioning_method == "nfc-thread":
+        try:
+            await dev_ctrl.CommissionNfcThread(
                 info.filter_value,
                 info.passcode,
                 node_id,
