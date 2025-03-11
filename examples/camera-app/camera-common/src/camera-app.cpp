@@ -21,16 +21,51 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Chime;
+using namespace chip::app::Clusters::CameraAvStreamManagement;
 
 template <typename T>
 using List   = chip::app::DataModel::List<T>;
 using Status = Protocols::InteractionModel::Status;
 
+CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface * aCameraDevice)
+{
+    mEndpoint = aClustersEndpoint;
+    mCameraDevice = aCameraDevice;
+    mChimeServerPtr = std::make_unique<ChimeServer>(mEndpoint, mCameraDevice->GetChimeDelegate());
+
+    BitFlags<Feature> features;
+    features.Set(Feature::kSnapshot);
+    BitFlags<OptionalAttribute> optionalAttrs;
+    optionalAttrs.Set(chip::app::Clusters::CameraAvStreamManagement::OptionalAttribute::kNightVision);
+    optionalAttrs.Set(chip::app::Clusters::CameraAvStreamManagement::OptionalAttribute::kNightVisionIllum);
+    uint32_t maxConcurrentVideoEncoders  = 1;
+    uint32_t maxEncodedPixelRate         = 10000;
+    VideoSensorParamsStruct sensorParams = { 4608, 2592, 120, chip::Optional<uint16_t>(30) }; // Typical numbers for Pi camera.
+    bool nightVisionCapable              = false;
+    VideoResolutionStruct minViewport    = { 854, 480 }; // Assuming 480p resolution.
+    std::vector<RateDistortionTradeOffStruct> rateDistortionTradeOffPoints = {};
+    uint32_t maxContentBufferSize                                          = 1024;
+    AudioCapabilitiesStruct micCapabilities{};
+    AudioCapabilitiesStruct spkrCapabilities{};
+    TwoWayTalkSupportTypeEnum twowayTalkSupport               = TwoWayTalkSupportTypeEnum::kNotSupported;
+    std::vector<SnapshotParamsStruct> supportedSnapshotParams = {};
+    uint32_t maxNetworkBandwidth                              = 64;
+    std::vector<StreamUsageEnum> supportedStreamUsages        = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording };
+
+    mAVStreamMgmtServerPtr = std::make_unique<CameraAVStreamMgmtServer>(
+        mCameraDevice->GetCameraAVStreamMgmtDelegate(), mEndpoint, features, optionalAttrs, maxConcurrentVideoEncoders, maxEncodedPixelRate,
+        sensorParams, nightVisionCapable, minViewport, rateDistortionTradeOffPoints, maxContentBufferSize, micCapabilities,
+        spkrCapabilities, twowayTalkSupport, supportedSnapshotParams, maxNetworkBandwidth, supportedStreamUsages);
+}
+
 void CameraApp::InitCameraDeviceClusters()
 {
     // Initialize Cluster Servers
-    mChimeServer.Init();
     mWebRTCTransportProvider.Init();
+
+    mChimeServerPtr->Init();
+
+    mAVStreamMgmtServerPtr->Init();
 }
 
 static constexpr EndpointId kCameraEndpointId = 1;

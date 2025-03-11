@@ -22,13 +22,54 @@
 
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Chime;
+using namespace chip::app::Clusters::CameraAvStreamManagement;
 using namespace Camera;
 
 CameraDevice::CameraDevice()
 {
     // set up the different modules/components
+    mCameraAVStreamManager.Init();
+}
+#if 0
+void CameraDevice::InitializeAvailableVideoStreams()
+{
+    // Example initialization with different codecs
+    // id, isAllocated, codec, fps
+    videoStreams.push_back({ 0, false, VideoCodecEnum::kH264, 24 });
+    videoStreams.push_back({ 1, false, VideoCodecEnum::kH264, 30 });
+    videoStreams.push_back({ 2, false, VideoCodecEnum::kHevc, 30 });
+    videoStreams.push_back({ 3, false, VideoCodecEnum::kHevc, 60 });
 }
 
+void CameraDevice::InitializeAvailableAudioStreams()
+{
+    // Example initialization with different codecs
+    // id, isAllocated, codec, channelCount
+    audioStreams.push_back({ 0, false, AudioCodecEnum::kOpus, 2 });
+    audioStreams.push_back({ 1, false, AudioCodecEnum::kOpus, 2 });
+    audioStreams.push_back({ 2, false, AudioCodecEnum::kAacLc, 1 });
+    audioStreams.push_back({ 3, false, AudioCodecEnum::kAacLc, 2 });
+}
+
+void CameraDevice::InitializeAvailableSnapshotStreams()
+{
+    // Example initialization with different codecs
+    // id, isAllocated, codec, quality
+    snapshotStreams.push_back({ 0, false, ImageCodecEnum::kJpeg, 80 });
+    snapshotStreams.push_back({ 1, false, ImageCodecEnum::kJpeg, 90 });
+    snapshotStreams.push_back({ 2, false, ImageCodecEnum::kJpeg, 90 });
+    snapshotStreams.push_back({ 3, false, ImageCodecEnum::kJpeg, 80 });
+}
+
+void CameraDevice::InitializeStreams()
+{
+    InitializeAvailableVideoStreams();
+
+    InitializeAvailableAudioStreams();
+
+    InitializeAvailableSnapshotStreams();
+}
+#endif
 ChimeDelegate & CameraDevice::GetChimeDelegate()
 {
     return mChimeManager;
@@ -37,4 +78,9 @@ ChimeDelegate & CameraDevice::GetChimeDelegate()
 WebRTCTransportProvider::Delegate & CameraDevice::GetWebRTCProviderDelegate()
 {
     return mWebRTCProviderManager;
+}
+
+CameraAVStreamMgmtDelegate & CameraDevice::GetCameraAVStreamMgmtDelegate()
+{
+    return mCameraAVStreamManager;
 }
