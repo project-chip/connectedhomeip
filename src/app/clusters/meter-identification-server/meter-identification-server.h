@@ -27,9 +27,6 @@
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPError.h>
 
-using chip::app::Clusters::MeterIdentification::MeterTypeEnum;
-using Feature = chip::app::Clusters::MeterIdentification::Feature;
-
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -37,6 +34,8 @@ namespace MeterIdentification {
 
 struct Delegate
 {
+    EndpointId mEndpointId = 0;
+
 public:
     virtual ~Delegate() = default;
 
@@ -47,9 +46,6 @@ public:
     virtual DataModel::Nullable<CharSpan> GetMeterSerialNumber()                          = 0;
     virtual DataModel::Nullable<CharSpan> GetProtocolVersion()                            = 0;
     virtual DataModel::Nullable<Structs::PowerThresholdStruct::Type> GetPowerThreshold()  = 0;
-
-protected:
-    EndpointId mEndpointId = 0;
 };
 
 class Instance : public AttributeAccessInterface
@@ -74,7 +70,6 @@ private:
 
     // AttributeAccessInterface
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 };
 
 } // namespace MeterIdentification
