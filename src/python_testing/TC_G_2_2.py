@@ -114,7 +114,7 @@ class TC_G_2_2(MatterBaseTest):
 
         self.step("1c")
         cmd = Clusters.Groups.Commands.RemoveAllGroups()
-        await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.RemoveAllGroups())
+        await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.RemoveAllGroups())
 
         self.step("1d")
         kGroupName1 = "Gp1"
@@ -122,7 +122,7 @@ class TC_G_2_2(MatterBaseTest):
         cmd = Clusters.Groups.Commands.AddGroup(kGroupId1, kGroupName1)
         groupTableList: List[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute(
             dev_ctrl=th1, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.GroupKeyManagement.Attributes.GroupTable)
-        result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.AddGroup(kGroupId1, kGroupName1))
+        result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroup(kGroupId1, kGroupName1))
         asserts.assert_equal(result.status, Status.Success, "Adding Group 0x0001 failed")
 
         self.step("2a")
@@ -136,7 +136,7 @@ class TC_G_2_2(MatterBaseTest):
         self.step("3")
         kGroupName2 = "Gp2"
         kGroupId2 = 2
-        result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.AddGroup(kGroupId2, kGroupName2))
+        result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroup(kGroupId2, kGroupName2))
         asserts.assert_equal(result.status, Status.Success, "Adding Group 0x0002 failed")
 
         self.step("4a")
@@ -149,43 +149,43 @@ class TC_G_2_2(MatterBaseTest):
 
         self.step("5")
         kGroupName3 = "Gp3"
-        result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.AddGroup(groupKeyMapStruct[2].groupId, kGroupName3))
+        result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroup(groupKeyMapStruct[2].groupId, kGroupName3))
         asserts.assert_equal(result.status, Status.Success, "Adding Group 0x0003 failed")
 
         kGroupName4 = "Gp4"
-        result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.AddGroup(groupKeyMapStruct[3].groupId, kGroupName4))
+        result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroup(groupKeyMapStruct[3].groupId, kGroupName4))
         asserts.assert_equal(result.status, Status.Success, "Adding Group 0x0004 failed")
 
         kGroupName5 = "Gp5"
-        result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.AddGroup(groupKeyMapStruct[4].groupId, kGroupName5))
+        result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroup(groupKeyMapStruct[4].groupId, kGroupName5))
         asserts.assert_equal(result.status, Status.Success, "Adding Group 0x0005 failed")
 
         kGroupName6 = "Gp6"
-        result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.AddGroup(groupKeyMapStruct[5].groupId, kGroupName6))
+        result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroup(groupKeyMapStruct[5].groupId, kGroupName6))
         asserts.assert_equal(result.status, Status.Success, "Adding Group 0x0006 failed")
 
         kGroupName7 = "Gp7"
-        result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.AddGroup(groupKeyMapStruct[6].groupId, kGroupName7))
+        result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroup(groupKeyMapStruct[6].groupId, kGroupName7))
         asserts.assert_equal(result.status, Status.Success, "Adding Group 0x0007 failed")
 
         kGroupName8 = "Gp8"
-        result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.AddGroup(groupKeyMapStruct[7].groupId, kGroupName8))
+        result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroup(groupKeyMapStruct[7].groupId, kGroupName8))
         asserts.assert_equal(result.status, Status.Success, "Adding Group 0x0008 failed")
 
         kGroupName9 = "Gp9"
-        result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.AddGroup(groupKeyMapStruct[8].groupId, kGroupName9))
+        result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroup(groupKeyMapStruct[8].groupId, kGroupName9))
         asserts.assert_equal(result.status, Status.Success, "Adding Group 0x0009 failed")
 
         kGroupName10 = "Gp10"
-        result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.AddGroup(groupKeyMapStruct[9].groupId, kGroupName10))
+        result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroup(groupKeyMapStruct[9].groupId, kGroupName10))
         asserts.assert_equal(result.status, Status.Success, "Adding Group 0x000A failed")
 
         kGroupName11 = "Gp11"
-        result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.AddGroup(groupKeyMapStruct[10].groupId, kGroupName11))
+        result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroup(groupKeyMapStruct[10].groupId, kGroupName11))
         asserts.assert_equal(result.status, Status.Success, "Adding Group 0x000B failed")
 
         kGroupName12 = "Gp12"
-        result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.AddGroup(groupKeyMapStruct[11].groupId, kGroupName12))
+        result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroup(groupKeyMapStruct[11].groupId, kGroupName12))
         asserts.assert_equal(result.status, Status.Success, "Adding Group 0x000C failed")
 
         self.step("6")
@@ -202,7 +202,7 @@ class TC_G_2_2(MatterBaseTest):
 
         self.step("7b")
         kGroupName13 = "Gp13"
-        result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.AddGroup(kGroupId13, kGroupName13))
+        result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroup(kGroupId13, kGroupName13))
         asserts.assert_equal(result.status, Status.ResourceExhausted, "Adding Group 0x000D failed")
 
         self.step("8")
@@ -213,31 +213,31 @@ class TC_G_2_2(MatterBaseTest):
         self.step("9")
         kGroupId = 0x0000
         kGroupName = "Gp0"
-        result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.AddGroup(kGroupId, kGroupName))
+        result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroup(kGroupId, kGroupName))
         asserts.assert_equal(result.status, Status.ConstraintError, "GroupId must be not in the range of 0x0001 to 0xffff")
 
         self.step("10")
-        result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.AddGroup(groupKeyMapStruct[4].groupId, kGroupName5))
+        result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroup(groupKeyMapStruct[4].groupId, kGroupName5))
         asserts.assert_equal(result.status, Status.UnsupportedAccess,
                              "Must be get an UNSUPPORTED_ACCESS as groupID in the AddGroup command does not have the security key")
 
         self.step("11")
-        result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.ViewGroup(kGroupId1))
+        result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.ViewGroup(kGroupId1))
         asserts.assert_equal(result.status, Status.Success, "ViewGroup 0x0001 failed")
 
         self.step("12")
         asserts.assert_equal(result.groupName, kGroupName1, "Unexpected error GroupName does not match written value")
 
         self.step("13")
-        result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.ViewGroup(kGroupId))
+        result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.ViewGroup(kGroupId))
         asserts.assert_equal(result.status, Status.ConstraintError, "GroupId must be not in the range of 0x0001 to 0xffff")
 
         self.step("14")
-        result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.RemoveGroup(kGroupId1))
+        result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.RemoveGroup(kGroupId1))
         asserts.assert_equal(result.status, Status.Success, "Unexpected error from RemoveGroupResponse")
 
         self.step("15")
-        result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.ViewGroup(kGroupId1))
+        result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.ViewGroup(kGroupId1))
         asserts.assert_equal(result.status, Status.NotFound, "Unexpected error GroupID as 0x0001 must be NOT_FOUND")
 
         self.step("16")
@@ -246,11 +246,11 @@ class TC_G_2_2(MatterBaseTest):
         asserts.assert_is_not(groupTableList[0], kGroupId1, "Unexpected error must not contains GroupID 0x0001")
 
         self.step("17")
-        result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.RemoveGroup(kGroupId))
+        result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.RemoveGroup(kGroupId))
         asserts.assert_equal(result.status, Status.ConstraintError, "Unexpected error from RemoveGroupResponse")
 
         self.step("18")
-        result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.RemoveGroup(kGroupId1))
+        result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.RemoveGroup(kGroupId1))
         asserts.assert_equal(result.status, Status.NotFound, "Unexpected error from RemoveGroupResponse")
 
         self.step("19")
@@ -258,10 +258,10 @@ class TC_G_2_2(MatterBaseTest):
             dev_ctrl=th1, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.GroupKeyManagement.Attributes.GroupTable)
         asserts.assert_is_not(groupTableList[0], kGroupId1, "Unexpected error must not contains GroupID 0x0001")
         self.step("20")
-        await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.RemoveAllGroups())
+        await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.RemoveAllGroups())
 
         self.step("21")
-        result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.ViewGroup(kGroupId2))
+        result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.ViewGroup(kGroupId2))
         asserts.assert_equal(result.status, Status.NotFound, "Unexpected error GroupID as 0x0002 must be NOT_FOUND")
 
         self.step("22")
@@ -271,7 +271,7 @@ class TC_G_2_2(MatterBaseTest):
 
         self.step("23")
         kGroupNameOverflow = "Gp123456789123456"
-        result = await th1.SendCommand(self.dut_node_id, 0, Clusters.Groups.Commands.AddGroup(kGroupId, kGroupNameOverflow))
+        result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroup(kGroupId, kGroupNameOverflow))
         asserts.assert_equal(result.status, Status.ConstraintError,
                              "Unexpected error status must be CONSTRAINT_ERROR as the groupName is of length > 16")
 
