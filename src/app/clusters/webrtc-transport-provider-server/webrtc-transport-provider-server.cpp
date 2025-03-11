@@ -418,7 +418,7 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
             CHIP_ERROR listErr = iter.GetStatus();
             if (listErr != CHIP_NO_ERROR)
             {
-                ChipLogError(Zcl, "HandleSolicitOffer: ICECandidates list error: %s", chip::ErrorStr(listErr));
+                ChipLogError(Zcl, "HandleSolicitOffer: ICECandidates list error: %" CHIP_ERROR_FORMAT, listErr.Format());
                 ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidCommand);
                 return;
             }
