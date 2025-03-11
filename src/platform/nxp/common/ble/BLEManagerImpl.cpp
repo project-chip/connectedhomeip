@@ -21,13 +21,6 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
-/*! App to Host message queue for the Host Task */
-messaging_t gApp2Host_TaskQueue;
-/*! HCI to Host message queue for the Host Task */
-messaging_t gHci2Host_TaskQueue;
-/*! Event for the Host Task Queue */
-OSA_EVENT_HANDLE_DEFINE(gHost_TaskEvent);
-
 #ifdef EXTERNAL_BLEMANAGERIMPL_HEADER
 #include EXTERNAL_BLEMANAGERIMPL_HEADER
 #elif defined(CHIP_DEVICE_LAYER_TARGET)
@@ -62,7 +55,7 @@ CHIP_ERROR BLEManagerImpl::InitHostController(BLECallbackDelegate::GapGenericCal
     (void) Controller_SetRandomSeed();
 
     /* Create BLE Host Task */
-    VerifyOrExit(BLEManagerImpl::blekw_host_init() == CHIP_NO_ERROR, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(Ble_HostTaskInit() == KOSA_StatusSuccess, err = CHIP_ERROR_INCORRECT_STATE);
 
     VerifyOrExit(Hcit_Init(Ble_HciRecv) == gHciSuccess_c, err = CHIP_ERROR_INCORRECT_STATE);
 
@@ -92,32 +85,6 @@ CHIP_ERROR BLEManagerImpl::ResetController()
 
     /* Wait for function to complete */
     PLATFORM_Delay(HCI_RESET_WAIT_TIME_US);
-
-    return CHIP_NO_ERROR;
-}
-
-void BLEManagerImpl::Host_Task(osaTaskParam_t argument)
-{
-    Host_TaskHandler((void *) NULL);
-}
-
-CHIP_ERROR BLEManagerImpl::blekw_host_init(void)
-{
-    /* Initialization of task related */
-    if (KOSA_StatusSuccess != OSA_EventCreate((osa_event_handle_t) gHost_TaskEvent, TRUE))
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    /* Initialization of task message queue */
-    MSG_InitQueue(&gApp2Host_TaskQueue);
-    MSG_InitQueue(&gHci2Host_TaskQueue);
-
-    /* Task creation */
-    if (pdPASS != xTaskCreate(Host_Task, "hostTask", HOST_TASK_STACK_SIZE, (void *) 0, HOST_TASK_PRIORITY, NULL))
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
 
     return CHIP_NO_ERROR;
 }

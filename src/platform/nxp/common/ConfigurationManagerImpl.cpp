@@ -58,9 +58,9 @@ ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
     return sInstance;
 }
 
-#if CONFIG_BOOT_REASON_SDK_SUPPORT
 CHIP_ERROR ConfigurationManagerImpl::DetermineBootReason(uint8_t rebootCause)
 {
+#if CONFIG_BOOT_REASON_SDK_SUPPORT
     /*
     With current implementation kBrownOutReset couldn't be catched
     */
@@ -93,8 +93,10 @@ CHIP_ERROR ConfigurationManagerImpl::DetermineBootReason(uint8_t rebootCause)
     }
 
     return StoreBootReason(to_underlying(bootReason));
-}
+#else
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 #endif
+}
 
 CHIP_ERROR ConfigurationManagerImpl::StoreSoftwareUpdateCompleted()
 {
