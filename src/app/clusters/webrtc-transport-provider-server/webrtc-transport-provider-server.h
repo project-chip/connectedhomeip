@@ -108,8 +108,8 @@ public:
      *     that uniquely identifies this session. The delegate implementation MUST use this identifier
      *     for all subsequent processing and tracking of the session.
      *   - The `args.iceServers` data (including `urls`) is only valid during this method call.
-     *   - The delegate **must** deep-copy any data (e.g., URLs) it needs to retain beyond the lifetime
-     *     of this handler. Storing references to the input data will cause undefined behavior.
+     *   - The delegate **must** deep-copy any data (e.g., URLs) it needs to retain after this call
+     *     returns. Storing references to the input data will cause undefined behavior.
      *
      * @param[in]  args
      *   Contains all input arguments for the command, including the SDP Offer, session usage, etc.
