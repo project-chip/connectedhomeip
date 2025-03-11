@@ -38,6 +38,8 @@ extern "C" {
 #endif // SL_SI91X_BOARD_INIT
 #include "sl_event_handler.h"
 
+#include "sl_si91x_hal_soc_soft_reset.h"
+
 #ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
 #include "sl_si91x_button.h"
 #include "sl_si91x_button_pin_config.h"
@@ -207,6 +209,11 @@ uint8_t SilabsPlatform::GetButtonState(uint8_t button)
     return 0;
 }
 #endif // SL_CATALOG_SIMPLE_BUTTON_PRESENT
+
+void SilabsPlatform::DoSoftreset()
+{
+    sl_si91x_soc_nvic_reset();
+}
 
 CHIP_ERROR SilabsPlatform::FlashInit()
 {
