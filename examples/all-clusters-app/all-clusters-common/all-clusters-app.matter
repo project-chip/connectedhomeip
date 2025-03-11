@@ -213,10 +213,10 @@ enum TestGlobalEnum : enum8 {
 }
 
 enum ThreeLevelAutoEnum : enum8 {
-  kLow = 0;
-  kMedium = 1;
-  kHigh = 2;
-  kAutomatic = 3;
+  kAuto = 0;
+  kLow = 1;
+  kMedium = 2;
+  kHigh = 3;
 }
 
 bitmap TestGlobalBitmap : bitmap32 {
@@ -2657,12 +2657,14 @@ cluster OperationalCredentials = 62 {
     fabric_id fabricID = 3;
     node_id nodeID = 4;
     char_string<32> label = 5;
+    optional octet_string<85> vidVerificationStatement = 6;
     fabric_idx fabricIndex = 254;
   }
 
   fabric_scoped struct NOCStruct {
-    fabric_sensitive octet_string noc = 1;
-    nullable fabric_sensitive octet_string icac = 2;
+    octet_string noc = 1;
+    nullable octet_string icac = 2;
+    optional octet_string vvsc = 3;
     fabric_idx fabricIndex = 254;
   }
 
@@ -2737,6 +2739,23 @@ cluster OperationalCredentials = 62 {
     octet_string rootCACertificate = 0;
   }
 
+  request struct SetVidVerificationStatementRequest {
+    optional vendor_id vendorID = 0;
+    optional octet_string vidVerificationStatement = 1;
+    optional octet_string vvsc = 2;
+  }
+
+  request struct SignVidVerificationRequestRequest {
+    fabric_idx fabricIndex = 0;
+    octet_string<32> clientChallenge = 1;
+  }
+
+  response struct SignVidVerificationResponse = 14 {
+    fabric_idx fabricIndex = 0;
+    int8u fabricBindingVersion = 1;
+    octet_string signature = 2;
+  }
+
   /** Sender is requesting attestation information from the receiver. */
   command access(invoke: administer) AttestationRequest(AttestationRequestRequest): AttestationResponse = 0;
   /** Sender is requesting a device attestation certificate from the receiver. */
@@ -2753,6 +2772,10 @@ cluster OperationalCredentials = 62 {
   command access(invoke: administer) RemoveFabric(RemoveFabricRequest): NOCResponse = 10;
   /** This command SHALL add a Trusted Root CA Certificate, provided as its CHIP Certificate representation. */
   command access(invoke: administer) AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
+  /** This command SHALL be used to update any of the accessing fabric's associated VendorID, VidVerificatioNStatement or VVSC (Vendor Verification Signing Certificate). */
+  fabric command access(invoke: administer) SetVidVerificationStatement(SetVidVerificationStatementRequest): DefaultSuccess = 12;
+  /** This command SHALL be used to request that the server authenticate the fabric associated with the FabricIndex given. */
+  command access(invoke: administer) SignVidVerificationRequest(SignVidVerificationRequestRequest): SignVidVerificationResponse = 13;
 }
 
 /** The Group Key Management Cluster is the mechanism by which group keys are managed. */
@@ -3365,7 +3388,7 @@ cluster RvcCleanMode = 85 {
 
 /** Attributes and commands for configuring the temperature control, and reporting temperature. */
 cluster TemperatureControl = 86 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   bitmap Feature : bitmap32 {
     kTemperatureNumber = 0x1;
@@ -3391,7 +3414,7 @@ cluster TemperatureControl = 86 {
     optional int8u targetTemperatureLevel = 1;
   }
 
-  /** Set Temperature */
+  /** The SetTemperature command SHALL have the following data fields: */
   command SetTemperature(SetTemperatureRequest): DefaultSuccess = 0;
 }
 
@@ -3483,7 +3506,7 @@ cluster DishwasherMode = 89 {
 
 /** Attributes for reporting air quality classification */
 cluster AirQuality = 91 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum AirQualityEnum : enum8 {
     kUnknown = 0;
@@ -3625,7 +3648,7 @@ cluster SmokeCoAlarm = 92 {
 
 /** Attributes and commands for configuring the Dishwasher alarm. */
 cluster DishwasherAlarm = 93 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   bitmap AlarmBitmap : bitmap32 {
     kInflowError = 0x1;
@@ -3666,9 +3689,9 @@ cluster DishwasherAlarm = 93 {
     AlarmBitmap mask = 0;
   }
 
-  /** Reset alarm */
+  /** This command resets active and latched alarms (if possible). */
   command Reset(ResetRequest): DefaultSuccess = 0;
-  /** Modify enabled alarms */
+  /** This command allows a client to request that an alarm be enabled or suppressed at the server. */
   command ModifyEnabledAlarms(ModifyEnabledAlarmsRequest): DefaultSuccess = 1;
 }
 
@@ -5277,7 +5300,7 @@ cluster WindowCovering = 258 {
 
 /** An interface for configuring and controlling pumps. */
 cluster PumpConfigurationAndControl = 512 {
-  revision 3;
+  revision 4;
 
   enum ControlModeEnum : enum8 {
     kConstantSpeed = 0;
@@ -5756,7 +5779,7 @@ cluster Thermostat = 513 {
 
 /** An interface for controlling a fan in a heating/cooling system. */
 cluster FanControl = 514 {
-  revision 4;
+  revision 5;
 
   enum AirflowDirectionEnum : enum8 {
     kForward = 0;
@@ -5832,7 +5855,7 @@ cluster FanControl = 514 {
     optional boolean lowestOff = 2;
   }
 
-  /** The Step command speeds up or slows down the fan, in steps. */
+  /** This command speeds up or slows down the fan, in steps, without a client having to know the fan speed. */
   command Step(StepRequest): DefaultSuccess = 0;
 }
 
@@ -6991,6 +7014,28 @@ cluster LowPower = 1288 {
   command Sleep(): DefaultSuccess = 0;
 }
 
+/** This cluster provides facilities to configure and play Chime sounds, such as those used in a doorbell. */
+provisional cluster Chime = 1366 {
+  revision 1;
+
+  struct ChimeSoundStruct {
+    int8u chimeID = 0;
+    char_string<48> name = 1;
+  }
+
+  readonly attribute ChimeSoundStruct installedChimeSounds[] = 0;
+  attribute int8u selectedChime = 1;
+  attribute boolean enabled = 2;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  command PlayChimeSound(): DefaultSuccess = 0;
+}
+
 /** The Test Cluster is meant to validate the generated code */
 internal cluster UnitTesting = 4294048773 {
   revision 1; // NOTE: Default/not specifically set
@@ -8144,9 +8189,22 @@ endpoint 1 {
   server cluster Actions {
     callback attribute actionList;
     callback attribute endpointLists;
-    callback attribute setupURL;
+    ram      attribute setupURL default = "https://example.com";
     ram      attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 1;
+
+    handle command InstantAction;
+    handle command InstantActionWithTransition;
+    handle command StartAction;
+    handle command StartActionWithDuration;
+    handle command StopAction;
+    handle command PauseAction;
+    handle command PauseActionWithDuration;
+    handle command ResumeAction;
+    handle command EnableAction;
+    handle command EnableActionWithDuration;
+    handle command DisableAction;
+    handle command DisableActionWithDuration;
   }
 
   server cluster PowerSource {
@@ -9253,6 +9311,19 @@ endpoint 1 {
     ram      attribute clusterRevision default = 1;
 
     handle command Sleep;
+  }
+
+  server cluster Chime {
+    callback attribute installedChimeSounds;
+    callback attribute selectedChime;
+    callback attribute enabled;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+
+    handle command PlayChimeSound;
   }
 
   server cluster UnitTesting {

@@ -41,7 +41,7 @@ namespace Clusters {
 
 ChimeServer::ChimeServer(EndpointId endpointId, ChimeDelegate & delegate) :
     AttributeAccessInterface(MakeOptional(endpointId), Chime::Id), CommandHandlerInterface(MakeOptional(endpointId), Chime::Id),
-    mDelegate(delegate), mActiveChimeID(0), mEnabled(true)
+    mDelegate(delegate), mSelectedChime(0), mEnabled(true)
 {
     mDelegate.SetChimeServer(this);
 }
@@ -68,21 +68,21 @@ CHIP_ERROR ChimeServer::Init()
 void ChimeServer::LoadPersistentAttributes()
 {
     // Load Active Chime ID
-    uint8_t storedActiveChimeID;
-    CHIP_ERROR err = GetSafeAttributePersistenceProvider()->ReadScalarValue(
-        ConcreteAttributePath(GetEndpointId(), Chime::Id, ActiveChimeID::Id), storedActiveChimeID);
+    uint8_t storedSelectedChime = 0;
+    CHIP_ERROR err              = GetSafeAttributePersistenceProvider()->ReadScalarValue(
+        ConcreteAttributePath(GetEndpointId(), Chime::Id, SelectedChime::Id), storedSelectedChime);
     if (err == CHIP_NO_ERROR)
     {
-        mActiveChimeID = storedActiveChimeID;
+        mSelectedChime = storedSelectedChime;
     }
     else
     {
         // otherwise defaults
-        ChipLogDetail(Zcl, "Chime: Unable to load the ActiveChimeID attribute from the KVS. Defaulting to %u", mActiveChimeID);
+        ChipLogDetail(Zcl, "Chime: Unable to load the SelectedChime attribute from the KVS. Defaulting to %u", mSelectedChime);
     }
 
     // Load Enabled
-    bool storedEnabled;
+    bool storedEnabled = false;
     err = GetSafeAttributePersistenceProvider()->ReadScalarValue(ConcreteAttributePath(GetEndpointId(), Chime::Id, Enabled::Id),
                                                                  storedEnabled);
     if (err == CHIP_NO_ERROR)
@@ -103,8 +103,8 @@ CHIP_ERROR ChimeServer::Read(const ConcreteReadAttributePath & aPath, AttributeV
 
     switch (aPath.mAttributeId)
     {
-    case ActiveChimeID::Id:
-        ReturnErrorOnFailure(aEncoder.Encode(mActiveChimeID));
+    case SelectedChime::Id:
+        ReturnErrorOnFailure(aEncoder.Encode(mSelectedChime));
         break;
     case Enabled::Id:
         ReturnErrorOnFailure(aEncoder.Encode(mEnabled));
@@ -119,9 +119,9 @@ CHIP_ERROR ChimeServer::Read(const ConcreteReadAttributePath & aPath, AttributeV
     return CHIP_NO_ERROR;
 }
 
-uint8_t ChimeServer::GetActiveChimeID() const
+uint8_t ChimeServer::GetSelectedChime() const
 {
-    return mActiveChimeID;
+    return mSelectedChime;
 }
 
 bool ChimeServer::GetEnabled() const
@@ -184,10 +184,10 @@ CHIP_ERROR ChimeServer::Write(const ConcreteDataAttributePath & aPath, Attribute
 
     switch (aPath.mAttributeId)
     {
-    case ActiveChimeID::Id: {
+    case SelectedChime::Id: {
         uint8_t newValue;
         ReturnErrorOnFailure(aDecoder.Decode(newValue));
-        status = SetActiveChimeID(newValue);
+        status = SetSelectedChime(newValue);
         return StatusIB(status).ToChipError();
     }
     case Enabled::Id: {
@@ -203,22 +203,22 @@ CHIP_ERROR ChimeServer::Write(const ConcreteDataAttributePath & aPath, Attribute
     }
 }
 
-Status ChimeServer::SetActiveChimeID(uint8_t chimeID)
+Status ChimeServer::SetSelectedChime(uint8_t chimeID)
 {
     if (!IsSupportedChimeID(chimeID))
     {
         return Protocols::InteractionModel::Status::ConstraintError;
     }
 
-    bool activeIDChanged = !(mActiveChimeID == chimeID);
+    bool activeIDChanged = !(mSelectedChime == chimeID);
     if (activeIDChanged)
     {
-        mActiveChimeID = chimeID;
+        mSelectedChime = chimeID;
 
         // Write new value to persistent storage.
         auto endpointId            = GetEndpointId();
-        ConcreteAttributePath path = ConcreteAttributePath(endpointId, Chime::Id, ActiveChimeID::Id);
-        GetSafeAttributePersistenceProvider()->WriteScalarValue(path, mActiveChimeID);
+        ConcreteAttributePath path = ConcreteAttributePath(endpointId, Chime::Id, SelectedChime::Id);
+        GetSafeAttributePersistenceProvider()->WriteScalarValue(path, mSelectedChime);
 
         // and mark as dirty
         MatterReportingAttributeChangeCallback(path);
@@ -252,7 +252,7 @@ void ChimeServer::InvokeCommand(HandlerContext & ctx)
     {
     case Commands::PlayChimeSound::Id:
         CommandHandlerInterface::HandleCommand<Commands::PlayChimeSound::DecodableType>(
-            ctx, [this](HandlerContext & ctx, const auto & req) { HandlePlayChimeSound(ctx, req); });
+            ctx, [this](HandlerContext & innerCtx, const auto & req) { HandlePlayChimeSound(innerCtx, req); });
         break;
     }
 }

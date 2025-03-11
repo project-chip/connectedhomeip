@@ -273,7 +273,7 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
         metadata.clusterId = MTRClusterIDTypeDescriptorID;
 
         metadata.attributes = sDescriptorAttributesMetadata;
-        metadata.attributeCount = ArraySize(sDescriptorAttributesMetadata);
+        metadata.attributeCount = MATTER_ARRAY_SIZE(sDescriptorAttributesMetadata);
 
         metadata.clusterSize = 0; // All our attributes are external.
 

@@ -402,6 +402,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeTLSCertificateManagementID:
         result = @"TLSCertificateManagement";
         break;
+    case MTRClusterIDTypeTLSClientManagementID:
+        result = @"TLSClientManagement";
+        break;
     case MTRClusterIDTypeUnitTestingID:
         result = @"UnitTesting";
         break;
@@ -7834,8 +7837,8 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"HDRModeEnabled";
             break;
 
-        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeFabricsUsingCameraID:
-            result = @"FabricsUsingCamera";
+        case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeSupportedStreamUsagesID:
+            result = @"SupportedStreamUsages";
             break;
 
         case MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeAllocatedVideoStreamsID:
@@ -8157,8 +8160,8 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"InstalledChimeSounds";
             break;
 
-        case MTRAttributeIDTypeClusterChimeAttributeActiveChimeIDID:
-            result = @"ActiveChimeID";
+        case MTRAttributeIDTypeClusterChimeAttributeSelectedChimeID:
+            result = @"SelectedChime";
             break;
 
         case MTRAttributeIDTypeClusterChimeAttributeEnabledID:
@@ -8274,16 +8277,16 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"MaxRootCertificates";
             break;
 
-        case MTRAttributeIDTypeClusterTLSCertificateManagementAttributeCurrentRootCertificatesID:
-            result = @"CurrentRootCertificates";
+        case MTRAttributeIDTypeClusterTLSCertificateManagementAttributeProvisionedRootCertificatesID:
+            result = @"ProvisionedRootCertificates";
             break;
 
         case MTRAttributeIDTypeClusterTLSCertificateManagementAttributeMaxClientCertificatesID:
             result = @"MaxClientCertificates";
             break;
 
-        case MTRAttributeIDTypeClusterTLSCertificateManagementAttributeCurrentClientCertificatesID:
-            result = @"CurrentClientCertificates";
+        case MTRAttributeIDTypeClusterTLSCertificateManagementAttributeProvisionedClientCertificatesID:
+            result = @"ProvisionedClientCertificates";
             break;
 
         case MTRAttributeIDTypeClusterTLSCertificateManagementAttributeGeneratedCommandListID:
@@ -8303,6 +8306,45 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             break;
 
         case MTRAttributeIDTypeClusterTLSCertificateManagementAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeTLSClientManagementID:
+
+        switch (attributeID) {
+
+            // Cluster TLSClientManagement attributes
+        case MTRAttributeIDTypeClusterTLSClientManagementAttributeMaxProvisionedID:
+            result = @"MaxProvisioned";
+            break;
+
+        case MTRAttributeIDTypeClusterTLSClientManagementAttributeProvisionedEndpointsID:
+            result = @"ProvisionedEndpoints";
+            break;
+
+        case MTRAttributeIDTypeClusterTLSClientManagementAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterTLSClientManagementAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterTLSClientManagementAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterTLSClientManagementAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterTLSClientManagementAttributeClusterRevisionID:
             result = @"ClusterRevision";
             break;
 
@@ -9346,6 +9388,14 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
 
         case MTRCommandIDTypeClusterOperationalCredentialsCommandAddTrustedRootCertificateID:
             result = @"AddTrustedRootCertificate";
+            break;
+
+        case MTRCommandIDTypeClusterOperationalCredentialsCommandSetVidVerificationStatementID:
+            result = @"SetVidVerificationStatement";
+            break;
+
+        case MTRCommandIDTypeClusterOperationalCredentialsCommandSignVidVerificationRequestID:
+            result = @"SignVidVerificationRequest";
             break;
 
         default:
@@ -11026,6 +11076,10 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
             result = @"SnapshotStreamAllocate";
             break;
 
+        case MTRCommandIDTypeClusterCameraAVStreamManagementCommandSnapshotStreamModifyID:
+            result = @"SnapshotStreamModify";
+            break;
+
         case MTRCommandIDTypeClusterCameraAVStreamManagementCommandSnapshotStreamDeallocateID:
             result = @"SnapshotStreamDeallocate";
             break;
@@ -11098,8 +11152,8 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
             result = @"ProvideAnswer";
             break;
 
-        case MTRCommandIDTypeClusterWebRTCTransportProviderCommandProvideICECandidateID:
-            result = @"ProvideICECandidate";
+        case MTRCommandIDTypeClusterWebRTCTransportProviderCommandProvideICECandidatesID:
+            result = @"ProvideICECandidates";
             break;
 
         case MTRCommandIDTypeClusterWebRTCTransportProviderCommandEndSessionID:
@@ -11124,8 +11178,8 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
             result = @"Answer";
             break;
 
-        case MTRCommandIDTypeClusterWebRTCTransportRequestorCommandICECandidateID:
-            result = @"ICECandidate";
+        case MTRCommandIDTypeClusterWebRTCTransportRequestorCommandICECandidatesID:
+            result = @"ICECandidates";
             break;
 
         case MTRCommandIDTypeClusterWebRTCTransportRequestorCommandEndID:
@@ -11252,6 +11306,28 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
 
         case MTRCommandIDTypeClusterTLSCertificateManagementCommandRemoveClientCertificateID:
             result = @"RemoveClientCertificate";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeTLSClientManagementID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterTLSClientManagementCommandProvisionEndpointID:
+            result = @"ProvisionEndpoint";
+            break;
+
+        case MTRCommandIDTypeClusterTLSClientManagementCommandFindEndpointID:
+            result = @"FindEndpoint";
+            break;
+
+        case MTRCommandIDTypeClusterTLSClientManagementCommandRemoveEndpointID:
+            result = @"RemoveEndpoint";
             break;
 
         default:
@@ -11794,6 +11870,10 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
 
         case MTRCommandIDTypeClusterOperationalCredentialsCommandNOCResponseID:
             result = @"NOCResponse";
+            break;
+
+        case MTRCommandIDTypeClusterOperationalCredentialsCommandSignVidVerificationResponseID:
+            result = @"SignVidVerificationResponse";
             break;
 
         default:
@@ -12994,16 +13074,30 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
             result = @"TLSClientCSRResponse";
             break;
 
-        case MTRCommandIDTypeClusterTLSCertificateManagementCommandProvisionClientCertificateResponseID:
-            result = @"ProvisionClientCertificateResponse";
-            break;
-
         case MTRCommandIDTypeClusterTLSCertificateManagementCommandFindClientCertificateResponseID:
             result = @"FindClientCertificateResponse";
             break;
 
         case MTRCommandIDTypeClusterTLSCertificateManagementCommandLookupClientCertificateResponseID:
             result = @"LookupClientCertificateResponse";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeTLSClientManagementID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterTLSClientManagementCommandProvisionEndpointResponseID:
+            result = @"ProvisionEndpointResponse";
+            break;
+
+        case MTRCommandIDTypeClusterTLSClientManagementCommandFindEndpointResponseID:
+            result = @"FindEndpointResponse";
             break;
 
         default:
@@ -14772,19 +14866,6 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
 
         switch (eventID) {
 
-            // Cluster CameraAVStreamManagement events
-        case MTREventIDTypeClusterCameraAVStreamManagementEventVideoStreamChangedID:
-            result = @"VideoStreamChanged";
-            break;
-
-        case MTREventIDTypeClusterCameraAVStreamManagementEventAudioStreamChangedID:
-            result = @"AudioStreamChanged";
-            break;
-
-        case MTREventIDTypeClusterCameraAVStreamManagementEventSnapshotStreamChangedID:
-            result = @"SnapshotStreamChanged";
-            break;
-
         default:
             result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
             break;
@@ -14876,6 +14957,16 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
         break;
 
     case MTRClusterIDTypeTLSCertificateManagementID:
+
+        switch (eventID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeTLSClientManagementID:
 
         switch (eventID) {
 
