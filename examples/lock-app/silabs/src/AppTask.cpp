@@ -206,7 +206,8 @@ CHIP_ERROR AppTask::Init()
                              .SetNumberOfWeekdaySchedulesPerUser(numberOfWeekdaySchedulesPerUser)
                              .SetNumberOfYeardaySchedulesPerUser(numberOfYeardaySchedulesPerUser)
                              .SetNumberOfHolidaySchedules(numberOfHolidaySchedules)
-                             .GetLockParam());
+                             .GetLockParam(),
+                         &Server::GetInstance().GetPersistentStorage());
 
     if (err != CHIP_NO_ERROR)
     {

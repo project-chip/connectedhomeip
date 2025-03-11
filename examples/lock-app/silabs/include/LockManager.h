@@ -161,7 +161,7 @@ public:
     } State;
 
     CHIP_ERROR Init(chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> state,
-                    EFR32DoorLock::LockInitParams::LockParam lockParam);
+                    EFR32DoorLock::LockInitParams::LockParam lockParam, PersistentStorageDelegate * storage);
     bool NextState();
     bool IsActionInProgress();
     bool InitiateAction(int32_t aActor, Action_t aAction);
@@ -300,8 +300,11 @@ private:
         return StorageKeyName::Formatted("g/lh/%x/e/%x", scheduleIndex, endpoint);
     }
 
-    LockUserInfo userInStorage;
-    LockCredentialInfo credentialInStorage;
+    // Pointer to the PeristentStorage
+    PersistentStorageDelegate * mStorage = nullptr;
+
+    LockUserInfo mUserInStorage;
+    LockCredentialInfo mCredentialInStorage;
     CredentialStruct mCredentials[kMaxCredentialsPerUser];
 };
 

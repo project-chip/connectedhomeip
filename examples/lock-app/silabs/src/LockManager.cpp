@@ -21,7 +21,6 @@
 #include "AppConfig.h"
 #include "AppTask.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/server/Server.h>
 #include <cstring>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -38,7 +37,8 @@ LockManager & LockMgr()
     return sLock;
 }
 
-CHIP_ERROR LockManager::Init(chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> state, LockParam lockParam)
+CHIP_ERROR LockManager::Init(chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> state, LockParam lockParam,
+                             PersistentStorageDelegate * storage)
 {
 
     LockParams = lockParam;
@@ -94,6 +94,10 @@ CHIP_ERROR LockManager::Init(chip::app::DataModel::Nullable<chip::app::Clusters:
         SILABS_LOG("mLockTimer timer create failed");
         return APP_ERROR_CREATE_TIMER_FAILED;
     }
+
+    VerifyOrReturnError(storage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    mStorage = storage;
 
     if (state.Value() == DlLockState::kUnlocked)
         mState = kState_UnlockCompleted;
@@ -335,7 +339,7 @@ bool LockManager::GetUser(chip::EndpointId endpointId, uint16_t userIndex, Ember
 
     uint16_t size = static_cast<uint16_t>(sizeof(LockUserInfo));
 
-    error = chip::Server::GetInstance().GetPersistentStorage().SyncGetKeyValue(userKey.KeyName(), &userInStorage, size);
+    error = mStorage->SyncGetKeyValue(userKey.KeyName(), &mUserInStorage, size);
     // If no data is found at user key
     if (error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
@@ -347,9 +351,9 @@ bool LockManager::GetUser(chip::EndpointId endpointId, uint16_t userIndex, Ember
     // Else if KVS read was successful
     else if (error == CHIP_NO_ERROR)
     {
-        user.userStatus = userInStorage.userStatus;
+        user.userStatus = mUserInStorage.userStatus;
 
-        if (userInStorage.userStatus == UserStatusEnum::kAvailable)
+        if (mUserInStorage.userStatus == UserStatusEnum::kAvailable)
         {
             ChipLogDetail(Zcl, "Found unoccupied user [endpoint=%d]", endpointId);
             return true;
@@ -361,27 +365,26 @@ bool LockManager::GetUser(chip::EndpointId endpointId, uint16_t userIndex, Ember
         return false;
     }
 
-    user.userName       = chip::CharSpan(userInStorage.userName, userInStorage.userNameSize);
-    user.userUniqueId   = userInStorage.userUniqueId;
-    user.userType       = userInStorage.userType;
-    user.credentialRule = userInStorage.credentialRule;
+    user.userName       = chip::CharSpan(mUserInStorage.userName, mUserInStorage.userNameSize);
+    user.userUniqueId   = mUserInStorage.userUniqueId;
+    user.userType       = mUserInStorage.userType;
+    user.credentialRule = mUserInStorage.credentialRule;
     // So far there's no way to actually create the credential outside Matter, so here we always set the creation/modification
     // source to Matter
     user.creationSource     = DlAssetSource::kMatterIM;
-    user.createdBy          = userInStorage.createdBy;
+    user.createdBy          = mUserInStorage.createdBy;
     user.modificationSource = DlAssetSource::kMatterIM;
-    user.lastModifiedBy     = userInStorage.lastModifiedBy;
+    user.lastModifiedBy     = mUserInStorage.lastModifiedBy;
 
-    // Ensure userInStorage.currentCredentialCount <= kMaxCredentialsPerUser to avoid buffer overflow
-    VerifyOrReturnValue(userInStorage.currentCredentialCount <= kMaxCredentialsPerUser, false);
+    // Ensure mUserInStorage.currentCredentialCount <= kMaxCredentialsPerUser to avoid buffer overflow
+    VerifyOrReturnValue(mUserInStorage.currentCredentialCount <= kMaxCredentialsPerUser, false);
 
     // Get credential struct from nvm3
     chip::StorageKeyName credentialKey = LockUserCredentialMap(userIndex);
 
-    uint16_t credentialSize = static_cast<uint16_t>(sizeof(CredentialStruct) * userInStorage.currentCredentialCount);
+    uint16_t credentialSize = static_cast<uint16_t>(sizeof(CredentialStruct) * mUserInStorage.currentCredentialCount);
 
-    error =
-        chip::Server::GetInstance().GetPersistentStorage().SyncGetKeyValue(credentialKey.KeyName(), mCredentials, credentialSize);
+    error = mStorage->SyncGetKeyValue(credentialKey.KeyName(), mCredentials, credentialSize);
 
     // If no data is found at credential key
     if (error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
@@ -391,7 +394,7 @@ bool LockManager::GetUser(chip::EndpointId endpointId, uint16_t userIndex, Ember
     // Else if KVS read was successful
     else if (error == CHIP_NO_ERROR)
     {
-        user.credentials = chip::Span<const CredentialStruct>{ mCredentials, userInStorage.currentCredentialCount };
+        user.credentials = chip::Span<const CredentialStruct>{ mCredentials, mUserInStorage.currentCredentialCount };
     }
     else
     {
@@ -445,22 +448,22 @@ bool LockManager::SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip:
         return false;
     }
 
-    memcpy(userInStorage.userName, userName.data(), userName.size());
-    userInStorage.userNameSize   = userName.size();
-    userInStorage.userUniqueId   = uniqueId;
-    userInStorage.userStatus     = userStatus;
-    userInStorage.userType       = usertype;
-    userInStorage.credentialRule = credentialRule;
-    userInStorage.lastModifiedBy = modifier;
-    userInStorage.createdBy      = creator;
+    memcpy(mUserInStorage.userName, userName.data(), userName.size());
+    mUserInStorage.userNameSize   = userName.size();
+    mUserInStorage.userUniqueId   = uniqueId;
+    mUserInStorage.userStatus     = userStatus;
+    mUserInStorage.userType       = usertype;
+    mUserInStorage.credentialRule = credentialRule;
+    mUserInStorage.lastModifiedBy = modifier;
+    mUserInStorage.createdBy      = creator;
 
-    userInStorage.currentCredentialCount = totalCredentials;
+    mUserInStorage.currentCredentialCount = totalCredentials;
 
     // Save credential struct in nvm3
     chip::StorageKeyName credentialKey = LockUserCredentialMap(userIndex);
 
-    error = chip::Server::GetInstance().GetPersistentStorage().SyncSetKeyValue(
-        credentialKey.KeyName(), credentials, static_cast<uint16_t>(sizeof(CredentialStruct) * totalCredentials));
+    error = mStorage->SyncSetKeyValue(credentialKey.KeyName(), credentials,
+                                      static_cast<uint16_t>(sizeof(CredentialStruct) * totalCredentials));
 
     if ((error != CHIP_NO_ERROR))
     {
@@ -471,8 +474,7 @@ bool LockManager::SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip:
     // Save user in nvm3
     chip::StorageKeyName userKey = LockUserEndpoint(userIndex, endpointId);
 
-    error = chip::Server::GetInstance().GetPersistentStorage().SyncSetKeyValue(userKey.KeyName(), &userInStorage,
-                                                                               static_cast<uint16_t>(sizeof(LockUserInfo)));
+    error = mStorage->SyncSetKeyValue(userKey.KeyName(), &mUserInStorage, static_cast<uint16_t>(sizeof(LockUserInfo)));
 
     if ((error != CHIP_NO_ERROR))
     {
@@ -511,7 +513,7 @@ bool LockManager::GetCredential(chip::EndpointId endpointId, uint16_t credential
 
     chip::StorageKeyName key = LockCredentialEndpoint(credentialIndex, credentialType, endpointId);
 
-    error = chip::Server::GetInstance().GetPersistentStorage().SyncGetKeyValue(key.KeyName(), &credentialInStorage, size);
+    error = mStorage->SyncGetKeyValue(key.KeyName(), &mCredentialInStorage, size);
 
     // If no data is found at credential key
     if (error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
@@ -524,7 +526,7 @@ bool LockManager::GetCredential(chip::EndpointId endpointId, uint16_t credential
     // Else if KVS read was successful
     else if (error == CHIP_NO_ERROR)
     {
-        credential.status = credentialInStorage.status;
+        credential.status = mCredentialInStorage.status;
         ChipLogDetail(Zcl, "CredentialStatus: %d, CredentialIndex: %d ", (int) credential.status, credentialIndex);
     }
     else
@@ -538,10 +540,10 @@ bool LockManager::GetCredential(chip::EndpointId endpointId, uint16_t credential
         ChipLogDetail(Zcl, "Found unoccupied credential ");
         return true;
     }
-    credential.credentialType = credentialInStorage.credentialType;
-    credential.credentialData = chip::ByteSpan{ credentialInStorage.credentialData, credentialInStorage.credentialDataSize };
-    credential.createdBy      = credentialInStorage.createdBy;
-    credential.lastModifiedBy = credentialInStorage.lastModifiedBy;
+    credential.credentialType = mCredentialInStorage.credentialType;
+    credential.credentialData = chip::ByteSpan{ mCredentialInStorage.credentialData, mCredentialInStorage.credentialDataSize };
+    credential.createdBy      = mCredentialInStorage.createdBy;
+    credential.lastModifiedBy = mCredentialInStorage.lastModifiedBy;
     // So far there's no way to actually create the credential outside Matter, so here we always set the creation/modification
     // source to Matter
     credential.creationSource     = DlAssetSource::kMatterIM;
@@ -578,27 +580,20 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credential
                     "[credentialStatus=%u,credentialType=%u,credentialDataSize=%u,creator=%d,modifier=%d]",
                     to_underlying(credentialStatus), to_underlying(credentialType), credentialData.size(), creator, modifier);
 
-    credentialInStorage.status             = credentialStatus;
-    credentialInStorage.credentialType     = credentialType;
-    credentialInStorage.createdBy          = creator;
-    credentialInStorage.lastModifiedBy     = modifier;
-    credentialInStorage.credentialDataSize = credentialData.size();
+    mCredentialInStorage.status             = credentialStatus;
+    mCredentialInStorage.credentialType     = credentialType;
+    mCredentialInStorage.createdBy          = creator;
+    mCredentialInStorage.lastModifiedBy     = modifier;
+    mCredentialInStorage.credentialDataSize = credentialData.size();
 
-    memcpy(credentialInStorage.credentialData, credentialData.data(), credentialInStorage.credentialDataSize);
+    memcpy(mCredentialInStorage.credentialData, credentialData.data(), mCredentialInStorage.credentialDataSize);
 
     chip::StorageKeyName key = LockCredentialEndpoint(credentialIndex, credentialType, endpointId);
 
-    if ((error != CHIP_NO_ERROR))
-    {
-        ChipLogError(Zcl, "Error reading from KVS key");
-        return false;
-    }
+    error = mStorage->SyncSetKeyValue(key.KeyName(), &mCredentialInStorage, static_cast<uint16_t>(sizeof(LockCredentialInfo)));
 
-    chip::Server::GetInstance().GetPersistentStorage().SyncSetKeyValue(key.KeyName(), &credentialInStorage,
-                                                                       static_cast<uint16_t>(sizeof(LockCredentialInfo)));
-
-    // Clear credentialInStorage.credentialData
-    memset(credentialInStorage.credentialData, 0, sizeof(uint8_t) * kMaxCredentialSize);
+    // Clear mCredentialInStorage.credentialData
+    memset(mCredentialInStorage.credentialData, 0, sizeof(uint8_t) * kMaxCredentialSize);
 
     if ((error != CHIP_NO_ERROR))
     {
@@ -634,8 +629,7 @@ DlStatus LockManager::GetWeekdaySchedule(chip::EndpointId endpointId, uint8_t we
 
     uint16_t scheduleSize = static_cast<uint16_t>(sizeof(WeekDayScheduleInfo));
 
-    error = chip::Server::GetInstance().GetPersistentStorage().SyncGetKeyValue(scheduleDataKey.KeyName(), &weekDayScheduleInStorage,
-                                                                               scheduleSize);
+    error = mStorage->SyncGetKeyValue(scheduleDataKey.KeyName(), &weekDayScheduleInStorage, scheduleSize);
 
     // If no data is found at scheduleUserMapKey key
     if (error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
@@ -692,8 +686,8 @@ DlStatus LockManager::SetWeekdaySchedule(chip::EndpointId endpointId, uint8_t we
     // Save schedule data in nvm3
     chip::StorageKeyName scheduleDataKey = LockUserWeekDayScheduleEndpoint(userIndex, weekdayIndex, endpointId);
 
-    error = chip::Server::GetInstance().GetPersistentStorage().SyncSetKeyValue(scheduleDataKey.KeyName(), &weekDayScheduleInStorage,
-                                                                               static_cast<uint16_t>(sizeof(WeekDayScheduleInfo)));
+    error = mStorage->SyncSetKeyValue(scheduleDataKey.KeyName(), &weekDayScheduleInStorage,
+                                      static_cast<uint16_t>(sizeof(WeekDayScheduleInfo)));
 
     if ((error != CHIP_NO_ERROR))
     {
@@ -727,8 +721,7 @@ DlStatus LockManager::GetYeardaySchedule(chip::EndpointId endpointId, uint8_t ye
 
     uint16_t scheduleSize = static_cast<uint16_t>(sizeof(YearDayScheduleInfo));
 
-    error = chip::Server::GetInstance().GetPersistentStorage().SyncGetKeyValue(scheduleDataKey.KeyName(), &yearDayScheduleInStorage,
-                                                                               scheduleSize);
+    error = mStorage->SyncGetKeyValue(scheduleDataKey.KeyName(), &yearDayScheduleInStorage, scheduleSize);
 
     // If no data is found at scheduleUserMapKey key
     if (error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
@@ -781,8 +774,8 @@ DlStatus LockManager::SetYeardaySchedule(chip::EndpointId endpointId, uint8_t ye
     // Save schedule data in nvm3
     chip::StorageKeyName scheduleDataKey = LockUserYearDayScheduleEndpoint(userIndex, yearDayIndex, endpointId);
 
-    error = chip::Server::GetInstance().GetPersistentStorage().SyncSetKeyValue(scheduleDataKey.KeyName(), &yearDayScheduleInStorage,
-                                                                               static_cast<uint16_t>(sizeof(YearDayScheduleInfo)));
+    error = mStorage->SyncSetKeyValue(scheduleDataKey.KeyName(), &yearDayScheduleInStorage,
+                                      static_cast<uint16_t>(sizeof(YearDayScheduleInfo)));
 
     if ((error != CHIP_NO_ERROR))
     {
@@ -813,8 +806,7 @@ DlStatus LockManager::GetHolidaySchedule(chip::EndpointId endpointId, uint8_t ho
 
     uint16_t scheduleSize = static_cast<uint16_t>(sizeof(HolidayScheduleInfo));
 
-    error = chip::Server::GetInstance().GetPersistentStorage().SyncGetKeyValue(scheduleDataKey.KeyName(), &holidayScheduleInStorage,
-                                                                               scheduleSize);
+    error = mStorage->SyncGetKeyValue(scheduleDataKey.KeyName(), &holidayScheduleInStorage, scheduleSize);
 
     // If no data is found at scheduleUserMapKey key
     if (error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
@@ -865,8 +857,8 @@ DlStatus LockManager::SetHolidaySchedule(chip::EndpointId endpointId, uint8_t ho
     // Save schedule data in nvm3
     chip::StorageKeyName scheduleDataKey = LockHolidayScheduleEndpoint(holidayIndex, endpointId);
 
-    error = chip::Server::GetInstance().GetPersistentStorage().SyncSetKeyValue(scheduleDataKey.KeyName(), &holidayScheduleInStorage,
-                                                                               static_cast<uint16_t>(sizeof(HolidayScheduleInfo)));
+    error = mStorage->SyncSetKeyValue(scheduleDataKey.KeyName(), &holidayScheduleInStorage,
+                                      static_cast<uint16_t>(sizeof(HolidayScheduleInfo)));
 
     if ((error != CHIP_NO_ERROR))
     {
@@ -939,7 +931,7 @@ bool LockManager::setLockState(chip::EndpointId endpointId, const Nullable<chip:
 
         uint16_t size = static_cast<uint16_t>(sizeof(LockUserInfo));
 
-        error = chip::Server::GetInstance().GetPersistentStorage().SyncGetKeyValue(userKey.KeyName(), &userInStorage, size);
+        error = mStorage->SyncGetKeyValue(userKey.KeyName(), &mUserInStorage, size);
 
         // No user exists at this index
         if (error != CHIP_NO_ERROR)
@@ -949,11 +941,10 @@ bool LockManager::setLockState(chip::EndpointId endpointId, const Nullable<chip:
 
         chip::StorageKeyName credentialKey = LockUserCredentialMap(userIndex);
 
-        uint16_t credentialStructSize = static_cast<uint16_t>(sizeof(CredentialStruct) * userInStorage.currentCredentialCount);
+        uint16_t credentialStructSize = static_cast<uint16_t>(sizeof(CredentialStruct) * mUserInStorage.currentCredentialCount);
 
         // Get array of credential indices and types associated to user
-        error = chip::Server::GetInstance().GetPersistentStorage().SyncGetKeyValue(credentialKey.KeyName(), &mCredentials,
-                                                                                   credentialStructSize);
+        error = mStorage->SyncGetKeyValue(credentialKey.KeyName(), &mCredentials, credentialStructSize);
 
         // No credential data associated with user
         if (error != CHIP_NO_ERROR)
@@ -961,7 +952,7 @@ bool LockManager::setLockState(chip::EndpointId endpointId, const Nullable<chip:
             continue;
         }
 
-        for (int j = 0; j < userInStorage.currentCredentialCount; j++)
+        for (int j = 0; j < mUserInStorage.currentCredentialCount; j++)
         {
             // If the current credential is a pin type, then check it against pin input. Otherwise ignore
             if (mCredentials[j].credentialType == CredentialTypeEnum::kPin)
@@ -972,8 +963,7 @@ bool LockManager::setLockState(chip::EndpointId endpointId, const Nullable<chip:
                 chip::StorageKeyName key =
                     LockCredentialEndpoint(mCredentials[j].credentialIndex, mCredentials[j].credentialType, endpointId);
 
-                error = chip::Server::GetInstance().GetPersistentStorage().SyncGetKeyValue(key.KeyName(), &credentialInStorage,
-                                                                                           credentialSize);
+                error = mStorage->SyncGetKeyValue(key.KeyName(), &mCredentialInStorage, credentialSize);
 
                 if ((error != CHIP_NO_ERROR) && (error != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND))
                 {
@@ -982,13 +972,13 @@ bool LockManager::setLockState(chip::EndpointId endpointId, const Nullable<chip:
                 }
 
                 // See if it matches the provided PIN
-                if (credentialInStorage.status == DlCredentialStatus::kAvailable)
+                if (mCredentialInStorage.status == DlCredentialStatus::kAvailable)
                 {
                     continue;
                 }
 
                 chip::ByteSpan currentCredential =
-                    chip::ByteSpan{ credentialInStorage.credentialData, credentialInStorage.credentialDataSize };
+                    chip::ByteSpan{ mCredentialInStorage.credentialData, mCredentialInStorage.credentialDataSize };
 
                 if (currentCredential.data_equal(pin.Value()))
                 {
