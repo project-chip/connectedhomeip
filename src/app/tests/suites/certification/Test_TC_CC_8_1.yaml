@@ -85,13 +85,13 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Wait 20s"
+    - label: "Wait 5s"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 20000
+                value: 5000
 
     - label: "Step 2c: TH sends StopMoveStep command to DUT"
       PICS: CC.S.C47.Rsp
@@ -104,13 +104,13 @@ tests:
                 value: 0
 
     - label: "Step 2d: TH reads CurrentHue attribute from DUT"
-      PICS: CC.S.A0000 && CC.S.C01.Rsp
+      PICS: CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 20
-              maxValue: 60
+              minValue: 221
+              maxValue: 229
 
     - label: "Wait 2s"
       cluster: "DelayCommands"
@@ -121,13 +121,13 @@ tests:
                 value: 2000
 
     - label: "Step 2e: TH reads CurrentHue attribute from DUT"
-      PICS: CC.S.A0000 && CC.S.C01.Rsp
+      PICS: CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 20
-              maxValue: 60
+              minValue: 221
+              maxValue: 229
 
     - label:
           "Step 3a: TH sends MoveToSaturation command to DUT with Saturation=150
