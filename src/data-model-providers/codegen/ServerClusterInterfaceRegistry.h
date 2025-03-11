@@ -21,6 +21,8 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 
+#include <iterator>
+
 namespace chip {
 namespace app {
 
@@ -55,6 +57,12 @@ public:
         class Iterator
         {
         public:
+            using difference_type   = size_t;
+            using value_type        = ServerClusterInterface *;
+            using pointer           = ServerClusterInterface **;
+            using reference         = ServerClusterInterface *&;
+            using iterator_category = std::forward_iterator_tag;
+
             Iterator(ServerClusterRegistration * interface, EndpointId endpoint) : mRegistration(interface), mEndpointId(endpoint)
             {
                 AdvanceUntilMatchingEndpoint();
@@ -124,12 +132,23 @@ public:
     /// Unregister all registrations for the given endpoint.
     void UnregisterAllFromEndpoint(EndpointId endpointId);
 
+    // Set up the underlying context for all clusters that are managed by this registry.
+    //
+    // The values within context will be copied and used.
+    CHIP_ERROR SetContext(ServerClusterContext && context);
+
+    // Invalidates current context.
+    void ClearContext();
+
 private:
     ServerClusterRegistration * mRegistrations = nullptr;
 
     // A one-element cache to speed up finding a cluster within an endpoint.
     // The endpointId specifies which endpoint the cache belongs to.
     ServerClusterInterface * mCachedInterface = nullptr;
+
+    // Managing context for this registry
+    std::optional<ServerClusterContext> mContext;
 };
 
 } // namespace app
