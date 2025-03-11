@@ -11,13 +11,13 @@ guides to get started.
 
 ---
 
-- [Matter ESP32 Thread Border Router Example](#matter-esp32-thread-border-router-example)
-    - [OpenThread Border Router Board](#openthread-border-router-board)
-    - [OpenThread RCP](#openthread-rcp)
-    - [OpenThread CLI](#openthread-cli)
-    - [Setup Thread Network](#setup-thread-network)
-    - [Commissioning Thread End Devices](#commissioning-thread-end-devices)
-    - [Generate OTA Firmware For BR](#generate-ota-firmware-for-br)
+-   [Matter ESP32 Thread Border Router Example](#matter-esp32-thread-border-router-example)
+    -   [OpenThread Border Router Board](#openthread-border-router-board)
+    -   [OpenThread RCP](#openthread-rcp)
+    -   [OpenThread CLI](#openthread-cli)
+    -   [Setup Thread Network](#setup-thread-network)
+    -   [Commissioning Thread End Devices](#commissioning-thread-end-devices)
+    -   [Generate OTA Firmware For BR](#generate-ota-firmware-for-br)
 
 ---
 
@@ -97,10 +97,12 @@ the Thread network.
 
 ### Generate OTA Firmware For BR
 
-After enable the option `CONFIG_CREATE_OTA_IMAGE_WITH_RCP_FW` in menuconfig, will generate
-OTA image with rcp firmware in build process, named `ota_with_rcp_image` in build folder.
+After enable the option `CONFIG_CREATE_OTA_IMAGE_WITH_RCP_FW` in menuconfig,
+will generate OTA image with rcp firmware in build process, named
+`ota_with_rcp_image` in build folder.
 
 Then can add a Matter OTA header for the ota_with_rcp_image file.
+
 ```
 ./ota_image_tool.py create -v 65521 -p 32768 --version 1 --version-str "v1.0" -da sha256 build/ota_with_rcp_image ota_with_rcp_image.ota
 ```
