@@ -157,6 +157,37 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(detail::ChangeIndicatio
         return EnumType::kUnknownEnumValue;
     }
 }
+static auto __attribute__((unused)) EnsureKnownEnumValue(detail::ColorEnum val)
+{
+    using EnumType = detail::ColorEnum;
+    switch (val)
+    {
+    case EnumType::kBlack:
+    case EnumType::kNavy:
+    case EnumType::kGreen:
+    case EnumType::kTeal:
+    case EnumType::kMaroon:
+    case EnumType::kPurple:
+    case EnumType::kOlive:
+    case EnumType::kGray:
+    case EnumType::kBlue:
+    case EnumType::kLime:
+    case EnumType::kAqua:
+    case EnumType::kRed:
+    case EnumType::kFuchsia:
+    case EnumType::kYellow:
+    case EnumType::kWhite:
+    case EnumType::kNickel:
+    case EnumType::kChrome:
+    case EnumType::kBrass:
+    case EnumType::kCopper:
+    case EnumType::kSilver:
+    case EnumType::kGold:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
 static auto __attribute__((unused)) EnsureKnownEnumValue(detail::DegradationDirectionEnum val)
 {
     using EnumType = detail::DegradationDirectionEnum;
@@ -355,6 +386,22 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::PositionTag va
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(detail::ProductFinishEnum val)
+{
+    using EnumType = detail::ProductFinishEnum;
+    switch (val)
+    {
+    case EnumType::kOther:
+    case EnumType::kMatte:
+    case EnumType::kSatin:
+    case EnumType::kPolished:
+    case EnumType::kRugged:
+    case EnumType::kFabric:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
 static auto __attribute__((unused)) EnsureKnownEnumValue(detail::ProductIdentifierTypeEnum val)
 {
     using EnumType = detail::ProductIdentifierTypeEnum;
@@ -680,54 +727,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Actions::EndpointListTy
     case EnumType::kOther:
     case EnumType::kRoom:
     case EnumType::kZone:
-        return val;
-    default:
-        return EnumType::kUnknownEnumValue;
-    }
-}
-
-static auto __attribute__((unused)) EnsureKnownEnumValue(BasicInformation::ColorEnum val)
-{
-    using EnumType = BasicInformation::ColorEnum;
-    switch (val)
-    {
-    case EnumType::kBlack:
-    case EnumType::kNavy:
-    case EnumType::kGreen:
-    case EnumType::kTeal:
-    case EnumType::kMaroon:
-    case EnumType::kPurple:
-    case EnumType::kOlive:
-    case EnumType::kGray:
-    case EnumType::kBlue:
-    case EnumType::kLime:
-    case EnumType::kAqua:
-    case EnumType::kRed:
-    case EnumType::kFuchsia:
-    case EnumType::kYellow:
-    case EnumType::kWhite:
-    case EnumType::kNickel:
-    case EnumType::kChrome:
-    case EnumType::kBrass:
-    case EnumType::kCopper:
-    case EnumType::kSilver:
-    case EnumType::kGold:
-        return val;
-    default:
-        return EnumType::kUnknownEnumValue;
-    }
-}
-static auto __attribute__((unused)) EnsureKnownEnumValue(BasicInformation::ProductFinishEnum val)
-{
-    using EnumType = BasicInformation::ProductFinishEnum;
-    switch (val)
-    {
-    case EnumType::kOther:
-    case EnumType::kMatte:
-    case EnumType::kSatin:
-    case EnumType::kPolished:
-    case EnumType::kRugged:
-    case EnumType::kFabric:
         return val;
     default:
         return EnumType::kUnknownEnumValue;
@@ -1508,54 +1507,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(TimeSynchronization::Ti
     case EnumType::kFull:
     case EnumType::kPartial:
     case EnumType::kNone:
-        return val;
-    default:
-        return EnumType::kUnknownEnumValue;
-    }
-}
-
-static auto __attribute__((unused)) EnsureKnownEnumValue(BridgedDeviceBasicInformation::ColorEnum val)
-{
-    using EnumType = BridgedDeviceBasicInformation::ColorEnum;
-    switch (val)
-    {
-    case EnumType::kBlack:
-    case EnumType::kNavy:
-    case EnumType::kGreen:
-    case EnumType::kTeal:
-    case EnumType::kMaroon:
-    case EnumType::kPurple:
-    case EnumType::kOlive:
-    case EnumType::kGray:
-    case EnumType::kBlue:
-    case EnumType::kLime:
-    case EnumType::kAqua:
-    case EnumType::kRed:
-    case EnumType::kFuchsia:
-    case EnumType::kYellow:
-    case EnumType::kWhite:
-    case EnumType::kNickel:
-    case EnumType::kChrome:
-    case EnumType::kBrass:
-    case EnumType::kCopper:
-    case EnumType::kSilver:
-    case EnumType::kGold:
-        return val;
-    default:
-        return EnumType::kUnknownEnumValue;
-    }
-}
-static auto __attribute__((unused)) EnsureKnownEnumValue(BridgedDeviceBasicInformation::ProductFinishEnum val)
-{
-    using EnumType = BridgedDeviceBasicInformation::ProductFinishEnum;
-    switch (val)
-    {
-    case EnumType::kOther:
-    case EnumType::kMatte:
-    case EnumType::kSatin:
-    case EnumType::kPolished:
-    case EnumType::kRugged:
-    case EnumType::kFabric:
         return val;
     default:
         return EnumType::kUnknownEnumValue;

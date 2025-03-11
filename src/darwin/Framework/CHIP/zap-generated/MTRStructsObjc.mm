@@ -2333,6 +2333,36 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRBridgedDeviceBasicInformationClusterCapabilityMinimaStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _caseSessionsPerFabric = @(0);
+
+        _subscriptionsPerFabric = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRBridgedDeviceBasicInformationClusterCapabilityMinimaStruct alloc] init];
+
+    other.caseSessionsPerFabric = self.caseSessionsPerFabric;
+    other.subscriptionsPerFabric = self.subscriptionsPerFabric;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: caseSessionsPerFabric:%@; subscriptionsPerFabric:%@; >", NSStringFromClass([self class]), _caseSessionsPerFabric, _subscriptionsPerFabric];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRBridgedDeviceBasicInformationClusterProductAppearanceStruct
 - (instancetype)init
 {

@@ -390,6 +390,40 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::Globals::Structs::Atom
     ComplexArgumentParser::Finalize(request.statusCode);
 }
 
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::detail::Structs::CapabilityMinimaStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist(
+        "CapabilityMinimaStruct.caseSessionsPerFabric", "caseSessionsPerFabric", value.isMember("caseSessionsPerFabric")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist(
+        "CapabilityMinimaStruct.subscriptionsPerFabric", "subscriptionsPerFabric", value.isMember("subscriptionsPerFabric")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "caseSessionsPerFabric");
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::Setup(labelWithMember, request.caseSessionsPerFabric, value["caseSessionsPerFabric"]));
+    valueCopy.removeMember("caseSessionsPerFabric");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "subscriptionsPerFabric");
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::Setup(labelWithMember, request.subscriptionsPerFabric, value["subscriptionsPerFabric"]));
+    valueCopy.removeMember("subscriptionsPerFabric");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::detail::Structs::CapabilityMinimaStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.caseSessionsPerFabric);
+    ComplexArgumentParser::Finalize(request.subscriptionsPerFabric);
+}
+
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters::detail::Structs::ErrorStateStruct::Type & request,
                                         Json::Value & value)
 {
@@ -538,6 +572,38 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::detail::Structs::Opera
 {
     ComplexArgumentParser::Finalize(request.operationalStateID);
     ComplexArgumentParser::Finalize(request.operationalStateLabel);
+}
+
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::detail::Structs::ProductAppearanceStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("ProductAppearanceStruct.finish", "finish", value.isMember("finish")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ProductAppearanceStruct.primaryColor", "primaryColor",
+                                                                  value.isMember("primaryColor")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "finish");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.finish, value["finish"]));
+    valueCopy.removeMember("finish");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "primaryColor");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.primaryColor, value["primaryColor"]));
+    valueCopy.removeMember("primaryColor");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::detail::Structs::ProductAppearanceStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.finish);
+    ComplexArgumentParser::Finalize(request.primaryColor);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters::detail::Structs::ViewportStruct::Type & request,
@@ -1091,72 +1157,6 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::Actions::Structs::Endp
     ComplexArgumentParser::Finalize(request.name);
     ComplexArgumentParser::Finalize(request.type);
     ComplexArgumentParser::Finalize(request.endpoints);
-}
-
-CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::BasicInformation::Structs::CapabilityMinimaStruct::Type & request,
-                                        Json::Value & value)
-{
-    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
-
-    // Copy to track which members we already processed.
-    Json::Value valueCopy(value);
-
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist(
-        "CapabilityMinimaStruct.caseSessionsPerFabric", "caseSessionsPerFabric", value.isMember("caseSessionsPerFabric")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist(
-        "CapabilityMinimaStruct.subscriptionsPerFabric", "subscriptionsPerFabric", value.isMember("subscriptionsPerFabric")));
-
-    char labelWithMember[kMaxLabelLength];
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "caseSessionsPerFabric");
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::Setup(labelWithMember, request.caseSessionsPerFabric, value["caseSessionsPerFabric"]));
-    valueCopy.removeMember("caseSessionsPerFabric");
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "subscriptionsPerFabric");
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::Setup(labelWithMember, request.subscriptionsPerFabric, value["subscriptionsPerFabric"]));
-    valueCopy.removeMember("subscriptionsPerFabric");
-
-    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
-}
-
-void ComplexArgumentParser::Finalize(chip::app::Clusters::BasicInformation::Structs::CapabilityMinimaStruct::Type & request)
-{
-    ComplexArgumentParser::Finalize(request.caseSessionsPerFabric);
-    ComplexArgumentParser::Finalize(request.subscriptionsPerFabric);
-}
-
-CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::BasicInformation::Structs::ProductAppearanceStruct::Type & request,
-                                        Json::Value & value)
-{
-    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
-
-    // Copy to track which members we already processed.
-    Json::Value valueCopy(value);
-
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("ProductAppearanceStruct.finish", "finish", value.isMember("finish")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ProductAppearanceStruct.primaryColor", "primaryColor",
-                                                                  value.isMember("primaryColor")));
-
-    char labelWithMember[kMaxLabelLength];
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "finish");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.finish, value["finish"]));
-    valueCopy.removeMember("finish");
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "primaryColor");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.primaryColor, value["primaryColor"]));
-    valueCopy.removeMember("primaryColor");
-
-    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
-}
-
-void ComplexArgumentParser::Finalize(chip::app::Clusters::BasicInformation::Structs::ProductAppearanceStruct::Type & request)
-{
-    ComplexArgumentParser::Finalize(request.finish);
-    ComplexArgumentParser::Finalize(request.primaryColor);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
@@ -2135,40 +2135,6 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::TimeSynchronization::S
     ComplexArgumentParser::Finalize(request.fabricIndex);
     ComplexArgumentParser::Finalize(request.nodeID);
     ComplexArgumentParser::Finalize(request.endpoint);
-}
-
-CHIP_ERROR
-ComplexArgumentParser::Setup(const char * label,
-                             chip::app::Clusters::BridgedDeviceBasicInformation::Structs::ProductAppearanceStruct::Type & request,
-                             Json::Value & value)
-{
-    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
-
-    // Copy to track which members we already processed.
-    Json::Value valueCopy(value);
-
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("ProductAppearanceStruct.finish", "finish", value.isMember("finish")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ProductAppearanceStruct.primaryColor", "primaryColor",
-                                                                  value.isMember("primaryColor")));
-
-    char labelWithMember[kMaxLabelLength];
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "finish");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.finish, value["finish"]));
-    valueCopy.removeMember("finish");
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "primaryColor");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.primaryColor, value["primaryColor"]));
-    valueCopy.removeMember("primaryColor");
-
-    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
-}
-
-void ComplexArgumentParser::Finalize(
-    chip::app::Clusters::BridgedDeviceBasicInformation::Structs::ProductAppearanceStruct::Type & request)
-{
-    ComplexArgumentParser::Finalize(request.finish);
-    ComplexArgumentParser::Finalize(request.primaryColor);
 }
 
 CHIP_ERROR

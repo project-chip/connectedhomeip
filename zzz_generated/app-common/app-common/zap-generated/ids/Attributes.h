@@ -532,6 +532,10 @@ namespace MaxPathsPerInvoke {
 static constexpr AttributeId Id = 0x00000016;
 } // namespace MaxPathsPerInvoke
 
+namespace ConfigurationVersion {
+static constexpr AttributeId Id = 0x00000018;
+} // namespace ConfigurationVersion
+
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList
@@ -1741,6 +1745,10 @@ static constexpr AttributeId Id = 0x00000012;
 namespace ProductAppearance {
 static constexpr AttributeId Id = 0x00000014;
 } // namespace ProductAppearance
+
+namespace ConfigurationVersion {
+static constexpr AttributeId Id = 0x00000018;
+} // namespace ConfigurationVersion
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;

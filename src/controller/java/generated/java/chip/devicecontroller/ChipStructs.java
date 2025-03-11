@@ -3010,6 +3010,67 @@ public static class TimeSynchronizationClusterTrustedTimeSourceStruct {
     return output.toString();
   }
 }
+public static class BridgedDeviceBasicInformationClusterCapabilityMinimaStruct {
+  public Integer caseSessionsPerFabric;
+  public Integer subscriptionsPerFabric;
+  private static final long CASE_SESSIONS_PER_FABRIC_ID = 0L;
+  private static final long SUBSCRIPTIONS_PER_FABRIC_ID = 1L;
+
+  public BridgedDeviceBasicInformationClusterCapabilityMinimaStruct(
+    Integer caseSessionsPerFabric,
+    Integer subscriptionsPerFabric
+  ) {
+    this.caseSessionsPerFabric = caseSessionsPerFabric;
+    this.subscriptionsPerFabric = subscriptionsPerFabric;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(CASE_SESSIONS_PER_FABRIC_ID, new UIntType(caseSessionsPerFabric)));
+    values.add(new StructElement(SUBSCRIPTIONS_PER_FABRIC_ID, new UIntType(subscriptionsPerFabric)));
+
+    return new StructType(values);
+  }
+
+  public static BridgedDeviceBasicInformationClusterCapabilityMinimaStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer caseSessionsPerFabric = null;
+    Integer subscriptionsPerFabric = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == CASE_SESSIONS_PER_FABRIC_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          caseSessionsPerFabric = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == SUBSCRIPTIONS_PER_FABRIC_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          subscriptionsPerFabric = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new BridgedDeviceBasicInformationClusterCapabilityMinimaStruct(
+      caseSessionsPerFabric,
+      subscriptionsPerFabric
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("BridgedDeviceBasicInformationClusterCapabilityMinimaStruct {\n");
+    output.append("\tcaseSessionsPerFabric: ");
+    output.append(caseSessionsPerFabric);
+    output.append("\n");
+    output.append("\tsubscriptionsPerFabric: ");
+    output.append(subscriptionsPerFabric);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class BridgedDeviceBasicInformationClusterProductAppearanceStruct {
   public Integer finish;
   public @Nullable Integer primaryColor;
