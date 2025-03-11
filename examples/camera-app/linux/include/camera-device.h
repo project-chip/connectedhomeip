@@ -19,21 +19,33 @@
 #pragma once
 #include "camera-device-interface.h"
 #include "chime-manager.h"
+#include "camera-av-stream-manager.h"
+#include "camera-hal.h"
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace Camera {
 
 class CameraDevice : public CameraDeviceInterface
+                     //public CameraHAL::CameraHALInterface
 {
-
 public:
-    CameraDevice();
 
-    virtual chip::app::Clusters::ChimeDelegate & GetChimeDelegate();
+    static CameraDevice & GetInstance()
+    {
+        static CameraDevice sCameraDevice;
+        return sCameraDevice;
+    }
+
+    chip::app::Clusters::ChimeDelegate & GetChimeDelegate();
+    chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtDelegate & GetCameraAVStreamMgmtDelegate();
 
 private:
+    CameraDevice();
+
     // Various cluster server delegates
     ChimeManager mChimeManager;
+
+    chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamManager mCameraAVStreamManager;
 };
 
 } // namespace Camera
