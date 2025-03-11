@@ -65406,6 +65406,11 @@ public class ChipClusters {
 
     public void readProvisionedRootCertificatesAttribute(
         ProvisionedRootCertificatesAttributeCallback callback) {
+      readProvisionedRootCertificatesAttributeWithFabricFilter(callback, true);
+    }
+
+    public void readProvisionedRootCertificatesAttributeWithFabricFilter(
+        ProvisionedRootCertificatesAttributeCallback callback, boolean isFabricFiltered) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PROVISIONED_ROOT_CERTIFICATES_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
@@ -65414,7 +65419,7 @@ public class ChipClusters {
             List<ChipStructs.TlsCertificateManagementClusterTLSCertStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, PROVISIONED_ROOT_CERTIFICATES_ATTRIBUTE_ID, true);
+        }, PROVISIONED_ROOT_CERTIFICATES_ATTRIBUTE_ID, isFabricFiltered);
     }
 
     public void subscribeProvisionedRootCertificatesAttribute(
@@ -65458,6 +65463,11 @@ public class ChipClusters {
 
     public void readProvisionedClientCertificatesAttribute(
         ProvisionedClientCertificatesAttributeCallback callback) {
+      readProvisionedClientCertificatesAttributeWithFabricFilter(callback, true);
+    }
+
+    public void readProvisionedClientCertificatesAttributeWithFabricFilter(
+        ProvisionedClientCertificatesAttributeCallback callback, boolean isFabricFiltered) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PROVISIONED_CLIENT_CERTIFICATES_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
@@ -65466,7 +65476,7 @@ public class ChipClusters {
             List<ChipStructs.TlsCertificateManagementClusterTLSClientCertificateDetailStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, PROVISIONED_CLIENT_CERTIFICATES_ATTRIBUTE_ID, true);
+        }, PROVISIONED_CLIENT_CERTIFICATES_ATTRIBUTE_ID, isFabricFiltered);
     }
 
     public void subscribeProvisionedClientCertificatesAttribute(
