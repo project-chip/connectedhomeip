@@ -45,6 +45,7 @@ executable("chip-camera-app") {
   include_dirs = [
     "include",
     "include/clusters/chime",
+    "include/camera-hal",
     "${chip_root}/examples/camera-app/camera-common/include",
   ]
 
