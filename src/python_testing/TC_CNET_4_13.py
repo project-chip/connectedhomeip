@@ -37,10 +37,7 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
-import random
-import string
 import math
-from typing import Optional
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
