@@ -39,7 +39,7 @@ class ContextManager:
             device=self.devCtrl.GetConnectedDeviceSync(self.node_id, allowPASE=True, timeoutMs=1000))
 
     def __exit__(self, type, value, traceback):
-        self.devCtrl.CloseSession(self.node_id)
+        self.devCtrl.MarkSessionDefunct(self.node_id)
         if self.is_ble:
             self.devCtrl.CloseBLEConnection(self.is_ble)
 

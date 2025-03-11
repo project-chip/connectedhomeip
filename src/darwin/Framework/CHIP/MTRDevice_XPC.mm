@@ -552,7 +552,11 @@ MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(readAttributePaths
                              return;
                          }
 
-                         completion(responses, nil);
+                         if (error != nil) {
+                             MTR_LOG_ERROR("%@ got error trying to invokeCommands: %@", self, error);
+                         }
+
+                         completion(responses, error);
                      });
                  }];
     } @catch (NSException * exception) {

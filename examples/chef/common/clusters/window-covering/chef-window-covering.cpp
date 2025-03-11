@@ -29,6 +29,8 @@ using namespace chip;
 using namespace chip::app::Clusters;
 using chip::Protocols::InteractionModel::Status;
 
+namespace ChefWindowCovering {
+
 constexpr size_t kWindowCoveringDelegateTableSize = MATTER_DM_WINDOW_COVERING_CLUSTER_SERVER_ENDPOINT_COUNT;
 static_assert(kWindowCoveringDelegateTableSize <= kEmberInvalidEndpointIndex, "WindowCovering Delegate table size error");
 
@@ -68,6 +70,7 @@ void InitChefWindowCoveringCluster()
         WindowCovering::SetDefaultDelegate(endpointId, gDelegateTable[epIndex].get());
     }
 }
+} // namespace ChefWindowCovering
 
 CHIP_ERROR WindowCovering::ChefDelegate::HandleMovement(WindowCoveringType type)
 {

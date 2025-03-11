@@ -50,6 +50,7 @@ constexpr char kCDTrustStorePathVariable[]      = "CAMERACONTROLLER_CD_TRUST_STO
 
 const chip::Credentials::AttestationTrustStore * CHIPCommand::sTrustStore = nullptr;
 chip::Credentials::GroupDataProviderImpl CHIPCommand::sGroupDataProvider{ kMaxGroupsPerFabric, kMaxGroupKeysPerFabric };
+chip::Crypto::RawKeySessionKeystore CHIPCommand::sSessionKeystore;
 
 namespace {
 
@@ -109,6 +110,7 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
     factoryInitParams.operationalKeystore      = &mOperationalKeystore;
     factoryInitParams.opCertStore              = &mOpCertStore;
     factoryInitParams.enableServerInteractions = NeedsOperationalAdvertising();
+    factoryInitParams.sessionKeystore          = &sSessionKeystore;
     factoryInitParams.dataModelProvider        = chip::app::CodegenDataModelProviderInstance(&mDefaultStorage);
 
     // Init group data provider that will be used for all group keys and IPKs for the

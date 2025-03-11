@@ -128,7 +128,7 @@ class TC_ICDM_3_4(MatterBaseTest):
                 paaTrustStorePath=str(self.config.paa_trust_store_path),
                 catTags=self.config.controller_cat_tags
             )
-            devCtrl.CloseSession(self.dut_node_id)
+            devCtrl.MarkSessionDefunct(self.dut_node_id)
         icdCounter2 = await self._read_icdm_attribute_expect_success(attribute=attributes.ICDCounter)
         asserts.assert_greater_equal(icdCounter2, icdCounter1,
                                      "ICDCounter have reboot is not greater or equal to the ICDCounter read before the reboot.")

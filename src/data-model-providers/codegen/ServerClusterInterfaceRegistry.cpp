@@ -22,6 +22,7 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
+#include <optional>
 
 namespace chip {
 namespace app {
@@ -31,8 +32,12 @@ ServerClusterInterfaceRegistry::~ServerClusterInterfaceRegistry()
     while (mRegistrations != nullptr)
     {
         ServerClusterRegistration * next = mRegistrations->next;
-        mRegistrations->next             = nullptr;
-        mRegistrations                   = next;
+        if (mContext.has_value())
+        {
+            mRegistrations->serverClusterInterface->Shutdown();
+        }
+        mRegistrations->next = nullptr;
+        mRegistrations       = next;
     }
 }
 
@@ -50,6 +55,11 @@ CHIP_ERROR ServerClusterInterfaceRegistry::Register(ServerClusterRegistration & 
     // Double-checking for duplicates makes the checks O(n^2) on the total number of registered
     // items. We preserve this however we may want to make this optional at some point in time.
     VerifyOrReturnError(Get(path) == nullptr, CHIP_ERROR_DUPLICATE_KEY_ID);
+
+    if (mContext.has_value())
+    {
+        ReturnErrorOnFailure(entry.serverClusterInterface->Startup(&*mContext));
+    }
 
     entry.next     = mRegistrations;
     mRegistrations = &entry;
@@ -84,6 +94,11 @@ ServerClusterInterface * ServerClusterInterfaceRegistry::Unregister(const Concre
             }
 
             current->next = nullptr; // Make sure current does not look like part of a list.
+            if (mContext.has_value())
+            {
+                current->serverClusterInterface->Shutdown();
+            }
+
             return current->serverClusterInterface;
         }
 
@@ -121,8 +136,14 @@ void ServerClusterInterfaceRegistry::UnregisterAllFromEndpoint(EndpointId endpoi
                 prev->next = current->next;
             }
             ServerClusterRegistration * actual_next = current->next;
-            current->next                           = nullptr; // Make sure current does not look like part of a list.
-            current                                 = actual_next;
+
+            current->next = nullptr; // Make sure current does not look like part of a list.
+            if (mContext.has_value())
+            {
+                current->serverClusterInterface->Shutdown();
+            }
+
+            current = actual_next;
         }
         else
         {
@@ -156,6 +177,58 @@ ServerClusterInterface * ServerClusterInterfaceRegistry::Get(const ConcreteClust
 
     // not found
     return nullptr;
+}
+
+CHIP_ERROR ServerClusterInterfaceRegistry::SetContext(ServerClusterContext && context)
+{
+    if (mContext.has_value())
+    {
+        // if there is no difference, do not re-initialize.
+        VerifyOrReturnError(*mContext != context, CHIP_NO_ERROR);
+        ClearContext();
+    }
+
+    mContext.emplace(std::move(context));
+    bool had_failure = false;
+
+    for (ServerClusterRegistration * registration = mRegistrations; registration != nullptr; registration = registration->next)
+    {
+        CHIP_ERROR err = registration->serverClusterInterface->Startup(&*mContext);
+        if (err != CHIP_NO_ERROR)
+        {
+#if CHIP_ERROR_LOGGING
+            const ConcreteClusterPath path = registration->serverClusterInterface->GetPath();
+            ChipLogError(DataManagement, "Cluster %u/" ChipLogFormatMEI " startup failed: %" CHIP_ERROR_FORMAT, path.mEndpointId,
+                         ChipLogValueMEI(path.mClusterId), err.Format());
+#endif
+            had_failure = true;
+            // NOTE: this makes the object be in an awkward state:
+            //       - cluster is not initialized
+            //       - mContext is valid
+            //       As a result, ::Shutdown on this cluster WILL be called even if startup failed.
+        }
+    }
+
+    if (had_failure)
+    {
+        return CHIP_ERROR_HAD_FAILURES;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+void ServerClusterInterfaceRegistry::ClearContext()
+{
+    if (!mContext.has_value())
+    {
+        return;
+    }
+    for (ServerClusterRegistration * registration = mRegistrations; registration != nullptr; registration = registration->next)
+    {
+        registration->serverClusterInterface->Shutdown();
+    }
+
+    mContext.reset();
 }
 
 } // namespace app
