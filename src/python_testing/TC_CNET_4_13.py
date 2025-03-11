@@ -40,9 +40,7 @@ import logging
 import math
 
 import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
-from chip.testing import matter_asserts
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
@@ -101,7 +99,7 @@ class TC_CNET_4_13(MatterBaseTest):
     async def test_TC_CNET_4_13(self):
 
         if self.is_pics_sdk_ci_only:
-            logger.info(f'Test is not running in CI.')
+            logger.info('Test is not running in CI.')
             self.skip_all_remaining_steps('precondition-1')
             return
 
