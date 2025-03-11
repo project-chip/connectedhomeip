@@ -16151,13 +16151,13 @@ public static class EcosystemInformationClusterLocationDescriptorStruct {
 }
 public static class TlsCertificateManagementClusterTLSCertStruct {
   public Integer caid;
-  public byte[] certificate;
+  public Optional<byte[]> certificate;
   private static final long CAID_ID = 0L;
   private static final long CERTIFICATE_ID = 1L;
 
   public TlsCertificateManagementClusterTLSCertStruct(
     Integer caid,
-    byte[] certificate
+    Optional<byte[]> certificate
   ) {
     this.caid = caid;
     this.certificate = certificate;
@@ -16166,7 +16166,7 @@ public static class TlsCertificateManagementClusterTLSCertStruct {
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(CAID_ID, new UIntType(caid)));
-    values.add(new StructElement(CERTIFICATE_ID, new ByteArrayType(certificate)));
+    values.add(new StructElement(CERTIFICATE_ID, certificate.<BaseTLVType>map((nonOptionalcertificate) -> new ByteArrayType(nonOptionalcertificate)).orElse(new EmptyType())));
 
     return new StructType(values);
   }
@@ -16176,7 +16176,7 @@ public static class TlsCertificateManagementClusterTLSCertStruct {
       return null;
     }
     Integer caid = null;
-    byte[] certificate = null;
+    Optional<byte[]> certificate = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == CAID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -16186,7 +16186,7 @@ public static class TlsCertificateManagementClusterTLSCertStruct {
       } else if (element.contextTagNum() == CERTIFICATE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
           ByteArrayType castingValue = element.value(ByteArrayType.class);
-          certificate = castingValue.value(byte[].class);
+          certificate = Optional.of(castingValue.value(byte[].class));
         }
       }
     }
@@ -16204,7 +16204,7 @@ public static class TlsCertificateManagementClusterTLSCertStruct {
     output.append(caid);
     output.append("\n");
     output.append("\tcertificate: ");
-    output.append(Arrays.toString(certificate));
+    output.append(certificate.isPresent() ? Arrays.toString(certificate.get()) : "");
     output.append("\n");
     output.append("}\n");
     return output.toString();
@@ -16212,16 +16212,16 @@ public static class TlsCertificateManagementClusterTLSCertStruct {
 }
 public static class TlsCertificateManagementClusterTLSClientCertificateDetailStruct {
   public Integer ccdid;
-  public byte[] clientCertificate;
-  public ArrayList<byte[]> intermediateCertificates;
+  public Optional<byte[]> clientCertificate;
+  public Optional<ArrayList<byte[]>> intermediateCertificates;
   private static final long CCDID_ID = 0L;
   private static final long CLIENT_CERTIFICATE_ID = 1L;
   private static final long INTERMEDIATE_CERTIFICATES_ID = 2L;
 
   public TlsCertificateManagementClusterTLSClientCertificateDetailStruct(
     Integer ccdid,
-    byte[] clientCertificate,
-    ArrayList<byte[]> intermediateCertificates
+    Optional<byte[]> clientCertificate,
+    Optional<ArrayList<byte[]>> intermediateCertificates
   ) {
     this.ccdid = ccdid;
     this.clientCertificate = clientCertificate;
@@ -16231,8 +16231,8 @@ public static class TlsCertificateManagementClusterTLSClientCertificateDetailStr
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(CCDID_ID, new UIntType(ccdid)));
-    values.add(new StructElement(CLIENT_CERTIFICATE_ID, new ByteArrayType(clientCertificate)));
-    values.add(new StructElement(INTERMEDIATE_CERTIFICATES_ID, ArrayType.generateArrayType(intermediateCertificates, (elementintermediateCertificates) -> new ByteArrayType(elementintermediateCertificates))));
+    values.add(new StructElement(CLIENT_CERTIFICATE_ID, clientCertificate.<BaseTLVType>map((nonOptionalclientCertificate) -> new ByteArrayType(nonOptionalclientCertificate)).orElse(new EmptyType())));
+    values.add(new StructElement(INTERMEDIATE_CERTIFICATES_ID, intermediateCertificates.<BaseTLVType>map((nonOptionalintermediateCertificates) -> ArrayType.generateArrayType(nonOptionalintermediateCertificates, (elementnonOptionalintermediateCertificates) -> new ByteArrayType(elementnonOptionalintermediateCertificates))).orElse(new EmptyType())));
 
     return new StructType(values);
   }
@@ -16242,8 +16242,8 @@ public static class TlsCertificateManagementClusterTLSClientCertificateDetailStr
       return null;
     }
     Integer ccdid = null;
-    byte[] clientCertificate = null;
-    ArrayList<byte[]> intermediateCertificates = null;
+    Optional<byte[]> clientCertificate = Optional.empty();
+    Optional<ArrayList<byte[]>> intermediateCertificates = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == CCDID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -16253,12 +16253,12 @@ public static class TlsCertificateManagementClusterTLSClientCertificateDetailStr
       } else if (element.contextTagNum() == CLIENT_CERTIFICATE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
           ByteArrayType castingValue = element.value(ByteArrayType.class);
-          clientCertificate = castingValue.value(byte[].class);
+          clientCertificate = Optional.of(castingValue.value(byte[].class));
         }
       } else if (element.contextTagNum() == INTERMEDIATE_CERTIFICATES_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Array) {
           ArrayType castingValue = element.value(ArrayType.class);
-          intermediateCertificates = castingValue.map((elementcastingValue) -> elementcastingValue.value(byte[].class));
+          intermediateCertificates = Optional.of(castingValue.map((elementcastingValue) -> elementcastingValue.value(byte[].class)));
         }
       }
     }
@@ -16277,7 +16277,7 @@ public static class TlsCertificateManagementClusterTLSClientCertificateDetailStr
     output.append(ccdid);
     output.append("\n");
     output.append("\tclientCertificate: ");
-    output.append(Arrays.toString(clientCertificate));
+    output.append(clientCertificate.isPresent() ? Arrays.toString(clientCertificate.get()) : "");
     output.append("\n");
     output.append("\tintermediateCertificates: ");
     output.append(intermediateCertificates);

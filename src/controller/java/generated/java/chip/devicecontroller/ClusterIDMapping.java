@@ -18407,7 +18407,7 @@ public class ClusterIDMapping {
 
         public enum Attribute {
             InstalledChimeSounds(0L),
-            ActiveChimeID(1L),
+            SelectedChime(1L),
             Enabled(2L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
@@ -18751,9 +18751,9 @@ public class ClusterIDMapping {
 
         public enum Attribute {
             MaxRootCertificates(0L),
-            CurrentRootCertificates(1L),
+            ProvisionedRootCertificates(1L),
             MaxClientCertificates(2L),
-            CurrentClientCertificates(3L),
+            ProvisionedClientCertificates(3L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
@@ -18806,9 +18806,9 @@ public class ClusterIDMapping {
             RemoveRootCertificate(6L),
             TLSClientCSR(7L),
             ProvisionClientCertificate(9L),
-            FindClientCertificate(11L),
-            LookupClientCertificate(13L),
-            RemoveClientCertificate(15L),;
+            FindClientCertificate(10L),
+            LookupClientCertificate(12L),
+            RemoveClientCertificate(14L),;
             private final long id;
             Command(long id) {
                 this.id = id;
