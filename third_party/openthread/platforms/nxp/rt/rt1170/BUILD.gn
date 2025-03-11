@@ -138,8 +138,12 @@ source_set("libopenthread-rt1170") {
 
   if (nxp_nvm_component == "nvm_fwk") {
     sources += [ "${openthread_nxp_root}/src/common/flash_nvm.c" ]
-  } else {
+  } else if (nxp_nvm_component == "littlefs") {
     sources += [ "${openthread_nxp_root}/src/common/flash_littlefs.c" ]
+  } else if (nxp_nvm_component == "key_storage") {
+    sources += [ "${openthread_nxp_root}/src/common/flash_fsa.c" ]
+  } else if (nxp_nvm_component == "nvs") {
+    sources += [ "${openthread_nxp_root}/src/common/flash_nvs.c" ]
   }
 
   defines = [ "OPENTHREAD_FTD=1" ]
