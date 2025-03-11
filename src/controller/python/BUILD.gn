@@ -92,6 +92,7 @@ shared_library("ChipDeviceCtrl") {
       "chip/native/PyChipError.h",
       "chip/tracing/TracingSetup.cpp",
       "chip/utils/DeviceProxyUtils.cpp",
+      "chip/webrtc/RTCClient.cpp",
     ]
     defines += [ "CHIP_CONFIG_MAX_GROUPS_PER_FABRIC=50" ]
     defines += [ "CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC=50" ]
@@ -217,6 +218,10 @@ chip_python_wheel_action("chip-core") {
         "chip/tracing/__init__.py",
         "chip/utils/CommissioningBuildingBlocks.py",
         "chip/utils/__init__.py",
+        "chip/webrtc/__init__.py",
+        "chip/webrtc/library_handle.py",
+        "chip/webrtc/types.py",
+        "chip/webrtc/callbacks.py",
         "chip/yaml/__init__.py",
         "chip/yaml/data_model_lookup.py",
         "chip/yaml/errors.py",
@@ -269,6 +274,7 @@ chip_python_wheel_action("chip-core") {
     "chip.storage",
     "chip.tracing",
     "chip.fault_injection",
+    "chip.webrtc",
   ]
 
   if (!chip_support_commissioning_in_controller) {
