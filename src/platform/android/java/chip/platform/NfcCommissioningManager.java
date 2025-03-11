@@ -19,16 +19,39 @@ package chip.platform;
 
 public interface NfcCommissioningManager {
 
-  // For app
+  /**
+   * @brief Set the NfcCallback (for app).
+   *        NB: This NfcCallback interface is currently NOT USED.
+   * @return  None
+   */
   void setNfcCallback(NfcCallback nfcCallback);
 
+  /**
+   * @brief Get the NfcCallback.
+   *        NB: This NfcCallback interface is currently NOT USED.
+   * @return  NfcCallback
+   */
   NfcCallback getCallback();
 
+  /**
+   * @brief Set the AndroidChipPlatform.
+   * @param platform contains the AndroidChipPlatform to use.
+   * @return  None
+   */
   void setAndroidChipPlatform(AndroidChipPlatform platform);
 
-  // NFCCommissioningManager
+  /**
+   * @brief NFCCommissioningManager init function.
+   * @return int (currently not used)
+   */
   int init();
 
-  // NfcApplicationDelegate
+  /**
+   * @brief Function to send data to an NFC Tag.
+   *        See NfcApplicationDelegate.
+   * @param buf contains the byte array to send.
+   * @return None
+   */
   void sendToNfcTag(byte[] buf);
+
 }

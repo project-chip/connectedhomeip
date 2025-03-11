@@ -92,7 +92,9 @@ public class AndroidNfcCommissioningManager implements NfcCommissioningManager {
     }.start();
   }
 
-  public void setNFCTag(Tag androidTag) {
+  ///////////////////////////////////////////////////////////////////////////////////
+
+  private void setNFCTag(Tag androidTag) {
     mIsoDep = IsoDep.get(androidTag);
     if (mIsoDep == null) {
       Log.e(TAG, "mIsoDep is null");
@@ -117,7 +119,7 @@ public class AndroidNfcCommissioningManager implements NfcCommissioningManager {
     }.start();
   }
 
-  public void setIsoDepTimeout(int timeout) throws IOException {
+  private void setIsoDepTimeout(int timeout) throws IOException {
 
     if (mIsoDep == null) {
       Log.e(TAG, "Error! mIsoDep is null!");
@@ -133,7 +135,7 @@ public class AndroidNfcCommissioningManager implements NfcCommissioningManager {
     mIsoDep.setTimeout(timeout);
   }
 
-  public byte[] selectMatterApplication() throws IOException {
+  private byte[] selectMatterApplication() throws IOException {
     byte[] response;
     byte[] frame = new byte[TYPE4_HEADER_SIZE + 10];
 
@@ -189,7 +191,7 @@ public class AndroidNfcCommissioningManager implements NfcCommissioningManager {
   // If the response doesn't fit in 255 bytes, it will be chained also.
   // When the tag response is fully received, it will be transmitted
   // by OnNfcTagResponse() callback.
-  public byte[] sendChainedAPDUs(byte[] data) throws IOException {
+  private byte[] sendChainedAPDUs(byte[] data) throws IOException {
     byte[] response = null;
     int totalLength = data.length;
     int nbrOfBytesSent = 0;
@@ -260,7 +262,7 @@ public class AndroidNfcCommissioningManager implements NfcCommissioningManager {
   // A chained response is used in that case. SW2 indicates the size of the data in the next
   // response packet. The next response packet can be read thanks to a call to getResponse()
   // command.
-  public byte[] processAPDUResponse(byte[] response) throws IOException {
+  private byte[] processAPDUResponse(byte[] response) throws IOException {
 
     // Response should at least contain the 2 status bytes
     if ((response == null) || (response.length < 2)) {
@@ -334,11 +336,11 @@ public class AndroidNfcCommissioningManager implements NfcCommissioningManager {
     }
   }
 
-  public void printSw1Sw2(byte sw1, byte sw2) {
+  private void printSw1Sw2(byte sw1, byte sw2) {
     Log.d(TAG, "SW1=" + String.format("0x%02X", sw1) + " SW2=" + String.format("0x%02X", sw2));
   }
 
-  public void dumpResponse(byte[] response) {
+  private void dumpResponse(byte[] response) {
     if ((response == null) || (response.length == 0)) {
       Log.e(TAG, "Error! Empty response!");
       return;
@@ -354,7 +356,7 @@ public class AndroidNfcCommissioningManager implements NfcCommissioningManager {
   // data contains the APDU data to send (This data might one part of chained APDUs).
   // isLastBlock indicates if this is the last APDU.
   // totalLength indicates the total length of chained APDU data.
-  public byte[] sendTransportAPDU(byte[] data, boolean isLastBlock, int totalLength)
+  private byte[] sendTransportAPDU(byte[] data, boolean isLastBlock, int totalLength)
       throws IOException {
     byte[] frame = new byte[5 + data.length + 1];
 
@@ -373,7 +375,7 @@ public class AndroidNfcCommissioningManager implements NfcCommissioningManager {
     return response;
   }
 
-  public byte[] getResponse(byte length) throws IOException {
+  private byte[] getResponse(byte length) throws IOException {
     byte[] frame = new byte[5];
 
     frame[0] = 0x00; // CLA
@@ -388,7 +390,7 @@ public class AndroidNfcCommissioningManager implements NfcCommissioningManager {
   }
 
   // An exception is returned if the response doesn't contained the 2 status Words SW1-SW2
-  public byte[] transceive(String commandName, byte[] data) throws IOException {
+  private byte[] transceive(String commandName, byte[] data) throws IOException {
     byte[] response;
 
     if (mIsoDep == null) {
@@ -423,12 +425,12 @@ public class AndroidNfcCommissioningManager implements NfcCommissioningManager {
   /////////////////////////////////////////////////////////////////
   // Functions managing "chainedResponseBuffer"
 
-  public void resetChainedResponseBuffer() {
+  private void resetChainedResponseBuffer() {
     Log.d(TAG, "resetChainedResponseBuffer()");
     chainedResponseLen = 0;
   }
 
-  public void addDataToChainedResponseBuffer(byte[] data, int dataLen) throws IOException {
+  private void addDataToChainedResponseBuffer(byte[] data, int dataLen) throws IOException {
     if ((chainedResponseLen + dataLen) >= chainedResponseBuffer.length) {
       throw new IOException("Error! Too many data for chainedResponseBuffer!");
     }
@@ -440,7 +442,7 @@ public class AndroidNfcCommissioningManager implements NfcCommissioningManager {
     chainedResponseLen += dataLen;
   }
 
-  public byte[] getChainedResponseBufferData() {
+  private byte[] getChainedResponseBufferData() {
     // chainedResponseBuffer contains 'chainedResponseLen' bytes
     byte[] result = new byte[chainedResponseLen];
 
@@ -458,7 +460,7 @@ public class AndroidNfcCommissioningManager implements NfcCommissioningManager {
 
   /////////////////////////////////////////////////////////////////
 
-  public static byte[] convertIntTo2BytesHexaFormat(int numberToConvert) throws IOException {
+  private static byte[] convertIntTo2BytesHexaFormat(int numberToConvert) throws IOException {
     if (numberToConvert >= 0 && numberToConvert <= 65535) {
       byte[] convertedNumber =
           new byte[] {(byte) ((numberToConvert & '\uff00') >> 8), (byte) (numberToConvert & 255)};
@@ -468,7 +470,7 @@ public class AndroidNfcCommissioningManager implements NfcCommissioningManager {
     }
   }
 
-  public static String convertHexByteArrayToString(byte[] in) {
+  private static String convertHexByteArrayToString(byte[] in) {
     final StringBuilder builder = new StringBuilder();
     for (byte b : in) {
       builder.append(String.format("%02x ", b));
