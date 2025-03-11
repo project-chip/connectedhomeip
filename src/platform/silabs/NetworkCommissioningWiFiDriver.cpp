@@ -258,6 +258,11 @@ chip::BitFlags<WiFiSecurity> SlWiFiDriver::ConvertSecuritytype(wfx_sec_t securit
     return securityType;
 }
 
+uint32_t SlWiFiDriver::GetSupportedWiFiBandsMask() const
+{
+    return WifiInterface::GetInstance()._GetSupportedWiFiBandsMask();
+}
+
 bool SlWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
 {
     ChipLogProgress(DeviceLayer, "Start Scan WiFi Networks");

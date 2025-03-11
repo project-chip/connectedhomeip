@@ -16,7 +16,9 @@
  */
 #pragma once
 
+#include <app-common/zap-generated/cluster-enums.h>
 #include <app/icd/server/ICDServerConfig.h>
+
 #include <array>
 #include <cmsis_os2.h>
 #include <lib/support/BitFlags.h>
@@ -409,6 +411,20 @@ public:
      *        If one isn't in-progress, function doesn't do anything
      */
     virtual void CancelScanNetworks() = 0;
+
+    using WiFiBandEnum = app::Clusters::NetworkCommissioning::WiFiBandEnum;
+    /**
+     *  @brief Provide all the frequency bands supported by the Wi-Fi interface.
+     *
+     *  The default implementation returns the 2.4 GHz band support.
+     *
+     *  @return a bitmask of supported Wi-Fi bands where each bit is associated with a WiFiBandEnum value.
+     */
+    virtual uint32_t _GetSupportedWiFiBandsMask() const
+    {
+        // Default to 2.4G support only
+        return static_cast<uint32_t>(1UL << chip::to_underlying(WiFiBandEnum::k2g4));
+    }
 
 protected:
     /**
