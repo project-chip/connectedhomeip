@@ -35,8 +35,8 @@
 
 #if defined(CONFIG_AUTO_UPDATE_RCP) && defined(CONFIG_OPENTHREAD_BORDER_ROUTER)
 #include "esp_check.h"
-#include "esp_rcp_update.h"
 #include "esp_rcp_ota.h"
+#include "esp_rcp_update.h"
 #endif
 
 namespace chip {

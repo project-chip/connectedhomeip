@@ -283,13 +283,13 @@ esp_err_t OTAImageProcessorImpl::DeltaOTAWriteCallback(const uint8_t * buf, size
 #if defined(CONFIG_AUTO_UPDATE_RCP) && defined(CONFIG_OPENTHREAD_BORDER_ROUTER)
 esp_err_t OTAImageProcessorImpl::ProcessRcpImage(intptr_t context, const uint8_t * buffer, uint32_t bufLen)
 {
-    esp_err_t err = ESP_OK;
+    esp_err_t err         = ESP_OK;
     auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
 
     if (!imageProcessor->mRcpDone)
     {
         size_t rcpOtaReceivedLen = 0;
-        err = esp_rcp_ota_receive(imageProcessor->mRcpOtaHandle, buffer, bufLen, &rcpOtaReceivedLen);
+        err                      = esp_rcp_ota_receive(imageProcessor->mRcpOtaHandle, buffer, bufLen, &rcpOtaReceivedLen);
 
         if (esp_rcp_ota_get_state(imageProcessor->mRcpOtaHandle) == ESP_RCP_OTA_STATE_FINISHED)
         {
@@ -369,9 +369,9 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
 #endif // CONFIG_ENABLE_ENCRYPTED_OTA
 
 #if defined(CONFIG_AUTO_UPDATE_RCP) && defined(CONFIG_OPENTHREAD_BORDER_ROUTER)
-    imageProcessor->mRcpOtaHandle = 0;
+    imageProcessor->mRcpOtaHandle   = 0;
     imageProcessor->mBrFirmwareSize = 0;
-    imageProcessor->mRcpDone = false;
+    imageProcessor->mRcpDone        = false;
     if (esp_rcp_ota_begin(&imageProcessor->mRcpOtaHandle) != ESP_OK)
     {
         return;
@@ -424,9 +424,9 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
 #elif defined(CONFIG_AUTO_UPDATE_RCP) && defined(CONFIG_OPENTHREAD_BORDER_ROUTER)
     esp_err_t err = esp_rcp_ota_end(imageProcessor->mRcpOtaHandle);
     err |= esp_ota_end(imageProcessor->mOTAUpdateHandle);
-    imageProcessor->mRcpOtaHandle = 0;
+    imageProcessor->mRcpOtaHandle   = 0;
     imageProcessor->mBrFirmwareSize = 0;
-    imageProcessor->mRcpDone = false;
+    imageProcessor->mRcpDone        = false;
 #else
     esp_err_t err = esp_ota_end(imageProcessor->mOTAUpdateHandle);
 #endif // CONFIG_ENABLE_DELTA_OTA
@@ -473,9 +473,9 @@ void OTAImageProcessorImpl::HandleAbort(intptr_t context)
     {
         ESP_LOGE(TAG, "ESP RCP OTA abort failed");
     }
-    imageProcessor->mRcpOtaHandle = 0;
+    imageProcessor->mRcpOtaHandle   = 0;
     imageProcessor->mBrFirmwareSize = 0;
-    imageProcessor->mRcpDone = false;
+    imageProcessor->mRcpDone        = false;
 #endif
 
     if (esp_ota_abort(imageProcessor->mOTAUpdateHandle) != ESP_OK)
@@ -541,9 +541,9 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
     // Apply the patch and writes that data to the passive partition.
     err = esp_delta_ota_feed_patch(imageProcessor->mDeltaOTAUpdateHandle, blockToWrite.data() + index, blockToWrite.size() - index);
 #elif defined(CONFIG_AUTO_UPDATE_RCP) && defined(CONFIG_OPENTHREAD_BORDER_ROUTER)
-    err           = imageProcessor->ProcessRcpImage(context, blockToWrite.data(), blockToWrite.size());
+    err                             = imageProcessor->ProcessRcpImage(context, blockToWrite.data(), blockToWrite.size());
 #else
-    err = esp_ota_write(imageProcessor->mOTAUpdateHandle, blockToWrite.data(), blockToWrite.size());
+    err           = esp_ota_write(imageProcessor->mOTAUpdateHandle, blockToWrite.data(), blockToWrite.size());
 #endif // CONFIG_ENABLE_DELTA_OTA
 
 #ifdef CONFIG_ENABLE_ENCRYPTED_OTA
