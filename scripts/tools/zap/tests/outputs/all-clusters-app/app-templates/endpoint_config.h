@@ -674,7 +674,7 @@
         { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x1 },      /* LampAlarmMode */                                               \
                                                                                                                                    \
         /* Endpoint: 1, Cluster: Chime (server) */                                                                                 \
-        { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFF }, /* ActiveChimeID */                                                   \
+        { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFF }, /* SelectedChime */                                                   \
                                                                                                                                    \
         /* Endpoint: 1, Cluster: Unit Testing (server) */                                                                          \
         { (uint16_t) 0x46, (uint16_t) 0x14, (uint16_t) 0x64 },   /* range_restricted_int8u */                                      \
@@ -2067,7 +2067,7 @@
         /* Endpoint: 1, Cluster: Chime (server) */                                                                                 \
         { ZAP_EMPTY_DEFAULT(), 0x00000000, 0, ZAP_TYPE(ARRAY), ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) }, /* InstalledChimeSounds */  \
         { ZAP_MIN_MAX_DEFAULTS_INDEX(42), 0x00000001, 1, ZAP_TYPE(INT8U),                                                          \
-          ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(WRITABLE) }, /* ActiveChimeID */ \
+          ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(WRITABLE) }, /* SelectedChime */ \
         { ZAP_EMPTY_DEFAULT(), 0x00000002, 1, ZAP_TYPE(BOOLEAN),                                                                   \
           ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(WRITABLE) }, /* Enabled */                                     \
         { ZAP_SIMPLE_DEFAULT(0), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32), 0 },         /* FeatureMap */                                  \

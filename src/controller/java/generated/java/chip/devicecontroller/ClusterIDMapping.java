@@ -412,6 +412,9 @@ public class ClusterIDMapping {
         if (clusterId == TlsCertificateManagement.ID) {
             return new TlsCertificateManagement();
         }
+        if (clusterId == TlsClientManagement.ID) {
+            return new TlsClientManagement();
+        }
         if (clusterId == UnitTesting.ID) {
             return new UnitTesting();
         }
@@ -18396,7 +18399,7 @@ public class ClusterIDMapping {
 
         public enum Attribute {
             InstalledChimeSounds(0L),
-            ActiveChimeID(1L),
+            SelectedChime(1L),
             Enabled(2L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
@@ -18740,9 +18743,9 @@ public class ClusterIDMapping {
 
         public enum Attribute {
             MaxRootCertificates(0L),
-            CurrentRootCertificates(1L),
+            ProvisionedRootCertificates(1L),
             MaxClientCertificates(2L),
-            CurrentClientCertificates(3L),
+            ProvisionedClientCertificates(3L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
@@ -18795,9 +18798,9 @@ public class ClusterIDMapping {
             RemoveRootCertificate(6L),
             TLSClientCSR(7L),
             ProvisionClientCertificate(9L),
-            FindClientCertificate(11L),
-            LookupClientCertificate(13L),
-            RemoveClientCertificate(15L),;
+            FindClientCertificate(10L),
+            LookupClientCertificate(12L),
+            RemoveClientCertificate(14L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -18962,6 +18965,162 @@ public class ClusterIDMapping {
                     }
                     public static RemoveClientCertificateCommandField value(int id) throws NoSuchFieldError {
                         for (RemoveClientCertificateCommandField field : RemoveClientCertificateCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }@Override
+        public String getAttributeName(long id) throws NoSuchFieldError {
+            return Attribute.value(id).toString();
+        }
+
+        @Override
+        public String getEventName(long id) throws NoSuchFieldError {
+            return Event.value(id).toString();
+        }
+
+        @Override
+        public String getCommandName(long id) throws NoSuchFieldError {
+            return Command.value(id).toString();
+        }
+
+        @Override
+        public long getAttributeID(String name) throws IllegalArgumentException {
+            return Attribute.valueOf(name).getID();
+        }
+
+        @Override
+        public long getEventID(String name) throws IllegalArgumentException {
+            return Event.valueOf(name).getID();
+        }
+
+        @Override
+        public long getCommandID(String name) throws IllegalArgumentException {
+            return Command.valueOf(name).getID();
+        }
+    }
+    public static class TlsClientManagement implements BaseCluster {
+        public static final long ID = 2050L;
+        public long getID() {
+            return ID;
+        }
+
+        public enum Attribute {
+            MaxProvisioned(0L),
+            ProvisionedEndpoints(1L),
+            GeneratedCommandList(65528L),
+            AcceptedCommandList(65529L),
+            EventList(65530L),
+            AttributeList(65531L),
+            FeatureMap(65532L),
+            ClusterRevision(65533L),;
+            private final long id;
+            Attribute(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Attribute value(long id) throws NoSuchFieldError {
+                for (Attribute attribute : Attribute.values()) {
+                    if (attribute.getID() == id) {
+                        return attribute;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Event {;
+            private final long id;
+            Event(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Event value(long id) throws NoSuchFieldError {
+                for (Event event : Event.values()) {
+                    if (event.getID() == id) {
+                        return event;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Command {
+            ProvisionEndpoint(0L),
+            FindEndpoint(2L),
+            RemoveEndpoint(4L),;
+            private final long id;
+            Command(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Command value(long id) throws NoSuchFieldError {
+                for (Command command : Command.values()) {
+                    if (command.getID() == id) {
+                        return command;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }public enum ProvisionEndpointCommandField {Hostname(0),Port(1),Caid(2),Ccdid(3),EndpointID(4),;
+                    private final int id;
+                    ProvisionEndpointCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static ProvisionEndpointCommandField value(int id) throws NoSuchFieldError {
+                        for (ProvisionEndpointCommandField field : ProvisionEndpointCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum FindEndpointCommandField {EndpointID(0),;
+                    private final int id;
+                    FindEndpointCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static FindEndpointCommandField value(int id) throws NoSuchFieldError {
+                        for (FindEndpointCommandField field : FindEndpointCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum RemoveEndpointCommandField {EndpointID(0),;
+                    private final int id;
+                    RemoveEndpointCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static RemoveEndpointCommandField value(int id) throws NoSuchFieldError {
+                        for (RemoveEndpointCommandField field : RemoveEndpointCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
