@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -21,55 +21,55 @@ using namespace pywebrtc;
 
 extern "C" {
 
-
-void* pychip_webrtc_CreateWebrtcClient(int id)
+void * pychip_webrtc_CreateWebrtcClient(int id)
 {
-     return pywebrtc::create_webrtc_client(id);
+    return pywebrtc::create_webrtc_client(id);
 }
 
-void pychip_webrtc_InitialiseConnection(void* client)
+void pychip_webrtc_InitialiseConnection(void * client)
 {
-     return pywebrtc::initialise_peer_connection(client);
+    return pywebrtc::initialise_peer_connection(client);
 }
 
-void pychip_webrtc_CloseConnection(void* client)
+void pychip_webrtc_CloseConnection(void * client)
 {
-     return pywebrtc::close_peer_connection(client);
+    return pywebrtc::close_peer_connection(client);
 }
 
-void pychip_webrtc_DestroyClient(void* client)
+void pychip_webrtc_DestroyClient(void * client)
 {
-     return pywebrtc::destroy_client(client);
+    return pywebrtc::destroy_client(client);
 }
 
-void pychip_webrtc_GetStats(void* client)
+void pychip_webrtc_GetStats(void * client)
 {
-     return pywebrtc::GetStats(client);
+    return pywebrtc::GetStats(client);
 }
 
-void pychip_webrtc_CreateOffer(void* client)
+void pychip_webrtc_CreateOffer(void * client)
 {
-   pywebrtc::CreateOffer(client);
+    pywebrtc::CreateOffer(client);
 }
 
-const char* pychip_webrtc_GetLocalSDP(void* client)
+const char * pychip_webrtc_GetLocalSDP(void * client)
 {
-   return pywebrtc::get_local_sdp(client);
+    return pywebrtc::get_local_sdp(client);
 }
 
-void pychip_webrtc_SetAnswer(void* client, const char* answer)
+void pychip_webrtc_SetAnswer(void * client, const char * answer)
 {
-   pywebrtc::SetAnswer(client, answer);
+    pywebrtc::SetAnswer(client, answer);
 }
 
-void pychip_webrtc_SetCandidate(void* client, const char* candidate)
+void pychip_webrtc_SetCandidate(void * client, const char * candidate)
 {
-   pywebrtc::SetCandidate(client, candidate);
+    pywebrtc::SetCandidate(client, candidate);
 }
 
-void pychip_webrtc_SetCallbacks(void* client, SdpOfferCallback offer_cb, SdpAnswerCallback answer_cb, IceCallback ice_cb, ErrorCallback error_cb, PeerConnectedCallback peer_connected_cb, PeerDisconnectedCallback peer_disconnected_cb, StatsCollectedCallback stats_callback)
- {
-     pywebrtc::set_callbacks(client, offer_cb, answer_cb, ice_cb, error_cb, peer_connected_cb, peer_disconnected_cb, stats_callback);
- }
-
+void pychip_webrtc_SetCallbacks(void * client, SdpOfferCallback offer_cb, SdpAnswerCallback answer_cb, IceCallback ice_cb,
+                                ErrorCallback error_cb, PeerConnectedCallback peer_connected_cb,
+                                PeerDisconnectedCallback peer_disconnected_cb, StatsCollectedCallback stats_callback)
+{
+    pywebrtc::set_callbacks(client, offer_cb, answer_cb, ice_cb, error_cb, peer_connected_cb, peer_disconnected_cb, stats_callback);
+}
 }
