@@ -1,52 +1,57 @@
-// Copyright (c) 2025 Project CHIP Authors
-
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-
-// http://www.apache.org/licenses/LICENSE-2.0
-
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+/*
+ *
+ *    Copyright (c) 2025 Project CHIP Authors
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 
 #include <string>
 
 #include "callbacks.h"
 
-namespace pywebrtc
+namespace pywebrtc {
+typedef enum
 {
-    typedef enum {
-        OfferWaiting,
-        OfferCreated
-    } LocalSDPStatus;
+    OfferWaiting,
+    OfferCreated
+} LocalSDPStatus;
 
-    typedef enum {
-        AnswerWaiting,
-        AnswerReceived
-    } RemoteSDPStatus;
+typedef enum
+{
+    AnswerWaiting,
+    AnswerReceived
+} RemoteSDPStatus;
 
-    struct ClientStatus {
-        int id;
-        LocalSDPStatus LocalSDPState;
-        RemoteSDPStatus RemoteSDPState;
+struct ClientStatus
+{
+    int id;
+    LocalSDPStatus LocalSDPState;
+    RemoteSDPStatus RemoteSDPState;
 
-        ClientStatus(int client_id);
-    };
+    ClientStatus(int client_id);
+};
 
-    void* create_webrtc_client(int id);
-    void destroy_client(void* Client);
-    void initialise_peer_connection(void* Client);
-    void close_peer_connection(void* Client);
-    void GetStats(void* Client);
-    void CreateOffer(void* Client);
-    void CreateAnswer(void* Client, const std::string& offer,  std::function<void(std::string)> callback, int index);
-    const char* get_local_sdp(void* Client);
-    void SetAnswer(void* Client, const std::string& answer);
-    void SetCandidate(void* Client, const std::string& candidates);
-    void send_data(void* Client, const std::string& data);
-    void set_callbacks(void* Client, SdpOfferCallback, SdpAnswerCallback, IceCallback, ErrorCallback, PeerConnectedCallback, PeerDisconnectedCallback, StatsCollectedCallback);
-
-}
+void * create_webrtc_client(int id);
+void destroy_client(void * Client);
+void initialise_peer_connection(void * Client);
+void close_peer_connection(void * Client);
+void GetStats(void * Client);
+void CreateOffer(void * Client);
+void CreateAnswer(void * Client, const std::string & offer, std::function<void(std::string)> callback, int index);
+const char * get_local_sdp(void * Client);
+void SetAnswer(void * Client, const std::string & answer);
+void SetCandidate(void * Client, const std::string & candidates);
+void send_data(void * Client, const std::string & data);
+void set_callbacks(void * Client, SdpOfferCallback, SdpAnswerCallback, IceCallback, ErrorCallback, PeerConnectedCallback,
+                   PeerDisconnectedCallback, StatsCollectedCallback);
+} // namespace pywebrtc
