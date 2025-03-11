@@ -177,10 +177,11 @@ void NxpChipDnssdShutdown()
     if (mListIsInit)
     {
         // Stop all browse operations and clean the browse list
-        otInstance * thrInstancePtr    = ThreadStackMgrImpl().OTInstance();
-        mDnsQueryCtx * pQueryContext   = reinterpret_cast<mDnsQueryCtx *>(LIST_GetHead(&mBrowseList));;
+        otInstance * thrInstancePtr  = ThreadStackMgrImpl().OTInstance();
+        mDnsQueryCtx * pQueryContext = reinterpret_cast<mDnsQueryCtx *>(LIST_GetHead(&mBrowseList));
+        ;
 
-        while(pQueryContext)
+        while (pQueryContext)
         {
             otMdnsStopBrowser(thrInstancePtr, &pQueryContext->mBrowseInfo);
             LIST_RemoveElement(&pQueryContext->link);
@@ -192,7 +193,7 @@ void NxpChipDnssdShutdown()
         // Stop all resolve operations and clean the resolve list
         pQueryContext = reinterpret_cast<mDnsQueryCtx *>(LIST_GetHead(&mResolveList));
 
-        while(pQueryContext)
+        while (pQueryContext)
         {
             otMdnsStopSrvResolver(thrInstancePtr, &pQueryContext->mSrvInfo);
             LIST_RemoveElement(&pQueryContext->link);
@@ -435,7 +436,7 @@ CHIP_ERROR NxpChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, 
     pBrowseContext->mBrowseInfo.mInfraIfIndex = mNetifIndex;
     pBrowseContext->mBrowseInfo.mCallback     = OtBrowseCallback;
 
-    LIST_AddTail(&mBrowseList, (list_element_handle_t)pBrowseContext);
+    LIST_AddTail(&mBrowseList, (list_element_handle_t) pBrowseContext);
 
     error = MapOpenThreadError(otMdnsStartBrowser(thrInstancePtr, &pBrowseContext->mBrowseInfo));
 
@@ -450,7 +451,7 @@ CHIP_ERROR NxpChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, 
         {
             // In this case, we need to send a final browse indication to signal the Matter App that there are no more
             // browse results coming but the result is no error since we have a match in the SRP cache.
-            error = CHIP_NO_ERROR;
+            error                 = CHIP_NO_ERROR;
             pBrowseContext->error = CHIP_NO_ERROR;
             DeviceLayer::PlatformMgr().ScheduleWork(DispatchBrowseEmpty, reinterpret_cast<intptr_t>(pBrowseContext));
         }
@@ -486,7 +487,7 @@ CHIP_ERROR NxpChipDnssdStopBrowse(intptr_t browseIdentifier)
 CHIP_ERROR NxpChipDnssdResolve(DnssdService * browseResult, Inet::InterfaceId interface, DnssdResolveCallback callback,
                                void * context)
 {
-    ChipError error = CHIP_ERROR_NOT_FOUND;
+    ChipError error                = CHIP_ERROR_NOT_FOUND;
     mDnsQueryCtx * pResolveContext = nullptr;
 
     if (browseResult == nullptr || callback == nullptr)
@@ -521,7 +522,7 @@ CHIP_ERROR NxpChipDnssdResolve(DnssdService * browseResult, Inet::InterfaceId in
         pResolveContext->mSrvInfo.mServiceInstance = pResolveContext->mMdnsService.mName;
         pResolveContext->mSrvInfo.mServiceType     = pResolveContext->mServiceType;
 
-        LIST_AddTail(&mResolveList, (list_element_handle_t)pResolveContext);
+        LIST_AddTail(&mResolveList, (list_element_handle_t) pResolveContext);
 
         error = MapOpenThreadError(otMdnsStartSrvResolver(thrInstancePtr, &pResolveContext->mSrvInfo));
     }
@@ -838,7 +839,7 @@ static void OtServiceCallback(otInstance * aInstance, const otMdnsSrvResult * aR
 
 static void OtTxtCallback(otInstance * aInstance, const otMdnsTxtResult * aResult)
 {
-    bool bSendDispatch = true;
+    bool bSendDispatch             = true;
     mDnsQueryCtx * pResolveContext = nullptr;
 
     // Ingnore reponses with TTL 0, the record is no longer valid and was removed from the mDNS cache
@@ -964,7 +965,7 @@ static void DispatchAddressResolve(intptr_t context)
 static void DispatchResolve(intptr_t context)
 {
     mDnsQueryCtx * pResolveContext = reinterpret_cast<mDnsQueryCtx *>(context);
-    Dnssd::DnssdService & service = pResolveContext->mMdnsService;
+    Dnssd::DnssdService & service  = pResolveContext->mMdnsService;
     Span<Inet::IPAddress> ipAddrs;
 
     // Stop Address resolver, we have finished resolving the service
