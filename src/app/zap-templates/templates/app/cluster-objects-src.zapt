@@ -95,13 +95,23 @@ namespace Commands {
 namespace {{asUpperCamelCase name}} {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const{
     DataModel::WrappedStructEncoder encoder{aWriter, aTag};
-    {{#zcl_command_arguments}}
+    {{#zcl_command_arguments~}}
+
+    {{~#if_is_fabric_scoped_struct type~}}
+    encoder.EncodeForWrite(to_underlying(Fields::k{{asUpperCamelCase label}}), {{asLowerCamelCase label}});
+    {{else}}
     encoder.Encode(to_underlying(Fields::k{{asUpperCamelCase label}}), {{asLowerCamelCase label}});
-    {{/zcl_command_arguments}}
+    {{/if_is_fabric_scoped_struct}}
+
+    {{~/zcl_command_arguments}}
     return encoder.Finalize();
 }
 
+{{#if isFabricScoped~}}
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader, FabricIndex aAccessingFabricIndex) {
+{{else}}
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader) {
+{{/if}}
     detail::StructDecodeIterator __iterator(reader);
     while (true) {
         auto __element = __iterator.Next();
@@ -115,16 +125,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader) {
         const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         {{/first~}}
+        {{#not_first}}
+        else
+        {{/not_first}}
         {{! NOTE: using if/else instead of switch because it seems to generate smaller code. ~}}
         if (__context_tag == to_underlying(Fields::k{{asUpperCamelCase label}}))
         {
             err = DataModel::Decode(reader, {{asLowerCamelCase label}});
-        }
-        else
-        {{#last}}
-        {
-        }
 
+            {{~#if_is_fabric_scoped_struct type~}}
+            if (err == CHIP_NO_ERROR)
+            {
+                {{asLowerCamelCase label}}.SetFabricIndex(aAccessingFabricIndex);
+            }
+            {{/if_is_fabric_scoped_struct~}}
+        }
+        {{#last}}
         ReturnErrorOnFailure(err);
         {{/last}}
         {{/zcl_command_arguments}}
