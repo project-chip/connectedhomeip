@@ -11400,61 +11400,6 @@ public class ClusterReadMapping {
           readClosureControlCurrentErrorListCommandParams
         );
         result.put("readCurrentErrorListAttribute", readClosureControlCurrentErrorListAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readClosureControlRestingProcedureCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readClosureControlRestingProcedureAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.ClosureControlCluster) cluster).readRestingProcedureAttribute(
-              (ChipClusters.IntegerAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-          readClosureControlRestingProcedureCommandParams
-        );
-        result.put("readRestingProcedureAttribute", readClosureControlRestingProcedureAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readClosureControlTriggerConditionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readClosureControlTriggerConditionAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.ClosureControlCluster) cluster).readTriggerConditionAttribute(
-              (ChipClusters.IntegerAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-          readClosureControlTriggerConditionCommandParams
-        );
-        result.put("readTriggerConditionAttribute", readClosureControlTriggerConditionAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readClosureControlTriggerPositionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readClosureControlTriggerPositionAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.ClosureControlCluster) cluster).readTriggerPositionAttribute(
-              (ChipClusters.IntegerAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-          readClosureControlTriggerPositionCommandParams
-        );
-        result.put("readTriggerPositionAttribute", readClosureControlTriggerPositionAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readClosureControlWaitingDelayCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readClosureControlWaitingDelayAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.ClosureControlCluster) cluster).readWaitingDelayAttribute(
-              (ChipClusters.LongAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
-          readClosureControlWaitingDelayCommandParams
-        );
-        result.put("readWaitingDelayAttribute", readClosureControlWaitingDelayAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readClosureControlKickoffTimerCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readClosureControlKickoffTimerAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.ClosureControlCluster) cluster).readKickoffTimerAttribute(
-              (ChipClusters.LongAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
-          readClosureControlKickoffTimerCommandParams
-        );
-        result.put("readKickoffTimerAttribute", readClosureControlKickoffTimerAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readClosureControlGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readClosureControlGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

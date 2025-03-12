@@ -4312,26 +4312,6 @@ namespace OverallTarget {
 static constexpr AttributeId Id = 0x00000004;
 } // namespace OverallTarget
 
-namespace RestingProcedure {
-static constexpr AttributeId Id = 0x00000005;
-} // namespace RestingProcedure
-
-namespace TriggerCondition {
-static constexpr AttributeId Id = 0x00000006;
-} // namespace TriggerCondition
-
-namespace TriggerPosition {
-static constexpr AttributeId Id = 0x00000007;
-} // namespace TriggerPosition
-
-namespace WaitingDelay {
-static constexpr AttributeId Id = 0x00000008;
-} // namespace WaitingDelay
-
-namespace KickoffTimer {
-static constexpr AttributeId Id = 0x00000009;
-} // namespace KickoffTimer
-
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList
