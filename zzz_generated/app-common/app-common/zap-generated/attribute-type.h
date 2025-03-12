@@ -129,11 +129,11 @@ inline bool IsSignedAttributeType(uint8_t attributeType)
         return true;
     case ZCL_INT64S_ATTRIBUTE_TYPE:
         return true;
-    case ZCL_TEMPERATURE_ATTRIBUTE_TYPE:
-        return true;
     case ZCL_POWER_MVA_ATTRIBUTE_TYPE:
         return true;
     case ZCL_POWER_MVAR_ATTRIBUTE_TYPE:
+        return true;
+    case ZCL_TEMPERATURE_ATTRIBUTE_TYPE:
         return true;
     case ZCL_POWER_MW_ATTRIBUTE_TYPE:
         return true;
