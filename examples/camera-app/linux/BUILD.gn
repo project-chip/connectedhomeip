@@ -40,12 +40,18 @@ executable("chip-camera-app") {
     "${chip_root}/examples/camera-app/camera-common:camera-lib",
     "${chip_root}/examples/platform/linux:app-main",
     "${chip_root}/src/lib",
+    "${chip_root}/third_party/libdatachannel:libdatachannel",
   ]
+
+  libs = [ "datachannel" ]
+  lib_dirs =
+      [ rebase_path("${chip_root}/third_party/libdatachannel/repo/build") ]
 
   include_dirs = [
     "include",
     "include/clusters/chime",
     "${chip_root}/examples/camera-app/camera-common/include",
+    "${chip_root}/third_party/libdatachannel/repo/include",
   ]
 
   cflags = [ "-Wconversion" ]
