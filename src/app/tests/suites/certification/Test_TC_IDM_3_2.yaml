@@ -101,8 +101,9 @@ tests:
           attribute is the InterfaceEnabled attribute in the Network Commissioning cluster, mark this test step as 'Not Applicable'.
           The mandatory writable 'InterfaceEnabled' attribute is of type boolean. However, its behavior is undefined if it is set to 'false' 
           on the same interface that is being used to write the value, which would be required for this test
-           ./chip-tool  basicinformation write local-config-disabled 1 1 0
-          On TH(chip-tool), verify that DUT sends a WriteResponseMessage with the status set to Success for the data sent in the above command and verify by sending a ReadRequestMessage to read the value that was modified.
+          ./chip-tool  basicinformation write local-config-disabled 1 1 0
+          On TH(chip-tool), verify that DUT sends a WriteResponseMessage with the status set to Success for the data sent in the above command and
+          verify by sending a ReadRequestMessage to read the value that was modified.
           [1686227392.013866][93552:93554] CHIP:DMG: WriteClient moving to [ResponseRe]
           [1686227392.013876][93552:93554] CHIP:DMG: WriteResponseMessage =
           [1686227392.013879][93552:93554] CHIP:DMG: {
