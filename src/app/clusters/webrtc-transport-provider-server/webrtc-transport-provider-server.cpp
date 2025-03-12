@@ -201,7 +201,7 @@ void WebRTCTransportProviderServer::RemoveSession(uint16_t sessionId)
 WebRTCSessionStruct * WebRTCTransportProviderServer::CheckForMatchingSession(HandlerContext & ctx, uint16_t sessionId)
 {
     WebRTCSessionStruct * session = FindSession(sessionId);
-    if (outSessionPtr == nullptr)
+    if (session == nullptr)
     {
         return nullptr;
     }
@@ -210,12 +210,12 @@ WebRTCSessionStruct * WebRTCTransportProviderServer::CheckForMatchingSession(Han
     FabricIndex peerFabricIndex = ctx.mCommandHandler.GetAccessingFabricIndex();
 
     // Ensure the session’s peer matches the current command invoker
-    if (peerNodeId != outSessionPtr->peerNodeID || peerFabricIndex != outSessionPtr->GetFabricIndex())
+    if (peerNodeId != session->peerNodeID || peerFabricIndex != session->GetFabricIndex())
     {
         return nullptr;
     }
 
-    return outSessionPtr;
+    return session;
 }
 
 uint16_t WebRTCTransportProviderServer::GenerateSessionId()
@@ -242,7 +242,7 @@ uint16_t WebRTCTransportProviderServer::GenerateSessionId()
 // Command Handlers
 void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, const Commands::SolicitOffer::DecodableType & req)
 {
-    // TODO: this check needs to be removed after https://github.com/CHIP-Specifications/connectedhomeip-spec/pull/11333
+    // TODO: Respond with INVALID_COMMAND after https://github.com/CHIP-Specifications/connectedhomeip-spec/pull/11333
     // If both the VideoStreamID and AudioStreamID are not present: Respond with CONSTRAINT_ERROR
     if (!req.videoStreamID.HasValue() && !req.audioStreamID.HasValue())
     {
@@ -363,7 +363,7 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
 
     WebRTCSessionStruct outSession;
 
-    // TODO: this check needs to be removed after https://github.com/CHIP-Specifications/connectedhomeip-spec/pull/11333
+    // TODO: Respond with INVALID_COMMAND after https://github.com/CHIP-Specifications/connectedhomeip-spec/pull/11333
     // If both video and audio stream IDs are missing, return CONSTRAINT_ERROR.
     if (!videoStreamID.HasValue() && !audioStreamID.HasValue())
     {
