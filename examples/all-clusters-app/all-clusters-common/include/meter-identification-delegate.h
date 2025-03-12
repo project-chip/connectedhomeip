@@ -39,7 +39,7 @@ class MeterIdentificationDelegate final : public MeterIdentification::Delegate
 private:
 
     static bool NullableCharSpanCompare(const DataModel::Nullable<CharSpan> & a, const DataModel::Nullable<CharSpan> & b);
-    static CHIP_ERROR NullableCharSpanCopy(const DataModel::Nullable<CharSpan> & src, DataModel::Nullable<CharSpan> & dst);
+    static CHIP_ERROR NullableCharSpanCopy(DataModel::Nullable<CharSpan> & dst, const DataModel::Nullable<CharSpan> & src);
     static CHIP_ERROR JsonToPowerThreshold(const Json::Value & root, Structs::PowerThresholdStruct::Type & value);
 
 public:
