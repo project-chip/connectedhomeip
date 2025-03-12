@@ -19,8 +19,8 @@
 #include "SoftwareFaultReports.h"
 #include "FreeRTOSConfig.h"
 #include "silabs_utils.h"
+#include <app/InteractionModelEngine.h>
 #include <app/clusters/software-diagnostics-server/software-diagnostics-server.h>
-#include <app/util/attribute-storage.h>
 #include <cmsis_os2.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
@@ -57,8 +57,10 @@ namespace Silabs {
 void OnSoftwareFaultEventHandler(const char * faultRecordString)
 {
 #ifdef MATTER_DM_PLUGIN_SOFTWARE_DIAGNOSTICS_SERVER
-    EnabledEndpointsWithServerCluster enabledEndpoints(SoftwareDiagnostics::Id);
-    VerifyOrReturn(enabledEndpoints.begin() != enabledEndpoints.end());
+    DataModel::ListBuilder<EndpointId> endpointsList;
+    InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(SoftwareDiagnostics::Id,
+                                                                                              endpointsList);
+    VerifyOrReturn(endpointsList.Size() > 0);
 
     TaskStatus_t taskDetails;
     TaskHandle_t taskHandle = xTaskGetCurrentTaskHandle();
