@@ -68,7 +68,11 @@ void FailSafeContext::CheckAddNOCStartedMarker()
     if (err == CHIP_NO_ERROR)
     {
         // This should not be possible at this point
-        VerifyOrDie(IsFailSafeArmed() == false);
+        if (IsFailSafeArmed())
+        {
+            ChipLogError(FailSafe, "Found a AddNOCStartedMarker, but Fail-Safe is armed. Something went wrong.");
+            return;
+        }
 
         // Fail-Safe may be busy due to cleanup scheduled by failed commit to FabricTable.
         // We can ignore it here, AddNOCStartedMarker will be deleted when Fail-Safe is disarmed.
