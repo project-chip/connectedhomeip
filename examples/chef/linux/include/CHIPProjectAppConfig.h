@@ -35,4 +35,3 @@
 
 // Enable subscriptions synchronization
 #define CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED 1
-

@@ -30,10 +30,15 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
+// Wake up periodically to send Check-in message since Linux application doesn't have physical button
 void notifyIcdActive(System::Layer * layer, void *)
 {
     ICDNotifier::GetInstance().NotifyNetworkActivityNotification();
-    DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC*1000), notifyIcdActive, nullptr);
+
+    ChipLogDetail(Shell, "Periodic wakeup to notify ICD active");
+    DeviceLayer::SystemLayer().StartTimer(
+        chip::System::Clock::Milliseconds32(LinuxDeviceOptions::GetInstance().icdPeriodicWakeupDurationMs), notifyIcdActive,
+        nullptr);
 }
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
@@ -58,7 +63,8 @@ int main(int argc, char * argv[])
 #endif
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
-    DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC*1000), notifyIcdActive, nullptr);
+    // Send notification right away after init
+    DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(0), notifyIcdActive, nullptr);
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
     ChipLinuxAppMainLoop();
