@@ -345,8 +345,7 @@ class TC_CADMIN(MatterBaseTest):
         await self.combined_commission_val_steps(commission_type="BCM")
 
 
-global __test_class__
-__test_class__ = TC_CADMIN
-
 if __name__ == "__main__":
+    # This makes the test class discoverable by the test runner
+    __test_class__ = TC_CADMIN
     default_matter_test_main()
