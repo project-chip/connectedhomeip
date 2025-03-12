@@ -35,8 +35,8 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-from typing import List
 import logging
+from typing import List
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
@@ -254,7 +254,7 @@ class TC_G_2_2(MatterBaseTest):
         try:
             result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroup(kGroupId, kGroupNameOverflow))
             asserts.assert_equal(result.status, Status.ConstraintError,
-                                "Unexpected error status must be CONSTRAINT_ERROR as the groupName is of length > 16")
+                                 "Unexpected error status must be CONSTRAINT_ERROR as the groupName is of length > 16")
         except Exception as e:
             logging.exception('Error while adding groupName')
 
