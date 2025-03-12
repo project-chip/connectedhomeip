@@ -97,8 +97,10 @@ tests:
       PICS: MCORE.IDM.S.Attribute_W.DataType_Bool
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster/attribute/command.
-          Note: If the DUT does not implement or support a mandatory writable boolean attribute, and no other writable boolean
-           attribute is available for verification, mark this test step as 'Not Applicable'. Currently, the mandatory writable 'Interface Enabled' attribute is of type boolean, but it does not support writing. Therefore, this step can be skipped
+          Note: If the DUT does not implement or support a mandatory writable boolean attribute, or if the only available writable boolean 
+          attribute is the InterfaceEnabled attribute in the Network Commissioning cluster, mark this test step as 'Not Applicable'.
+          The mandatory writable 'InterfaceEnabled' attribute is of type boolean. However, its behavior is undefined if it is set to 'false' 
+          on the same interface that is being used to write the value, which would be required for this test
            ./chip-tool  basicinformation write local-config-disabled 1 1 0
           On TH(chip-tool), verify that DUT sends a WriteResponseMessage with the status set to Success for the data sent in the above command and verify by sending a ReadRequestMessage to read the value that was modified.
           [1686227392.013866][93552:93554] CHIP:DMG: WriteClient moving to [ResponseRe]
