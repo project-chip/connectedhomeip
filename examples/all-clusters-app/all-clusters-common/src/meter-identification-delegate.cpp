@@ -51,19 +51,19 @@ chip::app::Clusters::MeterIdentification::MeterIdentificationDelegate::~MeterIde
 {
     if (!mPointOfDelivery.IsNull())
     {
-        chip::Platform::MemoryFree((void *) mPointOfDelivery.Value().data());
+        chip::Platform::MemoryFree(const_cast<char *>(mPointOfDelivery.Value().data()));
         mPointOfDelivery.SetNull();
     }
 
     if (!mMeterSerialNumber.IsNull())
     {
-        chip::Platform::MemoryFree((void *) mMeterSerialNumber.Value().data());
+        chip::Platform::MemoryFree(const_cast<char *>(mMeterSerialNumber.Value().data()));
         mMeterSerialNumber.SetNull();
     }
 
     if (!mProtocolVersion.IsNull())
     {
-        chip::Platform::MemoryFree((void *) mProtocolVersion.Value().data());
+        chip::Platform::MemoryFree(const_cast<char *>(mProtocolVersion.Value().data()));
         mProtocolVersion.SetNull();
     }
 }
@@ -194,8 +194,7 @@ CHIP_ERROR MeterIdentificationDelegate::SetMeterType(const DataModel::Nullable<M
             return CHIP_NO_ERROR;
         }
 
-        if(static_cast<std::underlying_type<MeterTypeEnum>::type>(MeterTypeEnum::kUnknownEnumValue) <=
-            static_cast<std::underlying_type<MeterTypeEnum>::type>(newValue.Value()))
+        if(MeterTypeEnum::kUnknownEnumValue == EnsureKnownEnumValue(newValue.Value()))
         {
             return CHIP_ERROR_INVALID_INTEGER_VALUE;
         }
@@ -214,7 +213,7 @@ CHIP_ERROR MeterIdentificationDelegate::SetPointOfDelivery(const DataModel::Null
         return CHIP_NO_ERROR;
     }
 
-    const CHIP_ERROR ret = NullableCharSpanCopy(newValue, mPointOfDelivery);
+    const CHIP_ERROR ret = NullableCharSpanCopy(mPointOfDelivery, newValue);
     if (CHIP_NO_ERROR == ret)
     {
         MatterReportingAttributeChangeCallback(mEndpointId, MeterIdentification::Id, PointOfDelivery::Id);
@@ -229,7 +228,7 @@ CHIP_ERROR MeterIdentificationDelegate::SetMeterSerialNumber(const DataModel::Nu
         return CHIP_NO_ERROR;
     }
 
-    const CHIP_ERROR ret = NullableCharSpanCopy(newValue, mMeterSerialNumber);
+    const CHIP_ERROR ret = NullableCharSpanCopy(mMeterSerialNumber, newValue);
     if (CHIP_NO_ERROR == ret)
     {
         MatterReportingAttributeChangeCallback(mEndpointId, MeterIdentification::Id, MeterSerialNumber::Id);
@@ -244,7 +243,7 @@ CHIP_ERROR MeterIdentificationDelegate::SetProtocolVersion(const DataModel::Null
         return CHIP_NO_ERROR;
     }
 
-    const CHIP_ERROR ret = NullableCharSpanCopy(newValue, mProtocolVersion);
+    const CHIP_ERROR ret = NullableCharSpanCopy(mProtocolVersion, newValue);
     if (CHIP_NO_ERROR == ret)
     {
         MatterReportingAttributeChangeCallback(mEndpointId, MeterIdentification::Id, ProtocolVersion::Id);
@@ -272,11 +271,8 @@ CHIP_ERROR MeterIdentificationDelegate::SetPowerThreshold(const DataModel::Nulla
             return CHIP_NO_ERROR;
         }
 
-        if ((newValue.Value().powerThreshold.HasValue() && INT64_MIN == newValue.Value().powerThreshold.Value()) ||
-            (newValue.Value().apparentPowerThreshold.HasValue() && INT64_MIN == newValue.Value().apparentPowerThreshold.Value()) ||
-            (!newValue.Value().powerThresholdSource.IsNull() && static_cast<std::underlying_type<PowerThresholdSourceEnum>::type>(
-                PowerThresholdSourceEnum::kUnknownEnumValue) <= static_cast<std::underlying_type<PowerThresholdSourceEnum>::type>(
-                    newValue.Value().powerThresholdSource.Value())))
+        if (!(newValue.ExistingValueInEncodableRange() && (newValue.Value().powerThresholdSource.IsNull() ||
+            PowerThresholdSourceEnum::kUnknownEnumValue != EnsureKnownEnumValue(newValue.Value().powerThresholdSource.Value()))))
         {
             return CHIP_ERROR_DECODE_FAILED;
         }
@@ -342,7 +338,7 @@ bool MeterIdentificationDelegate::NullableCharSpanCompare(const DataModel::Nulla
     return false;
 }
 
-CHIP_ERROR MeterIdentificationDelegate::NullableCharSpanCopy(const DataModel::Nullable<CharSpan> & src, DataModel::Nullable<CharSpan> & dst)
+CHIP_ERROR MeterIdentificationDelegate::NullableCharSpanCopy(DataModel::Nullable<CharSpan> & dst, const DataModel::Nullable<CharSpan> & src)
 {
     const size_t len = src.IsNull() ? 0 : src.Value().size();
     if (64 < len)
@@ -352,16 +348,21 @@ CHIP_ERROR MeterIdentificationDelegate::NullableCharSpanCopy(const DataModel::Nu
 
     if (!dst.IsNull())
     {
-        chip::Platform::MemoryFree((void *) dst.Value().data());
+        chip::Platform::MemoryFree(const_cast<char *>(dst.Value().data()));
         dst.SetNull();
     }
 
     if (!src.IsNull())
     {
-        char * str = (char *) chip::Platform::MemoryAlloc(len + 1);
-        strncpy(str, src.Value().data(), len);
+        auto * str = static_cast<char *>(chip::Platform::MemoryAlloc(1 + len));
+        if (nullptr == str)
+        {
+            return CHIP_ERROR_NO_MEMORY;
+        }
+
+        memcpy(str, src.Value().data(), len);
         str[len] = 0;
-        dst = MakeNullable(CharSpan::fromCharString(str));
+        dst = MakeNullable(CharSpan(str, len));
     }
 
     return CHIP_NO_ERROR;
