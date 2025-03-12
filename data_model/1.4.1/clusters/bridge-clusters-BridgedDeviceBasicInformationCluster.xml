@@ -1,0 +1,301 @@
+<?xml version="1.0"?>
+<!--
+Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+The information within this document is the property of the Connectivity
+Standards Alliance and its use and disclosure are restricted, except as
+expressly set forth herein.
+
+Connectivity Standards Alliance hereby grants you a fully-paid, non-exclusive,
+nontransferable, worldwide, limited and revocable license (without the right to
+sublicense), under Connectivity Standards Alliance's applicable copyright
+rights, to view, download, save, reproduce and use the document solely for your
+own internal purposes and in accordance with the terms of the license set forth
+herein. This license does not authorize you to, and you expressly warrant that
+you shall not: (a) permit others (outside your organization) to use this
+document; (b) post or publish this document; (c) modify, adapt, translate, or
+otherwise change this document in any manner or create any derivative work
+based on this document; (d) remove or modify any notice or label on this
+document, including this Copyright Notice, License and Disclaimer. The
+Connectivity Standards Alliance does not grant you any license hereunder other
+than as expressly stated herein.
+
+Elements of this document may be subject to third party intellectual property
+rights, including without limitation, patent, copyright or trademark rights,
+and any such third party may or may not be a member of the Connectivity
+Standards Alliance. Connectivity Standards Alliance members grant other
+Connectivity Standards Alliance members certain intellectual property rights as
+set forth in the Connectivity Standards Alliance IPR Policy. Connectivity
+Standards Alliance members do not grant you any rights under this license. The
+Connectivity Standards Alliance is not responsible for, and shall not be held
+responsible in any manner for, identifying or failing to identify any or all
+such third party intellectual property rights. Please visit www.csa-iot.org for
+more information on how to become a member of the Connectivity Standards
+Alliance.
+
+This document and the information contained herein are provided on an “AS IS”
+basis and the Connectivity Standards Alliance DISCLAIMS ALL WARRANTIES EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO (A) ANY WARRANTY THAT THE USE OF THE
+INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OF THIRD PARTIES (INCLUDING
+WITHOUT LIMITATION ANY INTELLECTUAL PROPERTY RIGHTS INCLUDING PATENT, COPYRIGHT
+OR TRADEMARK RIGHTS); OR (B) ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, TITLE OR NONINFRINGEMENT. IN NO EVENT WILL THE
+CONNECTIVITY STANDARDS ALLIANCE BE LIABLE FOR ANY LOSS OF PROFITS, LOSS OF
+BUSINESS, LOSS OF USE OF DATA, INTERRUPTION OF BUSINESS, OR FOR ANY OTHER
+DIRECT, INDIRECT, SPECIAL OR EXEMPLARY, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL
+DAMAGES OF ANY KIND, IN CONTRACT OR IN TORT, IN CONNECTION WITH THIS DOCUMENT
+OR THE INFORMATION CONTAINED HEREIN, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+LOSS OR DAMAGE.
+
+All company, brand and product names in this document may be trademarks that
+are the sole property of their respective owners.
+
+This notice and disclaimer must be included on all copies of this document.
+
+Connectivity Standards Alliance
+508 Second Street, Suite 206
+Davis, CA 95616, USA
+
+:xrefstyle: basic
+-->
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0039" name="Bridged Device Basic Information Cluster" revision="4">
+  <revisionHistory>
+    <revision revision="1" summary="Initial revision"/>
+    <revision revision="2" summary="Added ProductAppearance attribute"/>
+    <revision revision="3" summary="Added SpecificationVersion and MaxPathsPerInvoke attributes"/>
+    <revision revision="4" summary="Updated conformance for UniqueID to mandatory, ProductID to optional when bridging Matter devices, add the BridgedICDSupport feature."/>
+  </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0039" name="Bridged Device Basic Information"/>
+  </clusterIds>
+  <classification hierarchy="derived" baseCluster="Basic Information" role="utility" picsCode="BRBINFO" scope="Endpoint"/>
+  <features>
+    <feature bit="20" code="BIS" name="BridgedICDSupport" summary="Support bridged ICDs.">
+      <optionalConform/>
+    </feature>
+  </features>
+  <attributes>
+    <attribute id="0x0000" name="DataModelRevision" type="uint16" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <disallowConform/>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0001" name="VendorName" type="string" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <optionalConform/>
+      <constraint>
+        <maxLength value="32"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0002" name="VendorID" type="vendor-id" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x0003" name="ProductName" type="string" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <optionalConform/>
+      <constraint>
+        <maxLength value="32"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0004" name="ProductID" type="uint16" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+    </attribute>
+    <attribute id="0x0005" name="NodeLabel" type="string" default="&quot;&quot;">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <optionalConform/>
+      <constraint>
+        <maxLength value="32"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0006" name="Location" type="string" default="&quot;XX&quot;">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="admin"/>
+      <quality persistence="nonVolatile"/>
+      <disallowConform/>
+      <constraint>
+        <allowed value="2"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0007" name="HardwareVersion" type="uint16" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x0008" name="HardwareVersionString" type="string" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <optionalConform/>
+      <constraint>
+        <lengthBetween>
+          <from value="1"/>
+          <to value="64"/>
+        </lengthBetween>
+      </constraint>
+    </attribute>
+    <attribute id="0x0009" name="SoftwareVersion" type="uint32" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <optionalConform/>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x000A" name="SoftwareVersionString" type="string" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <optionalConform/>
+      <constraint>
+        <lengthBetween>
+          <from value="1"/>
+          <to value="64"/>
+        </lengthBetween>
+      </constraint>
+    </attribute>
+    <attribute id="0x000B" name="ManufacturingDate" type="string" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <optionalConform/>
+      <constraint>
+        <lengthBetween>
+          <from value="8"/>
+          <to value="16"/>
+        </lengthBetween>
+      </constraint>
+    </attribute>
+    <attribute id="0x000C" name="PartNumber" type="string" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <optionalConform/>
+      <constraint>
+        <maxLength value="32"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x000D" name="ProductURL" type="string" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <optionalConform/>
+      <constraint>
+        <maxLength value="256"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x000E" name="ProductLabel" type="string" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <optionalConform/>
+      <constraint>
+        <maxLength value="64"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x000F" name="SerialNumber" type="string" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <optionalConform/>
+      <constraint>
+        <maxLength value="32"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0010" name="LocalConfigDisabled" type="bool" default="false">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <disallowConform/>
+    </attribute>
+    <attribute id="0x0011" name="Reachable" type="bool" default="true">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0012" name="UniqueID" type="string" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform/>
+      <constraint>
+        <maxLength value="32"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0013" name="CapabilityMinima" type="CapabilityMinimaStruct" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <disallowConform/>
+    </attribute>
+    <attribute id="0x0014" name="ProductAppearance" type="ProductAppearanceStruct" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x0015" name="SpecificationVersion" type="uint32" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <disallowConform/>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0016" name="MaxPathsPerInvoke" type="uint16" default="1">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <disallowConform/>
+      <constraint>
+        <min value="1"/>
+      </constraint>
+    </attribute>
+  </attributes>
+  <commands>
+    <command id="0x80" name="KeepActive" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <feature name="BIS"/>
+      </mandatoryConform>
+      <field id="0" name="StayActiveDuration" type="uint32">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="TimeoutMs" type="uint32">
+        <mandatoryConform/>
+        <constraint>
+          <between>
+            <from value="30000"/>
+            <to value="3600000"/>
+          </between>
+        </constraint>
+      </field>
+    </command>
+  </commands>
+  <events>
+    <event id="0x00" name="StartUp">
+      <access readPrivilege="view"/>
+      <optionalConform/>
+    </event>
+    <event id="0x01" name="ShutDown">
+      <access readPrivilege="view"/>
+      <optionalConform/>
+    </event>
+    <event id="0x02" name="Leave">
+      <access readPrivilege="view"/>
+      <optionalConform/>
+      <field id="0" name="FabricIndex">
+        <disallowConform/>
+      </field>
+    </event>
+    <event id="0x03" name="ReachableChanged">
+      <access readPrivilege="view"/>
+      <mandatoryConform/>
+    </event>
+    <event id="0x80" name="ActiveChanged" priority="info">
+      <access readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="BIS"/>
+      </mandatoryConform>
+      <field id="0" name="PromisedActiveDuration" type="uint32">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </event>
+  </events>
+</cluster>

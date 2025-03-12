@@ -43,8 +43,8 @@ import re
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.basic_composition import BasicCompositionTests
-from chip.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body, default_matter_test_main, hex_from_bytes,
-                                         type_matches)
+from chip.testing.conversions import hex_from_bytes
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 from chip.tlv import TLVReader
 from cryptography import x509
 from cryptography.exceptions import InvalidSignature

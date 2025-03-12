@@ -159,6 +159,9 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
         chip::Credentials::SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore));
     }
 
+    // Because garbage collection may delay the removal of old controller instances, two instances could temporarily exist.
+    // To avoid issues with the shared ICD client storage, reset the storage before creating a new controller.
+    getICDClientStorage()->Shutdown();
     *errInfoOnFailure = getICDClientStorage()->Init(wrapperStorage, &wrapper->mSessionKeystore);
     if (*errInfoOnFailure != CHIP_NO_ERROR)
     {

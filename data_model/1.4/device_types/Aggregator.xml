@@ -54,6 +54,8 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x000E" name="Aggregator" revision="2">
   <revisionHistory>
@@ -61,6 +63,9 @@ Davis, CA 95616, USA
     <revision revision="2" summary="Added Commissioner Control Cluster and FabricSynchronization Condition."/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
+  <conditions>
+    <condition name="FabricSynchronization" summary="See description below."/>
+  </conditions>
   <clusters>
     <cluster id="0x0003" name="Identify" side="server">
       <optionalConform/>

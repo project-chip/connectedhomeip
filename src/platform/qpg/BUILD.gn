@@ -49,7 +49,10 @@ static_library("qpg") {
     "qpgConfig.h",
   ]
 
-  deps = [ "${chip_root}/src/platform/logging:headers" ]
+  deps = [
+    "${chip_root}/src/app:app_config",
+    "${chip_root}/src/platform/logging:headers",
+  ]
 
   public = [ "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h" ]
 
@@ -78,6 +81,7 @@ static_library("qpg") {
       "ThreadStackManagerImpl.cpp",
       "ThreadStackManagerImpl.h",
     ]
+    deps += [ "${chip_root}/src/app:app_config" ]
 
     if (chip_mdns == "platform") {
       sources += [

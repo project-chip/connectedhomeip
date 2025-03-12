@@ -84,6 +84,7 @@ static_library("android") {
 
   deps = [
     ":tracing",
+    "${chip_root}/src/app:app_config",
     "${chip_root}/src/lib/dnssd:platform_header",
     "${chip_root}/src/setup_payload",
   ]
@@ -141,5 +142,5 @@ android_library("java") {
 }
 
 java_prebuilt("android_sdk") {
-  jar_path = "${android_sdk_root}/platforms/android-26/android.jar"
+  jar_path = "${android_sdk_root}/platforms/android-30/android.jar"
 }

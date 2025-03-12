@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -54,6 +54,8 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0200" name="Pump Configuration and Control Cluster" revision="4">
   <revisionHistory>
@@ -68,19 +70,19 @@ Davis, CA 95616, USA
   <classification hierarchy="base" role="application" picsCode="PCC" scope="Endpoint"/>
   <features>
     <feature bit="0" code="PRSCONST" name="ConstantPressure" summary="Supports operating in constant pressure mode">
-      <optionalConform choice="a" more="true"/>
+      <optionalConform choice="a" more="true" min="1"/>
     </feature>
     <feature bit="1" code="PRSCOMP" name="CompensatedPressure" summary="Supports operating in compensated pressure mode">
-      <optionalConform choice="a" more="true"/>
+      <optionalConform choice="a" more="true" min="1"/>
     </feature>
     <feature bit="2" code="FLW" name="ConstantFlow" summary="Supports operating in constant flow mode">
-      <optionalConform choice="a" more="true"/>
+      <optionalConform choice="a" more="true" min="1"/>
     </feature>
     <feature bit="3" code="SPD" name="ConstantSpeed" summary="Supports operating in constant speed mode">
-      <optionalConform choice="a" more="true"/>
+      <optionalConform choice="a" more="true" min="1"/>
     </feature>
     <feature bit="4" code="TEMP" name="ConstantTemperature" summary="Supports operating in constant temperature mode">
-      <optionalConform choice="a" more="true"/>
+      <optionalConform choice="a" more="true" min="1"/>
     </feature>
     <feature bit="5" code="AUTO" name="Automatic" summary="Supports operating in automatic mode">
       <optionalConform/>
@@ -96,44 +98,37 @@ Davis, CA 95616, USA
           <feature name="SPD"/>
         </mandatoryConform>
       </item>
-      <item value="1" name="ConstantPressure" summary="The pump will regulate its speed to maintain a
-                                 constant differential pressure over its flanges.">
+      <item value="1" name="ConstantPressure" summary="The pump will regulate its speed to maintain a constant differential pressure over its flanges.">
         <mandatoryConform>
           <feature name="PRSCONST"/>
         </mandatoryConform>
       </item>
-      <item value="2" name="ProportionalPressure" summary="The pump will regulate its speed to maintain a
-                                 constant differential pressure over its flanges.">
+      <item value="2" name="ProportionalPressure" summary="The pump will regulate its speed to maintain a constant differential pressure over its flanges.">
         <mandatoryConform>
           <feature name="PRSCOMP"/>
         </mandatoryConform>
       </item>
-      <item value="3" name="ConstantFlow" summary="The pump will regulate its speed to maintain a
-                                 constant flow through the pump.">
+      <item value="3" name="ConstantFlow" summary="The pump will regulate its speed to maintain a constant flow through the pump.">
         <mandatoryConform>
           <feature name="FLW"/>
         </mandatoryConform>
       </item>
-      <item value="5" name="ConstantTemperature" summary="The pump will regulate its speed to maintain a
-                                 constant temperature.">
+      <item value="5" name="ConstantTemperature" summary="The pump will regulate its speed to maintain a constant temperature.">
         <mandatoryConform>
           <feature name="TEMP"/>
         </mandatoryConform>
       </item>
-      <item value="7" name="Automatic" summary="The operation of the pump is automatically optimized to provide
-                                 the most suitable performance with respect to comfort and energy savings.">
+      <item value="7" name="Automatic" summary="The operation of the pump is automatically optimized to provide the most suitable performance with respect to comfort and energy savings.">
         <mandatoryConform>
           <feature name="AUTO"/>
         </mandatoryConform>
       </item>
     </enum>
     <enum name="OperationModeEnum">
-      <item value="0" name="Normal" summary="The pump is controlled by a setpoint,
-                    as defined by a connected remote sensor or by the ControlMode attribute.">
+      <item value="0" name="Normal" summary="The pump is controlled by a setpoint, as defined by a connected remote sensor or by the ControlMode attribute.">
         <mandatoryConform/>
       </item>
-      <item value="1" name="Minimum" summary="This value sets the pump to run at the minimum possible speed
-                    it can without being stopped.">
+      <item value="1" name="Minimum" summary="This value sets the pump to run at the minimum possible speed it can without being stopped.">
         <mandatoryConform>
           <feature name="SPD"/>
         </mandatoryConform>
@@ -143,8 +138,7 @@ Davis, CA 95616, USA
           <feature name="SPD"/>
         </mandatoryConform>
       </item>
-      <item value="3" name="Local" summary="This value sets the pump to run with the local settings of the pump,
-                    regardless of what these are.">
+      <item value="3" name="Local" summary="This value sets the pump to run with the local settings of the pump, regardless of what these are.">
         <mandatoryConform>
           <feature name="LOCAL"/>
         </mandatoryConform>
@@ -183,22 +177,22 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="MaxPressure" type="int16" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="fixed"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0001" name="MaxSpeed" type="uint16" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="fixed"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0002" name="MaxFlow" type="uint16" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="fixed"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0003" name="MinConstPressure" type="int16" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="fixed"/>
       <otherwiseConform>
         <mandatoryConform>
           <feature name="PRSCONST"/>
@@ -210,7 +204,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0004" name="MaxConstPressure" type="int16" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="fixed"/>
       <otherwiseConform>
         <mandatoryConform>
           <feature name="PRSCONST"/>
@@ -222,7 +216,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0005" name="MinCompPressure" type="int16" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="fixed"/>
       <otherwiseConform>
         <mandatoryConform>
           <feature name="PRSCOMP"/>
@@ -234,7 +228,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0006" name="MaxCompPressure" type="int16" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="fixed"/>
       <otherwiseConform>
         <mandatoryConform>
           <feature name="PRSCOMP"/>
@@ -246,7 +240,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0007" name="MinConstSpeed" type="uint16" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="fixed"/>
       <otherwiseConform>
         <mandatoryConform>
           <feature name="SPD"/>
@@ -258,7 +252,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0008" name="MaxConstSpeed" type="uint16" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="fixed"/>
       <otherwiseConform>
         <mandatoryConform>
           <feature name="SPD"/>
@@ -270,7 +264,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0009" name="MinConstFlow" type="uint16" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="fixed"/>
       <otherwiseConform>
         <mandatoryConform>
           <feature name="FLW"/>
@@ -282,7 +276,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x000A" name="MaxConstFlow" type="uint16" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="fixed"/>
       <otherwiseConform>
         <mandatoryConform>
           <feature name="FLW"/>
@@ -294,7 +288,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x000B" name="MinConstTemp" type="int16" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="fixed"/>
       <otherwiseConform>
         <mandatoryConform>
           <feature name="TEMP"/>
@@ -303,11 +297,13 @@ Davis, CA 95616, USA
           <feature name="AUTO"/>
         </optionalConform>
       </otherwiseConform>
-      <constraint type="min" value="-27315"/>
+      <constraint>
+        <min value="-27315"/>
+      </constraint>
     </attribute>
     <attribute id="0x000C" name="MaxConstTemp" type="int16" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="fixed"/>
       <otherwiseConform>
         <mandatoryConform>
           <feature name="TEMP"/>
@@ -316,68 +312,77 @@ Davis, CA 95616, USA
           <feature name="AUTO"/>
         </optionalConform>
       </otherwiseConform>
-      <constraint type="min" value="-27315"/>
+      <constraint>
+        <min value="-27315"/>
+      </constraint>
     </attribute>
     <attribute id="0x0010" name="PumpStatus" type="PumpStatusBitmap" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
+      <quality reportable="true"/>
       <optionalConform/>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0011" name="EffectiveOperationMode" type="OperationModeEnum" default="desc">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform/>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0012" name="EffectiveControlMode" type="ControlModeEnum" default="desc">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform/>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0013" name="Capacity" type="int16" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" reportable="true"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0014" name="Speed" type="uint16" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0015" name="LifetimeRunningHours" type="uint24" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="nonVolatile"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0016" name="Power" type="uint24" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0017" name="LifetimeEnergyConsumed" type="uint32" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="nonVolatile"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0020" name="OperationMode" type="OperationModeEnum" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform/>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0021" name="ControlMode" type="ControlModeEnum" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <optionalConform/>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
-    <attribute id="0x0022" name="AlarmMask" type="map16" default="0">
-      <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+    <attribute id="0x0022" name="AlarmMask">
       <deprecateConform/>
-      <constraint type="desc"/>
     </attribute>
   </attributes>
   <events>

@@ -24,5 +24,7 @@ SET(CODEGEN_DATA_MODEL_SOURCES
   "${BASE_DIR}/EmberMetadata.cpp"
   "${BASE_DIR}/EmberMetadata.h"
   "${BASE_DIR}/Instance.cpp"
+  "${BASE_DIR}/ServerClusterInterfaceRegistry.cpp"
+  "${BASE_DIR}/ServerClusterInterfaceRegistry.h"
 )
 

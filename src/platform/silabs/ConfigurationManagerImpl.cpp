@@ -31,13 +31,14 @@
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
-#include <platform/silabs/wifi/WifiInterfaceAbstraction.h>
+#include <platform/silabs/wifi/WifiInterface.h>
 #endif
 
 namespace chip {
 namespace DeviceLayer {
 
 using namespace ::chip::DeviceLayer::Internal;
+using namespace ::chip ::DeviceLayer ::Silabs;
 
 ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
 {
@@ -275,14 +276,14 @@ void ConfigurationManagerImpl::ClearThreadStack()
 
 void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 {
-    CHIP_ERROR err;
+    CHIP_ERROR error = CHIP_NO_ERROR;
 
     ChipLogProgress(DeviceLayer, "Performing factory reset");
 
-    err = SilabsConfig::FactoryResetConfig();
-    if (err != CHIP_NO_ERROR)
+    error = SilabsConfig::FactoryResetConfig();
+    if (error != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "FactoryResetConfig() failed: %s", chip::ErrorStr(err));
+        ChipLogError(DeviceLayer, "FactoryResetConfig() failed: %s", chip::ErrorStr(error));
     }
 
     GetDefaultInstance().ClearThreadStack();
@@ -290,13 +291,14 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     PersistedStorage::KeyValueStoreMgrImpl().ErasePartition();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
-    sl_status_t status = sl_matter_wifi_disconnect();
-    if (status != SL_STATUS_OK)
+    error = WifiInterface::GetInstance().TriggerDisconnection();
+    if (error != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "sl_matter_wifi_disconnect() failed: %lx", status);
+        ChipLogError(DeviceLayer, "TriggerDisconnection() failed: %s", chip::ErrorStr(error));
     }
+
     ChipLogProgress(DeviceLayer, "Clearing WiFi provision");
-    wfx_clear_wifi_provision();
+    WifiInterface::GetInstance().ClearWifiCredentials();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
 
     // Restart the system.
@@ -316,7 +318,7 @@ CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
     VerifyOrReturnError(buf != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     MutableByteSpan byteSpan(buf, kPrimaryMACAddressLength);
-    return GetMacAddress(SL_WFX_STA_INTERFACE, byteSpan);
+    return WifiInterface::GetInstance().GetMacAddress(SL_WFX_STA_INTERFACE, byteSpan);
 }
 #endif
 

@@ -25,7 +25,7 @@ using namespace chip::app::Clusters::RvcOperationalState;
 CHIP_ERROR RvcOperationalStateDelegate::GetOperationalStateAtIndex(size_t index,
                                                                    OperationalState::GenericOperationalState & operationalState)
 {
-    if (index >= ArraySize(mOperationalStateList))
+    if (index >= MATTER_ARRAY_SIZE(mOperationalStateList))
     {
         return CHIP_ERROR_NOT_FOUND;
     }

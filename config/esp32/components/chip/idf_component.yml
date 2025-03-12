@@ -4,7 +4,6 @@ dependencies:
         version: "^1.1.0"
         rules:
             - if: "idf_version >=5.0"
-            - if: "target != esp32h2"
 
     espressif/esp_secure_cert_mgr:
         version: "^2.5.0"
@@ -12,7 +11,7 @@ dependencies:
             - if: "idf_version >=4.3"
 
     espressif/esp_encrypted_img:
-        version: "2.1.0"
+        version: "2.3.0"
         require: public
         rules:
             - if: "idf_version >=4.4"

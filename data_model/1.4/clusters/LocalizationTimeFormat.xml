@@ -54,6 +54,8 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x002C" name="Time Format Localization Cluster" revision="1">
   <revisionHistory>
@@ -71,43 +73,43 @@ Davis, CA 95616, USA
   <dataTypes>
     <enum name="CalendarTypeEnum">
       <item value="0" name="Buddhist" summary="Dates conveyed using the Buddhist calendar">
-        <optionalConform choice="a" more="true"/>
+        <optionalConform choice="a" more="true" min="1"/>
       </item>
       <item value="1" name="Chinese" summary="Dates conveyed using the Chinese calendar">
-        <optionalConform choice="a" more="true"/>
+        <optionalConform choice="a" more="true" min="1"/>
       </item>
       <item value="2" name="Coptic" summary="Dates conveyed using the Coptic calendar">
-        <optionalConform choice="a" more="true"/>
+        <optionalConform choice="a" more="true" min="1"/>
       </item>
       <item value="3" name="Ethiopian" summary="Dates conveyed using the Ethiopian calendar">
-        <optionalConform choice="a" more="true"/>
+        <optionalConform choice="a" more="true" min="1"/>
       </item>
       <item value="4" name="Gregorian" summary="Dates conveyed using the Gregorian calendar">
-        <optionalConform choice="a" more="true"/>
+        <optionalConform choice="a" more="true" min="1"/>
       </item>
       <item value="5" name="Hebrew" summary="Dates conveyed using the Hebrew calendar">
-        <optionalConform choice="a" more="true"/>
+        <optionalConform choice="a" more="true" min="1"/>
       </item>
       <item value="6" name="Indian" summary="Dates conveyed using the Indian calendar">
-        <optionalConform choice="a" more="true"/>
+        <optionalConform choice="a" more="true" min="1"/>
       </item>
       <item value="7" name="Islamic" summary="Dates conveyed using the Islamic calendar">
-        <optionalConform choice="a" more="true"/>
+        <optionalConform choice="a" more="true" min="1"/>
       </item>
       <item value="8" name="Japanese" summary="Dates conveyed using the Japanese calendar">
-        <optionalConform choice="a" more="true"/>
+        <optionalConform choice="a" more="true" min="1"/>
       </item>
       <item value="9" name="Korean" summary="Dates conveyed using the Korean calendar">
-        <optionalConform choice="a" more="true"/>
+        <optionalConform choice="a" more="true" min="1"/>
       </item>
       <item value="10" name="Persian" summary="Dates conveyed using the Persian calendar">
-        <optionalConform choice="a" more="true"/>
+        <optionalConform choice="a" more="true" min="1"/>
       </item>
       <item value="11" name="Taiwanese" summary="Dates conveyed using the Taiwanese calendar">
-        <optionalConform choice="a" more="true"/>
+        <optionalConform choice="a" more="true" min="1"/>
       </item>
       <item value="255" name="UseActiveLocale" summary="calendar implied from active locale">
-        <optionalConform choice="a" more="true"/>
+        <optionalConform choice="a" more="true" min="1"/>
       </item>
     </enum>
     <enum name="HourFormatEnum">
@@ -125,20 +127,20 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="HourFormat" type="HourFormatEnum">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0001" name="ActiveCalendarType" type="CalendarTypeEnum">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform>
         <feature name="CALFMT"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0002" name="SupportedCalendarTypes" type="list" default="N/A">
+    <attribute id="0x0002" name="SupportedCalendarTypes" type="list" default="">
       <entry type="CalendarTypeEnum"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="CALFMT"/>
       </mandatoryConform>

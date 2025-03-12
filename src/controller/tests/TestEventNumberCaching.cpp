@@ -18,10 +18,10 @@
 
 #include <pw_unit_test/framework.h>
 
-#include "app-common/zap-generated/ids/Clusters.h"
-#include "app/ClusterStateCache.h"
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/BufferedReadCallback.h>
+#include <app/ClusterStateCache.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/EventLogging.h>
 #include <app/InteractionModelEngine.h>
@@ -30,6 +30,7 @@
 #include <app/util/DataModelHandler.h>
 #include <app/util/attribute-storage.h>
 #include <controller/InvokeInteraction.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/TimeUtils.h>
@@ -59,6 +60,7 @@ protected:
     // Performs setup for each test in the suite
     void SetUp()
     {
+        ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
         const chip::app::LogStorageResources logStorageResources[] = {
             { &gDebugEventBuffer[0], sizeof(gDebugEventBuffer), chip::app::PriorityLevel::Debug },
             { &gInfoEventBuffer[0], sizeof(gInfoEventBuffer), chip::app::PriorityLevel::Info },
@@ -71,7 +73,7 @@ protected:
         // TODO: use ASSERT_EQ, once transition to pw_unit_test is complete
         VerifyOrDieWithMsg((err = mEventCounter.Init(0)) == CHIP_NO_ERROR, AppServer,
                            "Init EventCounter failed: %" CHIP_ERROR_FORMAT, err.Format());
-        chip::app::EventManagement::CreateEventManagement(&GetExchangeManager(), ArraySize(logStorageResources),
+        chip::app::EventManagement::CreateEventManagement(&GetExchangeManager(), MATTER_ARRAY_SIZE(logStorageResources),
                                                           gCircularEventBuffer, logStorageResources, &mEventCounter);
     }
 
@@ -80,6 +82,7 @@ protected:
     {
         chip::app::EventManagement::DestroyEventManagement();
         AppContext::TearDown();
+        chip::Platform::MemoryShutdown();
     }
 
 private:
@@ -144,10 +147,11 @@ TEST_F(TestEventNumberCaching, TestEventNumberCaching)
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
 
     // Initialize the ember side server logic
+    engine->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
-    DataVersion dataVersionStorage[ArraySize(testEndpointClusters)];
+    DataVersion dataVersionStorage[MATTER_ARRAY_SIZE(testEndpointClusters)];
     emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
 
     chip::EventNumber firstEventNumber;

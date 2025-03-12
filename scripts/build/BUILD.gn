@@ -26,7 +26,6 @@ pw_python_package("build_examples") {
     "testdata/dry_run_android-arm64-chip-tool.txt",
     "testdata/dry_run_efr32-brd4187c-light-rpc-no-version.txt",
     "testdata/dry_run_esp32-devkitc-light-rpc.txt",
-    "testdata/dry_run_esp32-m5stack-all-clusters-minimal-rpc-ipv6only.txt",
     "testdata/dry_run_linux-arm64-chip-tool-ipv6only-clang.txt",
     "testdata/dry_run_linux-arm64-ota-requestor-nodeps-ipv6only.txt",
     "testdata/dry_run_linux-x64-all-clusters-coverage.txt",

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2024). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -54,13 +54,17 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0752" name="Joint Fabric Datastore Cluster" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x0752" name="Joint Fabric Datastore Cluster"/>
+    <clusterId id="0x0752" name="Joint Fabric Datastore">
+      <provisionalConform/>
+    </clusterId>
   </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="JFDS" scope="Node"/>
   <dataTypes>
@@ -74,160 +78,179 @@ Davis, CA 95616, USA
       <item value="2" name="DeletePending" summary="Target device delete operation is pending">
         <mandatoryConform/>
       </item>
+      <item value="3" name="CommitFailed" summary="Target device operation has failed">
+        <mandatoryConform/>
+      </item>
     </enum>
-    <struct name="Datastore ACL Entry">
+    <struct name="DatastoreACLEntryStruct">
       <field id="0" name="ListID" type="uint16">
-        <access read="true"/>
         <mandatoryConform/>
       </field>
-      <field id="1" name="ACLEntry" type="ref_AccessControlEntryStruct">
-        <access read="true"/>
+      <field id="1" name="ACLEntry" type="AccessControlEntryStruct">
         <mandatoryConform/>
       </field>
-      <field id="2" name="StatusEntry" type="DatastoreStatusEntry">
-        <access read="true"/>
+      <field id="2" name="StatusEntry" type="DatastoreStatusEntryStruct">
         <mandatoryConform/>
       </field>
       <access fabricScoped="true"/>
     </struct>
-    <struct name="Datastore Administrator Information Entry">
+    <struct name="DatastoreAdministratorInformationEntryStruct">
       <field id="1" name="NodeID" type="node-id">
-        <access read="true"/>
         <mandatoryConform/>
       </field>
       <field id="2" name="FriendlyName" type="string">
-        <access read="true"/>
         <mandatoryConform/>
-        <constraint type="maxLength" value="32"/>
+        <constraint>
+          <maxLength value="32"/>
+        </constraint>
       </field>
       <field id="3" name="VendorID" type="vendor-id">
-        <access read="true"/>
         <mandatoryConform/>
       </field>
       <field id="4" name="ICAC" type="octstr">
-        <access read="true"/>
         <mandatoryConform/>
-        <constraint type="maxLength" value="400"/>
+        <constraint>
+          <maxLength value="400"/>
+        </constraint>
       </field>
       <access fabricScoped="true"/>
     </struct>
-    <struct name="Datastore Endpoint Entry">
+    <struct name="DatastoreBindingEntryStruct">
+      <field id="0" name="ListID" type="uint16">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="Binding" type="TargetStruct">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="2" name="StatusEntry" type="DatastoreStatusEntryStruct">
+        <mandatoryConform/>
+      </field>
+      <access fabricScoped="true"/>
+    </struct>
+    <struct name="DatastoreEndpointEntryStruct">
       <field id="0" name="EndpointID" type="endpoint-id">
-        <access read="true"/>
         <mandatoryConform/>
       </field>
       <field id="1" name="NodeID" type="node-id">
-        <access read="true"/>
         <mandatoryConform/>
       </field>
       <field id="2" name="FriendlyName" type="string">
-        <access read="true"/>
         <mandatoryConform/>
-        <constraint type="maxLength" value="32"/>
+        <constraint>
+          <maxLength value="32"/>
+        </constraint>
       </field>
-      <field id="3" name="StatusEntry" type="DatastoreStatusEntry">
-        <access read="true"/>
-        <mandatoryConform/>
-      </field>
-      <field id="4" name="GroupIDList" type="DataTypeList[Datastore Group ID Entry Type]">
-        <access read="true"/>
+      <field id="3" name="StatusEntry" type="DatastoreStatusEntryStruct">
         <mandatoryConform/>
       </field>
-      <field id="5" name="BindingList" type="DataTypeList[Datastore Binding Entry Type]">
-        <access read="true"/>
+      <field id="4" name="GroupIDList" type="list">
+        <entry type="DatastoreGroupIDEntryStruct"/>
+        <mandatoryConform/>
+      </field>
+      <field id="5" name="BindingList" type="list">
+        <entry type="DatastoreBindingEntryStruct"/>
         <mandatoryConform/>
       </field>
       <access fabricScoped="true"/>
     </struct>
-    <struct name="Datastore Group ID Entry">
+    <struct name="DatastoreGroupIDEntryStruct">
       <field id="0" name="GroupID" type="group-id">
-        <access read="true"/>
         <mandatoryConform/>
       </field>
-      <field id="1" name="StatusEntry" type="DatastoreStatusEntry">
-        <access read="true"/>
+      <field id="1" name="StatusEntry" type="DatastoreStatusEntryStruct">
         <mandatoryConform/>
       </field>
       <access fabricScoped="true"/>
     </struct>
-    <struct name="Datastore Group Information Entry">
+    <struct name="DatastoreGroupInformationEntryStruct">
       <field id="0" name="GroupID" type="uint64">
-        <access read="true"/>
         <mandatoryConform/>
       </field>
       <field id="1" name="FriendlyName" type="string">
-        <access read="true"/>
         <mandatoryConform/>
-        <constraint type="maxLength" value="32"/>
+        <constraint>
+          <maxLength value="32"/>
+        </constraint>
       </field>
       <field id="2" name="GroupKeySetID" type="uint16">
-        <access read="true"/>
         <mandatoryConform/>
-        <constraint type="between" from="1" to="65535"/>
+        <constraint>
+          <between>
+            <from value="1"/>
+            <to value="65535"/>
+          </between>
+        </constraint>
       </field>
       <field id="3" name="GroupCAT" type="uint16">
-        <access read="true"/>
         <mandatoryConform/>
-        <constraint type="between" from="1" to="65535"/>
+        <constraint>
+          <between>
+            <from value="1"/>
+            <to value="65535"/>
+          </between>
+        </constraint>
       </field>
       <field id="4" name="GroupCATVersion" type="uint16">
-        <access read="true"/>
         <mandatoryConform/>
-        <constraint type="between" from="1" to="65535"/>
+        <constraint>
+          <between>
+            <from value="1"/>
+            <to value="65535"/>
+          </between>
+        </constraint>
       </field>
-      <field id="5" name="GroupPermission" type="ref_AccessControlEntryPrivilegeEnum">
-        <access read="true"/>
+      <field id="5" name="GroupPermission" type="AccessControlEntryPrivilegeEnum">
         <mandatoryConform/>
       </field>
       <access fabricScoped="true"/>
     </struct>
-    <struct name="Datastore Node Information Entry">
+    <struct name="DatastoreNodeInformationEntryStruct">
       <field id="1" name="NodeID" type="node-id">
-        <access read="true"/>
         <mandatoryConform/>
       </field>
       <field id="2" name="FriendlyName" type="string">
-        <access read="true"/>
         <mandatoryConform/>
-        <constraint type="maxLength" value="32"/>
+        <constraint>
+          <maxLength value="32"/>
+        </constraint>
       </field>
-      <field id="3" name="CommissioningStatusEntry" type="DatastoreStatusEntry">
-        <access read="true"/>
+      <field id="3" name="CommissioningStatusEntry" type="DatastoreStatusEntryStruct">
         <mandatoryConform/>
       </field>
-      <field id="4" name="NodeKeySetList" type="DataTypeList[Datastore Node Key Entry Type]">
-        <access read="true"/>
+      <field id="4" name="NodeKeySetList" type="list">
+        <entry type="DatastoreNodeKeyEntryStruct"/>
         <mandatoryConform/>
       </field>
       <field id="5" name="ACLList" type="list">
-        <entry type="Datastore ACL Entry"/>
-        <access read="true"/>
+        <entry type="DatastoreACLEntryStruct"/>
         <mandatoryConform/>
       </field>
-      <field id="6" name="EndpointList" type="DataTypeList[Datastore Endpoint Entry Type]">
-        <access read="true"/>
+      <field id="6" name="EndpointList" type="list">
+        <entry type="DatastoreEndpointEntryStruct"/>
         <mandatoryConform/>
       </field>
       <access fabricScoped="true"/>
     </struct>
-    <struct name="Datastore Node Key Entry">
+    <struct name="DatastoreNodeKeyEntryStruct">
       <field id="0" name="GroupKeySetID" type="uint16">
-        <access read="true"/>
         <mandatoryConform/>
       </field>
-      <field id="1" name="StatusEntry" type="DatastoreStatusEntry">
-        <access read="true"/>
+      <field id="1" name="StatusEntry" type="DatastoreStatusEntryStruct">
         <mandatoryConform/>
       </field>
       <access fabricScoped="true"/>
     </struct>
-    <struct name="DatastoreStatusEntry">
+    <struct name="DatastoreStatusEntryStruct">
       <field id="0" name="State" type="DatastoreStateEnum" default="Pending">
-        <access read="true"/>
         <mandatoryConform/>
       </field>
-      <field id="1" name="UpdateTimestamp" type="utc" default="null">
-        <access read="true"/>
+      <field id="1" name="UpdateTimestamp" type="epoch-s" default="null">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="FailureCode" type="enum8" default="SUCCESS">
         <mandatoryConform/>
       </field>
       <access fabricScoped="true"/>
@@ -235,66 +258,72 @@ Davis, CA 95616, USA
   </dataTypes>
   <attributes>
     <attribute id="0x0000" name="AnchorRootCA" type="octstr">
-      <access read="true" readPrivilege="admin"/>
+      <access read="true" readPrivilege="admin" fabricSensitive="true"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0001" name="AnchorNodeID" type="node-id">
-      <access read="true" readPrivilege="admin"/>
+      <access read="true" readPrivilege="admin" fabricSensitive="true"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0002" name="AnchorVendorID" type="vendor-id">
-      <access read="true" readPrivilege="admin"/>
+      <access read="true" readPrivilege="admin" fabricSensitive="true"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0003" name="FriendlyName" type="string">
-      <access read="true" readPrivilege="admin"/>
+      <access read="true" readPrivilege="admin" fabricSensitive="true"/>
       <mandatoryConform/>
-      <constraint type="maxLength" value="32"/>
+      <constraint>
+        <maxLength value="32"/>
+      </constraint>
     </attribute>
-    <attribute id="0x0004" name="GroupKeySetList" type="DataTypeList[ref_GroupKeySetStruct]">
-      <access read="true" readPrivilege="admin"/>
-      <mandatoryConform/>
-    </attribute>
-    <attribute id="0x0005" name="GroupList" type="DataTypeList[Datastore Group Information Entry Type]">
-      <access read="true" readPrivilege="admin"/>
-      <mandatoryConform/>
-    </attribute>
-    <attribute id="0x0006" name="NodeList" type="DataTypeList[Datastore Node Information Entry Type]">
-      <access read="true" readPrivilege="admin"/>
+    <attribute id="0x0004" name="GroupKeySetList" type="list">
+      <entry type="GroupKeySetStruct"/>
+      <access read="true" readPrivilege="admin" fabricSensitive="true"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0007" name="AdminList" type="DataTypeList[Datastore Administrator Information Entry Type]">
-      <access read="true" readPrivilege="admin"/>
+    <attribute id="0x0005" name="GroupList" type="list">
+      <entry type="DatastoreGroupInformationEntryStruct"/>
+      <access read="true" readPrivilege="admin" fabricSensitive="true"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0008" name="StatusEntry" type="Datastore Administrator Information Entry">
-      <access read="true" readPrivilege="admin"/>
+    <attribute id="0x0006" name="NodeList" type="list">
+      <entry type="DatastoreNodeInformationEntryStruct"/>
+      <access read="true" readPrivilege="admin" fabricSensitive="true"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0007" name="AdminList" type="list">
+      <entry type="DatastoreAdministratorInformationEntryStruct"/>
+      <access read="true" readPrivilege="admin" fabricSensitive="true"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0008" name="StatusEntry" type="DatastoreStatusEntryStruct">
+      <access read="true" readPrivilege="admin" fabricSensitive="true"/>
       <mandatoryConform/>
     </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="AddKeySet Command" direction="commandToServer" response="Y">
+    <command id="0x00" name="AddKeySet" direction="commandToServer" response="Y">
       <access invokePrivilege="admin" fabricScoped="true"/>
       <mandatoryConform/>
-      <field id="0" name="GroupKeySet" type="ref_GroupKeySetStruct">
+      <field id="0" name="GroupKeySet" type="GroupKeySetStruct">
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x01" name="UpdateKeySet Command" direction="commandToServer" response="Y">
+    <command id="0x01" name="UpdateKeySet" direction="commandToServer" response="Y">
       <access invokePrivilege="admin" fabricScoped="true"/>
       <mandatoryConform/>
-      <field id="0" name="GroupKeySet" type="ref_GroupKeySetStruct">
+      <field id="0" name="GroupKeySet" type="GroupKeySetStruct">
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x02" name="RemoveKeySet Command" direction="commandToServer" response="Y">
+    <command id="0x02" name="RemoveKeySet" direction="commandToServer" response="Y">
       <access invokePrivilege="admin" fabricScoped="true"/>
       <mandatoryConform/>
       <field id="0" name="GroupKeySetID" type="uint16">
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x03" name="AddGroup Command" direction="commandToServer" response="Y">
+    <command id="0x03" name="AddGroup" direction="commandToServer" response="Y">
       <access invokePrivilege="admin" fabricScoped="true"/>
       <mandatoryConform/>
       <field id="0" name="GroupID" type="group-id">
@@ -302,25 +331,42 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="FriendlyName" type="string">
         <mandatoryConform/>
-        <constraint type="maxLength" value="32"/>
+        <constraint>
+          <maxLength value="32"/>
+        </constraint>
       </field>
       <field id="2" name="GroupKeySetID" type="uint16">
         <mandatoryConform/>
-        <constraint type="between" from="1" to="65535"/>
+        <constraint>
+          <between>
+            <from value="1"/>
+            <to value="65535"/>
+          </between>
+        </constraint>
       </field>
       <field id="3" name="GroupCAT" type="uint16">
         <mandatoryConform/>
-        <constraint type="between" from="1" to="65535"/>
+        <constraint>
+          <between>
+            <from value="1"/>
+            <to value="65535"/>
+          </between>
+        </constraint>
       </field>
       <field id="4" name="GroupCATVersion" type="uint16">
         <mandatoryConform/>
-        <constraint type="between" from="1" to="65535"/>
+        <constraint>
+          <between>
+            <from value="1"/>
+            <to value="65535"/>
+          </between>
+        </constraint>
       </field>
-      <field id="5" name="GroupPermission" type="ref_AccessControlEntryPrivilegeEnum">
+      <field id="5" name="GroupPermission" type="AccessControlEntryPrivilegeEnum">
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x04" name="UpdateGroup Command" direction="commandToServer" response="Y">
+    <command id="0x04" name="UpdateGroup" direction="commandToServer" response="Y">
       <access invokePrivilege="admin" fabricScoped="true"/>
       <mandatoryConform/>
       <field id="0" name="GroupID" type="group-id">
@@ -329,43 +375,59 @@ Davis, CA 95616, USA
       <field id="1" name="FriendlyName" type="string">
         <quality nullable="true"/>
         <mandatoryConform/>
-        <constraint type="maxLength" value="32"/>
+        <constraint>
+          <maxLength value="32"/>
+        </constraint>
       </field>
       <field id="2" name="GroupKeySetID" type="uint16">
         <quality nullable="true"/>
         <mandatoryConform/>
-        <constraint type="between" from="1" to="65535"/>
+        <constraint>
+          <between>
+            <from value="1"/>
+            <to value="65535"/>
+          </between>
+        </constraint>
       </field>
       <field id="3" name="GroupCAT" type="uint16">
         <quality nullable="true"/>
         <mandatoryConform/>
-        <constraint type="between" from="1" to="65535"/>
+        <constraint>
+          <between>
+            <from value="1"/>
+            <to value="65535"/>
+          </between>
+        </constraint>
       </field>
       <field id="4" name="GroupCATVersion" type="uint16">
         <quality nullable="true"/>
         <mandatoryConform/>
-        <constraint type="between" from="1" to="65535"/>
+        <constraint>
+          <between>
+            <from value="1"/>
+            <to value="65535"/>
+          </between>
+        </constraint>
       </field>
-      <field id="5" name="GroupPermission" type="ref_AccessControlEntryPrivilegeEnum">
+      <field id="5" name="GroupPermission" type="AccessControlEntryPrivilegeEnum">
         <mandatoryConform/>
-        <constraint type="allowed" value="0bX"/>
       </field>
     </command>
-    <command id="0x05" name="RemoveGroup Command" direction="commandToServer" response="Y">
+    <command id="0x05" name="RemoveGroup" direction="commandToServer" response="Y">
       <access invokePrivilege="admin" fabricScoped="true"/>
       <mandatoryConform/>
       <field id="0" name="GroupID" type="group-id">
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x06" name="AddAdmin Command" direction="commandToServer" response="Y">
+    <command id="0x06" name="AddAdmin" direction="commandToServer" response="Y">
       <access invokePrivilege="admin" fabricScoped="true"/>
       <mandatoryConform/>
-      <field id="0" name="AdminInformationEntry" type="Datastore Administrator Information Entry">
+      <field id="0" name="AdminInformationEntry" type="DatastoreAdministratorInformationEntryStruct">
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x07" name="UpdateAdmin Command" direction="commandToServer" response="Y">
+    <command id="0x07" name="UpdateAdmin" direction="commandToServer" response="Y">
       <access invokePrivilege="admin" fabricScoped="true"/>
       <mandatoryConform/>
       <field id="0" name="NodeID" type="node-id">
@@ -375,40 +437,26 @@ Davis, CA 95616, USA
       <field id="1" name="FriendlyName" type="string">
         <quality nullable="true"/>
         <mandatoryConform/>
-        <constraint type="maxLength" value="32"/>
+        <constraint>
+          <maxLength value="32"/>
+        </constraint>
       </field>
       <field id="2" name="ICAC" type="octstr">
         <quality nullable="true"/>
         <mandatoryConform/>
-        <constraint type="maxLength" value="400"/>
+        <constraint>
+          <maxLength value="400"/>
+        </constraint>
       </field>
     </command>
-    <command id="0x08" name="RemoveAdmin Command" direction="commandToServer" response="Y">
+    <command id="0x08" name="RemoveAdmin" direction="commandToServer" response="Y">
       <access invokePrivilege="admin" fabricScoped="true"/>
       <mandatoryConform/>
       <field id="0" name="NodeID" type="node-id">
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x09" name="AddPendingNode Command" direction="commandToServer" response="Y">
-      <access invokePrivilege="admin" fabricScoped="true"/>
-      <mandatoryConform/>
-      <field id="0" name="NodeID" type="node-id">
-        <mandatoryConform/>
-      </field>
-      <field id="1" name="FriendlyName" type="string">
-        <mandatoryConform/>
-        <constraint type="maxLength" value="32"/>
-      </field>
-    </command>
-    <command id="0x0A" name="RefreshNode Command" direction="commandToServer" response="Y">
-      <access invokePrivilege="admin" fabricScoped="true"/>
-      <mandatoryConform/>
-      <field id="0" name="NodeID" type="node-id">
-        <mandatoryConform/>
-      </field>
-    </command>
-    <command id="0x0B" name="UpdateNode Command" direction="commandToServer" response="Y">
+    <command id="0x09" name="AddPendingNode" direction="commandToServer" response="Y">
       <access invokePrivilege="admin" fabricScoped="true"/>
       <mandatoryConform/>
       <field id="0" name="NodeID" type="node-id">
@@ -416,17 +464,39 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="FriendlyName" type="string">
         <mandatoryConform/>
-        <constraint type="maxLength" value="32"/>
+        <constraint>
+          <maxLength value="32"/>
+        </constraint>
       </field>
     </command>
-    <command id="0x0C" name="RemoveNode Command" direction="commandToServer" response="Y">
+    <command id="0x0A" name="RefreshNode" direction="commandToServer" response="Y">
       <access invokePrivilege="admin" fabricScoped="true"/>
       <mandatoryConform/>
       <field id="0" name="NodeID" type="node-id">
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x0D" name="UpdateEndpointForNode Command" direction="commandToServer" response="Y">
+    <command id="0x0B" name="UpdateNode" direction="commandToServer" response="Y">
+      <access invokePrivilege="admin" fabricScoped="true"/>
+      <mandatoryConform/>
+      <field id="0" name="NodeID" type="node-id">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="FriendlyName" type="string">
+        <mandatoryConform/>
+        <constraint>
+          <maxLength value="32"/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x0C" name="RemoveNode" direction="commandToServer" response="Y">
+      <access invokePrivilege="admin" fabricScoped="true"/>
+      <mandatoryConform/>
+      <field id="0" name="NodeID" type="node-id">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x0D" name="UpdateEndpointForNode" direction="commandToServer" response="Y">
       <access invokePrivilege="admin" fabricScoped="true"/>
       <mandatoryConform/>
       <field id="0" name="EndpointID" type="endpoint-id">
@@ -437,10 +507,12 @@ Davis, CA 95616, USA
       </field>
       <field id="2" name="FriendlyName" type="string">
         <mandatoryConform/>
-        <constraint type="maxLength" value="32"/>
+        <constraint>
+          <maxLength value="32"/>
+        </constraint>
       </field>
     </command>
-    <command id="0x0E" name="AddGroupIDToEndpointForNode Command" direction="commandToServer" response="Y">
+    <command id="0x0E" name="AddGroupIDToEndpointForNode" direction="commandToServer" response="Y">
       <access invokePrivilege="admin" fabricScoped="true"/>
       <mandatoryConform/>
       <field id="0" name="NodeID" type="node-id">
@@ -453,7 +525,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x0F" name="RemoveGroupIDFromEndpointForNode Command" direction="commandToServer" response="Y">
+    <command id="0x0F" name="RemoveGroupIDFromEndpointForNode" direction="commandToServer" response="Y">
       <access invokePrivilege="admin" fabricScoped="true"/>
       <mandatoryConform/>
       <field id="0" name="NodeID" type="node-id">
@@ -466,7 +538,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x10" name="AddBindingToEndpointForNode Command" direction="commandToServer" response="Y">
+    <command id="0x10" name="AddBindingToEndpointForNode" direction="commandToServer" response="Y">
       <access invokePrivilege="admin" fabricScoped="true"/>
       <mandatoryConform/>
       <field id="0" name="NodeID" type="node-id">
@@ -475,11 +547,11 @@ Davis, CA 95616, USA
       <field id="1" name="EndpointID" type="endpoint-id">
         <mandatoryConform/>
       </field>
-      <field id="2" name="Binding" type="ref_BindingTargetStruct">
+      <field id="2" name="Binding" type="TargetStruct">
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x11" name="RemoveBindingFromEndpointForNode Command" direction="commandToServer" response="Y">
+    <command id="0x11" name="RemoveBindingFromEndpointForNode" direction="commandToServer" response="Y">
       <access invokePrivilege="admin" fabricScoped="true"/>
       <mandatoryConform/>
       <field id="0" name="ListID" type="uint16">
@@ -492,17 +564,17 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x12" name="AddACLToNode Command" direction="commandToServer" response="Y">
+    <command id="0x12" name="AddACLToNode" direction="commandToServer" response="Y">
       <access invokePrivilege="admin" fabricScoped="true"/>
       <mandatoryConform/>
       <field id="0" name="NodeID" type="node-id">
         <mandatoryConform/>
       </field>
-      <field id="1" name="ACLEntry" type="ref_AccessControlEntryStruct">
+      <field id="1" name="ACLEntry" type="AccessControlEntryStruct">
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x13" name="RemoveACLFromNode Command" direction="commandToServer" response="Y">
+    <command id="0x13" name="RemoveACLFromNode" direction="commandToServer" response="Y">
       <access invokePrivilege="admin" fabricScoped="true"/>
       <mandatoryConform/>
       <field id="0" name="ListID" type="uint16">

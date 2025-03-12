@@ -260,6 +260,9 @@ protected:
     const size_t mNumCerts;
 };
 
+// forward declaration
+class DeviceAttestationRevocationDelegate;
+
 class DeviceAttestationVerifier
 {
 public:
@@ -409,6 +412,18 @@ public:
 
     void EnableCdTestKeySupport(bool enabled) { mEnableCdTestKeySupport = enabled; }
     bool IsCdTestKeySupported() const { return mEnableCdTestKeySupport; }
+
+    /**
+     * @brief Try to set the revocation delegate.
+     *
+     * @param[in] revocationDelegate The revocation delegate to set.
+     *
+     * @return CHIP_NO_ERROR on success, CHIP_ERROR_NOT_IMPLEMENTED if the revocation delegate is not supported.
+     */
+    virtual CHIP_ERROR SetRevocationDelegate(DeviceAttestationRevocationDelegate * revocationDelegate)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
 
 protected:
     CHIP_ERROR ValidateAttestationSignature(const Crypto::P256PublicKey & pubkey, const ByteSpan & attestationElements,

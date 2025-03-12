@@ -88,11 +88,14 @@ static_library("shell") {
     ]
   } else if (chip_device_platform == "bl602" ||
              chip_device_platform == "bl702" ||
-             chip_device_platform == "bl702l") {
-    sources += [
-      "MainLoopDefault.cpp",
-      "streamer_bouffalolab.cpp",
-    ]
+             chip_device_platform == "bl702l" ||
+             chip_device_platform == "bl616") {
+    sources += [ "streamer_bouffalolab.cpp" ]
+    if (chip_device_platform == "bl616") {
+      sources += [ "MainLoopBouffalolab.cpp" ]
+    } else {
+      sources += [ "MainLoopDefault.cpp" ]
+    }
   } else if (chip_device_platform == "cc13x4_26x4") {
     sources += [
       "MainLoopDefault.cpp",

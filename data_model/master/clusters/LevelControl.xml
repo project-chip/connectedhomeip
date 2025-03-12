@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -60,27 +60,24 @@ Davis, CA 95616, USA
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0008" name="Level Control Cluster" revision="6">
   <revisionHistory>
     <revision revision="1" summary="Mandatory global ClusterRevision attribute added"/>
-    <revision revision="2" summary="Added Options attribute, state change table; ZLO 1.0; Base cluster (no change)
-             CCB 2085 1775 2281 2147"/>
+    <revision revision="2" summary="Added Options attribute, state change table; ZLO 1.0; Base cluster (no change) CCB 2085 1775 2281 2147"/>
     <revision revision="3" summary="CCB 2574 2616 2659 2702 2814 2818 2819 2898"/>
     <revision revision="4" summary="FeatureMap support with On/Off, Lighting and Frequency features"/>
     <revision revision="5" summary="New data model format and notation"/>
-    <revision revision="6" summary="Added Q quality for CurrentLevel, CurrentFrequency and RemainingTime attributes, +
-             added clarifications for behavior related to Step value and +
-             adjusted constraint of DefaultMoveRate"/>
+    <revision revision="6" summary="Added Q quality for CurrentLevel, CurrentFrequency and RemainingTime attributes, added clarifications for behavior related to Step value and adjusted constraint of DefaultMoveRate"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0008" name="Level Control"/>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="LVL" scope="Endpoint"/>
   <features>
-    <feature bit="0" code="OO" name="OnOff" default="1" summary="Dependency with the On/Off cluster">
+    <feature bit="0" code="OO" name="OnOff" summary="Dependency with the On/Off cluster">
       <optionalConform/>
     </feature>
-    <feature bit="1" code="LT" name="Lighting" default="0" summary="Behavior that supports lighting applications">
+    <feature bit="1" code="LT" name="Lighting" summary="Behavior that supports lighting applications">
       <optionalConform/>
     </feature>
-    <feature bit="2" code="FQ" name="Frequency" default="0" summary="Supports frequency attributes and behavior.">
+    <feature bit="2" code="FQ" name="Frequency" summary="Supports frequency attributes and behavior.">
       <provisionalConform/>
     </feature>
   </features>
@@ -120,13 +117,18 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="CurrentLevel" type="uint8" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="true" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
+      <quality nullable="true" scene="true" persistence="nonVolatile" quieterReporting="true"/>
       <mandatoryConform/>
-      <constraint type="between" from="MinLevel" to="MaxLevel"/>
+      <constraint>
+        <between>
+          <attribute name="MinLevel"/>
+          <attribute name="MaxLevel"/>
+        </between>
+      </constraint>
     </attribute>
     <attribute id="0x0001" name="RemainingTime" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
+      <quality quieterReporting="true"/>
       <mandatoryConform>
         <feature name="LT"/>
       </mandatoryConform>
@@ -136,7 +138,12 @@ Davis, CA 95616, USA
       <optionalConform>
         <feature name="LT"/>
       </optionalConform>
-      <constraint type="min" value="1"/>
+      <constraint>
+        <between>
+          <from value="1"/>
+          <to value="254"/>
+        </between>
+      </constraint>
     </attribute>
     <attribute id="0x0002" name="MinLevel" type="uint8" default="0">
       <access read="true" readPrivilege="view"/>
@@ -145,38 +152,55 @@ Davis, CA 95616, USA
           <feature name="LT"/>
         </notTerm>
       </optionalConform>
+      <constraint>
+        <max value="254"/>
+      </constraint>
     </attribute>
     <attribute id="0x0003" name="MaxLevel" type="uint8" default="254">
       <access read="true" readPrivilege="view"/>
       <optionalConform/>
-      <constraint type="between" from="MinLevel" to="254"/>
+      <constraint>
+        <between value="254">
+          <attribute name="MinLevel"/>
+        </between>
+      </constraint>
     </attribute>
     <attribute id="0x0004" name="CurrentFrequency" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="true" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="true"/>
+      <quality scene="true" reportable="true" quieterReporting="true"/>
       <mandatoryConform>
         <feature name="FQ"/>
       </mandatoryConform>
-      <constraint type="between" from="MinFrequency" to="MaxFrequency"/>
+      <constraint>
+        <between>
+          <attribute name="MinFrequency"/>
+          <attribute name="MaxFrequency"/>
+        </between>
+      </constraint>
     </attribute>
     <attribute id="0x0005" name="MinFrequency" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <feature name="FQ"/>
       </mandatoryConform>
-      <constraint type="max" value="MaxFrequency"/>
     </attribute>
     <attribute id="0x0006" name="MaxFrequency" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <feature name="FQ"/>
       </mandatoryConform>
-      <constraint type="min" value="MinFrequency"/>
+      <constraint>
+        <min>
+          <attribute name="MinFrequency"/>
+        </min>
+      </constraint>
     </attribute>
     <attribute id="0x000F" name="Options" type="OptionsBitmap" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
       <mandatoryConform/>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0010" name="OnOffTransitionTime" type="uint16" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
@@ -184,33 +208,42 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0011" name="OnLevel" type="uint8" default="null">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <mandatoryConform/>
-      <constraint type="between" from="MinLevel" to="MaxLevel"/>
+      <constraint>
+        <between>
+          <attribute name="MinLevel"/>
+          <attribute name="MaxLevel"/>
+        </between>
+      </constraint>
     </attribute>
     <attribute id="0x0012" name="OnTransitionTime" type="uint16" default="null">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0013" name="OffTransitionTime" type="uint16" default="null">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0014" name="DefaultMoveRate" type="uint8" default="MS">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <optionalConform/>
-      <constraint type="min" value="1"/>
+      <constraint>
+        <min value="1"/>
+      </constraint>
     </attribute>
     <attribute id="0x4000" name="StartUpCurrentLevel" type="uint8" default="MS">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="nonVolatile"/>
       <mandatoryConform>
         <feature name="LT"/>
       </mandatoryConform>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
   </attributes>
   <commands>
@@ -219,7 +252,9 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <field id="0" name="Level" type="uint8">
         <mandatoryConform/>
-        <constraint type="max" value="254"/>
+        <constraint>
+          <max value="254"/>
+        </constraint>
       </field>
       <field id="1" name="TransitionTime" type="uint16">
         <quality nullable="true"/>
@@ -227,11 +262,15 @@ Davis, CA 95616, USA
       </field>
       <field id="2" name="OptionsMask" type="OptionsBitmap" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="3" name="OptionsOverride" type="OptionsBitmap" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </command>
     <command id="0x01" name="Move" direction="commandToServer" response="Y">
@@ -239,7 +278,9 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <field id="0" name="MoveMode" type="MoveModeEnum">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="1" name="Rate" type="uint8">
         <quality nullable="true"/>
@@ -247,11 +288,15 @@ Davis, CA 95616, USA
       </field>
       <field id="2" name="OptionsMask" type="OptionsBitmap" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="3" name="OptionsOverride" type="OptionsBitmap" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </command>
     <command id="0x02" name="Step" direction="commandToServer" response="Y">
@@ -259,7 +304,9 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <field id="0" name="StepMode" type="StepModeEnum">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="1" name="StepSize" type="uint8">
         <mandatoryConform/>
@@ -270,11 +317,15 @@ Davis, CA 95616, USA
       </field>
       <field id="3" name="OptionsMask" type="OptionsBitmap" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="4" name="OptionsOverride" type="OptionsBitmap" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </command>
     <command id="0x03" name="Stop" direction="commandToServer" response="Y">
@@ -282,11 +333,15 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <field id="0" name="OptionsMask" type="OptionsBitmap" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="1" name="OptionsOverride" type="OptionsBitmap" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </command>
     <command id="0x04" name="MoveToLevelWithOnOff" direction="commandToServer" response="Y">

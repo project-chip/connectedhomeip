@@ -23,6 +23,7 @@ import com.matter.controller.commands.bdx.*
 import com.matter.controller.commands.common.*
 import com.matter.controller.commands.discover.*
 import com.matter.controller.commands.icd.*
+import com.matter.controller.commands.ota.PairOnNetworkLongOtaOverBdxCommand
 import com.matter.controller.commands.pairing.*
 
 private fun getDiscoveryCommands(
@@ -91,6 +92,15 @@ private fun getBdxCommands(
   )
 }
 
+private fun getOtaCommands(
+  controller: ChipDeviceController,
+  credentialsIssuer: CredentialsIssuer
+): List<Command> {
+  return listOf(
+    PairOnNetworkLongOtaOverBdxCommand(controller, credentialsIssuer),
+  )
+}
+
 fun main(args: Array<String>) {
   val controller =
     ChipDeviceController(
@@ -108,7 +118,7 @@ fun main(args: Array<String>) {
   commandManager.register("im", getImCommands(controller, credentialsIssuer))
   commandManager.register("icd", getICDCommands(controller, credentialsIssuer))
   commandManager.register("bdx", getBdxCommands(controller, credentialsIssuer))
-
+  commandManager.register("ota", getOtaCommands(controller, credentialsIssuer))
   try {
     commandManager.run(args)
   } catch (e: Exception) {

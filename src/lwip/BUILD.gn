@@ -32,9 +32,10 @@ assert(lwip_platform == "external" || lwip_platform == "standalone" ||
            lwip_platform == "nxp" || lwip_platform == "silabs" ||
            lwip_platform == "qpg" || lwip_platform == "mbed" ||
            lwip_platform == "psoc6" || lwip_platform == "cyw30739" ||
-           lwip_platform == "bl602" || lwip_platform == "mw320" ||
-           lwip_platform == "bl702" || lwip_platform == "bl702l" ||
-           lwip_platform == "mt793x" || lwip_platform == "asr",
+           lwip_platform == "mw320" || lwip_platform == "bl602" ||
+           lwip_platform == "bl616" || lwip_platform == "bl702" ||
+           lwip_platform == "bl702l" || lwip_platform == "mt793x" ||
+           lwip_platform == "asr",
        "Unsupported lwIP platform: ${lwip_platform}")
 
 if (lwip_platform != "external") {
@@ -59,6 +60,9 @@ if (lwip_platform == "cc13xx_26xx") {
   import("//build_overrides/cyw30739_sdk.gni")
 } else if (lwip_platform == "bl602") {
   import("//build_overrides/bouffalolab_iot_sdk.gni")
+} else if (lwip_platform == "bl616") {
+  import("//build_overrides/bouffalolab_iot_sdk.gni")
+  import("${chip_root}/src/platform/device.gni")
 } else if (lwip_platform == "bl702") {
   import("//build_overrides/bouffalolab_iot_sdk.gni")
   import("${chip_root}/src/platform/device.gni")
@@ -147,6 +151,16 @@ if (current_os == "zephyr" || current_os == "mbed") {
   group("lwip") {
     public_deps = [ ":lwip_buildconfig" ]
     public_deps += [ "${bouffalolab_iot_sdk_build_root}/bl602:bl_iot_sdk" ]
+  }
+
+  group("all") {
+    deps = [ ":lwip" ]
+  }
+} else if (lwip_platform == "bl616" && defined(chip_enable_openthread) &&
+           chip_enable_openthread == false) {
+  group("lwip") {
+    public_deps = [ ":lwip_buildconfig" ]
+    public_deps += [ "${bouffalolab_iot_sdk_build_root}/bl616:bouffalo_sdk" ]
   }
 
   group("all") {

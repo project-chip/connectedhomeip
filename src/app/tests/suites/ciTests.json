@@ -57,7 +57,6 @@
         "Test_TC_EEVSEM_3_3"
     ],
     "FlowMeasurement": ["Test_TC_FLW_2_1"],
-    "FixedLabel": ["Test_TC_FLABEL_2_1"],
     "FanControl": [
         "Test_TC_FAN_2_1",
         "Test_TC_FAN_2_2",
@@ -185,7 +184,6 @@
         "Test_TC_TCTL_1_1",
         "Test_TC_TCTL_2_1",
         "Test_TC_TCTL_2_2",
-        "Test_TC_TCTL_2_3",
         "Test_TC_TCTL_3_2",
         "Test_TC_TCTL_3_3"
     ],

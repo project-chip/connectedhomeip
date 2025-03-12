@@ -213,7 +213,9 @@ ALIASED_CLUSTERS = (
     '  </revisionHistory>'
     '  <clusterIds>'
     '    <clusterId id="0xFFFE" name="Test Alias1"/>'
-    '    <clusterId id="0xFFFD" name="Test Alias2"/>'
+    '    <clusterId id="0xFFFD" name="Test Alias2">'
+    '      <provisionalConform/>'
+    '    </clusterId>'
     '  </clusterIds>'
     '  <classification hierarchy="base" role="application" picsCode="BASE" scope="Endpoint"/>'
     '  <commands>'
@@ -251,25 +253,40 @@ PROVISIONAL_CLUSTER_TEMPLATE = """
 class TestSpecParsingSupport(MatterBaseTest):
     def setup_class(self):
         super().setup_class()
-        self.spec_xml_clusters, self.spec_problems = build_xml_clusters()
+        # Latest fully certified build
+        self.spec_xml_clusters, self.spec_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4)
         self.all_spec_clusters = set([(id, c.name, c.pics) for id, c in self.spec_xml_clusters.items()])
 
     def test_build_xml_override(self):
         # checks that the 1.3 spec (default) does not contain in-progress clusters and the TOT does
         tot_xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.kMaster)
         one_three_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_3)
-        one_four_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4)
+        one_four_clusters, one_four_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4)
+        one_four_one_clusters, one_four_one_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4_1)
+
+        # We know 1.4 and 1.4.1 are clear of errors, ensure it stays that way.
+        asserts.assert_equal(len(one_four_problems), 0, "Unexpected problems found on 1.4 cluster parsing")
+        asserts.assert_equal(len(one_four_one_problems), 0, "Unexpected problems found on 1.4.1 cluster parsing")
+
         asserts.assert_greater(len(set(tot_xml_clusters.keys()) - set(one_three_clusters.keys())),
                                0, "Master dir does not contain any clusters not in 1.3")
         asserts.assert_greater(len(set(tot_xml_clusters.keys()) - set(one_four_clusters.keys())),
                                0, "Master dir does not contain any clusters not in 1.4")
         asserts.assert_greater(len(set(one_four_clusters.keys()) - set(one_three_clusters.keys())),
                                0, "1.4 dir does not contain any clusters not in 1.3")
+        asserts.assert_equal(len(one_four_clusters.keys()), len(one_four_one_clusters.keys()),
+                             "1.4 and 1.4.1 do not contain the same clusters")
         # only the pulse width modulation cluster was removed post 1.3
-        asserts.assert_equal(set(one_three_clusters.keys()) - set(tot_xml_clusters.keys()),
-                             set([Clusters.PulseWidthModulation.id]), "There are some 1.3 clusters that are not included in the TOT spec")
+        one_four_removed = set([Clusters.PulseWidthModulation.id])
+        asserts.assert_equal(set(one_three_clusters.keys()) - set(one_four_clusters.keys()),
+                             one_four_removed, "There are some 1.3 clusters that are unexpectedly not included in the 1.4 spec")
+        # Ballast and all the proxy clusters are being removed in 1.5
+        one_five_removed = set([Clusters.BallastConfiguration.id, Clusters.ProxyConfiguration.id,
+                               Clusters.ProxyDiscovery.id, Clusters.ProxyValid.id])
         asserts.assert_equal(set(one_four_clusters.keys())-set(tot_xml_clusters.keys()),
-                             set(), "There are some 1.4 clusters that are not included in the TOT spec")
+                             one_five_removed, "There are some 1.4 clusters that are unexpectedly not included in the TOT spec")
+        asserts.assert_equal(set(one_three_clusters.keys())-set(tot_xml_clusters.keys()),
+                             one_four_removed.union(one_five_removed), "There are some 1.3 clusters that are unexpectedly not included in the TOT spec")
 
         str_path = get_data_model_directory(PrebuiltDataModelDirectory.k1_4, DataModelLevel.kCluster)
         string_override_check, problems = build_xml_clusters(str_path)
@@ -395,6 +412,10 @@ class TestSpecParsingSupport(MatterBaseTest):
         ids = [(id, c.name) for id, c in clusters.items()]
         asserts.assert_true((0xFFFE, 'Test Alias1') in ids, "Unable to find Test Alias1 cluster in parsed clusters")
         asserts.assert_true((0xFFFD, 'Test Alias2') in ids, "Unable to find Test Alias2 cluster in parsed clusters")
+
+        # Test Alias2 is marked as provisional, and TestAlias1 is not
+        asserts.assert_false(clusters[0xFFFE].is_provisional, "Test Alias1 is marked as provisional and should not be")
+        asserts.assert_true(clusters[0xFFFD].is_provisional, "Test Alias2 is not marked as provisional and should be")
 
     def test_known_aliased_clusters(self):
         known_aliased_clusters = set([(0x040C, 'Carbon Monoxide Concentration Measurement', 'CMOCONC'),

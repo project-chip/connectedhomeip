@@ -1,0 +1,318 @@
+<?xml version="1.0"?>
+<!--
+Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+The information within this document is the property of the Connectivity
+Standards Alliance and its use and disclosure are restricted, except as
+expressly set forth herein.
+
+Connectivity Standards Alliance hereby grants you a fully-paid, non-exclusive,
+nontransferable, worldwide, limited and revocable license (without the right to
+sublicense), under Connectivity Standards Alliance's applicable copyright
+rights, to view, download, save, reproduce and use the document solely for your
+own internal purposes and in accordance with the terms of the license set forth
+herein. This license does not authorize you to, and you expressly warrant that
+you shall not: (a) permit others (outside your organization) to use this
+document; (b) post or publish this document; (c) modify, adapt, translate, or
+otherwise change this document in any manner or create any derivative work
+based on this document; (d) remove or modify any notice or label on this
+document, including this Copyright Notice, License and Disclaimer. The
+Connectivity Standards Alliance does not grant you any license hereunder other
+than as expressly stated herein.
+
+Elements of this document may be subject to third party intellectual property
+rights, including without limitation, patent, copyright or trademark rights,
+and any such third party may or may not be a member of the Connectivity
+Standards Alliance. Connectivity Standards Alliance members grant other
+Connectivity Standards Alliance members certain intellectual property rights as
+set forth in the Connectivity Standards Alliance IPR Policy. Connectivity
+Standards Alliance members do not grant you any rights under this license. The
+Connectivity Standards Alliance is not responsible for, and shall not be held
+responsible in any manner for, identifying or failing to identify any or all
+such third party intellectual property rights. Please visit www.csa-iot.org for
+more information on how to become a member of the Connectivity Standards
+Alliance.
+
+This document and the information contained herein are provided on an “AS IS”
+basis and the Connectivity Standards Alliance DISCLAIMS ALL WARRANTIES EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO (A) ANY WARRANTY THAT THE USE OF THE
+INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OF THIRD PARTIES (INCLUDING
+WITHOUT LIMITATION ANY INTELLECTUAL PROPERTY RIGHTS INCLUDING PATENT, COPYRIGHT
+OR TRADEMARK RIGHTS); OR (B) ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, TITLE OR NONINFRINGEMENT. IN NO EVENT WILL THE
+CONNECTIVITY STANDARDS ALLIANCE BE LIABLE FOR ANY LOSS OF PROFITS, LOSS OF
+BUSINESS, LOSS OF USE OF DATA, INTERRUPTION OF BUSINESS, OR FOR ANY OTHER
+DIRECT, INDIRECT, SPECIAL OR EXEMPLARY, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL
+DAMAGES OF ANY KIND, IN CONTRACT OR IN TORT, IN CONNECTION WITH THIS DOCUMENT
+OR THE INFORMATION CONTAINED HEREIN, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+LOSS OR DAMAGE.
+
+All company, brand and product names in this document may be trademarks that
+are the sole property of their respective owners.
+
+This notice and disclaimer must be included on all copies of this document.
+
+Connectivity Standards Alliance
+508 Second Street, Suite 206
+Davis, CA 95616, USA
+
+:xrefstyle: basic
+-->
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0202" name="Fan Control Cluster" revision="4">
+  <revisionHistory>
+    <revision revision="1" summary="Mandatory global ClusterRevision attribute added"/>
+    <revision revision="2" summary="New data model format and notation; Percent, speed and motion settings; General cleanup"/>
+    <revision revision="3" summary="Addition of AirflowDirection and Step command"/>
+    <revision revision="4" summary="Change conformance for FanModeSequenceEnum"/>
+  </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0202" name="Fan Control"/>
+  </clusterIds>
+  <classification hierarchy="base" role="application" picsCode="FAN" scope="Endpoint"/>
+  <features>
+    <feature bit="0" code="SPD" name="MultiSpeed" summary="0-SpeedMax Fan Speeds">
+      <optionalConform/>
+    </feature>
+    <feature bit="1" code="AUT" name="Auto" summary="Automatic mode supported for fan speed">
+      <optionalConform/>
+    </feature>
+    <feature bit="2" code="RCK" name="Rocking" summary="Rocking movement supported">
+      <optionalConform/>
+    </feature>
+    <feature bit="3" code="WND" name="Wind" summary="Wind emulation supported">
+      <optionalConform/>
+    </feature>
+    <feature bit="4" code="STEP" name="Step" summary="Step command supported">
+      <optionalConform/>
+    </feature>
+    <feature bit="5" code="DIR" name="AirflowDirection" summary="Airflow Direction attribute is supported">
+      <optionalConform/>
+    </feature>
+  </features>
+  <dataTypes>
+    <enum name="AirflowDirectionEnum">
+      <item value="0" name="Forward" summary="Airflow is in the forward direction">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Reverse" summary="Airflow is in the reverse direction">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="FanModeEnum">
+      <item value="0" name="Off" summary="Fan is off">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Low" summary="Fan using low speed"/>
+      <item value="2" name="Medium" summary="Fan using medium speed"/>
+      <item value="3" name="High" summary="Fan using high speed">
+        <mandatoryConform/>
+      </item>
+      <item value="4" name="On">
+        <deprecateConform/>
+      </item>
+      <item value="5" name="Auto" summary="Fan is using auto mode">
+        <mandatoryConform>
+          <feature name="AUT"/>
+        </mandatoryConform>
+      </item>
+      <item value="6" name="Smart" summary="Fan is using smart mode">
+        <deprecateConform/>
+      </item>
+    </enum>
+    <enum name="FanModeSequenceEnum">
+      <item value="0" name="OffLowMedHigh" summary="Fan is capable of off, low, medium and high modes">
+        <optionalConform choice="a">
+          <notTerm>
+            <feature name="AUT"/>
+          </notTerm>
+        </optionalConform>
+      </item>
+      <item value="1" name="OffLowHigh" summary="Fan is capable of off, low and high modes">
+        <optionalConform choice="a">
+          <notTerm>
+            <feature name="AUT"/>
+          </notTerm>
+        </optionalConform>
+      </item>
+      <item value="2" name="OffLowMedHighAuto" summary="Fan is capable of off, low, medium, high and auto modes">
+        <optionalConform choice="a">
+          <feature name="AUT"/>
+        </optionalConform>
+      </item>
+      <item value="3" name="OffLowHighAuto" summary="Fan is capable of off, low, high and auto modes">
+        <optionalConform choice="a">
+          <feature name="AUT"/>
+        </optionalConform>
+      </item>
+      <item value="4" name="OffHighAuto" summary="Fan is capable of off, high and auto modes">
+        <optionalConform choice="a">
+          <feature name="AUT"/>
+        </optionalConform>
+      </item>
+      <item value="5" name="OffHigh" summary="Fan is capable of off and high modes">
+        <optionalConform choice="a">
+          <notTerm>
+            <feature name="AUT"/>
+          </notTerm>
+        </optionalConform>
+      </item>
+    </enum>
+    <enum name="StepDirectionEnum">
+      <item value="0" name="Increase" summary="Step moves in increasing direction">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Decrease" summary="Step moves in decreasing direction">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <bitmap name="RockBitmap">
+      <bitfield name="RockLeftRight" bit="0" summary="Indicate rock left to right">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="RockUpDown" bit="1" summary="Indicate rock up and down">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="RockRound" bit="2" summary="Indicate rock around">
+        <mandatoryConform/>
+      </bitfield>
+    </bitmap>
+    <bitmap name="WindBitmap">
+      <bitfield name="SleepWind" bit="0" summary="Indicate sleep wind">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="NaturalWind" bit="1" summary="Indicate natural wind">
+        <mandatoryConform/>
+      </bitfield>
+    </bitmap>
+  </dataTypes>
+  <attributes>
+    <attribute id="0x0000" name="FanMode" type="FanModeEnum" default="0">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0001" name="FanModeSequence" type="FanModeSequenceEnum" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0002" name="PercentSetting" type="percent" default="0">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
+      <quality nullable="true"/>
+      <mandatoryConform/>
+      <constraint>
+        <max value="100"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0003" name="PercentCurrent" type="percent" default="desc">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform/>
+      <constraint>
+        <max value="100"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0004" name="SpeedMax" type="uint8" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <feature name="SPD"/>
+      </mandatoryConform>
+      <constraint>
+        <between>
+          <from value="1"/>
+          <to value="100"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0005" name="SpeedSetting" type="uint8" default="0">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
+      <quality nullable="true"/>
+      <mandatoryConform>
+        <feature name="SPD"/>
+      </mandatoryConform>
+      <constraint>
+        <max>
+          <attribute name="SpeedMax"/>
+        </max>
+      </constraint>
+    </attribute>
+    <attribute id="0x0006" name="SpeedCurrent" type="uint8" default="desc">
+      <access read="true" readPrivilege="view"/>
+      <quality reportable="true"/>
+      <mandatoryConform>
+        <feature name="SPD"/>
+      </mandatoryConform>
+      <constraint>
+        <max>
+          <attribute name="SpeedMax"/>
+        </max>
+      </constraint>
+    </attribute>
+    <attribute id="0x0007" name="RockSupport" type="RockBitmap" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <feature name="RCK"/>
+      </mandatoryConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0008" name="RockSetting" type="RockBitmap" default="0">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
+      <quality reportable="true"/>
+      <mandatoryConform>
+        <feature name="RCK"/>
+      </mandatoryConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0009" name="WindSupport" type="WindBitmap" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <feature name="WND"/>
+      </mandatoryConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x000A" name="WindSetting" type="WindBitmap" default="0">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
+      <quality reportable="true"/>
+      <mandatoryConform>
+        <feature name="WND"/>
+      </mandatoryConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x000B" name="AirflowDirection" type="AirflowDirectionEnum" default="0">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
+      <quality reportable="true"/>
+      <mandatoryConform>
+        <feature name="DIR"/>
+      </mandatoryConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+  </attributes>
+  <commands>
+    <command id="0x00" name="Step" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <feature name="STEP"/>
+      </mandatoryConform>
+      <field id="0" name="Direction" type="StepDirectionEnum" default="Increase">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="Wrap" type="bool" default="false">
+        <optionalConform/>
+      </field>
+      <field id="2" name="LowestOff" type="bool" default="true">
+        <optionalConform/>
+      </field>
+    </command>
+  </commands>
+</cluster>

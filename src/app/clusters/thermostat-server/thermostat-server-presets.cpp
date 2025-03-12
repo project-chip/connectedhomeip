@@ -464,7 +464,7 @@ Status ThermostatAttrAccess::PrecommitPresets(EndpointId endpoint)
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl,
-                         "emberAfThermostatClusterCommitPresetsSchedulesRequestCallback: GetPresetAtIndex failed with error "
+                         "PrecommitPresets: GetPresetAtIndex failed with error "
                          "%" CHIP_ERROR_FORMAT,
                          err.Format());
             return Status::InvalidInState;
@@ -516,7 +516,7 @@ Status ThermostatAttrAccess::PrecommitPresets(EndpointId endpoint)
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl,
-                         "emberAfThermostatClusterCommitPresetsSchedulesRequestCallback: GetPendingPresetAtIndex failed with error "
+                         "PrecommitPresets: GetPendingPresetAtIndex failed with error "
                          "%" CHIP_ERROR_FORMAT,
                          err.Format());
             return Status::InvalidInState;

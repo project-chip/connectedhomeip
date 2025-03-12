@@ -61,6 +61,7 @@ class Secrets:
             self.fp.seek(0)
             self.fp.truncate()
             pickle.dump(self.secrets, self.fp)
+            self.fp.flush()
         except IOError as e:
             print("ERROR: " + str(e), file=sys.stderr)
 
@@ -92,14 +93,14 @@ Please, DO NOT store real secrets in it!""")
 subparsers = parser.add_subparsers(dest='command', required=True)
 
 parser_clear = subparsers.add_parser(
-    "clear", help="Remove passward associated with given key value pairs")
+    "clear", help="Remove password associated with given key value pairs")
 parser_clear.add_argument("-l", "--label", action='store', required=True,
                           help="label for given key value pairs")
 parser_clear.add_argument("kw", nargs='*',
                           help="key value pairs")
 
 parser_store = subparsers.add_parser(
-    "store", help="Store passward for given key value pairs")
+    "store", help="Store password for given key value pairs")
 parser_store.add_argument("-l", "--label", action='store', required=True,
                           help="label for given key value pairs")
 parser_store.add_argument("-p", "--password", action='store', required=True,
@@ -108,7 +109,7 @@ parser_store.add_argument("kw", nargs='*',
                           help="key value pairs")
 
 parser_lookup = subparsers.add_parser(
-    "lookup", help="Retrieve passward associated with given key value pairs")
+    "lookup", help="Retrieve password associated with given key value pairs")
 parser_lookup.add_argument("-l", "--label", action='store', required=True,
                            help="label for given key value pairs")
 parser_lookup.add_argument("kw", nargs='*',

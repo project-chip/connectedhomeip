@@ -318,12 +318,15 @@ void ConnectionHandler(CHIP_ERROR err, matter::casting::core::CastingPlayer * ca
             castingPlayer->GetId(), endpoints[index]->GetId());
 
         // demonstrate invoking a command
+        ChipLogProgress(AppServer, "simple-app-helper.cpp::ConnectionHandler() calling InvokeContentLauncherLaunchURL()");
         InvokeContentLauncherLaunchURL(endpoints[index]);
 
         // demonstrate reading an attribute
+        ChipLogProgress(AppServer, "simple-app-helper.cpp::ConnectionHandler() calling ReadApplicationBasicVendorID()");
         ReadApplicationBasicVendorID(endpoints[index]);
 
         // demonstrate subscribing to an attribute
+        ChipLogProgress(AppServer, "simple-app-helper.cpp::ConnectionHandler() calling SubscribeToMediaPlaybackCurrentState()");
         SubscribeToMediaPlaybackCurrentState(endpoints[index]);
     }
     else

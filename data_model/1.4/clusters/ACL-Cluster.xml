@@ -54,6 +54,8 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x001F" name="Access Control Cluster" revision="2">
   <revisionHistory>
@@ -61,7 +63,7 @@ Davis, CA 95616, USA
     <revision revision="2" summary="Added Managed Device feature, Extension feature, fixed conformance"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x001F" name="AccessControl"/>
+    <clusterId id="0x001F" name="Access Control"/>
   </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="ACL" scope="Node"/>
   <features>
@@ -83,10 +85,10 @@ Davis, CA 95616, USA
       </item>
     </enum>
     <enum name="AccessControlEntryPrivilegeEnum">
-      <item value="1" name="View" summary="Can read and observe all (except Access Control Cluster and as seen by a non-Proxy)">
+      <item value="1" name="View" summary="Can read and observe all (except Access Control Cluster and as seen by a non- Proxy)">
         <mandatoryConform/>
       </item>
-      <item value="2" name="Proxy" summary="Can read and observe all (as seen by a Proxy)">
+      <item value="2" name="ProxyView" summary="Can read and observe all (as seen by a Proxy)">
         <otherwiseConform>
           <provisionalConform/>
           <mandatoryConform/>
@@ -137,18 +139,22 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
       <field id="3" name="Subjects" type="list">
-        <entry type="SubjectID"/>
+        <entry type="subject-id"/>
         <access fabricSensitive="true"/>
         <quality nullable="true"/>
         <mandatoryConform/>
-        <constraint type="maxCount" value="SubjectsPerAccessControlEntry"/>
+        <constraint type="maxCount">
+          <value attribute="SubjectsPerAccessControlEntry"/>
+        </constraint>
       </field>
       <field id="4" name="Targets" type="list">
         <entry type="AccessControlTargetStruct"/>
         <access fabricSensitive="true"/>
         <quality nullable="true"/>
         <mandatoryConform/>
-        <constraint type="maxCount" value="TargetsPerAccessControlEntry"/>
+        <constraint type="maxCount">
+          <value attribute="TargetsPerAccessControlEntry"/>
+        </constraint>
       </field>
       <access fabricScoped="true"/>
     </struct>
@@ -183,7 +189,7 @@ Davis, CA 95616, USA
         <access fabricSensitive="true"/>
         <mandatoryConform/>
       </field>
-      <field id="2" name="Restrictions" type="list" default="desc">
+      <field id="2" name="Restrictions" type="list">
         <entry type="AccessRestrictionStruct"/>
         <access fabricSensitive="true"/>
         <mandatoryConform/>
@@ -207,7 +213,7 @@ Davis, CA 95616, USA
       <field id="1" name="Cluster" type="cluster-id">
         <mandatoryConform/>
       </field>
-      <field id="2" name="Restrictions" type="list" default="desc">
+      <field id="2" name="Restrictions" type="list">
         <entry type="AccessRestrictionStruct"/>
         <mandatoryConform/>
         <constraint type="minCount" value="1"/>
@@ -231,32 +237,32 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0002" name="SubjectsPerAccessControlEntry" type="uint16" default="4">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
       <constraint type="min" value="4"/>
     </attribute>
     <attribute id="0x0003" name="TargetsPerAccessControlEntry" type="uint16" default="3">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
       <constraint type="min" value="3"/>
     </attribute>
     <attribute id="0x0004" name="AccessControlEntriesPerFabric" type="uint16" default="4">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
       <constraint type="min" value="4"/>
     </attribute>
-    <attribute id="0x0005" name="CommissioningARL" type="list" default="[]">
+    <attribute id="0x0005" name="CommissioningARL" type="list" default="empty">
       <entry type="CommissioningAccessRestrictionEntryStruct"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="MNGD"/>
       </mandatoryConform>
       <constraint type="desc"/>
     </attribute>
-    <attribute id="0x0006" name="ARL" type="list" default="[]">
+    <attribute id="0x0006" name="ARL" type="list" default="empty">
       <entry type="AccessRestrictionEntryStruct"/>
       <access read="true" readPrivilege="view" fabricScoped="true"/>
       <mandatoryConform>
