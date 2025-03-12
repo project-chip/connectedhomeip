@@ -28,6 +28,10 @@ Git: 0.7-summer-2025-511-g2b8c413df
     <item fieldId="1" name="StatusCode" type="status"/>
   </struct>
 
+  <struct name="CurrencyStruct" apiMaturity="provisional">
+    <item fieldId="0" name="Currency" type="int16u" max="999"/>
+    <item fieldId="1" name="DecimalPoints" type="int8u"/>
+  </struct>
   <struct name="LocationDescriptorStruct">
     <item fieldId="0" name="LocationName"    type="char_string" length="128" isNullable="false" optional="false"/>
     <item fieldId="1" name="FloorNumber"     type="int16s"                   isNullable="true"  optional="false"/>
