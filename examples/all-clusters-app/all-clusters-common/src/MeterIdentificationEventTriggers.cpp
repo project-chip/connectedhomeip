@@ -41,13 +41,24 @@ private:
 
     static void SetCharSpan(DataModel::Nullable<CharSpan> & charSpan, const DataModel::Nullable<CharSpan> && value)
     {
+        if (!charSpan.IsNull())
+        {
+            chip::Platform::MemoryFree(const_cast<char *>(charSpan.Value().data()));
+            charSpan.SetNull();
+        }
+
         if (!value.IsNull())
         {
             const size_t len = value.Value().size();
-            char * str = (char *) chip::Platform::MemoryAlloc(len + 1);
-            strncpy(str, value.Value().data(), len);
+            auto * str = static_cast<char *>(chip::Platform::MemoryAlloc(1 + len));
+            if (nullptr == str)
+            {
+                return;
+            }
+
+            memcpy(str, value.Value().data(), len);
             str[len] = 0;
-            charSpan = DataModel::MakeNullable(CharSpan::fromCharString(str));
+            charSpan = DataModel::MakeNullable(CharSpan(str, len));
         }
     }
 
@@ -55,7 +66,7 @@ private:
     {
         if (!charSpan.IsNull())
         {
-            chip::Platform::MemoryFree((void *) charSpan.Value().data());
+            chip::Platform::MemoryFree(const_cast<char *>(charSpan.Value().data()));
             charSpan.SetNull();
         }
     }
