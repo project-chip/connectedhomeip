@@ -18,6 +18,7 @@ import("${chip_root}/config/standalone/args.gni")
 # SDK target. This is overridden to add our SDK app_config.h & defines.
 nxp_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 nxp_device = "MCXW716C"
+nxp_board = "frdmmcxw71"
 
 nxp_config_dimmable_led = false
 chip_enable_ota_requestor = true
@@ -34,6 +35,5 @@ nxp_enable_ot_cli = false
 chip_system_config_provide_statistics = false
 chip_system_config_use_open_thread_inet_endpoints = true
 chip_with_lwip = false
-
-nxp_use_smu2_static = true
-nxp_use_smu2_dynamic = true
+#nxp_use_smu2_static = true
+#nxp_use_smu2_dynamic = true
