@@ -27,8 +27,8 @@
 
 #include <crypto/CHIPCryptoPAL.h>
 #include <json/json.h>
-#include <lib/core/CHIPError.h>
 #include <lib/core/CHIPConfig.h>
+#include <lib/core/CHIPError.h>
 #include <lib/support/Base64.h>
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPMemString.h>
