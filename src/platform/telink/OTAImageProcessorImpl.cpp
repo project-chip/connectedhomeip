@@ -204,7 +204,7 @@ CHIP_ERROR OTAImageProcessorImpl::RestoreBytes(ByteSpan & aBlock)
     uint8_t *ImageDigestBuffer = new uint8_t[aBlock.size()];
     MutableByteSpan mImageDigest(ImageDigestBuffer, aBlock.size());
 
-    if (KeyValueStoreMgr().Get(kImageDigest, mImageDigest.data(), mImageDigest.size()) == CHIP_NO_ERROR && 
+    if (KeyValueStoreMgr().Get(kImageDigest, mImageDigest.data(), mImageDigest.size()) == CHIP_NO_ERROR &&
         KeyValueStoreMgr().Get(kDownloadedBytes, &downloadedBytesRestored, sizeof(downloadedBytesRestored)) == CHIP_NO_ERROR &&
         mImageDigest.data_equal(aBlock) && downloadedBytesRestored < mParams.totalFileBytes)
     {
