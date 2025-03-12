@@ -54,7 +54,7 @@ bool Instance::HasFeature(Feature aFeature) const
 {
     return mFeature.Has(aFeature);
 }
- 
+
 // AttributeAccessInterface
 CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
@@ -89,20 +89,20 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
     using namespace Commands;
 
     VerifyOrExit(callback(GetDetailedPriceRequest::Id, context) == Loop::Continue, /**/);
-    
+
     if (HasFeature(Feature::kForecasting))
     {
         VerifyOrExit(callback(GetDetailedForecastRequest::Id, context) == Loop::Continue, /**/);
     }
-    
+
 exit:
     return CHIP_NO_ERROR;
 }
- 
+
 void Instance::InvokeCommand(HandlerContext & handlerContext)
 {
     using namespace Commands;
- 
+
     switch (handlerContext.mRequestPath.mCommandId)
     {
      case GetDetailedPriceRequest::Id:
@@ -124,8 +124,8 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
          return;
      }
  }
- 
- 
+
+
 void Instance::HandleGetDetailedPriceRequest(HandlerContext & ctx, const Commands::GetDetailedPriceRequest::DecodableType & commandData)
 {
 //    bool validArgs = false;
@@ -133,7 +133,7 @@ void Instance::HandleGetDetailedPriceRequest(HandlerContext & ctx, const Command
 //    map16 details                       = commandData.details;
 
 // TODO finish off
-  
+
 
 }
 
@@ -148,14 +148,13 @@ void Instance::HandleGetDetailedPriceRequest(HandlerContext & ctx, const Command
      }
 
      // TODO finish off
- 
+
  }
- 
- 
+
+
  } // namespace CommodityPrice
  } // namespace Clusters
  } // namespace app
  } // namespace chip
- 
+
  void MatterCommodityPricePluginServerInitCallback() {}
- 

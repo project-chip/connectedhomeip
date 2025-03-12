@@ -47,7 +47,7 @@ public:
     virtual Globals::TariffUnitEnum GetTariffUnit()         = 0;
     virtual Globals::Structs::CurrencyStruct::Type GetCurrency()         = 0;
     virtual const DataModel::Nullable<Structs::CommodityPriceStruct::Type> &  GetCurrentPrice()       = 0;
-    virtual int64_t GetPriceForecast()         = 0; 
+    virtual int64_t GetPriceForecast()         = 0;
     // TODO GetPriceForecast returns a List of CommodityPriceStruct with simple details, unlike the command which can ask for specific details.
 
 
@@ -106,7 +106,7 @@ private:
     void HandleGetDetailedPriceRequest(HandlerContext & ctx, const Commands::GetDetailedPriceRequest::DecodableType & commandData);
     void HandleGetDetailedForecastRequest(HandlerContext & ctx,
                                         const Commands::GetDetailedForecastRequest::DecodableType & commandData);
-  
+
 };
 
 
