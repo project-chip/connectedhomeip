@@ -31,15 +31,13 @@ Git:
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="3"/>
-    <attribute side="server" code="0x0000" name="MeasuredValue" define="ILLUM_MEASURED_VALUE" type="int16u" min="0x0000" max="0" isNullable="true" default="0x0000">MeasuredValue</attribute>
-    <attribute side="server" code="0x0001" name="MinMeasuredValue" define="ILLUM_MIN_MEASURED_VALUE" type="int16u" min="0x0001" max="0xFFFD" isNullable="true">MinMeasuredValue</attribute>
-    <attribute side="server" code="0x0002" name="MaxMeasuredValue" define="ILLUM_MAX_MEASURED_VALUE" type="int16u" min="0x0002" isNullable="true">MaxMeasuredValue</attribute>
+    <attribute side="server" code="0x0000" name="MeasuredValue" define="ILLUM_MEASURED_VALUE" type="int16u" min="0x0000" max="0" isNullable="true" default="0x0000"/>
+    <attribute side="server" code="0x0001" name="MinMeasuredValue" define="ILLUM_MIN_MEASURED_VALUE" type="int16u" min="0x0001" max="0xFFFD" isNullable="true"/>
+    <attribute side="server" code="0x0002" name="MaxMeasuredValue" define="ILLUM_MAX_MEASURED_VALUE" type="int16u" min="0x0002" isNullable="true"/>
     <attribute side="server" code="0x0003" name="Tolerance" define="ILLUM_TOLERANCE" type="int16u" max="0x0800" optional="true">
-      <description>Tolerance</description>
       <optionalConform/>
     </attribute>
     <attribute side="server" code="0x0004" name="LightSensorType" define="ILLUM_LIGHT_SENSOR_TYPE" type="LightSensorTypeEnum" min="0x00" max="0x01" isNullable="true" optional="true">
-      <description>LightSensorType</description>
       <optionalConform/>
     </attribute>
   </cluster>
