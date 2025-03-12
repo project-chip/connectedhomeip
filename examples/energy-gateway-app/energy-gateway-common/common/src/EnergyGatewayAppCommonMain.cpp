@@ -28,7 +28,6 @@ using namespace chip::app;
 using namespace chip::app::DataModel;
 using namespace chip::app::Clusters;
 
-
 /*
  *  @brief  Creates a Delegate and Instance for CommodityPrice clusters
  *
@@ -36,9 +35,7 @@ using namespace chip::app::Clusters;
  * create the Delegate first, then wrap it in the Instance
  * Then call the Instance->Init() to register the attribute and command handlers
  */
-void ElectricalPriceApplicationInit()
-{
-}
+void ElectricalPriceApplicationInit() {}
 
 void ElectricalPriceApplicationShutdown()
 {

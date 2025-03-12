@@ -75,7 +75,6 @@ using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
 
-
 #if CONFIG_ENABLE_ESP_INSIGHTS_TRACE
 extern const char insights_auth_key_start[] asm("_binary_insights_auth_key_txt_start");
 extern const char insights_auth_key_end[] asm("_binary_insights_auth_key_txt_end");
@@ -114,7 +113,6 @@ chip::Credentials::DeviceAttestationCredentialsProvider * get_dac_provider(void)
 }
 
 } // namespace
-
 
 void ApplicationInit()
 {

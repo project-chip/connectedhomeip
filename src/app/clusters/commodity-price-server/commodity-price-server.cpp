@@ -105,56 +105,52 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
 
     switch (handlerContext.mRequestPath.mCommandId)
     {
-     case GetDetailedPriceRequest::Id:
-         HandleCommand<GetDetailedPriceRequest::DecodableType>(
-                 handlerContext,
-                 [this](HandlerContext & ctx, const auto & commandData) { HandleGetDetailedPriceRequest(ctx, commandData); });
-         return;
-     case GetDetailedForecastRequest::Id:
-         if (!HasFeature(Feature::kForecasting))
-         {
-             handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::UnsupportedCommand);
-         }
-         else
-         {
-             HandleCommand<GetDetailedForecastRequest::DecodableType>(
-                 handlerContext,
-                 [this](HandlerContext & ctx, const auto & commandData) { HandleGetDetailedForecastRequest(ctx, commandData); });
-         }
-         return;
-     }
- }
-
-
-void Instance::HandleGetDetailedPriceRequest(HandlerContext & ctx, const Commands::GetDetailedPriceRequest::DecodableType & commandData)
-{
-//    bool validArgs = false;
-
-//    map16 details                       = commandData.details;
-
-// TODO finish off
-
-
+    case GetDetailedPriceRequest::Id:
+        HandleCommand<GetDetailedPriceRequest::DecodableType>(
+            handlerContext,
+            [this](HandlerContext & ctx, const auto & commandData) { HandleGetDetailedPriceRequest(ctx, commandData); });
+        return;
+    case GetDetailedForecastRequest::Id:
+        if (!HasFeature(Feature::kForecasting))
+        {
+            handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::UnsupportedCommand);
+        }
+        else
+        {
+            HandleCommand<GetDetailedForecastRequest::DecodableType>(
+                handlerContext,
+                [this](HandlerContext & ctx, const auto & commandData) { HandleGetDetailedForecastRequest(ctx, commandData); });
+        }
+        return;
+    }
 }
 
- void Instance::HandleGetDetailedForecastRequest(HandlerContext & ctx,
-                                               const Commands::GetDetailedForecastRequest::DecodableType & commandData)
- {
-     if (!HasFeature(Feature::kForecasting))
-     {
-         ChipLogError(Zcl, "GetDetailedForecastRequest not supported");
-         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
-         return;
-     }
+void Instance::HandleGetDetailedPriceRequest(HandlerContext & ctx,
+                                             const Commands::GetDetailedPriceRequest::DecodableType & commandData)
+{
+    //    bool validArgs = false;
 
-     // TODO finish off
+    //    map16 details                       = commandData.details;
 
- }
+    // TODO finish off
+}
 
+void Instance::HandleGetDetailedForecastRequest(HandlerContext & ctx,
+                                                const Commands::GetDetailedForecastRequest::DecodableType & commandData)
+{
+    if (!HasFeature(Feature::kForecasting))
+    {
+        ChipLogError(Zcl, "GetDetailedForecastRequest not supported");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
+        return;
+    }
 
- } // namespace CommodityPrice
- } // namespace Clusters
- } // namespace app
- } // namespace chip
+    // TODO finish off
+}
 
- void MatterCommodityPricePluginServerInitCallback() {}
+} // namespace CommodityPrice
+} // namespace Clusters
+} // namespace app
+} // namespace chip
+
+void MatterCommodityPricePluginServerInitCallback() {}

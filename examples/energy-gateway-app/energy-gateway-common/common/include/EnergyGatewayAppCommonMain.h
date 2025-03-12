@@ -18,6 +18,5 @@
 
 #pragma once
 
-
 void ElectricalPriceApplicationInit();
 void ElectricalPriceApplicationShutdown();

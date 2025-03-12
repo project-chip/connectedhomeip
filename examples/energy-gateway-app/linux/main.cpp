@@ -37,7 +37,6 @@ void ApplicationShutdown()
     ChipLogDetail(AppServer, "Energy Gateway App: ApplicationShutdown()");
 
     ElectricalPriceApplicationShutdown();
-
 }
 
 int main(int argc, char * argv[])
