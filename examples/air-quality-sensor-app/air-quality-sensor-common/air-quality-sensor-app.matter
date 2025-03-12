@@ -2698,6 +2698,7 @@ endpoint 1 {
     callback attribute measuredValue;
     callback attribute minMeasuredValue;
     callback attribute maxMeasuredValue;
+    callback attribute measurementMedium;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -2709,6 +2710,7 @@ endpoint 1 {
     callback attribute measuredValue;
     callback attribute minMeasuredValue;
     callback attribute maxMeasuredValue;
+    callback attribute measurementMedium;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -2720,6 +2722,7 @@ endpoint 1 {
     callback attribute measuredValue;
     callback attribute minMeasuredValue;
     callback attribute maxMeasuredValue;
+    callback attribute measurementMedium;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -2731,6 +2734,7 @@ endpoint 1 {
     callback attribute measuredValue;
     callback attribute minMeasuredValue;
     callback attribute maxMeasuredValue;
+    callback attribute measurementMedium;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -2742,6 +2746,7 @@ endpoint 1 {
     callback attribute measuredValue;
     callback attribute minMeasuredValue;
     callback attribute maxMeasuredValue;
+    callback attribute measurementMedium;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -2753,6 +2758,7 @@ endpoint 1 {
     callback attribute measuredValue;
     callback attribute minMeasuredValue;
     callback attribute maxMeasuredValue;
+    callback attribute measurementMedium;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -2764,6 +2770,7 @@ endpoint 1 {
     callback attribute measuredValue;
     callback attribute minMeasuredValue;
     callback attribute maxMeasuredValue;
+    callback attribute measurementMedium;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -2775,6 +2782,7 @@ endpoint 1 {
     callback attribute measuredValue;
     callback attribute minMeasuredValue;
     callback attribute maxMeasuredValue;
+    callback attribute measurementMedium;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -2786,6 +2794,7 @@ endpoint 1 {
     callback attribute measuredValue;
     callback attribute minMeasuredValue;
     callback attribute maxMeasuredValue;
+    callback attribute measurementMedium;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -2797,6 +2806,7 @@ endpoint 1 {
     callback attribute measuredValue;
     callback attribute minMeasuredValue;
     callback attribute maxMeasuredValue;
+    callback attribute measurementMedium;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
