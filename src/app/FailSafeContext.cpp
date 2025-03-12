@@ -82,7 +82,7 @@ void FailSafeContext::CheckAddNOCStartedMarker()
         }
 
         // Found a marker! We need to trigger a cleanup.
-        ChipLogError(FailSafe, "Found a Fail-Safe marker for index 0x%x, preparing cleanup!",
+        ChipLogError(FailSafe, "Found a AddNOCStartedMarker for index 0x%x, preparing cleanup!",
                      static_cast<unsigned>(marker.fabricIndex));
 
         // Fake arm Fail-Safe and trigger timer expiry.
@@ -96,7 +96,7 @@ void FailSafeContext::CheckAddNOCStartedMarker()
     else if (err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
         // Got an error, but somehow value is not missing altogether: inconsistent state but touch nothing.
-        ChipLogError(FailSafe, "Error loading Fail-Safe marker: %" CHIP_ERROR_FORMAT ", hope for the best!", err.Format());
+        ChipLogError(FailSafe, "Error loading AddNOCStartedMarker: %" CHIP_ERROR_FORMAT ", hope for the best!", err.Format());
     }
 }
 
