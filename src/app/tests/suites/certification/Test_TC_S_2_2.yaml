@@ -1127,7 +1127,7 @@ tests:
           should fail and return a status of 0x85 (INVALID_COMMAND)."
       ## TODO: Change test to test for an existing bu non scenable attribute ID once scenability check is possible, see issue: https://github.com/project-chip/connectedhomeip/issues/24177
       verification: |
-          ./chip-tool scenesmanagement add-scene 0x0001 0x01 1000 "scene name" '[{"clusterID": "0x006", "attributeValueList":[{"attributeID": "0x4001", "attributeValue": "0x01"}]}]' 1 1
+          ./chip-tool scenesmanagement add-scene 0x0001 0x01 1000 "scene name" '[{"clusterID": "0x0300", "attributeValueList":[{"attributeID": "0x4011", "valueUnsigned16": "0x01"}]}]' 1 1
 
           Verify DUT sends a AddSceneResponse command to TH with the Status field set to 0x85 (INVALID_COMMAND), the GroupID field set to G1 and the SceneID field set to 0x01 on the TH(Chip-tool)
           Log and below is the sample log provided for the raspi platform:

@@ -5667,7 +5667,7 @@ static BOOL AttributeIsSpecifiedInCameraAVStreamManagementCluster(AttributeId aA
     case Attributes::HDRModeEnabled::Id: {
         return YES;
     }
-    case Attributes::FabricsUsingCamera::Id: {
+    case Attributes::SupportedStreamUsages::Id: {
         return YES;
     }
     case Attributes::AllocatedVideoStreams::Id: {
@@ -5913,7 +5913,7 @@ static BOOL AttributeIsSpecifiedInChimeCluster(AttributeId aAttributeId)
     case Attributes::InstalledChimeSounds::Id: {
         return YES;
     }
-    case Attributes::ActiveChimeID::Id: {
+    case Attributes::SelectedChime::Id: {
         return YES;
     }
     case Attributes::Enabled::Id: {
@@ -6003,13 +6003,43 @@ static BOOL AttributeIsSpecifiedInTLSCertificateManagementCluster(AttributeId aA
     case Attributes::MaxRootCertificates::Id: {
         return YES;
     }
-    case Attributes::CurrentRootCertificates::Id: {
+    case Attributes::ProvisionedRootCertificates::Id: {
         return YES;
     }
     case Attributes::MaxClientCertificates::Id: {
         return YES;
     }
-    case Attributes::CurrentClientCertificates::Id: {
+    case Attributes::ProvisionedClientCertificates::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInTLSClientManagementCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::TlsClientManagement;
+    switch (aAttributeId) {
+    case Attributes::MaxProvisioned::Id: {
+        return YES;
+    }
+    case Attributes::ProvisionedEndpoints::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -6728,6 +6758,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::TlsCertificateManagement::Id: {
         return AttributeIsSpecifiedInTLSCertificateManagementCluster(aAttributeId);
+    }
+    case Clusters::TlsClientManagement::Id: {
+        return AttributeIsSpecifiedInTLSClientManagementCluster(aAttributeId);
     }
     case Clusters::UnitTesting::Id: {
         return AttributeIsSpecifiedInUnitTestingCluster(aAttributeId);

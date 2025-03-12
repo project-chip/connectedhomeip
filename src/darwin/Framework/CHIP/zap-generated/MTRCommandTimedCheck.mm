@@ -1223,6 +1223,15 @@ static BOOL CommandNeedsTimedInvokeInTLSCertificateManagementCluster(AttributeId
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInTLSClientManagementCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::TlsClientManagement;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInUnitTestingCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::UnitTesting;
@@ -1625,6 +1634,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::TlsCertificateManagement::Id: {
         return CommandNeedsTimedInvokeInTLSCertificateManagementCluster(commandID);
+    }
+    case Clusters::TlsClientManagement::Id: {
+        return CommandNeedsTimedInvokeInTLSClientManagementCluster(commandID);
     }
     case Clusters::UnitTesting::Id: {
         return CommandNeedsTimedInvokeInUnitTestingCluster(commandID);

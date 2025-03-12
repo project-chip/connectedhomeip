@@ -421,10 +421,10 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::ThreeLevelAuto
     using EnumType = Globals::ThreeLevelAutoEnum;
     switch (val)
     {
+    case EnumType::kAuto:
     case EnumType::kLow:
     case EnumType::kMedium:
     case EnumType::kHigh:
-    case EnumType::kAutomatic:
         return val;
     default:
         return EnumType::kUnknownEnumValue;
@@ -3922,6 +3922,19 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(PushAvStreamTransport::
     case EnumType::kUserInitiated:
     case EnumType::kAutomation:
     case EnumType::kEmergency:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(TlsClientManagement::TLSEndpointStatusEnum val)
+{
+    using EnumType = TlsClientManagement::TLSEndpointStatusEnum;
+    switch (val)
+    {
+    case EnumType::kProvisioned:
+    case EnumType::kInUse:
         return val;
     default:
         return EnumType::kUnknownEnumValue;
