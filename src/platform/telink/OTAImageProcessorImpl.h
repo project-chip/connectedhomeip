@@ -54,7 +54,7 @@ private:
     // Define non-volatile storage keys for DownloadedBytes and ImageDigest.
     static constexpr char kDownloadedBytes[] = "DownloadedBytes";
     static constexpr char kImageDigest[]     = "ImageDigest";
-    uint64_t downloadedBytesRestored = 0;
+    uint64_t downloadedBytesRestored         = 0;
 };
 
 } // namespace DeviceLayer

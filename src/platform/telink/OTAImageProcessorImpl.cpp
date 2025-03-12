@@ -56,7 +56,7 @@ CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 
     return DeviceLayer::SystemLayer().ScheduleLambda([this] { mDownloader->OnPreparedForDownload(PrepareDownloadImpl()); });
 }
-    const struct device * flash_dev;
+const struct device * flash_dev;
 
 CHIP_ERROR OTAImageProcessorImpl::InitFlashStream(size_t offset)
 {
@@ -201,7 +201,7 @@ CHIP_ERROR OTAImageProcessorImpl::ConfirmCurrentImage()
 
 CHIP_ERROR OTAImageProcessorImpl::RestoreBytes(ByteSpan & aBlock)
 {
-    uint8_t *ImageDigestBuffer = new uint8_t[aBlock.size()];
+    uint8_t * ImageDigestBuffer = new uint8_t[aBlock.size()];
     MutableByteSpan mImageDigest(ImageDigestBuffer, aBlock.size());
 
     if (KeyValueStoreMgr().Get(kImageDigest, mImageDigest.data(), mImageDigest.size()) == CHIP_NO_ERROR &&
@@ -213,8 +213,8 @@ CHIP_ERROR OTAImageProcessorImpl::RestoreBytes(ByteSpan & aBlock)
         ChipLogDetail(SoftwareUpdate, "Restored %u/%u bytes", static_cast<unsigned>(downloadedBytesRestored),
                       static_cast<unsigned>(mParams.totalFileBytes))
 
-        // Reinit Flash Stream with offset
-        ReturnErrorOnFailure(System::MapErrorZephyr(stream_flash_buffered_write(&stream, NULL, 0, true)));
+            // Reinit Flash Stream with offset
+            ReturnErrorOnFailure(System::MapErrorZephyr(stream_flash_buffered_write(&stream, NULL, 0, true)));
         ReturnErrorOnFailure(InitFlashStream(downloadedBytesRestored));
     }
     else
