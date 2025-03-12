@@ -45,7 +45,7 @@ public:
     // ------------------------------------------------------------------
     // Get attribute methods
     virtual Globals::TariffUnitEnum GetTariffUnit()         = 0;
-    virtual Currency GetCurrency()         = 0;
+    virtual Globals::Structs::CurrencyStruct::Type GetCurrency()         = 0;
     virtual const DataModel::Nullable<Structs::CommodityPriceStruct::Type> &  GetCurrentPrice()       = 0;
     virtual int64_t GetPriceForecast()         = 0; 
     // TODO GetPriceForecast returns a List of CommodityPriceStruct with simple details, unlike the command which can ask for specific details.
