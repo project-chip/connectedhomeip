@@ -100,7 +100,7 @@ class TC_CNET_4_13(MatterBaseTest):
             TestStep(13, 'TH reads Networks attribute list from the DUT'),
             TestStep(14, '''TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 0'''),
             TestStep(15, '''TH reads Networks attribute list from the DUT'''),
-            TestStep(16, '''TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 900''')
+            TestStep(16, '''TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 900'''),
         ]
         return steps
 
