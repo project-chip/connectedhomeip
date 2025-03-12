@@ -36,13 +36,13 @@
 # === END CI TEST ARGUMENTS ===""
 
 
-import chip.clusters as Clusters
-
-from chip.interaction_model import Status
-from chip.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body, default_matter_test_main)
-from chip.testing import matter_asserts
-from mobly import asserts
 import logging
+
+import chip.clusters as Clusters
+from chip.interaction_model import Status
+from chip.testing import matter_asserts
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from mobly import asserts
 
 
 class TC_LTIME_3_1(MatterBaseTest):
@@ -114,8 +114,6 @@ class TC_LTIME_3_1(MatterBaseTest):
         asserts.assert_in(hour_format, hour_format_values)
 
         self.step(2)
-
-        ltime12hrguard = self.pics_guard(self.check_pics("LTIME.S.M.12HR"))
         if self.pics_guard(self.check_pics("LTIME.S.M.12HR")):
             await self.write_single_attribute(self.cluster.Attributes.HourFormat(0), self.endpoint, expect_success=True)
 
