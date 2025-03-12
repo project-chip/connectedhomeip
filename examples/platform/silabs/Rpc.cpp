@@ -117,7 +117,7 @@ private:
     osTimer_t mRebootTimerBuffer;
     osTimerAttr_t mRebootTimerAttr = { .name = "Reboot", .cb_mem = &mRebootTimerBuffer, .cb_size = osTimerCbSize };
 
-    static void RebootHandler(void * timerCbArg) { NVIC_SystemReset(); }
+    static void RebootHandler(void * timerCbArg) { Silabs::GetPlatform().SoftwareReset(); }
 };
 #endif // defined(PW_RPC_DEVICE_SERVICE) && PW_RPC_DEVICE_SERVICE
 
@@ -225,6 +225,5 @@ void Init()
     // Start App task.
     sRpcTaskHandle = osThreadNew(RunRpcService, nullptr, &kRpcTaskAttr);
 }
-
 } // namespace rpc
 } // namespace chip
