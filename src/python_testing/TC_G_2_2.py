@@ -256,7 +256,7 @@ class TC_G_2_2(MatterBaseTest):
             asserts.assert_equal(result.status, Status.ConstraintError,
                                  "Unexpected error status must be CONSTRAINT_ERROR as the groupName is of length > 16")
         except Exception as e:
-            logging.exception('Error while adding groupName')
+            logging.exception('Error while adding groupName: %s', e)
 
         self.step("24")
         groupTableList: List[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute(
