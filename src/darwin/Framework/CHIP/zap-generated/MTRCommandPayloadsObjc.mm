@@ -22295,7 +22295,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _tag = nil;
+        _position = nil;
 
         _latch = nil;
 
@@ -22310,7 +22310,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRClosureControlClusterMoveToParams alloc] init];
 
-    other.tag = self.tag;
+    other.position = self.position;
     other.latch = self.latch;
     other.speed = self.speed;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
@@ -22321,7 +22321,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: tag:%@; latch:%@; speed:%@; >", NSStringFromClass([self class]), _tag, _latch, _speed];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: position:%@; latch:%@; speed:%@; >", NSStringFromClass([self class]), _position, _latch, _speed];
     return descriptionString;
 }
 
@@ -22334,9 +22334,9 @@ NS_ASSUME_NONNULL_BEGIN
     chip::app::Clusters::ClosureControl::Commands::MoveTo::Type encodableStruct;
     ListFreer listFreer;
     {
-        if (self.tag != nil) {
-            auto & definedValue_0 = encodableStruct.tag.Emplace();
-            definedValue_0 = static_cast<std::remove_reference_t<decltype(definedValue_0)>>(self.tag.unsignedCharValue);
+        if (self.position != nil) {
+            auto & definedValue_0 = encodableStruct.position.Emplace();
+            definedValue_0 = static_cast<std::remove_reference_t<decltype(definedValue_0)>>(self.position.unsignedCharValue);
         }
     }
     {
