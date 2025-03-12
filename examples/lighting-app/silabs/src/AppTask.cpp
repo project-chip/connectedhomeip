@@ -21,8 +21,10 @@
 #include "AppConfig.h"
 #include "AppEvent.h"
 
+#include "ColorFormat.h"
 #include "LEDWidget.h"
 
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/on-off-server/on-off-server.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
@@ -54,7 +56,7 @@ using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Silabs;
 
 namespace {
-LEDWidget sLightLED;
+RGBLEDWidget sLightLED;
 }
 
 using namespace chip::TLV;
@@ -175,6 +177,55 @@ void AppTask::LightActionEventHandler(AppEvent * aEvent)
     }
 }
 
+#if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
+void AppTask::LightControlEventHandler(AppEvent * aEvent)
+{
+    uint8_t light_action = aEvent->LightControlEvent.Action;
+    // uint8_t value        = *reinterpret_cast<uint8_t *>(aEvent->LightControlEvent.Value);
+    // ChipLogProgress(Zcl, "Address of aEvent  %p", aEvent->LightControlEvent.Value);
+    ChipLogProgress(Zcl, "Value = %u", aEvent->LightControlEvent.Value);
+
+    PlatformMgr().LockChipStack();
+    Protocols::InteractionModel::Status status;
+    app::DataModel::Nullable<uint8_t> currentlevel;
+    // Read currentlevel value
+    status = Clusters::LevelControl::Attributes::CurrentLevel::Get(1, currentlevel);
+    PlatformMgr().UnlockChipStack();
+    if (status == Protocols::InteractionModel::Status::Success && !currentlevel.IsNull())
+    {
+        sLightLED.SetLevel(currentlevel.Value());
+    }
+    switch (light_action)
+    {
+    case LightingManager::COLOR_ACTION_XY: {
+        // XyColor_t xy = reinterpret_cast<XyColor_t>(value);
+        XyColor_t xy = *reinterpret_cast<XyColor_t *>(aEvent->LightControlEvent.Value);
+        sLightLED.SetColorFromXY(xy.x, xy.y);
+    }
+    break;
+    case LightingManager::COLOR_ACTION_HSV: {
+        // HsvColor_t hsv = reinterpret_cast<HsvColor_t>(value);
+        ChipLogProgress(Zcl, "HSV color action ");
+        // ChipLogProgress(Zcl, "Value = %u", *reinterpret_cast<uint8_t *>(&aEvent->LightControlEvent.Value));
+        //    / ChipLogProgress(Zcl, "Value ******** = %u", *reinterpret_cast<uint8_t *>(aEvent->LightControlEvent.Value));
+        HsvColor_t hsv = *reinterpret_cast<HsvColor_t *>(&aEvent->LightControlEvent.Value);
+        ChipLogProgress(Zcl, "New HSV color: %u|%u", hsv.h, hsv.s);
+        sLightLED.SetColorFromHSV(hsv.h, hsv.s);
+    }
+    break;
+    case LightingManager::COLOR_ACTION_CT: {
+        CtColor_t ct;
+        ct.ctMireds = *reinterpret_cast<uint16_t *>(aEvent->LightControlEvent.Value);
+        sLightLED.SetColorFromCT(ct);
+    }
+    break;
+    default:
+        ChipLogProgress(NotSpecified, "LightMgr:Unknown");
+        break;
+    }
+}
+#endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED)
+
 void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
 {
     AppEvent button_event           = {};
@@ -239,6 +290,21 @@ void AppTask::PostLightActionRequest(int32_t aActor, LightingManager::Action_t a
     event.Handler           = LightActionEventHandler;
     PostEvent(&event);
 }
+#if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
+void AppTask::PostLightControlActionRequest(int32_t aActor, LightingManager::Action_t aAction, uint16_t aValue)
+{
+    AppEvent light_event                 = {};
+    light_event.Type                     = AppEvent::kEventType_Light;
+    light_event.LightControlEvent.Actor  = aActor;
+    light_event.LightControlEvent.Action = aAction;
+    light_event.LightControlEvent.Value  = aValue;
+    light_event.Handler                  = LightControlEventHandler;
+    ChipLogProgress(Zcl, "Value in Post event ********** = %u", aValue);
+    ChipLogProgress(Zcl, "Value in Post event = %u", light_event.LightControlEvent.Value);
+    //   ChipLogProgress(Zcl, "Address of light_event  %d", &light_event.LightControlEvent.Value);
+    PostEvent(&light_event);
+}
+#endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED)
 
 void AppTask::UpdateClusterState(intptr_t context)
 {
