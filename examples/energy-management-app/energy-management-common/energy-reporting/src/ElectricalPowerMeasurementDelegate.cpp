@@ -146,14 +146,15 @@ static const Globals::Structs::MeasurementAccuracyStruct::Type kMeasurementAccur
         .measured         = true,
         .minMeasuredValue = -50'000'000, // -50 kW
         .maxMeasuredValue = 50'000'000,  //  50 kW
-        .accuracyRanges   = DataModel::List<const Globals::Structs::MeasurementAccuracyRangeStruct::Type>(activePowerAccuracyRanges),
+        .accuracyRanges = DataModel::List<const Globals::Structs::MeasurementAccuracyRangeStruct::Type>(activePowerAccuracyRanges),
     },
     {
         .measurementType  = Globals::MeasurementTypeEnum::kActiveCurrent,
         .measured         = true,
         .minMeasuredValue = -100'000, // -100A
         .maxMeasuredValue = 100'000,  //  100A
-        .accuracyRanges   = DataModel::List<const Globals::Structs::MeasurementAccuracyRangeStruct::Type>(activeCurrentAccuracyRanges),
+        .accuracyRanges =
+            DataModel::List<const Globals::Structs::MeasurementAccuracyRangeStruct::Type>(activeCurrentAccuracyRanges),
     },
     {
         .measurementType  = Globals::MeasurementTypeEnum::kVoltage,

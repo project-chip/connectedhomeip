@@ -326,8 +326,7 @@ void emberAfElectricalEnergyMeasurementClusterInitCallback(chip::EndpointId endp
         .measured         = true,
         .minMeasuredValue = 0,
         .maxMeasuredValue = 1'000'000'000'000'000, // 1 million Mwh
-        .accuracyRanges =
-            DataModel::List<const Globals::Structs::MeasurementAccuracyRangeStruct::Type>(energyAccuracyRanges)
+        .accuracyRanges   = DataModel::List<const Globals::Structs::MeasurementAccuracyRangeStruct::Type>(energyAccuracyRanges)
     };
 
     // Example of setting CumulativeEnergyReset structure - for now set these to 0
