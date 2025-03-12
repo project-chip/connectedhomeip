@@ -40,6 +40,7 @@ import chip.clusters as Clusters
 
 from chip.interaction_model import Status
 from chip.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body, default_matter_test_main)
+from chip.testing import matter_asserts
 from mobly import asserts
 import logging
 
@@ -92,44 +93,48 @@ class TC_LTIME_3_1(MatterBaseTest):
         calendar_type_values = [i for i in range(0, 12)]
         calendar_type_values.append(255)
 
-        # Read PIXIT values
-
-        pixit_SCT = self.user_params['PIXIT.LTIME.SCT']
-        logging.info(f"PIXIT SCT: {pixit_SCT}")
+        # Read PIXIT values --string-arg
+        pixit_SCT = self.user_params.get('PIXIT.LTIME.SCT')
         if pixit_SCT is not None:
-            pixit_SCT = pixit_SCT.split(",")
+            pixit_SCT = [int(i) for i in pixit_SCT.split(",")]
             logging.info(f"List of PIXIT.SCT {pixit_SCT}")
+        else:
+            logging.info("PIXIT.LTIME.SCT not found, creating range from 1 to 11")
+            pixit_SCT = [i for i in range(1, 12)]
 
         self.step(0)
 
         self.step(1)
         hour_format = await self.read_single_attribute_check_success(self.cluster, self.cluster.Attributes.HourFormat)
         logging.info(f"Hourformat {type(hour_format)} with value {hour_format}")
+        # Validate Enum8
+        matter_asserts.assert_valid_uint8(hour_format, description="Hourformat")
         asserts.assert_true(isinstance(hour_format, self.cluster.Enums.HourFormatEnum), "Hourformat is not type of HourFormatEnum")
-        # Is in range of 0-11,255
+        # Verify the values are 0,1 and 255
         asserts.assert_in(hour_format, hour_format_values)
 
         self.step(2)
-        if self.pics_guard("LTIME.S.M.12Hr"):
-            status = await self.write_single_attribute(self.cluster.Attributes.HourFormat(self.cluster.Enums.HourFormatEnum.k12hr), self.endpoint, expect_success=True)
-            logging.info(f"Write status {status}")
+
+        ltime12hrguard = self.pics_guard(self.check_pics("LTIME.S.M.12HR"))
+        if self.pics_guard(self.check_pics("LTIME.S.M.12HR")):
+            await self.write_single_attribute(self.cluster.Attributes.HourFormat(0), self.endpoint, expect_success=True)
 
         self.step(3)
-        hour_format = await self.read_single_attribute_check_success(self.cluster, self.cluster.Attributes.HourFormat)
-        asserts.assert_equal(hour_format, 0)
-
-        await self.write_single_attribute(Clusters.NetworkCommissioning.Attributes.MaxNetworks(2), endpoint_id=0, expect_success=True)
+        if self.pics_guard(self.check_pics("LTIME.S.M.12HR")):
+            hour_format = await self.read_single_attribute_check_success(self.cluster, self.cluster.Attributes.HourFormat)
+            asserts.assert_equal(hour_format, 0)
 
         self.step(4)
-        if self.pics_guard("LTIME.S.M.24Hr"):
-            status = await self.write_single_attribute(self.cluster.Attributes.HourFormat(self.cluster.Enums.HourFormatEnum.k24hr), self.endpoint, expect_success=True)
+        if self.pics_guard(self.check_pics("LTIME.S.M.24HR")):
+            await self.write_single_attribute(self.cluster.Attributes.HourFormat(1), self.endpoint, expect_success=True)
 
         self.step(5)
-        hour_format = await self.read_single_attribute_check_success(self.cluster, self.cluster.Attributes.HourFormat)
-        asserts.assert_equal(hour_format, 1)
+        if self.pics_guard(self.check_pics("LTIME.S.M.24HR")):
+            hour_format = await self.read_single_attribute_check_success(self.cluster, self.cluster.Attributes.HourFormat)
+            asserts.assert_equal(hour_format, 1)
 
         self.step(6)
-        status = await self.write_single_attribute(self.cluster.Attributes.HourFormat(self.cluster.Enums.HourFormatEnum.kUseActiveLocale), self.endpoint, expect_success=True)
+        await self.write_single_attribute(self.cluster.Attributes.HourFormat(255), self.endpoint, expect_success=True)
 
         self.step(7)
         hour_format = await self.read_single_attribute_check_success(self.cluster, self.cluster.Attributes.HourFormat)
@@ -137,11 +142,13 @@ class TC_LTIME_3_1(MatterBaseTest):
 
         self.step(8)
         activecalendartype_value = await self.read_single_attribute_check_success(self.cluster, self.cluster.Attributes.ActiveCalendarType)
+        logging.info(f"Value for {activecalendartype_value}")
         asserts.assert_true(isinstance(activecalendartype_value, self.cluster.Enums.CalendarTypeEnum),
                             "Activecalendartype  is not type of CalendarTypeEnum")
+        # Validate Enum8 range
+        matter_asserts.assert_valid_uint8(activecalendartype_value, "ActiveCalendarType")
         # Is in range of 0-11,255
         asserts.assert_in(activecalendartype_value, calendar_type_values)
-        # check values in the range
 
         self.step(9)
         await self.write_single_attribute(self.cluster.Attributes.ActiveCalendarType(0), self.endpoint, expect_success=True)
@@ -149,13 +156,16 @@ class TC_LTIME_3_1(MatterBaseTest):
         asserts.assert_equal(activecalendartype_value, 0)
 
         self.step(10)
-        for i in range(1, 12):
+        # These values are from
+        logging.info(f"PIXIT.LTIME.SCT values {pixit_SCT}")
+        for i in pixit_SCT:
             await self.write_single_attribute(self.cluster.Attributes.ActiveCalendarType(i), self.endpoint, expect_success=True)
             activecalendartype_value = await self.read_single_attribute_check_success(self.cluster, self.cluster.Attributes.ActiveCalendarType)
             asserts.assert_equal(activecalendartype_value, i)
 
         self.step(11)
         supportedcalendartype_values = await self.read_single_attribute_check_success(self.cluster, self.cluster.Attributes.SupportedCalendarTypes)
+        # Validate Enum8
         logging.info(f"Supported calendar type value {supportedcalendartype_values}")
         for calendartype in supportedcalendartype_values:
             asserts.assert_in(calendartype, calendar_type_values)
