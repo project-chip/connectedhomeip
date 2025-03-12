@@ -42,6 +42,29 @@ class MCConnectionExampleViewModel: ObservableObject {
 
     @Published var errorCodeDescription: String?
 
+    func cancelConnectionAttempt(selectedCastingPlayer: MCCastingPlayer?) {
+        DispatchQueue.main.async {
+            // Only stop connection if we are pending passcode confirmation
+            var connectionState = MC_CASTING_PLAYER_NOT_CONNECTED;
+            let err = selectedCastingPlayer?.getConnectionState(&connectionState)
+            if err != nil {
+                self.Log.error("MCConnectionExampleViewModel cancelConnect() MCCastingPlayer.getConnectionState() failed due to: \(err)")
+            }
+
+            if connectionState == MC_CASTING_PLAYER_CONNECTING {
+                self.Log.info("MCConnectionExampleViewModel cancelConnect(). User navigating back from ConnectionView")
+                let err = selectedCastingPlayer?.stopConnecting()
+                if err == nil {
+                    self.connectionStatus = "User cancelled the connection attempt with CastingPlayer.stopConnecting()."
+                    self.Log.info("MCConnectionExampleViewModel cancelConnect() MCCastingPlayer.stopConnecting() succeeded.")
+                } else {
+                    self.connectionStatus = "Cancel connection failed due to: \(String(describing: err))."
+                    self.Log.error("MCConnectionExampleViewModel cancelConnect() MCCastingPlayer.stopConnecting() failed due to: \(err)")
+                }
+            }
+        }
+    }
+
     func connect(selectedCastingPlayer: MCCastingPlayer?, useCommissionerGeneratedPasscode: Bool) {
         self.Log.info("MCConnectionExampleViewModel.connect() useCommissionerGeneratedPasscode: \(String(describing: useCommissionerGeneratedPasscode))")
 
@@ -108,17 +131,9 @@ class MCConnectionExampleViewModel: ObservableObject {
                                 dataSource.update(newCommissionableData)
                                 self.Log.info("MCConnectionExampleViewModel connect() commissionerDeclarationCallback, Updated MCAppParametersDataSource instance with new MCCommissionableData.")
                             } else {
-                                self.Log.error("MCConnectionExampleViewModel connect() commissionerDeclarationCallback, InitializationExample.getAppParametersDataSource() failed, calling stopConnecting()")
-                                self.connectionStatus = "Failed to update the MCAppParametersDataSource with the user entered passcode: \n\nRoute back and try again."
+                                self.Log.error("MCConnectionExampleViewModel connect() commissionerDeclarationCallback, InitializationExample.getAppParametersDataSource() failed")
+                                self.connectionStatus = "Failed to update the MCAppParametersDataSource with the user entered passcode: \n\nRoute back to disconnect and try again."
                                 self.connectionSuccess = false
-                                // Since we failed to update the passcode, Attempt to cancel the connection attempt with
-                                // the CastingPlayer/Commissioner.
-                                let err = selectedCastingPlayer?.stopConnecting()
-                                if err == nil {
-                                    self.Log.info("MCConnectionExampleViewModel connect() commissionerDeclarationCallback, InitializationExample.getAppParametersDataSource() failed, then stopConnecting() succeeded")
-                                } else {
-                                    self.Log.error("MCConnectionExampleViewModel connect() commissionerDeclarationCallback, InitializationExample.getAppParametersDataSource() failed, then stopConnecting() failed due to: \(err)")
-                                }
                                 return
                             }
 
@@ -127,28 +142,13 @@ class MCConnectionExampleViewModel: ObservableObject {
                             if errContinue == nil {
                                 self.connectionStatus = "Continuing to connect with user entered passcode: \(userEnteredPasscode)"
                             } else {
-                                self.connectionStatus = "Continue Connecting to Casting Player failed with: \(String(describing: errContinue)) \n\nRoute back and try again."
+                                self.connectionStatus = "Continue Connecting to Casting Player failed with: \(String(describing: errContinue)) \n\nRoute back to disconnect and try again."
                                 self.Log.error("MCConnectionExampleViewModel connect() commissionerDeclarationCallback, MCCastingPlayer.continueConnecting() failed due to: \(errContinue)")
-                                // Since continueConnecting() failed, Attempt to cancel the connection attempt with
-                                // the CastingPlayer/Commissioner.
-                                let err = selectedCastingPlayer?.stopConnecting()
-                                if err == nil {
-                                    self.Log.info("MCConnectionExampleViewModel connect() commissionerDeclarationCallback, MCCastingPlayer.continueConnecting() failed, then stopConnecting() succeeded")
-                                } else {
-                                    self.Log.error("MCConnectionExampleViewModel connect() commissionerDeclarationCallback, MCCastingPlayer.continueConnecting() failed, then stopConnecting() failed due to: \(err)")
-                                }
                             }
                         }, cancelConnecting: {
-                            self.Log.info("MCConnectionExampleViewModel connect() commissionerDeclarationCallback, Connection attempt cancelled by the user, calling MCCastingPlayer.stopConnecting()")
-                            let err = selectedCastingPlayer?.stopConnecting()
+                            self.Log.info("MCConnectionExampleViewModel connect() commissionerDeclarationCallback, Connection attempt cancelled by the user")
                             self.connectionSuccess = false
-                            if err == nil {
-                                self.connectionStatus = "User cancelled the connection attempt with CastingPlayer. \n\nRoute back to exit."
-                                self.Log.info("MCConnectionExampleViewModel connect() commissionerDeclarationCallback, User cancelled the connection attempt with MCCastingPlayer, MCCastingPlayer.stopConnecting() succeeded.")
-                            } else {
-                                self.connectionStatus = "Cancel connection failed due to: \(String(describing: err)) \n\nRoute back to exit."
-                                self.Log.error("MCConnectionExampleViewModel connect() commissionerDeclarationCallback, MCCastingPlayer.stopConnecting() failed due to: \(err)")
-                            }
+                            self.connectionStatus = "User cancelled the connection attempt with CastingPlayer. \n\nRoute back to disconnect & exit."
                         })
                     }
                 }

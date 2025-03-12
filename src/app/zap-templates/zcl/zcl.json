@@ -126,6 +126,7 @@
         "time-synchronization-cluster.xml",
         "timer-cluster.xml",
         "tls-certificate-management-cluster.xml",
+        "tls-client-management-cluster.xml",
         "user-label-cluster.xml",
         "unit-localization-cluster.xml",
         "valve-configuration-and-control-cluster.xml",
@@ -197,7 +198,7 @@
             "MaxPathsPerInvoke"
         ],
         "Bridged Device Basic Information": ["ProductAppearance"],
-        "Chime": ["ActiveChimeID", "Enabled"],
+        "Chime": ["SelectedChime", "Enabled"],
         "Closure Control": ["OverallState", "OverallTarget"],
         "Commodity Price": ["Currency", "CurrentPrice"],
         "Commodity Tariff": [

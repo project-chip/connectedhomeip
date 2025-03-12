@@ -252,10 +252,10 @@ enum TestGlobalEnum : enum8 {
 }
 
 enum ThreeLevelAutoEnum : enum8 {
-  kLow = 0;
-  kMedium = 1;
-  kHigh = 2;
-  kAutomatic = 3;
+  kAuto = 0;
+  kLow = 1;
+  kMedium = 2;
+  kHigh = 3;
 }
 
 bitmap TestGlobalBitmap : bitmap32 {
@@ -2088,7 +2088,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0x1f;
+    ram      attribute featureMap default = 0x17;
     ram      attribute clusterRevision default = 5;
 
     handle command UpOrOpen;

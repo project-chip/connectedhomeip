@@ -26,6 +26,7 @@ chip_test_suite("tests") {
     "${chip_root}/src/app/common:ids",
     "${chip_root}/src/app/data-model-provider/tests:encode-decode",
     "${chip_root}/src/app/server-cluster",
+    "${chip_root}/src/app/server-cluster/testing",
     "${chip_root}/src/lib/core:string-builder-adapters",
   ]
 }

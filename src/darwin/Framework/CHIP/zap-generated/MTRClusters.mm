@@ -8868,109 +8868,6 @@ using chip::System::Clock::Timeout;
 
 @end
 
-@implementation MTRClusterCommodityPrice
-
-- (void)getDetailedPriceRequestWithParams:(MTRCommodityPriceClusterGetDetailedPriceRequestParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRCommodityPriceClusterGetDetailedPriceResponseParams * _Nullable data, NSError * _Nullable error))completion
-{
-    if (params == nil) {
-        params = [[MTRCommodityPriceClusterGetDetailedPriceRequestParams
-            alloc] init];
-    }
-
-    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
-        completion(response, error);
-    };
-
-    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
-
-    using RequestType = CommodityPrice::Commands::GetDetailedPriceRequest::Type;
-    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
-                                         clusterID:@(RequestType::GetClusterId())
-                                         commandID:@(RequestType::GetCommandId())
-                                    commandPayload:params
-                                    expectedValues:expectedValues
-                             expectedValueInterval:expectedValueIntervalMs
-                                timedInvokeTimeout:timedInvokeTimeoutMs
-                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
-                                     responseClass:MTRCommodityPriceClusterGetDetailedPriceResponseParams.class
-                                             queue:self.callbackQueue
-                                        completion:responseHandler];
-}
-
-- (void)getDetailedForecastRequestWithParams:(MTRCommodityPriceClusterGetDetailedForecastRequestParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRCommodityPriceClusterGetDetailedForecastResponseParams * _Nullable data, NSError * _Nullable error))completion
-{
-    if (params == nil) {
-        params = [[MTRCommodityPriceClusterGetDetailedForecastRequestParams
-            alloc] init];
-    }
-
-    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
-        completion(response, error);
-    };
-
-    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
-
-    using RequestType = CommodityPrice::Commands::GetDetailedForecastRequest::Type;
-    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
-                                         clusterID:@(RequestType::GetClusterId())
-                                         commandID:@(RequestType::GetCommandId())
-                                    commandPayload:params
-                                    expectedValues:expectedValues
-                             expectedValueInterval:expectedValueIntervalMs
-                                timedInvokeTimeout:timedInvokeTimeoutMs
-                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
-                                     responseClass:MTRCommodityPriceClusterGetDetailedForecastResponseParams.class
-                                             queue:self.callbackQueue
-                                        completion:responseHandler];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeTariffUnitWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommodityPriceID) attributeID:@(MTRAttributeIDTypeClusterCommodityPriceAttributeTariffUnitID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeCurrencyWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommodityPriceID) attributeID:@(MTRAttributeIDTypeClusterCommodityPriceAttributeCurrencyID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeCurrentPriceWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommodityPriceID) attributeID:@(MTRAttributeIDTypeClusterCommodityPriceAttributeCurrentPriceID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributePriceForecastWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommodityPriceID) attributeID:@(MTRAttributeIDTypeClusterCommodityPriceAttributePriceForecastID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommodityPriceID) attributeID:@(MTRAttributeIDTypeClusterCommodityPriceAttributeGeneratedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommodityPriceID) attributeID:@(MTRAttributeIDTypeClusterCommodityPriceAttributeAcceptedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommodityPriceID) attributeID:@(MTRAttributeIDTypeClusterCommodityPriceAttributeAttributeListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommodityPriceID) attributeID:@(MTRAttributeIDTypeClusterCommodityPriceAttributeFeatureMapID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommodityPriceID) attributeID:@(MTRAttributeIDTypeClusterCommodityPriceAttributeClusterRevisionID) params:params];
-}
-
-@end
-
 @implementation MTRClusterDemandResponseLoadControl
 
 - (void)registerLoadControlProgramRequestWithParams:(MTRDemandResponseLoadControlClusterRegisterLoadControlProgramRequestParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
@@ -19440,6 +19337,33 @@ using chip::System::Clock::Timeout;
                                         completion:responseHandler];
 }
 
+- (void)snapshotStreamModifyWithParams:(MTRCameraAVStreamManagementClusterSnapshotStreamModifyParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRCameraAVStreamManagementClusterSnapshotStreamModifyParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = CameraAvStreamManagement::Commands::SnapshotStreamModify::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
 - (void)snapshotStreamDeallocateWithParams:(MTRCameraAVStreamManagementClusterSnapshotStreamDeallocateParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
     if (params == nil) {
@@ -19602,9 +19526,9 @@ using chip::System::Clock::Timeout;
     [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCameraAVStreamManagementID) attributeID:@(MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeHDRModeEnabledID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeFabricsUsingCameraWithParams:(MTRReadParams * _Nullable)params
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeSupportedStreamUsagesWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCameraAVStreamManagementID) attributeID:@(MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeFabricsUsingCameraID) params:params];
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCameraAVStreamManagementID) attributeID:@(MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeSupportedStreamUsagesID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAllocatedVideoStreamsWithParams:(MTRReadParams * _Nullable)params
@@ -20781,20 +20705,20 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeChimeID) attributeID:@(MTRAttributeIDTypeClusterChimeAttributeInstalledChimeSoundsID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeActiveChimeIDWithParams:(MTRReadParams * _Nullable)params
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeSelectedChimeWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeChimeID) attributeID:@(MTRAttributeIDTypeClusterChimeAttributeActiveChimeIDID) params:params];
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeChimeID) attributeID:@(MTRAttributeIDTypeClusterChimeAttributeSelectedChimeID) params:params];
 }
 
-- (void)writeAttributeActiveChimeIDWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+- (void)writeAttributeSelectedChimeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
 {
-    [self writeAttributeActiveChimeIDWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+    [self writeAttributeSelectedChimeWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
 }
-- (void)writeAttributeActiveChimeIDWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
+- (void)writeAttributeSelectedChimeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
 {
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
-    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeChimeID) attributeID:@(MTRAttributeIDTypeClusterChimeAttributeActiveChimeIDID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeChimeID) attributeID:@(MTRAttributeIDTypeClusterChimeAttributeSelectedChimeID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeEnabledWithParams:(MTRReadParams * _Nullable)params
@@ -20836,184 +20760,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeChimeID) attributeID:@(MTRAttributeIDTypeClusterChimeAttributeClusterRevisionID) params:params];
-}
-
-@end
-
-@implementation MTRClusterCommodityTariff
-
-- (void)getTariffComponentWithParams:(MTRCommodityTariffClusterGetTariffComponentParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRCommodityTariffClusterGetTariffComponentResponseParams * _Nullable data, NSError * _Nullable error))completion
-{
-    if (params == nil) {
-        params = [[MTRCommodityTariffClusterGetTariffComponentParams
-            alloc] init];
-    }
-
-    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
-        completion(response, error);
-    };
-
-    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
-
-    using RequestType = CommodityTariff::Commands::GetTariffComponent::Type;
-    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
-                                         clusterID:@(RequestType::GetClusterId())
-                                         commandID:@(RequestType::GetCommandId())
-                                    commandPayload:params
-                                    expectedValues:expectedValues
-                             expectedValueInterval:expectedValueIntervalMs
-                                timedInvokeTimeout:timedInvokeTimeoutMs
-                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
-                                     responseClass:MTRCommodityTariffClusterGetTariffComponentResponseParams.class
-                                             queue:self.callbackQueue
-                                        completion:responseHandler];
-}
-
-- (void)getDayEntryWithParams:(MTRCommodityTariffClusterGetDayEntryParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRCommodityTariffClusterGetDayEntryResponseParams * _Nullable data, NSError * _Nullable error))completion
-{
-    if (params == nil) {
-        params = [[MTRCommodityTariffClusterGetDayEntryParams
-            alloc] init];
-    }
-
-    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
-        completion(response, error);
-    };
-
-    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
-
-    using RequestType = CommodityTariff::Commands::GetDayEntry::Type;
-    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
-                                         clusterID:@(RequestType::GetClusterId())
-                                         commandID:@(RequestType::GetCommandId())
-                                    commandPayload:params
-                                    expectedValues:expectedValues
-                             expectedValueInterval:expectedValueIntervalMs
-                                timedInvokeTimeout:timedInvokeTimeoutMs
-                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
-                                     responseClass:MTRCommodityTariffClusterGetDayEntryResponseParams.class
-                                             queue:self.callbackQueue
-                                        completion:responseHandler];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeTariffInfoWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommodityTariffID) attributeID:@(MTRAttributeIDTypeClusterCommodityTariffAttributeTariffInfoID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeTariffUnitWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommodityTariffID) attributeID:@(MTRAttributeIDTypeClusterCommodityTariffAttributeTariffUnitID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeStartDateWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommodityTariffID) attributeID:@(MTRAttributeIDTypeClusterCommodityTariffAttributeStartDateID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeDayEntriesWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommodityTariffID) attributeID:@(MTRAttributeIDTypeClusterCommodityTariffAttributeDayEntriesID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeDayPatternsWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommodityTariffID) attributeID:@(MTRAttributeIDTypeClusterCommodityTariffAttributeDayPatternsID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeCalendarPeriodsWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommodityTariffID) attributeID:@(MTRAttributeIDTypeClusterCommodityTariffAttributeCalendarPeriodsID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeIndividualDaysWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommodityTariffID) attributeID:@(MTRAttributeIDTypeClusterCommodityTariffAttributeIndividualDaysID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeCurrentDayWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommodityTariffID) attributeID:@(MTRAttributeIDTypeClusterCommodityTariffAttributeCurrentDayID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeNextDayWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommodityTariffID) attributeID:@(MTRAttributeIDTypeClusterCommodityTariffAttributeNextDayID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeCurrentDayEntryWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommodityTariffID) attributeID:@(MTRAttributeIDTypeClusterCommodityTariffAttributeCurrentDayEntryID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeCurrentDayEntryDateWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommodityTariffID) attributeID:@(MTRAttributeIDTypeClusterCommodityTariffAttributeCurrentDayEntryDateID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeNextDayEntryWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommodityTariffID) attributeID:@(MTRAttributeIDTypeClusterCommodityTariffAttributeNextDayEntryID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeNextDayEntryDateWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommodityTariffID) attributeID:@(MTRAttributeIDTypeClusterCommodityTariffAttributeNextDayEntryDateID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeTariffComponentsWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommodityTariffID) attributeID:@(MTRAttributeIDTypeClusterCommodityTariffAttributeTariffComponentsID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeTariffPeriodsWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommodityTariffID) attributeID:@(MTRAttributeIDTypeClusterCommodityTariffAttributeTariffPeriodsID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeCurrentTariffComponentsWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommodityTariffID) attributeID:@(MTRAttributeIDTypeClusterCommodityTariffAttributeCurrentTariffComponentsID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeNextTariffComponentsWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommodityTariffID) attributeID:@(MTRAttributeIDTypeClusterCommodityTariffAttributeNextTariffComponentsID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeDefaultRandomizationOffsetWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommodityTariffID) attributeID:@(MTRAttributeIDTypeClusterCommodityTariffAttributeDefaultRandomizationOffsetID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeDefaultRandomizationTypeWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommodityTariffID) attributeID:@(MTRAttributeIDTypeClusterCommodityTariffAttributeDefaultRandomizationTypeID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommodityTariffID) attributeID:@(MTRAttributeIDTypeClusterCommodityTariffAttributeGeneratedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommodityTariffID) attributeID:@(MTRAttributeIDTypeClusterCommodityTariffAttributeAcceptedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommodityTariffID) attributeID:@(MTRAttributeIDTypeClusterCommodityTariffAttributeAttributeListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommodityTariffID) attributeID:@(MTRAttributeIDTypeClusterCommodityTariffAttributeFeatureMapID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommodityTariffID) attributeID:@(MTRAttributeIDTypeClusterCommodityTariffAttributeClusterRevisionID) params:params];
 }
 
 @end
@@ -21282,7 +21028,7 @@ using chip::System::Clock::Timeout;
                                         completion:responseHandler];
 }
 
-- (void)provisionClientCertificateWithParams:(MTRTLSCertificateManagementClusterProvisionClientCertificateParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRTLSCertificateManagementClusterProvisionClientCertificateResponseParams * _Nullable data, NSError * _Nullable error))completion
+- (void)provisionClientCertificateWithParams:(MTRTLSCertificateManagementClusterProvisionClientCertificateParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
     if (params == nil) {
         params = [[MTRTLSCertificateManagementClusterProvisionClientCertificateParams
@@ -21290,7 +21036,7 @@ using chip::System::Clock::Timeout;
     }
 
     auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
-        completion(response, error);
+        completion(error);
     };
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
@@ -21304,7 +21050,7 @@ using chip::System::Clock::Timeout;
                              expectedValueInterval:expectedValueIntervalMs
                                 timedInvokeTimeout:timedInvokeTimeoutMs
                        serverSideProcessingTimeout:params.serverSideProcessingTimeout
-                                     responseClass:MTRTLSCertificateManagementClusterProvisionClientCertificateResponseParams.class
+                                     responseClass:nil
                                              queue:self.callbackQueue
                                         completion:responseHandler];
 }
@@ -21395,9 +21141,9 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeTLSCertificateManagementID) attributeID:@(MTRAttributeIDTypeClusterTLSCertificateManagementAttributeMaxRootCertificatesID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeCurrentRootCertificatesWithParams:(MTRReadParams * _Nullable)params
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeProvisionedRootCertificatesWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeTLSCertificateManagementID) attributeID:@(MTRAttributeIDTypeClusterTLSCertificateManagementAttributeCurrentRootCertificatesID) params:params];
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeTLSCertificateManagementID) attributeID:@(MTRAttributeIDTypeClusterTLSCertificateManagementAttributeProvisionedRootCertificatesID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeMaxClientCertificatesWithParams:(MTRReadParams * _Nullable)params
@@ -21405,9 +21151,9 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeTLSCertificateManagementID) attributeID:@(MTRAttributeIDTypeClusterTLSCertificateManagementAttributeMaxClientCertificatesID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeCurrentClientCertificatesWithParams:(MTRReadParams * _Nullable)params
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeProvisionedClientCertificatesWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeTLSCertificateManagementID) attributeID:@(MTRAttributeIDTypeClusterTLSCertificateManagementAttributeCurrentClientCertificatesID) params:params];
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeTLSCertificateManagementID) attributeID:@(MTRAttributeIDTypeClusterTLSCertificateManagementAttributeProvisionedClientCertificatesID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
@@ -21437,100 +21183,122 @@ using chip::System::Clock::Timeout;
 
 @end
 
-@implementation MTRClusterMeterIdentification
+@implementation MTRClusterTLSClientManagement
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeMeterTypeWithParams:(MTRReadParams * _Nullable)params
+- (void)provisionEndpointWithParams:(MTRTLSClientManagementClusterProvisionEndpointParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRTLSClientManagementClusterProvisionEndpointResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeMeterIdentificationID) attributeID:@(MTRAttributeIDTypeClusterMeterIdentificationAttributeMeterTypeID) params:params];
+    if (params == nil) {
+        params = [[MTRTLSClientManagementClusterProvisionEndpointParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = TlsClientManagement::Commands::ProvisionEndpoint::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRTLSClientManagementClusterProvisionEndpointResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributePointOfDeliveryWithParams:(MTRReadParams * _Nullable)params
+- (void)findEndpointWithParams:(MTRTLSClientManagementClusterFindEndpointParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRTLSClientManagementClusterFindEndpointResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeMeterIdentificationID) attributeID:@(MTRAttributeIDTypeClusterMeterIdentificationAttributePointOfDeliveryID) params:params];
+    if (params == nil) {
+        params = [[MTRTLSClientManagementClusterFindEndpointParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = TlsClientManagement::Commands::FindEndpoint::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRTLSClientManagementClusterFindEndpointResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeMeterSerialNumberWithParams:(MTRReadParams * _Nullable)params
+- (void)removeEndpointWithParams:(MTRTLSClientManagementClusterRemoveEndpointParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeMeterIdentificationID) attributeID:@(MTRAttributeIDTypeClusterMeterIdentificationAttributeMeterSerialNumberID) params:params];
+    if (params == nil) {
+        params = [[MTRTLSClientManagementClusterRemoveEndpointParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = TlsClientManagement::Commands::RemoveEndpoint::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeProtocolVersionWithParams:(MTRReadParams * _Nullable)params
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeMaxProvisionedWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeMeterIdentificationID) attributeID:@(MTRAttributeIDTypeClusterMeterIdentificationAttributeProtocolVersionID) params:params];
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeTLSClientManagementID) attributeID:@(MTRAttributeIDTypeClusterTLSClientManagementAttributeMaxProvisionedID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributePowerThresholdWithParams:(MTRReadParams * _Nullable)params
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeProvisionedEndpointsWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeMeterIdentificationID) attributeID:@(MTRAttributeIDTypeClusterMeterIdentificationAttributePowerThresholdID) params:params];
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeTLSClientManagementID) attributeID:@(MTRAttributeIDTypeClusterTLSClientManagementAttributeProvisionedEndpointsID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeMeterIdentificationID) attributeID:@(MTRAttributeIDTypeClusterMeterIdentificationAttributeGeneratedCommandListID) params:params];
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeTLSClientManagementID) attributeID:@(MTRAttributeIDTypeClusterTLSClientManagementAttributeGeneratedCommandListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeMeterIdentificationID) attributeID:@(MTRAttributeIDTypeClusterMeterIdentificationAttributeAcceptedCommandListID) params:params];
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeTLSClientManagementID) attributeID:@(MTRAttributeIDTypeClusterTLSClientManagementAttributeAcceptedCommandListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeMeterIdentificationID) attributeID:@(MTRAttributeIDTypeClusterMeterIdentificationAttributeAttributeListID) params:params];
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeTLSClientManagementID) attributeID:@(MTRAttributeIDTypeClusterTLSClientManagementAttributeAttributeListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeMeterIdentificationID) attributeID:@(MTRAttributeIDTypeClusterMeterIdentificationAttributeFeatureMapID) params:params];
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeTLSClientManagementID) attributeID:@(MTRAttributeIDTypeClusterTLSClientManagementAttributeFeatureMapID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeMeterIdentificationID) attributeID:@(MTRAttributeIDTypeClusterMeterIdentificationAttributeClusterRevisionID) params:params];
-}
-
-@end
-
-@implementation MTRClusterCommodityMetering
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeMeteredQuantityWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommodityMeteringID) attributeID:@(MTRAttributeIDTypeClusterCommodityMeteringAttributeMeteredQuantityID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeMeteredQuantityTimestampWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommodityMeteringID) attributeID:@(MTRAttributeIDTypeClusterCommodityMeteringAttributeMeteredQuantityTimestampID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeMeasurementTypeWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommodityMeteringID) attributeID:@(MTRAttributeIDTypeClusterCommodityMeteringAttributeMeasurementTypeID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommodityMeteringID) attributeID:@(MTRAttributeIDTypeClusterCommodityMeteringAttributeGeneratedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommodityMeteringID) attributeID:@(MTRAttributeIDTypeClusterCommodityMeteringAttributeAcceptedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommodityMeteringID) attributeID:@(MTRAttributeIDTypeClusterCommodityMeteringAttributeAttributeListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommodityMeteringID) attributeID:@(MTRAttributeIDTypeClusterCommodityMeteringAttributeFeatureMapID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommodityMeteringID) attributeID:@(MTRAttributeIDTypeClusterCommodityMeteringAttributeClusterRevisionID) params:params];
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeTLSClientManagementID) attributeID:@(MTRAttributeIDTypeClusterTLSClientManagementAttributeClusterRevisionID) params:params];
 }
 
 @end

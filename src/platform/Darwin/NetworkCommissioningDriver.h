@@ -48,9 +48,9 @@ public:
     void Release() override { delete this; }
 
 protected:
-    size_t mInterfaceCount        = 0;
-    char mInterfaceName[IFNAMSIZ] = {};
-    bool mInterfaceStatus         = false;
+    size_t mInterfaceCount                                   = 0;
+    char mInterfaceName[Inet::InterfaceId::kMaxIfNameLength] = {};
+    bool mInterfaceStatus                                    = false;
 };
 
 class DarwinEthernetNetworkIterator final : public DarwinNetworkIterator

@@ -146,7 +146,6 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterIDTypeElectricalPowerMeasurementID MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x00000090,
     MTRClusterIDTypeElectricalEnergyMeasurementID MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x00000091,
     MTRClusterIDTypeWaterHeaterManagementID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000094,
-    MTRClusterIDTypeCommodityPriceID MTR_PROVISIONALLY_AVAILABLE = 0x00000095,
     MTRClusterIDTypeDemandResponseLoadControlID MTR_PROVISIONALLY_AVAILABLE = 0x00000096,
     MTRClusterIDTypeMessagesID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000097,
     MTRClusterIDTypeDeviceEnergyManagementID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000098,
@@ -206,12 +205,10 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterIDTypeWebRTCTransportRequestorID MTR_PROVISIONALLY_AVAILABLE = 0x00000554,
     MTRClusterIDTypePushAVStreamTransportID MTR_PROVISIONALLY_AVAILABLE = 0x00000555,
     MTRClusterIDTypeChimeID MTR_PROVISIONALLY_AVAILABLE = 0x00000556,
-    MTRClusterIDTypeCommodityTariffID MTR_PROVISIONALLY_AVAILABLE = 0x00000700,
     MTRClusterIDTypeEcosystemInformationID MTR_PROVISIONALLY_AVAILABLE = 0x00000750,
     MTRClusterIDTypeCommissionerControlID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000751,
     MTRClusterIDTypeTLSCertificateManagementID MTR_PROVISIONALLY_AVAILABLE = 0x00000801,
-    MTRClusterIDTypeMeterIdentificationID MTR_PROVISIONALLY_AVAILABLE = 0x00000B06,
-    MTRClusterIDTypeCommodityMeteringID MTR_PROVISIONALLY_AVAILABLE = 0x00000B07,
+    MTRClusterIDTypeTLSClientManagementID MTR_PROVISIONALLY_AVAILABLE = 0x00000802,
     MTRClusterIDTypeUnitTestingID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0xFFF1FC05,
     MTRClusterIDTypeSampleMEIID MTR_PROVISIONALLY_AVAILABLE = 0xFFF1FC20,
 
@@ -2499,17 +2496,6 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterWaterHeaterManagementAttributeFeatureMapID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
     MTRAttributeIDTypeClusterWaterHeaterManagementAttributeClusterRevisionID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
-    // Cluster CommodityPrice attributes
-    MTRAttributeIDTypeClusterCommodityPriceAttributeTariffUnitID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
-    MTRAttributeIDTypeClusterCommodityPriceAttributeCurrencyID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
-    MTRAttributeIDTypeClusterCommodityPriceAttributeCurrentPriceID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
-    MTRAttributeIDTypeClusterCommodityPriceAttributePriceForecastID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
-    MTRAttributeIDTypeClusterCommodityPriceAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
-    MTRAttributeIDTypeClusterCommodityPriceAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
-    MTRAttributeIDTypeClusterCommodityPriceAttributeAttributeListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
-    MTRAttributeIDTypeClusterCommodityPriceAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
-    MTRAttributeIDTypeClusterCommodityPriceAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
-
     // Cluster DemandResponseLoadControl attributes
     MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeLoadControlProgramsID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
     MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeNumberOfLoadControlProgramsID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
@@ -4677,7 +4663,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeMaxNetworkBandwidthID MTR_PROVISIONALLY_AVAILABLE = 0x0000000B,
     MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeCurrentFrameRateID MTR_PROVISIONALLY_AVAILABLE = 0x0000000C,
     MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeHDRModeEnabledID MTR_PROVISIONALLY_AVAILABLE = 0x0000000D,
-    MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeFabricsUsingCameraID MTR_PROVISIONALLY_AVAILABLE = 0x0000000E,
+    MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeSupportedStreamUsagesID MTR_PROVISIONALLY_AVAILABLE = 0x0000000E,
     MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeAllocatedVideoStreamsID MTR_PROVISIONALLY_AVAILABLE = 0x0000000F,
     MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeAllocatedAudioStreamsID MTR_PROVISIONALLY_AVAILABLE = 0x00000010,
     MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeAllocatedSnapshotStreamsID MTR_PROVISIONALLY_AVAILABLE = 0x00000011,
@@ -4754,39 +4740,13 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
 
     // Cluster Chime attributes
     MTRAttributeIDTypeClusterChimeAttributeInstalledChimeSoundsID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
-    MTRAttributeIDTypeClusterChimeAttributeActiveChimeIDID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterChimeAttributeSelectedChimeID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
     MTRAttributeIDTypeClusterChimeAttributeEnabledID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
     MTRAttributeIDTypeClusterChimeAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
     MTRAttributeIDTypeClusterChimeAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
     MTRAttributeIDTypeClusterChimeAttributeAttributeListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
     MTRAttributeIDTypeClusterChimeAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
     MTRAttributeIDTypeClusterChimeAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
-
-    // Cluster CommodityTariff attributes
-    MTRAttributeIDTypeClusterCommodityTariffAttributeTariffInfoID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
-    MTRAttributeIDTypeClusterCommodityTariffAttributeTariffUnitID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
-    MTRAttributeIDTypeClusterCommodityTariffAttributeStartDateID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
-    MTRAttributeIDTypeClusterCommodityTariffAttributeDayEntriesID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
-    MTRAttributeIDTypeClusterCommodityTariffAttributeDayPatternsID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
-    MTRAttributeIDTypeClusterCommodityTariffAttributeCalendarPeriodsID MTR_PROVISIONALLY_AVAILABLE = 0x00000005,
-    MTRAttributeIDTypeClusterCommodityTariffAttributeIndividualDaysID MTR_PROVISIONALLY_AVAILABLE = 0x00000006,
-    MTRAttributeIDTypeClusterCommodityTariffAttributeCurrentDayID MTR_PROVISIONALLY_AVAILABLE = 0x00000007,
-    MTRAttributeIDTypeClusterCommodityTariffAttributeNextDayID MTR_PROVISIONALLY_AVAILABLE = 0x00000008,
-    MTRAttributeIDTypeClusterCommodityTariffAttributeCurrentDayEntryID MTR_PROVISIONALLY_AVAILABLE = 0x00000009,
-    MTRAttributeIDTypeClusterCommodityTariffAttributeCurrentDayEntryDateID MTR_PROVISIONALLY_AVAILABLE = 0x0000000A,
-    MTRAttributeIDTypeClusterCommodityTariffAttributeNextDayEntryID MTR_PROVISIONALLY_AVAILABLE = 0x0000000B,
-    MTRAttributeIDTypeClusterCommodityTariffAttributeNextDayEntryDateID MTR_PROVISIONALLY_AVAILABLE = 0x0000000C,
-    MTRAttributeIDTypeClusterCommodityTariffAttributeTariffComponentsID MTR_PROVISIONALLY_AVAILABLE = 0x0000000D,
-    MTRAttributeIDTypeClusterCommodityTariffAttributeTariffPeriodsID MTR_PROVISIONALLY_AVAILABLE = 0x0000000E,
-    MTRAttributeIDTypeClusterCommodityTariffAttributeCurrentTariffComponentsID MTR_PROVISIONALLY_AVAILABLE = 0x0000000F,
-    MTRAttributeIDTypeClusterCommodityTariffAttributeNextTariffComponentsID MTR_PROVISIONALLY_AVAILABLE = 0x00000010,
-    MTRAttributeIDTypeClusterCommodityTariffAttributeDefaultRandomizationOffsetID MTR_PROVISIONALLY_AVAILABLE = 0x00000011,
-    MTRAttributeIDTypeClusterCommodityTariffAttributeDefaultRandomizationTypeID MTR_PROVISIONALLY_AVAILABLE = 0x00000012,
-    MTRAttributeIDTypeClusterCommodityTariffAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
-    MTRAttributeIDTypeClusterCommodityTariffAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
-    MTRAttributeIDTypeClusterCommodityTariffAttributeAttributeListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
-    MTRAttributeIDTypeClusterCommodityTariffAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
-    MTRAttributeIDTypeClusterCommodityTariffAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster EcosystemInformation attributes
     MTRAttributeIDTypeClusterEcosystemInformationAttributeDeviceDirectoryID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
@@ -4807,36 +4767,23 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
 
     // Cluster TLSCertificateManagement attributes
     MTRAttributeIDTypeClusterTLSCertificateManagementAttributeMaxRootCertificatesID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
-    MTRAttributeIDTypeClusterTLSCertificateManagementAttributeCurrentRootCertificatesID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterTLSCertificateManagementAttributeProvisionedRootCertificatesID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
     MTRAttributeIDTypeClusterTLSCertificateManagementAttributeMaxClientCertificatesID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
-    MTRAttributeIDTypeClusterTLSCertificateManagementAttributeCurrentClientCertificatesID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterTLSCertificateManagementAttributeProvisionedClientCertificatesID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
     MTRAttributeIDTypeClusterTLSCertificateManagementAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
     MTRAttributeIDTypeClusterTLSCertificateManagementAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
     MTRAttributeIDTypeClusterTLSCertificateManagementAttributeAttributeListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
     MTRAttributeIDTypeClusterTLSCertificateManagementAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
     MTRAttributeIDTypeClusterTLSCertificateManagementAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
-    // Cluster MeterIdentification attributes
-    MTRAttributeIDTypeClusterMeterIdentificationAttributeMeterTypeID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
-    MTRAttributeIDTypeClusterMeterIdentificationAttributePointOfDeliveryID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
-    MTRAttributeIDTypeClusterMeterIdentificationAttributeMeterSerialNumberID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
-    MTRAttributeIDTypeClusterMeterIdentificationAttributeProtocolVersionID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
-    MTRAttributeIDTypeClusterMeterIdentificationAttributePowerThresholdID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
-    MTRAttributeIDTypeClusterMeterIdentificationAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
-    MTRAttributeIDTypeClusterMeterIdentificationAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
-    MTRAttributeIDTypeClusterMeterIdentificationAttributeAttributeListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
-    MTRAttributeIDTypeClusterMeterIdentificationAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
-    MTRAttributeIDTypeClusterMeterIdentificationAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
-
-    // Cluster CommodityMetering attributes
-    MTRAttributeIDTypeClusterCommodityMeteringAttributeMeteredQuantityID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
-    MTRAttributeIDTypeClusterCommodityMeteringAttributeMeteredQuantityTimestampID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
-    MTRAttributeIDTypeClusterCommodityMeteringAttributeMeasurementTypeID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
-    MTRAttributeIDTypeClusterCommodityMeteringAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
-    MTRAttributeIDTypeClusterCommodityMeteringAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
-    MTRAttributeIDTypeClusterCommodityMeteringAttributeAttributeListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
-    MTRAttributeIDTypeClusterCommodityMeteringAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
-    MTRAttributeIDTypeClusterCommodityMeteringAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+    // Cluster TLSClientManagement attributes
+    MTRAttributeIDTypeClusterTLSClientManagementAttributeMaxProvisionedID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterTLSClientManagementAttributeProvisionedEndpointsID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterTLSClientManagementAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterTLSClientManagementAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterTLSClientManagementAttributeAttributeListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterTLSClientManagementAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterTLSClientManagementAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster TestCluster deprecated attribute names
     MTRClusterTestClusterAttributeBooleanID
@@ -6481,12 +6428,6 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterWaterHeaterManagementCommandBoostID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000000,
     MTRCommandIDTypeClusterWaterHeaterManagementCommandCancelBoostID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000001,
 
-    // Cluster CommodityPrice commands
-    MTRCommandIDTypeClusterCommodityPriceCommandGetDetailedPriceRequestID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
-    MTRCommandIDTypeClusterCommodityPriceCommandGetDetailedPriceResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
-    MTRCommandIDTypeClusterCommodityPriceCommandGetDetailedForecastRequestID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
-    MTRCommandIDTypeClusterCommodityPriceCommandGetDetailedForecastResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
-
     // Cluster DemandResponseLoadControl commands
     MTRCommandIDTypeClusterDemandResponseLoadControlCommandRegisterLoadControlProgramRequestID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
     MTRCommandIDTypeClusterDemandResponseLoadControlCommandUnregisterLoadControlProgramRequestID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
@@ -7042,10 +6983,11 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterCameraAVStreamManagementCommandVideoStreamDeallocateID MTR_PROVISIONALLY_AVAILABLE = 0x00000006,
     MTRCommandIDTypeClusterCameraAVStreamManagementCommandSnapshotStreamAllocateID MTR_PROVISIONALLY_AVAILABLE = 0x00000007,
     MTRCommandIDTypeClusterCameraAVStreamManagementCommandSnapshotStreamAllocateResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000008,
-    MTRCommandIDTypeClusterCameraAVStreamManagementCommandSnapshotStreamDeallocateID MTR_PROVISIONALLY_AVAILABLE = 0x00000009,
-    MTRCommandIDTypeClusterCameraAVStreamManagementCommandSetStreamPrioritiesID MTR_PROVISIONALLY_AVAILABLE = 0x0000000A,
-    MTRCommandIDTypeClusterCameraAVStreamManagementCommandCaptureSnapshotID MTR_PROVISIONALLY_AVAILABLE = 0x0000000B,
-    MTRCommandIDTypeClusterCameraAVStreamManagementCommandCaptureSnapshotResponseID MTR_PROVISIONALLY_AVAILABLE = 0x0000000C,
+    MTRCommandIDTypeClusterCameraAVStreamManagementCommandSnapshotStreamModifyID MTR_PROVISIONALLY_AVAILABLE = 0x00000009,
+    MTRCommandIDTypeClusterCameraAVStreamManagementCommandSnapshotStreamDeallocateID MTR_PROVISIONALLY_AVAILABLE = 0x0000000A,
+    MTRCommandIDTypeClusterCameraAVStreamManagementCommandSetStreamPrioritiesID MTR_PROVISIONALLY_AVAILABLE = 0x0000000B,
+    MTRCommandIDTypeClusterCameraAVStreamManagementCommandCaptureSnapshotID MTR_PROVISIONALLY_AVAILABLE = 0x0000000C,
+    MTRCommandIDTypeClusterCameraAVStreamManagementCommandCaptureSnapshotResponseID MTR_PROVISIONALLY_AVAILABLE = 0x0000000D,
 
     // Cluster CameraAVSettingsUserLevelManagement commands
     MTRCommandIDTypeClusterCameraAVSettingsUserLevelManagementCommandMPTZSetPositionID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
@@ -7084,12 +7026,6 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     // Cluster Chime commands
     MTRCommandIDTypeClusterChimeCommandPlayChimeSoundID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
 
-    // Cluster CommodityTariff commands
-    MTRCommandIDTypeClusterCommodityTariffCommandGetTariffComponentID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
-    MTRCommandIDTypeClusterCommodityTariffCommandGetTariffComponentResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
-    MTRCommandIDTypeClusterCommodityTariffCommandGetDayEntryID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
-    MTRCommandIDTypeClusterCommodityTariffCommandGetDayEntryResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
-
     // Cluster CommissionerControl commands
     MTRCommandIDTypeClusterCommissionerControlCommandRequestCommissioningApprovalID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000000,
     MTRCommandIDTypeClusterCommissionerControlCommandCommissionNodeID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000001,
@@ -7106,12 +7042,18 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterTLSCertificateManagementCommandTLSClientCSRID MTR_PROVISIONALLY_AVAILABLE = 0x00000007,
     MTRCommandIDTypeClusterTLSCertificateManagementCommandTLSClientCSRResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000008,
     MTRCommandIDTypeClusterTLSCertificateManagementCommandProvisionClientCertificateID MTR_PROVISIONALLY_AVAILABLE = 0x00000009,
-    MTRCommandIDTypeClusterTLSCertificateManagementCommandProvisionClientCertificateResponseID MTR_PROVISIONALLY_AVAILABLE = 0x0000000A,
-    MTRCommandIDTypeClusterTLSCertificateManagementCommandFindClientCertificateID MTR_PROVISIONALLY_AVAILABLE = 0x0000000B,
-    MTRCommandIDTypeClusterTLSCertificateManagementCommandFindClientCertificateResponseID MTR_PROVISIONALLY_AVAILABLE = 0x0000000C,
-    MTRCommandIDTypeClusterTLSCertificateManagementCommandLookupClientCertificateID MTR_PROVISIONALLY_AVAILABLE = 0x0000000D,
-    MTRCommandIDTypeClusterTLSCertificateManagementCommandLookupClientCertificateResponseID MTR_PROVISIONALLY_AVAILABLE = 0x0000000E,
-    MTRCommandIDTypeClusterTLSCertificateManagementCommandRemoveClientCertificateID MTR_PROVISIONALLY_AVAILABLE = 0x0000000F,
+    MTRCommandIDTypeClusterTLSCertificateManagementCommandFindClientCertificateID MTR_PROVISIONALLY_AVAILABLE = 0x0000000A,
+    MTRCommandIDTypeClusterTLSCertificateManagementCommandFindClientCertificateResponseID MTR_PROVISIONALLY_AVAILABLE = 0x0000000B,
+    MTRCommandIDTypeClusterTLSCertificateManagementCommandLookupClientCertificateID MTR_PROVISIONALLY_AVAILABLE = 0x0000000C,
+    MTRCommandIDTypeClusterTLSCertificateManagementCommandLookupClientCertificateResponseID MTR_PROVISIONALLY_AVAILABLE = 0x0000000D,
+    MTRCommandIDTypeClusterTLSCertificateManagementCommandRemoveClientCertificateID MTR_PROVISIONALLY_AVAILABLE = 0x0000000E,
+
+    // Cluster TLSClientManagement commands
+    MTRCommandIDTypeClusterTLSClientManagementCommandProvisionEndpointID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRCommandIDTypeClusterTLSClientManagementCommandProvisionEndpointResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRCommandIDTypeClusterTLSClientManagementCommandFindEndpointID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
+    MTRCommandIDTypeClusterTLSClientManagementCommandFindEndpointResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
+    MTRCommandIDTypeClusterTLSClientManagementCommandRemoveEndpointID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
 
     // Cluster TestCluster deprecated command id names
     MTRClusterTestClusterCommandTestID
@@ -7548,10 +7490,6 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
     MTREventIDTypeClusterWaterHeaterManagementEventBoostStartedID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000000,
     MTREventIDTypeClusterWaterHeaterManagementEventBoostEndedID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00000001,
 
-    // Cluster CommodityPrice events
-    MTREventIDTypeClusterCommodityPriceEventPriceChangeID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
-    MTREventIDTypeClusterCommodityPriceEventForecastChangeID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
-
     // Cluster DemandResponseLoadControl events
     MTREventIDTypeClusterDemandResponseLoadControlEventLoadControlEventStatusChangeID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
 
@@ -7697,11 +7635,6 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
     MTREventIDTypeClusterZoneManagementEventZoneTriggeredID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
     MTREventIDTypeClusterZoneManagementEventZoneStoppedID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
 
-    // Cluster CameraAVStreamManagement events
-    MTREventIDTypeClusterCameraAVStreamManagementEventVideoStreamChangedID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
-    MTREventIDTypeClusterCameraAVStreamManagementEventAudioStreamChangedID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
-    MTREventIDTypeClusterCameraAVStreamManagementEventSnapshotStreamChangedID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
-
     // Cluster PushAVStreamTransport events
     MTREventIDTypeClusterPushAVStreamTransportEventPushTransportBeginID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
     MTREventIDTypeClusterPushAVStreamTransportEventPushTransportEndID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
@@ -7816,10 +7749,6 @@ typedef NS_ENUM(uint32_t, MTRDeviceTypeIDType) {
     MTRDeviceTypeIDTypeDeviceEnergyManagementID MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) = 0x0000050D,
     MTRDeviceTypeIDTypeWaterHeaterID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x0000050F,
     MTRDeviceTypeIDTypeElectricalSensorID MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) = 0x00000510,
-    MTRDeviceTypeIDTypeElectricalUtilityMeterID MTR_PROVISIONALLY_AVAILABLE = 0x00000511,
-    MTRDeviceTypeIDTypeMeterReferencePointID MTR_PROVISIONALLY_AVAILABLE = 0x00000512,
-    MTRDeviceTypeIDTypeElectricalEnergyTariffID MTR_PROVISIONALLY_AVAILABLE = 0x00000513,
-    MTRDeviceTypeIDTypeElectricalMeterID MTR_PROVISIONALLY_AVAILABLE = 0x00000514,
     MTRDeviceTypeIDTypeControlBridgeID MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) = 0x00000840,
     MTRDeviceTypeIDTypeOnOffSensorID MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2)) = 0x00000850,
 } MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2));
