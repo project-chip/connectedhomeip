@@ -200,7 +200,7 @@ void WebRTCTransportProviderServer::RemoveSession(uint16_t sessionId)
 
 WebRTCSessionStruct * WebRTCTransportProviderServer::CheckForMatchingSession(HandlerContext & ctx, uint16_t sessionId)
 {
-    WebRTCSessionStruct * outSessionPtr = FindSession(sessionId);
+    WebRTCSessionStruct * session = FindSession(sessionId);
     if (outSessionPtr == nullptr)
     {
         return nullptr;
