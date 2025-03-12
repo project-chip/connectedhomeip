@@ -22,6 +22,7 @@ def main():
         "-DUSE_GNUTLS=0",
         "-DUSE_NICE=0",
         "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_CXX_FLAGS=-Wno-shadow",
     ]
 
     print(f"Running: {' '.join(cmake_cmd)}")

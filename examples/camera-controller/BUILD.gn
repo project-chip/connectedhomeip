@@ -114,6 +114,8 @@ executable("camera-controller") {
   lib_dirs =
       [ rebase_path("${chip_root}/third_party/libdatachannel/repo/build") ]
 
+  include_dirs = [ "${chip_root}/third_party/libdatachannel/repo/include" ]
+
   output_dir = root_out_dir
 }
 
