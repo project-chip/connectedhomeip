@@ -990,7 +990,7 @@ CHIP_ERROR ReadClient::ComputeLivenessCheckTimerTimeout(System::Clock::Timeout *
     // for the response, so to match the retransmission timeout computation for the message back to the peer, we should treat
     // it as active and handling non-initial message, isFirstMessageOnExchange needs to be set as false for
     // GetRetransmissionTimeout.
-    auto roundTripTimeout = mReadPrepareParams.mSessionHolder->GetMessageReceiptTimeout(System::Clock::kZero) +
+    auto roundTripTimeout = mReadPrepareParams.mSessionHolder->GetMessageReceiptTimeout(System::Clock::kZero, true /*isFirstMessageOnExchange*/) +
         kExpectedIMProcessingTime +
         GetRetransmissionTimeout(peerMRPConfig.mActiveRetransTimeout, peerMRPConfig.mIdleRetransTimeout,
                                  System::SystemClock().GetMonotonicTimestamp(), peerMRPConfig.mActiveThresholdTime,

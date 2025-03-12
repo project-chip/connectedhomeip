@@ -75,7 +75,7 @@ public:
         return System::Clock::Timeout();
     }
 
-    System::Clock::Milliseconds32 GetMessageReceiptTimeout(System::Clock::Timestamp ourLastActivity) const override
+    System::Clock::Milliseconds32 GetMessageReceiptTimeout(System::Clock::Timestamp ourLastActivity, bool isFirstMessageOnExchange) const override
     {
         // There are no timeouts for group sessions.
         VerifyOrDie(false);
@@ -134,7 +134,7 @@ public:
         return System::Clock::Timeout();
     }
 
-    System::Clock::Milliseconds32 GetMessageReceiptTimeout(System::Clock::Timestamp ourLastActivity) const override
+    System::Clock::Milliseconds32 GetMessageReceiptTimeout(System::Clock::Timestamp ourLastActivity, bool isFirstMessageOnExchange) const override
     {
         // There are no timeouts for group sessions.
         VerifyOrDie(false);

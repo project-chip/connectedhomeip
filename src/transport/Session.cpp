@@ -72,10 +72,10 @@ System::Clock::Timeout Session::ComputeRoundTripTimeout(System::Clock::Timeout u
         return System::Clock::kZero;
     }
 
-    // Treat us as active for purposes of GetMessageReceiptTimeout(), pass false into GetAckTimeout to
+    // Treat us as active for purposes of GetMessageReceiptTimeout(), pass false into GetMessageReceiptTimeout to
     // indicate we are processing non-initial message since the other side would be responding to our message.
     return GetAckTimeout(isFirstMessageOnExchange) + upperlayerProcessingTimeout +
-        GetMessageReceiptTimeout(System::SystemClock().GetMonotonicTimestamp());
+        GetMessageReceiptTimeout(System::SystemClock().GetMonotonicTimestamp(), false /*isFirstMessageOnExchange*/);
 }
 
 uint16_t Session::SessionIdForLogging() const
