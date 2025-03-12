@@ -325,6 +325,8 @@ class TC_CADMIN(MatterBaseTest):
     async def test_TC_CADMIN_1_4(self):
         await self.combined_commission_val_steps(commission_type="BCM")
 
+global __test_class__
+__test_class__ = TC_CADMIN
 
 if __name__ == "__main__":
     default_matter_test_main()
