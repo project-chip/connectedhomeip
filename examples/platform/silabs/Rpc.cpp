@@ -21,6 +21,7 @@
 #include "pigweed/RpcService.h"
 #include "pw_sys_io_efr32/init.h"
 #include <cmsis_os2.h>
+#include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 #include <sl_cmsis_os2_common.h>
 
 #if defined(PW_RPC_ATTRIBUTE_SERVICE) && PW_RPC_ATTRIBUTE_SERVICE
@@ -72,7 +73,7 @@ size_t pw_trace_GetTraceTimeTicksPerSecond()
 }
 
 #endif // defined(PW_RPC_TRACING_SERVICE) && PW_RPC_TRACING_SERVICE
-
+using namespace chip::DeviceLayer::Silabs;
 namespace chip {
 namespace rpc {
 
@@ -117,7 +118,7 @@ private:
     osTimer_t mRebootTimerBuffer;
     osTimerAttr_t mRebootTimerAttr = { .name = "Reboot", .cb_mem = &mRebootTimerBuffer, .cb_size = osTimerCbSize };
 
-    static void RebootHandler(void * timerCbArg) { Silabs::GetPlatform().SoftwareReset(); }
+    static void RebootHandler(void * timerCbArg) { GetPlatform().SoftwareReset(); }
 };
 #endif // defined(PW_RPC_DEVICE_SERVICE) && PW_RPC_DEVICE_SERVICE
 

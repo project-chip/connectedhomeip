@@ -43,6 +43,7 @@ extern "C" {
 
 uint8_t flag = RPS_HEADER;
 static chip::OTAImageProcessorImpl gImageProcessor;
+using namespace chip::DeviceLayer::Silabs;
 namespace chip {
 
 // Define static memebers
@@ -229,7 +230,7 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
         // send system reset request to reset the MCU and upgrade the m4 image
         ChipLogProgress(SoftwareUpdate, "SoC Soft Reset initiated!");
         // Reboots the device
-        DeviceLayer::Silabs::GetPlatform().SoftwareReset();
+        GetPlatform().SoftwareReset();
     }
 }
 
