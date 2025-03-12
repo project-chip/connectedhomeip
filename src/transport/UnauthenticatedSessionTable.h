@@ -112,7 +112,8 @@ public:
         return System::Clock::Timeout();
     }
 
-    System::Clock::Milliseconds32 GetMessageReceiptTimeout(System::Clock::Timestamp ourLastActivity, bool isFirstMessageOnExchange) const override
+    System::Clock::Milliseconds32 GetMessageReceiptTimeout(System::Clock::Timestamp ourLastActivity,
+                                                           bool isFirstMessageOnExchange) const override
     {
         switch (mPeerAddress.GetTransportType())
         {
@@ -121,8 +122,7 @@ public:
             const auto & defaultMRRPConfig   = GetDefaultMRPConfig();
             const auto & localMRPConfig      = maybeLocalMRPConfig.ValueOr(defaultMRRPConfig);
             return GetRetransmissionTimeout(localMRPConfig.mActiveRetransTimeout, localMRPConfig.mIdleRetransTimeout,
-                                            ourLastActivity, localMRPConfig.mActiveThresholdTime,
-                                            isFirstMessageOnExchange);
+                                            ourLastActivity, localMRPConfig.mActiveThresholdTime, isFirstMessageOnExchange);
         }
         case Transport::Type::kTcp:
             return System::Clock::Seconds16(30);

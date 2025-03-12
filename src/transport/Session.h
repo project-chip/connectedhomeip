@@ -268,7 +268,8 @@ public:
     // responding to a message it just received") and System::Clock::kZero (to
     // indicate "peer is reaching out to us, not in response to anything").
     // isFirstMessageOnExchange indicates whether the caller is handling the first message on exchange
-    virtual System::Clock::Milliseconds32 GetMessageReceiptTimeout(System::Clock::Timestamp ourLastActivity, bool isFirstMessageOnExchange) const = 0;
+    virtual System::Clock::Milliseconds32 GetMessageReceiptTimeout(System::Clock::Timestamp ourLastActivity,
+                                                                   bool isFirstMessageOnExchange) const = 0;
 
     const ReliableMessageProtocolConfig & GetRemoteMRPConfig() const { return GetRemoteSessionParameters().GetMRPConfig(); }
 
