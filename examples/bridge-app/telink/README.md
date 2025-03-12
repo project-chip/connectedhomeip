@@ -101,7 +101,8 @@ The example supports building and running on the following devices:
     $ docker run -it --rm -v $PWD:/host -w /host ghcr.io/project-chip/chip-build-telink:$(wget -q -O - https://raw.githubusercontent.com/project-chip/connectedhomeip/master/.github/workflows/examples-telink.yaml 2> /dev/null | grep chip-build-telink | awk -F: '{print $NF}' | head -n1)
     ```
 
-    The default Docker container includes the recommended Zephyr version, as specified in:
+    The default Docker container includes the recommended Zephyr version, as
+    specified in:
 
     ```bash
     $ integrations/docker/images/stage-2/chip-build-telink/Dockerfile
