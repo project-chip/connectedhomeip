@@ -599,6 +599,15 @@ static BOOL CommandNeedsTimedInvokeInWaterHeaterManagementCluster(AttributeId aA
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInCommodityPriceCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::CommodityPrice;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInDemandResponseLoadControlCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::DemandResponseLoadControl;
@@ -1196,6 +1205,15 @@ static BOOL CommandNeedsTimedInvokeInChimeCluster(AttributeId aAttributeId)
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInCommodityTariffCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::CommodityTariff;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInEcosystemInformationCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::EcosystemInformation;
@@ -1226,6 +1244,24 @@ static BOOL CommandNeedsTimedInvokeInTLSCertificateManagementCluster(AttributeId
 static BOOL CommandNeedsTimedInvokeInTLSClientManagementCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::TlsClientManagement;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL CommandNeedsTimedInvokeInMeterIdentificationCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::MeterIdentification;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL CommandNeedsTimedInvokeInCommodityMeteringCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::CommodityMetering;
     switch (aAttributeId) {
     default: {
         return NO;
@@ -1449,6 +1485,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     case Clusters::WaterHeaterManagement::Id: {
         return CommandNeedsTimedInvokeInWaterHeaterManagementCluster(commandID);
     }
+    case Clusters::CommodityPrice::Id: {
+        return CommandNeedsTimedInvokeInCommodityPriceCluster(commandID);
+    }
     case Clusters::DemandResponseLoadControl::Id: {
         return CommandNeedsTimedInvokeInDemandResponseLoadControlCluster(commandID);
     }
@@ -1626,6 +1665,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     case Clusters::Chime::Id: {
         return CommandNeedsTimedInvokeInChimeCluster(commandID);
     }
+    case Clusters::CommodityTariff::Id: {
+        return CommandNeedsTimedInvokeInCommodityTariffCluster(commandID);
+    }
     case Clusters::EcosystemInformation::Id: {
         return CommandNeedsTimedInvokeInEcosystemInformationCluster(commandID);
     }
@@ -1637,6 +1679,12 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::TlsClientManagement::Id: {
         return CommandNeedsTimedInvokeInTLSClientManagementCluster(commandID);
+    }
+    case Clusters::MeterIdentification::Id: {
+        return CommandNeedsTimedInvokeInMeterIdentificationCluster(commandID);
+    }
+    case Clusters::CommodityMetering::Id: {
+        return CommandNeedsTimedInvokeInCommodityMeteringCluster(commandID);
     }
     case Clusters::UnitTesting::Id: {
         return CommandNeedsTimedInvokeInUnitTestingCluster(commandID);
