@@ -92,9 +92,12 @@ public class AndroidNfcCommissioningManager implements NfcCommissioningManager {
     }.start();
   }
 
-  ///////////////////////////////////////////////////////////////////////////////////
-
-  private void setNFCTag(Tag androidTag) {
+  /**
+   * @brief Function to set the NFC Tag.
+   * @param androidTag : NFC Tag (as defined in android.nfc.Tag)
+   * @return None
+   */
+  public void setNFCTag(Tag androidTag) {
     mIsoDep = IsoDep.get(androidTag);
     if (mIsoDep == null) {
       Log.e(TAG, "mIsoDep is null");
@@ -118,6 +121,8 @@ public class AndroidNfcCommissioningManager implements NfcCommissioningManager {
       }
     }.start();
   }
+
+  ///////////////////////////////////////////////////////////////////////////////////
 
   private void setIsoDepTimeout(int timeout) throws IOException {
 
