@@ -405,7 +405,7 @@ chip_python_wheel_action("chip-repl") {
   } else if (current_os == "linux") {
     py_package_reqs += [
       "dbus-python==1.2.18",
-      "pygobject",
+      "pygobject==3.50.0",
     ]
   }
 

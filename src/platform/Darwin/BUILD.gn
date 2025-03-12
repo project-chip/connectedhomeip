@@ -124,14 +124,14 @@ static_library("Darwin") {
 
   if (chip_enable_ble) {
     sources += [
-      "BleApplicationDelegate.h",
+      "BleApplicationDelegateImpl.h",
       "BleApplicationDelegateImpl.mm",
-      "BleConnectionDelegate.h",
+      "BleConnectionDelegateImpl.h",
       "BleConnectionDelegateImpl.mm",
-      "BlePlatformDelegate.h",
+      "BlePlatformDelegateImpl.h",
       "BlePlatformDelegateImpl.mm",
-      "MTRUUIDHelper.h",
-      "MTRUUIDHelperImpl.mm",
+      "BleUtils.h",
+      "BleUtils.mm",
     ]
   }
 }

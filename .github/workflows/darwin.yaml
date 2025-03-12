@@ -116,11 +116,10 @@ jobs:
 
                   export TEST_RUNNER_ASAN_OPTIONS=__CURRENT_VALUE__:detect_stack_use_after_return=1
 
-                  # Disable BLE (CHIP_IS_BLE=NO) because the app does not have the permission to use it and that may crash the CI.
                   xcodebuild test -target "Matter" -scheme "Matter Framework Tests" \
                     -resultBundlePath /tmp/darwin/framework-tests/TestResults.xcresult \
                     -sdk macosx ${{ matrix.options.arguments }} \
-                    CHIP_IS_BLE=NO GCC_PREPROCESSOR_DEFINITIONS='${inherited} ${{ matrix.options.defines }}' \
+                    GCC_PREPROCESSOR_DEFINITIONS='${inherited} ${{ matrix.options.defines }}' \
                     > >(tee /tmp/darwin/framework-tests/darwin-tests.log) 2> >(tee /tmp/darwin/framework-tests/darwin-tests-err.log >&2)
             - name: Generate Summary
               if: always()

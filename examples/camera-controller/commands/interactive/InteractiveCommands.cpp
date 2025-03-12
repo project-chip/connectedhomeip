@@ -29,11 +29,6 @@
 #include <thread>
 #include <vector>
 
-#if defined(PW_RPC_ENABLED)
-#include <rpc/RpcClient.h>
-#include <rpc/RpcServer.h>
-#endif
-
 using namespace chip;
 
 namespace {
@@ -41,10 +36,6 @@ namespace {
 constexpr char kInteractiveModePrompt[]          = ">>> ";
 constexpr char kInteractiveModeHistoryFileName[] = "chip_tool_history";
 constexpr char kInteractiveModeStopCommand[]     = "quit()";
-
-#if defined(PW_RPC_ENABLED)
-constexpr uint16_t kRetryIntervalS = 3;
-#endif
 
 // File pointer for the log file
 FILE * sLogFile = nullptr;
@@ -114,28 +105,6 @@ void ENFORCE_FORMAT(3, 0) LoggingCallback(const char * module, uint8_t category,
     funlockfile(sLogFile);
 }
 
-#if defined(PW_RPC_ENABLED)
-void AttemptRpcClientConnect(System::Layer * systemLayer, void * appState)
-{
-    if (admin::StartRpcClient() == CHIP_NO_ERROR)
-    {
-        // print to console
-        fprintf(stderr, "Connected to Fabric-Bridge\n");
-    }
-    else
-    {
-        // print to console
-        fprintf(stderr, "Failed to connect to Fabric-Bridge, retry in %d seconds....\n", kRetryIntervalS);
-        systemLayer->StartTimer(System::Clock::Seconds16(kRetryIntervalS), AttemptRpcClientConnect, nullptr);
-    }
-}
-
-void ExecuteDeferredConnect(intptr_t ignored)
-{
-    AttemptRpcClientConnect(&DeviceLayer::SystemLayer(), nullptr);
-}
-#endif
-
 } // namespace
 
 char * InteractiveStartCommand::GetCommand(char * command)
@@ -197,13 +166,6 @@ CHIP_ERROR InteractiveStartCommand::RunCommand()
         // Redirect logs to the custom logging callback
         Logging::SetLogRedirectCallback(LoggingCallback);
     }
-
-#if defined(PW_RPC_ENABLED)
-    admin::SetRpcRemoteServerPort(mFabricBridgeServerPort.Value());
-    admin::InitRpcServer(mLocalServerPort.Value());
-    ChipLogProgress(NotSpecified, "PW_RPC initialized.");
-    DeviceLayer::PlatformMgr().ScheduleWork(ExecuteDeferredConnect, 0);
-#endif
 
     std::thread readCommands(ReadCommandThread);
     readCommands.detach();
