@@ -405,7 +405,7 @@ const char * sDeviceOptionHelp =
     "       Sets the ICD idle mode durations (in seconds). (Default: 300) \n"
     "       This defines the how long the ICD server can stay in idle mode.\n"
     "  --icdPeriodicWakeupDurationMs <icdPeriodicWakupDurationMs>\n"
-    "       Sets the ICD periodic wakeup (in milliseconds). (Default: 6000)\n"
+    "       Sets the ICD periodic wakeup (in milliseconds). (Default: 60000)\n"
     "       This is for testing purpose on Linux which defines the internal to wakeup periodically to send \n"
     "       Check-In messages since Linux application doesn't have a physical button to trigger wakeup\n"
 #endif
