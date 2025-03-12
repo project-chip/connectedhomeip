@@ -329,7 +329,7 @@ def main() -> int:
                       action="store_true", dest="do_erase")
     parser.add_option("-i", "--terminal", help="opens terminal to interact with with device",
                       action="store_true", dest="do_interact")
-    parser.add_option("-I", "--enable_lit_icd", help="enable ICD (Long Idle Time Intermittently Connected Device)",
+    parser.add_option("-I", "--enable_lit_icd", help="enable LIT ICD (Long Idle Time Intermittently Connected Device) mode",
                       action="store_true", default=False)
     parser.add_option("-m", "--menuconfig", help="runs menuconfig on platforms that support it",
                       action="store_true", dest="do_menuconfig")
