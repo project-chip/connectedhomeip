@@ -114,6 +114,7 @@ CHIP_ERROR Decode(TLV::TLVReader & reader, X & x)
     return x.Decode(reader);
 }
 
+
 /*
  * @brief
  *
@@ -127,8 +128,7 @@ CHIP_ERROR Decode(TLV::TLVReader & reader, X & x)
 template <typename X,
           typename std::enable_if_t<
               std::is_class<X>::value &&
-                  std::is_same<decltype(std::declval<X>().Decode(std::declval<TLV::TLVReader &>(), std::declval<FabricIndex>())),
-                               CHIP_ERROR>::value,
+                  std::is_same<decltype(std::declval<X>().Decode(std::declval<TLV::TLVReader &>(), std::declval<FabricIndex>())), CHIP_ERROR>::value,
               X> * = nullptr>
 CHIP_ERROR Decode(TLV::TLVReader & reader, X & x, FabricIndex aAccessingFabricIndex)
 {
