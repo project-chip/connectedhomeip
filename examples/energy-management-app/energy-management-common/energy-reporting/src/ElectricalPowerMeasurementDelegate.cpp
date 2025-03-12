@@ -59,7 +59,7 @@ CHIP_ERROR ElectricalPowerMeasurementDelegate::SetPowerMode(PowerModeEnum newVal
     return CHIP_NO_ERROR;
 }
 
-const MeasurementAccuracyRangeStruct::Type activePowerAccuracyRanges[] = {
+const Globals::Structs::MeasurementAccuracyRangeStruct::Type activePowerAccuracyRanges[] = {
     // 2 - 5%, 3% Typ
     {
         .rangeMin       = -50'000'000, // -50kW
@@ -86,7 +86,7 @@ const MeasurementAccuracyRangeStruct::Type activePowerAccuracyRanges[] = {
     },
 };
 
-const MeasurementAccuracyRangeStruct::Type activeCurrentAccuracyRanges[] = {
+const Globals::Structs::MeasurementAccuracyRangeStruct::Type activeCurrentAccuracyRanges[] = {
     // 2 - 5%, 3% Typ
     {
         .rangeMin       = -100'000, // -100A
@@ -113,7 +113,7 @@ const MeasurementAccuracyRangeStruct::Type activeCurrentAccuracyRanges[] = {
     },
 };
 
-const MeasurementAccuracyRangeStruct::Type voltageAccuracyRanges[] = {
+const Globals::Structs::MeasurementAccuracyRangeStruct::Type voltageAccuracyRanges[] = {
     // 2 - 5%, 3% Typ
     {
         .rangeMin       = -500'000, // -500V
@@ -140,27 +140,27 @@ const MeasurementAccuracyRangeStruct::Type voltageAccuracyRanges[] = {
     }
 };
 
-static const Structs::MeasurementAccuracyStruct::Type kMeasurementAccuracies[] = {
+static const Globals::Structs::MeasurementAccuracyStruct::Type kMeasurementAccuracies[] = {
     {
-        .measurementType  = MeasurementTypeEnum::kActivePower,
+        .measurementType  = Globals::MeasurementTypeEnum::kActivePower,
         .measured         = true,
         .minMeasuredValue = -50'000'000, // -50 kW
         .maxMeasuredValue = 50'000'000,  //  50 kW
-        .accuracyRanges   = DataModel::List<const MeasurementAccuracyRangeStruct::Type>(activePowerAccuracyRanges),
+        .accuracyRanges   = DataModel::List<const Globals::Structs::MeasurementAccuracyRangeStruct::Type>(activePowerAccuracyRanges),
     },
     {
-        .measurementType  = MeasurementTypeEnum::kActiveCurrent,
+        .measurementType  = Globals::MeasurementTypeEnum::kActiveCurrent,
         .measured         = true,
         .minMeasuredValue = -100'000, // -100A
         .maxMeasuredValue = 100'000,  //  100A
-        .accuracyRanges   = DataModel::List<const MeasurementAccuracyRangeStruct::Type>(activeCurrentAccuracyRanges),
+        .accuracyRanges   = DataModel::List<const Globals::Structs::MeasurementAccuracyRangeStruct::Type>(activeCurrentAccuracyRanges),
     },
     {
-        .measurementType  = MeasurementTypeEnum::kVoltage,
+        .measurementType  = Globals::MeasurementTypeEnum::kVoltage,
         .measured         = true,
         .minMeasuredValue = -500'000, // -500V
         .maxMeasuredValue = 500'000,  //  500V
-        .accuracyRanges   = DataModel::List<const MeasurementAccuracyRangeStruct::Type>(voltageAccuracyRanges),
+        .accuracyRanges   = DataModel::List<const Globals::Structs::MeasurementAccuracyRangeStruct::Type>(voltageAccuracyRanges),
     },
 };
 
@@ -179,7 +179,7 @@ CHIP_ERROR ElectricalPowerMeasurementDelegate::StartAccuracyRead()
 }
 
 CHIP_ERROR ElectricalPowerMeasurementDelegate::GetAccuracyByIndex(uint8_t accuracyIndex,
-                                                                  Structs::MeasurementAccuracyStruct::Type & accuracy)
+                                                                  Globals::Structs::MeasurementAccuracyStruct::Type & accuracy)
 {
     if (accuracyIndex >= MATTER_ARRAY_SIZE(kMeasurementAccuracies))
     {
