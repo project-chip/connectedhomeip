@@ -286,6 +286,8 @@ void SetTestEventTrigger_ConstraintBasedAdjustment()
 
 bool HandleDeviceEnergyManagementTestEventTrigger(uint64_t eventTrigger)
 {
+    DeviceEnergyManagementTestEventTriggerHandler handler;
+    eventTrigger                          = handler.setEndpointInEventTrigger(eventTrigger);
     DeviceEnergyManagementTrigger trigger = static_cast<DeviceEnergyManagementTrigger>(eventTrigger);
 
     switch (trigger)
