@@ -111,7 +111,7 @@ class TC_FAN_3_2(MatterBaseTest):
 
         return value
 
-    async def verify_attribute_invalid_in_state(self, attribute, init_value) -> None:
+    async def verify_attribute_constraint_error(self, attribute, init_value) -> None:
         value_current = await self.read_setting(attribute)
         asserts.assert_equal(value_current, init_value,
                              f"[FC] Current {attribute.__name__} value ({value_current}) must be equal to its initial value ({init_value}).")
@@ -199,11 +199,11 @@ class TC_FAN_3_2(MatterBaseTest):
         # If the write operation returned CONSTRAINT_ERROR, verify that the SpeedSetting, SpeedCurrent,
         # PercentSetting, PercentCurrent, and FanMode attributes are the same as their initial values
         elif write_status == Status.ConstraintError:
-            await self.verify_attribute_invalid_in_state(attributes.FanMode, init_fan_mode)
-            await self.verify_attribute_invalid_in_state(attributes.SpeedSetting, init_speed_setting)
-            await self.verify_attribute_invalid_in_state(attributes.SpeedCurrent, init_speed_current)
-            await self.verify_attribute_invalid_in_state(attributes.PercentSetting, init_percent_setting)
-            await self.verify_attribute_invalid_in_state(attributes.PercentCurrent, init_percent_current)
+            await self.verify_attribute_constraint_error(attributes.FanMode, init_fan_mode)
+            await self.verify_attribute_constraint_error(attributes.SpeedSetting, init_speed_setting)
+            await self.verify_attribute_constraint_error(attributes.SpeedCurrent, init_speed_current)
+            await self.verify_attribute_constraint_error(attributes.PercentSetting, init_percent_setting)
+            await self.verify_attribute_constraint_error(attributes.PercentCurrent, init_percent_current)
 
 
 if __name__ == "__main__":
