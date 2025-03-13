@@ -31,20 +31,23 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
 {
     mEndpoint = aClustersEndpoint;
     mCameraDevice = aCameraDevice;
+
+    // Instantiate Chime Server
     mChimeServerPtr = std::make_unique<ChimeServer>(mEndpoint, mCameraDevice->GetChimeDelegate());
 
+    // Fetch all initialization parameters for CameraAVStreamMgmt Server
     BitFlags<Feature> features;
     features.Set(Feature::kSnapshot);
     BitFlags<OptionalAttribute> optionalAttrs;
     optionalAttrs.Set(chip::app::Clusters::CameraAvStreamManagement::OptionalAttribute::kNightVision);
     optionalAttrs.Set(chip::app::Clusters::CameraAvStreamManagement::OptionalAttribute::kNightVisionIllum);
-    uint32_t maxConcurrentVideoEncoders  = 1;
-    uint32_t maxEncodedPixelRate         = 10000;
-    VideoSensorParamsStruct sensorParams = { 4608, 2592, 120, chip::Optional<uint16_t>(30) }; // Typical numbers for Pi camera.
-    bool nightVisionCapable              = false;
-    VideoResolutionStruct minViewport    = { 854, 480 }; // Assuming 480p resolution.
+    uint32_t maxConcurrentVideoEncoders  = mCameraDevice->GetCameraHALInterface().GetMaxConcurrentVideoEncoders();
+    uint32_t maxEncodedPixelRate         = mCameraDevice->GetCameraHALInterface().GetMaxEncodedPixelRate();
+    VideoSensorParamsStruct sensorParams = mCameraDevice->GetCameraHALInterface().GetVideoSensorParams();
+    bool nightVisionCapable              = mCameraDevice->GetCameraHALInterface().GetNightVisionCapable();
+    VideoResolutionStruct minViewport    = mCameraDevice->GetCameraHALInterface().GetMinViewport();
     std::vector<RateDistortionTradeOffStruct> rateDistortionTradeOffPoints = {};
-    uint32_t maxContentBufferSize                                          = 1024;
+    uint32_t maxContentBufferSize        = 1024;
     AudioCapabilitiesStruct micCapabilities{};
     AudioCapabilitiesStruct spkrCapabilities{};
     TwoWayTalkSupportTypeEnum twowayTalkSupport               = TwoWayTalkSupportTypeEnum::kNotSupported;
@@ -52,6 +55,7 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
     uint32_t maxNetworkBandwidth                              = 64;
     std::vector<StreamUsageEnum> supportedStreamUsages        = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording };
 
+    // Instantiate the CameraAVStreamMgmt Server
     mAVStreamMgmtServerPtr = std::make_unique<CameraAVStreamMgmtServer>(
         mCameraDevice->GetCameraAVStreamMgmtDelegate(), mEndpoint, features, optionalAttrs, maxConcurrentVideoEncoders, maxEncodedPixelRate,
         sensorParams, nightVisionCapable, minViewport, rateDistortionTradeOffPoints, maxContentBufferSize, micCapabilities,
