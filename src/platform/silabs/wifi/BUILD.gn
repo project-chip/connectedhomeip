@@ -15,6 +15,7 @@
 import("//build_overrides/chip.gni")
 import("//build_overrides/lwip.gni")
 import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/src/platform/silabs/tests/args.gni")
 import("${chip_root}/third_party/silabs/efr32_sdk.gni")
 import("${chip_root}/third_party/silabs/silabs_board.gni")
 
@@ -35,7 +36,8 @@ declare_args() {
   sl_enable_wifi_debug = false
 }
 
-if (chip_enable_wifi && !wifi_soc) {
+# Workaround to prevent the assert when we are building the unit tests
+if (chip_enable_wifi && !wifi_soc && !sl_build_unit_tests) {
   assert(use_rs9116 || use_wf200 || use_SiWx917)
   import("${chip_root}/src/platform/silabs/wifi/args.gni")
 
@@ -100,7 +102,7 @@ config("wifi-platform-config") {
   }
 }
 
-source_set("wifi-state-provider") {
+source_set("state-provider") {
   sources = [ "${silabs_platform_dir}/wifi/WifiStateProvider.h" ]
 
   public_configs = [ ":wifi-platform-config" ]
@@ -116,7 +118,7 @@ source_set("wifi-platform") {
   public_configs = [ ":wifi-platform-config" ]
 
   public_deps = [
-    ":wifi-state-provider",
+    ":state-provider",
     "${chip_root}/src/app/icd/server:icd-server-config",
     "${chip_root}/src/inet",
     "${chip_root}/src/lib/support",

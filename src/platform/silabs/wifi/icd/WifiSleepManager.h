@@ -61,18 +61,26 @@ public:
 
     inline void HandleCommissioningSessionStarted()
     {
-        mIsCommissioningInProgress = true;
+        bool wasCommissioningInProgress = mIsCommissioningInProgress;
+        mIsCommissioningInProgress      = true;
 
-        // TODO: Remove High Performance Req during commissioning when sleep issues are resolved
-        WifiSleepManager::GetInstance().RequestHighPerformance();
+        if (!wasCommissioningInProgress)
+        {
+            // TODO: Remove High Performance Req during commissioning when sleep issues are resolved
+            WifiSleepManager::GetInstance().RequestHighPerformanceWithTransition();
+        }
     }
 
     inline void HandleCommissioningSessionStopped()
     {
-        mIsCommissioningInProgress = false;
+        bool wasCommissioningInProgress = mIsCommissioningInProgress;
+        mIsCommissioningInProgress      = false;
 
-        // TODO: Remove High Performance Req during commissioning when sleep issues are resolved
-        WifiSleepManager::GetInstance().RemoveHighPerformanceRequest();
+        if (wasCommissioningInProgress)
+        {
+            // TODO: Remove High Performance Req during commissioning when sleep issues are resolved
+            WifiSleepManager::GetInstance().RemoveHighPerformanceRequest();
+        }
     }
 
     /**
@@ -86,7 +94,22 @@ public:
      * @return CHIP_ERROR CHIP_NO_ERROR if the chip was set to high performance or already in high performance
      *                    CHIP_ERROR_INTERNAL, if the high performance configuration failed
      */
-    CHIP_ERROR RequestHighPerformance();
+    CHIP_ERROR RequestHighPerformanceWithTransition() { return RequestHighPerformance(true); }
+
+    /**
+     * @brief Public API to increase the HighPerformance request counter without transitioning the Wi-Fi chip to High Performance.
+     *        The transition to a different power mode will be done the next the VerifyAndTransitionToLowPowerMode is called.
+     *
+     *        This API does not call the VerifyAndTransitionToLowPowerMode function.
+     *        To trigger the update directly adding a high performance request, call RequestHighPerformanceWithTransition.
+     *
+     *        This API can be called before the Init function. By doing so, the device will transition to High Performance during
+     *        the Init sequence
+     *
+     * @return CHIP_ERROR CHIP_NO_ERROR if the chip was set to high performance or already in high performance
+     *                    CHIP_ERROR_INTERNAL, if the high performance configuration failed
+     */
+    CHIP_ERROR RequestHighPerformanceWithoutTransition() { return RequestHighPerformance(false); }
 
     /**
      * @brief Public API to remove request to keep the Wi-Fi chip in High Performance.
@@ -160,6 +183,17 @@ private:
      *                    otherwise CHIP_ERROR_INTERNAL
      */
     CHIP_ERROR ConfigureDTIMBasedSleep();
+
+    /**
+     * @brief Increments the HighPerformance request counter and triggers the transition to High Performance if requested.
+     *
+     * @param triggerTransition true, triggers the transition to High Performance
+     *                          false, only increments the HighPerformance request counter
+     *
+     * @return CHIP_ERROR CHIP_NO_ERROR if the req removal and sleep transition succeed
+     *                    CHIP_ERROR_INTERNAL, if the req removal or the transition to sleep failed
+     */
+    CHIP_ERROR RequestHighPerformance(bool triggerTransition);
 
     static WifiSleepManager mInstance;
 

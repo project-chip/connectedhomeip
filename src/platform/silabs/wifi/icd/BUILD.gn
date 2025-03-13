@@ -25,17 +25,12 @@ source_set("wifi-sleep-manager") {
   sources = [
     "${chip_root}/src/platform/silabs/wifi/icd/WifiSleepManager.cpp",
     "${chip_root}/src/platform/silabs/wifi/icd/WifiSleepManager.h",
-
-    # TODO: Remove duplicated source files - This is a temporary workaround until the efr32_sdk.gni assert is refactored
-    #       This source is necessary because we can't use anything in the src/platform/silabs/wifi/BUILD.gn due to the efr32_sdk.gni import
-    #       The import causes an assert when building unit-tests due the silabs_board not being defined
-    #
-    "${chip_root}/src/platform/silabs/wifi/WifiStateProvider.h",
   ]
 
   public_deps = [
     ":power-save-interface",
     "${chip_root}/src/app/icd/server:configuration-data",
     "${chip_root}/src/lib/core",
+    "${chip_root}/src/platform/silabs/wifi:state-provider",
   ]
 }

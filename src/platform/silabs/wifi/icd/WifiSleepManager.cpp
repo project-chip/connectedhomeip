@@ -37,15 +37,18 @@ CHIP_ERROR WifiSleepManager::Init(PowerSaveInterface * platformInterface, WifiSt
     return VerifyAndTransitionToLowPowerMode(PowerEvent::kGenericEvent);
 }
 
-CHIP_ERROR WifiSleepManager::RequestHighPerformance()
+CHIP_ERROR WifiSleepManager::RequestHighPerformance(bool triggerTransition)
 {
     VerifyOrReturnError(mHighPerformanceRequestCounter < std::numeric_limits<uint8_t>::max(), CHIP_ERROR_INTERNAL,
                         ChipLogError(DeviceLayer, "High performance request counter overflow"));
 
     mHighPerformanceRequestCounter++;
 
-    // We don't do the mHighPerformanceRequestCounter check here; the check is in the VerifyAndTransitionToLowPowerMode function
-    ReturnErrorOnFailure(VerifyAndTransitionToLowPowerMode(PowerEvent::kGenericEvent));
+    if (triggerTransition)
+    {
+        // We don't do the mHighPerformanceRequestCounter check here; the check is in the VerifyAndTransitionToLowPowerMode function
+        ReturnErrorOnFailure(VerifyAndTransitionToLowPowerMode(PowerEvent::kGenericEvent));
+    }
 
     return CHIP_NO_ERROR;
 }
@@ -90,8 +93,8 @@ CHIP_ERROR WifiSleepManager::HandlePowerEvent(PowerEvent event)
 
 CHIP_ERROR WifiSleepManager::VerifyAndTransitionToLowPowerMode(PowerEvent event)
 {
-    VerifyOrDieWithMsg(mWifiStateProvider != nullptr, DeviceLayer, "WifiSleepManager is not initialized");
-    VerifyOrDieWithMsg(mPowerSaveInterface != nullptr, DeviceLayer, "WifiSleepManager is not initialized");
+    VerifyOrDieWithMsg(mWifiStateProvider != nullptr, DeviceLayer, "WifiStateProvider is not initialized");
+    VerifyOrDieWithMsg(mPowerSaveInterface != nullptr, DeviceLayer, "PowerSaveInterface is not initialized");
 
     ReturnErrorOnFailure(HandlePowerEvent(event));
 
@@ -117,6 +120,8 @@ CHIP_ERROR WifiSleepManager::VerifyAndTransitionToLowPowerMode(PowerEvent event)
 
 CHIP_ERROR WifiSleepManager::ConfigureDTIMBasedSleep()
 {
+    VerifyOrDieWithMsg(mPowerSaveInterface != nullptr, DeviceLayer, "PowerSaveInterface is not initialized");
+
     ReturnLogErrorOnFailure(mPowerSaveInterface->ConfigureBroadcastFilter(false));
 
     // Allowing the device to go to sleep must be the last actions to avoid configuration failures.
@@ -128,12 +133,16 @@ CHIP_ERROR WifiSleepManager::ConfigureDTIMBasedSleep()
 
 CHIP_ERROR WifiSleepManager::ConfigureDeepSleep()
 {
+    VerifyOrDieWithMsg(mPowerSaveInterface != nullptr, DeviceLayer, "PowerSaveInterface is not initialized");
+
     ReturnLogErrorOnFailure(mPowerSaveInterface->ConfigurePowerSave(PowerSaveInterface::PowerSaveConfiguration::kDeepSleep, 0));
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR WifiSleepManager::ConfigureHighPerformance()
 {
+    VerifyOrDieWithMsg(mPowerSaveInterface != nullptr, DeviceLayer, "PowerSaveInterface is not initialized");
+
     ReturnLogErrorOnFailure(
         mPowerSaveInterface->ConfigurePowerSave(PowerSaveInterface::PowerSaveConfiguration::kHighPerformance, 0));
     return CHIP_NO_ERROR;

@@ -129,13 +129,13 @@ TEST_F(TestWifiSleepManager, TestRequestHighPerformanceMaxCounter)
     // Set the counter to its maximum value
     for (uint8_t i = 0; i < std::numeric_limits<uint8_t>::max(); i++)
     {
-        EXPECT_EQ(WifiSleepManager::GetInstance().RequestHighPerformance(), CHIP_NO_ERROR);
+        EXPECT_EQ(WifiSleepManager::GetInstance().RequestHighPerformanceWithTransition(), CHIP_NO_ERROR);
         EXPECT_EQ(mMock.GetLastPowerSaveConfiguration(), PowerSaveInterface::PowerSaveConfiguration::kHighPerformance);
         EXPECT_TRUE(mMock.WasConfigurePowerSaveCalled());
     }
 
     // The next request should fail
-    EXPECT_EQ(WifiSleepManager::GetInstance().RequestHighPerformance(), CHIP_ERROR_INTERNAL);
+    EXPECT_EQ(WifiSleepManager::GetInstance().RequestHighPerformanceWithTransition(), CHIP_ERROR_INTERNAL);
     EXPECT_FALSE(mMock.WasConfigurePowerSaveCalled());
 
     // Reset the counter & validate reset
@@ -148,7 +148,7 @@ TEST_F(TestWifiSleepManager, TestRequestHighPerformanceMaxCounter)
 
 TEST_F(TestWifiSleepManager, TestRequestRemoveHighPerformance)
 {
-    EXPECT_EQ(WifiSleepManager::GetInstance().RequestHighPerformance(), CHIP_NO_ERROR);
+    EXPECT_EQ(WifiSleepManager::GetInstance().RequestHighPerformanceWithTransition(), CHIP_NO_ERROR);
     EXPECT_EQ(mMock.GetLastPowerSaveConfiguration(), PowerSaveInterface::PowerSaveConfiguration::kHighPerformance);
     EXPECT_TRUE(mMock.WasConfigurePowerSaveCalled());
 
@@ -198,4 +198,17 @@ TEST_F(TestWifiSleepManager, TestVerifyOrTransitionStandardOperation)
     EXPECT_TRUE(mMock.WasConfigurePowerSaveCalled());
     EXPECT_TRUE(mMock.WasConfigureBroadcastFilterCalled());
     EXPECT_FALSE(mMock.WasBroadcastFilterEnabled());
+}
+
+TEST_F(TestWifiSleepManager, TestRequestHighPerformanceWithoutProvisioning)
+{
+    EXPECT_EQ(WifiSleepManager::GetInstance().VerifyAndTransitionToLowPowerMode(WifiSleepManager::PowerEvent::kGenericEvent),
+              CHIP_NO_ERROR);
+
+    PowerSaveInterface::PowerSaveConfiguration config = mMock.GetLastPowerSaveConfiguration();
+    EXPECT_EQ(PowerSaveInterface::PowerSaveConfiguration::kDeepSleep, config);
+
+    // The configuration should not change
+    EXPECT_EQ(WifiSleepManager::GetInstance().RequestHighPerformanceWithoutTransition(), CHIP_NO_ERROR);
+    EXPECT_EQ(mMock.GetLastPowerSaveConfiguration(), config);
 }

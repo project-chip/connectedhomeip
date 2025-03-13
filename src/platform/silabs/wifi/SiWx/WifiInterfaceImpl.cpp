@@ -489,6 +489,9 @@ void WiseconnectWifiInterface::MatterWifiTask(void * arg)
     VerifyOrReturn(status == SL_STATUS_OK,
                    ChipLogError(DeviceLayer, "MatterWifiTask: SiWxPlatformInit failed: 0x%lx", static_cast<uint32_t>(status)));
 
+    // Remove High performance request after the device is initialized
+    // chip::DeviceLayer::Silabs::WifiSleepManager::GetInstance().RemoveHighPerformanceRequest();
+
     WifiInterfaceImpl::GetInstance().NotifyWifiTaskInitialized();
 
     ChipLogDetail(DeviceLayer, "MatterWifiTask: starting event loop");
@@ -508,6 +511,9 @@ void WiseconnectWifiInterface::MatterWifiTask(void * arg)
 CHIP_ERROR WifiInterfaceImpl::InitWiFiStack(void)
 {
     sl_status_t status = SL_STATUS_OK;
+
+    // Force the device to high performance mode during the init sequence.
+    chip::DeviceLayer::Silabs::WifiSleepManager::GetInstance().RequestHighPerformanceWithoutTransition();
 
     status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &config, &wifi_client_context, nullptr);
     VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_INTERNAL, ChipLogError(DeviceLayer, "sl_net_init failed: %lx", status));
@@ -705,7 +711,7 @@ sl_status_t WifiInterfaceImpl::JoinWifiNetwork(void)
 // To avoid IOP issues, it is recommended to enable high-performance mode before joining the network.
 // TODO: Remove this once the IOP issue related to power save mode switching is fixed in the Wi-Fi SDK.
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    chip::DeviceLayer::Silabs::WifiSleepManager::GetInstance().RequestHighPerformance();
+    chip::DeviceLayer::Silabs::WifiSleepManager::GetInstance().RequestHighPerformanceWithTransition();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     status = sl_net_up(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID);

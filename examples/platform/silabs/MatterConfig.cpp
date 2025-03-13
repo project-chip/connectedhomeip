@@ -203,6 +203,8 @@ void SilabsMatterConfig::AppInit()
 
 CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 {
+    using namespace chip::DeviceLayer::Silabs;
+
     CHIP_ERROR err;
 #ifdef SL_WIFI
     // Because OpenThread needs to use memory allocation during its Key operations, we initialize the memory management for thread
@@ -234,10 +236,9 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     ReturnErrorOnFailure(InitWiFi());
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    ReturnErrorOnFailure(DeviceLayer::Silabs::WifiSleepManager::GetInstance().Init(
-        &DeviceLayer::Silabs::WifiInterface::GetInstance(), &DeviceLayer::Silabs::WifiInterface::GetInstance()));
+    ReturnErrorOnFailure(WifiSleepManager::GetInstance().Init(&WifiInterface::GetInstance(), &WifiInterface::GetInstance()));
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
-#endif
+#endif // SL_WIFI
 
     ReturnErrorOnFailure(PlatformMgr().InitChipStack());
 
