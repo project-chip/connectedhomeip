@@ -136,7 +136,6 @@ enum
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     kDeviceOption_icdActiveModeDurationMs,
     kDeviceOption_icdIdleModeDuration,
-    kDeviceOption_icdPeriodicWakeupDurationMs,
 #endif // CHIP_ENABLE_ICD_SERVER
 };
 
@@ -221,7 +220,6 @@ OptionDef sDeviceOptionDefs[] = {
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     { "icdActiveModeDurationMs", kArgumentRequired, kDeviceOption_icdActiveModeDurationMs },
     { "icdIdleModeDuration", kArgumentRequired, kDeviceOption_icdIdleModeDuration },
-    { "icdPeriodicWakeupDurationMs", kArgumentRequired, kDeviceOption_icdPeriodicWakeupDurationMs },
 #endif // CHIP_ENABLE_ICD_SERVER
     {}
 };
@@ -404,10 +402,6 @@ const char * sDeviceOptionHelp =
     "  --icdIdleModeDuration <icdIdleModeDuration>\n"
     "       Sets the ICD idle mode durations (in seconds). (Default: 300) \n"
     "       This defines the how long the ICD server can stay in idle mode.\n"
-    "  --icdPeriodicWakeupDurationMs <icdPeriodicWakupDurationMs>\n"
-    "       Sets the ICD periodic wakeup (in milliseconds). (Default: 60000)\n"
-    "       This is for testing purpose on Linux which defines the internal to wakeup periodically to send \n"
-    "       Check-In messages since Linux application doesn't have a physical button to trigger wakeup\n"
 #endif
     "\n";
 
@@ -827,9 +821,6 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         }
         break;
     }
-    case kDeviceOption_icdPeriodicWakeupDurationMs:
-        LinuxDeviceOptions::GetInstance().icdPeriodicWakeupDurationMs = static_cast<uint32_t>(atoi(aValue));
-        break;
 #endif
     default:
         PrintArgError("%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);

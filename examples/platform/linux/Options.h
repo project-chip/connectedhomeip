@@ -101,7 +101,6 @@ struct LinuxDeviceOptions
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     chip::Optional<chip::System::Clock::Milliseconds32> icdActiveModeDurationMs;
     chip::Optional<chip::System::Clock::Milliseconds32> icdIdleModeDurationMs;
-    uint32_t icdPeriodicWakeupDurationMs = 60000;
 #endif
     static LinuxDeviceOptions & GetInstance();
 };
