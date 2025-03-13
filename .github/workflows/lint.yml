@@ -274,30 +274,14 @@ jobs:
                   Check for use of 'emberAf' symbols
               if: always()
               run: |
-                  emberAf_matches=$(git grep -I -n '\<emberAf[A-Za-z0-9_]*' -- './*' \
-                    ':(exclude).github/*' \
-                    ':(exclude)src/app/util/*' \
-                    ':(exclude)zzz_generated/app-common/app-common/zap-generated/access/Accessors.h' \
-                    ':(exclude)src/app/zap-templates/templates/app/attributes/Accessors-src.zapt') \
-                    && echo "Error: Found 'emberAf' symbols in the following files and lines:" \
-                    && echo "$emberAf_matches" \
-                    && exit 1 || exit 0
+                  ./scripts/check_symbols.sh ':(exclude).github/*' ':(exclude)src/app/util/*' ':(exclude)zzz_generated/app-common/app-common/zap-generated/access/Accessors.h' ':(exclude)src/app/zap-templates/templates/app/attributes/Accessors-src.zapt'
 
-            # First pattern: emberAf
-            # ---
             - name:
                   Check for use of 'emAf' symbols
               if: always()
               run: |
-                  emAf_matches=$(git grep -I -n '\<emAf[A-Za-z0-9_]*' -- './*' \
-                    ':(exclude).github/*' \
-                    ':(exclude)src/app/util/*' \
-                    ':(exclude)zzz_generated/app-common/app-common/zap-generated/access/Accessors.h' \
-                    ':(exclude)src/app/zap-templates/templates/app/attributes/Accessors-src.zapt') \
-                    && echo "Error: Found 'emAf' symbols in the following files and lines:" \
-                    && echo "$emAf_matches" \
-                    && exit 1 || exit 0
-            # Second pattern: emAf
+                  ./scripts/check_symbols.sh ':(exclude).github/*' ':(exclude)src/app/util/*' ':(exclude)zzz_generated/app-common/app-common/zap-generated/access/Accessors.h' ':(exclude)src/app/zap-templates/templates/app/attributes/Accessors-src.zapt'
+
             # git grep exits with 0 if it finds a match, but we want
             # to fail (exit nonzero) on match.  And we want to exclude this file,
             # to avoid our grep regexp matching itself, as well as excluding the files
@@ -350,7 +334,8 @@ jobs:
                   git grep -I -n 'SuccessOrExit([^=)]*(' -- './*' ':(exclude).github/workflows/lint.yml' && exit 1 || exit 0
 
             # git grep exits with 0 if it finds a match, but we want
-            # to fail (exit nonzero) on match.
+            # to fail (exit nonzero) on match.  And we want to exclude this file,
+            # to avoid our grep regexp matching itself.
             - name:
                   Check for use of "using namespace" outside of a class/function
                   in headers.
