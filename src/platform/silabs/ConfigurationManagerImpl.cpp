@@ -29,7 +29,6 @@
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
 #include <platform/silabs/SilabsConfig.h>
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
-#include <platform/silabs/wifi/icd/WifiSleepManager.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
 #include <platform/silabs/wifi/WifiInterface.h>
