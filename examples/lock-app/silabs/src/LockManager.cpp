@@ -26,6 +26,7 @@
 
 using chip::app::DataModel::MakeNullable;
 using namespace ::chip::DeviceLayer::Internal;
+using namespace EFR32DoorLock;
 using namespace EFR32DoorLock::LockInitParams;
 
 namespace {
