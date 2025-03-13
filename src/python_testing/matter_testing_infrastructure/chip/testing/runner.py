@@ -177,7 +177,8 @@ def get_test_info(test_class, matter_test_config) -> list[TestInfo]:
 
     info = []
     for t in tests:
-        info.append(TestInfo(t, steps=base.get_test_steps(t), desc=base.get_test_desc(t), pics=base.get_test_pics(t)))
+        info.append(TestInfo(t, steps=base.get_test_steps(
+            t), desc=base.get_test_desc(t), pics=base.get_test_pics(t)))
 
     return info
 
@@ -233,17 +234,21 @@ def run_tests_no_exit(test_class, matter_test_config,
                 nodeId=matter_test_config.controller_node_id,
                 paaTrustStorePath=str(matter_test_config.paa_trust_store_path),
                 catTags=matter_test_config.controller_cat_tags,
-                dacRevocationSetPath=str(matter_test_config.dac_revocation_set_path),
+                dacRevocationSetPath=str(
+                    matter_test_config.dac_revocation_set_path),
             )
-        test_config.user_params["default_controller"] = stash_globally(default_controller)
+        test_config.user_params["default_controller"] = stash_globally(
+            default_controller)
 
-        test_config.user_params["matter_test_config"] = stash_globally(matter_test_config)
+        test_config.user_params["matter_test_config"] = stash_globally(
+            matter_test_config)
         test_config.user_params["hooks"] = stash_globally(hooks)
 
         # Execute the test class with the config
         ok = True
 
-        test_config.user_params["certificate_authority_manager"] = stash_globally(stack.certificate_authority_manager)
+        test_config.user_params["certificate_authority_manager"] = stash_globally(
+            stack.certificate_authority_manager)
 
         # Execute the test class with the config
         ok = True
@@ -277,11 +282,13 @@ def run_tests_no_exit(test_class, matter_test_config,
             except signals.TestAbortAll:
                 ok = False
             except Exception:
-                logging.exception('Exception when executing %s.', test_config.testbed_name)
+                logging.exception('Exception when executing %s.',
+                                  test_config.testbed_name)
                 ok = False
 
     if hooks:
-        duration = (datetime.now(timezone.utc) - runner_start_time) / timedelta(microseconds=1)
+        duration = (datetime.now(timezone.utc) -
+                    runner_start_time) / timedelta(microseconds=1)
         hooks.stop(duration=duration)
 
     if not external_stack:
@@ -363,8 +370,10 @@ class MockTestRunner():
     def run_test_with_mock_read(self, read_cache: Attribute.AsyncReadTransaction.ReadResponse, hooks=None):
         self.default_controller.Read = AsyncMock(return_value=read_cache)
         # This doesn't need to do anything since we are overriding the read anyway
-        self.default_controller.FindOrEstablishPASESession = AsyncMock(return_value=None)
-        self.default_controller.GetConnectedDevice = AsyncMock(return_value=None)
+        self.default_controller.FindOrEstablishPASESession = AsyncMock(
+            return_value=None)
+        self.default_controller.GetConnectedDevice = AsyncMock(
+            return_value=None)
         with asyncio.Runner() as runner:
             return run_tests_no_exit(self.test_class, self.config, runner.get_loop(),
                                      hooks, self.default_controller, self.stack)
