@@ -274,13 +274,7 @@ jobs:
                   Check for use of 'emberAf' symbols
               if: always()
               run: |
-                  ./scripts/check_symbols.sh ':(exclude).github/*' ':(exclude)src/app/util/*' ':(exclude)zzz_generated/app-common/app-common/zap-generated/access/Accessors.h' ':(exclude)src/app/zap-templates/templates/app/attributes/Accessors-src.zapt'
-
-            - name:
-                  Check for use of 'emAf' symbols
-              if: always()
-              run: |
-                  ./scripts/check_symbols.sh ':(exclude).github/*' ':(exclude)src/app/util/*' ':(exclude)zzz_generated/app-common/app-common/zap-generated/access/Accessors.h' ':(exclude)src/app/zap-templates/templates/app/attributes/Accessors-src.zapt'
+                  ./scripts/check_symbols.sh --skip-dir .github --skip-dir src/app/util --skip-dir zzz_generated/app-common/app-common/zap-generated/access/Accessors.h --skip-dir src/app/zap-templates/templates/app/attributes/Accessors-src.zapt
 
             # git grep exits with 0 if it finds a match, but we want
             # to fail (exit nonzero) on match.  And we want to exclude this file,
@@ -334,8 +328,7 @@ jobs:
                   git grep -I -n 'SuccessOrExit([^=)]*(' -- './*' ':(exclude).github/workflows/lint.yml' && exit 1 || exit 0
 
             # git grep exits with 0 if it finds a match, but we want
-            # to fail (exit nonzero) on match.  And we want to exclude this file,
-            # to avoid our grep regexp matching itself.
+            # to fail (exit nonzero) on match.
             - name:
                   Check for use of "using namespace" outside of a class/function
                   in headers.

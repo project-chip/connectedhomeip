@@ -5,19 +5,27 @@
 
 # Function to check for 'ember' and 'emAf' symbols
 check_symbols() {
-    local exclusions=("$@")
-    local exclude_args=()
-    for exclude in "${exclusions[@]}"; do
-        exclude_args+=(":(exclude)$exclude")
+    local exclusions=()
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            --skip-dir)
+                exclusions+=(":(exclude)$2")
+                shift 2
+                ;;
+            *)
+                echo "Unknown option: $1"
+                exit 1
+                ;;
+        esac
     done
 
-    ember_matches=$(git grep -I -n '\<ember[A-Za-z0-9_]*' -- './*' "${exclude_args[@]}" \
+    ember_matches=$(git grep -I -n '\<ember[A-Za-z0-9_]*' -- './*' "${exclusions[@]}" \
         ':(exclude).github/*' \
         ':(exclude)src/app/util/*' \
         ':(exclude)zzz_generated/app-common/app-common/zap-generated/access/Accessors.h' \
         ':(exclude)src/app/zap-templates/templates/app/attributes/Accessors-src.zapt')
 
-    emAf_matches=$(git grep -I -n '\<emAf[A-Za-z0-9_]*' -- './*' "${exclude_args[@]}" \
+    emAf_matches=$(git grep -I -n '\<emAf[A-Za-z0-9_]*' -- './*' "${exclusions[@]}" \
         ':(exclude).github/*' \
         ':(exclude)src/app/util/*' \
         ':(exclude)zzz_generated/app-common/app-common/zap-generated/access/Accessors.h' \
@@ -32,5 +40,4 @@ check_symbols() {
 }
 
 # Main script execution
-exclusions=("$@")
-check_symbols "${exclusions[@]}"
+check_symbols "$@"
