@@ -396,7 +396,7 @@ const char * sDeviceOptionHelp =
     "       A json file with data used by the example dac provider to validate device attestation procedure.\n"
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     "  --icdActiveModeDurationMs <icdActiveModeDurationMs>\n"
-    "       Sets the ICD active mode threshold (in milliseconds). (Default: 300) \n"
+    "       Sets the ICD active mode duration (in milliseconds). (Default: 300) \n"
     "       This defines the how long the the server typically will stay in active mode after \n"
     "       initial transition out of idle mode.\n"
     "  --icdIdleModeDuration <icdIdleModeDuration>\n"
