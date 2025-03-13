@@ -60,7 +60,7 @@ public:
      * @brief Function trigger the platform to execute a software reset.
      *              Anything after this function will not be executed since the device will reboot.
      */
-    virtual void SoftwareReset(void) {}
+    virtual void SoftwareReset(void) = 0;
 
     // BLE Specific Method
 
