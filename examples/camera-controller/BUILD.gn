@@ -107,7 +107,14 @@ executable("camera-controller") {
   deps = [
     ":camera-controller-utils",
     "${chip_root}/src/platform/logging:stdio",
+    "${chip_root}/third_party/libdatachannel:libdatachannel",
   ]
+
+  libs = [ "datachannel" ]
+  lib_dirs =
+      [ rebase_path("${chip_root}/third_party/libdatachannel/repo/build") ]
+
+  include_dirs = [ "${chip_root}/third_party/libdatachannel/repo/include" ]
 
   output_dir = root_out_dir
 }
