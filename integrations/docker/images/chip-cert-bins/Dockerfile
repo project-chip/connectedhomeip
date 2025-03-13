@@ -332,6 +332,9 @@ RUN pip install --break-system-packages -r /tmp/requirements.txt && rm /tmp/requ
 # PIP requires MASON package compilation, which seems to require a JDK
 RUN set -x && DEBIAN_FRONTEND=noninteractive apt-get update; apt-get install -fy openjdk-8-jdk
 
+# This is necessary to avoid dependency conflict of PyGObject
+RUN apt-get remove -y python3-gi
+
 RUN pip install --break-system-packages --no-cache-dir \
     python_lib/python/obj/src/python_testing/matter_testing_infrastructure/chip-testing._build_wheel/chip_testing-*.whl \
     python_lib/controller/python/chip*.whl
