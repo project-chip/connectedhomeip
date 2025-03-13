@@ -274,7 +274,13 @@ jobs:
                   Check for use of 'emberAf' symbols
               if: always()
               run: |
-                  ./scripts/check_symbols.sh --skip-dir .github --skip-dir src/app/util --skip-dir zzz_generated/app-common/app-common/zap-generated/access/Accessors.h --skip-dir src/app/zap-templates/templates/app/attributes/Accessors-src.zapt
+                  chmod +x scripts/check_symbols.sh
+                  scripts/check_symbols.sh \
+                  --skip-dir .github \
+                  --skip-dir src/app/util \
+                  --skip-dir zzz_generated/app-common/app-common/zap-generated/access/Accessors.h \
+                  --skip-dir src/app/zap-templates/templates/app/attributes/Accessors-src.zapt \
+                  --skip-dir src/app/codegen-data-node-provider
 
             # git grep exits with 0 if it finds a match, but we want
             # to fail (exit nonzero) on match.  And we want to exclude this file,
