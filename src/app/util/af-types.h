@@ -25,7 +25,7 @@
 
 #include <stdbool.h> // For bool
 #include <stdint.h>  // For various uint*_t types
-#include <string>
+#include <string>    // For string
 
 #include <app/util/AttributesChangedListener.h>
 #include <app/util/MarkAttributeDirty.h>

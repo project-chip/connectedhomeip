@@ -193,4 +193,6 @@ ALLOW: Dict[str, Set[str]] = {
 
     # nrfconnect test runner
     'src/test_driver/nrfconnect/main/runner.cpp': {'vector'},
+
+    'src/app/util/af-types.h': {'string'},
 }
