@@ -29,7 +29,7 @@ config("config") {
     "include",
     "include/clusters/chime",
     "${chip_root}/examples/camera-app/camera-common/include",
-    "${chip_root}/third_party/libdatachannel/repo/include",    
+    "${chip_root}/third_party/libdatachannel/repo/include",
   ]
 }
 
