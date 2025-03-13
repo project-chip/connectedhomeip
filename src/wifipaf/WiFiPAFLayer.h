@@ -26,8 +26,6 @@
 #include <system/SystemLayer.h>
 #include <system/SystemPacketBuffer.h>
 
-#include <vector>
-
 namespace chip {
 namespace WiFiPAF {
 
@@ -151,6 +149,14 @@ enum class State
     kConnected   = 2, /**< Endpoint connected. */
 };
 
+enum class PafInfoAccess
+{
+    kAccNodeInfo,
+    kAccSessionId,
+    kAccNodeId,
+    kAccDisc,
+};
+
 class DLL_EXPORT WiFiPAFLayer
 {
     friend class WiFiPAFEndPoint;
@@ -159,7 +165,7 @@ public:
     State mAppState                          = State::kNotReady;
     WiFiPAFLayerDelegate * mWiFiPAFTransport = nullptr;
 
-    WiFiPAFLayer() = default;
+    WiFiPAFLayer();
     static WiFiPAFLayer * GetWiFiPAFLayer();
     CHIP_ERROR Init(chip::System::Layer * systemLayer);
 
@@ -182,15 +188,14 @@ public:
     static WiFiPAFTransportProtocolVersion
     GetHighestSupportedProtocolVersion(const PAFTransportCapabilitiesRequestMessage & reqMsg);
 
-    void AddPafSession(const NodeId nodeId, const uint16_t discriminator);
-    void AddPafSession(uint32_t id);
-    void RmPafSession(uint32_t id);
-    WiFiPAFSession * GetPAFInfo(NodeId nodeId);
-    WiFiPAFSession * GetPAFInfo(uint32_t id);
-    WiFiPAFSession * GetPAFInfo(uint16_t discriminator);
+    CHIP_ERROR AddPafSession(PafInfoAccess accType, WiFiPAFSession & SessionInfo);
+    CHIP_ERROR RmPafSession(PafInfoAccess accType, WiFiPAFSession & SessionInfo);
+    WiFiPAFSession * GetPAFInfo(PafInfoAccess accType, WiFiPAFSession & SessionInfo);
 
 private:
-    std::vector<WiFiPAFSession> PafInfoVect;
+    void InitialPafInfo();
+    void cleanPafInfo(WiFiPAFSession & SessionInfo);
+    WiFiPAFSession mPafInfoVect[WIFIPAF_LAYER_NUM_PAF_ENDPOINTS];
     chip::System::Layer * mSystemLayer;
 };
 

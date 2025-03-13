@@ -71,7 +71,8 @@ CHIP_ERROR WiFiPAFBase::SendMessage(const Transport::PeerAddress & address, Pack
     VerifyOrReturnError(address.GetTransportType() == Type::kWiFiPAF, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mWiFiPAFLayer->GetWiFiPAFState() != State::kNotReady, CHIP_ERROR_INCORRECT_STATE);
 
-    WiFiPAFSession * pTxInfo = mWiFiPAFLayer->GetPAFInfo(address.GetRemoteId());
+    WiFiPAFSession sessionInfo = { .nodeId = address.GetRemoteId() };
+    WiFiPAFSession * pTxInfo   = mWiFiPAFLayer->GetPAFInfo(chip::WiFiPAF::PafInfoAccess::kAccNodeId, sessionInfo);
     if (pTxInfo == nullptr)
     {
         /*
@@ -96,7 +97,7 @@ bool WiFiPAFBase::CanSendToPeer(const Transport::PeerAddress & address)
 
 CHIP_ERROR WiFiPAFBase::WiFiPAFMessageReceived(WiFiPAFSession & RxInfo, PacketBufferHandle && buffer)
 {
-    auto pPafInfo = mWiFiPAFLayer->GetPAFInfo(RxInfo.id);
+    auto pPafInfo = mWiFiPAFLayer->GetPAFInfo(chip::WiFiPAF::PafInfoAccess::kAccSessionId, RxInfo);
     if (pPafInfo == nullptr)
     {
         /*
