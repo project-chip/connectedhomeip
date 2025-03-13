@@ -32,40 +32,40 @@ namespace app {
 namespace Clusters {
 namespace MeterIdentification {
 
-struct Delegate
-{
-    EndpointId mEndpointId = 0;
-
-public:
-    virtual ~Delegate() = default;
-
-    void SetEndpointId(const EndpointId & aEndpoint) { mEndpointId = aEndpoint; }
-
-    virtual DataModel::Nullable<MeterTypeEnum> GetMeterType()                             = 0;
-    virtual DataModel::Nullable<CharSpan> GetPointOfDelivery()                            = 0;
-    virtual DataModel::Nullable<CharSpan> GetMeterSerialNumber()                          = 0;
-    virtual DataModel::Nullable<CharSpan> GetProtocolVersion()                            = 0;
-    virtual DataModel::Nullable<Structs::PowerThresholdStruct::Type> GetPowerThreshold()  = 0;
-};
-
 class Instance : public AttributeAccessInterface
 {
 public:
-    Instance(const EndpointId & aEndpointId, Delegate & aDelegate, const BitMask<Feature> & aFeature) :
-        AttributeAccessInterface(MakeOptional(aEndpointId), Id), mDelegate(aDelegate), mFeature(aFeature)
-    {
-        /* set the base class delegates endpointId */
-        mDelegate.SetEndpointId(aEndpointId);
-    }
-    ~Instance() { Shutdown(); }
+    Instance(const EndpointId & aEndpointId, const BitMask<Feature> & aFeature) :
+        AttributeAccessInterface(MakeOptional(aEndpointId), Id), mEndpointId(aEndpointId), mFeature(aFeature) {}
+    ~Instance() override;
 
     CHIP_ERROR Init();
     void Shutdown();
 
     bool HasFeature(const Feature & aFeature) const;
 
+    // Attribute Accessors
+    DataModel::Nullable<MeterTypeEnum> GetMeterType() { return mMeterType; }
+    DataModel::Nullable<CharSpan> GetPointOfDelivery() { return mPointOfDelivery; }
+    DataModel::Nullable<CharSpan> GetMeterSerialNumber() { return mMeterSerialNumber; }
+    DataModel::Nullable<CharSpan> GetProtocolVersion() { return mProtocolVersion; }
+    DataModel::Nullable<Structs::PowerThresholdStruct::Type> GetPowerThreshold() { return mPowerThreshold; }
+
+     // Internal Application API to set attribute values
+    CHIP_ERROR SetMeterType(const DataModel::Nullable<MeterTypeEnum> & value);
+    CHIP_ERROR SetPointOfDelivery(const DataModel::Nullable<CharSpan> & value);
+    CHIP_ERROR SetMeterSerialNumber(const DataModel::Nullable<CharSpan> & value);
+    CHIP_ERROR SetProtocolVersion(const DataModel::Nullable<CharSpan> & value);
+    CHIP_ERROR SetPowerThreshold(const DataModel::Nullable<Structs::PowerThresholdStruct::Type> & value);
+
 private:
-    Delegate & mDelegate;
+    // Attribute storage
+    DataModel::Nullable<MeterTypeEnum> mMeterType;
+    DataModel::Nullable<CharSpan> mPointOfDelivery;
+    DataModel::Nullable<CharSpan> mMeterSerialNumber;
+    DataModel::Nullable<CharSpan> mProtocolVersion;
+    DataModel::Nullable<Structs::PowerThresholdStruct::Type> mPowerThreshold;
+    EndpointId mEndpointId = 0;
     BitMask<Feature> mFeature;
 
     // AttributeAccessInterface
