@@ -271,33 +271,19 @@ jobs:
             # to avoid our grep regexp matching itself, as well as excluding the files
             # that implement the type-safe accessors
             - name:
-                  Check for use of 'emberAf' symbols
+                  Check for use of 'emberAf' or 'emAf' symbols
               if: always()
               run: |
-                  emberAf_matches=$(git grep -I -n '\<emberAf[A-Za-z0-9_]*' -- './*' \
-                    ':(exclude).github/*' \
-                    ':(exclude)src/app/util/*' \
-                    ':(exclude)zzz_generated/app-common/app-common/zap-generated/access/Accessors.h' \
-                    ':(exclude)src/app/zap-templates/templates/app/attributes/Accessors-src.zapt') \
-                    && echo "Error: Found 'emberAf' symbols in the following files and lines:" \
-                    && echo "$emberAf_matches" \
-                    && exit 1 || exit 0
+                  chmod +x scripts/check_symbols.sh
+                  scripts/check_symbols.sh \
+                  --skip-dir .github \
+                  --skip-dir src/app/util \
+                  --skip-dir zzz_generated/app-common/app-common/zap-generated \
+                  --skip-dir src/app/zap-templates/templates \
+                  --skip-dir src/app/codegen-data-node-provider \
+                  --skip-dir src/data-model-providers
+                  --skip-dir scripts/
 
-            # First pattern: emberAf
-            # ---
-            - name:
-                  Check for use of 'emAf' symbols
-              if: always()
-              run: |
-                  emAf_matches=$(git grep -I -n '\<emAf[A-Za-z0-9_]*' -- './*' \
-                    ':(exclude).github/*' \
-                    ':(exclude)src/app/util/*' \
-                    ':(exclude)zzz_generated/app-common/app-common/zap-generated/access/Accessors.h' \
-                    ':(exclude)src/app/zap-templates/templates/app/attributes/Accessors-src.zapt') \
-                    && echo "Error: Found 'emAf' symbols in the following files and lines:" \
-                    && echo "$emAf_matches" \
-                    && exit 1 || exit 0
-            # Second pattern: emAf
             # git grep exits with 0 if it finds a match, but we want
             # to fail (exit nonzero) on match.  And we want to exclude this file,
             # to avoid our grep regexp matching itself, as well as excluding the files
