@@ -85,13 +85,10 @@ enum class AttributeQualityFlags : uint32_t
 };
 
 
-// zero is not a valid privilege, just a default initial value for privileges
-constexpr std::underlying_type_t<Access::Privilege> kNoPrivilege(0) ;
 
 
 struct AttributeEntry
 {
-
     AttributeId attributeId;
 
     // Constructor
@@ -102,29 +99,37 @@ struct AttributeEntry
                             ) : attributeId(id), mask{ attrQualityFlags, readPriv, writePriv } {}
 
 
+    enum class ReadWriteFlag : uint8_t
+    {
+        AssignReadPrivilege  = 1 << 0,
+        AssignWritePrivilege = 1 << 1
+    };
 
-    // Overload assignment operator for mask.readPrivilege
+    ReadWriteFlag opFlag {ReadWriteFlag::AssignReadPrivilege};
+
+    
+    // Overload assignment operator for privileges
     AttributeEntry& operator=(Access::Privilege value) 
     {
         // Static ASSERT to check size of readPrivilege type vs entry parameter.
         static_assert(sizeof(std::underlying_type_t<Access::Privilege>) >= 
                       sizeof(chip::to_underlying(value)),
-                      "Size of readPrivilege is not able to accomodate parameter (value).");
+                      "Size of input privilege is not able to accomodate parameter (value).");
 
-        this->mask.readPrivilege = chip::to_underlying(value);
-        return *this;
-    }
+        switch (opFlag)
+        {
+            case ReadWriteFlag::AssignReadPrivilege :
+                this->mask.readPrivilege = to_underlying(value);
+                break;
 
+            case ReadWriteFlag::AssignWritePrivilege :
+                this->mask.writePrivilege = to_underlying(value);
+                break;
 
-    // Overload assignment operator for mask.writePrivilege
-    AttributeEntry& operator=(std::underlying_type_t<Access::Privilege> value)
-    {
-        // Static ASSERT to check size of writePrivilege type vs entry parameter.
-        static_assert(sizeof(std::underlying_type_t<Access::Privilege>) >= 
-                      sizeof(value),
-                      "Size of writePrivilege is not able to accomodate parameter (value).");
-
-        this->mask.writePrivilege = value;
+            default :
+                break;
+        }
+                      
         return *this;
     }
 
@@ -157,13 +162,17 @@ struct AttributeEntry
     }
 
 
-    constexpr bool FlagsHas(AttributeQualityFlags f) const { return (mask.flags & chip::to_underlying(f)) != 0; }   
+    constexpr bool HasFlags(AttributeQualityFlags f) const { return (mask.flags & chip::to_underlying(f)) != 0; }   
 
     bool ReadAllowed() {return mask.readPrivilege != kNoPrivilege;}
     bool WriteAllowed() {return mask.writePrivilege != kNoPrivilege;}
 
 
     private:
+
+        // zero is not a valid privilege, just a default initial value for privileges
+        static constexpr std::underlying_type_t<Access::Privilege> kNoPrivilege{0} ;
+
 
         struct attribute_entry_mask_t {
 
@@ -200,7 +209,6 @@ enum class CommandQualityFlags : uint32_t
 
 struct AcceptedCommandEntry
 {
-
     CommandId commandId;
 
     // Constructor
@@ -222,7 +230,7 @@ struct AcceptedCommandEntry
         this->mask.invokePrivilege = chip::to_underlying(value);
         return *this;
     }
-                            
+
 
     // Getter for mask.invokePrivilege
     Access::Privilege GetInvokePrivilege() const
@@ -245,10 +253,14 @@ struct AcceptedCommandEntry
     }
    
 
-    constexpr bool FlagsHas(CommandQualityFlags f) const { return (mask.flags & chip::to_underlying(f)) != 0; }   
+    constexpr bool HasFlags(CommandQualityFlags f) const { return (mask.flags & chip::to_underlying(f)) != 0; }   
 
     
     private:
+
+        // zero is not a valid privilege, just a default initial value for privileges
+        static constexpr std::underlying_type_t<Access::Privilege> kNoPrivilege{0} ;
+
 
         struct accepted_command_entry_mask_t {
 
