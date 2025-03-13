@@ -120,6 +120,11 @@ executable("camera-controller") {
 
   include_dirs = [ "${chip_root}/third_party/libdatachannel/repo/include" ]
 
+  cflags = [
+    "-Wconversion",
+    "-Wno-shadow",
+  ]
+
   output_dir = root_out_dir
 }
 

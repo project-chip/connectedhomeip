@@ -54,7 +54,10 @@ executable("chip-camera-app") {
     "${chip_root}/third_party/libdatachannel/repo/include",
   ]
 
-  cflags = [ "-Wconversion" ]
+  cflags = [ 
+    "-Wconversion",
+    "-Wno-shadow"
+  ]
 
   output_dir = root_out_dir
 }
