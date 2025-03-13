@@ -114,25 +114,31 @@ TEST_F(TestWiFiPAFLayer, CheckWiFiPAFTransportCapabilitiesResponseMessage)
 
 TEST_F(TestWiFiPAFLayer, CheckPafSession)
 {
-    const NodeId nodeId          = 0x1;
-    const uint16_t discriminator = 0xF00;
-    AddPafSession(nodeId, discriminator);
+    // Add a session by giving node_id, discriminator
+    WiFiPAF::WiFiPAFSession sessionInfo = { .nodeId = 0x1, .discriminator = 0xF00 };
+    EXPECT_EQ(AddPafSession(PafInfoAccess::kAccNodeInfo, sessionInfo), CHIP_NO_ERROR);
 
-    auto pPafSessionInfo_nodeid = GetPAFInfo(nodeId);
-    EXPECT_EQ(pPafSessionInfo_nodeid->nodeId, nodeId);
-    EXPECT_EQ(pPafSessionInfo_nodeid->discriminator, discriminator);
+    // Get the session info by giving node_id
+    sessionInfo.nodeId          = 0x1;
+    auto pPafSessionInfo_nodeid = GetPAFInfo(PafInfoAccess::kAccNodeId, sessionInfo);
+    EXPECT_EQ(pPafSessionInfo_nodeid->nodeId, sessionInfo.nodeId);
+    EXPECT_EQ(pPafSessionInfo_nodeid->discriminator, sessionInfo.discriminator);
 
-    auto pPafSessionInfo_disc = GetPAFInfo(discriminator);
-    EXPECT_EQ(pPafSessionInfo_disc->nodeId, nodeId);
-    EXPECT_EQ(pPafSessionInfo_disc->discriminator, discriminator);
+    // Get the session info by giving the discriminator
+    sessionInfo.discriminator = 0xF00;
+    auto pPafSessionInfo_disc = GetPAFInfo(PafInfoAccess::kAccDisc, sessionInfo);
+    EXPECT_EQ(pPafSessionInfo_disc->nodeId, sessionInfo.nodeId);
+    EXPECT_EQ(pPafSessionInfo_disc->discriminator, sessionInfo.discriminator);
 
-    uint32_t pafid = 0x2;
-    AddPafSession(pafid);
-    auto pPafSessionInfo_Remote = GetPAFInfo(pafid);
-    EXPECT_EQ(pPafSessionInfo_Remote->id, pafid);
-    RmPafSession(pafid);
-    auto pPafSessionInfo_Remote_1 = GetPAFInfo(pafid);
-    EXPECT_EQ(pPafSessionInfo_Remote_1, nullptr);
+    // Set the session ID of the existing session
+    pPafSessionInfo_disc->id = 0x1;
+
+    // Add a new session, but no space
+    sessionInfo.id = 0x2;
+    EXPECT_EQ(AddPafSession(PafInfoAccess::kAccSessionId, sessionInfo), CHIP_ERROR_PROVIDER_LIST_EXHAUSTED);
+
+    sessionInfo.id = 0x1;
+    EXPECT_EQ(RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo), CHIP_NO_ERROR);
 }
 
 TEST_F(TestWiFiPAFLayer, CheckNewEndpoint)

@@ -76,6 +76,9 @@ using namespace ::chip::app::Clusters::GeneralDiagnostics;
 using namespace ::chip::app::Clusters::WiFiNetworkDiagnostics;
 
 using namespace ::chip::DeviceLayer::NetworkCommissioning;
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+using namespace ::chip::WiFiPAF;
+#endif
 
 namespace chip {
 
@@ -938,7 +941,8 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFPublish(ConnectivityManager::WiFiPAF
     wpa_supplicant_1_interface_call_nanpublish_sync(mWpaSupplicant.iface, args, &publish_id, nullptr, &err.GetReceiver());
 
     ChipLogProgress(DeviceLayer, "WiFi-PAF: publish_id: %u ! ", publish_id);
-    _GetWiFiPAF()->AddPafSession(publish_id);
+    WiFiPAFSession sessionInfo = { .id = publish_id };
+    ReturnErrorOnFailure(_GetWiFiPAF()->AddPafSession(PafInfoAccess::kAccSessionId, sessionInfo));
     InArgs.publish_id = publish_id;
 
     g_signal_connect(mWpaSupplicant.iface, "nanreplied",
@@ -1461,7 +1465,8 @@ void ConnectivityManagerImpl::OnDiscoveryResult(GVariant * discov_info)
     /*
         Error Checking
     */
-    auto pPafInfo = _GetWiFiPAF()->GetPAFInfo(pPublishSSI->DevInfo);
+    WiFiPAFSession sessionInfo = { .discriminator = pPublishSSI->DevInfo };
+    auto pPafInfo              = _GetWiFiPAF()->GetPAFInfo(PafInfoAccess::kAccDisc, sessionInfo);
     if (pPafInfo == nullptr)
     {
         ChipLogError(DeviceLayer, "WiFi-PAF: DiscoveryResult, no valid session with discriminator: %u", pPublishSSI->DevInfo);
@@ -1559,7 +1564,8 @@ void ConnectivityManagerImpl::OnReplied(GVariant * reply_info)
                         SetupDiscriminator);
         return;
     }
-    auto pPafInfo = _GetWiFiPAF()->GetPAFInfo(publish_id);
+    WiFiPAFSession sessionInfo = { .id = publish_id };
+    auto pPafInfo              = _GetWiFiPAF()->GetPAFInfo(PafInfoAccess::kAccSessionId, sessionInfo);
     if (pPafInfo == nullptr)
     {
         ChipLogError(DeviceLayer, "WiFi-PAF: OnReplied, no valid session with publish_id: %d", publish_id);
@@ -1635,13 +1641,15 @@ void ConnectivityManagerImpl::OnNanReceive(GVariant * obj)
 void ConnectivityManagerImpl::OnNanPublishTerminated(guint public_id, gchar * reason)
 {
     ChipLogProgress(Controller, "WiFi-PAF: Publish terminated (%u, %s)", public_id, reason);
-    _GetWiFiPAF()->RmPafSession(public_id);
+    WiFiPAFSession sessionInfo = { .id = public_id };
+    _GetWiFiPAF()->RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo);
 }
 
 void ConnectivityManagerImpl::OnNanSubscribeTerminated(guint subscribe_id, gchar * reason)
 {
     ChipLogProgress(Controller, "WiFi-PAF: Subscription terminated (%u, %s)", subscribe_id, reason);
-    _GetWiFiPAF()->RmPafSession(subscribe_id);
+    WiFiPAFSession sessionInfo = { .id = subscribe_id };
+    _GetWiFiPAF()->RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo);
     /*
         Indicate the connection event
     */
@@ -1699,7 +1707,8 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFSubscribe(const uint16_t & connDiscr
     mOnPafSubscribeComplete = onSuccess;
     mOnPafSubscribeError    = onError;
 
-    auto pPafInfo = _GetWiFiPAF()->GetPAFInfo(PafPublish_ssi.DevInfo);
+    WiFiPAFSession sessionInfo = { .discriminator = PafPublish_ssi.DevInfo };
+    auto pPafInfo              = _GetWiFiPAF()->GetPAFInfo(PafInfoAccess::kAccDisc, sessionInfo);
     if (pPafInfo != nullptr)
     {
         pPafInfo->id   = subscribe_id;

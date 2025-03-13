@@ -842,8 +842,10 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
             const SetupDiscriminator connDiscriminator(params.GetSetupDiscriminator().value());
             VerifyOrReturnValue(!connDiscriminator.IsShortDiscriminator(), CHIP_ERROR_INVALID_ARGUMENT,
                                 ChipLogError(Controller, "Error, Long discriminator is required"));
-            uint16_t discriminator = connDiscriminator.GetLongValue();
-            DeviceLayer::ConnectivityMgr().GetWiFiPAF()->AddPafSession(nodeId, discriminator);
+            uint16_t discriminator              = connDiscriminator.GetLongValue();
+            WiFiPAF::WiFiPAFSession sessionInfo = { .nodeId = nodeId, .discriminator = discriminator };
+            ReturnErrorOnFailure(
+                DeviceLayer::ConnectivityMgr().GetWiFiPAF()->AddPafSession(WiFiPAF::PafInfoAccess::kAccNodeInfo, sessionInfo));
             DeviceLayer::ConnectivityMgr().WiFiPAFSubscribe(discriminator, reinterpret_cast<void *>(this),
                                                             OnWiFiPAFSubscribeComplete, OnWiFiPAFSubscribeError);
             ExitNow(CHIP_NO_ERROR);
