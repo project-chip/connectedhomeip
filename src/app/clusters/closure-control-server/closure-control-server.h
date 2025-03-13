@@ -51,7 +51,7 @@ public:
     // ------------------------------------------------------------------
     // Commands
     virtual Protocols::InteractionModel::Status Stop()                                                      = 0;
-    virtual Protocols::InteractionModel::Status MoveTo(const Optional<TagPositionEnum> & tag, const Optional<TagLatchEnum> & latch,
+    virtual Protocols::InteractionModel::Status MoveTo(const Optional<TargetPositionEnum> & pos, const Optional<TargetLatchEnum> & latch,
                                                        const Optional<Globals::ThreeLevelAutoEnum> & speed) = 0;
     virtual Protocols::InteractionModel::Status Calibrate()                                                 = 0;
 
