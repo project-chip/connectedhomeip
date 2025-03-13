@@ -1092,7 +1092,6 @@ CHIP_ERROR GetEndpointUniqueIdForEndPoint(EndpointId endpoint, char * buf)
     return CHIP_NO_ERROR;
 }
 
-
 CHIP_ERROR emberAfSetDeviceTypeList(EndpointId endpoint, Span<const EmberAfDeviceType> deviceTypeList)
 {
     uint16_t endpointIndex = emberAfIndexFromEndpoint(endpoint);
@@ -1127,7 +1126,6 @@ CHIP_ERROR SetEndPointUniqueId(chip::EndpointId endpoint, std::string endpointUn
 
     emAfEndpoints[endpointIndex].endpointUniqueId = endpointUniqueId;
     return CHIP_NO_ERROR;
-
 }
 
 // Returns the cluster of Nth server or client cluster,

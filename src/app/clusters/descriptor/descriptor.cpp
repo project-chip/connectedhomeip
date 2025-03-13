@@ -217,7 +217,8 @@ CHIP_ERROR EncodeString(AttributeValueEncoder & encoder, const char * buf, size_
     return encoder.Encode(chip::CharSpan(buf, strnlen(buf, maxBufSize)));
 }
 
-CHIP_ERROR DescriptorAttrAccess::ReadEndpointUniqueId(EndpointId endpoint, AttributeValueEncoder & aEncoder){
+CHIP_ERROR DescriptorAttrAccess::ReadEndpointUniqueId(EndpointId endpoint, AttributeValueEncoder & aEncoder)
+{
     char endpointUniqueId[32 + 1] = { 0 };
     GetEndpointUniqueIdForEndPoint(endpoint, endpointUniqueId);
     return EncodeString(aEncoder, endpointUniqueId, 32);

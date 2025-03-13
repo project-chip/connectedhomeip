@@ -238,7 +238,6 @@ struct EmberAfDefinedEndpoint
      */
     chip::Span<const chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> tagList;
 
-
     std::string endpointUniqueId;
 };
 
