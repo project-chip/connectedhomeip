@@ -280,7 +280,8 @@ jobs:
                   --skip-dir src/app/util \
                   --skip-dir zzz_generated/app-common/app-common/zap-generated \
                   --skip-dir src/app/zap-templates/templates \
-                  --skip-dir src/app/codegen-data-node-provider
+                  --skip-dir src/app/codegen-data-node-provider \
+                  --skip-dir src/data-model-providers
 
             # git grep exits with 0 if it finds a match, but we want
             # to fail (exit nonzero) on match.  And we want to exclude this file,
