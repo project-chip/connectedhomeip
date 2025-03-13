@@ -44,31 +44,31 @@ eval set -- "$OPTS"
 
 while :; do
     case "$1" in
-    -h | --help)
-        show_usage
-        exit 0
-        ;;
-    -t | --tag)
-        IMAGE_TAG=$2
-        shift 2
-        ;;
-    -u | --uid)
-        USER_UID=$2
-        shift 2
-        ;;
-    -v | --version)
-        BUILD_VERSION=$2
-        shift 2
-        ;;
-    --)
-        shift
-        break
-        ;;
-    *)
-        echo "Unexpected option: $1"
-        show_usage
-        exit 2
-        ;;
+        -h | --help)
+            show_usage
+            exit 0
+            ;;
+        -t | --tag)
+            IMAGE_TAG=$2
+            shift 2
+            ;;
+        -u | --uid)
+            USER_UID=$2
+            shift 2
+            ;;
+        -v | --version)
+            BUILD_VERSION=$2
+            shift 2
+            ;;
+        --)
+            shift
+            break
+            ;;
+        *)
+            echo "Unexpected option: $1"
+            show_usage
+            exit 2
+            ;;
     esac
 done
 
