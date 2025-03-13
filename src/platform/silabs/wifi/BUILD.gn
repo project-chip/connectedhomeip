@@ -132,11 +132,10 @@ source_set("wifi-platform") {
   if (wifi_soc) {
     sources += [
       "${silabs_platform_dir}/wifi/SiWx/WifiInterfaceImpl.cpp",
+      "${silabs_platform_dir}/wifi/SiWx/WifiInterfaceImpl.h",
       "${silabs_platform_dir}/wifi/wiseconnect-interface/WiseconnectWifiInterface.cpp",
       "${silabs_platform_dir}/wifi/wiseconnect-interface/WiseconnectWifiInterface.h",
-
-      # Wi-Fi Config - Using the file sdk support until the wiseconnect file is fixed
-      "${matter_support_root}/sdk-copies/components/service/network_manager/src/sl_net_for_lwip.c",
+      "${wifi_sdk_root}/components/service/network_manager/src/sl_net_for_lwip.c",
     ]
 
     public_deps += [ "${lwip_root}:lwip" ]
@@ -149,6 +148,7 @@ source_set("wifi-platform") {
       "${silabs_platform_dir}/wifi/lwip-support/ethernetif.cpp",
       "${silabs_platform_dir}/wifi/lwip-support/ethernetif.h",
       "${silabs_platform_dir}/wifi/lwip-support/lwip_netif.cpp",
+      "${silabs_platform_dir}/wifi/lwip-support/lwip_netif.h",
     ]
   }
 

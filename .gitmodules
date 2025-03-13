@@ -213,17 +213,17 @@
 [submodule "third_party/silabs/simplicity_sdk"]
 	path = third_party/silabs/simplicity_sdk
 	url = https://github.com/SiliconLabs/simplicity_sdk.git
-	branch = v2024.6.2
+	branch = v2024.12.1-0
 	platforms = silabs
 [submodule "third_party/silabs/wiseconnect-wifi-bt-sdk"]
 	path = third_party/silabs/wiseconnect-wifi-bt-sdk
 	url = https://github.com/SiliconLabs/wiseconnect-wifi-bt-sdk.git
-	branch = 2.10.3
+	branch = 2.11.2
 	platforms = silabs
 [submodule "third_party/silabs/wifi_sdk"]
 	path = third_party/silabs/wifi_sdk
 	url = https://github.com/SiliconLabs/wiseconnect.git
-	branch = v3.3.3
+	branch = v3.4.1
 	platforms = silabs
 [submodule "editline"]
 	path = third_party/editline/repo

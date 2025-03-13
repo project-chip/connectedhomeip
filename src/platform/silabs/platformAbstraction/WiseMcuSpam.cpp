@@ -33,8 +33,12 @@
 // TODO add includes ?
 extern "C" {
 #include "em_core.h"
+#if defined(SL_SI91X_BOARD_INIT)
 #include "rsi_board.h"
+#endif // SL_SI91X_BOARD_INIT
 #include "sl_event_handler.h"
+
+#include "sl_si91x_hal_soc_soft_reset.h"
 
 #ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
 #include "sl_si91x_button.h"
@@ -119,7 +123,9 @@ CHIP_ERROR SilabsPlatform::Init(void)
 void SilabsPlatform::InitLed(void)
 {
     // TODO
+#if defined(SL_SI91X_BOARD_INIT)
     RSI_Board_Init();
+#endif // SL_SI91X_BOARD_INIT
     SilabsPlatformAbstractionBase::InitLed();
 }
 
@@ -203,6 +209,11 @@ uint8_t SilabsPlatform::GetButtonState(uint8_t button)
     return 0;
 }
 #endif // SL_CATALOG_SIMPLE_BUTTON_PRESENT
+
+void SilabsPlatform::SoftwareReset()
+{
+    sl_si91x_soc_nvic_reset();
+}
 
 CHIP_ERROR SilabsPlatform::FlashInit()
 {

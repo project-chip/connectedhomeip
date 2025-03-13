@@ -1200,6 +1200,10 @@ MTR_DIRECT_MEMBERS
                           additionalRetransmitDelayMs:(nullable NSNumber *)additionalRetransmitDelayMs
 {
     [self _assertCurrentQueueIsNotMatterQueue];
+
+    MTR_LOG("%@ setting MRP params: idle %@ active %@ threshold %@ additional retransmit delay %@",
+        self, idleRetransmitMs, activeRetransmitMs, activeThresholdMs, additionalRetransmitDelayMs);
+
     dispatch_async(_chipWorkQueue, ^{
         bool resetAdvertising;
         if (idleRetransmitMs == nil && activeRetransmitMs == nil && activeThresholdMs == nil && additionalRetransmitDelayMs == nil) {

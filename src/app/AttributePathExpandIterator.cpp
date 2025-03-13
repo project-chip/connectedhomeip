@@ -182,7 +182,7 @@ std::optional<AttributeId> AttributePathExpandIterator::NextAttributeId()
     VerifyOrReturnValue(mPosition.mAttributePath->mValue.HasWildcardAttributeId(), std::nullopt);
 
     // Ensure (including ordering) that GlobalAttributesNotInMetadata is reported as needed
-    for (unsigned i = 0; i < ArraySize(GlobalAttributesNotInMetadata); i++)
+    for (unsigned i = 0; i < MATTER_ARRAY_SIZE(GlobalAttributesNotInMetadata); i++)
     {
         if (GlobalAttributesNotInMetadata[i] != mPosition.mOutputPath.mAttributeId)
         {
@@ -190,7 +190,7 @@ std::optional<AttributeId> AttributePathExpandIterator::NextAttributeId()
         }
 
         unsigned nextAttributeIndex = i + 1;
-        if (nextAttributeIndex < ArraySize(GlobalAttributesNotInMetadata))
+        if (nextAttributeIndex < MATTER_ARRAY_SIZE(GlobalAttributesNotInMetadata))
         {
             return GlobalAttributesNotInMetadata[nextAttributeIndex];
         }
@@ -206,7 +206,7 @@ std::optional<AttributeId> AttributePathExpandIterator::NextAttributeId()
     }
 
     // Finished the data model, start with global attributes
-    static_assert(ArraySize(GlobalAttributesNotInMetadata) > 0);
+    static_assert(MATTER_ARRAY_SIZE(GlobalAttributesNotInMetadata) > 0);
     return GlobalAttributesNotInMetadata[0];
 }
 

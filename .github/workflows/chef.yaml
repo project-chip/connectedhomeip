@@ -36,7 +36,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:112
+            image: ghcr.io/project-chip/chip-build:119
             options: --user root
 
         steps:
@@ -51,13 +51,35 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh "./examples/chef/chef.py --ci -t linux"
 
+    chef_linux_all_devices:
+        name: Chef - Linux CI Examples (All chef devices)
+        timeout-minutes: 60
+        runs-on: ubuntu-latest
+        if: github.actor != 'restyled-io[bot]'
+
+        container:
+            image: ghcr.io/project-chip/chip-build:119
+            options: --user root
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
+              with:
+                platform: linux
+            - name: CI Examples Linux
+              shell: bash
+              run: |
+                  ./scripts/run_in_build_env.sh "./examples/chef/chef.py --ci_linux"
+
     chef_esp32:
         name: Chef - ESP32 CI Examples
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-esp32:112
+            image: ghcr.io/project-chip/chip-build-esp32:119
             options: --user root
 
         steps:
@@ -78,7 +100,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nrf-platform:112
+            image: ghcr.io/project-chip/chip-build-nrf-platform:119
             options: --user root
 
         steps:
@@ -99,7 +121,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-telink:112
+            image: ghcr.io/project-chip/chip-build-telink:119
             options: --user root
 
         steps:
@@ -111,7 +133,7 @@ jobs:
                 platform: telink
             # - name: Update Zephyr to specific revision (for developers purpose)
             #   shell: bash
-            #   run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py ce4027fc0768b8509758af2e43f74e3fd2c7d58d"
+            #   run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py fdccaba1ebc147908e9cca653e6c6743def3332b"
             - name: CI Examples Telink
               shell: bash
               run: |

@@ -51,13 +51,14 @@ if (chip_build_tests) {
     deps = []
     tests = [
       "${chip_root}/src/access/tests",
-      "${chip_root}/src/app/data-model/tests",
       "${chip_root}/src/app/cluster-building-blocks/tests",
       "${chip_root}/src/app/data-model-provider/tests",
+      "${chip_root}/src/app/data-model/tests",
       "${chip_root}/src/app/icd/server/tests",
       "${chip_root}/src/crypto/tests",
       "${chip_root}/src/inet/tests",
       "${chip_root}/src/lib/address_resolve/tests",
+      "${chip_root}/src/app/server-cluster/tests",
       "${chip_root}/src/lib/asn1/tests",
       "${chip_root}/src/lib/core/tests",
       "${chip_root}/src/lib/format/tests",
@@ -94,10 +95,17 @@ if (chip_build_tests) {
       # symbols for ember mocks which are used by other tests.
 
       tests += [
-        "${chip_root}/src/data-model-providers/codegen/tests",
         "${chip_root}/src/setup_payload/tests",
         "${chip_root}/src/transport/raw/tests",
       ]
+    }
+
+    if (current_os != "zephyr" && current_os != "mbed" &&
+        chip_device_platform != "efr32") {
+      # Disabled from "one single binary" since the "mocks" contain duplicate sybmols
+      # with ember
+      # Disabled on EFR32 since "include <random>" fails with `::fabs` not defined
+      tests += [ "${chip_root}/src/data-model-providers/codegen/tests" ]
     }
 
     if (chip_device_platform != "efr32") {
@@ -120,7 +128,7 @@ if (chip_build_tests) {
       tests += [ "${chip_root}/src/lib/dnssd/minimal_mdns/tests" ]
     }
 
-    if (chip_device_platform != "esp32" && chip_device_platform != "ameba") {
+    if (chip_device_platform != "ameba") {
       tests += [ "${chip_root}/src/platform/tests" ]
     }
 

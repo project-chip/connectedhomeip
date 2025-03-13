@@ -27,6 +27,7 @@
         "chime-cluster.xml",
         "chip-ota.xml",
         "channel-cluster.xml",
+        "closure-control-cluster.xml",
         "clusters-extensions.xml",
         "color-control-cluster.xml",
         "commissioner-control-cluster.xml",
@@ -122,6 +123,7 @@
         "time-synchronization-cluster.xml",
         "timer-cluster.xml",
         "tls-certificate-management-cluster.xml",
+        "tls-client-management-cluster.xml",
         "user-label-cluster.xml",
         "unit-localization-cluster.xml",
         "valve-configuration-and-control-cluster.xml",
@@ -193,7 +195,8 @@
             "MaxPathsPerInvoke"
         ],
         "Bridged Device Basic Information": ["ProductAppearance"],
-        "Chime": ["ActiveChimeID", "Enabled"],
+        "Chime": ["SelectedChime", "Enabled"],
+        "Closure Control": ["OverallState", "OverallTarget"],
         "Descriptor": ["ClusterRevision", "FeatureMap"],
         "Device Energy Management": [
             "ESAType",

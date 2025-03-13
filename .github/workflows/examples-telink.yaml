@@ -39,7 +39,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-telink:112
+            image: ghcr.io/project-chip/chip-build-telink:119
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -58,7 +58,7 @@ jobs:
                 gh-context: ${{ toJson(github) }}
 
             # - name: Update Zephyr to specific revision (for developers purpose)
-            #   run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py ce4027fc0768b8509758af2e43f74e3fd2c7d58d"
+            #   run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py fdccaba1ebc147908e9cca653e6c6743def3332b"
 
             - name: Build example Telink (B92 retention) Air Quality Sensor App
               # Run test for master and s07641069 PRs
@@ -165,14 +165,27 @@ jobs:
             - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*
 
-            - name: Build example Telink (tl321x) Lighting App with OTA, Shell, Factory Data
+            - name: Build example Telink (tl321x) Lighting App with OTA (LZMA), Shell, Factory Data
               # Run test for master and all PRs
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target 'telink-tl3218x-light-ota-shell-factory-data' build"
+                    "./scripts/build/build_examples.py --target 'telink-tl3218x-light-ota-compress-lzma-shell-factory-data' build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink tl3218x light-app-ota-shell-factory-data \
-                    out/telink-tl3218x-light-ota-shell-factory-data/zephyr/zephyr.elf \
+                    telink tl3218x light-app-ota-compress-lzma-shell-factory-data \
+                    out/telink-tl3218x-light-ota-compress-lzma-shell-factory-data/zephyr/zephyr.elf \
+                    /tmp/bloat_reports/
+
+            - name: clean out build output (keep tools)
+              run: rm -rf ./out/telink*
+
+            - name: Build example Telink (tl321x_retention) Light Switch App with OTA, Shell, Factory Data
+              # Run test for master and all PRs
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target 'telink-tl3218x_retention-light-switch-ota-shell-factory-data' build"
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    telink tl3218x_retention light-switch-app-ota-shell-factory-data \
+                    out/telink-tl3218x_retention-light-switch-ota-shell-factory-data/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
             - name: clean out build output (keep tools)
@@ -301,19 +314,21 @@ jobs:
             - name: clean out build output
               run: rm -rf ./out
 
-            - name: Build example Telink (B91 Mars) Temperature Measurement App with OTA
-              # Run test for master and s07641069 PRs
-              if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 's07641069/connectedhomeip'
-              run: |
-                  ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-temperature-measurement-mars-ota' build"
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink tlsr9518adk80d temperature-measurement-app-mars-ota \
-                    out/telink-tlsr9518adk80d-temperature-measurement-mars-ota/zephyr/zephyr.elf \
-                    /tmp/bloat_reports/
+            # B91 Mars adopted only for Zephyr 3.7
+            # Will be uncommented in next commits
+            # - name: Build example Telink (B91 Mars) Temperature Measurement App with OTA
+            #   # Run test for master and s07641069 PRs
+            #   if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 's07641069/connectedhomeip'
+            #   run: |
+            #       ./scripts/run_in_build_env.sh \
+            #         "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-temperature-measurement-mars-ota' build"
+            #       .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+            #         telink tlsr9518adk80d temperature-measurement-app-mars-ota \
+            #         out/telink-tlsr9518adk80d-temperature-measurement-mars-ota/zephyr/zephyr.elf \
+            #         /tmp/bloat_reports/
 
-            - name: clean out build output
-              run: rm -rf ./out
+            # - name: clean out build output
+            #   run: rm -rf ./out
 
             - name: Build example Telink (B91) Thermostat App
               # Run test for master and s07641069 PRs
