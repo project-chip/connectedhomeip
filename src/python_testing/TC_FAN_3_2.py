@@ -172,7 +172,7 @@ class TC_FAN_3_2(MatterBaseTest):
         # A SpeedSetting value update of 1 in any initial fan conditions should always result in the
         # FanMode attribute being set to kLow, regardless of the available fan modes specified by
         # the FanModeSequence attribute value. This makes the expected FanMode value deterministic
-        # in this particular case. Using this approach as we don't know tha manufacturer's mappings.
+        # in this particular case. Using this approach as we don't know the manufacturer's mappings.
         speed_setting_expected = 1
         fan_mode_expected = fm_enum.kLow
 
