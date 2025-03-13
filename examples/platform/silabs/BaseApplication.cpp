@@ -281,7 +281,6 @@ CHIP_ERROR BaseApplication::Init()
         return err;
     }
 
-    InitCompleteCallback(err);
     return err;
 }
 
