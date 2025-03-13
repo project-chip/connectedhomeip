@@ -65,4 +65,6 @@ public:
 } // namespace app
 } // namespace chip
 
+namespace ChefWindowCovering {
 void InitChefWindowCoveringCluster();
+} // namespace ChefWindowCovering
