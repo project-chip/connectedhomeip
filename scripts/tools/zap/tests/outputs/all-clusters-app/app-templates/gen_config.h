@@ -552,7 +552,7 @@
 #define MATTER_DM_PLUGIN_SCENES_MANAGEMENT
 // User options for server plugin Scenes Management
 // Cluster spec 1.4.8.7
-#define SCENES_MANAGEMENT_TABLE_SIZE 16
+#define SCENES_MANAGEMENT_TABLE_SIZE
 // Scenes FeatureMap Attribute Toggle Scenes Name feature
 // App cluster specs 1.4.4
 #define MATTER_CLUSTER_SCENE_NAME_SUPPORT_MASK 0x0001

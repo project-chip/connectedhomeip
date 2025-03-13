@@ -8260,9 +8260,8 @@ public class ClusterIDMapping {
         }
 
         public enum Attribute {
-            LastConfiguredBy(0L),
-            SceneTableSize(1L),
-            FabricSceneInfo(2L),
+            SceneTableSize(0L),
+            FabricSceneInfo(1L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
@@ -8334,7 +8333,7 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum AddSceneCommandField {GroupID(0),SceneID(1),TransitionTime(2),SceneName(3),ExtensionFieldSets(4),;
+        }public enum AddSceneCommandField {GroupID(0),SceneID(1),TransitionTime(2),SceneName(3),ExtensionFieldSetStructs(4),;
                     private final int id;
                     AddSceneCommandField(int id) {
                         this.id = id;

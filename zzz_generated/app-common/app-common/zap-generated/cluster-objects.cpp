@@ -13375,7 +13375,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
 } // namespace AttributeValuePairStruct
 
-namespace ExtensionFieldSet {
+namespace ExtensionFieldSetStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -13414,7 +13414,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     }
 }
 
-} // namespace ExtensionFieldSet
+} // namespace ExtensionFieldSetStruct
 
 namespace SceneInfoStruct {
 CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -13513,7 +13513,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kSceneID), sceneID);
     encoder.Encode(to_underlying(Fields::kTransitionTime), transitionTime);
     encoder.Encode(to_underlying(Fields::kSceneName), sceneName);
-    encoder.Encode(to_underlying(Fields::kExtensionFieldSets), extensionFieldSets);
+    encoder.Encode(to_underlying(Fields::kExtensionFieldSetStructs), extensionFieldSetStructs);
     return encoder.Finalize();
 }
 
@@ -13547,9 +13547,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, sceneName);
         }
-        else if (__context_tag == to_underlying(Fields::kExtensionFieldSets))
+        else if (__context_tag == to_underlying(Fields::kExtensionFieldSetStructs))
         {
-            err = DataModel::Decode(reader, extensionFieldSets);
+            err = DataModel::Decode(reader, extensionFieldSetStructs);
         }
         else
         {
@@ -13651,7 +13651,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kSceneID), sceneID);
     encoder.Encode(to_underlying(Fields::kTransitionTime), transitionTime);
     encoder.Encode(to_underlying(Fields::kSceneName), sceneName);
-    encoder.Encode(to_underlying(Fields::kExtensionFieldSets), extensionFieldSets);
+    encoder.Encode(to_underlying(Fields::kExtensionFieldSetStructs), extensionFieldSetStructs);
     return encoder.Finalize();
 }
 
@@ -13689,9 +13689,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, sceneName);
         }
-        else if (__context_tag == to_underlying(Fields::kExtensionFieldSets))
+        else if (__context_tag == to_underlying(Fields::kExtensionFieldSetStructs))
         {
-            err = DataModel::Decode(reader, extensionFieldSets);
+            err = DataModel::Decode(reader, extensionFieldSetStructs);
         }
         else
         {
@@ -14172,8 +14172,6 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 {
     switch (path.mAttributeId)
     {
-    case Attributes::LastConfiguredBy::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, lastConfiguredBy);
     case Attributes::SceneTableSize::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, sceneTableSize);
     case Attributes::FabricSceneInfo::TypeInfo::GetAttributeId():
