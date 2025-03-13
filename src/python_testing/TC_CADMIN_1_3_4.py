@@ -51,9 +51,8 @@ import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.exceptions import ChipStackError
 from chip.interaction_model import Status
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from chip.tlv import TLVReader
-from chip.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body,
-                                                                       default_matter_test_main)
 from mdns_discovery import mdns_discovery
 from mobly import asserts
 
