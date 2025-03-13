@@ -43,7 +43,9 @@ extern "C" {
 
 uint8_t flag = RPS_HEADER;
 static chip::OTAImageProcessorImpl gImageProcessor;
+
 using namespace chip::DeviceLayer::Silabs;
+
 namespace chip {
 
 // Define static memebers
