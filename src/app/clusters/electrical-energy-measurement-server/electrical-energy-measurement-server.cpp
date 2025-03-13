@@ -161,7 +161,7 @@ MeasurementData * MeasurementDataForEndpoint(EndpointId endpointId)
     return &gMeasurements[index];
 }
 
-CHIP_ERROR SetMeasurementAccuracy(EndpointId endpointId, const MeasurementAccuracyStruct::Type & accuracy)
+CHIP_ERROR SetMeasurementAccuracy(EndpointId endpointId, const Globals::Structs::MeasurementAccuracyStruct::Type & accuracy)
 {
 
     MeasurementData * data = MeasurementDataForEndpoint(endpointId);

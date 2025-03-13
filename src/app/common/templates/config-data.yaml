@@ -38,6 +38,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Microwave Oven Control
     - Chime
     - Commissioner Control
+    - Commodity Price
     - Energy EVSE
     - Energy EVSE Mode
     - Device Energy Management
