@@ -73,7 +73,9 @@ size_t pw_trace_GetTraceTimeTicksPerSecond()
 }
 
 #endif // defined(PW_RPC_TRACING_SERVICE) && PW_RPC_TRACING_SERVICE
+
 using namespace chip::DeviceLayer::Silabs;
+
 namespace chip {
 namespace rpc {
 
