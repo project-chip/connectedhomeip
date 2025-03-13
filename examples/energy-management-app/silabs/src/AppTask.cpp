@@ -177,7 +177,7 @@ void ApplicationShutdown()
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 }
 
-CHIP_ERROR AppTask::Init()
+CHIP_ERROR AppTask::AppInit()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(AppTask::ButtonEventHandler);
@@ -189,13 +189,6 @@ CHIP_ERROR AppTask::Init()
     GetLCD().Init((uint8_t *) "energy-management-App (WaterHeater)");
 #endif
 #endif
-
-    err = BaseApplication::Init();
-    if (err != CHIP_NO_ERROR)
-    {
-        SILABS_LOG("BaseApplication::Init() failed");
-        appError(err);
-    }
 
     ApplicationInit();
 
