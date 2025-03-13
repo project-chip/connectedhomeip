@@ -4355,6 +4355,76 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace ClosureControl
 
+namespace ClosureDimension {
+namespace Attributes {
+
+namespace Current {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace Current
+
+namespace Target {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace Target
+
+namespace Resolution {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace Resolution
+
+namespace StepValue {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace StepValue
+
+namespace Unit {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace Unit
+
+namespace UnitRange {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace UnitRange
+
+namespace LimitRange {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace LimitRange
+
+namespace TranslationDirection {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace TranslationDirection
+
+namespace RotationAxis {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace RotationAxis
+
+namespace Overflow {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace Overflow
+
+namespace ModulationType {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace ModulationType
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace ClosureDimension
+
 namespace ServiceArea {
 namespace Attributes {
 

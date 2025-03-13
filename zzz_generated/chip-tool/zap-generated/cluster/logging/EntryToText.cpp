@@ -181,6 +181,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "WindowCovering";
     case chip::app::Clusters::ClosureControl::Id:
         return "ClosureControl";
+    case chip::app::Clusters::ClosureDimension::Id:
+        return "ClosureDimension";
     case chip::app::Clusters::ServiceArea::Id:
         return "ServiceArea";
     case chip::app::Clusters::PumpConfigurationAndControl::Id:
@@ -2757,6 +2759,45 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         case chip::app::Clusters::ClosureControl::Attributes::FeatureMap::Id:
             return "FeatureMap";
         case chip::app::Clusters::ClosureControl::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::ClosureDimension::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ClosureDimension::Attributes::Current::Id:
+            return "Current";
+        case chip::app::Clusters::ClosureDimension::Attributes::Target::Id:
+            return "Target";
+        case chip::app::Clusters::ClosureDimension::Attributes::Resolution::Id:
+            return "Resolution";
+        case chip::app::Clusters::ClosureDimension::Attributes::StepValue::Id:
+            return "StepValue";
+        case chip::app::Clusters::ClosureDimension::Attributes::Unit::Id:
+            return "Unit";
+        case chip::app::Clusters::ClosureDimension::Attributes::UnitRange::Id:
+            return "UnitRange";
+        case chip::app::Clusters::ClosureDimension::Attributes::LimitRange::Id:
+            return "LimitRange";
+        case chip::app::Clusters::ClosureDimension::Attributes::TranslationDirection::Id:
+            return "TranslationDirection";
+        case chip::app::Clusters::ClosureDimension::Attributes::RotationAxis::Id:
+            return "RotationAxis";
+        case chip::app::Clusters::ClosureDimension::Attributes::Overflow::Id:
+            return "Overflow";
+        case chip::app::Clusters::ClosureDimension::Attributes::ModulationType::Id:
+            return "ModulationType";
+        case chip::app::Clusters::ClosureDimension::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::ClosureDimension::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::ClosureDimension::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::ClosureDimension::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::ClosureDimension::Attributes::ClusterRevision::Id:
             return "ClusterRevision";
         default:
             return "Unknown";
@@ -5507,6 +5548,17 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "ConfigureFallback";
         case chip::app::Clusters::ClosureControl::Commands::CancelFallback::Id:
             return "CancelFallback";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::ClosureDimension::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::ClosureDimension::Commands::SetTarget::Id:
+            return "SetTarget";
+        case chip::app::Clusters::ClosureDimension::Commands::Step::Id:
+            return "Step";
         default:
             return "Unknown";
         }
