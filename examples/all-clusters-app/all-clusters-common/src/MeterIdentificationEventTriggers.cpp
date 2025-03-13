@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include <meter-identification-delegate.h>
+#include <meter-identification-instance.h>
 
 #include <app/clusters/meter-identification-server/MeterIdentificationTestEventTriggerHandler.h>
 
@@ -37,7 +37,7 @@ class OldMeterIdentificationAttributes
 
 private:
 
-    DataModel::Nullable<MeterIdentificationDelegate *> mDelegate;
+    Instance * mInstance = nullptr;
 
     static void SetCharSpan(DataModel::Nullable<CharSpan> & charSpan, const DataModel::Nullable<CharSpan> && value)
     {
@@ -50,15 +50,12 @@ private:
         if (!value.IsNull())
         {
             const size_t len = value.Value().size();
-            auto * str = static_cast<char *>(chip::Platform::MemoryAlloc(1 + len));
-            if (nullptr == str)
+            if (auto * str = static_cast<char *>(chip::Platform::MemoryAlloc(1 + len)))
             {
-                return;
+                memcpy(str, value.Value().data(), len);
+                str[len] = 0;
+                charSpan = DataModel::MakeNullable(CharSpan(str, len));
             }
-
-            memcpy(str, value.Value().data(), len);
-            str[len] = 0;
-            charSpan = DataModel::MakeNullable(CharSpan(str, len));
         }
     }
 
@@ -71,8 +68,14 @@ private:
         }
     }
 
+    /**
+     * Lexicographically increments a string.
+     *
+     * @param string A string to lexicographically increment
+     */
     static std::string IncrementString(const std::string &&string)
     {
+        //The lexicographically smallest and largest characters
         constexpr char minC = ' ', maxC = '~';
 
         std::string ret{minC};
@@ -102,13 +105,13 @@ private:
 
     void SaveAttributes()
     {
-        mDelegate.SetNonNull(GetDelegate());
-        VerifyOrDieWithMsg(mDelegate.Value() != nullptr, AppServer, "Meter Identification Delegate is null");
-        mMeterType = mDelegate.Value()->GetMeterType();
-        SetCharSpan(mPointOfDelivery, mDelegate.Value()->GetPointOfDelivery());
-        SetCharSpan(mMeterSerialNumber, mDelegate.Value()->GetMeterSerialNumber());
-        SetCharSpan(mProtocolVersion, mDelegate.Value()->GetProtocolVersion());
-        const auto && powerThreshold = mDelegate.Value()->GetPowerThreshold();
+        mInstance = GetInstance();
+        VerifyOrDieWithMsg(mInstance, AppServer, "Meter Identification instance is null");
+        mMeterType = mInstance->GetMeterType();
+        SetCharSpan(mPointOfDelivery, mInstance->GetPointOfDelivery());
+        SetCharSpan(mMeterSerialNumber, mInstance->GetMeterSerialNumber());
+        SetCharSpan(mProtocolVersion, mInstance->GetProtocolVersion());
+        const auto && powerThreshold = mInstance->GetPowerThreshold();
         if (!powerThreshold.IsNull())
         {
             mPowerThreshold.SetNonNull(powerThreshold.Value());
@@ -122,76 +125,77 @@ private:
         CleanCharSpan(mProtocolVersion);
         mMeterType.SetNull();
         mPowerThreshold.SetNull();
-        mDelegate.SetNull();
+        mInstance = nullptr;
     }
 
     void RestoreAttributes() const
     {
-        if (!mDelegate.IsNull())
+        if (mInstance)
         {
-            mDelegate.Value()->SetMeterType(mMeterType);
-            mDelegate.Value()->SetPointOfDelivery(mPointOfDelivery);
-            mDelegate.Value()->SetMeterSerialNumber(mMeterSerialNumber);
-            mDelegate.Value()->SetProtocolVersion(mProtocolVersion);
-            mDelegate.Value()->SetPowerThreshold(mPowerThreshold);
+            mInstance->SetMeterType(mMeterType);
+            mInstance->SetPointOfDelivery(mPointOfDelivery);
+            mInstance->SetMeterSerialNumber(mMeterSerialNumber);
+            mInstance->SetProtocolVersion(mProtocolVersion);
+            mInstance->SetPowerThreshold(mPowerThreshold);
         }
     }
 
     void IncreaseAttributes()
     {
-        if (mDelegate.Value()->GetMeterType().IsNull())
+        VerifyOrDieWithMsg(mInstance, AppServer, "Meter Identification instance is null");
+        if (mInstance->GetMeterType().IsNull())
         {
-            mDelegate.Value()->SetMeterType(DataModel::MakeNullable(static_cast<MeterTypeEnum>(0)));
+            mInstance->SetMeterType(DataModel::MakeNullable(static_cast<MeterTypeEnum>(0)));
         }
         else
         {
-            mDelegate.Value()->SetMeterType(DataModel::MakeNullable(static_cast<MeterTypeEnum>(1 +
-                static_cast<std::underlying_type<MeterTypeEnum>::type>(mDelegate.Value()->GetMeterType().Value()))));
+            mInstance->SetMeterType(DataModel::MakeNullable(static_cast<MeterTypeEnum>(1 +
+                static_cast<std::underlying_type<MeterTypeEnum>::type>(mInstance->GetMeterType().Value()))));
         }
 
-        if (mDelegate.Value()->GetPointOfDelivery().IsNull())
+        if (mInstance->GetPointOfDelivery().IsNull())
         {
-            mDelegate.Value()->SetPointOfDelivery(DataModel::MakeNullable(CharSpan::fromCharString("")));
+            mInstance->SetPointOfDelivery(DataModel::MakeNullable(CharSpan::fromCharString("")));
         }
         else
         {
-            mDelegate.Value()->SetPointOfDelivery(DataModel::MakeNullable(CharSpan::fromCharString(IncrementString(
-                mDelegate.Value()->GetPointOfDelivery().Value().data()).c_str())));
+            mInstance->SetPointOfDelivery(DataModel::MakeNullable(CharSpan::fromCharString(IncrementString(
+                mInstance->GetPointOfDelivery().Value().data()).c_str())));
         }
 
-        if (mDelegate.Value()->GetMeterSerialNumber().IsNull())
+        if (mInstance->GetMeterSerialNumber().IsNull())
         {
-            mDelegate.Value()->SetMeterSerialNumber(DataModel::MakeNullable(CharSpan::fromCharString("")));
+            mInstance->SetMeterSerialNumber(DataModel::MakeNullable(CharSpan::fromCharString("")));
         }
         else
         {
-            mDelegate.Value()->SetMeterSerialNumber(DataModel::MakeNullable(CharSpan::fromCharString(IncrementString(
-                mDelegate.Value()->GetMeterSerialNumber().Value().data()).c_str())));
+            mInstance->SetMeterSerialNumber(DataModel::MakeNullable(CharSpan::fromCharString(IncrementString(
+                mInstance->GetMeterSerialNumber().Value().data()).c_str())));
         }
 
-        if (mDelegate.Value()->GetProtocolVersion().IsNull())
+        if (mInstance->GetProtocolVersion().IsNull())
         {
-            mDelegate.Value()->SetProtocolVersion(DataModel::MakeNullable(CharSpan::fromCharString("")));
+            mInstance->SetProtocolVersion(DataModel::MakeNullable(CharSpan::fromCharString("")));
         }
         else
         {
-            mDelegate.Value()->SetProtocolVersion(DataModel::MakeNullable(CharSpan::fromCharString(IncrementString(
-                mDelegate.Value()->GetProtocolVersion().Value().data()).c_str())));
+            mInstance->SetProtocolVersion(DataModel::MakeNullable(CharSpan::fromCharString(IncrementString(
+                mInstance->GetProtocolVersion().Value().data()).c_str())));
         }
 
-        if (mDelegate.Value()->GetPowerThreshold().IsNull())
+        if (mInstance->GetPowerThreshold().IsNull())
         {
-            mDelegate.Value()->SetPowerThreshold(DataModel::MakeNullable((Structs::PowerThresholdStruct::Type){Optional<int64_t>(0),
+            mInstance->SetPowerThreshold(DataModel::MakeNullable((Structs::PowerThresholdStruct::Type){Optional<int64_t>(0),
                 Optional<int64_t>(0), static_cast<PowerThresholdSourceEnum>(0)}));
         }
         else
         {
-            auto powerThreshold = mDelegate.Value()->GetPowerThreshold();
+            auto powerThreshold = mInstance->GetPowerThreshold();
             ++powerThreshold.Value().powerThreshold.Value();
             ++powerThreshold.Value().apparentPowerThreshold.Value();
             powerThreshold.Value().powerThresholdSource.Value() = static_cast<PowerThresholdSourceEnum>(1 +
                 static_cast<std::underlying_type<PowerThresholdSourceEnum>::type>(powerThreshold.Value().powerThresholdSource.Value()));
-            mDelegate.Value()->SetPowerThreshold(std::move(powerThreshold));
+            mInstance->SetPowerThreshold(std::move(powerThreshold));
         }
     }
 
@@ -199,7 +203,7 @@ public:
 
     void Update()
     {
-        if (mDelegate.IsNull())
+        if (!mInstance)
         {
             SaveAttributes();
         }
