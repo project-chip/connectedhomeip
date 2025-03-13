@@ -43,8 +43,8 @@ import chip.clusters as Clusters
 from chip.clusters import ClusterObjects as ClusterObjects
 from chip.interaction_model import Status
 from chip.testing.matter_asserts import is_valid_uint_value
-from chip.testing.matter_testing import (AttributeValue, ClusterAttributeChangeAccumulator, MatterBaseTest,
-                                         TestStep, async_test_body, default_matter_test_main)
+from chip.testing.matter_testing import (AttributeValue, ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep,
+                                         async_test_body, default_matter_test_main)
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
