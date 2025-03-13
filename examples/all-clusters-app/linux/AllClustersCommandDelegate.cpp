@@ -30,7 +30,7 @@
 #include <platform/PlatformManager.h>
 
 #include "ButtonEventsSimulator.h"
-#include "meter-identification-delegate.h"
+#include "meter-identification-instance.h"
 #include <air-quality-instance.h>
 #include <dishwasher-mode.h>
 #include <laundry-washer-mode.h>
@@ -866,8 +866,7 @@ void AllClustersAppCommandHandler::OnOvenOperationalStateChange(std::string devi
 
 void AllClustersAppCommandHandler::OnMeterIdentificationHandler(const Json::Value & param)
 {
-    MeterIdentification::MeterIdentificationDelegate * delegate = MeterIdentification::GetDelegate();
-    const CHIP_ERROR error = delegate->LoadJson(param);
+    const CHIP_ERROR error = MeterIdentification::LoadJson(param);
     if (CHIP_NO_ERROR != error)
     {
         ChipLogError(NotSpecified, "Error: %s in the JSON: %s", ErrorStr(error), param.toStyledString().c_str());
