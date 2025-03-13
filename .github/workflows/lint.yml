@@ -274,6 +274,7 @@ jobs:
                   Check for use of 'emberAf' or 'emAf' symbols
               if: always()
               run: |
+                  chmod +x scripts/check_symbols.sh
                   scripts/check_symbols.sh \
                   --skip-dir .github \
                   --skip-dir src/app/util \
