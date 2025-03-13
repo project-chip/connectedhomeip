@@ -61,7 +61,6 @@ executable("chip-camera-app") {
     "include",
     "include/clusters/chime",
     "include/clusters/camera-avstream-mgmt",
-    "include/camera-hal",
     "${chip_root}/examples/camera-app/camera-common/include",
 
     #TODO: Adjust paths
