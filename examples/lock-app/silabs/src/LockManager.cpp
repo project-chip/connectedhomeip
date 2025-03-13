@@ -448,7 +448,7 @@ bool LockManager::SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip:
         return false;
     }
 
-    memcpy(mUserInStorage.userName, userName.data(), userName.size());
+    memmove(mUserInStorage.userName, userName.data(), userName.size());
     mUserInStorage.userNameSize   = userName.size();
     mUserInStorage.userUniqueId   = uniqueId;
     mUserInStorage.userStatus     = userStatus;
@@ -586,7 +586,7 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credential
     mCredentialInStorage.lastModifiedBy     = modifier;
     mCredentialInStorage.credentialDataSize = credentialData.size();
 
-    memcpy(mCredentialInStorage.credentialData, credentialData.data(), mCredentialInStorage.credentialDataSize);
+    memmove(mCredentialInStorage.credentialData, credentialData.data(), mCredentialInStorage.credentialDataSize);
 
     chip::StorageKeyName key = LockCredentialEndpoint(credentialIndex, credentialType, endpointId);
 
@@ -952,16 +952,17 @@ bool LockManager::setLockState(chip::EndpointId endpointId, const Nullable<chip:
             continue;
         }
 
-        for (int j = 0; j < mUserInStorage.currentCredentialCount; j++)
+        // Loop through each credential attached to the user
+        for (int userCredentialIndex = 0; userCredentialIndex < mUserInStorage.currentCredentialCount; userCredentialIndex++)
         {
             // If the current credential is a pin type, then check it against pin input. Otherwise ignore
-            if (mCredentials[j].credentialType == CredentialTypeEnum::kPin)
+            if (mCredentials[userCredentialIndex].credentialType == CredentialTypeEnum::kPin)
             {
                 // Read the individual credential at credentialIndex j
                 uint16_t credentialSize = static_cast<uint16_t>(sizeof(LockCredentialInfo));
 
-                chip::StorageKeyName key =
-                    LockCredentialEndpoint(mCredentials[j].credentialIndex, mCredentials[j].credentialType, endpointId);
+                chip::StorageKeyName key = LockCredentialEndpoint(mCredentials[userCredentialIndex].credentialIndex,
+                                                                  mCredentials[userCredentialIndex].credentialType, endpointId);
 
                 error = mStorage->SyncGetKeyValue(key.KeyName(), &mCredentialInStorage, credentialSize);
 
@@ -986,7 +987,8 @@ bool LockManager::setLockState(chip::EndpointId endpointId, const Nullable<chip:
                         Zcl, "Lock App: specified PIN code was found in the database, setting lock state to \"%s\" [endpointId=%d]",
                         lockStateToString(lockState), endpointId);
 
-                    LockOpCredentials userCredential[] = { { CredentialTypeEnum::kPin, mCredentials[j].credentialIndex } };
+                    LockOpCredentials userCredential[] = { { CredentialTypeEnum::kPin,
+                                                             mCredentials[userCredentialIndex].credentialIndex } };
                     auto userCredentials               = MakeNullable<List<const LockOpCredentials>>(userCredential);
 
                     DoorLockServer::Instance().SetLockState(endpointId, lockState, OperationSourceEnum::kRemote, userIndex,
