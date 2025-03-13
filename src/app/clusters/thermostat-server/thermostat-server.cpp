@@ -510,7 +510,7 @@ Delegate * GetDelegate(EndpointId endpoint)
 {
     uint16_t ep =
         emberAfGetClusterServerEndpointIndex(endpoint, Thermostat::Id, MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT);
-    return (ep >= ArraySize(gDelegateTable) ? nullptr : gDelegateTable[ep]);
+    return (ep >= MATTER_ARRAY_SIZE(gDelegateTable) ? nullptr : gDelegateTable[ep]);
 }
 
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
@@ -518,7 +518,7 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
     uint16_t ep =
         emberAfGetClusterServerEndpointIndex(endpoint, Thermostat::Id, MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT);
     // if endpoint is found, add the delegate in the delegate table
-    if (ep < ArraySize(gDelegateTable))
+    if (ep < MATTER_ARRAY_SIZE(gDelegateTable))
     {
         gDelegateTable[ep] = delegate;
     }
@@ -744,7 +744,7 @@ CHIP_ERROR ThermostatAttrAccess::Write(const ConcreteDataAttributePath & aPath, 
 
 void ThermostatAttrAccess::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
 {
-    for (size_t i = 0; i < ArraySize(mAtomicWriteSessions); ++i)
+    for (size_t i = 0; i < MATTER_ARRAY_SIZE(mAtomicWriteSessions); ++i)
     {
         auto & atomicWriteState = mAtomicWriteSessions[i];
         if (atomicWriteState.state == AtomicWriteState::Open && atomicWriteState.nodeId.GetFabricIndex() == fabricIndex)

@@ -722,6 +722,11 @@ for that run, e.g.:
 
     -   Example: `"Manual pairing code: \\[\\d+\\]"`
 
+-   `app-stdin-pipe`: Specifies the path to the named pipe that the test runner
+    might use to send input to the application.
+
+    -   Example: `/tmp/app-fifo`
+
 -   `script-args`: Specifies the arguments to be passed to the test script.
 
     -   Example:

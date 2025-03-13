@@ -257,6 +257,7 @@ class Cluster(ClusterObject):
     especially the TLV decoding logic. Also ThreadNetworkDiagnostics has an attribute with the same name so we
     picked data_version as its name.
     '''
+    id: Any
 
     def __init_subclass__(cls, *args, **kwargs) -> None:
         """Register a subclass."""

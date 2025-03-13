@@ -136,7 +136,7 @@ TEST_F(TestInetEndPoint, TestInetInterface)
 {
     InterfaceIterator intIterator;
     InterfaceAddressIterator addrIterator;
-    char intName[chip::Inet::InterfaceId::kMaxIfNameLength];
+    char intName[InterfaceId::kMaxIfNameLength];
     InterfaceId intId;
     IPAddress addr;
     InterfaceType intType;

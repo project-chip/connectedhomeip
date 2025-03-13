@@ -27,6 +27,7 @@ class Metadata:
     app: str = ""
     app_args: Optional[str] = None
     app_ready_pattern: Optional[str] = None
+    app_stdin_pipe: Optional[str] = None
     script_args: Optional[str] = None
     factory_reset: bool = False
     factory_reset_app_only: bool = False
@@ -148,6 +149,7 @@ class MetadataReader:
                 app=attr.get("app", ""),
                 app_args=attr.get("app-args"),
                 app_ready_pattern=attr.get("app-ready-pattern"),
+                app_stdin_pipe=attr.get("app-stdin-pipe"),
                 script_args=attr.get("script-args"),
                 factory_reset=attr.get("factory-reset", False),
                 quiet=attr.get("quiet", True),

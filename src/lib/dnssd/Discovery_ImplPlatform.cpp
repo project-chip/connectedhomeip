@@ -353,7 +353,7 @@ void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, DnssdService * r
     size_t addressesFound = 0;
     for (auto & ip : addresses)
     {
-        if (addressesFound == ArraySize(nodeData.resolutionData.ipAddress))
+        if (addressesFound == MATTER_ARRAY_SIZE(nodeData.resolutionData.ipAddress))
         {
             // Out of space.
             ChipLogProgress(Discovery, "Can't add more IPs to ResolvedNodeData");
@@ -396,7 +396,7 @@ void DnssdService::ToDiscoveredCommissionNodeData(const Span<Inet::IPAddress> & 
     size_t addressesFound = 0;
     for (auto & ip : addresses)
     {
-        if (addressesFound == ArraySize(discoveredData.ipAddress))
+        if (addressesFound == MATTER_ARRAY_SIZE(discoveredData.ipAddress))
         {
             // Out of space.
             ChipLogProgress(Discovery, "Can't add more IPs to DiscoveredNodeData");
@@ -452,8 +452,7 @@ void DiscoveryImplPlatform::HandleDnssdInit(void * context, CHIP_ERROR initError
         publisher->mState = State::kInitialized;
 
         // Post an event that will start advertising
-        DeviceLayer::ChipDeviceEvent event;
-        event.Type = DeviceLayer::DeviceEventType::kDnssdInitialized;
+        DeviceLayer::ChipDeviceEvent event{ .Type = DeviceLayer::DeviceEventType::kDnssdInitialized };
 
         CHIP_ERROR error = DeviceLayer::PlatformMgr().PostEvent(&event);
         if (error != CHIP_NO_ERROR)
@@ -477,9 +476,8 @@ void DiscoveryImplPlatform::HandleDnssdError(void * context, CHIP_ERROR error)
         // Restore dnssd state before restart, also needs to call ChipDnssdShutdown()
         publisher->Shutdown();
 
-        DeviceLayer::ChipDeviceEvent event;
-        event.Type = DeviceLayer::DeviceEventType::kDnssdRestartNeeded;
-        error      = DeviceLayer::PlatformMgr().PostEvent(&event);
+        DeviceLayer::ChipDeviceEvent event{ .Type = DeviceLayer::DeviceEventType::kDnssdRestartNeeded };
+        error = DeviceLayer::PlatformMgr().PostEvent(&event);
 
         if (error != CHIP_NO_ERROR)
         {

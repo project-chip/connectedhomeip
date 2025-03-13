@@ -44,6 +44,7 @@ void TransferFacilitator::ResetTransfer()
 
     VerifyOrReturn(mSystemLayer != nullptr);
     mSystemLayer->CancelTimer(PollTimerHandler, this);
+    mSystemLayer = nullptr;
 }
 
 CHIP_ERROR TransferFacilitator::OnMessageReceived(chip::Messaging::ExchangeContext * ec, const chip::PayloadHeader & payloadHeader,

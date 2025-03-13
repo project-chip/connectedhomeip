@@ -28,7 +28,7 @@ using namespace chip::app::Clusters::PowerTopology;
 
 CHIP_ERROR PowerTopologyDelegateImpl::GetAvailableEndpointAtIndex(size_t index, EndpointId & endpointId)
 {
-    VerifyOrReturnError(index < ArraySize(mAvailableEndpointIdList), CHIP_ERROR_PROVIDER_LIST_EXHAUSTED);
+    VerifyOrReturnError(index < MATTER_ARRAY_SIZE(mAvailableEndpointIdList), CHIP_ERROR_PROVIDER_LIST_EXHAUSTED);
 
     endpointId = mAvailableEndpointIdList[index];
 
@@ -37,7 +37,7 @@ CHIP_ERROR PowerTopologyDelegateImpl::GetAvailableEndpointAtIndex(size_t index, 
 
 CHIP_ERROR PowerTopologyDelegateImpl::GetActiveEndpointAtIndex(size_t index, EndpointId & endpointId)
 {
-    VerifyOrReturnError(index < ArraySize(mActiveEndpointIdList), CHIP_ERROR_PROVIDER_LIST_EXHAUSTED);
+    VerifyOrReturnError(index < MATTER_ARRAY_SIZE(mActiveEndpointIdList), CHIP_ERROR_PROVIDER_LIST_EXHAUSTED);
 
     endpointId = mActiveEndpointIdList[index];
 

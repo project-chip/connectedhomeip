@@ -116,14 +116,7 @@ void ICDManager::Shutdown()
 
 bool ICDManager::SupportsFeature(Feature feature)
 {
-    // Can't use attribute accessors/Attributes::FeatureMap::Get in unit tests
-#if !(CONFIG_BUILD_FOR_HOST_UNIT_TEST)
-    uint32_t featureMap = 0;
-    bool success        = (Attributes::FeatureMap::Get(kRootEndpointId, &featureMap) == Status::Success);
-    return success ? ((featureMap & to_underlying(feature)) != 0) : false;
-#else
-    return ((mFeatureMap & to_underlying(feature)) != 0);
-#endif // !(CONFIG_BUILD_FOR_HOST_UNIT_TEST)
+    return ICDConfigurationData::GetInstance().GetFeatureMap().Has(feature);
 }
 
 uint32_t ICDManager::StayActiveRequest(uint32_t stayActiveDuration)
@@ -394,12 +387,6 @@ void ICDManager::UpdateICDMode()
     if (ICDConfigurationData::GetInstance().GetICDMode() != tempMode)
     {
         ICDConfigurationData::GetInstance().SetICDMode(tempMode);
-
-        // Can't use attribute accessors/Attributes::OperatingMode::Set in unit tests
-#if !(CONFIG_BUILD_FOR_HOST_UNIT_TEST)
-        Attributes::OperatingMode::Set(kRootEndpointId, static_cast<OperatingModeEnum>(tempMode));
-#endif
-
         postObserverEvent(ObserverEventType::ICDModeChange);
     }
 

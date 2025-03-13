@@ -29,7 +29,7 @@
 #endif
 
 #if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKETS
-#include <zephyr/net/socket.h>
+#include <inet/ZephyrSocket.h> // nogncheck
 #endif
 
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING

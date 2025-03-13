@@ -29,6 +29,7 @@
 #include <vector>
 
 #include <access/AccessConfig.h>
+#include <app/AppConfig.h>
 #include <inet/InetInterface.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/Optional.h>
@@ -49,6 +50,7 @@ struct LinuxDeviceOptions
     chip::Optional<uint16_t> discriminator;
     chip::Optional<std::vector<uint8_t>> spake2pVerifier;
     chip::Optional<std::vector<uint8_t>> spake2pSalt;
+    chip::Optional<std::string> dacProviderFile;
     uint32_t spake2pIterations = 0; // When not provided (0), will default elsewhere
     uint32_t mBleDevice        = 0;
     bool wifiSupports5g        = false;
@@ -90,6 +92,10 @@ struct LinuxDeviceOptions
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
     chip::Optional<std::vector<chip::Access::AccessRestrictionProvider::Entry>> commissioningArlEntries;
     chip::Optional<std::vector<chip::Access::AccessRestrictionProvider::Entry>> arlEntries;
+#endif
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+    chip::Optional<uint16_t> tcVersion;
+    chip::Optional<uint16_t> tcRequired;
 #endif
     static LinuxDeviceOptions & GetInstance();
 };

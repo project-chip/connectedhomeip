@@ -199,9 +199,9 @@ void ElectricalSensorManager::UpdateEPMAttributes(OperationalStateEnum state)
         uint8_t updateState = to_underlying(state);
 
         // Check state range
-        if (updateState >= ArraySize(kAttributes))
+        if (updateState >= MATTER_ARRAY_SIZE(kAttributes))
         {
-            updateState = ArraySize(kAttributes) - 1;
+            updateState = MATTER_ARRAY_SIZE(kAttributes) - 1;
         }
 
         ChipLogDetail(AppServer, "UpdateAllAttributes to Operational State : %d", updateState);

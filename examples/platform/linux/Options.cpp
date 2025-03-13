@@ -23,7 +23,7 @@
 
 #include "Options.h"
 
-#include <app/server/OnboardingCodesUtil.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 
 #include <crypto/CHIPCryptoPAL.h>
 #include <json/json.h>
@@ -34,6 +34,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 
+#include <app/tests/suites/credentials/TestHarnessDACProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
 #if ENABLE_TRACING
@@ -126,6 +127,11 @@ enum
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     kDeviceOption_WiFi_PAF,
 #endif
+    kDeviceOption_DacProvider,
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+    kDeviceOption_TermsAndConditions_Version,
+    kDeviceOption_TermsAndConditions_Required,
+#endif
 };
 
 constexpr unsigned kAppUsageLength = 64;
@@ -140,7 +146,7 @@ OptionDef sDeviceOptionDefs[] = {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     { "wifipaf", kArgumentRequired, kDeviceOption_WiFi_PAF },
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #if CHIP_ENABLE_OPENTHREAD
     { "thread", kNoArgument, kDeviceOption_Thread },
 #endif // CHIP_ENABLE_OPENTHREAD
@@ -200,6 +206,11 @@ OptionDef sDeviceOptionDefs[] = {
 #endif
 #if CHIP_WITH_NLFAULTINJECTION
     { "faults", kArgumentRequired, kDeviceOption_FaultInjection },
+#endif
+    { "dac_provider", kArgumentRequired, kDeviceOption_DacProvider },
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+    { "tc-version", kArgumentRequired, kDeviceOption_TermsAndConditions_Version },
+    { "tc-required", kArgumentRequired, kDeviceOption_TermsAndConditions_Required },
 #endif
     {}
 };
@@ -359,10 +370,21 @@ const char * sDeviceOptionHelp =
     "      Specifies the time after which the device transitions from active to idle.\n"
     "\n"
 #endif
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+    "  --tc-version\n"
+    "       Sets the minimum required version of the Terms and Conditions\n"
+    "\n"
+    "  --tc-required\n"
+    "       Sets the required acknowledgements for the Terms and Conditions as a 16-bit enumeration.\n"
+    "       Each bit represents an ordinal corresponding to a specific acknowledgment requirement.\n"
+    "\n"
+#endif
 #if CHIP_WITH_NLFAULTINJECTION
     "  --faults <fault-string,...>\n"
     "       Inject specified fault(s) at runtime.\n"
 #endif
+    "   --dac_provider <filepath>\n"
+    "       A json file with data used by the example dac provider to validate device attestation procedure.\n"
     "\n";
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
@@ -719,7 +741,7 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
                                                                          Inet::FaultInjection::GetManager,
                                                                          System::FaultInjection::GetManager };
         Platform::ScopedMemoryString mutableArg(aValue, strlen(aValue)); // ParseFaultInjectionStr may mutate
-        if (!nl::FaultInjection::ParseFaultInjectionStr(mutableArg.Get(), faultManagerFns, ArraySize(faultManagerFns)))
+        if (!nl::FaultInjection::ParseFaultInjectionStr(mutableArg.Get(), faultManagerFns, MATTER_ARRAY_SIZE(faultManagerFns)))
         {
             PrintArgError("%s: Invalid fault injection specification\n", aProgram);
             retval = false;
@@ -731,6 +753,25 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
     case kDeviceOption_WiFi_PAF: {
         LinuxDeviceOptions::GetInstance().mWiFiPAF        = true;
         LinuxDeviceOptions::GetInstance().mWiFiPAFExtCmds = aValue;
+        break;
+    }
+#endif
+    case kDeviceOption_DacProvider: {
+        LinuxDeviceOptions::GetInstance().dacProviderFile.SetValue(aValue);
+        static chip::Credentials::Examples::TestHarnessDACProvider testDacProvider;
+        testDacProvider.Init(gDeviceOptions.dacProviderFile.Value().c_str());
+
+        LinuxDeviceOptions::GetInstance().dacProvider = &testDacProvider;
+        break;
+    }
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+    case kDeviceOption_TermsAndConditions_Version: {
+        LinuxDeviceOptions::GetInstance().tcVersion.SetValue(static_cast<uint16_t>(atoi(aValue)));
+        break;
+    }
+
+    case kDeviceOption_TermsAndConditions_Required: {
+        LinuxDeviceOptions::GetInstance().tcRequired.SetValue(static_cast<uint16_t>(atoi(aValue)));
         break;
     }
 #endif
@@ -777,5 +818,6 @@ LinuxDeviceOptions & LinuxDeviceOptions::GetInstance()
     {
         gDeviceOptions.dacProvider = chip::Credentials::Examples::GetExampleDACProvider();
     }
+
     return gDeviceOptions;
 }

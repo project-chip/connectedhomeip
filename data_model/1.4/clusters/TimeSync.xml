@@ -55,8 +55,7 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 
-:imagesdir: service_device_management/images
-:xrefstyle: full
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0038" name="Time Synchronization Cluster" revision="2">
   <revisionHistory>
@@ -99,7 +98,11 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </item>
     </enum>
-    <enum name="Status Codes" type="status"/>
+    <enum name="StatusCodeEnum">
+      <item value="0x02" name="TimeNotAccepted" summary="Node rejected the attempt to set the UTC time">
+        <mandatoryConform/>
+      </item>
+    </enum>
     <enum name="TimeSourceEnum">
       <item value="0" name="None" summary="Node is not currently synchronized with a UTC Time source.">
         <mandatoryConform/>
@@ -213,7 +216,7 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="UTCTime" type="epoch-us" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true" nullable="true"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0001" name="Granularity" type="GranularityEnum" default="NoTimeGranularity">
@@ -228,14 +231,14 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0003" name="TrustedTimeSource" type="TrustedTimeSourceStruct" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="nonVolatile"/>
       <mandatoryConform>
         <feature name="TSC"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0004" name="DefaultNTP" type="string" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="nonVolatile"/>
       <mandatoryConform>
         <feature name="NTPC"/>
       </mandatoryConform>
@@ -244,35 +247,35 @@ Davis, CA 95616, USA
     <attribute id="0x0005" name="TimeZone" type="list" default="[{0,0}]">
       <entry type="TimeZoneStruct"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform>
         <feature name="TZ"/>
       </mandatoryConform>
       <constraint type="countBetween" from="1" to="2"/>
     </attribute>
-    <attribute id="0x0006" name="DSTOffset" type="list" default="[]">
+    <attribute id="0x0006" name="DSTOffset" type="list" default="empty">
       <entry type="DSTOffsetStruct"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform>
         <feature name="TZ"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0007" name="LocalTime" type="epoch-us" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true" nullable="true"/>
       <mandatoryConform>
         <feature name="TZ"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0008" name="TimeZoneDatabase" type="TimeZoneDatabaseEnum" default="None">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="TZ"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0009" name="NTPServerAvailable" type="bool" default="False">
+    <attribute id="0x0009" name="NTPServerAvailable" type="bool" default="false">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <feature name="NTPS"/>
@@ -280,7 +283,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x000A" name="TimeZoneListMaxSize" type="uint8">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="TZ"/>
       </mandatoryConform>
@@ -288,15 +291,15 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x000B" name="DSTOffsetListMaxSize" type="uint8">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="TZ"/>
       </mandatoryConform>
       <constraint type="min" value="1"/>
     </attribute>
-    <attribute id="0x000C" name="SupportsDNSResolve" type="bool" default="False">
+    <attribute id="0x000C" name="SupportsDNSResolve" type="bool" default="false">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="NTPC"/>
       </mandatoryConform>
@@ -394,7 +397,6 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="Name" type="string">
         <optionalConform/>
-        <constraint type="lengthBetween" from="0" to="64 bytes"/>
       </field>
     </event>
     <event id="0x03" name="TimeFailure" priority="info">

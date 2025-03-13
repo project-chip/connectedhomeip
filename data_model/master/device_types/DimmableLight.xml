@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -54,6 +54,8 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0101" name="Dimmable Light" revision="3">
   <revisionHistory>
@@ -62,12 +64,11 @@ Davis, CA 95616, USA
     <revision revision="3" summary="Updated the Scenes cluster to Scenes Management with Cluster ID: 0x0062"/>
   </revisionHistory>
   <classification superset="On/Off Light" class="simple" scope="endpoint"/>
-  <conditions/>
   <clusters>
     <cluster id="0x0003" name="Identify" side="server">
       <mandatoryConform/>
       <commands>
-        <command id="" name="TriggerEffect">
+        <command id="0x0040" name="TriggerEffect">
           <mandatoryConform/>
         </command>
       </commands>
@@ -94,14 +95,23 @@ Davis, CA 95616, USA
         </feature>
       </features>
       <attributes>
-        <attribute code="" name="CurrentLevel">
-          <constraint type="between" from="1" to="254"/>
+        <attribute code="0x0000" name="CurrentLevel">
+          <constraint>
+            <between>
+              <from value="1"/>
+              <to value="254"/>
+            </between>
+          </constraint>
         </attribute>
-        <attribute code="" name="MinLevel">
-          <constraint type="allowed" value="1"/>
+        <attribute code="0x0002" name="MinLevel">
+          <constraint>
+            <allowed value="1"/>
+          </constraint>
         </attribute>
-        <attribute code="" name="MaxLevel">
-          <constraint type="allowed" value="254"/>
+        <attribute code="0x0003" name="MaxLevel">
+          <constraint>
+            <allowed value="254"/>
+          </constraint>
         </attribute>
       </attributes>
     </cluster>
@@ -111,7 +121,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </otherwiseConform>
       <commands>
-        <command id="" name="CopyScene">
+        <command id="0x0040" name="CopyScene">
           <otherwiseConform>
             <provisionalConform/>
             <mandatoryConform/>

@@ -16,14 +16,15 @@ import("//build_overrides/chip.gni")
 
 source_set("persistence") {
   sources = [
+    "AttributePersistenceProvider.cpp",
     "AttributePersistenceProvider.h",
     "DefaultAttributePersistenceProvider.cpp",
     "DefaultAttributePersistenceProvider.h",
   ]
 
   public_deps = [
-    "${chip_root}/src/app:attribute-persistence",
     "${chip_root}/src/app:paths",
+    "${chip_root}/src/app:storage-wrapper",
     "${chip_root}/src/app/util:types",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",

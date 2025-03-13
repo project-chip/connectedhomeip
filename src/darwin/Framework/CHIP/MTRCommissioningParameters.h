@@ -1,6 +1,5 @@
 /**
- *
- *    Copyright (c) 2022-2023 Project CHIP Authors
+ *    Copyright (c) 2022-2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -96,6 +95,23 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * device can use to decide on things like radio communications bands.
  */
 @property (nonatomic, copy, nullable) NSString * countryCode MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
+
+/**
+ * Read device type information from all endpoints during commissioning.
+ * Defaults to NO.
+ */
+@property (nonatomic, assign) BOOL readEndpointInformation MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
+
+/**
+ * A bitmask of the user’s responses to the presented terms and conditions.
+ * Each bit corresponds to a term’s acceptance (1) or non-acceptance (0) at the matching index.
+ */
+@property (nonatomic, copy, nullable) NSNumber * acceptedTermsAndConditions MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * The version of the terms and conditions that the user has accepted.
+ */
+@property (nonatomic, copy, nullable) NSNumber * acceptedTermsAndConditionsVersion MTR_PROVISIONALLY_AVAILABLE;
 
 @end
 

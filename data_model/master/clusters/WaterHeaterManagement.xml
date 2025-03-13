@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2023). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -103,20 +103,35 @@ Davis, CA 95616, USA
     <struct name="WaterHeaterBoostInfoStruct">
       <field id="0" name="Duration" type="elapsed-s">
         <mandatoryConform/>
-        <constraint type="min" value="1"/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
       </field>
-      <field id="1" name="OneShot" type="bool" default="False"/>
-      <field id="2" name="EmergencyBoost" type="bool" default="False">
+      <field id="1" name="OneShot" type="bool" default="false">
+        <otherwiseConform>
+          <optionalConform>
+            <notTerm>
+              <feature name="TP"/>
+            </notTerm>
+          </optionalConform>
+          <optionalConform choice="a" max="1">
+            <feature name="TP"/>
+          </optionalConform>
+        </otherwiseConform>
+      </field>
+      <field id="2" name="EmergencyBoost" type="bool" default="false">
         <optionalConform/>
       </field>
       <field id="3" name="TemporarySetpoint" type="temperature">
         <optionalConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="4" name="TargetPercentage" type="percent">
         <otherwiseConform>
           <mandatoryConform>
-            <attribute name="TargetReheat"/>
+            <field name="TargetReheat"/>
           </mandatoryConform>
           <optionalConform>
             <feature name="TP"/>
@@ -124,14 +139,21 @@ Davis, CA 95616, USA
         </otherwiseConform>
       </field>
       <field id="5" name="TargetReheat" type="percent">
-        <constraint type="max" value="TargetPercentage"/>
+        <optionalConform choice="a" max="1">
+          <feature name="TP"/>
+        </optionalConform>
+        <constraint>
+          <max>
+            <field name="TargetPercentage"/>
+          </max>
+        </constraint>
       </field>
     </struct>
   </dataTypes>
   <attributes>
     <attribute id="0x0000" name="HeaterTypes" type="WaterHeaterHeatSourceBitmap" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0001" name="HeatDemand" type="WaterHeaterHeatSourceBitmap" default="0">
@@ -149,7 +171,9 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="EM"/>
       </mandatoryConform>
-      <constraint type="min" value="0"/>
+      <constraint>
+        <min value="0"/>
+      </constraint>
     </attribute>
     <attribute id="0x0004" name="TankPercentage" type="percent" default="0">
       <access read="true" readPrivilege="view"/>
@@ -157,7 +181,8 @@ Davis, CA 95616, USA
         <feature name="TP"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0005" name="BoostState" type="BoostStateEnum" default="Inactive">
+    <attribute id="0x0005" name="BoostState" type="BoostStateEnum">
+      <enum default="Inactive"/>
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
     </attribute>
@@ -168,7 +193,6 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <field id="0" name="BoostInfo" type="WaterHeaterBoostInfoStruct">
         <mandatoryConform/>
-        <constraint type="desc"/>
       </field>
     </command>
     <command id="0x01" name="CancelBoost" direction="commandToServer" response="Y">
@@ -182,7 +206,6 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <field id="0" name="BoostInfo" type="WaterHeaterBoostInfoStruct">
         <mandatoryConform/>
-        <constraint type="desc"/>
       </field>
     </event>
     <event id="0x01" name="BoostEnded" priority="info">

@@ -18,7 +18,9 @@
 
 #include <app/AttributePathParams.h>
 #include <app/InteractionModelEngine.h>
+#include <app/data-model-provider/Provider.h>
 #include <app/util/attribute-storage.h>
+#include <lib/support/CodeUtils.h>
 #include <platform/LockTracker.h>
 
 using namespace chip;
@@ -30,7 +32,10 @@ void MatterReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clust
     // applications notifying about changes from their end.
     assertChipStackLockedByCurrentThread();
 
-    emberAfAttributeChanged(endpoint, clusterId, attributeId, emberAfGlobalInteractionModelAttributesChangedListener());
+    DataModel::Provider * provider = InteractionModelEngine::GetInstance()->GetDataModelProvider();
+    VerifyOrReturn(provider != nullptr);
+
+    provider->Temporary_ReportAttributeChanged(AttributePathParams(endpoint, clusterId, attributeId));
 }
 
 void MatterReportingAttributeChangeCallback(const ConcreteAttributePath & aPath)
@@ -39,8 +44,10 @@ void MatterReportingAttributeChangeCallback(const ConcreteAttributePath & aPath)
     // applications notifying about changes from their end.
     assertChipStackLockedByCurrentThread();
 
-    emberAfAttributeChanged(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId,
-                            emberAfGlobalInteractionModelAttributesChangedListener());
+    DataModel::Provider * provider = InteractionModelEngine::GetInstance()->GetDataModelProvider();
+    VerifyOrReturn(provider != nullptr);
+
+    provider->Temporary_ReportAttributeChanged(AttributePathParams(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId));
 }
 
 void MatterReportingAttributeChangeCallback(EndpointId endpoint)
@@ -49,5 +56,8 @@ void MatterReportingAttributeChangeCallback(EndpointId endpoint)
     // applications notifying about changes from their end.
     assertChipStackLockedByCurrentThread();
 
-    emberAfEndpointChanged(endpoint, emberAfGlobalInteractionModelAttributesChangedListener());
+    DataModel::Provider * provider = InteractionModelEngine::GetInstance()->GetDataModelProvider();
+    VerifyOrReturn(provider != nullptr);
+
+    provider->Temporary_ReportAttributeChanged(AttributePathParams(endpoint));
 }

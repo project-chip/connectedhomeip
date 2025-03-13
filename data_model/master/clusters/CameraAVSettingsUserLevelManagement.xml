@@ -1,0 +1,396 @@
+<?xml version="1.0"?>
+<!--
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
+The information within this document is the property of the Connectivity
+Standards Alliance and its use and disclosure are restricted, except as
+expressly set forth herein.
+
+Connectivity Standards Alliance hereby grants you a fully-paid, non-exclusive,
+nontransferable, worldwide, limited and revocable license (without the right to
+sublicense), under Connectivity Standards Alliance's applicable copyright
+rights, to view, download, save, reproduce and use the document solely for your
+own internal purposes and in accordance with the terms of the license set forth
+herein. This license does not authorize you to, and you expressly warrant that
+you shall not: (a) permit others (outside your organization) to use this
+document; (b) post or publish this document; (c) modify, adapt, translate, or
+otherwise change this document in any manner or create any derivative work
+based on this document; (d) remove or modify any notice or label on this
+document, including this Copyright Notice, License and Disclaimer. The
+Connectivity Standards Alliance does not grant you any license hereunder other
+than as expressly stated herein.
+
+Elements of this document may be subject to third party intellectual property
+rights, including without limitation, patent, copyright or trademark rights,
+and any such third party may or may not be a member of the Connectivity
+Standards Alliance. Connectivity Standards Alliance members grant other
+Connectivity Standards Alliance members certain intellectual property rights as
+set forth in the Connectivity Standards Alliance IPR Policy. Connectivity
+Standards Alliance members do not grant you any rights under this license. The
+Connectivity Standards Alliance is not responsible for, and shall not be held
+responsible in any manner for, identifying or failing to identify any or all
+such third party intellectual property rights. Please visit www.csa-iot.org for
+more information on how to become a member of the Connectivity Standards
+Alliance.
+
+This document and the information contained herein are provided on an “AS IS”
+basis and the Connectivity Standards Alliance DISCLAIMS ALL WARRANTIES EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO (A) ANY WARRANTY THAT THE USE OF THE
+INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OF THIRD PARTIES (INCLUDING
+WITHOUT LIMITATION ANY INTELLECTUAL PROPERTY RIGHTS INCLUDING PATENT, COPYRIGHT
+OR TRADEMARK RIGHTS); OR (B) ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, TITLE OR NONINFRINGEMENT. IN NO EVENT WILL THE
+CONNECTIVITY STANDARDS ALLIANCE BE LIABLE FOR ANY LOSS OF PROFITS, LOSS OF
+BUSINESS, LOSS OF USE OF DATA, INTERRUPTION OF BUSINESS, OR FOR ANY OTHER
+DIRECT, INDIRECT, SPECIAL OR EXEMPLARY, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL
+DAMAGES OF ANY KIND, IN CONTRACT OR IN TORT, IN CONNECTION WITH THIS DOCUMENT
+OR THE INFORMATION CONTAINED HEREIN, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+LOSS OR DAMAGE.
+
+All company, brand and product names in this document may be trademarks that
+are the sole property of their respective owners.
+
+This notice and disclaimer must be included on all copies of this document.
+
+Connectivity Standards Alliance
+508 Second Street, Suite 206
+Davis, CA 95616, USA
+
+:xrefstyle: basic
+-->
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0552" name="Camera AV Settings User Level Management Cluster" revision="1">
+  <revisionHistory>
+    <revision revision="1" summary="Initial release"/>
+  </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0552" name="Camera AV Settings User Level Management"/>
+  </clusterIds>
+  <classification hierarchy="base" role="application" picsCode="AVSUM" scope="Endpoint"/>
+  <features>
+    <feature bit="0" code="DPTZ" name="DigitalPTZ" summary="Digital PTZ support">
+      <optionalConform/>
+    </feature>
+    <feature bit="1" code="MPAN" name="MechanicalPan" summary="Mechanical Pan support">
+      <optionalConform choice="a" more="true" min="1"/>
+    </feature>
+    <feature bit="2" code="MTILT" name="MechanicalTilt" summary="Mechanical Tilt support">
+      <optionalConform choice="a" more="true" min="1"/>
+    </feature>
+    <feature bit="3" code="MZOOM" name="MechanicalZoom" summary="Mechanical Zoom support">
+      <optionalConform choice="a" more="true" min="1"/>
+    </feature>
+    <feature bit="4" code="MPRESETS" name="MechanicalPresets" summary="Mechanical saved presets support">
+      <optionalConform>
+        <orTerm>
+          <feature name="MPAN"/>
+          <feature name="MTILT"/>
+          <feature name="MZOOM"/>
+        </orTerm>
+      </optionalConform>
+    </feature>
+  </features>
+  <dataTypes>
+    <struct name="MPTZPresetStruct">
+      <field id="0" name="PresetID" type="uint8">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="Name" type="string">
+        <mandatoryConform/>
+        <constraint>
+          <maxLength value="32"/>
+        </constraint>
+      </field>
+      <field id="2" name="Settings" type="MPTZStruct">
+        <mandatoryConform/>
+      </field>
+    </struct>
+    <struct name="MPTZStruct">
+      <field id="0" name="Pan" type="int16" default="0">
+        <mandatoryConform>
+          <feature name="MPAN"/>
+        </mandatoryConform>
+        <constraint>
+          <min value="-180"/>
+        </constraint>
+        <constraint>
+          <max value="180"/>
+        </constraint>
+      </field>
+      <field id="1" name="Tilt" type="int16" default="0">
+        <mandatoryConform>
+          <feature name="MTILT"/>
+        </mandatoryConform>
+        <constraint>
+          <min value="-180"/>
+        </constraint>
+        <constraint>
+          <max value="180"/>
+        </constraint>
+      </field>
+      <field id="2" name="Zoom" type="uint8" default="1">
+        <mandatoryConform>
+          <feature name="MZOOM"/>
+        </mandatoryConform>
+        <constraint>
+          <between value="1">
+            <attribute name="ZoomMax"/>
+          </between>
+        </constraint>
+      </field>
+    </struct>
+  </dataTypes>
+  <attributes>
+    <attribute id="0x0000" name="MPTZPosition" type="MPTZStruct">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <orTerm>
+          <feature name="MPAN"/>
+          <feature name="MTILT"/>
+          <feature name="MZOOM"/>
+        </orTerm>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0001" name="MaxPresets" type="uint8" default="5">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="MPRESETS"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0002" name="MPTZPresets" type="list" default="empty">
+      <entry type="MPTZPresetStruct"/>
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="MPRESETS"/>
+      </mandatoryConform>
+      <constraint>
+        <allowed>
+          <attribute name="MaxPresets"/>
+        </allowed>
+      </constraint>
+    </attribute>
+    <attribute id="0x0003" name="DPTZRelativeMove" type="list" default="empty">
+      <entry type="VideoStreamID"/>
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="DPTZ"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0004" name="ZoomMax" type="uint8" default="100">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="MZOOM"/>
+      </mandatoryConform>
+      <constraint>
+        <between>
+          <from value="2"/>
+          <to value="100"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0005" name="TiltMin" type="int16" default="-90">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="MTILT"/>
+      </mandatoryConform>
+      <constraint>
+        <min value="-180"/>
+      </constraint>
+      <constraint>
+        <max value="179"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0006" name="TiltMax" type="int16" default="90">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="MTILT"/>
+      </mandatoryConform>
+      <constraint>
+        <min value="-179"/>
+      </constraint>
+      <constraint>
+        <max value="180"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0007" name="PanMin" type="int16" default="-180">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="MPAN"/>
+      </mandatoryConform>
+      <constraint>
+        <min value="-180"/>
+      </constraint>
+      <constraint>
+        <max value="179"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0008" name="PanMax" type="int16" default="180">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="MPAN"/>
+      </mandatoryConform>
+      <constraint>
+        <min value="-179"/>
+      </constraint>
+      <constraint>
+        <max value="180"/>
+      </constraint>
+    </attribute>
+  </attributes>
+  <commands>
+    <command id="0x00" name="MPTZSetPosition" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <orTerm>
+          <feature name="MPAN"/>
+          <feature name="MTILT"/>
+          <feature name="MZOOM"/>
+        </orTerm>
+      </mandatoryConform>
+      <field id="0" name="Pan" type="int16">
+        <optionalConform choice="b" more="true" min="1">
+          <feature name="MPAN"/>
+        </optionalConform>
+        <constraint>
+          <min>
+            <attribute name="PanMin"/>
+          </min>
+        </constraint>
+        <constraint>
+          <max>
+            <attribute name="PanMax"/>
+          </max>
+        </constraint>
+      </field>
+      <field id="1" name="Tilt" type="int16">
+        <optionalConform choice="b" more="true" min="1">
+          <feature name="MTILT"/>
+        </optionalConform>
+        <constraint>
+          <min>
+            <attribute name="TiltMin"/>
+          </min>
+        </constraint>
+        <constraint>
+          <max>
+            <attribute name="TiltMax"/>
+          </max>
+        </constraint>
+      </field>
+      <field id="2" name="Zoom" type="uint8">
+        <optionalConform choice="b" more="true" min="1">
+          <feature name="MZOOM"/>
+        </optionalConform>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+        <constraint>
+          <max>
+            <attribute name="ZoomMax"/>
+          </max>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x01" name="MPTZRelativeMove" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <optionalConform>
+        <orTerm>
+          <feature name="MPAN"/>
+          <feature name="MTILT"/>
+          <feature name="MZOOM"/>
+        </orTerm>
+      </optionalConform>
+      <field id="0" name="PanDelta" type="int16" default="0">
+        <optionalConform choice="c" more="true" min="1">
+          <feature name="MPAN"/>
+        </optionalConform>
+      </field>
+      <field id="1" name="TiltDelta" type="int16" default="0">
+        <optionalConform choice="c" more="true" min="1">
+          <feature name="MTILT"/>
+        </optionalConform>
+      </field>
+      <field id="2" name="ZoomDelta" type="int8" default="0">
+        <optionalConform choice="c" more="true" min="1">
+          <feature name="MZOOM"/>
+        </optionalConform>
+      </field>
+    </command>
+    <command id="0x02" name="MPTZMoveToPreset" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <feature name="MPRESETS"/>
+      </mandatoryConform>
+      <field id="0" name="PresetID" type="uint8">
+        <mandatoryConform/>
+        <constraint>
+          <max value="MaxPresets - 1"/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x03" name="MPTZSavePreset" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <feature name="MPRESETS"/>
+      </mandatoryConform>
+      <field id="0" name="PresetID" type="uint8">
+        <optionalConform/>
+        <constraint>
+          <max value="MaxPresets - 1"/>
+        </constraint>
+      </field>
+      <field id="1" name="Name" type="string">
+        <mandatoryConform/>
+        <constraint>
+          <maxLength value="32"/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x04" name="MPTZRemovePreset" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <feature name="MPRESETS"/>
+      </mandatoryConform>
+      <field id="0" name="PresetID" type="uint8">
+        <mandatoryConform/>
+        <constraint>
+          <max value="MaxPresets - 1"/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x05" name="DPTZSetViewport" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <feature name="DPTZ"/>
+      </mandatoryConform>
+      <field id="0" name="VideoStreamID" type="VideoStreamID">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="Viewport" type="ViewportStruct">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x06" name="DPTZRelativeMove" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <optionalConform>
+        <feature name="DPTZ"/>
+      </optionalConform>
+      <field id="0" name="VideoStreamID" type="VideoStreamID">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="DeltaX" type="int16" default="0">
+        <optionalConform choice="d" more="true" min="1"/>
+      </field>
+      <field id="2" name="DeltaY" type="int16" default="0">
+        <optionalConform choice="d" more="true" min="1"/>
+      </field>
+      <field id="3" name="ZoomDelta" type="int8" default="0">
+        <optionalConform choice="d" more="true" min="1"/>
+        <constraint>
+          <min value="-100"/>
+        </constraint>
+        <constraint>
+          <max value="100"/>
+        </constraint>
+      </field>
+    </command>
+  </commands>
+</cluster>

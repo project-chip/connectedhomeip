@@ -21,6 +21,7 @@
  */
 #pragma once
 
+#include <app-common/zap-generated/cluster-enums.h>
 #include <lib/support/TypeTraits.h>
 
 namespace chip {

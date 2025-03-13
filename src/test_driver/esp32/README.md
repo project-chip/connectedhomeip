@@ -6,9 +6,9 @@ An application that runs Matter's unit tests on ESP32 device or QEMU.
 
 -   [Matter Tests on Device](#chip-tests-on-device)
     -   [Supported Devices](#supported-devices)
-    -   [Building the Application](#building-the-application)
-        -   [To build the application, follow these steps:](#to-build-the-application-follow-these-steps)
-            -   [Using QEMU](#using-qemu)
+    -   [Requirements](#requirements)
+    -   [Building Unit Tests](#building-unit-tests)
+    -   [Running Unit Tests](#running-unit-tests)
 
 ---
 
@@ -20,7 +20,7 @@ The Matter application is intended to work on
 [M5Stack](http://m5stack.com). Support for the [M5Stack](http://m5stack.com) is
 still a Work in Progress.
 
-## Building the Application
+## Requirements
 
 Building the application requires the use of the Espressif ESP32 IoT Development
 Framework and the xtensa-esp32-elf toolchain.
@@ -51,20 +51,27 @@ follow these steps:
           $ make -j8
           $ export QEMU_ESP32=${HOME}/tools/qemu_esp32/xtensa-softmmu/qemu-system-xtensa
 
-### To build the application, follow these steps:
+## Building Unit Tests
 
-#### Using QEMU
+To build all unit tests:
 
--   Setup ESP32 QEMU. This will build QEMU and install necessary artifacts to
-    run unit tests.
+    $ source scripts/activate.sh
+    $ scripts/build/build_examples.py --target esp32-qemu-tests build
 
-          ```
-          source idf.sh
-          ./qemu_setup.sh
-          ```
+This generates a list of QEMU images in `out/esp32-qemu-tests/`
 
--   Run specific unit tests
+There is one image for each test directory (i.e. each chip_test_suite). So for
+example `src/inet/tests` builds to `out/esp32-qemu-tests/testInetLayer.img`
 
-          ```
-          idf make -C build/chip/src/crypto/tests check
-          ```
+The file `out/esp32-qemu-tests/test_images.txt` contains the names of all the
+images that were built.
+
+## Running Unit Tests
+
+To run all unit test images using QEMU:
+
+    $ src/test_driver/esp32/run_qemu_image.py --verbose --file-image-list out/esp32-qemu-tests/test_images.txt
+
+To run a single unit test image, such as `testInetLayer.img`:
+
+    $ src/test_driver/esp32/run_qemu_image.py --verbose --image out/esp32-qemu-tests/testInetLayer.img

@@ -7,6 +7,10 @@ commissioning mode, advertises itself as a Commissionable Node and gets
 commissioned. Then it allows the user to send Matter ContentLauncher commands to
 the TV.
 
+Refer to the
+[Matter Casting APIs documentation](https://project-chip.github.io/connectedhomeip-doc/examples/tv-casting-app/APIs.html)
+to build the Matter “Casting Client” into your consumer-facing mobile app.
+
 ---
 
 -   [Matter TV Casting iOS App Example](#matter-tv-casting-ios-app-example)
@@ -14,6 +18,8 @@ the TV.
         -   [Building through command line](#building-through-command-line)
         -   [Compilation Fixes](#compilation-fixes)
     -   [Installing the Application](#installing-the-application)
+    -   [Debugging](#debugging)
+    -   [Running the Application](#running-the-application)
 
 ---
 
@@ -98,3 +104,14 @@ the run button once more.
 
 Use the "TvCasting" scheme when building to enable debugging. If you wish to
 build the app without any debugging symbols, use the "TvCasting Release" scheme.
+
+## Running the Application
+
+This example Matter TV Casting iOS application can be tested with the following
+video players:
+
+1. With the
+   [example Matter tv-app](https://github.com/project-chip/connectedhomeip/tree/master/examples/tv-app)
+   running on a Raspberry Pi - works out of the box.
+2. With a FireTV device - requires your Amazon Customer ID to be allow-listed
+   first.

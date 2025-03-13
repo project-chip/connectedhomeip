@@ -1,0 +1,373 @@
+<?xml version="1.0"?>
+<!--
+Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+The information within this document is the property of the Connectivity
+Standards Alliance and its use and disclosure are restricted, except as
+expressly set forth herein.
+
+Connectivity Standards Alliance hereby grants you a fully-paid, non-exclusive,
+nontransferable, worldwide, limited and revocable license (without the right to
+sublicense), under Connectivity Standards Alliance's applicable copyright
+rights, to view, download, save, reproduce and use the document solely for your
+own internal purposes and in accordance with the terms of the license set forth
+herein. This license does not authorize you to, and you expressly warrant that
+you shall not: (a) permit others (outside your organization) to use this
+document; (b) post or publish this document; (c) modify, adapt, translate, or
+otherwise change this document in any manner or create any derivative work
+based on this document; (d) remove or modify any notice or label on this
+document, including this Copyright Notice, License and Disclaimer. The
+Connectivity Standards Alliance does not grant you any license hereunder other
+than as expressly stated herein.
+
+Elements of this document may be subject to third party intellectual property
+rights, including without limitation, patent, copyright or trademark rights,
+and any such third party may or may not be a member of the Connectivity
+Standards Alliance. Connectivity Standards Alliance members grant other
+Connectivity Standards Alliance members certain intellectual property rights as
+set forth in the Connectivity Standards Alliance IPR Policy. Connectivity
+Standards Alliance members do not grant you any rights under this license. The
+Connectivity Standards Alliance is not responsible for, and shall not be held
+responsible in any manner for, identifying or failing to identify any or all
+such third party intellectual property rights. Please visit www.csa-iot.org for
+more information on how to become a member of the Connectivity Standards
+Alliance.
+
+This document and the information contained herein are provided on an “AS IS”
+basis and the Connectivity Standards Alliance DISCLAIMS ALL WARRANTIES EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO (A) ANY WARRANTY THAT THE USE OF THE
+INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OF THIRD PARTIES (INCLUDING
+WITHOUT LIMITATION ANY INTELLECTUAL PROPERTY RIGHTS INCLUDING PATENT, COPYRIGHT
+OR TRADEMARK RIGHTS); OR (B) ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, TITLE OR NONINFRINGEMENT. IN NO EVENT WILL THE
+CONNECTIVITY STANDARDS ALLIANCE BE LIABLE FOR ANY LOSS OF PROFITS, LOSS OF
+BUSINESS, LOSS OF USE OF DATA, INTERRUPTION OF BUSINESS, OR FOR ANY OTHER
+DIRECT, INDIRECT, SPECIAL OR EXEMPLARY, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL
+DAMAGES OF ANY KIND, IN CONTRACT OR IN TORT, IN CONNECTION WITH THIS DOCUMENT
+OR THE INFORMATION CONTAINED HEREIN, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+LOSS OR DAMAGE.
+
+All company, brand and product names in this document may be trademarks that
+are the sole property of their respective owners.
+
+This notice and disclaimer must be included on all copies of this document.
+
+Connectivity Standards Alliance
+508 Second Street, Suite 206
+Davis, CA 95616, USA
+
+:xrefstyle: basic
+-->
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0008" name="Level Control Cluster" revision="6">
+  <revisionHistory>
+    <revision revision="1" summary="Mandatory global ClusterRevision attribute added"/>
+    <revision revision="2" summary="Added Options attribute, state change table; ZLO 1.0; Base cluster (no change) CCB 2085 1775 2281 2147"/>
+    <revision revision="3" summary="CCB 2574 2616 2659 2702 2814 2818 2819 2898"/>
+    <revision revision="4" summary="FeatureMap support with On/Off, Lighting and Frequency features"/>
+    <revision revision="5" summary="New data model format and notation"/>
+    <revision revision="6" summary="Added Q quality for CurrentLevel, CurrentFrequency and RemainingTime attributes, added clarifications for behavior related to Step value and adjusted constraint of DefaultMoveRate"/>
+  </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0008" name="Level Control"/>
+  </clusterIds>
+  <classification hierarchy="base" role="application" picsCode="LVL" scope="Endpoint"/>
+  <features>
+    <feature bit="0" code="OO" name="OnOff" summary="Dependency with the On/Off cluster">
+      <optionalConform/>
+    </feature>
+    <feature bit="1" code="LT" name="Lighting" summary="Behavior that supports lighting applications">
+      <optionalConform/>
+    </feature>
+    <feature bit="2" code="FQ" name="Frequency" summary="Supports frequency attributes and behavior.">
+      <provisionalConform/>
+    </feature>
+  </features>
+  <dataTypes>
+    <enum name="MoveModeEnum">
+      <item value="0" name="Up" summary="Increase the level">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Down" summary="Decrease the level">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="StepModeEnum">
+      <item value="0" name="Up" summary="Step upwards">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Down" summary="Step downwards">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <bitmap name="OptionsBitmap">
+      <bitfield name="ExecuteIfOff" bit="0" summary="Dependency on On/Off cluster">
+        <mandatoryConform>
+          <orTerm>
+            <feature name="LT"/>
+            <feature name="OO"/>
+          </orTerm>
+        </mandatoryConform>
+      </bitfield>
+      <bitfield name="CoupleColorTempToLevel" bit="1" summary="Dependency on Color Control cluster">
+        <mandatoryConform>
+          <feature name="LT"/>
+        </mandatoryConform>
+      </bitfield>
+    </bitmap>
+  </dataTypes>
+  <attributes>
+    <attribute id="0x0000" name="CurrentLevel" type="uint8" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" scene="true" persistence="nonVolatile" quieterReporting="true"/>
+      <mandatoryConform/>
+      <constraint>
+        <between>
+          <attribute name="MinLevel"/>
+          <attribute name="MaxLevel"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0001" name="RemainingTime" type="uint16" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality quieterReporting="true"/>
+      <mandatoryConform>
+        <feature name="LT"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0002" name="MinLevel" type="uint8" default="1">
+      <access read="true" readPrivilege="view"/>
+      <optionalConform>
+        <feature name="LT"/>
+      </optionalConform>
+      <constraint>
+        <between>
+          <from value="1"/>
+          <to value="254"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0002" name="MinLevel" type="uint8" default="0">
+      <access read="true" readPrivilege="view"/>
+      <optionalConform>
+        <notTerm>
+          <feature name="LT"/>
+        </notTerm>
+      </optionalConform>
+      <constraint>
+        <max value="254"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0003" name="MaxLevel" type="uint8" default="254">
+      <access read="true" readPrivilege="view"/>
+      <optionalConform/>
+      <constraint>
+        <between value="254">
+          <attribute name="MinLevel"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0004" name="CurrentFrequency" type="uint16" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality scene="true" reportable="true" quieterReporting="true"/>
+      <mandatoryConform>
+        <feature name="FQ"/>
+      </mandatoryConform>
+      <constraint>
+        <between>
+          <attribute name="MinFrequency"/>
+          <attribute name="MaxFrequency"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0005" name="MinFrequency" type="uint16" default="0">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="FQ"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0006" name="MaxFrequency" type="uint16" default="0">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="FQ"/>
+      </mandatoryConform>
+      <constraint>
+        <min>
+          <attribute name="MinFrequency"/>
+        </min>
+      </constraint>
+    </attribute>
+    <attribute id="0x000F" name="Options" type="OptionsBitmap" default="0">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
+      <mandatoryConform/>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0010" name="OnOffTransitionTime" type="uint16" default="0">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x0011" name="OnLevel" type="uint8" default="null">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
+      <quality nullable="true"/>
+      <mandatoryConform/>
+      <constraint>
+        <between>
+          <attribute name="MinLevel"/>
+          <attribute name="MaxLevel"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0012" name="OnTransitionTime" type="uint16" default="null">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
+      <quality nullable="true"/>
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x0013" name="OffTransitionTime" type="uint16" default="null">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
+      <quality nullable="true"/>
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x0014" name="DefaultMoveRate" type="uint8" default="MS">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
+      <quality nullable="true"/>
+      <optionalConform/>
+      <constraint>
+        <min value="1"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x4000" name="StartUpCurrentLevel" type="uint8" default="MS">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality nullable="true" persistence="nonVolatile"/>
+      <mandatoryConform>
+        <feature name="LT"/>
+      </mandatoryConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+  </attributes>
+  <commands>
+    <command id="0x00" name="MoveToLevel" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform/>
+      <field id="0" name="Level" type="uint8">
+        <mandatoryConform/>
+        <constraint>
+          <max value="254"/>
+        </constraint>
+      </field>
+      <field id="1" name="TransitionTime" type="uint16">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="OptionsMask" type="OptionsBitmap" default="0">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="3" name="OptionsOverride" type="OptionsBitmap" default="0">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x01" name="Move" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform/>
+      <field id="0" name="MoveMode" type="MoveModeEnum">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="1" name="Rate" type="uint8">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="OptionsMask" type="OptionsBitmap" default="0">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="3" name="OptionsOverride" type="OptionsBitmap" default="0">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x02" name="Step" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform/>
+      <field id="0" name="StepMode" type="StepModeEnum">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="1" name="StepSize" type="uint8">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="TransitionTime" type="uint16">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="OptionsMask" type="OptionsBitmap" default="0">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="4" name="OptionsOverride" type="OptionsBitmap" default="0">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x03" name="Stop" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform/>
+      <field id="0" name="OptionsMask" type="OptionsBitmap" default="0">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="1" name="OptionsOverride" type="OptionsBitmap" default="0">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x04" name="MoveToLevelWithOnOff" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform/>
+    </command>
+    <command id="0x05" name="MoveWithOnOff" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform/>
+    </command>
+    <command id="0x06" name="StepWithOnOff" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform/>
+    </command>
+    <command id="0x07" name="StopWithOnOff" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform/>
+    </command>
+    <command id="0x08" name="MoveToClosestFrequency" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <feature name="FQ"/>
+      </mandatoryConform>
+      <field id="0" name="Frequency" type="uint16" default="0">
+        <mandatoryConform/>
+      </field>
+    </command>
+  </commands>
+</cluster>
