@@ -393,11 +393,18 @@ def main() -> int:
                       help=("Builds Chef Examples defined in cicd_config under ci_allow_list_linux. "
                             "Devices are built without -c for faster compilation."),
                       dest="ci_linux", action="store_true")
-    parser.add_option(
-        "", "--enable_ipv4", help="Enable IPv4 mDNS. Only applicable to platforms that can support IPV4 (e.g, Linux, ESP32)",
-        action="store_true", default=False)
-    parser.add_option(
-        "", "--cpu_type", help="CPU type to compile for. Linux only.", choices=["arm64", "arm", "x64"])
+    parser.add_option("", "--cpu_type",
+                      help="CPU type to compile for. Linux only.",
+                      choices=["arm64", "arm", "x64"])
+    parser.add_option("", "--enable_ipv4",
+                      help="Enable IPv4 mDNS. Only applicable to platforms that can support IPV4 (e.g, Linux, ESP32)",
+                      action="store_true", default=False)
+    parser.add_option("", "--icd_persist_subscription",
+                      help="Enable ICD persistent subscription and re-establish subscriptions from the server side after reboot",
+                      action="store_true", default=False)
+    parser.add_option("", "--icd_subscription_resumption",
+                      help="Enable subscription resumption after timeout",
+                      action="store_true", default=False)
 
     options, _ = parser.parse_args(sys.argv[1:])
 
@@ -899,10 +906,14 @@ def main() -> int:
 
             if options.enable_lit_icd:
                 linux_args.append("chip_enable_icd_server = true")
-                linux_args.append("chip_subscription_timeout_resumption = true")
                 linux_args.append("chip_icd_report_on_active_mode = true")
                 linux_args.append("chip_enable_icd_lit = true")
                 linux_args.append("chip_enable_icd_dsls = true")
+                if options.icd_subscription_resumption:
+                    options.icd_persist_subscription = True
+                    linux_args.append("chip_subscription_timeout_resumption = true")
+                if options.icd_persist_subscription:
+                    linux_args.append("chip_persist_subscriptions = true")
 
             if sw_ver_string:
                 linux_args.append(
