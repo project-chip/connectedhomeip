@@ -274,7 +274,6 @@ jobs:
                   Check for use of 'emberAf' or 'emAf' symbols
               if: always()
               run: |
-                  chmod +x scripts/check_symbols.sh
                   scripts/check_symbols.sh \
                   --skip-dir .github \
                   --skip-dir src/app/util \
@@ -282,6 +281,7 @@ jobs:
                   --skip-dir src/app/zap-templates/templates \
                   --skip-dir src/app/codegen-data-node-provider \
                   --skip-dir src/data-model-providers
+                  --skip-dir scripts/
 
             # git grep exits with 0 if it finds a match, but we want
             # to fail (exit nonzero) on match.  And we want to exclude this file,
