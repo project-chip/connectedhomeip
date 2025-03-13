@@ -490,7 +490,7 @@ void WiseconnectWifiInterface::MatterWifiTask(void * arg)
                    ChipLogError(DeviceLayer, "MatterWifiTask: SiWxPlatformInit failed: 0x%lx", static_cast<uint32_t>(status)));
 
     // Remove High performance request after the device is initialized
-    // chip::DeviceLayer::Silabs::WifiSleepManager::GetInstance().RemoveHighPerformanceRequest();
+    chip::DeviceLayer::Silabs::WifiSleepManager::GetInstance().RemoveHighPerformanceRequest();
 
     WifiInterfaceImpl::GetInstance().NotifyWifiTaskInitialized();
 
