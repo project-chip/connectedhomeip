@@ -271,15 +271,15 @@ jobs:
             # to avoid our grep regexp matching itself, as well as excluding the files
             # that implement the type-safe accessors
             - name:
-                  Check for use of 'emberAf' symbols
+                  Check for use of 'emberAf' or 'emAf' symbols
               if: always()
               run: |
                   chmod +x scripts/check_symbols.sh
                   scripts/check_symbols.sh \
                   --skip-dir .github \
                   --skip-dir src/app/util \
-                  --skip-dir zzz_generated/app-common/app-common/zap-generated/access/Accessors.h \
-                  --skip-dir src/app/zap-templates/templates/app/attributes/Accessors-src.zapt \
+                  --skip-dir zzz_generated/app-common/app-common/zap-generated \
+                  --skip-dir src/app/zap-templates/templates \
                   --skip-dir src/app/codegen-data-node-provider
 
             # git grep exits with 0 if it finds a match, but we want
