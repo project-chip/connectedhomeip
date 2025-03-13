@@ -7122,67 +7122,6 @@ public static class CommodityPriceClusterCommodityPriceStruct {
     return output.toString();
   }
 }
-public static class CommodityPriceClusterPriceStruct {
-  public Long amount;
-  public ChipStructs.CommodityPriceClusterCurrencyStruct currency;
-  private static final long AMOUNT_ID = 0L;
-  private static final long CURRENCY_ID = 1L;
-
-  public CommodityPriceClusterPriceStruct(
-    Long amount,
-    ChipStructs.CommodityPriceClusterCurrencyStruct currency
-  ) {
-    this.amount = amount;
-    this.currency = currency;
-  }
-
-  public StructType encodeTlv() {
-    ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(AMOUNT_ID, new IntType(amount)));
-    values.add(new StructElement(CURRENCY_ID, currency.encodeTlv()));
-
-    return new StructType(values);
-  }
-
-  public static CommodityPriceClusterPriceStruct decodeTlv(BaseTLVType tlvValue) {
-    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
-      return null;
-    }
-    Long amount = null;
-    ChipStructs.CommodityPriceClusterCurrencyStruct currency = null;
-    for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == AMOUNT_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
-          IntType castingValue = element.value(IntType.class);
-          amount = castingValue.value(Long.class);
-        }
-      } else if (element.contextTagNum() == CURRENCY_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
-          StructType castingValue = element.value(StructType.class);
-          currency = ChipStructs.CommodityPriceClusterCurrencyStruct.decodeTlv(castingValue);
-        }
-      }
-    }
-    return new CommodityPriceClusterPriceStruct(
-      amount,
-      currency
-    );
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder output = new StringBuilder();
-    output.append("CommodityPriceClusterPriceStruct {\n");
-    output.append("\tamount: ");
-    output.append(amount);
-    output.append("\n");
-    output.append("\tcurrency: ");
-    output.append(currency);
-    output.append("\n");
-    output.append("}\n");
-    return output.toString();
-  }
-}
 public static class CommodityPriceClusterCurrencyStruct {
   public Integer currency;
   public Integer decimalPoints;
@@ -7239,6 +7178,67 @@ public static class CommodityPriceClusterCurrencyStruct {
     output.append("\n");
     output.append("\tdecimalPoints: ");
     output.append(decimalPoints);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class CommodityPriceClusterPriceStruct {
+  public Long amount;
+  public ChipStructs.CommodityPriceClusterCurrencyStruct currency;
+  private static final long AMOUNT_ID = 0L;
+  private static final long CURRENCY_ID = 1L;
+
+  public CommodityPriceClusterPriceStruct(
+    Long amount,
+    ChipStructs.CommodityPriceClusterCurrencyStruct currency
+  ) {
+    this.amount = amount;
+    this.currency = currency;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(AMOUNT_ID, new IntType(amount)));
+    values.add(new StructElement(CURRENCY_ID, currency.encodeTlv()));
+
+    return new StructType(values);
+  }
+
+  public static CommodityPriceClusterPriceStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Long amount = null;
+    ChipStructs.CommodityPriceClusterCurrencyStruct currency = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == AMOUNT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          amount = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == CURRENCY_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          currency = ChipStructs.CommodityPriceClusterCurrencyStruct.decodeTlv(castingValue);
+        }
+      }
+    }
+    return new CommodityPriceClusterPriceStruct(
+      amount,
+      currency
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("CommodityPriceClusterPriceStruct {\n");
+    output.append("\tamount: ");
+    output.append(amount);
+    output.append("\n");
+    output.append("\tcurrency: ");
+    output.append(currency);
     output.append("\n");
     output.append("}\n");
     return output.toString();
