@@ -314,20 +314,19 @@ void emberAfElectricalEnergyMeasurementClusterInitCallback(chip::EndpointId endp
             ElectricalEnergyMeasurement::OptionalAttributes::kOptionalAttributeCumulativeEnergyReset));
 
     // Create an accuracy entry which is between +/-0.5 and +/- 5% across the range of all possible energy readings
-    ElectricalEnergyMeasurement::Structs::MeasurementAccuracyRangeStruct::Type energyAccuracyRanges[] = {
+    Globals::Structs::MeasurementAccuracyRangeStruct::Type energyAccuracyRanges[] = {
         { .rangeMin   = 0,
           .rangeMax   = 1'000'000'000'000'000, // 1 million Mwh
           .percentMax = MakeOptional(static_cast<chip::Percent100ths>(500)),
           .percentMin = MakeOptional(static_cast<chip::Percent100ths>(50)) }
     };
 
-    ElectricalEnergyMeasurement::Structs::MeasurementAccuracyStruct::Type accuracy = {
-        .measurementType  = MeasurementTypeEnum::kElectricalEnergy,
+    Globals::Structs::MeasurementAccuracyStruct::Type accuracy = {
+        .measurementType  = Globals::MeasurementTypeEnum::kElectricalEnergy,
         .measured         = true,
         .minMeasuredValue = 0,
         .maxMeasuredValue = 1'000'000'000'000'000, // 1 million Mwh
-        .accuracyRanges =
-            DataModel::List<const ElectricalEnergyMeasurement::Structs::MeasurementAccuracyRangeStruct::Type>(energyAccuracyRanges)
+        .accuracyRanges   = DataModel::List<const Globals::Structs::MeasurementAccuracyRangeStruct::Type>(energyAccuracyRanges)
     };
 
     // Example of setting CumulativeEnergyReset structure - for now set these to 0
