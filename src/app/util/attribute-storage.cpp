@@ -1080,6 +1080,19 @@ CHIP_ERROR GetSemanticTagForEndpointAtIndex(EndpointId endpoint, size_t index,
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR GetEndpointUniqueIdForEndPoint(EndpointId endpoint, char * buf)
+{
+    uint16_t endpointIndex = emberAfIndexFromEndpoint(endpoint);
+
+    if (endpointIndex == 0xFFFF)
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }    
+    strcpy(buf, emAfEndpoints[endpointIndex].endpointUniqueId.c_str());
+    return CHIP_NO_ERROR;
+}
+
+
 CHIP_ERROR emberAfSetDeviceTypeList(EndpointId endpoint, Span<const EmberAfDeviceType> deviceTypeList)
 {
     uint16_t endpointIndex = emberAfIndexFromEndpoint(endpoint);
@@ -1102,6 +1115,19 @@ CHIP_ERROR SetTagList(EndpointId endpoint, Span<const Clusters::Descriptor::Stru
 
     emAfEndpoints[endpointIndex].tagList = tagList;
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR SetEndPointUniqueId(chip::EndpointId endpoint, std::string endpointUniqueId)
+{
+    uint16_t endpointIndex = emberAfIndexFromEndpoint(endpoint);
+    if (endpointIndex == 0xFFFF)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    emAfEndpoints[endpointIndex].endpointUniqueId = endpointUniqueId;
+    return CHIP_NO_ERROR;
+
 }
 
 // Returns the cluster of Nth server or client cluster,

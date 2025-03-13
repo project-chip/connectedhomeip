@@ -25,6 +25,7 @@
 
 #include <stdbool.h> // For bool
 #include <stdint.h>  // For various uint*_t types
+#include <string>
 
 #include <app/util/AttributesChangedListener.h>
 #include <app/util/MarkAttributeDirty.h>
@@ -236,6 +237,9 @@ struct EmberAfDefinedEndpoint
      * Span pointing to a list of tags. Lifetime has to outlive usage, and data is owned by callers.
      */
     chip::Span<const chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> tagList;
+
+
+    std::string endpointUniqueId;
 };
 
 /**

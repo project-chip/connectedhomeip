@@ -203,7 +203,7 @@
         "Bridged Device Basic Information": ["ProductAppearance"],
         "Chime": ["SelectedChime", "Enabled"],
         "Closure Control": ["OverallState", "OverallTarget"],
-        "Descriptor": ["ClusterRevision", "FeatureMap"],
+        "Descriptor": ["ClusterRevision", "FeatureMap", "EndpointUniqueId"],
         "Device Energy Management": [
             "ESAType",
             "ESACanGenerate",

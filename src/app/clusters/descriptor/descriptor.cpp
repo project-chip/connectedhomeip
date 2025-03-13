@@ -89,6 +89,7 @@ private:
     CHIP_ERROR ReadServerClusters(EndpointId endpoint, AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadClusterRevision(EndpointId endpoint, AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadFeatureMap(EndpointId endpoint, AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadEndpointUniqueId(EndpointId endpoint, AttributeValueEncoder & aEncoder);
 };
 
 CHIP_ERROR DescriptorAttrAccess::ReadFeatureMap(EndpointId endpoint, AttributeValueEncoder & aEncoder)
@@ -211,6 +212,17 @@ CHIP_ERROR DescriptorAttrAccess::ReadDeviceAttribute(EndpointId endpoint, Attrib
     return err;
 }
 
+CHIP_ERROR EncodeString(AttributeValueEncoder & encoder, const char * buf, size_t maxBufSize)
+{    
+    return encoder.Encode(chip::CharSpan(buf, strnlen(buf, maxBufSize)));
+}
+
+CHIP_ERROR DescriptorAttrAccess::ReadEndpointUniqueId(EndpointId endpoint, AttributeValueEncoder & aEncoder){        
+    char endpointUniqueId[32 + 1] = { 0 };    
+    GetEndpointUniqueIdForEndPoint(endpoint, endpointUniqueId);    
+    return EncodeString(aEncoder, endpointUniqueId, 32);
+}
+
 CHIP_ERROR DescriptorAttrAccess::ReadServerClusters(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
     DataModel::ListBuilder<DataModel::ServerClusterEntry> builder;
@@ -270,6 +282,9 @@ CHIP_ERROR DescriptorAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
     }
     case FeatureMap::Id: {
         return ReadFeatureMap(aPath.mEndpointId, aEncoder);
+    }
+    case EndpointUniqueId::Id: {
+        return ReadEndpointUniqueId(aPath.mEndpointId, aEncoder);
     }
     default: {
         break;
