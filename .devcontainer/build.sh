@@ -17,8 +17,8 @@
 #
 
 HERE="$(dirname "$0")"
-CHIP_ROOT="$(realpath "$HERE"/..)"
-BUILD_VERSION="latest"
+CHIP_ROOT="$(git rev-parse --show-toplevel)"
+BUILD_VERSION=$(sed 's/ .*//' "$CHIP_ROOT/integrations/docker/images/base/chip-build/version")
 IMAGE_TAG="matter-dev-environment:local"
 USER_UID=$UID
 
@@ -32,7 +32,7 @@ Options:
     -h,--help        Show this help
     -t,--tag         Image tag - default is matter-dev-environment:local
     -u,--uid         User UIDa - default is the current user ID
-    -v,--version     Build version - default is the latest
+    -v,--version     Build version - default is the version of the base chip-build docker image
 EOF
 }
 
@@ -44,31 +44,31 @@ eval set -- "$OPTS"
 
 while :; do
     case "$1" in
-        -h | --help)
-            show_usage
-            exit 0
-            ;;
-        -t | --tag)
-            IMAGE_TAG=$2
-            shift 2
-            ;;
-        -u | --uid)
-            USER_UID=$2
-            shift 2
-            ;;
-        -v | --version)
-            BUILD_VERSION=$2
-            shift 2
-            ;;
-        --)
-            shift
-            break
-            ;;
-        *)
-            echo "Unexpected option: $1"
-            show_usage
-            exit 2
-            ;;
+    -h | --help)
+        show_usage
+        exit 0
+        ;;
+    -t | --tag)
+        IMAGE_TAG=$2
+        shift 2
+        ;;
+    -u | --uid)
+        USER_UID=$2
+        shift 2
+        ;;
+    -v | --version)
+        BUILD_VERSION=$2
+        shift 2
+        ;;
+    --)
+        shift
+        break
+        ;;
+    *)
+        echo "Unexpected option: $1"
+        show_usage
+        exit 2
+        ;;
     esac
 done
 
