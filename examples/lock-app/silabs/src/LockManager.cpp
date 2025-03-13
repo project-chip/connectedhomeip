@@ -631,7 +631,7 @@ DlStatus LockManager::GetWeekdaySchedule(chip::EndpointId endpointId, uint8_t we
 
     error = mStorage->SyncGetKeyValue(scheduleDataKey.KeyName(), &weekDayScheduleInStorage, scheduleSize);
 
-    // If no data is found at scheduleUserMapKey key
+    // If no data is found at scheduleDataKey
     if (error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
         ChipLogError(Zcl, "No schedule data found for user");
@@ -723,7 +723,7 @@ DlStatus LockManager::GetYeardaySchedule(chip::EndpointId endpointId, uint8_t ye
 
     error = mStorage->SyncGetKeyValue(scheduleDataKey.KeyName(), &yearDayScheduleInStorage, scheduleSize);
 
-    // If no data is found at scheduleUserMapKey key
+    // If no data is found at scheduleDataKey
     if (error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
         ChipLogError(Zcl, "No schedule data found for user");
@@ -808,7 +808,7 @@ DlStatus LockManager::GetHolidaySchedule(chip::EndpointId endpointId, uint8_t ho
 
     error = mStorage->SyncGetKeyValue(scheduleDataKey.KeyName(), &holidayScheduleInStorage, scheduleSize);
 
-    // If no data is found at scheduleUserMapKey key
+    // If no data is found at scheduleDataKey
     if (error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
         ChipLogError(Zcl, "No schedule data found for user");
