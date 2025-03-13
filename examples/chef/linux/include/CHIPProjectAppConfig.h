@@ -32,6 +32,3 @@
 
 // Allows app options (ports) to be configured on launch of app
 #define CHIP_DEVICE_ENABLE_PORT_PARAMS 1
-
-// Enable subscriptions synchronization
-#define CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED 1
