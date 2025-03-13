@@ -82,9 +82,11 @@ if (silabs_board == "") {
 
 # Workaround to enable unit-tests when depending on files that import this gni
 if (silabs_board == "" && sl_build_unit_tests) {
-  print("Building the unit test configuration since silabs_board is not set.")
-  print("If you are building the efr32 test_driver, a board is required.")
-
+  if (!chip_build_all_platform_tests) {
+    # We can't print to the console when running our tests in the CSA CI otherwise CI fails.
+    print("Building the unit test configuration since silabs_board is not set.")
+    print("If you are building the efr32 test_driver, a board is required.")
+  }
   silabs_board = "unit-test"
   silabs_family = "unit-test"
   silabs_mcu = "unit-test"
