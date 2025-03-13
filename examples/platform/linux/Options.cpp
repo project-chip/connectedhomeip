@@ -400,7 +400,7 @@ const char * sDeviceOptionHelp =
     "       This defines the how long the the server typically will stay in active mode after \n"
     "       initial transition out of idle mode.\n"
     "  --icdIdleModeDuration <icdIdleModeDuration>\n"
-    "       Sets the ICD idle mode durations (in seconds). (Default: 300) \n"
+    "       Sets the ICD idle mode durations (in seconds). (Default: 300)\n"
     "       This defines the how long the ICD server can stay in idle mode.\n"
 #endif
     "\n";
