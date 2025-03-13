@@ -36,7 +36,9 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
+import math
 import random
+import time
 from typing import Any
 
 import chip.clusters as Clusters
@@ -63,12 +65,11 @@ class TC_FAN_3_2(MatterBaseTest):
         return [TestStep(1, "[FC] Commissioning already done.", is_commissioning=True),
                 TestStep(2, "[FC] TH checks the DUT for support of the MultiSpeed feature.",
                          "If the MultiSpeed feature is unsupported, fail the test."),
-                TestStep(3, "[FC] TH reads from the DUT the initial SpeedMax attribute value and store.",
-                         "Verify that the DUT response contains a uint8 with value between 1 and 100 inclusive."),
-                TestStep(4, "[FC] TH reads from the DUT the initial SpeedSetting attribute value and store.", "Verify that the DUT response contains a uint8 with value between 0 and the value of SpeedMax inclusive."),
-                TestStep(5, "[FC] TH subscribes to the DUT's FanControl cluster.", "Enables the TH to receive attribute updates."),
-                TestStep(6, "[FC] TH writes to the DUT a SpeedSetting value less than or equal to the SpeedMax value.",
-                         "Device shall return either SUCCESS or INVALID_VALUE. If the write operation returned SUCCESS, verify that the SpeedSetting and SpeedCurrent attributes are updated with the new value. If the write operation returned INVALID_VALUE, verify that the SpeedSetting and SpeedCurrent attributes are the same as the initial SpeedSetting value"),
+                TestStep(3, "[FC] TH reads from the DUT the initial SpeedMax, SpeedSetting, SpeedCurrent, PercentSetting, PercentCurrent, and FanMode attributes and stores.",
+                         "Verify that the SpeedMax DUT response contains a uint8 with value between 1 and 100 inclusive. Verify that the SpeedSetting DUT response contains a uint8 with value between 0 and SpeedMax inclusive. Verify that the SpeedCurrent DUT response contains a uint8 with value between 0 and SpeedMax inclusive. Verify that the PercentSeting DUT response contains a uint8 with value between 1 and 100 inclusive. Verify that the PercentCurrent DUT response contains a uint8 with value between 1 and 100 inclusive. Verify that the FanMode DUT response contains a FanModeEnum with value between 1 and 5 inclusive, excluding 4."),
+                TestStep(4, "[FC] TH subscribes to the DUT's FanControl cluster.", "Enables the TH to receive attribute updates."),
+                TestStep(5, "[FC] TH writes to the DUT a SpeedSetting value less than or equal to the SpeedMax value.",
+                         "Device shall return either SUCCESS or CONSTRAINT_ERROR. If the write operation returned SUCCESS, verify that the SpeedSetting, SpeedCurrent, PercentSetting, PercentCurrent, and FanMode attributes are updated to their expected values. If the write operation returned CONSTRAINT_ERROR, verify that the SpeedSetting, SpeedCurrent, PercentSetting, PercentCurrent, and FanMode attributes are the same as their initial values."),
                 ]
 
     async def read_setting(self, attribute: Any) -> Any:
@@ -91,12 +92,12 @@ class TC_FAN_3_2(MatterBaseTest):
     async def write_setting(self, attribute, value) -> Status:
         result = await self.default_controller.WriteAttribute(self.dut_node_id, [(self.endpoint, attribute(value))])
         write_status = result[0].Status
-        write_status_success = (write_status == Status.Success) or (write_status == Status.InvalidInState)
+        write_status_success = (write_status == Status.Success) or (write_status == Status.ConstraintError)
         asserts.assert_true(write_status_success,
-                            f"[FC] {attribute.__name__} write did not return a result of either SUCCESS or INVALID_IN_STATE ({write_status.name})")
-        return write_status, value
+                            f"[FC] {attribute.__name__} write did not return a result of either SUCCESS or CONSTRAINT_ERROR ({write_status.name})")
+        return write_status
 
-    async def verify_setting(self, attribute, type, range):
+    async def read_verify_setting(self, attribute, type, range):
         # Read attribute value
         value = await self.read_setting(attribute)
 
@@ -113,6 +114,10 @@ class TC_FAN_3_2(MatterBaseTest):
 
         return value    
 
+    async def verify_attribute_invalid_in_state(self, attribute, init_value) -> None:
+        value_current = await self.read_setting(attribute)
+        asserts.assert_equal(value_current, init_value, f"[FC] Current {attribute.__name__} value ({value_current}) must be equal to its initial value ({init_value}).")
+
     def pics_TC_FAN_3_2(self) -> list[str]:
         return ["FAN.S"]
 
@@ -122,6 +127,7 @@ class TC_FAN_3_2(MatterBaseTest):
         self.endpoint = self.get_endpoint(default=1)
         cluster = Clusters.FanControl
         attributes = cluster.Attributes
+        fm_enum = cluster.Enums.FanModeEnum
 
         # *** STEP 1 ***
         # Commissioning already done
@@ -137,52 +143,69 @@ class TC_FAN_3_2(MatterBaseTest):
             asserts.fail("[FC] This test case is only valid if the MultiSpeed feature is supported by the DUT.")
 
         # *** STEP 3 ***
-        # TH reads from the DUT the initial SpeedMax attribute value and store
-        # Verify that the DUT response contains a uint8 with value between 1 and 100 inclusive
+        # TH reads from the DUT the initial SpeedMax, SpeedSetting, SpeedCurrent, PercentSetting,
+        # PercentCurrent, and FanMode attributes and stores
+        #   - Verify that the SpeedMax DUT response contains a uint8 with value between 1 and 100 inclusive
+        #   - Verify that the SpeedSetting DUT response contains a uint8 with value between 0 and SpeedMax inclusive
+        #   - Verify that the SpeedCurrent DUT response contains a uint8 with value between 0 and SpeedMax inclusive
+        #   - Verify that the PercentSeting DUT response contains a uint8 with value between 1 and 100 inclusive
+        #   - Verify that the PercentCurrent DUT response contains a uint8 with value between 1 and 100 inclusive
+        #   - Verify that the FanMode DUT response contains a FanModeEnum with value between 1 and 5 inclusive, excluding 4
         self.step(3)
-        speed_max = await self.verify_setting(attributes.SpeedMax, Uint8Type, range(1, 101))
+        init_speed_max = await self.read_verify_setting(attributes.SpeedMax, Uint8Type, range(1, 101))
+        init_speed_setting = await self.read_verify_setting(attributes.SpeedSetting, Uint8Type, range(0, init_speed_max + 1))
+        init_speed_current = await self.read_verify_setting(attributes.SpeedCurrent, Uint8Type, range(0, init_speed_max + 1))
+        init_percent_setting = await self.read_verify_setting(attributes.PercentSetting, Uint8Type, range(0, 101))
+        init_percent_current = await self.read_verify_setting(attributes.PercentCurrent, Uint8Type, range(0, 101))
+        init_fan_mode = await self.read_verify_setting(attributes.FanMode, fm_enum, [0, 1, 2, 3, 5])
+        logging.info(f"[FC] Initial state - SpeedSetting: {init_speed_setting}, SpeedCurrent: {init_speed_current}, PercentSetting: {init_percent_setting}, PercentCurrent: {init_percent_current}, FanMode: {init_fan_mode}")
 
         # *** STEP 4 ***
-        # TH reads from the DUT the initial SpeedSetting attribute value and store
-        # Verify that the DUT response contains a uint8 with value between 0 and the value of SpeedMax inclusive
-        self.step(4)
-        speed_setting_init = await self.verify_setting(attributes.SpeedSetting, Uint8Type, range(0, speed_max + 1))
-        
-        logging.info(f"[FC] Initial settings - SpeedMax: {speed_max}, SpeedSetting: {speed_setting_init}")
-
-        # *** STEP 5 ***
         # TH subscribes to the DUT's FanControl cluster
-        self.step(5)
+        self.step(4)
         self.attribute_subscription = ClusterAttributeChangeAccumulator(cluster)
         await self.attribute_subscription.start(self.default_controller, self.dut_node_id, self.endpoint)
 
-        # *** STEP 6 ***
+        # *** STEP 5 ***
         # TH writes to the DUT a SpeedSetting value less than or equal to the SpeedMax value
-        # Device shall return either SUCCESS or INVALID_VALUE
-        # If the write operation returned SUCCESS, verify that the SpeedSetting and SpeedCurrent attributes
-        # are updated with the new value
-        # If the write operation returned INVALID_VALUE, verify that the SpeedSetting and SpeedCurrent attributes
-        # are the same as the initial SpeedSetting value
-        self.step(6)
-        write_status, value = await self.write_setting(attributes.SpeedSetting, random.randint(1, speed_max))
+        # Device shall return either SUCCESS or CONSTRAINT_ERROR
+        self.step(5)
+        # A SpeedSetting value update of 1 in any initial fan conditions should always result in the
+        # FanMode attribute being set to kLow, regardless of the available fan modes specified by
+        # the FanModeSequence attribute value. This makes the expected FanMode value deterministic
+        # in this particular case. Using this approach as we don't know tha manufacturer's mappings.
+        speed_setting_expected = 1
+        fan_mode_expected = fm_enum.kLow
+
+        # The expected PercentSetting value can be calculated from the SpeedSetting
+        # and SpeedMax values. The formula is provided by the Fan Control spec.
+        percent_setting_expected = math.floor((speed_setting_expected / init_speed_max) * 100)
+
+        # Write to the SpeedSetting attribute
+        write_status = await self.write_setting(attributes.SpeedSetting, speed_setting_expected)
+
+        # If the write operation returned SUCCESS, verify that the SpeedSetting, SpeedCurrent,
+        # PercentSetting, PercentCurrent, and FanMode attributes are updated to their expected values
         if write_status == Status.Success:
             expected_values = [
-                AttributeValue(
-                    endpoint_id=self.endpoint,
-                    attribute=attributes.SpeedSetting,
-                    value=value),
-                AttributeValue(
-                    endpoint_id=self.endpoint,
-                    attribute=attributes.SpeedCurrent,
-                    value=value)
+                AttributeValue(self.endpoint, attributes.SpeedSetting, speed_setting_expected),
+                AttributeValue(self.endpoint, attributes.SpeedCurrent, speed_setting_expected),
+                AttributeValue(self.endpoint, attributes.PercentSetting, percent_setting_expected),
+                AttributeValue(self.endpoint, attributes.PercentCurrent, percent_setting_expected),
+                AttributeValue(self.endpoint, attributes.FanMode, fan_mode_expected)
                 ]
             self.attribute_subscription.await_all_final_values_reported(
                 expected_final_values=expected_values, timeout_sec=1)
-        elif write_status == Status.InvalidInState:
-            speed_setting_current = await self.read_setting(attributes.SpeedSetting)
-            speed_current_current = await self.read_setting(attributes.SpeedCurrent)
-            asserts.assert_equal(speed_setting_current, speed_setting_init, f"[FC] Current SpeedSetting ({speed_setting_current}) must be equal to initial SpeedSetting ({speed_setting_init}).")
-            asserts.assert_equal(speed_current_current, speed_setting_init, f"[FC] Current SpeedCurrent ({speed_current_current}) must be equal to initial SpeedSetting ({speed_setting_init}).")
+
+        # If the write operation returned CONSTRAINT_ERROR, verify that the SpeedSetting, SpeedCurrent,
+        # PercentSetting, PercentCurrent, and FanMode attributes are the same as their initial values            
+        elif write_status == Status.ConstraintError:
+            await self.verify_attribute_invalid_in_state(attributes.FanMode, init_fan_mode)
+            await self.verify_attribute_invalid_in_state(attributes.SpeedSetting, init_speed_setting)
+            await self.verify_attribute_invalid_in_state(attributes.SpeedCurrent, init_speed_current)
+            await self.verify_attribute_invalid_in_state(attributes.PercentSetting, init_percent_setting)
+            await self.verify_attribute_invalid_in_state(attributes.PercentCurrent, init_percent_current)
+
 
 if __name__ == "__main__":
     default_matter_test_main()
