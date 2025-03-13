@@ -1087,7 +1087,7 @@ CHIP_ERROR GetEndpointUniqueIdForEndPoint(EndpointId endpoint, char * buf)
     if (endpointIndex == 0xFFFF)
     {
         return CHIP_ERROR_NOT_FOUND;
-    }    
+    }
     strcpy(buf, emAfEndpoints[endpointIndex].endpointUniqueId.c_str());
     return CHIP_NO_ERROR;
 }

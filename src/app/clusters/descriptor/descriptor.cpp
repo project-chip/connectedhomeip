@@ -213,13 +213,13 @@ CHIP_ERROR DescriptorAttrAccess::ReadDeviceAttribute(EndpointId endpoint, Attrib
 }
 
 CHIP_ERROR EncodeString(AttributeValueEncoder & encoder, const char * buf, size_t maxBufSize)
-{    
+{
     return encoder.Encode(chip::CharSpan(buf, strnlen(buf, maxBufSize)));
 }
 
-CHIP_ERROR DescriptorAttrAccess::ReadEndpointUniqueId(EndpointId endpoint, AttributeValueEncoder & aEncoder){        
-    char endpointUniqueId[32 + 1] = { 0 };    
-    GetEndpointUniqueIdForEndPoint(endpoint, endpointUniqueId);    
+CHIP_ERROR DescriptorAttrAccess::ReadEndpointUniqueId(EndpointId endpoint, AttributeValueEncoder & aEncoder){
+    char endpointUniqueId[32 + 1] = { 0 };
+    GetEndpointUniqueIdForEndPoint(endpoint, endpointUniqueId);
     return EncodeString(aEncoder, endpointUniqueId, 32);
 }
 
