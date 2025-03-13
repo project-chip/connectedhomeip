@@ -52,7 +52,7 @@ from chip import ChipDeviceCtrl
 from chip.exceptions import ChipStackError
 from chip.interaction_model import Status
 from chip.tlv import TLVReader
-from matter_testing_infrastructure.chip.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body,
+from chip.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body,
                                                                        default_matter_test_main)
 from mdns_discovery import mdns_discovery
 from mobly import asserts
@@ -346,6 +346,4 @@ class TC_CADMIN(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    # This makes the test class discoverable by the test runner
-    __test_class__ = TC_CADMIN
     default_matter_test_main()

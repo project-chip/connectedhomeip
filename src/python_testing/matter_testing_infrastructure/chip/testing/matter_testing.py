@@ -2196,3 +2196,6 @@ id_str = conversions.format_decimal_and_hex
 cluster_id_str = conversions.cluster_id_with_name
 
 default_matter_test_main = runner.default_matter_test_main
+get_test_info = runner.get_test_info
+run_tests = runner.run_tests
+run_tests_no_exit = runner.run_tests_no_exit
