@@ -104,28 +104,6 @@ CHIP_ERROR AddResponseOnError(CommandHandlerInterface::HandlerContext & ctx, Res
     return AddResponseOnError(ctx, resp, StatusIB(status).ToChipError());
 }
 
-Status SetLastConfiguredBy(HandlerContext & ctx)
-{
-    const Access::SubjectDescriptor descriptor = ctx.mCommandHandler.GetSubjectDescriptor();
-
-    if (AuthMode::kCase == descriptor.authMode)
-    {
-        return Attributes::LastConfiguredBy::Set(ctx.mRequestPath.mEndpointId, descriptor.subject);
-    }
-
-    return Attributes::LastConfiguredBy::SetNull(ctx.mRequestPath.mEndpointId);
-}
-
-template <typename ResponseType>
-CHIP_ERROR UpdateLastConfiguredBy(HandlerContext & ctx, ResponseType resp)
-{
-    Status status = SetLastConfiguredBy(ctx);
-
-    // LastConfiguredBy is optional, so we don't want to fail the command if it fails to update
-    VerifyOrReturnValue(!(Status::Success == status || Status::UnsupportedAttribute == status), CHIP_NO_ERROR);
-    return AddResponseOnError(ctx, resp, status);
-}
-
 /// @brief Helper function to update the FabricSceneInfo attribute for a given Endpoint and fabric
 /// @param endpoint Endpoint to update
 /// @param fabric Fabric to update
@@ -471,8 +449,6 @@ void AddSceneParse(CommandHandlerInterface::HandlerContext & ctx, const CommandD
                            UpdateFabricSceneInfo(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(),
                                                  Optional<GroupId>(), Optional<SceneId>(), Optional<bool>())));
 
-    ReturnOnFailure(UpdateLastConfiguredBy(ctx, response));
-
     // Write response
     response.status = to_underlying(Protocols::InteractionModel::Status::Success);
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
@@ -521,7 +497,7 @@ void ViewSceneParse(HandlerContext & ctx, const CommandData & req, GroupDataProv
                                                                       SceneStorageId(req.sceneID, req.groupID), scene)));
 
     // Response Extension Field Sets buffer
-    Structs::ExtensionFieldSet::Type responseEFSBuffer[scenes::kMaxClustersPerScene];
+    Structs::ExtensionFieldSetStruct::Type responseEFSBuffer[scenes::kMaxClustersPerScene];
     uint8_t deserializedEFSCount = 0;
 
     // Adds extension field sets to the scene
@@ -550,8 +526,8 @@ void ViewSceneParse(HandlerContext & ctx, const CommandData & req, GroupDataProv
     response.transitionTime.SetValue(scene.mStorageData.mSceneTransitionTimeMs);
 
     response.sceneName.SetValue(CharSpan(scene.mStorageData.mName, scene.mStorageData.mNameLength));
-    Span<Structs::ExtensionFieldSet::Type> responseEFSSpan(responseEFSBuffer, deserializedEFSCount);
-    response.extensionFieldSets.SetValue(responseEFSSpan);
+    Span<Structs::ExtensionFieldSetStruct::Type> responseEFSSpan(responseEFSBuffer, deserializedEFSCount);
+    response.extensionFieldSetStructs.SetValue(responseEFSSpan);
 
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
@@ -888,7 +864,6 @@ void ScenesServer::HandleRemoveScene(HandlerContext & ctx, const Commands::Remov
         sceneValid.Emplace(false);
     }
 
-    ReturnOnFailure(UpdateLastConfiguredBy(ctx, response));
     ReturnOnFailure(
         AddResponseOnError(ctx, response,
                            UpdateFabricSceneInfo(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(),
@@ -942,8 +917,6 @@ void ScenesServer::HandleRemoveAllScenes(HandlerContext & ctx, const Commands::R
                            UpdateFabricSceneInfo(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(),
                                                  Optional<GroupId>(), Optional<SceneId>(), sceneValid)));
 
-    ReturnOnFailure(UpdateLastConfiguredBy(ctx, response));
-
     // Write response
     response.status = to_underlying(Protocols::InteractionModel::Status::Success);
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
@@ -970,8 +943,6 @@ void ScenesServer::HandleStoreScene(HandlerContext & ctx, const Commands::StoreS
                                      req.sceneID, mGroupProvider);
 
     ReturnOnFailure(AddResponseOnError(ctx, response, err));
-
-    ReturnOnFailure(UpdateLastConfiguredBy(ctx, response));
     response.status = to_underlying(Protocols::InteractionModel::Status::Success);
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
@@ -1135,8 +1106,6 @@ void ScenesServer::HandleCopyScene(HandlerContext & ctx, const Commands::CopySce
                                       Optional<GroupId>(), Optional<SceneId>(), Optional<bool>() /* = sceneValid*/)));
         }
 
-        ReturnOnFailure(UpdateLastConfiguredBy(ctx, response));
-
         response.status = to_underlying(Protocols::InteractionModel::Status::Success);
         ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
         return;
@@ -1157,8 +1126,6 @@ void ScenesServer::HandleCopyScene(HandlerContext & ctx, const Commands::CopySce
                            UpdateFabricSceneInfo(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(),
                                                  Optional<GroupId>(), Optional<SceneId>(), Optional<bool>())));
 
-    ReturnOnFailure(UpdateLastConfiguredBy(ctx, response));
-
     response.status = to_underlying(Protocols::InteractionModel::Status::Success);
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
@@ -1174,12 +1141,6 @@ using namespace chip::app::Clusters::ScenesManagement;
 
 void emberAfScenesManagementClusterServerInitCallback(EndpointId endpoint)
 {
-    Status status = Attributes::LastConfiguredBy::SetNull(endpoint);
-    if (Status::Success != status)
-    {
-        ChipLogDetail(Zcl, "ERR: setting LastConfiguredBy on Endpoint %hu Status: %x", endpoint, to_underlying(status));
-    }
-
     // Initialize the FabricSceneInfo by getting the number of scenes and the remaining capacity for storing fabric scene data
     for (auto & info : chip::Server::GetInstance().GetFabricTable())
     {
