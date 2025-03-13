@@ -3410,7 +3410,7 @@
           "attributes": [
             {
               "name": "SceneTableSize",
-              "code": 1,
+              "code": 0,
               "mfgCode": null,
               "side": "server",
               "type": "int16u",
@@ -3426,7 +3426,7 @@
             },
             {
               "name": "FabricSceneInfo",
-              "code": 2,
+              "code": 1,
               "mfgCode": null,
               "side": "server",
               "type": "array",

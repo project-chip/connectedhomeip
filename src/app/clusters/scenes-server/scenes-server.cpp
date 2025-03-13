@@ -392,7 +392,7 @@ void AddSceneParse(CommandHandlerInterface::HandlerContext & ctx, const CommandD
         storageData.SetName(req.sceneName);
     }
 
-    auto fieldSetIter = req.extensionFieldSets.begin();
+    auto fieldSetIter = req.extensionFieldSetStructs.begin();
     uint8_t EFSCount  = 0;
     // Goes through all EFS in command
     while (fieldSetIter.Next() && EFSCount < scenes::kMaxClustersPerScene)

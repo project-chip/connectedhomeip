@@ -3930,6 +3930,7 @@ endpoint 1 {
   }
 
   server cluster ScenesManagement {
+    ram      attribute sceneTableSize default = 16;
     callback attribute fabricSceneInfo;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
