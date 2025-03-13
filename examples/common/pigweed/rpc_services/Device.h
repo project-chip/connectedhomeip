@@ -487,7 +487,7 @@ public:
 #if CHIP_CONFIG_ENABLE_ICD_CIP
         chip::DeviceLayer::PlatformMgr().ScheduleWork(
             [](intptr_t) {
-                ChipLogDetail(Shell, "Being triggerred to send ICD check-in message to subscriber");
+                ChipLogDetail(AppServer, "Being triggerred to send ICD check-in message to subscriber");
                 chip::app::ICDNotifier::GetInstance().NotifyNetworkActivityNotification();
             },
             reinterpret_cast<intptr_t>(nullptr));
@@ -497,7 +497,6 @@ public:
         return pw::Status::Unimplemented();
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
     }
-
 
 private:
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
