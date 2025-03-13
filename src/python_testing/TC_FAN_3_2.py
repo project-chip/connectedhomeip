@@ -109,11 +109,12 @@ class TC_FAN_3_2(MatterBaseTest):
         # Verify response is valid (value is within expected range)
         asserts.assert_in(value, range, f"[FC] {attribute.__name__} result ({value}) is invalid")
 
-        return value    
+        return value
 
     async def verify_attribute_invalid_in_state(self, attribute, init_value) -> None:
         value_current = await self.read_setting(attribute)
-        asserts.assert_equal(value_current, init_value, f"[FC] Current {attribute.__name__} value ({value_current}) must be equal to its initial value ({init_value}).")
+        asserts.assert_equal(value_current, init_value,
+                             f"[FC] Current {attribute.__name__} value ({value_current}) must be equal to its initial value ({init_value}).")
 
     def pics_TC_FAN_3_2(self) -> list[str]:
         return ["FAN.S"]
@@ -155,7 +156,8 @@ class TC_FAN_3_2(MatterBaseTest):
         init_percent_setting = await self.read_verify_setting(attributes.PercentSetting, Uint8Type, range(0, 101))
         init_percent_current = await self.read_verify_setting(attributes.PercentCurrent, Uint8Type, range(0, 101))
         init_fan_mode = await self.read_verify_setting(attributes.FanMode, fm_enum, [0, 1, 2, 3, 5])
-        logging.info(f"[FC] Initial state - SpeedSetting: {init_speed_setting}, SpeedCurrent: {init_speed_current}, PercentSetting: {init_percent_setting}, PercentCurrent: {init_percent_current}, FanMode: {init_fan_mode}")
+        logging.info(
+            f"[FC] Initial state - SpeedSetting: {init_speed_setting}, SpeedCurrent: {init_speed_current}, PercentSetting: {init_percent_setting}, PercentCurrent: {init_percent_current}, FanMode: {init_fan_mode}")
 
         # *** STEP 4 ***
         # TH subscribes to the DUT's FanControl cluster
@@ -190,12 +192,12 @@ class TC_FAN_3_2(MatterBaseTest):
                 AttributeValue(self.endpoint, attributes.PercentSetting, percent_setting_expected),
                 AttributeValue(self.endpoint, attributes.PercentCurrent, percent_setting_expected),
                 AttributeValue(self.endpoint, attributes.FanMode, fan_mode_expected)
-                ]
+            ]
             self.attribute_subscription.await_all_final_values_reported(
                 expected_final_values=expected_values, timeout_sec=1)
 
         # If the write operation returned CONSTRAINT_ERROR, verify that the SpeedSetting, SpeedCurrent,
-        # PercentSetting, PercentCurrent, and FanMode attributes are the same as their initial values            
+        # PercentSetting, PercentCurrent, and FanMode attributes are the same as their initial values
         elif write_status == Status.ConstraintError:
             await self.verify_attribute_invalid_in_state(attributes.FanMode, init_fan_mode)
             await self.verify_attribute_invalid_in_state(attributes.SpeedSetting, init_speed_setting)
