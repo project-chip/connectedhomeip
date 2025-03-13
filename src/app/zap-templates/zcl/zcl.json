@@ -198,12 +198,7 @@
         "Bridged Device Basic Information": ["ProductAppearance"],
         "Chime": ["SelectedChime", "Enabled"],
         "Closure Control": ["OverallState", "OverallTarget"],
-        "Closure Dimension": [
-            "Current",
-            "Target",
-            "UnitRange",
-            "LimitRange"
-        ],
+        "Closure Dimension": ["Current", "Target", "UnitRange", "LimitRange"],
         "Descriptor": ["ClusterRevision", "FeatureMap"],
         "Device Energy Management": [
             "ESAType",
