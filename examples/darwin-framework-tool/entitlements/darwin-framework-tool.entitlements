@@ -8,5 +8,9 @@
 	<array>
 		<string>group.com.appleinternal.chip-tool</string>
 	</array>
+	<key>com.apple.developer.homekit</key>
+	<true/>
+	<key>com.apple.developer.homekit.background-mode</key>
+	<true/>
 </dict>
 </plist>
