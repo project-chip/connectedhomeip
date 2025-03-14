@@ -587,7 +587,7 @@
             "request": "launch",
             "program": "${workspaceFolder}/out/linux-x64-camera/chip-camera-app",
             "cwd": "${workspaceFolder}"
-        },      
+        },
     ],
     "inputs": [
         {
