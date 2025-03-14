@@ -95,7 +95,7 @@ public:
     /**
      *   @brief Handle Command Delegate for Video stream allocation with the provided parameter list.
      *
-     *   @note The videoStreamID and referenceCount fields in the struct are
+     *   @note The videoStreamID and referenceCount fields in the struct must be
      *   ignored by the callee.
      *
      *   @param[in]  allocateArgs   Structure with parameters for video stream allocation.
