@@ -138,6 +138,7 @@ ALLOW: Dict[str, Set[str]] = {
     'src/app/clusters/target-navigator-server/target-navigator-delegate.h': {'list'},
     # WebRTCTransportProvider is for Camera and is intended to run on devices that are capable of handling these types.
     'src/app/clusters/webrtc-transport-provider-server/webrtc-transport-provider-server.h': {'string', 'vector'},
+    'src/app/clusters/webrtc-transport-requestor-server/webrtc-transport-requestor-server.h': {'string', 'vector'},
 
     'src/credentials/attestation_verifier/FileAttestationTrustStore.h': {'vector'},
     'src/credentials/attestation_verifier/FileAttestationTrustStore.cpp': {'string'},
