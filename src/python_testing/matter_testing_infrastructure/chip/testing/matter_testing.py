@@ -1217,8 +1217,14 @@ class MatterBaseTest(base_test.BaseTestClass):
             logger.info("Legacy test event trigger deactivated")
             target_endpoint = self.get_endpoint()
 
+        if not (0 <= target_endpoint <= 0xFFFF):
+            raise ValueError("Target endpoint should be between 0 and 0xFFFF")
+
+        # Clean endpoint target
+        eventTrigger = eventTrigger & ~ (0xFFFF << 32)
+
         # Sets endpoint in eventTrigger
-        eventTrigger = eventTrigger | (target_endpoint << 32)
+        eventTrigger |= (target_endpoint & 0xFFFF) << 32
 
         return eventTrigger
 
