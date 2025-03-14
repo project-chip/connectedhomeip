@@ -59,33 +59,102 @@ _DEFAULT_LOG_PATH = "/tmp/matter_testing/logs"
 
 
 class InternalTestRunnerHooks(TestRunnerHooks):
+    """
+    Implementation of TestRunnerHooks that logs test execution progress.
+    
+    This class provides hooks for the test runner to report on test execution
+    status, including test starts, stops, steps, and failures.
+    """
 
     def start(self, count: int):
+        """
+        Called when the test runner starts a new test set.
+        
+        Args:
+            count: The number of tests in the set.
+        """
         logging.info(f'Starting test set, running {count} tests')
 
     def stop(self, duration: int):
+        """
+        Called when the test runner finishes a test set.
+        
+        Args:
+            duration: The duration of the test set in milliseconds.
+        """
         logging.info(f'Finished test set, ran for {duration}ms')
 
     def test_start(self, filename: str, name: str, count: int, steps: list[str] = []):
+        """
+        Called when an individual test starts.
+        
+        Args:
+            filename: Source file containing the test
+            name: Name of the test
+            count: Number of steps in the test
+            steps: List of step descriptions
+        """
         logging.info(f'Starting test from {filename}: {name} - {count} steps')
 
     def test_stop(self, exception: Exception, duration: int):
+        """
+        Called when an individual test completes.
+        
+        Args:
+            exception: Exception raised during test execution, or None if successful
+            duration: Test execution duration in milliseconds
+        """
         logging.info(f'Finished test in {duration}ms')
 
     def step_skipped(self, name: str, expression: str):
+        """
+        Called when a test step is skipped.
+        
+        Args:
+            name: Name of the skipped step
+            expression: Condition expression that caused the skip
+        """
         # TODO: Do we really need the expression as a string? We can evaluate this in code very easily
         logging.info(f'\t\t**** Skipping: {name}')
 
     def step_start(self, name: str):
+        """
+        Called when a test step starts.
+        
+        Args:
+            name: Name of the step including its number
+        """
         # The way I'm calling this, the name is already includes the step number, but it seems like it might be good to separate these
         logging.info(f'\t\t***** Test Step {name}')
 
     def step_success(self, logger, logs, duration: int, request):
+        """
+        Called when a test step completes successfully.
+        
+        Args:
+            logger: Logger instance
+            logs: Captured logs during step execution
+            duration: Step execution duration in milliseconds
+            request: The original test request
+        """
         pass
 
     def step_failure(self, logger, logs, duration: int, request, received):
-        # TODO: there's supposed to be some kind of error message here, but I have no idea where it's meant to come from in this API
+        """
+        Called when a test step fails.
+        
+        Args:
+            logger: Logger instance
+            logs: Captured logs during step execution
+            duration: Step execution duration in milliseconds
+            request: The original test request
+            received: The actual response received
+        """
         logging.info('\t\t***** Test Failure : ')
+        if received is not None:
+            logging.info(f'\t\t      Received: {received}')
+        if request is not None:
+            logging.info(f'\t\t      Expected: {request}')
 
     def step_unknown(self):
         """
@@ -97,9 +166,24 @@ class InternalTestRunnerHooks(TestRunnerHooks):
                     msg: str,
                     placeholder: Optional[str] = None,
                     default_value: Optional[str] = None) -> None:
+        """
+        This method is called when the test runner needs to prompt the user for input.
+        
+        Args:
+            msg: The message to display to the user
+            placeholder: Optional placeholder for user input
+            default_value: Optional default value for user input
+        """
         pass
 
     def test_skipped(self, filename: str, name: str):
+        """
+        Called when a test is skipped.
+        
+        Args:
+            filename: Source file containing the test
+            name: Name of the test
+        """
         logging.info(f"Skipping test from {filename}: {name}")
 
 
@@ -123,6 +207,15 @@ class TestInfo:
 
 
 def generate_mobly_test_config(matter_test_config):
+    """
+    Generate a Mobly test configuration from Matter test configuration.
+    
+    Args:
+        matter_test_config: Matter test configuration object
+        
+    Returns:
+        TestRunConfig: Configured Mobly test run configuration
+    """
     test_run_config = TestRunConfig()
     # We use a default name. We don't use Mobly YAML configs, so that we can be
     # freestanding without relying
@@ -186,6 +279,23 @@ def get_test_info(test_class, matter_test_config) -> list[TestInfo]:
 def run_tests_no_exit(test_class, matter_test_config,
                       event_loop: asyncio.AbstractEventLoop, hooks: TestRunnerHooks,
                       default_controller=None, external_stack=None) -> bool:
+    """
+    Run Matter tests without exiting the process on failure.
+    
+    This function sets up the test environment, runs the specified tests,
+    and returns a boolean indicating success or failure.
+    
+    Args:
+        test_class: The test class to run
+        matter_test_config: Configuration for Matter tests
+        event_loop: Asyncio event loop to use for async operations
+        hooks: Test runner hooks for monitoring test progress
+        default_controller: Optional pre-configured controller
+        external_stack: Optional external Matter stack
+        
+    Returns:
+        bool: True if all tests passed, False otherwise
+    """
 
     # Lazy import to avoid circular dependency
     from typing import TYPE_CHECKING
@@ -308,6 +418,19 @@ def run_tests_no_exit(test_class, matter_test_config,
 
 def run_tests(test_class, matter_test_config,
               hooks: TestRunnerHooks, default_controller=None, external_stack=None) -> None:
+    """
+    Run Matter tests and exit the process with status code 1 on failure.
+    
+    This is a wrapper around run_tests_no_exit that exits the process
+    if tests fail.
+    
+    Args:
+        test_class: The test class to run
+        matter_test_config: Configuration for Matter tests
+        hooks: Test runner hooks for monitoring test progress
+        default_controller: Optional pre-configured controller
+        external_stack: Optional external Matter stack
+    """
     with asyncio.Runner() as runner:
         if not run_tests_no_exit(test_class, matter_test_config, runner.get_loop(),
                                  hooks, default_controller, external_stack):
@@ -315,12 +438,22 @@ def run_tests(test_class, matter_test_config,
 
 
 class AsyncMock(MagicMock):
+    """
+    Mock class for async methods that returns an awaitable.
+    
+    This is useful for testing async code without actual async execution.
+    """
     async def __call__(self, *args, **kwargs):
         return super(AsyncMock, self).__call__(*args, **kwargs)
 
 
 class MockTestRunner():
-
+    """
+    Test runner for mocking Matter device interactions.
+    
+    This class allows tests to run without actual device communication by
+    mocking the controller's Read method and other interactions.
+    """
     def __init__(self, abs_filename: str, classname: str, test: str, endpoint: int = None,
                  pics: dict[str, bool] = None, paa_trust_store_path=None):
 
