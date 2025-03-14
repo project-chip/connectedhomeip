@@ -43,7 +43,7 @@
 #include <lib/support/CHIPPlatformMemory.h>
 #include <platform/CHIPDeviceLayer.h>
 
-#include <app/server/OnboardingCodesUtil.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 
 #include <app/TestEventTriggerDelegate.h>
 #include <app/clusters/general-diagnostics-server/GenericFaultTestEventTriggerHandler.h>
@@ -53,7 +53,7 @@
 #include <ti/drivers/apps/LED.h>
 
 #if CHIP_CONFIG_ENABLE_ICD_UAT
-#include "app/icd/server/ICDNotifier.h"
+#include "app/icd/server/ICDNotifier.h" // nogncheck
 #endif
 
 /* syscfg */

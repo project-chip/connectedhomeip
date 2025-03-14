@@ -9,7 +9,7 @@ efr32-{brd2704b,brd4316a,brd4317a,brd4318a,brd4319a,brd4186a,brd4187a,brd2601b,b
 esp32-{m5stack,c3devkit,devkitc,qemu}-{all-clusters,all-clusters-minimal,energy-management,ota-provider,ota-requestor,shell,light,lock,bridge,temperature-measurement,ota-requestor,tests}[-rpc][-ipv6only][-tracing]
 genio-lighting-app
 linux-fake-tests[-mbedtls][-boringssl][-asan][-tsan][-ubsan][-libfuzzer][-ossfuzz][-pw-fuzztest][-coverage][-dmalloc][-clang]
-linux-{x64,arm64}-{rpc-console,all-clusters,all-clusters-minimal,chip-tool,thermostat,java-matter-controller,kotlin-matter-controller,minmdns,light,light-data-model-no-unique-id,lock,shell,ota-provider,ota-requestor,simulated-app1,simulated-app2,python-bindings,tv-app,tv-casting-app,bridge,fabric-admin,fabric-bridge,fabric-sync,tests,chip-cert,address-resolve-tool,contact-sensor,dishwasher,microwave-oven,refrigerator,rvc,air-purifier,lit-icd,air-quality-sensor,network-manager,energy-management,water-leak-detector,terms-and-conditions}[-nodeps][-nlfaultinject][-platform-mdns][-minmdns-verbose][-libnl][-same-event-loop][-no-interactive][-ipv6only][-no-ble][-no-wifi][-no-thread][-no-shell][-mbedtls][-boringssl][-asan][-tsan][-ubsan][-libfuzzer][-ossfuzz][-pw-fuzztest][-coverage][-dmalloc][-clang][-test][-rpc][-with-ui][-evse-test-event][-enable-dnssd-tests][-disable-dnssd-tests][-chip-casting-simplified][-googletest][-terms-and-conditions]
+linux-{x64,arm64}-{rpc-console,all-clusters,all-clusters-minimal,chip-tool,thermostat,java-matter-controller,kotlin-matter-controller,minmdns,light,light-data-model-no-unique-id,lock,shell,ota-provider,ota-requestor,simulated-app1,simulated-app2,python-bindings,tv-app,tv-casting-app,bridge,fabric-admin,fabric-bridge,fabric-sync,tests,chip-cert,address-resolve-tool,contact-sensor,dishwasher,microwave-oven,refrigerator,rvc,air-purifier,lit-icd,air-quality-sensor,network-manager,energy-management,water-leak-detector,terms-and-conditions,camera,camera-controller}[-nodeps][-nlfaultinject][-platform-mdns][-minmdns-verbose][-libnl][-same-event-loop][-no-interactive][-ipv6only][-no-ble][-no-wifi][-no-thread][-no-shell][-mbedtls][-boringssl][-asan][-tsan][-ubsan][-libfuzzer][-ossfuzz][-pw-fuzztest][-coverage][-dmalloc][-clang][-test][-rpc][-with-ui][-evse-test-event][-enable-dnssd-tests][-disable-dnssd-tests][-chip-casting-simplified][-googletest][-terms-and-conditions]
 linux-x64-efr32-test-runner[-clang]
 imx-{chip-tool,lighting-app,thermostat,all-clusters-app,all-clusters-minimal-app,ota-provider-app}[-release]
 infineon-psoc6-{lock,light,all-clusters,all-clusters-minimal}[-ota][-updateimage][-trustm]
@@ -17,10 +17,10 @@ nxp-{k32w0,k32w1,rt1060,rt1170,rw61x,rw61x_eth,mcxw71}-{zephyr,freertos}-{lighti
 mbed-cy8cproto_062_4343w-{lock,light,all-clusters,all-clusters-minimal,pigweed,ota-requestor,shell}[-release][-develop][-debug]
 mw320-all-clusters-app
 nrf-{nrf5340dk,nrf52840dk,nrf52840dongle}-{all-clusters,all-clusters-minimal,lock,light,light-switch,shell,pump,pump-controller,window-covering}[-rpc]
-nrf-native-posix-64-tests
+nrf-native-sim-tests
 nuttx-x64-light
 qpg-qpg6105-{lock,light,shell,persistent-storage,light-switch,thermostat}[-updateimage]
 stm32-stm32wb5mm-dk-light
 tizen-arm-{all-clusters,chip-tool,light,tests}[-no-ble][-no-thread][-no-wifi][-asan][-ubsan][-coverage][-with-ui]
-telink-{tlsr9118bdk40d,tlsr9518adk80d,tlsr9528a,tlsr9528a_retention,tl3218x,tl7218x,tl7218x_retention}-{air-quality-sensor,all-clusters,all-clusters-minimal,bridge,contact-sensor,light,light-switch,lock,ota-requestor,pump,pump-controller,shell,smoke-co-alarm,temperature-measurement,thermostat,window-covering}[-ota][-dfu][-shell][-rpc][-factory-data][-4mb][-mars][-usb][-compress-lzma][-thread-analyzer]
+telink-{tlsr9118bdk40d,tlsr9518adk80d,tlsr9528a,tlsr9528a_retention,tl3218x,tl3218x_retention,tl7218x,tl7218x_retention}-{air-quality-sensor,all-clusters,all-clusters-minimal,bridge,contact-sensor,light,light-switch,lock,ota-requestor,pump,pump-controller,shell,smoke-co-alarm,temperature-measurement,thermostat,window-covering}[-ota][-dfu][-shell][-rpc][-factory-data][-4mb][-mars][-usb][-compress-lzma][-thread-analyzer]
 openiotsdk-{shell,lock}[-mbedtls][-psa]

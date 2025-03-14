@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -54,19 +54,29 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x000E" name="Aggregator" revision="1">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x000E" name="Aggregator" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
+    <revision revision="2" summary="Added Commissioner Control Cluster and FabricSynchronization Condition."/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
-  <conditions/>
+  <conditions>
+    <condition name="FabricSynchronization" summary="See description below."/>
+  </conditions>
   <clusters>
     <cluster id="0x0003" name="Identify" side="server">
       <optionalConform/>
     </cluster>
     <cluster id="0x0025" name="Actions" side="server">
       <optionalConform/>
+    </cluster>
+    <cluster id="0x0751" name="Commissioner Control" side="server">
+      <mandatoryConform>
+        <condition name="FabricSynchronization"/>
+      </mandatoryConform>
     </cluster>
   </clusters>
 </deviceType>

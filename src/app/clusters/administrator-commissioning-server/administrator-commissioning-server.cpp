@@ -30,6 +30,7 @@
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/config.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CommissionableDataProvider.h>
@@ -38,7 +39,6 @@
 #include <setup_payload/SetupPayload.h>
 #include <system/SystemClock.h>
 #include <tracing/macros.h>
-#include <zap-generated/gen_config.h>
 
 using namespace chip;
 using namespace chip::app;

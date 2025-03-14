@@ -153,7 +153,7 @@ CHIP_ERROR BDXDiagnosticLogsServerDelegate::OnTransferBegin(chip::bdx::BDXTransf
     ReturnErrorOnFailure(GetFilePath(fileDesignator, outputFilePathSpan));
 
     // Ensure null-termination of the filename, since we will be passing it around as a char *.
-    VerifyOrReturnError(outputFilePathSpan.size() < ArraySize(outputFilePath), CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(outputFilePathSpan.size() < MATTER_ARRAY_SIZE(outputFilePath), CHIP_ERROR_INTERNAL);
     outputFilePath[outputFilePathSpan.size()] = '\0';
 
     ReturnErrorOnFailure(CheckFileDoesNotExist(outputFilePath));

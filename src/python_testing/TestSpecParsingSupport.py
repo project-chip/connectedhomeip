@@ -277,10 +277,16 @@ class TestSpecParsingSupport(MatterBaseTest):
         asserts.assert_equal(len(one_four_clusters.keys()), len(one_four_one_clusters.keys()),
                              "1.4 and 1.4.1 do not contain the same clusters")
         # only the pulse width modulation cluster was removed post 1.3
-        asserts.assert_equal(set(one_three_clusters.keys()) - set(tot_xml_clusters.keys()),
-                             set([Clusters.PulseWidthModulation.id]), "There are some 1.3 clusters that are not included in the TOT spec")
+        one_four_removed = set([Clusters.PulseWidthModulation.id])
+        asserts.assert_equal(set(one_three_clusters.keys()) - set(one_four_clusters.keys()),
+                             one_four_removed, "There are some 1.3 clusters that are unexpectedly not included in the 1.4 spec")
+        # Ballast and all the proxy clusters are being removed in 1.5
+        one_five_removed = set([Clusters.BallastConfiguration.id, Clusters.ProxyConfiguration.id,
+                               Clusters.ProxyDiscovery.id, Clusters.ProxyValid.id])
         asserts.assert_equal(set(one_four_clusters.keys())-set(tot_xml_clusters.keys()),
-                             set(), "There are some 1.4 clusters that are not included in the TOT spec")
+                             one_five_removed, "There are some 1.4 clusters that are unexpectedly not included in the TOT spec")
+        asserts.assert_equal(set(one_three_clusters.keys())-set(tot_xml_clusters.keys()),
+                             one_four_removed.union(one_five_removed), "There are some 1.3 clusters that are unexpectedly not included in the TOT spec")
 
         str_path = get_data_model_directory(PrebuiltDataModelDirectory.k1_4, DataModelLevel.kCluster)
         string_override_check, problems = build_xml_clusters(str_path)

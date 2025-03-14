@@ -71,6 +71,8 @@ source_set("app-main") {
     defines += [ "ENABLE_CHIP_SHELL" ]
   }
 
+  deps = [ "${chip_root}/src/setup_payload:onboarding-codes-utils" ]
+
   public_deps = [
     ":ota-test-event-trigger",
     "${chip_root}/examples/providers:device_info_provider",

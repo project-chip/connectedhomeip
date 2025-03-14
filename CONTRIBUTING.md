@@ -175,7 +175,7 @@ be useful for quick filtering like `[TC-ABC-1.2]` to tag test changes.
 Examples of descriptive titles:
 
 -   `[Silabs] Fix compile of SiWx917 if LED and BUTTON are disabled`
--   `[Telink] Update build Dockerfile with new Zeprhy SHA: c05c4.....`
+-   `[Telink] Update build Dockerfile with new Zephyr SHA: c05c4.....`
 -   `General Commissioning Cluster: use AttributeAccessInterface/CommandHandlerInterface for processing`
 -   `Scenes Management/CopyScene: set access as manage instead of default to match the spec`
 -   `Fix build errors due to ChipDeviceEvent default constructor not being available`
