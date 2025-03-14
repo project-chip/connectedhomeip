@@ -44,18 +44,43 @@ std::queue<std::string> sCommandQueue;
 std::mutex sQueueMutex;
 std::condition_variable sQueueCondition;
 
+// -----------------------------------------------------------------------------
+// READING THREAD SUPPORT
+// -----------------------------------------------------------------------------
+static std::thread sReadCommandsThread;
+static std::atomic<bool> sReadThreadQuit{ false };
+static bool sIsReadThreadRunning = false;
+
+/**
+ * The thread function that continuously reads commands from stdin.
+ * We exit the loop when sReadThreadQuit is set to true.
+ */
 void ReadCommandThread()
 {
-    char * command;
-    while (true)
+    while (!sReadThreadQuit.load())
     {
-        command = readline(kInteractiveModePrompt);
-        if (command != nullptr && *command)
+        // readline() will block until user hits Enter or EOF.
+        char * command = readline(kInteractiveModePrompt);
+        if (command == nullptr)
         {
+            // Usually means EOF or an error; if we want to keep going
+            // after EOF, do so, otherwise break out here.
+            // For now, break if command is nullptr to avoid infinite loop.
+            break;
+        }
+
+        if (*command)
+        {
+            // Non-empty line
             std::unique_lock<std::mutex> lock(sQueueMutex);
             sCommandQueue.push(command);
             free(command);
             sQueueCondition.notify_one();
+        }
+        else
+        {
+            // Empty line => skip
+            free(command);
         }
     }
 }
@@ -167,8 +192,7 @@ CHIP_ERROR InteractiveStartCommand::RunCommand()
         Logging::SetLogRedirectCallback(LoggingCallback);
     }
 
-    std::thread readCommands(ReadCommandThread);
-    readCommands.detach();
+    StartReadCommandThread();
 
     char * command = nullptr;
     int status;
@@ -223,4 +247,37 @@ void PushCommand(const std::string & command)
     ChipLogProgress(NotSpecified, "PushCommand: %s", command.c_str());
     sCommandQueue.push(command);
     sQueueCondition.notify_one();
+}
+
+void StartReadCommandThread()
+{
+    // Only start if not already running
+    if (!sIsReadThreadRunning)
+    {
+        sReadThreadQuit.store(false);
+        sReadCommandsThread  = std::thread(ReadCommandThread);
+        sIsReadThreadRunning = true;
+    }
+}
+
+void StopReadCommandThread()
+{
+    // Only stop if it's running
+    if (sIsReadThreadRunning)
+    {
+        // Signal the thread to quit
+        sReadThreadQuit.store(true);
+
+        // If readline() is currently blocking, it typically waits until ENTER or EOF.
+        // In most real integrations, pressing ENTER (or sending EOF) is enough to
+        // let the loop proceed and exit. If needed, you can forcibly break readline
+        // by calling something like `rl_done = 1;`, etc.
+
+        // Join the thread so we know it's finished
+        if (sReadCommandsThread.joinable())
+        {
+            sReadCommandsThread.join();
+        }
+        sIsReadThreadRunning = false;
+    }
 }

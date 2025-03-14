@@ -66,3 +66,15 @@ private:
 };
 
 void PushCommand(const std::string & command);
+
+/**
+ * Starts (or restarts) the ReadCommandThread, which continuously reads user input
+ * from the console and pushes commands into the queue.
+ */
+void StartReadCommandThread();
+
+/**
+ * Stops the ReadCommandThread by signaling it to exit and then joining the thread.
+ * Call this when you need to pause or stop reading from stdin to avoid conflicts.
+ */
+void StopReadCommandThread();
