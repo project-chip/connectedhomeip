@@ -51,7 +51,7 @@ CHIP_ERROR ChipDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturn
 
 void ChipDnssdShutdown()
 {
-    // Empty implementation. Intentionally left blank
+    NxpChipDnssdShutdown();
 }
 
 CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCallback callback, void * context)

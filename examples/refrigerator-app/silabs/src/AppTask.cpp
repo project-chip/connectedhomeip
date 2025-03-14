@@ -75,7 +75,7 @@ using namespace ::chip::DeviceLayer;
 
 AppTask AppTask::sAppTask;
 
-CHIP_ERROR AppTask::Init()
+CHIP_ERROR AppTask::AppInit()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(AppTask::ButtonEventHandler);
@@ -84,12 +84,6 @@ CHIP_ERROR AppTask::Init()
     GetLCD().Init((uint8_t *) "Refrigrator-App");
 #endif
 
-    err = BaseApplication::Init();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "BaseApplication::Init() failed");
-        appError(err);
-    }
     err = RefrigeratorMgr().Init();
     if (err != CHIP_NO_ERROR)
     {
