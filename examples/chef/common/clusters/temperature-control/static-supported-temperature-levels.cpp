@@ -35,7 +35,10 @@ CharSpan AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions[] = { "L
 const AppSupportedTemperatureLevelsDelegate::EndpointPair AppSupportedTemperatureLevelsDelegate::supportedOptionsByEndpoints
     [MATTER_DM_TEMPERATURE_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT] = { EndpointPair(
         1 /* endpointId */, AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions,
-        MATTER_ARRAY_SIZE(AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions)) };
+        MATTER_ARRAY_SIZE(AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions)),
+        EndpointPair(3 /* endpointId */, AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions,
+                     MATTER_ARRAY_SIZE(AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions))
+    };
 
 uint8_t AppSupportedTemperatureLevelsDelegate::Size()
 {
@@ -72,7 +75,6 @@ CHIP_ERROR AppSupportedTemperatureLevelsDelegate::Next(MutableCharSpan & item)
 }
 void emberAfTemperatureControlClusterInitCallback(EndpointId endpoint)
 {
-    static_assert(MATTER_DM_TEMPERATURE_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT == 1, "This cluster is only enabled for endpoint 1");
 
     chip::app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
 }
