@@ -355,6 +355,20 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::PositionTag va
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::PowerThresholdSourceEnum val)
+{
+    using EnumType = Globals::PowerThresholdSourceEnum;
+    switch (val)
+    {
+    case EnumType::kContract:
+    case EnumType::kRegulator:
+    case EnumType::kEquipment:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(detail::ProductIdentifierTypeEnum val)
 {
     using EnumType = detail::ProductIdentifierTypeEnum;
@@ -3949,19 +3963,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(MeterIdentification::Me
     case EnumType::kUtility:
     case EnumType::kPrivate:
     case EnumType::kGeneric:
-        return val;
-    default:
-        return EnumType::kUnknownEnumValue;
-    }
-}
-static auto __attribute__((unused)) EnsureKnownEnumValue(MeterIdentification::PowerThresholdSourceEnum val)
-{
-    using EnumType = MeterIdentification::PowerThresholdSourceEnum;
-    switch (val)
-    {
-    case EnumType::kContract:
-    case EnumType::kRegulator:
-    case EnumType::kEquipment:
         return val;
     default:
         return EnumType::kUnknownEnumValue;

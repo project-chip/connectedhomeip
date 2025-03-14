@@ -29187,7 +29187,7 @@ void registerClusterMeterIdentification(Commands & commands, CredentialIssuerCom
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::CharSpan>>>(
             Id, "protocol-version", Attributes::ProtocolVersion::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<
-            chip::app::DataModel::Nullable<chip::app::Clusters::MeterIdentification::Structs::PowerThresholdStruct::Type>>>(
+            chip::app::DataModel::Nullable<chip::app::Clusters::Globals::Structs::PowerThresholdStruct::Type>>>(
             Id, "power-threshold", Attributes::PowerThreshold::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
