@@ -185,6 +185,14 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
         SuccessOrExit(err);
     }
 
+    {
+        app::FailSafeContext::InitParams failSafeInitParams;
+        failSafeInitParams.storage = mDeviceStorage;
+
+        err = mFailSafeContext.Init(failSafeInitParams);
+        SuccessOrExit(err);
+    }
+
     SuccessOrExit(err = mAccessControl.Init(initParams.accessDelegate, sDeviceTypeResolver));
     Access::SetAccessControl(mAccessControl);
 
@@ -466,6 +474,10 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
                 reinterpret_cast<intptr_t>(this));
         }
     }
+
+    // Run fail-safe check for marker. If marker is present, then device was reset while fail-safe was armed
+    // and we need to trigger a cleanup.
+    GetFailSafeContext().CheckAddNOCStartedMarker();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT // support UDC port for commissioner declaration msgs
     mUdcTransportMgr = Platform::New<UdcTransportMgr>();
