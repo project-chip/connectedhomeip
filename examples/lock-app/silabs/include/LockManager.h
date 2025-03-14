@@ -91,48 +91,48 @@ private:
 } // namespace LockInitParams
 namespace Storage {
 
-    using namespace EFR32DoorLock::ResourceRanges;
-    struct WeekDayScheduleInfo
-    {
-        DlScheduleStatus status;
-        EmberAfPluginDoorLockWeekDaySchedule schedule;
-    };
-    
-    struct YearDayScheduleInfo
-    {
-        DlScheduleStatus status;
-        EmberAfPluginDoorLockYearDaySchedule schedule;
-    };
-    
-    struct HolidayScheduleInfo
-    {
-        DlScheduleStatus status;
-        EmberAfPluginDoorLockHolidaySchedule schedule;
-    };
-    
-    struct LockUserInfo
-    {
-        char userName[DOOR_LOCK_MAX_USER_NAME_SIZE];
-        size_t userNameSize;
-        uint32_t userUniqueId;
-        UserStatusEnum userStatus;
-        UserTypeEnum userType;
-        CredentialRuleEnum credentialRule;
-        chip::EndpointId endpointId;
-        chip::FabricIndex createdBy;
-        chip::FabricIndex lastModifiedBy;
-        uint16_t currentCredentialCount;
-    };
-    
-    struct LockCredentialInfo
-    {
-        DlCredentialStatus status;
-        CredentialTypeEnum credentialType;
-        chip::FabricIndex createdBy;
-        chip::FabricIndex lastModifiedBy;
-        uint8_t credentialData[kMaxCredentialSize];
-        size_t credentialDataSize;
-    };
+using namespace EFR32DoorLock::ResourceRanges;
+struct WeekDayScheduleInfo
+{
+    DlScheduleStatus status;
+    EmberAfPluginDoorLockWeekDaySchedule schedule;
+};
+
+struct YearDayScheduleInfo
+{
+    DlScheduleStatus status;
+    EmberAfPluginDoorLockYearDaySchedule schedule;
+};
+
+struct HolidayScheduleInfo
+{
+    DlScheduleStatus status;
+    EmberAfPluginDoorLockHolidaySchedule schedule;
+};
+
+struct LockUserInfo
+{
+    char userName[DOOR_LOCK_MAX_USER_NAME_SIZE];
+    size_t userNameSize;
+    uint32_t userUniqueId;
+    UserStatusEnum userStatus;
+    UserTypeEnum userType;
+    CredentialRuleEnum credentialRule;
+    chip::EndpointId endpointId;
+    chip::FabricIndex createdBy;
+    chip::FabricIndex lastModifiedBy;
+    uint16_t currentCredentialCount;
+};
+
+struct LockCredentialInfo
+{
+    DlCredentialStatus status;
+    CredentialTypeEnum credentialType;
+    chip::FabricIndex createdBy;
+    chip::FabricIndex lastModifiedBy;
+    uint8_t credentialData[kMaxCredentialSize];
+    size_t credentialDataSize;
+};
 } // namespace Storage
 } // namespace EFR32DoorLock
 
