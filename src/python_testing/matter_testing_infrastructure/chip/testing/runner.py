@@ -61,7 +61,7 @@ _DEFAULT_LOG_PATH = "/tmp/matter_testing/logs"
 class InternalTestRunnerHooks(TestRunnerHooks):
     """
     Implementation of TestRunnerHooks that logs test execution progress.
-    
+
     This class provides hooks for the test runner to report on test execution
     status, including test starts, stops, steps, and failures.
     """
@@ -69,7 +69,7 @@ class InternalTestRunnerHooks(TestRunnerHooks):
     def start(self, count: int):
         """
         Called when the test runner starts a new test set.
-        
+
         Args:
             count: The number of tests in the set.
         """
@@ -78,16 +78,21 @@ class InternalTestRunnerHooks(TestRunnerHooks):
     def stop(self, duration: int):
         """
         Called when the test runner finishes a test set.
-        
+
         Args:
             duration: The duration of the test set in milliseconds.
         """
         logging.info(f'Finished test set, ran for {duration}ms')
 
-    def test_start(self, filename: str, name: str, count: int, steps: list[str] = []):
+    def test_start(
+            self,
+            filename: str,
+            name: str,
+            count: int,
+            steps: list[str] = []):
         """
         Called when an individual test starts.
-        
+
         Args:
             filename: Source file containing the test
             name: Name of the test
@@ -99,7 +104,7 @@ class InternalTestRunnerHooks(TestRunnerHooks):
     def test_stop(self, exception: Exception, duration: int):
         """
         Called when an individual test completes.
-        
+
         Args:
             exception: Exception raised during test execution, or None if successful
             duration: Test execution duration in milliseconds
@@ -109,28 +114,30 @@ class InternalTestRunnerHooks(TestRunnerHooks):
     def step_skipped(self, name: str, expression: str):
         """
         Called when a test step is skipped.
-        
+
         Args:
             name: Name of the skipped step
             expression: Condition expression that caused the skip
         """
-        # TODO: Do we really need the expression as a string? We can evaluate this in code very easily
+        # TODO: Do we really need the expression as a string? We can evaluate
+        # this in code very easily
         logging.info(f'\t\t**** Skipping: {name}')
 
     def step_start(self, name: str):
         """
         Called when a test step starts.
-        
+
         Args:
             name: Name of the step including its number
         """
-        # The way I'm calling this, the name is already includes the step number, but it seems like it might be good to separate these
+        # The way I'm calling this, the name is already includes the step
+        # number, but it seems like it might be good to separate these
         logging.info(f'\t\t***** Test Step {name}')
 
     def step_success(self, logger, logs, duration: int, request):
         """
         Called when a test step completes successfully.
-        
+
         Args:
             logger: Logger instance
             logs: Captured logs during step execution
@@ -142,7 +149,7 @@ class InternalTestRunnerHooks(TestRunnerHooks):
     def step_failure(self, logger, logs, duration: int, request, received):
         """
         Called when a test step fails.
-        
+
         Args:
             logger: Logger instance
             logs: Captured logs during step execution
@@ -168,7 +175,7 @@ class InternalTestRunnerHooks(TestRunnerHooks):
                     default_value: Optional[str] = None) -> None:
         """
         This method is called when the test runner needs to prompt the user for input.
-        
+
         Args:
             msg: The message to display to the user
             placeholder: Optional placeholder for user input
@@ -179,7 +186,7 @@ class InternalTestRunnerHooks(TestRunnerHooks):
     def test_skipped(self, filename: str, name: str):
         """
         Called when a test is skipped.
-        
+
         Args:
             filename: Source file containing the test
             name: Name of the test
@@ -209,10 +216,10 @@ class TestInfo:
 def generate_mobly_test_config(matter_test_config):
     """
     Generate a Mobly test configuration from Matter test configuration.
-    
+
     Args:
         matter_test_config: Matter test configuration object
-        
+
     Returns:
         TestRunConfig: Configured Mobly test run configuration
     """
@@ -276,15 +283,19 @@ def get_test_info(test_class, matter_test_config) -> list[TestInfo]:
     return info
 
 
-def run_tests_no_exit(test_class, matter_test_config,
-                      event_loop: asyncio.AbstractEventLoop, hooks: TestRunnerHooks,
-                      default_controller=None, external_stack=None) -> bool:
+def run_tests_no_exit(
+        test_class,
+        matter_test_config,
+        event_loop: asyncio.AbstractEventLoop,
+        hooks: TestRunnerHooks,
+        default_controller=None,
+        external_stack=None) -> bool:
     """
     Run Matter tests without exiting the process on failure.
-    
+
     This function sets up the test environment, runs the specified tests,
     and returns a boolean indicating success or failure.
-    
+
     Args:
         test_class: The test class to run
         matter_test_config: Configuration for Matter tests
@@ -292,7 +303,7 @@ def run_tests_no_exit(test_class, matter_test_config,
         hooks: Test runner hooks for monitoring test progress
         default_controller: Optional pre-configured controller
         external_stack: Optional external Matter stack
-        
+
     Returns:
         bool: True if all tests passed, False otherwise
     """
@@ -312,7 +323,8 @@ def run_tests_no_exit(test_class, matter_test_config,
 
     # NOTE: It's not possible to pass event loop via Mobly TestRunConfig user params, because the
     #       Mobly deep copies the user params before passing them to the test class and the event
-    #       loop is not serializable. So, we are setting the event loop as a test class member.
+    # loop is not serializable. So, we are setting the event loop as a test
+    # class member.
     CommissionDeviceTest.event_loop = event_loop
     test_class.event_loop = event_loop
 
@@ -338,11 +350,13 @@ def run_tests_no_exit(test_class, matter_test_config,
         test_config.user_params["matter_stack"] = stash_globally(stack)
 
         # TODO: Steer to right FabricAdmin!
-        # TODO: If CASE Admin Subject is a CAT tag range, then make sure to issue NOC with that CAT tag
+        # TODO: If CASE Admin Subject is a CAT tag range, then make sure to
+        # issue NOC with that CAT tag
         if not default_controller:
             default_controller = stack.certificate_authorities[0].adminList[0].NewController(
                 nodeId=matter_test_config.controller_node_id,
-                paaTrustStorePath=str(matter_test_config.paa_trust_store_path),
+                paaTrustStorePath=str(
+                    matter_test_config.paa_trust_store_path),
                 catTags=matter_test_config.controller_cat_tags,
                 dacRevocationSetPath=str(
                     matter_test_config.dac_revocation_set_path),
@@ -379,7 +393,8 @@ def run_tests_no_exit(test_class, matter_test_config,
                 # but it's relatively easy to expand that to make the test process faster
                 # TODO: support a list of tests
                 hooks.start(count=1)
-                # Mobly gives the test run time in seconds, lets be a bit more precise
+                # Mobly gives the test run time in seconds, lets be a bit more
+                # precise
                 runner_start_time = datetime.now(timezone.utc)
 
             try:
@@ -416,14 +431,18 @@ def run_tests_no_exit(test_class, matter_test_config,
     return ok
 
 
-def run_tests(test_class, matter_test_config,
-              hooks: TestRunnerHooks, default_controller=None, external_stack=None) -> None:
+def run_tests(
+        test_class,
+        matter_test_config,
+        hooks: TestRunnerHooks,
+        default_controller=None,
+        external_stack=None) -> None:
     """
     Run Matter tests and exit the process with status code 1 on failure.
-    
+
     This is a wrapper around run_tests_no_exit that exits the process
     if tests fail.
-    
+
     Args:
         test_class: The test class to run
         matter_test_config: Configuration for Matter tests
@@ -432,17 +451,23 @@ def run_tests(test_class, matter_test_config,
         external_stack: Optional external Matter stack
     """
     with asyncio.Runner() as runner:
-        if not run_tests_no_exit(test_class, matter_test_config, runner.get_loop(),
-                                 hooks, default_controller, external_stack):
+        if not run_tests_no_exit(
+                test_class,
+                matter_test_config,
+                runner.get_loop(),
+                hooks,
+                default_controller,
+                external_stack):
             sys.exit(1)
 
 
 class AsyncMock(MagicMock):
     """
     Mock class for async methods that returns an awaitable.
-    
+
     This is useful for testing async code without actual async execution.
     """
+
     async def __call__(self, *args, **kwargs):
         return super(AsyncMock, self).__call__(*args, **kwargs)
 
@@ -450,28 +475,36 @@ class AsyncMock(MagicMock):
 class MockTestRunner():
     """
     Test runner for mocking Matter device interactions.
-    
+
     This class allows tests to run without actual device communication by
     mocking the controller's Read method and other interactions.
     """
-    def __init__(self, abs_filename: str, classname: str, test: str, endpoint: int = None,
-                 pics: dict[str, bool] = None, paa_trust_store_path=None):
+
+    def __init__(self,
+                 abs_filename: str,
+                 classname: str,
+                 test: str,
+                 endpoint: int = None,
+                 pics: dict[str,
+                            bool] = None,
+                 paa_trust_store_path=None):
 
         from chip.testing.matter_testing import MatterStackState, MatterTestConfig
 
         self.kvs_storage = 'kvs_admin.json'
-        self.config = MatterTestConfig(endpoint=endpoint, paa_trust_store_path=paa_trust_store_path,
-                                       pics=pics, storage_path=self.kvs_storage)
+        self.config = MatterTestConfig(
+            endpoint=endpoint,
+            paa_trust_store_path=paa_trust_store_path,
+            pics=pics,
+            storage_path=self.kvs_storage)
         self.set_test(abs_filename, classname, test)
 
         self.set_test_config(self.config)
 
         self.stack = MatterStackState(self.config)
         self.default_controller = self.stack.certificate_authorities[0].adminList[0].NewController(
-            nodeId=self.config.controller_node_id,
-            paaTrustStorePath=str(self.config.paa_trust_store_path),
-            catTags=self.config.controller_cat_tags
-        )
+            nodeId=self.config.controller_node_id, paaTrustStorePath=str(
+                self.config.paa_trust_store_path), catTags=self.config.controller_cat_tags)
 
     def set_test(self, abs_filename: str, classname: str, test: str):
         self.test = test
@@ -500,13 +533,22 @@ class MockTestRunner():
     def Shutdown(self):
         self.stack.Shutdown()
 
-    def run_test_with_mock_read(self, read_cache: Attribute.AsyncReadTransaction.ReadResponse, hooks=None):
+    def run_test_with_mock_read(
+            self,
+            read_cache: Attribute.AsyncReadTransaction.ReadResponse,
+            hooks=None):
         self.default_controller.Read = AsyncMock(return_value=read_cache)
-        # This doesn't need to do anything since we are overriding the read anyway
+        # This doesn't need to do anything since we are overriding the read
+        # anyway
         self.default_controller.FindOrEstablishPASESession = AsyncMock(
             return_value=None)
         self.default_controller.GetConnectedDevice = AsyncMock(
             return_value=None)
         with asyncio.Runner() as runner:
-            return run_tests_no_exit(self.test_class, self.config, runner.get_loop(),
-                                     hooks, self.default_controller, self.stack)
+            return run_tests_no_exit(
+                self.test_class,
+                self.config,
+                runner.get_loop(),
+                hooks,
+                self.default_controller,
+                self.stack)
