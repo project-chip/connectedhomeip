@@ -86,6 +86,11 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::detail::Structs
 
 static void Finalize(chip::app::Clusters::detail::Structs::OperationalStateStruct::Type & request);
 
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Globals::Structs::PowerThresholdStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::Globals::Structs::PowerThresholdStruct::Type & request);
+
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::detail::Structs::ViewportStruct::Type & request,
                         Json::Value & value);
 
@@ -844,11 +849,6 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::TlsClientManage
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::TlsClientManagement::Structs::TLSEndpointStruct::Type & request);
-
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::MeterIdentification::Structs::PowerThresholdStruct::Type & request,
-                        Json::Value & value);
-
-static void Finalize(chip::app::Clusters::MeterIdentification::Structs::PowerThresholdStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::UnitTesting::Structs::SimpleStruct::Type & request,
                         Json::Value & value);

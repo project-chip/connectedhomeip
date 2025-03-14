@@ -478,6 +478,32 @@ using DecodableType = Type;
 
 } // namespace AtomicAttributeStatusStruct
 
+namespace PowerThresholdStruct {
+enum class Fields : uint8_t
+{
+    kPowerThreshold         = 0,
+    kApparentPowerThreshold = 1,
+    kPowerThresholdSource   = 2,
+};
+
+struct Type
+{
+public:
+    Optional<int64_t> powerThreshold;
+    Optional<int64_t> apparentPowerThreshold;
+    DataModel::Nullable<Globals::PowerThresholdSourceEnum> powerThresholdSource;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace PowerThresholdStruct
+
 } // namespace Structs
 
 namespace Attributes {
@@ -46546,33 +46572,6 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace TlsClientManagement
 namespace MeterIdentification {
-namespace Structs {
-namespace PowerThresholdStruct {
-enum class Fields : uint8_t
-{
-    kPowerThreshold         = 0,
-    kApparentPowerThreshold = 1,
-    kPowerThresholdSource   = 2,
-};
-
-struct Type
-{
-public:
-    Optional<int64_t> powerThreshold;
-    Optional<int64_t> apparentPowerThreshold;
-    DataModel::Nullable<PowerThresholdSourceEnum> powerThresholdSource;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-using DecodableType = Type;
-
-} // namespace PowerThresholdStruct
-} // namespace Structs
 
 namespace Attributes {
 
@@ -46630,11 +46629,11 @@ struct TypeInfo
 namespace PowerThreshold {
 struct TypeInfo
 {
-    using Type = chip::app::DataModel::Nullable<chip::app::Clusters::MeterIdentification::Structs::PowerThresholdStruct::Type>;
+    using Type = chip::app::DataModel::Nullable<chip::app::Clusters::Globals::Structs::PowerThresholdStruct::Type>;
     using DecodableType =
-        chip::app::DataModel::Nullable<chip::app::Clusters::MeterIdentification::Structs::PowerThresholdStruct::DecodableType>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<
-        chip::app::Clusters::MeterIdentification::Structs::PowerThresholdStruct::DecodableType> &;
+        chip::app::DataModel::Nullable<chip::app::Clusters::Globals::Structs::PowerThresholdStruct::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::Nullable<chip::app::Clusters::Globals::Structs::PowerThresholdStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PowerThreshold::Id; }

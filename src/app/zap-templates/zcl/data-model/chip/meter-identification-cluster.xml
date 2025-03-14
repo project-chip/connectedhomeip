@@ -30,14 +30,12 @@ Git:
   </enum>
 
   <enum name="PowerThresholdSourceEnum" type="enum8">
-    <cluster code="0x0B06"/>
     <item name="Contract" value="0x00"/>
     <item name="Regulator" value="0x01"/>
     <item name="Equipment" value="0x02"/>
   </enum>
 
   <struct name="PowerThresholdStruct" apiMaturity="provisional">
-    <cluster code="0x0B06"/>
     <item fieldId="0" name="PowerThreshold" type="int64s" optional="true"/>
     <item fieldId="1" name="ApparentPowerThreshold" type="int64s" optional="true"/>
     <item fieldId="2" name="PowerThresholdSource" type="PowerThresholdSourceEnum" isNullable="true" min="0x00" max="0x02"/>

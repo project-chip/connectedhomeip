@@ -466,6 +466,39 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 }
 
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::Globals::Structs::PowerThresholdStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("PowerThreshold", indent + 1, value.powerThreshold);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PowerThreshold'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ApparentPowerThreshold", indent + 1, value.apparentPowerThreshold);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ApparentPowerThreshold'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("PowerThresholdSource", indent + 1, value.powerThresholdSource);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PowerThresholdSource'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::detail::Structs::ViewportStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -6489,40 +6522,6 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Status'");
-            return err;
-        }
-    }
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR
-DataModelLogger::LogValue(const char * label, size_t indent,
-                          const chip::app::Clusters::MeterIdentification::Structs::PowerThresholdStruct::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    {
-        CHIP_ERROR err = LogValue("PowerThreshold", indent + 1, value.powerThreshold);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PowerThreshold'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("ApparentPowerThreshold", indent + 1, value.apparentPowerThreshold);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ApparentPowerThreshold'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("PowerThresholdSource", indent + 1, value.powerThresholdSource);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PowerThresholdSource'");
             return err;
         }
     }
@@ -19836,8 +19835,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("ProtocolVersion", 1, value);
         }
         case MeterIdentification::Attributes::PowerThreshold::Id: {
-            chip::app::DataModel::Nullable<chip::app::Clusters::MeterIdentification::Structs::PowerThresholdStruct::DecodableType>
-                value;
+            chip::app::DataModel::Nullable<chip::app::Clusters::Globals::Structs::PowerThresholdStruct::DecodableType> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("PowerThreshold", 1, value);
         }
