@@ -17,7 +17,7 @@
 #
 
 HERE="$(dirname "$0")"
-CHIP_ROOT="$(git rev-parse --show-toplevel)"
+CHIP_ROOT="$(realpath "$HERE"/..)"
 BUILD_VERSION=$(sed 's/ .*//' "$CHIP_ROOT/integrations/docker/images/base/chip-build/version")
 IMAGE_TAG="matter-dev-environment:local"
 USER_UID=$UID
