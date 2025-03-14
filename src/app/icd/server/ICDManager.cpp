@@ -676,7 +676,6 @@ void ICDManager::ExtendActiveMode(Milliseconds16 extendDuration)
 
 CHIP_ERROR ICDManager::HandleEventTrigger(uint64_t eventTrigger)
 {
-    eventTrigger                     = setEndpointInEventTrigger(eventTrigger);
     ICDTestEventTriggerEvent trigger = static_cast<ICDTestEventTriggerEvent>(eventTrigger);
     CHIP_ERROR err                   = CHIP_NO_ERROR;
 
