@@ -81,6 +81,10 @@ not_automated:
       reason: Code/Test not being used or not shared code for any other tests
     - name: modebase_cluster_check.py
       reason: Shared code for Modebase derived clusters, not a standalone test.
+    - name: TC_TBRM_2_5.py
+      reason: For Node with Secondary Netwrok Interface support. Require Thread interface
+    - name: TC_TBRM_2_6.py
+      reason: For Node with Secondary Netwrok Interface support. Require Thread interface
 
 # This is a list of slow tests (just arbitrarily picked around 20 seconds)
 # used in some script reporting for "be patient" messages as well as potentially
