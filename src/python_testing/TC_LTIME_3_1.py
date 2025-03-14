@@ -28,7 +28,7 @@
 #       --discriminator 1234
 #       --passcode 20202021
 #       --PICS src/app/tests/suites/certification/ci-pics-values
-#       --str-arg PIXIT.LTIME.SCT:0,1,2,3,4,5,6,7,8,9,10,11
+#       --json-arg PIXIT.LTIME.SCT:'[0,1,2,3,4,5,6,7,8,9,10,11]'
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -93,15 +93,14 @@ class TC_LTIME_3_1(MatterBaseTest):
         calendar_type_values = [i for i in range(0, 12)]
         calendar_type_values.append(255)
 
-        # Read PIXIT values --string-arg
+        # Read PIXIT values --json-arg
         pixit_SCT = self.user_params.get('PIXIT.LTIME.SCT')
-        if pixit_SCT is not None:
-            pixit_SCT = [int(i) for i in pixit_SCT.split(",")]
-            logging.info(f"List of PIXIT.SCT {pixit_SCT}")
-        else:
+        logging.info(f"PIXIT {pixit_SCT}")
+        if pixit_SCT is None:
             logging.info("PIXIT.LTIME.SCT not found, creating range from 1 to 11")
             pixit_SCT = [i for i in range(1, 12)]
 
+        # Commisioning (precondition)
         self.step(0)
 
         self.step(1)
