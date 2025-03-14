@@ -45,6 +45,7 @@ declare install_virtual_env
 declare clean_virtual_env=yes
 declare install_pytest_requirements=yes
 declare install_jupyterlab=no
+declare enable_webrtc=no
 
 help() {
 
@@ -68,6 +69,7 @@ Input Options:
                                                             src/python_testing scripts.
                                                             Defaults to yes.
   -j, --jupyter-lab                                         Install jupyterlab requirements.
+  -w, --enable_webrtc  <yes|no>                             Enable webrtc in the controller.
   --extra_packages PACKAGES                                 Install extra Python packages from PyPI
   -z --pregen_dir DIRECTORY                                 Directory where generated zap files have been pre-generated.
 "
@@ -133,6 +135,14 @@ while (($#)); do
             pregen_dir=$2
             shift
             ;;
+        --enable_webrtc | -w)
+            enable_webrtc=$2
+            if [[ "$enable_webrtc" != "yes" && "$enable_webrtc" != "no" ]]; then
+                echo "enable_webrtc should have a yes/no value, not '$enable_webrtc'"
+                exit
+            fi
+            shift
+            ;;
         --jupyter-lab | -j)
             install_jupyterlab=yes
             ;;
@@ -146,7 +156,13 @@ while (($#)); do
 done
 
 # Print input values
-echo "Input values: chip_detail_logging = $chip_detail_logging , chip_mdns = \"$chip_mdns\", chip_case_retry_delta=\"$chip_case_retry_delta\", pregen_dir=\"$pregen_dir\", enable_ble=\"$enable_ble\""
+echo "Input values: chip_detail_logging = $chip_detail_logging , chip_mdns = \"$chip_mdns\", chip_case_retry_delta=\"$chip_case_retry_delta\", pregen_dir=\"$pregen_dir\", enable_ble=\"$enable_ble\", enable_webrtc=\"$enable_webrtc\""
+
+#
+if [ "$enable_webrtc" = "yes" ]; then
+    # Run gclient sync and ninja build of webrtc
+    source "$CHIP_ROOT/scripts/sync_webrtc.sh"
+fi
 
 # Ensure we have a compilation environment
 source "$CHIP_ROOT/scripts/activate.sh"

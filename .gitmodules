@@ -354,3 +354,6 @@
 	url = https://github.com/paullouisageneau/libdatachannel.git
 	platforms = linux
 	recursive = true
+[submodule "third_party/webrtc/src"]
+	path = third_party/webrtc/src
+	url = https://webrtc.googlesource.com/src.git
