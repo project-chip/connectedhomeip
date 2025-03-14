@@ -36,39 +36,33 @@ Git:
         <optionalConform/>
       </feature>
     </features>
-    <attribute side="server" code="0x0000" name="MeasuredValue" define="PRESSURE_MEASURED_VALUE" type="int16s" isNullable="true" max="32767">MeasuredValue</attribute>
-    <attribute side="server" code="0x0001" name="MinMeasuredValue" define="PRESSURE_MIN_MEASURED_VALUE" type="int16s" isNullable="true" max="32766">MinMeasuredValue</attribute>
-    <attribute side="server" code="0x0002" name="MaxMeasuredValue" define="PRESSURE_MAX_MEASURED_VALUE" type="int16s" isNullable="true" max="32767">MaxMeasuredValue</attribute>
+    <attribute side="server" code="0x0000" name="MeasuredValue" define="PRESSURE_MEASURED_VALUE" type="int16s" isNullable="true" min="-32767"/>
+    <attribute side="server" code="0x0001" name="MinMeasuredValue" define="PRESSURE_MIN_MEASURED_VALUE" type="int16s" isNullable="true" min="-32767" max="32766"/>
+    <attribute side="server" code="0x0002" name="MaxMeasuredValue" define="PRESSURE_MAX_MEASURED_VALUE" type="int16s" isNullable="true" min="-32766"/>
     <attribute side="server" code="0x0003" name="Tolerance" define="PRESSURE_TOLERANCE" type="int16u" max="0x0800" optional="true" default="0">
-      <description>Tolerance</description>
       <optionalConform/>
     </attribute>
-    <attribute side="server" code="0x0010" name="ScaledValue" define="PRESSURE_SCALED_VALUE" type="int16s" optional="true" default="0" isNullable="true" max="32767">
-      <description>ScaledValue</description>
+    <attribute side="server" code="0x0010" name="ScaledValue" define="PRESSURE_SCALED_VALUE" type="int16s" optional="true" default="0" isNullable="true" min="-32767">
       <mandatoryConform>
         <feature name="EXT"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x0011" name="MinScaledValue" define="PRESSURE_MIN_SCALED_VALUE" type="int16s" optional="true" default="0" isNullable="true" max="32766">
-      <description>MinScaledValue</description>
+    <attribute side="server" code="0x0011" name="MinScaledValue" define="PRESSURE_MIN_SCALED_VALUE" type="int16s" optional="true" default="0" isNullable="true" min="-32767" max="32766">
       <mandatoryConform>
         <feature name="EXT"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x0012" name="MaxScaledValue" define="PRESSURE_MAX_SCALED_VALUE" type="int16s" optional="true" default="0" isNullable="true" max="32767">
-      <description>MaxScaledValue</description>
+    <attribute side="server" code="0x0012" name="MaxScaledValue" define="PRESSURE_MAX_SCALED_VALUE" type="int16s" optional="true" default="0" isNullable="true" min="-32766">
       <mandatoryConform>
         <feature name="EXT"/>
       </mandatoryConform>
     </attribute>
     <attribute side="server" code="0x0013" name="ScaledTolerance" define="PRESSURE_SCALED_TOLERANCE" type="int16u" max="0x0800" optional="true" default="0">
-      <description>ScaledTolerance</description>
       <optionalConform>
         <feature name="EXT"/>
       </optionalConform>
     </attribute>
     <attribute side="server" code="0x0014" name="Scale" define="PRESSURE_SCALE" type="int8s" optional="true" default="0" min="-127">
-      <description>Scale</description>
       <mandatoryConform>
         <feature name="EXT"/>
       </mandatoryConform>
