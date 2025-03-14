@@ -79,10 +79,10 @@ for an example of a simple fuzz test.
     -   Another example:
         [src/setup_payload/tests/BUILD.gn](https://github.com/project-chip/connectedhomeip/blob/b367512f519e5e109346e81a0d84fd85cd9192f7/src/setup_payload/tests/BUILD.gn#L43)
 
--   Add to `src/BUILD.gn`
+-   Add to `${chip_root}/BUILD.gn`
 
     -   Add the Fuzzing Target in this part of the code :
-        [src/BUILD.gn](https://github.com/project-chip/connectedhomeip/blob/b367512f519e5e109346e81a0d84fd85cd9192f7/BUILD.gn#L52)
+        [\${chip_root}/BUILD.gn](https://github.com/project-chip/connectedhomeip/blob/b367512f519e5e109346e81a0d84fd85cd9192f7/BUILD.gn#L52)
 
     -   Add Fuzzing Target like that
 

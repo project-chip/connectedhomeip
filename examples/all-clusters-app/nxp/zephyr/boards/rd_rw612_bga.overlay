@@ -38,21 +38,23 @@
 	pinctrl-names = "default";
 };
 
+/delete-node/ &sram_data;
+/delete-node/ &sram_code;
+/delete-node/ &boot_partition;
+/delete-node/ &slot0_partition;
+/delete-node/ &slot1_partition;
+/delete-node/ &storage_partition;
+
 &sram {
 	#address-cells = <1>;
 	#size-cells = <1>;
 
-	sram_data: memory@40000 {
+	sram_data: memory@0 {
 		compatible = "mmio-sram";
-		reg = <0x40000 DT_SIZE_K(1216)>;
+		reg = <0x0 DT_SIZE_K(1216)>;
 	};
 };
 
-/delete-node/ &boot_partition;
-/delete-node/ &slot0_partition;
-/delete-node/ &slot1_partition;
-/delete-node/ &fw_storage;
-/delete-node/ &storage_partition;
 
 &flexspi {
 	status = "okay";

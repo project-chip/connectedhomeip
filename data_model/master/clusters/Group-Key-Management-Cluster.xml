@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -54,6 +54,8 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x003F" name="Group Key Management Cluster" revision="2">
   <revisionHistory>
@@ -61,7 +63,7 @@ Davis, CA 95616, USA
     <revision revision="2" summary="Clarify KeySetWrite validation and behavior on invalid epoch key lengths"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x003F" name="GroupKeyManagement"/>
+    <clusterId id="0x003F" name="Group Key Management"/>
   </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="GRPKEY" scope="Node"/>
   <features>
@@ -95,11 +97,15 @@ Davis, CA 95616, USA
       <field id="2" name="Endpoints" type="list">
         <entry type="endpoint-no"/>
         <mandatoryConform/>
-        <constraint type="minCount" value="1"/>
+        <constraint>
+          <minCount value="1"/>
+        </constraint>
       </field>
       <field id="3" name="GroupName" type="string">
         <optionalConform/>
-        <constraint type="maxLength" value="16"/>
+        <constraint>
+          <maxLength value="16"/>
+        </constraint>
       </field>
       <access fabricScoped="true"/>
     </struct>
@@ -109,7 +115,12 @@ Davis, CA 95616, USA
       </field>
       <field id="2" name="GroupKeySetID" type="uint16">
         <mandatoryConform/>
-        <constraint type="between" from="1" to="65535"/>
+        <constraint>
+          <between>
+            <from value="1"/>
+            <to value="65535"/>
+          </between>
+        </constraint>
       </field>
       <access fabricScoped="true"/>
     </struct>
@@ -125,7 +136,9 @@ Davis, CA 95616, USA
         <access fabricSensitive="true"/>
         <quality nullable="true"/>
         <mandatoryConform/>
-        <constraint type="maxLength" value="16"/>
+        <constraint>
+          <allowed value="16"/>
+        </constraint>
       </field>
       <field id="3" name="EpochStartTime0" type="epoch-us">
         <access fabricSensitive="true"/>
@@ -136,7 +149,9 @@ Davis, CA 95616, USA
         <access fabricSensitive="true"/>
         <quality nullable="true"/>
         <mandatoryConform/>
-        <constraint type="maxLength" value="16"/>
+        <constraint>
+          <allowed value="16"/>
+        </constraint>
       </field>
       <field id="5" name="EpochStartTime1" type="epoch-us">
         <access fabricSensitive="true"/>
@@ -147,7 +162,9 @@ Davis, CA 95616, USA
         <access fabricSensitive="true"/>
         <quality nullable="true"/>
         <mandatoryConform/>
-        <constraint type="maxLength" value="16"/>
+        <constraint>
+          <allowed value="16"/>
+        </constraint>
       </field>
       <field id="7" name="EpochStartTime2" type="epoch-us">
         <access fabricSensitive="true"/>
@@ -167,64 +184,73 @@ Davis, CA 95616, USA
     <attribute id="0x0000" name="GroupKeyMap" type="list" default="empty">
       <entry type="GroupKeyMapStruct"/>
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage" fabricScoped="true"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform/>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0001" name="GroupTable" type="list" default="empty">
       <entry type="GroupInfoMapStruct"/>
       <access read="true" readPrivilege="view" fabricScoped="true"/>
       <mandatoryConform/>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0002" name="MaxGroupsPerFabric" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0003" name="MaxGroupKeysPerFabric" type="uint16" default="1">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
-      <constraint type="between" from="1" to="65535"/>
+      <constraint>
+        <between>
+          <from value="1"/>
+          <to value="65535"/>
+        </between>
+      </constraint>
     </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="KeySetWrite Command" direction="commandToServer" response="Y">
+    <command id="0x00" name="KeySetWrite" direction="commandToServer" response="Y">
       <access invokePrivilege="admin" fabricScoped="true"/>
       <mandatoryConform/>
       <field id="0" name="GroupKeySet" type="GroupKeySetStruct">
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x01" name="KeySetRead Command" direction="commandToServer" response="KeySetReadResponse Command">
+    <command id="0x01" name="KeySetRead" direction="commandToServer" response="KeySetReadResponse">
       <access invokePrivilege="admin" fabricScoped="true"/>
       <mandatoryConform/>
       <field id="0" name="GroupKeySetID" type="uint16">
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x02" name="KeySetReadResponse Command" direction="responseFromServer">
+    <command id="0x02" name="KeySetReadResponse" direction="responseFromServer">
       <mandatoryConform/>
       <field id="0" name="GroupKeySet" type="GroupKeySetStruct">
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x03" name="KeySetRemove Command" direction="commandToServer" response="Y">
+    <command id="0x03" name="KeySetRemove" direction="commandToServer" response="Y">
       <access invokePrivilege="admin" fabricScoped="true"/>
       <mandatoryConform/>
       <field id="0" name="GroupKeySetID" type="uint16">
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x04" name="KeySetReadAllIndices Command" direction="commandToServer" response="KeySetReadAllIndicesResponse Command">
+    <command id="0x04" name="KeySetReadAllIndices" direction="commandToServer" response="KeySetReadAllIndicesResponse">
       <access invokePrivilege="admin" fabricScoped="true"/>
       <mandatoryConform/>
-      <field id="0" name="reserved">
+      <field id="0" name="DoNotUse">
         <disallowConform/>
       </field>
     </command>
-    <command id="0x05" name="KeySetReadAllIndicesResponse Command" direction="responseFromServer">
+    <command id="0x05" name="KeySetReadAllIndicesResponse" direction="responseFromServer">
       <mandatoryConform/>
       <field id="0" name="GroupKeySetIDs" type="list">
         <entry type="uint16"/>

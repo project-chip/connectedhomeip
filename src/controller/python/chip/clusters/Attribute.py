@@ -448,6 +448,7 @@ class SubscriptionTransaction:
             SubscriptionTransaction], None]] = None
         self._onResubscriptionSucceededCb_isAsync = False
         self._onResubscriptionAttemptedCb_isAsync = False
+        builtins.chipStack.RegisterSubscription(self)
 
     def GetAttributes(self):
         ''' Returns the attribute value cache tracking the latest state on the publisher.
@@ -555,7 +556,7 @@ class SubscriptionTransaction:
 
     def SetErrorCallback(self, callback: Callable[[int, SubscriptionTransaction], None]):
         '''
-        Sets the callback function in case a subscription error occured,
+        Sets the callback function in case a subscription error occurred,
         accepts a Callable accepts an error code and the cached data.
         '''
         if callback is not None:
@@ -578,19 +579,17 @@ class SubscriptionTransaction:
         return self._subscriptionId
 
     def Shutdown(self):
-        if (self._isDone):
+        if self._isDone:
             LOGGER.warning(
                 "Subscription 0x%08x was already terminated previously!", self.subscriptionId)
             return
 
         handle = chip.native.GetLibraryHandle()
+        builtins.chipStack.UnregisterSubscription(self)
         builtins.chipStack.Call(
             lambda: handle.pychip_ReadClient_ShutdownSubscription(
                 self._readTransaction._pReadClient))
         self._isDone = True
-
-    def __del__(self):
-        self.Shutdown()
 
     def __repr__(self):
         return f'<Subscription (Id={self._subscriptionId})>'
@@ -636,7 +635,7 @@ def _BuildEventIndex():
                         if inspect.isclass(event):
                             base_classes = inspect.getmro(event)
 
-                            # Only match on classes that extend the ClusterEventescriptor class
+                            # Only match on classes that extend the ClusterEvent class
                             matched = [
                                 value for value in base_classes if 'ClusterEvent' in str(value)]
                             if (matched == []):
@@ -767,7 +766,7 @@ class AsyncReadTransaction:
     def handleResubscriptionAttempted(self, terminationCause: PyChipError, nextResubscribeIntervalMsec: int):
         if not self._subscription_handler:
             return
-        if (self._subscription_handler._onResubscriptionAttemptedCb_isAsync):
+        if self._subscription_handler._onResubscriptionAttemptedCb_isAsync:
             self._event_loop.create_task(self._subscription_handler._onResubscriptionAttemptedCb(
                 self._subscription_handler, terminationCause.code, nextResubscribeIntervalMsec))
         else:
@@ -779,7 +778,7 @@ class AsyncReadTransaction:
         pass
 
     def _handleReportEnd(self):
-        if (self._subscription_handler is not None):
+        if self._subscription_handler is not None:
             for change in self._changedPathSet:
                 try:
                     attribute_path = TypedAttributePath(Path=change)

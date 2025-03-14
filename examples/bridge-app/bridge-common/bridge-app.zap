@@ -1,6 +1,6 @@
 {
   "fileFormat": 2,
-  "featureLevel": 103,
+  "featureLevel": 106,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -41,14 +41,16 @@
         "code": 22,
         "profileId": 259,
         "label": "MA-rootdevice",
-        "name": "MA-rootdevice"
+        "name": "MA-rootdevice",
+        "deviceTypeOrder": 0
       },
       "deviceTypes": [
         {
           "code": 22,
           "profileId": 259,
           "label": "MA-rootdevice",
-          "name": "MA-rootdevice"
+          "name": "MA-rootdevice",
+          "deviceTypeOrder": 0
         }
       ],
       "deviceVersions": [
@@ -214,14 +216,6 @@
               "reportableChange": 0
             }
           ]
-        },
-        {
-          "name": "Access Control",
-          "code": 31,
-          "mfgCode": null,
-          "define": "ACCESS_CONTROL_CLUSTER",
-          "side": "client",
-          "enabled": 1
         },
         {
           "name": "Access Control",
@@ -4403,14 +4397,16 @@
         "code": 14,
         "profileId": 259,
         "label": "MA-aggregator",
-        "name": "MA-aggregator"
+        "name": "MA-aggregator",
+        "deviceTypeOrder": 0
       },
       "deviceTypes": [
         {
           "code": 14,
           "profileId": 259,
           "label": "MA-aggregator",
-          "name": "MA-aggregator"
+          "name": "MA-aggregator",
+          "deviceTypeOrder": 0
         }
       ],
       "deviceVersions": [
@@ -4718,14 +4714,6 @@
           ]
         },
         {
-          "name": "Binding",
-          "code": 30,
-          "mfgCode": null,
-          "define": "BINDING_CLUSTER",
-          "side": "client",
-          "enabled": 1
-        },
-        {
           "name": "Actions",
           "code": 37,
           "mfgCode": null,
@@ -4891,14 +4879,16 @@
         "code": 257,
         "profileId": 259,
         "label": "MA-dimmablelight",
-        "name": "MA-dimmablelight"
+        "name": "MA-dimmablelight",
+        "deviceTypeOrder": 0
       },
       "deviceTypes": [
         {
           "code": 257,
           "profileId": 259,
           "label": "MA-dimmablelight",
-          "name": "MA-dimmablelight"
+          "name": "MA-dimmablelight",
+          "deviceTypeOrder": 0
         }
       ],
       "deviceVersions": [

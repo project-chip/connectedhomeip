@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2023). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -54,6 +54,8 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0096" name="Demand Response Load Control Cluster" revision="4">
   <revisionHistory>
@@ -68,22 +70,22 @@ Davis, CA 95616, USA
   <classification hierarchy="base" role="application" picsCode="DRLC" scope="Endpoint"/>
   <features>
     <feature bit="0" code="TEMPO" name="TemperatureOffset" summary="Supports temperature offsets">
-      <optionalConform choice="a" more="true"/>
+      <optionalConform choice="a" more="true" min="1"/>
     </feature>
     <feature bit="1" code="TEMPS" name="TemperatureSetpoint" summary="Supports temperature setpoints">
-      <optionalConform choice="a" more="true"/>
+      <optionalConform choice="a" more="true" min="1"/>
     </feature>
     <feature bit="2" code="LOADA" name="LoadAdjustment" summary="Supports average load adjustment percentage">
-      <optionalConform choice="a" more="true"/>
+      <optionalConform choice="a" more="true" min="1"/>
     </feature>
     <feature bit="3" code="DUTYC" name="DutyCycle" summary="Supports duty cycle adjustment">
-      <optionalConform choice="a" more="true"/>
+      <optionalConform choice="a" more="true" min="1"/>
     </feature>
     <feature bit="4" code="PWRSV" name="PowerSavings" summary="Supports power savings">
-      <optionalConform choice="a" more="true"/>
+      <optionalConform choice="a" more="true" min="1"/>
     </feature>
     <feature bit="5" code="HEATS" name="HeatingSource" summary="Supports selecting heating source">
-      <optionalConform choice="a" more="true"/>
+      <optionalConform choice="a" more="true" min="1"/>
     </feature>
   </features>
   <dataTypes>
@@ -191,7 +193,12 @@ Davis, CA 95616, USA
     <struct name="AverageLoadControlStruct">
       <field id="0" name="LoadAdjustment" type="int8">
         <mandatoryConform/>
-        <constraint type="between" from="-100" to="100"/>
+        <constraint>
+          <between>
+            <from value="-100"/>
+            <to value="100"/>
+          </between>
+        </constraint>
       </field>
     </struct>
     <struct name="DutyCycleControlStruct">
@@ -207,73 +214,106 @@ Davis, CA 95616, USA
     <struct name="LoadControlEventStruct">
       <field id="0" name="EventID" type="octstr" default="0">
         <mandatoryConform/>
-        <constraint type="maxLength" value="16"/>
+        <constraint>
+          <allowed value="16"/>
+        </constraint>
       </field>
       <field id="1" name="ProgramID" type="octstr" default="null">
-        <access fabricSensitive="true"/>
         <quality nullable="true"/>
         <mandatoryConform/>
-        <constraint type="maxLength" value="16"/>
+        <constraint>
+          <allowed value="16"/>
+        </constraint>
       </field>
       <field id="2" name="Status" type="LoadControlEventStatusEnum">
-        <access fabricSensitive="true"/>
         <optionalConform/>
       </field>
       <field id="3" name="Control" type="EventControlBitmap" default="1">
-        <access fabricSensitive="true"/>
         <mandatoryConform/>
       </field>
       <field id="4" name="Criticality" type="CriticalityLevelEnum" default="0">
-        <access fabricSensitive="true"/>
         <mandatoryConform/>
       </field>
       <field id="5" name="StartTime" type="epoch-s" default="null">
-        <access fabricSensitive="true"/>
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>
       <field id="6" name="Transitions" type="list" default="empty">
         <entry type="LoadControlEventTransitionStruct"/>
-        <access fabricSensitive="true"/>
         <mandatoryConform/>
-        <constraint type="maxCount" value="NumberOfTransitions Attribute"/>
+        <constraint>
+          <maxCount>
+            <attribute name="NumberOfTransitions"/>
+          </maxCount>
+        </constraint>
       </field>
-      <access fabricScoped="true"/>
     </struct>
     <struct name="LoadControlEventTransitionStruct">
       <field id="0" name="Duration" type="uint16" default="0">
         <mandatoryConform/>
-        <constraint type="max" value="1440"/>
+        <constraint>
+          <max value="1440"/>
+        </constraint>
       </field>
       <field id="1" name="Control" type="EventTransitionControlBitmap" default="0">
         <mandatoryConform/>
       </field>
-      <field id="2" name="TemperatureControl" type="TemperatureControlStruct"/>
-      <field id="3" name="AverageLoadControl" type="AverageLoadControlStruct"/>
-      <field id="4" name="DutyCycleControl" type="DutyCycleControlStruct"/>
-      <field id="5" name="PowerSavingsControl" type="PowerSavingsControlStruct"/>
-      <field id="6" name="HeatingSourceControl" type="HeatingSourceControlStruct"/>
+      <field id="2" name="TemperatureControl" type="TemperatureControlStruct">
+        <optionalConform choice="b" max="1">
+          <orTerm>
+            <feature name="TEMPO"/>
+            <feature name="TEMPS"/>
+          </orTerm>
+        </optionalConform>
+      </field>
+      <field id="3" name="AverageLoadControl" type="AverageLoadControlStruct">
+        <optionalConform choice="b" max="1">
+          <feature name="LOADA"/>
+        </optionalConform>
+      </field>
+      <field id="4" name="DutyCycleControl" type="DutyCycleControlStruct">
+        <optionalConform choice="b" max="1">
+          <feature name="DUTYC"/>
+        </optionalConform>
+      </field>
+      <field id="5" name="PowerSavingsControl" type="PowerSavingsControlStruct">
+        <optionalConform choice="b" max="1">
+          <feature name="PWRSV"/>
+        </optionalConform>
+      </field>
+      <field id="6" name="HeatingSourceControl" type="HeatingSourceControlStruct">
+        <optionalConform choice="b" max="1">
+          <feature name="HEATS"/>
+        </optionalConform>
+      </field>
     </struct>
     <struct name="LoadControlProgramStruct">
       <field id="0" name="ProgramID" type="octstr" default="0">
         <mandatoryConform/>
-        <constraint type="maxLength" value="16"/>
+        <constraint>
+          <allowed value="16"/>
+        </constraint>
       </field>
       <field id="1" name="Name" type="string">
         <mandatoryConform/>
-        <constraint type="maxLength" value="32"/>
+        <constraint>
+          <maxLength value="32"/>
+        </constraint>
       </field>
       <field id="2" name="RandomStartMinutes" type="uint8" default="null">
         <quality nullable="true"/>
         <mandatoryConform/>
-        <constraint type="max" value="60"/>
+        <constraint>
+          <max value="60"/>
+        </constraint>
       </field>
       <field id="3" name="RandomDurationMinutes" type="uint8" default="null">
         <quality nullable="true"/>
         <mandatoryConform/>
-        <constraint type="max" value="60"/>
+        <constraint>
+          <max value="60"/>
+        </constraint>
       </field>
-      <access fabricScoped="true"/>
     </struct>
     <struct name="PowerSavingsControlStruct">
       <field id="0" name="PowerSavings" type="percent">
@@ -281,13 +321,13 @@ Davis, CA 95616, USA
       </field>
     </struct>
     <struct name="TemperatureControlStruct">
-      <field id="0" name="CoolingTempOffset" type="ref_TempDiff" default="null">
+      <field id="0" name="CoolingTempOffset" type="int16s" default="null">
         <quality nullable="true"/>
         <mandatoryConform>
           <feature name="TEMPO"/>
         </mandatoryConform>
       </field>
-      <field id="1" name="HeatingTempOffset" type="ref_TempDiff" default="null">
+      <field id="1" name="HeatingTempOffset" type="int16s" default="null">
         <quality nullable="true"/>
         <mandatoryConform>
           <feature name="TEMPO"/>
@@ -310,54 +350,72 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="LoadControlPrograms" type="list" default="empty">
       <entry type="LoadControlProgramStruct"/>
-      <access read="true" readPrivilege="view" fabricScoped="true"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform/>
-      <constraint type="maxCount" value="NumberOfLoadControlPrograms"/>
+      <constraint>
+        <maxCount>
+          <attribute name="NumberOfLoadControlPrograms"/>
+        </maxCount>
+      </constraint>
     </attribute>
     <attribute id="0x0001" name="NumberOfLoadControlPrograms" type="uint8" default="5">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
-      <constraint type="min" value="5"/>
+      <constraint>
+        <min value="5"/>
+      </constraint>
     </attribute>
     <attribute id="0x0002" name="Events" type="list" default="empty">
       <entry type="LoadControlEventStruct"/>
-      <access read="true" readPrivilege="view" fabricScoped="true"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform/>
-      <constraint type="maxCount" value="NumberOfEventsPerProgram * (1 + NumberOfLoadControlPrograms)"/>
+      <constraint>
+        <maxCount value="NumberOfEventsPerProgram * (1 + NumberOfLoadControlPrograms)"/>
+      </constraint>
     </attribute>
     <attribute id="0x0003" name="ActiveEvents" type="list" default="empty">
       <entry type="octstr"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform/>
-      <constraint type="maxCount" value="NumberOfEventsPerProgram * (1 + NumberOfLoadControlPrograms)"/>
+      <constraint>
+        <maxCount value="NumberOfEventsPerProgram * (1 + NumberOfLoadControlPrograms)"/>
+      </constraint>
     </attribute>
     <attribute id="0x0004" name="NumberOfEventsPerProgram" type="uint8" default="10">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
-      <constraint type="min" value="10"/>
+      <constraint>
+        <min value="10"/>
+      </constraint>
     </attribute>
     <attribute id="0x0005" name="NumberOfTransitions" type="uint8" default="3">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
-      <constraint type="min" value="3"/>
+      <constraint>
+        <min value="3"/>
+      </constraint>
     </attribute>
     <attribute id="0x0006" name="DefaultRandomStart" type="uint8" default="0x1E">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform/>
-      <constraint type="max" value="60"/>
+      <constraint>
+        <max value="60"/>
+      </constraint>
     </attribute>
     <attribute id="0x0007" name="DefaultRandomDuration" type="uint8" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform/>
-      <constraint type="max" value="60"/>
+      <constraint>
+        <max value="60"/>
+      </constraint>
     </attribute>
   </attributes>
   <commands>
@@ -373,7 +431,9 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <field id="0" name="LoadControlProgramID" type="octstr">
         <mandatoryConform/>
-        <constraint type="maxLength" value="16"/>
+        <constraint>
+          <allowed value="16"/>
+        </constraint>
       </field>
     </command>
     <command id="0x02" name="AddLoadControlEventRequest" direction="commandToServer" response="Y">
@@ -388,7 +448,9 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <field id="0" name="EventID" type="octstr">
         <mandatoryConform/>
-        <constraint type="maxLength" value="16"/>
+        <constraint>
+          <allowed value="16"/>
+        </constraint>
       </field>
       <field id="1" name="CancelControl" type="CancelControlBitmap" default="0">
         <mandatoryConform/>
@@ -401,7 +463,9 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <field id="0" name="EventID" type="octstr">
         <mandatoryConform/>
-        <constraint type="maxLength" value="16"/>
+        <constraint>
+          <allowed value="16"/>
+        </constraint>
       </field>
       <field id="1" name="TransitionIndex" type="uint8">
         <mandatoryConform/>

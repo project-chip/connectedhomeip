@@ -67,10 +67,10 @@ Davis, CA 95616, USA
   <classification hierarchy="base" role="application" picsCode="EPM" scope="Endpoint"/>
   <features>
     <feature bit="0" code="DIRC" name="DirectCurrent" summary="Supports measurement of direct current">
-      <optionalConform choice="a" more="true"/>
+      <optionalConform choice="a" more="true" min="1"/>
     </feature>
     <feature bit="1" code="ALTC" name="AlternatingCurrent" summary="Supports measurement of alternating current">
-      <optionalConform choice="a" more="true"/>
+      <optionalConform choice="a" more="true" min="1"/>
     </feature>
     <feature bit="2" code="POLY" name="PolyphasePower" summary="Supports polyphase measurements">
       <optionalConform>
@@ -108,24 +108,24 @@ Davis, CA 95616, USA
       <field id="1" name="Measurement" type="int64" default="null">
         <quality nullable="true"/>
         <mandatoryConform/>
-        <constraint type="between" from="-2" to="2"/>
+        <constraint type="between" from="-4611686018427387904" to="4611686018427387904"/>
       </field>
     </struct>
     <struct name="MeasurementRangeStruct">
-      <field id="0" name="MeasurementType" type="ref_MeasurementTypeEnum">
+      <field id="0" name="MeasurementType" type="MeasurementTypeEnum">
         <mandatoryConform/>
       </field>
       <field id="1" name="Min" type="int64">
         <mandatoryConform/>
-        <constraint type="between" from="-2" to="2"/>
+        <constraint type="between" from="-4611686018427387904" to="4611686018427387904"/>
       </field>
       <field id="2" name="Max" type="int64">
         <mandatoryConform/>
-        <constraint type="between" from="-2" to="2"/>
+        <constraint type="between" from="-4611686018427387904" to="4611686018427387904"/>
       </field>
       <field id="3" name="StartTimestamp" type="epoch-s">
         <mandatoryConform>
-          <attribute name="EndTimestamp"/>
+          <field name="EndTimestamp"/>
         </mandatoryConform>
       </field>
       <field id="4" name="EndTimestamp" type="epoch-s">
@@ -133,18 +133,18 @@ Davis, CA 95616, USA
       </field>
       <field id="5" name="MinTimestamp" type="epoch-s">
         <mandatoryConform>
-          <attribute name="EndTimestamp"/>
+          <field name="EndTimestamp"/>
         </mandatoryConform>
       </field>
       <field id="6" name="MaxTimestamp" type="epoch-s">
         <mandatoryConform>
-          <attribute name="EndTimestamp"/>
+          <field name="EndTimestamp"/>
         </mandatoryConform>
         <constraint type="min" value="MinTimestamp + 1"/>
       </field>
       <field id="7" name="StartSystime" type="systime-ms">
         <mandatoryConform>
-          <attribute name="EndSystime"/>
+          <field name="EndSystime"/>
         </mandatoryConform>
       </field>
       <field id="8" name="EndSystime" type="systime-ms">
@@ -152,12 +152,12 @@ Davis, CA 95616, USA
       </field>
       <field id="9" name="MinSystime" type="systime-ms">
         <mandatoryConform>
-          <attribute name="EndSystime"/>
+          <field name="EndSystime"/>
         </mandatoryConform>
       </field>
       <field id="10" name="MaxSystime" type="systime-ms">
         <mandatoryConform>
-          <attribute name="EndSystime"/>
+          <field name="EndSystime"/>
         </mandatoryConform>
         <constraint type="min" value="MinSystime + 1"/>
       </field>
@@ -170,101 +170,107 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0001" name="NumberOfMeasurementTypes" type="uint8">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
       <constraint type="min" value="1"/>
     </attribute>
     <attribute id="0x0002" name="Accuracy" type="list">
-      <entry type="ref_MeasurementAccuracyStruct"/>
+      <entry type="MeasurementAccuracyStruct"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
-      <constraint type="countBetween" from="1" to="NumberOfMeasurementTypes"/>
+      <constraint type="countBetween">
+        <from value="1"/>
+        <to attribute="NumberOfMeasurementTypes"/>
+      </constraint>
     </attribute>
     <attribute id="0x0003" name="Ranges" type="list" default="empty">
       <entry type="MeasurementRangeStruct"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
+      <quality quieterReporting="true"/>
       <optionalConform/>
-      <constraint type="countBetween" from="0" to="NumberOfMeasurementTypes"/>
+      <constraint type="countBetween">
+        <from value="0"/>
+        <to attribute="NumberOfMeasurementTypes"/>
+      </constraint>
     </attribute>
     <attribute id="0x0004" name="Voltage" type="voltage-mV" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
+      <quality nullable="true" quieterReporting="true"/>
       <optionalConform/>
-      <constraint type="between" from="-2" to="2"/>
+      <constraint type="between" from="-4611686018427387904" to="4611686018427387904"/>
     </attribute>
     <attribute id="0x0005" name="ActiveCurrent" type="amperage-mA" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
+      <quality nullable="true" quieterReporting="true"/>
       <optionalConform/>
-      <constraint type="between" from="-2" to="2"/>
+      <constraint type="between" from="-4611686018427387904" to="4611686018427387904"/>
     </attribute>
     <attribute id="0x0006" name="ReactiveCurrent" type="amperage-mA" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
+      <quality nullable="true" quieterReporting="true"/>
       <optionalConform>
         <feature name="ALTC"/>
       </optionalConform>
-      <constraint type="between" from="-2" to="2"/>
+      <constraint type="between" from="-4611686018427387904" to="4611686018427387904"/>
     </attribute>
     <attribute id="0x0007" name="ApparentCurrent" type="amperage-mA" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
+      <quality nullable="true" quieterReporting="true"/>
       <optionalConform>
         <feature name="ALTC"/>
       </optionalConform>
-      <constraint type="between" from="0" to="2"/>
+      <constraint type="between" from="0" to="4611686018427387904"/>
     </attribute>
     <attribute id="0x0008" name="ActivePower" type="power-mW" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
+      <quality nullable="true" quieterReporting="true"/>
       <mandatoryConform/>
-      <constraint type="between" from="-2" to="2"/>
+      <constraint type="between" from="-4611686018427387904" to="4611686018427387904"/>
     </attribute>
     <attribute id="0x0009" name="ReactivePower" type="power-mW" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
+      <quality nullable="true" quieterReporting="true"/>
       <optionalConform>
         <feature name="ALTC"/>
       </optionalConform>
-      <constraint type="between" from="-2" to="2"/>
+      <constraint type="between" from="-4611686018427387904" to="4611686018427387904"/>
     </attribute>
     <attribute id="0x000A" name="ApparentPower" type="power-mW" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
+      <quality nullable="true" quieterReporting="true"/>
       <optionalConform>
         <feature name="ALTC"/>
       </optionalConform>
-      <constraint type="between" from="-2" to="2"/>
+      <constraint type="between" from="-4611686018427387904" to="4611686018427387904"/>
     </attribute>
     <attribute id="0x000B" name="RMSVoltage" type="voltage-mV" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
+      <quality nullable="true" quieterReporting="true"/>
       <optionalConform>
         <feature name="ALTC"/>
       </optionalConform>
-      <constraint type="between" from="-2" to="2"/>
+      <constraint type="between" from="-4611686018427387904" to="4611686018427387904"/>
     </attribute>
     <attribute id="0x000C" name="RMSCurrent" type="amperage-mA" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
+      <quality nullable="true" quieterReporting="true"/>
       <optionalConform>
         <feature name="ALTC"/>
       </optionalConform>
-      <constraint type="between" from="-2" to="2"/>
+      <constraint type="between" from="-4611686018427387904" to="4611686018427387904"/>
     </attribute>
     <attribute id="0x000D" name="RMSPower" type="power-mW" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
+      <quality nullable="true" quieterReporting="true"/>
       <optionalConform>
         <feature name="ALTC"/>
       </optionalConform>
-      <constraint type="between" from="-2" to="2"/>
+      <constraint type="between" from="-4611686018427387904" to="4611686018427387904"/>
     </attribute>
     <attribute id="0x000E" name="Frequency" type="int64" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
+      <quality nullable="true" quieterReporting="true"/>
       <optionalConform>
         <feature name="ALTC"/>
       </optionalConform>
@@ -273,7 +279,7 @@ Davis, CA 95616, USA
     <attribute id="0x000F" name="HarmonicCurrents" type="list" default="null">
       <entry type="HarmonicMeasurementStruct"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
+      <quality nullable="true" quieterReporting="true"/>
       <mandatoryConform>
         <feature name="HARM"/>
       </mandatoryConform>
@@ -282,7 +288,7 @@ Davis, CA 95616, USA
     <attribute id="0x0010" name="HarmonicPhases" type="list" default="null">
       <entry type="HarmonicMeasurementStruct"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
+      <quality nullable="true" quieterReporting="true"/>
       <mandatoryConform>
         <feature name="PWRQ"/>
       </mandatoryConform>
@@ -290,7 +296,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0011" name="PowerFactor" type="int64" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
+      <quality nullable="true" quieterReporting="true"/>
       <optionalConform>
         <feature name="ALTC"/>
       </optionalConform>
@@ -298,17 +304,20 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0012" name="NeutralCurrent" type="amperage-mA" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
+      <quality nullable="true" quieterReporting="true"/>
       <optionalConform>
         <feature name="POLY"/>
       </optionalConform>
-      <constraint type="between" from="-2" to="2"/>
+      <constraint type="between" from="-4611686018427387904" to="4611686018427387904"/>
     </attribute>
   </attributes>
   <events>
     <event id="0x00" name="MeasurementPeriodRanges" priority="info">
       <access readPrivilege="view"/>
-      <field id="0" name="Ranges" type="list" default="R V">
+      <mandatoryConform>
+        <attribute name="Ranges"/>
+      </mandatoryConform>
+      <field id="0" name="Ranges" type="list">
         <entry type="MeasurementRangeStruct"/>
         <mandatoryConform/>
       </field>

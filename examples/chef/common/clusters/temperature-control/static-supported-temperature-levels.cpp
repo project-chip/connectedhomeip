@@ -21,6 +21,7 @@
 #ifdef MATTER_DM_PLUGIN_TEMPERATURE_CONTROL_SERVER
 #include "static-supported-temperature-levels.h"
 #include <app/clusters/temperature-control-server/supported-temperature-levels-manager.h>
+#include <lib/support/CodeUtils.h>
 
 using namespace chip;
 using namespace chip::app::Clusters;
@@ -34,7 +35,7 @@ CharSpan AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions[] = { "L
 const AppSupportedTemperatureLevelsDelegate::EndpointPair AppSupportedTemperatureLevelsDelegate::supportedOptionsByEndpoints
     [MATTER_DM_TEMPERATURE_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT] = { EndpointPair(
         1 /* endpointId */, AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions,
-        ArraySize(AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions)) };
+        MATTER_ARRAY_SIZE(AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions)) };
 
 uint8_t AppSupportedTemperatureLevelsDelegate::Size()
 {

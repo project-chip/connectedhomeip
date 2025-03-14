@@ -209,7 +209,7 @@ private:
     YearDayScheduleInfo mYeardaySchedule[kMaxUsers][kMaxYeardaySchedulesPerUser];
     HolidayScheduleInfo mHolidaySchedule[kMaxHolidaySchedules];
 
-    char mUserNames[ArraySize(mLockUsers)][DOOR_LOCK_MAX_USER_NAME_SIZE];
+    char mUserNames[MATTER_ARRAY_SIZE(mLockUsers)][DOOR_LOCK_MAX_USER_NAME_SIZE];
     uint8_t mCredentialData[kNumCredentialTypes][kMaxCredentials][kMaxCredentialSize];
     CredentialStruct mCredentials[kMaxUsers][kMaxCredentials];
 

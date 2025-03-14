@@ -72,6 +72,28 @@ Davis, CA 95616, USA
     </feature>
   </features>
   <dataTypes>
+    <enum name="ModeTag">
+      <item value="0x00" name="Auto"/>
+      <item value="0x01" name="Quick"/>
+      <item value="0x02" name="Quiet"/>
+      <item value="0x03" name="LowNoise"/>
+      <item value="0x04" name="LowEnergy"/>
+      <item value="0x05" name="Vacation"/>
+      <item value="0x06" name="Min"/>
+      <item value="0x07" name="Max"/>
+      <item value="0x08" name="Night"/>
+      <item value="0x09" name="Day"/>
+      <item value="0x4000" name="Bake"/>
+      <item value="0x4001" name="Convection"/>
+      <item value="0x4002" name="Grill"/>
+      <item value="0x4003" name="Roast"/>
+      <item value="0x4004" name="Clean"/>
+      <item value="0x4005" name="Convection Bake"/>
+      <item value="0x4006" name="Convection Roast"/>
+      <item value="0x4007" name="Warming"/>
+      <item value="0x4008" name="Proofing"/>
+      <item value="0x4009" name="Steam"/>
+    </enum>
     <struct name="ModeOptionStruct">
       <field id="0" name="Label">
         <mandatoryConform/>
@@ -86,12 +108,8 @@ Davis, CA 95616, USA
     </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="SupportedModes">
-      <mandatoryConform/>
-    </attribute>
-    <attribute id="0x0001" name="CurrentMode">
-      <mandatoryConform/>
-    </attribute>
+    <attribute id="0x0000" name="SupportedModes"/>
+    <attribute id="0x0001" name="CurrentMode"/>
     <attribute id="0x0002" name="StartUpMode">
       <disallowConform/>
     </attribute>

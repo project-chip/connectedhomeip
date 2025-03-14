@@ -41,8 +41,8 @@ chip_build_libshell = false
 # OPENTHREAD CONFIG
 chip_enable_openthread = true
 
-# NFC CONFIG
-chip_enable_nfc = false
+# NFC ONBOARDING PAYLOAD CONFIG
+chip_enable_nfc_onboarding_payload = false
 
 # INET CONFIG for thread
 chip_inet_config_enable_ipv4 = false

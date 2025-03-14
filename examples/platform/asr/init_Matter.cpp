@@ -18,14 +18,14 @@
 
 #include "AppConfig.h"
 #include <DeviceInfoProviderImpl.h>
-#include <app/codegen-data-model-provider/Instance.h>
 #include <app/server/Dnssd.h>
-#include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <init_Matter.h>
 #include <mbedtls/platform.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 #ifdef CONFIG_ENABLE_CHIP_SHELL
 #include <shell/launch_shell.h>
 #endif
@@ -101,7 +101,7 @@ CHIP_ERROR MatterInitializer::Init_Matter_Server(void)
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    initParams.dataModelProvider = app::CodegenDataModelProviderInstance();
+    initParams.dataModelProvider = app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
 
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
     chip::Server::GetInstance().Init(initParams);

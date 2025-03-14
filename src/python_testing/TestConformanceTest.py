@@ -15,14 +15,14 @@
 #    limitations under the License.
 #
 
-from typing import Any
+from typing import Any, Optional
 
 import chip.clusters as Clusters
 from chip.testing.basic_composition import arls_populated
 from chip.testing.conformance import ConformanceDecision
 from chip.testing.global_attribute_ids import GlobalAttributeIds
 from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
-from chip.testing.spec_parsing import build_xml_clusters, build_xml_device_types
+from chip.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, build_xml_device_types
 from mobly import asserts
 from TC_DeviceConformance import DeviceConformanceTests
 
@@ -118,8 +118,10 @@ def is_mandatory(conformance):
 
 class TestConformanceSupport(MatterBaseTest, DeviceConformanceTests):
     def setup_class(self):
-        self.xml_clusters, self.problems = build_xml_clusters()
-        self.xml_device_types, problems = build_xml_device_types()
+        # Latest fully qualified version
+        # TODO: It might be good to find a way to run this against each directory.
+        self.xml_clusters, self.problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4)
+        self.xml_device_types, problems = build_xml_device_types(PrebuiltDataModelDirectory.k1_4)
         self.problems.extend(problems)
 
     @async_test_body
@@ -142,6 +144,12 @@ class TestConformanceSupport(MatterBaseTest, DeviceConformanceTests):
         success, problems = self.check_conformance(ignore_in_progress=False, is_ci=False, allow_provisional=False)
         asserts.assert_true(success, "Unexpected failure parsing endpoint with no clusters marked as provisional")
 
+    def _get_field_by_label(self, cl_object: Clusters.ClusterObjects.ClusterObject, label: str) -> Optional[Clusters.ClusterObjects.ClusterObjectFieldDescriptor]:
+        for field in cl_object.descriptor.Fields:
+            if field.Label == label:
+                return field
+        return None
+
     def _create_minimal_cluster(self, cluster_id: int) -> dict[int, Any]:
         attrs = {}
         attrs[GlobalAttributeIds.FEATURE_MAP_ID] = 0
@@ -160,11 +168,11 @@ class TestConformanceSupport(MatterBaseTest, DeviceConformanceTests):
         attrs[GlobalAttributeIds.CLUSTER_REVISION_ID] = self.xml_clusters[cluster_id].revision
         return attrs
 
-    def _create_minimal_dt(self, device_type_id: int) -> dict[int, dict[int, Any]]:
-        ''' Creates the internals of an endpoint_tlv with the minimal set of clusters, with the minimal set of attributes and commands. Global attributes only.
+    def _create_minimal_dt(self, device_type_id: int, is_tlv_endpoint: bool = True) -> dict[int, dict[int, Any]]:
+        ''' Creates the internals of an endpoint with the minimal set of clusters, with the minimal set of attributes and commands. Global attributes only.
             Does NOT take into account overrides yet.
         '''
-        endpoint_tlv = {}
+        endpoint = {}
         required_servers = [id for id, c in self.xml_device_types[device_type_id].server_clusters.items()
                             if is_mandatory(c.conformance)]
         required_clients = [id for id, c in self.xml_device_types[device_type_id].client_clusters.items()
@@ -172,25 +180,49 @@ class TestConformanceSupport(MatterBaseTest, DeviceConformanceTests):
         device_type_revision = self.xml_device_types[device_type_id].revision
 
         for s in required_servers:
-            endpoint_tlv[s] = self._create_minimal_cluster(s)
+            endpoint[s] = self._create_minimal_cluster(s)
 
         # Descriptor
         attr = Clusters.Descriptor.Attributes
+        structs = Clusters.Descriptor.Structs
         attrs = {}
-        attrs[attr.FeatureMap.attribute_id] = 0
-        attrs[attr.AcceptedCommandList.attribute_id] = []
-        attrs[attr.GeneratedCommandList.attribute_id] = []
-        attrs[attr.ClusterRevision.attribute_id] = self.xml_clusters[Clusters.Descriptor.id].revision
-        attrs[attr.DeviceTypeList.attribute_id] = [
-            Clusters.Descriptor.Structs.DeviceTypeStruct(deviceType=device_type_id, revision=device_type_revision)]
-        attrs[attr.ServerList.attribute_id] = required_servers
-        attrs[attr.ClientList.attribute_id] = required_clients
-        attrs[attr.PartsList.attribute_id] = []
-        attrs[attr.AttributeList.attribute_id] = []
-        attrs[attr.AttributeList.attribute_id] = list(attrs.keys())
 
-        endpoint_tlv[Clusters.Descriptor.id] = attrs
-        return endpoint_tlv
+        attributes = [
+            attr.FeatureMap,
+            attr.AcceptedCommandList,
+            attr.GeneratedCommandList,
+            attr.ClusterRevision,
+            attr.DeviceTypeList,
+            attr.ServerList,
+            attr.ClientList,
+            attr.PartsList,
+        ]
+
+        attribute_values = [
+            (0, 0),  # FeatureMap
+            ([], []),  # AcceptedCommandList
+            ([], []),  # GeneratedCommandList
+            (self.xml_clusters[Clusters.Descriptor.id].revision,
+             self.xml_clusters[Clusters.Descriptor.id].revision),  # ClusterRevision
+            ([{self._get_field_by_label(structs.DeviceTypeStruct, "deviceType").Tag: device_type_id,
+               self._get_field_by_label(structs.DeviceTypeStruct, "revision").Tag: device_type_revision}],
+             [Clusters.Descriptor.Structs.DeviceTypeStruct(
+                 deviceType=device_type_id, revision=device_type_revision)]),  # DeviceTypeList
+            (required_servers, required_servers),  # ServerList
+            (required_clients, required_clients),  # ClientList
+            ([], []),  # PartsList
+        ]
+
+        for attribute_name, attribute_value in zip(attributes, attribute_values):
+            key = attribute_name.attribute_id if is_tlv_endpoint else attribute_name
+            attrs[key] = attribute_value[0] if is_tlv_endpoint else attribute_value[1]
+
+        # Append the attribute list now that is populated.
+        attrs[attr.AttributeList.attribute_id if is_tlv_endpoint else attr.AttributeList] = list(attrs.keys())
+
+        endpoint[Clusters.Descriptor.id if is_tlv_endpoint else Clusters.Descriptor] = attrs
+
+        return endpoint
 
     def add_macl(self, root_endpoint: dict[int, dict[int, Any]], populate_arl: bool = False, populate_commissioning_arl: bool = False):
         ac = Clusters.AccessControl
@@ -220,6 +252,10 @@ class TestConformanceSupport(MatterBaseTest, DeviceConformanceTests):
         root = self._create_minimal_dt(device_type_id=root_node_id)
         nim = self._create_minimal_dt(device_type_id=nim_id)
         self.endpoints_tlv = {0: root, 1: nim}
+
+        root_no_tlv = self._create_minimal_dt(device_type_id=root_node_id, is_tlv_endpoint=False)
+        nim_no_tlv = self._create_minimal_dt(device_type_id=nim_id, is_tlv_endpoint=False)
+        self.endpoints = {0: root_no_tlv, 1: nim_no_tlv}
         asserts.assert_true(self._has_device_type_supporting_macl(), "Did not find supported device in generated device")
 
         success, problems = self.check_conformance(ignore_in_progress=False, is_ci=False, allow_provisional=True)
@@ -233,7 +269,7 @@ class TestConformanceSupport(MatterBaseTest, DeviceConformanceTests):
         asserts.assert_true(success, "Unexpected failure with NIM and MACL")
 
         # A MACL is not allowed when there is no NIM
-        self.endpoints_tlv[1] = self._create_minimal_dt(device_type_id=on_off_id)
+        self.endpoints[1] = self._create_minimal_dt(device_type_id=on_off_id, is_tlv_endpoint=False)
         success, problems = self.check_conformance(ignore_in_progress=False, is_ci=False, allow_provisional=True)
         self.problems.extend(problems)
         asserts.assert_false(success, "Unexpected success with On/Off and MACL")

@@ -140,7 +140,7 @@ static void pwm_pool_aux_update(const struct pwm_pool_data * pwm_pool)
 /* Pwm pool worker */
 static void pwm_pool_event_work(struct k_work * item)
 {
-    struct pwm_pool_data * pwm_pool = CONTAINER_OF(item, struct pwm_pool_data, work);
+    struct pwm_pool_data * pwm_pool = CONTAINER_OF(k_work_delayable_from_work(item), struct pwm_pool_data, work);
 
     pwm_pool_aux_update(pwm_pool);
     (void) k_work_reschedule(&pwm_pool->work, pwm_pool_aux_timeout(pwm_pool));

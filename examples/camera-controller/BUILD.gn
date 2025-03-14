@@ -1,0 +1,128 @@
+# Copyright (c) 2025 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+import("//build_overrides/editline.gni")
+import("${chip_root}/build/chip/tools.gni")
+import("${chip_root}/examples/camera-controller/camera-controller.gni")
+import("${chip_root}/src/lib/core/core.gni")
+
+assert(chip_build_tools)
+
+config("config") {
+  cflags = [
+    "-Wconversion",
+    "-Wno-shadow",
+  ]
+
+  include_dirs = [
+    ".",
+    "${chip_root}/examples/common",
+    "${chip_root}/zzz_generated/app-common/app-common",
+    "${chip_root}/zzz_generated/chip-tool",
+    "${chip_root}/src/lib",
+    "${chip_root}/third_party/libdatachannel/repo/include",
+  ]
+
+  defines = [ "CONFIG_USE_SEPARATE_EVENTLOOP=${config_use_separate_eventloop}" ]
+
+  # Note: CONFIG_USE_LOCAL_STORAGE is tested for via #ifdef, not #if.
+  if (config_use_local_storage) {
+    defines += [ "CONFIG_USE_LOCAL_STORAGE" ]
+  }
+}
+
+static_library("camera-controller-utils") {
+  sources = [
+    "${chip_root}/src/controller/ExamplePersistentStorage.cpp",
+    "${chip_root}/src/controller/ExamplePersistentStorage.h",
+    "${chip_root}/zzz_generated/chip-tool/zap-generated/cluster/ComplexArgumentParser.cpp",
+    "${chip_root}/zzz_generated/chip-tool/zap-generated/cluster/logging/DataModelLogger.cpp",
+    "commands/clusters/ModelCommand.cpp",
+    "commands/clusters/ModelCommand.h",
+    "commands/clusters/ReportCommand.cpp",
+    "commands/clusters/ReportCommand.h",
+    "commands/common/CHIPCommand.cpp",
+    "commands/common/CHIPCommand.h",
+    "commands/common/Command.cpp",
+    "commands/common/Command.h",
+    "commands/common/Commands.cpp",
+    "commands/common/Commands.h",
+    "commands/common/CredentialIssuerCommands.h",
+    "commands/common/HexConversion.h",
+    "commands/common/RemoteDataModelLogger.cpp",
+    "commands/common/RemoteDataModelLogger.h",
+    "commands/pairing/OpenCommissioningWindowCommand.cpp",
+    "commands/pairing/OpenCommissioningWindowCommand.h",
+    "commands/pairing/PairingCommand.cpp",
+    "commands/pairing/ToTLVCert.cpp",
+  ]
+
+  deps = [ "${chip_root}/src/app:events" ]
+
+  sources += [ "commands/interactive/InteractiveCommands.cpp" ]
+  deps += [
+    "${chip_root}/src/platform/logging:headers",
+    "${editline_root}:editline",
+  ]
+
+  if (chip_device_platform == "darwin") {
+    sources += [ "commands/common/DeviceScanner.cpp" ]
+  }
+
+  public_deps = [
+    "${chip_root}/examples/common/tracing:commandline",
+    "${chip_root}/src/app/server",
+    "${chip_root}/src/app/tests/suites/commands/interaction_model",
+    "${chip_root}/src/controller/data_model",
+    "${chip_root}/src/credentials:file_attestation_trust_store",
+    "${chip_root}/src/lib",
+    "${chip_root}/src/lib/core:types",
+    "${chip_root}/src/lib/support/jsontlv",
+    "${chip_root}/src/platform",
+    "${chip_root}/third_party/inipp",
+    "${chip_root}/third_party/jsoncpp",
+  ]
+
+  public_configs = [ ":config" ]
+
+  if (chip_enable_transport_trace) {
+    public_deps +=
+        [ "${chip_root}/examples/common/tracing:trace_handlers_decoder" ]
+  }
+
+  output_dir = root_out_dir
+}
+
+executable("camera-controller") {
+  sources = [ "main.cpp" ]
+
+  deps = [
+    ":camera-controller-utils",
+    "${chip_root}/src/platform/logging:stdio",
+    "${chip_root}/third_party/libdatachannel:libdatachannel",
+  ]
+
+  libs = [ "datachannel" ]
+  lib_dirs =
+      [ rebase_path("${chip_root}/third_party/libdatachannel/repo/build") ]
+
+  output_dir = root_out_dir
+}
+
+group("default") {
+  deps = [ ":camera-controller" ]
+}

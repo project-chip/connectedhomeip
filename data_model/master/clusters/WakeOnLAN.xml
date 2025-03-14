@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -62,21 +62,25 @@ Davis, CA 95616, USA
     <revision revision="1" summary="Initial revision"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x0503" name="Wake on LAN"/>
+    <clusterId id="0x0503" name="Wake On LAN"/>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="WAKEONLAN" scope="Endpoint"/>
   <attributes>
     <attribute id="0x0000" name="MACAddress" type="string">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <optionalConform/>
-      <constraint type="maxLength" value="12"/>
+      <constraint>
+        <maxLength value="12"/>
+      </constraint>
     </attribute>
     <attribute id="0x0001" name="LinkLocalAddress" type="ipv6adr">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <optionalConform/>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
   </attributes>
 </cluster>

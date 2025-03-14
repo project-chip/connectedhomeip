@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022,2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/Zephyr/DiagnosticDataProviderImpl.h>
@@ -56,6 +57,38 @@ namespace chip {
 namespace DeviceLayer {
 
 namespace {
+
+static void GetThreadInfo(const struct k_thread * thread, void * user_data)
+{
+    size_t unusedStackSize;
+    ThreadMetrics ** threadMetricsListHead = static_cast<ThreadMetrics **>(user_data);
+    ThreadMetrics * threadMetrics          = Platform::New<ThreadMetrics>();
+
+    VerifyOrReturn(threadMetrics != NULL, ChipLogError(DeviceLayer, "Failed to allocate ThreadMetrics"));
+
+#if defined(CONFIG_THREAD_NAME)
+    Platform::CopyString(threadMetrics->NameBuf, k_thread_name_get((k_tid_t) thread));
+    threadMetrics->name.Emplace(CharSpan::fromCharString(threadMetrics->NameBuf));
+#endif
+
+    threadMetrics->id = (uint64_t) thread;
+    threadMetrics->stackFreeCurrent.ClearValue(); // unsupported metric
+    threadMetrics->stackFreeMinimum.ClearValue();
+
+#if defined(CONFIG_THREAD_STACK_INFO)
+    threadMetrics->stackSize.Emplace(static_cast<uint32_t>(thread->stack_info.size));
+
+    if (k_thread_stack_space_get(thread, &unusedStackSize) == 0)
+    {
+        threadMetrics->stackFreeMinimum.Emplace(static_cast<uint32_t>(unusedStackSize));
+    }
+#else
+    (void) unusedStackSize;
+#endif
+
+    threadMetrics->Next    = *threadMetricsListHead;
+    *threadMetricsListHead = threadMetrics;
+}
 
 BootReasonType DetermineBootReason()
 {
@@ -186,6 +219,27 @@ CHIP_ERROR DiagnosticDataProviderImpl::ResetWatermarks()
 #endif
 }
 
+CHIP_ERROR DiagnosticDataProviderImpl::GetThreadMetrics(ThreadMetrics ** threadMetricsOut)
+{
+#if defined(CONFIG_THREAD_MONITOR)
+    *threadMetricsOut = NULL;
+    k_thread_foreach((k_thread_user_cb_t) GetThreadInfo, threadMetricsOut);
+    return CHIP_NO_ERROR;
+#else
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#endif
+}
+
+void DiagnosticDataProviderImpl::ReleaseThreadMetrics(ThreadMetrics * threadMetrics)
+{
+    while (threadMetrics)
+    {
+        ThreadMetrics * thread = threadMetrics;
+        threadMetrics          = threadMetrics->Next;
+        Platform::Delete<ThreadMetrics>(thread);
+    }
+}
+
 CHIP_ERROR DiagnosticDataProviderImpl::GetRebootCount(uint16_t & rebootCount)
 {
     uint32_t count = 0;
@@ -216,19 +270,8 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetUpTime(uint64_t & upTime)
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetTotalOperationalHours(uint32_t & totalOperationalHours)
 {
-    uint64_t upTimeS;
-
-    ReturnErrorOnFailure(GetUpTime(upTimeS));
-
-    uint64_t totalHours      = 0;
-    const uint32_t upTimeH   = upTimeS / 3600 < UINT32_MAX ? static_cast<uint32_t>(upTimeS / 3600) : UINT32_MAX;
-    const uint64_t deltaTime = upTimeH - PlatformMgrImpl().GetSavedOperationalHoursSinceBoot();
-
-    ReturnErrorOnFailure(ConfigurationMgr().GetTotalOperationalHours(reinterpret_cast<uint32_t &>(totalHours)));
-
-    totalOperationalHours = static_cast<uint32_t>(totalHours + deltaTime < UINT32_MAX ? totalHours + deltaTime : UINT32_MAX);
-
-    return CHIP_NO_ERROR;
+    // Update the total operational hours and get the most recent value.
+    return PlatformMgrImpl().UpdateOperationalHours(&totalOperationalHours);
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(BootReasonType & bootReason)
@@ -326,6 +369,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
         }
 
         ifp->IPv6Addresses = chip::app::DataModel::List<chip::ByteSpan>(ifp->Ipv6AddressSpans, ipv6AddressesCount);
+        ifp->Next          = head;
         head               = ifp;
     }
 

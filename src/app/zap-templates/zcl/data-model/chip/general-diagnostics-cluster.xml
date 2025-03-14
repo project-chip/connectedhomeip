@@ -151,7 +151,7 @@ limitations under the License.
       <mandatoryConform/>
     </command>
 
-    <command source="client" code="0x03" name="PayloadTestRequest" response="PayloadTestResponse" optional="true" apiMaturity="provisional">
+    <command source="client" code="0x03" name="PayloadTestRequest" response="PayloadTestResponse" optional="true">
       <description>Request a variable length payload response.</description>
       <arg name="EnableKey" type="octet_string" length="16"/>
       <arg name="Value" type="int8u"/>
@@ -159,9 +159,10 @@ limitations under the License.
       <mandatoryConform>
         <feature name="DMTEST"/>
       </mandatoryConform>
+      <access op="invoke" role="manage"/>
     </command>
 
-   <command source="server" code="0x04" name="PayloadTestResponse" optional="true" apiMaturity="provisional">
+   <command source="server" code="0x04" name="PayloadTestResponse" optional="true">
       <description>Response for the PayloadTestRequest command.</description>
       <arg name="Payload" type="octet_string" max="2048" optional="false"/>
       <mandatoryConform>

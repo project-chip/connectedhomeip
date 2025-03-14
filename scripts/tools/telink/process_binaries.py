@@ -103,7 +103,7 @@ if os.path.exists('merged.bin'):
     os.remove('merged.bin')
 
 # Telink W91 dual-core SoC binary operations
-if build_conf.getboolean('CONFIG_SOC_SERIES_RISCV_TELINK_W91'):
+if build_conf.getboolean('CONFIG_SOC_RISCV_TELINK_W91'):
     n22_partition_offset = build_conf['CONFIG_TELINK_W91_N22_PARTITION_ADDR']
     if build_conf.getboolean('CONFIG_BOOTLOADER_MCUBOOT'):
         n22_partition_offset -= build_conf['CONFIG_FLASH_LOAD_OFFSET']

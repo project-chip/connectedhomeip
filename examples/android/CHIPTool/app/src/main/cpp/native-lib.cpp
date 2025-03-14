@@ -33,7 +33,7 @@
 std::string base38Encode(void)
 {
     const uint8_t buf[] = { 0, 1, 2, 3, 4, 5 };
-    size_t size         = ArraySize(buf);
+    size_t size         = MATTER_ARRAY_SIZE(buf);
     return chip::base38Encode(&buf[0], size);
 }
 

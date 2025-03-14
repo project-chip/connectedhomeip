@@ -1,6 +1,6 @@
 {
   "fileFormat": 2,
-  "featureLevel": 103,
+  "featureLevel": 106,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -41,14 +41,16 @@
         "code": 22,
         "profileId": 259,
         "label": "MA-rootdevice",
-        "name": "MA-rootdevice"
+        "name": "MA-rootdevice",
+        "deviceTypeOrder": 0
       },
       "deviceTypes": [
         {
           "code": 22,
           "profileId": 259,
           "label": "MA-rootdevice",
-          "name": "MA-rootdevice"
+          "name": "MA-rootdevice",
+          "deviceTypeOrder": 0
         }
       ],
       "deviceVersions": [
@@ -2627,14 +2629,16 @@
         "code": 269,
         "profileId": 259,
         "label": "MA-extendedcolorlight",
-        "name": "MA-extendedcolorlight"
+        "name": "MA-extendedcolorlight",
+        "deviceTypeOrder": 0
       },
       "deviceTypes": [
         {
           "code": 269,
           "profileId": 259,
           "label": "MA-extendedcolorlight",
-          "name": "MA-extendedcolorlight"
+          "name": "MA-extendedcolorlight",
+          "deviceTypeOrder": 0
         }
       ],
       "deviceVersions": [

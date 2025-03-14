@@ -370,8 +370,9 @@ def main():
         if cmdLineArgs.runBootstrap:
             subprocess.check_call(getFilePath("scripts/tools/zap/zap_bootstrap.sh"), shell=True)
 
-        # The maximum memory usage is over 4GB (#15620)
-        os.environ["NODE_OPTIONS"] = "--max-old-space-size=8192"
+        # on 64 bit systems, allow maximum memory usage to go over 4GB (#15620)
+        if sys.maxsize >= 2**32:
+            os.environ["NODE_OPTIONS"] = "--max-old-space-size=8192"
 
         # `zap-cli` may extract things into a temporary directory. ensure extraction
         # does not conflict.

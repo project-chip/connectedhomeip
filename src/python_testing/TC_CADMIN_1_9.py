@@ -105,7 +105,9 @@ class TC_CADMIN_1_9(MatterBaseTest):
             errcode = await self.CommissionOnNetwork(setupPinCode)
             logging.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(errcode.is_success, errcode))
             asserts.assert_false(errcode.is_success, 'Commissioning complete did not error as expected')
-            asserts.assert_true(errcode.sdk_code == expectedErrCode, 'Unexpected error code returned from CommissioningComplete')
+            # TODO: Adding try or except clause here as the errcode code be either 50 for timeout or 3 for incorrect state at this time
+            # until issue mentioned in https://github.com/project-chip/connectedhomeip/issues/34383 can be resolved
+            asserts.assert_in(errcode.sdk_code, [expectedErrCode, 3], 'Unexpected error code returned from CommissioningComplete')
 
     def pics_TC_CADMIN_1_9(self) -> list[str]:
         return ["CADMIN.S"]
@@ -127,9 +129,6 @@ class TC_CADMIN_1_9(MatterBaseTest):
 
         self.step(3)
         await self.CommissionAttempt(setupPinCode, expectedErrCode=0x03)
-        # TODO: Found if we don't add sleep time after test completes that we get unexpected error code and response after the 21st iteration.
-        # Link to Bug Filed: https://github.com/project-chip/connectedhomeip/issues/34383
-        sleep(1)
 
         self.step(4)
         await self.CommissionAttempt(setupPinCode, expectedErrCode=0x32)

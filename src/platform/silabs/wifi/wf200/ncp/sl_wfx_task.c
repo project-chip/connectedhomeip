@@ -110,19 +110,13 @@ static void wfx_bus_task(void * p_arg)
     }
 }
 
-/***************************************************************************
- * @fn  void wfx_bus_start()
- * @brief
- * Creates WFX bus communication task.
- * @param[in] None
- * @return None
- ******************************************************************************/
-void wfx_bus_start()
+sl_status_t wfx_bus_start(void)
 {
     wfx_bus_task_handle =
         xTaskCreateStatic(wfx_bus_task, "wfxbus", BUS_TASK_STACK_SIZE, NULL, WFX_BUS_TASK_PRIORITY, busStack, &busTaskStruct);
     if (wfx_bus_task_handle == NULL)
     {
-        SILABS_LOG("*ERR*WFX BusTask");
+        return SL_STATUS_ALLOCATION_FAILED;
     }
+    return SL_STATUS_OK;
 }

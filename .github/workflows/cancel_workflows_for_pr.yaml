@@ -35,15 +35,16 @@ jobs:
                 python-version: '3.12'
             - name: Setup pip modules we use
               run: |
-                  pip install         \
+                  python3 -m venv venv
+                  venv/bin/pip3 install \
                       click           \
                       coloredlogs     \
                       python-dateutil \
                       pygithub        \
-                      && echo "DONE installint python prerequisites"
+                      && echo "DONE installing python prerequisites"
             - name: Cancel runs
               run: |
-                  scripts/tools/cancel_workflows_for_pr.py       \
+                  venv/bin/python3 scripts/tools/cancel_workflows_for_pr.py \
                     --gh-api-token "${{ secrets.GITHUB_TOKEN }}" \
                     --require "Restyled"       \
                     --require "Lint Code Base" \

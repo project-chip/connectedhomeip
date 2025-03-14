@@ -2605,6 +2605,22 @@ TEST_F(TestTLV, CheckCircularTLVBufferEdge)
 
     TestEnd<TLVReader>(reader);
 }
+
+TEST_F(TestTLV, CheckTLVPutStringOverrun)
+{
+    const size_t bufSize          = 8;
+    uint8_t backingStore[bufSize] = {};
+
+    const char * badPointer = "Foo <segfault here>";
+
+    TLVWriter writer;
+
+    writer.Init(backingStore, bufSize);
+
+    CHIP_ERROR err = writer.PutString(ProfileTag(TestProfile_1, 1), badPointer);
+    EXPECT_EQ(err, CHIP_ERROR_BUFFER_TOO_SMALL);
+}
+
 TEST_F(TestTLV, CheckTLVPutStringF)
 {
     const size_t bufsize = 24;

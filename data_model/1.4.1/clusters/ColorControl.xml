@@ -1,0 +1,1364 @@
+<?xml version="1.0"?>
+<!--
+Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+The information within this document is the property of the Connectivity
+Standards Alliance and its use and disclosure are restricted, except as
+expressly set forth herein.
+
+Connectivity Standards Alliance hereby grants you a fully-paid, non-exclusive,
+nontransferable, worldwide, limited and revocable license (without the right to
+sublicense), under Connectivity Standards Alliance's applicable copyright
+rights, to view, download, save, reproduce and use the document solely for your
+own internal purposes and in accordance with the terms of the license set forth
+herein. This license does not authorize you to, and you expressly warrant that
+you shall not: (a) permit others (outside your organization) to use this
+document; (b) post or publish this document; (c) modify, adapt, translate, or
+otherwise change this document in any manner or create any derivative work
+based on this document; (d) remove or modify any notice or label on this
+document, including this Copyright Notice, License and Disclaimer. The
+Connectivity Standards Alliance does not grant you any license hereunder other
+than as expressly stated herein.
+
+Elements of this document may be subject to third party intellectual property
+rights, including without limitation, patent, copyright or trademark rights,
+and any such third party may or may not be a member of the Connectivity
+Standards Alliance. Connectivity Standards Alliance members grant other
+Connectivity Standards Alliance members certain intellectual property rights as
+set forth in the Connectivity Standards Alliance IPR Policy. Connectivity
+Standards Alliance members do not grant you any rights under this license. The
+Connectivity Standards Alliance is not responsible for, and shall not be held
+responsible in any manner for, identifying or failing to identify any or all
+such third party intellectual property rights. Please visit www.csa-iot.org for
+more information on how to become a member of the Connectivity Standards
+Alliance.
+
+This document and the information contained herein are provided on an “AS IS”
+basis and the Connectivity Standards Alliance DISCLAIMS ALL WARRANTIES EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO (A) ANY WARRANTY THAT THE USE OF THE
+INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OF THIRD PARTIES (INCLUDING
+WITHOUT LIMITATION ANY INTELLECTUAL PROPERTY RIGHTS INCLUDING PATENT, COPYRIGHT
+OR TRADEMARK RIGHTS); OR (B) ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, TITLE OR NONINFRINGEMENT. IN NO EVENT WILL THE
+CONNECTIVITY STANDARDS ALLIANCE BE LIABLE FOR ANY LOSS OF PROFITS, LOSS OF
+BUSINESS, LOSS OF USE OF DATA, INTERRUPTION OF BUSINESS, OR FOR ANY OTHER
+DIRECT, INDIRECT, SPECIAL OR EXEMPLARY, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL
+DAMAGES OF ANY KIND, IN CONTRACT OR IN TORT, IN CONNECTION WITH THIS DOCUMENT
+OR THE INFORMATION CONTAINED HEREIN, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+LOSS OR DAMAGE.
+
+All company, brand and product names in this document may be trademarks that
+are the sole property of their respective owners.
+
+This notice and disclaimer must be included on all copies of this document.
+
+Connectivity Standards Alliance
+508 Second Street, Suite 206
+Davis, CA 95616, USA
+
+:xrefstyle: basic
+-->
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0300" name="Color Control Cluster" revision="7">
+  <revisionHistory>
+    <revision revision="1" summary="Mandatory global ClusterRevision attribute added; CCB 2028"/>
+    <revision revision="2" summary="Added Options attribute, CCB 2085 2104 2124 2230; ZLO 1.0"/>
+    <revision revision="3" summary="CCB 2501 2814 2839 2840 2843 2861"/>
+    <revision revision="4" summary="All Hubs changes"/>
+    <revision revision="5" summary="New data model format and notation, FeatureMap support"/>
+    <revision revision="6" summary="Added clarifications to Scenes support for Matter"/>
+    <revision revision="7" summary="Added Q quality for CurrentHue, CurrentSaturation, CurrentX, CurrentY, ColorTemperatureMireds, EnhancedCurrentHue and RemainingTime attributes. Added clarifications for behavior related to Step values. Added constraints on minimum acceptable color temperature values in mireds."/>
+  </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0300" name="Color Control"/>
+  </clusterIds>
+  <classification hierarchy="base" role="application" picsCode="CC" scope="Endpoint"/>
+  <features>
+    <feature bit="0" code="HS" name="HueSaturation" summary="Supports color specification via hue/saturation.">
+      <otherwiseConform>
+        <mandatoryConform>
+          <feature name="EHUE"/>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
+    </feature>
+    <feature bit="1" code="EHUE" name="EnhancedHue" summary="Enhanced hue is supported.">
+      <otherwiseConform>
+        <mandatoryConform>
+          <feature name="CL"/>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
+    </feature>
+    <feature bit="2" code="CL" name="ColorLoop" summary="Color loop is supported.">
+      <optionalConform/>
+    </feature>
+    <feature bit="3" code="XY" name="XY" summary="Supports color specification via XY.">
+      <optionalConform/>
+    </feature>
+    <feature bit="4" code="CT" name="ColorTemperature" summary="Supports specification of color temperature.">
+      <optionalConform/>
+    </feature>
+  </features>
+  <dataTypes>
+    <enum name="ColorLoopActionEnum">
+      <item value="0" name="Deactivate" summary="De-activate the color loop.">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="ActivateFromColorLoopStartEnhancedHue" summary="Activate the color loop from the value in the ColorLoopStartEnhancedHue field.">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="ActivateFromEnhancedCurrentHue" summary="Activate the color loop from the value of the EnhancedCurrentHue attribute.">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="ColorLoopDirectionEnum">
+      <item value="0" name="Decrement" summary="Decrement the hue in the color loop.">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Increment" summary="Increment the hue in the color loop.">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="ColorModeEnum">
+      <item value="0" name="CurrentHueAndCurrentSaturation" summary="The current hue and saturation attributes determine the color.">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="CurrentXAndCurrentY" summary="The current X and Y attributes determine the color.">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="ColorTemperatureMireds" summary="The color temperature attribute determines the color.">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="DirectionEnum">
+      <item value="0" name="Shortest" summary="Shortest distance">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Longest" summary="Longest distance">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="Up" summary="Up">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="Down" summary="Down">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="DriftCompensationEnum">
+      <item value="0" name="None" summary="There is no compensation.">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="OtherOrUnknown" summary="The compensation is based on other or unknown mechanism.">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="TemperatureMonitoring" summary="The compensation is based on temperature monitoring.">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="OpticalLuminanceMonitoringAndFeedback" summary="The compensation is based on optical luminance monitoring and feedback.">
+        <mandatoryConform/>
+      </item>
+      <item value="4" name="OpticalColorMonitoringAndFeedback" summary="The compensation is based on optical color monitoring and feedback.">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="EnhancedColorModeEnum">
+      <item value="0" name="CurrentHueAndCurrentSaturation" summary="The current hue and saturation attributes determine the color.">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="CurrentXAndCurrentY" summary="The current X and Y attributes determine the color.">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="ColorTemperatureMireds" summary="The color temperature attribute determines the color.">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="EnhancedCurrentHueAndCurrentSaturation" summary="The enhanced current hue and saturation attributes determine the color.">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="MoveModeEnum">
+      <item value="0" name="Stop" summary="Stop the movement">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Up" summary="Move in an upwards direction">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="Down" summary="Move in a downwards direction">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="StepModeEnum">
+      <item value="1" name="Up" summary="Step in an upwards direction">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="Down" summary="Step in a downwards direction">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <bitmap name="ColorCapabilitiesBitmap">
+      <bitfield name="HueSaturation" bit="0" summary="Supports color specification via hue/saturation.">
+        <mandatoryConform>
+          <feature name="HS"/>
+        </mandatoryConform>
+      </bitfield>
+      <bitfield name="EnhancedHue" bit="1" summary="Enhanced hue is supported.">
+        <mandatoryConform>
+          <feature name="EHUE"/>
+        </mandatoryConform>
+      </bitfield>
+      <bitfield name="ColorLoop" bit="2" summary="Color loop is supported.">
+        <mandatoryConform>
+          <feature name="CL"/>
+        </mandatoryConform>
+      </bitfield>
+      <bitfield name="XY" bit="3" summary="Supports color specification via XY.">
+        <mandatoryConform>
+          <feature name="XY"/>
+        </mandatoryConform>
+      </bitfield>
+      <bitfield name="ColorTemperature" bit="4" summary="Supports color specification via color temperature.">
+        <mandatoryConform>
+          <feature name="CT"/>
+        </mandatoryConform>
+      </bitfield>
+    </bitmap>
+    <bitmap name="OptionsBitmap">
+      <bitfield name="ExecuteIfOff" bit="0" summary="Dependency on On/Off cluster">
+        <mandatoryConform/>
+      </bitfield>
+    </bitmap>
+    <bitmap name="UpdateFlagsBitmap">
+      <bitfield name="UpdateAction" bit="0" summary="Device adheres to the associated action field.">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="UpdateDirection" bit="1" summary="Device updates the associated direction attribute.">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="UpdateTime" bit="2" summary="Device updates the associated time attribute.">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="UpdateStartHue" bit="3" summary="Device updates the associated start hue attribute.">
+        <mandatoryConform/>
+      </bitfield>
+    </bitmap>
+  </dataTypes>
+  <attributes>
+    <attribute id="0x0000" name="CurrentHue" type="uint8" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="nonVolatile" reportable="true" quieterReporting="true"/>
+      <mandatoryConform>
+        <feature name="HS"/>
+      </mandatoryConform>
+      <constraint>
+        <max value="254"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0001" name="CurrentSaturation" type="uint8" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality scene="true" persistence="nonVolatile" reportable="true" quieterReporting="true"/>
+      <mandatoryConform>
+        <feature name="HS"/>
+      </mandatoryConform>
+      <constraint>
+        <max value="254"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0002" name="RemainingTime" type="uint16" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality quieterReporting="true"/>
+      <optionalConform/>
+      <constraint>
+        <max value="65534"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0003" name="CurrentX" type="uint16" default="24939">
+      <access read="true" readPrivilege="view"/>
+      <quality scene="true" persistence="nonVolatile" reportable="true" quieterReporting="true"/>
+      <mandatoryConform>
+        <feature name="XY"/>
+      </mandatoryConform>
+      <constraint>
+        <max value="65279"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0004" name="CurrentY" type="uint16" default="24701">
+      <access read="true" readPrivilege="view"/>
+      <quality scene="true" persistence="nonVolatile" reportable="true" quieterReporting="true"/>
+      <mandatoryConform>
+        <feature name="XY"/>
+      </mandatoryConform>
+      <constraint>
+        <max value="65279"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0005" name="DriftCompensation" type="DriftCompensationEnum" default="">
+      <access read="true" readPrivilege="view"/>
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x0006" name="CompensationText" type="string" default="">
+      <access read="true" readPrivilege="view"/>
+      <optionalConform/>
+      <constraint>
+        <maxLength value="254"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0007" name="ColorTemperatureMireds" type="uint16" default="250">
+      <access read="true" readPrivilege="view"/>
+      <quality scene="true" persistence="nonVolatile" reportable="true" quieterReporting="true"/>
+      <mandatoryConform>
+        <feature name="CT"/>
+      </mandatoryConform>
+      <constraint>
+        <max value="65279"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0008" name="ColorMode" type="ColorModeEnum" default="1">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x000F" name="Options" type="OptionsBitmap" default="0">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
+      <mandatoryConform/>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0010" name="NumberOfPrimaries" type="uint8">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" persistence="fixed"/>
+      <mandatoryConform/>
+      <constraint>
+        <max value="6"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0011" name="Primary1X" type="uint16">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <otherwiseConform>
+        <mandatoryConform>
+          <greaterTerm>
+            <attribute name="NumberOfPrimaries"/>
+            <literal value="0"/>
+          </greaterTerm>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
+      <constraint>
+        <max value="65279"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0012" name="Primary1Y" type="uint16">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <otherwiseConform>
+        <mandatoryConform>
+          <greaterTerm>
+            <attribute name="NumberOfPrimaries"/>
+            <literal value="0"/>
+          </greaterTerm>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
+      <constraint>
+        <max value="65279"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0013" name="Primary1Intensity" type="uint8">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" persistence="fixed"/>
+      <otherwiseConform>
+        <mandatoryConform>
+          <greaterTerm>
+            <attribute name="NumberOfPrimaries"/>
+            <literal value="0"/>
+          </greaterTerm>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
+    </attribute>
+    <attribute id="0x0015" name="Primary2X" type="uint16">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <otherwiseConform>
+        <mandatoryConform>
+          <greaterTerm>
+            <attribute name="NumberOfPrimaries"/>
+            <literal value="1"/>
+          </greaterTerm>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
+      <constraint>
+        <max value="65279"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0016" name="Primary2Y" type="uint16">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <otherwiseConform>
+        <mandatoryConform>
+          <greaterTerm>
+            <attribute name="NumberOfPrimaries"/>
+            <literal value="1"/>
+          </greaterTerm>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
+      <constraint>
+        <max value="65279"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0017" name="Primary2Intensity" type="uint8">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" persistence="fixed"/>
+      <otherwiseConform>
+        <mandatoryConform>
+          <greaterTerm>
+            <attribute name="NumberOfPrimaries"/>
+            <literal value="1"/>
+          </greaterTerm>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
+    </attribute>
+    <attribute id="0x0019" name="Primary3X" type="uint16">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <otherwiseConform>
+        <mandatoryConform>
+          <greaterTerm>
+            <attribute name="NumberOfPrimaries"/>
+            <literal value="2"/>
+          </greaterTerm>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
+      <constraint>
+        <max value="65279"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x001A" name="Primary3Y" type="uint16">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <otherwiseConform>
+        <mandatoryConform>
+          <greaterTerm>
+            <attribute name="NumberOfPrimaries"/>
+            <literal value="2"/>
+          </greaterTerm>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
+      <constraint>
+        <max value="65279"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x001B" name="Primary3Intensity" type="uint8">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" persistence="fixed"/>
+      <otherwiseConform>
+        <mandatoryConform>
+          <greaterTerm>
+            <attribute name="NumberOfPrimaries"/>
+            <literal value="2"/>
+          </greaterTerm>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
+    </attribute>
+    <attribute id="0x0020" name="Primary4X" type="uint16">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <otherwiseConform>
+        <mandatoryConform>
+          <greaterTerm>
+            <attribute name="NumberOfPrimaries"/>
+            <literal value="3"/>
+          </greaterTerm>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
+      <constraint>
+        <max value="65279"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0021" name="Primary4Y" type="uint16">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <otherwiseConform>
+        <mandatoryConform>
+          <greaterTerm>
+            <attribute name="NumberOfPrimaries"/>
+            <literal value="3"/>
+          </greaterTerm>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
+      <constraint>
+        <max value="65279"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0022" name="Primary4Intensity" type="uint8">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" persistence="fixed"/>
+      <otherwiseConform>
+        <mandatoryConform>
+          <greaterTerm>
+            <attribute name="NumberOfPrimaries"/>
+            <literal value="3"/>
+          </greaterTerm>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
+    </attribute>
+    <attribute id="0x0024" name="Primary5X" type="uint16">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <otherwiseConform>
+        <mandatoryConform>
+          <greaterTerm>
+            <attribute name="NumberOfPrimaries"/>
+            <literal value="4"/>
+          </greaterTerm>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
+      <constraint>
+        <max value="65279"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0025" name="Primary5Y" type="uint16">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <otherwiseConform>
+        <mandatoryConform>
+          <greaterTerm>
+            <attribute name="NumberOfPrimaries"/>
+            <literal value="4"/>
+          </greaterTerm>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
+      <constraint>
+        <max value="65279"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0026" name="Primary5Intensity" type="uint8">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" persistence="fixed"/>
+      <otherwiseConform>
+        <mandatoryConform>
+          <greaterTerm>
+            <attribute name="NumberOfPrimaries"/>
+            <literal value="4"/>
+          </greaterTerm>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
+    </attribute>
+    <attribute id="0x0028" name="Primary6X" type="uint16">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <otherwiseConform>
+        <mandatoryConform>
+          <greaterTerm>
+            <attribute name="NumberOfPrimaries"/>
+            <literal value="5"/>
+          </greaterTerm>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
+      <constraint>
+        <max value="65279"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0029" name="Primary6Y" type="uint16">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <otherwiseConform>
+        <mandatoryConform>
+          <greaterTerm>
+            <attribute name="NumberOfPrimaries"/>
+            <literal value="5"/>
+          </greaterTerm>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
+      <constraint>
+        <max value="65279"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x002A" name="Primary6Intensity" type="uint8">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" persistence="fixed"/>
+      <otherwiseConform>
+        <mandatoryConform>
+          <greaterTerm>
+            <attribute name="NumberOfPrimaries"/>
+            <literal value="5"/>
+          </greaterTerm>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
+    </attribute>
+    <attribute id="0x0030" name="WhitePointX" type="uint16">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <optionalConform/>
+      <constraint>
+        <max value="65279"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0031" name="WhitePointY" type="uint16">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <optionalConform/>
+      <constraint>
+        <max value="65279"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0032" name="ColorPointRX" type="uint16">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <optionalConform/>
+      <constraint>
+        <max value="65279"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0033" name="ColorPointRY" type="uint16">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <optionalConform/>
+      <constraint>
+        <max value="65279"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0034" name="ColorPointRIntensity" type="uint8">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality nullable="true"/>
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x0036" name="ColorPointGX" type="uint16">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <optionalConform/>
+      <constraint>
+        <max value="65279"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0037" name="ColorPointGY" type="uint16">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <optionalConform/>
+      <constraint>
+        <max value="65279"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0038" name="ColorPointGIntensity" type="uint8">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality nullable="true"/>
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x003A" name="ColorPointBX" type="uint16">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <optionalConform/>
+      <constraint>
+        <max value="65279"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x003B" name="ColorPointBY" type="uint16">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <optionalConform/>
+      <constraint>
+        <max value="65279"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x003C" name="ColorPointBIntensity" type="uint8">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality nullable="true"/>
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x4000" name="EnhancedCurrentHue" type="uint16" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality scene="true" persistence="nonVolatile" quieterReporting="true"/>
+      <mandatoryConform>
+        <feature name="EHUE"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x4001" name="EnhancedColorMode" type="EnhancedColorModeEnum" default="1">
+      <access read="true" readPrivilege="view"/>
+      <quality scene="true" persistence="nonVolatile"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x4002" name="ColorLoopActive" type="uint8" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality scene="true" persistence="nonVolatile"/>
+      <mandatoryConform>
+        <feature name="CL"/>
+      </mandatoryConform>
+      <constraint>
+        <max value="1"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x4003" name="ColorLoopDirection" type="uint8" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality scene="true" persistence="nonVolatile"/>
+      <mandatoryConform>
+        <feature name="CL"/>
+      </mandatoryConform>
+      <constraint>
+        <max value="1"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x4004" name="ColorLoopTime" type="uint16" default="25">
+      <access read="true" readPrivilege="view"/>
+      <quality scene="true" persistence="nonVolatile"/>
+      <mandatoryConform>
+        <feature name="CL"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x4005" name="ColorLoopStartEnhancedHue" type="uint16" default="8960">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="CL"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x4006" name="ColorLoopStoredEnhancedHue" type="uint16" default="0">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="CL"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x400A" name="ColorCapabilities" type="ColorCapabilitiesBitmap" default="0">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform/>
+      <constraint>
+        <max value="0x001F"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x400B" name="ColorTempPhysicalMinMireds" type="uint16">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="CT"/>
+      </mandatoryConform>
+      <constraint>
+        <between>
+          <from value="1"/>
+          <to value="65279"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x400C" name="ColorTempPhysicalMaxMireds" type="uint16">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="CT"/>
+      </mandatoryConform>
+      <constraint>
+        <max value="65279"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x400D" name="CoupleColorTempToLevelMinMireds" type="uint16" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <orTerm>
+          <feature name="CT"/>
+          <attribute name="ColorTemperatureMireds"/>
+        </orTerm>
+      </mandatoryConform>
+      <constraint>
+        <between>
+          <attribute name="ColorTempPhysicalMinMireds"/>
+          <attribute name="ColorTemperatureMireds"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x4010" name="StartUpColorTemperatureMireds" type="uint16" default="MS">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality nullable="true" persistence="nonVolatile"/>
+      <mandatoryConform>
+        <orTerm>
+          <feature name="CT"/>
+          <attribute name="ColorTemperatureMireds"/>
+        </orTerm>
+      </mandatoryConform>
+      <constraint>
+        <between>
+          <from value="1"/>
+          <to value="65279"/>
+        </between>
+      </constraint>
+    </attribute>
+  </attributes>
+  <commands>
+    <command id="0x00" name="MoveToHue" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <feature name="HS"/>
+      </mandatoryConform>
+      <field id="0" name="Hue" type="uint8">
+        <mandatoryConform/>
+        <constraint>
+          <max value="254"/>
+        </constraint>
+      </field>
+      <field id="1" name="Direction" type="DirectionEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="TransitionTime" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <max value="65534"/>
+        </constraint>
+      </field>
+      <field id="3" name="OptionsMask" type="OptionsBitmap" default="0">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="4" name="OptionsOverride" type="OptionsBitmap" default="0">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x01" name="MoveHue" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <feature name="HS"/>
+      </mandatoryConform>
+      <field id="0" name="MoveMode" type="MoveModeEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="Rate" type="uint8">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="OptionsMask" type="OptionsBitmap" default="0">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="3" name="OptionsOverride" type="OptionsBitmap" default="0">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x02" name="StepHue" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <feature name="HS"/>
+      </mandatoryConform>
+      <field id="0" name="StepMode" type="StepModeEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="StepSize" type="uint8">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="TransitionTime" type="uint8">
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="OptionsMask" type="OptionsBitmap" default="0">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="4" name="OptionsOverride" type="OptionsBitmap" default="0">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x03" name="MoveToSaturation" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <feature name="HS"/>
+      </mandatoryConform>
+      <field id="0" name="Saturation" type="uint8">
+        <mandatoryConform/>
+        <constraint>
+          <max value="254"/>
+        </constraint>
+      </field>
+      <field id="1" name="TransitionTime" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <max value="65534"/>
+        </constraint>
+      </field>
+      <field id="2" name="OptionsMask" type="OptionsBitmap" default="0">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="3" name="OptionsOverride" type="OptionsBitmap" default="0">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x04" name="MoveSaturation" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <feature name="HS"/>
+      </mandatoryConform>
+      <field id="0" name="MoveMode" type="MoveModeEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="Rate" type="uint8">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="OptionsMask" type="OptionsBitmap" default="0">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="3" name="OptionsOverride" type="OptionsBitmap" default="0">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x05" name="StepSaturation" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <feature name="HS"/>
+      </mandatoryConform>
+      <field id="0" name="StepMode" type="StepModeEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="StepSize" type="uint8">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="TransitionTime" type="uint8">
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="OptionsMask" type="OptionsBitmap" default="0">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="4" name="OptionsOverride" type="OptionsBitmap" default="0">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x06" name="MoveToHueAndSaturation" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <feature name="HS"/>
+      </mandatoryConform>
+      <field id="0" name="Hue" type="uint8">
+        <mandatoryConform/>
+        <constraint>
+          <max value="254"/>
+        </constraint>
+      </field>
+      <field id="1" name="Saturation" type="uint8">
+        <mandatoryConform/>
+        <constraint>
+          <max value="254"/>
+        </constraint>
+      </field>
+      <field id="2" name="TransitionTime" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <max value="65534"/>
+        </constraint>
+      </field>
+      <field id="3" name="OptionsMask" type="OptionsBitmap" default="0">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="4" name="OptionsOverride" type="OptionsBitmap" default="0">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x07" name="MoveToColor" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <feature name="XY"/>
+      </mandatoryConform>
+      <field id="0" name="ColorX" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <max value="65279"/>
+        </constraint>
+      </field>
+      <field id="1" name="ColorY" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <max value="65279"/>
+        </constraint>
+      </field>
+      <field id="2" name="TransitionTime" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <max value="65534"/>
+        </constraint>
+      </field>
+      <field id="3" name="OptionsMask" type="OptionsBitmap" default="0">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="4" name="OptionsOverride" type="OptionsBitmap" default="0">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x08" name="MoveColor" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <feature name="XY"/>
+      </mandatoryConform>
+      <field id="0" name="RateX" type="int16">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="RateY" type="int16">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="OptionsMask" type="OptionsBitmap" default="0">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="3" name="OptionsOverride" type="OptionsBitmap" default="0">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x09" name="StepColor" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <feature name="XY"/>
+      </mandatoryConform>
+      <field id="0" name="StepX" type="int16">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="StepY" type="int16">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="TransitionTime" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <max value="65534"/>
+        </constraint>
+      </field>
+      <field id="3" name="OptionsMask" type="OptionsBitmap" default="0">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="4" name="OptionsOverride" type="OptionsBitmap" default="0">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x0A" name="MoveToColorTemperature" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <feature name="CT"/>
+      </mandatoryConform>
+      <field id="0" name="ColorTemperatureMireds" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <max value="65279"/>
+        </constraint>
+      </field>
+      <field id="1" name="TransitionTime" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <max value="65534"/>
+        </constraint>
+      </field>
+      <field id="2" name="OptionsMask" type="OptionsBitmap" default="0">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="3" name="OptionsOverride" type="OptionsBitmap" default="0">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x40" name="EnhancedMoveToHue" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <feature name="EHUE"/>
+      </mandatoryConform>
+      <field id="0" name="EnhancedHue" type="uint16">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="Direction" type="DirectionEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="TransitionTime" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <max value="65534"/>
+        </constraint>
+      </field>
+      <field id="3" name="OptionsMask" type="OptionsBitmap" default="0">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="4" name="OptionsOverride" type="OptionsBitmap" default="0">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x41" name="EnhancedMoveHue" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <feature name="EHUE"/>
+      </mandatoryConform>
+      <field id="0" name="MoveMode" type="MoveModeEnum">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="1" name="Rate" type="uint16">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="OptionsMask" type="OptionsBitmap" default="0">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="3" name="OptionsOverride" type="OptionsBitmap" default="0">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x42" name="EnhancedStepHue" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <feature name="EHUE"/>
+      </mandatoryConform>
+      <field id="0" name="StepMode" type="StepModeEnum">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="1" name="StepSize" type="uint16">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="TransitionTime" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <max value="65534"/>
+        </constraint>
+      </field>
+      <field id="3" name="OptionsMask" type="OptionsBitmap" default="0">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="4" name="OptionsOverride" type="OptionsBitmap" default="0">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x43" name="EnhancedMoveToHueAndSaturation" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <feature name="EHUE"/>
+      </mandatoryConform>
+      <field id="0" name="EnhancedHue" type="uint16">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="Saturation" type="uint8">
+        <mandatoryConform/>
+        <constraint>
+          <max value="254"/>
+        </constraint>
+      </field>
+      <field id="2" name="TransitionTime" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <max value="65534"/>
+        </constraint>
+      </field>
+      <field id="3" name="OptionsMask" type="OptionsBitmap" default="0">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="4" name="OptionsOverride" type="OptionsBitmap" default="0">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x44" name="ColorLoopSet" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <feature name="CL"/>
+      </mandatoryConform>
+      <field id="0" name="UpdateFlags" type="UpdateFlagsBitmap">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="Action" type="ColorLoopActionEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="Direction" type="ColorLoopDirectionEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="Time" type="uint16">
+        <mandatoryConform/>
+      </field>
+      <field id="4" name="StartHue" type="uint16">
+        <mandatoryConform/>
+      </field>
+      <field id="5" name="OptionsMask" type="OptionsBitmap" default="0">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="6" name="OptionsOverride" type="OptionsBitmap" default="0">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x47" name="StopMoveStep" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <orTerm>
+          <feature name="HS"/>
+          <feature name="XY"/>
+          <feature name="CT"/>
+        </orTerm>
+      </mandatoryConform>
+      <field id="0" name="OptionsMask" type="OptionsBitmap" default="0">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="1" name="OptionsOverride" type="OptionsBitmap" default="0">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x4B" name="MoveColorTemperature" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <feature name="CT"/>
+      </mandatoryConform>
+      <field id="0" name="MoveMode" type="MoveModeEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="Rate" type="uint16">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="ColorTemperatureMinimumMireds" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <max value="65279"/>
+        </constraint>
+      </field>
+      <field id="3" name="ColorTemperatureMaximumMireds" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <max value="65279"/>
+        </constraint>
+      </field>
+      <field id="4" name="OptionsMask" type="OptionsBitmap" default="0">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="5" name="OptionsOverride" type="OptionsBitmap" default="0">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x4C" name="StepColorTemperature" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <feature name="CT"/>
+      </mandatoryConform>
+      <field id="0" name="StepMode" type="StepModeEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="StepSize" type="uint16">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="TransitionTime" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <max value="65534"/>
+        </constraint>
+      </field>
+      <field id="3" name="ColorTemperatureMinimumMireds" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <max value="65279"/>
+        </constraint>
+      </field>
+      <field id="4" name="ColorTemperatureMaximumMireds" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <max value="65279"/>
+        </constraint>
+      </field>
+      <field id="5" name="OptionsMask" type="OptionsBitmap" default="0">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="6" name="OptionsOverride" type="OptionsBitmap" default="0">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+  </commands>
+</cluster>
