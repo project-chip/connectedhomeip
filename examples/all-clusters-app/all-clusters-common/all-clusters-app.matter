@@ -7014,25 +7014,6 @@ cluster LowPower = 1288 {
   command Sleep(): DefaultSuccess = 0;
 }
 
-<<<<<<< HEAD
-/** This cluster provides facilities to configure and play Chime sounds, such as those used in a doorbell. */
-provisional cluster Chime = 1366 {
-  revision 1;
-
-  struct ChimeSoundStruct {
-    int8u chimeID = 0;
-    char_string<48> name = 1;
-  }
-
-  readonly attribute ChimeSoundStruct installedChimeSounds[] = 0;
-  attribute int8u selectedChime = 1;
-  attribute boolean enabled = 2;
-
-  command PlayChimeSound(): DefaultSuccess = 0;
-}
-
-=======
->>>>>>> 903fe48729 (Updates to CameraAVStreamMgmt delegate.)
 /** The Camera AV Stream Management cluster is used to allow clients to manage, control, and configure various audio, video, and snapshot streams on a camera. */
 provisional cluster CameraAvStreamManagement = 1361 {
   revision 1;
@@ -7328,7 +7309,7 @@ provisional cluster Chime = 1366 {
   }
 
   readonly attribute ChimeSoundStruct installedChimeSounds[] = 0;
-  attribute int8u activeChimeID = 1;
+  attribute int8u selectedChime = 1;
   attribute boolean enabled = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
