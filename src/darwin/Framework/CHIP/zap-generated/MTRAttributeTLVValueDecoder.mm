@@ -18553,11 +18553,11 @@ static id _Nullable DecodeAttributeValueForMeterIdentificationCluster(AttributeI
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
-        MTRMeterIdentificationClusterPowerThresholdStruct * _Nullable value;
+        MTRDataTypePowerThresholdStruct * _Nullable value;
         if (cppValue.IsNull()) {
             value = nil;
         } else {
-            value = [MTRMeterIdentificationClusterPowerThresholdStruct new];
+            value = [MTRDataTypePowerThresholdStruct new];
             if (cppValue.Value().powerThreshold.HasValue()) {
                 value.powerThreshold = [NSNumber numberWithLongLong:cppValue.Value().powerThreshold.Value()];
             } else {

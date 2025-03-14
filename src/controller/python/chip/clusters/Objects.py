@@ -393,6 +393,16 @@ class Globals:
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 7
 
+        class PowerThresholdSourceEnum(MatterIntEnum):
+            kContract = 0x00
+            kRegulator = 0x01
+            kEquipment = 0x02
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 3
+
         class RelativePositionTag(MatterIntEnum):
             kUnder = 0x00
             kNextTo = 0x01
@@ -476,6 +486,21 @@ class Globals:
 
             attributeID: 'uint' = 0
             statusCode: 'uint' = 0
+
+        @dataclass
+        class PowerThresholdStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="powerThreshold", Tag=0, Type=typing.Optional[int]),
+                        ClusterObjectFieldDescriptor(Label="apparentPowerThreshold", Tag=1, Type=typing.Optional[int]),
+                        ClusterObjectFieldDescriptor(Label="powerThresholdSource", Tag=2, Type=typing.Union[Nullable, Globals.Enums.PowerThresholdSourceEnum]),
+                    ])
+
+            powerThreshold: 'typing.Optional[int]' = None
+            apparentPowerThreshold: 'typing.Optional[int]' = None
+            powerThresholdSource: 'typing.Union[Nullable, Globals.Enums.PowerThresholdSourceEnum]' = NullValue
 
 
 
@@ -49694,7 +49719,7 @@ class MeterIdentification(Cluster):
                 ClusterObjectFieldDescriptor(Label="pointOfDelivery", Tag=0x00000001, Type=typing.Union[Nullable, str]),
                 ClusterObjectFieldDescriptor(Label="meterSerialNumber", Tag=0x00000002, Type=typing.Union[Nullable, str]),
                 ClusterObjectFieldDescriptor(Label="protocolVersion", Tag=0x00000003, Type=typing.Union[None, Nullable, str]),
-                ClusterObjectFieldDescriptor(Label="powerThreshold", Tag=0x00000004, Type=typing.Union[None, Nullable, MeterIdentification.Structs.PowerThresholdStruct]),
+                ClusterObjectFieldDescriptor(Label="powerThreshold", Tag=0x00000004, Type=typing.Union[None, Nullable, Globals.Structs.PowerThresholdStruct]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -49706,7 +49731,7 @@ class MeterIdentification(Cluster):
     pointOfDelivery: typing.Union[Nullable, str] = NullValue
     meterSerialNumber: typing.Union[Nullable, str] = NullValue
     protocolVersion: typing.Union[None, Nullable, str] = None
-    powerThreshold: typing.Union[None, Nullable, MeterIdentification.Structs.PowerThresholdStruct] = None
+    powerThreshold: typing.Union[None, Nullable, Globals.Structs.PowerThresholdStruct] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -49724,35 +49749,9 @@ class MeterIdentification(Cluster):
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3
 
-        class PowerThresholdSourceEnum(MatterIntEnum):
-            kContract = 0x00
-            kRegulator = 0x01
-            kEquipment = 0x02
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving an unknown
-            # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3
-
     class Bitmaps:
         class Feature(IntFlag):
             kPowerThreshold = 0x1
-
-    class Structs:
-        @dataclass
-        class PowerThresholdStruct(ClusterObject):
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="powerThreshold", Tag=0, Type=typing.Optional[int]),
-                        ClusterObjectFieldDescriptor(Label="apparentPowerThreshold", Tag=1, Type=typing.Optional[int]),
-                        ClusterObjectFieldDescriptor(Label="powerThresholdSource", Tag=2, Type=typing.Union[Nullable, MeterIdentification.Enums.PowerThresholdSourceEnum]),
-                    ])
-
-            powerThreshold: 'typing.Optional[int]' = None
-            apparentPowerThreshold: 'typing.Optional[int]' = None
-            powerThresholdSource: 'typing.Union[Nullable, MeterIdentification.Enums.PowerThresholdSourceEnum]' = NullValue
 
     class Attributes:
         @dataclass
@@ -49831,9 +49830,9 @@ class MeterIdentification(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, MeterIdentification.Structs.PowerThresholdStruct])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, Globals.Structs.PowerThresholdStruct])
 
-            value: typing.Union[None, Nullable, MeterIdentification.Structs.PowerThresholdStruct] = None
+            value: typing.Union[None, Nullable, Globals.Structs.PowerThresholdStruct] = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
