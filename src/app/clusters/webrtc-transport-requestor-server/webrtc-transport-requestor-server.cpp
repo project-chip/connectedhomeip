@@ -181,16 +181,13 @@ bool WebRTCTransportRequestorServer::IsPeerNodeSessionValid(uint16_t sessionId, 
 
     if (!existingSession)
     {
-        // If sessionId is not null and does not match a value in current sessions.
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
         return false;
     }
 
     // Also check that the existing session belongs to the same PeerNodeID / Fabric
-    // If it doesn’t match, respond with CONSTRAINT_ERROR
+    // If it doesn’t match, return false
     if (peerNodeId != existingSession->peerNodeID || peerFabricIndex != existingSession->GetFabricIndex())
     {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
         return false;
     }
 
@@ -333,8 +330,10 @@ void WebRTCTransportRequestorServer::HandleICECandidates(HandlerContext & ctx, c
 
     // Check if the session, NodeID are valid
     if (!IsPeerNodeSessionValid(sessionId, ctx))
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
         return;
-
+    }
     // Handle ICE candidates in Delegate
     ctx.mCommandHandler.AddStatus(
         ctx.mRequestPath, Protocols::InteractionModel::ClusterStatusCode(mDelegate.HandleICECandidates(sessionId, candidates)));
@@ -356,8 +355,10 @@ void WebRTCTransportRequestorServer::HandleEnd(HandlerContext & ctx, const Comma
 
     // Check if the session, NodeID are valid
     if (!IsPeerNodeSessionValid(sessionId, ctx))
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
         return;
-
+    }
     // Handle End command in Delegate
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath,
                                   Protocols::InteractionModel::ClusterStatusCode(mDelegate.HandleEnd(sessionId, reason)));
