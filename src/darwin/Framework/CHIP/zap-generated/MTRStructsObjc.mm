@@ -10212,7 +10212,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _caid = @(0);
 
-        _certificate = [NSData data];
+        _certificate = nil;
     }
     return self;
 }
@@ -10242,9 +10242,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _ccdid = @(0);
 
-        _clientCertificate = [NSData data];
+        _clientCertificate = nil;
 
-        _intermediateCertificates = [NSArray array];
+        _intermediateCertificates = nil;
     }
     return self;
 }
@@ -10263,6 +10263,48 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: ccdid:%@; clientCertificate:%@; intermediateCertificates:%@; >", NSStringFromClass([self class]), _ccdid, [_clientCertificate base64EncodedStringWithOptions:0], _intermediateCertificates];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRTLSClientManagementClusterTLSEndpointStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _endpointID = @(0);
+
+        _hostname = [NSData data];
+
+        _port = @(0);
+
+        _caid = @(0);
+
+        _ccdid = nil;
+
+        _status = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRTLSClientManagementClusterTLSEndpointStruct alloc] init];
+
+    other.endpointID = self.endpointID;
+    other.hostname = self.hostname;
+    other.port = self.port;
+    other.caid = self.caid;
+    other.ccdid = self.ccdid;
+    other.status = self.status;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: endpointID:%@; hostname:%@; port:%@; caid:%@; ccdid:%@; status:%@; >", NSStringFromClass([self class]), _endpointID, [_hostname base64EncodedStringWithOptions:0], _port, _caid, _ccdid, _status];
     return descriptionString;
 }
 
