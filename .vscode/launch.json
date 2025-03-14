@@ -531,6 +531,7 @@
             "preLaunchTask": "Debug Open IoT SDK example",
             "showDevDebugOutput": "parsed"
         },
+
         {
             "name": "Debug Open IoT SDK unit-tests application",
             "type": "cortex-debug",
@@ -551,6 +552,7 @@
             "preLaunchTask": "Debug Open IoT SDK unit-tests",
             "showDevDebugOutput": "parsed"
         },
+
         {
             "name": "Zephyr native tests",
             "type": "cppdbg",
@@ -569,7 +571,23 @@
                     "ignoreFailures": true
                 }
             ]
-        }
+        },
+
+        {
+            "name": "Camera Controller (Linux)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/out/linux-x64-camera-controller/camera-controller",
+            "cwd": "${workspaceFolder}"
+        },
+
+        {
+            "name": "Camera App (Linux)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/out/linux-x64-camera/chip-camera-app",
+            "cwd": "${workspaceFolder}"
+        },      
     ],
     "inputs": [
         {
