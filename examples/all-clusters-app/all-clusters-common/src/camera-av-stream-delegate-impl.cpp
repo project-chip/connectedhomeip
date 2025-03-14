@@ -45,7 +45,22 @@ std::unique_ptr<CameraAVStreamMgmtServer> sCameraAVStreamMgmtClusterServerInstan
 Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamAllocate(const VideoStreamStruct & allocateArgs,
                                                                                uint16_t & outStreamID)
 {
-    outStreamID = kInvalidStreamID;
+    outStreamID               = kInvalidStreamID;
+    bool foundAvailableStream = false;
+
+    for (VideoStream & stream : videoStreams)
+    {
+        if (!stream.isAllocated)
+        {
+            foundAvailableStream = true;
+            break;
+        }
+    }
+
+    if (!foundAvailableStream)
+    {
+        return Status::ResourceExhausted;
+    }
 
     for (VideoStream & stream : videoStreams)
     {
@@ -62,8 +77,8 @@ Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamAllocate(c
 }
 
 Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamModify(const uint16_t streamID,
-                                                                             const chip::Optional<bool> waterMarkEnabled,
-                                                                             const chip::Optional<bool> osdEnabled)
+                                                                             const Optional<bool> waterMarkEnabled,
+                                                                             const Optional<bool> osdEnabled)
 {
     for (VideoStream & stream : videoStreams)
     {
@@ -75,7 +90,7 @@ Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamModify(con
     }
 
     ChipLogError(Zcl, "Allocated video stream with ID: %d not found", streamID);
-    return Status::Failure;
+    return Status::NotFound;
 }
 
 Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamDeallocate(const uint16_t streamID)
@@ -96,6 +111,22 @@ Protocols::InteractionModel::Status CameraAVStreamManager::AudioStreamAllocate(c
                                                                                uint16_t & outStreamID)
 {
     outStreamID = kInvalidStreamID;
+
+    bool foundAvailableStream = false;
+
+    for (AudioStream & stream : audioStreams)
+    {
+        if (!stream.isAllocated)
+        {
+            foundAvailableStream = true;
+            break;
+        }
+    }
+
+    if (!foundAvailableStream)
+    {
+        return Status::ResourceExhausted;
+    }
 
     for (AudioStream & stream : audioStreams)
     {
@@ -130,6 +161,22 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamAllocat
 {
     outStreamID = kInvalidStreamID;
 
+    bool foundAvailableStream = false;
+
+    for (SnapshotStream & stream : snapshotStreams)
+    {
+        if (!stream.isAllocated)
+        {
+            foundAvailableStream = true;
+            break;
+        }
+    }
+
+    if (!foundAvailableStream)
+    {
+        return Status::ResourceExhausted;
+    }
+
     for (SnapshotStream & stream : snapshotStreams)
     {
         if (!stream.isAllocated && stream.codec == allocateArgs.imageCodec)
@@ -144,8 +191,8 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamAllocat
 }
 
 Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamModify(const uint16_t streamID,
-                                                                                const chip::Optional<bool> waterMarkEnabled,
-                                                                                const chip::Optional<bool> osdEnabled)
+                                                                                const Optional<bool> waterMarkEnabled,
+                                                                                const Optional<bool> osdEnabled)
 {
     for (SnapshotStream & stream : snapshotStreams)
     {
@@ -157,7 +204,7 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamModify(
     }
 
     ChipLogError(Zcl, "Allocated snapshot stream with ID: %d not found", streamID);
-    return Status::Failure;
+    return Status::NotFound;
 }
 
 Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamDeallocate(const uint16_t streamID)
@@ -204,6 +251,7 @@ Protocols::InteractionModel::Status CameraAVStreamManager::CaptureSnapshot(const
     if (!file.read(reinterpret_cast<char *>(outImageSnapshot.data.data()), size))
     {
         ChipLogError(Zcl, "Error reading image file: ");
+        file.close();
         return Status::Failure;
     }
 
@@ -305,7 +353,7 @@ void emberAfCameraAvStreamManagementClusterInitCallback(EndpointId endpoint)
     optionalAttrs.Set(chip::app::Clusters::CameraAvStreamManagement::OptionalAttribute::kNightVisionIllum);
     uint32_t maxConcurrentVideoEncoders  = 1;
     uint32_t maxEncodedPixelRate         = 10000;
-    VideoSensorParamsStruct sensorParams = { 4608, 2592, 120, chip::Optional<uint16_t>(30) }; // Typical numbers for Pi camera.
+    VideoSensorParamsStruct sensorParams = { 4608, 2592, 120, Optional<uint16_t>(30) }; // Typical numbers for Pi camera.
     bool nightVisionCapable              = false;
     VideoResolutionStruct minViewport    = { 854, 480 }; // Assuming 480p resolution.
     std::vector<RateDistortionTradeOffStruct> rateDistortionTradeOffPoints = {};

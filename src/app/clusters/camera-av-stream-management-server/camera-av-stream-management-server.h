@@ -95,6 +95,9 @@ public:
     /**
      *   @brief Handle Command Delegate for Video stream allocation with the provided parameter list.
      *
+     *   @note The videoStreamID and referenceCount fields in the struct are
+     *   ignored by the callee.
+     *
      *   @param[in]  allocateArgs   Structure with parameters for video stream allocation.
      *
      *   @param[out] outStreamID    Indicates the ID of the allocated Video Stream.
@@ -120,9 +123,8 @@ public:
      *   @return Success if the stream modification is successful; otherwise, the command SHALL be rejected with an appropriate
      *   error.
      */
-    virtual Protocols::InteractionModel::Status VideoStreamModify(const uint16_t streamID,
-                                                                  const chip::Optional<bool> waterMarkEnabled,
-                                                                  const chip::Optional<bool> osdEnabled) = 0;
+    virtual Protocols::InteractionModel::Status VideoStreamModify(const uint16_t streamID, const Optional<bool> waterMarkEnabled,
+                                                                  const Optional<bool> osdEnabled) = 0;
 
     /**
      *   @brief Handle Command Delegate for Video stream deallocation for the
@@ -137,6 +139,9 @@ public:
 
     /**
      *   @brief Handle Command Delegate for Audio stream allocation.
+     *
+     *   @note The audioStreamID and referenceCount fields in the struct are
+     *   ignored by the callee.
      *
      *   @param[in]  allocateArgs   Structure with parameters for audio stream allocation.
      *
@@ -160,6 +165,9 @@ public:
 
     /**
      *   @brief Handle Command Delegate for Snapshot stream allocation.
+     *
+     *   @note The snapshotStreamID and referenceCount fields in the struct are
+     *   ignored by the callee.
      *
      *   @param[in]  allocateArgs   Structure with parameters for snapshot stream allocation.
      *
@@ -187,9 +195,8 @@ public:
      *   @return Success if the stream modification is successful; otherwise, the command SHALL be rejected with an appropriate
      *   error.
      */
-    virtual Protocols::InteractionModel::Status SnapshotStreamModify(const uint16_t streamID,
-                                                                     const chip::Optional<bool> waterMarkEnabled,
-                                                                     const chip::Optional<bool> osdEnabled) = 0;
+    virtual Protocols::InteractionModel::Status SnapshotStreamModify(const uint16_t streamID, const Optional<bool> waterMarkEnabled,
+                                                                     const Optional<bool> osdEnabled) = 0;
 
     /**
      *   @brief Handle Command Delegate for Snapshot stream deallocation.
@@ -253,8 +260,9 @@ private:
     CameraAVStreamMgmtServer * mCameraAVStreamMgmtServer = nullptr;
 
     /**
-     * This method is used by the SDK to set the CameraAVStreamMgmtServer pointer member in the delegate.
-     * This is done in the ctor during the instantiation of the CameraAVStreamMgmtServer object.
+     * This method is used by the SDK to ensure the delegate points to the server instance it's associated with.
+     * When a server instance is created or destroyed, this method will be called to set and clear, respectively,
+     * the pointer to the server instance.
      *
      * @param aCameraAVStreamMgmtServer A pointer to the CameraAVStreamMgmtServer object related to this delegate object.
      */

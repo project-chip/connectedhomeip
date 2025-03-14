@@ -93,7 +93,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::Init()
         VerifyOrReturnError(HasFeature(Feature::kVideo) || HasFeature(Feature::kSnapshot), CHIP_ERROR_INVALID_ARGUMENT,
                             ChipLogError(Zcl,
                                          "CameraAVStreamMgmt[ep=%d]: Feature configuration error. if ImageControl, Watermark, "
-                                         "OSD or HDR, then Video or Snapshotfeature required",
+                                         "OnScreenDisplay or HighDynamicRange, then Video or Snapshot feature required",
                                          mEndpointId));
     }
 
@@ -1289,8 +1289,7 @@ void CameraAVStreamMgmtServer::LoadPersistentAttributes()
 CHIP_ERROR CameraAVStreamMgmtServer::StoreViewport(const ViewportStruct & viewport)
 {
     uint8_t buffer[kViewportStructMaxSerializedSize];
-    uint16_t size = static_cast<uint16_t>(sizeof(buffer));
-    MutableByteSpan bufferSpan(buffer, size);
+    MutableByteSpan bufferSpan(buffer);
     TLV::TLVWriter writer;
 
     writer.Init(bufferSpan);
@@ -1305,8 +1304,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::StoreViewport(const ViewportStruct & viewpo
 CHIP_ERROR CameraAVStreamMgmtServer::LoadViewport(ViewportStruct & viewport)
 {
     uint8_t buffer[kViewportStructMaxSerializedSize];
-    uint16_t size = static_cast<uint16_t>(sizeof(buffer));
-    MutableByteSpan bufferSpan(buffer, size);
+    MutableByteSpan bufferSpan(buffer);
 
     auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::Viewport::Id);
     ReturnErrorOnFailure(GetSafeAttributePersistenceProvider()->SafeReadValue(path, bufferSpan));
@@ -1323,8 +1321,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::LoadViewport(ViewportStruct & viewport)
 CHIP_ERROR CameraAVStreamMgmtServer::StoreRankedVideoStreamPriorities()
 {
     uint8_t buffer[kRankedVideoStreamPrioritiesTlvSize];
-    uint16_t size = static_cast<uint16_t>(sizeof(buffer));
-    MutableByteSpan bufferSpan(buffer, size);
+    MutableByteSpan bufferSpan(buffer);
     TLV::TLVWriter writer;
     writer.Init(bufferSpan);
 
@@ -1346,8 +1343,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::StoreRankedVideoStreamPriorities()
 CHIP_ERROR CameraAVStreamMgmtServer::LoadRankedVideoStreamPriorities()
 {
     uint8_t buffer[kRankedVideoStreamPrioritiesTlvSize];
-    uint16_t size = static_cast<uint16_t>(sizeof(buffer));
-    MutableByteSpan bufferSpan(buffer, size);
+    MutableByteSpan bufferSpan(buffer);
 
     auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::RankedVideoStreamPrioritiesList::Id);
     ReturnErrorOnFailure(GetSafeAttributePersistenceProvider()->SafeReadValue(path, bufferSpan));
@@ -1360,13 +1356,15 @@ CHIP_ERROR CameraAVStreamMgmtServer::LoadRankedVideoStreamPriorities()
     ReturnErrorOnFailure(reader.EnterContainer(arrayType));
 
     mRankedVideoStreamPriorities.clear();
-    uint8_t i = 0;
+    StreamUsageEnum streamUsage;
     CHIP_ERROR err;
     while ((err = reader.Next(TLV::kTLVType_UnsignedInteger, TLV::AnonymousTag())) == CHIP_NO_ERROR)
     {
-        ReturnErrorOnFailure(reader.Get(mRankedVideoStreamPriorities[i]));
-        i++;
+        ReturnErrorOnFailure(reader.Get(streamUsage));
+        mRankedVideoStreamPriorities.push_back(streamUsage);
     }
+
+    VerifyOrReturnError(err == CHIP_ERROR_END_OF_TLV, err);
 
     ReturnErrorOnFailure(reader.ExitContainer(arrayType));
     return reader.VerifyEndOfContainer();
