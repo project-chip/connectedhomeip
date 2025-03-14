@@ -53,24 +53,19 @@ Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamAllocate(c
         if (!stream.isAllocated)
         {
             foundAvailableStream = true;
-            break;
+
+            if (stream.codec == allocateArgs.videoCodec)
+            {
+                stream.isAllocated = true;
+                outStreamID        = stream.id;
+                return Status::Success;
+            }
         }
     }
 
     if (!foundAvailableStream)
     {
         return Status::ResourceExhausted;
-    }
-
-    for (VideoStream & stream : videoStreams)
-    {
-        // Fake allocation with just matching codec
-        if (!stream.isAllocated && stream.codec == allocateArgs.videoCodec)
-        {
-            stream.isAllocated = true;
-            outStreamID        = stream.id;
-            return Status::Success;
-        }
     }
 
     return Status::Failure;
@@ -119,24 +114,19 @@ Protocols::InteractionModel::Status CameraAVStreamManager::AudioStreamAllocate(c
         if (!stream.isAllocated)
         {
             foundAvailableStream = true;
-            break;
+
+            if (stream.codec == allocateArgs.audioCodec)
+            {
+                stream.isAllocated = true;
+                outStreamID        = stream.id;
+                return Status::Success;
+            }
         }
     }
 
     if (!foundAvailableStream)
     {
         return Status::ResourceExhausted;
-    }
-
-    for (AudioStream & stream : audioStreams)
-    {
-        // Fake allocation with just matching codec
-        if (!stream.isAllocated && stream.codec == allocateArgs.audioCodec)
-        {
-            stream.isAllocated = true;
-            outStreamID        = stream.id;
-            return Status::Success;
-        }
     }
 
     return Status::Failure;
@@ -168,23 +158,19 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamAllocat
         if (!stream.isAllocated)
         {
             foundAvailableStream = true;
-            break;
+
+            if (stream.codec == allocateArgs.imageCodec)
+            {
+                stream.isAllocated = true;
+                outStreamID        = stream.id;
+                return Status::Success;
+            }
         }
     }
 
     if (!foundAvailableStream)
     {
         return Status::ResourceExhausted;
-    }
-
-    for (SnapshotStream & stream : snapshotStreams)
-    {
-        if (!stream.isAllocated && stream.codec == allocateArgs.imageCodec)
-        {
-            stream.isAllocated = true;
-            outStreamID        = stream.id;
-            return Status::Success;
-        }
     }
 
     return Status::Failure;

@@ -95,10 +95,9 @@ public:
     /**
      *   @brief Handle Command Delegate for Video stream allocation with the provided parameter list.
      *
-     *   @note The videoStreamID and referenceCount fields in the struct must be
-     *   ignored by the callee.
-     *
      *   @param[in]  allocateArgs   Structure with parameters for video stream allocation.
+     *                              The videoStreamID and referenceCount fields in the struct
+     *                              must be ignored by the callee.
      *
      *   @param[out] outStreamID    Indicates the ID of the allocated Video Stream.
      *
@@ -140,10 +139,9 @@ public:
     /**
      *   @brief Handle Command Delegate for Audio stream allocation.
      *
-     *   @note The audioStreamID and referenceCount fields in the struct are
-     *   ignored by the callee.
-     *
      *   @param[in]  allocateArgs   Structure with parameters for audio stream allocation.
+     *                              The audioStreamID and referenceCount fields in the struct
+     *                              must be ignored by the callee.
      *
      *   @param[out] outStreamID    Indicates the ID of the allocated Audio Stream.
      *
@@ -166,10 +164,9 @@ public:
     /**
      *   @brief Handle Command Delegate for Snapshot stream allocation.
      *
-     *   @note The snapshotStreamID and referenceCount fields in the struct are
-     *   ignored by the callee.
-     *
      *   @param[in]  allocateArgs   Structure with parameters for snapshot stream allocation.
+     *                              The snapshotStreamID and referenceCount fields in the struct
+     *                              must be ignored by the callee.
      *
      *   @param[out] outStreamID    Indicates the ID of the allocated Audio Stream.
      *
