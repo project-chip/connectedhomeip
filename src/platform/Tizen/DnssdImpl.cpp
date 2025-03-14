@@ -276,20 +276,49 @@ void GetTextEntries(unsigned short txtLen, uint8_t * txtRecord, std::vector<chip
     }
 }
 
+static void HandleResolveTask(intptr_t context)
+{
+    ChipLogDetail(DeviceLayer, "DNSsd %s", __func__);
+    auto rCtx = reinterpret_cast<chip::Dnssd::ResolveContext *>(context);
+    if (!rCtx)
+    {
+        ChipLogError(DeviceLayer, "Null context in HandleResolveTask");
+        return;
+    }
+
+    {
+        chip::DeviceLayer::StackLock lock;
+        rCtx->Finalize(CHIP_NO_ERROR);
+    }
+
+    rCtx->mInstance->RemoveContext(rCtx);
+}
+
 gboolean OnResolveFinalize(gpointer userData)
 {
     ChipLogDetail(DeviceLayer, "DNSsd %s", __func__);
     auto rCtx = reinterpret_cast<chip::Dnssd::ResolveContext *>(userData);
+    if (!rCtx)
+    {
+        ChipLogError(DeviceLayer, "Null context in OnResolveFinalize");
+        return G_SOURCE_REMOVE;
+    }
 
-    rCtx->Finalize(CHIP_NO_ERROR);
+    CHIP_ERROR err = chip::DeviceLayer::PlatformMgr().ScheduleWork(HandleResolveTask, reinterpret_cast<intptr_t>(rCtx));
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to schedule resolve task: %s", err.AsString());
+        rCtx->mInstance->RemoveContext(rCtx);
+        return G_SOURCE_REMOVE;
+    }
 
-    rCtx->mInstance->RemoveContext(rCtx);
     return G_SOURCE_REMOVE;
 }
 
 void OnResolve(dnssd_error_e result, dnssd_service_h service, void * userData)
 {
     ChipLogDetail(DeviceLayer, "DNSsd %s", __func__);
+
     auto rCtx = reinterpret_cast<chip::Dnssd::ResolveContext *>(userData);
 
     chip::GAutoPtr<char> name;
