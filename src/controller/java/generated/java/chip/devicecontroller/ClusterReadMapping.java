@@ -11524,6 +11524,153 @@ public class ClusterReadMapping {
      
        return result;
     }
+    private static Map<String, InteractionInfo> readClosureDimensionInteractionInfo() {
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readClosureDimensionResolutionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readClosureDimensionResolutionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ClosureDimensionCluster) cluster).readResolutionAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readClosureDimensionResolutionCommandParams
+        );
+        result.put("readResolutionAttribute", readClosureDimensionResolutionAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readClosureDimensionStepValueCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readClosureDimensionStepValueAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ClosureDimensionCluster) cluster).readStepValueAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readClosureDimensionStepValueCommandParams
+        );
+        result.put("readStepValueAttribute", readClosureDimensionStepValueAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readClosureDimensionUnitCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readClosureDimensionUnitAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ClosureDimensionCluster) cluster).readUnitAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readClosureDimensionUnitCommandParams
+        );
+        result.put("readUnitAttribute", readClosureDimensionUnitAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readClosureDimensionTranslationDirectionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readClosureDimensionTranslationDirectionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ClosureDimensionCluster) cluster).readTranslationDirectionAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readClosureDimensionTranslationDirectionCommandParams
+        );
+        result.put("readTranslationDirectionAttribute", readClosureDimensionTranslationDirectionAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readClosureDimensionRotationAxisCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readClosureDimensionRotationAxisAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ClosureDimensionCluster) cluster).readRotationAxisAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readClosureDimensionRotationAxisCommandParams
+        );
+        result.put("readRotationAxisAttribute", readClosureDimensionRotationAxisAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readClosureDimensionOverflowCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readClosureDimensionOverflowAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ClosureDimensionCluster) cluster).readOverflowAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readClosureDimensionOverflowCommandParams
+        );
+        result.put("readOverflowAttribute", readClosureDimensionOverflowAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readClosureDimensionModulationTypeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readClosureDimensionModulationTypeAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ClosureDimensionCluster) cluster).readModulationTypeAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readClosureDimensionModulationTypeCommandParams
+        );
+        result.put("readModulationTypeAttribute", readClosureDimensionModulationTypeAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readClosureDimensionGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readClosureDimensionGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ClosureDimensionCluster) cluster).readGeneratedCommandListAttribute(
+              (ChipClusters.ClosureDimensionCluster.GeneratedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedClosureDimensionClusterGeneratedCommandListAttributeCallback(),
+          readClosureDimensionGeneratedCommandListCommandParams
+        );
+        result.put("readGeneratedCommandListAttribute", readClosureDimensionGeneratedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readClosureDimensionAcceptedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readClosureDimensionAcceptedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ClosureDimensionCluster) cluster).readAcceptedCommandListAttribute(
+              (ChipClusters.ClosureDimensionCluster.AcceptedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedClosureDimensionClusterAcceptedCommandListAttributeCallback(),
+          readClosureDimensionAcceptedCommandListCommandParams
+        );
+        result.put("readAcceptedCommandListAttribute", readClosureDimensionAcceptedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readClosureDimensionEventListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readClosureDimensionEventListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ClosureDimensionCluster) cluster).readEventListAttribute(
+              (ChipClusters.ClosureDimensionCluster.EventListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedClosureDimensionClusterEventListAttributeCallback(),
+          readClosureDimensionEventListCommandParams
+        );
+        result.put("readEventListAttribute", readClosureDimensionEventListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readClosureDimensionAttributeListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readClosureDimensionAttributeListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ClosureDimensionCluster) cluster).readAttributeListAttribute(
+              (ChipClusters.ClosureDimensionCluster.AttributeListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedClosureDimensionClusterAttributeListAttributeCallback(),
+          readClosureDimensionAttributeListCommandParams
+        );
+        result.put("readAttributeListAttribute", readClosureDimensionAttributeListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readClosureDimensionFeatureMapCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readClosureDimensionFeatureMapAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ClosureDimensionCluster) cluster).readFeatureMapAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readClosureDimensionFeatureMapCommandParams
+        );
+        result.put("readFeatureMapAttribute", readClosureDimensionFeatureMapAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readClosureDimensionClusterRevisionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readClosureDimensionClusterRevisionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ClosureDimensionCluster) cluster).readClusterRevisionAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readClosureDimensionClusterRevisionCommandParams
+        );
+        result.put("readClusterRevisionAttribute", readClosureDimensionClusterRevisionAttributeInteractionInfo);
+     
+       return result;
+    }
     private static Map<String, InteractionInfo> readServiceAreaInteractionInfo() {
        Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readServiceAreaSupportedAreasCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readServiceAreaSupportedAreasAttributeInteractionInfo = new InteractionInfo(
@@ -21062,6 +21209,7 @@ public class ClusterReadMapping {
             put("doorLock", readDoorLockInteractionInfo());
             put("windowCovering", readWindowCoveringInteractionInfo());
             put("closureControl", readClosureControlInteractionInfo());
+            put("closureDimension", readClosureDimensionInteractionInfo());
             put("serviceArea", readServiceAreaInteractionInfo());
             put("pumpConfigurationAndControl", readPumpConfigurationAndControlInteractionInfo());
             put("thermostat", readThermostatInteractionInfo());

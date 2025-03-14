@@ -12977,6 +12977,174 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedClosureDimensionClusterCurrentAttributeCallback implements ChipClusters.ClosureDimensionCluster.CurrentAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable ChipStructs.ClosureDimensionClusterCurrentStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.ClosureDimensionClusterCurrentStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedClosureDimensionClusterTargetAttributeCallback implements ChipClusters.ClosureDimensionCluster.TargetAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable ChipStructs.ClosureDimensionClusterTargetStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.ClosureDimensionClusterTargetStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedClosureDimensionClusterUnitRangeAttributeCallback implements ChipClusters.ClosureDimensionCluster.UnitRangeAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable ChipStructs.ClosureDimensionClusterUnitRangeStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.ClosureDimensionClusterUnitRangeStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedClosureDimensionClusterLimitRangeAttributeCallback implements ChipClusters.ClosureDimensionCluster.LimitRangeAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(ChipStructs.ClosureDimensionClusterRangePercent100thsStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.ClosureDimensionClusterRangePercent100thsStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedClosureDimensionClusterGeneratedCommandListAttributeCallback implements ChipClusters.ClosureDimensionCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedClosureDimensionClusterAcceptedCommandListAttributeCallback implements ChipClusters.ClosureDimensionCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedClosureDimensionClusterEventListAttributeCallback implements ChipClusters.ClosureDimensionCluster.EventListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedClosureDimensionClusterAttributeListAttributeCallback implements ChipClusters.ClosureDimensionCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
 
   public static class DelegatedServiceAreaClusterSelectAreasResponseCallback implements ChipClusters.ServiceAreaCluster.SelectAreasResponseCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -23967,6 +24135,10 @@ public class ClusterInfoMapping {
       (ptr, endpointId) -> new ChipClusters.ClosureControlCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("closureControl", closureControlClusterInfo);
 
+    ClusterInfo closureDimensionClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.ClosureDimensionCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("closureDimension", closureDimensionClusterInfo);
+
     ClusterInfo serviceAreaClusterInfo = new ClusterInfo(
       (ptr, endpointId) -> new ChipClusters.ServiceAreaCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("serviceArea", serviceAreaClusterInfo);
@@ -24265,6 +24437,7 @@ public class ClusterInfoMapping {
     destination.get("doorLock").combineCommands(source.get("doorLock"));
     destination.get("windowCovering").combineCommands(source.get("windowCovering"));
     destination.get("closureControl").combineCommands(source.get("closureControl"));
+    destination.get("closureDimension").combineCommands(source.get("closureDimension"));
     destination.get("serviceArea").combineCommands(source.get("serviceArea"));
     destination.get("pumpConfigurationAndControl").combineCommands(source.get("pumpConfigurationAndControl"));
     destination.get("thermostat").combineCommands(source.get("thermostat"));
@@ -28541,6 +28714,64 @@ public class ClusterInfoMapping {
     closureControlClusterInteractionInfoMap.put("cancelFallback", closureControlcancelFallbackInteractionInfo);
 
     commandMap.put("closureControl", closureControlClusterInteractionInfoMap);
+
+    Map<String, InteractionInfo> closureDimensionClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    Map<String, CommandParameterInfo> closureDimensionsetTargetCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo closureDimensionsetTargetpositionCommandParameterInfo = new CommandParameterInfo("position", Optional.class, Integer.class);
+    closureDimensionsetTargetCommandParams.put("position",closureDimensionsetTargetpositionCommandParameterInfo);
+
+    CommandParameterInfo closureDimensionsetTargetlatchCommandParameterInfo = new CommandParameterInfo("latch", Optional.class, Integer.class);
+    closureDimensionsetTargetCommandParams.put("latch",closureDimensionsetTargetlatchCommandParameterInfo);
+
+    CommandParameterInfo closureDimensionsetTargetspeedCommandParameterInfo = new CommandParameterInfo("speed", Optional.class, Integer.class);
+    closureDimensionsetTargetCommandParams.put("speed",closureDimensionsetTargetspeedCommandParameterInfo);
+    InteractionInfo closureDimensionsetTargetInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ClosureDimensionCluster) cluster)
+        .setTarget((DefaultClusterCallback) callback
+        , (Optional<Integer>)
+        commandArguments.get("position")
+        , (Optional<Integer>)
+        commandArguments.get("latch")
+        , (Optional<Integer>)
+        commandArguments.get("speed")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        closureDimensionsetTargetCommandParams
+    );
+    closureDimensionClusterInteractionInfoMap.put("setTarget", closureDimensionsetTargetInteractionInfo);
+
+    Map<String, CommandParameterInfo> closureDimensionstepCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo closureDimensionstepdirectionCommandParameterInfo = new CommandParameterInfo("direction", Integer.class, Integer.class);
+    closureDimensionstepCommandParams.put("direction",closureDimensionstepdirectionCommandParameterInfo);
+
+    CommandParameterInfo closureDimensionstepnumberOfStepsCommandParameterInfo = new CommandParameterInfo("numberOfSteps", Integer.class, Integer.class);
+    closureDimensionstepCommandParams.put("numberOfSteps",closureDimensionstepnumberOfStepsCommandParameterInfo);
+
+    CommandParameterInfo closureDimensionstepspeedCommandParameterInfo = new CommandParameterInfo("speed", Optional.class, Integer.class);
+    closureDimensionstepCommandParams.put("speed",closureDimensionstepspeedCommandParameterInfo);
+    InteractionInfo closureDimensionstepInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ClosureDimensionCluster) cluster)
+        .step((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("direction")
+        , (Integer)
+        commandArguments.get("numberOfSteps")
+        , (Optional<Integer>)
+        commandArguments.get("speed")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        closureDimensionstepCommandParams
+    );
+    closureDimensionClusterInteractionInfoMap.put("step", closureDimensionstepInteractionInfo);
+
+    commandMap.put("closureDimension", closureDimensionClusterInteractionInfoMap);
 
     Map<String, InteractionInfo> serviceAreaClusterInteractionInfoMap = new LinkedHashMap<>();
 

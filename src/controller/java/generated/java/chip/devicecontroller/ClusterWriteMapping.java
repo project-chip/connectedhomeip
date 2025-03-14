@@ -1634,6 +1634,8 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("windowCovering", writeWindowCoveringInteractionInfo);
     Map<String, InteractionInfo> writeClosureControlInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("closureControl", writeClosureControlInteractionInfo);
+    Map<String, InteractionInfo> writeClosureDimensionInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("closureDimension", writeClosureDimensionInteractionInfo);
     Map<String, InteractionInfo> writeServiceAreaInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("serviceArea", writeServiceAreaInteractionInfo);
     Map<String, InteractionInfo> writePumpConfigurationAndControlInteractionInfo = new LinkedHashMap<>();

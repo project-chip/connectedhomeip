@@ -9489,6 +9489,280 @@ public static class ClosureControlClusterOverallTargetStruct {
     return output.toString();
   }
 }
+public static class ClosureDimensionClusterCurrentStruct {
+  public Optional<Integer> position;
+  public Optional<Integer> latching;
+  public Optional<Integer> speed;
+  private static final long POSITION_ID = 0L;
+  private static final long LATCHING_ID = 1L;
+  private static final long SPEED_ID = 2L;
+
+  public ClosureDimensionClusterCurrentStruct(
+    Optional<Integer> position,
+    Optional<Integer> latching,
+    Optional<Integer> speed
+  ) {
+    this.position = position;
+    this.latching = latching;
+    this.speed = speed;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(POSITION_ID, position.<BaseTLVType>map((nonOptionalposition) -> new UIntType(nonOptionalposition)).orElse(new EmptyType())));
+    values.add(new StructElement(LATCHING_ID, latching.<BaseTLVType>map((nonOptionallatching) -> new UIntType(nonOptionallatching)).orElse(new EmptyType())));
+    values.add(new StructElement(SPEED_ID, speed.<BaseTLVType>map((nonOptionalspeed) -> new UIntType(nonOptionalspeed)).orElse(new EmptyType())));
+
+    return new StructType(values);
+  }
+
+  public static ClosureDimensionClusterCurrentStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Optional<Integer> position = Optional.empty();
+    Optional<Integer> latching = Optional.empty();
+    Optional<Integer> speed = Optional.empty();
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == POSITION_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          position = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == LATCHING_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          latching = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == SPEED_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          speed = Optional.of(castingValue.value(Integer.class));
+        }
+      }
+    }
+    return new ClosureDimensionClusterCurrentStruct(
+      position,
+      latching,
+      speed
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ClosureDimensionClusterCurrentStruct {\n");
+    output.append("\tposition: ");
+    output.append(position);
+    output.append("\n");
+    output.append("\tlatching: ");
+    output.append(latching);
+    output.append("\n");
+    output.append("\tspeed: ");
+    output.append(speed);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ClosureDimensionClusterRangePercent100thsStruct {
+  public Integer min;
+  public Integer max;
+  private static final long MIN_ID = 0L;
+  private static final long MAX_ID = 1L;
+
+  public ClosureDimensionClusterRangePercent100thsStruct(
+    Integer min,
+    Integer max
+  ) {
+    this.min = min;
+    this.max = max;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(MIN_ID, new UIntType(min)));
+    values.add(new StructElement(MAX_ID, new UIntType(max)));
+
+    return new StructType(values);
+  }
+
+  public static ClosureDimensionClusterRangePercent100thsStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer min = null;
+    Integer max = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == MIN_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          min = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == MAX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          max = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new ClosureDimensionClusterRangePercent100thsStruct(
+      min,
+      max
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ClosureDimensionClusterRangePercent100thsStruct {\n");
+    output.append("\tmin: ");
+    output.append(min);
+    output.append("\n");
+    output.append("\tmax: ");
+    output.append(max);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ClosureDimensionClusterTargetStruct {
+  public Optional<Integer> position;
+  public Optional<Integer> latch;
+  public Optional<Integer> speed;
+  private static final long POSITION_ID = 0L;
+  private static final long LATCH_ID = 1L;
+  private static final long SPEED_ID = 2L;
+
+  public ClosureDimensionClusterTargetStruct(
+    Optional<Integer> position,
+    Optional<Integer> latch,
+    Optional<Integer> speed
+  ) {
+    this.position = position;
+    this.latch = latch;
+    this.speed = speed;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(POSITION_ID, position.<BaseTLVType>map((nonOptionalposition) -> new UIntType(nonOptionalposition)).orElse(new EmptyType())));
+    values.add(new StructElement(LATCH_ID, latch.<BaseTLVType>map((nonOptionallatch) -> new UIntType(nonOptionallatch)).orElse(new EmptyType())));
+    values.add(new StructElement(SPEED_ID, speed.<BaseTLVType>map((nonOptionalspeed) -> new UIntType(nonOptionalspeed)).orElse(new EmptyType())));
+
+    return new StructType(values);
+  }
+
+  public static ClosureDimensionClusterTargetStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Optional<Integer> position = Optional.empty();
+    Optional<Integer> latch = Optional.empty();
+    Optional<Integer> speed = Optional.empty();
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == POSITION_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          position = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == LATCH_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          latch = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == SPEED_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          speed = Optional.of(castingValue.value(Integer.class));
+        }
+      }
+    }
+    return new ClosureDimensionClusterTargetStruct(
+      position,
+      latch,
+      speed
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ClosureDimensionClusterTargetStruct {\n");
+    output.append("\tposition: ");
+    output.append(position);
+    output.append("\n");
+    output.append("\tlatch: ");
+    output.append(latch);
+    output.append("\n");
+    output.append("\tspeed: ");
+    output.append(speed);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ClosureDimensionClusterUnitRangeStruct {
+  public Integer min;
+  public Integer max;
+  private static final long MIN_ID = 0L;
+  private static final long MAX_ID = 1L;
+
+  public ClosureDimensionClusterUnitRangeStruct(
+    Integer min,
+    Integer max
+  ) {
+    this.min = min;
+    this.max = max;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(MIN_ID, new IntType(min)));
+    values.add(new StructElement(MAX_ID, new IntType(max)));
+
+    return new StructType(values);
+  }
+
+  public static ClosureDimensionClusterUnitRangeStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer min = null;
+    Integer max = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == MIN_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          min = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == MAX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          max = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new ClosureDimensionClusterUnitRangeStruct(
+      min,
+      max
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ClosureDimensionClusterUnitRangeStruct {\n");
+    output.append("\tmin: ");
+    output.append(min);
+    output.append("\n");
+    output.append("\tmax: ");
+    output.append(max);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class ServiceAreaClusterLandmarkInfoStruct {
   public Integer landmarkTag;
   public @Nullable Integer relativePositionTag;
