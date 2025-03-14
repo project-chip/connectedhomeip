@@ -40,7 +40,7 @@ Git:
     <description>This cluster provides a way to access options associated with the operation of
             a laundry dryer device type.</description>
     <globalAttribute side="either" code="0xFFFD" value="1"/>
-    <attribute side="server" code="0x0000" name="SupportedDrynessLevels" define="SUPPORTED_DRYNESS_LEVELS" type="array" entryType="DrynessLevelEnum" length="4" minLength="1">SupportedDrynessLevels</attribute>
-    <attribute side="server" code="0x0001" name="SelectedDrynessLevel" define="SELECTED_DRYNESS_LEVEL" type="DrynessLevelEnum" writable="true" isNullable="true" min="0x00" max="0x03">SelectedDrynessLevel</attribute>
+    <attribute side="server" code="0x0000" name="SupportedDrynessLevels" define="SUPPORTED_DRYNESS_LEVELS" type="array" entryType="DrynessLevelEnum" length="4" minLength="1"/>
+    <attribute side="server" code="0x0001" name="SelectedDrynessLevel" define="SELECTED_DRYNESS_LEVEL" type="DrynessLevelEnum" writable="true" isNullable="true" min="0x00" max="0x03"/>
   </cluster>
 </configurator>
