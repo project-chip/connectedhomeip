@@ -125,6 +125,7 @@
         "TIME_SYNCHRONIZATION_CLUSTER": [],
         "TIMER_CLUSTER": [],
         "TLS_CERTIFICATE_MANAGEMENT_CLUSTER": [],
+        "TLS_CLIENT_MANAGEMENT_CLUSTER": [],
         "TRUSTED_ROOT_CERTIFICATES_CLUSTER": [],
         "UNIT_LOCALIZATION_CLUSTER": [],
         "UNIT_TESTING_CLUSTER": [],
@@ -145,7 +146,7 @@
     "ServerDirectories": {
         "ACCESS_CONTROL_CLUSTER": ["access-control-server"],
         "ACCOUNT_LOGIN_CLUSTER": ["account-login-server"],
-        "ACTIONS_CLUSTER": [],
+        "ACTIONS_CLUSTER": ["actions-server"],
         "ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER": [
             "resource-monitoring-server"
         ],
@@ -177,7 +178,7 @@
         ],
         "CHANNEL_CLUSTER": ["channel-server"],
         "CHIME_CLUSTER": ["chime-server"],
-        "CLOSURE_CONTROL_CLUSTER": [],
+        "CLOSURE_CONTROL_CLUSTER": ["closure-control-server"],
         "COLOR_CONTROL_CLUSTER": ["color-control-server"],
         "COMMISSIONER_CONTROL_CLUSTER": ["commissioner-control-server"],
         "COMMISSIONING_CLUSTER": [],
@@ -311,6 +312,7 @@
         "TIME_SYNCHRONIZATION_CLUSTER": ["time-synchronization-server"],
         "TIMER_CLUSTER": ["timer-server"],
         "TLS_CERTIFICATE_MANAGEMENT_CLUSTER": [],
+        "TLS_CLIENT_MANAGEMENT_CLUSTER": [],
         "TVOC_CONCENTRATION_MEASUREMENT_CLUSTER": [
             "concentration-measurement-server"
         ],
@@ -323,7 +325,9 @@
         "WAKE_ON_LAN_CLUSTER": ["wake-on-lan-server"],
         "LAUNDRY_WASHER_CONTROLS_CLUSTER": ["laundry-washer-controls-server"],
         "LAUNDRY_DRYER_CONTROLS_CLUSTER": ["laundry-dryer-controls-server"],
-        "WEB_RTC_TRANSPORT_PROVIDER_CLUSTER": [],
+        "WEB_RTC_TRANSPORT_PROVIDER_CLUSTER": [
+            "webrtc-transport-provider-server"
+        ],
         "WEB_RTC_TRANSPORT_REQUESTOR_CLUSTER": [],
         "WIFI_NETWORK_DIAGNOSTICS_CLUSTER": ["wifi-network-diagnostics-server"],
         "WIFI_NETWORK_MANAGEMENT_CLUSTER": ["wifi-network-management-server"],

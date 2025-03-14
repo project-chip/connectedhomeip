@@ -22,7 +22,7 @@ LABEL org.opencontainers.image.source https://github.com/project-chip/connectedh
 ARG USERNAME=vscode
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
-ENV LANG en_US.utf8
+ENV LANG=en_US.utf8
 
 
 # These are installed for terminal/dev convenience. If more tooling for build is required, please
@@ -81,10 +81,10 @@ RUN sed -i '/^TIZEN_SDK_DATA_PATH/d' $TIZEN_SDK_ROOT/sdk.info \
     && ln -sf /home/$USERNAME/.tizen-cli-config $TIZEN_SDK_ROOT/tools/.tizen-cli-config \
     && : # last line
 
-ENV TIZEN_ROOTFS /tizen_rootfs
+ENV TIZEN_ROOTFS=/tizen_rootfs
 
 # Fast Model GDB plugins path for debugging support
-ENV FAST_MODEL_PLUGINS_PATH /opt/FastModelsPortfolio_11.16/plugins/Linux64_GCC-9.3
+ENV FAST_MODEL_PLUGINS_PATH=/opt/FastModelsPortfolio_11.16/plugins/Linux64_GCC-9.3
 
 # Set up ccache as a pigweed command launcher when using the scripts/build/build_examples.py
 # script. Also, set up icecc as the command prefix for ccache. Such setup allows to benefit
@@ -92,6 +92,6 @@ ENV FAST_MODEL_PLUGINS_PATH /opt/FastModelsPortfolio_11.16/plugins/Linux64_GCC-9
 #
 # NOTE: In order to use distributed compilation with icecc, one should run
 #       "scripts/icecc.sh start" before starting the build.
-ENV CHIP_PW_COMMAND_LAUNCHER ccache
-ENV CCACHE_PREFIX icecc
-ENV PATH /usr/lib/ccache:$PATH
+ENV CHIP_PW_COMMAND_LAUNCHER=ccache
+ENV CCACHE_PREFIX=icecc
+ENV PATH=/usr/lib/ccache:$PATH

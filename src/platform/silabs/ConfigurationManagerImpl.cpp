@@ -38,6 +38,7 @@ namespace chip {
 namespace DeviceLayer {
 
 using namespace ::chip::DeviceLayer::Internal;
+using namespace ::chip ::DeviceLayer ::Silabs;
 
 ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
 {
@@ -290,14 +291,14 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     PersistedStorage::KeyValueStoreMgrImpl().ErasePartition();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
-    error = TriggerDisconnection();
+    error = WifiInterface::GetInstance().TriggerDisconnection();
     if (error != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "TriggerDisconnection() failed: %s", chip::ErrorStr(error));
     }
 
     ChipLogProgress(DeviceLayer, "Clearing WiFi provision");
-    wfx_clear_wifi_provision();
+    WifiInterface::GetInstance().ClearWifiCredentials();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
 
     // Restart the system.
@@ -308,7 +309,7 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     // Block the task for 500 ms before the reset occurs to allow RPC response to be sent
     osDelay(pdMS_TO_TICKS(500));
 
-    NVIC_SystemReset();
+    Silabs::GetPlatform().SoftwareReset();
 }
 
 #ifdef SL_WIFI
@@ -317,7 +318,7 @@ CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
     VerifyOrReturnError(buf != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     MutableByteSpan byteSpan(buf, kPrimaryMACAddressLength);
-    return GetMacAddress(SL_WFX_STA_INTERFACE, byteSpan);
+    return WifiInterface::GetInstance().GetMacAddress(SL_WFX_STA_INTERFACE, byteSpan);
 }
 #endif
 
