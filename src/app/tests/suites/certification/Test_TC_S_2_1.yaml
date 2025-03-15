@@ -32,16 +32,8 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Step 2: TH reads from the DUT the LastConfiguredBy attribute"
-      PICS: S.S.A0000
-      command: "readAttribute"
-      attribute: "LastConfiguredBy"
-      response:
-          constraints:
-              type: node_id
-
     - label: "Step 3: TH reads from the DUT the SceneTableSize attribute"
-      PICS: S.S.A0001
+      PICS: S.S.A0000
       command: "readAttribute"
       attribute: "SceneTableSize"
       response:
@@ -49,7 +41,7 @@ tests:
               type: int16u
 
     - label: "Step 4: TH reads from the DUT the FabricSceneInfo attribute"
-      PICS: S.S.A0002
+      PICS: S.S.A0001
       command: "readAttribute"
       attribute: "FabricSceneInfo"
       response:
