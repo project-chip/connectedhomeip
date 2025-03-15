@@ -88,6 +88,9 @@ declare_args() {
   # Enable NFC Onboarding Payload support
   chip_enable_nfc_onboarding_payload = false
 
+  # Enable NFC Commissioning support
+  chip_enable_nfc_commissioning = false
+
   # Enable OTA requestor support
   chip_enable_ota_requestor = false
 
