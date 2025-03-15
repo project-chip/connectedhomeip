@@ -149,6 +149,9 @@ limitations under the License.
     <attribute side="server" code="22" name="MaxPathsPerInvoke" define="MAX_PATHS_PER_INVOKE" type="int16u">
       <mandatoryConform/>
     </attribute>
+    <attribute side="server" code="23" name="DeviceLocation" define="DEVICE_LOCATION" type="LocationDescriptorStruct" isNullable="true" writable="true" optional="true">
+      <optionalConform/>
+    </attribute>
 
     <event side="server" code="0x00" name="StartUp" priority="critical" optional="false">
       <description>The StartUp event SHALL be emitted by a Node as soon as reasonable after completing a boot or reboot process.</description>
