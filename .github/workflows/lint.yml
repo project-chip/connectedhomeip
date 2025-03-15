@@ -266,10 +266,9 @@ jobs:
               run: |
                   git grep -n 'NSLog(' -- src/darwin/Framework/CHIP && exit 1 || exit 0
 
-            # git grep exits with 0 if it finds a match, but we want
-            # to fail (exit nonzero) on match.  And we want to exclude this file,
-            # to avoid our grep regexp matching itself, as well as excluding the files
-            # that implement the type-safe accessors
+            # This check ensures that there are no `ember` nor `emAf` symbols being used
+            # We want to start removing exclusions as soon as they aren't required anymore
+            # To remove or add exclusions, simply add the directory as an argument with the `--skip-dir` flag
             - name:
                   Check for use of 'emberAf' or 'emAf' symbols
               if: always()
@@ -284,9 +283,11 @@ jobs:
                   --skip-dir src/data-model-providers \
                   --skip-dir scripts/
 
-            # This check ensures that there are no `ember` nor `emAf` symbols being used
-            # We want to start removing exclusions as soon as they aren't required anymore
-            # To remove or add exclusions, simply add the directory as an argument with the `--skip-dir` flag
+            # git grep exits with 0 if it finds a match, but we want
+            # to fail (exit nonzero) on match.  And we want to exclude this file,
+            # to avoid our grep regexp matching itself, as well as excluding the files
+            # that implement the type-safe accessors, attribute writing from the wire, and some
+            # Pigweed RPC code that seems hard to update.
             - name:
                   Check for use of 'emberAfReadAttribute' instead of the
                   type-safe getters
