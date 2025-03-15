@@ -19,17 +19,9 @@ check_symbols() {
         esac
     done
 
-    ember_matches=$(git grep -I -n '\<ember[A-Za-z0-9_]*' -- './*' "${exclusions[@]}" \
-        ':(exclude).github/*' \
-        ':(exclude)src/app/util/*' \
-        ':(exclude)zzz_generated/app-common/app-common/zap-generated/access/Accessors.h' \
-        ':(exclude)src/app/zap-templates/templates/app/attributes/Accessors-src.zapt')
+    ember_matches=$(git grep -I -n '\<ember[A-Za-z0-9_]*' -- './*' "${exclusions[@]}")
 
-    emAf_matches=$(git grep -I -n '\<emAf[A-Za-z0-9_]*' -- './*' "${exclusions[@]}" \
-        ':(exclude).github/*' \
-        ':(exclude)src/app/util/*' \
-        ':(exclude)zzz_generated/app-common/app-common/zap-generated/access/Accessors.h' \
-        ':(exclude)src/app/zap-templates/templates/app/attributes/Accessors-src.zapt')
+    emAf_matches=$(git grep -I -n '\<emAf[A-Za-z0-9_]*' -- './*' "${exclusions[@]}")
 
     if [[ -n "$ember_matches" || -n "$emAf_matches" ]]; then
         echo "Error: Found 'ember' or 'emAf' symbols in the following files and lines:"
