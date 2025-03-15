@@ -186,6 +186,26 @@ enum LandmarkTag : enum8 {
   kWineCooler = 50;
 }
 
+enum MeasurementTypeEnum : enum16 {
+  kUnspecified = 0;
+  kVoltage = 1;
+  kActiveCurrent = 2;
+  kReactiveCurrent = 3;
+  kApparentCurrent = 4;
+  kActivePower = 5;
+  kReactivePower = 6;
+  kApparentPower = 7;
+  kRMSVoltage = 8;
+  kRMSCurrent = 9;
+  kRMSPower = 10;
+  kFrequency = 11;
+  kPowerFactor = 12;
+  kNeutralCurrent = 13;
+  kElectricalEnergy = 14;
+  kReactiveEnergy = 15;
+  kApparentEnergy = 16;
+}
+
 enum PositionTag : enum8 {
   kLeft = 0;
   kRight = 1;
@@ -196,6 +216,12 @@ enum PositionTag : enum8 {
   kColumn = 6;
 }
 
+enum PowerThresholdSourceEnum : enum8 {
+  kContract = 0;
+  kRegulator = 1;
+  kEquipment = 2;
+}
+
 enum RelativePositionTag : enum8 {
   kUnder = 0;
   kNextTo = 1;
@@ -204,6 +230,19 @@ enum RelativePositionTag : enum8 {
   kAbove = 4;
   kFrontOf = 5;
   kBehind = 6;
+}
+
+enum TariffPriceTypeEnum : enum8 {
+  kStandard = 0;
+  kCritical = 1;
+  kVirtual = 2;
+  kIncentive = 3;
+  kIncentiveSignal = 4;
+}
+
+enum TariffUnitEnum : enum8 {
+  kKWh = 0;
+  kKVAh = 1;
 }
 
 enum TestGlobalEnum : enum8 {
@@ -224,10 +263,40 @@ bitmap TestGlobalBitmap : bitmap32 {
   kSecondBit = 0x2;
 }
 
+struct CurrencyStruct {
+  int16u currency = 0;
+  int8u decimalPoints = 1;
+}
+
+struct PowerThresholdStruct {
+  optional power_mw powerThreshold = 0;
+  optional power_mva apparentPowerThreshold = 1;
+  nullable PowerThresholdSourceEnum powerThresholdSource = 2;
+}
+
 struct TestGlobalStruct {
   char_string<128> name = 0;
   nullable TestGlobalBitmap myBitmap = 1;
   optional nullable TestGlobalEnum myEnum = 2;
+}
+
+struct MeasurementAccuracyRangeStruct {
+  int64s rangeMin = 0;
+  int64s rangeMax = 1;
+  optional percent100ths percentMax = 2;
+  optional percent100ths percentMin = 3;
+  optional percent100ths percentTypical = 4;
+  optional int64u fixedMax = 5;
+  optional int64u fixedMin = 6;
+  optional int64u fixedTypical = 7;
+}
+
+struct MeasurementAccuracyStruct {
+  MeasurementTypeEnum measurementType = 0;
+  boolean measured = 1;
+  int64s minMeasuredValue = 2;
+  int64s maxMeasuredValue = 3;
+  MeasurementAccuracyRangeStruct accuracyRanges[] = 4;
 }
 
 struct LocationDescriptorStruct {
@@ -236,9 +305,20 @@ struct LocationDescriptorStruct {
   nullable AreaTypeTag areaType = 2;
 }
 
+struct PriceStruct {
+  money amount = 0;
+  CurrencyStruct currency = 1;
+}
+
 struct AtomicAttributeStatusStruct {
   attrib_id attributeID = 0;
   status statusCode = 1;
+}
+
+fabric_scoped struct SuppliedAttributionData {
+  enum8 contextInformation = 0;
+  optional int32u sourceContext = 1;
+  fabric_idx fabricIndex = 254;
 }
 
 /** The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters. */
