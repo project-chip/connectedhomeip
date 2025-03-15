@@ -69,7 +69,8 @@
 #include <platform/silabs/wifi/WifiInterface.h>
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-#include <platform/silabs/wifi/icd/WifiSleepManager.h>
+#include <platform/silabs/wifi/icd/WifiSleepManager.h> // nogncheck
+
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 #endif // SL_WIFI
 
