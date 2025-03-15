@@ -254,6 +254,7 @@ out of convenience.
     that the new ID takes effect.
 
 > [!TIP]
+>
 > When working on a pull request for Matter SDK refrain from using the
 > "Update branch" feature in the GitHub UI too often. Updating the PR branch in
 > this way triggers the CI workflows cancellation and restart. This feature
