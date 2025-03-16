@@ -45,7 +45,7 @@ public:
      * until the End<Type>Read() has been called (e.g. releasing a lock on the data)
      */
     CHIP_ERROR StartAccuracyRead() override;
-    CHIP_ERROR GetAccuracyByIndex(uint8_t, Globals::Structs::MeasurementAccuracyStruct::Type &) override;
+    CHIP_ERROR GetAccuracyByIndex(uint8_t, Structs::MeasurementAccuracyStruct::Type &) override;
     CHIP_ERROR EndAccuracyRead() override;
 
     CHIP_ERROR StartRangesRead() override;
