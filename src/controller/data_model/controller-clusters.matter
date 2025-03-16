@@ -10117,10 +10117,11 @@ provisional cluster WebRTCTransportProvider = 1363 {
   fabric_scoped struct WebRTCSessionStruct {
     int16u id = 1;
     node_id peerNodeID = 2;
-    StreamUsageEnum streamUsage = 3;
-    nullable int16u videoStreamID = 4;
-    nullable int16u audioStreamID = 5;
-    WebRTCMetadataOptionsBitmap metadataOptions = 6;
+    endpoint_no peerEndpointID = 3;
+    StreamUsageEnum streamUsage = 4;
+    nullable int16u videoStreamID = 5;
+    nullable int16u audioStreamID = 6;
+    WebRTCMetadataOptionsBitmap metadataOptions = 7;
     fabric_idx fabricIndex = 254;
   }
 
@@ -10134,11 +10135,12 @@ provisional cluster WebRTCTransportProvider = 1363 {
 
   request struct SolicitOfferRequest {
     StreamUsageEnum streamUsage = 0;
-    optional nullable int16u videoStreamID = 1;
-    optional nullable int16u audioStreamID = 2;
-    optional ICEServerStruct ICEServers[] = 3;
-    optional char_string ICETransportPolicy = 4;
-    optional WebRTCMetadataOptionsBitmap metadataOptions = 5;
+    endpoint_no originatingEndpointID = 1;
+    optional nullable int16u videoStreamID = 2;
+    optional nullable int16u audioStreamID = 3;
+    optional ICEServerStruct ICEServers[] = 4;
+    optional char_string ICETransportPolicy = 5;
+    optional WebRTCMetadataOptionsBitmap metadataOptions = 6;
   }
 
   response struct SolicitOfferResponse = 2 {
@@ -10152,11 +10154,12 @@ provisional cluster WebRTCTransportProvider = 1363 {
     nullable int16u webRTCSessionID = 0;
     char_string sdp = 1;
     StreamUsageEnum streamUsage = 2;
-    optional nullable int16u videoStreamID = 3;
-    optional nullable int16u audioStreamID = 4;
-    optional ICEServerStruct ICEServers[] = 5;
-    optional char_string ICETransportPolicy = 6;
-    optional WebRTCMetadataOptionsBitmap metadataOptions = 7;
+    endpoint_no originatingEndpointID = 3;
+    optional nullable int16u videoStreamID = 4;
+    optional nullable int16u audioStreamID = 5;
+    optional ICEServerStruct ICEServers[] = 6;
+    optional char_string ICETransportPolicy = 7;
+    optional WebRTCMetadataOptionsBitmap metadataOptions = 8;
   }
 
   response struct ProvideOfferResponse = 4 {
@@ -10232,10 +10235,11 @@ provisional cluster WebRTCTransportRequestor = 1364 {
   fabric_scoped struct WebRTCSessionStruct {
     int16u id = 1;
     node_id peerNodeID = 2;
-    StreamUsageEnum streamUsage = 3;
-    nullable int16u videoStreamID = 4;
-    nullable int16u audioStreamID = 5;
-    WebRTCMetadataOptionsBitmap metadataOptions = 6;
+    endpoint_no peerEndpointID = 3;
+    StreamUsageEnum streamUsage = 4;
+    nullable int16u videoStreamID = 5;
+    nullable int16u audioStreamID = 6;
+    WebRTCMetadataOptionsBitmap metadataOptions = 7;
     fabric_idx fabricIndex = 254;
   }
 
