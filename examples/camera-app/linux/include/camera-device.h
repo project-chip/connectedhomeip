@@ -144,7 +144,7 @@ private:
     void InitializeSnapshotStreams();
 
     GstElement * CreatePipeline(const std::string & pipelineString, CameraError& error);
-    CameraError SetV4l2Control(int controlId, int value);
+    CameraError SetV4l2Control(uint32_t controlId, int value);
 
     // Various cluster server delegates
     ChimeManager mChimeManager;
