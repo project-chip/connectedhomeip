@@ -36,8 +36,7 @@ CameraDevice::CameraDevice()
 {
     InitializeCameraDevice();
 
-    // set up the different modules/components
-    mCameraAVStreamManager.Init();
+    InitializeStreams();
 }
 
 CameraDevice::~CameraDevice()
@@ -76,6 +75,8 @@ CameraError CameraDevice::InitializeStreams()
     InitializeAudioStreams();
     InitializeSnapshotStreams();
 
+    StartVideoStream(1);
+    StartSnapshotStream(1);
     return CameraError::SUCCESS;
 }
 
@@ -184,7 +185,7 @@ GstElement* CameraDevice::CreatePipeline(const std::string & pipelineString, Cam
 }
 
 // Helper function to set V4L2 control
-CameraError CameraDevice::SetV4l2Control(int controlId, int value)
+CameraError CameraDevice::SetV4l2Control(uint32_t controlId, int value)
 {
     if (videoDeviceFd == -1)
     {
@@ -230,7 +231,7 @@ CameraError CameraDevice::StartVideoStream(uint16_t streamID)
 
     if (it->codec == VideoCodecEnum::kH264)
     {
-        pipelineString += "x264enc ! rtph264pay ! ";
+        pipelineString += "videoconvert ! videoscale ! x264enc tune=zerolatency ! rtph264pay ! ";
     }
     else if (it->codec == VideoCodecEnum::kHevc)
     {
@@ -241,7 +242,8 @@ CameraError CameraDevice::StartVideoStream(uint16_t streamID)
         return CameraError::ERROR_VIDEO_STREAM_START_FAILED;
     }
 
-    pipelineString += "udpsink host=127.0.0.1 port=" + VIDEO_STREAM_GST_DEST_PORT; // Known socket
+    //pipelineString += "udpsink host=127.0.0.1 port=" + VIDEO_STREAM_GST_DEST_PORT; // Known socket
+    pipelineString += "udpsink host=127.0.0.1 port=5000"; // Known socket
 
     CameraError error = CameraError::SUCCESS;
     it->videoPipeline = CreatePipeline(pipelineString, error);
@@ -298,10 +300,12 @@ CameraError CameraDevice::StartSnapshotStream(uint16_t streamID)
         return CameraError::ERROR_SNAPSHOT_STREAM_START_FAILED;
     }
 
+#if 0
     // Construct the GStreamer pipeline string
     std::string pipelineString = "v4l2src device=/dev/video0 ! "
-                                 "video/x-raw,width=" + std::to_string(it->videoRes.width) +
-                                 ",height=" + std::to_string(it->videoRes.height) + " ! ";
+                                 //"video/x-raw,width=" + std::to_string(it->videoRes.width) +
+                                 "image/jpeg,width=" + std::to_string(it->videoRes.width) +
+                                 ",height=" + std::to_string(it->videoRes.height) + ",framerate=1/1 ! ";
 
     if (it->codec == ImageCodecEnum::kJpeg)
     {
@@ -311,7 +315,9 @@ CameraError CameraDevice::StartSnapshotStream(uint16_t streamID)
     {
         return CameraError::ERROR_SNAPSHOT_STREAM_START_FAILED;
     }
+#endif
 
+    std::string pipelineString = "v4l2src device=/dev/video0 ! videoconvert ! jpegenc snapshot=true ! ";
     pipelineString += "filesink location=./capture_snapshot.jpg";
 
     // Create the GStreamer pipeline
