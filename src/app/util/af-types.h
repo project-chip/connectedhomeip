@@ -238,7 +238,7 @@ struct EmberAfDefinedEndpoint
     chip::Span<const chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> tagList;
 
     /**
-     * Unique Id for this end point. 
+     * Unique Id for this end point.
      */
     char endpointUniqueId[chip::app::Clusters::Descriptor::Attributes::EndpointUniqueId::TypeInfo::MaxLength()] = {0};
 };

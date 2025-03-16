@@ -250,7 +250,7 @@ void emberAfEndpointConfigure();
 // An optional device type list can be passed in as well. If provided, the memory
 // backing the list needs to remain allocated until this dynamic endpoint is cleared.
 //
-// An optional endpointUniqueId can be passed. 
+// An optional endpointUniqueId can be passed.
 //
 // An optional parent endpoint id should be passed for child endpoints of composed device.
 //
@@ -262,7 +262,7 @@ void emberAfEndpointConfigure();
 CHIP_ERROR emberAfSetDynamicEndpoint(uint16_t index, chip::EndpointId id, const EmberAfEndpointType * ep,
                                      const chip::Span<chip::DataVersion> & dataVersionStorage,
                                      chip::Span<const EmberAfDeviceType> deviceTypeList = {},
-                                     chip::CharSpan endpointUniqueId ={}, 
+                                     chip::CharSpan endpointUniqueId ={},
                                      chip::EndpointId parentEndpointId = chip::kInvalidEndpointId);
 chip::EndpointId emberAfClearDynamicEndpoint(uint16_t index);
 uint16_t emberAfGetDynamicIndexFromEndpoint(chip::EndpointId id);

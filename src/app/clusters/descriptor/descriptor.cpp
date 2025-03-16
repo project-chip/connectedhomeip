@@ -217,7 +217,7 @@ CHIP_ERROR DescriptorAttrAccess::ReadEndpointUniqueId(EndpointId endpoint, Attri
     char epUniqueId[Attributes::EndpointUniqueId::TypeInfo::MaxLength() + 1] = { 0 };
     chip::MutableCharSpan epUniqueIdSpan(epUniqueId);
     GetEndpointUniqueIdForEndPoint(endpoint, epUniqueIdSpan);
-    
+
     return aEncoder.Encode(epUniqueIdSpan);
 }
 

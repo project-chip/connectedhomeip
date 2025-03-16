@@ -321,8 +321,8 @@ CHIP_ERROR emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, const EmberA
     emAfEndpoints[index].deviceTypeList   = deviceTypeList;
     emAfEndpoints[index].endpointType     = ep;
     emAfEndpoints[index].dataVersions     = dataVersionStorage.data();
-    memcpy((void *)(emAfEndpoints[index].endpointUniqueId), endpointUniqueId.data(), 
-           endpointUniqueId.size() > Clusters::Descriptor::Attributes::EndpointUniqueId::TypeInfo::MaxLength()? 
+    memcpy((void *)(emAfEndpoints[index].endpointUniqueId), endpointUniqueId.data(),
+           endpointUniqueId.size() > Clusters::Descriptor::Attributes::EndpointUniqueId::TypeInfo::MaxLength()?
            Clusters::Descriptor::Attributes::EndpointUniqueId::TypeInfo::MaxLength() : endpointUniqueId.size());
 
     // Start the endpoint off as disabled.
@@ -1092,7 +1092,7 @@ CHIP_ERROR GetEndpointUniqueIdForEndPoint(EndpointId endpoint, chip::MutableChar
     {
         return CHIP_ERROR_NOT_FOUND;
     }
-    chip::CharSpan epUniqueIdSpan(emAfEndpoints[endpointIndex].endpointUniqueId, 
+    chip::CharSpan epUniqueIdSpan(emAfEndpoints[endpointIndex].endpointUniqueId,
                                   strnlen(emAfEndpoints[endpointIndex].endpointUniqueId,
                                   Clusters::Descriptor::Attributes::EndpointUniqueId::TypeInfo::MaxLength()));
     chip::CopyCharSpanToMutableCharSpan(epUniqueIdSpan, epUniqueIdMutSpan);
