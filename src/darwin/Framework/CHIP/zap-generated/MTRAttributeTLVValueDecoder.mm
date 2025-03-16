@@ -7557,8 +7557,8 @@ static id _Nullable DecodeAttributeValueForElectricalPowerMeasurementCluster(Att
             auto iter_0 = cppValue.begin();
             while (iter_0.Next()) {
                 auto & entry_0 = iter_0.GetValue();
-                MTRDataTypeMeasurementAccuracyStruct * newElement_0;
-                newElement_0 = [MTRDataTypeMeasurementAccuracyStruct new];
+                MTRElectricalPowerMeasurementClusterMeasurementAccuracyStruct * newElement_0;
+                newElement_0 = [MTRElectricalPowerMeasurementClusterMeasurementAccuracyStruct new];
                 newElement_0.measurementType = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_0.measurementType)];
                 newElement_0.measured = [NSNumber numberWithBool:entry_0.measured];
                 newElement_0.minMeasuredValue = [NSNumber numberWithLongLong:entry_0.minMeasuredValue];
@@ -7568,8 +7568,8 @@ static id _Nullable DecodeAttributeValueForElectricalPowerMeasurementCluster(Att
                     auto iter_2 = entry_0.accuracyRanges.begin();
                     while (iter_2.Next()) {
                         auto & entry_2 = iter_2.GetValue();
-                        MTRDataTypeMeasurementAccuracyRangeStruct * newElement_2;
-                        newElement_2 = [MTRDataTypeMeasurementAccuracyRangeStruct new];
+                        MTRElectricalPowerMeasurementClusterMeasurementAccuracyRangeStruct * newElement_2;
+                        newElement_2 = [MTRElectricalPowerMeasurementClusterMeasurementAccuracyRangeStruct new];
                         newElement_2.rangeMin = [NSNumber numberWithLongLong:entry_2.rangeMin];
                         newElement_2.rangeMax = [NSNumber numberWithLongLong:entry_2.rangeMax];
                         if (entry_2.percentMax.HasValue()) {
@@ -7977,8 +7977,8 @@ static id _Nullable DecodeAttributeValueForElectricalEnergyMeasurementCluster(At
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
-        MTRDataTypeMeasurementAccuracyStruct * _Nonnull value;
-        value = [MTRDataTypeMeasurementAccuracyStruct new];
+        MTRElectricalEnergyMeasurementClusterMeasurementAccuracyStruct * _Nonnull value;
+        value = [MTRElectricalEnergyMeasurementClusterMeasurementAccuracyStruct new];
         value.measurementType = [NSNumber numberWithUnsignedShort:chip::to_underlying(cppValue.measurementType)];
         value.measured = [NSNumber numberWithBool:cppValue.measured];
         value.minMeasuredValue = [NSNumber numberWithLongLong:cppValue.minMeasuredValue];
@@ -7988,8 +7988,8 @@ static id _Nullable DecodeAttributeValueForElectricalEnergyMeasurementCluster(At
             auto iter_1 = cppValue.accuracyRanges.begin();
             while (iter_1.Next()) {
                 auto & entry_1 = iter_1.GetValue();
-                MTRDataTypeMeasurementAccuracyRangeStruct * newElement_1;
-                newElement_1 = [MTRDataTypeMeasurementAccuracyRangeStruct new];
+                MTRElectricalEnergyMeasurementClusterMeasurementAccuracyRangeStruct * newElement_1;
+                newElement_1 = [MTRElectricalEnergyMeasurementClusterMeasurementAccuracyRangeStruct new];
                 newElement_1.rangeMin = [NSNumber numberWithLongLong:entry_1.rangeMin];
                 newElement_1.rangeMax = [NSNumber numberWithLongLong:entry_1.rangeMax];
                 if (entry_1.percentMax.HasValue()) {

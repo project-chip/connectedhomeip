@@ -42,24 +42,7 @@ Git: 0.7-summer-2025-511-g2b8c413df
     These are test global items (no cluster attached) for testing only.
     Their usage is defined for UnitTestCluster only.
   -->
-  <struct name="MeasurementAccuracyRangeStruct" apiMaturity="provisional">
-    <item fieldId="0" name="RangeMin" type="int64s" min="-4611686018427387904" max="4611686018427387904"/>
-    <item fieldId="1" name="RangeMax" type="int64s" min="-4611686018427387904" max="4611686018427387904"/>
-    <item fieldId="2" name="PercentMax" type="percent100ths" optional="true"/>
-    <item fieldId="3" name="PercentMin" type="percent100ths" optional="true"/>
-    <item fieldId="4" name="PercentTypical" type="percent100ths" optional="true"/>
-    <item fieldId="5" name="FixedMax" type="int64u" optional="true" max="4611686018427387903"/>
-    <item fieldId="6" name="FixedMin" type="int64u" optional="true" max="4611686018427387903"/>
-    <item fieldId="7" name="FixedTypical" type="int64u" optional="true" max="4611686018427387903"/>
-  </struct>
-
-  <struct name="MeasurementAccuracyStruct" apiMaturity="provisional">
-    <item fieldId="0" name="MeasurementType" type="MeasurementTypeEnum" min="0x0000" max="0x0010"/>
-    <item fieldId="1" name="Measured" type="boolean" default="0"/>
-    <item fieldId="2" name="MinMeasuredValue" type="int64s" min="-4611686018427387904" max="4611686018427387904"/>
-    <item fieldId="3" name="MaxMeasuredValue" type="int64s" min="-4611686018427387904" max="4611686018427387904"/>
-    <item fieldId="4" name="AccuracyRanges" array="true" type="MeasurementAccuracyRangeStruct" minLength="1"/>
-  </struct>
+  
 
   <struct name="PowerThresholdStruct" apiMaturity="provisional">
     <item fieldId="0" name="PowerThreshold" type="power_mw" optional="true"/>

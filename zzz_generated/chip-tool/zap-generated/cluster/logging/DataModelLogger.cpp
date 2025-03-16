@@ -173,7 +173,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
-                          const chip::app::Clusters::Globals::Structs::MeasurementAccuracyRangeStruct::DecodableType & value)
+                          const chip::app::Clusters::detail::Structs::MeasurementAccuracyRangeStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -246,7 +246,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 }
 
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::Globals::Structs::MeasurementAccuracyStruct::DecodableType & value)
+                                     const chip::app::Clusters::detail::Structs::MeasurementAccuracyStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -15332,7 +15332,8 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("NumberOfMeasurementTypes", 1, value);
         }
         case ElectricalPowerMeasurement::Attributes::Accuracy::Id: {
-            chip::app::DataModel::DecodableList<chip::app::Clusters::Globals::Structs::MeasurementAccuracyStruct::DecodableType>
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::ElectricalPowerMeasurement::Structs::MeasurementAccuracyStruct::DecodableType>
                 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Accuracy", 1, value);
@@ -15455,7 +15456,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case ElectricalEnergyMeasurement::Attributes::Accuracy::Id: {
-            chip::app::Clusters::Globals::Structs::MeasurementAccuracyStruct::DecodableType value;
+            chip::app::Clusters::ElectricalEnergyMeasurement::Structs::MeasurementAccuracyStruct::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Accuracy", 1, value);
         }
@@ -20742,7 +20743,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("MeteredQuantityTimestamp", 1, value);
         }
         case CommodityMetering::Attributes::MeasurementType::Id: {
-            chip::app::DataModel::Nullable<chip::app::Clusters::Globals::MeasurementTypeEnum> value;
+            chip::app::DataModel::Nullable<chip::app::Clusters::CommodityMetering::MeasurementTypeEnum> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeasurementType", 1, value);
         }

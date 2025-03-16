@@ -39,27 +39,6 @@ MTR_PROVISIONALLY_AVAILABLE
 @property (nonatomic, copy) NSNumber * _Nullable myEnum MTR_PROVISIONALLY_AVAILABLE;
 @end
 
-MTR_PROVISIONALLY_AVAILABLE
-@interface MTRDataTypeMeasurementAccuracyRangeStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull rangeMin MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull rangeMax MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nullable percentMax MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nullable percentMin MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nullable percentTypical MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nullable fixedMax MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nullable fixedMin MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nullable fixedTypical MTR_PROVISIONALLY_AVAILABLE;
-@end
-
-MTR_PROVISIONALLY_AVAILABLE
-@interface MTRDataTypeMeasurementAccuracyStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull measurementType MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull measured MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull minMeasuredValue MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull maxMeasuredValue MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSArray * _Nonnull accuracyRanges MTR_PROVISIONALLY_AVAILABLE;
-@end
-
 MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
 @interface MTRDataTypeLocationDescriptorStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSString * _Nonnull locationName MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
@@ -1183,6 +1162,27 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
 @end
 
 MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
+@interface MTRElectricalPowerMeasurementClusterMeasurementAccuracyRangeStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull rangeMin MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
+@property (nonatomic, copy) NSNumber * _Nonnull rangeMax MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
+@property (nonatomic, copy) NSNumber * _Nullable percentMax MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
+@property (nonatomic, copy) NSNumber * _Nullable percentMin MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
+@property (nonatomic, copy) NSNumber * _Nullable percentTypical MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
+@property (nonatomic, copy) NSNumber * _Nullable fixedMax MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
+@property (nonatomic, copy) NSNumber * _Nullable fixedMin MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
+@property (nonatomic, copy) NSNumber * _Nullable fixedTypical MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
+@end
+
+MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
+@interface MTRElectricalPowerMeasurementClusterMeasurementAccuracyStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull measurementType MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
+@property (nonatomic, copy) NSNumber * _Nonnull measured MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
+@property (nonatomic, copy) NSNumber * _Nonnull minMeasuredValue MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
+@property (nonatomic, copy) NSNumber * _Nonnull maxMeasuredValue MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
+@property (nonatomic, copy) NSArray * _Nonnull accuracyRanges MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
+@end
+
+MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
 @interface MTRElectricalPowerMeasurementClusterHarmonicMeasurementStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull order MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 @property (nonatomic, copy) NSNumber * _Nullable measurement MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
@@ -1206,6 +1206,27 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
 MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
 @interface MTRElectricalPowerMeasurementClusterMeasurementPeriodRangesEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSArray * _Nonnull ranges MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
+@end
+
+MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
+@interface MTRElectricalEnergyMeasurementClusterMeasurementAccuracyRangeStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull rangeMin MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
+@property (nonatomic, copy) NSNumber * _Nonnull rangeMax MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
+@property (nonatomic, copy) NSNumber * _Nullable percentMax MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
+@property (nonatomic, copy) NSNumber * _Nullable percentMin MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
+@property (nonatomic, copy) NSNumber * _Nullable percentTypical MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
+@property (nonatomic, copy) NSNumber * _Nullable fixedMax MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
+@property (nonatomic, copy) NSNumber * _Nullable fixedMin MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
+@property (nonatomic, copy) NSNumber * _Nullable fixedTypical MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
+@end
+
+MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
+@interface MTRElectricalEnergyMeasurementClusterMeasurementAccuracyStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull measurementType MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
+@property (nonatomic, copy) NSNumber * _Nonnull measured MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
+@property (nonatomic, copy) NSNumber * _Nonnull minMeasuredValue MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
+@property (nonatomic, copy) NSNumber * _Nonnull maxMeasuredValue MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
+@property (nonatomic, copy) NSArray * _Nonnull accuracyRanges MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 @end
 
 MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))

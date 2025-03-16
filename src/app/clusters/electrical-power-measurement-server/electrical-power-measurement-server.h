@@ -44,9 +44,9 @@ public:
      * The delegate is expected to not change these values once Start<Type>Read has been called
      * until the End<Type>Read() has been called (e.g. releasing a lock on the data)
      */
-    virtual CHIP_ERROR StartAccuracyRead()                                                              = 0;
-    virtual CHIP_ERROR GetAccuracyByIndex(uint8_t, Globals::Structs::MeasurementAccuracyStruct::Type &) = 0;
-    virtual CHIP_ERROR EndAccuracyRead()                                                                = 0;
+    virtual CHIP_ERROR StartAccuracyRead()                                                     = 0;
+    virtual CHIP_ERROR GetAccuracyByIndex(uint8_t, Structs::MeasurementAccuracyStruct::Type &) = 0;
+    virtual CHIP_ERROR EndAccuracyRead()                                                       = 0;
 
     virtual CHIP_ERROR StartRangesRead()                                                 = 0;
     virtual CHIP_ERROR GetRangeByIndex(uint8_t, Structs::MeasurementRangeStruct::Type &) = 0;

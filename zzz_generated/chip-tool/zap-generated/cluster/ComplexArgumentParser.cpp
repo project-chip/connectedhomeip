@@ -199,7 +199,7 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::detail::Structs::ModeO
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::Globals::Structs::MeasurementAccuracyRangeStruct::Type & request,
+                                        chip::app::Clusters::detail::Structs::MeasurementAccuracyRangeStruct::Type & request,
                                         Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -266,7 +266,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::Globals::Structs::MeasurementAccuracyRangeStruct::Type & request)
+void ComplexArgumentParser::Finalize(chip::app::Clusters::detail::Structs::MeasurementAccuracyRangeStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.rangeMin);
     ComplexArgumentParser::Finalize(request.rangeMax);
@@ -279,7 +279,7 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::Globals::Structs::Meas
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::Globals::Structs::MeasurementAccuracyStruct::Type & request,
+                                        chip::app::Clusters::detail::Structs::MeasurementAccuracyStruct::Type & request,
                                         Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -322,7 +322,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::Globals::Structs::MeasurementAccuracyStruct::Type & request)
+void ComplexArgumentParser::Finalize(chip::app::Clusters::detail::Structs::MeasurementAccuracyStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.measurementType);
     ComplexArgumentParser::Finalize(request.measured);

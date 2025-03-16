@@ -6853,11 +6853,11 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
 MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
 @interface MTRBaseClusterElectricalEnergyMeasurement : MTRGenericBaseCluster
 
-- (void)readAttributeAccuracyWithCompletion:(void (^)(MTRDataTypeMeasurementAccuracyStruct * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
+- (void)readAttributeAccuracyWithCompletion:(void (^)(MTRElectricalEnergyMeasurementClusterMeasurementAccuracyStruct * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 - (void)subscribeAttributeAccuracyWithParams:(MTRSubscribeParams *)params
                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                               reportHandler:(void (^)(MTRDataTypeMeasurementAccuracyStruct * _Nullable value, NSError * _Nullable error))reportHandler MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
-+ (void)readAttributeAccuracyWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(MTRDataTypeMeasurementAccuracyStruct * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
+                               reportHandler:(void (^)(MTRElectricalEnergyMeasurementClusterMeasurementAccuracyStruct * _Nullable value, NSError * _Nullable error))reportHandler MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
++ (void)readAttributeAccuracyWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(MTRElectricalEnergyMeasurementClusterMeasurementAccuracyStruct * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 
 - (void)readAttributeCumulativeEnergyImportedWithCompletion:(void (^)(MTRElectricalEnergyMeasurementClusterEnergyMeasurementStruct * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 - (void)subscribeAttributeCumulativeEnergyImportedWithParams:(MTRSubscribeParams *)params
@@ -17207,26 +17207,6 @@ typedef NS_ENUM(uint8_t, MTRDataTypeLandmarkTag) {
     MTRDataTypeLandmarkTagWineCooler MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x32,
 } MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
-typedef NS_ENUM(uint16_t, MTRDataTypeMeasurementTypeEnum) {
-    MTRDataTypeMeasurementTypeEnumUnspecified MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRDataTypeMeasurementTypeEnumVoltage MTR_PROVISIONALLY_AVAILABLE = 0x01,
-    MTRDataTypeMeasurementTypeEnumActiveCurrent MTR_PROVISIONALLY_AVAILABLE = 0x02,
-    MTRDataTypeMeasurementTypeEnumReactiveCurrent MTR_PROVISIONALLY_AVAILABLE = 0x03,
-    MTRDataTypeMeasurementTypeEnumApparentCurrent MTR_PROVISIONALLY_AVAILABLE = 0x04,
-    MTRDataTypeMeasurementTypeEnumActivePower MTR_PROVISIONALLY_AVAILABLE = 0x05,
-    MTRDataTypeMeasurementTypeEnumReactivePower MTR_PROVISIONALLY_AVAILABLE = 0x06,
-    MTRDataTypeMeasurementTypeEnumApparentPower MTR_PROVISIONALLY_AVAILABLE = 0x07,
-    MTRDataTypeMeasurementTypeEnumRMSVoltage MTR_PROVISIONALLY_AVAILABLE = 0x08,
-    MTRDataTypeMeasurementTypeEnumRMSCurrent MTR_PROVISIONALLY_AVAILABLE = 0x09,
-    MTRDataTypeMeasurementTypeEnumRMSPower MTR_PROVISIONALLY_AVAILABLE = 0x0A,
-    MTRDataTypeMeasurementTypeEnumFrequency MTR_PROVISIONALLY_AVAILABLE = 0x0B,
-    MTRDataTypeMeasurementTypeEnumPowerFactor MTR_PROVISIONALLY_AVAILABLE = 0x0C,
-    MTRDataTypeMeasurementTypeEnumNeutralCurrent MTR_PROVISIONALLY_AVAILABLE = 0x0D,
-    MTRDataTypeMeasurementTypeEnumElectricalEnergy MTR_PROVISIONALLY_AVAILABLE = 0x0E,
-    MTRDataTypeMeasurementTypeEnumReactiveEnergy MTR_PROVISIONALLY_AVAILABLE = 0x0F,
-    MTRDataTypeMeasurementTypeEnumApparentEnergy MTR_PROVISIONALLY_AVAILABLE = 0x10,
-} MTR_PROVISIONALLY_AVAILABLE;
-
 typedef NS_ENUM(uint8_t, MTRDataTypePositionTag) {
     MTRDataTypePositionTagLeft MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00,
     MTRDataTypePositionTagRight MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x01,
@@ -18780,6 +18760,26 @@ typedef NS_OPTIONS(uint16_t, MTRValveConfigurationAndControlValveFaultBitmap) {
     MTRValveConfigurationAndControlValveFaultBitmapCurrentExceeded MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x20,
 } MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 
+typedef NS_ENUM(uint16_t, MTRElectricalPowerMeasurementMeasurementType) {
+    MTRElectricalPowerMeasurementMeasurementTypeUnspecified MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x00,
+    MTRElectricalPowerMeasurementMeasurementTypeVoltage MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x01,
+    MTRElectricalPowerMeasurementMeasurementTypeActiveCurrent MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x02,
+    MTRElectricalPowerMeasurementMeasurementTypeReactiveCurrent MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x03,
+    MTRElectricalPowerMeasurementMeasurementTypeApparentCurrent MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x04,
+    MTRElectricalPowerMeasurementMeasurementTypeActivePower MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x05,
+    MTRElectricalPowerMeasurementMeasurementTypeReactivePower MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x06,
+    MTRElectricalPowerMeasurementMeasurementTypeApparentPower MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x07,
+    MTRElectricalPowerMeasurementMeasurementTypeRMSVoltage MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x08,
+    MTRElectricalPowerMeasurementMeasurementTypeRMSCurrent MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x09,
+    MTRElectricalPowerMeasurementMeasurementTypeRMSPower MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x0A,
+    MTRElectricalPowerMeasurementMeasurementTypeFrequency MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x0B,
+    MTRElectricalPowerMeasurementMeasurementTypePowerFactor MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x0C,
+    MTRElectricalPowerMeasurementMeasurementTypeNeutralCurrent MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x0D,
+    MTRElectricalPowerMeasurementMeasurementTypeElectricalEnergy MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x0E,
+    MTRElectricalPowerMeasurementMeasurementTypeReactiveEnergy MTR_PROVISIONALLY_AVAILABLE = 0x0F,
+    MTRElectricalPowerMeasurementMeasurementTypeApparentEnergy MTR_PROVISIONALLY_AVAILABLE = 0x10,
+} MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
+
 typedef NS_ENUM(uint8_t, MTRElectricalPowerMeasurementPowerMode) {
     MTRElectricalPowerMeasurementPowerModeUnknown MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x00,
     MTRElectricalPowerMeasurementPowerModeDC MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x01,
@@ -18793,6 +18793,26 @@ typedef NS_OPTIONS(uint32_t, MTRElectricalPowerMeasurementFeature) {
     MTRElectricalPowerMeasurementFeatureHarmonics MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x8,
     MTRElectricalPowerMeasurementFeaturePowerQuality MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x10,
 } MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
+
+typedef NS_ENUM(uint16_t, MTRElectricalEnergyMeasurementMeasurementType) {
+    MTRElectricalEnergyMeasurementMeasurementTypeUnspecified MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00,
+    MTRElectricalEnergyMeasurementMeasurementTypeVoltage MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x01,
+    MTRElectricalEnergyMeasurementMeasurementTypeActiveCurrent MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x02,
+    MTRElectricalEnergyMeasurementMeasurementTypeReactiveCurrent MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x03,
+    MTRElectricalEnergyMeasurementMeasurementTypeApparentCurrent MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x04,
+    MTRElectricalEnergyMeasurementMeasurementTypeActivePower MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x05,
+    MTRElectricalEnergyMeasurementMeasurementTypeReactivePower MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x06,
+    MTRElectricalEnergyMeasurementMeasurementTypeApparentPower MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x07,
+    MTRElectricalEnergyMeasurementMeasurementTypeRMSVoltage MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x08,
+    MTRElectricalEnergyMeasurementMeasurementTypeRMSCurrent MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x09,
+    MTRElectricalEnergyMeasurementMeasurementTypeRMSPower MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x0A,
+    MTRElectricalEnergyMeasurementMeasurementTypeFrequency MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x0B,
+    MTRElectricalEnergyMeasurementMeasurementTypePowerFactor MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x0C,
+    MTRElectricalEnergyMeasurementMeasurementTypeNeutralCurrent MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x0D,
+    MTRElectricalEnergyMeasurementMeasurementTypeElectricalEnergy MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x0E,
+    MTRElectricalEnergyMeasurementMeasurementTypeReactiveEnergy MTR_PROVISIONALLY_AVAILABLE = 0x0F,
+    MTRElectricalEnergyMeasurementMeasurementTypeApparentEnergy MTR_PROVISIONALLY_AVAILABLE = 0x10,
+} MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
 typedef NS_OPTIONS(uint32_t, MTRElectricalEnergyMeasurementFeature) {
     MTRElectricalEnergyMeasurementFeatureImportedEnergy MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x1,
@@ -21402,6 +21422,26 @@ typedef NS_ENUM(uint8_t, MTRMeterIdentificationMeterType) {
 
 typedef NS_OPTIONS(uint32_t, MTRMeterIdentificationFeature) {
     MTRMeterIdentificationFeaturePowerThreshold MTR_PROVISIONALLY_AVAILABLE = 0x1,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint16_t, MTRCommodityMeteringMeasurementType) {
+    MTRCommodityMeteringMeasurementTypeUnspecified MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRCommodityMeteringMeasurementTypeVoltage MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRCommodityMeteringMeasurementTypeActiveCurrent MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRCommodityMeteringMeasurementTypeReactiveCurrent MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRCommodityMeteringMeasurementTypeApparentCurrent MTR_PROVISIONALLY_AVAILABLE = 0x04,
+    MTRCommodityMeteringMeasurementTypeActivePower MTR_PROVISIONALLY_AVAILABLE = 0x05,
+    MTRCommodityMeteringMeasurementTypeReactivePower MTR_PROVISIONALLY_AVAILABLE = 0x06,
+    MTRCommodityMeteringMeasurementTypeApparentPower MTR_PROVISIONALLY_AVAILABLE = 0x07,
+    MTRCommodityMeteringMeasurementTypeRMSVoltage MTR_PROVISIONALLY_AVAILABLE = 0x08,
+    MTRCommodityMeteringMeasurementTypeRMSCurrent MTR_PROVISIONALLY_AVAILABLE = 0x09,
+    MTRCommodityMeteringMeasurementTypeRMSPower MTR_PROVISIONALLY_AVAILABLE = 0x0A,
+    MTRCommodityMeteringMeasurementTypeFrequency MTR_PROVISIONALLY_AVAILABLE = 0x0B,
+    MTRCommodityMeteringMeasurementTypePowerFactor MTR_PROVISIONALLY_AVAILABLE = 0x0C,
+    MTRCommodityMeteringMeasurementTypeNeutralCurrent MTR_PROVISIONALLY_AVAILABLE = 0x0D,
+    MTRCommodityMeteringMeasurementTypeElectricalEnergy MTR_PROVISIONALLY_AVAILABLE = 0x0E,
+    MTRCommodityMeteringMeasurementTypeReactiveEnergy MTR_PROVISIONALLY_AVAILABLE = 0x0F,
+    MTRCommodityMeteringMeasurementTypeApparentEnergy MTR_PROVISIONALLY_AVAILABLE = 0x10,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRUnitTestingSimple) {

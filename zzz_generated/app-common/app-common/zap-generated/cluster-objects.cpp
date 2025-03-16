@@ -167,6 +167,133 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
 } // namespace ModeOptionStruct
 
+namespace MeasurementAccuracyRangeStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kRangeMin), rangeMin);
+    encoder.Encode(to_underlying(Fields::kRangeMax), rangeMax);
+    encoder.Encode(to_underlying(Fields::kPercentMax), percentMax);
+    encoder.Encode(to_underlying(Fields::kPercentMin), percentMin);
+    encoder.Encode(to_underlying(Fields::kPercentTypical), percentTypical);
+    encoder.Encode(to_underlying(Fields::kFixedMax), fixedMax);
+    encoder.Encode(to_underlying(Fields::kFixedMin), fixedMin);
+    encoder.Encode(to_underlying(Fields::kFixedTypical), fixedTypical);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kRangeMin))
+        {
+            err = DataModel::Decode(reader, rangeMin);
+        }
+        else if (__context_tag == to_underlying(Fields::kRangeMax))
+        {
+            err = DataModel::Decode(reader, rangeMax);
+        }
+        else if (__context_tag == to_underlying(Fields::kPercentMax))
+        {
+            err = DataModel::Decode(reader, percentMax);
+        }
+        else if (__context_tag == to_underlying(Fields::kPercentMin))
+        {
+            err = DataModel::Decode(reader, percentMin);
+        }
+        else if (__context_tag == to_underlying(Fields::kPercentTypical))
+        {
+            err = DataModel::Decode(reader, percentTypical);
+        }
+        else if (__context_tag == to_underlying(Fields::kFixedMax))
+        {
+            err = DataModel::Decode(reader, fixedMax);
+        }
+        else if (__context_tag == to_underlying(Fields::kFixedMin))
+        {
+            err = DataModel::Decode(reader, fixedMin);
+        }
+        else if (__context_tag == to_underlying(Fields::kFixedTypical))
+        {
+            err = DataModel::Decode(reader, fixedTypical);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace MeasurementAccuracyRangeStruct
+
+namespace MeasurementAccuracyStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kMeasurementType), measurementType);
+    encoder.Encode(to_underlying(Fields::kMeasured), measured);
+    encoder.Encode(to_underlying(Fields::kMinMeasuredValue), minMeasuredValue);
+    encoder.Encode(to_underlying(Fields::kMaxMeasuredValue), maxMeasuredValue);
+    encoder.Encode(to_underlying(Fields::kAccuracyRanges), accuracyRanges);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kMeasurementType))
+        {
+            err = DataModel::Decode(reader, measurementType);
+        }
+        else if (__context_tag == to_underlying(Fields::kMeasured))
+        {
+            err = DataModel::Decode(reader, measured);
+        }
+        else if (__context_tag == to_underlying(Fields::kMinMeasuredValue))
+        {
+            err = DataModel::Decode(reader, minMeasuredValue);
+        }
+        else if (__context_tag == to_underlying(Fields::kMaxMeasuredValue))
+        {
+            err = DataModel::Decode(reader, maxMeasuredValue);
+        }
+        else if (__context_tag == to_underlying(Fields::kAccuracyRanges))
+        {
+            err = DataModel::Decode(reader, accuracyRanges);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace MeasurementAccuracyStruct
+
 namespace DeviceTypeStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
@@ -699,133 +826,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 }
 
 } // namespace TestGlobalStruct
-
-namespace MeasurementAccuracyRangeStruct {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kRangeMin), rangeMin);
-    encoder.Encode(to_underlying(Fields::kRangeMax), rangeMax);
-    encoder.Encode(to_underlying(Fields::kPercentMax), percentMax);
-    encoder.Encode(to_underlying(Fields::kPercentMin), percentMin);
-    encoder.Encode(to_underlying(Fields::kPercentTypical), percentTypical);
-    encoder.Encode(to_underlying(Fields::kFixedMax), fixedMax);
-    encoder.Encode(to_underlying(Fields::kFixedMin), fixedMin);
-    encoder.Encode(to_underlying(Fields::kFixedTypical), fixedTypical);
-    return encoder.Finalize();
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    detail::StructDecodeIterator __iterator(reader);
-    while (true)
-    {
-        auto __element = __iterator.Next();
-        if (std::holds_alternative<CHIP_ERROR>(__element))
-        {
-            return std::get<CHIP_ERROR>(__element);
-        }
-
-        CHIP_ERROR err              = CHIP_NO_ERROR;
-        const uint8_t __context_tag = std::get<uint8_t>(__element);
-
-        if (__context_tag == to_underlying(Fields::kRangeMin))
-        {
-            err = DataModel::Decode(reader, rangeMin);
-        }
-        else if (__context_tag == to_underlying(Fields::kRangeMax))
-        {
-            err = DataModel::Decode(reader, rangeMax);
-        }
-        else if (__context_tag == to_underlying(Fields::kPercentMax))
-        {
-            err = DataModel::Decode(reader, percentMax);
-        }
-        else if (__context_tag == to_underlying(Fields::kPercentMin))
-        {
-            err = DataModel::Decode(reader, percentMin);
-        }
-        else if (__context_tag == to_underlying(Fields::kPercentTypical))
-        {
-            err = DataModel::Decode(reader, percentTypical);
-        }
-        else if (__context_tag == to_underlying(Fields::kFixedMax))
-        {
-            err = DataModel::Decode(reader, fixedMax);
-        }
-        else if (__context_tag == to_underlying(Fields::kFixedMin))
-        {
-            err = DataModel::Decode(reader, fixedMin);
-        }
-        else if (__context_tag == to_underlying(Fields::kFixedTypical))
-        {
-            err = DataModel::Decode(reader, fixedTypical);
-        }
-        else
-        {
-        }
-
-        ReturnErrorOnFailure(err);
-    }
-}
-
-} // namespace MeasurementAccuracyRangeStruct
-
-namespace MeasurementAccuracyStruct {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kMeasurementType), measurementType);
-    encoder.Encode(to_underlying(Fields::kMeasured), measured);
-    encoder.Encode(to_underlying(Fields::kMinMeasuredValue), minMeasuredValue);
-    encoder.Encode(to_underlying(Fields::kMaxMeasuredValue), maxMeasuredValue);
-    encoder.Encode(to_underlying(Fields::kAccuracyRanges), accuracyRanges);
-    return encoder.Finalize();
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    detail::StructDecodeIterator __iterator(reader);
-    while (true)
-    {
-        auto __element = __iterator.Next();
-        if (std::holds_alternative<CHIP_ERROR>(__element))
-        {
-            return std::get<CHIP_ERROR>(__element);
-        }
-
-        CHIP_ERROR err              = CHIP_NO_ERROR;
-        const uint8_t __context_tag = std::get<uint8_t>(__element);
-
-        if (__context_tag == to_underlying(Fields::kMeasurementType))
-        {
-            err = DataModel::Decode(reader, measurementType);
-        }
-        else if (__context_tag == to_underlying(Fields::kMeasured))
-        {
-            err = DataModel::Decode(reader, measured);
-        }
-        else if (__context_tag == to_underlying(Fields::kMinMeasuredValue))
-        {
-            err = DataModel::Decode(reader, minMeasuredValue);
-        }
-        else if (__context_tag == to_underlying(Fields::kMaxMeasuredValue))
-        {
-            err = DataModel::Decode(reader, maxMeasuredValue);
-        }
-        else if (__context_tag == to_underlying(Fields::kAccuracyRanges))
-        {
-            err = DataModel::Decode(reader, accuracyRanges);
-        }
-        else
-        {
-        }
-
-        ReturnErrorOnFailure(err);
-    }
-}
-
-} // namespace MeasurementAccuracyStruct
 
 namespace LocationDescriptorStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const

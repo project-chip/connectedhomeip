@@ -6294,16 +6294,17 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 
 namespace MeasurementType {
 Protocols::InteractionModel::Status
-Get(EndpointId endpoint, DataModel::Nullable<chip::app::Clusters::Globals::MeasurementTypeEnum> & value); // MeasurementTypeEnum
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::Globals::MeasurementTypeEnum value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::Globals::MeasurementTypeEnum value,
+Get(EndpointId endpoint,
+    DataModel::Nullable<chip::app::Clusters::CommodityMetering::MeasurementTypeEnum> & value); // MeasurementTypeEnum
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::CommodityMetering::MeasurementTypeEnum value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::CommodityMetering::MeasurementTypeEnum value,
                                         MarkAttributeDirty markDirty);
 Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
 Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
 Protocols::InteractionModel::Status
-Set(EndpointId endpoint, const chip::app::DataModel::Nullable<chip::app::Clusters::Globals::MeasurementTypeEnum> & value);
+Set(EndpointId endpoint, const chip::app::DataModel::Nullable<chip::app::Clusters::CommodityMetering::MeasurementTypeEnum> & value);
 Protocols::InteractionModel::Status
-Set(EndpointId endpoint, const chip::app::DataModel::Nullable<chip::app::Clusters::Globals::MeasurementTypeEnum> & value,
+Set(EndpointId endpoint, const chip::app::DataModel::Nullable<chip::app::Clusters::CommodityMetering::MeasurementTypeEnum> & value,
     MarkAttributeDirty markDirty);
 } // namespace MeasurementType
 

@@ -29,7 +29,7 @@ namespace ElectricalEnergyMeasurement {
 
 struct MeasurementData
 {
-    Globals::Structs::MeasurementAccuracyStruct::Type measurementAccuracy;
+    Structs::MeasurementAccuracyStruct::Type measurementAccuracy;
     Optional<Structs::EnergyMeasurementStruct::Type> cumulativeImported;
     Optional<Structs::EnergyMeasurementStruct::Type> cumulativeExported;
     Optional<Structs::EnergyMeasurementStruct::Type> periodicImported;
@@ -71,7 +71,7 @@ bool NotifyCumulativeEnergyMeasured(EndpointId endpointId, const Optional<Struct
 bool NotifyPeriodicEnergyMeasured(EndpointId endpointId, const Optional<Structs::EnergyMeasurementStruct::Type> & energyImported,
                                   const Optional<Structs::EnergyMeasurementStruct::Type> & energyExported);
 
-CHIP_ERROR SetMeasurementAccuracy(EndpointId endpointId, const Globals::Structs::MeasurementAccuracyStruct::Type & accuracy);
+CHIP_ERROR SetMeasurementAccuracy(EndpointId endpointId, const Structs::MeasurementAccuracyStruct::Type & accuracy);
 
 CHIP_ERROR SetCumulativeReset(EndpointId endpointId, const Optional<Structs::CumulativeEnergyResetStruct::Type> & cumulativeReset);
 

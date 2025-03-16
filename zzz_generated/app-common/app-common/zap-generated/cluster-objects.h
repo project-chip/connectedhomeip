@@ -99,6 +99,80 @@ public:
 };
 
 } // namespace ModeOptionStruct
+namespace MeasurementAccuracyRangeStruct {
+enum class Fields : uint8_t
+{
+    kRangeMin       = 0,
+    kRangeMax       = 1,
+    kPercentMax     = 2,
+    kPercentMin     = 3,
+    kPercentTypical = 4,
+    kFixedMax       = 5,
+    kFixedMin       = 6,
+    kFixedTypical   = 7,
+};
+
+struct Type
+{
+public:
+    int64_t rangeMin = static_cast<int64_t>(0);
+    int64_t rangeMax = static_cast<int64_t>(0);
+    Optional<chip::Percent100ths> percentMax;
+    Optional<chip::Percent100ths> percentMin;
+    Optional<chip::Percent100ths> percentTypical;
+    Optional<uint64_t> fixedMax;
+    Optional<uint64_t> fixedMin;
+    Optional<uint64_t> fixedTypical;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace MeasurementAccuracyRangeStruct
+namespace MeasurementAccuracyStruct {
+enum class Fields : uint8_t
+{
+    kMeasurementType  = 0,
+    kMeasured         = 1,
+    kMinMeasuredValue = 2,
+    kMaxMeasuredValue = 3,
+    kAccuracyRanges   = 4,
+};
+
+struct Type
+{
+public:
+    MeasurementTypeEnum measurementType = static_cast<MeasurementTypeEnum>(0);
+    bool measured                       = static_cast<bool>(0);
+    int64_t minMeasuredValue            = static_cast<int64_t>(0);
+    int64_t maxMeasuredValue            = static_cast<int64_t>(0);
+    DataModel::List<const Structs::MeasurementAccuracyRangeStruct::Type> accuracyRanges;
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    MeasurementTypeEnum measurementType = static_cast<MeasurementTypeEnum>(0);
+    bool measured                       = static_cast<bool>(0);
+    int64_t minMeasuredValue            = static_cast<int64_t>(0);
+    int64_t maxMeasuredValue            = static_cast<int64_t>(0);
+    DataModel::DecodableList<Structs::MeasurementAccuracyRangeStruct::DecodableType> accuracyRanges;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+};
+
+} // namespace MeasurementAccuracyStruct
 namespace DeviceTypeStruct {
 enum class Fields : uint8_t
 {
@@ -403,82 +477,6 @@ public:
 using DecodableType = Type;
 
 } // namespace TestGlobalStruct
-
-namespace MeasurementAccuracyRangeStruct {
-enum class Fields : uint8_t
-{
-    kRangeMin       = 0,
-    kRangeMax       = 1,
-    kPercentMax     = 2,
-    kPercentMin     = 3,
-    kPercentTypical = 4,
-    kFixedMax       = 5,
-    kFixedMin       = 6,
-    kFixedTypical   = 7,
-};
-
-struct Type
-{
-public:
-    int64_t rangeMin = static_cast<int64_t>(0);
-    int64_t rangeMax = static_cast<int64_t>(0);
-    Optional<chip::Percent100ths> percentMax;
-    Optional<chip::Percent100ths> percentMin;
-    Optional<chip::Percent100ths> percentTypical;
-    Optional<uint64_t> fixedMax;
-    Optional<uint64_t> fixedMin;
-    Optional<uint64_t> fixedTypical;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-using DecodableType = Type;
-
-} // namespace MeasurementAccuracyRangeStruct
-
-namespace MeasurementAccuracyStruct {
-enum class Fields : uint8_t
-{
-    kMeasurementType  = 0,
-    kMeasured         = 1,
-    kMinMeasuredValue = 2,
-    kMaxMeasuredValue = 3,
-    kAccuracyRanges   = 4,
-};
-
-struct Type
-{
-public:
-    Globals::MeasurementTypeEnum measurementType = static_cast<Globals::MeasurementTypeEnum>(0);
-    bool measured                                = static_cast<bool>(0);
-    int64_t minMeasuredValue                     = static_cast<int64_t>(0);
-    int64_t maxMeasuredValue                     = static_cast<int64_t>(0);
-    DataModel::List<const Globals::Structs::MeasurementAccuracyRangeStruct::Type> accuracyRanges;
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-struct DecodableType
-{
-public:
-    Globals::MeasurementTypeEnum measurementType = static_cast<Globals::MeasurementTypeEnum>(0);
-    bool measured                                = static_cast<bool>(0);
-    int64_t minMeasuredValue                     = static_cast<int64_t>(0);
-    int64_t maxMeasuredValue                     = static_cast<int64_t>(0);
-    DataModel::DecodableList<Globals::Structs::MeasurementAccuracyRangeStruct::DecodableType> accuracyRanges;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-};
-
-} // namespace MeasurementAccuracyStruct
 
 namespace LocationDescriptorStruct {
 enum class Fields : uint8_t
@@ -20349,6 +20347,8 @@ public:
 } // namespace ValveConfigurationAndControl
 namespace ElectricalPowerMeasurement {
 namespace Structs {
+namespace MeasurementAccuracyRangeStruct = Clusters::detail::Structs::MeasurementAccuracyRangeStruct;
+namespace MeasurementAccuracyStruct      = Clusters::detail::Structs::MeasurementAccuracyStruct;
 namespace HarmonicMeasurementStruct {
 enum class Fields : uint8_t
 {
@@ -20391,9 +20391,9 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    Globals::MeasurementTypeEnum measurementType = static_cast<Globals::MeasurementTypeEnum>(0);
-    int64_t min                                  = static_cast<int64_t>(0);
-    int64_t max                                  = static_cast<int64_t>(0);
+    MeasurementTypeEnum measurementType = static_cast<MeasurementTypeEnum>(0);
+    int64_t min                         = static_cast<int64_t>(0);
+    int64_t max                         = static_cast<int64_t>(0);
     Optional<uint32_t> startTimestamp;
     Optional<uint32_t> endTimestamp;
     Optional<uint32_t> minTimestamp;
@@ -20444,11 +20444,12 @@ struct TypeInfo
 namespace Accuracy {
 struct TypeInfo
 {
-    using Type = chip::app::DataModel::List<const chip::app::Clusters::Globals::Structs::MeasurementAccuracyStruct::Type>;
-    using DecodableType =
-        chip::app::DataModel::DecodableList<chip::app::Clusters::Globals::Structs::MeasurementAccuracyStruct::DecodableType>;
+    using Type =
+        chip::app::DataModel::List<const chip::app::Clusters::ElectricalPowerMeasurement::Structs::MeasurementAccuracyStruct::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<
+        chip::app::Clusters::ElectricalPowerMeasurement::Structs::MeasurementAccuracyStruct::DecodableType>;
     using DecodableArgType = const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::Globals::Structs::MeasurementAccuracyStruct::DecodableType> &;
+        chip::app::Clusters::ElectricalPowerMeasurement::Structs::MeasurementAccuracyStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalPowerMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Accuracy::Id; }
@@ -20761,6 +20762,8 @@ public:
 } // namespace ElectricalPowerMeasurement
 namespace ElectricalEnergyMeasurement {
 namespace Structs {
+namespace MeasurementAccuracyRangeStruct = Clusters::detail::Structs::MeasurementAccuracyRangeStruct;
+namespace MeasurementAccuracyStruct      = Clusters::detail::Structs::MeasurementAccuracyStruct;
 namespace CumulativeEnergyResetStruct {
 enum class Fields : uint8_t
 {
@@ -20828,9 +20831,10 @@ namespace Attributes {
 namespace Accuracy {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::Globals::Structs::MeasurementAccuracyStruct::Type;
-    using DecodableType    = chip::app::Clusters::Globals::Structs::MeasurementAccuracyStruct::DecodableType;
-    using DecodableArgType = const chip::app::Clusters::Globals::Structs::MeasurementAccuracyStruct::DecodableType &;
+    using Type          = chip::app::Clusters::ElectricalEnergyMeasurement::Structs::MeasurementAccuracyStruct::Type;
+    using DecodableType = chip::app::Clusters::ElectricalEnergyMeasurement::Structs::MeasurementAccuracyStruct::DecodableType;
+    using DecodableArgType =
+        const chip::app::Clusters::ElectricalEnergyMeasurement::Structs::MeasurementAccuracyStruct::DecodableType &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalEnergyMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Accuracy::Id; }
@@ -48031,9 +48035,9 @@ struct TypeInfo
 namespace MeasurementType {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::Nullable<chip::app::Clusters::Globals::MeasurementTypeEnum>;
-    using DecodableType    = chip::app::DataModel::Nullable<chip::app::Clusters::Globals::MeasurementTypeEnum>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::Clusters::Globals::MeasurementTypeEnum> &;
+    using Type             = chip::app::DataModel::Nullable<chip::app::Clusters::CommodityMetering::MeasurementTypeEnum>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::app::Clusters::CommodityMetering::MeasurementTypeEnum>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::Clusters::CommodityMetering::MeasurementTypeEnum> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CommodityMetering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementType::Id; }

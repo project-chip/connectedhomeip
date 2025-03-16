@@ -41462,9 +41462,9 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 namespace MeasurementType {
 
 Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        DataModel::Nullable<chip::app::Clusters::Globals::MeasurementTypeEnum> & value)
+                                        DataModel::Nullable<chip::app::Clusters::CommodityMetering::MeasurementTypeEnum> & value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::Globals::MeasurementTypeEnum>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::CommodityMetering::MeasurementTypeEnum>;
     Traits::StorageType temp;
     uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
     Protocols::InteractionModel::Status status =
@@ -41481,10 +41481,10 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint,
     return status;
 }
 
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::Globals::MeasurementTypeEnum value,
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::CommodityMetering::MeasurementTypeEnum value,
                                         MarkAttributeDirty markDirty)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::Globals::MeasurementTypeEnum>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::CommodityMetering::MeasurementTypeEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
         return Protocols::InteractionModel::Status::ConstraintError;
@@ -41496,9 +41496,9 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters
                                  EmberAfWriteDataInput(writable, ZCL_ENUM16_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::Globals::MeasurementTypeEnum value)
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::CommodityMetering::MeasurementTypeEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::Globals::MeasurementTypeEnum>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::CommodityMetering::MeasurementTypeEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
         return Protocols::InteractionModel::Status::ConstraintError;
@@ -41511,7 +41511,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters
 
 Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::Globals::MeasurementTypeEnum>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::CommodityMetering::MeasurementTypeEnum>;
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
@@ -41521,7 +41521,7 @@ Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDi
 
 Protocols::InteractionModel::Status SetNull(EndpointId endpoint)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::Globals::MeasurementTypeEnum>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::CommodityMetering::MeasurementTypeEnum>;
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
@@ -41529,7 +41529,7 @@ Protocols::InteractionModel::Status SetNull(EndpointId endpoint)
 }
 
 Protocols::InteractionModel::Status
-Set(EndpointId endpoint, const chip::app::DataModel::Nullable<chip::app::Clusters::Globals::MeasurementTypeEnum> & value,
+Set(EndpointId endpoint, const chip::app::DataModel::Nullable<chip::app::Clusters::CommodityMetering::MeasurementTypeEnum> & value,
     MarkAttributeDirty markDirty)
 {
     if (value.IsNull())
@@ -41541,7 +41541,7 @@ Set(EndpointId endpoint, const chip::app::DataModel::Nullable<chip::app::Cluster
 }
 
 Protocols::InteractionModel::Status
-Set(EndpointId endpoint, const chip::app::DataModel::Nullable<chip::app::Clusters::Globals::MeasurementTypeEnum> & value)
+Set(EndpointId endpoint, const chip::app::DataModel::Nullable<chip::app::Clusters::CommodityMetering::MeasurementTypeEnum> & value)
 {
     if (value.IsNull())
     {
