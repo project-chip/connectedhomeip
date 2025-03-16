@@ -267,6 +267,7 @@ void InitNetworkCommissioning()
 #endif // CHIP_APP_MAIN_HAS_ETHERNET_DRIVER
     }
 }
+
 } // anonymous namespace
 
 #if defined(ENABLE_CHIP_SHELL)
@@ -525,6 +526,20 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
         ChipLogProgress(NotSpecified, "Thread initialized.");
     }
 #endif // CHIP_ENABLE_OPENTHREAD
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    if (LinuxDeviceOptions::GetInstance().icdActiveModeDurationMs.HasValue() ||
+        LinuxDeviceOptions::GetInstance().icdIdleModeDurationMs.HasValue())
+    {
+        err = Server::GetInstance().GetICDManager().SetModeDurations(LinuxDeviceOptions::GetInstance().icdActiveModeDurationMs,
+                                                                     LinuxDeviceOptions::GetInstance().icdIdleModeDurationMs);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(NotSpecified, "Invalid arguments to set ICD mode durations");
+            SuccessOrExit(err);
+        }
+    }
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
 exit:
     if (err != CHIP_NO_ERROR)
