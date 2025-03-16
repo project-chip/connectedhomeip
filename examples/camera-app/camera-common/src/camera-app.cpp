@@ -80,9 +80,12 @@ void CameraAppInit(CameraDeviceInterface * cameraDevice)
 {
     gCameraApp = Platform::MakeUnique<CameraApp>(kCameraEndpointId, cameraDevice);
     gCameraApp.get()->InitCameraDeviceClusters();
+
+    ChipLogDetail(NotSpecified, "CameraAppInit: Initialized Camera clusters");
 }
 
 void CameraAppShutdown()
 {
+    ChipLogDetail(NotSpecified, "CameraAppShutdown: Shutting down Camera app");
     gCameraApp = nullptr;
 }

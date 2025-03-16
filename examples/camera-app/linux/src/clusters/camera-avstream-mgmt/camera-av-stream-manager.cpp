@@ -213,9 +213,3 @@ CameraAVStreamManager::PersistentAttributesLoadedCallback()
 
     return CHIP_NO_ERROR;
 }
-
-void CameraAVStreamManager::Init()
-{
-    CameraDevice::GetInstance().InitializeStreams();
-}
-
