@@ -29,19 +29,17 @@ namespace Silabs {
 class WiseconnectWifiInterface : public WifiInterface
 {
 public:
-    static constexpr uint32_t kDhcpPollIntervalMs = 250;
-
     enum class WifiPlatformEvent : uint8_t
     {
-        kStationConnect    = 0,
-        kStationDisconnect = 1,
-        kAPStart           = 2,
-        kAPStop            = 3,
-        kScan              = 4, /* This combines the scan start and scan result events  */
-        kStationStartJoin  = 5,
-        kStationDoDhcp     = 6,
-        kStationDhcpDone   = 7,
-        kStationDhcpPoll   = 8,
+        kStationConnect     = 0,
+        kStationDisconnect  = 1,
+        kAPStart            = 2,
+        kAPStop             = 3,
+        kScan               = 4, /* This combines the scan start and scan result events  */
+        kStationStartJoin   = 5,
+        kConnectionComplete = 6, /* This combines the DHCP for RS9116 and Notify for SiWx917 */
+        kStationDhcpDone    = 7,
+        kStationDhcpPoll    = 8,
     };
 
     virtual ~WiseconnectWifiInterface() = default;
@@ -103,29 +101,6 @@ protected:
     static void MatterWifiTask(void * arg);
 
     /**
-     * @brief Function cancels the DHCP timer if it is running.
-     *        If the timer isn't running, function doesn't do anything.
-     */
-    void CancelDHCPTimer();
-
-    /**
-     * @brief Function starts the DHCP timer with the given timeout.
-     *
-     * TODO: change input to milliseconds type
-     *
-     * @param timeout timer duration in milliseconds
-     */
-    void StartDHCPTimer(uint32_t timeout);
-
-    /**
-     * @brief Function creates the DHCP timer
-     *
-     *
-     * @return sl_status_t SL_STATUS_OK, the timer was successfully created
-     */
-    sl_status_t CreateDHCPTimer();
-
-    /**
      * @brief Notify the application about the connectivity status if it has not been notified yet.
      */
     void NotifyConnectivity(void);
@@ -141,7 +116,7 @@ protected:
      * @brief Function resets the IP and connectiity flags and triggers the DHCP operation
      *
      */
-    void ResetDHCPNotificationFlags();
+    void ResetConnectivityNotificationFlags();
 
 private:
     /**
@@ -153,12 +128,6 @@ private:
      */
     static WiseconnectWifiInterface & GetInstance();
 
-    /**
-     * @brief Callback function for the DHCP timer event.
-     */
-    static void DHCPTimerEventHandler(void * arg);
-
-    osTimerId_t mDHCPTimer;
     bool mHasNotifiedWifiConnectivity = false;
 };
 
