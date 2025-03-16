@@ -261,8 +261,7 @@ void emberAfEndpointConfigure();
 //
 CHIP_ERROR emberAfSetDynamicEndpoint(uint16_t index, chip::EndpointId id, const EmberAfEndpointType * ep,
                                      const chip::Span<chip::DataVersion> & dataVersionStorage,
-                                     chip::Span<const EmberAfDeviceType> deviceTypeList = {},
-                                     chip::CharSpan endpointUniqueId ={},
+                                     chip::Span<const EmberAfDeviceType> deviceTypeList = {}, chip::CharSpan endpointUniqueId = {},
                                      chip::EndpointId parentEndpointId = chip::kInvalidEndpointId);
 chip::EndpointId emberAfClearDynamicEndpoint(uint16_t index);
 uint16_t emberAfGetDynamicIndexFromEndpoint(chip::EndpointId id);

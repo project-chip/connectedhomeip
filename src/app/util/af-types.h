@@ -240,7 +240,7 @@ struct EmberAfDefinedEndpoint
     /**
      * Unique Id for this end point.
      */
-    char endpointUniqueId[chip::app::Clusters::Descriptor::Attributes::EndpointUniqueId::TypeInfo::MaxLength()] = {0};
+    char endpointUniqueId[chip::app::Clusters::Descriptor::Attributes::EndpointUniqueId::TypeInfo::MaxLength()] = { 0 };
 };
 
 /**

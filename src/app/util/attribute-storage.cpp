@@ -317,13 +317,14 @@ CHIP_ERROR emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, const EmberA
             }
         }
     }
-    emAfEndpoints[index].endpoint         = id;
-    emAfEndpoints[index].deviceTypeList   = deviceTypeList;
-    emAfEndpoints[index].endpointType     = ep;
-    emAfEndpoints[index].dataVersions     = dataVersionStorage.data();
-    memcpy((void *)(emAfEndpoints[index].endpointUniqueId), endpointUniqueId.data(),
-           endpointUniqueId.size() > Clusters::Descriptor::Attributes::EndpointUniqueId::TypeInfo::MaxLength()?
-           Clusters::Descriptor::Attributes::EndpointUniqueId::TypeInfo::MaxLength() : endpointUniqueId.size());
+    emAfEndpoints[index].endpoint       = id;
+    emAfEndpoints[index].deviceTypeList = deviceTypeList;
+    emAfEndpoints[index].endpointType   = ep;
+    emAfEndpoints[index].dataVersions   = dataVersionStorage.data();
+    memcpy((void *) (emAfEndpoints[index].endpointUniqueId), endpointUniqueId.data(),
+           endpointUniqueId.size() > Clusters::Descriptor::Attributes::EndpointUniqueId::TypeInfo::MaxLength()
+               ? Clusters::Descriptor::Attributes::EndpointUniqueId::TypeInfo::MaxLength()
+               : endpointUniqueId.size());
 
     // Start the endpoint off as disabled.
     emAfEndpoints[index].bitmask.Clear(EmberAfEndpointOptions::isEnabled);
@@ -1094,7 +1095,7 @@ CHIP_ERROR GetEndpointUniqueIdForEndPoint(EndpointId endpoint, chip::MutableChar
     }
     chip::CharSpan epUniqueIdSpan(emAfEndpoints[endpointIndex].endpointUniqueId,
                                   strnlen(emAfEndpoints[endpointIndex].endpointUniqueId,
-                                  Clusters::Descriptor::Attributes::EndpointUniqueId::TypeInfo::MaxLength()));
+                                          Clusters::Descriptor::Attributes::EndpointUniqueId::TypeInfo::MaxLength()));
     chip::CopyCharSpanToMutableCharSpan(epUniqueIdSpan, epUniqueIdMutSpan);
 
     return CHIP_NO_ERROR;
