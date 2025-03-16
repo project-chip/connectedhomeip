@@ -121,6 +121,7 @@ DECLARE_DYNAMIC_ATTRIBUTE(Descriptor::Attributes::DeviceTypeList::Id, ARRAY, kDe
     DECLARE_DYNAMIC_ATTRIBUTE(Descriptor::Attributes::ServerList::Id, ARRAY, kDescriptorAttributeArraySize, 0), /* server list */
     DECLARE_DYNAMIC_ATTRIBUTE(Descriptor::Attributes::ClientList::Id, ARRAY, kDescriptorAttributeArraySize, 0), /* client list */
     DECLARE_DYNAMIC_ATTRIBUTE(Descriptor::Attributes::PartsList::Id, ARRAY, kDescriptorAttributeArraySize, 0),  /* parts list */
+    DECLARE_DYNAMIC_ATTRIBUTE(Descriptor::Attributes::EndpointUniqueId::Id, ARRAY, 32, 0),  /* parts list */
     DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 // Declare Bridged Device Basic Information cluster attributes
@@ -258,7 +259,8 @@ DataVersion gComposedTempSensor2DataVersions[MATTER_ARRAY_SIZE(bridgedTempSensor
 // ---------------------------------------------------------------------------
 
 int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const Span<const EmberAfDeviceType> & deviceTypeList,
-                      const Span<DataVersion> & dataVersionStorage, chip::EndpointId parentEndpointId = chip::kInvalidEndpointId)
+                      const Span<DataVersion> & dataVersionStorage, chip::CharSpan epUniqueId,
+                      chip::EndpointId parentEndpointId = chip::kInvalidEndpointId)
 {
     uint8_t index = 0;
     while (index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
@@ -274,7 +276,7 @@ int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const Span<const E
                 dev->SetEndpointId(gCurrentEndpointId);
                 dev->SetParentEndpointId(parentEndpointId);
                 err =
-                    emberAfSetDynamicEndpoint(index, gCurrentEndpointId, ep, dataVersionStorage, deviceTypeList, parentEndpointId);
+                    emberAfSetDynamicEndpoint(index, gCurrentEndpointId, ep, dataVersionStorage, deviceTypeList, epUniqueId, parentEndpointId);
                 if (err == CHIP_NO_ERROR)
                 {
                     ChipLogProgress(DeviceLayer, "Added device %s to dynamic endpoint %d (index=%d)", dev->GetName(),
@@ -798,7 +800,7 @@ void * bridge_polling_thread(void * context)
             {
                 // TC-BR-2 step 2, Add Light2
                 AddDeviceEndpoint(&Light2, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                                  Span<DataVersion>(gLight2DataVersions), 1);
+                                  Span<DataVersion>(gLight2DataVersions), chip::CharSpan(), 1);
                 light2_added = true;
             }
             else if (ch == '4' && light1_added == true)
@@ -811,7 +813,7 @@ void * bridge_polling_thread(void * context)
             {
                 // TC-BR-2 step 5, Add Light 1 back
                 AddDeviceEndpoint(&Light1, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                                  Span<DataVersion>(gLight1DataVersions), 1);
+                                  Span<DataVersion>(gLight1DataVersions), chip::CharSpan(), 1);
                 light1_added = true;
             }
             if (ch == 'b')
@@ -955,33 +957,37 @@ void ApplicationInit()
 
     // Add light 1 -> will be mapped to ZCL endpoints 3
     AddDeviceEndpoint(&Light1, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                      Span<DataVersion>(gLight1DataVersions), 1);
+                      Span<DataVersion>(gLight1DataVersions), chip::CharSpan(), 1);
 
     // Add Temperature Sensor devices --> will be mapped to endpoints 4,5
     AddDeviceEndpoint(&TempSensor1, &bridgedTempSensorEndpoint, Span<const EmberAfDeviceType>(gBridgedTempSensorDeviceTypes),
-                      Span<DataVersion>(gTempSensor1DataVersions), 1);
+                      Span<DataVersion>(gTempSensor1DataVersions), chip::CharSpan(), 1);
     AddDeviceEndpoint(&TempSensor2, &bridgedTempSensorEndpoint, Span<const EmberAfDeviceType>(gBridgedTempSensorDeviceTypes),
-                      Span<DataVersion>(gTempSensor2DataVersions), 1);
+                      Span<DataVersion>(gTempSensor2DataVersions), chip::CharSpan(), 1);
 
     // Add composed Device with two temperature sensors and a power source
     AddDeviceEndpoint(&gComposedDevice, &bridgedComposedDeviceEndpoint, Span<const EmberAfDeviceType>(gBridgedComposedDeviceTypes),
-                      Span<DataVersion>(gComposedDeviceDataVersions), 1);
+                      Span<DataVersion>(gComposedDeviceDataVersions), chip::CharSpan(), 1);
     AddDeviceEndpoint(&ComposedTempSensor1, &bridgedTempSensorEndpoint,
                       Span<const EmberAfDeviceType>(gComposedTempSensorDeviceTypes),
-                      Span<DataVersion>(gComposedTempSensor1DataVersions), gComposedDevice.GetEndpointId());
+                      Span<DataVersion>(gComposedTempSensor1DataVersions), 
+                      chip::CharSpan("AABBCCDDEEFFGGHHIIJJKKLLMMNNOO01", strlen("AABBCCDDEEFFGGHHIIJJKKLLMMNNOO01")),
+                      gComposedDevice.GetEndpointId());
     AddDeviceEndpoint(&ComposedTempSensor2, &bridgedTempSensorEndpoint,
                       Span<const EmberAfDeviceType>(gComposedTempSensorDeviceTypes),
-                      Span<DataVersion>(gComposedTempSensor2DataVersions), gComposedDevice.GetEndpointId());
+                      Span<DataVersion>(gComposedTempSensor2DataVersions),
+                      chip::CharSpan("AABBCCDDEEFFGGHHIIJJKKLLMMNNOO02", strlen("AABBCCDDEEFFGGHHIIJJKKLLMMNNOO02")),
+                      gComposedDevice.GetEndpointId());
 
     // Add 4 lights for the Action Clusters tests
     AddDeviceEndpoint(&ActionLight1, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                      Span<DataVersion>(gActionLight1DataVersions), 1);
+                      Span<DataVersion>(gActionLight1DataVersions), chip::CharSpan(), 1);
     AddDeviceEndpoint(&ActionLight2, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                      Span<DataVersion>(gActionLight2DataVersions), 1);
+                      Span<DataVersion>(gActionLight2DataVersions), chip::CharSpan(), 1);
     AddDeviceEndpoint(&ActionLight3, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                      Span<DataVersion>(gActionLight3DataVersions), 1);
+                      Span<DataVersion>(gActionLight3DataVersions), chip::CharSpan(), 1);
     AddDeviceEndpoint(&ActionLight4, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                      Span<DataVersion>(gActionLight4DataVersions), 1);
+                      Span<DataVersion>(gActionLight4DataVersions), chip::CharSpan(), 1);
 
     // Because the power source is on the same endpoint as the composed device, it needs to be explicitly added
     gDevices[CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT] = &ComposedPowerSource;
