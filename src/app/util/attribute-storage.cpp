@@ -265,7 +265,7 @@ uint16_t emberAfGetDynamicIndexFromEndpoint(EndpointId id)
 
 CHIP_ERROR emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, const EmberAfEndpointType * ep,
                                      const Span<DataVersion> & dataVersionStorage, Span<const EmberAfDeviceType> deviceTypeList,
-                                     EndpointId parentEndpointId)
+                                     chip::CharSpan endpointUniqueId, EndpointId parentEndpointId)
 {
     auto realIndex = index + FIXED_ENDPOINT_COUNT;
 
@@ -317,10 +317,14 @@ CHIP_ERROR emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, const EmberA
             }
         }
     }
-    emAfEndpoints[index].endpoint       = id;
-    emAfEndpoints[index].deviceTypeList = deviceTypeList;
-    emAfEndpoints[index].endpointType   = ep;
-    emAfEndpoints[index].dataVersions   = dataVersionStorage.data();
+    emAfEndpoints[index].endpoint         = id;
+    emAfEndpoints[index].deviceTypeList   = deviceTypeList;
+    emAfEndpoints[index].endpointType     = ep;
+    emAfEndpoints[index].dataVersions     = dataVersionStorage.data();
+    memcpy((void *)(emAfEndpoints[index].endpointUniqueId), endpointUniqueId.data(), 
+           endpointUniqueId.size() > Clusters::Descriptor::Attributes::EndpointUniqueId::TypeInfo::MaxLength()? 
+           Clusters::Descriptor::Attributes::EndpointUniqueId::TypeInfo::MaxLength() : endpointUniqueId.size());
+
     // Start the endpoint off as disabled.
     emAfEndpoints[index].bitmask.Clear(EmberAfEndpointOptions::isEnabled);
     emAfEndpoints[index].parentEndpointId = parentEndpointId;
@@ -1080,7 +1084,7 @@ CHIP_ERROR GetSemanticTagForEndpointAtIndex(EndpointId endpoint, size_t index,
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR GetEndpointUniqueIdForEndPoint(EndpointId endpoint, char * buf)
+CHIP_ERROR GetEndpointUniqueIdForEndPoint(EndpointId endpoint, chip::MutableCharSpan & epUniqueIdMutSpan)
 {
     uint16_t endpointIndex = emberAfIndexFromEndpoint(endpoint);
 
@@ -1088,7 +1092,11 @@ CHIP_ERROR GetEndpointUniqueIdForEndPoint(EndpointId endpoint, char * buf)
     {
         return CHIP_ERROR_NOT_FOUND;
     }
-    strcpy(buf, emAfEndpoints[endpointIndex].endpointUniqueId.c_str());
+    chip::CharSpan epUniqueIdSpan(emAfEndpoints[endpointIndex].endpointUniqueId, 
+                                  strnlen(emAfEndpoints[endpointIndex].endpointUniqueId,
+                                  Clusters::Descriptor::Attributes::EndpointUniqueId::TypeInfo::MaxLength()));
+    chip::CopyCharSpanToMutableCharSpan(epUniqueIdSpan, epUniqueIdMutSpan);
+
     return CHIP_NO_ERROR;
 }
 
@@ -1113,18 +1121,6 @@ CHIP_ERROR SetTagList(EndpointId endpoint, Span<const Clusters::Descriptor::Stru
     }
 
     emAfEndpoints[endpointIndex].tagList = tagList;
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR SetEndPointUniqueId(chip::EndpointId endpoint, std::string endpointUniqueId)
-{
-    uint16_t endpointIndex = emberAfIndexFromEndpoint(endpoint);
-    if (endpointIndex == 0xFFFF)
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    emAfEndpoints[endpointIndex].endpointUniqueId = endpointUniqueId;
     return CHIP_NO_ERROR;
 }
 
