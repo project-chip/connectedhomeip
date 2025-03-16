@@ -58,7 +58,7 @@ executable("chip-camera-app") {
   output_dir = root_out_dir
 
   # Manually specify GStreamer libraries
-  libs = [
+  libs += [
     "gstreamer-1.0",
     "glib-2.0",
     "gobject-2.0",

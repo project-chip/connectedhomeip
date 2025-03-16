@@ -96,8 +96,6 @@ public:
 
     CHIP_ERROR PersistentAttributesLoadedCallback();
 
-    void Init();
-
     CameraAVStreamManager()  = default;
     ~CameraAVStreamManager() = default;
 
