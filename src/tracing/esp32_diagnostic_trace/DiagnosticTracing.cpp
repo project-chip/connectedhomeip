@@ -112,15 +112,33 @@ void ESP32Diagnostics::LogMetricEvent(const MetricEvent & event)
     {
     case ValueType::kInt32: {
         ChipLogProgress(DeviceLayer, "The value of %s is %" PRId32, event.key(), event.ValueInt32());
-        Diagnostic<int32_t> metric(const_cast<char *>(event.key()), event.ValueInt32(), esp_log_timestamp());
-        ReturnOnFailure(mStorageInstance->Store(metric));
+
+        // Allocate buffers for the diagnostic entry
+        char labelBuffer[kMaxStringValueSize];
+        strncpy(labelBuffer, event.key(), kMaxStringValueSize);
+        labelBuffer[kMaxStringValueSize - 1] = '\0';
+
+        DiagnosticEntry entry = { .label     = labelBuffer,
+                                  .intValue  = event.ValueInt32(),
+                                  .type      = Diagnostics::ValueType::kSignedInteger,
+                                  .timestamp = esp_log_timestamp() };
+        ReturnOnFailure(mStorageInstance->Store(entry));
     }
     break;
 
     case ValueType::kUInt32: {
         ChipLogProgress(DeviceLayer, "The value of %s is %" PRId32, event.key(), event.ValueUInt32());
-        Diagnostic<uint32_t> metric(const_cast<char *>(event.key()), event.ValueUInt32(), esp_log_timestamp());
-        ReturnOnFailure(mStorageInstance->Store(metric));
+
+        // Allocate buffers for the diagnostic entry
+        char labelBuffer[kMaxStringValueSize];
+        strncpy(labelBuffer, event.key(), kMaxStringValueSize);
+        labelBuffer[kMaxStringValueSize - 1] = '\0';
+
+        DiagnosticEntry entry = { .label     = labelBuffer,
+                                  .uintValue = event.ValueUInt32(),
+                                  .type      = Diagnostics::ValueType::kUnsignedInteger,
+                                  .timestamp = esp_log_timestamp() };
+        ReturnOnFailure(mStorageInstance->Store(entry));
     }
     break;
 
@@ -161,8 +179,23 @@ CHIP_ERROR ESP32Diagnostics::StoreDiagnostics(const char * label, const char * g
 {
     VerifyOrReturnError(mStorageInstance != nullptr, CHIP_ERROR_INCORRECT_STATE,
                         ChipLogError(DeviceLayer, "Diagnostic Storage Instance cannot be NULL"));
-    Diagnostic<char *> trace(const_cast<char *>(label), const_cast<char *>(group), esp_log_timestamp());
-    return mStorageInstance->Store(trace);
+
+    // Allocate buffers for the diagnostic entry
+    char labelBuffer[kMaxStringValueSize];
+    strncpy(labelBuffer, label, kMaxStringValueSize);
+    labelBuffer[kMaxStringValueSize - 1] = '\0';
+
+    char groupBuffer[kMaxStringValueSize];
+    strncpy(groupBuffer, group, kMaxStringValueSize);
+    groupBuffer[kMaxStringValueSize - 1] = '\0';
+
+    // Create diagnostic entry
+    DiagnosticEntry entry = { .label       = labelBuffer,
+                              .stringValue = groupBuffer,
+                              .type        = Diagnostics::ValueType::kCharString,
+                              .timestamp   = esp_log_timestamp() };
+
+    return mStorageInstance->Store(entry);
 }
 
 } // namespace Diagnostics

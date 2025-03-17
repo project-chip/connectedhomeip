@@ -19,10 +19,9 @@
  */
 
 #include <tracing/backend.h>
-#include <tracing/esp32_diagnostic_trace/Diagnostics.h>
+#include <tracing/esp32_diagnostic_trace/DiagnosticStorage.h>
 #include <tracing/metric_event.h>
 
-#include <memory>
 namespace chip {
 namespace Tracing {
 namespace Diagnostics {
@@ -32,7 +31,7 @@ namespace Diagnostics {
 class ESP32Diagnostics : public ::chip::Tracing::Backend
 {
 public:
-    ESP32Diagnostics(DiagnosticStorageInterface * storageInstance) : mStorageInstance(storageInstance) {}
+    ESP32Diagnostics(CircularDiagnosticBuffer * storageInstance) : mStorageInstance(storageInstance) {}
 
     // Deleted copy constructor and assignment operator to prevent copying
     ESP32Diagnostics(const ESP32Diagnostics &)             = delete;
@@ -57,7 +56,7 @@ public:
 
 private:
     using ValueType = MetricEvent::Value::Type;
-    DiagnosticStorageInterface * mStorageInstance;
+    CircularDiagnosticBuffer * mStorageInstance;
     CHIP_ERROR StoreDiagnostics(const char * label, const char * group);
 };
 

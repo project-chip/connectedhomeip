@@ -27,7 +27,7 @@
 #endif // defined(CONFIG_ESP_COREDUMP_ENABLE_TO_FLASH) && defined(CONFIG_ESP_COREDUMP_DATA_FORMAT_ELF)
 
 #ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
-#include <tracing/esp32_diagnostic_trace/DiagnosticStorageManager.h>
+#include <tracing/esp32_diagnostic_trace/DiagnosticStorage.h>
 using namespace chip::Tracing::Diagnostics;
 #endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
 
