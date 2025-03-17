@@ -404,7 +404,7 @@ void emberAfActionsClusterInitCallback(EndpointId endpoint)
     VerifyOrReturn(endpoint == 1,
                    ChipLogError(Zcl, "Actions cluster delegate is not implemented for endpoint with id %d.", endpoint));
     VerifyOrReturn(emberAfContainsServer(endpoint, app::Clusters::Actions::Id) == true,
-                   ChipLogError(Zcl, "Endpoint %d does not support Actions cluster.", endpoint));
+                   ChipLogError(Zcl, "Endpoint %u does not support Actions cluster.", endpoint));
     VerifyOrReturn(!sActionsDelegateImpl && !sActionsServer);
 
     sActionsDelegateImpl = std::make_unique<app::Clusters::Actions::ActionsDelegateImpl>();
