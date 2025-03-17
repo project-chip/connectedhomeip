@@ -4,18 +4,11 @@
 #include <lib/support/CodeUtils.h>
 #include <system/SystemClock.h>
 #include <system/SystemStats.h>
-#include <tracing/esp32_diagnostic_trace/Diagnostics.h>
+#include <tracing/esp32_diagnostic_trace/DiagnosticEntry.h>
+#include <tracing/esp32_diagnostic_trace/DiagnosticStorage.h>
 
 namespace chip {
 namespace Diagnostics {
-
-enum class ValueType : uint8_t
-{
-    kUndefined,    // Value is not valid
-    kInt32,        // int32_t
-    kUInt32,       // uint32_t
-    kChipErrorCode // chip::ChipError
-};
 
 /**
  * @brief Delegate interface for handling diagnostic data operations
@@ -43,7 +36,7 @@ public:
     virtual CHIP_ERROR StopPeriodicDiagnostics()                                       = 0;
     virtual CHIP_ERROR SetSamplingInterval(chip::System::Clock::Timeout aTimeout)      = 0;
 
-    static DiagnosticDataDelegate & GetInstance(Tracing::Diagnostics::DiagnosticStorageInterface * storageInstance);
+    static DiagnosticDataDelegate & GetInstance(Tracing::Diagnostics::CircularDiagnosticBuffer * storageInstance);
 };
 
 // Forward declaration of implementation class
