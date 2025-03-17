@@ -49,14 +49,14 @@ public:
     DataModel::Nullable<CharSpan> GetPointOfDelivery() { return mPointOfDelivery; }
     DataModel::Nullable<CharSpan> GetMeterSerialNumber() { return mMeterSerialNumber; }
     DataModel::Nullable<CharSpan> GetProtocolVersion() { return mProtocolVersion; }
-    DataModel::Nullable<Structs::PowerThresholdStruct::Type> GetPowerThreshold() { return mPowerThreshold; }
+    DataModel::Nullable<Globals::Structs::PowerThresholdStruct::Type> GetPowerThreshold() { return mPowerThreshold; }
 
      // Internal Application API to set attribute values
     CHIP_ERROR SetMeterType(const DataModel::Nullable<MeterTypeEnum> & value);
     CHIP_ERROR SetPointOfDelivery(const DataModel::Nullable<CharSpan> & value);
     CHIP_ERROR SetMeterSerialNumber(const DataModel::Nullable<CharSpan> & value);
     CHIP_ERROR SetProtocolVersion(const DataModel::Nullable<CharSpan> & value);
-    CHIP_ERROR SetPowerThreshold(const DataModel::Nullable<Structs::PowerThresholdStruct::Type> & value);
+    CHIP_ERROR SetPowerThreshold(const DataModel::Nullable<Globals::Structs::PowerThresholdStruct::Type> & value);
 
 private:
     // Attribute storage
@@ -64,7 +64,7 @@ private:
     DataModel::Nullable<CharSpan> mPointOfDelivery;
     DataModel::Nullable<CharSpan> mMeterSerialNumber;
     DataModel::Nullable<CharSpan> mProtocolVersion;
-    DataModel::Nullable<Structs::PowerThresholdStruct::Type> mPowerThreshold;
+    DataModel::Nullable<Globals::Structs::PowerThresholdStruct::Type> mPowerThreshold;
     EndpointId mEndpointId = 0;
     BitMask<Feature> mFeature;
 

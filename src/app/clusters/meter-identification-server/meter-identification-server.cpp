@@ -203,7 +203,7 @@ CHIP_ERROR Instance::SetProtocolVersion(const DataModel::Nullable<CharSpan> & ne
     return ret;
 }
 
-CHIP_ERROR Instance::SetPowerThreshold(const DataModel::Nullable<Structs::PowerThresholdStruct::Type> & newValue)
+CHIP_ERROR Instance::SetPowerThreshold(const DataModel::Nullable<Globals::Structs::PowerThresholdStruct::Type> & newValue)
 {
     if (newValue.IsNull())
     {
@@ -224,7 +224,7 @@ CHIP_ERROR Instance::SetPowerThreshold(const DataModel::Nullable<Structs::PowerT
         }
 
         if (!(newValue.ExistingValueInEncodableRange() && (newValue.Value().powerThresholdSource.IsNull() ||
-            PowerThresholdSourceEnum::kUnknownEnumValue != EnsureKnownEnumValue(newValue.Value().powerThresholdSource.Value()))))
+            Globals::PowerThresholdSourceEnum::kUnknownEnumValue != EnsureKnownEnumValue(newValue.Value().powerThresholdSource.Value()))))
         {
             return CHIP_ERROR_DECODE_FAILED;
         }
