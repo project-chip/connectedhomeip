@@ -50,10 +50,6 @@ CHIP_ERROR AppTask::AppInit()
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(WindowManager::ButtonEventHandler);
 
-#ifdef DISPLAY_ENABLED
-    GetLCD().Init((uint8_t *) "Window-App");
-#endif
-
     err = WindowManager::sWindow.Init();
 
     if (err != CHIP_NO_ERROR)
