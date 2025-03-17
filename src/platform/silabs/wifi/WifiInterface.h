@@ -412,7 +412,6 @@ public:
      */
     virtual void CancelScanNetworks() = 0;
 
-    using WiFiBandEnum = app::Clusters::NetworkCommissioning::WiFiBandEnum;
     /**
      *  @brief Provide all the frequency bands supported by the Wi-Fi interface.
      *
@@ -423,7 +422,7 @@ public:
     virtual uint32_t GetSupportedWiFiBandsMask() const
     {
         // Default to 2.4G support only
-        return static_cast<uint32_t>(1UL << chip::to_underlying(WiFiBandEnum::k2g4));
+        return static_cast<uint32_t>(1UL << chip::to_underlying(app::Clusters::NetworkCommissioning::WiFiBandEnum::k2g4));
     }
 
 protected:
