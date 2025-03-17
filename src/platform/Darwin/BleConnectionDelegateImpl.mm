@@ -101,7 +101,11 @@ namespace DeviceLayer {
             // Make a copy of the device discriminator for the block to capture.
             SetupDiscriminator deviceDiscriminator = inDeviceDiscriminator;
 
-            ChipLogProgress(Ble, "ConnectionDelegate NewConnection with discriminator");
+            if (inDeviceDiscriminator.IsShortDiscriminator()) {
+                ChipLogProgress(Ble, "ConnectionDelegate NewConnection with short discriminator %d (0x%x)", inDeviceDiscriminator.GetShortValue(), inDeviceDiscriminator.GetShortValue());
+            } else {
+                ChipLogProgress(Ble, "ConnectionDelegate NewConnection with long discriminator %d (0x%x)", inDeviceDiscriminator.GetLongValue(), inDeviceDiscriminator.GetLongValue());
+            }
             // If the previous connection delegate was not a try to connect to something, just reuse it instead of
             // creating a brand new connection but update the discriminator and the ble layer members.
             if (ble and ![ble isConnecting]) {

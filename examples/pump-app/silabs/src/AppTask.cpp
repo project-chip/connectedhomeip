@@ -71,7 +71,7 @@ using namespace ::chip::DeviceLayer;
 
 AppTask AppTask::sAppTask;
 
-CHIP_ERROR AppTask::Init()
+CHIP_ERROR AppTask::AppInit()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(AppTask::ButtonEventHandler);
@@ -79,13 +79,6 @@ CHIP_ERROR AppTask::Init()
 #ifdef DISPLAY_ENABLED
     GetLCD().Init((uint8_t *) "Pump-App");
 #endif
-
-    err = BaseApplication::Init();
-    if (err != CHIP_NO_ERROR)
-    {
-        SILABS_LOG("BaseApplication::Init() failed");
-        appError(err);
-    }
 
     err = PumpMgr().Init();
     if (err != CHIP_NO_ERROR)
