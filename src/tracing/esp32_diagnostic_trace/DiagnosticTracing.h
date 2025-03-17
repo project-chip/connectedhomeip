@@ -25,9 +25,9 @@
 namespace chip {
 namespace Tracing {
 namespace Diagnostics {
-/// A Backend that outputs data to chip logging.
+/// A Backend that stores data to storage instance
 ///
-/// Structured data is formatted as json strings.
+/// Structured data is formatted as TLV.
 class ESP32Diagnostics : public ::chip::Tracing::Backend
 {
 public:

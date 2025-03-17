@@ -46,14 +46,8 @@ CHIP_ERROR ESPDiagnosticCounter::ReportMetrics(const char * label, CircularDiagn
 {
     VerifyOrReturnError(storageInstance != nullptr, CHIP_ERROR_INCORRECT_STATE,
                         ChipLogError(DeviceLayer, "Diagnostic Storage Instance cannot be NULL"));
-
-    // Allocate buffers for the diagnostic entry
-    char labelBuffer[kMaxStringValueSize];
-    strncpy(labelBuffer, label, kMaxStringValueSize);
-    labelBuffer[kMaxStringValueSize - 1] = '\0';
-
     // Create diagnostic entry
-    DiagnosticEntry entry = { .label     = labelBuffer,
+    DiagnosticEntry entry = { .label     = const_cast<char *>(label),
                               .uintValue = GetInstanceCount(label),
                               .type      = ValueType::kUnsignedInteger,
                               .timestamp = esp_log_timestamp() };

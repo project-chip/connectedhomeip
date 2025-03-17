@@ -23,7 +23,7 @@ namespace chip {
 namespace Tracing {
 namespace Diagnostics {
 
-static constexpr size_t kMaxStringValueSize = 128;
+static constexpr size_t kMaxStringValueSize = 64;
 
 enum class ValueType
 {
@@ -34,9 +34,11 @@ enum class ValueType
 
 struct DiagnosticEntry
 {
+    // mutable label because modified in decode
     char * label;
     union
     {
+        // mutable stringValue because modified in decode
         char * stringValue;
         uint32_t uintValue;
         int32_t intValue;
@@ -47,13 +49,13 @@ struct DiagnosticEntry
 
 enum class DiagTag : uint8_t
 {
-    TIMESTAMP = 1,
-    LABEL     = 2,
-    VALUE     = 3
+    TIMESTAMP = 0,
+    LABEL     = 1,
+    VALUE     = 2,
 };
 
-CHIP_ERROR Encode(chip::TLV::CircularTLVWriter & writer, const DiagnosticEntry & entry);
-CHIP_ERROR Decode(chip::TLV::CircularTLVReader & reader, DiagnosticEntry & entry);
+CHIP_ERROR Encode(chip::TLV::TLVWriter & writer, const DiagnosticEntry & entry);
+CHIP_ERROR Decode(chip::TLV::TLVReader & reader, DiagnosticEntry & entry);
 
 } // namespace Diagnostics
 } // namespace Tracing

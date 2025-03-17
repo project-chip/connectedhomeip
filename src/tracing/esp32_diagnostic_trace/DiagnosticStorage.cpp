@@ -70,7 +70,7 @@ CHIP_ERROR CircularDiagnosticBuffer::Retrieve(MutableByteSpan & span, uint32_t &
         successful_written_bytes = writer.GetLengthWritten();
     }
     span.reduce_size(successful_written_bytes);
-    ChipLogProgress(DeviceLayer, "---------------Total Retrieved bytes : %ld----------------\n", successful_written_bytes);
+    ChipLogDetail(DeviceLayer, "---------------Total Retrieved bytes : %ld----------------\n", successful_written_bytes);
     return CHIP_NO_ERROR;
 }
 

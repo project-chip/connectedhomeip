@@ -52,7 +52,7 @@ uint32_t MurmurHash(const void * key)
 
     if (hash == 0)
     {
-        ESP_LOGW("Tracing", "MurmurHash resulted in a hash value of 0");
+        ChipLogError(DeviceLayer, "MurmurHash resulted in a hash value of 0");
     }
 
     return hash;
@@ -63,18 +63,23 @@ constexpr size_t kPermitListMaxSize = CONFIG_MAX_PERMIT_LIST_SIZE;
 using HashValue                     = uint32_t;
 using namespace Utils;
 
-// Only traces with scope in gPermitList are allowed.
-// Used for MATTER_TRACE_SCOPE()
+/*
+ * gPermitList will allow the following traces to be stored in the storage instance while other traces are skipped.
+ * Only traces with scope in gPermitList are allowed.
+ * Used for MATTER_TRACE_SCOPE()
+ */
 HashValue gPermitList[kPermitListMaxSize] = { MurmurHash("PASESession"),
                                               MurmurHash("CASESession"),
                                               MurmurHash("NetworkCommissioning"),
                                               MurmurHash("GeneralCommissioning"),
                                               MurmurHash("OperationalCredentials"),
                                               MurmurHash("CASEServer"),
-                                              MurmurHash("Fabric") }; // namespace
+                                              MurmurHash("Fabric") };
 
-// All traces with value from gSkipList are skipped.
-// Used for MATTER_TRACE_INSTANT()
+/*
+ * gSkipList will skip the following traces from being stored in the storage instance while other traces are stored.
+ * Used for MATTER_TRACE_INSTANT()
+ */
 HashValue gSkipList[kPermitListMaxSize] = {
     MurmurHash("Resolver"),
 };
@@ -111,14 +116,8 @@ void ESP32Diagnostics::LogMetricEvent(const MetricEvent & event)
     switch (event.ValueType())
     {
     case ValueType::kInt32: {
-        ChipLogProgress(DeviceLayer, "The value of %s is %" PRId32, event.key(), event.ValueInt32());
-
-        // Allocate buffers for the diagnostic entry
-        char labelBuffer[kMaxStringValueSize];
-        strncpy(labelBuffer, event.key(), kMaxStringValueSize);
-        labelBuffer[kMaxStringValueSize - 1] = '\0';
-
-        DiagnosticEntry entry = { .label     = labelBuffer,
+        ChipLogDetail(DeviceLayer, "The value of %s is %" PRId32, event.key(), event.ValueInt32());
+        DiagnosticEntry entry = { .label     = const_cast<char *>(event.key()),
                                   .intValue  = event.ValueInt32(),
                                   .type      = Diagnostics::ValueType::kSignedInteger,
                                   .timestamp = esp_log_timestamp() };
@@ -127,14 +126,8 @@ void ESP32Diagnostics::LogMetricEvent(const MetricEvent & event)
     break;
 
     case ValueType::kUInt32: {
-        ChipLogProgress(DeviceLayer, "The value of %s is %" PRId32, event.key(), event.ValueUInt32());
-
-        // Allocate buffers for the diagnostic entry
-        char labelBuffer[kMaxStringValueSize];
-        strncpy(labelBuffer, event.key(), kMaxStringValueSize);
-        labelBuffer[kMaxStringValueSize - 1] = '\0';
-
-        DiagnosticEntry entry = { .label     = labelBuffer,
+        ChipLogDetail(DeviceLayer, "The value of %s is %" PRId32, event.key(), event.ValueUInt32());
+        DiagnosticEntry entry = { .label     = const_cast<char *>(event.key()),
                                   .uintValue = event.ValueUInt32(),
                                   .type      = Diagnostics::ValueType::kUnsignedInteger,
                                   .timestamp = esp_log_timestamp() };
@@ -143,15 +136,15 @@ void ESP32Diagnostics::LogMetricEvent(const MetricEvent & event)
     break;
 
     case ValueType::kChipErrorCode:
-        ChipLogProgress(DeviceLayer, "The value of %s is error with code %lu ", event.key(), event.ValueErrorCode());
+        ChipLogDetail(DeviceLayer, "The value of %s is error with code %lu ", event.key(), event.ValueErrorCode());
         break;
 
     case ValueType::kUndefined:
-        ChipLogProgress(DeviceLayer, "The value of %s is undefined", event.key());
+        ChipLogDetail(DeviceLayer, "The value of %s is undefined", event.key());
         break;
 
     default:
-        ChipLogProgress(DeviceLayer, "The value of %s is of an UNKNOWN TYPE", event.key());
+        ChipLogDetail(DeviceLayer, "The value of %s is of an UNKNOWN TYPE", event.key());
         break;
     }
 }
@@ -180,18 +173,9 @@ CHIP_ERROR ESP32Diagnostics::StoreDiagnostics(const char * label, const char * g
     VerifyOrReturnError(mStorageInstance != nullptr, CHIP_ERROR_INCORRECT_STATE,
                         ChipLogError(DeviceLayer, "Diagnostic Storage Instance cannot be NULL"));
 
-    // Allocate buffers for the diagnostic entry
-    char labelBuffer[kMaxStringValueSize];
-    strncpy(labelBuffer, label, kMaxStringValueSize);
-    labelBuffer[kMaxStringValueSize - 1] = '\0';
-
-    char groupBuffer[kMaxStringValueSize];
-    strncpy(groupBuffer, group, kMaxStringValueSize);
-    groupBuffer[kMaxStringValueSize - 1] = '\0';
-
     // Create diagnostic entry
-    DiagnosticEntry entry = { .label       = labelBuffer,
-                              .stringValue = groupBuffer,
+    DiagnosticEntry entry = { .label       = const_cast<char *>(label),
+                              .stringValue = const_cast<char *>(group),
                               .type        = Diagnostics::ValueType::kCharString,
                               .timestamp   = esp_log_timestamp() };
 

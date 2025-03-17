@@ -5,7 +5,7 @@ namespace chip {
 namespace Tracing {
 namespace Diagnostics {
 
-CHIP_ERROR Encode(CircularTLVWriter & writer, const DiagnosticEntry & entry)
+CHIP_ERROR Encode(TLVWriter & writer, const DiagnosticEntry & entry)
 {
     TLVType DiagnosticOuterContainer = kTLVType_NotSpecified;
     ReturnErrorOnFailure(writer.StartContainer(AnonymousTag(), kTLVType_Structure, DiagnosticOuterContainer));
@@ -16,7 +16,8 @@ CHIP_ERROR Encode(CircularTLVWriter & writer, const DiagnosticEntry & entry)
     // Write label
     if (entry.label != nullptr)
     {
-        if (strlen(entry.label) > kMaxStringValueSize)
+        uint32_t labelSize = strlen(entry.label) > kMaxStringValueSize ? kMaxStringValueSize : strlen(entry.label);
+        if (labelSize >= kMaxStringValueSize)
         {
             char labelBuffer[kMaxStringValueSize + 1];
             memcpy(labelBuffer, entry.label, kMaxStringValueSize);
@@ -25,7 +26,7 @@ CHIP_ERROR Encode(CircularTLVWriter & writer, const DiagnosticEntry & entry)
         }
         else
         {
-            ReturnErrorOnFailure(writer.PutString(chip::TLV::ContextTag(DiagTag::LABEL), entry.label));
+            ReturnErrorOnFailure(writer.PutString(chip::TLV::ContextTag(DiagTag::LABEL), entry.label, labelSize));
         }
     }
 
@@ -35,7 +36,8 @@ CHIP_ERROR Encode(CircularTLVWriter & writer, const DiagnosticEntry & entry)
     case ValueType::kCharString:
         if (entry.stringValue != nullptr)
         {
-            if (strlen(entry.stringValue) > kMaxStringValueSize)
+            uint32_t valueSize = strlen(entry.stringValue) > kMaxStringValueSize ? kMaxStringValueSize : strlen(entry.stringValue);
+            if (valueSize >= kMaxStringValueSize)
             {
                 char valueBuffer[kMaxStringValueSize + 1];
                 memcpy(valueBuffer, entry.stringValue, kMaxStringValueSize);
@@ -44,7 +46,7 @@ CHIP_ERROR Encode(CircularTLVWriter & writer, const DiagnosticEntry & entry)
             }
             else
             {
-                ReturnErrorOnFailure(writer.PutString(chip::TLV::ContextTag(DiagTag::VALUE), entry.stringValue));
+                ReturnErrorOnFailure(writer.PutString(chip::TLV::ContextTag(DiagTag::VALUE), entry.stringValue, valueSize));
             }
         }
         break;
@@ -60,11 +62,11 @@ CHIP_ERROR Encode(CircularTLVWriter & writer, const DiagnosticEntry & entry)
 
     ReturnErrorOnFailure(writer.EndContainer(DiagnosticOuterContainer));
     ReturnErrorOnFailure(writer.Finalize());
-    ChipLogProgress(DeviceLayer, "Diagnostic Value written to storage successfully. label: %s\n", entry.label);
+    ChipLogDetail(DeviceLayer, "Diagnostic Value written to storage successfully. label: %s\n", entry.label);
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Decode(CircularTLVReader & reader, DiagnosticEntry & entry)
+CHIP_ERROR Decode(TLVReader & reader, DiagnosticEntry & entry)
 {
     TLVType containerType;
     ReturnErrorOnFailure(reader.EnterContainer(containerType));
