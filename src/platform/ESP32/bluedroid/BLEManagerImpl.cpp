@@ -100,8 +100,8 @@ const uint8_t UUID_CHIPoBLEChar_TX[]      = { 0x12, 0x9D, 0x9F, 0x42, 0x9C, 0x4F
 const uint8_t ShortUUID_CHIPoBLE_CharTx_Desc[] = { 0x02, 0x29 };
 #endif
 
-const uint8_t CharProps_ReadNotify = ESP_GATT_CHAR_PROP_BIT_READ | ESP_GATT_CHAR_PROP_BIT_NOTIFY;
-const uint8_t CharProps_Write      = ESP_GATT_CHAR_PROP_BIT_WRITE;
+const uint8_t CharProps_ReadIndicate = ESP_GATT_CHAR_PROP_BIT_READ | ESP_GATT_CHAR_PROP_BIT_INDICATE;
+const uint8_t CharProps_Write        = ESP_GATT_CHAR_PROP_BIT_WRITE;
 
 // Offsets into CHIPoBLEGATTAttrs for specific attributes.
 enum
@@ -131,7 +131,7 @@ const esp_gatts_attr_db_t CHIPoBLEGATTAttrs[] = {
 
     // Characteristic declaration
     { { ESP_GATT_AUTO_RSP },
-      { ESP_UUID_LEN_16, (uint8_t *) UUID_CharDecl, ESP_GATT_PERM_READ, 1, 1, (uint8_t *) &CharProps_ReadNotify } },
+      { ESP_UUID_LEN_16, (uint8_t *) UUID_CharDecl, ESP_GATT_PERM_READ, 1, 1, (uint8_t *) &CharProps_ReadIndicate } },
     // Characteristic value
     { { ESP_GATT_RSP_BY_APP }, { ESP_UUID_LEN_128, (uint8_t *) UUID_CHIPoBLEChar_TX, ESP_GATT_PERM_READ, 512, 0, NULL } },
     // Client characteristic configuration description (CCCD) value
@@ -568,7 +568,7 @@ void BLEManagerImpl::gattc_profile_event_handler(esp_gattc_cb_event_t event, esp
                         {
                             gl_profile_tab[PROFILE_A_APP_ID].write_char_handle = char_elem_result[i].char_handle;
                         }
-                        else if (char_elem_result[i].properties & CharProps_ReadNotify)
+                        else if (char_elem_result[i].properties & CharProps_ReadIndicate)
                         {
                             gl_profile_tab[PROFILE_A_APP_ID].notify_char_handle = char_elem_result[i].char_handle;
                             esp_ble_gattc_register_for_notify(gattc_if, gl_profile_tab[PROFILE_A_APP_ID].remote_bda,

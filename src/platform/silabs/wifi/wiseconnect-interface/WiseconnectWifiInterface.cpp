@@ -37,12 +37,13 @@ constexpr osThreadAttr_t kWlanTaskAttr = { .name       = "wlan_rsi",
                                            .stack_size = kWlanTaskSize,
                                            .priority   = osPriorityAboveNormal7 };
 
-osTimerId_t sDHCPTimer;
-bool hasNotifiedWifiConnectivity = false;
-
 } // namespace
 
-CHIP_ERROR GetMacAddress(sl_wfx_interface_t interface, chip::MutableByteSpan & address)
+namespace chip {
+namespace DeviceLayer {
+namespace Silabs {
+
+CHIP_ERROR WiseconnectWifiInterface::GetMacAddress(sl_wfx_interface_t interface, chip::MutableByteSpan & address)
 {
     VerifyOrReturnError(address.size() >= kWifiMacAddressLength, CHIP_ERROR_BUFFER_TOO_SMALL);
 
@@ -55,7 +56,7 @@ CHIP_ERROR GetMacAddress(sl_wfx_interface_t interface, chip::MutableByteSpan & a
     return CopySpanToMutableSpan(byteSpan, address);
 }
 
-CHIP_ERROR StartNetworkScan(chip::ByteSpan ssid, ScanCallback callback)
+CHIP_ERROR WiseconnectWifiInterface::StartNetworkScan(chip::ByteSpan ssid, ScanCallback callback)
 {
     VerifyOrReturnError(callback != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(!wfx_rsi.dev_state.Has(WifiState::kScanStarted), CHIP_ERROR_IN_PROGRESS);
@@ -86,7 +87,7 @@ CHIP_ERROR StartNetworkScan(chip::ByteSpan ssid, ScanCallback callback)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR StartWifiTask()
+CHIP_ERROR WiseconnectWifiInterface::StartWifiTask()
 {
     // Verify that the Wifi task has not already been started.
     VerifyOrReturnError(!(wfx_rsi.dev_state.Has(WifiState::kStationStarted)), CHIP_NO_ERROR);
@@ -99,27 +100,27 @@ CHIP_ERROR StartWifiTask()
     return CHIP_NO_ERROR;
 }
 
-void ConfigureStationMode()
+void WiseconnectWifiInterface::ConfigureStationMode()
 {
     wfx_rsi.dev_state.Set(WifiState::kStationMode);
 }
 
-bool IsStationModeEnabled()
+bool WiseconnectWifiInterface::IsStationModeEnabled()
 {
     return wfx_rsi.dev_state.Has(WifiState::kStationMode);
 }
 
-bool IsStationConnected()
+bool WiseconnectWifiInterface::IsStationConnected()
 {
     return wfx_rsi.dev_state.Has(WifiState::kStationConnected);
 }
 
-bool IsStationReady()
+bool WiseconnectWifiInterface::IsStationReady()
 {
     return wfx_rsi.dev_state.Has(WifiState::kStationInit);
 }
 
-CHIP_ERROR TriggerDisconnection()
+CHIP_ERROR WiseconnectWifiInterface::TriggerDisconnection()
 {
     VerifyOrReturnError(TriggerPlatformWifiDisconnection() == SL_STATUS_OK, CHIP_ERROR_INTERNAL);
     wfx_rsi.dev_state.Clear(WifiState::kStationConnected);
@@ -127,165 +128,104 @@ CHIP_ERROR TriggerDisconnection()
     return CHIP_NO_ERROR;
 }
 
-void DHCPTimerEventHandler(void * arg)
+void WiseconnectWifiInterface::NotifyConnectivity(void)
 {
-    WifiPlatformEvent event = WifiPlatformEvent::kStationDhcpPoll;
-    PostWifiPlatformEvent(event);
-}
-
-void CancelDHCPTimer(void)
-{
-    VerifyOrReturn(osTimerIsRunning(sDHCPTimer), ChipLogDetail(DeviceLayer, "CancelDHCPTimer: timer not running"));
-    VerifyOrReturn(osTimerStop(sDHCPTimer) == osOK, ChipLogError(DeviceLayer, "CancelDHCPTimer: failed to stop timer"));
-}
-
-void StartDHCPTimer(uint32_t timeout)
-{
-    // Cancel timer if already started
-    CancelDHCPTimer();
-
-    VerifyOrReturn(osTimerStart(sDHCPTimer, pdMS_TO_TICKS(timeout)) == osOK,
-                   ChipLogError(DeviceLayer, "StartDHCPTimer: failed to start timer"));
-}
-
-void NotifyConnectivity(void)
-{
-    VerifyOrReturn(!hasNotifiedWifiConnectivity);
+    VerifyOrReturn(!mHasNotifiedWifiConnectivity);
 
     NotifyConnection(wfx_rsi.ap_mac);
-    hasNotifiedWifiConnectivity = true;
+    mHasNotifiedWifiConnectivity = true;
 }
 
-sl_status_t CreateDHCPTimer()
-{
-    // TODO: Use LWIP timer instead of creating a new one here
-    sDHCPTimer = osTimerNew(DHCPTimerEventHandler, osTimerPeriodic, nullptr, nullptr);
-    VerifyOrReturnError(sDHCPTimer != nullptr, SL_STATUS_ALLOCATION_FAILED);
-
-    return SL_STATUS_OK;
-}
-
-/**
- * @brief Reset the flags that are used to notify the application about DHCP connectivity
- *        and emits a WifiPlatformEvent::kStationDoDhcp event to trigger DHCP polling checks.
- *
- * TODO: This function should be moved to the protected section once the class structure is done.
- */
-void ResetDHCPNotificationFlags(void)
+void WiseconnectWifiInterface::ResetConnectivityNotificationFlags(void)
 {
 
     ResetIPNotificationStates();
-    hasNotifiedWifiConnectivity = false;
+    mHasNotifiedWifiConnectivity = false;
 
-    WifiPlatformEvent event = WifiPlatformEvent::kStationDoDhcp;
+    WifiPlatformEvent event = WifiPlatformEvent::kConnectionComplete;
     PostWifiPlatformEvent(event);
-}
-
-/*********************************************************************
- * @fn  void wfx_set_wifi_provision(wfx_wifi_provision_t *cfg)
- * @brief
- *      Driver set the wifi provision
- * @param[in]  cfg:  wifi configuration
- * @return
- *       None
- ***********************************************************************/
-void wfx_set_wifi_provision(wfx_wifi_provision_t * cfg)
-{
-    VerifyOrReturn(cfg != nullptr);
-    wfx_rsi.sec = *cfg;
-    wfx_rsi.dev_state.Set(WifiState::kStationProvisioned);
-}
-
-/*********************************************************************
- * @fn  bool wfx_get_wifi_provision(wfx_wifi_provision_t *wifiConfig)
- * @brief
- *      Driver get the wifi provision
- * @param[in]  wifiConfig:  wifi configuration
- * @return  return false if successful,
- *        true otherwise
- ***********************************************************************/
-bool wfx_get_wifi_provision(wfx_wifi_provision_t * wifiConfig)
-{
-    VerifyOrReturnError(wifiConfig != nullptr, false);
-    VerifyOrReturnError(wfx_rsi.dev_state.Has(WifiState::kStationProvisioned), false);
-    *wifiConfig = wfx_rsi.sec;
-    return true;
-}
-
-/*********************************************************************
- * @fn  void wfx_clear_wifi_provision(void)
- * @brief
- *      Driver is clear the wifi provision
- * @param[in]  None
- * @return  None
- ***********************************************************************/
-void wfx_clear_wifi_provision(void)
-{
-    memset(&wfx_rsi.sec, 0, sizeof(wfx_rsi.sec));
-    wfx_rsi.dev_state.Clear(WifiState::kStationProvisioned);
-    ChipLogProgress(DeviceLayer, "Clear WiFi Provision");
-}
-
-/*************************************************************************
- * @fn sl_status_t wfx_connect_to_ap(void)
- * @brief
- * Start a JOIN command to the AP - Done by the wfx_rsi task
- * @param[in]   None
- * @return  returns SL_STATUS_OK if successful
- ****************************************************************************/
-sl_status_t wfx_connect_to_ap(void)
-{
-    VerifyOrReturnError(wfx_rsi.dev_state.Has(WifiState::kStationProvisioned), SL_STATUS_INVALID_CONFIGURATION);
-    VerifyOrReturnError(wfx_rsi.sec.ssid_length, SL_STATUS_INVALID_CREDENTIALS);
-    VerifyOrReturnError(wfx_rsi.sec.ssid_length <= WFX_MAX_SSID_LENGTH, SL_STATUS_HAS_OVERFLOWED);
-    ChipLogProgress(DeviceLayer, "connect to access point: %s", wfx_rsi.sec.ssid);
-
-    WifiPlatformEvent event = WifiPlatformEvent::kStationStartJoin;
-    PostWifiPlatformEvent(event);
-    return SL_STATUS_OK;
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_IPV4
-/*********************************************************************
- * @fn  bool wfx_have_ipv4_addr(sl_wfx_interface_t which_if)
- * @brief
- *      called fuction when driver have ipv4 address
- * @param[in]  which_if:
- * @return  returns ture if successful,
- *          false otherwise
- ***********************************************************************/
-bool wfx_have_ipv4_addr(sl_wfx_interface_t which_if)
+void WiseconnectWifiInterface::GotIPv4Address(uint32_t ip)
 {
-    VerifyOrReturnError(which_if == SL_WFX_STA_INTERFACE, false);
+    // Acquire the new IP address
+    for (int i = 0; i < 4; ++i)
+    {
+        wfx_rsi.ip4_addr[i] = (ip >> (i * 8)) & 0xFF;
+    }
+
+    ChipLogDetail(DeviceLayer, "DHCP OK: IP=%d.%d.%d.%d", wfx_rsi.ip4_addr[0], wfx_rsi.ip4_addr[1], wfx_rsi.ip4_addr[2],
+                  wfx_rsi.ip4_addr[3]);
+
+    // Notify the Connectivity Manager - via the app
+    wfx_rsi.dev_state.Set(WifiState::kStationDhcpDone).Set(WifiState::kStationReady);
+    NotifyIPv4Change(true);
+}
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
+
+void WiseconnectWifiInterface::ClearWifiCredentials()
+{
+    ChipLogProgress(DeviceLayer, "Clear WiFi Provision");
+
+    wfx_rsi.credentials.Clear();
+    wfx_rsi.dev_state.Clear(WifiState::kStationProvisioned);
+}
+
+CHIP_ERROR WiseconnectWifiInterface::GetWifiCredentials(WifiCredentials & credentials)
+{
+    VerifyOrReturnError(wfx_rsi.dev_state.Has(WifiState::kStationProvisioned), CHIP_ERROR_INCORRECT_STATE);
+    credentials = wfx_rsi.credentials;
+
+    return CHIP_NO_ERROR;
+}
+
+bool WiseconnectWifiInterface::IsWifiProvisioned()
+{
+    return wfx_rsi.dev_state.Has(WifiState::kStationProvisioned);
+}
+
+void WiseconnectWifiInterface::SetWifiCredentials(const WifiCredentials & credentials)
+{
+    wfx_rsi.credentials = credentials;
+    wfx_rsi.dev_state.Set(WifiState::kStationProvisioned);
+}
+
+CHIP_ERROR WiseconnectWifiInterface::ConnectToAccessPoint()
+{
+    VerifyOrReturnError(IsWifiProvisioned(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(wfx_rsi.credentials.ssidLength, CHIP_ERROR_INCORRECT_STATE);
+
+    // TODO: We should move this validation to where we set the credentials. It is too late here.
+    VerifyOrReturnError(wfx_rsi.credentials.ssidLength <= WFX_MAX_SSID_LENGTH, CHIP_ERROR_INVALID_ARGUMENT);
+
+    ChipLogProgress(DeviceLayer, "connect to access point: %s", wfx_rsi.credentials.ssid);
+
+    WifiPlatformEvent event = WifiPlatformEvent::kStationStartJoin;
+    PostWifiPlatformEvent(event);
+
+    return CHIP_NO_ERROR;
+}
+
+#if CHIP_DEVICE_CONFIG_ENABLE_IPV4
+bool WiseconnectWifiInterface::HasAnIPv4Address()
+{
     return wfx_rsi.dev_state.Has(WifiState::kStationDhcpDone);
 }
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
 
-/*********************************************************************
- * @fn  bool wfx_have_ipv6_addr(sl_wfx_interface_t which_if)
- * @brief
- *      called fuction when driver have ipv6 address
- * @param[in]  which_if:
- * @return  returns ture if successful,
- *          false otherwise
- ***********************************************************************/
-bool wfx_have_ipv6_addr(sl_wfx_interface_t which_if)
+bool WiseconnectWifiInterface::HasAnIPv6Address()
 {
-    VerifyOrReturnError(which_if == SL_WFX_STA_INTERFACE, false);
     // TODO: WifiState::kStationConnected does not guarantee SLAAC IPv6 LLA, maybe use a different FLAG
+    // Once connect is sync instead of async, this should be fine
     return wfx_rsi.dev_state.Has(WifiState::kStationConnected);
 }
 
-/***************************************************************************
- * @fn   void wfx_cancel_scan(void)
- * @brief
- *      called function when driver cancel scaning
- * @param[in]  None
- * @return
- *      None
- *****************************************************************************/
-void wfx_cancel_scan(void)
+void WiseconnectWifiInterface::CancelScanNetworks()
 {
-    /* Not possible */
-    ChipLogError(DeviceLayer, "cannot cancel scan");
+    // TODO: Implement cancel scan
 }
+
+} // namespace Silabs
+} // namespace DeviceLayer
+} // namespace chip

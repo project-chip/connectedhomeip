@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2020-2022 Project CHIP Authors
+#    Copyright (c) 2020-2025 Project CHIP Authors
 #    Copyright (c) 2019-2020 Google, LLC.
 #    Copyright (c) 2013-2018 Nest Labs, Inc.
 #    All rights reserved.
@@ -61,6 +61,8 @@ __all__ = ["ChipDeviceController", "CommissioningParameters"]
 
 # Defined in $CHIP_ROOT/src/lib/core/CHIPError.h
 CHIP_ERROR_TIMEOUT: int = 50
+
+_RCACCallbackType = CFUNCTYPE(None, POINTER(c_uint8), c_size_t)
 
 LOGGER = logging.getLogger(__name__)
 
@@ -479,6 +481,7 @@ class ChipDeviceControllerBase():
 
             if err.is_success:
                 self._commissioning_context.future.set_result(nodeId)
+
             else:
                 self._commissioning_context.future.set_exception(err.to_exception())
 
@@ -550,6 +553,7 @@ class ChipDeviceControllerBase():
 
         self.cbHandleCommissioningCompleteFunct = _DevicePairingDelegate_OnCommissioningCompleteFunct(
             HandleCommissioningComplete)
+
         self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningCompleteCallback(
             self.pairingDelegate, self.cbHandleCommissioningCompleteFunct)
 
@@ -698,12 +702,52 @@ class ChipDeviceControllerBase():
 
         self._ChipStack.Call(lambda: self._dmLib.pychip_ExpireSessions(self.devCtrl, nodeid)).raise_on_error()
 
-    # TODO: This needs to be called MarkSessionDefunct
-    def CloseSession(self, nodeid):
+    def MarkSessionDefunct(self, nodeid):
+        '''
+        Marks a previously active session with the specified node as defunct to temporarily prevent it
+        from being used with new exchanges to send or receive messages. This should be called when there
+        is suspicion of a loss-of-sync with the session state on the associated peer, such as evidence
+        of transport failure.
+
+        If messages are received thereafter on this session, the session will be put back into the Active state.
+
+        This function should only be called on an active session.
+        This will NOT detach any existing SessionHolders.
+
+        Parameters:
+            nodeid (int): The node ID of the device whose session should be marked as defunct.
+
+        Raises:
+            RuntimeError: If the controller is not active.
+            PyChipError: If the operation fails.
+        '''
         self.CheckIsActive()
 
         self._ChipStack.Call(
-            lambda: self._dmLib.pychip_DeviceController_CloseSession(
+            lambda: self._dmLib.pychip_DeviceController_MarkSessionDefunct(
+                self.devCtrl, nodeid)
+        ).raise_on_error()
+
+    def MarkSessionForEviction(self, nodeid):
+        '''
+        Marks the session with the specified node for eviction. It will first detach all SessionHolders
+        attached to this session by calling 'OnSessionReleased' on each of them. This will force them
+        to release their reference to the session. If there are no more references left, the session
+        will then be de-allocated.
+
+        Once marked for eviction, the session SHALL NOT ever become active again.
+
+        Parameters:
+            nodeid (int): The node ID of the device whose session should be marked for eviction.
+
+        Raises:
+            RuntimeError: If the controller is not active.
+            PyChipError: If the operation fails.
+        '''
+        self.CheckIsActive()
+
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_MarkSessionForEviction(
                 self.devCtrl, nodeid)
         ).raise_on_error()
 
@@ -1869,9 +1913,13 @@ class ChipDeviceControllerBase():
                 c_void_p, c_uint64, _DeviceUnpairingCompleteFunct]
             self._dmLib.pychip_DeviceController_UnpairDevice.restype = PyChipError
 
-            self._dmLib.pychip_DeviceController_CloseSession.argtypes = [
+            self._dmLib.pychip_DeviceController_MarkSessionDefunct.argtypes = [
                 c_void_p, c_uint64]
-            self._dmLib.pychip_DeviceController_CloseSession.restype = PyChipError
+            self._dmLib.pychip_DeviceController_MarkSessionDefunct.restype = PyChipError
+
+            self._dmLib.pychip_DeviceController_MarkSessionForEviction.argtypes = [
+                c_void_p, c_uint64]
+            self._dmLib.pychip_DeviceController_MarkSessionForEviction.restype = PyChipError
 
             self._dmLib.pychip_DeviceController_GetAddressAndPort.argtypes = [
                 c_void_p, c_uint64, c_char_p, c_uint64, POINTER(c_uint16)]
@@ -1957,6 +2005,10 @@ class ChipDeviceControllerBase():
 
             self._dmLib.pychip_GetCompletionError.argtypes = []
             self._dmLib.pychip_GetCompletionError.restype = PyChipError
+
+            self._dmLib.pychip_GetCommissioningRCACData.argtypes = [ctypes.POINTER(
+                ctypes.c_uint8), ctypes.POINTER(ctypes.c_size_t), ctypes.c_size_t]
+            self._dmLib.pychip_GetCommissioningRCACData.restype = None
 
             self._dmLib.pychip_DeviceController_IssueNOCChain.argtypes = [
                 c_void_p, py_object, c_char_p, c_size_t, c_uint64]
@@ -2251,6 +2303,34 @@ class ChipDeviceController(ChipDeviceControllerBase):
             )
 
             return await asyncio.futures.wrap_future(ctx.future)
+
+    def get_rcac(self):
+        '''
+        Passes captured RCAC data back to Python test modules for validation
+        - Setting buffer size to max size mentioned in spec:
+        - Ref: https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/06c4d55962954546ecf093c221fe1dab57645028/policies/matter_certificate_policy.adoc#615-key-sizes
+        '''
+        rcac_size = 400
+        rcac_buffer = (ctypes.c_uint8 * rcac_size)()  # Allocate buffer
+
+        actual_rcac_size = ctypes.c_size_t()
+
+        # Now calling the C++ function with the buffer size set as an additional parameter
+        self._dmLib.pychip_GetCommissioningRCACData(
+            ctypes.cast(rcac_buffer, ctypes.POINTER(ctypes.c_uint8)),
+            ctypes.byref(actual_rcac_size),
+            ctypes.c_size_t(rcac_size)  # Pass the buffer size
+        )
+
+        # Check if data is available
+        if actual_rcac_size.value > 0:
+            # Convert the data to a Python bytes object
+            rcac_data = bytearray(rcac_buffer[:actual_rcac_size.value])
+            rcac_bytes = bytes(rcac_data)
+        else:
+            LOGGER.exception("RCAC returned from C++ did not contain any data")
+            return None
+        return rcac_bytes
 
     async def CommissionWithCode(self, setupPayload: str, nodeid: int, discoveryType: DiscoveryType = DiscoveryType.DISCOVERY_ALL) -> int:
         ''' Commission with the given nodeid from the setupPayload.

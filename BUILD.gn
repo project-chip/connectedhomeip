@@ -394,6 +394,10 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     enable_linux_rvc_app_build =
         enable_default_builds && (host_os == "linux" || host_os == "mac")
 
+    # TODO: #37983: Add darwin support for libdatachannel and then add host_os == "mac" here.
+    # Build the Linux Camera app example.
+    enable_linux_camera_app_build = enable_default_builds && host_os == "linux"
+
     # Build the cc13x2x7_26x2x7 lock app example.
     enable_cc13x2x7_26x2x7_lock_app_build = enable_ti_simplelink_builds
 
@@ -781,6 +785,15 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     }
 
     extra_build_deps += [ ":linux_rvc_app" ]
+  }
+
+  if (enable_linux_camera_app_build) {
+    group("linux_camera_app") {
+      deps =
+          [ "${chip_root}/examples/camera-app/linux(${standalone_toolchain})" ]
+    }
+
+    extra_build_deps += [ ":linux_camera_app" ]
   }
 
   group("default") {

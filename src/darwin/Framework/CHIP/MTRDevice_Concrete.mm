@@ -58,6 +58,8 @@
 
 static NSString * const sLastInitialSubscribeLatencyKey = @"lastInitialSubscribeLatency";
 
+static NSString * const sDeviceMayBeReachableReason = @"SPI client indicated the device may now be reachable";
+
 // Not static, because these are public API.
 NSString * const MTRPreviousDataKey = @"previousData";
 NSString * const MTRDataVersionKey = @"dataVersion";
@@ -306,6 +308,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 //   Actively receiving priming report
 
 @property (nonatomic) MTRInternalDeviceState internalDeviceState;
+@property (nonatomic) BOOL doingCASEAttemptForDeviceMayBeReachable;
 
 #define MTRDEVICE_SUBSCRIPTION_ATTEMPT_MIN_WAIT_SECONDS (1)
 #define MTRDEVICE_SUBSCRIPTION_ATTEMPT_MAX_WAIT_SECONDS (3600)
@@ -470,6 +473,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         _state = MTRDeviceStateUnknown;
         _internalDeviceState = MTRInternalDeviceStateUnsubscribed;
         _internalDeviceStateForDescription = MTRInternalDeviceStateUnsubscribed;
+        _doingCASEAttemptForDeviceMayBeReachable = NO;
         if (controller.controllerDataStore) {
             _persistedClusterData = [[NSCache alloc] init];
         } else {
@@ -708,8 +712,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 {
     mtr_weakify(self);
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (nextUpdateInSeconds * NSEC_PER_SEC)), self.queue, ^{
-        MTR_LOG_DEBUG("%@ Timer expired, start Device Time Update", self);
         mtr_strongify(self);
+        MTR_LOG_DEBUG("%@ Timer expired, start Device Time Update", self);
         if (self) {
             [self _performScheduledTimeUpdate];
         } else {
@@ -884,11 +888,11 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     return self.suspended == NO && ![_deviceController isKindOfClass:MTRDeviceControllerOverXPC.class];
 }
 
-- (void)_delegateAdded
+- (void)_delegateAdded:(id<MTRDeviceDelegate>)delegate
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
-    [super _delegateAdded];
+    [super _delegateAdded:delegate];
 
     [self _ensureSubscriptionForExistingDelegates:@"delegate is set"];
 }
@@ -1031,8 +1035,9 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     // in fact be reachable yet; we won't know until we have managed to
     // establish a CASE session.  And at that point, our subscription will
     // trigger the state change as needed.
+    BOOL shouldReattemptSubscription = NO;
     if (self.reattemptingSubscription) {
-        [self _reattemptSubscriptionNowIfNeededWithReason:reason];
+        shouldReattemptSubscription = YES;
     } else {
         readClientToResubscribe = self.matterCPPObjectsHolder.readClient;
         subscriptionCallback = self.matterCPPObjectsHolder.subscriptionCallback;
@@ -1048,9 +1053,15 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             subscriptionCallback->ResetResubscriptionBackoff();
         }
         readClientToResubscribe->TriggerResubscribeIfScheduled(reason.UTF8String);
-    } else if (_internalDeviceState == MTRInternalDeviceStateSubscribing && nodeLikelyReachable) {
+    } else if (((_internalDeviceState == MTRInternalDeviceStateSubscribing && !self.doingCASEAttemptForDeviceMayBeReachable) || shouldReattemptSubscription) && nodeLikelyReachable) {
         // If we have reason to suspect that the node is now reachable and we haven't established a
         // CASE session yet, let's consider it to be stalled and invalidate the pairing session.
+
+        // Reset back off for framework resubscription
+        os_unfair_lock_lock(&self->_lock);
+        [self _setLastSubscriptionAttemptWait:0];
+        os_unfair_lock_unlock(&self->_lock);
+
         mtr_weakify(self);
         [self._concreteController asyncGetCommissionerOnMatterQueue:^(Controller::DeviceCommissioner * commissioner) {
             mtr_strongify(self);
@@ -1060,6 +1071,13 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             VerifyOrDie(caseSessionMgr != nullptr);
             caseSessionMgr->ReleaseSession(commissioner->GetPeerScopedId(self->_nodeID.unsignedLongLongValue));
         } errorHandler:nil /* not much we can do */];
+    }
+
+    // The subscription reattempt here eventually asyncs onto the matter queue for session,
+    // and should be called after the above ReleaseSession call, to avoid churn.
+    if (shouldReattemptSubscription) {
+        std::lock_guard lock(_lock);
+        [self _reattemptSubscriptionNowIfNeededWithReason:reason];
     }
 }
 
@@ -2731,6 +2749,9 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     [self _changeInternalState:MTRInternalDeviceStateSubscribing];
 
     MTR_LOG("%@ setting up subscription with reason: %@", self, reason);
+    if ([reason hasPrefix:sDeviceMayBeReachableReason]) {
+        self.doingCASEAttemptForDeviceMayBeReachable = YES;
+    }
 
     __block bool markUnreachableAfterWait = true;
 #ifdef DEBUG
@@ -2769,6 +2790,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                            NSNumber * _Nullable retryDelay) {
                            mtr_strongify(self);
                            VerifyOrReturn(self, MTR_LOG_DEBUG("_setupSubscriptionWithReason directlyGetSessionForNode called back with nil MTRDevice"));
+
+                           self.doingCASEAttemptForDeviceMayBeReachable = NO;
 
                            if (error != nil) {
                                MTR_LOG_ERROR("%@ getSessionForNode error %@", self, error);
@@ -2874,6 +2897,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                                    [matterCPPObjectsHolder setReadClient:nullptr subscriptionCallback:nullptr];
 
                                    // OnDone
+                                   std::lock_guard lock(self->_lock);
                                    [self _doHandleSubscriptionReset:nil];
                                },
                                ^(void) {
@@ -3644,8 +3668,12 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     for (NSArray<MTRCommandWithRequiredResponse *> * commandGroup in [commands reverseObjectEnumerator]) {
         // We want to invoke all the commands in the group in order, propagating along the list of
         // current responses.  Build up that linked list of command invokes via chaining the completions.
+        mtr_weakify(self);
         for (MTRCommandWithRequiredResponse * command in [commandGroup reverseObjectEnumerator]) {
             auto commandInvokeBlock = ^(BOOL allSucceededSoFar, NSArray<MTRDeviceResponseValueDictionary> * previousResponses) {
+                mtr_strongify(self);
+                VerifyOrReturn(self, MTR_LOG_DEBUG("invokeCommands commandInvokeBlock called back with nil MTRDevice"));
+
                 [self invokeCommandWithEndpointID:command.path.endpoint
                                         clusterID:command.path.cluster
                                         commandID:command.path.command
@@ -3654,6 +3682,8 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                             expectedValueInterval:nil
                                             queue:self.queue
                                        completion:^(NSArray<NSDictionary<NSString *, id> *> * responses, NSError * error) {
+                                           mtr_strongify(self);
+                                           VerifyOrReturn(self, MTR_LOG_DEBUG("invokeCommands invokeCommandWithEndpointID completion called back with nil MTRDevice"));
                                            if (error != nil) {
                                                nextCompletion(NO, [previousResponses arrayByAddingObject:@ {
                                                    MTRCommandPathKey : command.path,
@@ -3686,6 +3716,9 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         }
 
         auto commandGroupInvokeBlock = ^(BOOL allSucceededSoFar, NSArray<MTRDeviceResponseValueDictionary> * previousResponses) {
+            mtr_strongify(self);
+            VerifyOrReturn(self, MTR_LOG_DEBUG("invokeCommands commandGroupInvokeBlock called back with nil MTRDevice"));
+
             if (allSucceededSoFar == NO) {
                 // Don't start a new command group if something failed in the
                 // previous one.  Note that we might be running on self.queue here, so make sure we
@@ -3735,11 +3768,19 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                     queue:(dispatch_queue_t)queue
                completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
 {
+    MTR_LOG("%@ downloadLogOfType: %lu, timeout: %f", self, static_cast<unsigned long>(type), timeout);
+
     auto * baseDevice = [self newBaseDevice];
+
+    mtr_weakify(self);
     [baseDevice downloadLogOfType:type
                           timeout:timeout
                             queue:queue
-                       completion:completion];
+                       completion:^(NSURL * _Nullable url, NSError * _Nullable error) {
+                           mtr_strongify(self);
+                           MTR_LOG("%@ downloadLogOfType %lu completed: %@", self, static_cast<unsigned long>(type), error);
+                           completion(url, error);
+                       }];
 }
 
 #pragma mark - Cache management
@@ -4163,9 +4204,9 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                 // When the expected value interval expires, the correct value will be reported,
                 // if needed.
                 if (expectedValue) {
-                    MTR_LOG("%@ report %@ value filtered - expected value still present", self, attributePath);
+                    MTR_LOG("%@ report %@ value %@ filtered - expected value still present", self, attributePath, attributeDataValue);
                 } else {
-                    MTR_LOG("%@ report %@ value filtered - same as read cache", self, attributePath);
+                    MTR_LOG("%@ report %@ value %@ filtered - same as read cache", self, attributePath, attributeDataValue);
                 }
             }
 
@@ -4277,6 +4318,22 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     }
 
     [self _updateAttributeDependentDescriptionData];
+
+    NSNumber * networkFeatures = nil;
+    {
+        std::lock_guard descriptionLock(_descriptionLock);
+        networkFeatures = _allNetworkFeatures;
+    }
+
+    if ((networkFeatures.unsignedLongLongValue & MTRNetworkCommissioningFeatureWiFiNetworkInterface) == 0 && (networkFeatures.unsignedLongLongValue & MTRNetworkCommissioningFeatureThreadNetworkInterface) == 0) {
+        // We had persisted data, but apparently this device does not have any
+        // known network technologies?  Log some more information about what's
+        // going on.
+        auto * rootNetworkCommissioningPath = [MTRClusterPath clusterPathWithEndpointID:@(kRootEndpointId) clusterID:@(MTRClusterIDTypeNetworkCommissioningID)];
+        auto * networkCommisioningData = clusterData[rootNetworkCommissioningPath];
+        MTR_LOG("%@ after setting persisted data, network features: %@, root network commissioning featureMap: %@", self, networkFeatures,
+            networkCommisioningData.attributes[@(MTRClusterGlobalAttributeFeatureMapID)]);
+    }
 
     // We have some stored data.  Since we don't store data until the end of the
     // initial priming report, our device cache must be primed.
@@ -4812,7 +4869,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         std::lock_guard lock(self->_lock);
         // Use _ensureSubscriptionForExistingDelegates so that the subscriptions
         // will go through the pool as needed, not necessarily happen immediately.
-        [self _ensureSubscriptionForExistingDelegates:@"SPI client indicated the device may now be reachable"];
+        [self _ensureSubscriptionForExistingDelegates:sDeviceMayBeReachableReason];
     } errorHandler:nil];
 }
 

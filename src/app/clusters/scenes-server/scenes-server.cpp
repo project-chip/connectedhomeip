@@ -233,7 +233,7 @@ CHIP_ERROR ScenesServer::FabricSceneInfo::SetSceneInfoStruct(EndpointId endpoint
     uint8_t sceneInfoStructIndex = 0;
     if (CHIP_ERROR_NOT_FOUND == FindSceneInfoStructIndex(fabric, endpointIndex, sceneInfoStructIndex))
     {
-        VerifyOrReturnError(mSceneInfoStructsCount[endpointIndex] < ArraySize(mSceneInfoStructs[endpointIndex]),
+        VerifyOrReturnError(mSceneInfoStructsCount[endpointIndex] < MATTER_ARRAY_SIZE(mSceneInfoStructs[endpointIndex]),
                             CHIP_ERROR_NO_MEMORY);
         sceneInfoStructIndex = mSceneInfoStructsCount[endpointIndex];
 
@@ -256,7 +256,7 @@ void ScenesServer::FabricSceneInfo::ClearSceneInfoStruct(EndpointId endpoint, Fa
     ReturnOnFailure(FindSceneInfoStructIndex(fabric, endpointIndex, sceneInfoStructIndex));
 
     uint8_t nextIndex = static_cast<uint8_t>(sceneInfoStructIndex + 1);
-    uint8_t moveNum   = static_cast<uint8_t>(ArraySize(mSceneInfoStructs[endpointIndex]) - nextIndex);
+    uint8_t moveNum   = static_cast<uint8_t>(MATTER_ARRAY_SIZE(mSceneInfoStructs[endpointIndex]) - nextIndex);
     // Compress the endpoint's SceneInfoStruct array
     if (moveNum)
     {
@@ -289,7 +289,7 @@ CHIP_ERROR ScenesServer::FabricSceneInfo::FindFabricSceneInfoIndex(EndpointId en
     uint16_t index =
         emberAfGetClusterServerEndpointIndex(endpoint, ScenesManagement::Id, MATTER_DM_SCENES_CLUSTER_SERVER_ENDPOINT_COUNT);
 
-    if (index < ArraySize(mSceneInfoStructs))
+    if (index < MATTER_ARRAY_SIZE(mSceneInfoStructs))
     {
         endpointIndex = index;
         return CHIP_NO_ERROR;
@@ -307,7 +307,7 @@ CHIP_ERROR ScenesServer::FabricSceneInfo::FindFabricSceneInfoIndex(EndpointId en
 /// @return CHIP_NO_ERROR or CHIP_ERROR_NOT_FOUND, CHIP_ERROR_INVALID_ARGUMENT if invalid fabric or endpointIndex are provided
 CHIP_ERROR ScenesServer::FabricSceneInfo::FindSceneInfoStructIndex(FabricIndex fabric, size_t endpointIndex, uint8_t & index)
 {
-    VerifyOrReturnError(endpointIndex < ArraySize(mSceneInfoStructs), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(endpointIndex < MATTER_ARRAY_SIZE(mSceneInfoStructs), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(kUndefinedFabricIndex != fabric, CHIP_ERROR_INVALID_ARGUMENT);
 
     index = 0;

@@ -23,6 +23,7 @@
 #include <protocols/bdx/BdxTransferServerDelegate.h>
 #include <protocols/bdx/DiagnosticLogs.h>
 
+#import "MTRDeviceControllerFactory_Internal.h"
 #import "MTRDeviceController_Internal.h"
 #import "MTRError_Internal.h"
 #import "MTRLogging_Internal.h"
@@ -260,6 +261,7 @@ private:
 
 - (void)failure:(NSError * _Nullable)error
 {
+    MTR_LOG("%@ Diagnostic log transfer failure: %@", self, error);
     _finalize(error);
 }
 
@@ -417,6 +419,10 @@ private:
 {
     assertChipStackLockedByCurrentThread();
 
+    // Fow now, we only support one download at a time per controller; abort
+    // any existing ones so we can start this new one.
+    [self abortDownloadsForController:controller];
+
     uint16_t timeoutInSeconds = 0;
     if (timeout <= 0) {
         timeoutInSeconds = 0;
@@ -461,6 +467,9 @@ private:
         auto err = _bridge->StartBDXTransferTimeout(download, timeoutInSeconds);
         VerifyOrReturn(CHIP_NO_ERROR == err, [download failure:[MTRError errorForCHIPErrorCode:err]]);
     }
+
+    MTR_LOG("%@ Started log download attempt for node %016llX-%016llX (%llu)", download,
+        controller.compressedFabricID.unsignedLongLongValue, nodeID.unsignedLongLongValue, nodeID.unsignedLongLongValue);
 }
 
 - (void)abortDownloadsForController:(MTRDeviceController_Concrete *)controller;
@@ -477,9 +486,15 @@ private:
                                           abortHandler:(AbortHandler)abortHandler;
 {
     assertChipStackLockedByCurrentThread();
-    MTR_LOG("BDX Transfer Session Begin for log download: %@", fileDesignator);
 
     auto * download = [_downloads get:fileDesignator fabricIndex:fabricIndex nodeID:nodeID];
+
+    auto * controller = [[MTRDeviceControllerFactory sharedInstance] runningControllerForFabricIndex:fabricIndex.unsignedCharValue];
+
+    MTR_LOG("%@ BDX Transfer Session Begin for log download: %016llX-%016llX (%llu), %@", download,
+        controller.compressedFabricID.unsignedLongLongValue, nodeID.unsignedLongLongValue, nodeID.unsignedLongLongValue,
+        fileDesignator);
+
     VerifyOrReturn(nil != download, completion([MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_FOUND]));
 
     download.abortHandler = abortHandler;
@@ -493,9 +508,15 @@ private:
                                            completion:(MTRStatusCompletion)completion
 {
     assertChipStackLockedByCurrentThread();
-    MTR_LOG("BDX Transfer Session Data for log download: %@: %@", fileDesignator, data);
 
     auto * download = [_downloads get:fileDesignator fabricIndex:fabricIndex nodeID:nodeID];
+
+    auto * controller = [[MTRDeviceControllerFactory sharedInstance] runningControllerForFabricIndex:fabricIndex.unsignedCharValue];
+
+    MTR_LOG("%@ BDX Transfer Session Data for log download: %016llX-%016llX (%llu), %@: %@", download,
+        controller.compressedFabricID.unsignedLongLongValue, nodeID.unsignedLongLongValue, nodeID.unsignedLongLongValue,
+        fileDesignator, data);
+
     VerifyOrReturn(nil != download, completion([MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_FOUND]));
 
     NSError * error = nil;
@@ -511,9 +532,15 @@ private:
                                                error:(NSError * _Nullable)error
 {
     assertChipStackLockedByCurrentThread();
-    MTR_LOG("BDX Transfer Session End for log download: %@: %@", fileDesignator, error);
 
     auto * download = [_downloads get:fileDesignator fabricIndex:fabricIndex nodeID:nodeID];
+
+    auto * controller = [[MTRDeviceControllerFactory sharedInstance] runningControllerForFabricIndex:fabricIndex.unsignedCharValue];
+
+    MTR_LOG("%@ BDX Transfer Session End for log download: %016llX-%016llX (%llu), %@: %@", download,
+        controller.compressedFabricID.unsignedLongLongValue, nodeID.unsignedLongLongValue, nodeID.unsignedLongLongValue,
+        fileDesignator, error);
+
     VerifyOrReturn(nil != download);
 
     VerifyOrReturn(nil == error, [download failure:error]);
@@ -640,6 +667,12 @@ void DiagnosticLogsDownloaderBridge::OnTransferTimeout(chip::System::Layer * lay
 
     auto * download = (__bridge MTRDownload *) context;
     VerifyOrReturn(nil != download);
+
+    auto * controller = [[MTRDeviceControllerFactory sharedInstance] runningControllerForFabricIndex:download.fabricIndex.unsignedCharValue];
+
+    MTR_LOG("%@ Diagnostic log transfer timed out for %016llX-%016llX (%llu), abortHandler: %@", download,
+        controller.compressedFabricID.unsignedLongLongValue, download.nodeID.unsignedLongLongValue,
+        download.nodeID.unsignedLongLongValue, download.abortHandler);
 
     // If there is no abortHandler, it means that the BDX transfer has not started.
     // When a BDX transfer has started we need to abort the transfer and we would error out

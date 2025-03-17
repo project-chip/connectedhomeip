@@ -86,7 +86,7 @@ protected:
         // TODO: use ASSERT_EQ, once transition to pw_unit_test is complete
         VerifyOrDieWithMsg((err = mEventCounter.Init(0)) == CHIP_NO_ERROR, AppServer,
                            "Init EventCounter failed: %" CHIP_ERROR_FORMAT, err.Format());
-        chip::app::EventManagement::CreateEventManagement(&GetExchangeManager(), ArraySize(logStorageResources),
+        chip::app::EventManagement::CreateEventManagement(&GetExchangeManager(), MATTER_ARRAY_SIZE(logStorageResources),
                                                           gCircularEventBuffer, logStorageResources, &mEventCounter);
     }
 
@@ -292,7 +292,7 @@ TEST_F(TestEventChunking, TestEventChunking)
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
-    DataVersion dataVersionStorage[ArraySize(testEndpointClusters)];
+    DataVersion dataVersionStorage[MATTER_ARRAY_SIZE(testEndpointClusters)];
     emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
 
     chip::EventNumber firstEventNumber;
@@ -360,7 +360,7 @@ TEST_F(TestEventChunking, TestMixedEventsAndAttributesChunking)
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
-    DataVersion dataVersionStorage[ArraySize(testEndpointClusters)];
+    DataVersion dataVersionStorage[MATTER_ARRAY_SIZE(testEndpointClusters)];
     emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
 
     chip::EventNumber firstEventNumber;
@@ -407,7 +407,7 @@ TEST_F(TestEventChunking, TestMixedEventsAndAttributesChunking)
         // Always returns the same number of attributes read (5 + revision + GlobalAttributesNotInMetadata).
         //
         EXPECT_TRUE(readCallback.mOnReportEnd);
-        EXPECT_EQ(readCallback.mAttributeCount, 6 + ArraySize(GlobalAttributesNotInMetadata));
+        EXPECT_EQ(readCallback.mAttributeCount, 6 + MATTER_ARRAY_SIZE(GlobalAttributesNotInMetadata));
         EXPECT_EQ(readCallback.mEventCount, static_cast<uint32_t>(lastEventNumber - firstEventNumber + 1));
 
         EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
@@ -438,7 +438,7 @@ TEST_F(TestEventChunking, TestMixedEventsAndLargeAttributesChunking)
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
-    DataVersion dataVersionStorage[ArraySize(testEndpointClusters)];
+    DataVersion dataVersionStorage[MATTER_ARRAY_SIZE(testEndpointClusters)];
     emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint4, Span<DataVersion>(dataVersionStorage));
 
     chip::EventNumber firstEventNumber;

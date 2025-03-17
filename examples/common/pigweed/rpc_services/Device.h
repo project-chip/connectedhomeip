@@ -22,6 +22,7 @@
 #include <platform/CommissionableDataProvider.h>
 
 #include "app/clusters/ota-requestor/OTARequestorInterface.h"
+#include "app/icd/server/ICDNotifier.h"
 #include "app/server/CommissioningWindowManager.h"
 #include "app/server/Server.h"
 #include "credentials/FabricTable.h"
@@ -306,7 +307,7 @@ public:
         DeviceLayer::StackLock lock;
         for (const FabricInfo & fabricInfo : Server::GetInstance().GetFabricTable())
         {
-            if (count < ArraySize(response.fabric_info))
+            if (count < MATTER_ARRAY_SIZE(response.fabric_info))
             {
                 response.fabric_info[count].fabric_id = fabricInfo.GetFabricId();
                 response.fabric_info[count].node_id   = fabricInfo.GetPeerId().GetNodeId();
@@ -479,6 +480,22 @@ public:
             return pw::Status::Unknown();
         }
         return pw::OkStatus();
+    }
+
+    virtual pw::Status TriggerIcdCheckin(const pw_protobuf_Empty & request, pw_protobuf_Empty & response)
+    {
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+        chip::DeviceLayer::PlatformMgr().ScheduleWork(
+            [](intptr_t) {
+                ChipLogDetail(AppServer, "Being triggerred to send ICD check-in message to subscriber");
+                chip::app::ICDNotifier::GetInstance().NotifyNetworkActivityNotification();
+            },
+            reinterpret_cast<intptr_t>(nullptr));
+        return pw::OkStatus();
+#else  // CHIP_CONFIG_ENABLE_ICD_CIP
+        ChipLogError(AppServer, "TriggerIcdCheckin is not supported");
+        return pw::Status::Unimplemented();
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
     }
 
 private:

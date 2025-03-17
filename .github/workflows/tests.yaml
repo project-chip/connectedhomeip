@@ -50,7 +50,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:112
+            image: ghcr.io/project-chip/chip-build:119
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
@@ -93,6 +93,7 @@ jobs:
                       --log-level info \
                       src/app/zap-templates/zcl/data-model/chip/global-attributes.xml \
                       src/app/zap-templates/zcl/data-model/chip/chime-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/closure-control-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/global-bitmaps.xml \
                       src/app/zap-templates/zcl/data-model/chip/global-enums.xml \
                       src/app/zap-templates/zcl/data-model/chip/global-structs.xml \
@@ -199,6 +200,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/time-synchronization-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/timer-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/tls-certificate-management-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/tls-client-management-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/user-label-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/unit-localization-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/wake-on-lan-cluster.xml \
@@ -461,7 +463,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:112
+            image: ghcr.io/project-chip/chip-build:119
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 
