@@ -39,7 +39,7 @@ from datetime import datetime, timedelta, timezone
 from enum import Enum, IntFlag
 from functools import partial
 from itertools import chain
-from typing import Any, Iterable, List, Optional, Tuple
+from typing import Any, Iterable, List, Optional, Tuple, NamedTuple
 
 import chip.testing.conversions as conversions
 import chip.testing.matchers as matchers
@@ -292,6 +292,21 @@ class AttributeValue:
     timestamp_utc: Optional[datetime] = None
 
 
+class ComparisonEnum(Enum):
+    GreaterThan = 1
+    GreaterThanOrEqual = 2
+    LessThan = 3
+    LessThanOrEqual = 4
+    Equal = 5
+
+
+class AttributeValueExpectation(NamedTuple):
+    endpoint_id: int
+    attribute: ClusterObjects.ClusterAttributeDescriptor  # The attribute name or descriptor
+    threshold_value: Any  # The expected value
+    comparisson_type: ComparisonEnum  # The comparison type
+
+
 def await_sequence_of_reports(report_queue: queue.Queue, endpoint_id: int, attribute: TypedAttributePath, sequence: list[Any], timeout_sec: float) -> None:
     """Given a queue.Queue hooked-up to an attribute change accumulator, await a given expected sequence of attribute reports.
 
@@ -450,6 +465,67 @@ class ClusterAttributeChangeAccumulator:
         for expected_idx, expected_element in enumerate(expected_final_values):
             logging.info(f"  -> {expected_element} found: {last_report_matches.get(expected_idx)}")
         asserts.fail("Did not find all expected last report values before time-out")
+
+    def await_all_final_values_reported_threshold(self, value_expectations: Iterable[AttributeValueExpectation], timeout_sec: float = 1.0):
+        """Expect that every `value_expectations` report is the last value reported for the given attribute and complies
+        with the comparisson type (greater than / greater or equal than / less than / less or equal than), ignoring timestamps.
+
+        Waits for at least `timeout_sec` seconds.
+
+        This is a form of barrier for a set of attribute changes that should all happen together for an action.
+        """
+        start_time = time.time()
+        elapsed = 0.0
+        time_remaining = timeout_sec
+
+        last_report_matches: dict[int, bool] = {idx: False for idx, _ in enumerate(value_expectations)}
+
+        for element in value_expectations:
+            logging.info(
+                f"[FC] --> Expecting report for attribute {element.attribute.__name__}, threshold value {element.threshold_value}, comparison type {element.comparisson_type.name}, on endpoint {element.endpoint_id}")
+        logging.info(f"Waiting for {timeout_sec:.1f} seconds for all reports.")
+
+        while time_remaining > 0:
+            # Snapshot copy at the beginning of the loop. This is thread-safe based on the design.
+            all_reports = self._attribute_reports
+
+            # Recompute all last-value matches
+            for expected_idx, expected_element in enumerate(value_expectations):
+                last_value = None
+                for report in all_reports.get(expected_element.attribute, []):
+                    if report.endpoint_id == expected_element.endpoint_id:
+                        last_value = report.value
+
+                # Perform the comparison
+                if last_value is not None:
+                    if expected_element.comparisson_type == ComparisonEnum.GreaterThan:
+                        last_report_matches[expected_idx] = (last_value > expected_element.threshold_value)
+                    elif expected_element.comparisson_type == ComparisonEnum.GreaterThanOrEqual:
+                        last_report_matches[expected_idx] = (last_value >= expected_element.threshold_value)
+                    elif expected_element.comparisson_type == ComparisonEnum.LessThan:
+                        last_report_matches[expected_idx] = (last_value < expected_element.threshold_value)
+                    elif expected_element.comparisson_type == ComparisonEnum.LessThanOrEqual:
+                        last_report_matches[expected_idx] = (last_value <= expected_element.threshold_value)
+                    elif expected_element.comparisson_type == ComparisonEnum.Equal:
+                        last_report_matches[expected_idx] = (last_value == expected_element.threshold_value)
+                        
+                    logging.info(f"[FC] --> Value reported for {expected_element.attribute.__name__} attribute: {last_value}")
+
+            # Determine if all were met
+            if all(last_report_matches.values()):
+                logging.info("[FC] Found all expected reports were true.")
+                return
+
+            elapsed = time.time() - start_time
+            time_remaining = timeout_sec - elapsed
+            time.sleep(0.1)
+
+        # If we reach here, there was no early return and we failed to find all the values.
+        logging.error("[FC] Reached time-out without finding all expected report values for threshold.")
+        logging.info("[FC] Values found:")
+        for expected_idx, expected_element in enumerate(value_expectations):
+            logging.info(f"[FC]   -> {expected_element} found: {last_report_matches.get(expected_idx)}")
+        asserts.fail("[FC] Did not find all expected last report values for threshold before time-out")
 
     def await_sequence_of_reports(self, attribute: TypedAttributePath, sequence: list[Any], timeout_sec: float) -> None:
         """Await a given expected sequence of attribute reports in the accumulator for the endpoint associated.
