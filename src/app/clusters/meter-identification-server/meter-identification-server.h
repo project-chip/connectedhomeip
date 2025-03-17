@@ -51,7 +51,7 @@ public:
     DataModel::Nullable<CharSpan> GetProtocolVersion() { return mProtocolVersion; }
     DataModel::Nullable<Globals::Structs::PowerThresholdStruct::Type> GetPowerThreshold() { return mPowerThreshold; }
 
-     // Internal Application API to set attribute values
+    // Internal Application API to set attribute values
     CHIP_ERROR SetMeterType(const DataModel::Nullable<MeterTypeEnum> & value);
     CHIP_ERROR SetPointOfDelivery(const DataModel::Nullable<CharSpan> & value);
     CHIP_ERROR SetMeterSerialNumber(const DataModel::Nullable<CharSpan> & value);
@@ -60,10 +60,10 @@ public:
 
 private:
     // Attribute storage
-    static constexpr size_t kMaximumStringBufferSize = 65;
-    char mPointOfDeliveryBuf[kMaximumStringBufferSize] = {};
-    char mMeterSerialNumberBuf[kMaximumStringBufferSize] = {};
-    char mProtocolVersionBuf[kMaximumStringBufferSize] = {};
+    static constexpr size_t kMaximumStringSize = 64;
+    char mPointOfDeliveryBuf[kMaximumStringSize] = {};
+    char mMeterSerialNumberBuf[kMaximumStringSize] = {};
+    char mProtocolVersionBuf[kMaximumStringSize] = {};
     DataModel::Nullable<MeterTypeEnum> mMeterType;
     DataModel::Nullable<CharSpan> mPointOfDelivery;
     DataModel::Nullable<CharSpan> mMeterSerialNumber;
@@ -79,4 +79,4 @@ private:
 } // namespace MeterIdentification
 } // namespace Clusters
 } // namespace app
-} // namespace chip 
+} // namespace chip
