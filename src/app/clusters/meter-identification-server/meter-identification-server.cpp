@@ -50,38 +50,7 @@ bool NullableCharSpanCompare(const DataModel::Nullable<CharSpan> & a, const Data
 
     return false;
 }
-
-CHIP_ERROR NullableCharSpanCopy(DataModel::Nullable<CharSpan> & dst, const DataModel::Nullable<CharSpan> & src)
-{
-    const size_t len = src.IsNull() ? 0 : src.Value().size();
-    if (64 < len)
-    {
-        return CHIP_ERROR_INVALID_STRING_LENGTH;
-    }
-
-    if (!dst.IsNull())
-    {
-        chip::Platform::MemoryFree(const_cast<char *>(dst.Value().data()));
-        dst.SetNull();
-    }
-
-    if (!src.IsNull())
-    {
-        if (auto * str = static_cast<char *>(chip::Platform::MemoryAlloc(1 + len)))
-        {
-            memcpy(str, src.Value().data(), len);
-            str[len] = 0;
-            dst = MakeNullable(CharSpan(str, len));
-        }
-        else
-        {
-            return CHIP_ERROR_NO_MEMORY;
-        }
-    }
-
-    return CHIP_NO_ERROR;
-}
-    } // namespace
+} // namespace
 
 namespace chip {
 namespace app {
@@ -91,18 +60,6 @@ namespace MeterIdentification {
 Instance::~Instance()
 {
     Shutdown();
-    if (!mPointOfDelivery.IsNull())
-    {
-        chip::Platform::MemoryFree(const_cast<char *>(mPointOfDelivery.Value().data()));
-    }
-    if (!mMeterSerialNumber.IsNull())
-    {
-        chip::Platform::MemoryFree(const_cast<char *>(mMeterSerialNumber.Value().data()));
-    }
-    if (!mProtocolVersion.IsNull())
-    {
-        chip::Platform::MemoryFree(const_cast<char *>(mProtocolVersion.Value().data()));
-    }
 }
 
 CHIP_ERROR Instance::Init()
@@ -165,12 +122,26 @@ CHIP_ERROR Instance::SetPointOfDelivery(const DataModel::Nullable<CharSpan> & ne
         return CHIP_NO_ERROR;
     }
 
-    const CHIP_ERROR ret = NullableCharSpanCopy(mPointOfDelivery, newValue);
-    if (CHIP_NO_ERROR == ret)
+    const size_t len = newValue.IsNull() ? 0 : newValue.Value().size();
+    if (kMaximumStringBufferSize <= len)
     {
-        MatterReportingAttributeChangeCallback(mEndpointId, MeterIdentification::Id, PointOfDelivery::Id);
+        return CHIP_ERROR_INVALID_STRING_LENGTH;
     }
-    return ret;
+
+    if (!mPointOfDelivery.IsNull())
+    {
+        mPointOfDelivery.SetNull();
+    }
+
+    if (!newValue.IsNull())
+    {
+        memcpy(mPointOfDeliveryBuf, newValue.Value().data(), len);
+        mPointOfDeliveryBuf[len] = 0;
+        mPointOfDelivery = MakeNullable(CharSpan(mPointOfDeliveryBuf, len));
+    }
+
+    MatterReportingAttributeChangeCallback(mEndpointId, MeterIdentification::Id, PointOfDelivery::Id);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Instance::SetMeterSerialNumber(const DataModel::Nullable<CharSpan> & newValue)
@@ -180,12 +151,26 @@ CHIP_ERROR Instance::SetMeterSerialNumber(const DataModel::Nullable<CharSpan> & 
         return CHIP_NO_ERROR;
     }
 
-    const CHIP_ERROR ret = NullableCharSpanCopy(mMeterSerialNumber, newValue);
-    if (CHIP_NO_ERROR == ret)
+    const size_t len = newValue.IsNull() ? 0 : newValue.Value().size();
+    if (kMaximumStringBufferSize <= len)
     {
-        MatterReportingAttributeChangeCallback(mEndpointId, MeterIdentification::Id, MeterSerialNumber::Id);
+        return CHIP_ERROR_INVALID_STRING_LENGTH;
     }
-    return ret;
+
+    if (!mMeterSerialNumber.IsNull())
+    {
+        mMeterSerialNumber.SetNull();
+    }
+
+    if (!newValue.IsNull())
+    {
+        memcpy(mMeterSerialNumberBuf, newValue.Value().data(), len);
+        mMeterSerialNumberBuf[len] = 0;
+        mMeterSerialNumber = MakeNullable(CharSpan(mMeterSerialNumberBuf, len));
+    }
+
+    MatterReportingAttributeChangeCallback(mEndpointId, MeterIdentification::Id, MeterSerialNumber::Id);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Instance::SetProtocolVersion(const DataModel::Nullable<CharSpan> & newValue)
@@ -195,12 +180,26 @@ CHIP_ERROR Instance::SetProtocolVersion(const DataModel::Nullable<CharSpan> & ne
         return CHIP_NO_ERROR;
     }
 
-    const CHIP_ERROR ret = NullableCharSpanCopy(mProtocolVersion, newValue);
-    if (CHIP_NO_ERROR == ret)
+    const size_t len = newValue.IsNull() ? 0 : newValue.Value().size();
+    if (kMaximumStringBufferSize <= len)
     {
-        MatterReportingAttributeChangeCallback(mEndpointId, MeterIdentification::Id, ProtocolVersion::Id);
+        return CHIP_ERROR_INVALID_STRING_LENGTH;
     }
-    return ret;
+
+    if (!mProtocolVersion.IsNull())
+    {
+        mProtocolVersion.SetNull();
+    }
+
+    if (!newValue.IsNull())
+    {
+        memcpy(mProtocolVersionBuf, newValue.Value().data(), len);
+        mProtocolVersionBuf[len] = 0;
+        mProtocolVersion = MakeNullable(CharSpan(mProtocolVersionBuf, len));
+    }
+
+    MatterReportingAttributeChangeCallback(mEndpointId, MeterIdentification::Id, ProtocolVersion::Id);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Instance::SetPowerThreshold(const DataModel::Nullable<Globals::Structs::PowerThresholdStruct::Type> & newValue)
