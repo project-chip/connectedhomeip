@@ -3,12 +3,11 @@
 #include <esp_log.h>
 #include <lib/core/TLVReader.h>
 #include <lib/support/CodeUtils.h>
+#include <map>
 #include <platform/CHIPDeviceLayer.h>
 #include <system/SystemClock.h>
-#include <tracing/esp32_diagnostic_trace/Diagnostics.h>
-#include <unordered_map>
 
-#ifdef CONFIG_ENABLE_ESP_INSIGHTS
+#if CONFIG_ESP_INSIGHTS_ENABLED
 #include <esp_diagnostics_metrics.h>
 #endif // CONFIG_ENABLE_ESP_INSIGHTS
 
@@ -23,7 +22,7 @@ namespace Diagnostics {
 class DiagnosticDataDelegateImpl : public DiagnosticDataDelegate
 {
 public:
-    static DiagnosticDataDelegateImpl & GetInstance(Tracing::Diagnostics::DiagnosticStorageInterface * storageInstance)
+    static DiagnosticDataDelegateImpl & GetInstance(Tracing::Diagnostics::CircularDiagnosticBuffer * storageInstance)
     {
         static DiagnosticDataDelegateImpl * mInstance = nullptr;
         if (mInstance == nullptr)
@@ -33,8 +32,7 @@ public:
         return *mInstance;
     }
 
-    DiagnosticDataDelegateImpl(Tracing::Diagnostics::DiagnosticStorageInterface * storageInstance) :
-        mStorageInstance(storageInstance)
+    DiagnosticDataDelegateImpl(Tracing::Diagnostics::CircularDiagnosticBuffer * storageInstance) : mStorageInstance(storageInstance)
     {}
 
     CHIP_ERROR StartPeriodicDiagnostics(chip::System::Clock::Timeout aTimeout) override
@@ -68,65 +66,48 @@ public:
         return DeviceLayer::SystemLayer().StartTimer(mTimeout, DiagnosticSamplingHandler, this);
     }
 
-#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
     CHIP_ERROR EnableDiagnostics() override
     {
-        VerifyOrReturnError(mStorageInstance != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        if (IsDiagnosticBufferEmpty())
-        {
-            return CHIP_ERROR_NOT_FOUND;
-        }
-
-        // Get the TLV data
-        MutableByteSpan encodedSpan(mRetrievalBuffer, CONFIG_RETRIEVAL_BUFFER_SIZE);
+        uint32_t bufferSize = mStorageInstance->GetDataSize();
+        uint8_t retrievalBuffer[bufferSize];
+        MutableByteSpan encodedSpan(retrievalBuffer, bufferSize);
         uint32_t readEntries = 0;
 
         // Retrieve encoded data
         CHIP_ERROR err = mStorageInstance->Retrieve(encodedSpan, readEntries);
-        if (err != CHIP_NO_ERROR)
+        if (err != CHIP_NO_ERROR && err != CHIP_ERROR_BUFFER_TOO_SMALL && err != CHIP_ERROR_END_OF_TLV)
         {
             ESP_LOGE("Diagnostics", "Failed to retrieve data");
             return err;
         }
 
         chip::TLV::TLVReader mReader;
-        char label[kMaxStringValueSize];
-        char value[kMaxStringValueSize];
         mReader.Init(encodedSpan.data(), encodedSpan.size());
         while ((err = mReader.Next()) == CHIP_NO_ERROR)
         {
             if (mReader.GetType() == chip::TLV::kTLVType_Structure && mReader.GetTag() == chip::TLV::AnonymousTag())
             {
-                chip::TLV::TLVReader tempReader(mReader);
-                Diagnostic<char *> trace(label, value, 0);
-                err = trace.Decode(tempReader);
+                DiagnosticEntry entry;
+                err = Decode(mReader, entry);
                 if (err == CHIP_NO_ERROR)
                 {
-                    LogTraceData(trace.GetLabel(), trace.GetValue(), trace.GetTimestamp());
-                    continue;
+                    if (entry.type == ValueType::kCharString)
+                    {
+                        LogTraceData(entry);
+                    }
+                    else if (entry.type == ValueType::kSignedInteger || entry.type == ValueType::kUnsignedInteger)
+                    {
+                        LogMetricData(entry);
+                    }
+                    else
+                    {
+                        ESP_LOGE("Diagnostics", "Unsupported data type");
+                    }
                 }
-
-                chip::TLV::TLVReader tempReader2(mReader);
-
-                Diagnostic<int32_t> metricInt32(label, 0, 0);
-                err = metricInt32.Decode(tempReader2);
-                if (err == CHIP_NO_ERROR)
+                else
                 {
-                    LogMetricData(metricInt32.GetLabel(), ValueType::kInt32, metricInt32.GetValue());
-                    continue;
+                    ESP_LOGE("Diagnostics", "Failed to decode diagnostic");
                 }
-
-                chip::TLV::TLVReader tempReader3(mReader);
-
-                Diagnostic<uint32_t> metricUint32(label, 0, 0);
-                err = metricUint32.Decode(tempReader3);
-                if (err == CHIP_NO_ERROR)
-                {
-                    LogMetricData(metricUint32.GetLabel(), ValueType::kUInt32, metricUint32.GetValue());
-                    continue;
-                }
-
-                ESP_LOGE("Diagnostics", "Failed to decode diagnostic");
             }
             else
             {
@@ -137,31 +118,32 @@ public:
         mStorageInstance->ClearBuffer(readEntries);
         return CHIP_NO_ERROR;
     }
-#else
-    CHIP_ERROR EnableDiagnostics() override { return CHIP_ERROR_NOT_IMPLEMENTED; }
-#endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
 
 private:
-    Tracing::Diagnostics::DiagnosticStorageInterface * mStorageInstance = nullptr;
-#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
-    uint8_t mRetrievalBuffer[CONFIG_RETRIEVAL_BUFFER_SIZE];
-#endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
-    System::Clock::Timeout mTimeout = System::Clock::kZero;
-    std::unordered_map<const char *, ValueType> mRegisteredMetrics;
+    Tracing::Diagnostics::CircularDiagnosticBuffer * mStorageInstance = nullptr;
+    System::Clock::Timeout mTimeout                                   = System::Clock::kZero;
+    struct StringCompare
+    {
+        bool operator()(const char * a, const char * b) const { return strcmp(a, b) < 0; }
+    };
+    std::map<const char *, ValueType, StringCompare> mRegisteredMetrics;
 
     bool IsDiagnosticBufferEmpty() override { return (mStorageInstance == nullptr) ? true : mStorageInstance->IsBufferEmpty(); }
 
-    void LogTraceData(const char * label, const char * group, uint32_t timestamp)
+    void LogTraceData(const DiagnosticEntry & entry)
     {
-#ifdef CONFIG_ENABLE_ESP_INSIGHTS
-        ESP_LOGI("Diagnostics", "Log Trace Data");
+#if CONFIG_ESP_INSIGHTS_ENABLED
         const char * tag    = "MTR_TRC";
         const char * format = "EV (%" PRIu32 ") %s: %s";
-        esp_diag_log_event(tag, format, timestamp, label, group);
+        esp_err_t err       = esp_diag_log_event(tag, format, entry.timestamps_ms_since_boot, entry.label, entry.stringValue);
+        if (err == ESP_OK)
+        {
+            ESP_LOGD("MTR_TRC", "Event %s logged successfully", entry.label);
+        }
 #endif // CONFIG_ENABLE_ESP_INSIGHTS
     }
 
-#ifdef CONFIG_ENABLE_ESP_INSIGHTS
+#if CONFIG_ESP_INSIGHTS_ENABLED
     void RegisterMetric(const char * key, ValueType type)
     {
         // Check for the same key will not have two different types.
@@ -176,22 +158,29 @@ private:
 
         switch (type)
         {
-        case ValueType::kUInt32:
-            esp_diag_metrics_register("SYS_MTR" /*Tag of metrics */, key /* Unique key 8 */, key /* label displayed on dashboard */,
-                                      "insights.mtr" /* hierarchical path */, ESP_DIAG_DATA_TYPE_UINT /* data_type */);
+        case ValueType::kUnsignedInteger: {
+            esp_err_t err = esp_diag_metrics_register(
+                "SYS_MTR" /*Tag of metrics */, key /* Unique key 8 */, key /* label displayed on dashboard */,
+                "insights.mtr" /* hierarchical path */, ESP_DIAG_DATA_TYPE_UINT /* data_type */);
+            if (err == ESP_OK)
+            {
+                ESP_LOGD("SYS.MTR", "Metric %s registered successfully", key);
+            }
             break;
+        }
 
-        case ValueType::kInt32:
-            esp_diag_metrics_register("SYS_MTR" /*Tag of metrics */, key /* Unique key 8 */, key /* label displayed on dashboard */,
-                                      "insights.mtr" /* hierarchical path */, ESP_DIAG_DATA_TYPE_INT /* data_type */);
+        case ValueType::kSignedInteger: {
+            esp_err_t err = esp_diag_metrics_register(
+                "SYS_MTR" /*Tag of metrics */, key /* Unique key 8 */, key /* label displayed on dashboard */,
+                "insights.mtr" /* hierarchical path */, ESP_DIAG_DATA_TYPE_INT /* data_type */);
+            if (err == ESP_OK)
+            {
+                ESP_LOGD("SYS.MTR", "Metric %s registered successfully", key);
+            }
             break;
+        }
 
-        case ValueType::kChipErrorCode:
-            esp_diag_metrics_register("SYS_MTR" /*Tag of metrics */, key /* Unique key 8 */, key /* label displayed on dashboard */,
-                                      "insights.mtr" /* hierarchical path */, ESP_DIAG_DATA_TYPE_UINT /* data_type */);
-            break;
-
-        case ValueType::kUndefined:
+        default:
             ESP_LOGE("mtr", "failed to register %s as its value is undefined", key);
             break;
         }
@@ -199,51 +188,42 @@ private:
         mRegisteredMetrics[key] = type;
     }
 #endif // CONFIG_ENABLE_ESP_INSIGHTS
-    void LogMetricData(const char * key, ValueType type, uint32_t value)
+    void LogMetricData(const DiagnosticEntry & entry)
     {
-#ifdef CONFIG_ENABLE_ESP_INSIGHTS
-        ESP_LOGI("Diagnostics", "Log Metric Data");
-        if (key == nullptr)
+#if CONFIG_ESP_INSIGHTS_ENABLED
+        if (mRegisteredMetrics.find(entry.label) == mRegisteredMetrics.end())
         {
-            ESP_LOGE("mtr", "Invalid null pointer for metric key");
-            return;
-        }
-
-        if (mRegisteredMetrics.find(key) == mRegisteredMetrics.end())
-        {
-            RegisterMetric(key, type);
+            RegisterMetric(entry.label, entry.type);
         }
 
         // Use a fixed-size buffer for log messages
         static constexpr size_t MAX_LOG_LENGTH = 128;
         char logBuffer[MAX_LOG_LENGTH];
 
-        switch (type)
+        switch (entry.type)
         {
-        case ValueType::kInt32:
-            snprintf(logBuffer, MAX_LOG_LENGTH, "The value of %s is %ld", key, static_cast<int32_t>(value));
-            ESP_LOGI("mtr", "%s", logBuffer);
-            esp_diag_metrics_add_int(key, static_cast<int32_t>(value));
+        case ValueType::kSignedInteger: {
+            snprintf(logBuffer, MAX_LOG_LENGTH, "The value of %s is %ld", entry.label, static_cast<int32_t>(entry.intValue));
+            esp_err_t err = esp_diag_metrics_add_int(entry.label, static_cast<int32_t>(entry.intValue));
+            if (err == ESP_OK)
+            {
+                ESP_LOGD("SYS.MTR", "Metric %s added successfully", entry.label);
+            }
             break;
+        }
 
-        case ValueType::kUInt32:
-            snprintf(logBuffer, MAX_LOG_LENGTH, "The value of %s is %lu", key, value);
-            ESP_LOGI("mtr", "%s", logBuffer);
-            esp_diag_metrics_add_uint(key, value);
+        case ValueType::kUnsignedInteger: {
+            snprintf(logBuffer, MAX_LOG_LENGTH, "The value of %s is %lu", entry.label, entry.uintValue);
+            esp_err_t err = esp_diag_metrics_add_uint(entry.label, entry.uintValue);
+            if (err == ESP_OK)
+            {
+                ESP_LOGD("SYS.MTR", "Metric %s added successfully", entry.label);
+            }
             break;
-
-        case ValueType::kChipErrorCode:
-            snprintf(logBuffer, MAX_LOG_LENGTH, "The value of %s is error with code %lu", key, value);
-            ESP_LOGI("mtr", "%s", logBuffer);
-            esp_diag_metrics_add_uint(key, value);
-            break;
-
-        case ValueType::kUndefined:
-            ESP_LOGI("mtr", "The value of %s is undefined", key);
-            break;
+        }
 
         default:
-            ESP_LOGI("mtr", "The value of %s is of an UNKNOWN TYPE", key);
+            ESP_LOGD("mtr", "The value of %s is of an UNKNOWN TYPE", entry.label);
             break;
         }
 #endif // CONFIG_ENABLE_ESP_INSIGHTS
@@ -257,17 +237,16 @@ private:
 
         while (!instance->mStorageInstance->IsBufferEmpty())
         {
-            // Retrieve and send diagnostics
             instance->EnableDiagnostics();
         }
 
         // Schedule next sampling
         DeviceLayer::SystemLayer().StartTimer(instance->mTimeout, DiagnosticSamplingHandler, instance);
-        ESP_LOGI("Diagnostics", "Free heap Memory: %ld\n", esp_get_free_heap_size());
+        ESP_LOGD("Diagnostics", "Free heap Memory: %ld\n", esp_get_free_heap_size());
     }
 };
 
-DiagnosticDataDelegate & DiagnosticDataDelegate::GetInstance(Tracing::Diagnostics::DiagnosticStorageInterface * storageInstance)
+DiagnosticDataDelegate & DiagnosticDataDelegate::GetInstance(Tracing::Diagnostics::CircularDiagnosticBuffer * storageInstance)
 {
     return DiagnosticDataDelegateImpl::GetInstance(storageInstance);
 }
