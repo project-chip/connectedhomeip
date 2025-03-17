@@ -27,12 +27,12 @@ static_library("backend") {
   sources = [
     "Counter.cpp",
     "Counter.h",
+    "DiagnosticEntry.cpp",
+    "DiagnosticEntry.h",
     "DiagnosticStorage.cpp",
     "DiagnosticStorage.h",
     "DiagnosticTracing.cpp",
     "DiagnosticTracing.h",
-    "DiagnosticEntry.h",
-    "DiagnosticEntry.cpp",
   ]
 
   public_deps = [
