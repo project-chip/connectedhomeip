@@ -420,7 +420,7 @@ public:
      *
      *  @return a bitmask of supported Wi-Fi bands where each bit is associated with a WiFiBandEnum value.
      */
-    virtual uint32_t _GetSupportedWiFiBandsMask() const
+    virtual uint32_t GetSupportedWiFiBandsMask() const
     {
         // Default to 2.4G support only
         return static_cast<uint32_t>(1UL << chip::to_underlying(WiFiBandEnum::k2g4));

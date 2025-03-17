@@ -260,7 +260,7 @@ chip::BitFlags<WiFiSecurity> SlWiFiDriver::ConvertSecuritytype(wfx_sec_t securit
 
 uint32_t SlWiFiDriver::GetSupportedWiFiBandsMask() const
 {
-    return WifiInterface::GetInstance()._GetSupportedWiFiBandsMask();
+    return WifiInterface::GetInstance().GetSupportedWiFiBandsMask();
 }
 
 bool SlWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
