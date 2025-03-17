@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ namespace Internal {
 class BleApplicationDelegateImpl : public Ble::BleApplicationDelegate
 {
 public:
-    virtual void NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT connObj);
+    void NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT connObj) override;
 };
 
 } // namespace Internal

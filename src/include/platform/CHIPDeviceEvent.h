@@ -255,6 +255,11 @@ enum PublicEventTypes
      * Signals that secure session is established.
      */
     kSecureSessionEstablished,
+
+    /**
+     * Signals that factory reset has started.
+     */
+    kFactoryReset,
 };
 
 /**
