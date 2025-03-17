@@ -24,7 +24,7 @@ using namespace chip::app::Clusters::MeterIdentification;
 namespace {
 static std::unique_ptr<Instance> gMeterIdentificationCluster;
 
-CHIP_ERROR JsonToPowerThreshold(const Json::Value & root, Structs::PowerThresholdStruct::Type & value)
+CHIP_ERROR JsonToPowerThreshold(const Json::Value & root, Globals::Structs::PowerThresholdStruct::Type & value)
 {
     Json::Value t;
     if (root.isMember("PowerThreshold"))
@@ -57,7 +57,7 @@ CHIP_ERROR JsonToPowerThreshold(const Json::Value & root, Structs::PowerThreshol
             return CHIP_ERROR_DECODE_FAILED;
         }
 
-        value.powerThresholdSource.SetNonNull(static_cast<PowerThresholdSourceEnum>(t.asUInt()));
+        value.powerThresholdSource.SetNonNull(static_cast<Globals::PowerThresholdSourceEnum>(t.asUInt()));
     }
 
     return CHIP_NO_ERROR;
@@ -167,7 +167,7 @@ CHIP_ERROR MeterIdentification::LoadJson(const Json::Value & root)
         value = root.get("PowerThreshold", Json::Value());
         if (!value.empty() && value.isObject())
         {
-            Structs::PowerThresholdStruct::Type powerThreshopld;
+            Globals::Structs::PowerThresholdStruct::Type powerThreshopld;
             const CHIP_ERROR error = JsonToPowerThreshold(value, powerThreshopld);
             if (CHIP_NO_ERROR == error)
             {
