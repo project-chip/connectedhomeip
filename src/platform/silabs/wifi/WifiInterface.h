@@ -73,6 +73,7 @@ typedef struct wfx_wifi_scan_result
     uint8_t bssid[kWifiMacAddressLength];
     uint8_t chan;
     int16_t rssi; /* I suspect this is in dBm - so signed */
+    chip::app::Clusters::NetworkCommissioning::WiFiBandEnum wiFiBand;
 } wfx_wifi_scan_result_t;
 using ScanCallback = void (*)(wfx_wifi_scan_result_t *);
 
@@ -422,7 +423,7 @@ public:
     virtual uint32_t GetSupportedWiFiBandsMask() const
     {
         // Default to 2.4G support only
-        return static_cast<uint32_t>(1UL << chip::to_underlying(app::Clusters::NetworkCommissioning::WiFiBandEnum::k2g4));
+        return static_cast<uint32_t>(1UL << chip::to_underlying(chip::app::Clusters::NetworkCommissioning::WiFiBandEnum::k2g4));
     }
 
 protected:

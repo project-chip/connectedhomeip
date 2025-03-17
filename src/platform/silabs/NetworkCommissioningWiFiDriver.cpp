@@ -310,6 +310,7 @@ void SlWiFiDriver::OnScanWiFiNetworkDone(wfx_wifi_scan_result_t * aScanResult)
         scanResponse.ssidLen = aScanResult->ssid_length;
         memcpy(scanResponse.ssid, aScanResult->ssid, scanResponse.ssidLen);
         memcpy(scanResponse.bssid, aScanResult->bssid, sizeof(scanResponse.bssid));
+        scanResponse.wiFiBand = aScanResult->wiFiBand;
 
         mScanResponseIter.Add(&scanResponse);
     }
