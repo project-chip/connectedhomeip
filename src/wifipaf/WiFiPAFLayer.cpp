@@ -26,7 +26,6 @@
 #include "WiFiPAFConfig.h"
 #include "WiFiPAFEndPoint.h"
 #include "WiFiPAFError.h"
-#include <cassert>
 #include <lib/core/CHIPEncoding.h>
 
 #undef CHIP_WIFIPAF_LAYER_DEBUG_LOGGING_ENABLED
@@ -314,9 +313,9 @@ CHIP_ERROR WiFiPAFLayer::HandleWriteConfirmed(WiFiPAF::WiFiPAFSession & TxInfo, 
 }
 
 static WiFiPAFLayer sInstance;
-WiFiPAFLayer * WiFiPAFLayer::GetWiFiPAFLayer()
+WiFiPAFLayer & WiFiPAFLayer::GetWiFiPAFLayer()
 {
-    return &sInstance;
+    return sInstance;
 }
 
 CHIP_ERROR WiFiPAFLayer::NewEndPoint(WiFiPAFEndPoint ** retEndPoint, WiFiPAFSession & SessionInfo, WiFiPafRole role)
@@ -356,7 +355,7 @@ CHIP_ERROR WiFiPAFLayer::HandleTransportConnectionInitiated(WiFiPAF::WiFiPAFSess
 
 void WiFiPAFLayer::OnEndPointConnectComplete(WiFiPAFEndPoint * endPoint, CHIP_ERROR err)
 {
-    assert(endPoint != nullptr);
+    VerifyOrDie(endPoint != nullptr);
     if (endPoint->mOnPafSubscribeComplete != nullptr)
     {
         endPoint->mOnPafSubscribeComplete(endPoint->mAppState);
@@ -392,21 +391,21 @@ WiFiPAFLayer::GetHighestSupportedProtocolVersion(const PAFTransportCapabilitiesR
     return retVersion;
 }
 
-#define INVALID_PAF_SESSION_ID 0xff
+inline constexpr uint8_t kInvalidActiveWiFiPafSessionId = UINT8_MAX;
 void WiFiPAFLayer::InitialPafInfo()
 {
     for (uint8_t i = 0; i < WIFIPAF_LAYER_NUM_PAF_ENDPOINTS; i++)
     {
-        cleanPafInfo(mPafInfoVect[i]);
+        CleanPafInfo(mPafInfoVect[i]);
     }
 }
 
-void WiFiPAFLayer::cleanPafInfo(WiFiPAFSession & SessionInfo)
+void WiFiPAFLayer::CleanPafInfo(WiFiPAFSession & SessionInfo)
 {
     memset(&SessionInfo, 0, sizeof(WiFiPAFSession));
-    SessionInfo.id            = UINT32_MAX;
-    SessionInfo.peer_id       = UINT32_MAX;
-    SessionInfo.nodeId        = UINT32_MAX;
+    SessionInfo.id            = kUndefinedWiFiPafSessionId;
+    SessionInfo.peer_id       = kUndefinedWiFiPafSessionId;
+    SessionInfo.nodeId        = kUndefinedNodeId;
     SessionInfo.discriminator = UINT16_MAX;
     return;
 }
@@ -414,7 +413,7 @@ void WiFiPAFLayer::cleanPafInfo(WiFiPAFSession & SessionInfo)
 CHIP_ERROR WiFiPAFLayer::AddPafSession(PafInfoAccess accType, WiFiPAFSession & SessionInfo)
 {
     uint8_t i;
-    uint8_t eSlotId              = INVALID_PAF_SESSION_ID;
+    uint8_t eSlotId              = kInvalidActiveWiFiPafSessionId;
     WiFiPAFSession * pPafSession = nullptr;
 
     // Check if the session has existed
@@ -426,7 +425,7 @@ CHIP_ERROR WiFiPAFLayer::AddPafSession(PafInfoAccess accType, WiFiPAFSession & S
         case PafInfoAccess::kAccNodeInfo:
             if (pPafSession->nodeId == SessionInfo.nodeId)
             {
-                assert(pPafSession->discriminator == SessionInfo.discriminator);
+                VerifyOrDie(pPafSession->discriminator == SessionInfo.discriminator);
                 // Already exist
                 return CHIP_NO_ERROR;
             }
@@ -441,13 +440,17 @@ CHIP_ERROR WiFiPAFLayer::AddPafSession(PafInfoAccess accType, WiFiPAFSession & S
         default:
             return CHIP_ERROR_NOT_IMPLEMENTED;
         };
-        if ((pPafSession->id == UINT32_MAX) && (pPafSession->nodeId == UINT32_MAX) && (pPafSession->discriminator == UINT16_MAX))
+        if ((pPafSession->id == kUndefinedWiFiPafSessionId) && (pPafSession->nodeId == kUndefinedNodeId) &&
+            (pPafSession->discriminator == UINT16_MAX))
+        {
             eSlotId = i;
+        }
     }
     // Add the session if available
-    if (eSlotId != INVALID_PAF_SESSION_ID)
+    if (eSlotId != kInvalidActiveWiFiPafSessionId)
     {
-        pPafSession = &mPafInfoVect[eSlotId];
+        pPafSession       = &mPafInfoVect[eSlotId];
+        pPafSession->role = SessionInfo.role;
         switch (accType)
         {
         case PafInfoAccess::kAccNodeInfo:
@@ -483,7 +486,7 @@ CHIP_ERROR WiFiPAFLayer::RmPafSession(PafInfoAccess accType, WiFiPAFSession & Se
             {
                 ChipLogProgress(WiFiPAF, "Removing session with id: %u", pPafSession->id);
                 // Clear the slot
-                cleanPafInfo(*pPafSession);
+                CleanPafInfo(*pPafSession);
                 return CHIP_NO_ERROR;
             }
             break;
@@ -503,6 +506,13 @@ WiFiPAFSession * WiFiPAFLayer::GetPAFInfo(PafInfoAccess accType, WiFiPAFSession 
     for (i = 0; i < WIFIPAF_LAYER_NUM_PAF_ENDPOINTS; i++)
     {
         pPafSession = &mPafInfoVect[i];
+        if (pPafSession->role == kWiFiPafRole_Publisher)
+        {
+            if (pPafSession->id != kUndefinedWiFiPafSessionId)
+                return pPafSession;
+            else
+                continue;
+        }
         switch (accType)
         {
         case PafInfoAccess::kAccSessionId:

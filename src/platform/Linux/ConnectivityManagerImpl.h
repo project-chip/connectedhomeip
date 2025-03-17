@@ -152,7 +152,6 @@ public:
     void OnNanPublishTerminated(guint public_id, gchar * reason);
     void OnNanSubscribeTerminated(guint subscribe_id, gchar * reason);
     CHIP_ERROR _WiFiPAFSend(const WiFiPAF::WiFiPAFSession & TxInfo, chip::System::PacketBufferHandle && msgBuf);
-    WiFiPAF::WiFiPAFLayer * _GetWiFiPAF();
     void _WiFiPafSetApFreq(const uint16_t freq) { mApFreq = freq; }
     CHIP_ERROR _WiFiPAFShutdown(uint32_t id, WiFiPAF::WiFiPafRole role);
 #endif

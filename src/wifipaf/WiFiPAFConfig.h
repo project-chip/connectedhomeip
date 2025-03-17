@@ -36,7 +36,7 @@
  *    simultaneous PAF connections the application will establish).
  */
 #ifndef WIFIPAF_LAYER_NUM_PAF_ENDPOINTS
-#define WIFIPAF_LAYER_NUM_PAF_ENDPOINTS 1
+#define WIFIPAF_LAYER_NUM_PAF_ENDPOINTS 2
 #endif // WIFIPAF_LAYER_NUM_PAF_ENDPOINTS
 
 #if (WIFIPAF_LAYER_NUM_PAF_ENDPOINTS < 1)

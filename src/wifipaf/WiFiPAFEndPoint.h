@@ -183,6 +183,7 @@ private:
     void FreePAFtpEngine();
 
     void QueueTx(PacketBufferHandle && data, PacketType_t type);
+    void ClearAll();
 };
 
 } /* namespace WiFiPAF */

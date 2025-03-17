@@ -129,7 +129,7 @@ public:
     void LogState() const;
     void LogStateDebug() const;
 
-private:
+protected:
     State_t mRxState;
     uint16_t mRxLength;
     void * mAppState;
