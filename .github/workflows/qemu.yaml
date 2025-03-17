@@ -21,6 +21,7 @@ on:
             - 'v*-branch'
     pull_request:
     merge_group:
+    workflow_dispatch:
 
 concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
@@ -38,7 +39,7 @@ jobs:
             BUILD_TYPE: esp32-qemu
 
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]' && github.repository_owner == 'espressif'
+        if: github.actor != 'restyled-io[bot]' && (github.repository_owner == 'espressif' || github.event_name == 'workflow_dispatch')
 
         container:
             image: ghcr.io/project-chip/chip-build-esp32-qemu:119
