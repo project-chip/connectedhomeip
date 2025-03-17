@@ -35,12 +35,12 @@ bool HandleMeterIdentificationTestEventTrigger(uint64_t eventTrigger);
 namespace chip {
 
 /*
-* These Test EventTrigger values are specified in the TC_MTRID test plan
-* and are defined conditions used in test events.
-*
-* They are sent along with the enableKey (manufacturer defined secret)
-* in the General Diagnostic cluster TestEventTrigger command
-*/
+ * These Test EventTrigger values are specified in the TC_MTRID test plan
+ * and are defined conditions used in test events.
+ *
+ * They are sent along with the enableKey (manufacturer defined secret)
+ * in the General Diagnostic cluster TestEventTrigger command
+ */
 enum class MeterIdentificationTrigger : uint64_t
 {
     // Scenarios

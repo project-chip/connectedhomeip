@@ -34,7 +34,6 @@ using namespace chip::app::Clusters::MeterIdentification;
 using namespace chip::app::Clusters::MeterIdentification::Attributes;
 
 using chip::Protocols::InteractionModel::Status;
-
 namespace {
 bool NullableCharSpanCompare(const DataModel::Nullable<CharSpan> & a, const DataModel::Nullable<CharSpan> & b)
 {
@@ -123,7 +122,7 @@ CHIP_ERROR Instance::SetPointOfDelivery(const DataModel::Nullable<CharSpan> & ne
     }
 
     const size_t len = newValue.IsNull() ? 0 : newValue.Value().size();
-    if (kMaximumStringBufferSize <= len)
+    if (kMaximumStringSize < len)
     {
         return CHIP_ERROR_INVALID_STRING_LENGTH;
     }
@@ -136,7 +135,6 @@ CHIP_ERROR Instance::SetPointOfDelivery(const DataModel::Nullable<CharSpan> & ne
     if (!newValue.IsNull())
     {
         memcpy(mPointOfDeliveryBuf, newValue.Value().data(), len);
-        mPointOfDeliveryBuf[len] = 0;
         mPointOfDelivery = MakeNullable(CharSpan(mPointOfDeliveryBuf, len));
     }
 
@@ -152,7 +150,7 @@ CHIP_ERROR Instance::SetMeterSerialNumber(const DataModel::Nullable<CharSpan> & 
     }
 
     const size_t len = newValue.IsNull() ? 0 : newValue.Value().size();
-    if (kMaximumStringBufferSize <= len)
+    if (kMaximumStringSize < len)
     {
         return CHIP_ERROR_INVALID_STRING_LENGTH;
     }
@@ -165,7 +163,6 @@ CHIP_ERROR Instance::SetMeterSerialNumber(const DataModel::Nullable<CharSpan> & 
     if (!newValue.IsNull())
     {
         memcpy(mMeterSerialNumberBuf, newValue.Value().data(), len);
-        mMeterSerialNumberBuf[len] = 0;
         mMeterSerialNumber = MakeNullable(CharSpan(mMeterSerialNumberBuf, len));
     }
 
@@ -181,7 +178,7 @@ CHIP_ERROR Instance::SetProtocolVersion(const DataModel::Nullable<CharSpan> & ne
     }
 
     const size_t len = newValue.IsNull() ? 0 : newValue.Value().size();
-    if (kMaximumStringBufferSize <= len)
+    if (kMaximumStringSize < len)
     {
         return CHIP_ERROR_INVALID_STRING_LENGTH;
     }
@@ -194,7 +191,6 @@ CHIP_ERROR Instance::SetProtocolVersion(const DataModel::Nullable<CharSpan> & ne
     if (!newValue.IsNull())
     {
         memcpy(mProtocolVersionBuf, newValue.Value().data(), len);
-        mProtocolVersionBuf[len] = 0;
         mProtocolVersion = MakeNullable(CharSpan(mProtocolVersionBuf, len));
     }
 
@@ -235,6 +231,8 @@ CHIP_ERROR Instance::SetPowerThreshold(const DataModel::Nullable<Globals::Struct
     return CHIP_NO_ERROR;
 }
 
+
+
 // AttributeAccessInterface
 CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
@@ -254,7 +252,7 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
         break;
 
     case MeterSerialNumber::Id:
-        ReturnErrorOnFailure(aEncoder.Encode(GetMeterSerialNumber()));;
+        ReturnErrorOnFailure(aEncoder.Encode(GetMeterSerialNumber()));
         break;
 
     case ProtocolVersion::Id:
