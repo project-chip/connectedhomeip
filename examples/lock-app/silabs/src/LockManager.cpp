@@ -126,7 +126,9 @@ bool LockManager::IsValidCredentialIndex(uint16_t credentialIndex, CredentialTyp
     {
         return (0 == credentialIndex); // 0 is required index for Programming PIN
     }
-    return (credentialIndex < kMaxCredentialsPerUser);
+
+    // Other credential types are valid at all uint16_t indices, credential limit is based on available storage
+    return (credentialIndex < UINT16_MAX);
 }
 
 bool LockManager::IsValidCredentialType(CredentialTypeEnum type)
@@ -484,15 +486,7 @@ bool LockManager::GetCredential(chip::EndpointId endpointId, uint16_t credential
 
     VerifyOrReturnValue(IsValidCredentialType(credentialType), false);
 
-    if (CredentialTypeEnum::kProgrammingPIN == credentialType)
-    {
-        VerifyOrReturnValue(IsValidCredentialIndex(credentialIndex, credentialType),
-                            false); // programming pin index is only index allowed to contain 0
-    }
-    else
-    {
-        VerifyOrReturnValue(IsValidCredentialIndex(--credentialIndex, credentialType), false); // otherwise, indices are one-indexed
-    }
+    VerifyOrReturnValue(IsValidCredentialIndex(credentialIndex, credentialType), false);
 
     ChipLogProgress(Zcl, "Lock App: LockManager::GetCredential [credentialType=%u], credentialIndex=%d",
                     to_underlying(credentialType), credentialIndex);
@@ -516,6 +510,11 @@ bool LockManager::GetCredential(chip::EndpointId endpointId, uint16_t credential
     {
         credential.status = mCredentialInStorage.status;
         ChipLogDetail(Zcl, "CredentialStatus: %d, CredentialIndex: %d ", (int) credential.status, credentialIndex);
+        if (DlCredentialStatus::kAvailable == credential.status)
+        {
+            ChipLogDetail(Zcl, "Found unoccupied credential ");
+            return true;
+        }
     }
     else
     {
@@ -523,11 +522,6 @@ bool LockManager::GetCredential(chip::EndpointId endpointId, uint16_t credential
         return false;
     }
 
-    if (DlCredentialStatus::kAvailable == credential.status)
-    {
-        ChipLogDetail(Zcl, "Found unoccupied credential ");
-        return true;
-    }
     credential.credentialType = mCredentialInStorage.credentialType;
     credential.credentialData = chip::ByteSpan{ mCredentialInStorage.credentialData, mCredentialInStorage.credentialDataSize };
     credential.createdBy      = mCredentialInStorage.createdBy;
@@ -537,8 +531,7 @@ bool LockManager::GetCredential(chip::EndpointId endpointId, uint16_t credential
     credential.creationSource     = DlAssetSource::kMatterIM;
     credential.modificationSource = DlAssetSource::kMatterIM;
 
-    ChipLogDetail(Zcl, "Found occupied credential [type=%u,dataSize=%u]", to_underlying(credential.credentialType),
-                  credential.credentialData.size());
+    ChipLogDetail(Zcl, "Found occupied credential");
 
     return true;
 }
@@ -553,15 +546,7 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credential
 
     VerifyOrReturnValue(IsValidCredentialType(credentialType), false);
 
-    if (CredentialTypeEnum::kProgrammingPIN == credentialType)
-    {
-        VerifyOrReturnValue(IsValidCredentialIndex(credentialIndex, credentialType),
-                            false); // programming pin index is only index allowed to contain 0
-    }
-    else
-    {
-        VerifyOrReturnValue(IsValidCredentialIndex(--credentialIndex, credentialType), false); // otherwise, indices are one-indexed
-    }
+    VerifyOrReturnValue(IsValidCredentialIndex(credentialIndex, credentialType), false);
 
     VerifyOrReturnValue(credentialData.size() <= kMaxCredentialSize, false);
 
@@ -585,7 +570,7 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credential
     // Clear mCredentialInStorage.credentialData
     memset(mCredentialInStorage.credentialData, 0, kMaxCredentialSize);
 
-    if ((error != CHIP_NO_ERROR))
+    if (error != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "Error reading from KVS key");
         return false;
@@ -904,17 +889,17 @@ bool LockManager::setLockState(chip::EndpointId endpointId, const Nullable<chip:
 
         error = mStorage->SyncGetKeyValue(userKey.KeyName(), &mUserInStorage, userSize);
 
-        // No user exists at this index
+        // User exists at this index
         if (error == CHIP_NO_ERROR)
         {
             chip::StorageKeyName credentialKey = LockUserCredentialMap(userIndex);
 
-            uint16_t credentialSize = CredentialStructSize * mUserInStorage.currentCredentialCount;
+            uint16_t credentialStructSize = CredentialStructSize * mUserInStorage.currentCredentialCount;
 
             // Get array of credential indices and types associated to user
-            error = mStorage->SyncGetKeyValue(credentialKey.KeyName(), &mCredentials, credentialSize);
+            error = mStorage->SyncGetKeyValue(credentialKey.KeyName(), &mCredentials, credentialStructSize);
 
-            // No credential data associated with user
+            // Credential data associated with user
             if (error == CHIP_NO_ERROR)
             {
                 // Loop through each credential attached to the user
@@ -933,7 +918,7 @@ bool LockManager::setLockState(chip::EndpointId endpointId, const Nullable<chip:
 
                         error = mStorage->SyncGetKeyValue(key.KeyName(), &mCredentialInStorage, credentialSize);
 
-                        if ((error == CHIP_NO_ERROR) || (error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND))
+                        if (error == CHIP_NO_ERROR)
                         {
                             if (mCredentialInStorage.status == DlCredentialStatus::kOccupied)
                             {
@@ -959,7 +944,7 @@ bool LockManager::setLockState(chip::EndpointId endpointId, const Nullable<chip:
                                 }
                             }
                         }
-                        else
+                        else if (error != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
                         {
                             ChipLogError(Zcl, "Error reading credential");
                             return false;
