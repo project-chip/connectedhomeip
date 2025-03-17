@@ -105,7 +105,7 @@ ConnectivityManagerImpl ConnectivityManagerImpl::sInstance;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 static void StopSignalHandler(int signum)
 {
-    WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer()->Shutdown([](uint32_t id, WiFiPAF::WiFiPafRole role) {
+    WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().Shutdown([](uint32_t id, WiFiPAF::WiFiPafRole role) {
         switch (role)
         {
         case WiFiPAF::WiFiPafRole::kWiFiPafRole_Publisher:
@@ -165,7 +165,7 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     }
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    pmWiFiPAF = WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer();
+    pmWiFiPAF = &WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer();
     pmWiFiPAF->Init(&DeviceLayer::SystemLayer());
 
     struct sigaction sa = {};
@@ -185,20 +185,21 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>::_OnPlatformEvent(event);
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    WiFiPAFLayer & WiFiPafLayer = WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer();
     switch (event->Type)
     {
     case DeviceEventType::kCHIPoWiFiPAFReceived: {
         ChipLogProgress(DeviceLayer, "WiFi-PAF: event: kCHIPoWiFiPAFReceived");
-        WiFiPAF::WiFiPAFSession RxInfo;
+        WiFiPAFSession RxInfo;
         memcpy(&RxInfo, &event->CHIPoWiFiPAFReceived.SessionInfo, sizeof(WiFiPAF::WiFiPAFSession));
-        _GetWiFiPAF()->OnWiFiPAFMessageReceived(RxInfo, System::PacketBufferHandle::Adopt(event->CHIPoWiFiPAFReceived.Data));
+        WiFiPafLayer.OnWiFiPAFMessageReceived(RxInfo, System::PacketBufferHandle::Adopt(event->CHIPoWiFiPAFReceived.Data));
         break;
     }
     case DeviceEventType::kCHIPoWiFiPAFConnected: {
         ChipLogProgress(DeviceLayer, "WiFi-PAF: event: kCHIPoWiFiPAFConnected");
         WiFiPAF::WiFiPAFSession SessionInfo;
         memcpy(&SessionInfo, &event->CHIPoWiFiPAFReceived.SessionInfo, sizeof(WiFiPAF::WiFiPAFSession));
-        _GetWiFiPAF()->HandleTransportConnectionInitiated(SessionInfo, mOnPafSubscribeComplete, mAppState, mOnPafSubscribeError);
+        WiFiPafLayer.HandleTransportConnectionInitiated(SessionInfo, mOnPafSubscribeComplete, mAppState, mOnPafSubscribeError);
         break;
     }
     case DeviceEventType::kCHIPoWiFiPAFCancelConnect: {
@@ -214,7 +215,7 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         ChipLogProgress(DeviceLayer, "WiFi-PAF: event: kCHIPoWiFiPAFWriteDone");
         WiFiPAF::WiFiPAFSession TxInfo;
         memcpy(&TxInfo, &event->CHIPoWiFiPAFReceived.SessionInfo, sizeof(WiFiPAF::WiFiPAFSession));
-        _GetWiFiPAF()->HandleWriteConfirmed(TxInfo, event->CHIPoWiFiPAFReceived.result);
+        WiFiPafLayer.HandleWriteConfirmed(TxInfo, event->CHIPoWiFiPAFReceived.result);
         break;
     }
     }
@@ -941,8 +942,9 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFPublish(ConnectivityManager::WiFiPAF
     wpa_supplicant_1_interface_call_nanpublish_sync(mWpaSupplicant.iface, args, &publish_id, nullptr, &err.GetReceiver());
 
     ChipLogProgress(DeviceLayer, "WiFi-PAF: publish_id: %u ! ", publish_id);
-    WiFiPAFSession sessionInfo = { .id = publish_id };
-    ReturnErrorOnFailure(_GetWiFiPAF()->AddPafSession(PafInfoAccess::kAccSessionId, sessionInfo));
+    WiFiPAFSession sessionInfo  = { .role = WiFiPafRole::kWiFiPafRole_Publisher, .id = publish_id };
+    WiFiPAFLayer & WiFiPafLayer = WiFiPAFLayer::GetWiFiPAFLayer();
+    ReturnErrorOnFailure(WiFiPafLayer.AddPafSession(PafInfoAccess::kAccSessionId, sessionInfo));
     InArgs.publish_id = publish_id;
 
     g_signal_connect(mWpaSupplicant.iface, "nanreplied",
@@ -973,11 +975,6 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFCancelPublish(uint32_t PublishId)
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
     wpa_supplicant_1_interface_call_nancancel_publish_sync(mWpaSupplicant.iface, PublishId, nullptr, &err.GetReceiver());
     return CHIP_NO_ERROR;
-}
-
-WiFiPAF::WiFiPAFLayer * ConnectivityManagerImpl::_GetWiFiPAF()
-{
-    return pmWiFiPAF;
 }
 #endif
 
@@ -1465,8 +1462,9 @@ void ConnectivityManagerImpl::OnDiscoveryResult(GVariant * discov_info)
     /*
         Error Checking
     */
-    WiFiPAFSession sessionInfo = { .discriminator = pPublishSSI->DevInfo };
-    auto pPafInfo              = _GetWiFiPAF()->GetPAFInfo(PafInfoAccess::kAccDisc, sessionInfo);
+    WiFiPAFSession sessionInfo  = { .discriminator = pPublishSSI->DevInfo };
+    WiFiPAFLayer & WiFiPafLayer = WiFiPAFLayer::GetWiFiPAFLayer();
+    auto pPafInfo               = WiFiPafLayer.GetPAFInfo(PafInfoAccess::kAccDisc, sessionInfo);
     if (pPafInfo == nullptr)
     {
         ChipLogError(DeviceLayer, "WiFi-PAF: DiscoveryResult, no valid session with discriminator: %u", pPublishSSI->DevInfo);
@@ -1564,8 +1562,9 @@ void ConnectivityManagerImpl::OnReplied(GVariant * reply_info)
                         SetupDiscriminator);
         return;
     }
-    WiFiPAFSession sessionInfo = { .id = publish_id };
-    auto pPafInfo              = _GetWiFiPAF()->GetPAFInfo(PafInfoAccess::kAccSessionId, sessionInfo);
+    WiFiPAFSession sessionInfo  = { .id = publish_id };
+    WiFiPAFLayer & WiFiPafLayer = WiFiPAFLayer::GetWiFiPAFLayer();
+    auto pPafInfo               = WiFiPafLayer.GetPAFInfo(PafInfoAccess::kAccSessionId, sessionInfo);
     if (pPafInfo == nullptr)
     {
         ChipLogError(DeviceLayer, "WiFi-PAF: OnReplied, no valid session with publish_id: %d", publish_id);
@@ -1590,7 +1589,7 @@ void ConnectivityManagerImpl::OnReplied(GVariant * reply_info)
     pPafInfo->id      = publish_id;
     pPafInfo->peer_id = peer_subscribe_id;
     memcpy(pPafInfo->peer_addr, peer_addr, sizeof(uint8_t) * 6);
-    _GetWiFiPAF()->HandleTransportConnectionInitiated(*pPafInfo);
+    WiFiPafLayer.HandleTransportConnectionInitiated(*pPafInfo);
 }
 
 void ConnectivityManagerImpl::OnNanReceive(GVariant * obj)
@@ -1641,15 +1640,17 @@ void ConnectivityManagerImpl::OnNanReceive(GVariant * obj)
 void ConnectivityManagerImpl::OnNanPublishTerminated(guint public_id, gchar * reason)
 {
     ChipLogProgress(Controller, "WiFi-PAF: Publish terminated (%u, %s)", public_id, reason);
-    WiFiPAFSession sessionInfo = { .id = public_id };
-    _GetWiFiPAF()->RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo);
+    WiFiPAFSession sessionInfo  = { .id = public_id };
+    WiFiPAFLayer & WiFiPafLayer = WiFiPAFLayer::GetWiFiPAFLayer();
+    WiFiPafLayer.RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo);
 }
 
 void ConnectivityManagerImpl::OnNanSubscribeTerminated(guint subscribe_id, gchar * reason)
 {
     ChipLogProgress(Controller, "WiFi-PAF: Subscription terminated (%u, %s)", subscribe_id, reason);
-    WiFiPAFSession sessionInfo = { .id = subscribe_id };
-    _GetWiFiPAF()->RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo);
+    WiFiPAFSession sessionInfo  = { .id = subscribe_id };
+    WiFiPAFLayer & WiFiPafLayer = WiFiPAFLayer::GetWiFiPAFLayer();
+    WiFiPafLayer.RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo);
     /*
         Indicate the connection event
     */
@@ -1707,8 +1708,9 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFSubscribe(const uint16_t & connDiscr
     mOnPafSubscribeComplete = onSuccess;
     mOnPafSubscribeError    = onError;
 
-    WiFiPAFSession sessionInfo = { .discriminator = PafPublish_ssi.DevInfo };
-    auto pPafInfo              = _GetWiFiPAF()->GetPAFInfo(PafInfoAccess::kAccDisc, sessionInfo);
+    WiFiPAFSession sessionInfo  = { .discriminator = PafPublish_ssi.DevInfo };
+    WiFiPAFLayer & WiFiPafLayer = WiFiPAFLayer::GetWiFiPAFLayer();
+    auto pPafInfo               = WiFiPafLayer.GetPAFInfo(PafInfoAccess::kAccDisc, sessionInfo);
     if (pPafInfo != nullptr)
     {
         pPafInfo->id   = subscribe_id;

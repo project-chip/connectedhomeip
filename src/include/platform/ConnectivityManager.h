@@ -528,7 +528,7 @@ inline void ConnectivityManager::ResetThreadNetworkDiagnosticsCounts()
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 inline WiFiPAF::WiFiPAFLayer * ConnectivityManager::GetWiFiPAF()
 {
-    return static_cast<ImplClass *>(this)->_GetWiFiPAF();
+    return &WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer();
 }
 
 inline void ConnectivityManager::WiFiPafSetApFreq(const uint16_t freq)

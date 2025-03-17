@@ -138,6 +138,7 @@ CHIP_ERROR WiFiPAFBase::WiFiPAFCloseSession(WiFiPAFSession & SessionInfo)
 {
     VerifyOrReturnError(mWiFiPAFLayer->GetWiFiPAFState() != State::kNotReady, CHIP_ERROR_INCORRECT_STATE);
     DeviceLayer::ConnectivityMgr().WiFiPAFShutdown(SessionInfo.id, SessionInfo.role);
+    mWiFiPAFLayer->SetWiFiPAFState(State::kInitialized);
 
     return CHIP_NO_ERROR;
 }

@@ -166,7 +166,7 @@ public:
     WiFiPAFLayerDelegate * mWiFiPAFTransport = nullptr;
 
     WiFiPAFLayer();
-    static WiFiPAFLayer * GetWiFiPAFLayer();
+    static WiFiPAFLayer & GetWiFiPAFLayer();
     CHIP_ERROR Init(chip::System::Layer * systemLayer);
 
     typedef void (*OnCancelDeviceHandle)(uint32_t id, WiFiPAF::WiFiPafRole role);
@@ -194,7 +194,7 @@ public:
 
 private:
     void InitialPafInfo();
-    void cleanPafInfo(WiFiPAFSession & SessionInfo);
+    void CleanPafInfo(WiFiPAFSession & SessionInfo);
     WiFiPAFSession mPafInfoVect[WIFIPAF_LAYER_NUM_PAF_ENDPOINTS];
     chip::System::Layer * mSystemLayer;
 };
