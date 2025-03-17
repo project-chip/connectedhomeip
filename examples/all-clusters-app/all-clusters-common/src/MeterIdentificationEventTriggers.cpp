@@ -33,7 +33,7 @@ class OldMeterIdentificationAttributes
     DataModel::Nullable<CharSpan> mPointOfDelivery;
     DataModel::Nullable<CharSpan> mMeterSerialNumber;
     DataModel::Nullable<CharSpan> mProtocolVersion;
-    DataModel::Nullable<Structs::PowerThresholdStruct::Type> mPowerThreshold;
+    DataModel::Nullable<Globals::Structs::PowerThresholdStruct::Type> mPowerThreshold;
 
 private:
 
@@ -185,16 +185,16 @@ private:
 
         if (mInstance->GetPowerThreshold().IsNull())
         {
-            mInstance->SetPowerThreshold(DataModel::MakeNullable((Structs::PowerThresholdStruct::Type){Optional<int64_t>(0),
-                Optional<int64_t>(0), static_cast<PowerThresholdSourceEnum>(0)}));
+            mInstance->SetPowerThreshold(DataModel::MakeNullable((Globals::Structs::PowerThresholdStruct::Type){Optional<int64_t>(0),
+                Optional<int64_t>(0), static_cast<Globals::PowerThresholdSourceEnum>(0)}));
         }
         else
         {
             auto powerThreshold = mInstance->GetPowerThreshold();
             ++powerThreshold.Value().powerThreshold.Value();
             ++powerThreshold.Value().apparentPowerThreshold.Value();
-            powerThreshold.Value().powerThresholdSource.Value() = static_cast<PowerThresholdSourceEnum>(1 +
-                static_cast<std::underlying_type<PowerThresholdSourceEnum>::type>(powerThreshold.Value().powerThresholdSource.Value()));
+            powerThreshold.Value().powerThresholdSource.Value() = static_cast<Globals::PowerThresholdSourceEnum>(1 +
+                static_cast<std::underlying_type<Globals::PowerThresholdSourceEnum>::type>(powerThreshold.Value().powerThresholdSource.Value()));
             mInstance->SetPowerThreshold(std::move(powerThreshold));
         }
     }
