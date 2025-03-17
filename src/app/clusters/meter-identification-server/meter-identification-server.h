@@ -60,6 +60,10 @@ public:
 
 private:
     // Attribute storage
+    static constexpr size_t kMaximumStringBufferSize = 65;
+    char mPointOfDeliveryBuf[kMaximumStringBufferSize] = {};
+    char mMeterSerialNumberBuf[kMaximumStringBufferSize] = {};
+    char mProtocolVersionBuf[kMaximumStringBufferSize] = {};
     DataModel::Nullable<MeterTypeEnum> mMeterType;
     DataModel::Nullable<CharSpan> mPointOfDelivery;
     DataModel::Nullable<CharSpan> mMeterSerialNumber;
