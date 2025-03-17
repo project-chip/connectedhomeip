@@ -162,8 +162,8 @@ void PlatformManagerImpl::_GLibMatterContextInvokeSync(LambdaBridge && bridge)
         },
         &invokeData, nullptr);
 
-    bool isChipStackLocked = PlatformMgr().IsChipStackLockedByCurrentThread() &&
-        (mState.load(std::memory_order_relaxed) == State::kRunning);
+    bool isChipStackLocked =
+        PlatformMgr().IsChipStackLockedByCurrentThread() && (mState.load(std::memory_order_relaxed) == State::kRunning);
     if (isChipStackLocked)
     {
         PlatformMgr().UnlockChipStack();
