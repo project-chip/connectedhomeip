@@ -276,42 +276,19 @@ void GetTextEntries(unsigned short txtLen, uint8_t * txtRecord, std::vector<chip
     }
 }
 
-static void HandleResolveTask(intptr_t context)
+gboolean OnResolveFinalize(gpointer userData)
 {
     ChipLogDetail(DeviceLayer, "DNSsd %s", __func__);
-    auto rCtx = reinterpret_cast<chip::Dnssd::ResolveContext *>(context);
-    if (!rCtx)
-    {
-        ChipLogError(DeviceLayer, "Null context in HandleResolveTask");
-        return;
-    }
+    auto rCtx = reinterpret_cast<chip::Dnssd::ResolveContext *>(userData);
 
     {
+        // Lock the stack mutex when calling the callback function, so that the callback
+        // function could safely perform message exchange (e.g. PASE session pairing).
         chip::DeviceLayer::StackLock lock;
         rCtx->Finalize(CHIP_NO_ERROR);
     }
 
     rCtx->mInstance->RemoveContext(rCtx);
-}
-
-gboolean OnResolveFinalize(gpointer userData)
-{
-    ChipLogDetail(DeviceLayer, "DNSsd %s", __func__);
-    auto rCtx = reinterpret_cast<chip::Dnssd::ResolveContext *>(userData);
-    if (!rCtx)
-    {
-        ChipLogError(DeviceLayer, "Null context in OnResolveFinalize");
-        return G_SOURCE_REMOVE;
-    }
-
-    CHIP_ERROR err = chip::DeviceLayer::PlatformMgr().ScheduleWork(HandleResolveTask, reinterpret_cast<intptr_t>(rCtx));
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "Failed to schedule resolve task: %s", err.AsString());
-        rCtx->mInstance->RemoveContext(rCtx);
-        return G_SOURCE_REMOVE;
-    }
-
     return G_SOURCE_REMOVE;
 }
 

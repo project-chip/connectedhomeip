@@ -162,8 +162,19 @@ void PlatformManagerImpl::_GLibMatterContextInvokeSync(LambdaBridge && bridge)
         },
         &invokeData, nullptr);
 
+    bool isChipStackLocked = PlatformMgr().IsChipStackLockedByCurrentThread() &&
+        (mState.load(std::memory_order_relaxed) == State::kRunning);
+    if (isChipStackLocked)
+    {
+        PlatformMgr().UnlockChipStack();
+    }
+
     std::unique_lock<std::mutex> lock(invokeData.mDoneMutex);
     invokeData.mDoneCond.wait(lock, [&invokeData]() { return invokeData.mDone; });
+    if (isChipStackLocked)
+    {
+        PlatformMgr().LockChipStack();
+    }
 }
 
 } // namespace DeviceLayer

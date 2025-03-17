@@ -88,10 +88,6 @@ private:
     CHIP_ERROR _InitChipStack();
     void _Shutdown();
 
-#if CHIP_STACK_LOCK_TRACKING_ENABLED
-    bool _IsChipStackLockedByCurrentThread() const { return true; };
-#endif
-
     // ===== Members for internal use by the following friends.
 
     friend PlatformManager & PlatformMgr();
