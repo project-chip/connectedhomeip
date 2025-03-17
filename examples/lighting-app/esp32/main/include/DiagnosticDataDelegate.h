@@ -4,7 +4,8 @@
 #include <lib/support/CodeUtils.h>
 #include <system/SystemClock.h>
 #include <system/SystemStats.h>
-#include <tracing/esp32_diagnostic_trace/Diagnostics.h>
+#include <tracing/esp32_diagnostic_trace/DiagnosticEntry.h>
+#include <tracing/esp32_diagnostic_trace/DiagnosticStorage.h>
 
 namespace chip {
 namespace Diagnostics {
@@ -43,7 +44,7 @@ public:
     virtual CHIP_ERROR StopPeriodicDiagnostics()                                       = 0;
     virtual CHIP_ERROR SetSamplingInterval(chip::System::Clock::Timeout aTimeout)      = 0;
 
-    static DiagnosticDataDelegate & GetInstance(Tracing::Diagnostics::DiagnosticStorageInterface * storageInstance);
+    static DiagnosticDataDelegate & GetInstance(Tracing::Diagnostics::CircularDiagnosticBuffer * storageInstance);
 };
 
 // Forward declaration of implementation class

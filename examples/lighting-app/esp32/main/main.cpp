@@ -61,7 +61,7 @@
 
 #ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
 #include <DiagnosticDataDelegate.h>
-#include <tracing/esp32_diagnostic_trace/DiagnosticStorageManager.h>
+#include <tracing/esp32_diagnostic_trace/DiagnosticStorage.h>
 #include <tracing/esp32_diagnostic_trace/DiagnosticTracing.h>
 
 #if CONFIG_ESP_INSIGHTS_ENABLED

@@ -5,7 +5,6 @@
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <system/SystemClock.h>
-#include <tracing/esp32_diagnostic_trace/Diagnostics.h>
 #include <unordered_map>
 
 #ifdef CONFIG_ENABLE_ESP_INSIGHTS
@@ -23,7 +22,7 @@ namespace Diagnostics {
 class DiagnosticDataDelegateImpl : public DiagnosticDataDelegate
 {
 public:
-    static DiagnosticDataDelegateImpl & GetInstance(Tracing::Diagnostics::DiagnosticStorageInterface * storageInstance)
+    static DiagnosticDataDelegateImpl & GetInstance(Tracing::Diagnostics::CircularDiagnosticBuffer * storageInstance)
     {
         static DiagnosticDataDelegateImpl * mInstance = nullptr;
         if (mInstance == nullptr)
@@ -33,9 +32,7 @@ public:
         return *mInstance;
     }
 
-    DiagnosticDataDelegateImpl(Tracing::Diagnostics::DiagnosticStorageInterface * storageInstance) :
-        mStorageInstance(storageInstance)
-    {}
+    DiagnosticDataDelegateImpl(Tracing::Diagnostics::CircularDiagnosticBuffer * storageInstance) : mStorageInstance(storageInstance) {}
 
     CHIP_ERROR StartPeriodicDiagnostics(chip::System::Clock::Timeout aTimeout) override
     {
@@ -98,31 +95,46 @@ public:
             if (mReader.GetType() == chip::TLV::kTLVType_Structure && mReader.GetTag() == chip::TLV::AnonymousTag())
             {
                 chip::TLV::TLVReader tempReader(mReader);
-                Diagnostic<char *> trace(label, value, 0);
-                err = trace.Decode(tempReader);
+                DiagnosticEntry trace = {
+                    .label = label,
+                    .stringValue = value,
+                    .type = chip::Tracing::Diagnostics::ValueType::kCharString,
+                    .timestamp = 0
+                };
+                err = Decode(tempReader, trace);
                 if (err == CHIP_NO_ERROR)
                 {
-                    LogTraceData(trace.GetLabel(), trace.GetValue(), trace.GetTimestamp());
+                    LogTraceData(trace.label, trace.stringValue, trace.timestamp);
                     continue;
                 }
 
                 chip::TLV::TLVReader tempReader2(mReader);
 
-                Diagnostic<int32_t> metricInt32(label, 0, 0);
-                err = metricInt32.Decode(tempReader2);
+                DiagnosticEntry metricInt32 = {
+                    .label = label,
+                    .intValue = 0,
+                    .type = chip::Tracing::Diagnostics::ValueType::kSignedInteger,
+                    .timestamp = 0
+                };
+                err = Decode(tempReader2, metricInt32);
                 if (err == CHIP_NO_ERROR)
                 {
-                    LogMetricData(metricInt32.GetLabel(), ValueType::kInt32, metricInt32.GetValue());
+                    LogMetricData(metricInt32.label, ValueType::kInt32, metricInt32.intValue);
                     continue;
                 }
 
                 chip::TLV::TLVReader tempReader3(mReader);
 
-                Diagnostic<uint32_t> metricUint32(label, 0, 0);
-                err = metricUint32.Decode(tempReader3);
+                DiagnosticEntry metricUint32 = {
+                    .label = label,
+                    .uintValue = 0,
+                    .type = chip::Tracing::Diagnostics::ValueType::kUnsignedInteger,
+                    .timestamp = 0
+                };
+                err = Decode(tempReader3, metricUint32);
                 if (err == CHIP_NO_ERROR)
                 {
-                    LogMetricData(metricUint32.GetLabel(), ValueType::kUInt32, metricUint32.GetValue());
+                    LogMetricData(metricUint32.label, ValueType::kUInt32, metricUint32.uintValue);
                     continue;
                 }
 
@@ -142,7 +154,7 @@ public:
 #endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
 
 private:
-    Tracing::Diagnostics::DiagnosticStorageInterface * mStorageInstance = nullptr;
+    Tracing::Diagnostics::CircularDiagnosticBuffer * mStorageInstance = nullptr;
 #ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
     uint8_t mRetrievalBuffer[CONFIG_RETRIEVAL_BUFFER_SIZE];
 #endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
@@ -267,7 +279,7 @@ private:
     }
 };
 
-DiagnosticDataDelegate & DiagnosticDataDelegate::GetInstance(Tracing::Diagnostics::DiagnosticStorageInterface * storageInstance)
+DiagnosticDataDelegate & DiagnosticDataDelegate::GetInstance(Tracing::Diagnostics::CircularDiagnosticBuffer * storageInstance)
 {
     return DiagnosticDataDelegateImpl::GetInstance(storageInstance);
 }
