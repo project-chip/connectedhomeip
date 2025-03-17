@@ -50,7 +50,7 @@ private:
         if (!value.IsNull())
         {
             const size_t len = value.Value().size();
-            if (auto * str = static_cast<char *>(chip::Platform::MemoryAlloc(1 + len)))
+            if (auto * str = static_cast<char *>(chip::Platform::MemoryAlloc(len)))
             {
                 memcpy(str, value.Value().data(), len);
                 str[len] = 0;
@@ -159,8 +159,9 @@ private:
         }
         else
         {
+            const auto value = mInstance->GetPointOfDelivery().Value();
             mInstance->SetPointOfDelivery(DataModel::MakeNullable(CharSpan::fromCharString(IncrementString(
-                mInstance->GetPointOfDelivery().Value().data()).c_str())));
+                std::string(value.data(), value.size())).c_str())));
         }
 
         if (mInstance->GetMeterSerialNumber().IsNull())
@@ -169,8 +170,9 @@ private:
         }
         else
         {
+            const auto value = mInstance->GetMeterSerialNumber().Value();
             mInstance->SetMeterSerialNumber(DataModel::MakeNullable(CharSpan::fromCharString(IncrementString(
-                mInstance->GetMeterSerialNumber().Value().data()).c_str())));
+                std::string(value.data(), value.size())).c_str())));
         }
 
         if (mInstance->GetProtocolVersion().IsNull())
@@ -179,8 +181,9 @@ private:
         }
         else
         {
+            const auto value = mInstance->GetProtocolVersion().Value();
             mInstance->SetProtocolVersion(DataModel::MakeNullable(CharSpan::fromCharString(IncrementString(
-                mInstance->GetProtocolVersion().Value().data()).c_str())));
+                std::string(value.data(), value.size())).c_str())));
         }
 
         if (mInstance->GetPowerThreshold().IsNull())
