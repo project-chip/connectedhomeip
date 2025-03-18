@@ -115,8 +115,7 @@ AppPlatformExternalAttributeWriteCallback(EndpointId endpoint, ClusterId cluster
 
 EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointType * ep,
                                              const Span<DataVersion> & dataVersionStorage,
-                                             const Span<const EmberAfDeviceType> & deviceTypeList,
-                                             chip::CharSpan epUniqueId)
+                                             const Span<const EmberAfDeviceType> & deviceTypeList, chip::CharSpan epUniqueId)
 {
     CatalogVendorApp vendorApp = app->GetApplicationBasicDelegate()->GetCatalogVendorApp();
 
@@ -174,8 +173,7 @@ EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointTy
 
 EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointType * ep,
                                              const Span<DataVersion> & dataVersionStorage,
-                                             const Span<const EmberAfDeviceType> & deviceTypeList,
-					     chip::CharSpan epUniqueId,
+                                             const Span<const EmberAfDeviceType> & deviceTypeList, chip::CharSpan epUniqueId,
                                              EndpointId desiredEndpointId)
 {
     CatalogVendorApp vendorApp = app->GetApplicationBasicDelegate()->GetCatalogVendorApp();

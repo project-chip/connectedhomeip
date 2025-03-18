@@ -182,8 +182,8 @@ void BridgedDeviceManager::Init()
     mCurrentEndpointId = mFirstDynamicEndpointId;
 }
 
-std::optional<uint16_t> BridgedDeviceManager::AddDeviceEndpoint(std::unique_ptr<BridgedDevice> dev,
-                                                                chip::CharSpan epUniqueId, chip::EndpointId parentEndpointId)
+std::optional<uint16_t> BridgedDeviceManager::AddDeviceEndpoint(std::unique_ptr<BridgedDevice> dev, chip::CharSpan epUniqueId,
+                                                                chip::EndpointId parentEndpointId)
 {
     EmberAfEndpointType * ep = dev->IsIcd() ? &sIcdBridgedNodeEndpoint : &sBridgedNodeEndpoint;
 
@@ -215,9 +215,8 @@ std::optional<uint16_t> BridgedDeviceManager::AddDeviceEndpoint(std::unique_ptr<
         {
             dev->SetEndpointId(mCurrentEndpointId);
             dev->SetParentEndpointId(parentEndpointId);
-            CHIP_ERROR err =
-                emberAfSetDynamicEndpoint(index, mCurrentEndpointId, ep, dataVersionStorage, deviceTypeList, epUniqueId,
-                                          parentEndpointId);
+            CHIP_ERROR err = emberAfSetDynamicEndpoint(index, mCurrentEndpointId, ep, dataVersionStorage, deviceTypeList,
+                                                       epUniqueId, parentEndpointId);
             if (err == CHIP_NO_ERROR)
             {
                 ChipLogProgress(NotSpecified, "Added device with Id=[%d:0x" ChipLogFormatX64 "] to dynamic endpoint %d (index=%d)",

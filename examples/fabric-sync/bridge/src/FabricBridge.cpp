@@ -103,7 +103,8 @@ CHIP_ERROR FabricBridge::AddSynchronizedDevice(const SynchronizedDevice & data)
     device->SetIcd(data.isIcd.value_or(false));
 
     // Add the device to the bridge manager with a parent endpoint
-    auto result = BridgedDeviceManager::Instance().AddDeviceEndpoint(std::move(device), chip::CharSpan(), /* parentEndpointId= */ 1);
+    auto result =
+        BridgedDeviceManager::Instance().AddDeviceEndpoint(std::move(device), chip::CharSpan(), /* parentEndpointId= */ 1);
     if (!result.has_value())
     {
         ChipLogError(NotSpecified, "Failed to add device with Id=[%d:0x" ChipLogFormatX64 "]", data.id.GetFabricIndex(),

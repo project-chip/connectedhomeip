@@ -171,9 +171,8 @@ int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const Span<const E
             while (true)
             {
                 dev->SetEndpointId(gCurrentEndpointId);
-                err =
-                    emberAfSetDynamicEndpoint(index, gCurrentEndpointId, ep, dataVersionStorage, deviceTypeList,
-                                              epUniqueId, parentEndpointId);
+                err = emberAfSetDynamicEndpoint(index, gCurrentEndpointId, ep, dataVersionStorage, deviceTypeList, epUniqueId,
+                                                parentEndpointId);
                 if (err == CHIP_NO_ERROR)
                 {
                     ChipLogProgress(DeviceLayer, "Added device %s to dynamic endpoint %d (index=%d)", dev->GetName(),
