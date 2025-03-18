@@ -356,9 +356,7 @@ void OnResolve(dnssd_error_e result, dnssd_service_h service, void * userData)
     rCtx->mResult.mAddress.emplace(ipAddr);
 
     err = chip::DeviceLayer::PlatformMgr().ScheduleWork(HandleResolveTask, reinterpret_cast<intptr_t>(rCtx));
-    VerifyOrExit(
-        err == CHIP_NO_ERROR,
-        ChipLogError(DeviceLayer, "Failed to schedule resolve task: %s", err.AsString()));
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "Failed to schedule resolve task: %s", err.AsString()));
 
     return;
 
