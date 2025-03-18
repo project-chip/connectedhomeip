@@ -288,6 +288,10 @@ CHIP_ERROR BaseApplication::BaseInit()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+#ifdef DISPLAY_ENABLED
+    GetLCD().Init((uint8_t *) APP_TASK_NAME);
+#endif
+
 #ifdef SL_WIFI
     /*
      * Wait for the WiFi to be initialized
