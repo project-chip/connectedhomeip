@@ -485,6 +485,7 @@ public:
     virtual pw::Status TriggerIcdCheckin(const pw_protobuf_Empty & request, pw_protobuf_Empty & response)
     {
 #if CHIP_CONFIG_ENABLE_ICD_CIP
+        chip::app::InteractionModelEngine::GetInstance()->ShutdownAllSubscriptions();
         chip::DeviceLayer::PlatformMgr().ScheduleWork(
             [](intptr_t) {
                 ChipLogDetail(AppServer, "Being triggerred to send ICD check-in message to subscriber");
