@@ -36,8 +36,8 @@ AppTask AppTask::sAppTask;
 #include <app/InteractionModelEngine.h>
 
 int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const Span<const EmberAfDeviceType> & deviceTypeList,
-                      const Span<DataVersion> & dataVersionStorage, chip
-                      : CharSpan epUniqueId, chip::EndpointId parentEndpointId);
+                      const Span<DataVersion> & dataVersionStorage, chip::CharSpan epUniqueId,
+		      chip::EndpointId parentEndpointId);
 CHIP_ERROR RemoveDeviceEndpoint(Device * dev);
 void HandleDeviceTempSensorStatusChanged(DeviceTempSensor * dev, DeviceTempSensor::Changed_t itemChangedMask);
 Protocols::InteractionModel::Status HandleReadTempMeasurementAttribute(DeviceTempSensor * dev, chip::AttributeId attributeId,
