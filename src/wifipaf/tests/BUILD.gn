@@ -23,6 +23,7 @@ chip_test_suite("tests") {
   test_sources = [
     "TestWiFiPAFErrorStr.cpp",
     "TestWiFiPAFLayer.cpp",
+    "TestWiFiPAFTP.cpp",
   ]
 
   cflags = [ "-Wconversion" ]

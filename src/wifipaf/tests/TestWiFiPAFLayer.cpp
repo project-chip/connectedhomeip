@@ -33,6 +33,7 @@
 #include <system/SystemLayer.h>
 #include <system/SystemPacketBuffer.h>
 
+#include <wifipaf/WiFiPAFError.h>
 #include <wifipaf/WiFiPAFLayer.h>
 #include <wifipaf/WiFiPAFLayerDelegate.h>
 
@@ -114,10 +115,9 @@ TEST_F(TestWiFiPAFLayer, CheckWiFiPAFTransportCapabilitiesResponseMessage)
 
 TEST_F(TestWiFiPAFLayer, CheckPafSession)
 {
+    InitialPafInfo();
     // Add the 1st session by giving node_id, discriminator
-    WiFiPAF::WiFiPAFSession sessionInfo = { .role          = WiFiPAF::WiFiPafRole::kWiFiPafRole_Subscriber,
-                                            .nodeId        = 0x1,
-                                            .discriminator = 0xF01 };
+    WiFiPAF::WiFiPAFSession sessionInfo = { .role = kWiFiPafRole_Subscriber, .nodeId = 0x1, .discriminator = 0xF01 };
     EXPECT_EQ(AddPafSession(PafInfoAccess::kAccNodeInfo, sessionInfo), CHIP_NO_ERROR);
 
     // Add the 2nd session
@@ -161,11 +161,14 @@ TEST_F(TestWiFiPAFLayer, CheckPafSession)
     EXPECT_EQ(RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo), CHIP_NO_ERROR);
     sessionInfo.id = 0x2;
     EXPECT_EQ(RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo), CHIP_NO_ERROR);
+
+    EXPECT_EQ(RmPafSession(PafInfoAccess::kAccNodeInfo, sessionInfo), CHIP_ERROR_NOT_IMPLEMENTED);
+    EXPECT_EQ(RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo), CHIP_ERROR_NOT_FOUND);
 }
 
-TEST_F(TestWiFiPAFLayer, CheckNewEndpoint)
+TEST_F(TestWiFiPAFLayer, CheckRunAsCommissioner)
 {
-    WiFiPAFSession SessionInfo = {
+    WiFiPAFSession sessionInfo = {
         .role          = kWiFiPafRole_Subscriber,
         .id            = 1,
         .peer_id       = 1,
@@ -175,8 +178,110 @@ TEST_F(TestWiFiPAFLayer, CheckNewEndpoint)
     };
 
     WiFiPAFEndPoint * newEndPoint = nullptr;
-    EXPECT_EQ(NewEndPoint(&newEndPoint, SessionInfo, SessionInfo.role), CHIP_NO_ERROR);
+    EXPECT_EQ(NewEndPoint(&newEndPoint, sessionInfo, sessionInfo.role), CHIP_NO_ERROR);
     EXPECT_NE(newEndPoint, nullptr);
+    newEndPoint->mState = WiFiPAFEndPoint::kState_Ready;
+    SetWiFiPAFState(State::kInitialized);
+    EXPECT_EQ(GetWiFiPAFState(), State::kInitialized);
+
+    EXPECT_EQ(newEndPoint->StartConnect(), CHIP_NO_ERROR);
+    EXPECT_EQ(AddPafSession(PafInfoAccess::kAccSessionId, sessionInfo), CHIP_NO_ERROR);
+    newEndPoint->mState = WiFiPAFEndPoint::kState_Connected;
+
+    // Send the capability request packet
+    constexpr uint8_t bufCapReq[] = { 0x65, 0x6c, 0x04, 0x00, 0x00, 0x00, 0x5e, 0x01, 0x06 };
+    auto packetCapReq             = System::PacketBufferHandle::NewWithData(bufCapReq, sizeof(bufCapReq));
+    EXPECT_EQ(SendMessage(sessionInfo, std::move(packetCapReq)), CHIP_NO_ERROR);
+    EXPECT_EQ(HandleWriteConfirmed(sessionInfo, true), CHIP_NO_ERROR);
+
+    // Receive the capability response packet
+    constexpr uint8_t bufCapResp[] = { 0x65, 0x6c, 0x04, 0x5b, 0x01, 0x06 };
+    auto packetCapResp             = System::PacketBufferHandle::NewWithData(bufCapResp, sizeof(bufCapResp));
+    newEndPoint->mState            = WiFiPAFEndPoint::kState_Connecting;
+    EXPECT_EQ(OnWiFiPAFMessageReceived(sessionInfo, std::move(packetCapResp)), true);
+
+    // Send a packet
+    auto buf = System::PacketBufferHandle::New(100);
+    buf->SetDataLength(100);
+    EXPECT_EQ(SendMessage(sessionInfo, std::move(buf)), CHIP_NO_ERROR);
+    EXPECT_EQ(HandleWriteConfirmed(sessionInfo, true), CHIP_NO_ERROR);
+
+    constexpr uint8_t buf_rx[] = {
+        to_underlying(WiFiPAFTP::HeaderFlags::kStartMessage) | to_underlying(WiFiPAFTP::HeaderFlags::kEndMessage) |
+            to_underlying(WiFiPAFTP::HeaderFlags::kFragmentAck),
+        0x01,
+        0x01,
+        0x00,
+        0x00, // payload
+    };
+
+    // Receive a pcaket
+    auto packet_rx = System::PacketBufferHandle::NewWithData(buf_rx, sizeof(buf_rx));
+    EXPECT_EQ(packet_rx->DataLength(), static_cast<size_t>(5));
+    EXPECT_EQ(newEndPoint->Receive(std::move(packet_rx)), CHIP_NO_ERROR);
+
+    EXPECT_EQ(newEndPoint->DriveStandAloneAck(), CHIP_NO_ERROR);
+    EXPECT_EQ(newEndPoint->DoSendStandAloneAck(), CHIP_NO_ERROR);
+
+    // Close the session
+    EXPECT_EQ(RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo), CHIP_NO_ERROR);
+    newEndPoint->DoClose(kWiFiPAFCloseFlag_AbortTransmission, WIFIPAF_ERROR_APP_CLOSED_CONNECTION);
+}
+
+TEST_F(TestWiFiPAFLayer, CheckRunAsCommissionee)
+{
+    WiFiPAFSession sessionInfo = {
+        .role          = kWiFiPafRole_Publisher,
+        .id            = 1,
+        .peer_id       = 1,
+        .peer_addr     = { 0xd0, 0x17, 0x69, 0xee, 0x7f, 0x3c },
+        .nodeId        = 1,
+        .discriminator = 0xF00,
+    };
+
+    WiFiPAFEndPoint * newEndPoint = nullptr;
+    EXPECT_EQ(NewEndPoint(&newEndPoint, sessionInfo, sessionInfo.role), CHIP_NO_ERROR);
+    EXPECT_NE(newEndPoint, nullptr);
+    newEndPoint->mState = WiFiPAFEndPoint::kState_Ready;
+
+    EXPECT_EQ(newEndPoint->StartConnect(), CHIP_NO_ERROR);
+    EXPECT_EQ(AddPafSession(PafInfoAccess::kAccSessionId, sessionInfo), CHIP_NO_ERROR);
+
+    newEndPoint->mState = WiFiPAFEndPoint::kState_Ready;
+
+    // Receive the Capability_Request packet
+    constexpr uint8_t bufCapReq[] = { 0x65, 0x6c, 0x04, 0x00, 0x00, 0x00, 0x5e, 0x01, 0x06 };
+    auto packetCapReq             = System::PacketBufferHandle::NewWithData(bufCapReq, sizeof(bufCapReq));
+    EXPECT_EQ(OnWiFiPAFMessageReceived(sessionInfo, std::move(packetCapReq)), true);
+
+    // Reply the Capability Response packet
+    constexpr uint8_t bufCapResp[] = { 0x65, 0x6c, 0x04, 0x5b, 0x01, 0x06 };
+    auto packetCapResp             = System::PacketBufferHandle::NewWithData(bufCapResp, sizeof(bufCapResp));
+    EXPECT_EQ(SendMessage(sessionInfo, std::move(packetCapResp)), CHIP_NO_ERROR);
+    EXPECT_EQ(HandleWriteConfirmed(sessionInfo, true), CHIP_NO_ERROR);
+
+    // Send a packet
+    auto buf = System::PacketBufferHandle::New(100);
+    buf->SetDataLength(100);
+    EXPECT_EQ(SendMessage(sessionInfo, std::move(buf)), CHIP_NO_ERROR);
+    EXPECT_EQ(HandleWriteConfirmed(sessionInfo, true), CHIP_NO_ERROR);
+
+    // Receive a packet
+    constexpr uint8_t buf_rx[] = {
+        to_underlying(WiFiPAFTP::HeaderFlags::kStartMessage) | to_underlying(WiFiPAFTP::HeaderFlags::kEndMessage) |
+            to_underlying(WiFiPAFTP::HeaderFlags::kFragmentAck),
+        0x01,
+        0x01,
+        0x00,
+        0x00, // payload
+    };
+    auto packet_rx = System::PacketBufferHandle::NewWithData(buf_rx, sizeof(buf_rx));
+    EXPECT_EQ(packet_rx->DataLength(), static_cast<size_t>(5));
+    EXPECT_EQ(newEndPoint->Receive(std::move(packet_rx)), CHIP_NO_ERROR);
+
+    // Close the session
+    EXPECT_EQ(RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo), CHIP_NO_ERROR);
+    newEndPoint->DoClose(kWiFiPAFCloseFlag_AbortTransmission, WIFIPAF_ERROR_APP_CLOSED_CONNECTION);
 }
 }; // namespace WiFiPAF
 }; // namespace chip
