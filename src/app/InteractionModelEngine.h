@@ -169,6 +169,12 @@ public:
      * Tears down all active subscriptions.
      */
     void ShutdownAllSubscriptions();
+
+    /**
+     * Tears down all subscription handlers.
+     */
+    void ShutdownAllSubscriptionHandlers();
+
 #endif // CHIP_CONFIG_ENABLE_READ_CLIENT
 
     uint32_t GetNumActiveReadHandlers() const;
