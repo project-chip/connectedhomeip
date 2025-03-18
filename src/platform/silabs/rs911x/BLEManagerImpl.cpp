@@ -163,6 +163,23 @@ void rsi_ble_add_matter_service(void)
                                                    RSI_BLE_ATT_PROPERTY_READ | RSI_BLE_ATT_PROPERTY_NOTIFY |
                                                    RSI_BLE_ATT_PROPERTY_INDICATE, // Set read, write, write without response
                                                data, sizeof(data), ATT_REC_MAINTAIN_IN_HOST);
+#ifdef CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    static const uuid_t custom_characteristic_C3 = {
+        .size     = RSI_BLE_CUSTOM_CHARACTERISTIC_C3_SIZE,
+        .reserved = { RSI_BLE_CUSTOM_CHARACTERISTIC_C3_RESERVED },
+        .val      = { .val128 = { .data1 = RSI_BLE_CUSTOM_CHARACTERISTIC_C3_VALUE_128_DATA_1,
+                                  .data2 = RSI_BLE_CUSTOM_CHARACTERISTIC_C3_VALUE_128_DATA_2,
+                                  .data3 = RSI_BLE_CUSTOM_CHARACTERISTIC_C3_VALUE_128_DATA_3,
+                                  .data4 = { RSI_BLE_CUSTOM_CHARACTERISTIC_C3_VALUE_128_DATA_4 } } }
+    };
+
+    // Adding custom characteristic declaration to the custom service
+    SilabsBleWrapper::rsi_ble_add_char_serv_att(
+        new_serv_resp.serv_handler, new_serv_resp.start_handle + RSI_BLE_CHARACTERISTIC_C3_ATTRIBUTE_HANDLE_LOCATION,
+        RSI_BLE_ATT_PROPERTY_WRITE_NO_RESPONSE | RSI_BLE_ATT_PROPERTY_WRITE | RSI_BLE_ATT_PROPERTY_READ |
+            RSI_BLE_ATT_PROPERTY_NOTIFY | RSI_BLE_ATT_PROPERTY_INDICATE, // Set read, write, write without response
+        new_serv_resp.start_handle + RSI_BLE_CHARACTERISTIC_C3_MEASUREMENT_HANDLE_LOCATION, custom_characteristic_C3);
+#endif // CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
 }
 
 } // namespace
@@ -1028,9 +1045,9 @@ CHIP_ERROR BLEManagerImpl::EncodeAdditionalDataTlv()
     additionalDataFields.Set(AdditionalDataFields::RotatingDeviceId);
 #endif /* CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID) */
 
-    err = AdditionalDataPayloadGenerator().generateAdditionalDataPayload(additionalDataPayloadParams, c3AdditionalDataBufferHandle,
-                                                                         additionalDataFields);
-
+    err = AdditionalDataPayloadGenerator().generateAdditionalDataPayload(
+        additionalDataPayloadParams, sInstance.c3AdditionalDataBufferHandle, additionalDataFields);
+    SuccessOrExit(err);
 exit:
     if (err != CHIP_NO_ERROR)
     {
