@@ -452,26 +452,26 @@ void AppTask::InitServer(intptr_t context)
 
     // Add lights 1..3 --> will be mapped to ZCL endpoints 3, 4, 5
     AddDeviceEndpoint(&gLight1, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                      Span<DataVersion>(gLight1DataVersions), chip::Span(), 1);
+                      Span<DataVersion>(gLight1DataVersions), chip::CharSpan(), 1);
     AddDeviceEndpoint(&gLight2, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                      Span<DataVersion>(gLight2DataVersions), chip::Span(), 1);
+                      Span<DataVersion>(gLight2DataVersions), chip::CharSpan(), 1);
     AddDeviceEndpoint(&gLight3, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                      Span<DataVersion>(gLight3DataVersions), chip::Span(), 1);
+                      Span<DataVersion>(gLight3DataVersions), chip::CharSpan(), 1);
 
     // Remove Light 2 -- Lights 1 & 3 will remain mapped to endpoints 3 & 5
     RemoveDeviceEndpoint(&gLight2);
 
     // Add Light 4 -- > will be mapped to ZCL endpoint 6
     AddDeviceEndpoint(&gLight4, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                      Span<DataVersion>(gLight4DataVersions), chip::Span(), 1);
+                      Span<DataVersion>(gLight4DataVersions), chip::CharSpan(), 1);
 
     // Re-add Light 2 -- > will be mapped to ZCL endpoint 7
     AddDeviceEndpoint(&gLight2, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                      Span<DataVersion>(gLight2DataVersions), chip::Span(), 1);
+                      Span<DataVersion>(gLight2DataVersions), chip::CharSpan(), 1);
 
     // Add Temperature Sensor devices --> will be mapped to endpoint 8
     AddDeviceEndpoint(&TempSensor1, &bridgedTempSensorEndpoint, Span<const EmberAfDeviceType>(gBridgedTempSensorDeviceTypes),
-                      Span<DataVersion>(gTempSensor1DataVersions), chip::Span(), 1);
+                      Span<DataVersion>(gTempSensor1DataVersions), chip::CharSpan(), 1);
 }
 
 void HandleDeviceTempSensorStatusChanged(DeviceTempSensor * dev, DeviceTempSensor::Changed_t itemChangedMask)
