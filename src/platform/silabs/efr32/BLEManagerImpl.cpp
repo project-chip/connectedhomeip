@@ -949,6 +949,7 @@ CHIP_ERROR BLEManagerImpl::EncodeAdditionalDataTlv()
 
     err = AdditionalDataPayloadGenerator().generateAdditionalDataPayload(additionalDataPayloadParams, c3AdditionalDataBufferHandle,
                                                                          additionalDataFields);
+    SuccessOrExit(err);
 
 exit:
     if (err != CHIP_NO_ERROR)
