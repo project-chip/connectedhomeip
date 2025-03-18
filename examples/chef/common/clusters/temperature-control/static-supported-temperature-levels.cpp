@@ -33,9 +33,9 @@ app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSup
 CharSpan AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions[] = { "Low"_span, "Medium"_span, "High"_span };
 
 const AppSupportedTemperatureLevelsDelegate::EndpointPair AppSupportedTemperatureLevelsDelegate::supportedOptionsByEndpoints
-    [MATTER_DM_TEMPERATURE_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT] = { EndpointPair(
-        1 /* endpointId */, AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions,
-        MATTER_ARRAY_SIZE(AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions)),
+    [MATTER_DM_TEMPERATURE_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT] = {
+        EndpointPair(1 /* endpointId */, AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions,
+                     MATTER_ARRAY_SIZE(AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions)),
         EndpointPair(3 /* endpointId */, AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions,
                      MATTER_ARRAY_SIZE(AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions))
     };
