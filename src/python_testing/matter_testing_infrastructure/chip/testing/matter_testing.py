@@ -302,9 +302,9 @@ class ComparisonEnum(Enum):
 
 class AttributeValueExpectation(NamedTuple):
     endpoint_id: int
-    attribute: ClusterObjects.ClusterAttributeDescriptor  # The attribute name or descriptor
-    threshold_value: Any  # The expected value
-    comparisson_type: ComparisonEnum  # The comparison type
+    attribute: ClusterObjects.ClusterAttributeDescriptor
+    comparisson_type: ComparisonEnum
+    threshold_value: Any
 
 
 def await_sequence_of_reports(report_queue: queue.Queue, endpoint_id: int, attribute: TypedAttributePath, sequence: list[Any], timeout_sec: float) -> None:
@@ -477,6 +477,7 @@ class ClusterAttributeChangeAccumulator:
         start_time = time.time()
         elapsed = 0.0
         time_remaining = timeout_sec
+        values = []
 
         last_report_matches: dict[int, bool] = {idx: False for idx, _ in enumerate(value_expectations)}
 
@@ -495,6 +496,7 @@ class ClusterAttributeChangeAccumulator:
                 for report in all_reports.get(expected_element.attribute, []):
                     if report.endpoint_id == expected_element.endpoint_id:
                         last_value = report.value
+                        values.append(last_value)
 
                 # Perform the comparison
                 if last_value is not None:
@@ -508,13 +510,13 @@ class ClusterAttributeChangeAccumulator:
                         last_report_matches[expected_idx] = (last_value <= expected_element.threshold_value)
                     elif expected_element.comparisson_type == ComparisonEnum.Equal:
                         last_report_matches[expected_idx] = (last_value == expected_element.threshold_value)
-                        
+
                     logging.info(f"[FC] --> Value reported for {expected_element.attribute.__name__} attribute: {last_value}")
 
             # Determine if all were met
             if all(last_report_matches.values()):
                 logging.info("[FC] Found all expected reports were true.")
-                return
+                return tuple(values)
 
             elapsed = time.time() - start_time
             time_remaining = timeout_sec - elapsed

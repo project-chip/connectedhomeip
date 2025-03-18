@@ -92,6 +92,11 @@ class TC_FAN_3_5(MatterBaseTest):
         sd_enum = cluster.Enums.StepDirectionEnum
         fm_enum = cluster.Enums.FanModeEnum
         value_off = 0
+        percent_setting_max = 100
+        percent_setting = value_off
+        percent_current = value_off
+        fan_mode = fm_enum(value_off)
+        timeout_sec = 2
 
         # *** STEP 1 ***
         # Commissioning already done
@@ -122,27 +127,72 @@ class TC_FAN_3_5(MatterBaseTest):
         # self.step(4)
         fan_mode = await self.read_setting(attributes.FanMode)
         if fan_mode != fm_enum.kOff:
-            await self.write_setting(attributes.FanMode, fm_enum(value_off))
+            await self.write_setting(attributes.FanMode, fan_mode)
             value_expectations = [
-                AttributeValueExpectation(self.endpoint, attributes.PercentSetting, value_off, ComparisonEnum.Equal),
-                AttributeValueExpectation(self.endpoint, attributes.PercentCurrent, value_off, ComparisonEnum.Equal),
-                AttributeValueExpectation(self.endpoint, attributes.FanMode, fm_enum(value_off), ComparisonEnum.Equal),
+                AttributeValueExpectation(self.endpoint, attributes.PercentSetting, ComparisonEnum.Equal, percent_setting),
+                AttributeValueExpectation(self.endpoint, attributes.PercentCurrent, ComparisonEnum.Equal, percent_current),
+                AttributeValueExpectation(self.endpoint, attributes.FanMode, ComparisonEnum.Equal, fan_mode),
             ]
-            self.attribute_subscription.await_all_final_values_reported_threshold(
-                value_expectations=value_expectations, timeout_sec=1)
+            percent_setting, percent_current, fan_mode = self.attribute_subscription.await_all_final_values_reported_threshold(
+                value_expectations=value_expectations, timeout_sec=timeout_sec)
+            self.attribute_subscription.reset()
 
         # *** STEP 5 ***
         # TH sends Step command to DUT with Direction set to Increase
         # self.step(5)
         await self.send_step_command(direction=sd_enum.kIncrease)
-
         value_expectations = [
-            AttributeValueExpectation(self.endpoint, attributes.PercentCurrent, value_off, ComparisonEnum.GreaterThan),
-            AttributeValueExpectation(self.endpoint, attributes.PercentSetting, value_off, ComparisonEnum.GreaterThan),
-            AttributeValueExpectation(self.endpoint, attributes.FanMode, fm_enum(value_off), ComparisonEnum.GreaterThan),
+            AttributeValueExpectation(self.endpoint, attributes.PercentSetting, ComparisonEnum.GreaterThan, percent_setting),
+            AttributeValueExpectation(self.endpoint, attributes.PercentCurrent, ComparisonEnum.GreaterThan, percent_current),
+            AttributeValueExpectation(self.endpoint, attributes.FanMode, ComparisonEnum.GreaterThan, fan_mode),
         ]
         self.attribute_subscription.await_all_final_values_reported_threshold(
-            value_expectations=value_expectations, timeout_sec=1)
+            value_expectations=value_expectations, timeout_sec=timeout_sec)
+        self.attribute_subscription.reset()
+
+        # *** STEP 6 ***
+        # TH writes to the DUT the PercentStting attribute with 100
+        #   - Verify that the PercentStting and PercentCurrent attributes are both 100
+        #   - Verify that the FanMode attribute is set to High
+        # self.step(6)
+        await self.write_setting(attributes.FanMode, fm_enum.kHigh)
+        value_expectations = [
+            AttributeValueExpectation(self.endpoint, attributes.PercentSetting, ComparisonEnum.LessThan, percent_setting_max),
+            AttributeValueExpectation(self.endpoint, attributes.PercentCurrent, ComparisonEnum.LessThan, percent_setting_max),
+            AttributeValueExpectation(self.endpoint, attributes.FanMode, ComparisonEnum.Equal, fm_enum.kHigh),
+        ]
+        percent_setting, percent_current, fan_mode = self.attribute_subscription.await_all_final_values_reported_threshold(
+            value_expectations=value_expectations, timeout_sec=timeout_sec)
+        self.attribute_subscription.reset()
+
+        # *** STEP 7 ***
+        # TH sends Step command to DUT with Direction set to Decrease
+        # self.step(7)
+        await self.send_step_command(direction=sd_enum.kDecrease)
+        value_expectations = [
+            AttributeValueExpectation(self.endpoint, attributes.PercentSetting, ComparisonEnum.LessThan, percent_setting),
+            AttributeValueExpectation(self.endpoint, attributes.PercentCurrent, ComparisonEnum.LessThan, percent_current),
+            AttributeValueExpectation(self.endpoint, attributes.FanMode, ComparisonEnum.LessThan, fan_mode),
+        ]
+        self.attribute_subscription.await_all_final_values_reported_threshold(
+            value_expectations=value_expectations, timeout_sec=timeout_sec)
+        self.attribute_subscription.reset()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
