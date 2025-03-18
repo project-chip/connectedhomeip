@@ -600,8 +600,8 @@ class TestSpecParsingDataType(MatterBaseTest):
         asserts.assert_true("maxCountAttribute" in max_count_field.constraints, "maxCountAttribute missing")
         asserts.assert_equal(max_count_field.constraints.get("maxCountAttribute"), "MaxItems", "Attribute reference incorrect")
 
-    def test_real_clusters_data_types(self):
-        """Test data types from real clusters in the XML specification"""
+    def test_XML_clusters_data_types(self):
+        """Test data types from clusters in the 1.4.1 cluster spec XML files"""
         # First, find a cluster with enums to test
         enum_found = False
         struct_found = False
@@ -648,8 +648,9 @@ class TestSpecParsingDataType(MatterBaseTest):
             logging.info("Successfully found and tested a bitmap")
 
     def test_detailed_check_xml_datatype(self):
-        """Test a specific real data type in detail to ensure all properties are correctly parsed"""
-        # Test a specific, known enum from the Access Control cluster
+        """Test a specific cluster XML's data type in detail to ensure all properties are correctly parsed"""
+        
+        # Test a specific, known enum from the Access Control cluster, just as an example
         access_control_id = uint(Clusters.AccessControl.id)
         if access_control_id not in self.xml_clusters:
             self.skipTest("Access Control cluster not found in parsed XML")
@@ -673,7 +674,6 @@ class TestSpecParsingDataType(MatterBaseTest):
         asserts.assert_true(len(privilege_enum.components) >= 4, "Should have at least 4 enum values")
         
         # Verify that we have the expected components (view, operate, manage, administer privileges)
-        # Note: Exact component IDs may vary, so we check by name pattern
         view_found = operate_found = manage_found = admin_found = False
         
         for component_id, component in privilege_enum.components.items():
@@ -717,7 +717,7 @@ class TestSpecParsingDataType(MatterBaseTest):
                                "Master should have at least as many structs as 1.4.1")
     
     def test_find_complex_bitmaps(self):
-        """Find and test bitmaps with multi-bit fields in the real data model"""
+        """Find and test bitmaps with multi-bit fields in the data model"""
         multi_bit_bitmaps = []
         
         # Look through all clusters for bitmaps that might have multi-bit fields
@@ -820,7 +820,7 @@ class TestSpecParsingDataType(MatterBaseTest):
             asserts.assert_true(hasattr(first_component, 'conformance'), "Component missing 'conformance' attribute")
 
     def test_xml_datatype_component_fields(self):
-        """Test the additional fields in XmlDataTypeComponent using real XML files"""
+        """Test the additional fields in XmlDataTypeComponent using 1.4.1 cluster spec XML files"""
         
         # Statistics to track coverage
         clusters_examined = 0
