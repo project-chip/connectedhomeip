@@ -63,7 +63,7 @@ public:
     void TearDown() override
     {
         mWiFiPAFTransport = nullptr;
-        Shutdown(nullptr);
+        Shutdown([](uint32_t id, WiFiPAF::WiFiPafRole role) {});
     }
 
     CHIP_ERROR WiFiPAFMessageReceived(WiFiPAFSession & RxInfo, System::PacketBufferHandle && msg) override { return CHIP_NO_ERROR; }
@@ -114,30 +114,52 @@ TEST_F(TestWiFiPAFLayer, CheckWiFiPAFTransportCapabilitiesResponseMessage)
 
 TEST_F(TestWiFiPAFLayer, CheckPafSession)
 {
-    // Add a session by giving node_id, discriminator
-    WiFiPAF::WiFiPAFSession sessionInfo = { .nodeId = 0x1, .discriminator = 0xF00 };
+    // Add the 1st session by giving node_id, discriminator
+    WiFiPAF::WiFiPAFSession sessionInfo = { .role          = WiFiPAF::WiFiPafRole::kWiFiPafRole_Subscriber,
+                                            .nodeId        = 0x1,
+                                            .discriminator = 0xF01 };
     EXPECT_EQ(AddPafSession(PafInfoAccess::kAccNodeInfo, sessionInfo), CHIP_NO_ERROR);
+
+    // Add the 2nd session
+    sessionInfo = { .role = WiFiPAF::WiFiPafRole::kWiFiPafRole_Subscriber, .nodeId = 0x2, .discriminator = 0xF02 };
+    EXPECT_EQ(AddPafSession(PafInfoAccess::kAccNodeInfo, sessionInfo), CHIP_NO_ERROR);
+
+    // Add the 3rd session => expect: no space
+    sessionInfo.id = 0x3;
+    EXPECT_EQ(AddPafSession(PafInfoAccess::kAccSessionId, sessionInfo), CHIP_ERROR_PROVIDER_LIST_EXHAUSTED);
 
     // Get the session info by giving node_id
     sessionInfo.nodeId          = 0x1;
     auto pPafSessionInfo_nodeid = GetPAFInfo(PafInfoAccess::kAccNodeId, sessionInfo);
-    EXPECT_EQ(pPafSessionInfo_nodeid->nodeId, sessionInfo.nodeId);
-    EXPECT_EQ(pPafSessionInfo_nodeid->discriminator, sessionInfo.discriminator);
+    pPafSessionInfo_nodeid->id  = 0x1;
+    EXPECT_EQ(pPafSessionInfo_nodeid->nodeId, 0x1u);
+    EXPECT_EQ(pPafSessionInfo_nodeid->discriminator, 0xF01);
 
     // Get the session info by giving the discriminator
-    sessionInfo.discriminator = 0xF00;
+    sessionInfo.discriminator = 0xF01;
     auto pPafSessionInfo_disc = GetPAFInfo(PafInfoAccess::kAccDisc, sessionInfo);
-    EXPECT_EQ(pPafSessionInfo_disc->nodeId, sessionInfo.nodeId);
-    EXPECT_EQ(pPafSessionInfo_disc->discriminator, sessionInfo.discriminator);
+    EXPECT_NE(pPafSessionInfo_disc, nullptr);
+    EXPECT_EQ(pPafSessionInfo_disc->nodeId, 0x1u);
+    pPafSessionInfo_disc->id = 1;
 
-    // Set the session ID of the existing session
-    pPafSessionInfo_disc->id = 0x1;
+    sessionInfo.discriminator = 0xF02;
+    pPafSessionInfo_disc      = GetPAFInfo(PafInfoAccess::kAccDisc, sessionInfo);
+    EXPECT_NE(pPafSessionInfo_disc, nullptr);
+    EXPECT_EQ(pPafSessionInfo_disc->nodeId, 0x2u);
+    EXPECT_EQ(pPafSessionInfo_disc->discriminator, 0xF02);
+    pPafSessionInfo_disc->id = 2;
 
-    // Add a new session, but no space
-    sessionInfo.id = 0x2;
-    EXPECT_EQ(AddPafSession(PafInfoAccess::kAccSessionId, sessionInfo), CHIP_ERROR_PROVIDER_LIST_EXHAUSTED);
+    // Get the session info by giving the session id
+    sessionInfo.id          = 0x1;
+    auto pPafSessionInfo_id = GetPAFInfo(PafInfoAccess::kAccSessionId, sessionInfo);
+    EXPECT_NE(pPafSessionInfo_id, nullptr);
+    EXPECT_EQ(pPafSessionInfo_id->nodeId, 0x1u);
+    EXPECT_EQ(pPafSessionInfo_id->discriminator, 0xF01);
 
+    // Remove the session
     sessionInfo.id = 0x1;
+    EXPECT_EQ(RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo), CHIP_NO_ERROR);
+    sessionInfo.id = 0x2;
     EXPECT_EQ(RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo), CHIP_NO_ERROR);
 }
 
