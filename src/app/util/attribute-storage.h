@@ -326,36 +326,6 @@ unsigned emberAfMetadataStructureGeneration();
 namespace chip {
 namespace app {
 
-class EnabledEndpointsWithServerCluster
-{
-public:
-    EnabledEndpointsWithServerCluster(ClusterId clusterId);
-
-    // Instead of having a separate Iterator class, optimize for codesize by
-    // just reusing ourselves as our own iterator.  We could do a bit better
-    // here with C++17 and using a different type for the end iterator, but this
-    // is the best I've found with C++14 so far.
-    //
-    // This does mean that you can only iterate a given
-    // EnabledEndpointsWithServerCluster once, but that's OK given how we use it
-    // in practice.
-    EnabledEndpointsWithServerCluster & begin() { return *this; }
-    const EnabledEndpointsWithServerCluster & end() const { return *this; }
-
-    bool operator!=(const EnabledEndpointsWithServerCluster & other) const { return mEndpointIndex != mEndpointCount; }
-
-    EnabledEndpointsWithServerCluster & operator++();
-
-    EndpointId operator*() const;
-
-private:
-    void EnsureMatchingEndpoint();
-
-    uint16_t mEndpointIndex = 0;
-    uint16_t mEndpointCount = 0;
-    ClusterId mClusterId;
-};
-
 /**
  * @brief Sets the parent endpoint for a given endpoint
  */

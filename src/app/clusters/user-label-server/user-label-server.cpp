@@ -25,10 +25,9 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
+#include <app/InteractionModelEngine.h>
 #include <app/server/Server.h>
-#include <app/util/attribute-storage.h>
 #include <credentials/FabricTable.h>
-#include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/DeviceInfoProvider.h>
 #include <platform/PlatformManager.h>
@@ -210,7 +209,12 @@ public:
             DeviceLayer::DeviceInfoProvider * provider = DeviceLayer::GetDeviceInfoProvider();
             if (provider)
             {
-                for (auto endpoint : EnabledEndpointsWithServerCluster(UserLabel::Id))
+                // Find all endpoints that have UserLabel implemented
+                DataModel::ListBuilder<EndpointId> endpointsList;
+                InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(UserLabel::Id,
+                                                                                                          endpointsList);
+
+                for (auto endpoint : endpointsList.TakeBuffer())
                 {
                     // If UserLabel cluster is implemented on this endpoint
                     if (CHIP_NO_ERROR != provider->ClearUserLabelList(endpoint))
