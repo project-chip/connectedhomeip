@@ -44,7 +44,6 @@ public:
     class Iterator
     {
     public:
-        virtual ~Iterator() = default;
         /**
          *  @retval The number of entries in total that will be iterated.
          */
@@ -63,6 +62,7 @@ public:
 
     protected:
         Iterator() = default;
+        ~Iterator() = default;
     };
 
     using FixedLabelType = app::Clusters::FixedLabel::Structs::LabelStruct::Type;
