@@ -216,7 +216,7 @@ std::optional<unsigned> BridgedDeviceManager::AddDeviceEndpoint(std::unique_ptr<
             dev->SetEndpointId(mCurrentEndpointId);
             dev->SetParentEndpointId(parentEndpointId);
             CHIP_ERROR err =
-                emberAfSetDynamicEndpoint(index, mCurrentEndpointId, ep, dataVersionStorage, deviceTypeList, epUniqueId, 
+                emberAfSetDynamicEndpoint(index, mCurrentEndpointId, ep, dataVersionStorage, deviceTypeList, epUniqueId,
                                           parentEndpointId);
             if (err == CHIP_NO_ERROR)
             {

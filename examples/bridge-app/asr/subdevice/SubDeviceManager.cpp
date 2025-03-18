@@ -62,7 +62,7 @@ int AddDeviceEndpoint(SubDevice * dev, EmberAfEndpointType * ep, const Span<cons
             {
                 dev->SetEndpointId(gCurrentEndpointId);
                 err =
-                    emberAfSetDynamicEndpoint(index, gCurrentEndpointId, ep, dataVersionStorage, deviceTypeList, 
+                    emberAfSetDynamicEndpoint(index, gCurrentEndpointId, ep, dataVersionStorage, deviceTypeList,
                                               epUniqueId, parentEndpointId);
                 if (err == CHIP_NO_ERROR)
                 {
