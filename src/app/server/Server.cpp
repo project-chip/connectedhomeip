@@ -618,8 +618,7 @@ void Server::GenerateShutDownEvent()
 
 void Server::PostFactoryResetEvent()
 {
-    DeviceLayer::ChipDeviceEvent event;
-    event.Type = DeviceLayer::DeviceEventType::kFactoryReset;
+    DeviceLayer::ChipDeviceEvent event{ .Type = DeviceLayer::DeviceEventType::kFactoryReset };
 
     CHIP_ERROR error = DeviceLayer::PlatformMgr().PostEvent(&event);
     if (error != CHIP_NO_ERROR)
