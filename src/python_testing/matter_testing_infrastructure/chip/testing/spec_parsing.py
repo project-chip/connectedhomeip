@@ -68,8 +68,13 @@ class DataTypeEnum(StrEnum):
 class XmlDataTypeComponent:
     value: uint
     name: str
-    # TODO: other fields are available as well - type, constraints etc.
     conformance: ConformanceCallable
+    # Additional datatype component fields from cluster XML's
+    summary: Optional[str] = None  # For descriptions/documentation
+    type_info: Optional[str] = None  # Data type for struct fields
+    is_optional: bool = False  # Whether field is optional
+    is_nullable: bool = False  # Whether field can be null
+    constraints: Optional[dict] = None  # For min/max values, lists, etc.
 
 
 @dataclass
@@ -425,7 +430,53 @@ class ClusterParser:
                 p = ProblemNotice("Spec XML Parsing", location=location,
                                   severity=ProblemSeverity.WARNING, problem=f"Struct field in {struct_name} with no id or name")
                 self._problems.append(p)
-                continue
+                continue            
+            
+            # Extract additional field attributes
+            summary = xml_field.attrib.get('summary', None)
+            type_info = xml_field.attrib.get('type', None) if component_type == DataTypeEnum.kStruct else None
+            
+            # Check for optional fields - determined by optionalConform tag or isOptional attribute
+            is_optional = False
+            if 'isOptional' in xml_field.attrib and xml_field.attrib['isOptional'] == 'true':
+                is_optional = True
+            else:
+                # Also check for optionalConform tag
+                optional_conform = xml_field.find('./optionalConform')
+                if optional_conform is not None:
+                    is_optional = True
+            
+            # Check for nullable fields - determined by quality tag with nullable attribute
+            is_nullable = False
+            if 'isNullable' in xml_field.attrib and xml_field.attrib['isNullable'] == 'true':
+                is_nullable = True
+            else:
+                # Also check for quality tag with nullable attribute
+                quality = xml_field.find('./quality')
+                if quality is not None and 'nullable' in quality.attrib and quality.attrib['nullable'] == 'true':
+                    is_nullable = True
+            
+            # Process constraints - handle both direct attributes and child elements
+            constraints = None
+            # First check for direct constraint elements with attributes
+            constraint_elements = xml_field.findall('./constraint')
+            if constraint_elements:
+                constraints = {}
+                for constraint in constraint_elements:
+                    # Handle direct attributes like min/max
+                    for attr_name in ['min', 'max']:
+                        if attr_name in constraint.attrib:
+                            constraints[attr_name] = constraint.attrib[attr_name]
+                    
+                    # Handle child elements like maxCount
+                    max_count = constraint.find('./maxCount')
+                    if max_count is not None:
+                        constraints['maxCount'] = max_count.text
+                        # If maxCount references an attribute, store that reference
+                        attr_element = max_count.find('./attribute')
+                        if attr_element is not None and 'name' in attr_element.attrib:
+                            constraints['maxCountAttribute'] = attr_element.attrib['name']
+            
             xml_conformance, problems = get_conformance(xml_field, self._cluster_id)
             # There are a LOT of struct fields with either arithmetic or desc conformances. We'll just call these as optional if we can't parse
             # These are currently unused, so this is fine for now.
@@ -434,7 +485,18 @@ class ClusterParser:
                 conformance = self.parse_conformance(xml_conformance)
             if not conformance:
                 conformance = optional()
-            components[id] = XmlDataTypeComponent(id, name, conformance)
+            
+            # Create component with all extracted attributes
+            components[id] = XmlDataTypeComponent(
+                value=id, 
+                name=name, 
+                conformance=conformance,
+                summary=summary,
+                type_info=type_info,
+                is_optional=is_optional,
+                is_nullable=is_nullable,
+                constraints=constraints
+            )
         return components
 
     def _parse_data_type(self, data_type: DataTypeEnum) -> dict[str, XmlDataType]:
@@ -451,8 +513,16 @@ class ClusterParser:
                     self._problems.append(ProblemNotice("Spec XML Parsing", location=location,
                                           severity=ProblemSeverity.WARNING, problem=f"Struct {element} with no id or name"))
                     continue
-                data_types[name] = XmlDataType(data_type=data_type, name=name, components=self._parse_components(
-                    element, data_type), cluster_ids=[self._cluster_id])
+                
+                # Ensure we're using a valid cluster ID list, never [None]
+                cluster_ids = [self._cluster_id] if self._cluster_id is not None else []
+                
+                data_types[name] = XmlDataType(
+                    data_type=data_type, 
+                    name=name, 
+                    components=self._parse_components(element, data_type), 
+                    cluster_ids=cluster_ids
+                )
         return data_types
 
     def parse_features(self) -> dict[uint, XmlFeature]:
