@@ -184,7 +184,7 @@ const EmberAfDeviceType gBridgedTempSensorDeviceTypes[] = { { DEVICE_TYPE_TEMP_S
                                                             { DEVICE_TYPE_BRIDGED_NODE, DEVICE_VERSION_DEFAULT } };
 
 int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const Span<const EmberAfDeviceType> & deviceTypeList,
-                      const Span<DataVersion> & dataVersionStorage, chip::CharSpan epUniqueId, 
+                      const Span<DataVersion> & dataVersionStorage, chip::CharSpan epUniqueId,
 		      chip::EndpointId parentEndpointId)
 {
     uint8_t index = 0;
