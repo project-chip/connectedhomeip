@@ -46,9 +46,20 @@ class BindingFabricTableDelegate : public chip::FabricTable::Delegate
 
 BindingFabricTableDelegate gFabricTableDelegate;
 
-} // namespace
+bool IsSelfNodeId(const chip::ScopedNodeId & nodeId)
+{
+    chip::FabricTable & fabricTable = chip::Server::GetInstance().GetFabricTable();
+    for (const chip::FabricInfo & fabricInfo : fabricTable)
+    {
+        if (fabricInfo.GetScopedNodeId() == nodeId)
+        {
+            return true;
+        }
+    }
+    return false;
+}
 
-namespace {} // namespace
+} // namespace
 
 namespace chip {
 
@@ -56,7 +67,11 @@ BindingManager BindingManager::sBindingManager;
 
 CHIP_ERROR BindingManager::UnicastBindingCreated(uint8_t fabricIndex, NodeId nodeId)
 {
-    return EstablishConnection(ScopedNodeId(nodeId, fabricIndex));
+    if (!IsSelfNodeId(ScopedNodeId(nodeId, fabricIndex)))
+    {
+        return EstablishConnection(ScopedNodeId(nodeId, fabricIndex));
+    }
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR BindingManager::UnicastBindingRemoved(uint8_t bindingEntryId)
@@ -189,10 +204,17 @@ CHIP_ERROR BindingManager::NotifyBoundClusterChanged(EndpointId endpoint, Cluste
         {
             if (iter->type == MATTER_UNICAST_BINDING)
             {
-                error = mPendingNotificationMap.AddPendingNotification(iter.GetIndex(), bindingContext);
-                SuccessOrExit(error);
-                error = EstablishConnection(ScopedNodeId(iter->nodeId, iter->fabricIndex));
-                SuccessOrExit(error);
+                if (IsSelfNodeId(ScopedNodeId(iter->nodeId, iter->fabricIndex)))
+                {
+                    mBoundDeviceChangedHandler(*iter, nullptr, bindingContext->GetContext());
+                }
+                else
+                {
+                    error = mPendingNotificationMap.AddPendingNotification(iter.GetIndex(), bindingContext);
+                    SuccessOrExit(error);
+                    error = EstablishConnection(ScopedNodeId(iter->nodeId, iter->fabricIndex));
+                    SuccessOrExit(error);
+                }
             }
             else if (iter->type == MATTER_MULTICAST_BINDING)
             {
