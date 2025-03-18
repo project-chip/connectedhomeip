@@ -14,18 +14,18 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
+import logging
 import xml.etree.ElementTree as ElementTree
+from enum import StrEnum
 
 import chip.clusters as Clusters
 from chip.clusters import Attribute
 from chip.testing.conformance import conformance_allowed
 from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
-from chip.testing.spec_parsing import (DataTypeEnum, PrebuiltDataModelDirectory, ClusterParser, build_xml_clusters)
-from enum import StrEnum
+from chip.testing.spec_parsing import ClusterParser, DataTypeEnum, PrebuiltDataModelDirectory, build_xml_clusters
 from chip.tlv import uint
 from jinja2 import Template
 from mobly import asserts
-import logging
 
 
 class TestSpecParsingDataType(MatterBaseTest):
