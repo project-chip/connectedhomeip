@@ -616,8 +616,22 @@ void Server::GenerateShutDownEvent()
     PlatformMgr().ScheduleWork([](intptr_t) { PlatformMgr().HandleServerShuttingDown(); });
 }
 
+void Server::PostFactoryResetEvent()
+{
+    DeviceLayer::ChipDeviceEvent event;
+    event.Type = DeviceLayer::DeviceEventType::kFactoryReset;
+
+    CHIP_ERROR error = DeviceLayer::PlatformMgr().PostEvent(&event);
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Posting kFactoryReset event failed with %" CHIP_ERROR_FORMAT, error.Format());
+    }
+}
+
 void Server::ScheduleFactoryReset()
 {
+    PostFactoryResetEvent();
+
     PlatformMgr().ScheduleWork([](intptr_t) {
         // Delete all fabrics and emit Leave event.
         GetInstance().GetFabricTable().DeleteAllFabrics();

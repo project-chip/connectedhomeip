@@ -61,4 +61,5 @@ service Device {
   rpc SetPairingInfo(PairingInfo) returns (pw.protobuf.Empty){}
   rpc GetSpakeInfo(pw.protobuf.Empty) returns (SpakeInfo){}
   rpc SetSpakeInfo(SpakeInfo) returns (pw.protobuf.Empty){}
+  rpc TriggerIcdCheckin(pw.protobuf.Empty) returns (pw.protobuf.Empty){}
 }

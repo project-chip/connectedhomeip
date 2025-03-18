@@ -46,13 +46,13 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)_didUpdateState;
 - (void)_maybeDiscoverPeripheral:(MTRMockCBPeripheralDetails *)details;
 
-// MARK: CBManager
+#pragma mark - CBManager
 
 @property (nonatomic, assign, readonly) CBManagerState state;
 @property (nonatomic, assign, readonly) CBManagerAuthorization authorization;
 @property (class, nonatomic, assign, readonly) CBManagerAuthorization authorization;
 
-// MARK: CBCentralManager
+#pragma mark - CBCentralManager
 
 @property (nonatomic, weak, nullable) id<CBCentralManagerDelegate> delegate;
 @property (nonatomic, assign, readonly) BOOL isScanning;
@@ -82,11 +82,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readonly, strong, nonatomic) MTRMockCBCentralManager * manager; // not API, but used by BlePlatformDelegateImpl via KVC
 
-// MARK: CBPeer
+#pragma mark - CBPeer
 
 @property (readonly, nonatomic) NSUUID * identifier;
 
-// MARK: CBPeripheral
+#pragma mark - CBPeripheral
 
 @property (weak, nonatomic, nullable) id<CBPeripheralDelegate> delegate;
 @property (retain, readonly, nullable) NSString * name;
@@ -422,7 +422,7 @@ static void InterceptClassMethod(__strong os_block_t * inOutCleanup, Class cls, 
     return result;
 }
 
-// MARK: CBManager
+#pragma mark - CBManager
 
 + (CBManagerAuthorization)authorization
 {
@@ -439,7 +439,7 @@ static void InterceptClassMethod(__strong os_block_t * inOutCleanup, Class cls, 
     return _mock.state;
 }
 
-// MARK: CBCentralManager
+#pragma mark - CBCentralManager
 
 + (BOOL)supportsFeatures:(CBCentralManagerFeature)features
 {
@@ -536,7 +536,7 @@ static void InterceptClassMethod(__strong os_block_t * inOutCleanup, Class cls, 
 {
 }
 
-// MARK: Internals
+#pragma mark - Internals
 
 - (void)_didUpdateState
 {
@@ -592,11 +592,11 @@ static void InterceptClassMethod(__strong os_block_t * inOutCleanup, Class cls, 
     return result;
 }
 
-// MARK: CBPeer <NSCopying>
+#pragma mark - CBPeer <NSCopying>
 
 - (BOOL)isEqual:(id)object
 {
-    return [object class] == [self class] && [((MTRMockCBPeripheral *) object).identifier isEqualTo:self.identifier];
+    return [object class] == [self class] && [((MTRMockCBPeripheral *) object).identifier isEqual:self.identifier];
 }
 
 - (NSUInteger)hash
@@ -614,7 +614,7 @@ static void InterceptClassMethod(__strong os_block_t * inOutCleanup, Class cls, 
     return _details.identifier;
 }
 
-// MARK: CBPeripheral
+#pragma mark - CBPeripheral
 
 - (nullable NSString *)name
 {

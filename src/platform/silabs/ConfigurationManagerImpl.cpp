@@ -309,7 +309,7 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     // Block the task for 500 ms before the reset occurs to allow RPC response to be sent
     osDelay(pdMS_TO_TICKS(500));
 
-    NVIC_SystemReset();
+    Silabs::GetPlatform().SoftwareReset();
 }
 
 #ifdef SL_WIFI

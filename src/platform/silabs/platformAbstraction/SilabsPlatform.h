@@ -61,6 +61,8 @@ public:
     CHIP_ERROR FlashErasePage(uint32_t addr) override;
     CHIP_ERROR FlashWritePage(uint32_t addr, const uint8_t * data, size_t size) override;
 
+    void SoftwareReset(void) override;
+
 private:
     friend SilabsPlatform & GetPlatform(void);
 

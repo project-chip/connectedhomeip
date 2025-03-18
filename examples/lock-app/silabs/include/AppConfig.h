@@ -25,7 +25,7 @@
 
 #define APP_TASK_NAME "Lock"
 
-#define BLE_DEV_NAME "SiLabs-Door-Lock"
+#define BLE_DEV_NAME "SL-" APP_TASK_NAME
 
 // Time it takes in ms for the simulated actuator to move from one
 // state to another.

@@ -27,8 +27,6 @@
 // Tasks that are not scoped to a specific test, but rather to a specific test suite.
 static NSMutableSet<NSTask *> * sRunningCrossTestTasks;
 
-static MTRMockCB * sMockCB;
-
 static void ClearTaskSet(NSMutableSet<NSTask *> * __strong & tasks)
 {
     for (NSTask * task in tasks) {
@@ -38,6 +36,8 @@ static void ClearTaskSet(NSMutableSet<NSTask *> * __strong & tasks)
     tasks = nil;
 }
 #endif // HAVE_NSTASK
+
+static MTRMockCB * sMockCB;
 
 @implementation MTRTestCase {
 #if HAVE_NSTASK
