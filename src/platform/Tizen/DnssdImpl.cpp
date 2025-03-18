@@ -38,9 +38,9 @@
 #include <lib/support/SafeInt.h>
 #include <lib/support/Span.h>
 #include <platform/CHIPDeviceConfig.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <platform/GLibTypeDeleter.h>
 #include <platform/PlatformManager.h>
-#include <platform/CHIPDeviceLayer.h>
 
 #include "ErrorUtils.h"
 
