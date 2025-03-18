@@ -97,12 +97,6 @@ the Thread network.
 
 ### Generate OTA Firmware For BR
 
-After enable the option `CONFIG_CREATE_OTA_IMAGE_WITH_RCP_FW` in menuconfig,
-will generate OTA image with rcp firmware in build process, named
-`ota_with_rcp_image` in build folder.
-
-Then can add a Matter OTA header for the ota_with_rcp_image file.
-
-```
-./ota_image_tool.py create -v 65521 -p 32768 --version 1 --version-str "v1.0" -da sha256 build/ota_with_rcp_image ota_with_rcp_image.ota
-```
+After enable the option `CONFIG_CREATE_OTA_IMAGE_WITH_RCP_FW` and 
+`CONFIG_CHIP_OTA_IMAGE_BUILD` in menuconfig, will generate OTA image with rcp 
+firmware, named `ota_with_rcp_image_ota.bin` in build folder.

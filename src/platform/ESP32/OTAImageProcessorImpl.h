@@ -108,9 +108,9 @@ private:
 
 #if defined(CONFIG_AUTO_UPDATE_RCP) && defined(CONFIG_OPENTHREAD_BORDER_ROUTER)
     esp_rcp_ota_handle_t mRcpOtaHandle;
-    bool mRcpDone;
+    bool mRcpFirmwareDownloaded;
     uint32_t mBrFirmwareSize;
-    esp_err_t ProcessRcpImage(intptr_t context, const uint8_t * buffer, uint32_t bufLen);
+    esp_err_t ProcessRcpImage(const uint8_t * buffer, uint32_t bufLen);
 #endif
 };
 
