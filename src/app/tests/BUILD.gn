@@ -109,6 +109,18 @@ source_set("power-cluster-test-srcs") {
   ]
 }
 
+source_set("actions-cluster-test-srcs") {
+  sources =
+      [ "${chip_root}/src/app/clusters/actions-server/actions-server.cpp" ]
+
+  public_deps = [
+    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/app/util/mock:mock_codegen_data_model",
+    "${chip_root}/src/app/util/mock:mock_ember",
+    "${chip_root}/src/lib/core",
+  ]
+}
+
 source_set("scenes-table-test-srcs") {
   sources = [
     "${chip_root}/src/app/clusters/scenes-server/ExtensionFieldSets.h",
@@ -195,6 +207,7 @@ chip_test_suite("tests") {
   test_sources = [
     "TestAclAttribute.cpp",
     "TestAclEvent.cpp",
+    "TestActionsCluster.cpp",
     "TestAttributeAccessInterfaceCache.cpp",
     "TestAttributePathExpandIterator.cpp",
     "TestAttributePathParams.cpp",
@@ -228,6 +241,7 @@ chip_test_suite("tests") {
     "TestReadInteraction.cpp",
     "TestReportScheduler.cpp",
     "TestReportingEngine.cpp",
+    "TestServer.cpp",
     "TestStatusIB.cpp",
     "TestStatusResponseMessage.cpp",
     "TestTestEventTriggerDelegate.cpp",
@@ -271,6 +285,7 @@ chip_test_suite("tests") {
       "TestSceneTable.cpp",
     ]
     public_deps += [
+      ":actions-cluster-test-srcs",
       ":power-cluster-test-srcs",
       ":scenes-table-test-srcs",
     ]

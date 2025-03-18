@@ -175,7 +175,7 @@ be useful for quick filtering like `[TC-ABC-1.2]` to tag test changes.
 Examples of descriptive titles:
 
 -   `[Silabs] Fix compile of SiWx917 if LED and BUTTON are disabled`
--   `[Telink] Update build Dockerfile with new Zeprhy SHA: c05c4.....`
+-   `[Telink] Update build Dockerfile with new Zephyr SHA: c05c4.....`
 -   `General Commissioning Cluster: use AttributeAccessInterface/CommandHandlerInterface for processing`
 -   `Scenes Management/CopyScene: set access as manage instead of default to match the spec`
 -   `Fix build errors due to ChipDeviceEvent default constructor not being available`
@@ -252,6 +252,15 @@ out of convenience.
     `N/A` or `checked new URL opens`. Note that these cases are rare - e.g.
     fixing a typo in an ID still requires some description on how you checked
     that the new ID takes effect.
+
+> [!TIP]
+>
+> When working on a pull request for Matter SDK refrain from using the "Update
+> branch" feature in the GitHub UI too often. Updating the PR branch in this way
+> triggers the CI workflows cancellation and restart. This feature should be
+> used only when a PR has not been worked on for a long time and a lot of
+> divergence has accumulated. Your PR branch being out of sync with master is
+> not a blocker for merging an approved PR.
 
 ### Review Requirements
 

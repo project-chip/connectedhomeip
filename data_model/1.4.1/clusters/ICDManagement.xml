@@ -1,0 +1,352 @@
+<?xml version="1.0"?>
+<!--
+Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+The information within this document is the property of the Connectivity
+Standards Alliance and its use and disclosure are restricted, except as
+expressly set forth herein.
+
+Connectivity Standards Alliance hereby grants you a fully-paid, non-exclusive,
+nontransferable, worldwide, limited and revocable license (without the right to
+sublicense), under Connectivity Standards Alliance's applicable copyright
+rights, to view, download, save, reproduce and use the document solely for your
+own internal purposes and in accordance with the terms of the license set forth
+herein. This license does not authorize you to, and you expressly warrant that
+you shall not: (a) permit others (outside your organization) to use this
+document; (b) post or publish this document; (c) modify, adapt, translate, or
+otherwise change this document in any manner or create any derivative work
+based on this document; (d) remove or modify any notice or label on this
+document, including this Copyright Notice, License and Disclaimer. The
+Connectivity Standards Alliance does not grant you any license hereunder other
+than as expressly stated herein.
+
+Elements of this document may be subject to third party intellectual property
+rights, including without limitation, patent, copyright or trademark rights,
+and any such third party may or may not be a member of the Connectivity
+Standards Alliance. Connectivity Standards Alliance members grant other
+Connectivity Standards Alliance members certain intellectual property rights as
+set forth in the Connectivity Standards Alliance IPR Policy. Connectivity
+Standards Alliance members do not grant you any rights under this license. The
+Connectivity Standards Alliance is not responsible for, and shall not be held
+responsible in any manner for, identifying or failing to identify any or all
+such third party intellectual property rights. Please visit www.csa-iot.org for
+more information on how to become a member of the Connectivity Standards
+Alliance.
+
+This document and the information contained herein are provided on an “AS IS”
+basis and the Connectivity Standards Alliance DISCLAIMS ALL WARRANTIES EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO (A) ANY WARRANTY THAT THE USE OF THE
+INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OF THIRD PARTIES (INCLUDING
+WITHOUT LIMITATION ANY INTELLECTUAL PROPERTY RIGHTS INCLUDING PATENT, COPYRIGHT
+OR TRADEMARK RIGHTS); OR (B) ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, TITLE OR NONINFRINGEMENT. IN NO EVENT WILL THE
+CONNECTIVITY STANDARDS ALLIANCE BE LIABLE FOR ANY LOSS OF PROFITS, LOSS OF
+BUSINESS, LOSS OF USE OF DATA, INTERRUPTION OF BUSINESS, OR FOR ANY OTHER
+DIRECT, INDIRECT, SPECIAL OR EXEMPLARY, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL
+DAMAGES OF ANY KIND, IN CONTRACT OR IN TORT, IN CONNECTION WITH THIS DOCUMENT
+OR THE INFORMATION CONTAINED HEREIN, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+LOSS OR DAMAGE.
+
+All company, brand and product names in this document may be trademarks that
+are the sole property of their respective owners.
+
+This notice and disclaimer must be included on all copies of this document.
+
+Connectivity Standards Alliance
+508 Second Street, Suite 206
+Davis, CA 95616, USA
+
+:xrefstyle: basic
+-->
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0046" name="ICD Management Cluster" revision="3">
+  <revisionHistory>
+    <revision revision="1" summary="Initial revision"/>
+    <revision revision="2" summary="Addition of LIT ICD support, UserActiveModeTrigger, ActiveModeDuration, StayActiveResponse; removal of field Key in MonitoringRegistrationStruct"/>
+    <revision revision="3" summary="Addition of the ClientType attribute; addition of the ICD Check-In Backoff support; addition of the DynamicSitLitSupport feature"/>
+  </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0046" name="ICD Management"/>
+  </clusterIds>
+  <classification hierarchy="base" role="utility" picsCode="ICDM" scope="Node"/>
+  <features>
+    <feature bit="0" code="CIP" name="CheckInProtocolSupport" summary="Device supports attributes and commands for the Check-In Protocol support.">
+      <otherwiseConform>
+        <mandatoryConform>
+          <feature name="LITS"/>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
+    </feature>
+    <feature bit="1" code="UAT" name="UserActiveModeTrigger" summary="Device supports the user active mode trigger feature.">
+      <otherwiseConform>
+        <mandatoryConform>
+          <feature name="LITS"/>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
+    </feature>
+    <feature bit="2" code="LITS" name="LongIdleTimeSupport" summary="Device supports operating as a Long Idle Time ICD.">
+      <optionalConform/>
+    </feature>
+    <feature bit="3" code="DSLS" name="DynamicSitLitSupport" summary="Device supports dynamic switching from SIT to LIT operating modes.">
+      <optionalConform>
+        <feature name="LITS"/>
+      </optionalConform>
+    </feature>
+  </features>
+  <dataTypes>
+    <enum name="ClientTypeEnum">
+      <item value="0" name="Permanent" summary="The client is typically resident, always-on, fixed infrastructure in the home.">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Ephemeral" summary="The client is mobile or non-resident or not always-on and may not always be available in the home.">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="OperatingModeEnum">
+      <item value="0" name="SIT" summary="ICD is operating as a Short Idle Time ICD.">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="LIT" summary="ICD is operating as a Long Idle Time ICD.">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <bitmap name="UserActiveModeTriggerBitmap">
+      <bitfield name="PowerCycle" bit="0" summary="Power Cycle to transition the device to ActiveMode">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="SettingsMenu" bit="1" summary="Settings menu on the device informs how to transition the device to ActiveMode">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="CustomInstruction" bit="2" summary="Custom Instruction on how to transition the device to ActiveMode">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="DeviceManual" bit="3" summary="Device Manual informs how to transition the device to ActiveMode">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="ActuateSensor" bit="4" summary="Actuate Sensor to transition the device to ActiveMode">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="ActuateSensorSeconds" bit="5" summary="Actuate Sensor for N seconds to transition the device to ActiveMode">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="ActuateSensorTimes" bit="6" summary="Actuate Sensor N times to transition the device to ActiveMode">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="ActuateSensorLightsBlink" bit="7" summary="Actuate Sensor until light blinks to transition the device to ActiveMode">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="ResetButton" bit="8" summary="Press Reset Button to transition the device to ActiveMode">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="ResetButtonLightsBlink" bit="9" summary="Press Reset Button until light blinks to transition the device to ActiveMode">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="ResetButtonSeconds" bit="10" summary="Press Reset Button for N seconds to transition the device to ActiveMode">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="ResetButtonTimes" bit="11" summary="Press Reset Button N times to transition the device to ActiveMode">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="SetupButton" bit="12" summary="Press Setup Button to transition the device to ActiveMode">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="SetupButtonSeconds" bit="13" summary="Press Setup Button for N seconds to transition the device to ActiveMode">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="SetupButtonLightsBlink" bit="14" summary="Press Setup Button until light blinks to transition the device to ActiveMode">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="SetupButtonTimes" bit="15" summary="Press Setup Button N times to transition the device to ActiveMode">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="AppDefinedButton" bit="16" summary="Press the N Button to transition the device to ActiveMode">
+        <mandatoryConform/>
+      </bitfield>
+    </bitmap>
+    <struct name="MonitoringRegistrationStruct">
+      <field id="1" name="CheckInNodeID" type="node-id">
+        <access fabricSensitive="true"/>
+        <quality persistence="nonVolatile"/>
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="MonitoredSubject" type="subject-id">
+        <access fabricSensitive="true"/>
+        <quality persistence="nonVolatile"/>
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="Key">
+        <deprecateConform/>
+      </field>
+      <field id="4" name="ClientType" type="ClientTypeEnum" default="0">
+        <access fabricSensitive="true"/>
+        <quality persistence="nonVolatile"/>
+        <mandatoryConform/>
+      </field>
+      <access fabricScoped="true"/>
+    </struct>
+  </dataTypes>
+  <attributes>
+    <attribute id="0x0000" name="IdleModeDuration" type="uint32" default="1">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform/>
+      <constraint>
+        <between>
+          <from value="1"/>
+          <to value="64800"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0001" name="ActiveModeDuration" type="uint32" default="300">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0002" name="ActiveModeThreshold" type="uint16" default="300">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0003" name="RegisteredClients" type="list" default="empty">
+      <entry type="MonitoringRegistrationStruct"/>
+      <access read="true" readPrivilege="admin" fabricScoped="true"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform>
+        <feature name="CIP"/>
+      </mandatoryConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0004" name="ICDCounter" type="uint32" default="0">
+      <access read="true" readPrivilege="admin"/>
+      <quality changeOmitted="true" persistence="nonVolatile"/>
+      <mandatoryConform>
+        <feature name="CIP"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0005" name="ClientsSupportedPerFabric" type="uint16" default="1">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <feature name="CIP"/>
+      </mandatoryConform>
+      <constraint>
+        <min value="1"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0006" name="UserActiveModeTriggerHint" type="UserActiveModeTriggerBitmap" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <feature name="UAT"/>
+      </mandatoryConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0007" name="UserActiveModeTriggerInstruction" type="string" default="&quot;&quot;">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <constraint>
+        <maxLength value="128"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0008" name="OperatingMode" type="OperatingModeEnum">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="LITS"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0009" name="MaximumCheckInBackoff" type="uint32" default="1">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <feature name="CIP"/>
+      </mandatoryConform>
+      <constraint>
+        <between value="64800">
+          <attribute name="IdleModeDuration"/>
+        </between>
+      </constraint>
+    </attribute>
+  </attributes>
+  <commands>
+    <command id="0x00" name="RegisterClient" direction="commandToServer" response="RegisterClientResponse">
+      <access invokePrivilege="manage" fabricScoped="true"/>
+      <mandatoryConform>
+        <feature name="CIP"/>
+      </mandatoryConform>
+      <field id="0" name="CheckInNodeID" type="node-id">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="MonitoredSubject" type="subject-id">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="Key" type="octstr">
+        <mandatoryConform/>
+        <constraint>
+          <allowed value="16"/>
+        </constraint>
+      </field>
+      <field id="3" name="VerificationKey" type="octstr">
+        <optionalConform/>
+        <constraint>
+          <allowed value="16"/>
+        </constraint>
+      </field>
+      <field id="4" name="ClientType" type="ClientTypeEnum">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x01" name="RegisterClientResponse" direction="responseFromServer">
+      <mandatoryConform>
+        <feature name="CIP"/>
+      </mandatoryConform>
+      <field id="0" name="ICDCounter" type="uint32">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x02" name="UnregisterClient" direction="commandToServer" response="Y">
+      <access invokePrivilege="manage" fabricScoped="true"/>
+      <mandatoryConform>
+        <feature name="CIP"/>
+      </mandatoryConform>
+      <field id="0" name="CheckInNodeID" type="node-id">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="VerificationKey" type="octstr">
+        <optionalConform/>
+        <constraint>
+          <allowed value="16"/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x03" name="StayActiveRequest" direction="commandToServer" response="StayActiveResponse">
+      <access invokePrivilege="operate"/>
+      <otherwiseConform>
+        <mandatoryConform>
+          <feature name="LITS"/>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
+      <field id="0" name="StayActiveDuration" type="uint32">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x04" name="StayActiveResponse" direction="responseFromServer">
+      <otherwiseConform>
+        <mandatoryConform>
+          <feature name="LITS"/>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
+      <field id="0" name="PromisedActiveDuration" type="uint32">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+  </commands>
+</cluster>

@@ -22,7 +22,10 @@ import("${chip_root}/src/platform/nxp/common/ota/ota.gni")
 
 import("${nxp_sdk_build_root}/nxp_sdk.gni")
 
-import("${nxp_sdk_build_root}/${nxp_sdk_name}/${nxp_sdk_name}.gni")
+# If external SDK is used, do not import ${nxp_sdk_name}.gni
+if (!nxp_external_sdk) {
+  import("${nxp_sdk_build_root}/${nxp_sdk_name}/${nxp_sdk_name}.gni")
+}
 
 assert(chip_device_platform == "nxp")
 assert(nxp_platform == "mcxw71_k32w1")
@@ -42,8 +45,6 @@ source_set("nxp_factory_data") {
     "${chip_root}/src/credentials/CHIPCert.h",
     "${chip_root}/src/credentials/CertificationDeclaration.h",
   ]
-
-  defines = [ "PLATFORM_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/common/factory_data/legacy/FactoryDataProviderImpl.h\"" ]
 
   deps = [
     ":nxp_platform",
@@ -70,6 +71,14 @@ config("nxp_platform_config") {
     "../common/factory_data/legacy",
     "../common/ota",
   ]
+
+  # Needed for sources that use mbedtls
+  if (nxp_external_sdk) {
+    include_dirs += [
+      "${nxp_sdk_root}/middleware/mbedtls/include",
+      "${nxp_sdk_root}/middleware/mbedtls/port/sssapi",
+    ]
+  }
 }
 
 static_library("nxp_platform") {
@@ -158,10 +167,9 @@ static_library("nxp_platform") {
       "../common/crypto/PersistentStorageOpKeystoreS200.cpp",
       "../common/crypto/PersistentStorageOpKeystoreS200.h",
     ]
-
-    if (nxp_enable_ot_cli) {
-      defines += [ "CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI=1" ]
-    }
+    #if (nxp_enable_ot_cli) {
+    #  defines += [ "CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI=1" ]
+    #}
   }
 
   if (chip_enable_openthread) {

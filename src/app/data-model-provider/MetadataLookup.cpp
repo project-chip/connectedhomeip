@@ -21,6 +21,8 @@ namespace chip {
 namespace app {
 namespace DataModel {
 
+using Protocols::InteractionModel::Status;
+
 std::optional<ServerClusterEntry> ServerClusterFinder::Find(const ConcreteClusterPath & path)
 {
     VerifyOrReturnValue(mProvider != nullptr, std::nullopt);
@@ -63,23 +65,26 @@ std::optional<AttributeEntry> AttributeFinder::Find(const ConcreteAttributePath 
     return std::nullopt;
 }
 
-EndpointFinder::EndpointFinder(ProviderMetadataTree * provider) : mProvider(provider)
+Protocols::InteractionModel::Status ValidateClusterPath(ProviderMetadataTree * provider, const ConcreteClusterPath & path,
+                                                        Protocols::InteractionModel::Status successStatus)
 {
-    VerifyOrReturn(mProvider != nullptr);
-    mEndpoints = mProvider->EndpointsIgnoreError();
-}
-
-std::optional<EndpointEntry> EndpointFinder::Find(EndpointId endpointId)
-{
-    for (auto & endpointEntry : mEndpoints)
+    if (ServerClusterFinder(provider).Find(path).has_value())
     {
-        if (endpointEntry.id == endpointId)
+        return successStatus;
+    }
+
+    // If we get here, the cluster identified by the path does not exist.
+    auto endpoints = provider->EndpointsIgnoreError();
+    for (auto & endpointEntry : endpoints)
+    {
+        if (endpointEntry.id == path.mEndpointId)
         {
-            return endpointEntry;
+            // endpoint is valid
+            return Protocols::InteractionModel::Status::UnsupportedCluster;
         }
     }
 
-    return std::nullopt;
+    return Protocols::InteractionModel::Status::UnsupportedEndpoint;
 }
 
 } // namespace DataModel

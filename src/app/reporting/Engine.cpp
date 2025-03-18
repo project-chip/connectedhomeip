@@ -35,8 +35,9 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
-#include <optional>
 #include <protocols/interaction_model/StatusCode.h>
+
+#include <optional>
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #include <app/icd/server/ICDNotifier.h> // nogncheck
@@ -50,20 +51,6 @@ namespace reporting {
 namespace {
 
 using Protocols::InteractionModel::Status;
-
-Status EventPathValid(DataModel::Provider * model, const ConcreteEventPath & eventPath)
-{
-    {
-        DataModel::ServerClusterFinder serverClusterFinder(model);
-        if (serverClusterFinder.Find(eventPath).has_value())
-        {
-            return Status::Success;
-        }
-    }
-
-    DataModel::EndpointFinder endpointFinder(model);
-    return endpointFinder.Find(eventPath.mEndpointId).has_value() ? Status::UnsupportedCluster : Status::UnsupportedEndpoint;
-}
 
 /// Returns the status of ACL validation.
 ///   If the return value has a status set, that means the ACL check failed,
@@ -173,9 +160,21 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
     DataModel::ActionReturnStatus status(CHIP_NO_ERROR);
     AttributeValueEncoder attributeValueEncoder(reportBuilder, subjectDescriptor, path, version, isFabricFiltered, encoderState);
 
+    // TODO: we explicitly DO NOT validate that path is a valid cluster path (even more, above serverClusterFinder
+    //       explicitly ignores that case). This means that global attribute reads as well as ReadAttribute
+    //       can be passed invalid paths when an invalid Read is detected and must handle them.
+    //
+    //       See https://github.com/project-chip/connectedhomeip/issues/37410
+
     if (auto access_status = ValidateReadAttributeACL(dataModel, subjectDescriptor, path); access_status.has_value())
     {
         status = *access_status;
+    }
+    else if (IsSupportedGlobalAttributeNotInMetadata(readRequest.path.mAttributeId))
+    {
+        // Global attributes are NOT directly handled by data model providers, instead
+        // the are routed through metadata.
+        status = ReadGlobalAttributeFromMetadata(dataModel, readRequest.path, attributeValueEncoder);
     }
     else
     {
@@ -517,7 +516,9 @@ CHIP_ERROR Engine::CheckAccessDeniedEventPaths(TLV::TLVWriter & aWriter, bool & 
         }
 
         ConcreteEventPath path(current->mValue.mEndpointId, current->mValue.mClusterId, current->mValue.mEventId);
-        Status status = EventPathValid(mpImEngine->GetDataModelProvider(), path);
+
+        // A event path is valid only if the cluster is valid
+        Status status = DataModel::ValidateClusterPath(mpImEngine->GetDataModelProvider(), path, Status::Success);
 
         if (status != Status::Success)
         {

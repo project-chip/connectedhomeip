@@ -20,6 +20,7 @@ load "../src/app/zap-templates/zcl/data-model/chip/channel-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/chime-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/chip-ota.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/chip-types.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/closure-control-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/clusters-extensions.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/color-control-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/commissioner-control-cluster.xml";
@@ -106,6 +107,7 @@ load "../src/app/zap-templates/zcl/data-model/chip/time-format-localization-clus
 load "../src/app/zap-templates/zcl/data-model/chip/time-synchronization-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/timer-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/tls-certificate-management-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/tls-client-management-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/unit-localization-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/user-label-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/wake-on-lan-cluster.xml";

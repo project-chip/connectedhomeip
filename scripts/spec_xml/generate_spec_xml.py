@@ -154,6 +154,9 @@ def scrape_all(scraper, spec_root, output_dir, dry_run, include_in_progress):
             os.remove(os.path.join(clusters_output_dir, filename))
 
     for filename in os.listdir(device_types_output_dir):
+        # Closures also has multiple device types in one file, should fix this, but for now a workaround:
+        if filename.startswith('ClosureBaseDeviceTypes'):
+            continue
         adoc = os.path.basename(filename).replace('.xml', '.adoc')
         if adoc not in device_type_files:
             print(f'Removing {adoc} as it was not in the generated spec document')

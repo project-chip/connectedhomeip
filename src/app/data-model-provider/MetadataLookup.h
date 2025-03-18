@@ -24,6 +24,7 @@
 #include <app/data-model-provider/ProviderMetadataTree.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 #include <optional>
 
@@ -65,20 +66,22 @@ private:
     ReadOnlyBuffer<AttributeEntry> mAttributes;
 };
 
-/// Helps search for a specific server endpoint in the given
-/// metadata provider.
+/// Validates that the cluster identified by `path` exists within the given provider.
 ///
-/// Facilitates the operation of "find an endpoint with a given ID".
-class EndpointFinder
-{
-public:
-    EndpointFinder(ProviderMetadataTree * provider);
-    std::optional<EndpointEntry> Find(EndpointId endpointId);
+/// If the endpoint identified by the path does not exist, will return Status::UnsupportedEndpoint.
+/// If the endpoint exists but does not have the cluster identified by the path, will return Status::UnsupportedCluster.
+///
+/// otherwise, it will return successStatus.
+Protocols::InteractionModel::Status ValidateClusterPath(ProviderMetadataTree * provider, const ConcreteClusterPath & path,
+                                                        Protocols::InteractionModel::Status successStatus);
 
-private:
-    ProviderMetadataTree * mProvider;
-    ReadOnlyBuffer<EndpointEntry> mEndpoints;
-};
+/// Validates that the cluster identified by `path` exists within the given provider.
+/// If the endpoint does not exist, will return Status::UnsupportedEndpoint.
+/// If the endpoint exists but does not have the cluster identified by the path, will return Status::UnsupportedCluster.
+///
+/// Otherwise, will return successStatus.
+Protocols::InteractionModel::Status ValidateClusterPath(ProviderMetadataTree * provider, const ConcreteClusterPath & path,
+                                                        Protocols::InteractionModel::Status successStatus);
 
 } // namespace DataModel
 } // namespace app

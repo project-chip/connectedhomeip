@@ -1,6 +1,6 @@
 {
   "fileFormat": 2,
-  "featureLevel": 103,
+  "featureLevel": 106,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -41,14 +41,16 @@
         "code": 22,
         "profileId": 259,
         "label": "MA-rootdevice",
-        "name": "MA-rootdevice"
+        "name": "MA-rootdevice",
+        "deviceTypeOrder": 0
       },
       "deviceTypes": [
         {
           "code": 22,
           "profileId": 259,
           "label": "MA-rootdevice",
-          "name": "MA-rootdevice"
+          "name": "MA-rootdevice",
+          "deviceTypeOrder": 0
         }
       ],
       "deviceVersions": [
@@ -2233,14 +2235,16 @@
         "code": 268,
         "profileId": 259,
         "label": "MA-colortemperaturelight",
-        "name": "MA-colortemperaturelight"
+        "name": "MA-colortemperaturelight",
+        "deviceTypeOrder": 0
       },
       "deviceTypes": [
         {
           "code": 268,
           "profileId": 259,
           "label": "MA-colortemperaturelight",
-          "name": "MA-colortemperaturelight"
+          "name": "MA-colortemperaturelight",
+          "deviceTypeOrder": 0
         }
       ],
       "deviceVersions": [

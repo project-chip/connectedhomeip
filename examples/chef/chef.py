@@ -40,6 +40,11 @@ _DEVICE_LIST = [file[:-4]
                 for file in os.listdir(_DEVICE_FOLDER) if file.endswith(".zap") and file != 'template.zap']
 _CICD_CONFIG_FILE_NAME = os.path.join(_CHEF_SCRIPT_PATH, "cicd_config.json")
 _CD_STAGING_DIR = os.path.join(_CHEF_SCRIPT_PATH, "staging")
+_EXCLUDE_DEVICE_FROM_LINUX_CI = [  # These do not compile / deprecated.
+    "noip_rootnode_dimmablelight_bCwGYSDpoe",
+    "icd_rootnode_contactsensor_ed3b19ec55",
+    "rootnode_refrigerator_temperaturecontrolledcabinet_temperaturecontrolledcabinet_ffdb696680",
+]
 
 gen_dir = ""  # Filled in after sample app type is read from args.
 
@@ -324,6 +329,8 @@ def main() -> int:
                       action="store_true", dest="do_erase")
     parser.add_option("-i", "--terminal", help="opens terminal to interact with with device",
                       action="store_true", dest="do_interact")
+    parser.add_option("-I", "--enable_lit_icd", help="enable LIT ICD (Long Idle Time Intermittently Connected Device) mode",
+                      action="store_true", default=False)
     parser.add_option("-m", "--menuconfig", help="runs menuconfig on platforms that support it",
                       action="store_true", dest="do_menuconfig")
     parser.add_option("-z", "--zap", help="runs zap to generate data model & interaction model artifacts",
@@ -382,11 +389,22 @@ def main() -> int:
                       help=("Builds Chef examples defined in cicd_config. "
                             "Uses specified target from -t. Chef exits after completion."),
                       dest="ci", action="store_true")
-    parser.add_option(
-        "", "--enable_ipv4", help="Enable IPv4 mDNS. Only applicable to platforms that can support IPV4 (e.g, Linux, ESP32)",
-        action="store_true", default=False)
-    parser.add_option(
-        "", "--cpu_type", help="CPU type to compile for. Linux only.", choices=["arm64", "arm", "x64"])
+    parser.add_option("", "--ci_linux",
+                      help=("Builds Chef Examples defined in cicd_config under ci_allow_list_linux. "
+                            "Devices are built without -c for faster compilation."),
+                      dest="ci_linux", action="store_true")
+    parser.add_option("", "--cpu_type",
+                      help="CPU type to compile for. Linux only.",
+                      choices=["arm64", "arm", "x64"])
+    parser.add_option("", "--enable_ipv4",
+                      help="Enable IPv4 mDNS. Only applicable to platforms that can support IPV4 (e.g, Linux, ESP32)",
+                      action="store_true", default=False)
+    parser.add_option("", "--icd_persist_subscription",
+                      help="Enable ICD persistent subscription and re-establish subscriptions from the server side after reboot",
+                      action="store_true", default=False)
+    parser.add_option("", "--icd_subscription_resumption",
+                      help="Enable subscription resumption after timeout",
+                      action="store_true", default=False)
 
     options, _ = parser.parse_args(sys.argv[1:])
 
@@ -407,6 +425,21 @@ def main() -> int:
             flush_print(f"Building {command}", with_border=True)
             shell.run_cmd(command)
             bundle(options.build_target, device_name)
+        exit(0)
+
+    #
+    # CI Linux
+    #
+
+    if options.ci_linux:
+        for device_name in _DEVICE_LIST:
+            if device_name in _EXCLUDE_DEVICE_FROM_LINUX_CI:
+                continue
+            shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
+            command = f"./chef.py -br -d {device_name} -t linux"
+            flush_print(f"Building {command}", with_border=True)
+            shell.run_cmd(command)
+            bundle("linux", device_name)
         exit(0)
 
     #
@@ -871,6 +904,17 @@ def main() -> int:
             else:
                 linux_args.append("chip_inet_config_enable_ipv4=false")
 
+            if options.enable_lit_icd:
+                linux_args.append("chip_enable_icd_server = true")
+                linux_args.append("chip_icd_report_on_active_mode = true")
+                linux_args.append("chip_enable_icd_lit = true")
+                linux_args.append("chip_enable_icd_dsls = true")
+                if options.icd_subscription_resumption:
+                    options.icd_persist_subscription = True
+                    linux_args.append("chip_subscription_timeout_resumption = true")
+                if options.icd_persist_subscription:
+                    linux_args.append("chip_persist_subscriptions = true")
+
             if sw_ver_string:
                 linux_args.append(
                     f'chip_device_config_device_software_version_string = "{sw_ver_string}"')
@@ -884,7 +928,7 @@ def main() -> int:
                         """))
             if options.do_clean:
                 shell.run_cmd("rm -rf out")
-            shell.run_cmd("gn gen --add-export-compile-commands=* out")
+            shell.run_cmd("gn gen --add-export-compile-commands=\"*\" out")
             shell.run_cmd("ninja -C out")
 
     #

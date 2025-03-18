@@ -19,11 +19,11 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 
 #include <app/server/Dnssd.h>
-#include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <platform/bouffalolab/common/DiagnosticDataProviderImpl.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 #include <system/SystemClock.h>
 
 #if HEAP_MONITORING
@@ -85,8 +85,9 @@ CHIP_ERROR AppTask::StartAppShellTask()
 
 void StartAppTask(void)
 {
-    GetAppTask().sAppTaskHandle = xTaskCreateStatic(GetAppTask().AppTaskMain, APP_TASK_NAME, ArraySize(GetAppTask().appStack), NULL,
-                                                    APP_TASK_PRIORITY, GetAppTask().appStack, &GetAppTask().appTaskStruct);
+    GetAppTask().sAppTaskHandle =
+        xTaskCreateStatic(GetAppTask().AppTaskMain, APP_TASK_NAME, MATTER_ARRAY_SIZE(GetAppTask().appStack), NULL,
+                          APP_TASK_PRIORITY, GetAppTask().appStack, &GetAppTask().appTaskStruct);
     if (GetAppTask().sAppTaskHandle == NULL)
     {
         ChipLogError(NotSpecified, "Failed to create app task");

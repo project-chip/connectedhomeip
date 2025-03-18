@@ -149,6 +149,14 @@ if(CONFIG_ENABLE_ICD_SERVER)
     endif()
 endif()
 
+if(CONFIG_CHIP_MEM_ALLOC_MODE_INTERNAL)
+    chip_gn_arg_append("chip_memory_alloc_mode"               "\"internal\"")
+elseif(CONFIG_CHIP_MEM_ALLOC_MODE_EXTERNAL)
+    chip_gn_arg_append("chip_memory_alloc_mode"               "\"external\"")
+elseif(CONFIG_CHIP_MEM_ALLOC_MODE_DEFAULT)
+    chip_gn_arg_append("chip_memory_alloc_mode"               "\"default\"")
+endif()
+
 if(CONFIG_ENABLE_PW_RPC)
     string(APPEND chip_gn_args "import(\"//build_overrides/pigweed.gni\")\n")
     chip_gn_arg_append("remove_default_configs"             "[\"//third_party/connectedhomeip/third_party/pigweed/repo/pw_build:toolchain_cpp_standard\"]")
@@ -434,6 +442,10 @@ endif()
 
 if (CONFIG_SEC_CERT_DAC_PROVIDER)
     list(APPEND matter_requires espressif__esp_secure_cert_mgr)
+endif()
+
+if (CONFIG_ENABLE_ENCRYPTED_OTA)
+    list(APPEND matter_requires espressif__esp_encrypted_img)
 endif()
 
 add_prebuilt_library(matterlib "${CMAKE_CURRENT_BINARY_DIR}/lib/libCHIP.a"

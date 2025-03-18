@@ -26,7 +26,7 @@ you can build the master branch of a binary and save it somewhere like
 Example runs:
 
 ```
-> ~/devel/chip-scripts/bindiff.py \
+> ./scripts/tools/binary_elf_size_diff.py \
   ./out/qpg-qpg6105-light/chip-qpg6105-lighting-example.out \
   ./out/qpg-master.out
 
@@ -46,7 +46,7 @@ TOTAL       -34
 ```
 
 ```
-> ~/devel/chip-scripts/bindiff.py \
+> ./scripts/tools/binary_elf_size_diff.py \
   --output csv --skip-total       \
   ./out/qpg-qpg6105-light/chip-qpg6105-lighting-example.out ./out/qpg-master.out
 

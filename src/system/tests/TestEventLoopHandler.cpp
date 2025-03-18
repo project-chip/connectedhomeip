@@ -109,7 +109,12 @@ TEST_F(TestEventLoopHandler, EventLoopHandlerSequence)
     });
 
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
+
+#if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
     EXPECT_EQ(loopHandler.trace, std::string("1AP2HP3R4"));
+#else
+    EXPECT_EQ(loopHandler.trace, std::string("1APHP2HPHP3R4"));
+#endif
 }
 
 TEST_F(TestEventLoopHandler, EventLoopHandlerWake)

@@ -1,6 +1,6 @@
 {
   "fileFormat": 2,
-  "featureLevel": 103,
+  "featureLevel": 106,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -41,14 +41,16 @@
         "code": 22,
         "profileId": 259,
         "label": "MA-rootdevice",
-        "name": "MA-rootdevice"
+        "name": "MA-rootdevice",
+        "deviceTypeOrder": 0
       },
       "deviceTypes": [
         {
           "code": 22,
           "profileId": 259,
           "label": "MA-rootdevice",
-          "name": "MA-rootdevice"
+          "name": "MA-rootdevice",
+          "deviceTypeOrder": 0
         }
       ],
       "deviceVersions": [
@@ -2802,14 +2804,16 @@
         "code": 117,
         "profileId": 259,
         "label": "MA-dishwasher",
-        "name": "MA-dishwasher"
+        "name": "MA-dishwasher",
+        "deviceTypeOrder": 0
       },
       "deviceTypes": [
         {
           "code": 117,
           "profileId": 259,
           "label": "MA-dishwasher",
-          "name": "MA-dishwasher"
+          "name": "MA-dishwasher",
+          "deviceTypeOrder": 0
         }
       ],
       "deviceVersions": [

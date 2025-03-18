@@ -137,13 +137,13 @@ private:
     // ===== Private members reserved for use by this class only.
     enum class Flags : uint16_t
     {
-        kAdvertisingEnabled     = 0x0001,
-        kFastAdvertisingEnabled = 0x0002,
-        kAdvertising            = 0x0004,
-        kRestartAdvertising     = 0x0008,
-        kEFRBLEStackInitialized = 0x0010,
-        kDeviceNameSet          = 0x0020,
-        kExtAdvertisingEnabled  = 0x0040,
+        kAdvertisingEnabled       = 0x0001,
+        kFastAdvertisingEnabled   = 0x0002,
+        kAdvertising              = 0x0004,
+        kRestartAdvertising       = 0x0008,
+        kSiLabsBLEStackInitialize = 0x0010,
+        kDeviceNameSet            = 0x0020,
+        kExtAdvertisingEnabled    = 0x0040,
     };
 
     enum
@@ -159,9 +159,6 @@ private:
 
     struct CHIPoBLEConState
     {
-#if !(SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)
-        bd_addr address;
-#endif
         uint16_t mtu : 10;
         uint16_t allocated : 1;
         uint16_t subscribed : 1;

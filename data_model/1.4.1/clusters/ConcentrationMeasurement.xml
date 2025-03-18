@@ -1,0 +1,290 @@
+<?xml version="1.0"?>
+<!--
+Copyright (C) Connectivity Standards Alliance (2023). All rights reserved.
+The information within this document is the property of the Connectivity
+Standards Alliance and its use and disclosure are restricted, except as
+expressly set forth herein.
+
+Connectivity Standards Alliance hereby grants you a fully-paid, non-exclusive,
+nontransferable, worldwide, limited and revocable license (without the right to
+sublicense), under Connectivity Standards Alliance's applicable copyright
+rights, to view, download, save, reproduce and use the document solely for your
+own internal purposes and in accordance with the terms of the license set forth
+herein. This license does not authorize you to, and you expressly warrant that
+you shall not: (a) permit others (outside your organization) to use this
+document; (b) post or publish this document; (c) modify, adapt, translate, or
+otherwise change this document in any manner or create any derivative work
+based on this document; (d) remove or modify any notice or label on this
+document, including this Copyright Notice, License and Disclaimer. The
+Connectivity Standards Alliance does not grant you any license hereunder other
+than as expressly stated herein.
+
+Elements of this document may be subject to third party intellectual property
+rights, including without limitation, patent, copyright or trademark rights,
+and any such third party may or may not be a member of the Connectivity
+Standards Alliance. Connectivity Standards Alliance members grant other
+Connectivity Standards Alliance members certain intellectual property rights as
+set forth in the Connectivity Standards Alliance IPR Policy. Connectivity
+Standards Alliance members do not grant you any rights under this license. The
+Connectivity Standards Alliance is not responsible for, and shall not be held
+responsible in any manner for, identifying or failing to identify any or all
+such third party intellectual property rights. Please visit www.csa-iot.org for
+more information on how to become a member of the Connectivity Standards
+Alliance.
+
+This document and the information contained herein are provided on an “AS IS”
+basis and the Connectivity Standards Alliance DISCLAIMS ALL WARRANTIES EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO (A) ANY WARRANTY THAT THE USE OF THE
+INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OF THIRD PARTIES (INCLUDING
+WITHOUT LIMITATION ANY INTELLECTUAL PROPERTY RIGHTS INCLUDING PATENT, COPYRIGHT
+OR TRADEMARK RIGHTS); OR (B) ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, TITLE OR NONINFRINGEMENT. IN NO EVENT WILL THE
+CONNECTIVITY STANDARDS ALLIANCE BE LIABLE FOR ANY LOSS OF PROFITS, LOSS OF
+BUSINESS, LOSS OF USE OF DATA, INTERRUPTION OF BUSINESS, OR FOR ANY OTHER
+DIRECT, INDIRECT, SPECIAL OR EXEMPLARY, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL
+DAMAGES OF ANY KIND, IN CONTRACT OR IN TORT, IN CONNECTION WITH THIS DOCUMENT
+OR THE INFORMATION CONTAINED HEREIN, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+LOSS OR DAMAGE.
+
+All company, brand and product names in this document may be trademarks that
+are the sole property of their respective owners.
+
+This notice and disclaimer must be included on all copies of this document.
+
+Connectivity Standards Alliance
+508 Second Street, Suite 206
+Davis, CA 95616, USA
+
+:xrefstyle: basic
+-->
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" name="Concentration Measurement Clusters" revision="3">
+  <revisionHistory>
+    <revision revision="1" summary="Mandatory global ClusterRevision attribute added"/>
+    <revision revision="2" summary="CCB 2882"/>
+    <revision revision="3" summary="Cluster redesigned to add support for Level Indication, Peak/Average Measurement, Medium/Unit of Measurement and Uncertainty."/>
+  </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x040C" name="Carbon Monoxide Concentration Measurement" picsCode="CMOCONC"/>
+    <clusterId id="0x040D" name="Carbon Dioxide Concentration Measurement" picsCode="CDOCONC"/>
+    <clusterId id="0x0413" name="Nitrogen Dioxide Concentration Measurement" picsCode="NDOCONC"/>
+    <clusterId id="0x0415" name="Ozone Concentration Measurement" picsCode="OZCONC"/>
+    <clusterId id="0x042A" name="PM2.5 Concentration Measurement" picsCode="PMICONC"/>
+    <clusterId id="0x042B" name="Formaldehyde Concentration Measurement" picsCode="FLDCONC"/>
+    <clusterId id="0x042C" name="PM1 Concentration Measurement" picsCode="PMHCONC"/>
+    <clusterId id="0x042D" name="PM10 Concentration Measurement" picsCode="PMKCONC"/>
+    <clusterId id="0x042E" name="Total Volatile Organic Compounds Concentration Measurement" picsCode="TVOCCONC"/>
+    <clusterId id="0x042F" name="Radon Concentration Measurement" picsCode="RNCONC"/>
+  </clusterIds>
+  <classification hierarchy="base" role="application" picsCode="CONC" scope="Endpoint"/>
+  <features>
+    <feature bit="0" code="MEA" name="NumericMeasurement" summary="Cluster supports numeric measurement of substance">
+      <optionalConform choice="a" more="true" min="1"/>
+    </feature>
+    <feature bit="1" code="LEV" name="LevelIndication" summary="Cluster supports basic level indication for substance using the ConcentrationLevel enum">
+      <optionalConform choice="a" more="true" min="1"/>
+    </feature>
+    <feature bit="2" code="MED" name="MediumLevel" summary="Cluster supports the Medium Concentration Level">
+      <optionalConform>
+        <feature name="LEV"/>
+      </optionalConform>
+    </feature>
+    <feature bit="3" code="CRI" name="CriticalLevel" summary="Cluster supports the Critical Concentration Level">
+      <optionalConform>
+        <feature name="LEV"/>
+      </optionalConform>
+    </feature>
+    <feature bit="4" code="PEA" name="PeakMeasurement" summary="Cluster supports peak numeric measurement of substance">
+      <optionalConform>
+        <feature name="MEA"/>
+      </optionalConform>
+    </feature>
+    <feature bit="5" code="AVG" name="AverageMeasurement" summary="Cluster supports average numeric measurement of substance">
+      <optionalConform>
+        <feature name="MEA"/>
+      </optionalConform>
+    </feature>
+  </features>
+  <dataTypes>
+    <enum name="LevelValueEnum">
+      <item value="0" name="Unknown" summary="The level is Unknown">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Low" summary="The level is considered Low">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="Medium" summary="The level is considered Medium">
+        <mandatoryConform>
+          <feature name="MED"/>
+        </mandatoryConform>
+      </item>
+      <item value="3" name="High" summary="The level is considered High">
+        <mandatoryConform/>
+      </item>
+      <item value="4" name="Critical" summary="The level is considered Critical">
+        <mandatoryConform>
+          <feature name="CRI"/>
+        </mandatoryConform>
+      </item>
+    </enum>
+    <enum name="MeasurementMediumEnum">
+      <item value="0" name="Air" summary="The measurement is being made in Air">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Water" summary="The measurement is being made in Water">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="Soil" summary="The measurement is being made in Soil">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="MeasurementUnitEnum">
+      <item value="0" name="PPM" summary="Parts per Million (10)">
+        <mandatoryConform>
+          <feature name="MEA"/>
+        </mandatoryConform>
+      </item>
+      <item value="1" name="PPB" summary="Parts per Billion (10)">
+        <mandatoryConform>
+          <feature name="MEA"/>
+        </mandatoryConform>
+      </item>
+      <item value="2" name="PPT" summary="Parts per Trillion (10)">
+        <mandatoryConform>
+          <feature name="MEA"/>
+        </mandatoryConform>
+      </item>
+      <item value="3" name="MGM3" summary="Milligram per m">
+        <mandatoryConform>
+          <feature name="MEA"/>
+        </mandatoryConform>
+      </item>
+      <item value="4" name="UGM3" summary="Microgram per m">
+        <mandatoryConform>
+          <feature name="MEA"/>
+        </mandatoryConform>
+      </item>
+      <item value="5" name="NGM3" summary="Nanogram per m">
+        <mandatoryConform>
+          <feature name="MEA"/>
+        </mandatoryConform>
+      </item>
+      <item value="6" name="PM3" summary="Particles per m">
+        <mandatoryConform>
+          <feature name="MEA"/>
+        </mandatoryConform>
+      </item>
+      <item value="7" name="BQM3" summary="Becquerel per m">
+        <mandatoryConform>
+          <feature name="MEA"/>
+        </mandatoryConform>
+      </item>
+    </enum>
+  </dataTypes>
+  <attributes>
+    <attribute id="0x0000" name="MeasuredValue" type="single" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" reportable="true"/>
+      <mandatoryConform>
+        <feature name="MEA"/>
+      </mandatoryConform>
+      <constraint>
+        <between>
+          <attribute name="MinMeasuredValue"/>
+          <attribute name="MaxMeasuredValue"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0001" name="MinMeasuredValue" type="single" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform>
+        <feature name="MEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0002" name="MaxMeasuredValue" type="single" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform>
+        <feature name="MEA"/>
+      </mandatoryConform>
+      <constraint>
+        <min>
+          <attribute name="MinMeasuredValue"/>
+        </min>
+      </constraint>
+    </attribute>
+    <attribute id="0x0003" name="PeakMeasuredValue" type="single" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" reportable="true"/>
+      <mandatoryConform>
+        <feature name="PEA"/>
+      </mandatoryConform>
+      <constraint>
+        <between>
+          <attribute name="MinMeasuredValue"/>
+          <attribute name="MaxMeasuredValue"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0004" name="PeakMeasuredValueWindow" type="elapsed-s" default="1">
+      <access read="true" readPrivilege="view"/>
+      <quality reportable="true"/>
+      <mandatoryConform>
+        <feature name="PEA"/>
+      </mandatoryConform>
+      <constraint>
+        <max value="604800"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0005" name="AverageMeasuredValue" type="single" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" reportable="true"/>
+      <mandatoryConform>
+        <feature name="AVG"/>
+      </mandatoryConform>
+      <constraint>
+        <between>
+          <attribute name="MinMeasuredValue"/>
+          <attribute name="MaxMeasuredValue"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0006" name="AverageMeasuredValueWindow" type="elapsed-s" default="1">
+      <access read="true" readPrivilege="view"/>
+      <quality reportable="true"/>
+      <mandatoryConform>
+        <feature name="AVG"/>
+      </mandatoryConform>
+      <constraint>
+        <max value="604800"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0007" name="Uncertainty" type="single" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <optionalConform>
+        <feature name="MEA"/>
+      </optionalConform>
+      <constraint>
+        <allowed value="MS"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0008" name="MeasurementUnit" type="MeasurementUnitEnum" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <feature name="MEA"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0009" name="MeasurementMedium" type="MeasurementMediumEnum" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x000A" name="LevelValue" type="LevelValueEnum" default="0">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="LEV"/>
+      </mandatoryConform>
+    </attribute>
+  </attributes>
+</cluster>
