@@ -40,6 +40,7 @@
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/GLibTypeDeleter.h>
 #include <platform/PlatformManager.h>
+#include <platform/CHIPDeviceLayer.h>
 
 #include "ErrorUtils.h"
 
@@ -276,20 +277,6 @@ void GetTextEntries(unsigned short txtLen, uint8_t * txtRecord, std::vector<chip
     }
 }
 
-static void HandleResolveTask(intptr_t context)
-{
-    ChipLogProgress(DeviceLayer, "DNSsd %s", __func__);
-    auto rCtx = reinterpret_cast<chip::Dnssd::ResolveContext *>(context);
-    if (!rCtx)
-    {
-        ChipLogError(DeviceLayer, "Null context in HandleResolveTask");
-        return;
-    }
-
-    rCtx->Finalize(CHIP_NO_ERROR);
-    rCtx->mInstance->RemoveContext(rCtx);
-}
-
 void OnResolve(dnssd_error_e result, dnssd_service_h service, void * userData)
 {
     ChipLogProgress(DeviceLayer, "DNSsd %s", __func__);
@@ -355,7 +342,12 @@ void OnResolve(dnssd_error_e result, dnssd_service_h service, void * userData)
 
     rCtx->mResult.mAddress.emplace(ipAddr);
 
-    err = chip::DeviceLayer::PlatformMgr().ScheduleWork(HandleResolveTask, reinterpret_cast<intptr_t>(rCtx));
+    err = chip::DeviceLayer::SystemLayer().ScheduleLambda([rCtx] {
+        ChipLogProgress(DeviceLayer, "DNSsd Handle resolve task on schedule lambda");
+
+        rCtx->Finalize(CHIP_NO_ERROR);
+        rCtx->mInstance->RemoveContext(rCtx);
+    });
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "Failed to schedule resolve task: %s", err.AsString()));
 
     return;
