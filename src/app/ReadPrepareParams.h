@@ -49,9 +49,6 @@ struct ReadPrepareParams
     bool mIsFabricFiltered              = true;
     bool mIsPeerLIT                     = false;
 
-    // see ReadClient::OnActiveModeNotification
-    bool mCatsMatchCheckIn = true;
-
     ReadPrepareParams() {}
     ReadPrepareParams(const SessionHandle & sessionHandle) { mSessionHolder.Grab(sessionHandle); }
     ReadPrepareParams(ReadPrepareParams && other) : mSessionHolder(other.mSessionHolder)
@@ -69,7 +66,6 @@ struct ReadPrepareParams
         mTimeout                           = other.mTimeout;
         mIsFabricFiltered                  = other.mIsFabricFiltered;
         mIsPeerLIT                         = other.mIsPeerLIT;
-        mCatsMatchCheckIn                  = other.mCatsMatchCheckIn;
         other.mpEventPathParamsList        = nullptr;
         other.mEventPathParamsListSize     = 0;
         other.mpAttributePathParamsList    = nullptr;
@@ -95,7 +91,6 @@ struct ReadPrepareParams
         mTimeout                           = other.mTimeout;
         mIsFabricFiltered                  = other.mIsFabricFiltered;
         mIsPeerLIT                         = other.mIsPeerLIT;
-        mCatsMatchCheckIn                  = other.mCatsMatchCheckIn;
         other.mpEventPathParamsList        = nullptr;
         other.mEventPathParamsListSize     = 0;
         other.mpAttributePathParamsList    = nullptr;

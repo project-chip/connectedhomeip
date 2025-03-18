@@ -490,10 +490,6 @@ void ReadClient::OnActiveModeNotification()
     // called, either mEventPathParamsListSize or mAttributePathParamsListSize is not 0.
     VerifyOrReturn(mReadPrepareParams.mEventPathParamsListSize != 0 || mReadPrepareParams.mAttributePathParamsListSize != 0);
 
-    // If mCatsMatchCheckIn is true, it means cats used in icd registration matches with the one in current subscription,
-    // OnActiveModeNotification continues to revive the subscription as needed, otherwise, do nothing.
-    VerifyOrReturn(mReadPrepareParams.mCatsMatchCheckIn);
-
     // When we reach here, the subscription definitely exceeded the liveness timeout. Just continue the unfinished resubscription
     // logic in `OnLivenessTimeoutCallback`.
     if (IsInactiveICDSubscription())
@@ -502,9 +498,8 @@ void ReadClient::OnActiveModeNotification()
         return;
     }
 
-    // If the server sends out check-in message, and there is a tracked active subscription in client side at the same time, it
-    // means current client does not realize this tracked subscription has gone, and we should forcibly timeout current
-    // subscription, and schedule a new one.
+    // When receiving check-in message, it means all tracked subscriptions for this node has gone in server side, if there is a related active subscription
+    // and subscription has not yet rescheduled in client side, we should forcibly timeout the current subscription, and schedule a new one.
     if (!mIsResubscriptionScheduled)
     {
         // Closing will ultimately trigger ScheduleResubscription with the aReestablishCASE argument set to true, effectively
@@ -525,6 +520,12 @@ void ReadClient::OnPeerTypeChange(PeerType aType)
     mIsPeerLIT = (aType == PeerType::kLITICD);
 
     ChipLogProgress(DataManagement, "Peer is now %s LIT ICD.", mIsPeerLIT ? "a" : "not a");
+
+    // If the peer is no longer LIT and in inactive ICD subscription status, try to wake up the subscription and do resubscribe.
+    if (!mIsPeerLIT && IsInactiveICDSubscription())
+    {
+        TriggerResubscriptionForLivenessTimeout(CHIP_ERROR_TIMEOUT);
+    }
 }
 
 CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,

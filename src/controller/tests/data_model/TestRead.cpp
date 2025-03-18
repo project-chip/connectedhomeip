@@ -2330,7 +2330,7 @@ TEST_F(TestRead, TestSubscribe_OnActiveModeNotification)
         GetLoopback().mNumMessagesToDrop = 0;
         callback.ClearCounters();
         InteractionModelEngine::GetInstance()->OnActiveModeNotification(
-            ScopedNodeId(readClient.GetPeerNodeId(), readClient.GetFabricIndex()));
+            ScopedNodeId(readClient.GetPeerNodeId(), readClient.GetFabricIndex()), static_cast<uint64_t>(0));
         EXPECT_EQ(callback.mOnResubscriptionsAttempted, 1);
         EXPECT_EQ(callback.mLastError, CHIP_ERROR_TIMEOUT);
 
@@ -2402,7 +2402,7 @@ TEST_F(TestRead, TestSubscribe_SubGoAwayInserverOnActiveModeNotification)
         GetLoopback().mNumMessagesToDrop = 0;
         callback.ClearCounters();
         InteractionModelEngine::GetInstance()->OnActiveModeNotification(
-            ScopedNodeId(readClient.GetPeerNodeId(), readClient.GetFabricIndex()));
+            ScopedNodeId(readClient.GetPeerNodeId(), readClient.GetFabricIndex()), static_cast<uint64_t>(0));
         EXPECT_EQ(callback.mOnResubscriptionsAttempted, 1);
         EXPECT_EQ(callback.mLastError, CHIP_ERROR_TIMEOUT);
 
@@ -2453,7 +2453,6 @@ TEST_F(TestRead, TestSubscribe_MismatchedSubGoAwayInserverOnActiveModeNotificati
         attributePathParams[0].mEndpointId             = kTestEndpointId;
         attributePathParams[0].mClusterId              = Clusters::UnitTesting::Id;
         attributePathParams[0].mAttributeId            = Clusters::UnitTesting::Attributes::Boolean::Id;
-        readPrepareParams.mCatsMatchCheckIn            = false;
         constexpr uint16_t maxIntervalCeilingSeconds   = 1;
 
         readPrepareParams.mMaxIntervalCeilingSeconds = maxIntervalCeilingSeconds;
@@ -2474,7 +2473,7 @@ TEST_F(TestRead, TestSubscribe_MismatchedSubGoAwayInserverOnActiveModeNotificati
         GetLoopback().mNumMessagesToDrop = 0;
         callback.ClearCounters();
         InteractionModelEngine::GetInstance()->OnActiveModeNotification(
-            ScopedNodeId(readClient.GetPeerNodeId(), readClient.GetFabricIndex()));
+            ScopedNodeId(readClient.GetPeerNodeId(), readClient.GetFabricIndex()), static_cast<uint64_t>(0));
         EXPECT_EQ(callback.mOnResubscriptionsAttempted, 0);
         EXPECT_EQ(callback.mLastError, CHIP_NO_ERROR);
         EXPECT_EQ(callback.mOnError, 0);
@@ -2526,7 +2525,7 @@ TEST_F(TestRead, TestSubscribeFailed_OnActiveModeNotification)
         GetLoopback().mNumMessagesToDrop = 0;
         callback.ClearCounters();
         InteractionModelEngine::GetInstance()->OnActiveModeNotification(
-            ScopedNodeId(readClient.GetPeerNodeId(), readClient.GetFabricIndex()));
+            ScopedNodeId(readClient.GetPeerNodeId(), readClient.GetFabricIndex()), static_cast<uint64_t>(0));
         //
         // Drive servicing IO till we have established a subscription.
         //
