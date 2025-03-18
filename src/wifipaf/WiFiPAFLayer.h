@@ -188,12 +188,12 @@ public:
     static WiFiPAFTransportProtocolVersion
     GetHighestSupportedProtocolVersion(const PAFTransportCapabilitiesRequestMessage & reqMsg);
 
+    void InitialPafInfo();
     CHIP_ERROR AddPafSession(PafInfoAccess accType, WiFiPAFSession & SessionInfo);
     CHIP_ERROR RmPafSession(PafInfoAccess accType, WiFiPAFSession & SessionInfo);
     WiFiPAFSession * GetPAFInfo(PafInfoAccess accType, WiFiPAFSession & SessionInfo);
 
 private:
-    void InitialPafInfo();
     void CleanPafInfo(WiFiPAFSession & SessionInfo);
     WiFiPAFSession mPafInfoVect[WIFIPAF_LAYER_NUM_PAF_ENDPOINTS];
     chip::System::Layer * mSystemLayer;
