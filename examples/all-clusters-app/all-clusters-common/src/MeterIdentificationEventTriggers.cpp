@@ -17,7 +17,6 @@
  */
 
 #include <meter-identification-instance.h>
-
 #include <app/clusters/meter-identification-server/MeterIdentificationTestEventTriggerHandler.h>
 
 using namespace chip;
@@ -29,42 +28,94 @@ namespace {
 
 class OldMeterIdentificationAttributes
 {
+private:
+
+    Instance * mInstance = nullptr;
+    static constexpr size_t kMaximumStringSize = 64;
+    char mPointOfDeliveryBuf[kMaximumStringSize] = {};
+    char mMeterSerialNumberBuf[kMaximumStringSize] = {};
+    char mProtocolVersionBuf[kMaximumStringSize] = {};
     DataModel::Nullable<MeterTypeEnum> mMeterType;
     DataModel::Nullable<CharSpan> mPointOfDelivery;
     DataModel::Nullable<CharSpan> mMeterSerialNumber;
     DataModel::Nullable<CharSpan> mProtocolVersion;
     DataModel::Nullable<Globals::Structs::PowerThresholdStruct::Type> mPowerThreshold;
 
-private:
-
-    Instance * mInstance = nullptr;
-
-    static void SetCharSpan(DataModel::Nullable<CharSpan> & charSpan, const DataModel::Nullable<CharSpan> && value)
+    static bool NullableCharSpanCompare(const DataModel::Nullable<CharSpan> & a, const DataModel::Nullable<CharSpan> & b)
     {
-        if (!charSpan.IsNull())
+        if (a.IsNull() && b.IsNull())
         {
-            chip::Platform::MemoryFree(const_cast<char *>(charSpan.Value().data()));
-            charSpan.SetNull();
+            return true;
         }
 
-        if (!value.IsNull())
+        if (!a.IsNull() && !b.IsNull())
         {
-            const size_t len = value.Value().size();
-            if (auto * str = static_cast<char *>(chip::Platform::MemoryAlloc(len)))
-            {
-                memcpy(str, value.Value().data(), len);
-                str[len] = 0;
-                charSpan = DataModel::MakeNullable(CharSpan(str, len));
-            }
+            return a.Value().data_equal(b.Value());
+        }
+
+        return false;
+    }
+
+    void SavePointOfDelivery(const DataModel::Nullable<CharSpan> & newValue)
+    {
+        if (NullableCharSpanCompare(newValue, mPointOfDelivery))
+        {
+            return;
+        }
+
+        if (!mPointOfDelivery.IsNull())
+        {
+            mPointOfDelivery.SetNull();
+        }
+
+        if (!newValue.IsNull())
+        {
+            const size_t len = newValue.IsNull() ? 0 : newValue.Value().size() < kMaximumStringSize ?
+                newValue.Value().size() : kMaximumStringSize;
+            memcpy(mPointOfDeliveryBuf, newValue.Value().data(), len);
+            mPointOfDelivery = chip::app::DataModel::MakeNullable(CharSpan(mPointOfDeliveryBuf, len));
         }
     }
 
-    static void CleanCharSpan(DataModel::Nullable<CharSpan> & charSpan)
+    void SaveMeterSerialNumber(const DataModel::Nullable<CharSpan> & newValue)
     {
-        if (!charSpan.IsNull())
+        if (NullableCharSpanCompare(newValue, mMeterSerialNumber))
         {
-            chip::Platform::MemoryFree(const_cast<char *>(charSpan.Value().data()));
-            charSpan.SetNull();
+            return;
+        }
+
+        if (!mMeterSerialNumber.IsNull())
+        {
+            mMeterSerialNumber.SetNull();
+        }
+
+        if (!newValue.IsNull())
+        {
+            const size_t len = newValue.IsNull() ? 0 : newValue.Value().size() < kMaximumStringSize ?
+                newValue.Value().size() : kMaximumStringSize;
+            memcpy(mMeterSerialNumberBuf, newValue.Value().data(), len);
+            mMeterSerialNumber = chip::app::DataModel::MakeNullable(CharSpan(mMeterSerialNumberBuf, len));
+        }
+    }
+
+    void SaveProtocolVersion(const DataModel::Nullable<CharSpan> & newValue)
+    {
+        if (NullableCharSpanCompare(newValue, mProtocolVersion))
+        {
+            return;
+        }
+
+        if (!mProtocolVersion.IsNull())
+        {
+            mProtocolVersion.SetNull();
+        }
+
+        if (!newValue.IsNull())
+        {
+            const size_t len = newValue.IsNull() ? 0 : newValue.Value().size() < kMaximumStringSize ?
+                newValue.Value().size() : kMaximumStringSize;
+            memcpy(mProtocolVersionBuf, newValue.Value().data(), len);
+            mProtocolVersion = chip::app::DataModel::MakeNullable(CharSpan(mProtocolVersionBuf, len));
         }
     }
 
@@ -95,7 +146,7 @@ private:
             else
             {
                 ret = string;
-                ++(*(ret.rbegin() + std::distance(string.rbegin(), rit)));
+                ++(*(ret.rbegin() + distance(string.rbegin(), rit)));
                 break;
             }
         }
@@ -108,21 +159,25 @@ private:
         mInstance = GetInstance();
         VerifyOrDieWithMsg(mInstance, AppServer, "Meter Identification instance is null");
         mMeterType = mInstance->GetMeterType();
-        SetCharSpan(mPointOfDelivery, mInstance->GetPointOfDelivery());
-        SetCharSpan(mMeterSerialNumber, mInstance->GetMeterSerialNumber());
-        SetCharSpan(mProtocolVersion, mInstance->GetProtocolVersion());
+        SavePointOfDelivery(mInstance->GetPointOfDelivery());
+        SaveMeterSerialNumber(mInstance->GetMeterSerialNumber());
+        SaveProtocolVersion(mInstance->GetProtocolVersion());
         const auto && powerThreshold = mInstance->GetPowerThreshold();
         if (!powerThreshold.IsNull())
         {
             mPowerThreshold.SetNonNull(powerThreshold.Value());
         }
+        else
+        {
+            mPowerThreshold.SetNull();
+        }
     }
 
     void ClearAttributes()
     {
-        CleanCharSpan(mPointOfDelivery);
-        CleanCharSpan(mMeterSerialNumber);
-        CleanCharSpan(mProtocolVersion);
+        mPointOfDelivery.SetNull();
+        mMeterSerialNumber.SetNull();
+        mProtocolVersion.SetNull();
         mMeterType.SetNull();
         mPowerThreshold.SetNull();
         mInstance = nullptr;
@@ -145,12 +200,12 @@ private:
         VerifyOrDieWithMsg(mInstance, AppServer, "Meter Identification instance is null");
         if (mInstance->GetMeterType().IsNull())
         {
-            mInstance->SetMeterType(DataModel::MakeNullable(static_cast<MeterTypeEnum>(0)));
+            mInstance->SetMeterType(chip::app::DataModel::NullNullable);
         }
         else
         {
             mInstance->SetMeterType(DataModel::MakeNullable(static_cast<MeterTypeEnum>(1 +
-                static_cast<std::underlying_type<MeterTypeEnum>::type>(mInstance->GetMeterType().Value()))));
+                to_underlying(mInstance->GetMeterType().Value()))));
         }
 
         if (mInstance->GetPointOfDelivery().IsNull())
@@ -188,8 +243,8 @@ private:
 
         if (mInstance->GetPowerThreshold().IsNull())
         {
-            mInstance->SetPowerThreshold(DataModel::MakeNullable((Globals::Structs::PowerThresholdStruct::Type){Optional<int64_t>(0),
-                Optional<int64_t>(0), static_cast<Globals::PowerThresholdSourceEnum>(0)}));
+            mInstance->SetPowerThreshold(DataModel::MakeNullable(Globals::Structs::PowerThresholdStruct::Type({Optional<int64_t>(0),
+                Optional<int64_t>(0), Globals::PowerThresholdSourceEnum::kContract})));
         }
         else
         {
@@ -197,7 +252,7 @@ private:
             ++powerThreshold.Value().powerThreshold.Value();
             ++powerThreshold.Value().apparentPowerThreshold.Value();
             powerThreshold.Value().powerThresholdSource.Value() = static_cast<Globals::PowerThresholdSourceEnum>(1 +
-                static_cast<std::underlying_type<Globals::PowerThresholdSourceEnum>::type>(powerThreshold.Value().powerThresholdSource.Value()));
+                to_underlying(powerThreshold.Value().powerThresholdSource.Value()));
             mInstance->SetPowerThreshold(std::move(powerThreshold));
         }
     }
