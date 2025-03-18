@@ -5821,15 +5821,14 @@ enum class IngestMethodsEnum : uint8_t
 // Enum for StatusCodeEnum
 enum class StatusCodeEnum : uint8_t
 {
-    kAllocationNotPermitted     = 0x02,
-    kInvalidTLSEndpoint         = 0x03,
-    kInvalidStream              = 0x04,
-    kInvalidURL                 = 0x05,
-    kInvalidZone                = 0x06,
-    kUnsupportedContainerFormat = 0x07,
-    kUnsupportedIngestMethod    = 0x08,
-    kInvalidTriggerType         = 0x09,
-    kInvalidTransportStatus     = 0x10,
+    kInvalidTLSEndpoint         = 0x02,
+    kInvalidStream              = 0x03,
+    kInvalidURL                 = 0x04,
+    kInvalidZone                = 0x05,
+    kUnsupportedContainerFormat = 0x06,
+    kUnsupportedIngestMethod    = 0x07,
+    kInvalidTriggerType         = 0x08,
+    kInvalidTransportStatus     = 0x09,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
