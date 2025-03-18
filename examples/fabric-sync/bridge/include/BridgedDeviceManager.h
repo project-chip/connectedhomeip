@@ -62,6 +62,7 @@ public:
      * @return uint16_t The index of the dynamic endpoint if successful, nullopt otherwise
      */
     std::optional<uint16_t> AddDeviceEndpoint(std::unique_ptr<BridgedDevice> dev,
+		                              chip::CharSpan epUniqueId = {},
                                               chip::EndpointId parentEndpointId = chip::kInvalidEndpointId);
 
     /**

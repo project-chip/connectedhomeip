@@ -115,7 +115,8 @@ AppPlatformExternalAttributeWriteCallback(EndpointId endpoint, ClusterId cluster
 
 EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointType * ep,
                                              const Span<DataVersion> & dataVersionStorage,
-                                             const Span<const EmberAfDeviceType> & deviceTypeList)
+                                             const Span<const EmberAfDeviceType> & deviceTypeList,
+                                             chip::CharSpan epUniqueId)
 {
     CatalogVendorApp vendorApp = app->GetApplicationBasicDelegate()->GetCatalogVendorApp();
 
@@ -147,7 +148,7 @@ EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointTy
 
         do
         {
-            err = emberAfSetDynamicEndpoint(index, mCurrentEndpointId, ep, dataVersionStorage, deviceTypeList);
+            err = emberAfSetDynamicEndpoint(index, mCurrentEndpointId, ep, dataVersionStorage, deviceTypeList, epUniqueId);
             if (err == CHIP_NO_ERROR)
             {
                 ChipLogProgress(DeviceLayer, "Added ContentApp %s to dynamic endpoint %d (index=%d)", vendorApp.applicationId,
@@ -173,7 +174,9 @@ EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointTy
 
 EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointType * ep,
                                              const Span<DataVersion> & dataVersionStorage,
-                                             const Span<const EmberAfDeviceType> & deviceTypeList, EndpointId desiredEndpointId)
+                                             const Span<const EmberAfDeviceType> & deviceTypeList,
+					     chip::CharSpan epUniqueId,
+                                             EndpointId desiredEndpointId)
 {
     CatalogVendorApp vendorApp = app->GetApplicationBasicDelegate()->GetCatalogVendorApp();
 
@@ -208,7 +211,7 @@ EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointTy
             index++;
             continue;
         }
-        CHIP_ERROR err = emberAfSetDynamicEndpoint(index, desiredEndpointId, ep, dataVersionStorage, deviceTypeList);
+        CHIP_ERROR err = emberAfSetDynamicEndpoint(index, desiredEndpointId, ep, dataVersionStorage, deviceTypeList, epUniqueId);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(DeviceLayer, "Adding ContentApp error : %" CHIP_ERROR_FORMAT, err.Format());

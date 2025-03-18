@@ -159,7 +159,7 @@ DataVersion gLight4DataVersions[MATTER_ARRAY_SIZE(bridgedLightClusters)];
 #define ZCL_ON_OFF_CLUSTER_REVISION (4u)
 
 int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const Span<const EmberAfDeviceType> & deviceTypeList,
-                      const Span<DataVersion> & dataVersionStorage, chip::EndpointId parentEndpointId)
+                      const Span<DataVersion> & dataVersionStorage, chip::CharSpan epUniqueId, chip::EndpointId parentEndpointId)
 {
     uint8_t index = 0;
     while (index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
@@ -172,7 +172,8 @@ int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const Span<const E
             {
                 dev->SetEndpointId(gCurrentEndpointId);
                 err =
-                    emberAfSetDynamicEndpoint(index, gCurrentEndpointId, ep, dataVersionStorage, deviceTypeList, parentEndpointId);
+                    emberAfSetDynamicEndpoint(index, gCurrentEndpointId, ep, dataVersionStorage, deviceTypeList,
+                                              epUniqueId, parentEndpointId);
                 if (err == CHIP_NO_ERROR)
                 {
                     ChipLogProgress(DeviceLayer, "Added device %s to dynamic endpoint %d (index=%d)", dev->GetName(),
@@ -377,22 +378,22 @@ static void InitServer(intptr_t context)
 
     // Add lights 1..3 --> will be mapped to ZCL endpoints 3, 4, 5
     AddDeviceEndpoint(&gLight1, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                      Span<DataVersion>(gLight1DataVersions), 1);
+                      Span<DataVersion>(gLight1DataVersions), chip::Span(), 1);
     AddDeviceEndpoint(&gLight2, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                      Span<DataVersion>(gLight2DataVersions), 1);
+                      Span<DataVersion>(gLight2DataVersions), chip::Span(), 1);
     AddDeviceEndpoint(&gLight3, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                      Span<DataVersion>(gLight3DataVersions), 1);
+                      Span<DataVersion>(gLight3DataVersions), chip::Span(), 1);
 
     // Remove Light 2 -- Lights 1 & 3 will remain mapped to endpoints 3 & 5
     RemoveDeviceEndpoint(&gLight2);
 
     // Add Light 4 -- > will be mapped to ZCL endpoint 6
     AddDeviceEndpoint(&gLight4, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                      Span<DataVersion>(gLight4DataVersions), 1);
+                      Span<DataVersion>(gLight4DataVersions), chip::Span(), 1);
 
     // Re-add Light 2 -- > will be mapped to ZCL endpoint 7
     AddDeviceEndpoint(&gLight2, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                      Span<DataVersion>(gLight2DataVersions), 1);
+                      Span<DataVersion>(gLight2DataVersions), chip::Span(), 1);
 }
 
 extern "C" void app_main()

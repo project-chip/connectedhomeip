@@ -106,7 +106,7 @@ public:
     // dataVersionStorage.size() needs to be at least as big as the number of
     // server clusters in the EmberAfEndpointType passed in.
     EndpointId AddContentApp(ContentApp * app, EmberAfEndpointType * ep, const Span<DataVersion> & dataVersionStorage,
-                             const Span<const EmberAfDeviceType> & deviceTypeList);
+                             const Span<const EmberAfDeviceType> & deviceTypeList, chip::CharSpan ={});
 
     // add apps to the platform.
     // This will assign the app to the desiredEndpointId (if it is not already used)
@@ -115,7 +115,8 @@ public:
     // dataVersionStorage.size() needs to be at least as big as the number of
     // server clusters in the EmberAfEndpointType passed in.
     EndpointId AddContentApp(ContentApp * app, EmberAfEndpointType * ep, const Span<DataVersion> & dataVersionStorage,
-                             const Span<const EmberAfDeviceType> & deviceTypeList, EndpointId desiredEndpointId);
+                             const Span<const EmberAfDeviceType> & deviceTypeList, chip::CharSpan epUniqueId,
+			     EndpointId desiredEndpointId);
 
     // remove app from the platform.
     // returns the endpoint id where the app was, or 0 if app was not loaded
