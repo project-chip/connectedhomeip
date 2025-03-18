@@ -276,25 +276,23 @@ void GetTextEntries(unsigned short txtLen, uint8_t * txtRecord, std::vector<chip
     }
 }
 
-gboolean OnResolveFinalize(gpointer userData)
+static void HandleResolveTask(intptr_t context)
 {
-    ChipLogDetail(DeviceLayer, "DNSsd %s", __func__);
-    auto rCtx = reinterpret_cast<chip::Dnssd::ResolveContext *>(userData);
-
+    ChipLogProgress(DeviceLayer, "DNSsd %s", __func__);
+    auto rCtx = reinterpret_cast<chip::Dnssd::ResolveContext *>(context);
+    if (!rCtx)
     {
-        // Lock the stack mutex when calling the callback function, so that the callback
-        // function could safely perform message exchange (e.g. PASE session pairing).
-        chip::DeviceLayer::StackLock lock;
-        rCtx->Finalize(CHIP_NO_ERROR);
+        ChipLogError(DeviceLayer, "Null context in HandleResolveTask");
+        return;
     }
 
+    rCtx->Finalize(CHIP_NO_ERROR);
     rCtx->mInstance->RemoveContext(rCtx);
-    return G_SOURCE_REMOVE;
 }
 
 void OnResolve(dnssd_error_e result, dnssd_service_h service, void * userData)
 {
-    ChipLogDetail(DeviceLayer, "DNSsd %s", __func__);
+    ChipLogProgress(DeviceLayer, "DNSsd %s", __func__);
 
     auto rCtx = reinterpret_cast<chip::Dnssd::ResolveContext *>(userData);
 
@@ -357,17 +355,10 @@ void OnResolve(dnssd_error_e result, dnssd_service_h service, void * userData)
 
     rCtx->mResult.mAddress.emplace(ipAddr);
 
-    {
-        // Before calling the Resolve() callback, we need to lock stack mutex.
-        // However, we cannot lock the stack mutex from here, because we might
-        // face lock inversion problem. This callback (OnResolve()) is called
-        // with the NSD internal mutex locked, which is also locked by the
-        // dnssd_create_remote_service() function called in the Resolve(), and
-        // the Resolve() itself is called with the stack mutex locked.
-        chip::GAutoPtr<GSource> sourceIdle(g_idle_source_new());
-        g_source_set_callback(sourceIdle.get(), OnResolveFinalize, rCtx, NULL);
-        g_source_attach(sourceIdle.get(), g_main_context_get_thread_default());
-    }
+    err = chip::DeviceLayer::PlatformMgr().ScheduleWork(HandleResolveTask, reinterpret_cast<intptr_t>(rCtx));
+    VerifyOrExit(
+        err == CHIP_NO_ERROR,
+        ChipLogError(DeviceLayer, "Failed to schedule resolve task: %s", err.AsString()));
 
     return;
 
@@ -487,6 +478,7 @@ ResolveContext::~ResolveContext()
 
 void ResolveContext::Finalize(CHIP_ERROR error)
 {
+    ChipLogProgress(DeviceLayer, "DNSsd %s", __func__);
     // In case of error, run the callback function with nullptr as the result.
     VerifyOrReturn(error == CHIP_NO_ERROR, mCallback(mCbContext, nullptr, chip::Span<chip::Inet::IPAddress>(), error));
 
