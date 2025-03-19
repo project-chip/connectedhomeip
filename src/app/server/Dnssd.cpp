@@ -207,7 +207,7 @@ CHIP_ERROR DnssdServer::AdvertiseOperational()
                                        .SetPort(GetSecuredPort())
                                        .SetInterfaceId(GetInterfaceId())
                                        .SetLocalMRPConfig(GetLocalMRPConfig().std_optional())
-                                       .EnableIpV4(true);
+                                       .EnableIpV4(SecuredIPv4PortMatchesIPv6Port());
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
         AddICDKeyToAdvertisement(advertiseParameters);
@@ -234,7 +234,7 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
     auto advertiseParameters = chip::Dnssd::CommissionAdvertisingParameters()
                                    .SetPort(commissionableNode ? GetSecuredPort() : GetUnsecuredPort())
                                    .SetInterfaceId(GetInterfaceId())
-                                   .EnableIpV4(true);
+                                   .EnableIpV4(!commissionableNode || SecuredIPv4PortMatchesIPv6Port());
     advertiseParameters.SetCommissionAdvertiseMode(commissionableNode ? chip::Dnssd::CommssionAdvertiseMode::kCommissionableNode
                                                                       : chip::Dnssd::CommssionAdvertiseMode::kCommissioner);
 
