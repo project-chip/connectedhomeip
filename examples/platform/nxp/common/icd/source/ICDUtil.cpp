@@ -26,12 +26,19 @@ chip::NXP::App::ICDUtil chip::NXP::App::ICDUtil::sICDUtil;
 CHIP_ERROR chip::NXP::App::ICDUtil::OnSubscriptionRequested(chip::app::ReadHandler & aReadHandler,
                                                             chip::Transport::SecureSession & aSecureSession)
 {
-    uint16_t requestedMinInterval = 0;
-    uint16_t requestedMaxInterval = 0;
-    aReadHandler.GetReportingIntervals(requestedMinInterval, requestedMaxInterval);
+    uint16_t reqMinInterval = 0;
+    uint16_t reqMaxInterval = 0;
+    static uint16_t maxOfMinIntervals = 0;
+
+    aReadHandler.GetReportingIntervals(reqMinInterval, reqMaxInterval);
+
+    if (reqMinInterval > maxOfMinIntervals)
+    {
+        maxOfMinIntervals = reqMinInterval;
+    }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-    chip::NXP::App::OTARequestorInitiator::Instance().gImageProcessor.SetRebootDelaySec(requestedMinInterval);
+    chip::NXP::App::OTARequestorInitiator::Instance().gImageProcessor.SetRebootDelaySec(maxOfMinIntervals);
 #endif
     return CHIP_NO_ERROR;
 }
