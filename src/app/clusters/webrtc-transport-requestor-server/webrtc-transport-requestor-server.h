@@ -142,9 +142,7 @@ public:
      * @brief
      *   Gets the current sessions from the Requestor server.
      */
-    std::vector<WebRTCSessionTypeStruct> GetCurrentSessions() const {
-        return mCurrentSessions;
-    }
+    std::vector<WebRTCSessionTypeStruct> GetCurrentSessions() const { return mCurrentSessions; }
 
 private:
     enum class UpsertResultEnum : uint8_t
