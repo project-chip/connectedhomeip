@@ -62929,11 +62929,11 @@ public class ChipClusters {
       return 0L;
     }
 
-    public void solicitOffer(SolicitOfferResponseCallback callback, Integer streamUsage, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID, Optional<ArrayList<ChipStructs.WebRTCTransportProviderClusterICEServerStruct>> ICEServers, Optional<String> ICETransportPolicy, Optional<Integer> metadataOptions) {
-      solicitOffer(callback, streamUsage, videoStreamID, audioStreamID, ICEServers, ICETransportPolicy, metadataOptions, 0);
+    public void solicitOffer(SolicitOfferResponseCallback callback, Integer streamUsage, Integer originatingEndpointID, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID, Optional<ArrayList<ChipStructs.WebRTCTransportProviderClusterICEServerStruct>> ICEServers, Optional<String> ICETransportPolicy, Optional<Integer> metadataOptions) {
+      solicitOffer(callback, streamUsage, originatingEndpointID, videoStreamID, audioStreamID, ICEServers, ICETransportPolicy, metadataOptions, 0);
     }
 
-    public void solicitOffer(SolicitOfferResponseCallback callback, Integer streamUsage, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID, Optional<ArrayList<ChipStructs.WebRTCTransportProviderClusterICEServerStruct>> ICEServers, Optional<String> ICETransportPolicy, Optional<Integer> metadataOptions, int timedInvokeTimeoutMs) {
+    public void solicitOffer(SolicitOfferResponseCallback callback, Integer streamUsage, Integer originatingEndpointID, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID, Optional<ArrayList<ChipStructs.WebRTCTransportProviderClusterICEServerStruct>> ICEServers, Optional<String> ICETransportPolicy, Optional<Integer> metadataOptions, int timedInvokeTimeoutMs) {
       final long commandId = 1L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -62941,23 +62941,27 @@ public class ChipClusters {
       BaseTLVType streamUsagetlvValue = new UIntType(streamUsage);
       elements.add(new StructElement(streamUsageFieldID, streamUsagetlvValue));
 
-      final long videoStreamIDFieldID = 1L;
+      final long originatingEndpointIDFieldID = 1L;
+      BaseTLVType originatingEndpointIDtlvValue = new UIntType(originatingEndpointID);
+      elements.add(new StructElement(originatingEndpointIDFieldID, originatingEndpointIDtlvValue));
+
+      final long videoStreamIDFieldID = 2L;
       BaseTLVType videoStreamIDtlvValue = videoStreamID != null ? videoStreamID.<BaseTLVType>map((nonOptionalvideoStreamID) -> new UIntType(nonOptionalvideoStreamID)).orElse(new EmptyType()) : new NullType();
       elements.add(new StructElement(videoStreamIDFieldID, videoStreamIDtlvValue));
 
-      final long audioStreamIDFieldID = 2L;
+      final long audioStreamIDFieldID = 3L;
       BaseTLVType audioStreamIDtlvValue = audioStreamID != null ? audioStreamID.<BaseTLVType>map((nonOptionalaudioStreamID) -> new UIntType(nonOptionalaudioStreamID)).orElse(new EmptyType()) : new NullType();
       elements.add(new StructElement(audioStreamIDFieldID, audioStreamIDtlvValue));
 
-      final long ICEServersFieldID = 3L;
+      final long ICEServersFieldID = 4L;
       BaseTLVType ICEServerstlvValue = ICEServers.<BaseTLVType>map((nonOptionalICEServers) -> ArrayType.generateArrayType(nonOptionalICEServers, (elementnonOptionalICEServers) -> elementnonOptionalICEServers.encodeTlv())).orElse(new EmptyType());
       elements.add(new StructElement(ICEServersFieldID, ICEServerstlvValue));
 
-      final long ICETransportPolicyFieldID = 4L;
+      final long ICETransportPolicyFieldID = 5L;
       BaseTLVType ICETransportPolicytlvValue = ICETransportPolicy.<BaseTLVType>map((nonOptionalICETransportPolicy) -> new StringType(nonOptionalICETransportPolicy)).orElse(new EmptyType());
       elements.add(new StructElement(ICETransportPolicyFieldID, ICETransportPolicytlvValue));
 
-      final long metadataOptionsFieldID = 5L;
+      final long metadataOptionsFieldID = 6L;
       BaseTLVType metadataOptionstlvValue = metadataOptions.<BaseTLVType>map((nonOptionalmetadataOptions) -> new UIntType(nonOptionalmetadataOptions)).orElse(new EmptyType());
       elements.add(new StructElement(metadataOptionsFieldID, metadataOptionstlvValue));
 
@@ -63000,11 +63004,11 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void provideOffer(ProvideOfferResponseCallback callback, @Nullable Integer webRTCSessionID, String sdp, Integer streamUsage, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID, Optional<ArrayList<ChipStructs.WebRTCTransportProviderClusterICEServerStruct>> ICEServers, Optional<String> ICETransportPolicy, Optional<Integer> metadataOptions) {
-      provideOffer(callback, webRTCSessionID, sdp, streamUsage, videoStreamID, audioStreamID, ICEServers, ICETransportPolicy, metadataOptions, 0);
+    public void provideOffer(ProvideOfferResponseCallback callback, @Nullable Integer webRTCSessionID, String sdp, Integer streamUsage, Integer originatingEndpointID, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID, Optional<ArrayList<ChipStructs.WebRTCTransportProviderClusterICEServerStruct>> ICEServers, Optional<String> ICETransportPolicy, Optional<Integer> metadataOptions) {
+      provideOffer(callback, webRTCSessionID, sdp, streamUsage, originatingEndpointID, videoStreamID, audioStreamID, ICEServers, ICETransportPolicy, metadataOptions, 0);
     }
 
-    public void provideOffer(ProvideOfferResponseCallback callback, @Nullable Integer webRTCSessionID, String sdp, Integer streamUsage, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID, Optional<ArrayList<ChipStructs.WebRTCTransportProviderClusterICEServerStruct>> ICEServers, Optional<String> ICETransportPolicy, Optional<Integer> metadataOptions, int timedInvokeTimeoutMs) {
+    public void provideOffer(ProvideOfferResponseCallback callback, @Nullable Integer webRTCSessionID, String sdp, Integer streamUsage, Integer originatingEndpointID, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID, Optional<ArrayList<ChipStructs.WebRTCTransportProviderClusterICEServerStruct>> ICEServers, Optional<String> ICETransportPolicy, Optional<Integer> metadataOptions, int timedInvokeTimeoutMs) {
       final long commandId = 3L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -63020,23 +63024,27 @@ public class ChipClusters {
       BaseTLVType streamUsagetlvValue = new UIntType(streamUsage);
       elements.add(new StructElement(streamUsageFieldID, streamUsagetlvValue));
 
-      final long videoStreamIDFieldID = 3L;
+      final long originatingEndpointIDFieldID = 3L;
+      BaseTLVType originatingEndpointIDtlvValue = new UIntType(originatingEndpointID);
+      elements.add(new StructElement(originatingEndpointIDFieldID, originatingEndpointIDtlvValue));
+
+      final long videoStreamIDFieldID = 4L;
       BaseTLVType videoStreamIDtlvValue = videoStreamID != null ? videoStreamID.<BaseTLVType>map((nonOptionalvideoStreamID) -> new UIntType(nonOptionalvideoStreamID)).orElse(new EmptyType()) : new NullType();
       elements.add(new StructElement(videoStreamIDFieldID, videoStreamIDtlvValue));
 
-      final long audioStreamIDFieldID = 4L;
+      final long audioStreamIDFieldID = 5L;
       BaseTLVType audioStreamIDtlvValue = audioStreamID != null ? audioStreamID.<BaseTLVType>map((nonOptionalaudioStreamID) -> new UIntType(nonOptionalaudioStreamID)).orElse(new EmptyType()) : new NullType();
       elements.add(new StructElement(audioStreamIDFieldID, audioStreamIDtlvValue));
 
-      final long ICEServersFieldID = 5L;
+      final long ICEServersFieldID = 6L;
       BaseTLVType ICEServerstlvValue = ICEServers.<BaseTLVType>map((nonOptionalICEServers) -> ArrayType.generateArrayType(nonOptionalICEServers, (elementnonOptionalICEServers) -> elementnonOptionalICEServers.encodeTlv())).orElse(new EmptyType());
       elements.add(new StructElement(ICEServersFieldID, ICEServerstlvValue));
 
-      final long ICETransportPolicyFieldID = 6L;
+      final long ICETransportPolicyFieldID = 7L;
       BaseTLVType ICETransportPolicytlvValue = ICETransportPolicy.<BaseTLVType>map((nonOptionalICETransportPolicy) -> new StringType(nonOptionalICETransportPolicy)).orElse(new EmptyType());
       elements.add(new StructElement(ICETransportPolicyFieldID, ICETransportPolicytlvValue));
 
-      final long metadataOptionsFieldID = 7L;
+      final long metadataOptionsFieldID = 8L;
       BaseTLVType metadataOptionstlvValue = metadataOptions.<BaseTLVType>map((nonOptionalmetadataOptions) -> new UIntType(nonOptionalmetadataOptions)).orElse(new EmptyType());
       elements.add(new StructElement(metadataOptionsFieldID, metadataOptionstlvValue));
 
