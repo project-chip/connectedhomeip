@@ -199,36 +199,15 @@ void WebRTCTransportRequestorServer::HandleOffer(HandlerContext & ctx, const Com
     // Extract command fields from the request
     uint16_t sessionId = req.webRTCSessionID;
 
-    NodeId peerNodeId           = GetNodeIdFromCtx(ctx.mCommandHandler);
-    FabricIndex peerFabricIndex = ctx.mCommandHandler.GetAccessingFabricIndex();
+    // Check if the session, NodeID are valid
+    if (!IsPeerNodeSessionValid(sessionId, ctx))
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
+        return;
+    }
 
-    // Check if the session ID is in the existing sessions list
-    WebRTCSessionTypeStruct * existingSession = FindSession(sessionId);
     // Create arguments for WebRTCTransportRequestorDelegate.
     WebRTCTransportRequestorDelegate::OfferArgs args;
-    WebRTCSessionTypeStruct outSession;
-
-    if (!existingSession)
-    {
-        // As per specification, sessionId represents the established session
-        args.sessionId = sessionId;
-        // TODO: For Session validation, SolicitOfferResponse SHALL create a WebRTCSessionTypeStruct with the received
-        // webRTCSessionID and store it to CurrentSessions.
-        outSession.id         = sessionId;
-        outSession.peerNodeID = peerNodeId;
-        outSession.SetFabricIndex(peerFabricIndex);
-    }
-    else
-    {
-        // Also check that the existing session belongs to the same PeerNodeID / Fabric
-        // If it doesn’t match, respond with CONSTRAINT_ERROR
-        if (peerNodeId != existingSession->peerNodeID || peerFabricIndex != existingSession->GetFabricIndex())
-        {
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
-            return;
-        }
-    }
-
     args.sdp = std::string(req.sdp.data(), req.sdp.size());
 
     // Convert ICE servers list from DecodableList to vector.
@@ -239,6 +218,15 @@ void WebRTCTransportRequestorServer::HandleOffer(HandlerContext & ctx, const Com
         {
             args.iceServers.Value().push_back(iterator.GetValue());
         }
+
+        // Check the list validity
+        CHIP_ERROR err = iterator.GetStatus();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "HandleOffer: ICECandidates list error: %" CHIP_ERROR_FORMAT, err.Format());
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+            return;
+        }
     }
 
     // Convert ICETransportPolicy from CharSpan to std::string.
@@ -247,6 +235,7 @@ void WebRTCTransportRequestorServer::HandleOffer(HandlerContext & ctx, const Com
         args.iceTransportPolicy.SetValue(std::string(req.ICETransportPolicy.Value().data(), req.ICETransportPolicy.Value().size()));
     }
 
+    WebRTCSessionTypeStruct outSession;
     // Delegate processing: handle the SDP offer, gather ICE candidates, SDP answer, etc.
     Protocols::InteractionModel::ClusterStatusCode delegateStatus =
         Protocols::InteractionModel::ClusterStatusCode(mDelegate.HandleOffer(sessionId, args, outSession));
@@ -268,31 +257,11 @@ void WebRTCTransportRequestorServer::HandleAnswer(HandlerContext & ctx, const Co
     uint16_t sessionId = req.webRTCSessionID;
     auto sdpSpan       = req.sdp;
 
-    NodeId peerNodeId           = GetNodeIdFromCtx(ctx.mCommandHandler);
-    FabricIndex peerFabricIndex = ctx.mCommandHandler.GetAccessingFabricIndex();
-
-    // Check if the session ID is in the existing sessions list
-    WebRTCSessionTypeStruct * existingSession = FindSession(sessionId);
-
-    WebRTCSessionTypeStruct outSession;
-
-    if (!existingSession)
+    // Check if the session, NodeID are valid
+    if (!IsPeerNodeSessionValid(sessionId, ctx))
     {
-        // TODO: For Session validation, ProvideOfferResponse SHALL create a WebRTCSessionTypeStruct with the received
-        // webRTCSessionID and store it to the CurrentSessions.
-        outSession.id         = sessionId;
-        outSession.peerNodeID = peerNodeId;
-        outSession.SetFabricIndex(peerFabricIndex);
-    }
-    else
-    {
-        // Also check that the existing session belongs to the same PeerNodeID / Fabric
-        // If it doesn’t match, respond with CONSTRAINT_ERROR
-        if (peerNodeId != existingSession->peerNodeID || peerFabricIndex != existingSession->GetFabricIndex())
-        {
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
-            return;
-        }
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
+        return;
     }
 
     std::string sdpAnswer(sdpSpan.data(), sdpSpan.size());
@@ -300,9 +269,6 @@ void WebRTCTransportRequestorServer::HandleAnswer(HandlerContext & ctx, const Co
     // Delegate handles Answer command received.
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath,
                                   Protocols::InteractionModel::ClusterStatusCode(mDelegate.HandleAnswer(sessionId, sdpAnswer)));
-
-    // Store the new WebRTCSessionTypeStruct in CurrentSessions.
-    UpsertSession(outSession);
 }
 
 void WebRTCTransportRequestorServer::HandleICECandidates(HandlerContext & ctx, const Commands::ICECandidates::DecodableType & req)
@@ -323,8 +289,8 @@ void WebRTCTransportRequestorServer::HandleICECandidates(HandlerContext & ctx, c
     CHIP_ERROR err = iter.GetStatus();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "HandleICECandidates: ICECandidates list error: %s", chip::ErrorStr(err));
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::ConstraintError);
+        ChipLogError(Zcl, "HandleICECandidates: ICECandidates list error: %" CHIP_ERROR_FORMAT, err.Format());
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
         return;
     }
 
@@ -334,6 +300,15 @@ void WebRTCTransportRequestorServer::HandleICECandidates(HandlerContext & ctx, c
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
         return;
     }
+
+    // Check ice candidates min 1 contraint.
+    if (candidates.empty())
+    {
+        ChipLogError(Zcl, "HandleICECandidates: No ICE candidates provided.");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+        return;
+    }
+
     // Handle ICE candidates in Delegate
     ctx.mCommandHandler.AddStatus(
         ctx.mRequestPath, Protocols::InteractionModel::ClusterStatusCode(mDelegate.HandleICECandidates(sessionId, candidates)));
@@ -349,7 +324,7 @@ void WebRTCTransportRequestorServer::HandleEnd(HandlerContext & ctx, const Comma
     if (reason == WebRTCEndReasonEnum::kUnknownEnumValue)
     {
         ChipLogError(Zcl, "HandleEnd: Invalid reason value %u.", static_cast<uint8_t>(reason));
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidCommand);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
         return;
     }
 
