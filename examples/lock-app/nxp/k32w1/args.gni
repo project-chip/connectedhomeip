@@ -26,7 +26,7 @@ chip_enable_ble = true
 chip_generate_link_map_file = true
 
 chip_system_config_provide_statistics = false
-chip_system_config_use_open_thread_inet_endpoints = true
+chip_system_config_use_openthread_inet_endpoints = true
 chip_with_lwip = false
 
 chip_enable_icd_server = true
