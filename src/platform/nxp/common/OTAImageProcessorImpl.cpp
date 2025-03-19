@@ -24,6 +24,8 @@
 
 static constexpr uint16_t deltaRebootDelayMs = 200;
 
+static chip::OTAImageProcessorImpl gImageProcessor;
+
 namespace chip {
 
 CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
@@ -357,6 +359,11 @@ CHIP_ERROR OTAImageProcessorImpl::ReleaseBlock()
 void OTAImageProcessorImpl::SetRebootDelaySec(uint16_t rebootDelay)
 {
     mDelayBeforeRebootSec = rebootDelay;
+}
+
+OTAImageProcessorImpl & OTAImageProcessorImpl::GetDefaultInstance()
+{
+    return gImageProcessor;
 }
 
 } // namespace chip

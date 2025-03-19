@@ -49,6 +49,8 @@ public:
     void SetOTADownloader(OTADownloader * downloader) { mDownloader = downloader; }
     void SetRebootDelaySec(uint16_t rebootDelay);
 
+    static OTAImageProcessorImpl & GetDefaultInstance();
+
 private:
     //////////// Actual handlers for the OTAImageProcessorInterface ///////////////
     static void HandlePrepareDownload(intptr_t context);
