@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -71,7 +71,7 @@ CHIP_ERROR CircularDiagnosticBuffer::Retrieve(MutableByteSpan & span, uint32_t &
     }
     span.reduce_size(successful_written_bytes);
     ChipLogDetail(DeviceLayer, "---------------Total Retrieved bytes : %ld----------------\n", successful_written_bytes);
-    return CHIP_NO_ERROR;
+    return err;
 }
 
 bool CircularDiagnosticBuffer::IsBufferEmpty()

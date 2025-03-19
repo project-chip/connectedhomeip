@@ -1,3 +1,20 @@
+/*
+ *
+ *    Copyright (c) 2025 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 #pragma once
 #include <lib/core/TLVCircularBuffer.h>
 #include <lib/support/Span.h>
@@ -29,7 +46,7 @@ public:
      *
      * This method retrieves the stored diagnostic data and copies it into the
      * provided `payload` buffer. If the buffer is too small to hold all the data,
-     * the method returns the successfully copied entries along with an error code
+     * still method returns the successfully copied entries along with an error code
      * indicating that the buffer was insufficient.
      *
      * @param payload       A reference to a `MutableByteSpan` where the retrieved
@@ -39,6 +56,7 @@ public:
      *
      * @retval CHIP_NO_ERROR             If the operation succeeded and all data was copied.
      * @retval CHIP_ERROR_BUFFER_TOO_SMALL If the buffer was not large enough to hold all data.
+     * @retval CHIP_ERROR_END_OF_TLV      If the end of the TLV stream is reached.
      * @retval CHIP_ERROR                 If any other failure occurred during the operation.
      */
     CHIP_ERROR Retrieve(MutableByteSpan & payload, uint32_t & read_entries);
