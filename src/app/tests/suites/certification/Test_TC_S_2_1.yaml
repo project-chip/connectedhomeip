@@ -33,7 +33,7 @@ tests:
                 value: nodeId
 
     - label: "Step 3: TH reads from the DUT the SceneTableSize attribute"
-      PICS: S.S.A0000
+      PICS: S.S.A0001
       command: "readAttribute"
       attribute: "SceneTableSize"
       response:
@@ -41,7 +41,7 @@ tests:
               type: int16u
 
     - label: "Step 4: TH reads from the DUT the FabricSceneInfo attribute"
-      PICS: S.S.A0001
+      PICS: S.S.A0002
       command: "readAttribute"
       attribute: "FabricSceneInfo"
       response:

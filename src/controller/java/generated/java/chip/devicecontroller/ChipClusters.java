@@ -26218,8 +26218,8 @@ public class ChipClusters {
   public static class ScenesManagementCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 98L;
 
-    private static final long SCENE_TABLE_SIZE_ATTRIBUTE_ID = 0L;
-    private static final long FABRIC_SCENE_INFO_ATTRIBUTE_ID = 1L;
+    private static final long SCENE_TABLE_SIZE_ATTRIBUTE_ID = 1L;
+    private static final long FABRIC_SCENE_INFO_ATTRIBUTE_ID = 2L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;

@@ -5464,15 +5464,15 @@ class ChipClusters:
             },
         },
         "attributes": {
-            0x00000000: {
+            0x00000001: {
                 "attributeName": "SceneTableSize",
-                "attributeId": 0x00000000,
+                "attributeId": 0x00000001,
                 "type": "int",
                 "reportable": True,
             },
-            0x00000001: {
+            0x00000002: {
                 "attributeName": "FabricSceneInfo",
-                "attributeId": 0x00000001,
+                "attributeId": 0x00000002,
                 "type": "",
                 "reportable": True,
             },

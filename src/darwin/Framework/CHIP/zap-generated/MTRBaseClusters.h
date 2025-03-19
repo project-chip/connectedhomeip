@@ -6101,7 +6101,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command AddScene
  *
- * It is not mandatory for an extension field set to be included in the command for every cluster on that endpoint that has a defined extension field set.
+ * Add a scene to the scene table. Extension field sets are input as '{"ClusterID": VALUE, "AttributeValueList":[{"AttributeID": VALUE, "Value*": VALUE}]}'.
  */
 - (void)addSceneWithParams:(MTRScenesManagementClusterAddSceneParams *)params completion:(void (^)(MTRScenesManagementClusterAddSceneResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 /**

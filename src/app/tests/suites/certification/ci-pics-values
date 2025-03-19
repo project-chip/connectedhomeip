@@ -677,8 +677,8 @@ I.C.AO-WRITE=0
 
 # Scenes Management Cluster
 S.S=1
-S.S.A0000=1
 S.S.A0001=1
+S.S.A0002=1
 S.S.C00.Rsp=1
 S.S.C01.Rsp=1
 S.S.C02.Rsp=1

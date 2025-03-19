@@ -85,10 +85,10 @@ Git: 1.4-1773-g2b8c413df
         <optionalConform/>
       </feature>
     </features>
-    <attribute side="server" code="0x0000" name="SceneTableSize" define="SCENE_TABLE_SIZE" type="int16u" default="16">SceneTableSize</attribute>
-    <attribute side="server" code="0x0001" name="FabricSceneInfo" define="FABRIC_SCENE_INFO" type="array" entryType="SceneInfoStruct">FabricSceneInfo</attribute>
+    <attribute side="server" code="0x0001" name="SceneTableSize" define="SCENE_TABLE_SIZE" type="int16u" default="16"></attribute>
+    <attribute side="server" code="0x0002" name="FabricSceneInfo" define="FABRIC_SCENE_INFO" type="array" entryType="SceneInfoStruct"></attribute>
     <command source="client" code="0x00" name="AddScene" response="AddSceneResponse" isFabricScoped="true" optional="false" cli="chip scenes add">
-      <description>It is not mandatory for an extension field set to be included in the command for every cluster on that endpoint that has a defined extension field set.</description>
+      <description>Add a scene to the scene table. Extension field sets are input as '{"ClusterID": VALUE, "AttributeValueList":[{"AttributeID": VALUE, "Value*": VALUE}]}'.</description>
       <arg id="0" name="GroupID" type="group_id"/>
       <arg id="1" name="SceneID" type="int8u" max="254"/>
       <arg id="2" name="TransitionTime" type="int32u" max="60000000"/>

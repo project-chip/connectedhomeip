@@ -5926,10 +5926,10 @@ PICS:
     #
 
     - label: "Does the device implement the SceneTableSize attribute?"
-      id: S.S.A0000
+      id: S.S.A0001
 
     - label: "Does the device implement the FabricSceneInfo attribute?"
-      id: S.S.A0001
+      id: S.S.A0002
 
     #
     # server / commandsReceived

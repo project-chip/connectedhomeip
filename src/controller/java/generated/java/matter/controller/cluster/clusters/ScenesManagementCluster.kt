@@ -785,7 +785,7 @@ class ScenesManagementCluster(
   }
 
   suspend fun readSceneTableSizeAttribute(): UShort {
-    val ATTRIBUTE_ID: UInt = 0u
+    val ATTRIBUTE_ID: UInt = 1u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -819,7 +819,7 @@ class ScenesManagementCluster(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<UShortSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 0u
+    val ATTRIBUTE_ID: UInt = 1u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -868,7 +868,7 @@ class ScenesManagementCluster(
   }
 
   suspend fun readFabricSceneInfoAttribute(): FabricSceneInfoAttribute {
-    val ATTRIBUTE_ID: UInt = 1u
+    val ATTRIBUTE_ID: UInt = 2u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -909,7 +909,7 @@ class ScenesManagementCluster(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<FabricSceneInfoAttributeSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 1u
+    val ATTRIBUTE_ID: UInt = 2u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)

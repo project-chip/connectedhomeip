@@ -5982,8 +5982,8 @@ private:
 | * CopyScene                                                         |   0x40 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
-| * SceneTableSize                                                    | 0x0000 |
-| * FabricSceneInfo                                                   | 0x0001 |
+| * SceneTableSize                                                    | 0x0001 |
+| * FabricSceneInfo                                                   | 0x0002 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |

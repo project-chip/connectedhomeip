@@ -3055,11 +3055,11 @@ namespace ScenesManagement {
 namespace Attributes {
 
 namespace SceneTableSize {
-static constexpr AttributeId Id = 0x00000000;
+static constexpr AttributeId Id = 0x00000001;
 } // namespace SceneTableSize
 
 namespace FabricSceneInfo {
-static constexpr AttributeId Id = 0x00000001;
+static constexpr AttributeId Id = 0x00000002;
 } // namespace FabricSceneInfo
 
 namespace GeneratedCommandList {

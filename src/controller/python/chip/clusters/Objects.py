@@ -19766,8 +19766,8 @@ class ScenesManagement(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields=[
-                ClusterObjectFieldDescriptor(Label="sceneTableSize", Tag=0x00000000, Type=uint),
-                ClusterObjectFieldDescriptor(Label="fabricSceneInfo", Tag=0x00000001, Type=typing.List[ScenesManagement.Structs.SceneInfoStruct]),
+                ClusterObjectFieldDescriptor(Label="sceneTableSize", Tag=0x00000001, Type=uint),
+                ClusterObjectFieldDescriptor(Label="fabricSceneInfo", Tag=0x00000002, Type=typing.List[ScenesManagement.Structs.SceneInfoStruct]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -20162,7 +20162,7 @@ class ScenesManagement(Cluster):
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
-                return 0x00000000
+                return 0x00000001
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
@@ -20178,7 +20178,7 @@ class ScenesManagement(Cluster):
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
-                return 0x00000001
+                return 0x00000002
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
