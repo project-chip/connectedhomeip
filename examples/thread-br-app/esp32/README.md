@@ -97,6 +97,6 @@ the Thread network.
 
 ### Generate OTA Firmware For BR
 
-After enable the option `CONFIG_CREATE_OTA_IMAGE_WITH_RCP_FW` and 
-`CONFIG_CHIP_OTA_IMAGE_BUILD` in menuconfig, will generate OTA image with rcp 
+After enable the option `CONFIG_CREATE_OTA_IMAGE_WITH_RCP_FW` and
+`CONFIG_CHIP_OTA_IMAGE_BUILD` in menuconfig, will generate OTA image with rcp
 firmware, named `ota_with_rcp_image_ota.bin` in build folder.
