@@ -17,9 +17,18 @@
  */
 
 #include "ICDUtil.h"
+
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-#include "OTARequestorInitiator.h"
-#endif
+#ifdef CONFIG_CHIP_OTA_IMAGE_PROCESSOR_HEADER
+#include CONFIG_CHIP_OTA_IMAGE_PROCESSOR_HEADER
+#else
+#ifndef CONFIG_APP_FREERTOS_OS
+#include <platform/nxp/zephyr/ota/OTAImageProcessorImpl.h>
+#else
+#include "OTAImageProcessorImpl.h"
+#endif /* CONFIG_APP_FREERTOS_OS */
+#endif /* CONFIG_CHIP_OTA_IMAGE_PROCESSOR_HEADER */
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR */
 
 chip::NXP::App::ICDUtil chip::NXP::App::ICDUtil::sICDUtil;
 
@@ -38,7 +47,7 @@ CHIP_ERROR chip::NXP::App::ICDUtil::OnSubscriptionRequested(chip::app::ReadHandl
     }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-    chip::NXP::App::OTARequestorInitiator::Instance().gImageProcessor.SetRebootDelaySec(maxOfMinIntervals);
+    chip::OTAImageProcessorImpl::GetDefaultInstance().SetRebootDelaySec(maxOfMinIntervals);
 #endif
     return CHIP_NO_ERROR;
 }
