@@ -348,7 +348,7 @@ void OnResolve(dnssd_error_e result, dnssd_service_h service, void * userData)
         rCtx->Finalize(CHIP_NO_ERROR);
         rCtx->mInstance->RemoveContext(rCtx);
     });
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "Failed to schedule resolve task: %s", err.AsString()));
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "Failed to schedule resolve task: %" CHIP_ERROR_FORMAT, err.Format()));
 
     return;
 
