@@ -107,7 +107,8 @@ const sl_wifi_device_configuration_t config = {
 #ifdef SLI_SI91X_MCU_INTERFACE
                          (SL_SI91X_FEAT_SECURITY_OPEN | SL_SI91X_FEAT_WPS_DISABLE),
 #else
-                         (SL_SI91X_FEAT_SECURITY_OPEN | SL_SI91X_FEAT_AGGREGATION),
+                         (SL_SI91X_FEAT_SECURITY_OPEN | SL_SI91X_FEAT_AGGREGATION | SL_SI91X_FEAT_ULP_GPIO_BASED_HANDSHAKE |
+                          SL_SI91X_FEAT_DEV_TO_HOST_ULP_GPIO_1),
 #endif
                      .tcp_ip_feature_bit_map = (SL_SI91X_TCP_IP_FEAT_DHCPV4_CLIENT | SL_SI91X_TCP_IP_FEAT_DNS_CLIENT |
                                                 SL_SI91X_TCP_IP_FEAT_SSL | SL_SI91X_TCP_IP_FEAT_BYPASS
@@ -372,7 +373,10 @@ sl_status_t SetWifiConfigurations()
     VerifyOrReturnError(status == SL_STATUS_OK, status,
                         ChipLogError(DeviceLayer, "sl_wifi_set_listen_interval failed: 0x%lx", status));
 
-    sl_wifi_advanced_client_configuration_t client_config = { .max_retry_attempts = 5 };
+    // This is be triggered on the disconnect use case, providing the amount of TA tries
+    // Setting the TA retry to 1 and giving the control to the M4 for improved power efficiency
+    // When max_retry_attempts is set to 0, TA will retry indefinitely.
+    sl_wifi_advanced_client_configuration_t client_config = { .max_retry_attempts = 1 };
     status = sl_wifi_set_advanced_client_configuration(SL_WIFI_CLIENT_INTERFACE, &client_config);
     VerifyOrReturnError(status == SL_STATUS_OK, status,
                         ChipLogError(DeviceLayer, "sl_wifi_set_advanced_client_configuration failed: 0x%lx", status));
@@ -490,10 +494,6 @@ CHIP_ERROR WifiInterfaceImpl::InitWiFiStack(void)
     sWifiEventQueue = osMessageQueueNew(kWfxQueueSize, sizeof(WiseconnectWifiInterface::WifiPlatformEvent), nullptr);
     VerifyOrReturnError(sWifiEventQueue != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    status = CreateDHCPTimer();
-    VerifyOrReturnError(status == SL_STATUS_OK, CHIP_ERROR_NO_MEMORY,
-                        ChipLogError(DeviceLayer, "CreateDHCPTimer failed: %lx", status));
-
     return CHIP_NO_ERROR;
 }
 
@@ -504,7 +504,7 @@ void WifiInterfaceImpl::ProcessEvent(WiseconnectWifiInterface::WifiPlatformEvent
     case WiseconnectWifiInterface::WifiPlatformEvent::kStationConnect:
         ChipLogDetail(DeviceLayer, "WifiPlatformEvent::kStationConnect");
         wfx_rsi.dev_state.Set(WifiInterface::WifiState::kStationConnected);
-        ResetDHCPNotificationFlags();
+        ResetConnectivityNotificationFlags();
         break;
 
     case WiseconnectWifiInterface::WifiPlatformEvent::kStationDisconnect: {
@@ -513,11 +513,10 @@ void WifiInterfaceImpl::ProcessEvent(WiseconnectWifiInterface::WifiPlatformEvent
 
         wfx_rsi.dev_state.Clear(WifiInterface::WifiState::kStationReady)
             .Clear(WifiInterface::WifiState::kStationConnecting)
-            .Clear(WifiInterface::WifiState::kStationConnected)
-            .Clear(WifiInterface::WifiState::kStationDhcpDone);
+            .Clear(WifiInterface::WifiState::kStationConnected);
 
         // TODO: Implement disconnect notify
-        ResetDHCPNotificationFlags();
+        ResetConnectivityNotificationFlags();
 #if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
         NotifyIPv4Change(false);
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
@@ -595,61 +594,29 @@ void WifiInterfaceImpl::ProcessEvent(WiseconnectWifiInterface::WifiPlatformEvent
         JoinWifiNetwork();
         break;
 
-    case WiseconnectWifiInterface::WifiPlatformEvent::kStationDoDhcp:
-        ChipLogDetail(DeviceLayer, "WifiPlatformEvent::kStationDoDhcp");
-        StartDHCPTimer(kDhcpPollIntervalMs);
-        break;
-
-    case WiseconnectWifiInterface::WifiPlatformEvent::kStationDhcpDone:
-        ChipLogDetail(DeviceLayer, "WifiPlatformEvent::kStationDhcpDone");
-        CancelDHCPTimer();
-        break;
-
-    case WiseconnectWifiInterface::WifiPlatformEvent::kStationDhcpPoll:
-        ChipLogDetail(DeviceLayer, "WifiPlatformEvent::kStationDhcpPoll");
-        HandleDHCPPolling();
-        break;
+    case WiseconnectWifiInterface::WifiPlatformEvent::kConnectionComplete:
+        ChipLogDetail(DeviceLayer, "WifiPlatformEvent::kConnectionComplete");
+        NotifySuccessfulConnection();
 
     default:
         break;
     }
 }
 
-void WifiInterfaceImpl::HandleDHCPPolling(void)
+void WifiInterfaceImpl::NotifySuccessfulConnection(void)
 {
-    WiseconnectWifiInterface::WifiPlatformEvent event;
-
-    // TODO: Notify the application that the interface is not set up or Chipdie here because we are in an unkonwn state
     struct netif * sta_netif = &wifi_client_context.netif;
-    VerifyOrReturn(sta_netif != nullptr, ChipLogError(DeviceLayer, "HandleDHCPPolling: failed to get STA netif"));
+    VerifyOrReturn(sta_netif != nullptr, ChipLogError(DeviceLayer, "NotifySuccessfulConnection: failed to get STA netif"));
 
 #if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
-    uint8_t dhcp_state = dhcpclient_poll(sta_netif);
-    if (dhcp_state == DHCP_ADDRESS_ASSIGNED && !mHasNotifiedIPv4)
-    {
-        GotIPv4Address((uint32_t) sta_netif->ip_addr.u_addr.ip4.addr);
-        event = WiseconnectWifiInterface::WifiPlatformEvent::kStationDhcpDone;
-        WiseconnectWifiInterface::PostWifiPlatformEvent(event);
-        NotifyConnectivity();
-    }
-    else if (dhcp_state == DHCP_OFF)
-    {
-        NotifyIPv4Change(false);
-    }
+    GotIPv4Address((uint32_t) sta_netif->ip_addr.u_addr.ip4.addr);
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
-    /* Checks if the assigned IPv6 address is preferred by evaluating
-     * the first block of IPv6 address ( block 0)
-     */
-    if ((ip6_addr_ispreferred(netif_ip6_addr_state(sta_netif, 0))) && !mHasNotifiedIPv6)
-    {
-        char addrStr[chip::Inet::IPAddress::kMaxStringLength] = { 0 };
-        VerifyOrReturn(ip6addr_ntoa_r(netif_ip6_addr(sta_netif, 0), addrStr, sizeof(addrStr)) != nullptr);
-        ChipLogProgress(DeviceLayer, "SLAAC OK: linklocal addr: %s", addrStr);
-        NotifyIPv6Change(true);
-        event = WiseconnectWifiInterface::WifiPlatformEvent::kStationDhcpDone;
-        PostWifiPlatformEvent(event);
-        NotifyConnectivity();
-    }
+
+    char addrStr[chip::Inet::IPAddress::kMaxStringLength] = { 0 };
+    VerifyOrReturn(ip6addr_ntoa_r(netif_ip6_addr(sta_netif, 0), addrStr, sizeof(addrStr)) != nullptr);
+    ChipLogProgress(DeviceLayer, "SLAAC OK: linklocal addr: %s", addrStr);
+    NotifyIPv6Change(true);
+    NotifyConnectivity();
 }
 
 sl_status_t WifiInterfaceImpl::JoinWifiNetwork(void)
