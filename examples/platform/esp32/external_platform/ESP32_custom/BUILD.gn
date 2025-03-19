@@ -15,6 +15,7 @@
 import("//build_overrides/chip.gni")
 
 import("${chip_root}/build/chip/buildconfig_header.gni")
+import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/platform/device.gni")
 
 declare_args() {
@@ -29,6 +30,7 @@ declare_args() {
   chip_bt_bluedroid_enabled = true
   chip_max_discovered_ip_addresses = 5
   chip_enable_route_hook = false
+  chip_memory_alloc_mode = "default"
 }
 
 buildconfig_header("custom_buildconfig") {
@@ -109,6 +111,16 @@ static_library("ESP32_custom") {
     "${chip_root}/src/crypto",
     "${chip_root}/src/platform:platform_base",
   ]
+
+  if (chip_config_memory_management == "platform") {
+    if (chip_memory_alloc_mode == "internal") {
+      sources += [ "CHIPMem-PlatformInternal.cpp" ]
+    } else if (chip_memory_alloc_mode == "external") {
+      sources += [ "CHIPMem-PlatformExternal.cpp" ]
+    } else {
+      sources += [ "CHIPMem-PlatformDefault.cpp" ]
+    }
+  }
 
   if (chip_enable_ota_requestor) {
     sources += [
