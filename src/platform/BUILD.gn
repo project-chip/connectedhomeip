@@ -149,7 +149,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         chip_device_platform == "tizen" || chip_device_platform == "android" ||
         chip_device_platform == "webos" || chip_device_platform == "bl602" ||
         chip_device_platform == "bl702" || chip_device_platform == "bl702l" ||
-        chip_device_platform == "bl616") {
+        chip_device_platform == "bl616" || chip_device_platform == "esp32") {
       defines += [ "CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=${chip_enable_ble}" ]
     }
 

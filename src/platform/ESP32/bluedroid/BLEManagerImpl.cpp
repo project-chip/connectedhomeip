@@ -24,15 +24,11 @@
  */
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-
 #include "sdkconfig.h"
 #ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
 #include <lib/support/CodeUtils.h>
 #endif
 
-#ifdef CONFIG_BT_BLUEDROID_ENABLED
 
 #ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
 #include <ble/Ble.h>
@@ -2158,7 +2154,3 @@ void BLEManagerImpl::DriveBLEState(intptr_t arg)
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // CONFIG_BT_BLUEDROID_ENABLED
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
