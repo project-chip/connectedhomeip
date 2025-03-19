@@ -18,22 +18,20 @@
 Handles linux-specific functionality for running test cases
 """
 
-import glob
+import asyncio
 import logging
 import os
-import shutil
+import pathlib
 import subprocess
+import threading
 import sys
 import time
-from collections import namedtuple
-from time import sleep
-from typing import Optional
+
+import sdbus
 
 from .test_definition import ApplicationPaths
 
 test_environ = os.environ.copy()
-PW_PROJECT_ROOT = os.environ.get("PW_PROJECT_ROOT")
-QEMU_CONFIG_FILES = "integrations/docker/images/stage-2/chip-build-linux-qemu/files"
 
 
 def EnsureNetworkNamespaceAvailability():
@@ -64,7 +62,7 @@ def EnsurePrivateState():
         sys.exit(1)
 
 
-def CreateNamespacesForAppTest(ble_wifi: bool = False):
+def CreateNamespacesForAppTest():
     """
     Creates appropriate namespaces for a tool and app binaries in a simulated
     isolated network.
@@ -95,32 +93,22 @@ def CreateNamespacesForAppTest(ble_wifi: bool = False):
         "ip netns exec app ip link set dev lo up",
         "ip link set dev eth-app-switch up",
 
-        "ip netns exec tool ip addr add 10.10.12.2/24 dev eth-tool",
+        "ip netns exec tool ip addr add 10.10.10.2/24 dev eth-tool",
         "ip netns exec tool ip link set dev eth-tool up",
         "ip netns exec tool ip link set dev lo up",
         "ip link set dev eth-tool-switch up",
 
+        # Force IPv6 to use ULAs that we control
+        "ip netns exec tool ip -6 addr flush eth-tool",
+        "ip netns exec app ip -6 addr flush eth-app",
+        "ip netns exec tool ip -6 a add fd00:0:1:1::2/64 dev eth-tool",
+        "ip netns exec app ip -6 a add fd00:0:1:1::3/64 dev eth-app",
+
+        # create link between virtual host 'tool' and the test runner
         "ip addr add 10.10.10.5/24 dev eth-ci",
-        "ip addr add 10.10.12.5/24 dev eth-ci",
         "ip link set dev eth-ci up",
         "ip link set dev eth-ci-switch up",
     ]
-
-    if not ble_wifi:
-        COMMANDS += [
-            "ip link add eth-app-direct type veth peer name eth-tool-direct",
-            "ip link set eth-app-direct netns app",
-            "ip link set eth-tool-direct netns tool",
-            "ip netns exec app ip addr add 10.10.15.1/24 dev eth-app-direct",
-            "ip netns exec app ip link set dev eth-app-direct up",
-            "ip netns exec tool ip addr add 10.10.15.2/24 dev eth-tool-direct",
-            "ip netns exec tool ip link set dev eth-tool-direct up",
-            # Force IPv6 to use ULAs that we control
-            "ip netns exec tool ip -6 addr flush eth-tool",
-            "ip netns exec app ip -6 addr flush eth-app",
-            "ip netns exec tool ip -6 a add fd00:0:1:1::2/64 dev eth-tool-direct",
-            "ip netns exec app ip -6 a add fd00:0:1:1::3/64 dev eth-app-direct",
-        ]
 
     for command in COMMANDS:
         logging.debug("Executing '%s'" % command)
@@ -141,7 +129,7 @@ def CreateNamespacesForAppTest(ble_wifi: bool = False):
             break
         time.sleep(0.1)
     else:
-        logging.warn("Some addresses look to still be tentative")
+        logging.warning("Some addresses look to still be tentative")
 
 
 def RemoveNamespaceForAppTest():
@@ -173,230 +161,168 @@ def RemoveNamespaceForAppTest():
             sys.exit(1)
 
 
-def PrepareNamespacesForTestExecution(in_unshare: bool, ble_wifi: bool = False):
+def PrepareNamespacesForTestExecution(in_unshare: bool):
     if not in_unshare:
         EnsureNetworkNamespaceAvailability()
     elif in_unshare:
         EnsurePrivateState()
 
-    CreateNamespacesForAppTest(ble_wifi)
+    CreateNamespacesForAppTest()
 
 
 def ShutdownNamespaceForTestExecution():
     RemoveNamespaceForAppTest()
 
 
-class DbusTest:
-    DBUS_SYSTEM_BUS_ADDRESS = "unix:path=/tmp/chip-dbus-test"
+class DBusTestSystemBus(subprocess.Popen):
+    """Run a dbus-daemon in a subprocess as a test system bus."""
 
-    def __init__(self, dry_run: bool = False):
-        self._dbus = None
-        self._dbus_proxy = None
-        self.dry_run = dry_run
+    SOCKET = pathlib.Path(f"/tmp/chip-dbus-{os.getpid()}")
+    ADDRESS = f"unix:path={SOCKET}"
 
-    def start(self):
-        if self.dry_run:
-            logging.info("Would start dbus")
-            return
-        original_env = os.environ.copy()
-        os.environ["DBUS_SYSTEM_BUS_ADDRESS"] = DbusTest.DBUS_SYSTEM_BUS_ADDRESS
-        dbus = shutil.which("dbus-daemon")
-        self._dbus = subprocess.Popen([dbus, "--session", "--address", self.DBUS_SYSTEM_BUS_ADDRESS])
+    def __init__(self):
+        super().__init__(["dbus-daemon", "--session", "--address", self.ADDRESS],
+                         stderr=subprocess.DEVNULL)
+        os.environ["DBUS_SYSTEM_BUS_ADDRESS"] = self.ADDRESS
+        # Wait for the bus to start .
+        time.sleep(0.5)
 
-        self._dbus_proxy = subprocess.Popen(
-            ["python3", f"{PW_PROJECT_ROOT}/scripts/tools/dbus-proxy-bluez.py", "--bus-proxy", DbusTest.DBUS_SYSTEM_BUS_ADDRESS],
-            env=original_env,
-        )
-
-    def stop(self):
-        if self._dbus:
-            self._dbus_proxy.terminate()
-            self._dbus.terminate()
-            self._dbus.wait()
+    def terminate(self):
+        super().terminate()
+        self.SOCKET.unlink(True)
+        self.wait()
 
 
-class VirtualWifi:
-    def __init__(
-        self,
-        hostapd_path: str,
-        dnsmasq_path: str,
-        wpa_supplicant_path: str,
-        wlan_app: Optional[str] = None,
-        wlan_tool: Optional[str] = None,
-        dry_run: bool = False,
-    ):
-        self.dry_run = dry_run
-        self._hostapd_path = hostapd_path
-        self._dnsmasq_path = dnsmasq_path
-        self._wpa_supplicant_path = wpa_supplicant_path
-        self._hostapd_conf = os.path.join(PW_PROJECT_ROOT, QEMU_CONFIG_FILES, "wifi/hostapd.conf")
-        self._dnsmasq_conf = os.path.join(PW_PROJECT_ROOT, QEMU_CONFIG_FILES, "wifi/dnsmasq.conf")
-        self._wpa_supplicant_conf = os.path.join(PW_PROJECT_ROOT, QEMU_CONFIG_FILES, "wifi/wpa_supplicant.conf")
+class BluetoothMock(subprocess.Popen):
+    """Run a BlueZ mock server in a subprocess."""
 
-        if (wlan_app is None or wlan_tool is None) and not dry_run:
-            wlans = glob.glob("/sys/devices/virtual/mac80211_hwsim/hwsim*/net/*")
-            if len(wlans) < 2:
-                raise RuntimeError("Not enough wlan devices found")
+    # The MAC addresses of the virtual Bluetooth adapters.
+    ADAPTERS = ["00:00:00:00:00:10", "00:00:00:00:00:20"]
 
-            self._wlan_app = os.path.basename(wlans[0])
-            self._wlan_tool = os.path.basename(wlans[1])
-        else:
-            self._wlan_app = wlan_app
-            self._wlan_tool = wlan_tool
-        self._hostapd = None
-        self._dnsmasq = None
-        self._wpa_supplicant = None
-        self._dhclient = None
+    def __init__(self):
+        adapters = [f"--adapter={mac}" for mac in self.ADAPTERS]
+        super().__init__(["bluezoo", "--quiet", "--auto-enable"] + adapters)
 
-    @staticmethod
-    def _get_phy(dev: str) -> str:
-        output = subprocess.check_output(["iw", "dev", dev, "info"])
-        for line in output.split(b"\n"):
-            if b"wiphy" in line:
-                wiphy = int(line.split(b" ")[1])
-                return f"phy{wiphy}"
-        raise ValueError(f"No wiphy found for {dev}")
-
-    @staticmethod
-    def _move_phy_to_netns(phy: str, netns: str):
-        subprocess.check_call(["iw", "phy", phy, "set", "netns", "name", netns])
-
-    @staticmethod
-    def _set_interface_ip_in_netns(netns: str, dev: str, ip: str):
-        subprocess.check_call(["ip", "netns", "exec", netns, "ip", "link", "set", "dev", dev, "up"])
-        subprocess.check_call(["ip", "netns", "exec", netns, "ip", "addr", "add", ip, "dev", dev])
-
-    def start(self):
-        hostapd_cmd = ["ip", "netns", "exec", "tool", self._hostapd_path, self._hostapd_conf]
-        dnsmaq_cmd = ["ip", "netns", "exec", "tool", self._dnsmasq_path, "-d", "-C", self._dnsmasq_conf]
-        dhclient_cmd = ["ip", "netns", "exec", "app", "dhclient", self._wlan_app]
-        wpa_cmd = [
-            "ip",
-            "netns",
-            "exec",
-            "app",
-            self._wpa_supplicant_path,
-            "-u",
-            "-s",
-            "-i",
-            self._wlan_app,
-            "-c",
-            self._wpa_supplicant_conf,
-        ]
-        if self.dry_run:
-            logging.info(f"Would run hostapd with {hostapd_cmd}")
-            logging.info(f"Would run dnsmasq with {dnsmaq_cmd}")
-            logging.info(f"Would run wpa_supplicant with {wpa_cmd}")
-            return
-        # Write clean configuration for wifi to prevent auto wifi connection during next test
-        with open(self._wpa_supplicant_conf, "w") as f:
-            f.write("ctrl_interface=DIR=/run/wpa_supplicant\nctrl_interface_group=root\nupdate_config=1\n")
-        self._move_phy_to_netns(self._get_phy(self._wlan_app), "app")
-        self._move_phy_to_netns(self._get_phy(self._wlan_tool), "tool")
-        self._set_interface_ip_in_netns("tool", self._wlan_tool, "192.168.200.1/24")
-
-        self._hostapd = subprocess.Popen(hostapd_cmd, stdout=subprocess.DEVNULL)
-        self._dnsmasq = subprocess.Popen(dnsmaq_cmd, stdout=subprocess.DEVNULL)
-        self._dhclient = subprocess.Popen(dhclient_cmd, stdout=subprocess.DEVNULL)
-        print(f"DnsMasq started with {self._dnsmasq.pid}")
-        self._wpa_supplicant = subprocess.Popen(wpa_cmd, stdout=subprocess.DEVNULL)
-
-    def stop(self):
-        if self.dry_run:
-            logging.info("Would stop hostapd, dnsmasq and wpa_supplicant")
-            return
-        if self._hostapd:
-            self._hostapd.terminate()
-            self._hostapd.wait()
-        if self._dnsmasq:
-            self._dnsmasq.terminate()
-            self._dnsmasq.wait()
-        if self._wpa_supplicant:
-            self._wpa_supplicant.terminate()
-            self._wpa_supplicant.wait()
-        if self._dhclient:
-            self._dhclient.terminate()
-            self._dhclient.wait()
+    def terminate(self):
+        super().terminate()
+        self.wait()
 
 
-class VirtualBle:
-    BleDevice = namedtuple("BleDevice", ["hci", "mac", "index"])
+class WpaSupplicantMock(threading.Thread):
+    """Mock server for WpaSupplicant D-Bus API."""
 
-    def __init__(self, btvirt_path: str, bluetoothctl_path: str, dry_run: bool = False):
-        self._btvirt_path = btvirt_path
-        self._bluetoothctl_path = bluetoothctl_path
-        self._btvirt = None
-        self._bluetoothctl = None
-        self._ble_app = None
-        self._ble_tool = None
-        self._dry_run = dry_run
+    class Wpa(sdbus.DbusInterfaceCommonAsync,
+              interface_name="fi.w1.wpa_supplicant1"):
+        path = "/fi/w1/wpa_supplicant1"
 
-    @property
-    def ble_app(self) -> Optional[BleDevice]:
-        if self._dry_run:
-            return self.BleDevice(hci="hci0", mac="00:11:22:33:44:55", index=0)
-        if not self._ble_app:
-            raise RuntimeError("Bluetooth not started")
-        return self._ble_app
+        @sdbus.dbus_method_async("a{sv}", "o")
+        async def CreateInterface(self, args) -> str:
+            # Always return our pre-defined mock interface.
+            return WpaSupplicantMock.WpaInterface.path
 
-    @property
-    def ble_tool(self) -> Optional[BleDevice]:
-        if self._dry_run:
-            return self.BleDevice(hci="hci1", mac="00:11:22:33:44:56", index=1)
-        if not self._ble_tool:
-            raise RuntimeError("Bluetooth not started")
-        return self._ble_tool
+        @sdbus.dbus_method_async("s", "o")
+        async def GetInterface(self, name) -> str:
+            # Always return our pre-defined mock interface.
+            return WpaSupplicantMock.WpaInterface.path
 
-    def bletoothctl_cmd(self, cmd):
-        self._bluetoothctl.stdin.write(cmd)
-        self._bluetoothctl.stdin.flush()
+    class WpaInterface(sdbus.DbusInterfaceCommonAsync,
+                       interface_name="fi.w1.wpa_supplicant1.Interface"):
+        path = "/fi/w1/wpa_supplicant1/Interfaces/1"
+        state = "disconnected"
+        current_network = "/"
 
-    def _get_mac_address(self, hci_name):
-        result = subprocess.run(["hcitool", "dev"], capture_output=True, text=True)
-        lines = result.stdout.splitlines()
+        @sdbus.dbus_method_async("s")
+        async def AutoScan(self, arg):
+            pass
 
-        for line in lines:
-            if hci_name in line:
-                mac_address = line.split()[1]
-                return mac_address
+        @sdbus.dbus_method_async("a{sv}")
+        async def Scan(self, args):
+            pass
 
-        raise RuntimeError(f"No MAC address found for device {hci_name}")
+        @sdbus.dbus_method_async("a{sv}", "o")
+        async def AddNetwork(self, args):
+            # Mock AP association process.
+            await self.State.set_async("associating")
+            await self.State.set_async("associated")
+            await self.State.set_async("completed")
+            # Always return our pre-defined mock network.
+            return WpaSupplicantMock.WpaNetwork.path
 
-    def _get_ble_info(self):
-        ble_dev_paths = glob.glob("/sys/devices/virtual/bluetooth/hci*")
-        hci = [os.path.basename(path) for path in ble_dev_paths]
-        if len(hci) < 2:
-            raise RuntimeError("Not enough BLE devices found")
-        self._ble_app = self.BleDevice(hci=hci[0], mac=self._get_mac_address(hci[0]), index=int(hci[0].replace("hci", "")))
-        self._ble_tool = self.BleDevice(hci=hci[1], mac=self._get_mac_address(hci[1]), index=int(hci[1].replace("hci", "")))
+        @sdbus.dbus_method_async("o")
+        async def SelectNetwork(self, path):
+            self.current_network = path
 
-    def _run_bluetoothctl(self):
-        self._bluetoothctl = subprocess.Popen(
-            [self._bluetoothctl_path], text=True, stdin=subprocess.PIPE, stdout=subprocess.DEVNULL
-        )
-        self.bletoothctl_cmd(f"select {self.ble_app.mac}\n")
-        self.bletoothctl_cmd("power on\n")
-        self.bletoothctl_cmd(f"select {self.ble_tool.mac}\n")
-        self.bletoothctl_cmd("power on\n")
-        self.bletoothctl_cmd("quit\n")
-        self._bluetoothctl.wait()
+        @sdbus.dbus_method_async("o")
+        async def RemoveNetwork(self, path):
+            self.current_network = "/"
 
-    def start(self):
-        if self._dry_run:
-            logging.info("Would start bluetooth")
-            return
-        self._btvirt = subprocess.Popen([self._btvirt_path, "-l2"])
-        sleep(1)
-        self._get_ble_info()
-        self._run_bluetoothctl()
+        @sdbus.dbus_method_async()
+        async def RemoveAllNetworks(self):
+            self.current_network = "/"
 
-    def stop(self):
-        if self._dry_run:
-            logging.info("Would stop bluetooth")
-            return
-        if self._btvirt:
-            self._btvirt.terminate()
-            self._btvirt.wait()
+        @sdbus.dbus_method_async()
+        async def Disconnect(self):
+            pass
+
+        @sdbus.dbus_method_async()
+        async def SaveConfig(self):
+            pass
+
+        @sdbus.dbus_property_async("s")
+        def State(self):
+            return self.state
+
+        @State.setter_private
+        def State_setter(self, value):
+            self.state = value
+
+        @sdbus.dbus_property_async("o")
+        def CurrentNetwork(self):
+            return self.current_network
+
+        @sdbus.dbus_property_async("s")
+        def CurrentAuthMode(self):
+            return "WPA2-PSK"
+
+    class WpaNetwork(sdbus.DbusInterfaceCommonAsync,
+                     interface_name="fi.w1.wpa_supplicant1.Network"):
+        path = "/fi/w1/wpa_supplicant1/Interfaces/1/Networks/1"
+        enabled = False
+
+        @sdbus.dbus_property_async("a{sv}")
+        def Properties(self):
+            return {}
+
+        @sdbus.dbus_property_async("b")
+        def Enabled(self):
+            return self.enabled
+
+        @Enabled.setter
+        def Enabled(self, value):
+            self.enabled = value
+
+    async def startup(self):
+        bus = sdbus.sd_bus_open_system()
+        sdbus.set_default_bus(bus)
+        # Acquire name on the system bus.
+        await bus.request_name_async("fi.w1.wpa_supplicant1", 0)
+        # Expose interfaces of our service.
+        self.wpa = WpaSupplicantMock.Wpa()
+        self.wpa.export_to_dbus(self.wpa.path)
+        self.iface = WpaSupplicantMock.WpaInterface()
+        self.iface.export_to_dbus(self.iface.path)
+        self.net = WpaSupplicantMock.WpaNetwork()
+        self.net.export_to_dbus(self.net.path)
+
+    def __init__(self):
+        self.loop = asyncio.new_event_loop()
+        self.loop.run_until_complete(self.startup())
+        super().__init__(target=self.loop.run_forever)
+        self.start()
+
+    def terminate(self):
+        self.loop.call_soon_threadsafe(self.loop.stop)
+        self.join()
 
 
 def PathsWithNetworkNamespaces(paths: ApplicationPaths) -> ApplicationPaths:
