@@ -70,7 +70,7 @@ limitations under the License.
     </attribute>
     <attribute side="server" code="0x0002" define="START_UP_MODE"    type="int8u"                              writable="true"  optional="true"  isNullable="true">StartUpMode</attribute>
     <attribute side="server" code="0x0003" define="ON_MODE"          type="int8u"                              writable="true"  optional="true"  isNullable="true">OnMode</attribute>
-    
+
     <!-- Commands -->
     <command source="client" code="0x00" name="ChangeToMode" response="ChangeToModeResponse" optional="false">
       <description>
@@ -86,7 +86,7 @@ limitations under the License.
         This command is sent by the device on receipt of the ChangeToModeWithStatus command.
       </description>
       <arg name="Status"     type="enum8"                   optional="false"/>
-      <arg name="StatusText" type="char_string" lenght="64" optional="true"/>
+      <arg name="StatusText" type="char_string" length="64" optional="true"/>
       <mandatoryConform/>
     </command>
   </cluster>
