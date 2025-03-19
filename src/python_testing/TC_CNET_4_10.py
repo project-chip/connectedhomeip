@@ -16,7 +16,7 @@
 #
 
 import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches, async_test_body
 from mobly import asserts
 
 
@@ -52,9 +52,11 @@ class TC_CNET_4_10(MatterBaseTest):
             TestStep(17, "TH reads Networks attribute from the DUT")
         ]
 
-    @run_if_endpoint_matches(has_feature(Clusters.NetworkCommissioning,
-                                         Clusters.NetworkCommissioning.Bitmaps.Feature.kThreadNetworkInterface))
+    @async_test_body
     async def test_TC_CNET_4_10(self):
+        # Commissioning is already done
+        self.step("preconditions")
+        
         cnet = Clusters.NetworkCommissioning
         gen_comm = Clusters.GeneralCommissioning
         thread_network_id = "hex:1111111122222222"  # From PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET
