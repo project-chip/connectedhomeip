@@ -24,8 +24,6 @@ namespace chip {
 
 class OTADownloader;
 
-namespace DeviceLayer {
-
 class OTAImageProcessorImpl : public OTAImageProcessorInterface
 {
 public:
@@ -42,6 +40,8 @@ public:
     CHIP_ERROR ConfirmCurrentImage() override;
     void SetRebootDelaySec(uint16_t rebootDelay);
 
+    static OTAImageProcessorImpl & GetDefaultInstance();
+
 private:
     CHIP_ERROR PrepareDownloadImpl();
     CHIP_ERROR ProcessHeader(ByteSpan & aBlock);
@@ -52,5 +52,4 @@ private:
     uint8_t mBuffer[kBufferSize];
 };
 
-} // namespace DeviceLayer
 } // namespace chip

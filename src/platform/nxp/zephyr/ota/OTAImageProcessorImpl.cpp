@@ -35,8 +35,11 @@ static struct stream_flash_ctx stream;
 
 static constexpr uint16_t deltaRebootDelayMs = 200;
 
+static chip::OTAImageProcessorImpl gImageProcessor;
+
 namespace chip {
-namespace DeviceLayer {
+
+using namespace ::chip::DeviceLayer;
 
 CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 {
@@ -187,5 +190,10 @@ void OTAImageProcessorImpl::SetRebootDelaySec(uint16_t rebootDelay)
 {
     mDelayBeforeRebootSec = rebootDelay;
 }
-} // namespace DeviceLayer
+
+OTAImageProcessorImpl & OTAImageProcessorImpl::GetDefaultInstance()
+{
+    return gImageProcessor;
+}
+
 } // namespace chip
