@@ -60,7 +60,6 @@ public:
     DefaultOTARequestorStorage gRequestorStorage;
     DeviceLayer::DefaultOTARequestorDriver gRequestorUser;
     BDXDownloader gDownloader;
-    OTAImageProcessorImpl gImageProcessor;
 };
 } // namespace App
 } // namespace NXP
