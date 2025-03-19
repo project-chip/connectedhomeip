@@ -138,7 +138,7 @@ public:
     CHIP_ERROR ConfigureScanResponseData(ByteSpan data);
     void ClearScanResponseData(void);
 #ifdef CONFIG_BT_NIMBLE_ENABLED
-    CHIP_ERROR ConfigureExtraServices(std::vector<struct ble_gatt_svc_def> &extGattSvcs, bool afterMatterSvc);
+    CHIP_ERROR ConfigureExtraServices(std::vector<struct ble_gatt_svc_def> & extGattSvcs, bool afterMatterSvc);
 #endif
 
 private:
@@ -240,7 +240,7 @@ private:
 #ifdef CONFIG_BT_NIMBLE_ENABLED
 #ifdef CONFIG_BT_NIMBLE_EXT_ADV
     static constexpr size_t kMaxMatterAdvDataLen = 31;
-    static constexpr uint8_t kMatterAdvInstance = 0;
+    static constexpr uint8_t kMatterAdvInstance  = 0;
     uint8_t mMatterAdvData[kMaxMatterAdvDataLen];
     uint16_t mMatterAdvDataLen = 0;
 #endif

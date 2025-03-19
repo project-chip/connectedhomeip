@@ -23,12 +23,11 @@
  *          for the ESP32 platform.
  */
 /* this file behaves like a config.h, comes first */
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include "sdkconfig.h"
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 #ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
 #include <lib/support/CodeUtils.h>
 #endif
-
 
 #ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
 #include <ble/Ble.h>
