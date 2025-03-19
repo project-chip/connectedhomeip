@@ -410,19 +410,16 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaSupplicant1Interface * 
 
         while (g_variant_iter_loop(iter.get(), "{&sv}", &key, &value))
         {
-            GAutoPtr<gchar> value_str(g_variant_print(value, TRUE));
-            ChipLogProgress(DeviceLayer, "wpa_supplicant:PropertiesChanged:key:%s -> %s", StringOrNullMarker(key),
-                            StringOrNullMarker(value_str.get()));
-
             if (g_strcmp0(key, "State") == 0)
             {
-                if (g_strcmp0(value_str.get(), "\'associating\'") == 0)
+                const char * state = g_variant_get_string(value, nullptr);
+                if (g_strcmp0(state, "associating") == 0)
                 {
                     mAssociationStarted = true;
                 }
-                else if (g_strcmp0(value_str.get(), "\'disconnected\'") == 0)
+                else if (g_strcmp0(state, "disconnected") == 0)
                 {
-                    gint reason = wpa_supplicant_1_interface_get_disconnect_reason(mWpaSupplicant.iface.get());
+                    int reason = wpa_supplicant_1_interface_get_disconnect_reason(mWpaSupplicant.iface.get());
 
                     if (delegate)
                     {
@@ -475,7 +472,7 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaSupplicant1Interface * 
 
                     mAssociationStarted = false;
                 }
-                else if (g_strcmp0(value_str.get(), "\'associated\'") == 0)
+                else if (g_strcmp0(state, "associated") == 0)
                 {
                     if (delegate)
                     {
@@ -485,7 +482,7 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaSupplicant1Interface * 
 
                     DeviceLayer::SystemLayer().ScheduleLambda([]() { ConnectivityMgrImpl().UpdateNetworkStatus(); });
                 }
-                else if (g_strcmp0(value_str.get(), "\'completed\'") == 0)
+                else if (g_strcmp0(state, "completed") == 0)
                 {
                     if (mAssociationStarted)
                     {
