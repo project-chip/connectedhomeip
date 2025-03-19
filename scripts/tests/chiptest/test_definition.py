@@ -429,7 +429,7 @@ class TestDefinition:
                 if ble_adapter_tool is not None:
                     # Explicitly use ble-wifi pairing to force the use of BLE
                     # exchange and AP association. The code-wifi pairing skips
-                    # BLE commissioning is devices can be commissioned over IP
+                    # BLE commissioning if devices can be commissioned over IP
                     # network.
                     pairing_cmd = paths.chip_tool_with_python_cmd + [
                         "pairing", "ble-wifi", TEST_NODE_ID, "MatterAP", "MatterAPPassword", "20202021", "3840"]

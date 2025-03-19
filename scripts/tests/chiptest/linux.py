@@ -184,7 +184,7 @@ class DBusTestSystemBus(subprocess.Popen):
         super().__init__(["dbus-daemon", "--session", "--address", self.ADDRESS],
                          stderr=subprocess.DEVNULL)
         os.environ["DBUS_SYSTEM_BUS_ADDRESS"] = self.ADDRESS
-        # Wait for the bus to start .
+        # Wait for the bus to start.
         time.sleep(0.5)
 
     def terminate(self):
@@ -197,7 +197,7 @@ class BluetoothMock(subprocess.Popen):
     """Run a BlueZ mock server in a subprocess."""
 
     # The MAC addresses of the virtual Bluetooth adapters.
-    ADAPTERS = ["00:00:00:00:00:10", "00:00:00:00:00:20"]
+    ADAPTERS = ["00:00:00:11:11:11", "00:00:00:22:22:22"]
 
     def __init__(self):
         adapters = [f"--adapter={mac}" for mac in self.ADAPTERS]
@@ -298,7 +298,7 @@ class WpaSupplicantMock(threading.Thread):
             return self.enabled
 
         @Enabled.setter
-        def Enabled(self, value):
+        def Enabled_setter(self, value):
             self.enabled = value
 
     async def startup(self):
