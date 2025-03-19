@@ -368,14 +368,14 @@ void ServiceEvents(uint32_t aSleepTimeMilliseconds)
     gSystemLayer.HandleEvents();
 #endif
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#if CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     if (gSystemLayer.IsInitialized())
     {
         static uint32_t sRemainingSystemLayerEventDelay = 0;
 
         if (sRemainingSystemLayerEventDelay == 0)
         {
-#if CHIP_DEVICE_LAYER_TARGET_OPEN_IOT_SDK || CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#if CHIP_DEVICE_LAYER_TARGET_OPEN_IOT_SDK || CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
             // We need to terminate event loop after performance single step.
             // Event loop processing work items until StopEventLoopTask is called.
             // Scheduling StopEventLoop task guarantees correct operation of the loop.
@@ -390,7 +390,7 @@ void ServiceEvents(uint32_t aSleepTimeMilliseconds)
 
         gSystemLayer.HandlePlatformTimer();
     }
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
 }
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP && !(CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT)

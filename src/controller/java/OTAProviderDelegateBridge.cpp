@@ -275,6 +275,10 @@ void OTAProviderDelegateBridge::HandleQueryImage(CommandHandler * commandObj, co
         jboolean userConsentNeeded = JniReferences::GetInstance().BooleanToPrimitive(boxedUserConsentNeeded);
         response.userConsentNeeded.SetValue(userConsentNeeded == JNI_TRUE);
     }
+    else
+    {
+        response.userConsentNeeded.SetValue(0);
+    }
 
     status = static_cast<uint8_t>(jStatus);
     if (status == static_cast<uint8_t>(OTAQueryStatus::kNotAvailable))
@@ -317,7 +321,6 @@ void OTAProviderDelegateBridge::HandleQueryImage(CommandHandler * commandObj, co
         GenerateUpdateToken(mToken, kUpdateTokenLen);
 
         response.updateToken.SetValue(chip::ByteSpan(mToken, kUpdateTokenLen));
-        response.userConsentNeeded.SetValue(0);
 
         err = mBdxOTASender->PrepareForTransfer(fabricIndex, nodeId);
         if (CHIP_NO_ERROR != err)

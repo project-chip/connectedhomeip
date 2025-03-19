@@ -99,7 +99,7 @@ buildconfig_header("system_buildconfig") {
     "CHIP_SYSTEM_CONFIG_USE_DISPATCH=${chip_system_config_use_dispatch}",
     "CHIP_SYSTEM_CONFIG_USE_LIBEV=${chip_system_config_use_libev}",
     "CHIP_SYSTEM_CONFIG_USE_LWIP=${chip_system_config_use_lwip}",
-    "CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT=${chip_system_config_use_open_thread_inet_endpoints}",
+    "CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT=${chip_system_config_use_openthread_inet_endpoints}",
     "CHIP_SYSTEM_CONFIG_USE_SOCKETS=${chip_system_config_use_sockets}",
     "CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK=${chip_system_config_use_network_framework}",
     "CHIP_SYSTEM_CONFIG_POSIX_LOCKING=${chip_system_config_posix_locking}",

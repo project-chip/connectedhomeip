@@ -428,9 +428,9 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     //
     // Thread LWIP devices using dedicated Inet endpoint implementations are excluded because they call this function from:
     // src/platform/OpenThread/GenericThreadStackManagerImpl_OpenThread_LwIP.cpp
-#if !CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#if !CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     RejoinExistingMulticastGroups();
-#endif // !CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#endif // !CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
 
     // Handle deferred clean-up of a previously armed fail-safe that occurred during FabricTable commit.
     // This is done at the very end since at the earlier time above when FabricTable::Init() is called,
@@ -532,7 +532,7 @@ void Server::OnPlatformEvent(const DeviceLayer::ChipDeviceEvent & event)
         ResumeSubscriptions();
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
         break;
-#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     case DeviceEventType::kThreadConnectivityChange:
         if (event.ThreadConnectivityChange.Result == kConnectivity_Established)
         {
@@ -541,7 +541,7 @@ void Server::OnPlatformEvent(const DeviceLayer::ChipDeviceEvent & event)
             RejoinExistingMulticastGroups();
         }
         break;
-#endif // CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#endif // CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     default:
         break;
     }
@@ -618,8 +618,7 @@ void Server::GenerateShutDownEvent()
 
 void Server::PostFactoryResetEvent()
 {
-    DeviceLayer::ChipDeviceEvent event;
-    event.Type = DeviceLayer::DeviceEventType::kFactoryReset;
+    DeviceLayer::ChipDeviceEvent event{ .Type = DeviceLayer::DeviceEventType::kFactoryReset };
 
     CHIP_ERROR error = DeviceLayer::PlatformMgr().PostEvent(&event);
     if (error != CHIP_NO_ERROR)
