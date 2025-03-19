@@ -18,6 +18,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/scenes-server/ExtensionFieldSets.h>
+#include <app/common/FabricTable.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CommonIterator.h>
 #include <lib/support/IntrusiveList.h>
@@ -28,14 +29,13 @@ namespace chip {
 namespace scenes {
 
 // Storage index for scenes in nvm
-typedef uint16_t SceneIndex;
+typedef app::common::EntryIndex SceneIndex;
 
 typedef uint32_t TransitionTimeMs;
 typedef uint32_t SceneTransitionTime;
 
-inline constexpr GroupId kGlobalGroupSceneId     = 0x0000;
-inline constexpr SceneIndex kUndefinedSceneIndex = 0xffff;
-inline constexpr SceneId kUndefinedSceneId       = 0xff;
+inline constexpr GroupId kGlobalGroupSceneId = 0x0000;
+inline constexpr SceneId kUndefinedSceneId   = 0xff;
 
 static constexpr size_t kIteratorsMax            = CHIP_CONFIG_MAX_SCENES_CONCURRENT_ITERATORS;
 static constexpr size_t kSceneNameMaxLength      = CHIP_CONFIG_SCENES_CLUSTER_MAXIMUM_NAME_LENGTH;
@@ -127,148 +127,137 @@ public:
                                   TransitionTimeMs timeMs) = 0;
 };
 
+namespace scene_table_elements {
+/// @brief struct used to identify a scene in storage by 3 ids, endpoint, group and scene
+struct SceneStorageId
+{
+    // Identifies group within the scope of the given fabric
+    GroupId mGroupId = kGlobalGroupSceneId;
+    SceneId mSceneId = kUndefinedSceneId;
+
+    SceneStorageId() = default;
+    SceneStorageId(SceneId id, GroupId groupId = kGlobalGroupSceneId) : mGroupId(groupId), mSceneId(id) {}
+
+    void Clear()
+    {
+        mGroupId = kGlobalGroupSceneId;
+        mSceneId = kUndefinedSceneId;
+    }
+
+    bool IsValid() { return (mSceneId != kUndefinedSceneId); }
+
+    bool operator==(const SceneStorageId & other) const { return (mGroupId == other.mGroupId && mSceneId == other.mSceneId); }
+};
+
+/// @brief struct used to store data held in a scene
+/// Members:
+/// mName: char buffer holding the name of the scene, only serialized when mNameLenght is greater than 0
+/// mNameLength: lentgh of the name if a name was provided at scene creation
+/// mSceneTransitionTimeSeconds: Time in seconds it will take a cluster to change to the scene
+/// mExtensionFieldSets: class holding the different field sets of each cluster values to store with the scene
+/// mTransitionTime100ms: Transition time in tenths of a second, allows for more precise transition when combiened with
+/// mSceneTransitionTimeSeconds in enhanced scene commands
+template <class EFStype>
+struct SceneData
+{
+    char mName[kSceneNameMaxLength]            = { 0 };
+    size_t mNameLength                         = 0;
+    SceneTransitionTime mSceneTransitionTimeMs = 0;
+    EFStype mExtensionFieldSets;
+
+    SceneData(const CharSpan & sceneName = CharSpan(), SceneTransitionTime time = 0) : mSceneTransitionTimeMs(time)
+    {
+        SetName(sceneName);
+    }
+    SceneData(EFStype fields, const CharSpan & sceneName = CharSpan(), SceneTransitionTime time = 0) : mSceneTransitionTimeMs(time)
+    {
+        SetName(sceneName);
+
+        mExtensionFieldSets = fields;
+    }
+    SceneData(const SceneData & other) : mSceneTransitionTimeMs(other.mSceneTransitionTimeMs)
+    {
+        SetName(CharSpan(other.mName, other.mNameLength));
+
+        mExtensionFieldSets = other.mExtensionFieldSets;
+    }
+    ~SceneData(){};
+
+    bool operator==(const SceneData & other) const
+    {
+        return ((CharSpan(mName, mNameLength).data_equal(CharSpan(other.mName, other.mNameLength))) &&
+                (mSceneTransitionTimeMs == other.mSceneTransitionTimeMs) && (mExtensionFieldSets == other.mExtensionFieldSets));
+    }
+
+    void SetName(const CharSpan & sceneName)
+    {
+        if (nullptr == sceneName.data())
+        {
+            mName[0]    = 0;
+            mNameLength = 0;
+        }
+        else
+        {
+            size_t maxChars = std::min(sceneName.size(), kSceneNameMaxLength);
+            memcpy(mName, sceneName.data(), maxChars);
+            mNameLength = maxChars;
+        }
+    }
+
+    void Clear()
+    {
+        SetName(CharSpan());
+        mSceneTransitionTimeMs = 0;
+        mExtensionFieldSets.Clear();
+    }
+
+    void operator=(const SceneData & other)
+    {
+        SetName(CharSpan(other.mName, other.mNameLength));
+        mExtensionFieldSets    = other.mExtensionFieldSets;
+        mSceneTransitionTimeMs = other.mSceneTransitionTimeMs;
+    }
+};
+} // namespace scene_table_elements
+
 template <class EFStype>
 class SceneTable
+    : public virtual app::common::FabricTable<scene_table_elements::SceneStorageId, scene_table_elements::SceneData<EFStype>>
 {
 public:
-    /// @brief struct used to identify a scene in storage by 3 ids, endpoint, group and scene
-    struct SceneStorageId
-    {
-        // Identifies group within the scope of the given fabric
-        GroupId mGroupId = kGlobalGroupSceneId;
-        SceneId mSceneId = kUndefinedSceneId;
-
-        SceneStorageId() = default;
-        SceneStorageId(SceneId id, GroupId groupId = kGlobalGroupSceneId) : mGroupId(groupId), mSceneId(id) {}
-
-        void Clear()
-        {
-            mGroupId = kGlobalGroupSceneId;
-            mSceneId = kUndefinedSceneId;
-        }
-
-        bool IsValid() { return (mSceneId != kUndefinedSceneId); }
-
-        bool operator==(const SceneStorageId & other) const { return (mGroupId == other.mGroupId && mSceneId == other.mSceneId); }
-    };
-
-    /// @brief struct used to store data held in a scene
-    /// Members:
-    /// mName: char buffer holding the name of the scene, only serialized when mNameLenght is greater than 0
-    /// mNameLength: lentgh of the name if a name was provided at scene creation
-    /// mSceneTransitionTimeSeconds: Time in seconds it will take a cluster to change to the scene
-    /// mExtensionFieldSets: class holding the different field sets of each cluster values to store with the scene
-    /// mTransitionTime100ms: Transition time in tenths of a second, allows for more precise transition when combiened with
-    /// mSceneTransitionTimeSeconds in enhanced scene commands
-    struct SceneData
-    {
-        char mName[kSceneNameMaxLength]            = { 0 };
-        size_t mNameLength                         = 0;
-        SceneTransitionTime mSceneTransitionTimeMs = 0;
-        EFStype mExtensionFieldSets;
-
-        SceneData(const CharSpan & sceneName = CharSpan(), SceneTransitionTime time = 0) : mSceneTransitionTimeMs(time)
-        {
-            SetName(sceneName);
-        }
-        SceneData(EFStype fields, const CharSpan & sceneName = CharSpan(), SceneTransitionTime time = 0) :
-            mSceneTransitionTimeMs(time)
-        {
-            SetName(sceneName);
-
-            mExtensionFieldSets = fields;
-        }
-        SceneData(const SceneData & other) : mSceneTransitionTimeMs(other.mSceneTransitionTimeMs)
-        {
-            SetName(CharSpan(other.mName, other.mNameLength));
-
-            mExtensionFieldSets = other.mExtensionFieldSets;
-        }
-        ~SceneData(){};
-
-        bool operator==(const SceneData & other) const
-        {
-            return ((CharSpan(mName, mNameLength).data_equal(CharSpan(other.mName, other.mNameLength))) &&
-                    (mSceneTransitionTimeMs == other.mSceneTransitionTimeMs) && (mExtensionFieldSets == other.mExtensionFieldSets));
-        }
-
-        void SetName(const CharSpan & sceneName)
-        {
-            if (nullptr == sceneName.data())
-            {
-                mName[0]    = 0;
-                mNameLength = 0;
-            }
-            else
-            {
-                size_t maxChars = std::min(sceneName.size(), kSceneNameMaxLength);
-                memcpy(mName, sceneName.data(), maxChars);
-                mNameLength = maxChars;
-            }
-        }
-
-        void Clear()
-        {
-            SetName(CharSpan());
-            mSceneTransitionTimeMs = 0;
-            mExtensionFieldSets.Clear();
-        }
-
-        void operator=(const SceneData & other)
-        {
-            SetName(CharSpan(other.mName, other.mNameLength));
-            mExtensionFieldSets    = other.mExtensionFieldSets;
-            mSceneTransitionTimeMs = other.mSceneTransitionTimeMs;
-        }
-    };
-
-    /// @brief Struct combining both ID and data of a table entry
-    struct SceneTableEntry
-    {
-        // ID
-        SceneStorageId mStorageId;
-
-        // DATA
-        SceneData mStorageData;
-
-        SceneTableEntry() = default;
-        SceneTableEntry(SceneStorageId id) : mStorageId(id) {}
-        SceneTableEntry(const SceneStorageId id, const SceneData data) : mStorageId(id), mStorageData(data) {}
-
-        bool operator==(const SceneTableEntry & other) const
-        {
-            return (mStorageId == other.mStorageId && mStorageData == other.mStorageData);
-        }
-
-        void operator=(const SceneTableEntry & other)
-        {
-            mStorageId   = other.mStorageId;
-            mStorageData = other.mStorageData;
-        }
-    };
+    using Super = app::common::FabricTable<scene_table_elements::SceneStorageId, scene_table_elements::SceneData<EFStype>>;
+    using SceneTableEntry = typename Super::TableEntry;
+    using SceneStorageId  = scene_table_elements::SceneStorageId;
+    using SceneData       = scene_table_elements::SceneData<EFStype>;
 
     SceneTable(){};
 
     virtual ~SceneTable(){};
 
-    // Not copyable
-    SceneTable(const SceneTable &) = delete;
-
-    SceneTable & operator=(const SceneTable &) = delete;
-
-    virtual CHIP_ERROR Init(PersistentStorageDelegate * storage) = 0;
-    virtual void Finish()                                        = 0;
-
     // Global scene count
-    virtual CHIP_ERROR GetEndpointSceneCount(uint8_t & scene_count)                         = 0;
-    virtual CHIP_ERROR GetFabricSceneCount(FabricIndex fabric_index, uint8_t & scene_count) = 0;
+    inline CHIP_ERROR GetEndpointSceneCount(uint8_t & scene_count) { return this->GetEndpointEntryCount(scene_count); }
+    inline CHIP_ERROR GetFabricSceneCount(FabricIndex fabric_index, uint8_t & scene_count)
+    {
+        return this->GetFabricEntryCount(fabric_index, scene_count);
+    }
 
     // Data
-    virtual CHIP_ERROR GetRemainingCapacity(FabricIndex fabric_index, uint8_t & capacity)                                   = 0;
-    virtual CHIP_ERROR SetSceneTableEntry(FabricIndex fabric_index, const SceneTableEntry & entry)                          = 0;
-    virtual CHIP_ERROR GetSceneTableEntry(FabricIndex fabric_index, SceneStorageId scene_id, SceneTableEntry & entry)       = 0;
-    virtual CHIP_ERROR RemoveSceneTableEntry(FabricIndex fabric_index, SceneStorageId scene_id)                             = 0;
-    virtual CHIP_ERROR RemoveSceneTableEntryAtPosition(EndpointId endpoint, FabricIndex fabric_index, SceneIndex scene_idx) = 0;
+    inline CHIP_ERROR SetSceneTableEntry(FabricIndex fabric_index, const SceneTableEntry & entry)
+    {
+        return this->SetTableEntry(fabric_index, entry);
+    }
+    inline CHIP_ERROR GetSceneTableEntry(FabricIndex fabric_index, SceneStorageId scene_id, SceneTableEntry & entry)
+    {
+        return this->GetTableEntry(fabric_index, scene_id, entry);
+    }
+    inline CHIP_ERROR RemoveSceneTableEntry(FabricIndex fabric_index, SceneStorageId scene_id)
+    {
+        return this->RemoveTableEntry(fabric_index, scene_id);
+    }
+    inline CHIP_ERROR RemoveSceneTableEntryAtPosition(EndpointId endpoint, FabricIndex fabric_index, SceneIndex scene_idx)
+    {
+        return this->RemoveTableEntryAtPosition(endpoint, fabric_index, scene_idx);
+    }
 
     // Groups
     virtual CHIP_ERROR GetAllSceneIdsInGroup(FabricIndex fabric_index, GroupId group_id, Span<SceneId> & scene_list) = 0;
@@ -283,22 +272,10 @@ public:
     virtual CHIP_ERROR SceneSaveEFS(SceneTableEntry & scene)        = 0;
     virtual CHIP_ERROR SceneApplyEFS(const SceneTableEntry & scene) = 0;
 
-    // Fabrics
-
-    /**
-     * @brief Removes all scenes associated with a fabric index and the stored FabricSceneData that maps them
-     * @param fabric_index Fabric index to remove
-     * @return CHIP_ERROR, CHIP_NO_ERROR if successful or if the Fabric was not found, specific CHIP_ERROR otherwise
-     * @note This function is meant to be used after a fabric is removed from the device, the implementation MUST ensure that it
-     * won't interact with the actual fabric table as it will be removed beforehand.
-     */
-    virtual CHIP_ERROR RemoveFabric(FabricIndex fabric_index) = 0;
-    virtual CHIP_ERROR RemoveEndpoint()                       = 0;
-
     // Iterators
     using SceneEntryIterator = CommonIterator<SceneTableEntry>;
 
-    virtual SceneEntryIterator * IterateSceneEntries(FabricIndex fabric_index) = 0;
+    SceneEntryIterator * IterateSceneEntries(FabricIndex fabric_index) { return this->IterateTableEntries(fabric_index); }
 
     // Handlers
     virtual bool HandlerListEmpty() { return mHandlerList.Empty(); }
