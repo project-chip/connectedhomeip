@@ -190,7 +190,12 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>
-      <constraint type="between" from="1" to="64800"/>
+      <constraint>
+        <between>
+          <from value="1"/>
+          <to value="64800"/>
+        </between>
+      </constraint>
     </attribute>
     <attribute id="0x0001" name="ActiveModeDuration" type="uint32" default="300">
       <access read="true" readPrivilege="view"/>
@@ -209,7 +214,9 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="CIP"/>
       </mandatoryConform>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0004" name="ICDCounter" type="uint32" default="0">
       <access read="true" readPrivilege="admin"/>
@@ -224,7 +231,9 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="CIP"/>
       </mandatoryConform>
-      <constraint type="min" value="1"/>
+      <constraint>
+        <min value="1"/>
+      </constraint>
     </attribute>
     <attribute id="0x0006" name="UserActiveModeTriggerHint" type="UserActiveModeTriggerBitmap" default="0">
       <access read="true" readPrivilege="view"/>
@@ -232,12 +241,16 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="UAT"/>
       </mandatoryConform>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0007" name="UserActiveModeTriggerInstruction" type="string" default="&quot;&quot;">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
-      <constraint type="maxLength" value="128"/>
+      <constraint>
+        <maxLength value="128"/>
+      </constraint>
     </attribute>
     <attribute id="0x0008" name="OperatingMode" type="OperatingModeEnum">
       <access read="true" readPrivilege="view"/>
@@ -251,9 +264,10 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="CIP"/>
       </mandatoryConform>
-      <constraint type="between">
-        <from attribute="IdleModeDuration"/>
-        <to value="64800"/>
+      <constraint>
+        <between value="64800">
+          <attribute name="IdleModeDuration"/>
+        </between>
       </constraint>
     </attribute>
   </attributes>
@@ -271,11 +285,15 @@ Davis, CA 95616, USA
       </field>
       <field id="2" name="Key" type="octstr">
         <mandatoryConform/>
-        <constraint type="allowed" value="16"/>
+        <constraint>
+          <allowed value="16"/>
+        </constraint>
       </field>
       <field id="3" name="VerificationKey" type="octstr">
         <optionalConform/>
-        <constraint type="allowed" value="16"/>
+        <constraint>
+          <allowed value="16"/>
+        </constraint>
       </field>
       <field id="4" name="ClientType" type="ClientTypeEnum">
         <mandatoryConform/>
@@ -299,7 +317,9 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="VerificationKey" type="octstr">
         <optionalConform/>
-        <constraint type="allowed" value="16"/>
+        <constraint>
+          <allowed value="16"/>
+        </constraint>
       </field>
     </command>
     <command id="0x03" name="StayActiveRequest" direction="commandToServer" response="StayActiveResponse">
@@ -323,7 +343,9 @@ Davis, CA 95616, USA
       </otherwiseConform>
       <field id="0" name="PromisedActiveDuration" type="uint32">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </command>
   </commands>

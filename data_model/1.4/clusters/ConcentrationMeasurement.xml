@@ -187,9 +187,11 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="MEA"/>
       </mandatoryConform>
-      <constraint type="between">
-        <from attribute="MinMeasuredValue"/>
-        <to attribute="MaxMeasuredValue"/>
+      <constraint>
+        <between>
+          <attribute name="MinMeasuredValue"/>
+          <attribute name="MaxMeasuredValue"/>
+        </between>
       </constraint>
     </attribute>
     <attribute id="0x0001" name="MinMeasuredValue" type="single" default="null">
@@ -205,8 +207,10 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="MEA"/>
       </mandatoryConform>
-      <constraint type="min">
-        <value attribute="MinMeasuredValue"/>
+      <constraint>
+        <min>
+          <attribute name="MinMeasuredValue"/>
+        </min>
       </constraint>
     </attribute>
     <attribute id="0x0003" name="PeakMeasuredValue" type="single" default="null">
@@ -215,9 +219,11 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="PEA"/>
       </mandatoryConform>
-      <constraint type="between">
-        <from attribute="MinMeasuredValue"/>
-        <to attribute="MaxMeasuredValue"/>
+      <constraint>
+        <between>
+          <attribute name="MinMeasuredValue"/>
+          <attribute name="MaxMeasuredValue"/>
+        </between>
       </constraint>
     </attribute>
     <attribute id="0x0004" name="PeakMeasuredValueWindow" type="elapsed-s" default="1">
@@ -226,7 +232,9 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="PEA"/>
       </mandatoryConform>
-      <constraint type="max" value="604800"/>
+      <constraint>
+        <max value="604800"/>
+      </constraint>
     </attribute>
     <attribute id="0x0005" name="AverageMeasuredValue" type="single" default="null">
       <access read="true" readPrivilege="view"/>
@@ -234,9 +242,11 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="AVG"/>
       </mandatoryConform>
-      <constraint type="between">
-        <from attribute="MinMeasuredValue"/>
-        <to attribute="MaxMeasuredValue"/>
+      <constraint>
+        <between>
+          <attribute name="MinMeasuredValue"/>
+          <attribute name="MaxMeasuredValue"/>
+        </between>
       </constraint>
     </attribute>
     <attribute id="0x0006" name="AverageMeasuredValueWindow" type="elapsed-s" default="1">
@@ -245,14 +255,18 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="AVG"/>
       </mandatoryConform>
-      <constraint type="max" value="604800"/>
+      <constraint>
+        <max value="604800"/>
+      </constraint>
     </attribute>
     <attribute id="0x0007" name="Uncertainty" type="single" default="MS">
       <access read="true" readPrivilege="view"/>
       <optionalConform>
         <feature name="MEA"/>
       </optionalConform>
-      <constraint type="allowed" value="MS"/>
+      <constraint>
+        <allowed value="MS"/>
+      </constraint>
     </attribute>
     <attribute id="0x0008" name="MeasurementUnit" type="MeasurementUnitEnum" default="MS">
       <access read="true" readPrivilege="view"/>

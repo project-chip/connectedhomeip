@@ -110,7 +110,9 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="SENSLVL"/>
       </mandatoryConform>
-      <constraint type="max" value="SupportedSensitivityLevels - 1"/>
+      <constraint>
+        <max value="SupportedSensitivityLevels - 1"/>
+      </constraint>
     </attribute>
     <attribute id="0x0001" name="SupportedSensitivityLevels" type="uint8" default="MS">
       <access read="true" readPrivilege="view"/>
@@ -118,7 +120,12 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="SENSLVL"/>
       </mandatoryConform>
-      <constraint type="between" from="2" to="10"/>
+      <constraint>
+        <between>
+          <from value="2"/>
+          <to value="10"/>
+        </between>
+      </constraint>
     </attribute>
     <attribute id="0x0002" name="DefaultSensitivityLevel" type="uint8" default="MS">
       <access read="true" readPrivilege="view"/>
@@ -126,7 +133,9 @@ Davis, CA 95616, USA
       <optionalConform>
         <feature name="SENSLVL"/>
       </optionalConform>
-      <constraint type="max" value="SupportedSensitivityLevels - 1"/>
+      <constraint>
+        <max value="SupportedSensitivityLevels - 1"/>
+      </constraint>
     </attribute>
     <attribute id="0x0003" name="AlarmsActive" type="AlarmModeBitmap" default="0">
       <access read="true" readPrivilege="view"/>
