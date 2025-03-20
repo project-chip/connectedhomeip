@@ -15,14 +15,13 @@
 #    limitations under the License.
 #
 
-import os
 import xml.etree.ElementTree as ElementTree
 import zipfile
 from importlib.abc import Traversable
 
 from chip.testing.matter_testing import (MatterBaseTest, NamespacePathLocation, ProblemNotice, ProblemSeverity,
                                          default_matter_test_main)
-from chip.testing.spec_parsing import (DataModelLevel, PrebuiltDataModelDirectory, XmlNamespace, build_xml_namespaces,
+from chip.testing.spec_parsing import (DataModelLevel, PrebuiltDataModelDirectory, build_xml_namespaces,
                                        get_data_model_directory, parse_namespace)
 from jinja2 import Template
 from mobly import asserts
@@ -236,7 +235,7 @@ class TestSpecParsingNamespace(MatterBaseTest):
         except Exception as e:
             problems.append(ProblemNotice(
                 test_name="Validate Namespace XML",
-                location=UnknownProblemLocation(),
+                location=NamespacePathLocation(),
                 severity=ProblemSeverity.WARNING,
                 problem=f"Failed to parse {xml_file.name}: {str(e)}"
             ))

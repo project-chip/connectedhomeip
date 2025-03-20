@@ -18,7 +18,6 @@
 import importlib
 import importlib.resources as pkg_resources
 import logging
-import os
 import typing
 import xml.etree.ElementTree as ElementTree
 import zipfile
