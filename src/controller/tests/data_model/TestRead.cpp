@@ -1568,14 +1568,14 @@ TEST_F(TestRead, TestShutdownAllSubscriptionHandlers)
         EXPECT_EQ(callback.mOnError, 0);
         EXPECT_EQ(callback.mOnResubscriptionsAttempted, 0);
 
-
-        InteractionModelEngine::GetInstance()->ShutdownAllSubscriptionHandlers();
-
         ReadHandler * readHandler = InteractionModelEngine::GetInstance()->ActiveHandlerAt(0);
 
         uint16_t minInterval;
         uint16_t maxInterval;
         readHandler->GetReportingIntervals(minInterval, maxInterval);
+
+        InteractionModelEngine::GetInstance()->ShutdownAllSubscriptionHandlers();
+
         GetIOContext().DriveIOUntil(ComputeSubscriptionTimeout(System::Clock::Seconds16(maxInterval)),
                                     [&]() { return callback.mOnResubscriptionsAttempted > 0; });
 
@@ -1601,7 +1601,7 @@ TEST_F(TestRead, TestShutdownAllSubscriptionHandlers)
 
     SetMRPMode(MessagingContext::MRPMode::kDefault);
 
-    InteractionModelEngine::GetInstance()->ShutdownAllSubscriptions();
+    InteractionModelEngine::GetInstance()->ShutdownActiveReads();
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
