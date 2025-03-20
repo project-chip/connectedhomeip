@@ -87,8 +87,10 @@ TEST_F(TestWiFiPAFTP, CheckLogState)
 
 TEST_F(TestWiFiPAFTP, CheckSendSingle)
 {
-    auto buf = System::PacketBufferHandle::New(100);
-    buf->SetDataLength(100);
+    constexpr size_t kShortPacketLength = 100;
+    auto buf                            = System::PacketBufferHandle::New(kShortPacketLength);
+    buf->SetDataLength(kShortPacketLength);
+    memset(buf->Start(), 0, buf->DataLength());
     mRxNextSeqNum = 1;
     EXPECT_TRUE(HandleCharacteristicSend(buf.Retain(), true));
     EXPECT_EQ(TxState(), kState_Complete);
@@ -98,8 +100,11 @@ TEST_F(TestWiFiPAFTP, CheckSendSingle)
 
 TEST_F(TestWiFiPAFTP, CheckSendMultiple)
 {
-    auto buf = System::PacketBufferHandle::New(500);
-    buf->SetDataLength(500);
+    constexpr size_t kLongPacketLength = 500;
+    auto buf                           = System::PacketBufferHandle::New(kLongPacketLength);
+    ASSERT_FALSE(buf.IsNull());
+    buf->SetDataLength(kLongPacketLength);
+    memset(buf->Start(), 0, buf->DataLength());
     EXPECT_TRUE(HandleCharacteristicSend(buf.Retain(), false));
 
     EXPECT_EQ(TxState(), kState_InProgress);

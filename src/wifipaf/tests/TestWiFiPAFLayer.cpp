@@ -59,6 +59,7 @@ public:
     {
         ASSERT_EQ(Init(&DeviceLayer::SystemLayer()), CHIP_NO_ERROR);
         mWiFiPAFTransport = this;
+        InitialPafInfo();
     }
 
     void TearDown() override
@@ -70,6 +71,15 @@ public:
     CHIP_ERROR WiFiPAFMessageReceived(WiFiPAFSession & RxInfo, System::PacketBufferHandle && msg) override { return CHIP_NO_ERROR; }
     CHIP_ERROR WiFiPAFMessageSend(WiFiPAFSession & TxInfo, System::PacketBufferHandle && msg) override { return CHIP_NO_ERROR; }
     CHIP_ERROR WiFiPAFCloseSession(WiFiPAFSession & SessionInfo) override { return CHIP_NO_ERROR; }
+    static constexpr size_t kTestPacketLength = 100;
+
+    void SetEndPoint(WiFiPAFEndPoint * pEndPoint) { mEndPoint = pEndPoint; }
+    void EpDoClose(uint8_t flags, CHIP_ERROR err) { return mEndPoint->DoClose(flags, err); }
+    CHIP_ERROR EpDriveStandAloneAck() { return mEndPoint->DriveStandAloneAck(); }
+    CHIP_ERROR EpDoSendStandAloneAck() { return mEndPoint->DoSendStandAloneAck(); }
+
+private:
+    WiFiPAFEndPoint * mEndPoint;
 };
 
 TEST_F(TestWiFiPAFLayer, CheckWiFiPAFTransportCapabilitiesRequestMessage)
@@ -115,7 +125,6 @@ TEST_F(TestWiFiPAFLayer, CheckWiFiPAFTransportCapabilitiesResponseMessage)
 
 TEST_F(TestWiFiPAFLayer, CheckPafSession)
 {
-    InitialPafInfo();
     // Add the 1st session by giving node_id, discriminator
     WiFiPAF::WiFiPAFSession sessionInfo = { .role = kWiFiPafRole_Subscriber, .nodeId = 0x1, .discriminator = 0xF01 };
     EXPECT_EQ(AddPafSession(PafInfoAccess::kAccNodeInfo, sessionInfo), CHIP_NO_ERROR);
@@ -180,6 +189,7 @@ TEST_F(TestWiFiPAFLayer, CheckRunAsCommissioner)
     WiFiPAFEndPoint * newEndPoint = nullptr;
     EXPECT_EQ(NewEndPoint(&newEndPoint, sessionInfo, sessionInfo.role), CHIP_NO_ERROR);
     EXPECT_NE(newEndPoint, nullptr);
+    SetEndPoint(newEndPoint);
     newEndPoint->mState = WiFiPAFEndPoint::kState_Ready;
     SetWiFiPAFState(State::kInitialized);
     EXPECT_EQ(GetWiFiPAFState(), State::kInitialized);
@@ -201,8 +211,9 @@ TEST_F(TestWiFiPAFLayer, CheckRunAsCommissioner)
     EXPECT_EQ(OnWiFiPAFMessageReceived(sessionInfo, std::move(packetCapResp)), true);
 
     // Send a packet
-    auto buf = System::PacketBufferHandle::New(100);
-    buf->SetDataLength(100);
+    auto buf = System::PacketBufferHandle::New(kTestPacketLength);
+    buf->SetDataLength(kTestPacketLength);
+    memset(buf->Start(), 0, buf->DataLength());
     EXPECT_EQ(SendMessage(sessionInfo, std::move(buf)), CHIP_NO_ERROR);
     EXPECT_EQ(HandleWriteConfirmed(sessionInfo, true), CHIP_NO_ERROR);
 
@@ -220,12 +231,12 @@ TEST_F(TestWiFiPAFLayer, CheckRunAsCommissioner)
     EXPECT_EQ(packet_rx->DataLength(), static_cast<size_t>(5));
     EXPECT_EQ(newEndPoint->Receive(std::move(packet_rx)), CHIP_NO_ERROR);
 
-    EXPECT_EQ(newEndPoint->DriveStandAloneAck(), CHIP_NO_ERROR);
-    EXPECT_EQ(newEndPoint->DoSendStandAloneAck(), CHIP_NO_ERROR);
+    EXPECT_EQ(EpDriveStandAloneAck(), CHIP_NO_ERROR);
+    EXPECT_EQ(EpDoSendStandAloneAck(), CHIP_NO_ERROR);
 
     // Close the session
     EXPECT_EQ(RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo), CHIP_NO_ERROR);
-    newEndPoint->DoClose(kWiFiPAFCloseFlag_AbortTransmission, WIFIPAF_ERROR_APP_CLOSED_CONNECTION);
+    EpDoClose(kWiFiPAFCloseFlag_AbortTransmission, WIFIPAF_ERROR_APP_CLOSED_CONNECTION);
 }
 
 TEST_F(TestWiFiPAFLayer, CheckRunAsCommissionee)
@@ -242,6 +253,7 @@ TEST_F(TestWiFiPAFLayer, CheckRunAsCommissionee)
     WiFiPAFEndPoint * newEndPoint = nullptr;
     EXPECT_EQ(NewEndPoint(&newEndPoint, sessionInfo, sessionInfo.role), CHIP_NO_ERROR);
     EXPECT_NE(newEndPoint, nullptr);
+    SetEndPoint(newEndPoint);
     newEndPoint->mState = WiFiPAFEndPoint::kState_Ready;
 
     EXPECT_EQ(newEndPoint->StartConnect(), CHIP_NO_ERROR);
@@ -261,8 +273,9 @@ TEST_F(TestWiFiPAFLayer, CheckRunAsCommissionee)
     EXPECT_EQ(HandleWriteConfirmed(sessionInfo, true), CHIP_NO_ERROR);
 
     // Send a packet
-    auto buf = System::PacketBufferHandle::New(100);
-    buf->SetDataLength(100);
+    auto buf = System::PacketBufferHandle::New(kTestPacketLength);
+    buf->SetDataLength(kTestPacketLength);
+    memset(buf->Start(), 0, buf->DataLength());
     EXPECT_EQ(SendMessage(sessionInfo, std::move(buf)), CHIP_NO_ERROR);
     EXPECT_EQ(HandleWriteConfirmed(sessionInfo, true), CHIP_NO_ERROR);
 
@@ -281,7 +294,7 @@ TEST_F(TestWiFiPAFLayer, CheckRunAsCommissionee)
 
     // Close the session
     EXPECT_EQ(RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo), CHIP_NO_ERROR);
-    newEndPoint->DoClose(kWiFiPAFCloseFlag_AbortTransmission, WIFIPAF_ERROR_APP_CLOSED_CONNECTION);
+    EpDoClose(kWiFiPAFCloseFlag_AbortTransmission, WIFIPAF_ERROR_APP_CLOSED_CONNECTION);
 }
 }; // namespace WiFiPAF
 }; // namespace chip
