@@ -285,7 +285,7 @@ esp_err_t OTAImageProcessorImpl::ProcessRcpImage(const uint8_t * buffer, uint32_
 {
     esp_err_t err = ESP_OK;
 
-    if (!this->mRcpFirmwareDownloaded)
+    if (!mRcpFirmwareDownloaded)
     {
         size_t rcpOtaReceivedLen = 0;
         err                      = esp_rcp_ota_receive(this->mRcpOtaHandle, buffer, bufLen, &rcpOtaReceivedLen);
