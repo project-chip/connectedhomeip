@@ -2426,7 +2426,7 @@ exit:
 
 namespace {
 System::Clock::Timeout ComputeRoundTripTimeout(ExchangeContext::Timeout serverProcessingTime,
-                                               const ReliableMessageProtocolConfig & remoteMrpConfig)
+                                               const ReliableMessageProtocolConfig & remoteMrpConfig, bool isFirstMessageOnExchange)
 {
     // TODO: This is duplicating logic from Session::ComputeRoundTripTimeout.  Unfortunately, it's called by
     // consumers who do not have a session.
@@ -2434,26 +2434,29 @@ System::Clock::Timeout ComputeRoundTripTimeout(ExchangeContext::Timeout serverPr
     const auto & defaultMRRPConfig   = GetDefaultMRPConfig();
     const auto & localMRPConfig      = maybeLocalMRPConfig.ValueOr(defaultMRRPConfig);
     return GetRetransmissionTimeout(remoteMrpConfig.mActiveRetransTimeout, remoteMrpConfig.mIdleRetransTimeout,
-                                    // Assume peer is idle, as a worst-case assumption (probably true for
-                                    // Sigma1, since that will be our initial message on the session, but less
-                                    // so for Sigma2).
-                                    System::Clock::kZero, remoteMrpConfig.mActiveThresholdTime) +
+                                    // The activity time only matters when isFirstMessageOnExchange is false,
+                                    // which only happens for Sigma1.  In that case, assume peer is idle,
+                                    // as a worst-case assumption, and pass System::Clock::kZero.
+                                    System::Clock::kZero, remoteMrpConfig.mActiveThresholdTime, isFirstMessageOnExchange) +
         serverProcessingTime +
         GetRetransmissionTimeout(localMRPConfig.mActiveRetransTimeout, localMRPConfig.mIdleRetransTimeout,
-                                 // Peer will assume we are active, since it's
-                                 // responding to our message.
-                                 System::SystemClock().GetMonotonicTimestamp(), localMRPConfig.mActiveThresholdTime);
+                                 // Peer will be responding to our message, so isFirstMessageOnExchange should be false
+                                 // and the timestamp does not matter.
+                                 System::SystemClock().GetMonotonicTimestamp(), localMRPConfig.mActiveThresholdTime,
+                                 false /*isFirstMessageOnExchange*/);
 }
 } // anonymous namespace
 
 System::Clock::Timeout CASESession::ComputeSigma1ResponseTimeout(const ReliableMessageProtocolConfig & remoteMrpConfig)
 {
-    return ComputeRoundTripTimeout(kExpectedSigma1ProcessingTime, remoteMrpConfig);
+    // Sigma1 is the first message on the exchange.
+    return ComputeRoundTripTimeout(kExpectedSigma1ProcessingTime, remoteMrpConfig, true /*isFirstMessageOnExchange*/);
 }
 
 System::Clock::Timeout CASESession::ComputeSigma2ResponseTimeout(const ReliableMessageProtocolConfig & remoteMrpConfig)
 {
-    return ComputeRoundTripTimeout(kExpectedHighProcessingTime, remoteMrpConfig);
+    // Sigma2 is never the first message on the exchange.
+    return ComputeRoundTripTimeout(kExpectedHighProcessingTime, remoteMrpConfig, false /*isFirstMessageOnExchange*/);
 }
 
 bool CASESession::InvokeBackgroundWorkWatchdog()
