@@ -235,7 +235,7 @@ class TestSpecParsingNamespace(MatterBaseTest):
         except Exception as e:
             problems.append(ProblemNotice(
                 test_name="Validate Namespace XML",
-                location=UnknownProblemLocation(),
+                location=NamespacePathLocation(),
                 severity=ProblemSeverity.WARNING,
                 problem=f"Failed to parse {xml_file.name}: {str(e)}"
             ))
