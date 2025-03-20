@@ -97,10 +97,10 @@ private:
     sl_status_t JoinWifiNetwork();
 
     /**
-     * @brief Processing function responsible of executing the DHCP polling operation until we have an IPv6 or IPv4 address
+     * @brief Processing function responsible for notifying the upper layers of a succesful connection attempt.
      *
      */
-    void HandleDHCPPolling();
+    void NotifySuccessfulConnection();
 
     static WifiInterfaceImpl mInstance;
 };

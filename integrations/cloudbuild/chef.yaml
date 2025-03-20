@@ -29,7 +29,7 @@ steps:
       args:
           - >-
               perl -i -pe 's/^gdbgui==/# gdbgui==/' /opt/espressif/esp-idf/requirements.txt &&
-              ./examples/chef/chef.py --build_all --build_exclude "noip|temperaturecontrolledcabinet"
+              ./examples/chef/chef.py --build_all --build_exclude "noip|temperaturecontrolledcabinet|icd"
       id: CompileAll
       waitFor:
           - Bootstrap
@@ -61,7 +61,7 @@ steps:
 logsBucket: matter-build-automation-build-logs
 
 # Global timeout for all steps
-timeout: 36000s
+timeout: 43200s
 queueTtl: 21600s
 
 artifacts:
