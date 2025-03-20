@@ -34,7 +34,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:121
+            image: ghcr.io/project-chip/chip-build:122
 
         steps:
             - name: Checkout
