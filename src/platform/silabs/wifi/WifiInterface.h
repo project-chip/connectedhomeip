@@ -16,7 +16,9 @@
  */
 #pragma once
 
+#include <app-common/zap-generated/cluster-enums.h>
 #include <app/icd/server/ICDServerConfig.h>
+
 #include <array>
 #include <cmsis_os2.h>
 #include <lib/support/BitFlags.h>
@@ -71,6 +73,7 @@ typedef struct wfx_wifi_scan_result
     uint8_t bssid[kWifiMacAddressLength];
     uint8_t chan;
     int16_t rssi; /* I suspect this is in dBm - so signed */
+    chip::app::Clusters::NetworkCommissioning::WiFiBandEnum wiFiBand;
 } wfx_wifi_scan_result_t;
 using ScanCallback = void (*)(wfx_wifi_scan_result_t *);
 
@@ -409,6 +412,19 @@ public:
      *        If one isn't in-progress, function doesn't do anything
      */
     virtual void CancelScanNetworks() = 0;
+
+    /**
+     *  @brief Provide all the frequency bands supported by the Wi-Fi interface.
+     *
+     *  The default implementation returns the 2.4 GHz band support.
+     *
+     *  @return a bitmask of supported Wi-Fi bands where each bit is associated with a WiFiBandEnum value.
+     */
+    virtual uint32_t GetSupportedWiFiBandsMask() const
+    {
+        // Default to 2.4G support only
+        return static_cast<uint32_t>(1UL << chip::to_underlying(chip::app::Clusters::NetworkCommissioning::WiFiBandEnum::k2g4));
+    }
 
 protected:
     /**
