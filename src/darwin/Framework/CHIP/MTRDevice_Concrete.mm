@@ -277,7 +277,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 #define MTRDEVICE_SUBSCRIPTION_LATENCY_NEW_VALUE_WEIGHT (1.0 / 3.0)
 
 @interface MTRDevice_Concrete ()
-// protects against concurrent time updates by guarding timeUpdateScheduled flag which manages time updates scheduling,
+// protects against concurrent time updates by guarding the timeUpdateTimer field, which manages time update scheduling,
 // and protects device calls to setUTCTime and setDSTOffset.  This can't just be replaced with "lock", because the time
 // update code calls public APIs like readAttributeWithEndpointID:.. (which attempt to take "lock") while holding
 // whatever lock protects the time sync bits.
@@ -332,7 +332,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 @property (nonatomic) BOOL expirationCheckScheduled;
 
-@property (nonatomic) BOOL timeUpdateScheduled;
+@property (nonatomic, retain, readwrite, nullable) dispatch_source_t timeUpdateTimer;
 
 @property (nonatomic) NSDate * estimatedStartTimeFromGeneralDiagnosticsUpTime;
 
@@ -710,8 +710,17 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 - (void)_scheduleNextUpdate:(UInt64)nextUpdateInSeconds
 {
+    os_unfair_lock_assert_owner(&self->_timeSyncLock);
+
+    auto timerSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, self.queue);
+
+    dispatch_source_set_timer(timerSource, dispatch_time(DISPATCH_TIME_NOW, nextUpdateInSeconds * NSEC_PER_SEC), DISPATCH_TIME_FOREVER,
+        // Allow 3 seconds of leeway; should be plenty, in practice.
+        static_cast<uint64_t>(3 * static_cast<double>(NSEC_PER_SEC)));
+
     mtr_weakify(self);
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (nextUpdateInSeconds * NSEC_PER_SEC)), self.queue, ^{
+    dispatch_source_set_event_handler(timerSource, ^{
+        dispatch_source_cancel(timerSource);
         mtr_strongify(self);
         MTR_LOG_DEBUG("%@ Timer expired, start Device Time Update", self);
         if (self) {
@@ -721,8 +730,9 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             return;
         }
     });
-    self.timeUpdateScheduled = YES;
+    self.timeUpdateTimer = timerSource;
     MTR_LOG_DEBUG("%@ Timer Scheduled for next Device Time Update, in %llu seconds", self, nextUpdateInSeconds);
+    dispatch_resume(timerSource);
 }
 
 // Time Updates are a day apart (this can be changed in the future)
@@ -731,7 +741,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 - (void)_updateDeviceTimeAndScheduleNextUpdate
 {
     os_unfair_lock_assert_owner(&self->_timeSyncLock);
-    if (self.timeUpdateScheduled) {
+    if (self.timeUpdateTimer != nil) {
         MTR_LOG_DEBUG("%@ Device Time Update already scheduled", self);
         return;
     }
@@ -749,12 +759,21 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         return;
     }
     // Device must not be invalidated
-    if (!self.timeUpdateScheduled) {
+    if (self.timeUpdateTimer == nil) {
         MTR_LOG_DEBUG("%@ Device Time Update is no longer scheduled, MTRDevice may have been invalidated.", self);
         return;
     }
-    self.timeUpdateScheduled = NO;
+    self.timeUpdateTimer = nil;
     [self _updateDeviceTimeAndScheduleNextUpdate];
+}
+
+- (void)_cancelTimeUpdateTimer
+{
+    std::lock_guard lock(self->_timeSyncLock);
+    if (self.timeUpdateTimer != nil) {
+        dispatch_source_cancel(self.timeUpdateTimer);
+        self.timeUpdateTimer = nil;
+    }
 }
 
 - (NSArray<NSNumber *> *)_endpointsWithTimeSyncClusterServer
@@ -961,9 +980,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     [_asyncWorkQueue invalidate];
 
-    os_unfair_lock_lock(&self->_timeSyncLock);
-    _timeUpdateScheduled = NO;
-    os_unfair_lock_unlock(&self->_timeSyncLock);
+    [self _cancelTimeUpdateTimer];
 
     os_unfair_lock_lock(&self->_lock);
 
@@ -1286,7 +1303,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     os_unfair_lock_lock(&self->_timeSyncLock);
 
-    if (!self.timeUpdateScheduled) {
+    if (self.timeUpdateTimer == nil) {
         [self _scheduleNextUpdate:MTR_DEVICE_TIME_UPDATE_INITIAL_WAIT_TIME_SEC];
     }
 
@@ -4757,6 +4774,8 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 - (void)controllerSuspended
 {
     [super controllerSuspended];
+
+    [self _cancelTimeUpdateTimer];
 
     std::lock_guard lock(self->_lock);
     self.suspended = YES;
