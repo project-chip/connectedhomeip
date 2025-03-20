@@ -188,7 +188,7 @@ CHIP_ERROR WriteClient::StartNewMessage()
     reservedSize = static_cast<uint16_t>(reservedSize + Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES);
 
     // ... and the overhead for end of AttributeDataIBs (end of container), more chunks flag, end of WriteRequestMessage (another
-    // end of container).
+    // end of container), the End of the List (EndOfContainer as well) and End of AttributeDataIB (EndOfContainer)
     reservedSize = static_cast<uint16_t>(reservedSize + kReservedSizeForTLVEncodingOverhead);
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
