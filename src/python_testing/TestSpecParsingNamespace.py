@@ -21,11 +21,12 @@ import os
 import xml.etree.ElementTree as ElementTree
 import zipfile
 
-from chip.testing.matter_testing import (MatterBaseTest, default_matter_test_main, 
-                                       ProblemNotice, ProblemSeverity, NamespacePathLocation)
+from chip.testing.matter_testing import (MatterBaseTest, default_matter_test_main,
+                                         ProblemNotice, ProblemSeverity, NamespacePathLocation)
 from chip.testing.spec_parsing import (XmlNamespace, parse_namespace, PrebuiltDataModelDirectory,
-                                     build_xml_namespaces, get_data_model_directory, DataModelLevel)
+                                       build_xml_namespaces, get_data_model_directory, DataModelLevel)
 from mobly import asserts
+
 
 class TestSpecParsingNamespace(MatterBaseTest):
     def setup_class(self):
@@ -65,7 +66,7 @@ class TestSpecParsingNamespace(MatterBaseTest):
         asserts.assert_equal(namespace.id, self.namespace_id, "Incorrect namespace ID")
         asserts.assert_equal(namespace.name, self.namespace_name, "Incorrect namespace name")
         asserts.assert_equal(len(namespace.tags), len(self.tags), "Incorrect number of tags")
-        
+
         for tag_id, tag_name in self.tags.items():
             asserts.assert_true(tag_id in namespace.tags, f"Tag ID 0x{tag_id:04X} not found")
             asserts.assert_equal(namespace.tags[tag_id].name, tag_name, f"Incorrect name for tag 0x{tag_id:04X}")
@@ -116,17 +117,17 @@ class TestSpecParsingNamespace(MatterBaseTest):
 
         # Check version relationships
         asserts.assert_greater(len(set(tot.keys()) - set(one_three.keys())),
-                            0, "Master dir does not contain any namespaces not in 1.3")
+                               0, "Master dir does not contain any namespaces not in 1.3")
         asserts.assert_greater(len(set(tot.keys()) - set(one_four.keys())),
-                            0, "Master dir does not contain any namespaces not in 1.4")
+                               0, "Master dir does not contain any namespaces not in 1.4")
         asserts.assert_greater(len(set(one_four.keys()) - set(one_three.keys())),
-                            0, "1.4 dir does not contain any namespaces not in 1.3")
-        
+                               0, "1.4 dir does not contain any namespaces not in 1.3")
+
         # Check version consistency
         asserts.assert_equal(set(one_four.keys()) - set(one_four_one.keys()),
-                        set(), "There are some 1.4 namespaces that are unexpectedly not included in the 1.4.1 files")
+                             set(), "There are some 1.4 namespaces that are unexpectedly not included in the 1.4.1 files")
         asserts.assert_equal(set(one_four.keys()) - set(tot.keys()),
-                        set(), "There are some 1.4 namespaces that are unexpectedly not included in the TOT files")
+                             set(), "There are some 1.4 namespaces that are unexpectedly not included in the TOT files")
 
     def validate_namespace_xml(self, xml_file: Traversable) -> list[ProblemNotice]:
         """Validate namespace XML file"""
@@ -134,7 +135,7 @@ class TestSpecParsingNamespace(MatterBaseTest):
         try:
             with xml_file.open('r', encoding="utf8") as f:
                 root = ElementTree.parse(f).getroot()
-                
+
                 # Check for namespace ID and validate format
                 namespace_id = root.get('id')
                 if not namespace_id:
@@ -259,7 +260,7 @@ class TestSpecParsingNamespace(MatterBaseTest):
 
                 # Get the directory for validation
                 top = get_data_model_directory(dm_path, DataModelLevel.kNamespace)
-                
+
                 # Handle both zip files and directories
                 if isinstance(top, zipfile.Path):
                     files = [f for f in top.iterdir() if str(f).endswith('.xml')]
@@ -280,25 +281,26 @@ class TestSpecParsingNamespace(MatterBaseTest):
                     with file.open('r', encoding="utf8") as xml:
                         root = ElementTree.parse(xml).getroot()
                         namespace, parse_problems = parse_namespace(root)
-                        
+
                         # Basic attribute verification
-                        asserts.assert_true(hasattr(namespace, 'id'), 
-                                        f"Namespace in {file.name} missing ID")
-                        asserts.assert_true(hasattr(namespace, 'name'), 
-                                        f"Namespace in {file.name} missing name")
-                        asserts.assert_true(hasattr(namespace, 'tags'), 
-                                        f"Namespace in {file.name} missing tags dictionary")
+                        asserts.assert_true(hasattr(namespace, 'id'),
+                                            f"Namespace in {file.name} missing ID")
+                        asserts.assert_true(hasattr(namespace, 'name'),
+                                            f"Namespace in {file.name} missing name")
+                        asserts.assert_true(hasattr(namespace, 'tags'),
+                                            f"Namespace in {file.name} missing tags dictionary")
 
                         # Verify each tag
                         for tag_id, tag in namespace.tags.items():
-                            asserts.assert_true(hasattr(tag, 'id'), 
-                                            f"Tag in {file.name} missing ID")
-                            asserts.assert_true(hasattr(tag, 'name'), 
-                                            f"Tag in {file.name} missing name")
+                            asserts.assert_true(hasattr(tag, 'id'),
+                                                f"Tag in {file.name} missing ID")
+                            asserts.assert_true(hasattr(tag, 'name'),
+                                                f"Tag in {file.name} missing name")
 
             except Exception as e:
                 print(f"Error processing {version}: {str(e)}")
                 raise
+
 
 if __name__ == "__main__":
     default_matter_test_main()

@@ -140,25 +140,31 @@ class XmlDeviceTypeClusterRequirements:
     def __str__(self):
         return f'{self.name}: {str(self.conformance)}'
 
+
 """
 XML namespaces and XML Tags dataclass implementation below this line
 """
+
+
 @dataclass
 class XmlNamespace:
     """Represents a namespace definition from XML"""
+
     def __init__(self):
         self.id: int = 0
         self.name: str = ""
         self.tags: dict[int, XmlTag] = {}
 
     def __str__(self) -> str:
-        tags_str = '\n  '.join(f"{tag_id:04X}: {tag.name}" 
-                              for tag_id, tag in sorted(self.tags.items()))
+        tags_str = '\n  '.join(f"{tag_id:04X}: {tag.name}"
+                               for tag_id, tag in sorted(self.tags.items()))
         return f"Namespace 0x{self.id:04X} ({self.name})\n  {tags_str}"
+
 
 @dataclass
 class XmlTag:
     """Represents a tag within a namespace"""
+
     def __init__(self):
         self.id: int = 0
         self.name: str = ""
@@ -168,9 +174,11 @@ class XmlTag:
         desc = f" - {self.description}" if self.description else ""
         return f"{self.name}{desc}"
 
+
 """
 XML namespaces and XML Tags implementation above this line
 """
+
 
 @dataclass
 class XmlDeviceType:
@@ -824,11 +832,13 @@ def combine_derived_clusters_with_base(xml_clusters: dict[uint, XmlCluster], pur
 """
 Added XML namespace parsing functions below
 """
+
+
 def parse_namespace(et: ElementTree.Element) -> tuple[XmlNamespace, list[ProblemNotice]]:
     """Parse a single namespace XML definition"""
     problems: list[ProblemNotice] = []
     namespace = XmlNamespace()
-    
+
     # Parse namespace attributes
     namespace_id = et.get('id')
     if namespace_id is not None:
@@ -848,7 +858,7 @@ def parse_namespace(et: ElementTree.Element) -> tuple[XmlNamespace, list[Problem
             severity=ProblemSeverity.WARNING,
             problem="Missing namespace ID"
         ))
-    
+
     # Parse and validate namespace name
     namespace.name = et.get('name', '').strip()
     if not namespace.name:
@@ -858,7 +868,7 @@ def parse_namespace(et: ElementTree.Element) -> tuple[XmlNamespace, list[Problem
             severity=ProblemSeverity.WARNING,
             problem="Missing or empty namespace name"
         ))
-    
+
     # Parse tags
     tags_elem = et.find('tags')
     if tags_elem is not None:
@@ -876,7 +886,7 @@ def parse_namespace(et: ElementTree.Element) -> tuple[XmlNamespace, list[Problem
                         problem=f"Invalid tag ID: {tag_id}"
                     ))
                     continue
-                
+
             tag.name = tag_elem.get('name', '').strip()
             if not tag.name:
                 problems.append(ProblemNotice(
@@ -895,12 +905,13 @@ def parse_namespace(et: ElementTree.Element) -> tuple[XmlNamespace, list[Problem
 
     return namespace, problems
 
+
 def build_xml_namespaces(data_model_directory: typing.Union[PrebuiltDataModelDirectory, Traversable]) -> tuple[dict[int, XmlNamespace], list[ProblemNotice]]:
     """Build a dictionary of namespaces from XML files in the given directory"""
     namespace_dir = get_data_model_directory(data_model_directory, DataModelLevel.kNamespace)
     namespaces: dict[int, XmlNamespace] = {}
     problems: list[ProblemNotice] = []
-    
+
     found_xmls = 0
 
     try:
@@ -913,13 +924,13 @@ def build_xml_namespaces(data_model_directory: typing.Union[PrebuiltDataModelDir
         for filename in filenames:
             logging.info('Parsing file %s', str(filename))
             found_xmls += 1
-            
+
             try:
                 with filename.open('r', encoding="utf8") as xml:
                     root = ElementTree.parse(xml).getroot()
                     namespace, parse_problems = parse_namespace(root)
                     problems.extend(parse_problems)
-                    
+
                     if namespace.id in namespaces:
                         problems.append(ProblemNotice(
                             test_name="Build XML Namespaces",
@@ -929,7 +940,7 @@ def build_xml_namespaces(data_model_directory: typing.Union[PrebuiltDataModelDir
                         ))
                     else:
                         namespaces[namespace.id] = namespace
-                        
+
             except Exception as e:
                 problems.append(ProblemNotice(
                     test_name="Build XML Namespaces",
@@ -963,9 +974,11 @@ def build_xml_namespaces(data_model_directory: typing.Union[PrebuiltDataModelDir
 
     return namespaces, problems
 
+
 """
 Added XML namespace parsing functions above
 """
+
 
 def parse_single_device_type(root: ElementTree.Element) -> tuple[dict[int, XmlDeviceType], list[ProblemNotice]]:
     problems: list[ProblemNotice] = []
