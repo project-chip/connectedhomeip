@@ -627,13 +627,16 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteHandlerReceiveInvalidMessage)
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
     EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
 
-    // Reserve all except the last 128 bytes, so that we make sure to chunk.
+    // Reserve all except the last 96 bytes, so that we make sure to chunk.
     app::WriteClient writeClient(&GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing(),
-                                 static_cast<uint16_t>(kMaxSecureSduLengthBytes - 128) /* reserved buffer size */);
+                                 static_cast<uint16_t>(kMaxSecureSduLengthBytes - 96) /* reserved buffer size */);
 
-    ByteSpan list[5];
+    // it was empirically determined that we need a list of at least 25 items to make sure we chunk (when the reserved buffer size =
+    // kMaxSecureSduLengthBytes - 96)
+    constexpr uint8_t kTestListLength = 30;
+    ByteSpan list[kTestListLength];
 
-    EXPECT_EQ(writeClient.EncodeAttribute(attributePath, app::DataModel::List<ByteSpan>(list, 5)), CHIP_NO_ERROR);
+    EXPECT_EQ(writeClient.EncodeAttribute(attributePath, app::DataModel::List<ByteSpan>(list, kTestListLength)), CHIP_NO_ERROR);
 
     GetLoopback().mSentMessageCount                 = 0;
     GetLoopback().mNumMessagesToDrop                = 1;
@@ -641,6 +644,7 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteHandlerReceiveInvalidMessage)
     EXPECT_EQ(writeClient.SendWriteRequest(sessionHandle), CHIP_NO_ERROR);
     DrainAndServiceIO();
 
+    // TODO failure here, we have NULLPTR ERROR or a segmentation fault
     EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers(), 1u);
     EXPECT_EQ(GetLoopback().mSentMessageCount, 3u);
     EXPECT_EQ(GetLoopback().mDroppedMessageCount, 1u);
@@ -692,13 +696,13 @@ TEST_F(TestWriteInteraction, TestWriteHandlerInvalidateFabric)
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
     EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
 
-    // Reserve all except the last 128 bytes, so that we make sure to chunk.
+    // Reserve all except the last 96 bytes, so that we make sure to chunk.
     app::WriteClient writeClient(&GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing(),
-                                 static_cast<uint16_t>(kMaxSecureSduLengthBytes - 128) /* reserved buffer size */);
+                                 static_cast<uint16_t>(kMaxSecureSduLengthBytes - 96) /* reserved buffer size */);
 
-    ByteSpan list[5];
+    ByteSpan list[30];
 
-    EXPECT_EQ(writeClient.EncodeAttribute(attributePath, app::DataModel::List<ByteSpan>(list, 5)), CHIP_NO_ERROR);
+    EXPECT_EQ(writeClient.EncodeAttribute(attributePath, app::DataModel::List<ByteSpan>(list, 30)), CHIP_NO_ERROR);
 
     GetLoopback().mDroppedMessageCount              = 0;
     GetLoopback().mSentMessageCount                 = 0;
