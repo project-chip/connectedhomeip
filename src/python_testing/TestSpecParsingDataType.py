@@ -438,8 +438,8 @@ class TestSpecParsingDataType(MatterBaseTest):
                     </{data_type}>"""
 
                 cluster_xml = self.cluster_template.render(cluster_id=self.cluster_id,
-                                                          cluster_name=self.cluster_name,
-                                                          data_types=xml)
+                                                           cluster_name=self.cluster_name,
+                                                           data_types=xml)
 
                 # Parse the XML
                 et = ElementTree.fromstring(cluster_xml)
@@ -448,7 +448,7 @@ class TestSpecParsingDataType(MatterBaseTest):
                 problems = parser.get_problems()
                 asserts.assert_equal(len(problems), 1, "Should have one problem for missing name")
                 asserts.assert_true("with no id or name" in problems[0].problem,
-                                   f"Problem message doesn't match expected error for {data_type}")
+                                    f"Problem message doesn't match expected error for {data_type}")
             except Exception as e:
                 self.print_step("Error", f"Exception when testing {data_type}: {e}")
 
@@ -497,20 +497,20 @@ class TestSpecParsingDataType(MatterBaseTest):
                             <optionalConform/>
                         </field>
                     </struct>"""
-        
+
         cluster_xml = self.cluster_template.render(
-            cluster_id=self.cluster_id, 
-            cluster_name=self.cluster_name, 
+            cluster_id=self.cluster_id,
+            cluster_name=self.cluster_name,
             data_types=struct_xml
         )
-        
+
         # Parse the XML
         et = ElementTree.fromstring(cluster_xml)
         parser = ClusterParser(et, self.cluster_id, self.cluster_name)
         cluster = parser.create_cluster()
         problems = parser.get_problems()
         asserts.assert_equal(len(problems), 0, "Expected no parsing problems")
-        
+
         # Verify that optionalConform was properly detected
         struct = cluster.structs["OptionalConformStruct"]
         asserts.assert_false(struct.components["1"].is_optional, "MandatoryField should not be marked optional")
