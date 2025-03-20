@@ -624,6 +624,7 @@ CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optiona
 
     encoder.Encode(to_underlying(Fields::kId), id);
     encoder.Encode(to_underlying(Fields::kPeerNodeID), peerNodeID);
+    encoder.Encode(to_underlying(Fields::kPeerEndpointID), peerEndpointID);
     encoder.Encode(to_underlying(Fields::kStreamUsage), streamUsage);
     encoder.Encode(to_underlying(Fields::kVideoStreamID), videoStreamID);
     encoder.Encode(to_underlying(Fields::kAudioStreamID), audioStreamID);
@@ -657,6 +658,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kPeerNodeID))
         {
             err = DataModel::Decode(reader, peerNodeID);
+        }
+        else if (__context_tag == to_underlying(Fields::kPeerEndpointID))
+        {
+            err = DataModel::Decode(reader, peerEndpointID);
         }
         else if (__context_tag == to_underlying(Fields::kStreamUsage))
         {
@@ -30941,6 +30946,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kStreamUsage), streamUsage);
+    encoder.Encode(to_underlying(Fields::kOriginatingEndpointID), originatingEndpointID);
     encoder.Encode(to_underlying(Fields::kVideoStreamID), videoStreamID);
     encoder.Encode(to_underlying(Fields::kAudioStreamID), audioStreamID);
     encoder.Encode(to_underlying(Fields::kICEServers), ICEServers);
@@ -30966,6 +30972,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         if (__context_tag == to_underlying(Fields::kStreamUsage))
         {
             err = DataModel::Decode(reader, streamUsage);
+        }
+        else if (__context_tag == to_underlying(Fields::kOriginatingEndpointID))
+        {
+            err = DataModel::Decode(reader, originatingEndpointID);
         }
         else if (__context_tag == to_underlying(Fields::kVideoStreamID))
         {
@@ -31051,6 +31061,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kWebRTCSessionID), webRTCSessionID);
     encoder.Encode(to_underlying(Fields::kSdp), sdp);
     encoder.Encode(to_underlying(Fields::kStreamUsage), streamUsage);
+    encoder.Encode(to_underlying(Fields::kOriginatingEndpointID), originatingEndpointID);
     encoder.Encode(to_underlying(Fields::kVideoStreamID), videoStreamID);
     encoder.Encode(to_underlying(Fields::kAudioStreamID), audioStreamID);
     encoder.Encode(to_underlying(Fields::kICEServers), ICEServers);
@@ -31084,6 +31095,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kStreamUsage))
         {
             err = DataModel::Decode(reader, streamUsage);
+        }
+        else if (__context_tag == to_underlying(Fields::kOriginatingEndpointID))
+        {
+            err = DataModel::Decode(reader, originatingEndpointID);
         }
         else if (__context_tag == to_underlying(Fields::kVideoStreamID))
         {

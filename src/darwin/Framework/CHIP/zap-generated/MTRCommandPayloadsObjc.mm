@@ -34319,6 +34319,8 @@ NS_ASSUME_NONNULL_BEGIN
 
         _streamUsage = @(0);
 
+        _originatingEndpointID = @(0);
+
         _videoStreamID = nil;
 
         _audioStreamID = nil;
@@ -34339,6 +34341,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRWebRTCTransportProviderClusterSolicitOfferParams alloc] init];
 
     other.streamUsage = self.streamUsage;
+    other.originatingEndpointID = self.originatingEndpointID;
     other.videoStreamID = self.videoStreamID;
     other.audioStreamID = self.audioStreamID;
     other.iceServers = self.iceServers;
@@ -34352,7 +34355,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: streamUsage:%@; videoStreamID:%@; audioStreamID:%@; iceServers:%@; iceTransportPolicy:%@; metadataOptions:%@; >", NSStringFromClass([self class]), _streamUsage, _videoStreamID, _audioStreamID, _iceServers, _iceTransportPolicy, _metadataOptions];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: streamUsage:%@; originatingEndpointID:%@; videoStreamID:%@; audioStreamID:%@; iceServers:%@; iceTransportPolicy:%@; metadataOptions:%@; >", NSStringFromClass([self class]), _streamUsage, _originatingEndpointID, _videoStreamID, _audioStreamID, _iceServers, _iceTransportPolicy, _metadataOptions];
     return descriptionString;
 }
 
@@ -34366,6 +34369,9 @@ NS_ASSUME_NONNULL_BEGIN
     ListFreer listFreer;
     {
         encodableStruct.streamUsage = static_cast<std::remove_reference_t<decltype(encodableStruct.streamUsage)>>(self.streamUsage.unsignedCharValue);
+    }
+    {
+        encodableStruct.originatingEndpointID = self.originatingEndpointID.unsignedShortValue;
     }
     {
         if (self.videoStreamID != nil) {
@@ -34626,6 +34632,8 @@ NS_ASSUME_NONNULL_BEGIN
 
         _streamUsage = @(0);
 
+        _originatingEndpointID = @(0);
+
         _videoStreamID = nil;
 
         _audioStreamID = nil;
@@ -34648,6 +34656,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.webRTCSessionID = self.webRTCSessionID;
     other.sdp = self.sdp;
     other.streamUsage = self.streamUsage;
+    other.originatingEndpointID = self.originatingEndpointID;
     other.videoStreamID = self.videoStreamID;
     other.audioStreamID = self.audioStreamID;
     other.iceServers = self.iceServers;
@@ -34661,7 +34670,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: webRTCSessionID:%@; sdp:%@; streamUsage:%@; videoStreamID:%@; audioStreamID:%@; iceServers:%@; iceTransportPolicy:%@; metadataOptions:%@; >", NSStringFromClass([self class]), _webRTCSessionID, _sdp, _streamUsage, _videoStreamID, _audioStreamID, _iceServers, _iceTransportPolicy, _metadataOptions];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: webRTCSessionID:%@; sdp:%@; streamUsage:%@; originatingEndpointID:%@; videoStreamID:%@; audioStreamID:%@; iceServers:%@; iceTransportPolicy:%@; metadataOptions:%@; >", NSStringFromClass([self class]), _webRTCSessionID, _sdp, _streamUsage, _originatingEndpointID, _videoStreamID, _audioStreamID, _iceServers, _iceTransportPolicy, _metadataOptions];
     return descriptionString;
 }
 
@@ -34686,6 +34695,9 @@ NS_ASSUME_NONNULL_BEGIN
     }
     {
         encodableStruct.streamUsage = static_cast<std::remove_reference_t<decltype(encodableStruct.streamUsage)>>(self.streamUsage.unsignedCharValue);
+    }
+    {
+        encodableStruct.originatingEndpointID = self.originatingEndpointID.unsignedShortValue;
     }
     {
         if (self.videoStreamID != nil) {
