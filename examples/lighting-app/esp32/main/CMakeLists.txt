@@ -68,7 +68,7 @@ chip_configure_data_model(${COMPONENT_LIB}
     ZAP_FILE ${LIGHT_COMMON_DIR}/lighting-app.zap
 )
 
-if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
+if (CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE)
     target_add_binary_data(${COMPONENT_TARGET} "insights_auth_key.txt" TEXT)
 endif()
 
