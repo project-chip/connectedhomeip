@@ -51,9 +51,8 @@ import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.exceptions import ChipStackError
 from chip.interaction_model import Status
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from chip.tlv import TLVReader
-from matter_testing_infrastructure.chip.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body,
-                                                                       default_matter_test_main)
 from mdns_discovery import mdns_discovery
 from mobly import asserts
 
@@ -77,13 +76,15 @@ class TC_CADMIN(MatterBaseTest):
 
     async def write_nl_attr(self, th: ChipDeviceCtrl, attr_val: object):
         result = await th.WriteAttribute(nodeid=self.dut_node_id, attributes=[(0, attr_val)])
-        asserts.assert_equal(result[0].Status, Status.Success, f"{th} node label write failed")
+        asserts.assert_equal(
+            result[0].Status, Status.Success, f"{th} node label write failed")
 
     async def read_nl_attr(self, th: ChipDeviceCtrl, attr_val: object):
         try:
             await th.ReadAttribute(nodeid=self.dut_node_id, attributes=[(0, attr_val)])
         except Exception as e:
-            asserts.assert_equal(e.err, "Received error message from read attribute attempt")
+            asserts.assert_equal(
+                e.err, "Received error message from read attribute attempt")
             self.print_step(0, e)
 
     async def read_currentfabricindex(self, th: ChipDeviceCtrl) -> int:
@@ -124,7 +125,8 @@ class TC_CADMIN(MatterBaseTest):
             )
 
         elif commission_type == "BCM":
-            obcCmd = Clusters.AdministratorCommissioning.Commands.OpenBasicCommissioningWindow(180)
+            obcCmd = Clusters.AdministratorCommissioning.Commands.OpenBasicCommissioningWindow(
+                180)
             await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=obcCmd, timedRequestTimeoutMs=6000)
 
         else:
@@ -134,7 +136,8 @@ class TC_CADMIN(MatterBaseTest):
         services = await self.get_txt_record()
         expected_cm_value = "2" if commission_type == "ECM" else "1"
         if services.txt_record['CM'] != expected_cm_value:
-            asserts.fail(f"Expected cm record value {expected_cm_value}, but found {services.txt_record['CM']}")
+            asserts.fail(
+                f"Expected cm record value {expected_cm_value}, but found {services.txt_record['CM']}")
 
         self.step("3c")
         BI_cluster = Clusters.BasicInformation
@@ -145,8 +148,10 @@ class TC_CADMIN(MatterBaseTest):
         self.step(4)
         # Establishing TH2
         th2_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
-        th2_fabric_admin = th2_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=self.th1.fabricId + 1)
-        self.th2 = th2_fabric_admin.NewController(nodeId=2, useTestCommissioner=True)
+        th2_fabric_admin = th2_certificate_authority.NewFabricAdmin(
+            vendorId=0xFFF1, fabricId=self.th1.fabricId + 1)
+        self.th2 = th2_fabric_admin.NewController(
+            nodeId=2, useTestCommissioner=True)
 
         if commission_type == "ECM":
             await self.th2.CommissionOnNetwork(
@@ -158,7 +163,8 @@ class TC_CADMIN(MatterBaseTest):
         else:
             setupPayloadInfo = self.get_setup_payload_info()
             if not setupPayloadInfo:
-                asserts.fail("Setup payload info is required for basic commissioning.")
+                asserts.fail(
+                    "Setup payload info is required for basic commissioning.")
             await self.th2.CommissionOnNetwork(
                 nodeId=self.dut_node_id,
                 setupPinCode=setupPayloadInfo[0].passcode,
@@ -174,17 +180,21 @@ class TC_CADMIN(MatterBaseTest):
         th1_cam_rcac = TLVReader(base64.b64decode(
             self.certificate_authority_manager.activeCaList[0]._persistentStorage._jsonData["sdk-config"]["f/1/r"])).get()["Any"][9]
         if th1_fabric_info[0].rootPublicKey != th1_cam_rcac:
-            asserts.fail("Public keys from fabric and certs for TH1 are not the same.")
+            asserts.fail(
+                "Public keys from fabric and certs for TH1 are not the same.")
         if th1_fabric_info[0].nodeID != self.dut_node_id:
-            asserts.fail("DUT node ID from fabric does not equal DUT node ID for TH1 during commissioning.")
+            asserts.fail(
+                "DUT node ID from fabric does not equal DUT node ID for TH1 during commissioning.")
 
         self.step(6)
         # TH_CR2 reads the Fabrics attribute
         th2_fabric_info = await self.get_fabrics(th=self.th2)
         if th2_fabric_info[0].rootPublicKey != th2_rcac_decoded:
-            asserts.fail("Public keys from fabric and certs for TH2 are not the same.")
+            asserts.fail(
+                "Public keys from fabric and certs for TH2 are not the same.")
         if th2_fabric_info[0].nodeID != self.dut_node_id:
-            asserts.fail("DUT node ID from fabric does not equal DUT node ID for TH2 during commissioning.")
+            asserts.fail(
+                "DUT node ID from fabric does not equal DUT node ID for TH2 during commissioning.")
 
         if commission_type == "ECM":
             self.step(7)
@@ -195,7 +205,8 @@ class TC_CADMIN(MatterBaseTest):
             self.step(8)
             # TH_CR2 writes and reads the Basic Information Cluster’s NodeLabel mandatory attribute of DUT_CE
             val = await self.read_nl_attr(th=self.th2, attr_val=self.nl_attribute)
-            self.print_step("basic information cluster node label attr value", val)
+            self.print_step(
+                "basic information cluster node label attr value", val)
             await self.write_nl_attr(th=self.th2, attr_val=self.nl_attribute)
             await self.read_nl_attr(th=self.th2, attr_val=self.nl_attribute)
 
@@ -219,7 +230,8 @@ class TC_CADMIN(MatterBaseTest):
             outer_key = list(window_status.keys())[0]
             inner_key = list(window_status[outer_key].keys())[1]
             if window_status[outer_key][inner_key] != Clusters.AdministratorCommissioning.Enums.CommissioningWindowStatusEnum.kWindowNotOpen:
-                asserts.fail("Commissioning window is expected to be closed, but was found to be open")
+                asserts.fail(
+                    "Commissioning window is expected to be closed, but was found to be open")
 
             self.step(12)
             # TH_CR2 opens a commissioning window on DUT_CE using ECM
@@ -258,7 +270,8 @@ class TC_CADMIN(MatterBaseTest):
         outer_key = list(th2_idx.keys())[0]
         inner_key = list(th2_idx[outer_key].keys())[0]
         attribute_key = list(th2_idx[outer_key][inner_key].keys())[1]
-        removeFabricCmd = Clusters.OperationalCredentials.Commands.RemoveFabric(th2_idx[outer_key][inner_key][attribute_key])
+        removeFabricCmd = Clusters.OperationalCredentials.Commands.RemoveFabric(
+            th2_idx[outer_key][inner_key][attribute_key])
         await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
 
     def pics_TC_CADMIN_1_3(self) -> list[str]:
@@ -266,11 +279,13 @@ class TC_CADMIN(MatterBaseTest):
 
     def steps_TC_CADMIN_1_3(self) -> list[TestStep]:
         return [
-            TestStep(1, "TH_CR1 starts a commissioning process with DUT_CE", is_commissioning=True),
+            TestStep(
+                1, "TH_CR1 starts a commissioning process with DUT_CE", is_commissioning=True),
             TestStep(2, "TH_CR1 reads the BasicCommissioningInfo attribute from the General Commissioning cluster and saves the MaxCumulativeFailsafeSeconds field as max_window_duration."),
             TestStep("3a", "TH_CR1 opens a commissioning window on DUT_CE using a commissioning timeout of max_window_duration using ECM",
                      "DUT_CE opens its Commissioning window to allow a second commissioning."),
-            TestStep("3b", "DNS-SD records shows DUT_CE advertising", "Verify that the DNS-SD advertisement shows CM=2"),
+            TestStep("3b", "DNS-SD records shows DUT_CE advertising",
+                     "Verify that the DNS-SD advertisement shows CM=2"),
             TestStep("3c", "TH_CR1 writes and reads the Basic Information Cluster’s NodeLabel mandatory attribute of DUT_CE",
                      "Verify DUT_CE responds to both write/read with a success"),
             TestStep(4, "TH creates a controller (TH_CR2) on a new fabric and commissions DUT_CE using that controller. TH_CR2 should commission the device using a different NodeID than TH_CR1.",
@@ -283,7 +298,8 @@ class TC_CADMIN(MatterBaseTest):
                      "Verify DUT_CE responds to both write/read with a success"),
             TestStep(8, "TH_CR2 reads, writes and then reads the Basic Information Cluster’s NodeLabel mandatory attribute of DUT_CE",
                      "Verify the initial read reflect the value written in the above step. Verify DUT_CE responds to both write/read with a success"),
-            TestStep(9, "TH_CR2 opens a commissioning window on DUT_CE for 180 seconds using ECM"),
+            TestStep(
+                9, "TH_CR2 opens a commissioning window on DUT_CE for 180 seconds using ECM"),
             TestStep(10, "Wait for the commissioning window in step 9 to timeout"),
             TestStep(11, "TH_CR2 reads the window status to verify the DUT_CE window is closed",
                      "DUT_CE windows status shows the window is closed"),
@@ -300,11 +316,13 @@ class TC_CADMIN(MatterBaseTest):
 
     def steps_TC_CADMIN_1_4(self) -> list[TestStep]:
         return [
-            TestStep(1, "TH_CR1 starts a commissioning process with DUT_CE", is_commissioning=True),
+            TestStep(
+                1, "TH_CR1 starts a commissioning process with DUT_CE", is_commissioning=True),
             TestStep(2, "TH_CR1 reads the BasicCommissioningInfo attribute from the General Commissioning cluster and saves the MaxCumulativeFailsafeSeconds field as max_window_duration."),
             TestStep("3a", "TH_CR1 opens a commissioning window on DUT_CE using a commissioning timeout of max_window_duration using BCM",
                      "DUT_CE opens its Commissioning window to allow a second commissioning."),
-            TestStep("3b", "DNS-SD records shows DUT_CE advertising", "Verify that the DNS-SD advertisement shows CM=1"),
+            TestStep("3b", "DNS-SD records shows DUT_CE advertising",
+                     "Verify that the DNS-SD advertisement shows CM=1"),
             TestStep("3c", "TH_CR1 writes and reads the Basic Information Cluster’s NodeLabel mandatory attribute of DUT_CE",
                      "Verify DUT_CE responds to both write/read with a success"),
             TestStep(4, "TH creates a controller (TH_CR2) on a new fabric and commissions DUT_CE using that controller. TH_CR2 should commission the device using a different NodeID than TH_CR1.",
