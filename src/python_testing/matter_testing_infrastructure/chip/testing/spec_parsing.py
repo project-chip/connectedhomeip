@@ -18,6 +18,7 @@
 import importlib
 import importlib.resources as pkg_resources
 import logging
+import os
 import typing
 import xml.etree.ElementTree as ElementTree
 import zipfile
@@ -26,7 +27,6 @@ from dataclasses import dataclass
 from enum import Enum, auto
 from importlib.abc import Traversable
 from typing import Callable, Optional, Union
-import os
 
 import chip.clusters as Clusters
 import chip.testing.conformance as conformance_support
@@ -34,8 +34,9 @@ from chip.testing.conformance import (OPTIONAL_CONFORM, TOP_LEVEL_CONFORMANCE_TA
                                       ConformanceParseParameters, feature, is_disallowed, mandatory, optional, or_operation,
                                       parse_callable_from_xml, parse_device_type_callable_from_xml)
 from chip.testing.global_attribute_ids import GlobalAttributeIds
-from chip.testing.matter_testing import (NamespacePathLocation, AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation, UnknownProblemLocation,
-                                         EventPathLocation, FeaturePathLocation, ProblemLocation, ProblemNotice, ProblemSeverity)
+from chip.testing.matter_testing import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
+                                         EventPathLocation, FeaturePathLocation, NamespacePathLocation, ProblemLocation,
+                                         ProblemNotice, ProblemSeverity, UnknownProblemLocation)
 from chip.tlv import uint
 
 _PRIVILEGE_STR = {
