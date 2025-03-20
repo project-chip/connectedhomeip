@@ -266,6 +266,12 @@ class TestSpecParsingDataType(MatterBaseTest):
         parser = ClusterParser(et, self.cluster_id, self.cluster_name)
         cluster = parser.create_cluster()
         problems = parser.get_problems()
+        
+        # Verify the valid field was parsed and the invalid one generated a problem
+        asserts.assert_true("TestStruct" in cluster.structs, "TestStruct not found in parsed structs")
+        struct = cluster.structs["TestStruct"]
+        asserts.assert_equal(len(struct.components), 1, "Should only have one valid field")
+        asserts.assert_true("1" in struct.components, "Valid field not found in struct components")
         asserts.assert_equal(len(problems), 1, "Should have one problem for invalid field")
         asserts.assert_true("Struct field in TestStruct with no id or name" in problems[0].problem,
                             "Problem message doesn't match expected error")
@@ -378,18 +384,24 @@ class TestSpecParsingDataType(MatterBaseTest):
         parser = ClusterParser(et, self.cluster_id, self.cluster_name)
         cluster = parser.create_cluster()
         problems = parser.get_problems()
+        
+        # Verify the valid item was parsed and the invalid one generated a problem
+        asserts.assert_true("TestEnum" in cluster.enums, "TestEnum not found in parsed enums")
+        enum = cluster.enums["TestEnum"]
+        asserts.assert_equal(len(enum.components), 1, "Should only have one valid item")
+        asserts.assert_true("0" in enum.components, "Valid item not found in enum components")
         asserts.assert_equal(len(problems), 1, "Should have one problem for invalid item")
         asserts.assert_true("Struct field in TestEnum with no id or name" in problems[0].problem,
-                            "Problem message doesn't match expected error")
+                          "Problem message doesn't match expected error")
 
     def test_invalid_bitmap_field(self):
-        """Test handling of a bitmap with an invalid field (missing bit)"""
+        """Test handling of a bitmap with an invalid bitfield (missing bit)"""
         # Create a bitmap with one valid field and one invalid field (missing bit)
         bitmap_xml = """<bitmap name="TestBitmap">
                         <bitfield bit="0" name="Bit0">
                             <mandatoryConform/>
                         </bitfield>
-                        <bitfield name="InvalidBitfield">
+                        <bitfield name="InvalidBit">
                             <mandatoryConform/>
                         </bitfield>
                     </bitmap>"""
@@ -403,9 +415,15 @@ class TestSpecParsingDataType(MatterBaseTest):
         parser = ClusterParser(et, self.cluster_id, self.cluster_name)
         cluster = parser.create_cluster()
         problems = parser.get_problems()
+        
+        # Verify the valid field was parsed and the invalid one generated a problem
+        asserts.assert_true("TestBitmap" in cluster.bitmaps, "TestBitmap not found in parsed bitmaps")
+        bitmap = cluster.bitmaps["TestBitmap"]
+        asserts.assert_equal(len(bitmap.components), 1, "Should only have one valid field")
+        asserts.assert_true("0" in bitmap.components, "Valid bitfield not found in bitmap components")
         asserts.assert_equal(len(problems), 1, "Should have one problem for invalid bitfield")
         asserts.assert_true("Struct field in TestBitmap with no id or name" in problems[0].problem,
-                            "Problem message doesn't match expected error")
+                          "Problem message doesn't match expected error")
 
     def test_missing_name(self):
         """Test handling of a data type with missing name attribute"""
