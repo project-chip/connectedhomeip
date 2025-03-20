@@ -55,6 +55,7 @@ class DLL_EXPORT WiFiPAFEndPoint
 {
     friend class WiFiPAFLayer;
     friend class WiFiPAFEndPointPool;
+    friend class TestWiFiPAFLayer;
 
 public:
     typedef uint64_t AlignT;
@@ -87,11 +88,6 @@ public:
     CHIP_ERROR StartConnect();
     WiFiPAFEndPoint()  = default;
     ~WiFiPAFEndPoint() = default;
-
-    void DoClose(uint8_t flags, CHIP_ERROR err);
-    CHIP_ERROR HandleConnectComplete();
-    CHIP_ERROR DriveStandAloneAck();
-    CHIP_ERROR DoSendStandAloneAck();
 
 private:
     CHIP_ERROR _Receive(PacketBufferHandle && data);
@@ -144,17 +140,21 @@ private:
     SequenceNumber_t mReceiveWindowMaxSize;
 
     CHIP_ERROR Init(WiFiPAFLayer * WiFiPafLayer, WiFiPAFSession & SessionInfo);
+    void DoClose(uint8_t flags, CHIP_ERROR err);
     bool IsConnected(uint8_t state) const;
 
     // Transmit path:
     CHIP_ERROR DriveSending();
+    CHIP_ERROR DriveStandAloneAck();
     bool PrepareNextFragment(PacketBufferHandle && data, bool & sentAck);
     CHIP_ERROR SendNextMessage();
     CHIP_ERROR ContinueMessageSend();
+    CHIP_ERROR DoSendStandAloneAck();
     CHIP_ERROR SendCharacteristic(PacketBufferHandle && buf);
     CHIP_ERROR SendWrite(PacketBufferHandle && buf);
 
     // Receive path:
+    CHIP_ERROR HandleConnectComplete();
     CHIP_ERROR HandleSendConfirmationReceived(bool result);
     CHIP_ERROR HandleHandshakeConfirmationReceived();
     CHIP_ERROR HandleFragmentConfirmationReceived(bool result);
