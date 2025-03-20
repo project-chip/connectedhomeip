@@ -466,6 +466,65 @@ class ClusterAttributeChangeAccumulator:
             logging.info(f"  -> {expected_element} found: {last_report_matches.get(expected_idx)}")
         asserts.fail("Did not find all expected last report values before time-out")
 
+    def get_last_attribute_report_value(self, endpoint, attribute: ClusterObjects.ClusterAttributeDescriptor, timeout_sec: float = 1.0):
+        """
+        Gets the last reported value for a specific attribute on a given endpoint.
+
+        Args:
+            endpoint (int): The endpoint identifier.
+            attribute (ClusterObjects.ClusterAttributeDescriptor): The attribute for which a report will be looked for.
+            timeout_sec (float): The maximum time to wait for the report.
+
+        Returns:
+            The attribute value from its last report or None if no reports for the specified attribute were found.
+        """
+        start_time = time.time()
+        elapsed = 0.0
+        time_remaining = timeout_sec
+
+        logging.info(
+                f"--> [FC] Getting the last report for the {attribute.__name__} attribute on endpoint {endpoint}, waiting for {timeout_sec:.1f} seconds.")
+
+        first_match_found = False
+        timestamp_utc = None
+        old_report = None
+        while time_remaining > 0:
+            # Snapshot copy at the beginning of the loop. This is thread-safe based on the design
+            all_reports = self._attribute_reports
+
+            # Recompute all last-value matches
+            # Iterating in reverse order to match with the last report first
+            for report in reversed(all_reports.get(attribute, [])):
+                if report.endpoint_id == endpoint:
+                    # - Get the timestamp of the first matching attribute report
+                    # - Since multiple reports for the same attribue are possible,
+                    #   the one with a timestamp greater than the one in the first
+                    #   match is the last report, which means that a new report
+                    #   arrived during the timeout period
+                    # - If now new report arrived during the timeout period, the
+                    #   last report's value will be used
+                    if not first_match_found:
+                        timestamp_utc = report.timestamp_utc
+                        first_match_found = True
+                        old_report = report
+                    if report.timestamp_utc > timestamp_utc:
+                        logging.info(f"--> [FC] Last report for the {attribute.__name__} attribute found - value: {report.value}")
+                        return report.value
+
+            elapsed = time.time() - start_time
+            time_remaining = timeout_sec - elapsed
+            time.sleep(0.1)
+
+        # If we reach here, no new report arrived before the timeout
+        # Returning the last report's value
+        if first_match_found:
+            logging.info(f"--> [FC] Last report for the {attribute.__name__} attribute found - value: {old_report.value}")
+            return old_report.value
+
+        # Returning None if no reports for the specified attribute were found
+        logging.info(f"--> [FC] No reports for the {attribute.__name__} attribute were found.")
+        return None
+
     def await_all_final_values_reported_threshold(self, value_expectations: Iterable[AttributeValueExpectation], timeout_sec: float = 1.0):
         """Expect that every `value_expectations` report is the last value reported for the given attribute and complies
         with the comparisson type (greater than / greater or equal than / less than / less or equal than), ignoring timestamps.
@@ -487,7 +546,7 @@ class ClusterAttributeChangeAccumulator:
         logging.info(f"Waiting for {timeout_sec:.1f} seconds for all reports.")
 
         while time_remaining > 0:
-            # Snapshot copy at the beginning of the loop. This is thread-safe based on the design.
+            # Snapshot copy at the beginning of the loop. This is thread-safe based on the design
             all_reports = self._attribute_reports
 
             # Recompute all last-value matches

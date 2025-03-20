@@ -76,6 +76,7 @@ class TC_FAN_3_5(MatterBaseTest):
                                 wrap: bool = False, lowestOff: bool = False) -> None:
         try:
             await self.send_single_cmd(cmd=Clusters.Objects.FanControl.Commands.Step(direction=direction, wrap=wrap, lowestOff=lowestOff), endpoint=self.endpoint)
+            logger.info("[FC] send_single_cmd")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, f"Unexpected error returned ({e})")
             pass
@@ -121,9 +122,8 @@ class TC_FAN_3_5(MatterBaseTest):
         # TH reads from the DUT the FanMode attribute
         #   - If the FanMode attribute is different than 0 (Off), the
         #     TH writes to the DUT the FanMode attribute with 0 (Off),
-        #     else, skip to the next step
-        #   - Verify that the FanMode, PercentStting, PercentCurrent,
-        #     and FanMode attributes are all 0
+        #     and verify that the PercentStting, PercentCurrent, and
+        #     FanMode attributes are all 0, else, skip to the next step
         # self.step(4)
         fan_mode = await self.read_setting(attributes.FanMode)
         if fan_mode != fm_enum.kOff:
@@ -139,6 +139,8 @@ class TC_FAN_3_5(MatterBaseTest):
 
         # *** STEP 5 ***
         # TH sends Step command to DUT with Direction set to Increase
+        #   - Verify that the PercentStting, PercentCurrent, and
+        #     FanMode attributes are greater than 0
         # self.step(5)
         await self.send_step_command(direction=sd_enum.kIncrease)
         value_expectations = [
@@ -151,8 +153,9 @@ class TC_FAN_3_5(MatterBaseTest):
         self.attribute_subscription.reset()
 
         # *** STEP 6 ***
-        # TH writes to the DUT the PercentStting attribute with 100
-        #   - Verify that the PercentStting and PercentCurrent attributes are both 100
+        # TH writes to the DUT the FanMode attribute with 3 (High)
+        #   - Verify that the PercentStting and PercentCurrent
+        #     attributes are both less than 100
         #   - Verify that the FanMode attribute is set to High
         # self.step(6)
         await self.write_setting(attributes.FanMode, fm_enum.kHigh)
@@ -167,6 +170,8 @@ class TC_FAN_3_5(MatterBaseTest):
 
         # *** STEP 7 ***
         # TH sends Step command to DUT with Direction set to Decrease
+        #   - Verify that the PercentStting and PercentCurrent attributes are less than 100
+        #   - Verify that the FanMode attribute is set to a value lower than High
         # self.step(7)
         await self.send_step_command(direction=sd_enum.kDecrease)
         value_expectations = [
