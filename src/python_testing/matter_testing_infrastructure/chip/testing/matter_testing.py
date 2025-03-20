@@ -468,7 +468,7 @@ class ClusterAttributeChangeAccumulator:
 
     def get_last_attribute_report_value(self, endpoint, attribute: ClusterObjects.ClusterAttributeDescriptor, timeout_sec: float = 1.0):
         """
-        Gets the last reported value for a specific attribute on a given endpoint.
+        Gets the last reported value for a specific attribute within a given timeout period.
 
         Args:
             endpoint (int): The endpoint identifier.
@@ -476,7 +476,7 @@ class ClusterAttributeChangeAccumulator:
             timeout_sec (float): The maximum time to wait for the report.
 
         Returns:
-            The attribute value from its last report or None if no reports for the specified attribute were found.
+            The attribute value from the last report or None if no reports for the specified attribute were found.
         """
         start_time = time.time()
         elapsed = 0.0
@@ -542,7 +542,7 @@ class ClusterAttributeChangeAccumulator:
 
         for element in value_expectations:
             logging.info(
-                f"[FC] --> Expecting report for attribute {element.attribute.__name__}, threshold value {element.threshold_value}, comparison type {element.comparisson_type.name}, on endpoint {element.endpoint_id}")
+                f"[FC] --> Expecting report for the {element.attribute.__name__} attribute. Comparisson: {element.comparisson_type.name}. Value: {element.threshold_value}. Endpoint {element.endpoint_id}.")
         logging.info(f"Waiting for {timeout_sec:.1f} seconds for all reports.")
 
         while time_remaining > 0:
@@ -574,7 +574,7 @@ class ClusterAttributeChangeAccumulator:
 
             # Determine if all were met
             if all(last_report_matches.values()):
-                logging.info("[FC] Found all expected reports were true.")
+                logging.info(f"[FC] Found all expected reports were true.")
                 return tuple(values)
 
             elapsed = time.time() - start_time

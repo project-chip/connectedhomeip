@@ -81,6 +81,10 @@ class TC_FAN_3_5(MatterBaseTest):
             asserts.assert_equal(e.status, Status.Success, f"Unexpected error returned ({e})")
             pass
 
+    def verify_expected_value(self, attribute, value_expected, timeout_sec):
+        value_current = self.attribute_subscription.get_last_attribute_report_value(self.endpoint, attribute, timeout_sec)
+        asserts.assert_equal(value_current, value_expected, f"Current {attribute.__name__} attribute value ({value_current}) is not equal to the expected value ({value_expected})")
+
     def pics_TC_FAN_3_5(self) -> list[str]:
         return ["FAN.S"]
 
@@ -97,15 +101,17 @@ class TC_FAN_3_5(MatterBaseTest):
         percent_setting = value_off
         percent_current = value_off
         fan_mode = fm_enum(value_off)
-        timeout_sec = 2
+        timeout_sec = 1
 
         # *** STEP 1 ***
         # Commissioning already done
         # self.step(1)
+        print(f"[FC] # self.step(1)")
 
         # *** STEP 2 ***
         # TH checks the DUT for support of the `Step` feature
         # self.step(2)
+        print(f"[FC] # self.step(2)")
         feature_map = await self.read_setting(attributes.FeatureMap)
         self.supports_step = bool(feature_map & cluster.Bitmaps.Feature.kStep)
         if not self.supports_step:
@@ -115,6 +121,7 @@ class TC_FAN_3_5(MatterBaseTest):
         # *** STEP 3 ***
         # TH subscribes to the DUT's FanControl cluster
         # self.step(3)
+        print(f"[FC] # self.step(3)")
         self.attribute_subscription = ClusterAttributeChangeAccumulator(cluster)
         await self.attribute_subscription.start(self.default_controller, self.dut_node_id, self.endpoint)
 
@@ -125,6 +132,7 @@ class TC_FAN_3_5(MatterBaseTest):
         #     and verify that the PercentStting, PercentCurrent, and
         #     FanMode attributes are all 0, else, skip to the next step
         # self.step(4)
+        print(f"[FC] # self.step(4)")
         fan_mode = await self.read_setting(attributes.FanMode)
         if fan_mode != fm_enum.kOff:
             await self.write_setting(attributes.FanMode, fan_mode)
@@ -142,6 +150,7 @@ class TC_FAN_3_5(MatterBaseTest):
         #   - Verify that the PercentStting, PercentCurrent, and
         #     FanMode attributes are greater than 0
         # self.step(5)
+        print(f"[FC] # self.step(5)")
         await self.send_step_command(direction=sd_enum.kIncrease)
         value_expectations = [
             AttributeValueExpectation(self.endpoint, attributes.PercentSetting, ComparisonEnum.GreaterThan, percent_setting),
@@ -158,6 +167,7 @@ class TC_FAN_3_5(MatterBaseTest):
         #     attributes are both less than 100
         #   - Verify that the FanMode attribute is set to High
         # self.step(6)
+        print(f"[FC] # self.step(6)")
         await self.write_setting(attributes.FanMode, fm_enum.kHigh)
         value_expectations = [
             AttributeValueExpectation(self.endpoint, attributes.PercentSetting, ComparisonEnum.LessThan, percent_setting_max),
@@ -173,6 +183,7 @@ class TC_FAN_3_5(MatterBaseTest):
         #   - Verify that the PercentStting and PercentCurrent attributes are less than 100
         #   - Verify that the FanMode attribute is set to a value lower than High
         # self.step(7)
+        print(f"[FC] # self.step(7)")
         await self.send_step_command(direction=sd_enum.kDecrease)
         value_expectations = [
             AttributeValueExpectation(self.endpoint, attributes.PercentSetting, ComparisonEnum.LessThan, percent_setting),
@@ -183,141 +194,169 @@ class TC_FAN_3_5(MatterBaseTest):
             value_expectations=value_expectations, timeout_sec=timeout_sec)
         self.attribute_subscription.reset()
 
+        # *** STEP 8 ***
+        # TH writes to the DUT the PercentSetting attribute with 100
+        #   - Verify that the PercentStting and PercentCurrent
+        #     attributes are both 100
+        #   - Verify that the FanMode attribute is set to High
+        # self.step(8)
+        print(f"[FC] # self.step(8)")
+        await self.write_setting(attributes.PercentSetting, percent_setting_max)
+        value_expectations = [
+            AttributeValueExpectation(self.endpoint, attributes.PercentSetting, ComparisonEnum.Equal, percent_setting_max),
+            AttributeValueExpectation(self.endpoint, attributes.PercentCurrent, ComparisonEnum.Equal, percent_setting_max),
+            AttributeValueExpectation(self.endpoint, attributes.FanMode, ComparisonEnum.Equal, fm_enum.kHigh),
+        ]
+        percent_setting, percent_current, fan_mode = self.attribute_subscription.await_all_final_values_reported_threshold(
+            value_expectations=value_expectations, timeout_sec=timeout_sec)
 
+        # *** STEP 9 ***
+        # TH sends Step command to DUT with Direction set to Increase,
+        # and Wrap set to False
+        #   - Verify that the PercentStting and PercentCurrent
+        #     attributes are both 100
+        #   - Verify that the FanMode attribute is set to High
+        # self.step(9)
+        print(f"[FC] # self.step(9)")
+        await self.send_step_command(direction=sd_enum.kIncrease, wrap=False)
+        self.verify_expected_value(attributes.PercentSetting, percent_setting_max, timeout_sec)
+        self.verify_expected_value(attributes.PercentCurrent, percent_setting_max, timeout_sec)
+        self.verify_expected_value(attributes.FanMode, fm_enum.kHigh, timeout_sec)
+        self.attribute_subscription.reset()
 
+        # *** STEP 10 ***
+        # TH sends Step command to DUT with Direction set to Increase,
+        # Wrap set to True, and LowestOff set to False
+        #   - Verify that the PercentStting, PercentCurrent, and FanMode
+        #     attribute values are greater than 0
+        # self.step(10)
+        print(f"[FC] # self.step(10)")
+        await self.send_step_command(direction=sd_enum.kIncrease, wrap=True, lowestOff=False)
+        value_expectations = [
+            AttributeValueExpectation(self.endpoint, attributes.PercentSetting, ComparisonEnum.GreaterThan, 0),
+            AttributeValueExpectation(self.endpoint, attributes.PercentCurrent, ComparisonEnum.GreaterThan, 0),
+            AttributeValueExpectation(self.endpoint, attributes.FanMode, ComparisonEnum.GreaterThan, fm_enum.kOff),
+        ]
+        percent_setting, percent_current, fan_mode = self.attribute_subscription.await_all_final_values_reported_threshold(
+            value_expectations=value_expectations, timeout_sec=timeout_sec)
+        self.attribute_subscription.reset()
 
+        # *** STEP 11 ***
+        # TH writes to the DUT the PercentSetting attribute with 100
+        #   - Verify that the PercentStting and PercentCurrent
+        #     attributes are both 100
+        #   - Verify that the FanMode attribute is set to High
+        # self.step(11)
+        print(f"[FC] # self.step(11)")
+        await self.write_setting(attributes.PercentSetting, percent_setting_max)
+        value_expectations = [
+            AttributeValueExpectation(self.endpoint, attributes.PercentSetting, ComparisonEnum.Equal, percent_setting_max),
+            AttributeValueExpectation(self.endpoint, attributes.PercentCurrent, ComparisonEnum.Equal, percent_setting_max),
+            AttributeValueExpectation(self.endpoint, attributes.FanMode, ComparisonEnum.Equal, fm_enum.kHigh),
+        ]
+        percent_setting, percent_current, fan_mode = self.attribute_subscription.await_all_final_values_reported_threshold(
+            value_expectations=value_expectations, timeout_sec=timeout_sec)
+        self.attribute_subscription.reset()
 
+        # *** STEP 12 ***
+        # TH sends Step command to DUT with Direction set to Increase,
+        # Wrap set to True, and LowestOff set to True
+        #   - Verify that the PercentStting, PercentCurrent, and FanMode
+        #     attribute values are 0
+        # self.step(12)
+        print(f"[FC] # self.step(12)")
+        await self.send_step_command(direction=sd_enum.kIncrease, wrap=True, lowestOff=True)
+        value_expectations = [
+            AttributeValueExpectation(self.endpoint, attributes.PercentSetting, ComparisonEnum.Equal, 0),
+            AttributeValueExpectation(self.endpoint, attributes.PercentCurrent, ComparisonEnum.Equal, 0),
+            AttributeValueExpectation(self.endpoint, attributes.FanMode, ComparisonEnum.Equal, fm_enum.kOff),
+        ]
+        percent_setting, percent_current, fan_mode = self.attribute_subscription.await_all_final_values_reported_threshold(
+            value_expectations=value_expectations, timeout_sec=timeout_sec)
+        self.attribute_subscription.reset()
 
+        # *** STEP 13 ***
+        # TH writes to the DUT the PercentSetting attribute with 1
+        #   - Verify that the PercentStting and PercentCurrent
+        #     attributes are both 1
+        #   - Verify that the FanMode attribute is set to Low
+        # self.step(13)
+        print(f"[FC] # self.step(13)")
+        await self.write_setting(attributes.PercentSetting, 1)
+        value_expectations = [
+            AttributeValueExpectation(self.endpoint, attributes.PercentSetting, ComparisonEnum.Equal, 1),
+            AttributeValueExpectation(self.endpoint, attributes.PercentCurrent, ComparisonEnum.Equal, 1),
+            AttributeValueExpectation(self.endpoint, attributes.FanMode, ComparisonEnum.Equal, fm_enum.kLow),
+        ]
+        percent_setting, percent_current, fan_mode = self.attribute_subscription.await_all_final_values_reported_threshold(
+            value_expectations=value_expectations, timeout_sec=timeout_sec)
 
+        # *** STEP 14 ***
+        # TH sends Step command to DUT with Direction set to Decrease,
+        # Wrap set to False, and LowestOff set to False
+        #   - Verify that the PercentStting, PercentCurrent, and FanMode
+        #     attribute values are 1
+        # self.step(14)
+        print(f"[FC] # self.step(14)")
+        await self.send_step_command(direction=sd_enum.kDecrease, wrap=False, lowestOff=False)
+        self.verify_expected_value(attributes.PercentSetting, percent_setting, timeout_sec)
+        self.verify_expected_value(attributes.PercentCurrent, percent_current, timeout_sec)
+        self.verify_expected_value(attributes.FanMode, fan_mode, timeout_sec)
+        self.attribute_subscription.reset()
 
+        # *** STEP 15 ***
+        # TH sends Step command to DUT with Direction set to Decrease,
+        # Wrap set to True, and LowestOff set to False
+        #   - Verify that the PercentStting and PercentCurrent
+        #     attributes are both 100
+        #   - Verify that the FanMode attribute is set to High
+        # self.step(15)
+        print(f"[FC] # self.step(15)")
+        await self.send_step_command(direction=sd_enum.kDecrease, wrap=True, lowestOff=False)
+        value_expectations = [
+            AttributeValueExpectation(self.endpoint, attributes.PercentSetting, ComparisonEnum.Equal, percent_setting_max),
+            AttributeValueExpectation(self.endpoint, attributes.PercentCurrent, ComparisonEnum.Equal, percent_setting_max),
+            AttributeValueExpectation(self.endpoint, attributes.FanMode, ComparisonEnum.Equal, fm_enum.kHigh),
+        ]
+        percent_setting, percent_current, fan_mode = self.attribute_subscription.await_all_final_values_reported_threshold(
+            value_expectations=value_expectations, timeout_sec=timeout_sec)
+        self.attribute_subscription.reset()
+        
+        # *** STEP 16 ***
+        # TH writes to the DUT the PercentSetting attribute with 0
+        #   - Verify that the PercentStting and PercentCurrent
+        #     attributes are both 0
+        #   - Verify that the FanMode attribute is set to Off
+        # self.step(16)
+        print(f"[FC] # self.step(16)")
+        await self.write_setting(attributes.PercentSetting, 0)
+        value_expectations = [
+            AttributeValueExpectation(self.endpoint, attributes.PercentSetting, ComparisonEnum.Equal, 0),
+            AttributeValueExpectation(self.endpoint, attributes.PercentCurrent, ComparisonEnum.Equal, 0),
+            AttributeValueExpectation(self.endpoint, attributes.FanMode, ComparisonEnum.Equal, fm_enum.kOff),
+        ]
+        percent_setting, percent_current, fan_mode = self.attribute_subscription.await_all_final_values_reported_threshold(
+            value_expectations=value_expectations, timeout_sec=timeout_sec)
+        self.attribute_subscription.reset()
+        
+        # *** STEP 17 ***
+        # TH sends Step command to DUT with Direction set to Decrease,
+        # Wrap set to True, and LowestOff set to True
+        #   - Verify that the PercentStting and PercentCurrent
+        #     attributes are both 100
+        #   - Verify that the FanMode attribute is set to High
+        # self.step(17)
+        print(f"[FC] # self.step(17)")
+        await self.send_step_command(direction=sd_enum.kDecrease, wrap=True, lowestOff=True)
+        value_expectations = [
+            AttributeValueExpectation(self.endpoint, attributes.PercentSetting, ComparisonEnum.Equal, percent_setting_max),
+            AttributeValueExpectation(self.endpoint, attributes.PercentCurrent, ComparisonEnum.Equal, percent_setting_max),
+            AttributeValueExpectation(self.endpoint, attributes.FanMode, ComparisonEnum.Equal, fm_enum.kHigh),
+        ]
+        percent_setting, percent_current, fan_mode = self.attribute_subscription.await_all_final_values_reported_threshold(
+            value_expectations=value_expectations, timeout_sec=timeout_sec)
+        self.attribute_subscription.reset()        
 
-
-
-
-
-
-
-
-
-
-
-        # time.sleep(1)
-
-        # self.print_step("2d", "Read from the DUT the PercentCurrent attribute and check its higher than the stored value")
-        # percent_current_after = await self.read_percent_current(endpoint=endpoint)
-        # asserts.assert_greater(percent_current_after, percent_current, "PercentCurrent did not increase")
-
-        # # Part 3
-
-        # self.print_step("3a", "writes to the DUT the PercentSetting attribute with 50")
-        # await self.write_percent_setting(endpoint=endpoint, percent_setting=50)
-
-        # time.sleep(1)
-
-        # self.print_step("3b", "Read from the DUT the PercentCurrent attribute and store")
-        # percent_current = await self.read_percent_current(endpoint=endpoint)
-
-        # self.print_step("3c", "TH sends Step command to DUT with Direction set to Decrease")
-        # await self.send_step_command(endpoint=endpoint, direction=Clusters.Objects.FanControl.Enums.StepDirectionEnum.kDecrease)
-
-        # self.print_step("3d", "Read from the DUT the PercentCurrent attribute and check its lower than the stored value")
-        # percent_current_after = await self.read_percent_current(endpoint=endpoint)
-        # asserts.assert_less(percent_current_after, percent_current, "PercentCurrent did not decrease")
-
-        # # Part 4
-        # self.print_step("4a", "TH reads from the DUT the SpeedMax attribute")
-        # speed_max = await self.read_speed_max(endpoint=endpoint)
-
-        # self.print_step("4b", "TH writes to the DUT the SpeedSetting attribute with the value of SpeedMax")
-        # await self.write_speed_setting(endpoint=endpoint, speed_setting=speed_max)
-
-        # time.sleep(1)
-
-        # self.print_step("4c", "TH sends Step command to DUT with Direction set to Increase and Wrap set to False")
-        # await self.send_step_command(endpoint=endpoint, direction=Clusters.Objects.FanControl.Enums.StepDirectionEnum.kIncrease, wrap=False)
-
-        # time.sleep(1)
-
-        # self.print_step("4d", "Read from the DUT the SpeedCurrent attribute and check its equal to SpeedMax")
-        # speed_current = await self.read_speed_current(endpoint=endpoint)
-        # asserts.assert_equal(speed_current, speed_max, "SpeedCurrent incremented past SpeedMax when wrap was false")
-
-        # # Part 5
-        # self.print_step("5a", "TH writes to the DUT the SpeedSetting attribute with the value of SpeedMax")
-        # await self.write_speed_setting(endpoint=endpoint, speed_setting=speed_max)
-
-        # time.sleep(1)
-
-        # self.print_step("5b", "TH sends Step command to DUT with Direction set to Increase and Wrap set to True")
-        # await self.send_step_command(endpoint=endpoint, direction=Clusters.Objects.FanControl.Enums.StepDirectionEnum.kIncrease, wrap=True)
-
-        # time.sleep(1)
-
-        # self.print_step("5c", "Read from the DUT the SpeedCurrent attribute and check its equal to 1")
-        # speed_current = await self.read_speed_current(endpoint=endpoint)
-        # asserts.assert_equal(speed_current, 1, "SpeedCurrent did not wrap to 1 when wrap was true")
-
-        # # Part 6
-        # self.print_step("6a", "TH writes to the DUT the SpeedSetting attribute with the value of SpeedMax")
-        # await self.write_speed_setting(endpoint=endpoint, speed_setting=speed_max)
-
-        # time.sleep(1)
-
-        # self.print_step("6b", "TH sends Step command to DUT with Direction set to Increase, Wrap set to True and LowestOff set to True")
-        # await self.send_step_command(endpoint=endpoint, direction=Clusters.Objects.FanControl.Enums.StepDirectionEnum.kIncrease, wrap=True, lowestOff=True)
-
-        # time.sleep(1)
-
-        # self.print_step("6c", "Read from the DUT the SpeedCurrent attribute and check its equal to 0")
-        # speed_current = await self.read_speed_current(endpoint=endpoint)
-        # asserts.assert_equal(speed_current, 0, "SpeedCurrent did not wrap to 0 when wrap was true and lowestOff was true")
-
-        # # Part 7
-        # self.print_step("7a", "TH writes to the DUT the SpeedSetting attribute with the value of 1")
-        # await self.write_speed_setting(endpoint=endpoint, speed_setting=1)
-
-        # time.sleep(1)
-
-        # self.print_step("7b", "TH sends Step command to DUT with Direction set to Decrease, Wrap set to False and LowestOff set to False")
-        # await self.send_step_command(endpoint=endpoint, direction=Clusters.Objects.FanControl.Enums.StepDirectionEnum.kDecrease, wrap=False, lowestOff=False)
-
-        # time.sleep(1)
-
-        # self.print_step("7c", "Read from the DUT the SpeedCurrent attribute and check its equal to 1")
-        # speed_current = await self.read_speed_current(endpoint=endpoint)
-        # asserts.assert_equal(speed_current, 1, "SpeedCurrent decremented past 1 when wrap was false and lowestOff was false")
-
-        # # Part 8
-        # self.print_step("8b", "TH writes to the DUT the SpeedSetting attribute with the value of 1")
-        # await self.write_speed_setting(endpoint=endpoint, speed_setting=1)
-
-        # time.sleep(1)
-
-        # self.print_step("8c", "TH sends Step command to DUT with Direction set to Decrease, Wrap set to True and LowestOff set to False")
-        # await self.send_step_command(endpoint=endpoint, direction=Clusters.Objects.FanControl.Enums.StepDirectionEnum.kDecrease, wrap=True, lowestOff=False)
-
-        # time.sleep(1)
-
-        # self.print_step("8d", "Read from the DUT the SpeedCurrent attribute and check its equal to SpeedMax")
-        # speed_current = await self.read_speed_current(endpoint=endpoint)
-        # asserts.assert_equal(speed_current, speed_max,
-        #                      "SpeedCurrent did not wrap to SpeedMax when wrap was true and lowestOff was false")
-
-        # # Part 9
-        # self.print_step("9b", "TH writes to the DUT the SpeedSetting attribute with the value of 0")
-        # await self.write_speed_setting(endpoint=endpoint, speed_setting=0)
-
-        # time.sleep(1)
-
-        # self.print_step("9c", "TH sends Step command to DUT with Direction set to Decrease, Wrap set to True and LowestOff set to True")
-        # await self.send_step_command(endpoint=endpoint, direction=Clusters.Objects.FanControl.Enums.StepDirectionEnum.kDecrease, wrap=True, lowestOff=True)
-
-        # time.sleep(1)
-
-        # self.print_step("9d", "Read from the DUT the SpeedCurrent attribute and check its equal to SpeedMax")
-        # speed_current = await self.read_speed_current(endpoint=endpoint)
-        # asserts.assert_equal(speed_current, speed_max,
-        #                      "SpeedCurrent did not wrap to SpeedMax when wrap was true and lowestOff was true")
 
 
 if __name__ == "__main__":
