@@ -358,19 +358,21 @@ enum class Fields : uint8_t
 {
     kId              = 1,
     kPeerNodeID      = 2,
-    kStreamUsage     = 3,
-    kVideoStreamID   = 4,
-    kAudioStreamID   = 5,
-    kMetadataOptions = 6,
+    kPeerEndpointID  = 3,
+    kStreamUsage     = 4,
+    kVideoStreamID   = 5,
+    kAudioStreamID   = 6,
+    kMetadataOptions = 7,
     kFabricIndex     = 254,
 };
 
 struct Type
 {
 public:
-    uint16_t id                 = static_cast<uint16_t>(0);
-    chip::NodeId peerNodeID     = static_cast<chip::NodeId>(0);
-    StreamUsageEnum streamUsage = static_cast<StreamUsageEnum>(0);
+    uint16_t id                     = static_cast<uint16_t>(0);
+    chip::NodeId peerNodeID         = static_cast<chip::NodeId>(0);
+    chip::EndpointId peerEndpointID = static_cast<chip::EndpointId>(0);
+    StreamUsageEnum streamUsage     = static_cast<StreamUsageEnum>(0);
     DataModel::Nullable<uint16_t> videoStreamID;
     DataModel::Nullable<uint16_t> audioStreamID;
     chip::BitMask<WebRTCMetadataOptionsBitmap> metadataOptions = static_cast<chip::BitMask<WebRTCMetadataOptionsBitmap>>(0);
@@ -43564,12 +43566,13 @@ namespace Commands {
 namespace SolicitOffer {
 enum class Fields : uint8_t
 {
-    kStreamUsage        = 0,
-    kVideoStreamID      = 1,
-    kAudioStreamID      = 2,
-    kICEServers         = 3,
-    kICETransportPolicy = 4,
-    kMetadataOptions    = 5,
+    kStreamUsage           = 0,
+    kOriginatingEndpointID = 1,
+    kVideoStreamID         = 2,
+    kAudioStreamID         = 3,
+    kICEServers            = 4,
+    kICETransportPolicy    = 5,
+    kMetadataOptions       = 6,
 };
 
 struct Type
@@ -43579,7 +43582,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SolicitOffer::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportProvider::Id; }
 
-    StreamUsageEnum streamUsage = static_cast<StreamUsageEnum>(0);
+    StreamUsageEnum streamUsage            = static_cast<StreamUsageEnum>(0);
+    chip::EndpointId originatingEndpointID = static_cast<chip::EndpointId>(0);
     Optional<DataModel::Nullable<uint16_t>> videoStreamID;
     Optional<DataModel::Nullable<uint16_t>> audioStreamID;
     Optional<DataModel::List<const Structs::ICEServerStruct::Type>> ICEServers;
@@ -43599,7 +43603,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SolicitOffer::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportProvider::Id; }
 
-    StreamUsageEnum streamUsage = static_cast<StreamUsageEnum>(0);
+    StreamUsageEnum streamUsage            = static_cast<StreamUsageEnum>(0);
+    chip::EndpointId originatingEndpointID = static_cast<chip::EndpointId>(0);
     Optional<DataModel::Nullable<uint16_t>> videoStreamID;
     Optional<DataModel::Nullable<uint16_t>> audioStreamID;
     Optional<DataModel::DecodableList<Structs::ICEServerStruct::DecodableType>> ICEServers;
@@ -43652,14 +43657,15 @@ public:
 namespace ProvideOffer {
 enum class Fields : uint8_t
 {
-    kWebRTCSessionID    = 0,
-    kSdp                = 1,
-    kStreamUsage        = 2,
-    kVideoStreamID      = 3,
-    kAudioStreamID      = 4,
-    kICEServers         = 5,
-    kICETransportPolicy = 6,
-    kMetadataOptions    = 7,
+    kWebRTCSessionID       = 0,
+    kSdp                   = 1,
+    kStreamUsage           = 2,
+    kOriginatingEndpointID = 3,
+    kVideoStreamID         = 4,
+    kAudioStreamID         = 5,
+    kICEServers            = 6,
+    kICETransportPolicy    = 7,
+    kMetadataOptions       = 8,
 };
 
 struct Type
@@ -43671,7 +43677,8 @@ public:
 
     DataModel::Nullable<uint16_t> webRTCSessionID;
     chip::CharSpan sdp;
-    StreamUsageEnum streamUsage = static_cast<StreamUsageEnum>(0);
+    StreamUsageEnum streamUsage            = static_cast<StreamUsageEnum>(0);
+    chip::EndpointId originatingEndpointID = static_cast<chip::EndpointId>(0);
     Optional<DataModel::Nullable<uint16_t>> videoStreamID;
     Optional<DataModel::Nullable<uint16_t>> audioStreamID;
     Optional<DataModel::List<const Structs::ICEServerStruct::Type>> ICEServers;
@@ -43693,7 +43700,8 @@ public:
 
     DataModel::Nullable<uint16_t> webRTCSessionID;
     chip::CharSpan sdp;
-    StreamUsageEnum streamUsage = static_cast<StreamUsageEnum>(0);
+    StreamUsageEnum streamUsage            = static_cast<StreamUsageEnum>(0);
+    chip::EndpointId originatingEndpointID = static_cast<chip::EndpointId>(0);
     Optional<DataModel::Nullable<uint16_t>> videoStreamID;
     Optional<DataModel::Nullable<uint16_t>> audioStreamID;
     Optional<DataModel::DecodableList<Structs::ICEServerStruct::DecodableType>> ICEServers;

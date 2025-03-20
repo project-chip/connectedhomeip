@@ -14855,6 +14855,7 @@ public:
         ClusterCommand("solicit-offer", credsIssuerConfig), mComplex_ICEServers(&mRequest.ICEServers)
     {
         AddArgument("StreamUsage", 0, UINT8_MAX, &mRequest.streamUsage);
+        AddArgument("OriginatingEndpointID", 0, UINT16_MAX, &mRequest.originatingEndpointID);
         AddArgument("VideoStreamID", 0, UINT16_MAX, &mRequest.videoStreamID);
         AddArgument("AudioStreamID", 0, UINT16_MAX, &mRequest.audioStreamID);
         AddArgument("ICEServers", &mComplex_ICEServers, "", Argument::kOptional);
@@ -14903,6 +14904,7 @@ public:
         AddArgument("WebRTCSessionID", 0, UINT16_MAX, &mRequest.webRTCSessionID);
         AddArgument("Sdp", &mRequest.sdp);
         AddArgument("StreamUsage", 0, UINT8_MAX, &mRequest.streamUsage);
+        AddArgument("OriginatingEndpointID", 0, UINT16_MAX, &mRequest.originatingEndpointID);
         AddArgument("VideoStreamID", 0, UINT16_MAX, &mRequest.videoStreamID);
         AddArgument("AudioStreamID", 0, UINT16_MAX, &mRequest.audioStreamID);
         AddArgument("ICEServers", &mComplex_ICEServers, "", Argument::kOptional);

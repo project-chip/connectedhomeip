@@ -13101,6 +13101,7 @@ class ChipClusters:
                 "commandName": "SolicitOffer",
                 "args": {
                     "streamUsage": "int",
+                    "originatingEndpointID": "int",
                     "videoStreamID": "int",
                     "audioStreamID": "int",
                     "ICEServers": "ICEServerStruct",
@@ -13115,6 +13116,7 @@ class ChipClusters:
                     "webRTCSessionID": "int",
                     "sdp": "str",
                     "streamUsage": "int",
+                    "originatingEndpointID": "int",
                     "videoStreamID": "int",
                     "audioStreamID": "int",
                     "ICEServers": "ICEServerStruct",

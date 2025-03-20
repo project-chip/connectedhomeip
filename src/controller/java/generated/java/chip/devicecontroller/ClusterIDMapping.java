@@ -17899,7 +17899,7 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum SolicitOfferCommandField {StreamUsage(0),VideoStreamID(1),AudioStreamID(2),ICEServers(3),ICETransportPolicy(4),MetadataOptions(5),;
+        }public enum SolicitOfferCommandField {StreamUsage(0),OriginatingEndpointID(1),VideoStreamID(2),AudioStreamID(3),ICEServers(4),ICETransportPolicy(5),MetadataOptions(6),;
                     private final int id;
                     SolicitOfferCommandField(int id) {
                         this.id = id;
@@ -17916,7 +17916,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum ProvideOfferCommandField {WebRTCSessionID(0),Sdp(1),StreamUsage(2),VideoStreamID(3),AudioStreamID(4),ICEServers(5),ICETransportPolicy(6),MetadataOptions(7),;
+                }public enum ProvideOfferCommandField {WebRTCSessionID(0),Sdp(1),StreamUsage(2),OriginatingEndpointID(3),VideoStreamID(4),AudioStreamID(5),ICEServers(6),ICETransportPolicy(7),MetadataOptions(8),;
                     private final int id;
                     ProvideOfferCommandField(int id) {
                         this.id = id;
