@@ -213,10 +213,10 @@ enum TestGlobalEnum : enum8 {
 }
 
 enum ThreeLevelAutoEnum : enum8 {
-  kLow = 0;
-  kMedium = 1;
-  kHigh = 2;
-  kAutomatic = 3;
+  kAuto = 0;
+  kLow = 1;
+  kMedium = 2;
+  kHigh = 3;
 }
 
 bitmap TestGlobalBitmap : bitmap32 {
@@ -1774,7 +1774,7 @@ cluster AirQuality = 91 {
 
 /** Attributes and commands for configuring the measurement of temperature, and reporting temperature measurements. */
 cluster TemperatureMeasurement = 1026 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 4;
 
   readonly attribute nullable temperature measuredValue = 0;
   readonly attribute nullable temperature minMeasuredValue = 1;

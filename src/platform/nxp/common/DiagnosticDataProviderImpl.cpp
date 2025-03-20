@@ -53,9 +53,6 @@ extern "C" {
 #define GetMinimumEverFreeHeapSize xPortGetMinimumEverFreeHeapSize
 #endif // NXP_USE_MML
 
-// Not implement into the SDK
-// extern "C" void xPortResetHeapMinimumEverFreeHeapSize(void);
-
 namespace chip {
 namespace DeviceLayer {
 
@@ -103,14 +100,10 @@ CHIP_ERROR DiagnosticDataProviderImpl::ResetWatermarks()
 
 #if NXP_USE_MML
     MEM_ResetFreeHeapSizeLowWaterMark();
-
-    return CHIP_NO_ERROR;
 #else
-    // Not implement into the SDK
-    // xPortResetHeapMinimumEverFreeHeapSize();
-
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    xPortResetHeapMinimumEverFreeHeapSize();
 #endif
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetThreadMetrics(ThreadMetrics ** threadMetricsOut)
@@ -438,7 +431,6 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketUnicastTxCount(uint32_t & pa
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-#if SDK_2_16_100
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketUnicastRxCount(uint32_t & packetUnicastRxCount)
 {
 #ifdef CONFIG_WIFI_GET_LOG
@@ -467,8 +459,6 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiOverrunCount(uint64_t & overrunCou
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-#endif
-
 CHIP_ERROR DiagnosticDataProviderImpl::ResetWiFiNetworkDiagnosticsCounts(void)
 {
 #ifdef CONFIG_WIFI_GET_LOG
@@ -481,10 +471,8 @@ CHIP_ERROR DiagnosticDataProviderImpl::ResetWiFiNetworkDiagnosticsCounts(void)
         mPacketMulticastRxCount = stats.mcast_rx_frame;
         mBeaconRxCount          = stats.bcn_rcv_cnt;
         mBeaconLostCount        = stats.bcn_miss_cnt;
-#if SDK_2_16_100
-        mPacketUnicastRxCount = stats.rx_unicast_cnt;
-        mOverrunCount         = stats.tx_overrun_cnt + stats.rx_overrun_cnt;
-#endif
+        mPacketUnicastRxCount   = stats.rx_unicast_cnt;
+        mOverrunCount           = stats.tx_overrun_cnt + stats.rx_overrun_cnt;
         return CHIP_NO_ERROR;
     }
 #endif /* CONFIG_WIFI_GET_LOG */
