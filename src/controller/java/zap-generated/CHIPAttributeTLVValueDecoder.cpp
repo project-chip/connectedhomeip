@@ -43095,6 +43095,13 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(newElement_0_peerNodeIDClassName.c_str(),
                                                                             newElement_0_peerNodeIDCtorSignature.c_str(),
                                                                             jninewElement_0_peerNodeID, newElement_0_peerNodeID);
+                jobject newElement_0_peerEndpointID;
+                std::string newElement_0_peerEndpointIDClassName     = "java/lang/Integer";
+                std::string newElement_0_peerEndpointIDCtorSignature = "(I)V";
+                jint jninewElement_0_peerEndpointID                  = static_cast<jint>(entry_0.peerEndpointID);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    newElement_0_peerEndpointIDClassName.c_str(), newElement_0_peerEndpointIDCtorSignature.c_str(),
+                    jninewElement_0_peerEndpointID, newElement_0_peerEndpointID);
                 jobject newElement_0_streamUsage;
                 std::string newElement_0_streamUsageClassName     = "java/lang/Integer";
                 std::string newElement_0_streamUsageCtorSignature = "(I)V";
@@ -43160,7 +43167,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     err = chip::JniReferences::GetInstance().FindMethod(
                         env, webRTCSessionStructStructClass_1, "<init>",
                         "(Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/"
-                        "Integer;Ljava/lang/Integer;)V",
+                        "Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V",
                         &webRTCSessionStructStructCtor_1);
                     if (err != CHIP_NO_ERROR || webRTCSessionStructStructCtor_1 == nullptr)
                     {
@@ -43169,10 +43176,10 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         return nullptr;
                     }
 
-                    newElement_0 =
-                        env->NewObject(webRTCSessionStructStructClass_1, webRTCSessionStructStructCtor_1, newElement_0_id,
-                                       newElement_0_peerNodeID, newElement_0_streamUsage, newElement_0_videoStreamID,
-                                       newElement_0_audioStreamID, newElement_0_metadataOptions, newElement_0_fabricIndex);
+                    newElement_0 = env->NewObject(webRTCSessionStructStructClass_1, webRTCSessionStructStructCtor_1,
+                                                  newElement_0_id, newElement_0_peerNodeID, newElement_0_peerEndpointID,
+                                                  newElement_0_streamUsage, newElement_0_videoStreamID, newElement_0_audioStreamID,
+                                                  newElement_0_metadataOptions, newElement_0_fabricIndex);
                 }
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
@@ -43324,6 +43331,13 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(newElement_0_peerNodeIDClassName.c_str(),
                                                                             newElement_0_peerNodeIDCtorSignature.c_str(),
                                                                             jninewElement_0_peerNodeID, newElement_0_peerNodeID);
+                jobject newElement_0_peerEndpointID;
+                std::string newElement_0_peerEndpointIDClassName     = "java/lang/Integer";
+                std::string newElement_0_peerEndpointIDCtorSignature = "(I)V";
+                jint jninewElement_0_peerEndpointID                  = static_cast<jint>(entry_0.peerEndpointID);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    newElement_0_peerEndpointIDClassName.c_str(), newElement_0_peerEndpointIDCtorSignature.c_str(),
+                    jninewElement_0_peerEndpointID, newElement_0_peerEndpointID);
                 jobject newElement_0_streamUsage;
                 std::string newElement_0_streamUsageClassName     = "java/lang/Integer";
                 std::string newElement_0_streamUsageCtorSignature = "(I)V";
@@ -43389,7 +43403,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     err = chip::JniReferences::GetInstance().FindMethod(
                         env, webRTCSessionStructStructClass_1, "<init>",
                         "(Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/"
-                        "Integer;Ljava/lang/Integer;)V",
+                        "Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V",
                         &webRTCSessionStructStructCtor_1);
                     if (err != CHIP_NO_ERROR || webRTCSessionStructStructCtor_1 == nullptr)
                     {
@@ -43398,10 +43412,10 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         return nullptr;
                     }
 
-                    newElement_0 =
-                        env->NewObject(webRTCSessionStructStructClass_1, webRTCSessionStructStructCtor_1, newElement_0_id,
-                                       newElement_0_peerNodeID, newElement_0_streamUsage, newElement_0_videoStreamID,
-                                       newElement_0_audioStreamID, newElement_0_metadataOptions, newElement_0_fabricIndex);
+                    newElement_0 = env->NewObject(webRTCSessionStructStructClass_1, webRTCSessionStructStructCtor_1,
+                                                  newElement_0_id, newElement_0_peerNodeID, newElement_0_peerEndpointID,
+                                                  newElement_0_streamUsage, newElement_0_videoStreamID, newElement_0_audioStreamID,
+                                                  newElement_0_metadataOptions, newElement_0_fabricIndex);
                 }
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }

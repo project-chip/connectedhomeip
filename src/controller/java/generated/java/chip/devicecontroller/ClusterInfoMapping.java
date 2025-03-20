@@ -31433,6 +31433,9 @@ public class ClusterInfoMapping {
     CommandParameterInfo webRTCTransportProvidersolicitOfferstreamUsageCommandParameterInfo = new CommandParameterInfo("streamUsage", Integer.class, Integer.class);
     webRTCTransportProvidersolicitOfferCommandParams.put("streamUsage",webRTCTransportProvidersolicitOfferstreamUsageCommandParameterInfo);
 
+    CommandParameterInfo webRTCTransportProvidersolicitOfferoriginatingEndpointIDCommandParameterInfo = new CommandParameterInfo("originatingEndpointID", Integer.class, Integer.class);
+    webRTCTransportProvidersolicitOfferCommandParams.put("originatingEndpointID",webRTCTransportProvidersolicitOfferoriginatingEndpointIDCommandParameterInfo);
+
     CommandParameterInfo webRTCTransportProvidersolicitOffervideoStreamIDCommandParameterInfo = new CommandParameterInfo("videoStreamID", Optional.class, Integer.class);
     webRTCTransportProvidersolicitOfferCommandParams.put("videoStreamID",webRTCTransportProvidersolicitOffervideoStreamIDCommandParameterInfo);
 
@@ -31451,6 +31454,9 @@ public class ClusterInfoMapping {
           .solicitOffer((ChipClusters.WebRTCTransportProviderCluster.SolicitOfferResponseCallback) callback
            , (Integer)
              commandArguments.get("streamUsage")
+
+           , (Integer)
+             commandArguments.get("originatingEndpointID")
 
            , (Optional<Integer>)
              commandArguments.get("videoStreamID")
@@ -31485,6 +31491,9 @@ public class ClusterInfoMapping {
     CommandParameterInfo webRTCTransportProviderprovideOfferstreamUsageCommandParameterInfo = new CommandParameterInfo("streamUsage", Integer.class, Integer.class);
     webRTCTransportProviderprovideOfferCommandParams.put("streamUsage",webRTCTransportProviderprovideOfferstreamUsageCommandParameterInfo);
 
+    CommandParameterInfo webRTCTransportProviderprovideOfferoriginatingEndpointIDCommandParameterInfo = new CommandParameterInfo("originatingEndpointID", Integer.class, Integer.class);
+    webRTCTransportProviderprovideOfferCommandParams.put("originatingEndpointID",webRTCTransportProviderprovideOfferoriginatingEndpointIDCommandParameterInfo);
+
     CommandParameterInfo webRTCTransportProviderprovideOffervideoStreamIDCommandParameterInfo = new CommandParameterInfo("videoStreamID", Optional.class, Integer.class);
     webRTCTransportProviderprovideOfferCommandParams.put("videoStreamID",webRTCTransportProviderprovideOffervideoStreamIDCommandParameterInfo);
 
@@ -31509,6 +31518,9 @@ public class ClusterInfoMapping {
 
            , (Integer)
              commandArguments.get("streamUsage")
+
+           , (Integer)
+             commandArguments.get("originatingEndpointID")
 
            , (Optional<Integer>)
              commandArguments.get("videoStreamID")
