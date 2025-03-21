@@ -24,6 +24,7 @@ cluster_to_pics_dict = {
     "OTA Software Update Requestor": "OTA Software Update",
     "On/Off": "On-Off",
     "GroupKeyManagement": "Group Communication",
+    "Wake On LAN": "Media Cluster",
     "Wake on LAN": "Media Cluster",
     "Low Power": "Media Cluster",
     "Keypad Input": "Media Cluster",
