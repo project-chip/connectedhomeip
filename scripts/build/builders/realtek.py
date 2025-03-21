@@ -89,7 +89,6 @@ class RealtekBuilder(Builder):
         self.enable_cli = enable_cli
         self.enable_rpc = enable_rpc
         self.enable_shell = enable_shell
-
         self.ot_src_dir = os.path.join(os.getcwd(), 'third_party/openthread/ot-realtek')
 
     def CmakeBuildFlags(self) -> str:
@@ -102,22 +101,18 @@ class RealtekBuilder(Builder):
             f"-DOT_CMAKE_NINJA_TARGET={self.app.TargetName}",
             f"-DMATTER_EXAMPLE_PATH={self.root}/examples/{self.app.ExampleName}/realtek_bee"
         ]
-
         if self.enable_cli:
             flags.append("-DENABLE_CLI=ON")
         else:
             flags.append("-DENABLE_CLI=OFF")
-
         if self.enable_rpc:
             flags.append("-DENABLE_PW_RPC=ON")
         else:
             flags.append("-DENABLE_PW_RPC=OFF")
-
         if self.enable_shell:
             flags.append("-DENABLE_SHELL=ON")
         else:
             flags.append("-DENABLE_SHELL=OFF")
-
         return " ".join(flags)
 
     def generate(self):
@@ -125,7 +120,6 @@ class RealtekBuilder(Builder):
             ot_src_dir=self.ot_src_dir,
             board_name=self.board.BoardName)
         self._Execute(['bash', '-c', cmd])
-
         cmd = 'cmake -GNinja -DOT_COMPILE_WARNING_AS_ERROR=ON {build_flags} {example_folder} -B{out_folder}'.format(
             build_flags=self.CmakeBuildFlags(),
             example_folder=self.ot_src_dir,
@@ -134,17 +128,18 @@ class RealtekBuilder(Builder):
 
     def _build(self):
         cmd = ['ninja', '-C', self.output_dir]
-
         if self.ninja_jobs is not None:
             cmd.append('-j' + str(self.ninja_jobs))
-
         cmd.append(self.app.TargetName)
-
         self._Execute(cmd, title='Building ' + self.identifier)
-
         cleanup_cmd = ['rm', '-rf', f"{self.root}/third_party/openthread/ot-realtek/src/bee4/{self.board.BoardName}/*.gen"]
-
         self._Execute(cleanup_cmd, title='Cleaning up generated files')
 
     def build_outputs(self):
-        logging.info('build_outputs %s', self.output_dir)
+        yield BuilderOutput(
+            os.path.join(self.output_dir, 'bin', 'matter-cli-ftd'),
+            self.app.AppNamePrefix)
+        if self.options.enable_link_map_file:
+            yield BuilderOutput(
+                os.path.join(self.output_dir, 'map.map'),
+                self.app.AppNamePrefix + '.map')
