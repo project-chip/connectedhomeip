@@ -667,4 +667,4 @@ jobs:
               uses: ./.github/actions/upload-size-reports
               if: ${{ !env.ACT }}
               with:
-                platform-name: Telink
+                platform-name: Telink_3_3
