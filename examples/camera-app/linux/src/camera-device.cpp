@@ -82,15 +82,27 @@ CameraError CameraDevice::InitializeStreams()
 
 CameraError CameraDevice::VideoStreamAllocate(const VideoStreamStruct & allocateArgs, uint16_t & outStreamID)
 {
+    outStreamID               = kInvalidStreamID;
+    bool foundAvailableStream = false;
+
     for (VideoStream & stream : videoStreams)
     {
-        // Fake allocation with just matching codec
-        if (!stream.isAllocated && stream.codec == allocateArgs.videoCodec)
+        if (!stream.isAllocated)
         {
-            stream.isAllocated = true;
-            outStreamID        = stream.id;
-            return CameraError::SUCCESS;
+            foundAvailableStream = true;
+
+            if (stream.codec == allocateArgs.videoCodec)
+            {
+                stream.isAllocated = true;
+                outStreamID        = stream.id;
+                return CameraError::SUCCESS;
+            }
         }
+    }
+
+    if (!foundAvailableStream)
+    {
+        return CameraError::ERROR_RESOURCE_EXHAUSTED;
     }
 
     return CameraError::ERROR_VIDEO_STREAM_ALLOC_FAILED;
@@ -112,15 +124,28 @@ CameraError CameraDevice::VideoStreamDeallocate(const uint16_t streamID)
 
 CameraError CameraDevice::AudioStreamAllocate(const AudioStreamStruct & allocateArgs, uint16_t & outStreamID)
 {
+    outStreamID = kInvalidStreamID;
+
+    bool foundAvailableStream = false;
+
     for (AudioStream & stream : audioStreams)
     {
-        // TODO: Match more params
-        if (!stream.isAllocated && stream.codec == allocateArgs.audioCodec)
+        if (!stream.isAllocated)
         {
-            stream.isAllocated = true;
-            outStreamID        = stream.id;
-            return CameraError::SUCCESS;
+            foundAvailableStream = true;
+
+            if (stream.codec == allocateArgs.audioCodec)
+            {
+                stream.isAllocated = true;
+                outStreamID        = stream.id;
+                return CameraError::SUCCESS;
+            }
         }
+    }
+
+    if (!foundAvailableStream)
+    {
+        return CameraError::ERROR_RESOURCE_EXHAUSTED;
     }
 
     return CameraError::ERROR_AUDIO_STREAM_ALLOC_FAILED;
@@ -142,15 +167,28 @@ CameraError CameraDevice::AudioStreamDeallocate(const uint16_t streamID)
 
 CameraError CameraDevice::SnapshotStreamAllocate(const SnapshotStreamStruct & allocateArgs, uint16_t & outStreamID)
 {
+    outStreamID = kInvalidStreamID;
+
+    bool foundAvailableStream = false;
+
     for (SnapshotStream & stream : snapshotStreams)
     {
-        // TODO: Match more params
-        if (!stream.isAllocated && stream.codec == allocateArgs.imageCodec)
+        if (!stream.isAllocated)
         {
-            stream.isAllocated = true;
-            outStreamID        = stream.id;
-            return CameraError::SUCCESS;
+            foundAvailableStream = true;
+
+            if (stream.codec == allocateArgs.imageCodec)
+            {
+                stream.isAllocated = true;
+                outStreamID        = stream.id;
+                return CameraError::SUCCESS;
+            }
         }
+    }
+
+    if (!foundAvailableStream)
+    {
+        return CameraError::ERROR_RESOURCE_EXHAUSTED;
     }
 
     return CameraError::ERROR_SNAPSHOT_STREAM_ALLOC_FAILED;
