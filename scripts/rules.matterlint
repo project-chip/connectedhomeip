@@ -55,6 +55,8 @@ load "../src/app/zap-templates/zcl/data-model/chip/groups-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/group-key-mgmt-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/identify-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/illuminance-measurement-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/joint-fabric-datastore-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/joint-fabric-administrator-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/keypad-input-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/laundry-washer-mode-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/laundry-dryer-controls-cluster.xml";
@@ -160,6 +162,8 @@ endpoint 0 {
   require server cluster GeneralCommissioning;
   require server cluster AdministratorCommissioning;
   require server cluster OperationalCredentials;
+  require server cluster JointFabricDatastore;
+  require server cluster JointFabricAdministrator;
   require server cluster GeneralDiagnostics;
 
   // It is disallowed to have Simple Device type cluster requirements on EP0.

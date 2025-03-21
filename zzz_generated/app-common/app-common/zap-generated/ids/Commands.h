@@ -2089,6 +2089,130 @@ static constexpr CommandId Id = 0x00000002;
 } // namespace Commands
 } // namespace CommissionerControl
 
+namespace JointFabricDatastore {
+namespace Commands {
+
+namespace AddKeySet {
+static constexpr CommandId Id = 0x00000000;
+} // namespace AddKeySet
+
+namespace UpdateKeySet {
+static constexpr CommandId Id = 0x00000001;
+} // namespace UpdateKeySet
+
+namespace RemoveKeySet {
+static constexpr CommandId Id = 0x00000002;
+} // namespace RemoveKeySet
+
+namespace AddGroup {
+static constexpr CommandId Id = 0x00000003;
+} // namespace AddGroup
+
+namespace UpdateGroup {
+static constexpr CommandId Id = 0x00000004;
+} // namespace UpdateGroup
+
+namespace RemoveGroup {
+static constexpr CommandId Id = 0x00000005;
+} // namespace RemoveGroup
+
+namespace AddAdmin {
+static constexpr CommandId Id = 0x00000006;
+} // namespace AddAdmin
+
+namespace UpdateAdmin {
+static constexpr CommandId Id = 0x00000007;
+} // namespace UpdateAdmin
+
+namespace RemoveAdmin {
+static constexpr CommandId Id = 0x00000008;
+} // namespace RemoveAdmin
+
+namespace AddPendingNode {
+static constexpr CommandId Id = 0x00000009;
+} // namespace AddPendingNode
+
+namespace RefreshNode {
+static constexpr CommandId Id = 0x0000000A;
+} // namespace RefreshNode
+
+namespace UpdateNode {
+static constexpr CommandId Id = 0x0000000B;
+} // namespace UpdateNode
+
+namespace RemoveNode {
+static constexpr CommandId Id = 0x0000000C;
+} // namespace RemoveNode
+
+namespace UpdateEndpointForNode {
+static constexpr CommandId Id = 0x0000000D;
+} // namespace UpdateEndpointForNode
+
+namespace AddGroupIDToEndpointForNode {
+static constexpr CommandId Id = 0x0000000E;
+} // namespace AddGroupIDToEndpointForNode
+
+namespace RemoveGroupIDFromEndpointForNode {
+static constexpr CommandId Id = 0x0000000F;
+} // namespace RemoveGroupIDFromEndpointForNode
+
+namespace AddBindingToEndpointForNode {
+static constexpr CommandId Id = 0x00000010;
+} // namespace AddBindingToEndpointForNode
+
+namespace RemoveBindingFromEndpointForNode {
+static constexpr CommandId Id = 0x00000011;
+} // namespace RemoveBindingFromEndpointForNode
+
+namespace AddACLToNode {
+static constexpr CommandId Id = 0x00000012;
+} // namespace AddACLToNode
+
+namespace RemoveACLFromNode {
+static constexpr CommandId Id = 0x00000013;
+} // namespace RemoveACLFromNode
+
+} // namespace Commands
+} // namespace JointFabricDatastore
+
+namespace JointFabricAdministrator {
+namespace Commands {
+
+namespace ICACCSRRequest {
+static constexpr CommandId Id = 0x00000000;
+} // namespace ICACCSRRequest
+
+namespace ICACCSRResponse {
+static constexpr CommandId Id = 0x00000001;
+} // namespace ICACCSRResponse
+
+namespace AddICAC {
+static constexpr CommandId Id = 0x00000002;
+} // namespace AddICAC
+
+namespace ICACResponse {
+static constexpr CommandId Id = 0x00000003;
+} // namespace ICACResponse
+
+namespace OpenJointCommissioningWindow {
+static constexpr CommandId Id = 0x00000004;
+} // namespace OpenJointCommissioningWindow
+
+namespace TransferAnchorRequest {
+static constexpr CommandId Id = 0x00000005;
+} // namespace TransferAnchorRequest
+
+namespace TransferAnchorResponse {
+static constexpr CommandId Id = 0x00000006;
+} // namespace TransferAnchorResponse
+
+namespace TransferAnchorComplete {
+static constexpr CommandId Id = 0x00000007;
+} // namespace TransferAnchorComplete
+
+} // namespace Commands
+} // namespace JointFabricAdministrator
+
 namespace TlsCertificateManagement {
 namespace Commands {
 

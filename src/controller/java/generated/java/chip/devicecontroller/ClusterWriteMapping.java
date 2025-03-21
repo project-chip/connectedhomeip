@@ -3800,6 +3800,32 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("ecosystemInformation", writeEcosystemInformationInteractionInfo);
     Map<String, InteractionInfo> writeCommissionerControlInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("commissionerControl", writeCommissionerControlInteractionInfo);
+    Map<String, InteractionInfo> writeJointFabricDatastoreInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("jointFabricDatastore", writeJointFabricDatastoreInteractionInfo);
+    Map<String, InteractionInfo> writeJointFabricAdministratorInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeJointFabricAdministratorAdministratorFabricIndexCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo jointFabricAdministratoradministratorFabricIndexCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Integer.class, 
+            Integer.class 
+        );
+    writeJointFabricAdministratorAdministratorFabricIndexCommandParams.put(
+        "value",
+        jointFabricAdministratoradministratorFabricIndexCommandParameterInfo
+    );
+    InteractionInfo writeJointFabricAdministratorAdministratorFabricIndexAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.JointFabricAdministratorCluster) cluster).writeAdministratorFabricIndexAttribute(
+          (DefaultClusterCallback) callback,
+          (Integer) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeJointFabricAdministratorAdministratorFabricIndexCommandParams
+    );
+    writeJointFabricAdministratorInteractionInfo.put("writeAdministratorFabricIndexAttribute", writeJointFabricAdministratorAdministratorFabricIndexAttributeInteractionInfo);
+    writeAttributeMap.put("jointFabricAdministrator", writeJointFabricAdministratorInteractionInfo);
     Map<String, InteractionInfo> writeTlsCertificateManagementInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("tlsCertificateManagement", writeTlsCertificateManagementInteractionInfo);
     Map<String, InteractionInfo> writeTlsClientManagementInteractionInfo = new LinkedHashMap<>();

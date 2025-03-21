@@ -18,6 +18,7 @@ limitations under the License.
   <domain name="CHIP"/>
 
   <enum name="AccessControlEntryPrivilegeEnum" type="enum8">
+    <cluster code="0x0752"/> <!-- Joint Fabric Datastore -->
     <cluster code="0x001F"/>
     <item name="View" value="0x01"/>
     <item name="ProxyView" value="0x02"/>
@@ -27,6 +28,7 @@ limitations under the License.
   </enum>
 
   <enum name="AccessControlEntryAuthModeEnum" type="enum8">
+    <cluster code="0x0752"/> <!-- Joint Fabric Datastore -->
     <cluster code="0x001F"/>
     <item name="PASE" value="0x01"/>
     <item name="CASE" value="0x02"/>
@@ -49,6 +51,7 @@ limitations under the License.
   </enum>
 
   <struct name="AccessControlTargetStruct">
+    <cluster code="0x0752"/> <!-- Joint Fabric Datastore -->
     <cluster code="0x001F"/>
     <item fieldId="0" name="Cluster" type="cluster_id" isNullable="true"/>
     <item fieldId="1" name="Endpoint" type="endpoint_no" isNullable="true"/>
@@ -56,6 +59,7 @@ limitations under the License.
   </struct>
 
   <struct name="AccessControlEntryStruct" isFabricScoped="true">
+    <cluster code="0x0752"/> <!-- Joint Fabric Datastore -->
     <cluster code="0x001F"/>
     <item fieldId="1" name="Privilege" type="AccessControlEntryPrivilegeEnum" isFabricSensitive="true" min="0x00" max="0x05"/>
     <item fieldId="2" name="AuthMode" type="AccessControlEntryAuthModeEnum" isFabricSensitive="true" min="0x00" max="0x03"/>

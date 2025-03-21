@@ -28,6 +28,34 @@ namespace Clusters {
 namespace detail {
 // Enums shared across multiple clusters.
 
+// Enum for AccessControlEntryAuthModeEnum
+enum class AccessControlEntryAuthModeEnum : uint8_t
+{
+    kPase  = 0x01,
+    kCase  = 0x02,
+    kGroup = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 0,
+};
+
+// Enum for AccessControlEntryPrivilegeEnum
+enum class AccessControlEntryPrivilegeEnum : uint8_t
+{
+    kView       = 0x01,
+    kProxyView  = 0x02,
+    kOperate    = 0x03,
+    kManage     = 0x04,
+    kAdminister = 0x05,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 0,
+};
+
 // Enum for ChangeIndicationEnum
 enum class ChangeIndicationEnum : uint8_t
 {
@@ -46,6 +74,18 @@ enum class DegradationDirectionEnum : uint8_t
 {
     kUp   = 0x00,
     kDown = 0x01,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 2,
+};
+
+// Enum for GroupKeySecurityPolicyEnum
+enum class GroupKeySecurityPolicyEnum : uint8_t
+{
+    kTrustFirst   = 0x00,
+    kCacheAndSync = 0x01,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
@@ -657,33 +697,9 @@ namespace Binding {} // namespace Binding
 
 namespace AccessControl {
 
-// Enum for AccessControlEntryAuthModeEnum
-enum class AccessControlEntryAuthModeEnum : uint8_t
-{
-    kPase  = 0x01,
-    kCase  = 0x02,
-    kGroup = 0x03,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 0,
-};
+using AccessControlEntryAuthModeEnum = Clusters::detail::AccessControlEntryAuthModeEnum;
 
-// Enum for AccessControlEntryPrivilegeEnum
-enum class AccessControlEntryPrivilegeEnum : uint8_t
-{
-    kView       = 0x01,
-    kProxyView  = 0x02,
-    kOperate    = 0x03,
-    kManage     = 0x04,
-    kAdminister = 0x05,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 0,
-};
+using AccessControlEntryPrivilegeEnum = Clusters::detail::AccessControlEntryPrivilegeEnum;
 
 // Enum for AccessRestrictionTypeEnum
 enum class AccessRestrictionTypeEnum : uint8_t
@@ -1902,17 +1918,7 @@ enum class NodeOperationalCertStatusEnum : uint8_t
 
 namespace GroupKeyManagement {
 
-// Enum for GroupKeySecurityPolicyEnum
-enum class GroupKeySecurityPolicyEnum : uint8_t
-{
-    kTrustFirst   = 0x00,
-    kCacheAndSync = 0x01,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 2,
-};
+using GroupKeySecurityPolicyEnum = Clusters::detail::GroupKeySecurityPolicyEnum;
 
 // Bitmap for Feature
 enum class Feature : uint32_t
@@ -5919,6 +5925,69 @@ enum class SupportedDeviceCategoryBitmap : uint32_t
     kFabricSynchronization = 0x1,
 };
 } // namespace CommissionerControl
+
+namespace JointFabricDatastore {
+
+using AccessControlEntryAuthModeEnum = Clusters::detail::AccessControlEntryAuthModeEnum;
+
+using AccessControlEntryPrivilegeEnum = Clusters::detail::AccessControlEntryPrivilegeEnum;
+
+// Enum for DatastoreStateEnum
+enum class DatastoreStateEnum : uint8_t
+{
+    kPending       = 0x00,
+    kCommitted     = 0x01,
+    kDeletePending = 0x02,
+    kCommitFailed  = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
+};
+
+// Enum for FailureCodeEnum
+enum class FailureCodeEnum : uint8_t
+{
+    kOk = 0x00,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 1,
+};
+
+using GroupKeySecurityPolicyEnum = Clusters::detail::GroupKeySecurityPolicyEnum;
+} // namespace JointFabricDatastore
+
+namespace JointFabricAdministrator {
+
+// Enum for ICACResponseStatusEnum
+enum class ICACResponseStatusEnum : uint8_t
+{
+    kOk               = 0x00,
+    kInvalidPublicKey = 0x01,
+    kInvalidICAC      = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for TransferAnchorResponseStatusEnum
+enum class TransferAnchorResponseStatusEnum : uint8_t
+{
+    kOk                                = 0x00,
+    kTransferAnchorStatusDatastoreBusy = 0x01,
+    kTransferAnchorStatusNoUserConsent = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+} // namespace JointFabricAdministrator
 
 namespace TlsCertificateManagement {} // namespace TlsCertificateManagement
 

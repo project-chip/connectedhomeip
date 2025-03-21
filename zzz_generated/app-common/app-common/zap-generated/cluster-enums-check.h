@@ -24,6 +24,34 @@
 namespace chip {
 namespace app {
 namespace Clusters {
+static auto __attribute__((unused)) EnsureKnownEnumValue(detail::AccessControlEntryAuthModeEnum val)
+{
+    using EnumType = detail::AccessControlEntryAuthModeEnum;
+    switch (val)
+    {
+    case EnumType::kPase:
+    case EnumType::kCase:
+    case EnumType::kGroup:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(detail::AccessControlEntryPrivilegeEnum val)
+{
+    using EnumType = detail::AccessControlEntryPrivilegeEnum;
+    switch (val)
+    {
+    case EnumType::kView:
+    case EnumType::kProxyView:
+    case EnumType::kOperate:
+    case EnumType::kManage:
+    case EnumType::kAdminister:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
 static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::AreaTypeTag val)
 {
     using EnumType = Globals::AreaTypeTag;
@@ -204,6 +232,18 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::FloorSurfaceTa
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(detail::GroupKeySecurityPolicyEnum val)
+{
+    using EnumType = detail::GroupKeySecurityPolicyEnum;
+    switch (val)
+    {
+    case EnumType::kTrustFirst:
+    case EnumType::kCacheAndSync:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
 static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::LandmarkTag val)
 {
     using EnumType = Globals::LandmarkTag;
@@ -573,34 +613,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(LevelControl::StepModeE
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(AccessControl::AccessControlEntryAuthModeEnum val)
-{
-    using EnumType = AccessControl::AccessControlEntryAuthModeEnum;
-    switch (val)
-    {
-    case EnumType::kPase:
-    case EnumType::kCase:
-    case EnumType::kGroup:
-        return val;
-    default:
-        return EnumType::kUnknownEnumValue;
-    }
-}
-static auto __attribute__((unused)) EnsureKnownEnumValue(AccessControl::AccessControlEntryPrivilegeEnum val)
-{
-    using EnumType = AccessControl::AccessControlEntryPrivilegeEnum;
-    switch (val)
-    {
-    case EnumType::kView:
-    case EnumType::kProxyView:
-    case EnumType::kOperate:
-    case EnumType::kManage:
-    case EnumType::kAdminister:
-        return val;
-    default:
-        return EnumType::kUnknownEnumValue;
-    }
-}
 static auto __attribute__((unused)) EnsureKnownEnumValue(AccessControl::AccessRestrictionTypeEnum val)
 {
     using EnumType = AccessControl::AccessRestrictionTypeEnum;
@@ -1616,19 +1628,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(OperationalCredentials:
     case EnumType::kFabricConflict:
     case EnumType::kLabelConflict:
     case EnumType::kInvalidFabricIndex:
-        return val;
-    default:
-        return EnumType::kUnknownEnumValue;
-    }
-}
-
-static auto __attribute__((unused)) EnsureKnownEnumValue(GroupKeyManagement::GroupKeySecurityPolicyEnum val)
-{
-    using EnumType = GroupKeyManagement::GroupKeySecurityPolicyEnum;
-    switch (val)
-    {
-    case EnumType::kTrustFirst:
-    case EnumType::kCacheAndSync:
         return val;
     default:
         return EnumType::kUnknownEnumValue;
@@ -3922,6 +3921,59 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(PushAvStreamTransport::
     case EnumType::kUserInitiated:
     case EnumType::kAutomation:
     case EnumType::kEmergency:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(JointFabricDatastore::DatastoreStateEnum val)
+{
+    using EnumType = JointFabricDatastore::DatastoreStateEnum;
+    switch (val)
+    {
+    case EnumType::kPending:
+    case EnumType::kCommitted:
+    case EnumType::kDeletePending:
+    case EnumType::kCommitFailed:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(JointFabricDatastore::FailureCodeEnum val)
+{
+    using EnumType = JointFabricDatastore::FailureCodeEnum;
+    switch (val)
+    {
+    case EnumType::kOk:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(JointFabricAdministrator::ICACResponseStatusEnum val)
+{
+    using EnumType = JointFabricAdministrator::ICACResponseStatusEnum;
+    switch (val)
+    {
+    case EnumType::kOk:
+    case EnumType::kInvalidPublicKey:
+    case EnumType::kInvalidICAC:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(JointFabricAdministrator::TransferAnchorResponseStatusEnum val)
+{
+    using EnumType = JointFabricAdministrator::TransferAnchorResponseStatusEnum;
+    switch (val)
+    {
+    case EnumType::kOk:
+    case EnumType::kTransferAnchorStatusDatastoreBusy:
+    case EnumType::kTransferAnchorStatusNoUserConsent:
         return val;
     default:
         return EnumType::kUnknownEnumValue;

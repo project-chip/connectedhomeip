@@ -31,12 +31,14 @@ limitations under the License.
   </struct>
 
   <enum name="GroupKeySecurityPolicyEnum" type="enum8">
+    <cluster code="0x0752"/> <!-- Joint Fabric Datastore -->
     <cluster code="0x003F"/>
     <item name="TrustFirst" value="0x00"/>
     <item name="CacheAndSync" value="0x01"/>
   </enum>
 
   <struct name="GroupKeySetStruct">
+    <cluster code="0x0752"/> <!-- Joint Fabric Datastore -->
     <cluster code="0x003F"/>
     <item fieldId="0" name="GroupKeySetID" type="int16u"/>
     <item fieldId="1" name="GroupKeySecurityPolicy" type="GroupKeySecurityPolicyEnum"/>
