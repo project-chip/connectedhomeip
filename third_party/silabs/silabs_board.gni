@@ -67,7 +67,7 @@ declare_args() {
 }
 
 # TODO - This needs to be removed once multiplexing issues resolved
-if (use_SiWx917) {
+if (use_SiWx917 || use_rs9116) {
   disable_lcd = true
   show_qr_code = false
   use_external_flash = false
