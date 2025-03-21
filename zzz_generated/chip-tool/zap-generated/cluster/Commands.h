@@ -5982,7 +5982,6 @@ private:
 | * CopyScene                                                         |   0x40 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
-| * LastConfiguredBy                                                  | 0x0000 |
 | * SceneTableSize                                                    | 0x0001 |
 | * FabricSceneInfo                                                   | 0x0002 |
 | * GeneratedCommandList                                              | 0xFFF8 |
@@ -6001,13 +6000,13 @@ class ScenesManagementAddScene : public ClusterCommand
 {
 public:
     ScenesManagementAddScene(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("add-scene", credsIssuerConfig), mComplex_ExtensionFieldSets(&mRequest.extensionFieldSets)
+        ClusterCommand("add-scene", credsIssuerConfig), mComplex_ExtensionFieldSetStructs(&mRequest.extensionFieldSetStructs)
     {
         AddArgument("GroupID", 0, UINT16_MAX, &mRequest.groupID);
         AddArgument("SceneID", 0, UINT8_MAX, &mRequest.sceneID);
         AddArgument("TransitionTime", 0, UINT32_MAX, &mRequest.transitionTime);
         AddArgument("SceneName", &mRequest.sceneName);
-        AddArgument("ExtensionFieldSets", &mComplex_ExtensionFieldSets);
+        AddArgument("ExtensionFieldSetStructs", &mComplex_ExtensionFieldSetStructs);
         ClusterCommand::AddArguments();
     }
 
@@ -6034,8 +6033,9 @@ public:
 
 private:
     chip::app::Clusters::ScenesManagement::Commands::AddScene::Type mRequest;
-    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::Type>>
-        mComplex_ExtensionFieldSets;
+    TypedComplexArgument<
+        chip::app::DataModel::List<const chip::app::Clusters::ScenesManagement::Structs::ExtensionFieldSetStruct::Type>>
+        mComplex_ExtensionFieldSetStructs;
 };
 
 /*
@@ -22277,7 +22277,6 @@ void registerClusterScenesManagement(Commands & commands, CredentialIssuerComman
         // Attributes
         //
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<ReadAttribute>(Id, "last-configured-by", Attributes::LastConfiguredBy::Id, credsIssuerConfig),         //
         make_unique<ReadAttribute>(Id, "scene-table-size", Attributes::SceneTableSize::Id, credsIssuerConfig),             //
         make_unique<ReadAttribute>(Id, "fabric-scene-info", Attributes::FabricSceneInfo::Id, credsIssuerConfig),           //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
@@ -22286,9 +22285,6 @@ void registerClusterScenesManagement(Commands & commands, CredentialIssuerComman
         make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
-        make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::NodeId>>>(
-            Id, "last-configured-by", 0, UINT64_MAX, Attributes::LastConfiguredBy::Id, WriteCommandType::kForceWrite,
-            credsIssuerConfig), //
         make_unique<WriteAttribute<uint16_t>>(Id, "scene-table-size", 0, UINT16_MAX, Attributes::SceneTableSize::Id,
                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<
@@ -22306,7 +22302,6 @@ void registerClusterScenesManagement(Commands & commands, CredentialIssuerComman
         make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
                                               WriteCommandType::kForceWrite, credsIssuerConfig),                                //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<SubscribeAttribute>(Id, "last-configured-by", Attributes::LastConfiguredBy::Id, credsIssuerConfig),         //
         make_unique<SubscribeAttribute>(Id, "scene-table-size", Attributes::SceneTableSize::Id, credsIssuerConfig),             //
         make_unique<SubscribeAttribute>(Id, "fabric-scene-info", Attributes::FabricSceneInfo::Id, credsIssuerConfig),           //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
