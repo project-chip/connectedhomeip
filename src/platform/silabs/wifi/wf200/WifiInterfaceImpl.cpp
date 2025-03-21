@@ -750,7 +750,7 @@ CHIP_ERROR WifiInterfaceImpl::GetAccessPointExtendedInfo(wfx_wifi_scan_ext_t & i
 }
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-CHIP_ERROR WifiInterfaceImpl::ConfigurePowerSave()
+CHIP_ERROR WifiInterfaceImpl::ConfigurePowerSave(PowerSaveInterface::PowerSaveConfiguration configuration, uint32_t listenInterval)
 {
     // TODO: Implement Power save configuration. We do a silent failure to avoid causing problems in higher layers.
     return CHIP_NO_ERROR;
@@ -833,12 +833,19 @@ CHIP_ERROR WifiInterfaceImpl::ConnectToAccessPoint(void)
     return CHIP_NO_ERROR;
 }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_IPV4
 bool WifiInterfaceImpl::HasAnIPv4Address()
 {
-    return (sta_ip == STA_IP_FAIL) ? false : true;
-}
+    bool hasIPv4 = false;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_IPV4
+    if (sta_ip != STA_IP_FAIL)
+    {
+        hasIPv4 = true;
+    }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_IPV4
+
+    return hasIPv4;
+}
 
 bool WifiInterfaceImpl::HasAnIPv6Address()
 {
