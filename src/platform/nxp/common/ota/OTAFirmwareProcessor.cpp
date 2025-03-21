@@ -31,6 +31,14 @@ CHIP_ERROR OTAFirmwareProcessor::Init()
 
     VerifyOrReturnError(gOtaSuccess_c == OTA_SelectExternalStoragePartition(), CHIP_ERROR_OTA_PROCESSOR_EXTERNAL_STORAGE);
 
+#if CONFIG_CHIP_OTA_POSTED_OPERATIONS_IN_IDLE
+    /* Resume flash write/erase transactions only in the idle task */
+    ota_config_t OTAconfig;
+    OTA_GetDefaultConfig(&OTAconfig);
+    OTAconfig.PostedOpInIdleTask = true;
+    OTA_SetConfig(&OTAconfig);
+#endif // CHIP_OTA_POSTED_OPERATIONS_IN_IDLE
+
     otaResult_t ota_status;
     ota_status = OTA_ServiceInit(&mPostedOperationsStorage[0], NB_PENDING_TRANSACTIONS * TRANSACTION_SZ);
 
@@ -116,12 +124,10 @@ CHIP_ERROR OTAFirmwareProcessor::AbortAction()
 
 CHIP_ERROR OTAFirmwareProcessor::ExitAction()
 {
-    if (OTA_CommitImage(NULL) != gOtaSuccess_c)
-    {
-        ChipLogError(SoftwareUpdate, "Failed to commit firmware image.");
-        mApplyState = ApplyState::kDoNotApply;
-        return CHIP_ERROR_OTA_PROCESSOR_IMG_COMMIT;
-    }
+    /* 
+     * The image will be commited in the context of HandleApply after all ApplyAction are completed. 
+     * So here, we return no error.
+    */
 
     return CHIP_NO_ERROR;
 }

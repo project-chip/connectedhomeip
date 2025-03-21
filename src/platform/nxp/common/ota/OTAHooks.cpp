@@ -17,9 +17,9 @@
  */
 
 #include <platform/nxp/common/ota/OTAImageProcessorImpl.h>
-#include <src/include/platform/CHIPDeviceLayer.h>
+#include <platform/CHIPDeviceLayer.h>
 
-#include <src/app/clusters/ota-requestor/OTARequestorInterface.h>
+#include <app/clusters/ota-requestor/OTARequestorInterface.h>
 
 #include <platform/nxp/common/ota/OTAFirmwareProcessor.h>
 #if CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
@@ -97,7 +97,7 @@ extern "C" WEAK void OtaHookReset()
 
     // Set the bootloader flags
     OTA_SetNewImageFlag();
-    ResetMCU();
+    chip::DeviceLayer::PlatformMgrImpl().ScheduleResetInIdle();
 }
 
 extern "C" WEAK void OtaHookAbort()
