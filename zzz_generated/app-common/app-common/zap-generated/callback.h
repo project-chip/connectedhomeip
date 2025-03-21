@@ -6225,12 +6225,6 @@ bool emberAfDemandResponseLoadControlClusterRemoveLoadControlEventRequestCallbac
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DemandResponseLoadControl::Commands::RemoveLoadControlEventRequest::DecodableType & commandData);
 /**
- * @brief Demand Response Load Control Cluster ClearLoadControlEventsRequest Command callback (from client)
- */
-bool emberAfDemandResponseLoadControlClusterClearLoadControlEventsRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::DemandResponseLoadControl::Commands::ClearLoadControlEventsRequest::DecodableType & commandData);
-/**
  * @brief Messages Cluster PresentMessagesRequest Command callback (from client)
  */
 bool emberAfMessagesClusterPresentMessagesRequestCallback(

@@ -5244,19 +5244,12 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             value_eventID = value_eventIDByteArray;
 
             jobject value_transitionIndex;
-            if (cppValue.transitionIndex.IsNull())
-            {
-                value_transitionIndex = nullptr;
-            }
-            else
-            {
-                std::string value_transitionIndexClassName     = "java/lang/Integer";
-                std::string value_transitionIndexCtorSignature = "(I)V";
-                jint jnivalue_transitionIndex                  = static_cast<jint>(cppValue.transitionIndex.Value());
-                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(value_transitionIndexClassName.c_str(),
-                                                                           value_transitionIndexCtorSignature.c_str(),
-                                                                           jnivalue_transitionIndex, value_transitionIndex);
-            }
+            std::string value_transitionIndexClassName     = "java/lang/Integer";
+            std::string value_transitionIndexCtorSignature = "(I)V";
+            jint jnivalue_transitionIndex                  = static_cast<jint>(cppValue.transitionIndex);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(value_transitionIndexClassName.c_str(),
+                                                                       value_transitionIndexCtorSignature.c_str(),
+                                                                       jnivalue_transitionIndex, value_transitionIndex);
 
             jobject value_status;
             std::string value_statusClassName     = "java/lang/Integer";
@@ -5325,36 +5318,36 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                             value_temperatureControlInsideOptional_coolingTempOffsetInsideOptional,
                             value_temperatureControlInsideOptional_coolingTempOffset);
                     }
-                    jobject value_temperatureControlInsideOptional_heatingtTempOffset;
-                    if (!cppValue.temperatureControl.Value().Value().heatingtTempOffset.HasValue())
+                    jobject value_temperatureControlInsideOptional_heatingTempOffset;
+                    if (!cppValue.temperatureControl.Value().Value().heatingTempOffset.HasValue())
                     {
-                        chip::JniReferences::GetInstance().CreateOptional(
-                            nullptr, value_temperatureControlInsideOptional_heatingtTempOffset);
+                        chip::JniReferences::GetInstance().CreateOptional(nullptr,
+                                                                          value_temperatureControlInsideOptional_heatingTempOffset);
                     }
                     else
                     {
-                        jobject value_temperatureControlInsideOptional_heatingtTempOffsetInsideOptional;
-                        if (cppValue.temperatureControl.Value().Value().heatingtTempOffset.Value().IsNull())
+                        jobject value_temperatureControlInsideOptional_heatingTempOffsetInsideOptional;
+                        if (cppValue.temperatureControl.Value().Value().heatingTempOffset.Value().IsNull())
                         {
-                            value_temperatureControlInsideOptional_heatingtTempOffsetInsideOptional = nullptr;
+                            value_temperatureControlInsideOptional_heatingTempOffsetInsideOptional = nullptr;
                         }
                         else
                         {
-                            std::string value_temperatureControlInsideOptional_heatingtTempOffsetInsideOptionalClassName =
+                            std::string value_temperatureControlInsideOptional_heatingTempOffsetInsideOptionalClassName =
                                 "java/lang/Integer";
-                            std::string value_temperatureControlInsideOptional_heatingtTempOffsetInsideOptionalCtorSignature =
+                            std::string value_temperatureControlInsideOptional_heatingTempOffsetInsideOptionalCtorSignature =
                                 "(I)V";
-                            jint jnivalue_temperatureControlInsideOptional_heatingtTempOffsetInsideOptional =
-                                static_cast<jint>(cppValue.temperatureControl.Value().Value().heatingtTempOffset.Value().Value());
+                            jint jnivalue_temperatureControlInsideOptional_heatingTempOffsetInsideOptional =
+                                static_cast<jint>(cppValue.temperatureControl.Value().Value().heatingTempOffset.Value().Value());
                             chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                                value_temperatureControlInsideOptional_heatingtTempOffsetInsideOptionalClassName.c_str(),
-                                value_temperatureControlInsideOptional_heatingtTempOffsetInsideOptionalCtorSignature.c_str(),
-                                jnivalue_temperatureControlInsideOptional_heatingtTempOffsetInsideOptional,
-                                value_temperatureControlInsideOptional_heatingtTempOffsetInsideOptional);
+                                value_temperatureControlInsideOptional_heatingTempOffsetInsideOptionalClassName.c_str(),
+                                value_temperatureControlInsideOptional_heatingTempOffsetInsideOptionalCtorSignature.c_str(),
+                                jnivalue_temperatureControlInsideOptional_heatingTempOffsetInsideOptional,
+                                value_temperatureControlInsideOptional_heatingTempOffsetInsideOptional);
                         }
                         chip::JniReferences::GetInstance().CreateOptional(
-                            value_temperatureControlInsideOptional_heatingtTempOffsetInsideOptional,
-                            value_temperatureControlInsideOptional_heatingtTempOffset);
+                            value_temperatureControlInsideOptional_heatingTempOffsetInsideOptional,
+                            value_temperatureControlInsideOptional_heatingTempOffset);
                     }
                     jobject value_temperatureControlInsideOptional_coolingTempSetpoint;
                     if (!cppValue.temperatureControl.Value().Value().coolingTempSetpoint.HasValue())
@@ -5447,7 +5440,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                         value_temperatureControlInsideOptional =
                             env->NewObject(temperatureControlStructStructClass_2, temperatureControlStructStructCtor_2,
                                            value_temperatureControlInsideOptional_coolingTempOffset,
-                                           value_temperatureControlInsideOptional_heatingtTempOffset,
+                                           value_temperatureControlInsideOptional_heatingTempOffset,
                                            value_temperatureControlInsideOptional_coolingTempSetpoint,
                                            value_temperatureControlInsideOptional_heatingTempSetpoint);
                     }

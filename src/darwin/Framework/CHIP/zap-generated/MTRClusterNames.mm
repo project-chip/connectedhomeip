@@ -9946,10 +9946,6 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
             result = @"RemoveLoadControlEventRequest";
             break;
 
-        case MTRCommandIDTypeClusterDemandResponseLoadControlCommandClearLoadControlEventsRequestID:
-            result = @"ClearLoadControlEventsRequest";
-            break;
-
         default:
             result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
             break;

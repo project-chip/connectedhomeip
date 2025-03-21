@@ -71,13 +71,10 @@ class DemandResponseLoadControlCluster(
     object SubscriptionEstablished : EventsAttributeSubscriptionState()
   }
 
-  class ActiveEventsAttribute(
-    val value: List<DemandResponseLoadControlClusterLoadControlEventStruct>
-  )
+  class ActiveEventsAttribute(val value: List<ByteArray>)
 
   sealed class ActiveEventsAttributeSubscriptionState {
-    data class Success(val value: List<DemandResponseLoadControlClusterLoadControlEventStruct>) :
-      ActiveEventsAttributeSubscriptionState()
+    data class Success(val value: List<ByteArray>) : ActiveEventsAttributeSubscriptionState()
 
     data class Error(val exception: Exception) : ActiveEventsAttributeSubscriptionState()
 
@@ -211,24 +208,6 @@ class DemandResponseLoadControlCluster(
 
     val TAG_CANCEL_CONTROL_REQ: Int = 1
     tlvWriter.put(ContextSpecificTag(TAG_CANCEL_CONTROL_REQ), cancelControl)
-    tlvWriter.endStructure()
-
-    val request: InvokeRequest =
-      InvokeRequest(
-        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
-        tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
-      )
-
-    val response: InvokeResponse = controller.invoke(request)
-    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
-  }
-
-  suspend fun clearLoadControlEventsRequest(timedInvokeTimeout: Duration? = null) {
-    val commandId: UInt = 4u
-
-    val tlvWriter = TlvWriter()
-    tlvWriter.startStructure(AnonymousTag)
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
@@ -560,13 +539,11 @@ class DemandResponseLoadControlCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: List<DemandResponseLoadControlClusterLoadControlEventStruct> =
-      buildList<DemandResponseLoadControlClusterLoadControlEventStruct> {
+    val decodedValue: List<ByteArray> =
+      buildList<ByteArray> {
         tlvReader.enterArray(AnonymousTag)
         while (!tlvReader.isEndOfContainer()) {
-          add(
-            DemandResponseLoadControlClusterLoadControlEventStruct.fromTlv(AnonymousTag, tlvReader)
-          )
+          add(tlvReader.getByteArray(AnonymousTag))
         }
         tlvReader.exitContainer()
       }
@@ -613,16 +590,11 @@ class DemandResponseLoadControlCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: List<DemandResponseLoadControlClusterLoadControlEventStruct> =
-            buildList<DemandResponseLoadControlClusterLoadControlEventStruct> {
+          val decodedValue: List<ByteArray> =
+            buildList<ByteArray> {
               tlvReader.enterArray(AnonymousTag)
               while (!tlvReader.isEndOfContainer()) {
-                add(
-                  DemandResponseLoadControlClusterLoadControlEventStruct.fromTlv(
-                    AnonymousTag,
-                    tlvReader,
-                  )
-                )
+                add(tlvReader.getByteArray(AnonymousTag))
               }
               tlvReader.exitContainer()
             }

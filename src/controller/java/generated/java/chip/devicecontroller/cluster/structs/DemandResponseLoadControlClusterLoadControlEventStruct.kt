@@ -27,9 +27,8 @@ import matter.tlv.TlvWriter
 class DemandResponseLoadControlClusterLoadControlEventStruct(
   val eventID: ByteArray,
   val programID: ByteArray?,
+  val status: Optional<UInt>,
   val control: UInt,
-  val deviceClass: ULong,
-  val enrollmentGroup: Optional<UInt>,
   val criticality: UInt,
   val startTime: ULong?,
   val transitions: List<DemandResponseLoadControlClusterLoadControlEventTransitionStruct>,
@@ -38,9 +37,8 @@ class DemandResponseLoadControlClusterLoadControlEventStruct(
     append("DemandResponseLoadControlClusterLoadControlEventStruct {\n")
     append("\teventID : $eventID\n")
     append("\tprogramID : $programID\n")
+    append("\tstatus : $status\n")
     append("\tcontrol : $control\n")
-    append("\tdeviceClass : $deviceClass\n")
-    append("\tenrollmentGroup : $enrollmentGroup\n")
     append("\tcriticality : $criticality\n")
     append("\tstartTime : $startTime\n")
     append("\ttransitions : $transitions\n")
@@ -56,12 +54,11 @@ class DemandResponseLoadControlClusterLoadControlEventStruct(
       } else {
         putNull(ContextSpecificTag(TAG_PROGRAM_ID))
       }
-      put(ContextSpecificTag(TAG_CONTROL), control)
-      put(ContextSpecificTag(TAG_DEVICE_CLASS), deviceClass)
-      if (enrollmentGroup.isPresent) {
-        val optenrollmentGroup = enrollmentGroup.get()
-        put(ContextSpecificTag(TAG_ENROLLMENT_GROUP), optenrollmentGroup)
+      if (status.isPresent) {
+        val optstatus = status.get()
+        put(ContextSpecificTag(TAG_STATUS), optstatus)
       }
+      put(ContextSpecificTag(TAG_CONTROL), control)
       put(ContextSpecificTag(TAG_CRITICALITY), criticality)
       if (startTime != null) {
         put(ContextSpecificTag(TAG_START_TIME), startTime)
@@ -80,12 +77,11 @@ class DemandResponseLoadControlClusterLoadControlEventStruct(
   companion object {
     private const val TAG_EVENT_ID = 0
     private const val TAG_PROGRAM_ID = 1
-    private const val TAG_CONTROL = 2
-    private const val TAG_DEVICE_CLASS = 3
-    private const val TAG_ENROLLMENT_GROUP = 4
-    private const val TAG_CRITICALITY = 5
-    private const val TAG_START_TIME = 6
-    private const val TAG_TRANSITIONS = 7
+    private const val TAG_STATUS = 2
+    private const val TAG_CONTROL = 3
+    private const val TAG_CRITICALITY = 4
+    private const val TAG_START_TIME = 5
+    private const val TAG_TRANSITIONS = 6
 
     fun fromTlv(
       tlvTag: Tag,
@@ -100,14 +96,13 @@ class DemandResponseLoadControlClusterLoadControlEventStruct(
           tlvReader.getNull(ContextSpecificTag(TAG_PROGRAM_ID))
           null
         }
-      val control = tlvReader.getUInt(ContextSpecificTag(TAG_CONTROL))
-      val deviceClass = tlvReader.getULong(ContextSpecificTag(TAG_DEVICE_CLASS))
-      val enrollmentGroup =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_ENROLLMENT_GROUP))) {
-          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_ENROLLMENT_GROUP)))
+      val status =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_STATUS))) {
+          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_STATUS)))
         } else {
           Optional.empty()
         }
+      val control = tlvReader.getUInt(ContextSpecificTag(TAG_CONTROL))
       val criticality = tlvReader.getUInt(ContextSpecificTag(TAG_CRITICALITY))
       val startTime =
         if (!tlvReader.isNull()) {
@@ -135,9 +130,8 @@ class DemandResponseLoadControlClusterLoadControlEventStruct(
       return DemandResponseLoadControlClusterLoadControlEventStruct(
         eventID,
         programID,
+        status,
         control,
-        deviceClass,
-        enrollmentGroup,
         criticality,
         startTime,
         transitions,

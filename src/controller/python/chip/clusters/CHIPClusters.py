@@ -6237,12 +6237,6 @@ class ChipClusters:
                     "cancelControl": "int",
                 },
             },
-            0x00000004: {
-                "commandId": 0x00000004,
-                "commandName": "ClearLoadControlEventsRequest",
-                "args": {
-                },
-            },
         },
         "attributes": {
             0x00000000: {
@@ -6266,7 +6260,7 @@ class ChipClusters:
             0x00000003: {
                 "attributeName": "ActiveEvents",
                 "attributeId": 0x00000003,
-                "type": "",
+                "type": "bytes",
                 "reportable": True,
             },
             0x00000004: {

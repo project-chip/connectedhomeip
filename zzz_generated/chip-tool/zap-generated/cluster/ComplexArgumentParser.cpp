@@ -3269,13 +3269,12 @@ ComplexArgumentParser::Setup(const char * label,
     }
     valueCopy.removeMember("coolingTempOffset");
 
-    if (value.isMember("heatingtTempOffset"))
+    if (value.isMember("heatingTempOffset"))
     {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "heatingtTempOffset");
-        ReturnErrorOnFailure(
-            ComplexArgumentParser::Setup(labelWithMember, request.heatingtTempOffset, value["heatingtTempOffset"]));
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "heatingTempOffset");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.heatingTempOffset, value["heatingTempOffset"]));
     }
-    valueCopy.removeMember("heatingtTempOffset");
+    valueCopy.removeMember("heatingTempOffset");
 
     if (value.isMember("coolingTempSetpoint"))
     {
@@ -3300,7 +3299,7 @@ void ComplexArgumentParser::Finalize(
     chip::app::Clusters::DemandResponseLoadControl::Structs::TemperatureControlStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.coolingTempOffset);
-    ComplexArgumentParser::Finalize(request.heatingtTempOffset);
+    ComplexArgumentParser::Finalize(request.heatingTempOffset);
     ComplexArgumentParser::Finalize(request.coolingTempSetpoint);
     ComplexArgumentParser::Finalize(request.heatingTempSetpoint);
 }
@@ -3398,8 +3397,6 @@ ComplexArgumentParser::Setup(const char * label,
         ComplexArgumentParser::EnsureMemberExist("LoadControlEventStruct.programID", "programID", value.isMember("programID")));
     ReturnErrorOnFailure(
         ComplexArgumentParser::EnsureMemberExist("LoadControlEventStruct.control", "control", value.isMember("control")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("LoadControlEventStruct.deviceClass", "deviceClass",
-                                                                  value.isMember("deviceClass")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("LoadControlEventStruct.criticality", "criticality",
                                                                   value.isMember("criticality")));
     ReturnErrorOnFailure(
@@ -3416,20 +3413,16 @@ ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.programID, value["programID"]));
     valueCopy.removeMember("programID");
 
+    if (value.isMember("status"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "status");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.status, value["status"]));
+    }
+    valueCopy.removeMember("status");
+
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "control");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.control, value["control"]));
     valueCopy.removeMember("control");
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "deviceClass");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.deviceClass, value["deviceClass"]));
-    valueCopy.removeMember("deviceClass");
-
-    if (value.isMember("enrollmentGroup"))
-    {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "enrollmentGroup");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.enrollmentGroup, value["enrollmentGroup"]));
-    }
-    valueCopy.removeMember("enrollmentGroup");
 
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "criticality");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.criticality, value["criticality"]));
@@ -3451,9 +3444,8 @@ void ComplexArgumentParser::Finalize(
 {
     ComplexArgumentParser::Finalize(request.eventID);
     ComplexArgumentParser::Finalize(request.programID);
+    ComplexArgumentParser::Finalize(request.status);
     ComplexArgumentParser::Finalize(request.control);
-    ComplexArgumentParser::Finalize(request.deviceClass);
-    ComplexArgumentParser::Finalize(request.enrollmentGroup);
     ComplexArgumentParser::Finalize(request.criticality);
     ComplexArgumentParser::Finalize(request.startTime);
     ComplexArgumentParser::Finalize(request.transitions);
@@ -3472,8 +3464,6 @@ ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(
         ComplexArgumentParser::EnsureMemberExist("LoadControlProgramStruct.programID", "programID", value.isMember("programID")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("LoadControlProgramStruct.name", "name", value.isMember("name")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("LoadControlProgramStruct.enrollmentGroup", "enrollmentGroup",
-                                                                  value.isMember("enrollmentGroup")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("LoadControlProgramStruct.randomStartMinutes",
                                                                   "randomStartMinutes", value.isMember("randomStartMinutes")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist(
@@ -3487,10 +3477,6 @@ ComplexArgumentParser::Setup(const char * label,
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "name");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.name, value["name"]));
     valueCopy.removeMember("name");
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "enrollmentGroup");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.enrollmentGroup, value["enrollmentGroup"]));
-    valueCopy.removeMember("enrollmentGroup");
 
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "randomStartMinutes");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.randomStartMinutes, value["randomStartMinutes"]));
@@ -3509,7 +3495,6 @@ void ComplexArgumentParser::Finalize(
 {
     ComplexArgumentParser::Finalize(request.programID);
     ComplexArgumentParser::Finalize(request.name);
-    ComplexArgumentParser::Finalize(request.enrollmentGroup);
     ComplexArgumentParser::Finalize(request.randomStartMinutes);
     ComplexArgumentParser::Finalize(request.randomDurationMinutes);
 }

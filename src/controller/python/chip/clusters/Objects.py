@@ -22854,7 +22854,7 @@ class DemandResponseLoadControl(Cluster):
                 ClusterObjectFieldDescriptor(Label="loadControlPrograms", Tag=0x00000000, Type=typing.List[DemandResponseLoadControl.Structs.LoadControlProgramStruct]),
                 ClusterObjectFieldDescriptor(Label="numberOfLoadControlPrograms", Tag=0x00000001, Type=uint),
                 ClusterObjectFieldDescriptor(Label="events", Tag=0x00000002, Type=typing.List[DemandResponseLoadControl.Structs.LoadControlEventStruct]),
-                ClusterObjectFieldDescriptor(Label="activeEvents", Tag=0x00000003, Type=typing.List[DemandResponseLoadControl.Structs.LoadControlEventStruct]),
+                ClusterObjectFieldDescriptor(Label="activeEvents", Tag=0x00000003, Type=typing.List[bytes]),
                 ClusterObjectFieldDescriptor(Label="numberOfEventsPerProgram", Tag=0x00000004, Type=uint),
                 ClusterObjectFieldDescriptor(Label="numberOfTransitions", Tag=0x00000005, Type=uint),
                 ClusterObjectFieldDescriptor(Label="defaultRandomStart", Tag=0x00000006, Type=uint),
@@ -22869,7 +22869,7 @@ class DemandResponseLoadControl(Cluster):
     loadControlPrograms: typing.List[DemandResponseLoadControl.Structs.LoadControlProgramStruct] = field(default_factory=lambda: [])
     numberOfLoadControlPrograms: uint = 0
     events: typing.List[DemandResponseLoadControl.Structs.LoadControlEventStruct] = field(default_factory=lambda: [])
-    activeEvents: typing.List[DemandResponseLoadControl.Structs.LoadControlEventStruct] = field(default_factory=lambda: [])
+    activeEvents: typing.List[bytes] = field(default_factory=lambda: [])
     numberOfEventsPerProgram: uint = 0
     numberOfTransitions: uint = 0
     defaultRandomStart: uint = 0
@@ -22889,14 +22889,11 @@ class DemandResponseLoadControl(Cluster):
             kLevel3 = 0x04
             kLevel4 = 0x05
             kLevel5 = 0x06
-            kEmergency = 0x07
-            kPlannedOutage = 0x08
-            kServiceDisconnect = 0x09
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 10
+            kUnknownEnumValue = 7
 
         class HeatingSourceEnum(MatterIntEnum):
             kAny = 0x00
@@ -22907,15 +22904,6 @@ class DemandResponseLoadControl(Cluster):
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3
-
-        class LoadControlEventChangeSourceEnum(MatterIntEnum):
-            kAutomatic = 0x00
-            kUserAction = 0x01
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving an unknown
-            # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 2
 
         class LoadControlEventStatusEnum(MatterIntEnum):
             kUnknown = 0x00
@@ -22941,25 +22929,6 @@ class DemandResponseLoadControl(Cluster):
         class CancelControlBitmap(IntFlag):
             kRandomEnd = 0x1
 
-        class DeviceClassBitmap(IntFlag):
-            kHvac = 0x1
-            kStripHeater = 0x2
-            kWaterHeater = 0x4
-            kPoolPump = 0x8
-            kSmartAppliance = 0x10
-            kIrrigationPump = 0x20
-            kCommercialLoad = 0x40
-            kResidentialLoad = 0x80
-            kExteriorLighting = 0x100
-            kInteriorLighting = 0x200
-            kEv = 0x400
-            kGenerationSystem = 0x800
-            kSmartInverter = 0x1000
-            kEvse = 0x2000
-            kResu = 0x4000
-            kEms = 0x8000
-            kSem = 0x10000
-
         class EventControlBitmap(IntFlag):
             kRandomStart = 0x1
 
@@ -22968,13 +22937,12 @@ class DemandResponseLoadControl(Cluster):
             kIgnoreOptOut = 0x2
 
         class Feature(IntFlag):
-            kEnrollmentGroups = 0x1
-            kTemperatureOffset = 0x2
-            kTemperatureSetpoint = 0x4
-            kLoadAdjustment = 0x8
-            kDutyCycle = 0x10
-            kPowerSavings = 0x20
-            kHeatingSource = 0x40
+            kTemperatureOffset = 0x1
+            kTemperatureSetpoint = 0x2
+            kLoadAdjustment = 0x4
+            kDutyCycle = 0x8
+            kPowerSavings = 0x10
+            kHeatingSource = 0x20
 
     class Structs:
         @dataclass
@@ -23027,14 +22995,14 @@ class DemandResponseLoadControl(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="coolingTempOffset", Tag=0, Type=typing.Union[None, Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="heatingtTempOffset", Tag=1, Type=typing.Union[None, Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="coolingTempOffset", Tag=0, Type=typing.Union[None, Nullable, int]),
+                        ClusterObjectFieldDescriptor(Label="heatingTempOffset", Tag=1, Type=typing.Union[None, Nullable, int]),
                         ClusterObjectFieldDescriptor(Label="coolingTempSetpoint", Tag=2, Type=typing.Union[None, Nullable, int]),
                         ClusterObjectFieldDescriptor(Label="heatingTempSetpoint", Tag=3, Type=typing.Union[None, Nullable, int]),
                     ])
 
-            coolingTempOffset: 'typing.Union[None, Nullable, uint]' = None
-            heatingtTempOffset: 'typing.Union[None, Nullable, uint]' = None
+            coolingTempOffset: 'typing.Union[None, Nullable, int]' = None
+            heatingTempOffset: 'typing.Union[None, Nullable, int]' = None
             coolingTempSetpoint: 'typing.Union[None, Nullable, int]' = None
             heatingTempSetpoint: 'typing.Union[None, Nullable, int]' = None
 
@@ -23069,19 +23037,17 @@ class DemandResponseLoadControl(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="eventID", Tag=0, Type=bytes),
                         ClusterObjectFieldDescriptor(Label="programID", Tag=1, Type=typing.Union[Nullable, bytes]),
-                        ClusterObjectFieldDescriptor(Label="control", Tag=2, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="deviceClass", Tag=3, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="enrollmentGroup", Tag=4, Type=typing.Optional[uint]),
-                        ClusterObjectFieldDescriptor(Label="criticality", Tag=5, Type=DemandResponseLoadControl.Enums.CriticalityLevelEnum),
-                        ClusterObjectFieldDescriptor(Label="startTime", Tag=6, Type=typing.Union[Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="transitions", Tag=7, Type=typing.List[DemandResponseLoadControl.Structs.LoadControlEventTransitionStruct]),
+                        ClusterObjectFieldDescriptor(Label="status", Tag=2, Type=typing.Optional[DemandResponseLoadControl.Enums.LoadControlEventStatusEnum]),
+                        ClusterObjectFieldDescriptor(Label="control", Tag=3, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="criticality", Tag=4, Type=DemandResponseLoadControl.Enums.CriticalityLevelEnum),
+                        ClusterObjectFieldDescriptor(Label="startTime", Tag=5, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="transitions", Tag=6, Type=typing.List[DemandResponseLoadControl.Structs.LoadControlEventTransitionStruct]),
                     ])
 
             eventID: 'bytes' = b""
             programID: 'typing.Union[Nullable, bytes]' = NullValue
+            status: 'typing.Optional[DemandResponseLoadControl.Enums.LoadControlEventStatusEnum]' = None
             control: 'uint' = 0
-            deviceClass: 'uint' = 0
-            enrollmentGroup: 'typing.Optional[uint]' = None
             criticality: 'DemandResponseLoadControl.Enums.CriticalityLevelEnum' = 0
             startTime: 'typing.Union[Nullable, uint]' = NullValue
             transitions: 'typing.List[DemandResponseLoadControl.Structs.LoadControlEventTransitionStruct]' = field(default_factory=lambda: [])
@@ -23094,14 +23060,12 @@ class DemandResponseLoadControl(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="programID", Tag=0, Type=bytes),
                         ClusterObjectFieldDescriptor(Label="name", Tag=1, Type=str),
-                        ClusterObjectFieldDescriptor(Label="enrollmentGroup", Tag=2, Type=typing.Union[Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="randomStartMinutes", Tag=3, Type=typing.Union[Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="randomDurationMinutes", Tag=4, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="randomStartMinutes", Tag=2, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="randomDurationMinutes", Tag=3, Type=typing.Union[Nullable, uint]),
                     ])
 
             programID: 'bytes' = b""
             name: 'str' = ""
-            enrollmentGroup: 'typing.Union[Nullable, uint]' = NullValue
             randomStartMinutes: 'typing.Union[Nullable, uint]' = NullValue
             randomDurationMinutes: 'typing.Union[Nullable, uint]' = NullValue
 
@@ -23172,19 +23136,6 @@ class DemandResponseLoadControl(Cluster):
             eventID: bytes = b""
             cancelControl: uint = 0
 
-        @dataclass
-        class ClearLoadControlEventsRequest(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x00000096
-            command_id: typing.ClassVar[int] = 0x00000004
-            is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[typing.Optional[str]] = None
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                    ])
-
     class Attributes:
         @dataclass
         class LoadControlPrograms(ClusterAttributeDescriptor):
@@ -23246,9 +23197,9 @@ class DemandResponseLoadControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.List[DemandResponseLoadControl.Structs.LoadControlEventStruct])
+                return ClusterObjectFieldDescriptor(Type=typing.List[bytes])
 
-            value: typing.List[DemandResponseLoadControl.Structs.LoadControlEventStruct] = field(default_factory=lambda: [])
+            value: typing.List[bytes] = field(default_factory=lambda: [])
 
         @dataclass
         class NumberOfEventsPerProgram(ClusterAttributeDescriptor):
@@ -23410,7 +23361,7 @@ class DemandResponseLoadControl(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="eventID", Tag=0, Type=bytes),
-                        ClusterObjectFieldDescriptor(Label="transitionIndex", Tag=1, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="transitionIndex", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(Label="status", Tag=2, Type=DemandResponseLoadControl.Enums.LoadControlEventStatusEnum),
                         ClusterObjectFieldDescriptor(Label="criticality", Tag=3, Type=DemandResponseLoadControl.Enums.CriticalityLevelEnum),
                         ClusterObjectFieldDescriptor(Label="control", Tag=4, Type=uint),
@@ -23422,7 +23373,7 @@ class DemandResponseLoadControl(Cluster):
                     ])
 
             eventID: bytes = b""
-            transitionIndex: typing.Union[Nullable, uint] = NullValue
+            transitionIndex: uint = 0
             status: DemandResponseLoadControl.Enums.LoadControlEventStatusEnum = 0
             criticality: DemandResponseLoadControl.Enums.CriticalityLevelEnum = 0
             control: uint = 0

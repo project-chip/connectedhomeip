@@ -2904,10 +2904,10 @@ CHIP_ERROR DataModelLogger::LogValue(
         }
     }
     {
-        CHIP_ERROR err = LogValue("HeatingtTempOffset", indent + 1, value.heatingtTempOffset);
+        CHIP_ERROR err = LogValue("HeatingTempOffset", indent + 1, value.heatingTempOffset);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'HeatingtTempOffset'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'HeatingTempOffset'");
             return err;
         }
     }
@@ -3020,26 +3020,18 @@ CHIP_ERROR DataModelLogger::LogValue(
         }
     }
     {
+        CHIP_ERROR err = LogValue("Status", indent + 1, value.status);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Status'");
+            return err;
+        }
+    }
+    {
         CHIP_ERROR err = LogValue("Control", indent + 1, value.control);
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Control'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("DeviceClass", indent + 1, value.deviceClass);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'DeviceClass'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("EnrollmentGroup", indent + 1, value.enrollmentGroup);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'EnrollmentGroup'");
             return err;
         }
     }
@@ -3090,14 +3082,6 @@ CHIP_ERROR DataModelLogger::LogValue(
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Name'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("EnrollmentGroup", indent + 1, value.enrollmentGroup);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'EnrollmentGroup'");
             return err;
         }
     }
@@ -14913,9 +14897,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("Events", 1, value);
         }
         case DemandResponseLoadControl::Attributes::ActiveEvents::Id: {
-            chip::app::DataModel::DecodableList<
-                chip::app::Clusters::DemandResponseLoadControl::Structs::LoadControlEventStruct::DecodableType>
-                value;
+            chip::app::DataModel::DecodableList<chip::ByteSpan> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ActiveEvents", 1, value);
         }

@@ -24,15 +24,15 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class DemandResponseLoadControlClusterTemperatureControlStruct(
-  val coolingTempOffset: Optional<UShort>?,
-  val heatingtTempOffset: Optional<UShort>?,
+  val coolingTempOffset: Optional<Short>?,
+  val heatingTempOffset: Optional<Short>?,
   val coolingTempSetpoint: Optional<Short>?,
   val heatingTempSetpoint: Optional<Short>?,
 ) {
   override fun toString(): String = buildString {
     append("DemandResponseLoadControlClusterTemperatureControlStruct {\n")
     append("\tcoolingTempOffset : $coolingTempOffset\n")
-    append("\theatingtTempOffset : $heatingtTempOffset\n")
+    append("\theatingTempOffset : $heatingTempOffset\n")
     append("\tcoolingTempSetpoint : $coolingTempSetpoint\n")
     append("\theatingTempSetpoint : $heatingTempSetpoint\n")
     append("}\n")
@@ -49,13 +49,13 @@ class DemandResponseLoadControlClusterTemperatureControlStruct(
       } else {
         putNull(ContextSpecificTag(TAG_COOLING_TEMP_OFFSET))
       }
-      if (heatingtTempOffset != null) {
-        if (heatingtTempOffset.isPresent) {
-          val optheatingtTempOffset = heatingtTempOffset.get()
-          put(ContextSpecificTag(TAG_HEATINGT_TEMP_OFFSET), optheatingtTempOffset)
+      if (heatingTempOffset != null) {
+        if (heatingTempOffset.isPresent) {
+          val optheatingTempOffset = heatingTempOffset.get()
+          put(ContextSpecificTag(TAG_HEATING_TEMP_OFFSET), optheatingTempOffset)
         }
       } else {
-        putNull(ContextSpecificTag(TAG_HEATINGT_TEMP_OFFSET))
+        putNull(ContextSpecificTag(TAG_HEATING_TEMP_OFFSET))
       }
       if (coolingTempSetpoint != null) {
         if (coolingTempSetpoint.isPresent) {
@@ -79,7 +79,7 @@ class DemandResponseLoadControlClusterTemperatureControlStruct(
 
   companion object {
     private const val TAG_COOLING_TEMP_OFFSET = 0
-    private const val TAG_HEATINGT_TEMP_OFFSET = 1
+    private const val TAG_HEATING_TEMP_OFFSET = 1
     private const val TAG_COOLING_TEMP_SETPOINT = 2
     private const val TAG_HEATING_TEMP_SETPOINT = 3
 
@@ -91,7 +91,7 @@ class DemandResponseLoadControlClusterTemperatureControlStruct(
       val coolingTempOffset =
         if (!tlvReader.isNull()) {
           if (tlvReader.isNextTag(ContextSpecificTag(TAG_COOLING_TEMP_OFFSET))) {
-            Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_COOLING_TEMP_OFFSET)))
+            Optional.of(tlvReader.getShort(ContextSpecificTag(TAG_COOLING_TEMP_OFFSET)))
           } else {
             Optional.empty()
           }
@@ -99,15 +99,15 @@ class DemandResponseLoadControlClusterTemperatureControlStruct(
           tlvReader.getNull(ContextSpecificTag(TAG_COOLING_TEMP_OFFSET))
           null
         }
-      val heatingtTempOffset =
+      val heatingTempOffset =
         if (!tlvReader.isNull()) {
-          if (tlvReader.isNextTag(ContextSpecificTag(TAG_HEATINGT_TEMP_OFFSET))) {
-            Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_HEATINGT_TEMP_OFFSET)))
+          if (tlvReader.isNextTag(ContextSpecificTag(TAG_HEATING_TEMP_OFFSET))) {
+            Optional.of(tlvReader.getShort(ContextSpecificTag(TAG_HEATING_TEMP_OFFSET)))
           } else {
             Optional.empty()
           }
         } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_HEATINGT_TEMP_OFFSET))
+          tlvReader.getNull(ContextSpecificTag(TAG_HEATING_TEMP_OFFSET))
           null
         }
       val coolingTempSetpoint =
@@ -137,7 +137,7 @@ class DemandResponseLoadControlClusterTemperatureControlStruct(
 
       return DemandResponseLoadControlClusterTemperatureControlStruct(
         coolingTempOffset,
-        heatingtTempOffset,
+        heatingTempOffset,
         coolingTempSetpoint,
         heatingTempSetpoint,
       )

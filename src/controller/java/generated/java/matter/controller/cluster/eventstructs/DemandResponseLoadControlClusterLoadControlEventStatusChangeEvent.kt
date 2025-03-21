@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 
 class DemandResponseLoadControlClusterLoadControlEventStatusChangeEvent(
   val eventID: ByteArray,
-  val transitionIndex: UByte?,
+  val transitionIndex: UByte,
   val status: UByte,
   val criticality: UByte,
   val control: UShort,
@@ -69,11 +69,7 @@ class DemandResponseLoadControlClusterLoadControlEventStatusChangeEvent(
     tlvWriter.apply {
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_EVENT_ID), eventID)
-      if (transitionIndex != null) {
-        put(ContextSpecificTag(TAG_TRANSITION_INDEX), transitionIndex)
-      } else {
-        putNull(ContextSpecificTag(TAG_TRANSITION_INDEX))
-      }
+      put(ContextSpecificTag(TAG_TRANSITION_INDEX), transitionIndex)
       put(ContextSpecificTag(TAG_STATUS), status)
       put(ContextSpecificTag(TAG_CRITICALITY), criticality)
       put(ContextSpecificTag(TAG_CONTROL), control)
@@ -139,13 +135,7 @@ class DemandResponseLoadControlClusterLoadControlEventStatusChangeEvent(
     ): DemandResponseLoadControlClusterLoadControlEventStatusChangeEvent {
       tlvReader.enterStructure(tlvTag)
       val eventID = tlvReader.getByteArray(ContextSpecificTag(TAG_EVENT_ID))
-      val transitionIndex =
-        if (!tlvReader.isNull()) {
-          tlvReader.getUByte(ContextSpecificTag(TAG_TRANSITION_INDEX))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_TRANSITION_INDEX))
-          null
-        }
+      val transitionIndex = tlvReader.getUByte(ContextSpecificTag(TAG_TRANSITION_INDEX))
       val status = tlvReader.getUByte(ContextSpecificTag(TAG_STATUS))
       val criticality = tlvReader.getUByte(ContextSpecificTag(TAG_CRITICALITY))
       val control = tlvReader.getUShort(ContextSpecificTag(TAG_CONTROL))

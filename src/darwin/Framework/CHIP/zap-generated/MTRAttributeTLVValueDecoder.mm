@@ -8325,11 +8325,6 @@ static id _Nullable DecodeAttributeValueForDemandResponseLoadControlCluster(Attr
                     *aError = err;
                     return nil;
                 }
-                if (entry_0.enrollmentGroup.IsNull()) {
-                    newElement_0.enrollmentGroup = nil;
-                } else {
-                    newElement_0.enrollmentGroup = [NSNumber numberWithUnsignedChar:entry_0.enrollmentGroup.Value()];
-                }
                 if (entry_0.randomStartMinutes.IsNull()) {
                     newElement_0.randomStartMinutes = nil;
                 } else {
@@ -8383,13 +8378,12 @@ static id _Nullable DecodeAttributeValueForDemandResponseLoadControlCluster(Attr
                 } else {
                     newElement_0.programID = AsData(entry_0.programID.Value());
                 }
-                newElement_0.control = [NSNumber numberWithUnsignedShort:entry_0.control.Raw()];
-                newElement_0.deviceClass = [NSNumber numberWithUnsignedInt:entry_0.deviceClass.Raw()];
-                if (entry_0.enrollmentGroup.HasValue()) {
-                    newElement_0.enrollmentGroup = [NSNumber numberWithUnsignedChar:entry_0.enrollmentGroup.Value()];
+                if (entry_0.status.HasValue()) {
+                    newElement_0.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.status.Value())];
                 } else {
-                    newElement_0.enrollmentGroup = nil;
+                    newElement_0.status = nil;
                 }
+                newElement_0.control = [NSNumber numberWithUnsignedShort:entry_0.control.Raw()];
                 newElement_0.criticality = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.criticality)];
                 if (entry_0.startTime.IsNull()) {
                     newElement_0.startTime = nil;
@@ -8411,19 +8405,19 @@ static id _Nullable DecodeAttributeValueForDemandResponseLoadControlCluster(Attr
                                 if (entry_2.temperatureControl.Value().coolingTempOffset.Value().IsNull()) {
                                     newElement_2.temperatureControl.coolingTempOffset = nil;
                                 } else {
-                                    newElement_2.temperatureControl.coolingTempOffset = [NSNumber numberWithUnsignedShort:entry_2.temperatureControl.Value().coolingTempOffset.Value().Value()];
+                                    newElement_2.temperatureControl.coolingTempOffset = [NSNumber numberWithShort:entry_2.temperatureControl.Value().coolingTempOffset.Value().Value()];
                                 }
                             } else {
                                 newElement_2.temperatureControl.coolingTempOffset = nil;
                             }
-                            if (entry_2.temperatureControl.Value().heatingtTempOffset.HasValue()) {
-                                if (entry_2.temperatureControl.Value().heatingtTempOffset.Value().IsNull()) {
-                                    newElement_2.temperatureControl.heatingtTempOffset = nil;
+                            if (entry_2.temperatureControl.Value().heatingTempOffset.HasValue()) {
+                                if (entry_2.temperatureControl.Value().heatingTempOffset.Value().IsNull()) {
+                                    newElement_2.temperatureControl.heatingTempOffset = nil;
                                 } else {
-                                    newElement_2.temperatureControl.heatingtTempOffset = [NSNumber numberWithUnsignedShort:entry_2.temperatureControl.Value().heatingtTempOffset.Value().Value()];
+                                    newElement_2.temperatureControl.heatingTempOffset = [NSNumber numberWithShort:entry_2.temperatureControl.Value().heatingTempOffset.Value().Value()];
                                 }
                             } else {
-                                newElement_2.temperatureControl.heatingtTempOffset = nil;
+                                newElement_2.temperatureControl.heatingTempOffset = nil;
                             }
                             if (entry_2.temperatureControl.Value().coolingTempSetpoint.HasValue()) {
                                 if (entry_2.temperatureControl.Value().coolingTempSetpoint.Value().IsNull()) {
@@ -8503,110 +8497,8 @@ static id _Nullable DecodeAttributeValueForDemandResponseLoadControlCluster(Attr
             auto iter_0 = cppValue.begin();
             while (iter_0.Next()) {
                 auto & entry_0 = iter_0.GetValue();
-                MTRDemandResponseLoadControlClusterLoadControlEventStruct * newElement_0;
-                newElement_0 = [MTRDemandResponseLoadControlClusterLoadControlEventStruct new];
-                newElement_0.eventID = AsData(entry_0.eventID);
-                if (entry_0.programID.IsNull()) {
-                    newElement_0.programID = nil;
-                } else {
-                    newElement_0.programID = AsData(entry_0.programID.Value());
-                }
-                newElement_0.control = [NSNumber numberWithUnsignedShort:entry_0.control.Raw()];
-                newElement_0.deviceClass = [NSNumber numberWithUnsignedInt:entry_0.deviceClass.Raw()];
-                if (entry_0.enrollmentGroup.HasValue()) {
-                    newElement_0.enrollmentGroup = [NSNumber numberWithUnsignedChar:entry_0.enrollmentGroup.Value()];
-                } else {
-                    newElement_0.enrollmentGroup = nil;
-                }
-                newElement_0.criticality = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.criticality)];
-                if (entry_0.startTime.IsNull()) {
-                    newElement_0.startTime = nil;
-                } else {
-                    newElement_0.startTime = [NSNumber numberWithUnsignedInt:entry_0.startTime.Value()];
-                }
-                { // Scope for our temporary variables
-                    auto * array_2 = [NSMutableArray new];
-                    auto iter_2 = entry_0.transitions.begin();
-                    while (iter_2.Next()) {
-                        auto & entry_2 = iter_2.GetValue();
-                        MTRDemandResponseLoadControlClusterLoadControlEventTransitionStruct * newElement_2;
-                        newElement_2 = [MTRDemandResponseLoadControlClusterLoadControlEventTransitionStruct new];
-                        newElement_2.duration = [NSNumber numberWithUnsignedShort:entry_2.duration];
-                        newElement_2.control = [NSNumber numberWithUnsignedShort:entry_2.control.Raw()];
-                        if (entry_2.temperatureControl.HasValue()) {
-                            newElement_2.temperatureControl = [MTRDemandResponseLoadControlClusterTemperatureControlStruct new];
-                            if (entry_2.temperatureControl.Value().coolingTempOffset.HasValue()) {
-                                if (entry_2.temperatureControl.Value().coolingTempOffset.Value().IsNull()) {
-                                    newElement_2.temperatureControl.coolingTempOffset = nil;
-                                } else {
-                                    newElement_2.temperatureControl.coolingTempOffset = [NSNumber numberWithUnsignedShort:entry_2.temperatureControl.Value().coolingTempOffset.Value().Value()];
-                                }
-                            } else {
-                                newElement_2.temperatureControl.coolingTempOffset = nil;
-                            }
-                            if (entry_2.temperatureControl.Value().heatingtTempOffset.HasValue()) {
-                                if (entry_2.temperatureControl.Value().heatingtTempOffset.Value().IsNull()) {
-                                    newElement_2.temperatureControl.heatingtTempOffset = nil;
-                                } else {
-                                    newElement_2.temperatureControl.heatingtTempOffset = [NSNumber numberWithUnsignedShort:entry_2.temperatureControl.Value().heatingtTempOffset.Value().Value()];
-                                }
-                            } else {
-                                newElement_2.temperatureControl.heatingtTempOffset = nil;
-                            }
-                            if (entry_2.temperatureControl.Value().coolingTempSetpoint.HasValue()) {
-                                if (entry_2.temperatureControl.Value().coolingTempSetpoint.Value().IsNull()) {
-                                    newElement_2.temperatureControl.coolingTempSetpoint = nil;
-                                } else {
-                                    newElement_2.temperatureControl.coolingTempSetpoint = [NSNumber numberWithShort:entry_2.temperatureControl.Value().coolingTempSetpoint.Value().Value()];
-                                }
-                            } else {
-                                newElement_2.temperatureControl.coolingTempSetpoint = nil;
-                            }
-                            if (entry_2.temperatureControl.Value().heatingTempSetpoint.HasValue()) {
-                                if (entry_2.temperatureControl.Value().heatingTempSetpoint.Value().IsNull()) {
-                                    newElement_2.temperatureControl.heatingTempSetpoint = nil;
-                                } else {
-                                    newElement_2.temperatureControl.heatingTempSetpoint = [NSNumber numberWithShort:entry_2.temperatureControl.Value().heatingTempSetpoint.Value().Value()];
-                                }
-                            } else {
-                                newElement_2.temperatureControl.heatingTempSetpoint = nil;
-                            }
-                        } else {
-                            newElement_2.temperatureControl = nil;
-                        }
-                        if (entry_2.averageLoadControl.HasValue()) {
-                            newElement_2.averageLoadControl = [MTRDemandResponseLoadControlClusterAverageLoadControlStruct new];
-                            newElement_2.averageLoadControl.loadAdjustment = [NSNumber numberWithChar:entry_2.averageLoadControl.Value().loadAdjustment];
-                        } else {
-                            newElement_2.averageLoadControl = nil;
-                        }
-                        if (entry_2.dutyCycleControl.HasValue()) {
-                            newElement_2.dutyCycleControl = [MTRDemandResponseLoadControlClusterDutyCycleControlStruct new];
-                            newElement_2.dutyCycleControl.dutyCycle = [NSNumber numberWithUnsignedChar:entry_2.dutyCycleControl.Value().dutyCycle];
-                        } else {
-                            newElement_2.dutyCycleControl = nil;
-                        }
-                        if (entry_2.powerSavingsControl.HasValue()) {
-                            newElement_2.powerSavingsControl = [MTRDemandResponseLoadControlClusterPowerSavingsControlStruct new];
-                            newElement_2.powerSavingsControl.powerSavings = [NSNumber numberWithUnsignedChar:entry_2.powerSavingsControl.Value().powerSavings];
-                        } else {
-                            newElement_2.powerSavingsControl = nil;
-                        }
-                        if (entry_2.heatingSourceControl.HasValue()) {
-                            newElement_2.heatingSourceControl = [MTRDemandResponseLoadControlClusterHeatingSourceControlStruct new];
-                            newElement_2.heatingSourceControl.heatingSource = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_2.heatingSourceControl.Value().heatingSource)];
-                        } else {
-                            newElement_2.heatingSourceControl = nil;
-                        }
-                        [array_2 addObject:newElement_2];
-                    }
-                    CHIP_ERROR err = iter_2.GetStatus();
-                    if (err != CHIP_NO_ERROR) {
-                        *aError = err;
-                        return nil;
-                    }
-                    newElement_0.transitions = array_2;
-                }
+                NSData * newElement_0;
+                newElement_0 = AsData(entry_0);
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();

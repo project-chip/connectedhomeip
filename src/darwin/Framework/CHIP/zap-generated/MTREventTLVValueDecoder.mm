@@ -2847,12 +2847,8 @@ static id _Nullable DecodeEventPayloadForDemandResponseLoadControlCluster(EventI
             value.eventID = memberValue;
         } while (0);
         do {
-            NSNumber * _Nullable memberValue;
-            if (cppValue.transitionIndex.IsNull()) {
-                memberValue = nil;
-            } else {
-                memberValue = [NSNumber numberWithUnsignedChar:cppValue.transitionIndex.Value()];
-            }
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:cppValue.transitionIndex];
             value.transitionIndex = memberValue;
         } while (0);
         do {
@@ -2881,19 +2877,19 @@ static id _Nullable DecodeEventPayloadForDemandResponseLoadControlCluster(EventI
                         if (cppValue.temperatureControl.Value().Value().coolingTempOffset.Value().IsNull()) {
                             memberValue.coolingTempOffset = nil;
                         } else {
-                            memberValue.coolingTempOffset = [NSNumber numberWithUnsignedShort:cppValue.temperatureControl.Value().Value().coolingTempOffset.Value().Value()];
+                            memberValue.coolingTempOffset = [NSNumber numberWithShort:cppValue.temperatureControl.Value().Value().coolingTempOffset.Value().Value()];
                         }
                     } else {
                         memberValue.coolingTempOffset = nil;
                     }
-                    if (cppValue.temperatureControl.Value().Value().heatingtTempOffset.HasValue()) {
-                        if (cppValue.temperatureControl.Value().Value().heatingtTempOffset.Value().IsNull()) {
-                            memberValue.heatingtTempOffset = nil;
+                    if (cppValue.temperatureControl.Value().Value().heatingTempOffset.HasValue()) {
+                        if (cppValue.temperatureControl.Value().Value().heatingTempOffset.Value().IsNull()) {
+                            memberValue.heatingTempOffset = nil;
                         } else {
-                            memberValue.heatingtTempOffset = [NSNumber numberWithUnsignedShort:cppValue.temperatureControl.Value().Value().heatingtTempOffset.Value().Value()];
+                            memberValue.heatingTempOffset = [NSNumber numberWithShort:cppValue.temperatureControl.Value().Value().heatingTempOffset.Value().Value()];
                         }
                     } else {
-                        memberValue.heatingtTempOffset = nil;
+                        memberValue.heatingTempOffset = nil;
                     }
                     if (cppValue.temperatureControl.Value().Value().coolingTempSetpoint.HasValue()) {
                         if (cppValue.temperatureControl.Value().Value().coolingTempSetpoint.Value().IsNull()) {
