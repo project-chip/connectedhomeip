@@ -32,16 +32,18 @@ class CameraApp
 
 public:
     // This class is responsible for initialising all the camera clusters and managing the interactions between them
-    explicit CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface * cameraDevice) :
-        mChimeServer(aClustersEndpoint, cameraDevice->GetChimeDelegate())
-    {}
+    CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface * aCameraDevice);
 
     // Initialize all the camera device clusters.
     void InitCameraDeviceClusters();
 
 private:
+    chip::EndpointId mEndpoint;
+    CameraDeviceInterface * mCameraDevice;
+
     // SDK cluster servers
-    chip::app::Clusters::ChimeServer mChimeServer;
+    std::unique_ptr<chip::app::Clusters::ChimeServer> mChimeServerPtr;
+    std::unique_ptr<chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtServer> mAVStreamMgmtServerPtr;
 };
 
 void CameraAppInit(CameraDeviceInterface * cameraDevice);

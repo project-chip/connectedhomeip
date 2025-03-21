@@ -39,6 +39,7 @@ executable("chip-camera-app") {
   sources = [
     "${chip_root}/examples/camera-app/linux/src/camera-device.cpp",
     "${chip_root}/examples/camera-app/linux/src/clusters/chime/chime-manager.cpp",
+    "${chip_root}/examples/camera-app/linux/src/clusters/camera-avstream-mgmt/camera-av-stream-manager.cpp",
     "include/CHIPProjectAppConfig.h",
     "main.cpp",
   ]
@@ -55,7 +56,32 @@ executable("chip-camera-app") {
   lib_dirs =
       [ rebase_path("${chip_root}/third_party/libdatachannel/repo/build") ]
 
+  include_dirs = [
+    "include",
+    "include/clusters/chime",
+    "include/clusters/camera-avstream-mgmt",
+    "${chip_root}/examples/camera-app/camera-common/include",
+
+    #TODO: Adjust paths
+    "/usr/include/gstreamer-1.0",
+    "/usr/include/glib-2.0",
+    "/usr/lib/x86_64-linux-gnu/glib-2.0/include",
+    "/usr/include/gobject-2.0",
+    "/usr/include/gst-app-1.0",
+  ]
+
+  cflags = [ "-Wconversion" ]
+
   output_dir = root_out_dir
+
+  # Manually specify GStreamer libraries
+  libs += [
+    "gstreamer-1.0",
+    "glib-2.0",
+    "gobject-2.0",
+    "gstapp-1.0",
+  ]
+
 }
 
 group("linux") {
