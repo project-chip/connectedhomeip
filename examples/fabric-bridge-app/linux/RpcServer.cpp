@@ -118,7 +118,7 @@ pw::Status FabricBridge::AddSynchronizedDevice(const chip_rpc_SynchronizedDevice
     device->SetBridgedAttributes(attributes);
     device->SetIcd(request.has_is_icd && request.is_icd);
 
-    auto result = BridgedDeviceManager::Instance().AddDeviceEndpoint(std::move(device), 1 /* parentEndpointId */);
+    auto result = BridgedDeviceManager::Instance().AddDeviceEndpoint(std::move(device), chip::CharSpan(), 1 /* parentEndpointId */);
     if (!result.has_value())
     {
         ChipLogError(NotSpecified, "Failed to add device with Id=[%d:0x" ChipLogFormatX64 "]", scopedNodeId.GetFabricIndex(),
