@@ -19,15 +19,11 @@
 #include "ICDUtil.h"
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-#ifdef CONFIG_CHIP_OTA_IMAGE_PROCESSOR_HEADER
-#include CONFIG_CHIP_OTA_IMAGE_PROCESSOR_HEADER
-#else
 #ifndef CONFIG_APP_FREERTOS_OS
 #include <platform/nxp/zephyr/ota/OTAImageProcessorImpl.h>
 #else
-#include "OTAImageProcessorImpl.h"
+#include <platform/nxp/common/ota/OTAImageProcessorImpl.h>
 #endif /* CONFIG_APP_FREERTOS_OS */
-#endif /* CONFIG_CHIP_OTA_IMAGE_PROCESSOR_HEADER */
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR */
 
 chip::NXP::App::ICDUtil chip::NXP::App::ICDUtil::sICDUtil;

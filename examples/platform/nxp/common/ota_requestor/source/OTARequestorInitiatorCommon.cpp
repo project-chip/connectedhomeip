@@ -21,6 +21,8 @@
 
 using namespace chip;
 
+constexpr uint16_t requestedOtaBlockSize = 1024;
+
 void chip::NXP::App::OTARequestorInitiator::InitOTA(intptr_t context)
 {
     auto * otaRequestorInit = reinterpret_cast<OTARequestorInitiator *>(context);
@@ -31,8 +33,9 @@ void chip::NXP::App::OTARequestorInitiator::InitOTA(intptr_t context)
     otaRequestorInit->gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
     otaRequestorInit->gRequestorCore.Init(chip::Server::GetInstance(), otaRequestorInit->gRequestorStorage,
                                           otaRequestorInit->gRequestorUser, otaRequestorInit->gDownloader);
+    otaRequestorInit->gRequestorUser.SetMaxDownloadBlockSize(requestedOtaBlockSize);
     otaRequestorInit->gRequestorUser.Init(&otaRequestorInit->gRequestorCore, &imageProcessor);
-    imageProcessor.SetOTADownloader(&otaRequestorInit->gDownloader);
+    imageProcessor.Init(&otaRequestorInit->gDownloader);
 
     // Set the image processor instance used for handling image being downloaded
     otaRequestorInit->gDownloader.SetImageProcessorDelegate(&imageProcessor);
