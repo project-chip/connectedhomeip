@@ -12,10 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("${chip_root}/build/chip/tests.gni")
+import("//build_overrides/pigweed.gni")
+import("${chip_root}/build/chip/chip_test_group.gni")
+import("${chip_root}/build/chip/chip_test_suite.gni")
 
-declare_args() {
-  # Build argument to enable Silabs specific unit tests
-  sl_build_unit_tests = chip_build_all_platform_tests
+chip_test_suite("wifi_icd_tests") {
+  output_name = "libSilabsWifiICDPlatformTests"
+
+  test_sources = [ "TestWifiSleepManager.cpp" ]
+
+  public_deps = [
+    "${chip_root}/src/lib/core:string-builder-adapters",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/lib/support:testing",
+    "${chip_root}/src/platform/silabs/wifi/icd:wifi-sleep-manager",
+  ]
 }
