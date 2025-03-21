@@ -55,6 +55,7 @@ extern "C" {
 WfxRsi_t wfx_rsi;
 
 using namespace chip::DeviceLayer::Silabs;
+using WiFiBandEnum = chip::app::Clusters::NetworkCommissioning::WiFiBandEnum;
 
 namespace {
 
@@ -71,6 +72,9 @@ osThreadAttr_t kDrvTaskAttr = { .name       = "drv_rsi",
                                 .priority   = osPriorityHigh };
 
 osMessageQueueId_t sWifiEventQueue = NULL;
+
+//  DHCP Polling interval for the IPv4/IPv6
+constexpr uint32_t kDhcpPollIntervalMs = 250;
 
 uint8_t wfx_rsi_drv_buf[WFX_RSI_BUF_SZ];
 wfx_wifi_scan_ext_t temp_reset;
@@ -314,7 +318,7 @@ void WifiInterfaceImpl::ProcessEvent(WifiPlatformEvent event)
     case WiseconnectWifiInterface::WifiPlatformEvent::kStationConnect: {
         ChipLogDetail(DeviceLayer, "WiseconnectWifiInterface::WifiPlatformEvent::kStationConnect");
         wfx_rsi.dev_state.Set(WifiInterface::WifiState::kStationConnected);
-        ResetDHCPNotificationFlags();
+        ResetConnectivityNotificationFlags();
         chip::DeviceLayer::Silabs::Lwip::SetLwipStationLinkUp();
     }
     break;
@@ -327,7 +331,7 @@ void WifiInterfaceImpl::ProcessEvent(WifiPlatformEvent event)
             .Clear(WifiInterface::WifiState::kStationDhcpDone);
 
         /* TODO: Implement disconnect notify */
-        ResetDHCPNotificationFlags();
+        ResetConnectivityNotificationFlags();
         chip::DeviceLayer::Silabs::Lwip::SetLwipStationLinkDown();
 
 #if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
@@ -376,6 +380,8 @@ void WifiInterfaceImpl::ProcessEvent(WifiPlatformEvent event)
             chip::MutableByteSpan bssidSpan(ap.bssid, kWifiMacAddressLength);
             chip::ByteSpan scanBssidSpan(scan.bssid, kWifiMacAddressLength);
             chip::CopySpanToMutableSpan(scanBssidSpan, bssidSpan);
+            // TODO: change this when SDK provides values
+            ap.wiFiBand = WiFiBandEnum::k2g4;
 
             wfx_rsi.scan_cb(&ap);
 
@@ -404,7 +410,7 @@ void WifiInterfaceImpl::ProcessEvent(WifiPlatformEvent event)
         JoinWifiNetwork();
     }
     break;
-    case WiseconnectWifiInterface::WifiPlatformEvent::kStationDoDhcp: {
+    case WiseconnectWifiInterface::WifiPlatformEvent::kConnectionComplete: {
         StartDHCPTimer(kDhcpPollIntervalMs);
     }
     break;
@@ -604,6 +610,36 @@ void WifiInterfaceImpl::JoinWifiNetwork(void)
         wfx_rsi.dev_state.Clear(WifiInterface::WifiState::kStationConnecting);
         ScheduleConnectionAttempt();
     }
+}
+
+void WifiInterfaceImpl::DHCPTimerEventHandler(void * arg)
+{
+    WifiPlatformEvent event = WiseconnectWifiInterface::WifiPlatformEvent::kStationDhcpPoll;
+    WifiInterfaceImpl::GetInstance().PostWifiPlatformEvent(event);
+}
+
+void WifiInterfaceImpl::CancelDHCPTimer(void)
+{
+    VerifyOrReturn(osTimerIsRunning(mDHCPTimer), ChipLogDetail(DeviceLayer, "CancelDHCPTimer: timer not running"));
+    VerifyOrReturn(osTimerStop(mDHCPTimer) == osOK, ChipLogError(DeviceLayer, "CancelDHCPTimer: failed to stop timer"));
+}
+
+void WifiInterfaceImpl::StartDHCPTimer(uint32_t timeout)
+{
+    // Cancel timer if already started
+    CancelDHCPTimer();
+
+    VerifyOrReturn(osTimerStart(mDHCPTimer, pdMS_TO_TICKS(timeout)) == osOK,
+                   ChipLogError(DeviceLayer, "StartDHCPTimer: failed to start timer"));
+}
+
+sl_status_t WifiInterfaceImpl::CreateDHCPTimer()
+{
+    // TODO: Use LWIP timer instead of creating a new one here
+    mDHCPTimer = osTimerNew(DHCPTimerEventHandler, osTimerPeriodic, nullptr, nullptr);
+    VerifyOrReturnError(mDHCPTimer != nullptr, SL_STATUS_ALLOCATION_FAILED);
+
+    return SL_STATUS_OK;
 }
 
 void WifiInterfaceImpl::HandleDHCPPolling(void)
