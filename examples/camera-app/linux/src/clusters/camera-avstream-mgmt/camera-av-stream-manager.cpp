@@ -43,13 +43,15 @@ Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamAllocate(c
 {
     outStreamID = kInvalidStreamID;
 
-    if (CameraDevice::GetInstance().VideoStreamAllocate(allocateArgs, outStreamID) == CameraError::SUCCESS)
+    CameraError error = CameraDevice::GetInstance().VideoStreamAllocate(allocateArgs, outStreamID);
+    switch (error)
     {
-        return Status::Success;
-    }
-    else
-    {
-        return Status::Failure;
+    case CameraError::SUCCESS:
+      return Status::Success;
+    case CameraError::ERROR_RESOURCE_EXHAUSTED:
+      return Status::ResourceExhausted;
+    default:
+      return Status::Failure;
     }
 }
 
@@ -83,13 +85,15 @@ Protocols::InteractionModel::Status CameraAVStreamManager::AudioStreamAllocate(c
 {
     outStreamID = kInvalidStreamID;
 
-    if (CameraDevice::GetInstance().AudioStreamAllocate(allocateArgs, outStreamID) == CameraError::SUCCESS)
+    CameraError error = CameraDevice::GetInstance().AudioStreamAllocate(allocateArgs, outStreamID);
+    switch (error)
     {
-        return Status::Success;
-    }
-    else
-    {
-        return Status::Failure;
+    case CameraError::SUCCESS:
+      return Status::Success;
+    case CameraError::ERROR_RESOURCE_EXHAUSTED:
+      return Status::ResourceExhausted;
+    default:
+      return Status::Failure;
     }
 }
 
@@ -105,13 +109,15 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamAllocat
 {
     outStreamID = kInvalidStreamID;
 
-    if (CameraDevice::GetInstance().SnapshotStreamAllocate(allocateArgs, outStreamID) == CameraError::SUCCESS)
+    CameraError error = CameraDevice::GetInstance().SnapshotStreamAllocate(allocateArgs, outStreamID);
+    switch (error)
     {
-        return Status::Success;
-    }
-    else
-    {
-        return Status::Failure;
+    case CameraError::SUCCESS:
+      return Status::Success;
+    case CameraError::ERROR_RESOURCE_EXHAUSTED:
+      return Status::ResourceExhausted;
+    default:
+      return Status::Failure;
     }
 }
 
