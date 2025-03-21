@@ -122,3 +122,65 @@ void MatterWindowCoveringPluginServerInitCallback();
     MatterWiFiNetworkDiagnosticsPluginServerInitCallback(); \
     MatterWindowCoveringPluginServerInitCallback();
 
+#define MATTER_PLUGINS_SHUTDOWN \
+    MatterAccessControlPluginServerShutdownCallback(); \
+    MatterAccountLoginPluginServerShutdownCallback(); \
+    MatterActionsPluginServerShutdownCallback(); \
+    MatterAdministratorCommissioningPluginServerShutdownCallback(); \
+    MatterApplicationBasicPluginServerShutdownCallback(); \
+    MatterApplicationLauncherPluginServerShutdownCallback(); \
+    MatterAudioOutputPluginServerShutdownCallback(); \
+    MatterBasicInformationPluginServerShutdownCallback(); \
+    MatterBinaryInputBasicPluginServerShutdownCallback(); \
+    MatterBindingPluginServerShutdownCallback(); \
+    MatterBooleanStatePluginServerShutdownCallback(); \
+    MatterChannelPluginServerShutdownCallback(); \
+    MatterColorControlPluginServerShutdownCallback(); \
+    MatterContentLauncherPluginServerShutdownCallback(); \
+    MatterDescriptorPluginServerShutdownCallback(); \
+    MatterDiagnosticLogsPluginServerShutdownCallback(); \
+    MatterDoorLockPluginServerShutdownCallback(); \
+    MatterEthernetNetworkDiagnosticsPluginServerShutdownCallback(); \
+    MatterFanControlPluginServerShutdownCallback(); \
+    MatterFaultInjectionPluginServerShutdownCallback(); \
+    MatterFixedLabelPluginServerShutdownCallback(); \
+    MatterFlowMeasurementPluginServerShutdownCallback(); \
+    MatterGeneralCommissioningPluginServerShutdownCallback(); \
+    MatterGeneralDiagnosticsPluginServerShutdownCallback(); \
+    MatterGroupKeyManagementPluginServerShutdownCallback(); \
+    MatterGroupsPluginServerShutdownCallback(); \
+    MatterIdentifyPluginServerShutdownCallback(); \
+    MatterIlluminanceMeasurementPluginServerShutdownCallback(); \
+    MatterKeypadInputPluginServerShutdownCallback(); \
+    MatterLevelControlPluginServerShutdownCallback(); \
+    MatterLocalizationConfigurationPluginServerShutdownCallback(); \
+    MatterLowPowerPluginServerShutdownCallback(); \
+    MatterMatterScenesPluginServerShutdownCallback(); \
+    MatterMediaInputPluginServerShutdownCallback(); \
+    MatterMediaPlaybackPluginServerShutdownCallback(); \
+    MatterModeSelectPluginServerShutdownCallback(); \
+    MatterNetworkCommissioningPluginServerShutdownCallback(); \
+    MatterOccupancySensingPluginServerShutdownCallback(); \
+    MatterOnOffPluginServerShutdownCallback(); \
+    MatterOperationalCredentialsPluginServerShutdownCallback(); \
+    MatterOtaSoftwareUpdateRequestorPluginServerShutdownCallback(); \
+    MatterPowerSourcePluginServerShutdownCallback(); \
+    MatterPowerSourceConfigurationPluginServerShutdownCallback(); \
+    MatterPressureMeasurementPluginServerShutdownCallback(); \
+    MatterPumpConfigurationAndControlPluginServerShutdownCallback(); \
+    MatterRelativeHumidityMeasurementPluginServerShutdownCallback(); \
+    MatterSoftwareDiagnosticsPluginServerShutdownCallback(); \
+    MatterSwitchPluginServerShutdownCallback(); \
+    MatterTargetNavigatorPluginServerShutdownCallback(); \
+    MatterTemperatureMeasurementPluginServerShutdownCallback(); \
+    MatterThermostatPluginServerShutdownCallback(); \
+    MatterThermostatUserInterfaceConfigurationPluginServerShutdownCallback(); \
+    MatterThreadNetworkDiagnosticsPluginServerShutdownCallback(); \
+    MatterTimeFormatLocalizationPluginServerShutdownCallback(); \
+    MatterUnitLocalizationPluginServerShutdownCallback(); \
+    MatterUnitTestingPluginServerShutdownCallback(); \
+    MatterUserLabelPluginServerShutdownCallback(); \
+    MatterWakeOnLanPluginServerShutdownCallback(); \
+    MatterWiFiNetworkDiagnosticsPluginServerShutdownCallback(); \
+    MatterWindowCoveringPluginServerShutdownCallback();
+
