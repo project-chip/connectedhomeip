@@ -271,7 +271,7 @@ rt_executable("all_cluster_app") {
   ]
 
   if (evkname == "evkcmimxrt1060") {
-    ldflags += [ "-Wl,--defsym=gEVKCFlashSize_d=0x1000000" ]
+    ldflags += [ "-Wl,--defsym=gFlashSize_d=0x1000000" ]
   }
 
   if (enable_ota_provider) {

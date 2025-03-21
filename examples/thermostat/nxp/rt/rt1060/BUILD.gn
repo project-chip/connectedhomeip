@@ -300,7 +300,7 @@ rt_executable("thermostat") {
   ]
 
   if (evkname == "evkcmimxrt1060") {
-    ldflags += [ "-Wl,--defsym=gEVKCFlashSize_d=0x1000000" ]
+    ldflags += [ "-Wl,--defsym=gFlashSize_d=0x1000000" ]
   }
   if (enable_ota_provider) {
     # As the OTA file will be stored in the littlefs file system, it is required to increase the size of the file system
