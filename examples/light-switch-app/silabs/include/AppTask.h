@@ -75,5 +75,4 @@ private:
      * @return CHIP_ERROR
      */
     CHIP_ERROR AppInit() override;
-
 };
