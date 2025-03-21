@@ -4947,26 +4947,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"OverallTarget";
             break;
 
-        case MTRAttributeIDTypeClusterClosureControlAttributeRestingProcedureID:
-            result = @"RestingProcedure";
-            break;
-
-        case MTRAttributeIDTypeClusterClosureControlAttributeTriggerConditionID:
-            result = @"TriggerCondition";
-            break;
-
-        case MTRAttributeIDTypeClusterClosureControlAttributeTriggerPositionID:
-            result = @"TriggerPosition";
-            break;
-
-        case MTRAttributeIDTypeClusterClosureControlAttributeWaitingDelayID:
-            result = @"WaitingDelay";
-            break;
-
-        case MTRAttributeIDTypeClusterClosureControlAttributeKickoffTimerID:
-            result = @"KickoffTimer";
-            break;
-
         case MTRAttributeIDTypeClusterClosureControlAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
@@ -10262,14 +10242,6 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
 
         case MTRCommandIDTypeClusterClosureControlCommandCalibrateID:
             result = @"Calibrate";
-            break;
-
-        case MTRCommandIDTypeClusterClosureControlCommandConfigureFallbackID:
-            result = @"ConfigureFallback";
-            break;
-
-        case MTRCommandIDTypeClusterClosureControlCommandCancelFallbackID:
-            result = @"CancelFallback";
             break;
 
         default:
