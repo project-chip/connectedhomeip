@@ -118,6 +118,7 @@ static_library("controller") {
   ]
 
   cflags = [ "-Wconversion" ]
+  public_deps += [ "${chip_root}/src/controller/webrtc:chip_webrtc" ]
 
   public_configs = [ "${chip_root}/src:includes" ]
 }
