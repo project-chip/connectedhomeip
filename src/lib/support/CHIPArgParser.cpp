@@ -458,7 +458,7 @@ bool ParseArgs(const char * progName, int argc, char * const argv[], OptionSet *
         // character of an option group (e.g. 'a' or 'b' in "-abc"), or [prevOptIndex, optind) if it's the final character of an
         // option group or not a group at all.  Walk through those elements knowing that all elements we encounter before reaching
         // the option must be nonoptions.  Store the range of those nonoptions in firstNonoptionNew and lastNonoptionPlus1New.  If
-        // this is the final iteration (getopt_long returned -1) then prevOptIndex == optind == argc, which means firstNonoptionNe
+        // this is the final iteration (getopt_long returned -1) then prevOptIndex == optind == argc, which means firstNonoptionNew
         // == lastNonoptionPlus1New == argc, the following for loop will be skipped, and all the nonoptions we had already found
         // will get moved to the end of argv.
         firstNonoptionNew     = prevOptIndex;
