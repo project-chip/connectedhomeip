@@ -6641,6 +6641,155 @@ cluster ClosureControl = 260 {
   command CancelFallback(): DefaultSuccess = 4;
 }
 
+/** Ceiling values are dedicated for closures that close a ceiling, such as horizontal awnings, pergolas, etc. */
+provisional cluster ClosureDimension = 261 {
+  revision 1;
+
+  enum ClosureUnitEnum : enum8 {
+    kMillimeter = 0;
+    kDegree = 1;
+  }
+
+  enum LatchingEnum : enum8 {
+    kLatchedAndSecured = 0;
+    kLatchedButNotSecured = 1;
+    kNotLatched = 2;
+  }
+
+  enum ModulationTypeEnum : enum8 {
+    kSlatsOrientation = 0;
+    kSlatsOpenwork = 1;
+    kStripesAlignment = 2;
+    kOpacity = 3;
+    kVentilation = 4;
+  }
+
+  enum OverflowEnum : enum8 {
+    kNoOverflow = 0;
+    kInside = 1;
+    kOutside = 2;
+    kTopInside = 3;
+    kTopOutside = 4;
+    kBottomInside = 5;
+    kBottomOutside = 6;
+    kLeftInside = 7;
+    kLeftOutside = 8;
+    kRightInside = 9;
+    kRightOutside = 10;
+  }
+
+  enum RotationAxisEnum : enum8 {
+    kLeft = 0;
+    kCenteredVertical = 1;
+    kLeftAndRight = 2;
+    kRight = 3;
+    kTop = 4;
+    kCenteredHorizontal = 5;
+    kTopAndBottom = 6;
+    kBottom = 7;
+    kLeftBarrier = 8;
+    kLeftAndRightBarriers = 9;
+    kRightBarrier = 10;
+  }
+
+  enum StepDirectionEnum : enum8 {
+    kDecrease = 0;
+    kIncrease = 1;
+  }
+
+  enum TargetLatchEnum : enum8 {
+    kLatch = 0;
+    kUnlatch = 1;
+  }
+
+  enum TranslationDirectionEnum : enum8 {
+    kDownward = 0;
+    kUpward = 1;
+    kVerticalMask = 2;
+    kVerticalSymmetry = 3;
+    kLeftward = 4;
+    kRightward = 5;
+    kHorizontalMask = 6;
+    kHorizontalSymmetry = 7;
+    kForward = 8;
+    kBackward = 9;
+    kDepthMask = 10;
+    kDepthSymmetry = 11;
+    kCeilingSimple = 12;
+    kCeilingMask = 13;
+    kCeilingSidedSymmetry = 14;
+    kCeilingCenteredSymmetry = 15;
+  }
+
+  bitmap Feature : bitmap32 {
+    kPositioning = 0x1;
+    kMotionLatching = 0x2;
+    kUnit = 0x4;
+    kLimitation = 0x8;
+    kSpeed = 0x10;
+    kTranslation = 0x20;
+    kRotation = 0x40;
+    kModulation = 0x80;
+  }
+
+  struct CurrentStruct {
+    optional percent100ths position = 0;
+    optional LatchingEnum latching = 1;
+    optional ThreeLevelAutoEnum speed = 2;
+  }
+
+  struct RangePercent100thsStruct {
+    percent100ths min = 0;
+    percent100ths max = 1;
+  }
+
+  struct TargetStruct {
+    optional percent100ths position = 0;
+    optional TargetLatchEnum latch = 1;
+    optional ThreeLevelAutoEnum speed = 2;
+  }
+
+  struct UnitRangeStruct {
+    int16s min = 0;
+    int16s max = 1;
+  }
+
+  readonly attribute nullable CurrentStruct current = 0;
+  readonly attribute nullable TargetStruct target = 1;
+  readonly attribute optional percent100ths resolution = 2;
+  readonly attribute optional percent100ths stepValue = 3;
+  readonly attribute optional ClosureUnitEnum unit = 4;
+  readonly attribute optional nullable UnitRangeStruct unitRange = 5;
+  readonly attribute optional RangePercent100thsStruct limitRange = 6;
+  readonly attribute optional TranslationDirectionEnum translationDirection = 7;
+  readonly attribute optional RotationAxisEnum rotationAxis = 8;
+  readonly attribute optional OverflowEnum overflow = 9;
+  readonly attribute optional ModulationTypeEnum modulationType = 10;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct SetTargetRequest {
+    optional percent100ths position = 0;
+    optional TargetLatchEnum latch = 1;
+    optional ThreeLevelAutoEnum speed = 2;
+  }
+
+  request struct StepRequest {
+    StepDirectionEnum direction = 0;
+    int16u numberOfSteps = 1;
+    optional ThreeLevelAutoEnum speed = 2;
+  }
+
+  /** Upon receipt, this SHALL move the product's dimension in the most fitting state following the data as follows: */
+  command SetTarget(SetTargetRequest): DefaultSuccess = 0;
+  /** Upon receipt, this SHALL update the Target.Position attribute value e.g. by sending multiple commands with short step by step or a single command with multiple steps. */
+  command Step(StepRequest): DefaultSuccess = 1;
+}
+
 /** The Service Area cluster provides an interface for controlling the areas where a device should operate, and for querying the current area being serviced. */
 provisional cluster ServiceArea = 336 {
   revision 1;

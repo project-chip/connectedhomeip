@@ -426,6 +426,11 @@ void emberAfClosureControlClusterInitCallback(chip::EndpointId endpoint);
 /**
  * @param endpoint    Endpoint that is being initialized
  */
+void emberAfClosureDimensionClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
 void emberAfServiceAreaClusterInitCallback(chip::EndpointId endpoint);
 
 /**
@@ -3707,6 +3712,45 @@ MatterClosureControlClusterServerPreAttributeChangedCallback(const chip::app::Co
 void emberAfClosureControlClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
+// Closure Dimension Cluster
+//
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfClosureDimensionClusterServerInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterClosureDimensionClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfClosureDimensionClusterClientInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterClosureDimensionClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/**
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterClosureDimensionClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                               EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/**
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfClosureDimensionClusterServerTickCallback(chip::EndpointId endpoint);
+
+//
 // Service Area Cluster
 //
 
@@ -6410,6 +6454,18 @@ bool emberAfWindowCoveringClusterGoToTiltValueCallback(
 bool emberAfWindowCoveringClusterGoToTiltPercentageCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::WindowCovering::Commands::GoToTiltPercentage::DecodableType & commandData);
+/**
+ * @brief Closure Dimension Cluster SetTarget Command callback (from client)
+ */
+bool emberAfClosureDimensionClusterSetTargetCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ClosureDimension::Commands::SetTarget::DecodableType & commandData);
+/**
+ * @brief Closure Dimension Cluster Step Command callback (from client)
+ */
+bool emberAfClosureDimensionClusterStepCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ClosureDimension::Commands::Step::DecodableType & commandData);
 /**
  * @brief Thermostat Cluster SetpointRaiseLower Command callback (from client)
  */

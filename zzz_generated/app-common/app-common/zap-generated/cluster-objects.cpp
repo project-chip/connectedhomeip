@@ -20691,6 +20691,321 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 namespace Events {} // namespace Events
 
 } // namespace ClosureControl
+namespace ClosureDimension {
+namespace Structs {
+
+namespace CurrentStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kPosition), position);
+    encoder.Encode(to_underlying(Fields::kLatching), latching);
+    encoder.Encode(to_underlying(Fields::kSpeed), speed);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kPosition))
+        {
+            err = DataModel::Decode(reader, position);
+        }
+        else if (__context_tag == to_underlying(Fields::kLatching))
+        {
+            err = DataModel::Decode(reader, latching);
+        }
+        else if (__context_tag == to_underlying(Fields::kSpeed))
+        {
+            err = DataModel::Decode(reader, speed);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace CurrentStruct
+
+namespace RangePercent100thsStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kMin), min);
+    encoder.Encode(to_underlying(Fields::kMax), max);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kMin))
+        {
+            err = DataModel::Decode(reader, min);
+        }
+        else if (__context_tag == to_underlying(Fields::kMax))
+        {
+            err = DataModel::Decode(reader, max);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace RangePercent100thsStruct
+
+namespace TargetStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kPosition), position);
+    encoder.Encode(to_underlying(Fields::kLatch), latch);
+    encoder.Encode(to_underlying(Fields::kSpeed), speed);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kPosition))
+        {
+            err = DataModel::Decode(reader, position);
+        }
+        else if (__context_tag == to_underlying(Fields::kLatch))
+        {
+            err = DataModel::Decode(reader, latch);
+        }
+        else if (__context_tag == to_underlying(Fields::kSpeed))
+        {
+            err = DataModel::Decode(reader, speed);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace TargetStruct
+
+namespace UnitRangeStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kMin), min);
+    encoder.Encode(to_underlying(Fields::kMax), max);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kMin))
+        {
+            err = DataModel::Decode(reader, min);
+        }
+        else if (__context_tag == to_underlying(Fields::kMax))
+        {
+            err = DataModel::Decode(reader, max);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace UnitRangeStruct
+} // namespace Structs
+
+namespace Commands {
+namespace SetTarget {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kPosition), position);
+    encoder.Encode(to_underlying(Fields::kLatch), latch);
+    encoder.Encode(to_underlying(Fields::kSpeed), speed);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kPosition))
+        {
+            err = DataModel::Decode(reader, position);
+        }
+        else if (__context_tag == to_underlying(Fields::kLatch))
+        {
+            err = DataModel::Decode(reader, latch);
+        }
+        else if (__context_tag == to_underlying(Fields::kSpeed))
+        {
+            err = DataModel::Decode(reader, speed);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace SetTarget.
+namespace Step {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kDirection), direction);
+    encoder.Encode(to_underlying(Fields::kNumberOfSteps), numberOfSteps);
+    encoder.Encode(to_underlying(Fields::kSpeed), speed);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kDirection))
+        {
+            err = DataModel::Decode(reader, direction);
+        }
+        else if (__context_tag == to_underlying(Fields::kNumberOfSteps))
+        {
+            err = DataModel::Decode(reader, numberOfSteps);
+        }
+        else if (__context_tag == to_underlying(Fields::kSpeed))
+        {
+            err = DataModel::Decode(reader, speed);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace Step.
+} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+    {
+    case Attributes::Current::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, current);
+    case Attributes::Target::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, target);
+    case Attributes::Resolution::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, resolution);
+    case Attributes::StepValue::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, stepValue);
+    case Attributes::Unit::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, unit);
+    case Attributes::UnitRange::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, unitRange);
+    case Attributes::LimitRange::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, limitRange);
+    case Attributes::TranslationDirection::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, translationDirection);
+    case Attributes::RotationAxis::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, rotationAxis);
+    case Attributes::Overflow::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, overflow);
+    case Attributes::ModulationType::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, modulationType);
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, generatedCommandList);
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, acceptedCommandList);
+    case Attributes::AttributeList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, attributeList);
+    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, featureMap);
+    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, clusterRevision);
+    default:
+        return CHIP_NO_ERROR;
+    }
+}
+} // namespace Attributes
+
+namespace Events {} // namespace Events
+
+} // namespace ClosureDimension
 namespace ServiceArea {
 namespace Structs {
 
@@ -37247,6 +37562,13 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
         }
     }
     case Clusters::ClosureControl::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::ClosureDimension::Id: {
         switch (aCommand)
         {
         default:
