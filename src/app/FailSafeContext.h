@@ -23,10 +23,10 @@
 
 #pragma once
 
+#include "lib/core/CHIPPersistentStorageDelegate.h"
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <system/SystemClock.h>
 
 namespace chip {
 namespace app {
@@ -34,6 +34,16 @@ namespace app {
 class FailSafeContext
 {
 public:
+    struct InitParams
+    {
+        // PersistentStorageDelegate for marker storage (MANDATORY).
+        PersistentStorageDelegate * storage = nullptr;
+    };
+
+    CHIP_ERROR Init(const InitParams & initParams);
+
+    void CheckAddNOCStartedMarker();
+
     // ===== Members for internal use by other Device Layer components.
 
     /**
@@ -48,11 +58,21 @@ public:
      * @brief Cleanly disarm failsafe timer, such as on CommissioningComplete
      */
     void DisarmFailSafe();
+
+    bool SetAddNocCommandStarted(FabricIndex nocFabricIndex)
+    {
+        mFabricIndex = nocFabricIndex;
+
+        AddNOCStartedMarker marker{ mFabricIndex };
+        return StoreAddNOCStartedMarker(marker) == CHIP_NO_ERROR;
+    }
+
     void SetAddNocCommandInvoked(FabricIndex nocFabricIndex)
     {
         mAddNocCommandHasBeenInvoked = true;
         mFabricIndex                 = nocFabricIndex;
     }
+
     void SetUpdateNocCommandInvoked() { mUpdateNocCommandHasBeenInvoked = true; }
     void SetAddTrustedRootCertInvoked() { mAddTrustedRootCertHasBeenInvoked = true; }
     void SetCsrRequestForUpdateNoc(bool isForUpdateNoc) { mIsCsrRequestForUpdateNoc = isForUpdateNoc; }
@@ -105,6 +125,16 @@ public:
     void ForceFailSafeTimerExpiry();
 
 private:
+    // Stored to indicate a Fail-Safe is in armed, so that clean-up cana run on next boot
+    // if device is reset e.g. during commissioning.
+    struct AddNOCStartedMarker
+    {
+        AddNOCStartedMarker() = default;
+        AddNOCStartedMarker(FabricIndex fabricIndex_) : fabricIndex{ fabricIndex_ } {}
+        FabricIndex fabricIndex = kUndefinedFabricIndex;
+    };
+
+    PersistentStorageDelegate * mStorage   = nullptr;
     bool mFailSafeArmed                    = false;
     bool mFailSafeBusy                     = false;
     bool mAddNocCommandHasBeenInvoked      = false;
@@ -149,9 +179,14 @@ private:
         mFailSafeBusy                           = false;
         mIsCsrRequestForUpdateNoc               = false;
         mUpdateTermsAndConditionsHasBeenInvoked = false;
+
+        ClearAddNOCStartedMarker();
     }
 
     void FailSafeTimerExpired();
+    CHIP_ERROR GetAddNOCStartedMarker(AddNOCStartedMarker & outMarker);
+    CHIP_ERROR StoreAddNOCStartedMarker(const AddNOCStartedMarker & marker);
+    void ClearAddNOCStartedMarker();
 };
 
 } // namespace app
