@@ -27,23 +27,7 @@
 #include <cmsis_os2.h>
 #include <lib/core/CHIPError.h>
 
-struct WeekDaysScheduleInfo
-{
-    DlScheduleStatus status;
-    EmberAfPluginDoorLockWeekDaySchedule schedule;
-};
-
-struct YearDayScheduleInfo
-{
-    DlScheduleStatus status;
-    EmberAfPluginDoorLockYearDaySchedule schedule;
-};
-
-struct HolidayScheduleInfo
-{
-    DlScheduleStatus status;
-    EmberAfPluginDoorLockHolidaySchedule schedule;
-};
+#include <lib/support/DefaultStorageKeyAllocator.h>
 
 namespace EFR32DoorLock {
 namespace ResourceRanges {
@@ -55,8 +39,6 @@ static constexpr uint8_t kMaxYeardaySchedulesPerUser = 10;
 static constexpr uint8_t kMaxHolidaySchedules        = 10;
 static constexpr uint8_t kMaxCredentialSize          = 20;
 static constexpr uint8_t kNumCredentialTypes         = 6;
-
-static constexpr uint8_t kMaxCredentials = kMaxUsers * kMaxCredentialsPerUser;
 
 } // namespace ResourceRanges
 
@@ -107,10 +89,56 @@ private:
 };
 
 } // namespace LockInitParams
+namespace Storage {
+
+using namespace EFR32DoorLock::ResourceRanges;
+struct WeekDayScheduleInfo
+{
+    DlScheduleStatus status;
+    EmberAfPluginDoorLockWeekDaySchedule schedule;
+};
+
+struct YearDayScheduleInfo
+{
+    DlScheduleStatus status;
+    EmberAfPluginDoorLockYearDaySchedule schedule;
+};
+
+struct HolidayScheduleInfo
+{
+    DlScheduleStatus status;
+    EmberAfPluginDoorLockHolidaySchedule schedule;
+};
+
+struct LockUserInfo
+{
+    char userName[DOOR_LOCK_MAX_USER_NAME_SIZE];
+    size_t userNameSize;
+    uint32_t userUniqueId;
+    UserStatusEnum userStatus;
+    UserTypeEnum userType;
+    CredentialRuleEnum credentialRule;
+    chip::EndpointId endpointId;
+    chip::FabricIndex createdBy;
+    chip::FabricIndex lastModifiedBy;
+    uint16_t currentCredentialCount;
+};
+
+struct LockCredentialInfo
+{
+    DlCredentialStatus status;
+    CredentialTypeEnum credentialType;
+    chip::FabricIndex createdBy;
+    chip::FabricIndex lastModifiedBy;
+    uint8_t credentialData[kMaxCredentialSize];
+    size_t credentialDataSize;
+};
+} // namespace Storage
 } // namespace EFR32DoorLock
 
 using namespace ::chip;
 using namespace EFR32DoorLock::ResourceRanges;
+using namespace EFR32DoorLock::Storage;
 
 class LockManager
 {
@@ -135,7 +163,7 @@ public:
     } State;
 
     CHIP_ERROR Init(chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> state,
-                    EFR32DoorLock::LockInitParams::LockParam lockParam);
+                    EFR32DoorLock::LockInitParams::LockParam lockParam, PersistentStorageDelegate * storage);
     bool NextState();
     bool IsActionInProgress();
     bool InitiateAction(int32_t aActor, Action_t aAction);
@@ -192,8 +220,6 @@ public:
                       OperationErrorEnum & err);
     const char * lockStateToString(DlLockState lockState) const;
 
-    bool ReadConfigValues();
-
     void UnlockAfterUnlatch();
 
 private:
@@ -244,17 +270,44 @@ private:
     static void ActuatorMovementTimerEventHandler(AppEvent * aEvent);
 
     osTimerId_t mLockTimer;
-    EmberAfPluginDoorLockUserInfo mLockUsers[kMaxUsers];
-    EmberAfPluginDoorLockCredentialInfo mLockCredentials[kNumCredentialTypes][kMaxCredentials];
-    WeekDaysScheduleInfo mWeekdaySchedule[kMaxUsers][kMaxWeekdaySchedulesPerUser];
-    YearDayScheduleInfo mYeardaySchedule[kMaxUsers][kMaxYeardaySchedulesPerUser];
-    HolidayScheduleInfo mHolidaySchedule[kMaxHolidaySchedules];
-
-    char mUserNames[MATTER_ARRAY_SIZE(mLockUsers)][DOOR_LOCK_MAX_USER_NAME_SIZE];
-    uint8_t mCredentialData[kNumCredentialTypes][kMaxCredentials][kMaxCredentialSize];
-    CredentialStruct mCredentials[kMaxUsers][kMaxCredentials];
 
     EFR32DoorLock::LockInitParams::LockParam LockParams;
+
+    // Stores LockUserInfo corresponding to a user index
+    static StorageKeyName LockUserEndpoint(uint16_t userIndex, chip::EndpointId endpoint)
+    {
+        return StorageKeyName::Formatted("g/lu/%x/e/%x", userIndex, endpoint);
+    }
+    // Stores LockCredentialInfo corresponding to a credential index and type
+    static StorageKeyName LockCredentialEndpoint(uint16_t credentialIndex, CredentialTypeEnum credentialType,
+                                                 chip::EndpointId endpoint)
+    {
+        return StorageKeyName::Formatted("g/lc/%x/t/%x/e/%x", credentialIndex, static_cast<uint16_t>(credentialType), endpoint);
+    }
+    // Stores all the credential indices that belong to a user
+    static StorageKeyName LockUserCredentialMap(uint16_t userIndex) { return StorageKeyName::Formatted("g/lu/%x/lc", userIndex); }
+    // Stores WeekDayScheduleInfo corresponding to a user and schedule index
+    static StorageKeyName LockUserWeekDayScheduleEndpoint(uint16_t userIndex, uint16_t scheduleIndex, chip::EndpointId endpoint)
+    {
+        return StorageKeyName::Formatted("g/lu/%x/lw/%x/e/%x", userIndex, scheduleIndex, endpoint);
+    }
+    // Stores YearDayScheduleInfo corresponding to a user and schedule index
+    static StorageKeyName LockUserYearDayScheduleEndpoint(uint16_t userIndex, uint16_t scheduleIndex, chip::EndpointId endpoint)
+    {
+        return StorageKeyName::Formatted("g/lu/%x/ly/%x/e/%x", userIndex, scheduleIndex, endpoint);
+    }
+    // Stores HolidayScheduleInfo corresponding to a schedule index
+    static StorageKeyName LockHolidayScheduleEndpoint(uint16_t scheduleIndex, chip::EndpointId endpoint)
+    {
+        return StorageKeyName::Formatted("g/lh/%x/e/%x", scheduleIndex, endpoint);
+    }
+
+    // Pointer to the PeristentStorage
+    PersistentStorageDelegate * mStorage = nullptr;
+
+    LockUserInfo mUserInStorage;
+    LockCredentialInfo mCredentialInStorage;
+    CredentialStruct mCredentials[kMaxCredentialsPerUser];
 };
 
 LockManager & LockMgr();
