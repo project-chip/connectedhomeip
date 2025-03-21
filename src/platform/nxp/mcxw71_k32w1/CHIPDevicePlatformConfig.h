@@ -62,16 +62,6 @@
 // These can be overridden by the application as needed.
 
 /**
- * @def CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
- *
- * Enables default OTA TLV factory data processor.
- * Disabled by default.
- */
-#ifndef CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
-#define CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR 0
-#endif // CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
-
-/**
  * @def CHIP_DEVICE_LAYER_BLE_OBSERVER_PRIORITY
  *
  * The priority of the SoftDevice observer event handler registered by the
@@ -90,15 +80,6 @@
 #ifndef CHIP_DEVICE_LAYER_BLE_CONN_CFG_TAG
 #define CHIP_DEVICE_LAYER_BLE_CONN_CFG_TAG 1
 #endif // CHIP_DEVICE_LAYER_BLE_CONN_CFG_TAG
-
-/**
- * @def CHIP_DEVICE_LAYER_OTA_REBOOT_DELAY
- *
- * The delay before rebooting after an OTA process was finished.
- */
-#ifndef CHIP_DEVICE_LAYER_OTA_REBOOT_DELAY
-#define CHIP_DEVICE_LAYER_OTA_REBOOT_DELAY 3000
-#endif // CHIP_DEVICE_LAYER_OTA_REBOOT_DELAY
 
 // ========== Platform-specific Configuration Overrides =========
 #ifndef CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE
