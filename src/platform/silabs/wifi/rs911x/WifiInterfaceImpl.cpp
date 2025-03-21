@@ -55,6 +55,7 @@ extern "C" {
 WfxRsi_t wfx_rsi;
 
 using namespace chip::DeviceLayer::Silabs;
+using WiFiBandEnum = chip::app::Clusters::NetworkCommissioning::WiFiBandEnum;
 
 namespace {
 
@@ -379,6 +380,8 @@ void WifiInterfaceImpl::ProcessEvent(WifiPlatformEvent event)
             chip::MutableByteSpan bssidSpan(ap.bssid, kWifiMacAddressLength);
             chip::ByteSpan scanBssidSpan(scan.bssid, kWifiMacAddressLength);
             chip::CopySpanToMutableSpan(scanBssidSpan, bssidSpan);
+            // TODO: change this when SDK provides values
+            ap.wiFiBand = WiFiBandEnum::k2g4;
 
             wfx_rsi.scan_cb(&ap);
 

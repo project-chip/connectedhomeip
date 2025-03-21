@@ -258,6 +258,11 @@ chip::BitFlags<WiFiSecurity> SlWiFiDriver::ConvertSecuritytype(wfx_sec_t securit
     return securityType;
 }
 
+uint32_t SlWiFiDriver::GetSupportedWiFiBandsMask() const
+{
+    return WifiInterface::GetInstance().GetSupportedWiFiBandsMask();
+}
+
 bool SlWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
 {
     ChipLogProgress(DeviceLayer, "Start Scan WiFi Networks");
@@ -305,6 +310,7 @@ void SlWiFiDriver::OnScanWiFiNetworkDone(wfx_wifi_scan_result_t * aScanResult)
         scanResponse.ssidLen = aScanResult->ssid_length;
         memcpy(scanResponse.ssid, aScanResult->ssid, scanResponse.ssidLen);
         memcpy(scanResponse.bssid, aScanResult->bssid, sizeof(scanResponse.bssid));
+        scanResponse.wiFiBand = aScanResult->wiFiBand;
 
         mScanResponseIter.Add(&scanResponse);
     }

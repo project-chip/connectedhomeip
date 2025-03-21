@@ -42,6 +42,7 @@
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Silabs;
+using WiFiBandEnum = chip::app::Clusters::NetworkCommissioning::WiFiBandEnum;
 
 // TODO: This is a workaround because we depend on the platform lib which depends on the platform implementation.
 //       As such we can't depend on the platform here as well
@@ -483,6 +484,8 @@ static void sl_wfx_scan_result_callback(sl_wfx_scan_result_ind_body_t * scan_res
 
     ap->scan.chan = scan_result->channel;
     ap->scan.rssi = ConvertRcpiToRssi(scan_result->rcpi);
+    // WF200 only supports 2.4GHz band
+    ap->scan.wiFiBand = WiFiBandEnum::k2g4;
 
     chip::ByteSpan scannedBssid(scan_result->mac, kWifiMacAddressLength);
     chip::MutableByteSpan outputBssid(ap->scan.bssid, kWifiMacAddressLength);
