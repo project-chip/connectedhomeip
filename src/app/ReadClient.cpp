@@ -485,6 +485,11 @@ CHIP_ERROR ReadClient::GenerateDataVersionFilterList(DataVersionFilterIBs::Build
 void ReadClient::OnActiveModeNotification()
 {
     VerifyOrDie(mpImEngine->InActiveReadClientList(this));
+
+    // Note: this API only works when issuing subscription via SendAutoResubscribeRequest. When SendAutoResubscribeRequest is
+    // called, either mEventPathParamsListSize or mAttributePathParamsListSize is not 0.
+    VerifyOrReturn(mReadPrepareParams.mEventPathParamsListSize != 0 || mReadPrepareParams.mAttributePathParamsListSize != 0);
+
     // When we reach here, the subscription definitely exceeded the liveness timeout. Just continue the unfinished resubscription
     // logic in `OnLivenessTimeoutCallback`.
     if (IsInactiveICDSubscription())
@@ -493,6 +498,18 @@ void ReadClient::OnActiveModeNotification()
         return;
     }
 
+    // When receiving check-in message, it means all tracked subscriptions for this node has gone in server side, if there is a related active subscription
+    // and subscription has not yet rescheduled in client side, we should forcibly timeout the current subscription, and schedule a new one.
+    if (!mIsResubscriptionScheduled)
+    {
+        // Closing will ultimately trigger ScheduleResubscription with the aReestablishCASE argument set to true, effectively
+        // rendering the session defunct.
+        Close(CHIP_ERROR_TIMEOUT);
+        return;
+    }
+
+    // If the server sends a check-in message and a subscription is already scheduled, it indicates a client-side subscription
+    // timeout or failure. Cancel the scheduled subscription and initiate a new one immediately.
     TriggerResubscribeIfScheduled("check-in message");
 }
 
@@ -504,10 +521,10 @@ void ReadClient::OnPeerTypeChange(PeerType aType)
 
     ChipLogProgress(DataManagement, "Peer is now %s LIT ICD.", mIsPeerLIT ? "a" : "not a");
 
-    // If the peer is no longer LIT, try to wake up the subscription and do resubscribe when necessary.
-    if (!mIsPeerLIT)
+    // If the peer is no longer LIT and in inactive ICD subscription status, try to wake up the subscription and do resubscribe.
+    if (!mIsPeerLIT && IsInactiveICDSubscription())
     {
-        OnActiveModeNotification();
+        TriggerResubscriptionForLivenessTimeout(CHIP_ERROR_TIMEOUT);
     }
 }
 
