@@ -300,7 +300,8 @@ class ComparisonEnum(Enum):
     Equal = 5
 
 
-class AttributeValueExpectation(NamedTuple):
+@dataclass
+class AttributeValueExpected:
     endpoint_id: int
     attribute: ClusterObjects.ClusterAttributeDescriptor
     comparisson_type: ComparisonEnum
@@ -413,7 +414,7 @@ class ClusterAttributeChangeAccumulator:
             data = transaction.GetAttribute(path)
             value = AttributeValue(endpoint_id=path.Path.EndpointId, attribute=path.AttributeType,
                                    value=data, timestamp_utc=datetime.now(timezone.utc))
-            logging.info(f"Got subscription report for {path.AttributeType}: {data}")
+            logging.info(f"[FC] Got subscription report for {path.AttributeType}: {data}")
             self._q.put(value)
             with self._lock:
                 self._attribute_report_counts[path.AttributeType] += 1
@@ -525,7 +526,7 @@ class ClusterAttributeChangeAccumulator:
         logging.info(f"--> [FC] No reports for the {attribute.__name__} attribute were found.")
         return None
 
-    def await_all_final_values_reported_threshold(self, value_expectations: Iterable[AttributeValueExpectation], timeout_sec: float = 1.0):
+    def await_all_final_values_reported_threshold(self, value_expectations: Iterable[AttributeValueExpected], timeout_sec: float = 1.0):
         """Expect that every `value_expectations` report is the last value reported for the given attribute and complies
         with the comparisson type (greater than / greater or equal than / less than / less or equal than), ignoring timestamps.
 
@@ -583,9 +584,11 @@ class ClusterAttributeChangeAccumulator:
 
         # If we reach here, there was no early return and we failed to find all the values.
         logging.error("[FC] Reached time-out without finding all expected report values for threshold.")
-        logging.info("[FC] Values found:")
+        logging.info("[FC] Result:")
         for expected_idx, expected_element in enumerate(value_expectations):
-            logging.info(f"[FC]   -> {expected_element} found: {last_report_matches.get(expected_idx)}")
+            found_str = "Found:   " if last_report_matches.get(expected_idx) else "Not found"
+            logging.info(
+                f"[FC]   -> {found_str} [Attribute: {expected_element.attribute.__name__}, comparisson: {expected_element.comparisson_type.name}, value: {expected_element.threshold_value}, endpoint: {expected_element.endpoint_id}]")
         asserts.fail("[FC] Did not find all expected last report values for threshold before time-out")
 
     def await_sequence_of_reports(self, attribute: TypedAttributePath, sequence: list[Any], timeout_sec: float) -> None:
