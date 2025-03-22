@@ -128,6 +128,7 @@ class TC_FAN_3_5(MatterBaseTest):
         Raises:
             AssertionError: If the write operation fails or the response status is not successful.
         """
+        logger.info(f"[FC] Writing to the {attribute.__name__} attribute, value: {value}")
         result = await self.default_controller.WriteAttribute(self.dut_node_id, [(self.endpoint, attribute(value))])
         asserts.assert_equal(result[0].Status, Status.Success, f"[FC] {attribute.__name__} attribute write faield.")
 
