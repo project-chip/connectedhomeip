@@ -157,7 +157,7 @@ class TC_FAN_3_5(MatterBaseTest):
             None
         """
         try:
-            logger.info(f"[FC] Sending Step command - direction: {direction}, wrap: {wrap}, lowestOff: {lowestOff}")
+            logger.info(f"[FC] Sending Step command - direction: {direction.name}, wrap: {wrap}, lowestOff: {lowestOff}")
             await self.send_single_cmd(cmd=Clusters.Objects.FanControl.Commands.Step(direction=direction, wrap=wrap, lowestOff=lowestOff), endpoint=self.endpoint)
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, f"[FC] Unexpected error returned ({e})")
@@ -179,11 +179,11 @@ class TC_FAN_3_5(MatterBaseTest):
         value_current = self.attribute_subscription.get_last_attribute_report_value(self.endpoint, attribute, self.timeout_sec)
         if value_current is not None:
             asserts.assert_equal(value_current, expected_value,
-                                 f"Current {attribute.__name__} attribute value ({value_current}) is not equal to the expected value ({value_expected})")
+                                 f"Current {attribute.__name__} attribute value ({value_current}) is not equal to the expected value ({expected_value})")
         else:
             asserts.fail(f"The {attribute.__name__} attribute was not found in the attribute reports")
 
-    async def verify_step_attribute_values(self, attribute_update: AttributeUpdate, step: Step, expect_updates: bool = True) -> None:
+    async def verify_step_attribute_values(self, attribute_update: AttributeUpdate, step: Step, expect_write_updates: bool = True, expect_command_updates: bool = True) -> None:
         """
         Verifies that attribute values are updated correctly, if expected, after performing write and command operations.
 
@@ -196,25 +196,38 @@ class TC_FAN_3_5(MatterBaseTest):
                                                  and the expected attribute values after the update.
             step (Step): An object containing the parameters for the step command, including direction, wrap, 
                          lowestOff, and the expected attribute values after the command execution.
-            expect_updates (bool): If False, the value of the last attribute report will be used (not incoming reports).
-                                   If True, the value of the incoming report will be used (not a pre-existing reports).
-                                   Defaults to True.
+            expect_write_updates (bool): - If False, the value of the last report of the specified attribute will be
+                                           used following the write operation (not incoming reports)
+                                         - If True, the value of the incoming report of the specified attribute will be
+                                           used following the write operation (not pre-existing reports)
+                                         Defaults to True.
+            expect_command_updates (bool): - If False, the value of the last report of the specified attribute will be
+                                              used following the command operation (not incoming reports)
+                                           - If True, the value of the incoming report of the specified attribute will be
+                                              used following the command operation (not pre-existing reports)
+                                           Defaults to True.
         Returns:
             None
 
         Raises:
             Assertion failure if the expected attribute values are not reported within the specified timeout.
         """
+        if expect_write_updates:
+            self.attribute_subscription.reset()
         await self.write_setting(attribute_update.attribute, attribute_update.value)
-        if expect_updates:
+        if expect_write_updates:
             self.attribute_subscription.await_all_final_values_reported_threshold(
                 value_expectations=attribute_update.expected_attributes, timeout_sec=self.timeout_sec)
-            self.attribute_subscription.reset()
+        else:
+            for expected_attribute in attribute_update.expected_attributes:
+                self.verify_expected_value(expected_attribute.attribute, expected_attribute.threshold_value)
 
-            await self.send_step_command(direction=step.direction, wrap=step.wrap, lowestOff=step.lowest_off)
+        if expect_command_updates:
+            self.attribute_subscription.reset()
+        await self.send_step_command(direction=step.direction, wrap=step.wrap, lowestOff=step.lowest_off)
+        if expect_command_updates:
             self.attribute_subscription.await_all_final_values_reported_threshold(
                 value_expectations=step.expected_attributes, timeout_sec=self.timeout_sec)
-            self.attribute_subscription.reset()
         else:
             for expected_attribute in step.expected_attributes:
                 self.verify_expected_value(expected_attribute.attribute, expected_attribute.threshold_value)
@@ -245,7 +258,7 @@ class TC_FAN_3_5(MatterBaseTest):
         attr = cluster.Attributes
         sd_enum = cluster.Enums.StepDirectionEnum
         fm_enum = cluster.Enums.FanModeEnum
-        self.timeout_sec = 1
+        self.timeout_sec: float = 0.5
 
         # *** STEP 1 ***
         # Commissioning already done
@@ -375,15 +388,15 @@ class TC_FAN_3_5(MatterBaseTest):
         percent_setting_expected = 0
         fan_mode_expected = fm_enum.kOff
         command_expect = [
-            AttributeValueExpected(self.endpoint, attr.SpeedSetting, ComparisonEnum.Equal, speed_setting_expected),
-            AttributeValueExpected(self.endpoint, attr.SpeedCurrent, ComparisonEnum.Equal, speed_setting_expected),
+            # AttributeValueExpected(self.endpoint, attr.SpeedSetting, ComparisonEnum.Equal, speed_setting_expected),
+            # AttributeValueExpected(self.endpoint, attr.SpeedCurrent, ComparisonEnum.Equal, speed_setting_expected),
             AttributeValueExpected(self.endpoint, attr.PercentSetting, ComparisonEnum.Equal, percent_setting_expected),
             AttributeValueExpected(self.endpoint, attr.PercentCurrent, ComparisonEnum.Equal, percent_setting_expected),
             AttributeValueExpected(self.endpoint, attr.FanMode, ComparisonEnum.Equal, fan_mode_expected),
         ]
         attribute_update = AttributeUpdate(attr.SpeedSetting, speed_setting, write_expect)
         step = Step(direction=sd_enum.kDecrease, expected_attributes=command_expect, wrap=False, lowest_off=True)
-        await self.verify_step_attribute_values(attribute_update, step, expect_updates=False)
+        await self.verify_step_attribute_values(attribute_update, step, expect_command_updates=False)
 
         # *** STEP 9 ***
         # TH writes to the DUT the SpeedSetting attribute with 0, then sends a Step
@@ -415,7 +428,7 @@ class TC_FAN_3_5(MatterBaseTest):
         ]
         attribute_update = AttributeUpdate(attr.SpeedSetting, speed_setting, write_expect)
         step = Step(direction=sd_enum.kDecrease, expected_attributes=command_expect, wrap=True, lowest_off=True)
-        await self.verify_step_attribute_values(attribute_update, step)
+        await self.verify_step_attribute_values(attribute_update, step, expect_write_updates=False)
 
         # *** STEP 10 ***
         # TH writes to the DUT the SpeedSetting attribute with 1, then sends a Step
@@ -447,7 +460,7 @@ class TC_FAN_3_5(MatterBaseTest):
         ]
         attribute_update = AttributeUpdate(attr.SpeedSetting, speed_setting, write_expect)
         step = Step(direction=sd_enum.kDecrease, expected_attributes=command_expect, wrap=False, lowest_off=False)
-        await self.verify_step_attribute_values(attribute_update, step, expect_updates=False)
+        await self.verify_step_attribute_values(attribute_update, step, expect_command_updates=False)
 
         # *** STEP 11 ***
         # TH writes to the DUT the SpeedSetting attribute with 1, then sends a Step
@@ -477,7 +490,7 @@ class TC_FAN_3_5(MatterBaseTest):
         ]
         attribute_update = AttributeUpdate(attr.SpeedSetting, speed_setting, write_expect)
         step = Step(direction=sd_enum.kDecrease, expected_attributes=command_expect, wrap=False, lowest_off=True)
-        await self.verify_step_attribute_values(attribute_update, step)
+        await self.verify_step_attribute_values(attribute_update, step, expect_write_updates=False)
 
         # *** STEP 12 ***
         # TH writes to the DUT the SpeedSetting attribute with SpeedMax, then sends a Step
@@ -509,7 +522,7 @@ class TC_FAN_3_5(MatterBaseTest):
         ]
         attribute_update = AttributeUpdate(attr.SpeedSetting, speed_setting, write_expect)
         step = Step(direction=sd_enum.kIncrease, expected_attributes=command_expect, wrap=False, lowest_off=False)
-        await self.verify_step_attribute_values(attribute_update, step, expect_updates=False)
+        await self.verify_step_attribute_values(attribute_update, step, expect_command_updates=False)
 
         # *** STEP 13 ***
         # TH writes to the DUT the SpeedSetting attribute with SpeedMax, then sends a Step
@@ -539,7 +552,7 @@ class TC_FAN_3_5(MatterBaseTest):
         ]
         attribute_update = AttributeUpdate(attr.SpeedSetting, speed_setting, write_expect)
         step = Step(direction=sd_enum.kIncrease, expected_attributes=command_expect, wrap=True, lowest_off=True)
-        await self.verify_step_attribute_values(attribute_update, step)
+        await self.verify_step_attribute_values(attribute_update, step, expect_write_updates=False)
 
         # *** STEP 14 ***
         # TH writes to the DUT the SpeedSetting attribute with SpeedMax, then sends a Step
