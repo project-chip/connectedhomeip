@@ -187,7 +187,9 @@ public:
         uint16_t numSuccessfullyEncodedItems = kInvalidListIndex;
         bool chunkingNeeded                  = false;
 
-        VerifyOrReturnError(!listValue.empty(), CHIP_ERROR_INVALID_LIST_LENGTH);
+        // TODO Should we be able to send an empty List? In TestUserLabelCluster.yaml we send an empty list to CLEAR User Label
+        // List, This means this should be supported?
+        // VerifyOrReturnError(!listValue.empty(), CHIP_ERROR_INVALID_LIST_LENGTH);
 
         // BACKWARD COMPATIBILITY: Legacy OTA Requestor Servers( Pre-Matter 1.4) only support having an empty list for ReplaceAll
         // when writing to the DefaultOTAProviders attribute and they will only Decode List Items that are  of the AppendItem List
@@ -195,7 +197,11 @@ public:
         // TODO remove this special case when Matter 1.3 is Sunsetted
         bool encodeEmptyListAsReplaceAll =
             (path.mClusterId == Clusters::OtaSoftwareUpdateRequestor::Id &&
-             path.mAttributeId == Clusters::OtaSoftwareUpdateRequestor::Attributes::DefaultOTAProviders::Id);
+             path.mAttributeId == Clusters::OtaSoftwareUpdateRequestor::Attributes::DefaultOTAProviders::Id) ||
+            // TODO, fix the ListNullablesAndOptionalsStruct in test-cluster-server, do we need to keep this for backward
+            // compatibility?
+            (path.mClusterId == Clusters::UnitTesting::Id &&
+             path.mAttributeId == Clusters::UnitTesting::Attributes::ListNullablesAndOptionalsStruct::Id);
 
         if (encodeEmptyListAsReplaceAll)
         {

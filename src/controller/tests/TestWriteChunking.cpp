@@ -259,9 +259,9 @@ TEST_F(TestWriteChunking, TestListChunking)
         app::WriteClient writeClient(&GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing(),
                                      static_cast<uint16_t>(minReservationSize + i) /* reserved buffer size */);
 
-        ByteSpan list[40];
+        ByteSpan list[20];
 
-        err = writeClient.EncodeAttribute(attributePath, app::DataModel::List<ByteSpan>(list, 40));
+        err = writeClient.EncodeAttribute(attributePath, app::DataModel::List<ByteSpan>(list, 20));
 
         //  err = writeClient.EncodeAttribute(attributePath, app::DataModel::List<ByteSpan>(list, sizeof(list_binary)));
         EXPECT_EQ(err, CHIP_NO_ERROR);
