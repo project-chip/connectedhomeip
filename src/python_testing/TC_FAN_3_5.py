@@ -95,7 +95,9 @@ class AttributeUpdate:
     expected_attributes: List[AttributeValueExpected] = field(default_factory=list)
 
 class TC_FAN_3_5(MatterBaseTest):
-    
+    def desc_TC_FAN_3_5(self) -> str:
+        return "[TC-FAN-3.5] Optional step functionality with DUT as Server"
+
     async def read_setting(self, attribute: Any) -> Any:
         """
         Asynchronously reads a specified attribute from the FanControl cluster at a given endpoint.
@@ -113,22 +115,71 @@ class TC_FAN_3_5(MatterBaseTest):
         return await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=cluster, attribute=attribute)    
 
     async def write_setting(self, attribute, value) -> None:
+        """
+        Writes a specified value to a given attribute on the device under test (DUT).
+        It verifies that the write operation is successful by asserting the status of the response.
+
+        Args:
+            attribute (Callable): The attribute to be written, represented as a callable that takes the value.
+            value (Any): The value to write to the specified attribute.
+
+        Returns:
+            None
+
+        Raises:
+            AssertionError: If the write operation fails or the response status is not successful.
+        """
         result = await self.default_controller.WriteAttribute(self.dut_node_id, [(self.endpoint, attribute(value))])
         asserts.assert_equal(result[0].Status, Status.Success, f"[FC] {attribute.__name__} attribute write faield.")
 
     async def send_step_command(self, direction: Clusters.Objects.FanControl.Enums.StepDirectionEnum,
                                 wrap: bool = False, lowestOff: bool = False) -> None:
+        """
+        Sends a step command to the Fan Control cluster.
+
+        This asynchronous method sends a single command to adjust the fan's speed or state
+        based on the specified direction, wrap, and lowestOff parameters.
+
+        Args:
+            direction (Clusters.Objects.FanControl.Enums.StepDirectionEnum): 
+                The direction in which to step the fan's speed or state.
+            wrap (bool, optional): 
+                Indicates whether the fan speed should wrap around when reaching the maximum or minimum limit. 
+                Defaults to False.
+            lowestOff (bool, optional): 
+                Specifies whether the lowest fan speed should turn the fan off. 
+                Defaults to False.
+
+        Raises:
+            InteractionModelError: 
+                If an unexpected error occurs, it asserts that the error status is equal to `Status.Success`.
+
+        Returns:
+            None
+        """        
         try:
+            logger.info(f"[FC] Sending Step command - direction: {direction}, wrap: {wrap}, lowestOff: {lowestOff}")
             await self.send_single_cmd(cmd=Clusters.Objects.FanControl.Commands.Step(direction=direction, wrap=wrap, lowestOff=lowestOff), endpoint=self.endpoint)
-            logger.info("[FC] send_single_cmd")
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.Success, f"Unexpected error returned ({e})")
+            asserts.assert_equal(e.status, Status.Success, f"[FC] Unexpected error returned ({e})")
             pass
 
-    def verify_expected_value(self, attribute, value_expected, timeout_sec):
-        value_current = self.attribute_subscription.get_last_attribute_report_value(self.endpoint, attribute, timeout_sec)
+    def verify_expected_value(self, attribute, expected_value) -> None:
+        """
+        Gets and verifies a given attribute report value against an expected value.
+
+        Args:
+            attribute: The attribute to be verified.
+            expected_value: The expected value of the attribute.
+
+        Raises:
+            AssertionError: If the current attribute value does not match the expected value.
+            AssertionError: If the attribute is not found in the attribute reports.
+        """
+        # Gets and verifies a given attribute report value against an expected value.
+        value_current = self.attribute_subscription.get_last_attribute_report_value(self.endpoint, attribute, self.timeout_sec)
         if value_current is not None:
-            asserts.assert_equal(value_current, value_expected, f"Current {attribute.__name__} attribute value ({value_current}) is not equal to the expected value ({value_expected})")
+            asserts.assert_equal(value_current, expected_value, f"Current {attribute.__name__} attribute value ({value_current}) is not equal to the expected value ({value_expected})")
         else:
             asserts.fail(f"The {attribute.__name__} attribute was not found in the attribute reports")
 
@@ -145,9 +196,9 @@ class TC_FAN_3_5(MatterBaseTest):
                                                  and the expected attribute values after the update.
             step (Step): An object containing the parameters for the step command, including direction, wrap, 
                          lowestOff, and the expected attribute values after the command execution.
-            expect_updates (bool): If False, the value of the last attribute report will be used (not incoming reports)
-                                   If True, the value of the incoming report will be used (not a pre-existing reports)
-
+            expect_updates (bool): If False, the value of the last attribute report will be used (not incoming reports).
+                                   If True, the value of the incoming report will be used (not a pre-existing reports).
+                                   Defaults to True.
         Returns:
             None
 
@@ -166,11 +217,11 @@ class TC_FAN_3_5(MatterBaseTest):
             self.attribute_subscription.reset()
         else:
             for expected_attribute in step.expected_attributes:
-                self.verify_expected_value(expected_attribute.attribute, expected_attribute.threshold_value, self.timeout_sec)
+                self.verify_expected_value(expected_attribute.attribute, expected_attribute.threshold_value)
 
     def compute_percent_setting(self, speed_setting):
         """
-        Computes the percentage setting of a fan based on the given speed setting.
+        Computes the fan's percent based on a given speed setting.
 
         This method calculates the percentage representation of the current fan speed
         relative to the maximum speed. The result is rounded down to the nearest integer.
@@ -179,7 +230,7 @@ class TC_FAN_3_5(MatterBaseTest):
             speed_setting (float): The current speed setting of the fan.
 
         Returns:
-            int: The percentage of the current speed setting relative to the maximum speed.
+            int: The corresponding percent value.
         """
         return math.floor((speed_setting / self.speed_max) * 100)
 

@@ -414,7 +414,7 @@ class ClusterAttributeChangeAccumulator:
             data = transaction.GetAttribute(path)
             value = AttributeValue(endpoint_id=path.Path.EndpointId, attribute=path.AttributeType,
                                    value=data, timestamp_utc=datetime.now(timezone.utc))
-            logging.info(f"[FC] Got subscription report for {path.AttributeType}: {data}")
+            logging.info(f"Got subscription report for {path.AttributeType}: {data}")
             self._q.put(value)
             with self._lock:
                 self._attribute_report_counts[path.AttributeType] += 1
@@ -484,7 +484,7 @@ class ClusterAttributeChangeAccumulator:
         time_remaining = timeout_sec
 
         logging.info(
-                f"--> [FC] Getting the last report for the {attribute.__name__} attribute on endpoint {endpoint}, waiting for {timeout_sec:.1f} seconds.")
+                f"--> Getting the last report for the {attribute.__name__} attribute on endpoint {endpoint}, waiting for {timeout_sec:.1f} seconds.")
 
         first_match_found = False
         timestamp_utc = None
@@ -509,7 +509,7 @@ class ClusterAttributeChangeAccumulator:
                         first_match_found = True
                         old_report = report
                     if report.timestamp_utc > timestamp_utc:
-                        logging.info(f"--> [FC] Last report for the {attribute.__name__} attribute found - value: {report.value}")
+                        logging.info(f"--> Last report for the {attribute.__name__} attribute found - value: {report.value}")
                         return report.value
 
             elapsed = time.time() - start_time
@@ -519,11 +519,11 @@ class ClusterAttributeChangeAccumulator:
         # If we reach here, no new report arrived before the timeout
         # Returning the last report's value
         if first_match_found:
-            logging.info(f"--> [FC] Last report for the {attribute.__name__} attribute found - value: {old_report.value}")
+            logging.info(f"--> Last report for the {attribute.__name__} attribute found - value: {old_report.value}")
             return old_report.value
 
         # Returning None if no reports for the specified attribute were found
-        logging.info(f"--> [FC] No reports for the {attribute.__name__} attribute were found.")
+        logging.info(f"--> No reports for the {attribute.__name__} attribute were found.")
         return None
 
     def await_all_final_values_reported_threshold(self, value_expectations: Iterable[AttributeValueExpected], timeout_sec: float = 1.0):
@@ -543,7 +543,7 @@ class ClusterAttributeChangeAccumulator:
 
         for element in value_expectations:
             logging.info(
-                f"[FC] --> Expecting report for the {element.attribute.__name__} attribute. Comparisson: {element.comparisson_type.name}. Value: {element.threshold_value}. Endpoint {element.endpoint_id}.")
+                f"--> Expecting report for the {element.attribute.__name__} attribute. Comparisson: {element.comparisson_type.name}. Value: {element.threshold_value}. Endpoint {element.endpoint_id}.")
         logging.info(f"Waiting for {timeout_sec:.1f} seconds for all reports.")
 
         while time_remaining > 0:
@@ -571,11 +571,11 @@ class ClusterAttributeChangeAccumulator:
                     elif expected_element.comparisson_type == ComparisonEnum.Equal:
                         last_report_matches[expected_idx] = (last_value == expected_element.threshold_value)
 
-                    logging.info(f"[FC] --> Value reported for {expected_element.attribute.__name__} attribute: {last_value}")
+                    logging.info(f"--> Value reported for {expected_element.attribute.__name__} attribute: {last_value}")
 
             # Determine if all were met
             if all(last_report_matches.values()):
-                logging.info(f"[FC] Found all expected reports were true.")
+                logging.info(f"Found all expected reports were true.")
                 return tuple(values)
 
             elapsed = time.time() - start_time
@@ -583,13 +583,13 @@ class ClusterAttributeChangeAccumulator:
             time.sleep(0.1)
 
         # If we reach here, there was no early return and we failed to find all the values.
-        logging.error("[FC] Reached time-out without finding all expected report values for threshold.")
-        logging.info("[FC] Result:")
+        logging.error("Reached time-out without finding all expected report values for threshold.")
+        logging.info("Result:")
         for expected_idx, expected_element in enumerate(value_expectations):
             found_str = "Found:   " if last_report_matches.get(expected_idx) else "Not found"
             logging.info(
-                f"[FC]   -> {found_str} [Attribute: {expected_element.attribute.__name__}, comparisson: {expected_element.comparisson_type.name}, value: {expected_element.threshold_value}, endpoint: {expected_element.endpoint_id}]")
-        asserts.fail("[FC] Did not find all expected last report values for threshold before time-out")
+                f"  -> {found_str} [Attribute: {expected_element.attribute.__name__}, comparisson: {expected_element.comparisson_type.name}, value: {expected_element.threshold_value}, endpoint: {expected_element.endpoint_id}]")
+        asserts.fail("Did not find all expected last report values for threshold before time-out")
 
     def await_sequence_of_reports(self, attribute: TypedAttributePath, sequence: list[Any], timeout_sec: float) -> None:
         """Await a given expected sequence of attribute reports in the accumulator for the endpoint associated.
