@@ -273,8 +273,8 @@ class TC_FAN_3_5(MatterBaseTest):
         print(f"[FC] # self.step(2)")
         feature_map = await self.read_setting(attr.FeatureMap)
         self.supports_step = bool(feature_map & cluster.Bitmaps.Feature.kStep)
-        self.multi_speed = bool(feature_map & cluster.Bitmaps.Feature.kMultiSpeed)
-        if not self.supports_step or not self.supports_step:
+        self.supports_multi_speed = bool(feature_map & cluster.Bitmaps.Feature.kMultiSpeed)
+        if not self.supports_step or not self.supports_multi_speed:
             logger.info("Both the Step and MultiSpeed features must be supported by the DUT for this test, skipping test.")
             return
 
@@ -342,7 +342,7 @@ class TC_FAN_3_5(MatterBaseTest):
         # command with Direction set to Increase, Wrap set to False, and LowestOff set to True
         #  - After the write operation:
         #    - Verify that the SpeedSetting and SpeedCurrent attributes are both set to 0
-        #  - After the step command is executed:
+        #  - After the step command operation:
         #    - Verify that the SpeedSetting and SpeedCurrent attributes are both set to 1
         #    - Verify that the PercentStting and PercentCurrent attributes are both
         #      set to the corresponding values as per the percent formula:
@@ -374,7 +374,7 @@ class TC_FAN_3_5(MatterBaseTest):
         # command with Direction set to Decrease, Wrap set to False, and LowestOff set to True
         #  - After the write operation:
         #    - Verify that the SpeedSetting and SpeedCurrent attributes are both set to 0
-        #  - After the step command is executed:
+        #  - After the step command operation:
         #    - Verify that the SpeedSetting and SpeedCurrent attributes are both set to 0
         #    - Verify that the PercentStting and PercentCurrent attributes are both set to 0
         #    - Verify that the FanMode attribute is set to Off (0)
@@ -404,7 +404,7 @@ class TC_FAN_3_5(MatterBaseTest):
         # command with Direction set to Decrease, Wrap set to True, and LowestOff set to True
         #  - After the write operation:
         #    - Verify that the SpeedSetting and SpeedCurrent attributes are both set to 0
-        #  - After the step command is executed:
+        #  - After the step command operation:
         #    - Verify that the SpeedSetting and SpeedCurrent attributes are both set to SpeedMax
         #    - Verify that the PercentStting and PercentCurrent attributes are both
         #      set to the corresponding values as per the percent formula:
@@ -436,7 +436,7 @@ class TC_FAN_3_5(MatterBaseTest):
         # command with Direction set to Decrease, Wrap set to False, and LowestOff set to False
         #  - After the write operation:
         #    - Verify that the SpeedSetting and SpeedCurrent attributes are both set to 1
-        #  - After the step command is executed:
+        #  - After the step command operation:
         #    - Verify that the SpeedSetting and SpeedCurrent attributes are both set to 1
         #    - Verify that the PercentStting and PercentCurrent attributes are both
         #      set to the corresponding values as per the percent formula:
@@ -468,7 +468,7 @@ class TC_FAN_3_5(MatterBaseTest):
         # command with Direction set to Decrease, Wrap set to False, and LowestOff set to True
         #  - After the write operation:
         #    - Verify that the SpeedSetting and SpeedCurrent attributes are both set to 0
-        #  - After the step command is executed:
+        #  - After the step command operation:
         #    - Verify that the SpeedSetting and SpeedCurrent attributes are both set to 0
         #    - Verify that the PercentStting and PercentCurrent attributes are both set to 0
         #    - Verify that the FanMode attribute is set to Off (0)
@@ -498,7 +498,7 @@ class TC_FAN_3_5(MatterBaseTest):
         # command with Direction set to Increase, Wrap set to False, and LowestOff set to False
         #  - After the write operation:
         #    - Verify that the SpeedSetting and SpeedCurrent attributes are both set to SpeedMax
-        #  - After the step command is executed:
+        #  - After the step command operation:
         #    - Verify that the SpeedSetting and SpeedCurrent attributes are both set to SpeedMax
         #    - Verify that the PercentStting and PercentCurrent attributes are both
         #      set to the corresponding values as per the percent formula:
@@ -530,7 +530,7 @@ class TC_FAN_3_5(MatterBaseTest):
         # command with Direction set to Increase, Wrap set to True, and LowestOff set to True
         #  - After the write operation:
         #    - Verify that the SpeedSetting and SpeedCurrent attributes are both set to SpeedMax
-        #  - After the step command is executed:
+        #  - After the step command operation:
         #    - Verify that the SpeedSetting and SpeedCurrent attributes are both set to 0
         #    - Verify that the PercentStting and PercentCurrent attributes are both set to 0
         #    - Verify that the FanMode attribute is set to Off (0)
@@ -560,7 +560,7 @@ class TC_FAN_3_5(MatterBaseTest):
         # command with Direction set to Increase, Wrap set to True, and LowestOff set to False
         #  - After the write operation:
         #    - Verify that the SpeedSetting and SpeedCurrent attributes are both set to SpeedMax
-        #  - After the step command is executed:
+        #  - After the step command operation:
         #    - Verify that the SpeedSetting and SpeedCurrent attributes are both set to 1
         #    - Verify that the PercentStting and PercentCurrent attributes are both
         #      set to the corresponding values as per the percent formula:
