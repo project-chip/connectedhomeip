@@ -39,7 +39,7 @@ from datetime import datetime, timedelta, timezone
 from enum import Enum, IntFlag
 from functools import partial
 from itertools import chain
-from typing import Any, Iterable, List, Optional, Tuple, NamedTuple
+from typing import Any, Iterable, List, Optional, Tuple
 
 import chip.testing.conversions as conversions
 import chip.testing.matchers as matchers
@@ -484,7 +484,7 @@ class ClusterAttributeChangeAccumulator:
         time_remaining = timeout_sec
 
         logging.info(
-                f"--> Getting the last report for the {attribute.__name__} attribute on endpoint {endpoint}, waiting for {timeout_sec:.1f} seconds.")
+            f"--> Getting the last report for the {attribute.__name__} attribute on endpoint {endpoint}, waiting for {timeout_sec:.1f} seconds.")
 
         first_match_found = False
         timestamp_utc = None

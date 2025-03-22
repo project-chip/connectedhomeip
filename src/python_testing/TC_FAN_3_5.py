@@ -34,23 +34,20 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-from dataclasses import dataclass, field
 import logging
 import math
-import time
+from dataclasses import dataclass, field
 from typing import Any, List
 
 import chip.clusters as Clusters
-# from chip.clusters import ClusterObjects as ClusterObjects
 from chip.interaction_model import InteractionModelError, Status
-# from chip.testing.matter_testing import AttributeValue, ClusterAttributeChangeAccumulator, MatterBaseTest, async_test_body, default_matter_test_main
-# from 
-
+from matter_testing_infrastructure.chip.testing.matter_testing import (AttributeValueExpected, ClusterAttributeChangeAccumulator,
+                                                                       ComparisonEnum, MatterBaseTest, async_test_body,
+                                                                       default_matter_test_main)
 from mobly import asserts
 
-from matter_testing_infrastructure.chip.testing.matter_testing import AttributeValueExpected, ComparisonEnum, ClusterAttributeChangeAccumulator, MatterBaseTest, async_test_body, default_matter_test_main
-
 logger = logging.getLogger(__name__)
+
 
 @dataclass
 class Step:
@@ -69,11 +66,12 @@ class Step:
         expected_attributes (List[AttributeValueExpected]): A list of expected 
             attribute value updates after the step command is executed. Defaults to 
             an empty list.
-    """    
+    """
     direction: Clusters.FanControl.Enums.StepDirectionEnum = Clusters.FanControl.Enums.StepDirectionEnum.kIncrease
     wrap: bool = False
     lowest_off: bool = True
     expected_attributes: List[AttributeValueExpected] = field(default_factory=list)
+
 
 @dataclass
 class AttributeUpdate:
@@ -94,6 +92,7 @@ class AttributeUpdate:
     value: Any
     expected_attributes: List[AttributeValueExpected] = field(default_factory=list)
 
+
 class TC_FAN_3_5(MatterBaseTest):
     def desc_TC_FAN_3_5(self) -> str:
         return "[TC-FAN-3.5] Optional step functionality with DUT as Server"
@@ -112,7 +111,7 @@ class TC_FAN_3_5(MatterBaseTest):
             AssertionError: If the read operation fails.
         """
         cluster = Clusters.Objects.FanControl
-        return await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=cluster, attribute=attribute)    
+        return await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=cluster, attribute=attribute)
 
     async def write_setting(self, attribute, value) -> None:
         """
@@ -156,7 +155,7 @@ class TC_FAN_3_5(MatterBaseTest):
 
         Returns:
             None
-        """        
+        """
         try:
             logger.info(f"[FC] Sending Step command - direction: {direction}, wrap: {wrap}, lowestOff: {lowestOff}")
             await self.send_single_cmd(cmd=Clusters.Objects.FanControl.Commands.Step(direction=direction, wrap=wrap, lowestOff=lowestOff), endpoint=self.endpoint)
@@ -179,7 +178,8 @@ class TC_FAN_3_5(MatterBaseTest):
         # Gets and verifies a given attribute report value against an expected value.
         value_current = self.attribute_subscription.get_last_attribute_report_value(self.endpoint, attribute, self.timeout_sec)
         if value_current is not None:
-            asserts.assert_equal(value_current, expected_value, f"Current {attribute.__name__} attribute value ({value_current}) is not equal to the expected value ({value_expected})")
+            asserts.assert_equal(value_current, expected_value,
+                                 f"Current {attribute.__name__} attribute value ({value_current}) is not equal to the expected value ({value_expected})")
         else:
             asserts.fail(f"The {attribute.__name__} attribute was not found in the attribute reports")
 
