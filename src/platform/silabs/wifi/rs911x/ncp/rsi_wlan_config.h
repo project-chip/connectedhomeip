@@ -38,21 +38,31 @@
 //! opermode command paramaters
 /*=======================================================================*/
 //! To set wlan feature select bit map
-#define RSI_FEATURE_BIT_MAP (FEAT_SECURITY_OPEN)
-
+#define RSI_FEATURE_BIT_MAP (FEAT_SECURITY_OPEN | FEAT_SECURITY_PSK | FEAT_AGGREGATION | FEAT_ULP_GPIO_BASED_HANDSHAKE)
 //! TCP IP BYPASS feature check
 #define RSI_TCP_IP_BYPASS RSI_ENABLE
-#define RSI_TCP_IP_FEATURE_BIT_MAP (TCP_IP_FEAT_BYPASS /*| TCP_IP_FEAT_EXTENSION_VALID*/)
+#define RSI_TCP_IP_FEATURE_BIT_MAP (TCP_IP_FEAT_BYPASS | TCP_IP_FEAT_EXTENSION_VALID)
 
 //! To set Extended custom feature select bit map
+//! To set Extended custom feature select bit map
 #if WIFI_ENABLE_SECURITY_WPA3_TRANSITION
+#ifdef CHIP_9117
+#define RSI_EXT_CUSTOM_FEATURE_BIT_MAP                                                                                             \
+    (EXT_FEAT_448K_M4SS_256K | EXT_FEAT_LOW_POWER_MODE | EXT_FEAT_XTAL_CLK_ENABLE | EXT_FEAT_IEEE_80211W)
+#else /* !CHIP_9117 */
 #define RSI_EXT_CUSTOM_FEATURE_BIT_MAP (EXT_FEAT_384K_MODE | EXT_FEAT_IEEE_80211W)
-#else /* !WIFI_ENABLE_SECURITY_WPA3_TRANSITION */
+#endif /* CHIP_9117 */
+#else  /* !WIFI_ENABLE_SECURITY_WPA3_TRANSITION */
+#ifdef CHIP_9117
+#define RSI_EXT_CUSTOM_FEATURE_BIT_MAP (EXT_FEAT_448K_M4SS_256K | EXT_FEAT_LOW_POWER_MODE | EXT_FEAT_XTAL_CLK_ENABLE)
+#else /* !CHIP_9117 */
 #define RSI_EXT_CUSTOM_FEATURE_BIT_MAP EXT_FEAT_384K_MODE
+#endif /* CHIP_9117 */
 #endif /* WIFI_ENABLE_SECURITY_WPA3_TRANSITION */
 
 //! To set Extended TCPIP feature select bit map
-#define RSI_EXT_TCPIP_FEATURE_BITMAP (/*EXT_FEAT_HTTP_OTAF_SUPPORT |*/ EXT_TCP_IP_SSL_16K_RECORD)
+#define RSI_EXT_TCPIP_FEATURE_BITMAP (/*EXT_FEAT_HTTP_OTAF_SUPPORT |*/ EXT_TCP_IP_SSL_16K_RECORD | CONFIG_FEAT_EXTENTION_VALID)
+#define RSI_CONFIG_FEATURE_BITMAP RSI_FEAT_SLEEP_GPIO_SEL_BITMAP
 //! Extended custom feature is selected internally
 //! CCP         -- EXT_FEAT_256K_MODE
 //! Wiseconnect -- EXT_FEAT_384K_MODE
