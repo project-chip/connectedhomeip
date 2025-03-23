@@ -120,6 +120,7 @@ CHIP_ERROR UserLabelAttrAccess::ReadLabelList(EndpointId endpoint, AttributeValu
 
 CHIP_ERROR UserLabelAttrAccess::WriteLabelList(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
 {
+    CHIP_ERROR err                             = CHIP_NO_ERROR;
     EndpointId endpoint                        = aPath.mEndpointId;
     DeviceLayer::DeviceInfoProvider * provider = DeviceLayer::GetDeviceInfoProvider();
 
@@ -137,8 +138,15 @@ CHIP_ERROR UserLabelAttrAccess::WriteLabelList(const ConcreteDataAttributePath &
         while (iter.Next())
         {
             auto & entry = iter.GetValue();
-            ReturnErrorOnFailure(labelList.add(entry));
+            err          = labelList.add(entry);
+
+            if (err == CHIP_ERROR_NO_MEMORY)
+            {
+                return CHIP_IM_GLOBAL_STATUS(ResourceExhausted);
+            }
+            ReturnErrorOnFailure(err);
         }
+
         ReturnErrorOnFailure(iter.GetStatus());
 
         return provider->SetUserLabelList(endpoint, labelList);
@@ -152,7 +160,7 @@ CHIP_ERROR UserLabelAttrAccess::WriteLabelList(const ConcreteDataAttributePath &
         VerifyOrReturnError(IsValidLabelEntry(entry), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
         // Append the single user label entry
-        CHIP_ERROR err = provider->AppendUserLabel(endpoint, entry);
+        err = provider->AppendUserLabel(endpoint, entry);
         if (err == CHIP_ERROR_NO_MEMORY)
         {
             return CHIP_IM_GLOBAL_STATUS(ResourceExhausted);
