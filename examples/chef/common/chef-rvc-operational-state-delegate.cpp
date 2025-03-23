@@ -86,7 +86,7 @@ void RvcOperationalStateDelegate::HandlePauseStateCallback(GenericOperationalErr
         return;
     }
 
-    if (state != RvcOperationalState::OperationalStateEnum::kRunning)
+    if (state != OperationalState::OperationalStateEnum::kRunning)
     {
         ChipLogDetail(DeviceLayer, "HandlePauseStateCallback: RVC not running. Current state = %d. Returning.",
                       to_underlying(state));
@@ -117,7 +117,7 @@ void RvcOperationalStateDelegate::HandleResumeStateCallback(GenericOperationalEr
         return;
     }
 
-    if (state != RvcOperationalState::OperationalStateEnum::kPaused)
+    if (state != OperationalState::OperationalStateEnum::kPaused)
     {
         ChipLogDetail(DeviceLayer, "HandleResumeStateCallback: RVC not in paused state. Current state = %d. Returning.",
                       to_underlying(state));
@@ -152,8 +152,8 @@ void RvcOperationalStateDelegate::HandleStartStateCallback(GenericOperationalErr
     RvcOperationalState::OperationalStateEnum current_state =
         static_cast<RvcOperationalState::OperationalStateEnum>(gRvcOperationalStateInstance->GetCurrentOperationalState());
 
-    if (current_state == RvcOperationalState::OperationalStateEnum::kRunning ||
-        state == RvcOperationalState::OperationalStateEnum::kPaused)
+    if (current_state == OperationalState::OperationalStateEnum::kRunning ||
+        current_state == OperationalState::OperationalStateEnum::kPaused)
     {
         ChipLogDetail(DeviceLayer, "HandleStartStateCallback: RVC is already started. Current state = %d. Returning.",
                       to_underlying(current_state));
@@ -161,8 +161,8 @@ void RvcOperationalStateDelegate::HandleStartStateCallback(GenericOperationalErr
         return;
     }
 
-    if (current_state != RvcOperationalState::OperationalStateEnum::kCharging &&
-        state != RvcOperationalState::OperationalStateEnum::kStopped)
+    if (to_underlying(current_state) != to_underlying(RvcOperationalState::OperationalStateEnum::kCharging) &&
+        to_underlying(current_state) != to_underlying(RvcOperationalState::OperationalStateEnum::kStopped))
     {
         ChipLogError(
             DeviceLayer,
