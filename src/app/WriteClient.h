@@ -369,7 +369,7 @@ private:
     template <class T>
     CHIP_ERROR TryEncodeListIntoSingleAttributeDataIB(const ConcreteDataAttributePath & attributePath,
                                                       const DataModel::List<T> & list, bool & chunkingNeeded,
-                                                      ListIndex & numSuccessfullyEncodedItems)
+                                                      ListIndex & outNumSuccessfullyEncodedItems)
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
         TLV::TLVWriter backupWriter;
@@ -379,7 +379,7 @@ private:
         chip::TLV::TLVWriter * writer = nullptr;
         VerifyOrReturnError((writer = GetAttributeDataIBTLVWriter()) != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-        numSuccessfullyEncodedItems = 0;
+        outNumSuccessfullyEncodedItems = 0;
 
         for (auto & item : list)
         {
@@ -400,7 +400,7 @@ private:
                 break;
             }
             ReturnErrorOnFailure(err);
-            numSuccessfullyEncodedItems++;
+            outNumSuccessfullyEncodedItems++;
         }
 
         ReturnErrorOnFailure(EnsureListEnded());
@@ -448,6 +448,9 @@ private:
     CHIP_ERROR PutSinglePreencodedAttributeWritePayload(const ConcreteDataAttributePath & attributePath,
                                                         const TLV::TLVReader & data);
 
+    CHIP_ERROR TryPutPreencodedListIntoSingleAttributeWritePayload(const chip::app::ConcreteDataAttributePath & attributePath,
+                                                                   TLV::TLVReader & valueReader, bool & chunkingNeeded,
+                                                                   ListIndex & outNumSuccessfullyEncodedItems);
     CHIP_ERROR EnsureMessage();
 
     /**

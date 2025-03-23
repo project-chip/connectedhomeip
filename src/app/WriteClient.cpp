@@ -247,6 +247,45 @@ CHIP_ERROR WriteClient::PutSinglePreencodedAttributeWritePayload(const chip::app
     return err;
 }
 
+CHIP_ERROR
+WriteClient::TryPutPreencodedListIntoSingleAttributeWritePayload(const chip::app::ConcreteDataAttributePath & attributePath,
+                                                                 TLV::TLVReader & valueReader, bool & chunkingNeeded,
+                                                                 ListIndex & outNumSuccessfullyEncodedItems)
+{
+    TLV::TLVWriter backupWriter;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    // mWriteRequestBuilder.GetWriteRequests().Checkpoint(backupWriter);
+
+    ReturnErrorOnFailure(EnsureListStarted(attributePath));
+
+    chip::TLV::TLVWriter * writer = nullptr;
+    VerifyOrReturnError((writer = GetAttributeDataIBTLVWriter()) != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    outNumSuccessfullyEncodedItems = 0;
+
+    while ((err = valueReader.Next()) == CHIP_NO_ERROR)
+    {
+        mWriteRequestBuilder.GetWriteRequests().Checkpoint(backupWriter);
+        err = writer->CopyElement(TLV::AnonymousTag(), valueReader);
+
+        if (err == CHIP_ERROR_NO_MEMORY || err == CHIP_ERROR_BUFFER_TOO_SMALL)
+        {
+            mWriteRequestBuilder.GetWriteRequests().Rollback(backupWriter);
+            chunkingNeeded = true;
+            err            = CHIP_NO_ERROR;
+            break;
+        }
+        ReturnErrorOnFailure(err);
+        outNumSuccessfullyEncodedItems++;
+    }
+    VerifyOrReturnError(err == CHIP_END_OF_TLV || err == CHIP_NO_ERROR, err);
+
+    ReturnErrorOnFailure(EnsureListEnded());
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR WriteClient::PutPreencodedAttribute(const ConcreteDataAttributePath & attributePath, const TLV::TLVReader & data)
 {
     ReturnErrorOnFailure(EnsureMessage());
@@ -258,21 +297,38 @@ CHIP_ERROR WriteClient::PutPreencodedAttribute(const ConcreteDataAttributePath &
         TLV::TLVReader valueReader;
         CHIP_ERROR err = CHIP_NO_ERROR;
 
-        ConcreteDataAttributePath path = attributePath;
-
         dataReader.Init(data);
         dataReader.OpenContainer(valueReader);
 
-        // Encode an empty list for the chunking protocol.
-        ReturnErrorOnFailure(EncodeSingleAttributeDataIB(path, DataModel::List<uint8_t>()));
+        //    ListIndex nextItemToAppendIndex      = kInvalidListIndex;
+        uint16_t numSuccessfullyEncodedItems = kInvalidListIndex;
+        bool chunkingNeeded                  = false;
 
-        if (err == CHIP_NO_ERROR)
+        ConcreteDataAttributePath path = attributePath;
+
+        //  dataReader.Init(data);
+        //   dataReader.OpenContainer(valueReader);
+
+        // Encode an empty list for the chunking protocol.
+        // ReturnErrorOnFailure(EncodeSingleAttributeDataIB(path, DataModel::List<uint8_t>()));
+        ReturnErrorOnFailure(
+            TryPutPreencodedListIntoSingleAttributeWritePayload(path, valueReader, chunkingNeeded, numSuccessfullyEncodedItems));
+
+        if (!chunkingNeeded)
         {
-            path.mListOp = ConcreteDataAttributePath::ListOperation::AppendItem;
-            while ((err = valueReader.Next()) == CHIP_NO_ERROR)
-            {
-                ReturnErrorOnFailure(PutSinglePreencodedAttributeWritePayload(path, valueReader));
-            }
+            return CHIP_NO_ERROR;
+        }
+
+        // Start a new WriteRequest chunk.
+        ReturnErrorOnFailure(StartNewMessage());
+        //   nextItemToAppendIndex = numSuccessfullyEncodedItems;
+
+        path.mListOp = ConcreteDataAttributePath::ListOperation::AppendItem;
+        // TODO HOW WOULD I KNOW WHERE TO CONTINUE? if chunking is needed, where to put the index?
+        // This ?
+        while ((err = valueReader.Next()) == CHIP_NO_ERROR)
+        {
+            ReturnErrorOnFailure(PutSinglePreencodedAttributeWritePayload(path, valueReader));
         }
 
         if (err == CHIP_END_OF_TLV)
