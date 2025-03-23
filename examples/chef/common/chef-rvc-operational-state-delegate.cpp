@@ -88,7 +88,8 @@ void RvcOperationalStateDelegate::HandlePauseStateCallback(GenericOperationalErr
 
     if (state != RvcOperationalState::OperationalStateEnum::kRunning)
     {
-        ChipLogDetail("HandlePauseStateCallback: RVC not running. Current state = %d. Returning.", state);
+        ChipLogDetail(DeviceLayer, "HandlePauseStateCallback: RVC not running. Current state = %d. Returning.",
+                      to_underlying(state));
         err.Set(to_underlying(OperationalState::ErrorStateEnum::kCommandInvalidInState));
         return;
     }
@@ -118,7 +119,8 @@ void RvcOperationalStateDelegate::HandleResumeStateCallback(GenericOperationalEr
 
     if (state != RvcOperationalState::OperationalStateEnum::kPaused)
     {
-        ChipLogDetail("HandleResumeStateCallback: RVC not in paused state. Current state = %d. Returning.", state);
+        ChipLogDetail(DeviceLayer, "HandleResumeStateCallback: RVC not in paused state. Current state = %d. Returning.",
+                      to_underlying(state));
         err.Set(to_underlying(OperationalState::ErrorStateEnum::kCommandInvalidInState));
         return;
     }
@@ -154,7 +156,7 @@ void RvcOperationalStateDelegate::HandleStartStateCallback(GenericOperationalErr
         state == RvcOperationalState::OperationalStateEnum::kPaused)
     {
         ChipLogDetail(DeviceLayer, "HandleStartStateCallback: RVC is already started. Current state = %d. Returning.",
-                      current_state);
+                      to_underlying(current_state));
         err.Set(to_underlying(OperationalState::ErrorStateEnum::kNoError));
         return;
     }
@@ -165,7 +167,7 @@ void RvcOperationalStateDelegate::HandleStartStateCallback(GenericOperationalErr
         ChipLogError(
             DeviceLayer,
             "HandleStartStateCallback: RVC must be in either charging or stopped state before starting. current state = %d",
-            current_state);
+            to_underlying(current_state));
         err.Set(to_underlying(OperationalState::ErrorStateEnum::kCommandInvalidInState));
         return;
     }
@@ -192,7 +194,8 @@ void RvcOperationalStateDelegate::HandleStopStateCallback(GenericOperationalErro
     if (current_state != RvcOperationalState::OperationalStateEnum::kRunning &&
         current_state != RvcOperationalState::OperationalStateEnum::kPaused)
     {
-        ChipLogDetail("HandleStopStateCallback: RVC not started. Current state = %d. Returning.", current_state);
+        ChipLogDetail(DeviceLayer, "HandleStopStateCallback: RVC not started. Current state = %d. Returning.",
+                      to_underlying(current_state));
         err.Set(to_underlying(OperationalState::ErrorStateEnum::kNoError));
         return;
     }
@@ -231,7 +234,8 @@ void RvcOperationalStateDelegate::HandleGoHomeCommandCallback(OperationalState::
     if (current_state == RvcOperationalState::OperationalStateEnum::kRunning ||
         current_state == RvcOperationalState::OperationalStateEnum::kPaused)
     {
-        ChipLogDetail("HandleGoHomeCommandCallback: RVC was started, current state = %d. Stopping RVC.", current_state);
+        ChipLogDetail(DeviceLayer, "HandleGoHomeCommandCallback: RVC was started, current state = %d. Stopping RVC.",
+                      to_underlying(current_state));
         gRvcOperationalStateDelegate->HandleStopStateCallback(err);
     }
 
