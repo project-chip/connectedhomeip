@@ -282,7 +282,7 @@ jobs:
                   --skip-dir src/data-model-providers \
                   --skip-dir scripts/ \
                   --skip-dir src/app/clusters \
-                  --skip-dir src/app/examples \
+                  --skip-dir examples \
                   --skip-dir docs \
                   --skip-dir src/app/tests
 
