@@ -295,8 +295,8 @@ static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data
     uint32_t mPausedTime  = gRvcOperationalStateDelegate->mPausedTime;
     uint32_t mRunningTime = gRvcOperationalStateDelegate->mRunningTime;
 
-    ChipLogDetail(DeviceLayer, "RVC timer tick: Current state = %d. CountdownTime = %d. PauseTime = %d. RunningTime = %d.", state,
-                  gRvcOperationalStateDelegate->mCountdownTime.Value(), mPausedTime, mRunningTime);
+    ChipLogDetail(DeviceLayer, "RVC timer tick: Current state = %d. CountdownTime = %d. PauseTime = %d. RunningTime = %d.",
+                  to_underlying(state), gRvcOperationalStateDelegate->mCountdownTime.Value(), mPausedTime, mRunningTime);
 
     if (gRvcOperationalStateDelegate->mCountdownTime.Value() > mRunningTime)
     {
