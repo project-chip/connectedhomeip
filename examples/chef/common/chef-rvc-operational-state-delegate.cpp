@@ -322,7 +322,6 @@ static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data
             gRvcOperationalStateDelegate->mRunningTime = 0;
             gRvcOperationalStateDelegate->mPausedTime  = 0;
             gRvcOperationalStateDelegate->mCountdownTime.SetNull();
-            instance->UpdateCountdownTimeFromDelegate();
 
 #ifdef MATTER_DM_PLUGIN_RVC_RUN_MODE_SERVER
             getRvcRunModeInstance()->UpdateCurrentMode(RvcRunMode::ModeIdle);
