@@ -42,7 +42,7 @@ from typing import Any, List
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
 from matter_testing_infrastructure.chip.testing.matter_testing import (AttributeValueExpected, ClusterAttributeChangeAccumulator,
-                                                                       ComparisonEnum, MatterBaseTest, async_test_body,
+                                                                       ComparisonEnum, MatterBaseTest, TestStep, async_test_body,
                                                                        default_matter_test_main)
 from mobly import asserts
 
@@ -96,6 +96,23 @@ class AttributeUpdate:
 class TC_FAN_3_5(MatterBaseTest):
     def desc_TC_FAN_3_5(self) -> str:
         return "[TC-FAN-3.5] Optional step functionality with DUT as Server"
+
+    def steps_TC_FAN_3_5(self):
+        return [TestStep(1, "[FC] Commissioning already done.", is_commissioning=True),
+                TestStep(2, "[FC] TH checks the DUT for support of the Step and MultiSpeed features.", "If the DUT does not support both features, the test is skipped."),
+                TestStep(3, "[FC] TH reads from the DUT the SpeedMax attribute.", "Store value for future reference."),
+                TestStep(4, "[FC] TH subscribes to the FanControl cluster.", "Enables the TH to receive attribute updates."),
+                TestStep(5, "[FC] TH writes to the DUT the PercentSetting attribute with 50, then sends a Step command with Direction set to Increase, Wrap set to False, and LowestOff set to True.", "- Verify that the PercentStting and PercentCurrent attributes are both set to 50 after the write operation. - Verify that the PercentStting and PercentCurrent attributes are both greater than 50 after the Step command is executed."),
+                TestStep(6, "[FC] TH writes to the DUT the PercentSetting attribute with 50, then sends a Step command with Direction set to Decrease, Wrap set to False, and LowestOff set to True.", "- Verify that the PercentStting and PercentCurrent attributes are both set to 50 after the write operation. - Verify that the PercentStting and PercentCurrent attributes are both less than 50 after the Step command is executed."),
+                TestStep(7, "[FC] TH writes to the DUT the SpeedSetting attribute with 0, then sends a Step command with Direction set to Increase, Wrap set to False, and LowestOff set to True.", "- After the write operation: * Verify that the SpeedSetting and SpeedCurrent attributes are both set to 0. - After the step command operation: * Verify that the SpeedSetting and SpeedCurrent attributes are both set to 1. * Verify that the PercentStting and PercentCurrent attributes are both set to the corresponding values as per the percent formula: percent=floor(speed/SpeedMax*100). * Verify that the FanMode attribute is set to Low (1)."),
+                TestStep(8, "[FC] TH writes to the DUT the SpeedSetting attribute with 0, then sends a Step command with Direction set to Decrease, Wrap set to False, and LowestOff set to True.", "- After the write operation: * Verify that the SpeedSetting and SpeedCurrent attributes are both set to 0. - After the step command operation: * Verify that the SpeedSetting and SpeedCurrent attributes are both set to 0. * Verify that the PercentStting and PercentCurrent attributes are both set to 0. * Verify that the FanMode attribute is set to Off (0)."),
+                TestStep(9, "[FC] TH writes to the DUT the SpeedSetting attribute with 0, then sends a Step command with Direction set to Decrease, Wrap set to True, and LowestOff set to True.", "- After the write operation: * Verify that the SpeedSetting and SpeedCurrent attributes are both set to 0. - After the step command operation: * Verify that the SpeedSetting and SpeedCurrent attributes are both set to SpeedMax. * Verify that the PercentStting and PercentCurrent attributes are both set to the corresponding values as per the percent formula: percent=floor(speed/SpeedMax*100). * Verify that the FanMode attribute is set to High (3)."),
+                TestStep(10, "[FC] TH writes to the DUT the SpeedSetting attribute with 1, then sends a Step command with Direction set to Decrease, Wrap set to False, and LowestOff set to False.", "- After the write operation: * Verify that the SpeedSetting and SpeedCurrent attributes are both set to 1. - After the step command operation: * Verify that the SpeedSetting and SpeedCurrent attributes are both set to 1. * Verify that the PercentStting and PercentCurrent attributes are both set to the corresponding values as per the percent formula: percent=floor(speed/SpeedMax*100). * Verify that the FanMode attribute is set to Low (1)."),
+                TestStep(11, "[FC] TH writes to the DUT the SpeedSetting attribute with 1, then sends a Step command with Direction set to Decrease, Wrap set to False, and LowestOff set to True.", "- After the write operation: * Verify that the SpeedSetting and SpeedCurrent attributes are both set to 0. - After the step command operation: * Verify that the SpeedSetting and SpeedCurrent attributes are both set to 0. * Verify that the PercentStting and PercentCurrent attributes are both set to 0. * Verify that the FanMode attribute is set to Off (0)."),
+                TestStep(12, "[FC] TH writes to the DUT the SpeedSetting attribute with SpeedMax, then sends a Step command with Direction set to Increase, Wrap set to False, and LowestOff set to False.", "- After the write operation: * Verify that the SpeedSetting and SpeedCurrent attributes are both set to SpeedMax. - After the step command operation: * Verify that the SpeedSetting and SpeedCurrent attributes are both set to SpeedMax. * Verify that the PercentStting and PercentCurrent attributes are both set to the corresponding values as per the percent formula: percent=floor(speed/SpeedMax*100). * Verify that the FanMode attribute is set to High (3)."),
+                TestStep(13, "[FC] TH writes to the DUT the SpeedSetting attribute with SpeedMax, then sends a Step command with Direction set to Increase, Wrap set to True, and LowestOff set to True.", "- After the write operation: * Verify that the SpeedSetting and SpeedCurrent attributes are both set to SpeedMax. - After the step command operation: * Verify that the SpeedSetting and SpeedCurrent attributes are both set to 0. * Verify that the PercentStting and PercentCurrent attributes are both set to 0. * Verify that the FanMode attribute is set to Off (0)."),
+                TestStep(14, "[FC] TH writes to the DUT the SpeedSetting attribute with SpeedMax, then sends a Step command with Direction set to Increase, Wrap set to True, and LowestOff set to False.", "- After the write operation: * Verify that the SpeedSetting and SpeedCurrent attributes are both set to SpeedMax. - After the step command operation: * Verify that the SpeedSetting and SpeedCurrent attributes are both set to 1. * Verify that the PercentStting and PercentCurrent attributes are both set to the corresponding values as per the percent formula: percent=floor(speed/SpeedMax*100). * Verify that the FanMode attribute is set to Low (1)."),
+                ]
 
     async def read_setting(self, attribute: Any) -> Any:
         """
@@ -263,14 +280,12 @@ class TC_FAN_3_5(MatterBaseTest):
 
         # *** STEP 1 ***
         # Commissioning already done
-        # self.step(1)
-        print(f"[FC] # self.step(1)")
+        self.step(1)
 
         # *** STEP 2 ***
         # TH checks the DUT for support of the Step and MultiSpeed features
         #  - If the DUT does not support both features, the test is skipped
-        # self.step(2)
-        print(f"[FC] # self.step(2)")
+        self.step(2)
         feature_map = await self.read_setting(attr.FeatureMap)
         self.supports_step = bool(feature_map & cluster.Bitmaps.Feature.kStep)
         self.supports_multi_speed = bool(feature_map & cluster.Bitmaps.Feature.kMultiSpeed)
@@ -281,15 +296,13 @@ class TC_FAN_3_5(MatterBaseTest):
         # *** STEP 3 ***
         # TH reads from the DUT the SpeedMax attribute
         #  - Store value for future reference
-        # self.step(3)
-        print(f"[FC] # self.step(3)")
+        self.step(3)
         self.speed_max = await self.read_setting(attr.SpeedMax)
 
         # *** STEP 4 ***
         # TH subscribes to the FanControl cluster
         #  - Enables the TH to receive attribute updates
-        # self.step(4)
-        print(f"[FC] # self.step(4)")
+        self.step(4)
         self.attribute_subscription = ClusterAttributeChangeAccumulator(cluster)
         await self.attribute_subscription.start(self.default_controller, self.dut_node_id, self.endpoint)
 
@@ -300,8 +313,7 @@ class TC_FAN_3_5(MatterBaseTest):
         #    are both set to 50 after the write operation
         #  - Verify that the PercentStting and PercentCurrent attributes
         #    are both greater than 50 after the Step command is executed
-        # self.step(5)
-        print(f"[FC] # self.step(5)")
+        self.step(5)
         percent_setting = 50
         write_expect = [
             AttributeValueExpected(self.endpoint, attr.PercentSetting, ComparisonEnum.Equal, percent_setting),
@@ -322,8 +334,7 @@ class TC_FAN_3_5(MatterBaseTest):
         #    are both set to 50 after the write operation
         #  - Verify that the PercentStting and PercentCurrent attributes
         #    are both less than 50 after the Step command is executed
-        # self.step(6)
-        print(f"[FC] # self.step(6)")
+        self.step(6)
         percent_setting = 50
         write_expect = [
             AttributeValueExpected(self.endpoint, attr.PercentSetting, ComparisonEnum.Equal, percent_setting),
@@ -348,8 +359,7 @@ class TC_FAN_3_5(MatterBaseTest):
         #      set to the corresponding values as per the percent formula:
         #      percent=floor(speed/SpeedMax*100)
         #    - Verify that the FanMode attribute is set to Low (1)
-        # self.step(7)
-        print(f"[FC] # self.step(7)")
+        self.step(7)
         speed_setting = 0
         write_expect = [
             AttributeValueExpected(self.endpoint, attr.SpeedSetting, ComparisonEnum.Equal, speed_setting),
@@ -378,8 +388,7 @@ class TC_FAN_3_5(MatterBaseTest):
         #    - Verify that the SpeedSetting and SpeedCurrent attributes are both set to 0
         #    - Verify that the PercentStting and PercentCurrent attributes are both set to 0
         #    - Verify that the FanMode attribute is set to Off (0)
-        # self.step(8)
-        print(f"[FC] # self.step(8)")
+        self.step(8)
         speed_setting = 0
         write_expect = [
             AttributeValueExpected(self.endpoint, attr.SpeedSetting, ComparisonEnum.Equal, speed_setting),
@@ -389,8 +398,8 @@ class TC_FAN_3_5(MatterBaseTest):
         percent_setting_expected = 0
         fan_mode_expected = fm_enum.kOff
         command_expect = [
-            # AttributeValueExpected(self.endpoint, attr.SpeedSetting, ComparisonEnum.Equal, speed_setting_expected),
-            # AttributeValueExpected(self.endpoint, attr.SpeedCurrent, ComparisonEnum.Equal, speed_setting_expected),
+            AttributeValueExpected(self.endpoint, attr.SpeedSetting, ComparisonEnum.Equal, speed_setting_expected),
+            AttributeValueExpected(self.endpoint, attr.SpeedCurrent, ComparisonEnum.Equal, speed_setting_expected),
             AttributeValueExpected(self.endpoint, attr.PercentSetting, ComparisonEnum.Equal, percent_setting_expected),
             AttributeValueExpected(self.endpoint, attr.PercentCurrent, ComparisonEnum.Equal, percent_setting_expected),
             AttributeValueExpected(self.endpoint, attr.FanMode, ComparisonEnum.Equal, fan_mode_expected),
@@ -410,8 +419,7 @@ class TC_FAN_3_5(MatterBaseTest):
         #      set to the corresponding values as per the percent formula:
         #      percent=floor(speed/SpeedMax*100)
         #    - Verify that the FanMode attribute is set to High (3)
-        # self.step(9)
-        print(f"[FC] # self.step(9)")
+        self.step(9)
         speed_setting = 0
         write_expect = [
             AttributeValueExpected(self.endpoint, attr.SpeedSetting, ComparisonEnum.Equal, speed_setting),
@@ -442,8 +450,7 @@ class TC_FAN_3_5(MatterBaseTest):
         #      set to the corresponding values as per the percent formula:
         #      percent=floor(speed/SpeedMax*100)
         #    - Verify that the FanMode attribute is set to Low (1)
-        # self.step(10)
-        print(f"[FC] # self.step(10)")
+        self.step(10)
         speed_setting = 1
         write_expect = [
             AttributeValueExpected(self.endpoint, attr.SpeedSetting, ComparisonEnum.Equal, speed_setting),
@@ -472,8 +479,7 @@ class TC_FAN_3_5(MatterBaseTest):
         #    - Verify that the SpeedSetting and SpeedCurrent attributes are both set to 0
         #    - Verify that the PercentStting and PercentCurrent attributes are both set to 0
         #    - Verify that the FanMode attribute is set to Off (0)
-        # self.step(11)
-        print(f"[FC] # self.step(11)")
+        self.step(11)
         speed_setting = 1
         write_expect = [
             AttributeValueExpected(self.endpoint, attr.SpeedSetting, ComparisonEnum.Equal, speed_setting),
@@ -504,8 +510,7 @@ class TC_FAN_3_5(MatterBaseTest):
         #      set to the corresponding values as per the percent formula:
         #      percent=floor(speed/SpeedMax*100)
         #    - Verify that the FanMode attribute is set to High (3)
-        # self.step(12)
-        print(f"[FC] # self.step(12)")
+        self.step(12)
         speed_setting = self.speed_max
         write_expect = [
             AttributeValueExpected(self.endpoint, attr.SpeedSetting, ComparisonEnum.Equal, speed_setting),
@@ -534,8 +539,7 @@ class TC_FAN_3_5(MatterBaseTest):
         #    - Verify that the SpeedSetting and SpeedCurrent attributes are both set to 0
         #    - Verify that the PercentStting and PercentCurrent attributes are both set to 0
         #    - Verify that the FanMode attribute is set to Off (0)
-        # self.step(13)
-        print(f"[FC] # self.step(13)")
+        self.step(13)
         speed_setting = self.speed_max
         write_expect = [
             AttributeValueExpected(self.endpoint, attr.SpeedSetting, ComparisonEnum.Equal, speed_setting),
@@ -566,8 +570,7 @@ class TC_FAN_3_5(MatterBaseTest):
         #      set to the corresponding values as per the percent formula:
         #      percent=floor(speed/SpeedMax*100)
         #    - Verify that the FanMode attribute is set to Low (1)
-        # self.step(14)
-        print(f"[FC] # self.step(14)")
+        self.step(14)
         speed_setting = self.speed_max
         write_expect = [
             AttributeValueExpected(self.endpoint, attr.SpeedSetting, ComparisonEnum.Equal, speed_setting),
