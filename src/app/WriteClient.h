@@ -404,7 +404,7 @@ private:
     template <class T>
     CHIP_ERROR TryEncodeListIntoSingleAttributeDataIB(const ConcreteDataAttributePath & attributePath,
                                                       const DataModel::List<T> & list, bool & chunkingNeeded,
-                                                      ListIndex & numSuccessfullyEncodedItems)
+                                                      ListIndex & outNumSuccessfullyEncodedItems)
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
         TLV::TLVWriter backupWriter;
@@ -414,7 +414,7 @@ private:
         chip::TLV::TLVWriter * writer = nullptr;
         VerifyOrReturnError((writer = GetAttributeDataIBTLVWriter()) != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-        numSuccessfullyEncodedItems = 0;
+        outNumSuccessfullyEncodedItems = 0;
 
         for (auto & item : list)
         {
@@ -435,7 +435,7 @@ private:
                 break;
             }
             ReturnErrorOnFailure(err);
-            numSuccessfullyEncodedItems++;
+            outNumSuccessfullyEncodedItems++;
         }
 
         ReturnErrorOnFailure(EnsureListEnded());
@@ -483,13 +483,9 @@ private:
     CHIP_ERROR PutSinglePreencodedAttributeWritePayload(const ConcreteDataAttributePath & attributePath,
                                                         const TLV::TLVReader & data);
 
-    /**
-     * Encodes preencoded attribute data into a list, that will be decoded by cluster servers as a REPLACE Change.
-     * Returns outChunkingNeeded = true if it was not possible to fit all the data into a single list.
-     */
-    CHIP_ERROR TryPutPreencodedAttributeWritePayloadIntoList(const chip::app::ConcreteDataAttributePath & attributePath,
-                                                             TLV::TLVReader & valueReader, bool & outChunkingNeeded,
-                                                             uint16_t & outEncodedItemCount);
+    CHIP_ERROR TryPutPreencodedListIntoSingleAttributeWritePayload(const chip::app::ConcreteDataAttributePath & attributePath,
+                                                                   TLV::TLVReader & valueReader, bool & chunkingNeeded,
+                                                                   ListIndex & outNumSuccessfullyEncodedItems);
     CHIP_ERROR EnsureMessage();
 
     /**
