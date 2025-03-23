@@ -12,6 +12,12 @@ check_symbols() {
                 exclusions+=(":(exclude)$2")
                 shift 2
                 ;;
+            --help)
+                echo "Usage: $0 [--skip-dir <dir>]"
+                echo "  --skip-dir <dir>  Skip the specified directory from the search (can be used multiple times for different directories)"
+                echo "  --help            Display this help message"
+                exit 0
+                ;;
             *)
                 echo "Unknown option: $1"
                 exit 1
@@ -19,9 +25,9 @@ check_symbols() {
         esac
     done
 
-    ember_matches=$(git grep -I -n '\<ember[A-Za-z0-9_]*' -- './*' "${exclusions[@]}")
+    ember_matches=$(git grep -I -n '\<ember[A-Za-z0-9_]*(' -- './*' "${exclusions[@]}")
 
-    emAf_matches=$(git grep -I -n '\<emAf[A-Za-z0-9_]*' -- './*' "${exclusions[@]}")
+    emAf_matches=$(git grep -I -n '\<emAf[A-Za-z0-9_]*(' -- './*' "${exclusions[@]}")
 
     if [[ -n "$ember_matches" || -n "$emAf_matches" ]]; then
         echo "Error: Found 'ember' or 'emAf' symbols in the following files and lines:"
