@@ -152,8 +152,8 @@ void RvcOperationalStateDelegate::HandleStartStateCallback(GenericOperationalErr
     RvcOperationalState::OperationalStateEnum current_state =
         static_cast<RvcOperationalState::OperationalStateEnum>(gRvcOperationalStateInstance->GetCurrentOperationalState());
 
-    if (current_state == OperationalState::OperationalStateEnum::kRunning ||
-        current_state == OperationalState::OperationalStateEnum::kPaused)
+    if (current_state == RvcOperationalState::OperationalStateEnum::kRunning ||
+        current_state == RvcOperationalState::OperationalStateEnum::kPaused)
     {
         ChipLogDetail(DeviceLayer, "HandleStartStateCallback: RVC is already started. Current state = %d. Returning.",
                       to_underlying(current_state));
