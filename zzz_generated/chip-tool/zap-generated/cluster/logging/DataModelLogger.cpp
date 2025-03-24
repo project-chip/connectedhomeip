@@ -2016,10 +2016,10 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = LogValue("VidVerificationStatement", indent + 1, value.vidVerificationStatement);
+        CHIP_ERROR err = LogValue("VIDVerificationStatement", indent + 1, value.VIDVerificationStatement);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'VidVerificationStatement'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'VIDVerificationStatement'");
             return err;
         }
     }
@@ -9772,7 +9772,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const OperationalCredentials::Commands::SignVidVerificationResponse::DecodableType & value)
+                                     const OperationalCredentials::Commands::SignVIDVerificationResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("fabricIndex", indent + 1, value.fabricIndex));
@@ -20508,10 +20508,10 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("NOCResponse", 1, value);
         }
-        case OperationalCredentials::Commands::SignVidVerificationResponse::Id: {
-            OperationalCredentials::Commands::SignVidVerificationResponse::DecodableType value;
+        case OperationalCredentials::Commands::SignVIDVerificationResponse::Id: {
+            OperationalCredentials::Commands::SignVIDVerificationResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("SignVidVerificationResponse", 1, value);
+            return DataModelLogger::LogValue("SignVIDVerificationResponse", 1, value);
         }
         }
         break;

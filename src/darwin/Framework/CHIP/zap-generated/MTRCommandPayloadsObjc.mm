@@ -9421,7 +9421,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self.rootCACertificate;
 }
 @end
-@implementation MTROperationalCredentialsClusterSetVidVerificationStatementParams
+@implementation MTROperationalCredentialsClusterSetVIDVerificationStatementParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -9439,7 +9439,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTROperationalCredentialsClusterSetVidVerificationStatementParams alloc] init];
+    auto other = [[MTROperationalCredentialsClusterSetVIDVerificationStatementParams alloc] init];
 
     other.vendorID = self.vendorID;
     other.vidVerificationStatement = self.vidVerificationStatement;
@@ -9458,11 +9458,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTROperationalCredentialsClusterSetVidVerificationStatementParams (InternalMethods)
+@implementation MTROperationalCredentialsClusterSetVIDVerificationStatementParams (InternalMethods)
 
 - (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
 {
-    chip::app::Clusters::OperationalCredentials::Commands::SetVidVerificationStatement::Type encodableStruct;
+    chip::app::Clusters::OperationalCredentials::Commands::SetVIDVerificationStatement::Type encodableStruct;
     ListFreer listFreer;
     {
         if (self.vendorID != nil) {
@@ -9472,7 +9472,7 @@ NS_ASSUME_NONNULL_BEGIN
     }
     {
         if (self.vidVerificationStatement != nil) {
-            auto & definedValue_0 = encodableStruct.vidVerificationStatement.Emplace();
+            auto & definedValue_0 = encodableStruct.VIDVerificationStatement.Emplace();
             definedValue_0 = AsByteSpan(self.vidVerificationStatement);
         }
     }
@@ -9521,7 +9521,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTROperationalCredentialsClusterSignVidVerificationRequestParams
+@implementation MTROperationalCredentialsClusterSignVIDVerificationRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -9537,7 +9537,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTROperationalCredentialsClusterSignVidVerificationRequestParams alloc] init];
+    auto other = [[MTROperationalCredentialsClusterSignVIDVerificationRequestParams alloc] init];
 
     other.fabricIndex = self.fabricIndex;
     other.clientChallenge = self.clientChallenge;
@@ -9555,11 +9555,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTROperationalCredentialsClusterSignVidVerificationRequestParams (InternalMethods)
+@implementation MTROperationalCredentialsClusterSignVIDVerificationRequestParams (InternalMethods)
 
 - (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
 {
-    chip::app::Clusters::OperationalCredentials::Commands::SignVidVerificationRequest::Type encodableStruct;
+    chip::app::Clusters::OperationalCredentials::Commands::SignVIDVerificationRequest::Type encodableStruct;
     ListFreer listFreer;
     {
         encodableStruct.fabricIndex = self.fabricIndex.unsignedCharValue;
@@ -9606,7 +9606,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTROperationalCredentialsClusterSignVidVerificationResponseParams
+@implementation MTROperationalCredentialsClusterSignVIDVerificationResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -9622,7 +9622,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTROperationalCredentialsClusterSignVidVerificationResponseParams alloc] init];
+    auto other = [[MTROperationalCredentialsClusterSignVIDVerificationResponseParams alloc] init];
 
     other.fabricIndex = self.fabricIndex;
     other.fabricBindingVersion = self.fabricBindingVersion;
@@ -9644,7 +9644,7 @@ NS_ASSUME_NONNULL_BEGIN
         return nil;
     }
 
-    using DecodableType = chip::app::Clusters::OperationalCredentials::Commands::SignVidVerificationResponse::DecodableType;
+    using DecodableType = chip::app::Clusters::OperationalCredentials::Commands::SignVIDVerificationResponse::DecodableType;
     chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
                                                                            clusterID:DecodableType::GetClusterId()
                                                                            commandID:DecodableType::GetCommandId()
@@ -9679,9 +9679,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTROperationalCredentialsClusterSignVidVerificationResponseParams (InternalMethods)
+@implementation MTROperationalCredentialsClusterSignVIDVerificationResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::OperationalCredentials::Commands::SignVidVerificationResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::OperationalCredentials::Commands::SignVIDVerificationResponse::DecodableType &)decodableStruct
 {
     {
         self.fabricIndex = [NSNumber numberWithUnsignedChar:decodableStruct.fabricIndex];
