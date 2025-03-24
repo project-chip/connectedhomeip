@@ -27,6 +27,9 @@ using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ModeBase;
 using chip::Protocols::InteractionModel::Status;
+template <typename T>
+using List              = chip::app::DataModel::List<T>;
+using ModeTagStructType = chip::app::Clusters::detail::Structs::ModeTagStruct::Type;
 
 namespace ChefOvenMode {
 
