@@ -1813,7 +1813,6 @@ endpoint 0 {
     handle command UpdateFabricLabel;
     handle command RemoveFabric;
     handle command AddTrustedRootCertificate;
-    handle command SignVidVerificationResponse;
   }
 
   server cluster GroupKeyManagement {
