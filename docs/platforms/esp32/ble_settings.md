@@ -36,9 +36,9 @@ Note: Scan response should be configure before `InitServer`.
 
 ## Nimble: additional custom GATT services
 
-The `ConfigureExtraServices` API is used to configure additional services alongside
-the Matter services. This API allows users to add their own custom services for
-provisioning or other purposes.
+The `ConfigureExtraServices` API is used to configure additional services
+alongside the Matter services. This API allows users to add their own custom
+services for provisioning or other purposes.
 
 ### Usage
 
@@ -101,9 +101,10 @@ Note: Extra service should be configure before `InitServer`.
 
 ## Nimble: multiple BLE advertisement
 
-The chips that support BLE 5.0 features can advertise their custom BLE GAP advertisement
-alongside Matter's BLE advertisement if `CONFIG_BT_NIMBLE_EXT_ADV` is enabled and
-`CONFIG_BT_NIMBLE_MAX_EXT_ADV_INSTANCES` is a value greater than 1.
+The chips that support BLE 5.0 features can advertise their custom BLE GAP
+advertisement alongside Matter's BLE advertisement if `CONFIG_BT_NIMBLE_EXT_ADV`
+is enabled and `CONFIG_BT_NIMBLE_MAX_EXT_ADV_INSTANCES` is a value greater
+than 1.
 
 ### Usage
 
@@ -164,4 +165,5 @@ static int ble_multi_adv_gap_event(struct ble_gap_event *event, void *arg);
 }
 ```
 
-Note: The custom additional advertisement should be configured after BLE stack is started.
+Note: The custom additional advertisement should be configured after BLE stack
+is started.
