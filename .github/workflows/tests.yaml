@@ -88,7 +88,7 @@ jobs:
               #
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/py_matter_idl/matter_idl/zapxml_parser.py \
+                    "./scripts/py_matter_idl/matter/idl/zapxml_parser.py \
                       --no-print \
                       --log-level info \
                       src/app/zap-templates/zcl/data-model/chip/global-attributes.xml \
@@ -200,6 +200,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/time-synchronization-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/timer-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/tls-certificate-management-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/tls-client-management-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/user-label-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/unit-localization-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/wake-on-lan-cluster.xml \

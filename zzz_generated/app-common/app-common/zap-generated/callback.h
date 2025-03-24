@@ -676,6 +676,11 @@ void emberAfTlsCertificateManagementClusterInitCallback(chip::EndpointId endpoin
 /**
  * @param endpoint    Endpoint that is being initialized
  */
+void emberAfTlsClientManagementClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
 void emberAfUnitTestingClusterInitCallback(chip::EndpointId endpoint);
 
 /**
@@ -5635,6 +5640,44 @@ chip::Protocols::InteractionModel::Status MatterTlsCertificateManagementClusterS
 void emberAfTlsCertificateManagementClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
+// TLS Client Management Cluster
+//
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfTlsClientManagementClusterServerInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterTlsClientManagementClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfTlsClientManagementClusterClientInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterTlsClientManagementClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/**
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterTlsClientManagementClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/**
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfTlsClientManagementClusterServerTickCallback(chip::EndpointId endpoint);
+
+//
 // Unit Testing Cluster
 //
 
@@ -6841,66 +6884,6 @@ bool emberAfZoneManagementClusterRemoveZoneCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ZoneManagement::Commands::RemoveZone::DecodableType & commandData);
 /**
- * @brief Camera AV Stream Management Cluster AudioStreamAllocate Command callback (from client)
- */
-bool emberAfCameraAvStreamManagementClusterAudioStreamAllocateCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CameraAvStreamManagement::Commands::AudioStreamAllocate::DecodableType & commandData);
-/**
- * @brief Camera AV Stream Management Cluster AudioStreamDeallocate Command callback (from client)
- */
-bool emberAfCameraAvStreamManagementClusterAudioStreamDeallocateCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CameraAvStreamManagement::Commands::AudioStreamDeallocate::DecodableType & commandData);
-/**
- * @brief Camera AV Stream Management Cluster VideoStreamAllocate Command callback (from client)
- */
-bool emberAfCameraAvStreamManagementClusterVideoStreamAllocateCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CameraAvStreamManagement::Commands::VideoStreamAllocate::DecodableType & commandData);
-/**
- * @brief Camera AV Stream Management Cluster VideoStreamModify Command callback (from client)
- */
-bool emberAfCameraAvStreamManagementClusterVideoStreamModifyCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CameraAvStreamManagement::Commands::VideoStreamModify::DecodableType & commandData);
-/**
- * @brief Camera AV Stream Management Cluster VideoStreamDeallocate Command callback (from client)
- */
-bool emberAfCameraAvStreamManagementClusterVideoStreamDeallocateCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CameraAvStreamManagement::Commands::VideoStreamDeallocate::DecodableType & commandData);
-/**
- * @brief Camera AV Stream Management Cluster SnapshotStreamAllocate Command callback (from client)
- */
-bool emberAfCameraAvStreamManagementClusterSnapshotStreamAllocateCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CameraAvStreamManagement::Commands::SnapshotStreamAllocate::DecodableType & commandData);
-/**
- * @brief Camera AV Stream Management Cluster SnapshotStreamModify Command callback (from client)
- */
-bool emberAfCameraAvStreamManagementClusterSnapshotStreamModifyCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CameraAvStreamManagement::Commands::SnapshotStreamModify::DecodableType & commandData);
-/**
- * @brief Camera AV Stream Management Cluster SnapshotStreamDeallocate Command callback (from client)
- */
-bool emberAfCameraAvStreamManagementClusterSnapshotStreamDeallocateCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CameraAvStreamManagement::Commands::SnapshotStreamDeallocate::DecodableType & commandData);
-/**
- * @brief Camera AV Stream Management Cluster SetStreamPriorities Command callback (from client)
- */
-bool emberAfCameraAvStreamManagementClusterSetStreamPrioritiesCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CameraAvStreamManagement::Commands::SetStreamPriorities::DecodableType & commandData);
-/**
- * @brief Camera AV Stream Management Cluster CaptureSnapshot Command callback (from client)
- */
-bool emberAfCameraAvStreamManagementClusterCaptureSnapshotCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CameraAvStreamManagement::Commands::CaptureSnapshot::DecodableType & commandData);
-/**
  * @brief Camera AV Settings User Level Management Cluster MPTZSetPosition Command callback (from client)
  */
 bool emberAfCameraAvSettingsUserLevelManagementClusterMPTZSetPositionCallback(
@@ -6942,36 +6925,6 @@ bool emberAfCameraAvSettingsUserLevelManagementClusterDPTZSetViewportCallback(
 bool emberAfCameraAvSettingsUserLevelManagementClusterDPTZRelativeMoveCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::DPTZRelativeMove::DecodableType & commandData);
-/**
- * @brief WebRTC Transport Provider Cluster SolicitOffer Command callback (from client)
- */
-bool emberAfWebRTCTransportProviderClusterSolicitOfferCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::WebRTCTransportProvider::Commands::SolicitOffer::DecodableType & commandData);
-/**
- * @brief WebRTC Transport Provider Cluster ProvideOffer Command callback (from client)
- */
-bool emberAfWebRTCTransportProviderClusterProvideOfferCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideOffer::DecodableType & commandData);
-/**
- * @brief WebRTC Transport Provider Cluster ProvideAnswer Command callback (from client)
- */
-bool emberAfWebRTCTransportProviderClusterProvideAnswerCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideAnswer::DecodableType & commandData);
-/**
- * @brief WebRTC Transport Provider Cluster ProvideICECandidates Command callback (from client)
- */
-bool emberAfWebRTCTransportProviderClusterProvideICECandidatesCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideICECandidates::DecodableType & commandData);
-/**
- * @brief WebRTC Transport Provider Cluster EndSession Command callback (from client)
- */
-bool emberAfWebRTCTransportProviderClusterEndSessionCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::WebRTCTransportProvider::Commands::EndSession::DecodableType & commandData);
 /**
  * @brief WebRTC Transport Requestor Cluster Offer Command callback (from client)
  */
@@ -7086,6 +7039,24 @@ bool emberAfTlsCertificateManagementClusterLookupClientCertificateCallback(
 bool emberAfTlsCertificateManagementClusterRemoveClientCertificateCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::TlsCertificateManagement::Commands::RemoveClientCertificate::DecodableType & commandData);
+/**
+ * @brief TLS Client Management Cluster ProvisionEndpoint Command callback (from client)
+ */
+bool emberAfTlsClientManagementClusterProvisionEndpointCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::TlsClientManagement::Commands::ProvisionEndpoint::DecodableType & commandData);
+/**
+ * @brief TLS Client Management Cluster FindEndpoint Command callback (from client)
+ */
+bool emberAfTlsClientManagementClusterFindEndpointCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::TlsClientManagement::Commands::FindEndpoint::DecodableType & commandData);
+/**
+ * @brief TLS Client Management Cluster RemoveEndpoint Command callback (from client)
+ */
+bool emberAfTlsClientManagementClusterRemoveEndpointCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::TlsClientManagement::Commands::RemoveEndpoint::DecodableType & commandData);
 /**
  * @brief Unit Testing Cluster Test Command callback (from client)
  */

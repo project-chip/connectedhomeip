@@ -17,6 +17,7 @@
 #pragma once
 
 #include <app/server-cluster/ServerClusterInterface.h>
+#include <optional>
 
 namespace chip {
 namespace app {
@@ -39,6 +40,14 @@ public:
     ~DefaultServerCluster() override = default;
 
     //////////////////////////// ServerClusterInterface implementation ////////////////////////////////////////
+
+    /// Startup allows only a single initialization per cluster and will
+    /// fail with CHIP_ERROR_ALREADY_INITIALIZED if the object has already
+    /// been initialized.
+    ///
+    /// Call Shutdown to de-initialize the object.
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
+    void Shutdown() override;
 
     [[nodiscard]] DataVersion GetDataVersion() const override { return mDataVersion; }
     [[nodiscard]] BitFlags<DataModel::ClusterQualityFlags> GetClusterFlags() const override;
@@ -73,8 +82,19 @@ public:
     /// Default implementation is a NOOP (no list items generated)
     CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, DataModel::ListBuilder<CommandId> & builder) override;
 
+    /// Returns all global attributes that the spec defines in `7.13 Global Elements / Table 93: Global Attributes`
+    static Span<const DataModel::AttributeEntry> GlobalAttributes();
+
 protected:
+    ServerClusterContext * mContext = nullptr;
+
     void IncreaseDataVersion() { mDataVersion++; }
+
+    /// Marks that a specific attribute has changed value
+    ///
+    /// This increases cluster data version and if a cluster context is available it will
+    /// notify that the attribute has changed.
+    void NotifyAttributeChanged(AttributeId attributeId);
 
 private:
     DataVersion mDataVersion; // will be random-initialized as per spec

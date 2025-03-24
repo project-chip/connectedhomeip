@@ -38,24 +38,30 @@
 
 int main(int argc, const char * argv[])
 {
-    int exitCode = EXIT_SUCCESS;
-    @autoreleasepool {
-        dft::logging::Setup();
+    __auto_type * runQueue = dispatch_queue_create("com.chip.main.dft", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+    dispatch_async(runQueue, ^{
+        int exitCode = EXIT_SUCCESS;
 
-        Commands commands;
-        registerCommandsBdx(commands);
-        registerCommandsPairing(commands);
-        registerCommandsDCL(commands);
-        registerCommandsDelay(commands);
-        registerCommandsDiscover(commands);
-        registerCommandsInteractive(commands);
-        registerCommandsMemory(commands);
-        registerCommandsPayload(commands);
-        registerClusterOtaSoftwareUpdateProviderInteractive(commands);
-        registerCommandsStorage(commands);
-        registerCommandsConfiguration(commands);
-        registerClusters(commands);
-        exitCode = commands.Run(argc, (char **) argv);
-    }
-    return ConditionalLeaksCheck(exitCode);
+        @autoreleasepool {
+            dft::logging::Setup();
+            Commands commands;
+            registerCommandsBdx(commands);
+            registerCommandsPairing(commands);
+            registerCommandsDCL(commands);
+            registerCommandsDelay(commands);
+            registerCommandsDiscover(commands);
+            registerCommandsInteractive(commands);
+            registerCommandsMemory(commands);
+            registerCommandsPayload(commands);
+            registerClusterOtaSoftwareUpdateProviderInteractive(commands);
+            registerCommandsStorage(commands);
+            registerCommandsConfiguration(commands);
+            registerClusters(commands);
+            exitCode = commands.Run(argc, (char **) argv);
+        }
+        exit(ConditionalLeaksCheck(exitCode));
+    });
+
+    dispatch_main();
+    return EXIT_SUCCESS;
 }
