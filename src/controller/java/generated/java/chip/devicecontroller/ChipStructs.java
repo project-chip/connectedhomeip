@@ -5502,13 +5502,13 @@ public static class ScenesManagementClusterAttributeValuePairStruct {
     return output.toString();
   }
 }
-public static class ScenesManagementClusterExtensionFieldSet {
+public static class ScenesManagementClusterExtensionFieldSetStruct {
   public Long clusterID;
   public ArrayList<ChipStructs.ScenesManagementClusterAttributeValuePairStruct> attributeValueList;
   private static final long CLUSTER_ID_ID = 0L;
   private static final long ATTRIBUTE_VALUE_LIST_ID = 1L;
 
-  public ScenesManagementClusterExtensionFieldSet(
+  public ScenesManagementClusterExtensionFieldSetStruct(
     Long clusterID,
     ArrayList<ChipStructs.ScenesManagementClusterAttributeValuePairStruct> attributeValueList
   ) {
@@ -5524,7 +5524,7 @@ public static class ScenesManagementClusterExtensionFieldSet {
     return new StructType(values);
   }
 
-  public static ScenesManagementClusterExtensionFieldSet decodeTlv(BaseTLVType tlvValue) {
+  public static ScenesManagementClusterExtensionFieldSetStruct decodeTlv(BaseTLVType tlvValue) {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
@@ -5543,7 +5543,7 @@ public static class ScenesManagementClusterExtensionFieldSet {
         }
       }
     }
-    return new ScenesManagementClusterExtensionFieldSet(
+    return new ScenesManagementClusterExtensionFieldSetStruct(
       clusterID,
       attributeValueList
     );
@@ -5552,7 +5552,7 @@ public static class ScenesManagementClusterExtensionFieldSet {
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
-    output.append("ScenesManagementClusterExtensionFieldSet {\n");
+    output.append("ScenesManagementClusterExtensionFieldSetStruct {\n");
     output.append("\tclusterID: ");
     output.append(clusterID);
     output.append("\n");
@@ -14970,6 +14970,7 @@ public static class WebRTCTransportProviderClusterICEServerStruct {
 public static class WebRTCTransportProviderClusterWebRTCSessionStruct {
   public Integer id;
   public Long peerNodeID;
+  public Integer peerEndpointID;
   public Integer streamUsage;
   public @Nullable Integer videoStreamID;
   public @Nullable Integer audioStreamID;
@@ -14977,15 +14978,17 @@ public static class WebRTCTransportProviderClusterWebRTCSessionStruct {
   public Integer fabricIndex;
   private static final long ID_ID = 1L;
   private static final long PEER_NODE_ID_ID = 2L;
-  private static final long STREAM_USAGE_ID = 3L;
-  private static final long VIDEO_STREAM_ID_ID = 4L;
-  private static final long AUDIO_STREAM_ID_ID = 5L;
-  private static final long METADATA_OPTIONS_ID = 6L;
+  private static final long PEER_ENDPOINT_ID_ID = 3L;
+  private static final long STREAM_USAGE_ID = 4L;
+  private static final long VIDEO_STREAM_ID_ID = 5L;
+  private static final long AUDIO_STREAM_ID_ID = 6L;
+  private static final long METADATA_OPTIONS_ID = 7L;
   private static final long FABRIC_INDEX_ID = 254L;
 
   public WebRTCTransportProviderClusterWebRTCSessionStruct(
     Integer id,
     Long peerNodeID,
+    Integer peerEndpointID,
     Integer streamUsage,
     @Nullable Integer videoStreamID,
     @Nullable Integer audioStreamID,
@@ -14994,6 +14997,7 @@ public static class WebRTCTransportProviderClusterWebRTCSessionStruct {
   ) {
     this.id = id;
     this.peerNodeID = peerNodeID;
+    this.peerEndpointID = peerEndpointID;
     this.streamUsage = streamUsage;
     this.videoStreamID = videoStreamID;
     this.audioStreamID = audioStreamID;
@@ -15005,6 +15009,7 @@ public static class WebRTCTransportProviderClusterWebRTCSessionStruct {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(ID_ID, new UIntType(id)));
     values.add(new StructElement(PEER_NODE_ID_ID, new UIntType(peerNodeID)));
+    values.add(new StructElement(PEER_ENDPOINT_ID_ID, new UIntType(peerEndpointID)));
     values.add(new StructElement(STREAM_USAGE_ID, new UIntType(streamUsage)));
     values.add(new StructElement(VIDEO_STREAM_ID_ID, videoStreamID != null ? new UIntType(videoStreamID) : new NullType()));
     values.add(new StructElement(AUDIO_STREAM_ID_ID, audioStreamID != null ? new UIntType(audioStreamID) : new NullType()));
@@ -15020,6 +15025,7 @@ public static class WebRTCTransportProviderClusterWebRTCSessionStruct {
     }
     Integer id = null;
     Long peerNodeID = null;
+    Integer peerEndpointID = null;
     Integer streamUsage = null;
     @Nullable Integer videoStreamID = null;
     @Nullable Integer audioStreamID = null;
@@ -15035,6 +15041,11 @@ public static class WebRTCTransportProviderClusterWebRTCSessionStruct {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
           peerNodeID = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == PEER_ENDPOINT_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          peerEndpointID = castingValue.value(Integer.class);
         }
       } else if (element.contextTagNum() == STREAM_USAGE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -15066,6 +15077,7 @@ public static class WebRTCTransportProviderClusterWebRTCSessionStruct {
     return new WebRTCTransportProviderClusterWebRTCSessionStruct(
       id,
       peerNodeID,
+      peerEndpointID,
       streamUsage,
       videoStreamID,
       audioStreamID,
@@ -15083,6 +15095,9 @@ public static class WebRTCTransportProviderClusterWebRTCSessionStruct {
     output.append("\n");
     output.append("\tpeerNodeID: ");
     output.append(peerNodeID);
+    output.append("\n");
+    output.append("\tpeerEndpointID: ");
+    output.append(peerEndpointID);
     output.append("\n");
     output.append("\tstreamUsage: ");
     output.append(streamUsage);
@@ -15197,6 +15212,7 @@ public static class WebRTCTransportRequestorClusterICEServerStruct {
 public static class WebRTCTransportRequestorClusterWebRTCSessionStruct {
   public Integer id;
   public Long peerNodeID;
+  public Integer peerEndpointID;
   public Integer streamUsage;
   public @Nullable Integer videoStreamID;
   public @Nullable Integer audioStreamID;
@@ -15204,15 +15220,17 @@ public static class WebRTCTransportRequestorClusterWebRTCSessionStruct {
   public Integer fabricIndex;
   private static final long ID_ID = 1L;
   private static final long PEER_NODE_ID_ID = 2L;
-  private static final long STREAM_USAGE_ID = 3L;
-  private static final long VIDEO_STREAM_ID_ID = 4L;
-  private static final long AUDIO_STREAM_ID_ID = 5L;
-  private static final long METADATA_OPTIONS_ID = 6L;
+  private static final long PEER_ENDPOINT_ID_ID = 3L;
+  private static final long STREAM_USAGE_ID = 4L;
+  private static final long VIDEO_STREAM_ID_ID = 5L;
+  private static final long AUDIO_STREAM_ID_ID = 6L;
+  private static final long METADATA_OPTIONS_ID = 7L;
   private static final long FABRIC_INDEX_ID = 254L;
 
   public WebRTCTransportRequestorClusterWebRTCSessionStruct(
     Integer id,
     Long peerNodeID,
+    Integer peerEndpointID,
     Integer streamUsage,
     @Nullable Integer videoStreamID,
     @Nullable Integer audioStreamID,
@@ -15221,6 +15239,7 @@ public static class WebRTCTransportRequestorClusterWebRTCSessionStruct {
   ) {
     this.id = id;
     this.peerNodeID = peerNodeID;
+    this.peerEndpointID = peerEndpointID;
     this.streamUsage = streamUsage;
     this.videoStreamID = videoStreamID;
     this.audioStreamID = audioStreamID;
@@ -15232,6 +15251,7 @@ public static class WebRTCTransportRequestorClusterWebRTCSessionStruct {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(ID_ID, new UIntType(id)));
     values.add(new StructElement(PEER_NODE_ID_ID, new UIntType(peerNodeID)));
+    values.add(new StructElement(PEER_ENDPOINT_ID_ID, new UIntType(peerEndpointID)));
     values.add(new StructElement(STREAM_USAGE_ID, new UIntType(streamUsage)));
     values.add(new StructElement(VIDEO_STREAM_ID_ID, videoStreamID != null ? new UIntType(videoStreamID) : new NullType()));
     values.add(new StructElement(AUDIO_STREAM_ID_ID, audioStreamID != null ? new UIntType(audioStreamID) : new NullType()));
@@ -15247,6 +15267,7 @@ public static class WebRTCTransportRequestorClusterWebRTCSessionStruct {
     }
     Integer id = null;
     Long peerNodeID = null;
+    Integer peerEndpointID = null;
     Integer streamUsage = null;
     @Nullable Integer videoStreamID = null;
     @Nullable Integer audioStreamID = null;
@@ -15262,6 +15283,11 @@ public static class WebRTCTransportRequestorClusterWebRTCSessionStruct {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
           peerNodeID = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == PEER_ENDPOINT_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          peerEndpointID = castingValue.value(Integer.class);
         }
       } else if (element.contextTagNum() == STREAM_USAGE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -15293,6 +15319,7 @@ public static class WebRTCTransportRequestorClusterWebRTCSessionStruct {
     return new WebRTCTransportRequestorClusterWebRTCSessionStruct(
       id,
       peerNodeID,
+      peerEndpointID,
       streamUsage,
       videoStreamID,
       audioStreamID,
@@ -15310,6 +15337,9 @@ public static class WebRTCTransportRequestorClusterWebRTCSessionStruct {
     output.append("\n");
     output.append("\tpeerNodeID: ");
     output.append(peerNodeID);
+    output.append("\n");
+    output.append("\tpeerEndpointID: ");
+    output.append(peerEndpointID);
     output.append("\n");
     output.append("\tstreamUsage: ");
     output.append(streamUsage);

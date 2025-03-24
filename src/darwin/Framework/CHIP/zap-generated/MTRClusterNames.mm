@@ -3610,10 +3610,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
         switch (attributeID) {
 
             // Cluster ScenesManagement attributes
-        case MTRAttributeIDTypeClusterScenesManagementAttributeLastConfiguredByID:
-            result = @"LastConfiguredBy";
-            break;
-
         case MTRAttributeIDTypeClusterScenesManagementAttributeSceneTableSizeID:
             result = @"SceneTableSize";
             break;

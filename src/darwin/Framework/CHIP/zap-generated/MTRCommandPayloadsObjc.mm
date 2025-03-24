@@ -13587,7 +13587,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _sceneName = @"";
 
-        _extensionFieldSets = [NSArray array];
+        _extensionFieldSetStructs = [NSArray array];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -13602,7 +13602,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.sceneID = self.sceneID;
     other.transitionTime = self.transitionTime;
     other.sceneName = self.sceneName;
-    other.extensionFieldSets = self.extensionFieldSets;
+    other.extensionFieldSetStructs = self.extensionFieldSetStructs;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -13611,7 +13611,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; sceneID:%@; transitionTime:%@; sceneName:%@; extensionFieldSets:%@; >", NSStringFromClass([self class]), _groupID, _sceneID, _transitionTime, _sceneName, _extensionFieldSets];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; sceneID:%@; transitionTime:%@; sceneName:%@; extensionFieldSetStructs:%@; >", NSStringFromClass([self class]), _groupID, _sceneID, _transitionTime, _sceneName, _extensionFieldSetStructs];
     return descriptionString;
 }
 
@@ -13637,19 +13637,19 @@ NS_ASSUME_NONNULL_BEGIN
     }
     {
         {
-            using ListType_0 = std::remove_reference_t<decltype(encodableStruct.extensionFieldSets)>;
+            using ListType_0 = std::remove_reference_t<decltype(encodableStruct.extensionFieldSetStructs)>;
             using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-            if (self.extensionFieldSets.count != 0) {
-                auto * listHolder_0 = new ListHolder<ListMemberType_0>(self.extensionFieldSets.count);
+            if (self.extensionFieldSetStructs.count != 0) {
+                auto * listHolder_0 = new ListHolder<ListMemberType_0>(self.extensionFieldSetStructs.count);
                 if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
                     return CHIP_ERROR_INVALID_ARGUMENT;
                 }
                 listFreer.add(listHolder_0);
-                for (size_t i_0 = 0; i_0 < self.extensionFieldSets.count; ++i_0) {
-                    auto element_0 = MTR_SAFE_CAST(self.extensionFieldSets[i_0], MTRScenesManagementClusterExtensionFieldSet);
+                for (size_t i_0 = 0; i_0 < self.extensionFieldSetStructs.count; ++i_0) {
+                    auto element_0 = MTR_SAFE_CAST(self.extensionFieldSetStructs[i_0], MTRScenesManagementClusterExtensionFieldSetStruct);
                     if (!element_0) {
                         // Wrong kind of value.
-                        MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.extensionFieldSets[i_0], NSStringFromClass(MTRScenesManagementClusterExtensionFieldSet.class));
+                        MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.extensionFieldSetStructs[i_0], NSStringFromClass(MTRScenesManagementClusterExtensionFieldSetStruct.class));
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
                     listHolder_0->mList[i_0].clusterID = element_0.clusterID.unsignedIntValue;
@@ -13709,9 +13709,9 @@ NS_ASSUME_NONNULL_BEGIN
                         }
                     }
                 }
-                encodableStruct.extensionFieldSets = ListType_0(listHolder_0->mList, self.extensionFieldSets.count);
+                encodableStruct.extensionFieldSetStructs = ListType_0(listHolder_0->mList, self.extensionFieldSetStructs.count);
             } else {
-                encodableStruct.extensionFieldSets = ListType_0();
+                encodableStruct.extensionFieldSetStructs = ListType_0();
             }
         }
     }
@@ -13945,7 +13945,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _sceneName = nil;
 
-        _extensionFieldSets = nil;
+        _extensionFieldSetStructs = nil;
     }
     return self;
 }
@@ -13959,14 +13959,14 @@ NS_ASSUME_NONNULL_BEGIN
     other.sceneID = self.sceneID;
     other.transitionTime = self.transitionTime;
     other.sceneName = self.sceneName;
-    other.extensionFieldSets = self.extensionFieldSets;
+    other.extensionFieldSetStructs = self.extensionFieldSetStructs;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupID:%@; sceneID:%@; transitionTime:%@; sceneName:%@; extensionFieldSets:%@; >", NSStringFromClass([self class]), _status, _groupID, _sceneID, _transitionTime, _sceneName, _extensionFieldSets];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupID:%@; sceneID:%@; transitionTime:%@; sceneName:%@; extensionFieldSetStructs:%@; >", NSStringFromClass([self class]), _status, _groupID, _sceneID, _transitionTime, _sceneName, _extensionFieldSetStructs];
     return descriptionString;
 }
 
@@ -14044,14 +14044,14 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
     {
-        if (decodableStruct.extensionFieldSets.HasValue()) {
+        if (decodableStruct.extensionFieldSetStructs.HasValue()) {
             { // Scope for our temporary variables
                 auto * array_1 = [NSMutableArray new];
-                auto iter_1 = decodableStruct.extensionFieldSets.Value().begin();
+                auto iter_1 = decodableStruct.extensionFieldSetStructs.Value().begin();
                 while (iter_1.Next()) {
                     auto & entry_1 = iter_1.GetValue();
-                    MTRScenesManagementClusterExtensionFieldSet * newElement_1;
-                    newElement_1 = [MTRScenesManagementClusterExtensionFieldSet new];
+                    MTRScenesManagementClusterExtensionFieldSetStruct * newElement_1;
+                    newElement_1 = [MTRScenesManagementClusterExtensionFieldSetStruct new];
                     newElement_1.clusterID = [NSNumber numberWithUnsignedInt:entry_1.clusterID];
                     { // Scope for our temporary variables
                         auto * array_3 = [NSMutableArray new];
@@ -14115,10 +14115,10 @@ NS_ASSUME_NONNULL_BEGIN
                 if (err != CHIP_NO_ERROR) {
                     return err;
                 }
-                self.extensionFieldSets = array_1;
+                self.extensionFieldSetStructs = array_1;
             }
         } else {
-            self.extensionFieldSets = nil;
+            self.extensionFieldSetStructs = nil;
         }
     }
     return CHIP_NO_ERROR;
@@ -34945,6 +34945,8 @@ NS_ASSUME_NONNULL_BEGIN
 
         _streamUsage = @(0);
 
+        _originatingEndpointID = @(0);
+
         _videoStreamID = nil;
 
         _audioStreamID = nil;
@@ -34965,6 +34967,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRWebRTCTransportProviderClusterSolicitOfferParams alloc] init];
 
     other.streamUsage = self.streamUsage;
+    other.originatingEndpointID = self.originatingEndpointID;
     other.videoStreamID = self.videoStreamID;
     other.audioStreamID = self.audioStreamID;
     other.iceServers = self.iceServers;
@@ -34978,7 +34981,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: streamUsage:%@; videoStreamID:%@; audioStreamID:%@; iceServers:%@; iceTransportPolicy:%@; metadataOptions:%@; >", NSStringFromClass([self class]), _streamUsage, _videoStreamID, _audioStreamID, _iceServers, _iceTransportPolicy, _metadataOptions];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: streamUsage:%@; originatingEndpointID:%@; videoStreamID:%@; audioStreamID:%@; iceServers:%@; iceTransportPolicy:%@; metadataOptions:%@; >", NSStringFromClass([self class]), _streamUsage, _originatingEndpointID, _videoStreamID, _audioStreamID, _iceServers, _iceTransportPolicy, _metadataOptions];
     return descriptionString;
 }
 
@@ -34992,6 +34995,9 @@ NS_ASSUME_NONNULL_BEGIN
     ListFreer listFreer;
     {
         encodableStruct.streamUsage = static_cast<std::remove_reference_t<decltype(encodableStruct.streamUsage)>>(self.streamUsage.unsignedCharValue);
+    }
+    {
+        encodableStruct.originatingEndpointID = self.originatingEndpointID.unsignedShortValue;
     }
     {
         if (self.videoStreamID != nil) {
@@ -35252,6 +35258,8 @@ NS_ASSUME_NONNULL_BEGIN
 
         _streamUsage = @(0);
 
+        _originatingEndpointID = @(0);
+
         _videoStreamID = nil;
 
         _audioStreamID = nil;
@@ -35274,6 +35282,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.webRTCSessionID = self.webRTCSessionID;
     other.sdp = self.sdp;
     other.streamUsage = self.streamUsage;
+    other.originatingEndpointID = self.originatingEndpointID;
     other.videoStreamID = self.videoStreamID;
     other.audioStreamID = self.audioStreamID;
     other.iceServers = self.iceServers;
@@ -35287,7 +35296,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: webRTCSessionID:%@; sdp:%@; streamUsage:%@; videoStreamID:%@; audioStreamID:%@; iceServers:%@; iceTransportPolicy:%@; metadataOptions:%@; >", NSStringFromClass([self class]), _webRTCSessionID, _sdp, _streamUsage, _videoStreamID, _audioStreamID, _iceServers, _iceTransportPolicy, _metadataOptions];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: webRTCSessionID:%@; sdp:%@; streamUsage:%@; originatingEndpointID:%@; videoStreamID:%@; audioStreamID:%@; iceServers:%@; iceTransportPolicy:%@; metadataOptions:%@; >", NSStringFromClass([self class]), _webRTCSessionID, _sdp, _streamUsage, _originatingEndpointID, _videoStreamID, _audioStreamID, _iceServers, _iceTransportPolicy, _metadataOptions];
     return descriptionString;
 }
 
@@ -35312,6 +35321,9 @@ NS_ASSUME_NONNULL_BEGIN
     }
     {
         encodableStruct.streamUsage = static_cast<std::remove_reference_t<decltype(encodableStruct.streamUsage)>>(self.streamUsage.unsignedCharValue);
+    }
+    {
+        encodableStruct.originatingEndpointID = self.originatingEndpointID.unsignedShortValue;
     }
     {
         if (self.videoStreamID != nil) {

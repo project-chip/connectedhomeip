@@ -1927,7 +1927,7 @@ endpoint 0 {
     callback attribute regulatoryConfig;
     callback attribute locationCapability;
     callback attribute supportsConcurrentConnection;
-    ram      attribute featureMap default = 6;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 0x0001;
 
     handle command ArmFailSafe;
