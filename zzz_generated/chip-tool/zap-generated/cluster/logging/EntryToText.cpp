@@ -2033,8 +2033,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
     case chip::app::Clusters::ScenesManagement::Id: {
         switch (id)
         {
-        case chip::app::Clusters::ScenesManagement::Attributes::LastConfiguredBy::Id:
-            return "LastConfiguredBy";
         case chip::app::Clusters::ScenesManagement::Attributes::SceneTableSize::Id:
             return "SceneTableSize";
         case chip::app::Clusters::ScenesManagement::Attributes::FabricSceneInfo::Id:

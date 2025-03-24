@@ -387,6 +387,18 @@ void InteractionModelEngine::ShutdownAllSubscriptions()
     ShutdownMatchingSubscriptions();
 }
 
+void InteractionModelEngine::ShutdownAllSubscriptionHandlers()
+{
+    mReadHandlers.ForEachActiveObject([&](auto * handler) {
+        if (!handler->IsType(ReadHandler::InteractionType::Subscribe))
+        {
+            return Loop::Continue;
+        }
+        handler->Close();
+        return Loop::Continue;
+    });
+}
+
 void InteractionModelEngine::ShutdownMatchingSubscriptions(const Optional<FabricIndex> & aFabricIndex,
                                                            const Optional<NodeId> & aPeerNodeId)
 {

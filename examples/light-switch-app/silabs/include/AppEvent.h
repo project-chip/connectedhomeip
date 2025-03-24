@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include <cstdint>
+
 struct AppEvent;
 typedef void (*EventHandler)(AppEvent *);
 
@@ -30,6 +32,15 @@ struct AppEvent
         kEventType_Timer,
         kEventType_Light,
         kEventType_Install,
+        kEventType_ResetWarning,
+        kEventType_ResetCanceled,
+        // Button events
+        kEventType_ActionButtonPressed,
+        kEventType_ActionButtonReleased,
+        kEventType_FunctionButtonPressed,
+        kEventType_FunctionButtonReleased,
+        kEventType_TriggerLevelControlAction,
+        kEventType_TriggerToggle,
     };
 
     uint16_t Type;
@@ -46,9 +57,8 @@ struct AppEvent
         } TimerEvent;
         struct
         {
-            uint8_t Action;
-            int32_t Actor;
-        } LightEvent;
+            void * Context;
+        } LightSwitchEvent;
     };
 
     EventHandler Handler;
