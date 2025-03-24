@@ -8,3 +8,5 @@ mypy==1.10.1
 pyyaml
 tabulate
 websockets
+gobject-introspection 
+libgirepository1.0-dev
