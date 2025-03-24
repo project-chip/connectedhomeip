@@ -64,7 +64,6 @@ executable("chip-camera-app") {
     "gobject-2.0",
     "gstapp-1.0",
   ]
-
 }
 
 group("linux") {
