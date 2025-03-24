@@ -192,10 +192,18 @@ class TizenBuilder(GnBuilder):
                 raise Exception(
                     "Environment %s missing, cannot build Tizen target" % env)
 
-        sysroot = os.environ['TIZEN_SDK_SYSROOT']
+        sysroot = None
 
         if self.board.value.target_cpu == "arm64":
             env = 'TIZEN_SDK_SYSROOT_ARM64'
+            if env not in os.environ:
+                raise Exception(
+                    "Environment %s missing, cannot build Tizen target" % env)
+
+            sysroot = os.environ[env]
+
+        elif self.board.value.target_cpu == "arm":
+            env = 'TIZEN_SDK_SYSROOT_ARM'
             if env not in os.environ:
                 raise Exception(
                     "Environment %s missing, cannot build Tizen target" % env)
