@@ -39,7 +39,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-telink:122
+            image: ghcr.io/project-chip/chip-build-telink:123
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -359,7 +359,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-telink-zephyr_3_3:122
+            image: ghcr.io/project-chip/chip-build-telink-zephyr_3_3:123
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
