@@ -71,8 +71,6 @@ void InitChefOvenModeCluster()
         gInstanceTable[epIndex] =
             std::make_unique<ModeBase::Instance>(gDelegateTable[epIndex].get(), endpointId, OvenMode::Id, featureMap);
 
-        gDelegateTable[epIndex]->SetInstance(gInstanceTable[epIndex].get());
-
         ChipLogProgress(DeviceLayer, "Endpoint %d OvenMode Initialized.", endpointId);
     }
 }
@@ -85,11 +83,15 @@ CHIP_ERROR OvenMode::ChefDelegate::Init()
 
 void OvenMode::ChefDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
 {
+    EndpointId endpointId = mInstance.GetEndpointId();
+    ChipLogDetail(DeviceLayer, "HandleChangeToMode: Endpoint %d", to_underlying(endpointId));
     response.status = to_underlying(ModeBase::StatusCode::kSuccess);
 }
 
 CHIP_ERROR OvenMode::ChefDelegate::GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label)
 {
+    EndpointId endpointId = mInstance.GetEndpointId();
+    ChipLogDetail(DeviceLayer, "GetModeLabelByIndex: Endpoint %d", to_underlying(endpointId));
     if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
@@ -99,6 +101,8 @@ CHIP_ERROR OvenMode::ChefDelegate::GetModeLabelByIndex(uint8_t modeIndex, chip::
 
 CHIP_ERROR OvenMode::ChefDelegate::GetModeValueByIndex(uint8_t modeIndex, uint8_t & value)
 {
+    EndpointId endpointId = mInstance.GetEndpointId();
+    ChipLogDetail(DeviceLayer, "GetModeValueByIndex: Endpoint %d", to_underlying(endpointId));
     if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
@@ -109,6 +113,8 @@ CHIP_ERROR OvenMode::ChefDelegate::GetModeValueByIndex(uint8_t modeIndex, uint8_
 
 CHIP_ERROR OvenMode::ChefDelegate::GetModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> & tags)
 {
+    EndpointId endpointId = mInstance.GetEndpointId();
+    ChipLogDetail(DeviceLayer, "GetModeTagsByIndex: Endpoint %d", to_underlying(endpointId));
     if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
