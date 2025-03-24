@@ -1,6 +1,6 @@
 {
   "fileFormat": 2,
-  "featureLevel": 103,
+  "featureLevel": 106,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -41,14 +41,16 @@
         "code": 22,
         "profileId": 259,
         "label": "MA-rootdevice",
-        "name": "MA-rootdevice"
+        "name": "MA-rootdevice",
+        "deviceTypeOrder": 0
       },
       "deviceTypes": [
         {
           "code": 22,
           "profileId": 259,
           "label": "MA-rootdevice",
-          "name": "MA-rootdevice"
+          "name": "MA-rootdevice",
+          "deviceTypeOrder": 0
         }
       ],
       "deviceVersions": [
@@ -2797,14 +2799,16 @@
         "code": 771,
         "profileId": 2457,
         "label": "MA-pump",
-        "name": "MA-pump"
+        "name": "MA-pump",
+        "deviceTypeOrder": 0
       },
       "deviceTypes": [
         {
           "code": 771,
           "profileId": 2457,
           "label": "MA-pump",
-          "name": "MA-pump"
+          "name": "MA-pump",
+          "deviceTypeOrder": 0
         }
       ],
       "deviceVersions": [

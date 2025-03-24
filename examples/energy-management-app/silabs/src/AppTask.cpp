@@ -28,12 +28,12 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
-#include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
 #include <assert.h>
 #include <lib/support/BitMask.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
@@ -177,26 +177,10 @@ void ApplicationShutdown()
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 }
 
-CHIP_ERROR AppTask::Init()
+CHIP_ERROR AppTask::AppInit()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(AppTask::ButtonEventHandler);
-
-#ifdef DISPLAY_ENABLED
-#if SL_MATTER_CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE
-    GetLCD().Init((uint8_t *) "energy-management-App (EVSE)");
-#elif SL_CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE
-    GetLCD().Init((uint8_t *) "energy-management-App (WaterHeater)");
-#endif
-#endif
-
-    err = BaseApplication::Init();
-    if (err != CHIP_NO_ERROR)
-    {
-        SILABS_LOG("BaseApplication::Init() failed");
-        appError(err);
-    }
-
     ApplicationInit();
 
 #ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLED

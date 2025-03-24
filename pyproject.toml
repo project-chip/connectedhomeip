@@ -17,6 +17,8 @@ exclude = [
     "out",
     "third_party",
     "examples/common/QRCode/",
+    # TODO(#37698)
+    "docs/development_controllers/chip-repl/*.ipynb",
 ]
 
 [tool.ruff.lint]

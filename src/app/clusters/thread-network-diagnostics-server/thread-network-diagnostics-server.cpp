@@ -45,18 +45,18 @@ using chip::Protocols::InteractionModel::Status;
 
 namespace {
 
-class ThreadDiagosticsAttrAccess : public AttributeAccessInterface
+class ThreadDiagnosticsAttrAccess : public AttributeAccessInterface
 {
 public:
     // Register for the ThreadNetworkDiagnostics cluster on all endpoints.
-    ThreadDiagosticsAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), ThreadNetworkDiagnostics::Id) {}
+    ThreadDiagnosticsAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), ThreadNetworkDiagnostics::Id) {}
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 };
 
-ThreadDiagosticsAttrAccess gAttrAccess;
+ThreadDiagnosticsAttrAccess gAttrAccess;
 
-CHIP_ERROR ThreadDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR ThreadDiagnosticsAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     if (aPath.mClusterId != ThreadNetworkDiagnostics::Id)
     {

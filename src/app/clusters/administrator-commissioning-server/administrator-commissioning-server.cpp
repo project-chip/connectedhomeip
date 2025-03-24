@@ -24,10 +24,13 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandler.h>
+#include <app/CommandHandlerInterface.h>
+#include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/config.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CommissionableDataProvider.h>
@@ -45,20 +48,32 @@ using namespace chip::Protocols;
 using namespace chip::Crypto;
 using chip::Protocols::InteractionModel::Status;
 
-class AdministratorCommissioningAttrAccess : public AttributeAccessInterface
+class AdministratorCommissioningServer : public AttributeAccessInterface, public CommandHandlerInterface
 {
 public:
-    // Register for the OperationalCredentials cluster on all endpoints.
-    AdministratorCommissioningAttrAccess() :
-        AttributeAccessInterface(Optional<EndpointId>::Missing(), Clusters::AdministratorCommissioning::Id)
+    // Register for the AdministratorCommissioning cluster on all endpoints.
+    AdministratorCommissioningServer() :
+        AttributeAccessInterface(Optional<EndpointId>::Missing(), Clusters::AdministratorCommissioning::Id),
+        CommandHandlerInterface(Optional<EndpointId>::Missing(), Clusters::AdministratorCommissioning::Id)
     {}
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+
+private:
+    void InvokeCommand(HandlerContext & context) override;
+
+    // Methods to handle the various commands this cluster may receive.
+    void OpenCommissioningWindow(HandlerContext & context, const Commands::OpenCommissioningWindow::DecodableType & commandData);
+#ifdef ADMINISTRATOR_COMMISSIONING_ENABLE_OPEN_BASIC_COMMISSIONING_WINDOW_CMD
+    void OpenBasicCommissioningWindow(HandlerContext & context,
+                                      const Commands::OpenBasicCommissioningWindow::DecodableType & commandData);
+#endif
+    void RevokeCommissioning(HandlerContext & context, const Commands::RevokeCommissioning::DecodableType & commandData);
 };
 
-AdministratorCommissioningAttrAccess gAdminCommissioningAttrAccess;
+AdministratorCommissioningServer gAdminCommissioningServer;
 
-CHIP_ERROR AdministratorCommissioningAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR AdministratorCommissioningServer::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     VerifyOrDie(aPath.mClusterId == Clusters::AdministratorCommissioning::Id);
 
@@ -80,9 +95,29 @@ CHIP_ERROR AdministratorCommissioningAttrAccess::Read(const ConcreteReadAttribut
     return CHIP_NO_ERROR;
 }
 
-bool emberAfAdministratorCommissioningClusterOpenCommissioningWindowCallback(
-    app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-    const Commands::OpenCommissioningWindow::DecodableType & commandData)
+void AdministratorCommissioningServer::InvokeCommand(HandlerContext & context)
+{
+    switch (context.mRequestPath.mCommandId)
+    {
+    case Commands::OpenCommissioningWindow::Id:
+        HandleCommand<Commands::OpenCommissioningWindow::DecodableType>(
+            context, [this](HandlerContext & ctx, const auto & commandData) { OpenCommissioningWindow(ctx, commandData); });
+        break;
+#ifdef ADMINISTRATOR_COMMISSIONING_ENABLE_OPEN_BASIC_COMMISSIONING_WINDOW_CMD
+    case Commands::OpenBasicCommissioningWindow::Id:
+        HandleCommand<Commands::OpenBasicCommissioningWindow::DecodableType>(
+            context, [this](HandlerContext & ctx, const auto & commandData) { OpenBasicCommissioningWindow(ctx, commandData); });
+        break;
+#endif
+    case Commands::RevokeCommissioning::Id:
+        HandleCommand<Commands::RevokeCommissioning::DecodableType>(
+            context, [this](HandlerContext & ctx, const auto & commandData) { RevokeCommissioning(ctx, commandData); });
+        break;
+    }
+}
+
+void AdministratorCommissioningServer::OpenCommissioningWindow(HandlerContext & context,
+                                                               const Commands::OpenCommissioningWindow::DecodableType & commandData)
 {
     MATTER_TRACE_SCOPE("OpenCommissioningWindow", "AdministratorCommissioning");
     auto commissioningTimeout = System::Clock::Seconds16(commandData.commissioningTimeout);
@@ -97,7 +132,7 @@ bool emberAfAdministratorCommissioningClusterOpenCommissioningWindowCallback(
 
     ChipLogProgress(Zcl, "Received command to open commissioning window");
 
-    FabricIndex fabricIndex       = commandObj->GetAccessingFabricIndex();
+    FabricIndex fabricIndex       = context.mCommandHandler.GetAccessingFabricIndex();
     const FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
     auto & failSafeContext        = Server::GetInstance().GetFailSafeContext();
     auto & commissionMgr          = Server::GetInstance().GetCommissioningWindowManager();
@@ -124,7 +159,7 @@ exit:
     if (status.HasValue())
     {
         ChipLogError(Zcl, "Failed to open commissioning window. Cluster status 0x%02x", to_underlying(status.Value()));
-        commandObj->AddClusterSpecificFailure(commandPath, to_underlying(status.Value()));
+        context.mCommandHandler.AddClusterSpecificFailure(context.mRequestPath, to_underlying(status.Value()));
     }
     else
     {
@@ -133,14 +168,13 @@ exit:
             ChipLogError(Zcl, "Failed to open commissioning window. Global status " ChipLogFormatIMStatus,
                          ChipLogValueIMStatus(globalStatus));
         }
-        commandObj->AddStatus(commandPath, globalStatus);
+        context.mCommandHandler.AddStatus(context.mRequestPath, globalStatus);
     }
-    return true;
 }
 
-bool emberAfAdministratorCommissioningClusterOpenBasicCommissioningWindowCallback(
-    app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-    const Commands::OpenBasicCommissioningWindow::DecodableType & commandData)
+#ifdef ADMINISTRATOR_COMMISSIONING_ENABLE_OPEN_BASIC_COMMISSIONING_WINDOW_CMD
+void AdministratorCommissioningServer::OpenBasicCommissioningWindow(
+    CommandHandlerInterface::HandlerContext & context, const Commands::OpenBasicCommissioningWindow::DecodableType & commandData)
 {
     MATTER_TRACE_SCOPE("OpenBasicCommissioningWindow", "AdministratorCommissioning");
     auto commissioningTimeout = System::Clock::Seconds16(commandData.commissioningTimeout);
@@ -149,7 +183,7 @@ bool emberAfAdministratorCommissioningClusterOpenBasicCommissioningWindowCallbac
     Status globalStatus         = Status::Success;
     ChipLogProgress(Zcl, "Received command to open basic commissioning window");
 
-    FabricIndex fabricIndex       = commandObj->GetAccessingFabricIndex();
+    FabricIndex fabricIndex       = context.mCommandHandler.GetAccessingFabricIndex();
     const FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
     auto & failSafeContext        = Server::GetInstance().GetFailSafeContext();
     auto & commissionMgr          = Server::GetInstance().GetCommissioningWindowManager();
@@ -169,7 +203,7 @@ exit:
     if (status.HasValue())
     {
         ChipLogError(Zcl, "Failed to open commissioning window. Cluster status 0x%02x", to_underlying(status.Value()));
-        commandObj->AddClusterSpecificFailure(commandPath, to_underlying(status.Value()));
+        context.mCommandHandler.AddClusterSpecificFailure(context.mRequestPath, to_underlying(status.Value()));
     }
     else
     {
@@ -178,14 +212,13 @@ exit:
             ChipLogError(Zcl, "Failed to open commissioning window. Global status " ChipLogFormatIMStatus,
                          ChipLogValueIMStatus(globalStatus));
         }
-        commandObj->AddStatus(commandPath, globalStatus);
+        context.mCommandHandler.AddStatus(context.mRequestPath, globalStatus);
     }
-    return true;
 }
+#endif
 
-bool emberAfAdministratorCommissioningClusterRevokeCommissioningCallback(
-    app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-    const Commands::RevokeCommissioning::DecodableType & commandData)
+void AdministratorCommissioningServer::RevokeCommissioning(CommandHandlerInterface::HandlerContext & context,
+                                                           const Commands::RevokeCommissioning::DecodableType & commandData)
 {
     MATTER_TRACE_SCOPE("RevokeCommissioning", "AdministratorCommissioning");
     ChipLogProgress(Zcl, "Received command to close commissioning window");
@@ -195,19 +228,19 @@ bool emberAfAdministratorCommissioningClusterRevokeCommissioningCallback(
     if (!Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen())
     {
         ChipLogError(Zcl, "Commissioning window is currently not open");
-        commandObj->AddClusterSpecificFailure(commandPath, to_underlying(StatusCode::kWindowNotOpen));
+        context.mCommandHandler.AddClusterSpecificFailure(context.mRequestPath, to_underlying(StatusCode::kWindowNotOpen));
     }
     else
     {
         Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
         ChipLogProgress(Zcl, "Commissioning window is now closed");
-        commandObj->AddStatus(commandPath, Status::Success);
+        context.mCommandHandler.AddStatus(context.mRequestPath, Status::Success);
     }
-    return true;
 }
 
 void MatterAdministratorCommissioningPluginServerInitCallback()
 {
     ChipLogProgress(Zcl, "Initiating Admin Commissioning cluster.");
-    AttributeAccessInterfaceRegistry::Instance().Register(&gAdminCommissioningAttrAccess);
+    CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&gAdminCommissioningServer);
+    AttributeAccessInterfaceRegistry::Instance().Register(&gAdminCommissioningServer);
 }

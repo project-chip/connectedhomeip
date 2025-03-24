@@ -1133,8 +1133,6 @@ MTR_DIRECT_MEMBERS
     for (MTRDeviceController_Concrete * controller in controllersCopy) {
         auto * compressedFabricId = controller.compressedFabricID;
         if (compressedFabricId != nil && compressedFabricId.unsignedLongLongValue == operationalID.GetCompressedFabricId()) {
-            ChipLogProgress(Controller, "Notifying controller at fabric index %u about new operational node 0x" ChipLogFormatX64,
-                controller.fabricIndex, ChipLogValueX64(operationalID.GetNodeId()));
             [controller operationalInstanceAdded:@(operationalID.GetNodeId())];
         }
 
@@ -1202,6 +1200,10 @@ MTR_DIRECT_MEMBERS
                           additionalRetransmitDelayMs:(nullable NSNumber *)additionalRetransmitDelayMs
 {
     [self _assertCurrentQueueIsNotMatterQueue];
+
+    MTR_LOG("%@ setting MRP params: idle %@ active %@ threshold %@ additional retransmit delay %@",
+        self, idleRetransmitMs, activeRetransmitMs, activeThresholdMs, additionalRetransmitDelayMs);
+
     dispatch_async(_chipWorkQueue, ^{
         bool resetAdvertising;
         if (idleRetransmitMs == nil && activeRetransmitMs == nil && activeThresholdMs == nil && additionalRetransmitDelayMs == nil) {

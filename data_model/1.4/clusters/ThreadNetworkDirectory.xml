@@ -69,7 +69,7 @@ Davis, CA 95616, USA
     <struct name="ThreadNetworkStruct">
       <field id="0" name="ExtendedPanID" type="octstr">
         <mandatoryConform/>
-        <constraint type="maxLength" value="8"/>
+        <constraint type="allowed" value="8"/>
       </field>
       <field id="1" name="NetworkName" type="string">
         <mandatoryConform/>
@@ -86,20 +86,22 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="PreferredExtendedPanID" type="octstr" default="null">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="nonVolatile"/>
       <mandatoryConform/>
-      <constraint type="maxLength" value="8"/>
+      <constraint type="allowed" value="8"/>
     </attribute>
     <attribute id="0x0001" name="ThreadNetworks" type="list">
       <entry type="ThreadNetworkStruct"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform/>
-      <constraint type="maxCount" value="ThreadNetworkTableSize"/>
+      <constraint type="maxCount">
+        <value attribute="ThreadNetworkTableSize"/>
+      </constraint>
     </attribute>
     <attribute id="0x0002" name="ThreadNetworkTableSize" type="uint8" default="10">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
       <constraint type="desc"/>
     </attribute>
@@ -118,7 +120,7 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <field id="0" name="ExtendedPanID" type="octstr">
         <mandatoryConform/>
-        <constraint type="maxLength" value="8"/>
+        <constraint type="allowed" value="8"/>
       </field>
     </command>
     <command id="0x02" name="GetOperationalDataset" direction="commandToServer" response="OperationalDatasetResponse">
@@ -126,7 +128,7 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <field id="0" name="ExtendedPanID" type="octstr">
         <mandatoryConform/>
-        <constraint type="maxLength" value="8"/>
+        <constraint type="allowed" value="8"/>
       </field>
     </command>
     <command id="0x03" name="OperationalDatasetResponse" direction="responseFromServer">

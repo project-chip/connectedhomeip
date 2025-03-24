@@ -113,7 +113,8 @@ void SubscriptionResumptionSessionEstablisher::HandleDeviceConnected(void * cont
     readHandler->OnSubscriptionResumed(sessionHandle, *establisher);
 #if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     // Reset the resumption retries to 0 if subscription is resumed
-    subscriptionInfo.mResumptionRetries  = 0;
+    subscriptionInfo.mResumptionRetries = 0;
+    imEngine->ResetNumSubscriptionsRetries();
     auto * subscriptionResumptionStorage = InteractionModelEngine::GetInstance()->GetSubscriptionResumptionStorage();
     if (subscriptionResumptionStorage)
     {
@@ -157,6 +158,9 @@ void SubscriptionResumptionSessionEstablisher::HandleDeviceConnectionFailure(voi
         // Clean up the persistent subscription information storage.
         subscriptionResumptionStorage->Delete(subscriptionInfo.mNodeId, subscriptionInfo.mFabricIndex,
                                               subscriptionInfo.mSubscriptionId);
+#if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+        imEngine->ResetNumSubscriptionsRetries();
+#endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     }
 }
 

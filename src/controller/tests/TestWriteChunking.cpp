@@ -98,8 +98,8 @@ protected:
 
 //clang-format off
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(testClusterAttrsOnEndpoint)
-DECLARE_DYNAMIC_ATTRIBUTE(kTestListAttribute, ARRAY, 1, ATTRIBUTE_MASK_WRITABLE),
-    DECLARE_DYNAMIC_ATTRIBUTE(kTestListAttribute2, ARRAY, 1, ATTRIBUTE_MASK_WRITABLE), DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
+DECLARE_DYNAMIC_ATTRIBUTE(kTestListAttribute, ARRAY, 1, MATTER_ATTRIBUTE_FLAG_WRITABLE),
+    DECLARE_DYNAMIC_ATTRIBUTE(kTestListAttribute2, ARRAY, 1, MATTER_ATTRIBUTE_FLAG_WRITABLE), DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(testEndpointClusters)
 DECLARE_DYNAMIC_CLUSTER(Clusters::UnitTesting::Id, testClusterAttrsOnEndpoint, ZAP_CLUSTER_MASK(SERVER), nullptr, nullptr),
@@ -107,7 +107,7 @@ DECLARE_DYNAMIC_CLUSTER(Clusters::UnitTesting::Id, testClusterAttrsOnEndpoint, Z
 
 DECLARE_DYNAMIC_ENDPOINT(testEndpoint, testEndpointClusters);
 
-DataVersion dataVersionStorage[ArraySize(testEndpointClusters)];
+DataVersion dataVersionStorage[MATTER_ARRAY_SIZE(testEndpointClusters)];
 
 //clang-format on
 
@@ -571,9 +571,10 @@ void TestWriteChunking::RunTest(Instructions instructions)
     err = writeClient->SendWriteRequest(sessionHandle);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    GetIOContext().DriveIOUntil(sessionHandle->ComputeRoundTripTimeout(app::kExpectedIMProcessingTime) +
-                                    System::Clock::Seconds16(1),
-                                [&]() { return GetExchangeManager().GetNumActiveExchanges() == 0; });
+    GetIOContext().DriveIOUntil(
+        sessionHandle->ComputeRoundTripTimeout(app::kExpectedIMProcessingTime, true /*isFirstMessageOnExchange*/) +
+            System::Clock::Seconds16(1),
+        [&]() { return GetExchangeManager().GetNumActiveExchanges() == 0; });
 
     EXPECT_EQ(onGoingPath, app::ConcreteAttributePath());
     EXPECT_EQ(status.size(), instructions.expectedStatus.size());

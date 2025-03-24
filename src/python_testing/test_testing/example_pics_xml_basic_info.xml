@@ -199,6 +199,27 @@ Draft
 				<status cond="BINFO.S">O</status>
 				<support>false</support>
 			</picsItem>
+			<picsItem>
+				<itemNumber>BINFO.S.A0015</itemNumber>
+				<feature>Does the DUT(server) support the SpecificationVersion attribute?</feature>
+				<reference>9.2.1. Attributes - index.html[pdf]</reference>
+				<status cond="BINFO.S">M</status>
+				<support>true</support>
+			</picsItem>
+			<picsItem>
+				<itemNumber>BINFO.S.A0016</itemNumber>
+				<feature>Does the DUT(server) support the MaxPathsPerInvoke attribute?</feature>
+				<reference>9.2.1. Attributes - index.html[pdf]</reference>
+				<status cond="BINFO.S">M</status>
+				<support>false</support>
+			</picsItem>
+			<picsItem>
+				<itemNumber>BINFO.S.A0017</itemNumber>
+				<feature>Does the DUT(server) support the DeviceLocation attribute?</feature>
+				<reference>9.2.1. Attributes - index.html[pdf]</reference>
+				<status cond="BINFO.S">O</status>
+				<support>false</support>
+			</picsItem>
 		</attributes>
 		<!--Events PICS write-->
 		<events>

@@ -281,7 +281,7 @@ Davis, CA 95616, USA
         <constraint type="maxCount" value="255"/>
       </field>
       <field id="18" name="ExternalIDList" type="list" default="empty">
-        <entry type="ref_AdditionalInfoStruct"/>
+        <entry type="AdditionalInfoStruct"/>
         <optionalConform/>
         <constraint type="maxCount" value="255"/>
       </field>
@@ -307,7 +307,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0001" name="Lineup" type="LineupInfoStruct" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <mandatoryConform>
         <feature name="LI"/>
       </mandatoryConform>
@@ -315,7 +315,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0002" name="CurrentChannel" type="ChannelInfoStruct" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <optionalConform/>
       <constraint type="desc"/>
     </attribute>
@@ -390,7 +390,7 @@ Davis, CA 95616, USA
         <optionalConform/>
       </field>
       <field id="6" name="ExternalIDList" type="list" default="empty">
-        <entry type="ref_AdditionalInfoStruct"/>
+        <entry type="AdditionalInfoStruct"/>
         <optionalConform/>
         <constraint type="maxCount" value="255"/>
       </field>
@@ -427,7 +427,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
       <field id="2" name="ExternalIDList" type="list" default="empty">
-        <entry type="ref_AdditionalInfoStruct"/>
+        <entry type="AdditionalInfoStruct"/>
         <optionalConform/>
         <constraint type="maxCount" value="255"/>
       </field>
@@ -452,7 +452,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
       <field id="2" name="ExternalIDList" type="list" default="empty">
-        <entry type="ref_AdditionalInfoStruct"/>
+        <entry type="AdditionalInfoStruct"/>
         <optionalConform/>
         <constraint type="maxCount" value="255"/>
       </field>

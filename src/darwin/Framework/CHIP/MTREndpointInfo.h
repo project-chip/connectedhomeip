@@ -24,7 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Meta-data about an endpoint of a Matter node.
  */
 NS_SWIFT_SENDABLE
-MTR_NEWLY_AVAILABLE
+MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
 @interface MTREndpointInfo : NSObject <NSCopying, NSSecureCoding>
 
 - (instancetype)init NS_UNAVAILABLE;

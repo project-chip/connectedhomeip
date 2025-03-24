@@ -39,6 +39,7 @@ template("cyw30739_example") {
     deps = [
       "${chip_root}/examples/providers:device_info_provider",
       "${chip_root}/examples/shell/shell_common:shell_common",
+      "${chip_root}/src/setup_payload:onboarding-codes-utils",
       "${matter_wpan_sdk_build_root}:${board}",
       app_data_model,
     ]
