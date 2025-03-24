@@ -23,12 +23,12 @@ import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ScenesManagementClusterExtensionFieldSet(
+class ScenesManagementClusterExtensionFieldSetStruct(
   val clusterID: UInt,
   val attributeValueList: List<ScenesManagementClusterAttributeValuePairStruct>,
 ) {
   override fun toString(): String = buildString {
-    append("ScenesManagementClusterExtensionFieldSet {\n")
+    append("ScenesManagementClusterExtensionFieldSetStruct {\n")
     append("\tclusterID : $clusterID\n")
     append("\tattributeValueList : $attributeValueList\n")
     append("}\n")
@@ -51,7 +51,7 @@ class ScenesManagementClusterExtensionFieldSet(
     private const val TAG_CLUSTER_ID = 0
     private const val TAG_ATTRIBUTE_VALUE_LIST = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ScenesManagementClusterExtensionFieldSet {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ScenesManagementClusterExtensionFieldSetStruct {
       tlvReader.enterStructure(tlvTag)
       val clusterID = tlvReader.getUInt(ContextSpecificTag(TAG_CLUSTER_ID))
       val attributeValueList =
@@ -65,7 +65,7 @@ class ScenesManagementClusterExtensionFieldSet(
 
       tlvReader.exitContainer()
 
-      return ScenesManagementClusterExtensionFieldSet(clusterID, attributeValueList)
+      return ScenesManagementClusterExtensionFieldSetStruct(clusterID, attributeValueList)
     }
   }
 }
