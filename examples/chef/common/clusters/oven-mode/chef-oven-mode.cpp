@@ -70,6 +70,7 @@ void InitChefOvenModeCluster()
                            "Failed to read OvenMode feature map for endpoint %d", endpointId);
         gInstanceTable[epIndex] =
             std::make_unique<ModeBase::Instance>(gDelegateTable[epIndex].get(), endpointId, OvenMode::Id, featureMap);
+        gInstanceTable[epIndex]->Init();
 
         ChipLogProgress(DeviceLayer, "Endpoint %d OvenMode Initialized.", endpointId);
     }
