@@ -21,8 +21,8 @@ from importlib.abc import Traversable
 
 from chip.testing.matter_testing import (MatterBaseTest, NamespacePathLocation, ProblemNotice, ProblemSeverity,
                                          default_matter_test_main)
-from chip.testing.spec_parsing import (DataModelLevel, PrebuiltDataModelDirectory, build_xml_namespaces,
-                                       get_data_model_directory, parse_namespace)
+from chip.testing.spec_parsing import (DataModelLevel, PrebuiltDataModelDirectory, build_xml_namespaces, get_data_model_directory,
+                                       parse_namespace)
 from jinja2 import Template
 from mobly import asserts
 
