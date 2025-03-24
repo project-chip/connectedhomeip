@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include "camera-device.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -24,7 +25,6 @@
 #include <fstream>
 #include <iostream>
 #include <lib/support/logging/CHIPLogging.h>
-#include "camera-device.h"
 
 #define SNAPSHOT_FILE_PATH "./capture_snapshot.jpg"
 #define SNAPSHOT_FILE_RES_WIDTH (168)
@@ -47,11 +47,11 @@ Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamAllocate(c
     switch (error)
     {
     case CameraError::SUCCESS:
-      return Status::Success;
+        return Status::Success;
     case CameraError::ERROR_RESOURCE_EXHAUSTED:
-      return Status::ResourceExhausted;
+        return Status::ResourceExhausted;
     default:
-      return Status::Failure;
+        return Status::Failure;
     }
 }
 
@@ -89,11 +89,11 @@ Protocols::InteractionModel::Status CameraAVStreamManager::AudioStreamAllocate(c
     switch (error)
     {
     case CameraError::SUCCESS:
-      return Status::Success;
+        return Status::Success;
     case CameraError::ERROR_RESOURCE_EXHAUSTED:
-      return Status::ResourceExhausted;
+        return Status::ResourceExhausted;
     default:
-      return Status::Failure;
+        return Status::Failure;
     }
 }
 
@@ -113,11 +113,11 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamAllocat
     switch (error)
     {
     case CameraError::SUCCESS:
-      return Status::Success;
+        return Status::Success;
     case CameraError::ERROR_RESOURCE_EXHAUSTED:
-      return Status::ResourceExhausted;
+        return Status::ResourceExhausted;
     default:
-      return Status::Failure;
+        return Status::Failure;
     }
 }
 

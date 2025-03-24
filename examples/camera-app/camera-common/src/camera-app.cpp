@@ -29,7 +29,7 @@ using Status = Protocols::InteractionModel::Status;
 
 CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface * aCameraDevice)
 {
-    mEndpoint = aClustersEndpoint;
+    mEndpoint     = aClustersEndpoint;
     mCameraDevice = aCameraDevice;
 
     // Instantiate Chime Server
@@ -47,7 +47,7 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
     bool nightVisionCapable              = mCameraDevice->GetCameraHALInterface().GetNightVisionCapable();
     VideoResolutionStruct minViewport    = mCameraDevice->GetCameraHALInterface().GetMinViewport();
     std::vector<RateDistortionTradeOffStruct> rateDistortionTradeOffPoints = {};
-    uint32_t maxContentBufferSize        = 1024;
+    uint32_t maxContentBufferSize                                          = 1024;
     AudioCapabilitiesStruct micCapabilities{};
     AudioCapabilitiesStruct spkrCapabilities{};
     TwoWayTalkSupportTypeEnum twowayTalkSupport               = TwoWayTalkSupportTypeEnum::kNotSupported;
@@ -57,9 +57,9 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
 
     // Instantiate the CameraAVStreamMgmt Server
     mAVStreamMgmtServerPtr = std::make_unique<CameraAVStreamMgmtServer>(
-        mCameraDevice->GetCameraAVStreamMgmtDelegate(), mEndpoint, features, optionalAttrs, maxConcurrentVideoEncoders, maxEncodedPixelRate,
-        sensorParams, nightVisionCapable, minViewport, rateDistortionTradeOffPoints, maxContentBufferSize, micCapabilities,
-        spkrCapabilities, twowayTalkSupport, supportedSnapshotParams, maxNetworkBandwidth, supportedStreamUsages);
+        mCameraDevice->GetCameraAVStreamMgmtDelegate(), mEndpoint, features, optionalAttrs, maxConcurrentVideoEncoders,
+        maxEncodedPixelRate, sensorParams, nightVisionCapable, minViewport, rateDistortionTradeOffPoints, maxContentBufferSize,
+        micCapabilities, spkrCapabilities, twowayTalkSupport, supportedSnapshotParams, maxNetworkBandwidth, supportedStreamUsages);
 }
 
 void CameraApp::InitCameraDeviceClusters()

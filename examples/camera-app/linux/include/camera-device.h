@@ -17,6 +17,7 @@
  */
 
 #pragma once
+#include "camera-av-stream-manager.h"
 #include "camera-device-interface.h"
 #include "chime-manager.h"
 #include "webrtc-provider-manager.h"
@@ -34,40 +35,41 @@ constexpr uint16_t kInvalidStreamID = 65500;
 
 struct VideoStream
 {
-    uint16_t id;          // Stream ID
-    bool isAllocated;     // Flag to indicate if the stream is allocated
+    uint16_t id;                                                         // Stream ID
+    bool isAllocated;                                                    // Flag to indicate if the stream is allocated
     chip::app::Clusters::CameraAvStreamManagement::VideoCodecEnum codec; // Codec information (e.g., "H.264", "HEVC")
     VideoResolutionStruct videoRes;
-    uint16_t frameRate;   // frame rate
+    uint16_t frameRate; // frame rate
     GstElement * videoPipeline;
 };
 
 struct AudioStream
 {
-    uint16_t id;          // Stream ID
-    bool isAllocated;     // Flag to indicate if the stream is allocated
+    uint16_t id;                                                         // Stream ID
+    bool isAllocated;                                                    // Flag to indicate if the stream is allocated
     chip::app::Clusters::CameraAvStreamManagement::AudioCodecEnum codec; // Codec information (e.g., "OPUS", "AACLC")
-    uint8_t channelCount; // channel count
+    uint8_t channelCount;                                                // channel count
     GstElement * audioPipeline;
 };
 
 struct SnapshotStream
 {
-    uint16_t id;          // Stream ID
-    bool isAllocated;     // Flag to indicate if the stream is allocated
+    uint16_t id;                                                         // Stream ID
+    bool isAllocated;                                                    // Flag to indicate if the stream is allocated
     chip::app::Clusters::CameraAvStreamManagement::ImageCodecEnum codec; // Codec information (e.g., "JPEG")
     VideoResolutionStruct videoRes;
-    uint8_t quality;      // Quality
+    uint8_t quality; // Quality
     GstElement * snapshotPipeline;
 };
 
-class CameraDevice : public CameraDeviceInterface,
-                     public CameraDeviceInterface::CameraHALInterface
+class CameraDevice : public CameraDeviceInterface, public CameraDeviceInterface::CameraHALInterface
 {
 public:
 
     chip::app::Clusters::ChimeDelegate & GetChimeDelegate();
     chip::app::Clusters::WebRTCTransportProvider::Delegate & GetWebRTCProviderDelegate();
+    chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtDelegate & GetCameraAVStreamMgmtDelegate();
+
     ~CameraDevice();
 
     static CameraDevice & GetInstance()
@@ -75,8 +77,6 @@ public:
         static CameraDevice sCameraDevice;
         return sCameraDevice;
     }
-
-    chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtDelegate & GetCameraAVStreamMgmtDelegate();
 
     CameraDeviceInterface::CameraHALInterface & GetCameraHALInterface() { return *this; }
 
@@ -98,7 +98,7 @@ public:
     CameraError SnapshotStreamDeallocate(const uint16_t streamID);
 
     CameraError CaptureSnapshot(const uint16_t streamID, const VideoResolutionStruct & resolution,
-                                           ImageSnapshot & outImageSnapshot);
+                                ImageSnapshot & outImageSnapshot);
 
     CameraError StartVideoStream(uint16_t streamID);
 
@@ -143,7 +143,7 @@ private:
     void InitializeAudioStreams();
     void InitializeSnapshotStreams();
 
-    GstElement * CreatePipeline(const std::string & pipelineString, CameraError& error);
+    GstElement * CreatePipeline(const std::string & pipelineString, CameraError & error);
     CameraError SetV4l2Control(uint32_t controlId, int value);
 
     // Various cluster server delegates

@@ -18,14 +18,14 @@
 
 #include "camera-device.h"
 #include <AppMain.h>
-#include <iostream>
+#include <fcntl.h> // For file descriptor operations
 #include <gst/gst.h>
 #include <gst/video/videooverlay.h>
-#include <sys/ioctl.h>
-#include <fcntl.h> // For file descriptor operations
-#include <linux/videodev2.h> // For V4L2 definitions
+#include <iostream>
 #include <lib/support/logging/CHIPLogging.h>
-//#include <gst/app/gstappsrc.h>
+#include <linux/videodev2.h> // For V4L2 definitions
+#include <sys/ioctl.h>
+// #include <gst/app/gstappsrc.h>
 
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Chime;
@@ -209,11 +209,12 @@ CameraError CameraDevice::SnapshotStreamDeallocate(const uint16_t streamID)
 }
 
 // Helper function to create a GStreamer pipeline
-GstElement* CameraDevice::CreatePipeline(const std::string & pipelineString, CameraError& error)
+GstElement * CameraDevice::CreatePipeline(const std::string & pipelineString, CameraError & error)
 {
-    GError * gerror = nullptr;
+    GError * gerror       = nullptr;
     GstElement * pipeline = gst_parse_launch(pipelineString.c_str(), &gerror);
-    if (gerror != nullptr) {
+    if (gerror != nullptr)
+    {
         ChipLogError(NotSpecified, "Error creating pipeline: %s", gerror->message);
         g_error_free(gerror);
         error = CameraError::ERROR_INIT_FAILED;
@@ -231,7 +232,7 @@ CameraError CameraDevice::SetV4l2Control(uint32_t controlId, int value)
     }
 
     v4l2_control control;
-    control.id = controlId;
+    control.id    = controlId;
     control.value = value;
 
     if (ioctl(videoDeviceFd, VIDIOC_S_CTRL, &control) == -1)
@@ -245,15 +246,15 @@ CameraError CameraDevice::SetV4l2Control(uint32_t controlId, int value)
 }
 
 CameraError CameraDevice::CaptureSnapshot(const uint16_t streamID, const VideoResolutionStruct & resolution,
-                            ImageSnapshot & outImageSnapshot)
+                                          ImageSnapshot & outImageSnapshot)
 {
     return CameraError::ERROR_NOT_IMPLEMENTED;
 }
 
 CameraError CameraDevice::StartVideoStream(uint16_t streamID)
 {
-    auto it = std::find_if(videoStreams.begin(), videoStreams.end(),
-                           [streamID](const VideoStream & s) { return s.id == streamID; });
+    auto it =
+        std::find_if(videoStreams.begin(), videoStreams.end(), [streamID](const VideoStream & s) { return s.id == streamID; });
 
     if (it == videoStreams.end())
     {
@@ -262,10 +263,9 @@ CameraError CameraDevice::StartVideoStream(uint16_t streamID)
 
     // Construct RTP video pipeline
     std::string pipelineString = "v4l2src device=/dev/video0 ! "
-                                 "video/x-raw,width=" + std::to_string(it->videoRes.width) +
-                                 ",height=" + std::to_string(it->videoRes.height) +
-                                 ",framerate=" + std::to_string(it->frameRate) +
-                                 "/1 ! ";
+                                 "video/x-raw,width=" +
+        std::to_string(it->videoRes.width) + ",height=" + std::to_string(it->videoRes.height) +
+        ",framerate=" + std::to_string(it->frameRate) + "/1 ! ";
 
     if (it->codec == VideoCodecEnum::kH264)
     {
@@ -280,7 +280,7 @@ CameraError CameraDevice::StartVideoStream(uint16_t streamID)
         return CameraError::ERROR_VIDEO_STREAM_START_FAILED;
     }
 
-    //pipelineString += "udpsink host=127.0.0.1 port=" + VIDEO_STREAM_GST_DEST_PORT; // Known socket
+    // pipelineString += "udpsink host=127.0.0.1 port=" + VIDEO_STREAM_GST_DEST_PORT; // Known socket
     pipelineString += "udpsink host=127.0.0.1 port=5000"; // Known socket
 
     CameraError error = CameraError::SUCCESS;
@@ -299,8 +299,8 @@ CameraError CameraDevice::StartVideoStream(uint16_t streamID)
 // Stop video stream
 CameraError CameraDevice::StopVideoStream(uint16_t streamID)
 {
-    auto it = std::find_if(videoStreams.begin(), videoStreams.end(),
-                           [streamID](const VideoStream & s) { return s.id == streamID; });
+    auto it =
+        std::find_if(videoStreams.begin(), videoStreams.end(), [streamID](const VideoStream & s) { return s.id == streamID; });
 
     if (it == videoStreams.end())
     {
@@ -332,7 +332,8 @@ CameraError CameraDevice::StopAudioStream(uint16_t streamID)
 // Start snapshot stream
 CameraError CameraDevice::StartSnapshotStream(uint16_t streamID)
 {
-    auto it = std::find_if(snapshotStreams.begin(), snapshotStreams.end(), [streamID](const SnapshotStream & s) { return s.id == streamID; });
+    auto it = std::find_if(snapshotStreams.begin(), snapshotStreams.end(),
+                           [streamID](const SnapshotStream & s) { return s.id == streamID; });
     if (it == snapshotStreams.end())
     {
         return CameraError::ERROR_SNAPSHOT_STREAM_START_FAILED;
@@ -359,7 +360,7 @@ CameraError CameraDevice::StartSnapshotStream(uint16_t streamID)
     pipelineString += "filesink location=./capture_snapshot.jpg";
 
     // Create the GStreamer pipeline
-    CameraError error = CameraError::SUCCESS;
+    CameraError error    = CameraError::SUCCESS;
     it->snapshotPipeline = CreatePipeline(pipelineString, error);
     if (it->snapshotPipeline == nullptr)
     {
@@ -394,7 +395,8 @@ CameraError CameraDevice::StartSnapshotStream(uint16_t streamID)
 // Stop snapshot stream
 CameraError CameraDevice::StopSnapshotStream(uint16_t streamID)
 {
-    auto it = std::find_if(snapshotStreams.begin(), snapshotStreams.end(), [streamID](const SnapshotStream & s) { return s.id == streamID; });
+    auto it = std::find_if(snapshotStreams.begin(), snapshotStreams.end(),
+                           [streamID](const SnapshotStream & s) { return s.id == streamID; });
     if (it == snapshotStreams.end())
     {
         return CameraError::ERROR_SNAPSHOT_STREAM_STOP_FAILED;
@@ -419,7 +421,8 @@ CameraError CameraDevice::StopSnapshotStream(uint16_t streamID)
 
 VideoSensorParamsStruct & CameraDevice::GetVideoSensorParams()
 {
-    static VideoSensorParamsStruct videoSensorParams = { 4608, 2592, 120, chip::Optional<uint16_t>(30) }; // Typical numbers for Pi camera.
+    static VideoSensorParamsStruct videoSensorParams = { 4608, 2592, 120,
+                                                         chip::Optional<uint16_t>(30) }; // Typical numbers for Pi camera.
     return videoSensorParams;
 }
 
@@ -449,28 +452,25 @@ uint16_t CameraDevice::GetFrameRate()
     return 60;
 }
 
-void CameraDevice::SetHDRMode(bool hdrMode)
-{
-
-}
+void CameraDevice::SetHDRMode(bool hdrMode) {}
 
 void CameraDevice::InitializeVideoStreams()
 {
-    VideoStream videoStream = {1, false, VideoCodecEnum::kH264, {640, 480}, 30, nullptr};
+    VideoStream videoStream = { 1, false, VideoCodecEnum::kH264, { 640, 480 }, 30, nullptr };
 
     videoStreams.push_back(videoStream);
 }
 
 void CameraDevice::InitializeAudioStreams()
 {
-    AudioStream audioStream = {1, false, AudioCodecEnum::kOpus, 2, nullptr};
+    AudioStream audioStream = { 1, false, AudioCodecEnum::kOpus, 2, nullptr };
 
     audioStreams.push_back(audioStream);
 }
 
 void CameraDevice::InitializeSnapshotStreams()
 {
-    snapshotStreams.push_back({ 1, false, ImageCodecEnum::kJpeg, {168, 112}, 90, nullptr });
+    snapshotStreams.push_back({ 1, false, ImageCodecEnum::kJpeg, { 168, 112 }, 90, nullptr });
 }
 
 ChimeDelegate & CameraDevice::GetChimeDelegate()
