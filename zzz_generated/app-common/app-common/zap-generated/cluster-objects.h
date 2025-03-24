@@ -18358,7 +18358,7 @@ public:
 using DecodableType = Type;
 
 } // namespace AttributeValuePairStruct
-namespace ExtensionFieldSet {
+namespace ExtensionFieldSetStruct {
 enum class Fields : uint8_t
 {
     kClusterID          = 0,
@@ -18387,7 +18387,7 @@ public:
     static constexpr bool kIsFabricScoped = false;
 };
 
-} // namespace ExtensionFieldSet
+} // namespace ExtensionFieldSetStruct
 namespace SceneInfoStruct {
 enum class Fields : uint8_t
 {
@@ -18513,11 +18513,11 @@ namespace Commands {
 namespace AddScene {
 enum class Fields : uint8_t
 {
-    kGroupID            = 0,
-    kSceneID            = 1,
-    kTransitionTime     = 2,
-    kSceneName          = 3,
-    kExtensionFieldSets = 4,
+    kGroupID                  = 0,
+    kSceneID                  = 1,
+    kTransitionTime           = 2,
+    kSceneName                = 3,
+    kExtensionFieldSetStructs = 4,
 };
 
 struct Type
@@ -18531,7 +18531,7 @@ public:
     uint8_t sceneID         = static_cast<uint8_t>(0);
     uint32_t transitionTime = static_cast<uint32_t>(0);
     chip::CharSpan sceneName;
-    DataModel::List<const Structs::ExtensionFieldSet::Type> extensionFieldSets;
+    DataModel::List<const Structs::ExtensionFieldSetStruct::Type> extensionFieldSetStructs;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -18550,7 +18550,7 @@ public:
     uint8_t sceneID         = static_cast<uint8_t>(0);
     uint32_t transitionTime = static_cast<uint32_t>(0);
     chip::CharSpan sceneName;
-    DataModel::DecodableList<Structs::ExtensionFieldSet::DecodableType> extensionFieldSets;
+    DataModel::DecodableList<Structs::ExtensionFieldSetStruct::DecodableType> extensionFieldSetStructs;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace AddScene
@@ -18630,12 +18630,12 @@ public:
 namespace ViewSceneResponse {
 enum class Fields : uint8_t
 {
-    kStatus             = 0,
-    kGroupID            = 1,
-    kSceneID            = 2,
-    kTransitionTime     = 3,
-    kSceneName          = 4,
-    kExtensionFieldSets = 5,
+    kStatus                   = 0,
+    kGroupID                  = 1,
+    kSceneID                  = 2,
+    kTransitionTime           = 3,
+    kSceneName                = 4,
+    kExtensionFieldSetStructs = 5,
 };
 
 struct Type
@@ -18650,7 +18650,7 @@ public:
     uint8_t sceneID       = static_cast<uint8_t>(0);
     Optional<uint32_t> transitionTime;
     Optional<chip::CharSpan> sceneName;
-    Optional<DataModel::List<const Structs::ExtensionFieldSet::Type>> extensionFieldSets;
+    Optional<DataModel::List<const Structs::ExtensionFieldSetStruct::Type>> extensionFieldSetStructs;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -18670,7 +18670,7 @@ public:
     uint8_t sceneID       = static_cast<uint8_t>(0);
     Optional<uint32_t> transitionTime;
     Optional<chip::CharSpan> sceneName;
-    Optional<DataModel::DecodableList<Structs::ExtensionFieldSet::DecodableType>> extensionFieldSets;
+    Optional<DataModel::DecodableList<Structs::ExtensionFieldSetStruct::DecodableType>> extensionFieldSetStructs;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ViewSceneResponse
@@ -19084,18 +19084,6 @@ public:
 
 namespace Attributes {
 
-namespace LastConfiguredBy {
-struct TypeInfo
-{
-    using Type             = chip::app::DataModel::Nullable<chip::NodeId>;
-    using DecodableType    = chip::app::DataModel::Nullable<chip::NodeId>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<chip::NodeId> &;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ScenesManagement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::LastConfiguredBy::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace LastConfiguredBy
 namespace SceneTableSize {
 struct TypeInfo
 {
@@ -19161,7 +19149,6 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::LastConfiguredBy::TypeInfo::DecodableType lastConfiguredBy;
         Attributes::SceneTableSize::TypeInfo::DecodableType sceneTableSize = static_cast<uint16_t>(0);
         Attributes::FabricSceneInfo::TypeInfo::DecodableType fabricSceneInfo;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
