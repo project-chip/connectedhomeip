@@ -51,9 +51,9 @@ Git:
     <item fieldId="2" name="AreaType"        type="AreaTypeTag"              isNullable="true"  optional="false"/>
   </struct>
 
-  <struct name="CurrencyStruct">
-    <cluster code="0x0700"/>
-    <item fieldId="0" name="Currency" type="int16u" min="0" max="999"/>
-    <item fieldId="1" name="DecimalPoints" type="int8u"  min="0" max="255"/>
+  <struct name="TestGlobalStruct">
+    <item fieldId="0" name="Name" type="char_string" length="128"/>
+    <item fieldId="1" name="MyBitmap" type="TestGlobalBitmap" isNullable="true"/>
+    <item fieldId="2" name="MyEnum" type="TestGlobalEnum" isNullable="true" optional="true"/>
   </struct>
 </configurator>
