@@ -26,7 +26,6 @@
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace ModeBase {
 namespace OvenMode {
 
 const uint8_t ModeBake            = 0;
@@ -39,7 +38,7 @@ const uint8_t ModeConvectionRoast = 6;
 const uint8_t ModeWarming         = 7;
 const uint8_t ModeProofing        = 8;
 
-class ChefDelegate : public Delegate
+class ChefDelegate : public ModeBase::Delegate
 {
 private:
     using ModeTagStructType                      = detail::Structs::ModeTagStruct::Type;
@@ -99,7 +98,6 @@ public:
 };
 
 } // namespace OvenMode
-} // namespace ModeBase
 } // namespace Clusters
 } // namespace app
 } // namespace chip
