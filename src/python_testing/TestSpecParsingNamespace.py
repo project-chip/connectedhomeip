@@ -21,10 +21,11 @@ import os
 import xml.etree.ElementTree as ElementTree
 import zipfile
 
-from chip.testing.matter_testing import (MatterBaseTest, default_matter_test_main, 
-                                       ProblemNotice, ProblemSeverity, NamespacePathLocation)
-from chip.testing.spec_parsing import (XmlNamespace, parse_namespace, PrebuiltDataModelDirectory,
-                                     build_xml_namespaces, get_data_model_directory, DataModelLevel)
+from chip.testing.matter_testing import (MatterBaseTest, NamespacePathLocation, ProblemNotice, ProblemSeverity,
+                                         default_matter_test_main)
+from chip.testing.spec_parsing import (DataModelLevel, PrebuiltDataModelDirectory, build_xml_namespaces, get_data_model_directory,
+                                       parse_namespace)
+from jinja2 import Template
 from mobly import asserts
 
 class TestSpecParsingNamespace(MatterBaseTest):
