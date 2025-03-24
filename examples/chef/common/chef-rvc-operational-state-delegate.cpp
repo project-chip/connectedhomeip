@@ -299,7 +299,7 @@ static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data
     if (state == OperationalState::OperationalStateEnum::kRunning)
     {
         // Reported CountDownTime is the remaining time to run = mCountdownTime.Value() - mRunningTime.
-        GetInstance()->UpdateCountdownTimeFromDelegate();
+        instance->UpdateCountdownTimeFromDelegate();
     }
 
     if (gRvcOperationalStateDelegate->mCountdownTime.Value() > mRunningTime)
