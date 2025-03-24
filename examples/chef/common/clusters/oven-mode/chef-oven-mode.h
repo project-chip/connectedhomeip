@@ -101,3 +101,7 @@ public:
 } // namespace Clusters
 } // namespace app
 } // namespace chip
+
+namespace ChefOvenMode {
+void InitChefOvenModeCluster();
+} // namespace ChefOvenMode
