@@ -212,16 +212,14 @@ void AppTask::AppTaskMain(void * pvParameter)
 void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
 {
     AppEvent event = {};
-    event.Handler = AppTask::AppEventHandler;
+    event.Handler  = AppTask::AppEventHandler;
     if (btnAction == to_underlying(SilabsPlatform::ButtonAction::ButtonPressed))
     {
-        event.Type = (button ? AppEvent::kEventType_ActionButtonPressed
-                             : AppEvent::kEventType_FunctionButtonPressed);
+        event.Type = (button ? AppEvent::kEventType_ActionButtonPressed : AppEvent::kEventType_FunctionButtonPressed);
     }
     else
     {
-        event.Type = (button ? AppEvent::kEventType_ActionButtonReleased
-                             : AppEvent::kEventType_FunctionButtonReleased);
+        event.Type = (button ? AppEvent::kEventType_ActionButtonReleased : AppEvent::kEventType_FunctionButtonReleased);
     }
     AppTask::GetAppTask().PostEvent(&event);
 }

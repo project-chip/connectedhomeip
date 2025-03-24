@@ -79,7 +79,7 @@ private:
     // Default Step direction for Level control
     StepModeEnum stepDirection = StepModeEnum::kUp;
 
-    LightSwitchMgr()           = default;
+    LightSwitchMgr() = default;
 
     /**
      * @brief This function will be called when PB0 is
