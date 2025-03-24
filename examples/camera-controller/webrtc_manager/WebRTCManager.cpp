@@ -164,4 +164,3 @@ void WebRTCManager::HandleCommandResponse(const ConcreteCommandPath & path, TLV:
         HandleProvideOfferResponse(data);
     }
 }
-
