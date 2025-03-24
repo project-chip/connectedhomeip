@@ -432,8 +432,11 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
                 std::string(req.ICETransportPolicy.Value().data(), req.ICETransportPolicy.Value().size()));
         }
 
+        SessionHandle sessionHandle = ctx.mCommandHandler.GetExchangeContext()->GetSessionHandle();
+
         // Delegate processing: process the SDP offer, gather ICE candidates, create SDP answer, etc.
-        auto delegateStatus = Protocols::InteractionModel::ClusterStatusCode(mDelegate.HandleProvideOffer(args, outSession));
+        auto delegateStatus =
+            Protocols::InteractionModel::ClusterStatusCode(mDelegate.HandleProvideOffer(args, outSession, sessionHandle, 1));
         if (!delegateStatus.IsSuccess())
         {
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, delegateStatus);

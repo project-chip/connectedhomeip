@@ -123,12 +123,20 @@ public:
      *   method returns `CHIP_NO_ERROR`. If an error is returned, `outSession` is left unmodified or
      *   set to an invalid state.
      *
+     * @param[in] sessionHandle
+     *   The secure session handle representing the connection with the requestor.
+     *
+     * @param[in] originatingEndpointId
+     *   The endpoint ID from which the ProvideOffer command was received. This can be used to to invoke
+     *   the commands on the Requestor cluster.
+     *
      * @return
      *   - CHIP_NO_ERROR if the request succeeds and `outSession` is populated.
      *   - CHIP_ERROR_NO_MEMORY if the device cannot allocate a new session.
      *   - Appropriate error otherwise.
      */
-    virtual CHIP_ERROR HandleProvideOffer(const ProvideOfferRequestArgs & args, WebRTCSessionStruct & outSession) = 0;
+    virtual CHIP_ERROR HandleProvideOffer(const ProvideOfferRequestArgs & args, WebRTCSessionStruct & outSession,
+                                          const SessionHandle & sessionHandle, EndpointId originatingEndpointId) = 0;
 
     /**
      * @brief

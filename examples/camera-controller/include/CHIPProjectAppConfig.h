@@ -62,4 +62,7 @@
 // Allow us, for test purposes, to encode invalid enum values.
 #define CHIP_CONFIG_IM_ENABLE_ENCODING_SENTINEL_ENUM_VALUES 1
 
+// Overrides CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT
+#define CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT 1
+
 #endif /* CHIPPROJECTCONFIG_H */
