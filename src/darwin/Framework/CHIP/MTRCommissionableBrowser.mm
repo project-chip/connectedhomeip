@@ -26,9 +26,11 @@
 #include <controller/CHIPDeviceController.h>
 #include <lib/dnssd/platform/Dnssd.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/Darwin/BleUtils.h>
 
 using namespace chip::Dnssd;
 using namespace chip::DeviceLayer;
+using namespace chip::DeviceLayer::Internal;
 
 #if CONFIG_NETWORK_LAYER_BLE
 #include <platform/Darwin/BleScannerDelegate.h>
@@ -39,6 +41,8 @@ constexpr char kBleKey[] = "BLE";
 
 using namespace chip::Tracing::DarwinFramework;
 
+@class CBPeripheral;
+
 @implementation MTRCommissionableBrowserResultInterfaces
 @end
 
@@ -48,6 +52,7 @@ using namespace chip::Tracing::DarwinFramework;
 @property (nonatomic) NSNumber * productID;
 @property (nonatomic) NSNumber * discriminator;
 @property (nonatomic) BOOL commissioningMode;
+@property (nonatomic, strong, nullable) CBPeripheral * peripheral;
 @end
 
 @implementation MTRCommissionableBrowserResult
@@ -302,6 +307,7 @@ public:
         result.discriminator = @(info.GetDeviceDiscriminator());
         result.commissioningMode = YES;
         result.params = chip::MakeOptional(chip::Controller::SetUpCodePairerParameters(connObj, false /* connected */));
+        result.peripheral = CBPeripheralFromBleConnObject(connObj); // avoid params holding a dangling pointer
 
         MATTER_LOG_METRIC(kMetricBLEDevicesAdded, ++mBLEDevicesAdded);
 

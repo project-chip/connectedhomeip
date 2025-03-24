@@ -1171,6 +1171,7 @@ PyFunction
 pylint
 PyObject
 pypi
+pyproject
 PyRun
 pytest
 PYTHONPATH
@@ -1201,6 +1202,7 @@ READMEs
 readonly
 readthedocs
 Reag
+Realtek
 rebase
 recommand
 recommanded

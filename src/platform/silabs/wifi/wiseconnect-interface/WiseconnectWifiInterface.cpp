@@ -128,27 +128,6 @@ CHIP_ERROR WiseconnectWifiInterface::TriggerDisconnection()
     return CHIP_NO_ERROR;
 }
 
-void WiseconnectWifiInterface::DHCPTimerEventHandler(void * arg)
-{
-    WifiPlatformEvent event = WifiPlatformEvent::kStationDhcpPoll;
-    WiseconnectWifiInterface::GetInstance().PostWifiPlatformEvent(event);
-}
-
-void WiseconnectWifiInterface::CancelDHCPTimer(void)
-{
-    VerifyOrReturn(osTimerIsRunning(mDHCPTimer), ChipLogDetail(DeviceLayer, "CancelDHCPTimer: timer not running"));
-    VerifyOrReturn(osTimerStop(mDHCPTimer) == osOK, ChipLogError(DeviceLayer, "CancelDHCPTimer: failed to stop timer"));
-}
-
-void WiseconnectWifiInterface::StartDHCPTimer(uint32_t timeout)
-{
-    // Cancel timer if already started
-    CancelDHCPTimer();
-
-    VerifyOrReturn(osTimerStart(mDHCPTimer, pdMS_TO_TICKS(timeout)) == osOK,
-                   ChipLogError(DeviceLayer, "StartDHCPTimer: failed to start timer"));
-}
-
 void WiseconnectWifiInterface::NotifyConnectivity(void)
 {
     VerifyOrReturn(!mHasNotifiedWifiConnectivity);
@@ -157,22 +136,13 @@ void WiseconnectWifiInterface::NotifyConnectivity(void)
     mHasNotifiedWifiConnectivity = true;
 }
 
-sl_status_t WiseconnectWifiInterface::CreateDHCPTimer()
-{
-    // TODO: Use LWIP timer instead of creating a new one here
-    mDHCPTimer = osTimerNew(DHCPTimerEventHandler, osTimerPeriodic, nullptr, nullptr);
-    VerifyOrReturnError(mDHCPTimer != nullptr, SL_STATUS_ALLOCATION_FAILED);
-
-    return SL_STATUS_OK;
-}
-
-void WiseconnectWifiInterface::ResetDHCPNotificationFlags(void)
+void WiseconnectWifiInterface::ResetConnectivityNotificationFlags(void)
 {
 
     ResetIPNotificationStates();
     mHasNotifiedWifiConnectivity = false;
 
-    WifiPlatformEvent event = WifiPlatformEvent::kStationDoDhcp;
+    WifiPlatformEvent event = WifiPlatformEvent::kConnectionComplete;
     PostWifiPlatformEvent(event);
 }
 
@@ -237,12 +207,16 @@ CHIP_ERROR WiseconnectWifiInterface::ConnectToAccessPoint()
     return CHIP_NO_ERROR;
 }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_IPV4
 bool WiseconnectWifiInterface::HasAnIPv4Address()
 {
-    return wfx_rsi.dev_state.Has(WifiState::kStationDhcpDone);
+    bool hasIPv4 = false;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_IPV4
+    hasIPv4 = wfx_rsi.dev_state.Has(WifiState::kStationDhcpDone);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_IPV4
+
+    return hasIPv4;
 }
-#endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
 
 bool WiseconnectWifiInterface::HasAnIPv6Address()
 {
