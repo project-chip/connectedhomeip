@@ -12,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/chip.gni")
+import("${chip_root}/src/platform/silabs/tests/args.gni")
+
 declare_args() {
   # Silabs wireless starter kit plug-in boards featuring specific mcu family and mcu model.
   # Find more information at https://www.silabs.com/development-tools/wireless.
@@ -75,6 +78,18 @@ if (use_SiWx917 || use_rs9116) {
 
 if (silabs_board == "") {
   silabs_board = getenv("SILABS_BOARD")
+}
+
+# Workaround to enable unit-tests when depending on files that import this gni
+if (silabs_board == "" && sl_build_unit_tests) {
+  if (!chip_build_all_platform_tests) {
+    # We can't print to the console when running our tests in the CSA CI otherwise CI fails.
+    print("Building the unit test configuration since silabs_board is not set.")
+    print("If you are building the efr32 test_driver, a board is required.")
+  }
+  silabs_board = "unit-test"
+  silabs_family = "unit-test"
+  silabs_mcu = "unit-test"
 }
 
 assert(silabs_board != "", "silabs_board must be specified")
@@ -190,6 +205,8 @@ if (silabs_board == "BRD4338A" || silabs_board == "BRD2605A" ||
   print("Using custom board configuration")
   print("silabs_family:", silabs_family)
   print("silabs_mcu:", silabs_mcu)
+} else if (silabs_board == "unit-test") {
+  # Do nothing
 } else {
   assert(
       false,
