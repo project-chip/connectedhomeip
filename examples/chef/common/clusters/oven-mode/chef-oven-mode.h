@@ -23,6 +23,8 @@
 
 #pragma once
 
+#ifdef MATTER_DM_PLUGIN_OVEN_MODE_SERVER
+
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -105,3 +107,5 @@ public:
 namespace ChefOvenMode {
 void InitChefOvenModeCluster();
 } // namespace ChefOvenMode
+
+#endif // MATTER_DM_PLUGIN_OVEN_MODE_SERVER

@@ -23,6 +23,8 @@
 #include <app/util/endpoint-config-api.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#ifdef MATTER_DM_PLUGIN_OVEN_MODE_SERVER
+
 using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ModeBase;
@@ -122,3 +124,5 @@ CHIP_ERROR OvenMode::ChefDelegate::GetModeTagsByIndex(uint8_t modeIndex, List<Mo
 
     return CHIP_NO_ERROR;
 }
+
+#endif // MATTER_DM_PLUGIN_OVEN_MODE_SERVER
