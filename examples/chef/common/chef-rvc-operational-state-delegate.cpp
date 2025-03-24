@@ -129,7 +129,6 @@ void RvcOperationalStateDelegate::HandleResumeStateCallback(GenericOperationalEr
     auto error = gRvcOperationalStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
     if (error == CHIP_NO_ERROR)
     {
-        GetInstance()->UpdateCountdownTimeFromDelegate();
         err.Set(to_underlying(OperationalState::ErrorStateEnum::kNoError));
     }
     else
@@ -297,6 +296,11 @@ static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data
 
     ChipLogDetail(DeviceLayer, "RVC timer tick: Current state = %d. CountdownTime = %d. PauseTime = %d. RunningTime = %d.",
                   to_underlying(state), gRvcOperationalStateDelegate->mCountdownTime.Value(), mPausedTime, mRunningTime);
+    if (state == OperationalState::OperationalStateEnum::kRunning)
+    {
+        // Reported CountDownTime is the remaining time to run = mCountdownTime.Value() - mRunningTime.
+        GetInstance()->UpdateCountdownTimeFromDelegate();
+    }
 
     if (gRvcOperationalStateDelegate->mCountdownTime.Value() > mRunningTime)
     {
@@ -322,6 +326,7 @@ static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data
             gRvcOperationalStateDelegate->mRunningTime = 0;
             gRvcOperationalStateDelegate->mPausedTime  = 0;
             gRvcOperationalStateDelegate->mCountdownTime.SetNull();
+            instance->UpdateCountdownTimeFromDelegate();
 
 #ifdef MATTER_DM_PLUGIN_RVC_RUN_MODE_SERVER
             getRvcRunModeInstance()->UpdateCurrentMode(RvcRunMode::ModeIdle);
