@@ -4929,7 +4929,7 @@ MTR_PROVISIONALLY_AVAILABLE
 
 @property (nonatomic, copy) NSString * _Nonnull sceneName MTR_PROVISIONALLY_AVAILABLE;
 
-@property (nonatomic, copy) NSArray * _Nonnull extensionFieldSets MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nonnull extensionFieldSetStructs MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5024,7 +5024,7 @@ MTR_PROVISIONALLY_AVAILABLE
 
 @property (nonatomic, copy) NSString * _Nullable sceneName MTR_PROVISIONALLY_AVAILABLE;
 
-@property (nonatomic, copy) NSArray * _Nullable extensionFieldSets MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nullable extensionFieldSetStructs MTR_PROVISIONALLY_AVAILABLE;
 
 /**
  * Initialize an MTRScenesManagementClusterViewSceneResponseParams with a response-value dictionary

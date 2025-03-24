@@ -4339,7 +4339,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRScenesManagementClusterExtensionFieldSet
+@implementation MTRScenesManagementClusterExtensionFieldSetStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4353,7 +4353,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRScenesManagementClusterExtensionFieldSet alloc] init];
+    auto other = [[MTRScenesManagementClusterExtensionFieldSetStruct alloc] init];
 
     other.clusterID = self.clusterID;
     other.attributeValueList = self.attributeValueList;

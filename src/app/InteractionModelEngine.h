@@ -169,7 +169,13 @@ public:
      * Tears down all active subscriptions.
      */
     void ShutdownAllSubscriptions();
+
 #endif // CHIP_CONFIG_ENABLE_READ_CLIENT
+
+    /**
+     * Tears down all subscription handlers.
+     */
+    void ShutdownAllSubscriptionHandlers();
 
     uint32_t GetNumActiveReadHandlers() const;
     uint32_t GetNumActiveReadHandlers(ReadHandler::InteractionType type) const;

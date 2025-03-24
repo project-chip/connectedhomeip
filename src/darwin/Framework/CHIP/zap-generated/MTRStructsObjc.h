@@ -1086,7 +1086,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRScenesManagementClusterExtensionFieldSet : NSObject <NSCopying>
+@interface MTRScenesManagementClusterExtensionFieldSetStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull clusterID MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSArray * _Nonnull attributeValueList MTR_PROVISIONALLY_AVAILABLE;
 @end

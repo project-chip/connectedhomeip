@@ -2377,7 +2377,6 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterRVCOperationalStateAttributeClusterRevisionID MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4)) = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster ScenesManagement attributes
-    MTRAttributeIDTypeClusterScenesManagementAttributeLastConfiguredByID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
     MTRAttributeIDTypeClusterScenesManagementAttributeSceneTableSizeID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
     MTRAttributeIDTypeClusterScenesManagementAttributeFabricSceneInfoID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
     MTRAttributeIDTypeClusterScenesManagementAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
