@@ -67,6 +67,7 @@ executable("${sample_name}") {
     "${project_dir}/common/clusters/target-navigator/TargetNavigatorManager.cpp",
     "${project_dir}/common/clusters/temperature-control/static-supported-temperature-levels.cpp",
     "${project_dir}/common/clusters/wake-on-lan/WakeOnLanManager.cpp",
+    "${project_dir}/common/clusters/window-covering/chef-window-covering.cpp",
     "${project_dir}/common/stubs.cpp",
     "${project_dir}/linux/main.cpp",
   ]

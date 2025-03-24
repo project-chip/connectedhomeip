@@ -24,6 +24,10 @@ config CHIP_PROJECT_CONFIG
     string "Project configuration file for Matter"
     default "include/CHIPProjectConfig.h"
 
+config ZEPHYR_VERSION_3_3
+    bool "Using Zephyr version 3.3"
+    default n
+
 config LOG
     default y
 
@@ -34,7 +38,6 @@ choice LOG_MODE
 endchoice
 
 choice MATTER_LOG_LEVEL_CHOICE
-    default MATTER_LOG_LEVEL_WRN if SOC_RISCV_TELINK_TL321X
     default MATTER_LOG_LEVEL_DBG
 endchoice
 
@@ -63,6 +66,7 @@ config POSIX_MAX_FDS
 # Application stack size
 config MAIN_STACK_SIZE
     default 3240 if PM || SOC_RISCV_TELINK_TL321X
+    default 4608 if SOC_RISCV_TELINK_W91 && !ZEPHYR_VERSION_3_3
     default 4096
 
 config INIT_STACKS
@@ -80,11 +84,13 @@ config SYSTEM_WORKQUEUE_STACK_SIZE
     default 616 if PM
 
 config HEAP_MEM_POOL_SIZE
-    default 256
+    default 256 if ZEPHYR_VERSION_3_3
+    default 1280
 
 config COMMON_LIBC_MALLOC_ARENA_SIZE
-    default 20716 if SOC_RISCV_TELINK_TL321X || SOC_SERIES_RISCV_TELINK_B9X_RETENTION
-    default 16384 if SOC_RISCV_TELINK_TL721X
+    default 20716 if SOC_SERIES_RISCV_TELINK_B9X_RETENTION || (SOC_RISCV_TELINK_TL321X && ZEPHYR_VERSION_3_3)
+    default 16384 if SOC_RISCV_TELINK_TL721X || (SOC_RISCV_TELINK_TL321X && !ZEPHYR_VERSION_3_3)
+    default 13568 if SOC_RISCV_TELINK_W91
     default 12288
 
 config NET_IPV6_MLD
@@ -172,7 +178,8 @@ config BT_DEVICE_NAME_GATT_WRITABLE
 if SOC_RISCV_TELINK_B9X || SOC_RISCV_TELINK_TLX
 
 config TL_BLE_CTRL_THREAD_STACK_SIZE
-    default 648
+    default 648 if ZEPHYR_VERSION_3_3
+    default 680
 
 config TL_BLE_CTRL_MASTER_MAX_NUM
     default 0
@@ -194,13 +201,9 @@ endif # SOC_RISCV_TELINK_B9X || SOC_RISCV_TELINK_TLX
 
 endif # BT
 
-# Board retention config
-# Cut down the ram cost by matter's change,it can keep ramcode (driver).
-# No need load the ramcode every time in thread mode (retention mode).
-# If the ram is not enough , can change it back , initial setting is n.
 if BOARD_TLSR9528A_RETENTION || BOARD_TLSR9518ADK80D_RETENTION
 config SOC_SERIES_RISCV_TELINK_B9X_NON_RETENTION_RAM_CODE
-    default n if PM
+    default y if PM
 
 config TELINK_B9X_MATTER_RETENTION_LAYOUT
     default y if PM
@@ -237,7 +240,7 @@ config CHIP_OTA_REQUESTOR
     default y
 
 config MCUBOOT_SIGNATURE_KEY_FILE
-    default "bootloader/mcuboot/root-ec-p256.pem" if BOARD_TLSR9118BDK40D
+    default "bootloader/mcuboot/root-ec-p256.pem" if BOARD_TLSR9118BDK40D || BOARD_TLSR9118BDK40D_V1
     depends on BOOTLOADER_MCUBOOT
 
 # In current config/zephyr/Kconfig
@@ -351,6 +354,8 @@ config CHIP_WIFI
     select NET_IPV6_ND # enable Neighbor Discovery to handle Router Advertisements
     select NET_IPV6_NBR_CACHE
     select NET_STATISTICS_USER_API
+    imply MBEDTLS_ENTROPY_C
+    imply MBEDTLS_KEY_EXCHANGE_RSA_ENABLED
 
 if CHIP_WIFI
 
@@ -405,7 +410,14 @@ config CHIP_WIFI_CONNECTION_RECOVERY_JITTER
       within range [-JITTER; +JITTER].
 
 config NET_MGMT_EVENT_STACK_SIZE
-    default 1128
+    default 1128 if ZEPHYR_VERSION_3_3
+    default 1250
+
+if !ZEPHYR_VERSION_3_3
+config IPC_SERVICE_BACKEND_ICMSG_WQ_STACK_SIZE
+    int "Size of RX work queue stack"
+    default 2304 if TELINK_W91_IPC_DISPATCHER
+endif
 
 endif # CHIP_WIFI
 
@@ -420,11 +432,8 @@ config CHIP_ENABLE_PAIRING_AUTOSTART
 config MBEDTLS
     default y
 
-config MBEDTLS_USER_CONFIG_ENABLE
+config MBEDTLS_CIPHER_AES_ENABLED
     default y
-
-config MBEDTLS_USER_CONFIG_FILE
-    default "telink-mbedtls-config.h"
 
 config MBEDTLS_CIPHER_CCM_ENABLED
     default y
@@ -444,9 +453,28 @@ config MBEDTLS_ECDH_C
 config MBEDTLS_ECDSA_C
     default y
 
-# getopt version
-config GETOPT_LONG
+config MBEDTLS_PKCS5_C
     default y
+
+config MBEDTLS_KEY_EXCHANGE_ECDH_ECDSA_ENABLED
+    default y
+
+if !ZEPHYR_VERSION_3_3
+config MBEDTLS_ENTROPY_POLL_ZEPHYR
+    bool "Provide entropy data to Mbed TLS through entropy driver or random generator"
+    default y
+
+config MBEDTLS_HKDF_C
+    bool "HMAC-based Extract-and-Expand Key Derivation Function"
+    default y
+
+config MBEDTLS_X509_CSR_WRITE_C
+    bool "X.509 Certificate Signing Requests writing"
+    default y
+endif # !ZEPHYR_VERSION_3_3
+
+config GETOPT_LONG
+    default y if ZEPHYR_VERSION_3_3
 
 # Disable not used shell modules
 
