@@ -76,7 +76,7 @@ class CannotStartUpCluster : public FakeServerClusterInterface
 {
 public:
     CannotStartUpCluster(EndpointId endpoint, ClusterId id) : FakeServerClusterInterface(endpoint, id) {}
-    CHIP_ERROR Startup(ServerClusterContext * context) override { return CHIP_ERROR_BUSY; }
+    CHIP_ERROR Startup(ServerClusterContext & context) override { return CHIP_ERROR_BUSY; }
 };
 
 struct TestServerClusterInterfaceRegistry : public ::testing::Test
