@@ -382,7 +382,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconRxCount(uint32_t & beaconRxC
 #if CONFIG_WIFI_GET_LOG
     wlan_stats_t stats;
     wlan_bss_type bss_type = WLAN_BSS_TYPE_STA;
-    int ret = wlan_get_stats(&stats, bss_type);
+    int ret                = wlan_get_stats(&stats, bss_type);
     if (ret == WM_SUCCESS)
     {
         beaconRxCount = stats.sta_mgmt.beacons_rx;
@@ -397,7 +397,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketMulticastRxCount(uint32_t & 
 #if CONFIG_WIFI_GET_LOG
     wlan_stats_t stats;
     wlan_bss_type bss_type = WLAN_BSS_TYPE_STA;
-    int ret = wlan_get_stats(&stats, bss_type);
+    int ret                = wlan_get_stats(&stats, bss_type);
     if (ret == WM_SUCCESS)
     {
         packetMulticastRxCount = stats.multicast.tx;
@@ -412,7 +412,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketMulticastTxCount(uint32_t & 
 #if CONFIG_WIFI_GET_LOG
     wlan_stats_t stats;
     wlan_bss_type bss_type = WLAN_BSS_TYPE_STA;
-    int ret = wlan_get_stats(&stats, bss_type);
+    int ret                = wlan_get_stats(&stats, bss_type);
     if (ret == WM_SUCCESS)
     {
         packetMulticastTxCount = stats.multicast.tx;
@@ -427,7 +427,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketUnicastTxCount(uint32_t & pa
 #if CONFIG_WIFI_GET_LOG
     wlan_stats_t stats;
     wlan_bss_type bss_type = WLAN_BSS_TYPE_STA;
-    int ret = wlan_get_stats(&stats, bss_type);
+    int ret                = wlan_get_stats(&stats, bss_type);
     if (ret == WM_SUCCESS)
     {
         packetUnicastTxCount = stats.unicast.tx;
@@ -442,7 +442,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketUnicastRxCount(uint32_t & pa
 #if CONFIG_WIFI_GET_LOG
     wlan_stats_t stats;
     wlan_bss_type bss_type = WLAN_BSS_TYPE_STA;
-    int ret = wlan_get_stats(&stats, bss_type);
+    int ret                = wlan_get_stats(&stats, bss_type);
     if (ret == WM_SUCCESS)
     {
         packetUnicastRxCount = stats.unicast.rx;
@@ -457,7 +457,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiOverrunCount(uint64_t & overrunCou
 #if CONFIG_WIFI_GET_LOG
     wlan_stats_t stats;
     wlan_bss_type bss_type = WLAN_BSS_TYPE_STA;
-    int ret = wlan_get_stats(&stats, bss_type);
+    int ret                = wlan_get_stats(&stats, bss_type);
     if (ret == WM_SUCCESS)
     {
         overrunCount = (stats.overrun.tx + stats.overrun.rx);
@@ -471,7 +471,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::ResetWiFiNetworkDiagnosticsCounts(void)
 {
 #if CONFIG_WIFI_GET_LOG
     wlan_bss_type bss_type = WLAN_BSS_TYPE_STA;
-    int ret = wlan_reset_stats(bss_type);
+    int ret                = wlan_reset_stats(bss_type);
     if (ret == WM_SUCCESS)
     {
         return CHIP_NO_ERROR;
