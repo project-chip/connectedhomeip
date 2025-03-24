@@ -1599,7 +1599,7 @@ cluster TemperatureMeasurement = 1026 {
 }
 
 endpoint 0 {
-  device type ma_rootdevice = 22, version 1;
+  device type ma_rootdevice = 22, version 3;
 
 
   server cluster Descriptor {
@@ -1659,7 +1659,7 @@ endpoint 0 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute clusterRevision default = 4;
   }
 
   server cluster LocalizationConfiguration {
@@ -1704,8 +1704,6 @@ endpoint 0 {
   server cluster NetworkCommissioning {
     ram      attribute maxNetworks;
     callback attribute networks;
-    ram      attribute scanMaxTimeSeconds;
-    ram      attribute connectMaxTimeSeconds;
     ram      attribute interfaceEnabled;
     ram      attribute lastNetworkingStatus;
     ram      attribute lastNetworkID;
@@ -1815,8 +1813,6 @@ endpoint 0 {
     handle command UpdateFabricLabel;
     handle command RemoveFabric;
     handle command AddTrustedRootCertificate;
-    handle command SetVidVerificationStatement;
-    handle command SignVidVerificationRequest;
     handle command SignVidVerificationResponse;
   }
 
@@ -1837,7 +1833,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_oven = 123, version 1;
+  device type ma_oven = 123, version 2;
 
 
   server cluster Identify {
@@ -1847,7 +1843,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 5;
 
     handle command Identify;
   }
@@ -1865,7 +1861,7 @@ endpoint 1 {
   }
 }
 endpoint 2 {
-  device type ma_temperature_controlled_cabinet = 113, version 1;
+  device type ma_temperature_controlled_cabinet = 113, version 3;
 
 
   server cluster Descriptor {
@@ -1873,7 +1869,6 @@ endpoint 2 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
-    callback attribute tagList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -1893,7 +1888,7 @@ endpoint 2 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
 
     handle command Stop;
     handle command Start;
@@ -1907,7 +1902,7 @@ endpoint 2 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
 
     handle command ChangeToMode;
     handle command ChangeToModeResponse;
@@ -1949,7 +1944,7 @@ endpoint 3 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 5;
 
     handle command Identify;
   }
@@ -1963,8 +1958,6 @@ endpoint 3 {
     ram      attribute clusterRevision default = 6;
 
     handle command Off;
-    handle command On;
-    handle command Toggle;
   }
 
   server cluster Descriptor {
@@ -1992,8 +1985,6 @@ endpoint 4 {
     ram      attribute clusterRevision default = 6;
 
     handle command Off;
-    handle command On;
-    handle command Toggle;
   }
 
   server cluster Descriptor {
@@ -2014,7 +2005,7 @@ endpoint 4 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 2;
     ram      attribute clusterRevision default = 1;
 
     handle command SetTemperature;
@@ -2028,7 +2019,7 @@ endpoint 4 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 4;
   }
 }
 
