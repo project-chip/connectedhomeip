@@ -1195,13 +1195,3 @@ exit:
     commandObj->AddStatus(commandPath, finalStatus);
     return true;
 }
-
-bool emberAfOperationalCredentialsClusterSignVidVerificationRequestCallback(chip::app::CommandHandler*, chip::app::ConcreteCommandPath const&, chip::app::Clusters::OperationalCredentials::Commands::SignVidVerificationRequest::DecodableType const&)
-{
-    return true;
-}
-
-bool emberAfOperationalCredentialsClusterSetVidVerificationStatementCallback(chip::app::CommandHandler*, chip::app::ConcreteCommandPath const&, chip::app::Clusters::OperationalCredentials::Commands::SetVidVerificationStatement::DecodableType const&)
-{
-    return true;
-}
