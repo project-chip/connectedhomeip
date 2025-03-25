@@ -34,11 +34,10 @@ void MatterSampleMeiPluginServerInitCallback()
     VerifyOrReturn(AttributeAccessInterfaceRegistry::Instance().Register(&SampleMeiServer::Instance()), CHIP_ERROR_INCORRECT_STATE);
 }
 
-void MatterSampleMeiPluginServerInitCallback()
+void MatterSampleMeiPluginServerShutdownCallback()
 {
-    ReturnOnFailure(CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(&SampleMeiServer::Instance()));
-    VerifyOrReturn(AttributeAccessInterfaceRegistry::Instance().Unregister(&SampleMeiServer::Instance()),
-                   CHIP_ERROR_INCORRECT_STATE);
+    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(&SampleMeiServer::Instance());
+    AttributeAccessInterfaceRegistry::Instance().Unregister(&SampleMeiServer::Instance());
 }
 
 void emberAfSampleMeiClusterServerInitCallback(chip::EndpointId endpoint)
