@@ -66,6 +66,7 @@ private:
     CHIP_ERROR ReadProductAppearance(AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadSpecificationVersion(AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadMaxPathsPerInvoke(AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadConfigurationVersion(AttributeValueEncoder & aEncoder);
 };
 
 BasicAttrAccess gAttrAccess;
@@ -301,6 +302,16 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
 
     case MaxPathsPerInvoke::Id: {
         status = ReadMaxPathsPerInvoke(aEncoder);
+        break;
+    }
+
+    case ConfigurationVersion::Id: {
+        uint32_t configurationVersion = 0;
+        status                        = ConfigurationMgr().GetConfigurationVersion(configurationVersion);
+        if (status == CHIP_NO_ERROR)
+        {
+            status = aEncoder.Encode(configurationVersion);
+        }
         break;
     }
 

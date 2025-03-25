@@ -272,6 +272,15 @@
 #endif
 
 /**
+ * CHIP_DEVICE_CONFIG_DEVICE_CONFIGURATION_VERSION
+ *
+ * A monothonic number identifying the configuration version running on the device.
+ */
+#ifndef CHIP_DEVICE_CONFIG_DEVICE_CONFIGURATION_VERSION
+#define CHIP_DEVICE_CONFIG_DEVICE_CONFIGURATION_VERSION 1
+#endif
+
+/**
  * CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
  *
  * Enables the use of a hard-coded default serial number if none
@@ -347,9 +356,7 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID
 #define CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID                                                                            \
-    {                                                                                                                              \
-        0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff                             \
-    }
+    { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff }
 #endif
 
 /**

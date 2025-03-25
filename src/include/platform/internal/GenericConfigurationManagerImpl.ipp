@@ -285,6 +285,19 @@ inline CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreSoftwareVer
 }
 
 template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetConfigurationVersion(uint32_t & configurationVer)
+{
+    configurationVer = static_cast<uint32_t>(CHIP_DEVICE_CONFIG_DEVICE_CONFIGURATION_VERSION);
+    return CHIP_NO_ERROR;
+}
+
+template <class ConfigClass>
+inline CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreConfigurationVersion(uint32_t softwareVer)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetFirmwareBuildChipEpochTime(System::Clock::Seconds32 & chipEpochTime)
 {
     // If the setter was called and we have a value in memory, return this.
