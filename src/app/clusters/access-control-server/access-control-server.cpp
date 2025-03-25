@@ -102,8 +102,11 @@ private:
     CHIP_ERROR ReadExtension(AttributeValueEncoder & aEncoder);
     CHIP_ERROR WriteAcl(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder);
     CHIP_ERROR WriteExtension(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder);
+    CHIP_ERROR IsValidAclEntryList(const DataModel::DecodableList<AclStorage::DecodableEntry> & list);
+
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
-    CHIP_ERROR ReadCommissioningArl(AttributeValueEncoder & aEncoder);
+    CHIP_ERROR
+    ReadCommissioningArl(AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadArl(AttributeValueEncoder & aEncoder);
 #endif
 } sAttribute;
@@ -262,6 +265,20 @@ CHIP_ERROR AccessControlAttribute::WriteImpl(const ConcreteDataAttributePath & a
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR AccessControlAttribute::IsValidAclEntryList(const DataModel::DecodableList<AclStorage::DecodableEntry> & list)
+{
+    auto validationIterator = list.begin();
+    while (validationIterator.Next())
+    {
+        // validationIterator.Next() will implicity call Decode and check that each field of an Access Control Entry
+        // (AccessControlEntryStruct) is valid
+        VerifyOrReturnError(GetAccessControl().IsValid(validationIterator.GetValue().GetEntry()), CHIP_ERROR_INVALID_ARGUMENT);
+    }
+    ReturnErrorOnFailure(validationIterator.GetStatus());
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR AccessControlAttribute::WriteAcl(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
 {
     FabricIndex accessingFabricIndex = aDecoder.AccessingFabricIndex();
@@ -280,6 +297,10 @@ CHIP_ERROR AccessControlAttribute::WriteAcl(const ConcreteDataAttributePath & aP
         ReturnErrorOnFailure(list.ComputeSize(&newCount));
 
         VerifyOrReturnError(newCount <= maxCount, CHIP_IM_GLOBAL_STATUS(ResourceExhausted));
+
+        // Validating all ACL entries in the ReplaceAll list, if any of the entries has an invalid field, we will reject the whole
+        // list.
+        ReturnErrorOnFailure(IsValidAclEntryList(list));
 
         auto iterator = list.begin();
         size_t i      = 0;

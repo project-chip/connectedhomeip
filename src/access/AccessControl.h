@@ -662,14 +662,15 @@ public:
      */
     CHIP_ERROR Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath, Privilege requestPrivilege);
 
+    // TODO: Is this ok? if yes, add doxygen comment
+    bool IsValid(const Entry & entry);
+
 #if CHIP_ACCESS_CONTROL_DUMP_ENABLED
     CHIP_ERROR Dump(const Entry & entry);
 #endif
 
 private:
     bool IsInitialized() const { return (mDelegate != nullptr); }
-
-    bool IsValid(const Entry & entry);
 
     void NotifyEntryChanged(const SubjectDescriptor * subjectDescriptor, FabricIndex fabric, size_t index, const Entry * entry,
                             EntryListener::ChangeType changeType);

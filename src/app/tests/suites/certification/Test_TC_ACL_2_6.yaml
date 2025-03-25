@@ -114,23 +114,7 @@ tests:
                       {
                           AdminNodeID: CommissionerNodeId,
                           AdminPasscodeID: null,
-                          ChangeType: 2,
-                          LatestValue:
-                              {
-                                  Privilege: 5,
-                                  AuthMode: 2,
-                                  Subjects: [CommissionerNodeId],
-                                  Targets: null,
-                                  FabricIndex: CurrentFabricIndexValue,
-                              },
-                          FabricIndex: CurrentFabricIndexValue,
-                      }
-          - values:
-                - value:
-                      {
-                          AdminNodeID: CommissionerNodeId,
-                          AdminPasscodeID: null,
-                          ChangeType: 1,
+                          ChangeType: 0,
                           LatestValue:
                               {
                                   Privilege: 5,
@@ -190,59 +174,23 @@ tests:
       response:
           error: CONSTRAINT_ERROR
 
+      # Since in Step 6 one of the ACL List Entries had an invalid item, then the whole ACL Entries List was rejected, As such no change will happen to the already-existing AccessControl Entries, and thus no AccessControlEntryChanged event will be generated
+      # SKIP for Now, as YAML does not provide a way to check that the received ReportDataMessage does NOT contain an EventReportIB
+      # Example of Output of this Step
+      # 2025-03-25 16:36:59.453 ERROR   16:36:59.296 - TEST OUT  : 		    [DMG] ReportDataMessage =
+      # 2025-03-25 16:36:59.453 ERROR   16:36:59.296 - TEST OUT  : 		    [DMG] {
+      # 2025-03-25 16:36:59.453 ERROR   16:36:59.296 - TEST OUT  : 		    [DMG] 	SuppressResponse = true, 
+      # 2025-03-25 16:36:59.453 ERROR   16:36:59.296 - TEST OUT  : 		    [DMG] 	InteractionModelRevision = 12
+      # 2025-03-25 16:36:59.453 ERROR   16:36:59.296 - TEST OUT  : 		    [DMG] }
+
     - label:
           "Step 7: TH1 reads DUT Endpoint 0 AccessControl cluster
           AccessControlEntryChanged event"
-      PICS: ACL.S.E00
+      PICS: PICS_SKIP_SAMPLE_APP && ACL.S.E00
       command: "readEvent"
       event: "AccessControlEntryChanged"
       eventNumber: "LastReceivedEventNumber + 1"
       response:
           - values:
                 - value:
-                      {
-                          AdminNodeID: CommissionerNodeId,
-                          AdminPasscodeID: null,
-                          ChangeType: 2,
-                          LatestValue:
-                              {
-                                  Privilege: 3,
-                                  AuthMode: 3,
-                                  Subjects: null,
-                                  Targets: null,
-                                  FabricIndex: CurrentFabricIndexValue,
-                              },
-                          FabricIndex: CurrentFabricIndexValue,
-                      }
-          - values:
-                - value:
-                      {
-                          AdminNodeID: CommissionerNodeId,
-                          AdminPasscodeID: null,
-                          ChangeType: 2,
-                          LatestValue:
-                              {
-                                  Privilege: 5,
-                                  AuthMode: 2,
-                                  Subjects: [CommissionerNodeId],
-                                  Targets: null,
-                                  FabricIndex: CurrentFabricIndexValue,
-                              },
-                          FabricIndex: CurrentFabricIndexValue,
-                      }
-          - values:
-                - value:
-                      {
-                          AdminNodeID: CommissionerNodeId,
-                          AdminPasscodeID: null,
-                          ChangeType: 1,
-                          LatestValue:
-                              {
-                                  Privilege: 5,
-                                  AuthMode: 2,
-                                  Subjects: [CommissionerNodeId],
-                                  Targets: null,
-                                  FabricIndex: CurrentFabricIndexValue,
-                              },
-                          FabricIndex: CurrentFabricIndexValue,
-                      }
+                      {}
