@@ -50,7 +50,7 @@ Git: 0.7-summer-2025-511-g2b8c413df
     <name>Commodity Price</name>
     <code>0x0095</code>
     <define>COMMODITY_PRICE_CLUSTER</define>
-    <description/>
+    <description>The Commodity Price Cluster provides the mechanism for communicating Gas, Energy, or Water pricing information within the premises.</description>
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
     <globalAttribute code="0xFFFD" side="either" value="4"/>

@@ -153,7 +153,7 @@ Git: 0.7-summer-2025-511-g2b8c413df
     <name>Commodity Tariff</name>
     <code>0x0700</code>
     <define>COMMODITY_TARIFF_CLUSTER</define>
-    <description/>
+    <description>The CommodityTariffCluster provides the mechanism for communicating Commodity Tariff information within the premises.</description>
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
     <globalAttribute code="0xFFFD" side="either" value="1"/>

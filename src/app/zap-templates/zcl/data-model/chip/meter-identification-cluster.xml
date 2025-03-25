@@ -34,7 +34,7 @@ Git: 0.7-summer-2025-511-g2b8c413df
     <name>Meter Identification</name>
     <code>0x0B06</code>
     <define>METER_IDENTIFICATION_CLUSTER</define>
-    <description/>
+    <description>This Meter Identification Cluster provides attributes for determining advanced information about utility metering device.</description>
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
     <globalAttribute code="0xFFFD" side="either" value="1"/>

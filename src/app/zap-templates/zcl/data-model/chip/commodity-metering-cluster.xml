@@ -33,7 +33,7 @@ Git: 0.7-summer-2025-511-g2b8c413df
     <name>Commodity Metering</name>
     <code>0x0B07</code>
     <define>COMMODITY_METERING_CLUSTER</define>
-    <description/>
+    <description>The Commodity Metering Cluster provides the mechanism for communicating commodity consumption information within a premises.</description>
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
     <globalAttribute code="0xFFFD" side="either" value="1"/>
