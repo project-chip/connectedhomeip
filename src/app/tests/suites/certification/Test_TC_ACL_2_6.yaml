@@ -179,9 +179,10 @@ tests:
       # Example of Output of this Step
       # 2025-03-25 16:36:59.453 ERROR   16:36:59.296 - TEST OUT  : 		    [DMG] ReportDataMessage =
       # 2025-03-25 16:36:59.453 ERROR   16:36:59.296 - TEST OUT  : 		    [DMG] {
-      # 2025-03-25 16:36:59.453 ERROR   16:36:59.296 - TEST OUT  : 		    [DMG] 	SuppressResponse = true,
+      # 2025-03-25 16:36:59.453 ERROR   16:36:59.296 - TEST OUT  : 		    [DMG] 	SuppressResponse = true, 
       # 2025-03-25 16:36:59.453 ERROR   16:36:59.296 - TEST OUT  : 		    [DMG] 	InteractionModelRevision = 12
       # 2025-03-25 16:36:59.453 ERROR   16:36:59.296 - TEST OUT  : 		    [DMG] }
+
     - label:
           "Step 7: TH1 reads DUT Endpoint 0 AccessControl cluster
           AccessControlEntryChanged event"
@@ -191,4 +192,5 @@ tests:
       eventNumber: "LastReceivedEventNumber + 1"
       response:
           - values:
-                - value: {}
+                - value:
+                      {}
