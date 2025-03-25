@@ -160,30 +160,7 @@ Protocols::InteractionModel::Status CameraAVStreamManager::CaptureSnapshot(const
                                                                            const VideoResolutionStruct & resolution,
                                                                            ImageSnapshot & outImageSnapshot)
 {
-    std::ifstream file(SNAPSHOT_FILE_PATH, std::ios::binary | std::ios::ate);
-    if (!file.is_open())
-    {
-        ChipLogError(Zcl, "Error opening snapshot image file: ");
-        return Status::Failure;
-    }
-
-    std::streamsize size = file.tellg();
-    file.seekg(0, std::ios::beg);
-
-    // Ensure space for image snapshot data in outImageSnapshot
-    outImageSnapshot.data.resize(static_cast<size_t>(size));
-
-    if (!file.read(reinterpret_cast<char *>(outImageSnapshot.data.data()), size))
-    {
-        ChipLogError(Zcl, "Error reading image file: ");
-        return Status::Failure;
-    }
-
-    file.close();
-
-    outImageSnapshot.imageRes.width  = SNAPSHOT_FILE_RES_WIDTH;
-    outImageSnapshot.imageRes.height = SNAPSHOT_FILE_RES_HEIGHT;
-    outImageSnapshot.imageCodec      = ImageCodecEnum::kJpeg;
+    CameraDevice::GetInstance().CaptureSnapshot(streamID, resolution, outImageSnapshot);
 
     return Status::Success;
 }
