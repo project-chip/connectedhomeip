@@ -52,6 +52,10 @@
 #ifndef __ARCH_CC_H__
 #define __ARCH_CC_H__
 
+#if CHIP_HAVE_CONFIG_H
+#include <lwip/lwip_buildconfig.h>
+#endif
+
 /* Include some files for defining library routines */
 #include <inttypes.h>
 #include <limits.h>

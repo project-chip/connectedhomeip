@@ -40,14 +40,12 @@
 
 #if (CHIP_PLAT_NVM_SUPPORT == CHIP_PLAT_NVM_FWK)
 #include "NVM_Interface.h"
+#include "ram_storage.h"
 #elif (CHIP_PLAT_NVM_SUPPORT == CHIP_PLAT_LITTLEFS)
 #include "fwk_filesystem.h"
-#endif
-
-#if (CHIP_PLAT_NVM_SUPPORT == CHIP_PLAT_KEY_STORAGE)
-#include "fwk_key_storage.h"
-#else
 #include "ram_storage.h"
+#elif (CHIP_PLAT_NVM_SUPPORT == CHIP_PLAT_KEY_STORAGE)
+#include "fwk_key_storage.h"
 #endif
 
 namespace chip {
@@ -188,11 +186,14 @@ public:
 private:
 #if (CHIP_PLAT_NVM_SUPPORT == CHIP_PLAT_KEY_STORAGE)
     static CHIP_ERROR MapKeyStorageStatus(ks_error_t ksStatus);
-#else
+#elif (CHIP_PLAT_NVM_SUPPORT != CHIP_PLAT_NO_NVM)
     static CHIP_ERROR MapRamStorageStatus(rsError rsStatus);
 #endif
     static int SaveIntKeysToFS(void);
     static int SaveStringKeysToFS(void);
+#if (CHIP_DEVICE_CONFIG_KVS_WEAR_STATS == 1)
+    static CHIP_ERROR InitStorageWearStats(void);
+#endif
 };
 
 } // namespace Internal

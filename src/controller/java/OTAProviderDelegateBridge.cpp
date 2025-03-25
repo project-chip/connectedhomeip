@@ -154,11 +154,10 @@ void OTAProviderDelegateBridge::HandleQueryImage(CommandHandler * commandObj, co
     VendorId vendorId        = commandData.vendorID;
     uint16_t productId       = commandData.productID;
     uint32_t softwareVersion = commandData.softwareVersion;
-    DataModel::DecodableList<OTADownloadProtocol> protocolsSupported = commandData.protocolsSupported;
-    Optional<uint16_t> hardwareVersion                               = commandData.hardwareVersion;
-    Optional<chip::CharSpan> location                                = commandData.location;
-    Optional<bool> requestorCanConsent                               = commandData.requestorCanConsent;
-    Optional<chip::ByteSpan> metadataForProvider                     = commandData.metadataForProvider;
+    Optional<uint16_t> hardwareVersion           = commandData.hardwareVersion;
+    Optional<chip::CharSpan> location            = commandData.location;
+    Optional<bool> requestorCanConsent           = commandData.requestorCanConsent;
+    Optional<chip::ByteSpan> metadataForProvider = commandData.metadataForProvider;
 
     bool isBDXProtocolSupported = false;
 
@@ -276,6 +275,10 @@ void OTAProviderDelegateBridge::HandleQueryImage(CommandHandler * commandObj, co
         jboolean userConsentNeeded = JniReferences::GetInstance().BooleanToPrimitive(boxedUserConsentNeeded);
         response.userConsentNeeded.SetValue(userConsentNeeded == JNI_TRUE);
     }
+    else
+    {
+        response.userConsentNeeded.SetValue(0);
+    }
 
     status = static_cast<uint8_t>(jStatus);
     if (status == static_cast<uint8_t>(OTAQueryStatus::kNotAvailable))
@@ -318,7 +321,6 @@ void OTAProviderDelegateBridge::HandleQueryImage(CommandHandler * commandObj, co
         GenerateUpdateToken(mToken, kUpdateTokenLen);
 
         response.updateToken.SetValue(chip::ByteSpan(mToken, kUpdateTokenLen));
-        response.userConsentNeeded.SetValue(0);
 
         err = mBdxOTASender->PrepareForTransfer(fabricIndex, nodeId);
         if (CHIP_NO_ERROR != err)

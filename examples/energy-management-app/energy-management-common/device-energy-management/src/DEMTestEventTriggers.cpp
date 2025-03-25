@@ -16,10 +16,10 @@
  *    limitations under the License.
  */
 
-#include <DEMDelegate.h>
 #include <DeviceEnergyManagementDelegateImpl.h>
-#include <EVSEManufacturerImpl.h>
+#include <EnergyManagementAppCommonMain.h>
 #include <app/clusters/device-energy-management-server/DeviceEnergyManagementTestEventTriggerHandler.h>
+#include <lib/support/CodeUtils.h>
 
 #include <EnergyTimeUtils.h>
 
@@ -29,18 +29,20 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::DeviceEnergyManagement;
+namespace {
 
-static constexpr uint16_t MAX_SLOTS             = 10;
-static constexpr uint16_t MAX_POWER_ADJUSTMENTS = 5;
+constexpr uint16_t MAX_SLOTS             = 10;
+constexpr uint16_t MAX_POWER_ADJUSTMENTS = 5;
 
-static chip::app::Clusters::DeviceEnergyManagement::Structs::SlotStruct::Type sSlots[MAX_SLOTS];
-static chip::app::Clusters::DeviceEnergyManagement::Structs::ForecastStruct::Type sForecastStruct;
-static chip::app::DataModel::Nullable<chip::app::Clusters::DeviceEnergyManagement::Structs::ForecastStruct::Type> sForecast;
+chip::app::Clusters::DeviceEnergyManagement::Structs::SlotStruct::Type sSlots[MAX_SLOTS];
+chip::app::Clusters::DeviceEnergyManagement::Structs::ForecastStruct::Type sForecastStruct;
 
-static chip::app::Clusters::DeviceEnergyManagement::Structs::PowerAdjustStruct::Type sPowerAdjustments[MAX_POWER_ADJUSTMENTS];
-static chip::app::Clusters::DeviceEnergyManagement::Structs::PowerAdjustCapabilityStruct::Type sPowerAdjustCapabilityStruct;
-static chip::app::DataModel::Nullable<chip::app::Clusters::DeviceEnergyManagement::Structs::PowerAdjustCapabilityStruct::Type>
+chip::app::Clusters::DeviceEnergyManagement::Structs::PowerAdjustStruct::Type sPowerAdjustments[MAX_POWER_ADJUSTMENTS];
+chip::app::Clusters::DeviceEnergyManagement::Structs::PowerAdjustCapabilityStruct::Type sPowerAdjustCapabilityStruct;
+chip::app::DataModel::Nullable<chip::app::Clusters::DeviceEnergyManagement::Structs::PowerAdjustCapabilityStruct::Type>
     sPowerAdjustmentCapability;
+
+} // namespace
 
 CHIP_ERROR ConfigureForecast(uint16_t numSlots)
 {

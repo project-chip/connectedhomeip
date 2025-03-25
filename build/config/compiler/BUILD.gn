@@ -24,10 +24,43 @@ if (current_os == "mac" || current_os == "ios") {
   import("${build_root}/config/mac/mac_sdk.gni")
 }
 
+# To use different sanitizer options, use `gn args .` in the out folder and
+# use settings like:
+#
+#   is_clang=true
+#   is_debug=true
+#   optimize_for_size=false
+#   is_asan=true
+#   is_sanitize_fatal=false
+#
+
 declare_args() {
   # Enable -Werror. This can be disabled if using a different compiler
   # with unfixed or unsupported wanings.
   treat_warnings_as_errors = true
+
+  # Enable Thread sanitizer
+  is_tsan = false
+
+  # Enable memory sanitizer
+  is_msan = false
+
+  # enable undefined behavior sanitizer
+  is_ubsan = false
+
+  # Exit on sanitize error. Generally standard libraries may get errors
+  # so not stopping on the first error is often useful
+  is_sanitize_fatal = true
+
+  # Enable or disable Runtime Type Information (RTTI).
+  # Defaults true on darwin because Darwin.framework uses it.
+  enable_rtti = current_os == "mac" || current_os == "ios"
+
+  # Enable or disable support for C++ exceptions.
+  enable_exceptions = false
+
+  # Disable this to allow for overriding built-in defines, such as __FILE__.
+  warn_builtin_macro_redefined = true
 }
 
 if (current_cpu == "arm" || current_cpu == "arm64") {
@@ -209,6 +242,9 @@ config("disabled_warnings") {
       "-Wno-psabi",
       "-Wno-maybe-uninitialized",
     ]
+  }
+  if (!warn_builtin_macro_redefined) {
+    cflags += [ "-Wno-builtin-macro-redefined" ]
   }
 }
 
@@ -397,21 +433,6 @@ config("runtime_default") {
 #   is_sanitize_fatal=false
 #
 
-declare_args() {
-  # Enable Thread sanitizer
-  is_tsan = false
-
-  # Enable memory sanitizer
-  is_msan = false
-
-  # enable undefined behavior sanitizer
-  is_ubsan = false
-
-  # Exit on sanitize error. Generally standard libraries may get errors
-  # so not stopping on the first error is often useful
-  is_sanitize_fatal = true
-}
-
 config("sanitize_address") {
   defines = []
   cflags = [
@@ -452,8 +473,12 @@ config("sanitize_undefined_behavior") {
       "-fsanitize=unsigned-integer-overflow",
       "-fsanitize=implicit-conversion",
       "-fsanitize=nullability",
-      "-fno-sanitize=vptr,function",
     ]
+  }
+
+  #According to the LLVM UBSan documentation, sanitizing vptr is incompatible with the -fno-rtti flag.
+  if (!enable_rtti) {
+    cflags += [ "-fno-sanitize=vptr" ]
   }
 
   ldflags = cflags
@@ -511,8 +536,28 @@ config("fuzzing_default") {
 }
 
 config("coverage") {
-  cflags = [ "--coverage" ]
+  if (is_clang) {
+    cflags = [
+      # CLANG builds use the clang-specific coverage, so that versions of lcov/gcov
+      # do not have to match and `llvm-cov export -format=lcov` can be used
+      #
+      # Documentation: https://clang.llvm.org/docs/SourceBasedCodeCoverage.html
+      "-fprofile-instr-generate",
+      "-fcoverage-mapping",
+    ]
+  } else {
+    cflags = [ "--coverage" ]
+  }
   ldflags = cflags
+
+  if (is_clang) {
+    # Looking to add buildid which _could_ be used for coverage
+    # file format using `%b` (see
+    # https://clang.llvm.org/docs/SourceBasedCodeCoverage.html#running-the-instrumented-program)
+    # however at the time of writing this, linux clang used during bootstrap
+    # does not seem to support this.
+    ldflags += [ "-Wl,--build-id" ]
+  }
 }
 
 config("coverage_default") {
@@ -520,15 +565,6 @@ config("coverage_default") {
   if (use_coverage) {
     configs += [ ":coverage" ]
   }
-}
-
-declare_args() {
-  # Enable or disable Runtime Type Information (RTTI).
-  # Defaults true on darwin because Darwin.framework uses it.
-  enable_rtti = current_os == "mac" || current_os == "ios"
-
-  # Enable or disable support for C++ exceptions.
-  enable_exceptions = false
 }
 
 config("no_rtti") {
@@ -633,5 +669,12 @@ config("specs_default") {
     libs = [ "nosys" ]
 
     ldflags = cflags
+  }
+}
+
+config("link_as_needed") {
+  # ld64.lld on clang used by Apple does not have a --as-needed option
+  if (current_os != "mac" && current_os != "ios") {
+    ldflags = [ "-Wl,--as-needed" ]
   }
 }

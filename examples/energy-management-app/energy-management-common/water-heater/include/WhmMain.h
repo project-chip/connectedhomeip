@@ -25,7 +25,7 @@ namespace app {
 namespace Clusters {
 namespace WaterHeaterManagement {
 
-CHIP_ERROR WhmApplicationInit();
+CHIP_ERROR WhmApplicationInit(EndpointId endpointId);
 CHIP_ERROR WhmApplicationShutdown();
 
 } // namespace WaterHeaterManagement

@@ -1,6 +1,6 @@
 {
   "fileFormat": 2,
-  "featureLevel": 103,
+  "featureLevel": 106,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -41,14 +41,16 @@
         "code": 22,
         "profileId": 259,
         "label": "MA-rootdevice",
-        "name": "MA-rootdevice"
+        "name": "MA-rootdevice",
+        "deviceTypeOrder": 0
       },
       "deviceTypes": [
         {
           "code": 22,
           "profileId": 259,
           "label": "MA-rootdevice",
-          "name": "MA-rootdevice"
+          "name": "MA-rootdevice",
+          "deviceTypeOrder": 0
         }
       ],
       "deviceVersions": [
@@ -2158,14 +2160,16 @@
         "code": 771,
         "profileId": 2457,
         "label": "MA-pump",
-        "name": "MA-pump"
+        "name": "MA-pump",
+        "deviceTypeOrder": 0
       },
       "deviceTypes": [
         {
           "code": 771,
           "profileId": 2457,
           "label": "MA-pump",
-          "name": "MA-pump"
+          "name": "MA-pump",
+          "deviceTypeOrder": 0
         }
       ],
       "deviceVersions": [
@@ -2359,7 +2363,7 @@
               "side": "server",
               "type": "boolean",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "NVM",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0",
@@ -2667,7 +2671,7 @@
               "side": "server",
               "type": "OperationModeEnum",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "NVM",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -2683,7 +2687,7 @@
               "side": "server",
               "type": "ControlModeEnum",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "NVM",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -2715,7 +2719,7 @@
               "side": "server",
               "type": "OperationModeEnum",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "NVM",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x00",

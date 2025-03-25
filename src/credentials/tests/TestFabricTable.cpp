@@ -72,6 +72,16 @@ public:
         return mFabricTable.Init(initParams);
     }
 
+    CHIP_ERROR ReinitFabricTable(chip::TestPersistentStorageDelegate * storage)
+    {
+        chip::FabricTable::InitParams initParams;
+        initParams.storage             = storage;
+        initParams.operationalKeystore = &mOpKeyStore;
+        initParams.opCertStore         = &mOpCertStore;
+
+        return mFabricTable.Init(initParams);
+    }
+
     FabricTable & GetFabricTable() { return mFabricTable; }
 
 private:
@@ -203,6 +213,9 @@ struct TestFabricTable : public ::testing::Test
     {
         DeviceLayer::SetConfigurationMgr(&DeviceLayer::ConfigurationManagerImpl::GetDefaultInstance());
         ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
+#if CHIP_CRYPTO_PSA
+        ASSERT_EQ(psa_crypto_init(), PSA_SUCCESS);
+#endif
     }
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 };
@@ -706,6 +719,7 @@ TEST_F(TestFabricTable, TestBasicAddNocUpdateNocFlow)
                 {
                     EXPECT_EQ(iterFabricInfo.GetNodeId(), nodeId);
                     EXPECT_EQ(iterFabricInfo.GetFabricId(), fabricId);
+                    EXPECT_TRUE(iterFabricInfo.ShouldAdvertiseIdentity());
                     saw1 = true;
                 }
             }
@@ -817,12 +831,14 @@ TEST_F(TestFabricTable, TestBasicAddNocUpdateNocFlow)
                 {
                     EXPECT_EQ(iterFabricInfo.GetNodeId(), 55u);
                     EXPECT_EQ(iterFabricInfo.GetFabricId(), 11u);
+                    EXPECT_TRUE(iterFabricInfo.ShouldAdvertiseIdentity());
                     saw1 = true;
                 }
                 if (iterFabricInfo.GetFabricIndex() == 2)
                 {
                     EXPECT_EQ(iterFabricInfo.GetNodeId(), 999u);
                     EXPECT_EQ(iterFabricInfo.GetFabricId(), 44u);
+                    EXPECT_TRUE(iterFabricInfo.ShouldAdvertiseIdentity());
                     saw2 = true;
                 }
             }
@@ -1104,7 +1120,9 @@ TEST_F(TestFabricTable, TestAddMultipleSameRootDifferentFabricId)
         EXPECT_EQ(fabricTable.FabricCount(), 0);
         EXPECT_EQ(fabricTable.AddNewPendingTrustedRootCert(rcac), CHIP_NO_ERROR);
         FabricIndex newFabricIndex = kUndefinedFabricIndex;
-        EXPECT_EQ(fabricTable.AddNewPendingFabricWithOperationalKeystore(noc, icac, kVendorId, &newFabricIndex), CHIP_NO_ERROR);
+        EXPECT_EQ(fabricTable.AddNewPendingFabricWithOperationalKeystore(noc, icac, kVendorId, &newFabricIndex,
+                                                                         FabricTable::AdvertiseIdentity::No),
+                  CHIP_NO_ERROR);
         EXPECT_EQ(fabricTable.FabricCount(), 1);
         EXPECT_EQ(newFabricIndex, 1);
 
@@ -1118,6 +1136,23 @@ TEST_F(TestFabricTable, TestAddMultipleSameRootDifferentFabricId)
         EXPECT_EQ(fabricInfo->GetFabricId(), 1111u);
         EXPECT_EQ(fabricInfo->GetVendorId(), kVendorId);
         EXPECT_EQ(fabricInfo->GetFabricLabel().size(), 0u);
+        EXPECT_FALSE(fabricInfo->ShouldAdvertiseIdentity());
+
+        EXPECT_EQ(fabricTable.SetShouldAdvertiseIdentity(newFabricIndex, FabricTable::AdvertiseIdentity::Yes), CHIP_NO_ERROR);
+        EXPECT_TRUE(fabricInfo->ShouldAdvertiseIdentity());
+
+        // Check that for indices we don't have a fabric for, SetShouldAdvertiseIdentity fails.
+        EXPECT_EQ(fabricTable.SetShouldAdvertiseIdentity(kUndefinedFabricIndex, FabricTable::AdvertiseIdentity::No),
+                  CHIP_ERROR_INVALID_FABRIC_INDEX);
+        EXPECT_EQ(fabricTable.SetShouldAdvertiseIdentity(kUndefinedFabricIndex, FabricTable::AdvertiseIdentity::Yes),
+                  CHIP_ERROR_INVALID_FABRIC_INDEX);
+        EXPECT_EQ(fabricTable.SetShouldAdvertiseIdentity(2, FabricTable::AdvertiseIdentity::Yes), CHIP_ERROR_INVALID_FABRIC_INDEX);
+        EXPECT_EQ(fabricTable.SetShouldAdvertiseIdentity(2, FabricTable::AdvertiseIdentity::No), CHIP_ERROR_INVALID_FABRIC_INDEX);
+
+        EXPECT_TRUE(fabricInfo->ShouldAdvertiseIdentity());
+
+        EXPECT_EQ(fabricTable.SetShouldAdvertiseIdentity(newFabricIndex, FabricTable::AdvertiseIdentity::No), CHIP_NO_ERROR);
+        EXPECT_FALSE(fabricInfo->ShouldAdvertiseIdentity());
     }
     size_t numStorageKeysAfterFirstAdd = storage.GetNumKeys();
     EXPECT_EQ(numStorageKeysAfterFirstAdd, 7u); // Metadata, index, 3 certs, 1 opkey, last known good time
@@ -1155,6 +1190,14 @@ TEST_F(TestFabricTable, TestAddMultipleSameRootDifferentFabricId)
         EXPECT_EQ(fabricInfo->GetFabricId(), 2222u);
         EXPECT_EQ(fabricInfo->GetVendorId(), kVendorId);
         EXPECT_EQ(fabricInfo->GetFabricLabel().size(), 0u);
+
+        EXPECT_TRUE(fabricInfo->ShouldAdvertiseIdentity());
+
+        EXPECT_EQ(fabricTable.SetShouldAdvertiseIdentity(newFabricIndex, FabricTable::AdvertiseIdentity::No), CHIP_NO_ERROR);
+        EXPECT_FALSE(fabricInfo->ShouldAdvertiseIdentity());
+
+        EXPECT_EQ(fabricTable.SetShouldAdvertiseIdentity(newFabricIndex, FabricTable::AdvertiseIdentity::Yes), CHIP_NO_ERROR);
+        EXPECT_TRUE(fabricInfo->ShouldAdvertiseIdentity());
     }
     size_t numStorageKeysAfterSecondAdd = storage.GetNumKeys();
     EXPECT_EQ(numStorageKeysAfterSecondAdd, (numStorageKeysAfterFirstAdd + 5)); // Add 3 certs, 1 metadata, 1 opkey
@@ -2963,6 +3006,60 @@ TEST_F(TestFabricTable, TestCommitMarker)
         }
     }
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
+}
+
+class TestFabricTableDelegate : public FabricTable::Delegate
+{
+public:
+    void FabricWillBeRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override { willBeRemovedCalled = true; }
+
+    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override { onRemovedCalled = true; }
+
+    bool willBeRemovedCalled = false;
+    bool onRemovedCalled     = false;
+};
+
+TEST_F(TestFabricTable, Delete)
+{
+    Credentials::TestOnlyLocalCertificateAuthority fabricCertAuthority;
+    EXPECT_TRUE(fabricCertAuthority.Init().IsSuccess());
+
+    chip::TestPersistentStorageDelegate storage;
+    ScopedFabricTable fabricTableHolder;
+    EXPECT_EQ(fabricTableHolder.Init(&storage), CHIP_NO_ERROR);
+
+    FabricTable & fabricTable = fabricTableHolder.GetFabricTable();
+    FabricId fabricId         = 1;
+    NodeId nodeId             = 10;
+
+    // Simulate AddNOC
+    uint8_t csrBuf[chip::Crypto::kMIN_CSR_Buffer_Size];
+    MutableByteSpan csrSpan{ csrBuf };
+    EXPECT_EQ(fabricTable.AllocatePendingOperationalKey(chip::NullOptional, csrSpan), CHIP_NO_ERROR);
+
+    EXPECT_EQ(fabricCertAuthority.SetIncludeIcac(true).GenerateNocChain(fabricId, nodeId, csrSpan).GetStatus(), CHIP_NO_ERROR);
+    ByteSpan rcac = fabricCertAuthority.GetRcac();
+    ByteSpan icac = fabricCertAuthority.GetIcac();
+    ByteSpan noc  = fabricCertAuthority.GetNoc();
+
+    fabricTable.AddNewPendingTrustedRootCert(rcac);
+
+    constexpr uint16_t kVendorId = 0xFFF1u;
+    FabricIndex newFabricIndex   = kUndefinedFabricIndex;
+    EXPECT_EQ(fabricTable.AddNewPendingFabricWithOperationalKeystore(noc, icac, kVendorId, &newFabricIndex), CHIP_NO_ERROR);
+
+    // Reinitialize FabricTable to simulate device reboot
+    EXPECT_EQ(fabricTableHolder.ReinitFabricTable(&storage), CHIP_NO_ERROR);
+
+    TestFabricTableDelegate fabricDelegate;
+    fabricTable.AddFabricDelegate(&fabricDelegate);
+
+    // Check if calling Delete invokes OnFabricRemoved on delegates
+    fabricTable.Delete(newFabricIndex);
+    EXPECT_TRUE(fabricDelegate.willBeRemovedCalled);
+    EXPECT_TRUE(fabricDelegate.onRemovedCalled);
+
+    fabricTable.RemoveFabricDelegate(&fabricDelegate);
 }
 
 } // namespace

@@ -18,12 +18,12 @@ import("//build_overrides/jlink.gni")
 import("//build_overrides/openthread.gni")
 import("${chip_root}/src/lwip/lwip.gni")
 import("${chip_root}/src/platform/device.gni")
-import("${efr32_sdk_build_root}/silabs_board.gni")
+import("${silabs_sdk_build_root}/silabs_board.gni")
 
 if (wifi_soc == true) {  # CCP board
-  import("${efr32_sdk_build_root}/SiWx917_sdk.gni")
+  import("${silabs_sdk_build_root}/SiWx917_sdk.gni")
 } else {
-  import("${efr32_sdk_build_root}/efr32_sdk.gni")
+  import("${silabs_sdk_build_root}/efr32_sdk.gni")
 }
 
 declare_args() {
@@ -49,7 +49,7 @@ config("silabs_config") {
 }
 
 assert(silabs_sdk_target != "", "silabs_sdk_target must be specified")
-group("efr32_sdk") {
+group("silabs_sdk") {
   public_deps = [ silabs_sdk_target ]
   public_configs = [ ":silabs_config" ]
 }
@@ -94,15 +94,19 @@ if (wifi_soc != true) {  # CCP board
         "RADIO_CONFIG_DMP_SUPPORT=1",
         "${silabs_board}=1",
         "${silabs_mcu}",
+        "SL_OPENTHREAD_CERT_LIB=1",
+        "OPENTHREAD_CONFIG_TCP_ENABLE=0",
+        "OPENTHREAD_CONFIG_DNS_CLIENT_OVER_TCP_ENABLE=0",
         "OPENTHREAD_CORE_CONFIG_PLATFORM_CHECK_FILE=\"openthread-core-efr32-config-check.h\"",
       ]
 
       include_dirs = [
         "${chip_root}/examples/platform/silabs/efr32",
         "${chip_root}/examples/platform/silabs",
-        "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}",
+        "${matter_support_root}/board-support/efr32/${silabs_family}/${silabs_board}",
         "${sl_ot_efr32_root}",
         "${openthread_root}/src/",
+        "${openthread_root}/third_party/tcplp",
       ]
 
       # temporarily disable check until gsdk pulls in a more recent version
@@ -117,7 +121,7 @@ if (wifi_soc != true) {  # CCP board
 
       public_deps = [
         ":libopenthread-platform",
-        "${efr32_sdk_build_root}:efr32_sdk",
+        "${silabs_sdk_build_root}:silabs_sdk",
       ]
 
       public_configs = [ ":openthread_efr32_config" ]
@@ -125,8 +129,32 @@ if (wifi_soc != true) {  # CCP board
 
     source_set("ot-efr32-cert") {
       sources = [
+        "${openthread_root}/examples/platforms/utils/link_metrics.cpp",
         "${openthread_root}/examples/platforms/utils/mac_frame.cpp",
         "${openthread_root}/examples/platforms/utils/mac_frame.h",
+        "${openthread_root}/examples/platforms/utils/settings_ram.c",
+        "${sl_ot_efr32_root}/alarm.c",
+        "${sl_ot_efr32_root}/crypto.c",
+        "${sl_ot_efr32_root}/entropy.c",
+        "${sl_ot_efr32_root}/flash.c",
+        "${sl_ot_efr32_root}/ieee802154-packet-utils.cpp",
+        "${sl_ot_efr32_root}/misc.c",
+        "${sl_ot_efr32_root}/radio_coex.c",
+        "${sl_ot_efr32_root}/radio_extension.c",
+        "${sl_ot_efr32_root}/radio_power_manager.c",
+        "${sl_ot_efr32_root}/sl_gp_interface.c",
+        "${sl_ot_efr32_root}/sleep.c",
+        "${sl_ot_efr32_root}/soft_source_match_table.c",
+        "${sl_ot_efr32_root}/system.c",
+        "${sl_ot_libs_path}/src/stubs/tcp/tcp_stubs.c",
+
+        # Temporary file until the files in the SI SDK is fixed
+        "${matter_support_root}/sdk-copies/protocol/openthread/platform-abstraction/efr32/radio.c",
+      ]
+
+      include_dirs = [
+        "${openthread_root}/examples/platforms/utils",
+        "${sl_ot_platform_abstraction}/include",
       ]
 
       if (enable_openthread_cli) {
@@ -190,7 +218,7 @@ if (wifi_soc != true) {  # CCP board
         "${segger_rtt_root}:segger_rtt",
       ]
 
-      deps = [ "${efr32_sdk_build_root}:efr32_sdk" ]
+      deps = [ "${silabs_sdk_build_root}:silabs_sdk" ]
 
       # selected thread device type FTD or MTD
       XTD = "ftd"
@@ -199,19 +227,14 @@ if (wifi_soc != true) {  # CCP board
       } else {
         # additional files needed for ftd lib
         sources += [
-          "${openthread_root}/examples/platforms/utils/link_metrics.cpp",
-          "${openthread_root}/examples/platforms/utils/link_metrics.h",
           "${openthread_root}/src/core/api/link_api.cpp",
           "${openthread_root}/src/core/mac/mac.cpp",
           "${openthread_root}/src/core/mac/mac_frame.cpp",
           "${openthread_root}/src/core/mac/sub_mac.cpp",
+          "${openthread_root}/src/core/mac/sub_mac_csl_receiver.cpp",
           "${openthread_root}/src/core/thread/mle.cpp",
-          "${sl_ot_platform_abstraction}/efr32/radio.c",
         ]
-
-        include_dirs = [ "${sl_ot_platform_abstraction}/include" ]
       }
-      sources += [ "${sl_ot_platform_abstraction}/efr32/sleep.c" ]
 
       # Use silabs openthread library stack with or without coap api enabled
       COAP_API = ""
@@ -222,14 +245,11 @@ if (wifi_soc != true) {  # CCP board
       public_configs += [ "${openthread_root}:openthread_${XTD}_config" ]
 
       if (silabs_family == "mgm24") {
-        # Locally set silabs_family to efr32mg24 as mgm24 doesn't have dedicated sl_ot_platform libs
+        # Locally set silabs_family to efr32mg24 as mgm24 doesn't have dedicated libsl_ot_stack lib
         silabs_family = "efr32mg24"
       }
 
-      libs = [
-        "${sl_ot_libs_path}/libs/libsl_ot_stack_${XTD}_${COAP_API}${silabs_family}_gcc.a",
-        "${sl_ot_libs_path}/libs/libsl_platform_${XTD}_dmp_${silabs_family}_gcc.a",
-      ]
+      libs = [ "${sl_ot_libs_path}/libs/libsl_ot_stack_${XTD}_${COAP_API}${silabs_family}_gcc.a" ]
     }
   }
 }

@@ -1,4 +1,4 @@
-# Welcome to Matter's documentation!
+# Welcome to Matter's documentation
 
 ```{toctree}
 :maxdepth: 2
@@ -8,22 +8,22 @@
 PROJECT_FLOW
 VSCODE_DEVELOPMENT
 ci-cd/index
+development_controllers/index
 getting_started/index
+ids_and_codes/index
 cluster_and_device_type_dev/index
 guides/index
+platforms/index
 style/index
 examples/index
 product_considerations/index
 testing/index
 tips_and_troubleshooting/index
 tools/index
+zap_and_codegen/index
 BUG_REPORT
-code_generation
-zap_clusters
-spec_clusters
 upgrading
-ERROR_CODES
-
+issue_triage
 ```
 
 ```{include} README.md

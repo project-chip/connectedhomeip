@@ -19,8 +19,8 @@ is defined by a ZAP config file and tests can be added with a
 
 -   [Building Prerequisites](./BUILDING.md#prerequisites)
 -   [Prepare For Building](./BUILDING.md#prepare-for-building)
--   [Code Generate](../code_generation.md)
--   [ZAP Installed](../code_generation.md#installing-zap-and-environment-variables)
+-   [Code Generate](../zap_and_codegen/code_generation.md)
+-   [ZAP Installed](../zap_and_codegen/code_generation.md#installing-zap-and-environment-variables)
 
 ## Building the default Simulated App with Script
 

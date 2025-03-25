@@ -165,6 +165,45 @@ JNI_METHOD(void, disconnect)
     castingPlayer->Disconnect();
 }
 
+JNI_METHOD(jstring, getConnectionStateNative)
+(JNIEnv * env, jobject thiz)
+{
+    char error_str[50];
+    jobject jstr_obj = nullptr;
+
+    if (NULL == env)
+    {
+        LogErrorOnFailure(
+            chip::JniReferences::GetInstance().CharToStringUTF(CharSpan::fromCharString("JNIEnv interface is NULL"), jstr_obj));
+        return static_cast<jstring>(jstr_obj);
+    }
+
+    chip::DeviceLayer::StackLock lock;
+    ChipLogProgress(AppServer, "MatterCastingPlayer-JNI::getConnectionState()");
+
+    CastingPlayer * castingPlayer = support::convertCastingPlayerFromJavaToCpp(thiz);
+    VerifyOrReturnValue(castingPlayer != nullptr, env->NewStringUTF("Cast Player is nullptr"));
+
+    matter::casting::core::ConnectionState state = castingPlayer->GetConnectionState();
+    switch (state)
+    {
+    case matter::casting::core::ConnectionState::CASTING_PLAYER_NOT_CONNECTED:
+        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(CharSpan::fromCharString("NOT_CONNECTED"), jstr_obj));
+        break;
+    case matter::casting::core::ConnectionState::CASTING_PLAYER_CONNECTING:
+        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(CharSpan::fromCharString("CONNECTING"), jstr_obj));
+        break;
+    case matter::casting::core::ConnectionState::CASTING_PLAYER_CONNECTED:
+        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(CharSpan::fromCharString("CONNECTED"), jstr_obj));
+        break;
+    default:
+        snprintf(error_str, sizeof(error_str), "Unsupported Connection State: %d", state);
+        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(CharSpan::fromCharString(error_str), jstr_obj));
+        break;
+    }
+    return static_cast<jstring>(jstr_obj);
+}
+
 JNI_METHOD(jobject, getEndpoints)
 (JNIEnv * env, jobject thiz)
 {

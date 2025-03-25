@@ -36,10 +36,10 @@ tests:
           - Verify that each ModeOptionsStruct entry’s ModeTags field has:
           at least one entry the values of the Value fields that are not larger than 16 bits
           - for each Value field: Is the mode tag value a defined common tag value (Auto(0x0000), Quick(0x0001), Quiet(0x0002), LowNoise(0x0003), LowEnergy(0x0004), Vacation(0x0005), Min(0x0006), Max(0x0007), Night(0x0008), Day(0x0009)) or a defined cluster-derived tag value (No Optimization, Device Optimization, Local Optimization, Grid Optimization) or in the MfgTags (0x8000 to 0xBFFF) range
-          - for at least one Value field: Is the mode tag value a defined common tag value (Auto(0x0000), Quick(0x0001), Quiet(0x0002), LowNoise(0x0003), LowEnergy(0x0004), Vacation(0x0005), Min(0x0006), Max(0x0007), Night(0x0008), Day(0x0009)) or a derived cluster value (RapidCool, RapidFreeze)
-          - Verify that at least one ModeOptionsStruct entry includes either the RapidCool semantic tag or the RapidFreeze semantic tag in the SemanticTags field
+          - for at least one Value field: Is the mode tag value a defined common tag value (Auto(0x0000), Quick(0x0001), Quiet(0x0002), LowNoise(0x0003), LowEnergy(0x0004), Vacation(0x0005), Min(0x0006), Max(0x0007), Night(0x0008), Day(0x0009)) or a derived cluster value (No Optimization, Device Optimization, Local Optimization, Grid Optimization)
+          - Verify that at least one SupportedModes entry includes the No Optimization mode tag or Local Optimization mode tag or Grid Optimization mode tag.
+          - Verify that an entry in the SupportedModes attribute that include one of Device Optimization, Local Optimization, Grid Optimization does not also include No Optimization mode tag.
           - Save the Mode field values as supported_modes_dut on the TH (Chip-tool) and below is the sample log provided for the raspi platform:
-
 
           [1705923890.093456][23589:23591] CHIP:DMG: }
           [1705923890.094137][23589:23591] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_009F Attribute 0x0000_0000 DataVersion: 2217281174

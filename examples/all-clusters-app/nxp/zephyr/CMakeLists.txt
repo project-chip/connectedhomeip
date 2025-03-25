@@ -82,7 +82,6 @@ if(CONFIG_CHIP_OTA_REQUESTOR)
 endif()
 
 chip_configure_data_model(app
-    INCLUDE_SERVER
     ZAP_FILE ${ALL_CLUSTERS_COMMON_DIR}/all-clusters-app.zap
 )
 
@@ -109,6 +108,7 @@ target_sources(app
     ${ALL_CLUSTERS_COMMON_DIR}/src/bridged-actions-stub.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/fan-stub.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/air-quality-instance.cpp
+    ${ALL_CLUSTERS_COMMON_DIR}/src/chime-instance.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/concentration-measurement-instances.cpp
     ${ALL_CLUSTERS_COMMON_DIR}/src/resource-monitoring-delegates.cpp
     ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/icd/source/ICDUtil.cpp

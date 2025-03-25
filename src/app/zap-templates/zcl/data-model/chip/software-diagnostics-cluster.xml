@@ -37,20 +37,34 @@ limitations under the License.
       </feature>
     </features>
 
-    <attribute side="server" code="0x00" define="THREAD_METRICS" type="array" entryType="ThreadMetricsStruct" length="254" writable="false" optional="true">ThreadMetrics</attribute>
-    <attribute side="server" code="0x01" define="CURRENT_HEAP_FREE" type="int64u" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" optional="true">CurrentHeapFree</attribute>
-    <attribute side="server" code="0x02" define="CURRENT_HEAP_USED" type="int64u" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" optional="true">CurrentHeapUsed</attribute>
-    <attribute side="server" code="0x03" define="CURRENT_HEAP_HIGH_WATERMARK" type="int64u" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" optional="true">CurrentHeapHighWatermark</attribute>
+    <attribute side="server" code="0x00" name="ThreadMetrics" define="THREAD_METRICS" type="array" entryType="ThreadMetricsStruct" length="254" optional="true">
+      <optionalConform/>
+    </attribute>
+    <attribute side="server" code="0x01" name="CurrentHeapFree" define="CURRENT_HEAP_FREE" type="int64u" optional="true">
+      <optionalConform/>
+    </attribute>
+    <attribute side="server" code="0x02" name="CurrentHeapUsed" define="CURRENT_HEAP_USED" type="int64u" optional="true">
+      <optionalConform/>
+    </attribute>
+    <attribute side="server" code="0x03" name="CurrentHeapHighWatermark" define="CURRENT_HEAP_HIGH_WATERMARK" type="int64u" optional="true">
+      <mandatoryConform>
+        <feature name="WTRMRK"/>
+      </mandatoryConform>
+    </attribute>
     <command source="client" code="0x00" name="ResetWatermarks" optional="true" cli="chip software_diagnostics resetwatermarks">
       <description>Reception of this command SHALL reset the values: The StackFreeMinimum field of the ThreadMetrics attribute, CurrentHeapHighWaterMark attribute.</description>
       <access op="invoke" privilege="manage"/>
+      <mandatoryConform>
+        <feature name="WTRMRK"/>
+      </mandatoryConform>
     </command>
     <event side="server" code="0x00" name="SoftwareFault" priority="info" optional="true">
       <description>Indicate the last software fault that has taken place on the Node.</description>
       <field id="0" name="ID" type="int64u"/>
       <field id="1" name="Name" type="char_string" length="8" optional="true"/>
       <field id="2" name="FaultRecording" type="octet_string" length="1024" optional="true"/>
-    </event>    
+      <optionalConform/>
+    </event>
   </cluster>
 
 </configurator>

@@ -39,12 +39,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     (void) attributeId;
     ChipLogProgress(Zcl, "Cluster callback: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
 
-    if (clusterId == OnOffSwitchConfiguration::Id)
-    {
-        ChipLogProgress(Zcl, "OnOffSwitchConfiguration attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
-                        ChipLogValueMEI(attributeId), type, *value, size);
-    }
-    else if (clusterId == Identify::Id)
+    if (clusterId == Identify::Id)
     {
         ChipLogProgress(Zcl, "Identify attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
                         ChipLogValueMEI(attributeId), type, *value, size);

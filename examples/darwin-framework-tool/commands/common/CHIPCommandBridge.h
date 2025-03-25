@@ -30,6 +30,7 @@
 inline constexpr char kIdentityAlpha[] = "alpha";
 inline constexpr char kIdentityBeta[] = "beta";
 inline constexpr char kIdentityGamma[] = "gamma";
+inline constexpr char kControllerIdPrefix[] = "8DCADB14-AF1F-45D0-B084-00000000000";
 
 class CHIPCommandBridge : public Command {
 public:
@@ -41,6 +42,8 @@ public:
             "Sets the commissioner node ID of the given "
             "commissioner-name. Interactive mode will only set a single commissioner on the inital command. "
             "The commissioner node ID will be persisted until a different one is specified.");
+        AddArgument("commissioner-shared-storage", 0, 1, &mCommissionerSharedStorage,
+            "Use a shared storage instance instead of individual storage for each commissioner. Default is false.");
         AddArgument("paa-trust-store-path", &mPaaTrustStorePath,
             "Path to directory holding PAA certificate information.  Can be absolute or relative to the current working "
             "directory.");
@@ -49,6 +52,7 @@ public:
         AddArgument("commissioner-vendor-id", 0, UINT16_MAX, &mCommissionerVendorId,
             "The vendor id to use for darwin-framework-tool. If not provided, chip::VendorId::TestVendor1 (65521, 0xFFF1) will be "
             "used.");
+        AddArgument("use-xpc", &mUseXPC, "Use a controller that will connect to an XPC endpoint instead of talking to devices directly. If a string argument is provided, it must identify a Mach service name that can be used to connect to a remote endpoint. If no argument is provided, a local endpoint will be used.");
     }
 
     /////////// Command Interface /////////
@@ -66,6 +70,8 @@ public:
     }
 
     static OTAProviderDelegate * mOTADelegate;
+
+    static NSNumber * GetCommissionerFabricId(const char * identity);
 
 protected:
     // Will be called in a setting in which it's safe to touch the CHIP
@@ -87,12 +93,17 @@ protected:
 
     // This method returns the commissioner instance to be used for running the command.
     MTRDeviceController * CurrentCommissioner();
+    NSNumber * CurrentCommissionerFabricId();
 
     MTRDeviceController * GetCommissioner(const char * identity);
 
     // Returns the MTRBaseDevice for the specified node ID.
     // Will utilize an existing PASE connection if the device is being commissioned.
     MTRBaseDevice * BaseDeviceWithNodeId(chip::NodeId nodeId);
+
+    // Returns the MTRDevice for the specified node ID.
+    // Will utilize an existing PASE connection if the device is being commissioned.
+    MTRDevice * DeviceWithNodeId(chip::NodeId nodeId);
 
     // Will log the given string and given error (as progress if success, error
     // if failure).
@@ -118,6 +129,10 @@ protected:
 
     void RestartCommissioners();
 
+    void SuspendOrResumeCommissioners();
+
+    MTRDevice * GetLastUsedDevice();
+
 private:
     CHIP_ERROR InitializeCommissioner(
         std::string key, chip::FabricId fabricId, const chip::Credentials::AttestationTrustStore * trustStore);
@@ -130,6 +145,8 @@ private:
     void StopWaiting();
 
     CHIP_ERROR MaybeSetUpStack();
+    CHIP_ERROR SetUpStackWithSharedStorage(NSArray<NSData *> * productAttestationAuthorityCertificates);
+    CHIP_ERROR SetUpStackWithPerControllerStorage(NSArray<NSData *> * productAttestationAuthorityCertificates);
     void MaybeTearDownStack();
 
     CHIP_ERROR GetPAACertsFromFolder(NSArray<NSData *> * __autoreleasing * paaCertsResult);
@@ -140,6 +157,9 @@ private:
     // The current controller; the one the current command should be using.
     MTRDeviceController * mCurrentController;
 
+    static bool sUseSharedStorage;
+    chip::Optional<bool> mCommissionerSharedStorage;
+
     std::condition_variable cvWaitingForResponse;
     std::mutex cvWaitingForResponseMutex;
     chip::Optional<char *> mCommissionerName;
@@ -148,4 +168,6 @@ private:
     static dispatch_queue_t mOTAProviderCallbackQueue;
     chip::Optional<char *> mPaaTrustStorePath;
     chip::Optional<chip::VendorId> mCommissionerVendorId;
+    std::string mCurrentIdentity;
+    chip::Optional<chip::app::DataModel::Nullable<char *>> mUseXPC;
 };

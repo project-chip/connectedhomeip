@@ -202,7 +202,7 @@ tests:
                 value: 1000
               - name: "SceneName"
                 value: "Scene1"
-              - name: "ExtensionFieldSets"
+              - name: "ExtensionFieldSetStructs"
                 value:
                     [
                         {
@@ -252,6 +252,11 @@ tests:
                                         ValueUnsigned8: 0x64,
                                     },
                                 ],
+                        },
+                        {
+                            ClusterID: 0x0050,
+                            AttributeValueList:
+                                [{ AttributeID: 0x0003, ValueUnsigned8: 0x01 }],
                         },
                     ]
       response:
@@ -298,7 +303,7 @@ tests:
                 value: 0x01
               - name: "TransitionTime"
                 value: 1000
-              - name: "ExtensionFieldSets"
+              - name: "ExtensionFieldSetStructs"
                 value:
                     [
                         {
@@ -348,6 +353,11 @@ tests:
                                         ValueUnsigned8: 0x64,
                                     },
                                 ],
+                        },
+                        {
+                            ClusterID: 0x0050,
+                            AttributeValueList:
+                                [{ AttributeID: 0x0003, ValueUnsigned8: 0x01 }],
                         },
                     ]
 
@@ -404,7 +414,7 @@ tests:
                 value: 2000
               - name: "SceneName"
                 value: "Scene1"
-              - name: "ExtensionFieldSets"
+              - name: "ExtensionFieldSetStructs"
                 value:
                     [
                         {
@@ -437,7 +447,7 @@ tests:
                 value: 0x01
               - name: "TransitionTime"
                 value: 2000
-              - name: "ExtensionFieldSets"
+              - name: "ExtensionFieldSetStructs"
                 value:
                     [
                         {

@@ -29,6 +29,8 @@ lwip_platform = "external"
 chip_inet_config_enable_tcp_endpoint = false
 chip_inet_config_enable_udp_endpoint = true
 
+chip_config_memory_management = "platform"
+
 custom_toolchain = "//third_party/connectedhomeip/config/esp32/toolchain:esp32"
 
 # Avoid constraint forcing for ESP32:

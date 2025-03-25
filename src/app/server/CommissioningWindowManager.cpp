@@ -111,6 +111,8 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
 
 void CommissioningWindowManager::Shutdown()
 {
+    VerifyOrReturn(nullptr != mServer);
+
     StopAdvertisement(/* aShuttingDown = */ true);
 
     ResetState();
@@ -300,6 +302,20 @@ CHIP_ERROR CommissioningWindowManager::AdvertiseAndListenForPASE()
     ReturnErrorOnFailure(StartAdvertisement());
 
     return CHIP_NO_ERROR;
+}
+
+System::Clock::Seconds32 CommissioningWindowManager::MaxCommissioningTimeout() const
+{
+#if CHIP_DEVICE_CONFIG_EXT_ADVERTISING
+    /* Allow for extended announcement only if the device is uncomissioned. */
+    if (mServer->GetFabricTable().FabricCount() == 0)
+    {
+        // Specification section 2.3.1 - Extended Announcement Duration up to 48h
+        return System::Clock::Seconds32(60 * 60 * 48);
+    }
+#endif
+    // Specification section 5.4.2.3. Announcement Duration says 15 minutes.
+    return System::Clock::Seconds32(15 * 60);
 }
 
 CHIP_ERROR CommissioningWindowManager::OpenBasicCommissioningWindow(Seconds32 commissioningTimeout,

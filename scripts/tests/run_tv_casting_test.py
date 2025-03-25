@@ -17,7 +17,6 @@
 import glob
 import logging
 import os
-import signal
 import sys
 import tempfile
 import time
@@ -32,7 +31,7 @@ from linux.tv_casting_test_sequences import START_APP, STOP_APP
 """
 This script can be used to validate the casting experience between the Linux tv-casting-app and the Linux tv-app.
 
-It runs a series of test sequences that check for expected output lines from the tv-casting-app and the tv-app in 
+It runs a series of test sequences that check for expected output lines from the tv-casting-app and the tv-app in
 a deterministic order. If these lines are not found, it indicates an issue with the casting experience.
 """
 
@@ -92,24 +91,14 @@ def stop_app(test_sequence_name: str, app_name: str, app: ProcessOutputCapture):
             None,
         )
 
-    if app_exit_code >= 0:
+    if app_exit_code != 0:
         raise TestStepException(
             f"{test_sequence_name}: {app_name} exited with unexpected exit code {app_exit_code}.",
             test_sequence_name,
             None,
         )
 
-    signal_number = -app_exit_code
-    if signal_number != signal.SIGTERM.value:
-        raise TestStepException(
-            f"{test_sequence_name}: {app_name} stopped by signal {signal_number} instead of {signal.SIGTERM.value} (SIGTERM).",
-            test_sequence_name,
-            None,
-        )
-
-    logging.info(
-        f"{test_sequence_name}: {app_name} stopped by {signal_number} (SIGTERM) signal."
-    )
+    logging.info(f"{test_sequence_name}: {app_name} stopped.")
 
 
 def parse_output_msg_in_subprocess(

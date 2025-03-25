@@ -95,7 +95,14 @@ void ApplicationShutdown()
     }
 }
 
-extern "C" int main(int argc, char * argv[])
+#ifdef __NuttX__
+// NuttX requires the main function to be defined with C-linkage. However, marking
+// the main as extern "C" is not strictly conformant with the C++ standard. Since
+// clang >= 20 such code triggers -Wmain warning.
+extern "C" {
+#endif
+
+int main(int argc, char * argv[])
 {
     if (ChipLinuxAppInit(argc, argv) != 0)
     {
@@ -124,3 +131,7 @@ extern "C" int main(int argc, char * argv[])
 
     return 0;
 }
+
+#ifdef __NuttX__
+}
+#endif

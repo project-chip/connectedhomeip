@@ -155,6 +155,7 @@ class Converter():
     def __init__(self, specifications):
         self.__specs = specifications
         self.__converters = [
+            DarwinAnyFormatConverter(),
             StructFieldsNameConverter(),
             FloatConverter(),
             OctetStringConverter()
@@ -249,6 +250,43 @@ class BaseConverter:
         return value
 
     def maybe_convert(self, typename: str, value):
+        return value
+
+
+class DarwinAnyFormatConverter(BaseConverter):
+    """
+    Darwin payloads format for *ById commands is different from the base
+    format used for other commands.
+    """
+
+    def run(self, specs, value, cluster_name: str, typename: str, array: bool):
+        if isinstance(value, list) and len(value) >= 1 and isinstance(value[0], dict) and value[0].get('data') is not None:
+            value = [self.__convert(item_value) for item_value in value]
+        return value
+
+    def __convert(self, value):
+        if not isinstance(value, dict):
+            return value
+
+        data = value.get('data')
+        if not isinstance(data, dict):
+            return value
+
+        value = data.get('value')
+        if not isinstance(value, list):
+            return value
+
+        value_type = data.get('type')
+
+        if value_type == 'Structure':
+            struct = {}
+            for field in value:
+                context_tag = field.get('contextTag')
+                struct[str(context_tag)] = self.__convert(field)
+            value = struct
+        elif value_type == 'Array':
+            value = [self.__convert(item_value) for item_value in value]
+
         return value
 
 
@@ -348,7 +386,14 @@ class StructFieldsNameConverter():
                 del value[key_name]
 
         elif isinstance(value, list) and array:
-            value = [self.run(specs, v, cluster_name, typename, False)
+            # Instead of using `False` for the last parameter (array), `isinstance(v, list)` is used.
+            # While the data model specification does not include lists of lists, the format returned
+            # by the Matter.framework for *ById APIs may contain them.
+            # For example, the command:
+            # darwin-framework-tool any read-by-id 29 0 0x12344321 65535
+            # returns value such as:
+            # [[{'DeviceType': 17, 'Revision': 1}, {'DeviceType': 22, 'Revision': 1}], ...]
+            value = [self.run(specs, v, cluster_name, typename, isinstance(v, list))
                      for v in value]
 
         return value

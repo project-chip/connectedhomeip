@@ -18,12 +18,21 @@
 # for details about the block below.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${CHIP_LOCK_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values --endpoint 1 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# test-runner-runs:
+#   run1:
+#     app: ${CHIP_LOCK_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --endpoint 1
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
@@ -34,7 +43,7 @@ import chip.clusters as Clusters
 from chip.clusters.Attribute import EventPriority
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
@@ -53,6 +62,7 @@ class TC_DRLK_2_13(MatterBaseTest):
 
     def steps_TC_DRLK_2_13(self) -> list[TestStep]:
         steps = [
+            TestStep("0", "Commissoning with DUT is done", is_commissioning=True),
             TestStep("1a", "TH reads OperationalCredentials cluster's CurrentFabricIndex and save the attribute",
                      "TH Reads Attribute Successfully"),
             TestStep("1b", "TH sends ClearUser Command to DUT with the UserIndex as 0xFFFE to clear all the users",
@@ -145,11 +155,11 @@ class TC_DRLK_2_13(MatterBaseTest):
                      "Verify that the DUT responds with SetCredentialResponse command and Status success. This step will fill the last slot with credentialType as AliroEvictableEndpointKey"),
             TestStep("31",
                      "TH sends SetCredential Command to DUT with CredentialType as AliroNonEvictableEndpointKey and number of credentials for 'alirouser' exceeds the max_aliro_keys_supported",
-                     "Verify that the DUT responds with SetCredentialResponse command and Status success."),
-            TestStep("32", "TH sends GetCredentialStatus Command with Credential as 7 startcredentialindex+1",
-                     "DUT responds with GetCredentialStatusResponse Command and CredentialExists is false"),
-            TestStep("33", "TH sends GetCredentialStatus Command with Credential as 8 startcredentialindex+1",
-                     "Verify DUT responds with GetCredentialStatusResponse having CredentialExists is true and UserIndex as 1"),
+                     "Verify that the DUT responds with SetCredentialResponse command and Status ResourceExhausted"),
+            TestStep("32", "TH sends GetCredentialStatus Command with Credential as 7 1",
+                     "DUT responds with GetCredentialStatusResponse Command and CredentialExists is True"),
+            TestStep("33", "TH sends GetCredentialStatus Command with Credential as 8 max_aliro_keys_supported",
+                     "Verify DUT responds with GetCredentialStatusResponse having CredentialExists is false and UserIndex as 1"),
             TestStep("34", "TH sends ClearCredential Command to DUT to clear the ALIRO CredentialType",
                      "Verify that the DUT sends SUCCESS response"),
             TestStep("35", "TH sends ClearUser Command to DUT with the UserIndex as 1",
@@ -249,7 +259,7 @@ class TC_DRLK_2_13(MatterBaseTest):
             self.step(step)
         try:
             flags = ["DRLK.S.F0d", "DRLK.S.C24.Rsp", "DRLK.S.C25.Tx"]
-            if not self.pics_guard(all([self.check_pics(p) for p in flags])):
+            if self.pics_guard(all([self.check_pics(p) for p in flags])):
                 credentials_struct = cluster.Structs.CredentialStruct(credentialIndex=credentialIndex,
                                                                       credentialType=credentialType)
                 response = await self.send_single_cmd(endpoint=self.app_cluster_endpoint, timedRequestTimeoutMs=1000,
@@ -268,7 +278,8 @@ class TC_DRLK_2_13(MatterBaseTest):
             asserts.assert_equal(e.status, Status.Success, f"Unexpected error returned: {e}")
 
     async def set_credential_cmd(self, credential_enum: Clusters.DoorLock.Enums.CredentialTypeEnum, credentialIndex,
-                                 operationType, userIndex, credentialData, userStatus, userType, step=None):
+                                 operationType, userIndex, credentialData, userStatus, userType, step=None,
+                                 expected_status: Status = Status.Success):
         if step:
             self.step(step)
         credentials = cluster.Structs.CredentialStruct(
@@ -287,7 +298,7 @@ class TC_DRLK_2_13(MatterBaseTest):
                     timedRequestTimeoutMs=1000)
                 asserts.assert_true(type_matches(response, Clusters.Objects.DoorLock.Commands.SetCredentialResponse),
                                     "Unexpected return type for SetCredential")
-                asserts.assert_true(response.status == Status.Success,
+                asserts.assert_true(response.status == expected_status,
                                     "Error sending SetCredential command, status={}".format(str(response.status)))
             except InteractionModelError as e:
                 logging.exception(e)
@@ -357,7 +368,7 @@ class TC_DRLK_2_13(MatterBaseTest):
         self.groupIdentifier = bytes.fromhex("89d085fc302ca53e279bfcdecdf3c4ad")
         self.groupResolvingKey = bytes.fromhex("89d0859bfcdecdf3c4adfc302ca53e27")
         self.common_cluster_endpoint = 0
-        self.app_cluster_endpoint = self.matter_test_config.endpoint
+        self.app_cluster_endpoint = self.get_endpoint(default=1)
         self.alirouser = "AliroUser"
         self.alirocredentialissuerkey = bytes.fromhex(
             "047a4c882d753924cdf3779a3c84fec2debaa6f0b3084450878acc7ddcce7856ae57b1ebbe2561015103dd7474c2a183675378ec55f1e465ac3436bf3dd5ca54d4")
@@ -370,6 +381,7 @@ class TC_DRLK_2_13(MatterBaseTest):
         self.alirononevictableendpointkey1 = bytes.fromhex(
             "047a4c552d753924cdf3779a3c84fec2debaa6f0b3084450878acc7ddcce7856ae57b1ebbe2561015103dd7474c2a183675378ec55f1e465ac3436bf3dd5ca54d4")
         #  step 1 TH reads DUT Endpoint 0 OperationalCredentials cluster CurrentFabricIndex attribute
+        self.step("0")
         self.step("1a")
         self.fabric_idx1 = await self.read_attributes_from_dut(endpoint=self.common_cluster_endpoint,
                                                                cluster=Clusters.Objects.OperationalCredentials,
@@ -569,6 +581,8 @@ class TC_DRLK_2_13(MatterBaseTest):
                 endpoint=self.app_cluster_endpoint,
                 cluster=Clusters.Objects.DoorLock,
                 attribute=Clusters.DoorLock.Attributes.NumberOfCredentialsSupportedPerUser)
+        logging.info(f"After reading  attribute NumberOfCredentialsSupportedPerUser we get"
+                     f" value {self.numberofcredentialsupportedperuser} ")
         self.step("28b")
         await self.clear_all_aliro_credential()
         await self.send_clear_user_cmd(user_index=1)
@@ -600,7 +614,7 @@ class TC_DRLK_2_13(MatterBaseTest):
                 start_credential_index = 1
                 credentials_data = self.alirononevictableendpointkey
                 while 1:
-                    if start_credential_index <= (self.max_aliro_keys_supported - 2):
+                    if start_credential_index <= (self.max_aliro_keys_supported - 1):
                         if start_credential_index != 1:
                             credentials_data = self.generate_unique_octbytes()
 
@@ -614,37 +628,36 @@ class TC_DRLK_2_13(MatterBaseTest):
                         logging.info(f"The updated value of start_credential_index is {start_credential_index}")
                     else:
                         break
-
-                # step 30
-                logging.info(f"the value of start_credential_index is {start_credential_index} for step 30")
                 self.step("30")
                 await self.set_credential_cmd(credentialData=self.alirononevictableendpointkey,
                                               operationType=cluster.Enums.DataOperationTypeEnum.kAdd,
                                               credential_enum=cluster.Enums.CredentialTypeEnum.kAliroEvictableEndpointKey,
-                                              credentialIndex=start_credential_index, userIndex=1, userStatus=NullValue,
+                                              credentialIndex=1, userIndex=1, userStatus=NullValue,
                                               userType=NullValue)
+
                 # step 31
                 self.step("31")
                 await self.set_credential_cmd(credentialData=self.alirononevictableendpointkey1,
                                               operationType=cluster.Enums.DataOperationTypeEnum.kAdd,
                                               credential_enum=cluster.Enums.CredentialTypeEnum.kAliroNonEvictableEndpointKey,
-                                              credentialIndex=start_credential_index, userIndex=1, userStatus=NullValue,
-                                              userType=NullValue)
+                                              credentialIndex=self.max_aliro_keys_supported, userIndex=1, userStatus=NullValue,
+                                              userType=NullValue,
+                                              expected_status=Status.ResourceExhausted)
                 # step 32
-                dut_get_cred_response = await self.get_credentials_status(step="32",
-                                                                          credentialIndex=start_credential_index,
-                                                                          credentialType=cluster.Enums.CredentialTypeEnum.kAliroEvictableEndpointKey,
-                                                                          credential_exists=False, userIndex=NullValue)
-                asserts.assert_equal(dut_get_cred_response.credentialExists, NullValue,
-                                     f"Error when comparing for {dut_get_cred_response} of null")
+                await self.get_credentials_status(step="32", credentialIndex=1,
+                                                  credentialType=cluster.Enums.CredentialTypeEnum.kAliroEvictableEndpointKey,
+                                                  credential_exists=True, userIndex=1)
 
                 # step 33
-                await self.get_credentials_status(step="33", credentialIndex=start_credential_index,
+                await self.get_credentials_status(step="33", credentialIndex=self.max_aliro_keys_supported,
                                                   credentialType=cluster.Enums.CredentialTypeEnum.kAliroNonEvictableEndpointKey,
-                                                  credential_exists=True, userIndex=1)
+                                                  credential_exists=False, userIndex=NullValue)
                 # step 34
                 self.step("34")
-                await self.clear_all_aliro_credential()
+                if self.pics_guard(self.check_pics("DRLK.S.C26.Rsp")):
+                    await self.send_single_cmd(cmd=Clusters.DoorLock.Commands.ClearCredential(credential=NullValue),
+                                               endpoint=self.app_cluster_endpoint,
+                                               timedRequestTimeoutMs=1000)
 
                 # step 35
                 self.step("35")

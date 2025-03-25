@@ -208,7 +208,6 @@ limitations under the License.
 
   <struct name="WeeklyScheduleTransitionStruct">
     <cluster code="0x0201"/>
-    <!-- See https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/6217 for HeatSetpoint and CoolSetpoint.  They might end up being nullable. -->
     <item fieldId="0" name="TransitionTime" type="int16u" max="1439"/>
     <item fieldId="1" name="HeatSetpoint" type="temperature" isNullable="true"/>
     <item fieldId="2" name="CoolSetpoint" type="temperature" isNullable="true"/>
@@ -312,146 +311,308 @@ limitations under the License.
       </feature>
     </features>
     <!-- Attributes -->
-    <attribute side="server" code="0x0000" define="LOCAL_TEMPERATURE" type="temperature" reportable="true" isNullable="true">LocalTemperature</attribute>
-    <attribute side="server" code="0x0001" define="OUTDOOR_TEMPERATURE" type="temperature" optional="true" isNullable="true">OutdoorTemperature</attribute>
-    <attribute side="server" code="0x0002" define="THERMOSTAT_OCCUPANCY" type="OccupancyBitmap" default="1" optional="true" min="0x00" max="0x01">Occupancy</attribute>
-    <attribute side="server" code="0x0003" define="ABS_MIN_HEAT_SETPOINT_LIMIT" type="temperature" default="700" optional="true">AbsMinHeatSetpointLimit</attribute>
-    <attribute side="server" code="0x0004" define="ABS_MAX_HEAT_SETPOINT_LIMIT" type="temperature" default="3000" optional="true">AbsMaxHeatSetpointLimit</attribute>
-    <attribute side="server" code="0x0005" define="ABS_MIN_COOL_SETPOINT_LIMIT" type="temperature" default="1600" optional="true">AbsMinCoolSetpointLimit</attribute>
-    <attribute side="server" code="0x0006" define="ABS_MAX_COOL_SETPOINT_LIMIT" type="temperature" default="3200" optional="true">AbsMaxCoolSetpointLimit</attribute>
-    <attribute side="server" code="0x0007" define="PI_COOLING_DEMAND" type="int8u" min="0" max="100" reportable="true" optional="true">PICoolingDemand</attribute>
-    <attribute side="server" code="0x0008" define="PI_HEATING_DEMAND" type="int8u" min="0" max="100" reportable="true" optional="true">PIHeatingDemand</attribute>
-    <attribute side="server" code="0x0009" define="HVAC_SYSTEM_TYPE_CONFIGURATION" type="HVACSystemTypeBitmap" min="0x00" max="0x3F" writable="true" optional="true" default="0x00">
-      <description>HVACSystemTypeConfiguration</description>
-      <access op="write" privilege="manage"/>
+    <attribute side="server" code="0x0000" name="LocalTemperature" define="LOCAL_TEMPERATURE" type="temperature" reportable="true" isNullable="true">
+      <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x0010" define="LOCAL_TEMPERATURE_CALIBRATION" type="int8s" min="-127" max="127" writable="true" default="0x00" optional="true">
-      <description>LocalTemperatureCalibration</description>
-      <access op="write" privilege="manage"/>
+    <attribute side="server" code="0x0001" name="OutdoorTemperature" define="OUTDOOR_TEMPERATURE" type="temperature" optional="true" isNullable="true">
+      <optionalConform/>
     </attribute>
-    <attribute side="server" code="0x0011" define="OCCUPIED_COOLING_SETPOINT" type="temperature" min="-27315" max="0x7FFF" writable="true" default="2600" optional="true">OccupiedCoolingSetpoint</attribute>
-    <attribute side="server" code="0x0012" define="OCCUPIED_HEATING_SETPOINT" type="temperature" min="-27315" max="0x7FFF" writable="true" default="2000" optional="true">OccupiedHeatingSetpoint</attribute>
-    <attribute side="server" code="0x0013" define="UNOCCUPIED_COOLING_SETPOINT" type="temperature" min="-27315" max="0x7FFF" writable="true" default="2600" optional="true">UnoccupiedCoolingSetpoint</attribute>
-    <attribute side="server" code="0x0014" define="UNOCCUPIED_HEATING_SETPOINT" type="temperature" min="-27315" max="0x7FFF" writable="true" default="2000" optional="true">UnoccupiedHeatingSetpoint</attribute>
-    <attribute side="server" code="0x0015" define="MIN_HEAT_SETPOINT_LIMIT" type="temperature" min="-27315" max="0x7FFF" writable="true" default="700" optional="true">
-      <description>MinHeatSetpointLimit</description>
-      <access op="write" privilege="manage"/>
+    <attribute side="server" code="0x0002" name="Occupancy" define="THERMOSTAT_OCCUPANCY" type="OccupancyBitmap" default="1" optional="true" min="0x00" max="0x01">
+      <mandatoryConform>
+        <feature name="OCC"/>
+      </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x0016" define="MAX_HEAT_SETPOINT_LIMIT" type="temperature" min="-27315" max="0x7FFF" writable="true" default="3000" optional="true">
-      <description>MaxHeatSetpointLimit</description>
-      <access op="write" privilege="manage"/>
+    <attribute side="server" code="0x0003" name="AbsMinHeatSetpointLimit" define="ABS_MIN_HEAT_SETPOINT_LIMIT" type="temperature" default="700" optional="true">
+      <optionalConform>
+        <feature name="HEAT"/>
+      </optionalConform>
     </attribute>
-    <attribute side="server" code="0x0017" define="MIN_COOL_SETPOINT_LIMIT" type="temperature" min="-27315" max="0x7FFF" writable="true" default="1600" optional="true">
-      <description>MinCoolSetpointLimit</description>
-      <access op="write" privilege="manage"/>
+    <attribute side="server" code="0x0004" name="AbsMaxHeatSetpointLimit" define="ABS_MAX_HEAT_SETPOINT_LIMIT" type="temperature" default="3000" optional="true">
+      <optionalConform>
+        <feature name="HEAT"/>
+      </optionalConform>
     </attribute>
-    <attribute side="server" code="0x0018" define="MAX_COOL_SETPOINT_LIMIT" type="temperature" min="-27315" max="0x7FFF" writable="true" default="3200" optional="true">
-      <description>MaxCoolSetpointLimit</description>
-      <access op="write" privilege="manage"/>
+    <attribute side="server" code="0x0005" name="AbsMinCoolSetpointLimit" define="ABS_MIN_COOL_SETPOINT_LIMIT" type="temperature" default="1600" optional="true">
+      <optionalConform>
+        <feature name="COOL"/>
+      </optionalConform>
     </attribute>
-    <attribute side="server" code="0x0019" define="MIN_SETPOINT_DEAD_BAND" type="int8s" min="0" max="127" writable="true" default="25" optional="true">
-      <description>MinSetpointDeadBand</description>
-      <access op="write" privilege="manage"/>
+    <attribute side="server" code="0x0006" name="AbsMaxCoolSetpointLimit" define="ABS_MAX_COOL_SETPOINT_LIMIT" type="temperature" default="3200" optional="true">
+      <optionalConform>
+        <feature name="COOL"/>
+      </optionalConform>
     </attribute>
-    <attribute side="server" code="0x001A" define="REMOTE_SENSING" type="RemoteSensingBitmap" min="0x0" max="0x7" writable="true" default="0" optional="true">
-      <description>RemoteSensing</description>
-      <access op="write" privilege="manage"/>
+    <attribute side="server" code="0x0007" name="PICoolingDemand" define="PI_COOLING_DEMAND" type="int8u" min="0" max="100" reportable="true" optional="true">
+      <optionalConform>
+        <feature name="COOL"/>
+      </optionalConform>
     </attribute>
-    <attribute side="server" code="0x001B" define="CONTROL_SEQUENCE_OF_OPERATION" type="ControlSequenceOfOperationEnum" min="0x0" max="0x5" writable="true" default="4">
-      <description>ControlSequenceOfOperation</description>
-      <access op="write" privilege="manage"/>
+    <attribute side="server" code="0x0008" name="PIHeatingDemand" define="PI_HEATING_DEMAND" type="int8u" min="0" max="100" reportable="true" optional="true">
+      <optionalConform>
+        <feature name="HEAT"/>
+      </optionalConform>
     </attribute>
-    <attribute side="server" code="0x001C" define="SYSTEM_MODE" type="SystemModeEnum" min="0x0" max="0x9" writable="true" default="1">
-      <description>SystemMode</description>
+    <attribute side="server" code="0x0009" name="HVACSystemTypeConfiguration" define="HVAC_SYSTEM_TYPE_CONFIGURATION" type="HVACSystemTypeBitmap" min="0x00" max="0x3F" writable="true" optional="true" default="0x00">
       <access op="write" privilege="manage"/>
+      <deprecateConform/>
     </attribute>
-    <attribute side="server" code="0x001E" define="THERMOSTAT_RUNNING_MODE" type="ThermostatRunningModeEnum" min="0x0" max="0x4" optional="true" default="0">ThermostatRunningMode</attribute>
-    <attribute side="server" code="0x0020" define="START_OF_WEEK" type="StartOfWeekEnum" min="0x0" max="0x6" optional="true">StartOfWeek</attribute>
-    <attribute side="server" code="0x0021" define="NUMBER_OF_WEEKLY_TRANSITIONS" type="int8u" optional="true" default="0">NumberOfWeeklyTransitions</attribute>
-    <attribute side="server" code="0x0022" define="NUMBER_OF_DAILY_TRANSITIONS" type="int8u" optional="true" default="0">NumberOfDailyTransitions</attribute>
-    <attribute side="server" code="0x0023" define="TEMPERATURE_SETPOINT_HOLD" type="TemperatureSetpointHoldEnum" min="0x0" max="0x1" writable="true" default="0" optional="true">
-      <description>TemperatureSetpointHold</description>
+    <attribute side="server" code="0x0010" name="LocalTemperatureCalibration" define="LOCAL_TEMPERATURE_CALIBRATION" type="int8s" min="-127" max="127" writable="true" default="0x00" optional="true">
       <access op="write" privilege="manage"/>
+      <optionalConform>
+        <notTerm>
+          <feature name="LTNE"/>
+        </notTerm>
+      </optionalConform>
     </attribute>
-    <attribute side="server" code="0x0024" define="TEMPERATURE_SETPOINT_HOLD_DURATION" type="int16u" max="1440" writable="true" optional="true" isNullable="true">
-      <description>TemperatureSetpointHoldDuration</description>
+    <attribute side="server" code="0x0011" name="OccupiedCoolingSetpoint" define="OCCUPIED_COOLING_SETPOINT" type="temperature" min="-27315" max="0x7FFF" writable="true" default="2600" optional="true">
+      <mandatoryConform>
+        <feature name="COOL"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0012" name="OccupiedHeatingSetpoint" define="OCCUPIED_HEATING_SETPOINT" type="temperature" min="-27315" max="0x7FFF" writable="true" default="2000" optional="true">
+      <mandatoryConform>
+        <feature name="HEAT"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0013" name="UnoccupiedCoolingSetpoint" define="UNOCCUPIED_COOLING_SETPOINT" type="temperature" min="-27315" max="0x7FFF" writable="true" default="2600" optional="true">
+      <mandatoryConform>
+        <andTerm>
+          <feature name="COOL"/>
+          <feature name="OCC"/>
+        </andTerm>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0014" name="UnoccupiedHeatingSetpoint" define="UNOCCUPIED_HEATING_SETPOINT" type="temperature" min="-27315" max="0x7FFF" writable="true" default="2000" optional="true">
+      <mandatoryConform>
+        <andTerm>
+          <feature name="HEAT"/>
+          <feature name="OCC"/>
+        </andTerm>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0015" name="MinHeatSetpointLimit" define="MIN_HEAT_SETPOINT_LIMIT" type="temperature" min="-27315" max="0x7FFF" writable="true" default="700" optional="true">
       <access op="write" privilege="manage"/>
+      <optionalConform>
+        <feature name="HEAT"/>
+      </optionalConform>
     </attribute>
-    <attribute side="server" code="0x0025" define="THERMOSTAT_PROGRAMMING_OPERATION_MODE" type="ProgrammingOperationModeBitmap" writable="true" default="0" optional="true" reportable="true" min="0x0" max="0x7">
-      <description>ThermostatProgrammingOperationMode</description>
+    <attribute side="server" code="0x0016" name="MaxHeatSetpointLimit" define="MAX_HEAT_SETPOINT_LIMIT" type="temperature" min="-27315" max="0x7FFF" writable="true" default="3000" optional="true">
       <access op="write" privilege="manage"/>
+      <optionalConform>
+        <feature name="HEAT"/>
+      </optionalConform>
     </attribute>
-    <attribute side="server" code="0x0029" define="THERMOSTAT_RUNNING_STATE" type="RelayStateBitmap" optional="true" min="0x0" max="0x7F">ThermostatRunningState</attribute>
-    <attribute side="server" code="0x0030" define="SETPOINT_CHANGE_SOURCE" type="SetpointChangeSourceEnum" optional="true" default="0" min="0x0" max="0x2">SetpointChangeSource</attribute>
-    <attribute side="server" code="0x0031" define="SETPOINT_CHANGE_AMOUNT" type="int16s" optional="true" isNullable="true">SetpointChangeAmount</attribute>
-    <attribute side="server" code="0x0032" define="SETPOINT_CHANGE_SOURCE_TIMESTAMP" type="epoch_s" optional="true" default="0">SetpointChangeSourceTimestamp</attribute>
-    <attribute side="server" code="0x0034" define="OCCUPIED_SETBACK" type="int8u" writable="true" optional="true" isNullable="true" max="254">
-      <description>OccupiedSetback</description>
+    <attribute side="server" code="0x0017" name="MinCoolSetpointLimit" define="MIN_COOL_SETPOINT_LIMIT" type="temperature" min="-27315" max="0x7FFF" writable="true" default="1600" optional="true">
       <access op="write" privilege="manage"/>
+      <optionalConform>
+        <feature name="COOL"/>
+      </optionalConform>
     </attribute>
-    <attribute side="server" code="0x0035" define="OCCUPIED_SETBACK_MIN" type="int8u" optional="true" isNullable="true" max="254">OccupiedSetbackMin</attribute>
-    <attribute side="server" code="0x0036" define="OCCUPIED_SETBACK_MAX" type="int8u" optional="true" isNullable="true" max="254">OccupiedSetbackMax</attribute>
-    <attribute side="server" code="0x0037" define="UNOCCUPIED_SETBACK" type="int8u" writable="true" optional="true" isNullable="true" max="254">
-      <description>UnoccupiedSetback</description>
+    <attribute side="server" code="0x0018" name="MaxCoolSetpointLimit" define="MAX_COOL_SETPOINT_LIMIT" type="temperature" min="-27315" max="0x7FFF" writable="true" default="3200" optional="true">
       <access op="write" privilege="manage"/>
+      <optionalConform>
+        <feature name="COOL"/>
+      </optionalConform>
     </attribute>
-    <attribute side="server" code="0x0038" define="UNOCCUPIED_SETBACK_MIN" type="int8u" optional="true" isNullable="true" max="254">UnoccupiedSetbackMin</attribute>
-    <attribute side="server" code="0x0039" define="UNOCCUPIED_SETBACK_MAX" type="int8u" optional="true" isNullable="true" max="254">UnoccupiedSetbackMax</attribute>
-    <attribute side="server" code="0x003A" define="EMERGENCY_HEAT_DELTA" type="int8u" writable="true" optional="true" default="0xFF" min="0" max="255">
-      <description>EmergencyHeatDelta</description>
+    <attribute side="server" code="0x0019" name="MinSetpointDeadBand" define="MIN_SETPOINT_DEAD_BAND" type="int8s" min="0" max="127" writable="true" default="25" optional="true">
       <access op="write" privilege="manage"/>
+      <mandatoryConform>
+        <feature name="AUTO"/>
+      </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x0040" define="AC_TYPE" type="ACTypeEnum" min="0x0" max="0x4" writable="true" default="0" optional="true">
-      <description>ACType</description>
+    <attribute side="server" code="0x001A" name="RemoteSensing" define="REMOTE_SENSING" type="RemoteSensingBitmap" min="0x0" max="0x7" writable="true" default="0" optional="true">
       <access op="write" privilege="manage"/>
+      <optionalConform/>
     </attribute>
-    <attribute side="server" code="0x0041" define="AC_CAPACITY" type="int16u" writable="true" default="0" optional="true" max="65535">
-      <description>ACCapacity</description>
+    <attribute side="server" code="0x001B" name="ControlSequenceOfOperation" define="CONTROL_SEQUENCE_OF_OPERATION" type="ControlSequenceOfOperationEnum" min="0x0" max="0x5" writable="true" default="4">
       <access op="write" privilege="manage"/>
+      <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x0042" define="AC_REFRIGERANT_TYPE" type="ACRefrigerantTypeEnum" min="0x0" max="0x3" writable="true" default="0" optional="true">
-      <description>ACRefrigerantType</description>
+    <attribute side="server" code="0x001C" name="SystemMode" define="SYSTEM_MODE" type="SystemModeEnum" min="0x0" max="0x9" writable="true" default="1">
       <access op="write" privilege="manage"/>
+      <mandatoryConform/>
     </attribute>
-    <attribute side="server" code="0x0043" define="AC_COMPRESSOR_TYPE" type="ACCompressorTypeEnum" min="0x0" max="0x3" writable="true" default="0" optional="true">
-      <description>ACCompressorType</description>
+    <attribute side="server" code="0x001E" name="ThermostatRunningMode" define="THERMOSTAT_RUNNING_MODE" type="ThermostatRunningModeEnum" min="0x0" max="0x4" optional="true" default="0">
+      <optionalConform>
+        <feature name="AUTO"/>
+      </optionalConform>
+    </attribute>
+    <attribute side="server" code="0x0020" name="StartOfWeek" define="START_OF_WEEK" type="StartOfWeekEnum" min="0x0" max="0x6" optional="true">
+      <mandatoryConform>
+        <feature name="SCH"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0021" name="NumberOfWeeklyTransitions" define="NUMBER_OF_WEEKLY_TRANSITIONS" type="int8u" optional="true" default="0">
+      <mandatoryConform>
+        <feature name="SCH"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0022" name="NumberOfDailyTransitions" define="NUMBER_OF_DAILY_TRANSITIONS" type="int8u" optional="true" default="0">
+      <mandatoryConform>
+        <feature name="SCH"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0023" name="TemperatureSetpointHold" define="TEMPERATURE_SETPOINT_HOLD" type="TemperatureSetpointHoldEnum" min="0x0" max="0x1" writable="true" default="0" optional="true">
       <access op="write" privilege="manage"/>
+      <optionalConform/>
     </attribute>
-    <attribute side="server" code="0x0044" define="AC_ERROR_CODE" type="ACErrorCodeBitmap" writable="true" default="0" optional="true">
-      <description>ACErrorCode</description>
+    <attribute side="server" code="0x0024" name="TemperatureSetpointHoldDuration" define="TEMPERATURE_SETPOINT_HOLD_DURATION" type="int16u" max="1440" writable="true" optional="true" isNullable="true">
       <access op="write" privilege="manage"/>
+      <optionalConform/>
     </attribute>
-    <attribute side="server" code="0x0045" define="AC_LOUVER_POSITION" type="ACLouverPositionEnum" min="0x0" max="0x5" writable="true" default="0" optional="true">
-      <description>ACLouverPosition</description>
+    <attribute side="server" code="0x0025" name="ThermostatProgrammingOperationMode" define="THERMOSTAT_PROGRAMMING_OPERATION_MODE" type="ProgrammingOperationModeBitmap" writable="true" default="0" optional="true" reportable="true" min="0x0" max="0x7">
       <access op="write" privilege="manage"/>
+      <optionalConform/>
     </attribute>
-    <attribute side="server" code="0x0046" define="AC_COIL_TEMPERATURE" type="temperature" optional="true" isNullable="true">ACCoilTemperature</attribute>
-    <attribute side="server" code="0x0047" define="AC_CAPACITY_FORMAT" type="ACCapacityFormatEnum" min="0x00" max="0x00" writable="true" default="0" optional="true">
-      <description>ACCapacityformat</description>
+    <attribute side="server" code="0x0029" name="ThermostatRunningState" define="THERMOSTAT_RUNNING_STATE" type="RelayStateBitmap" optional="true" min="0x0" max="0x7F">
+      <optionalConform/>
+    </attribute>
+    <attribute side="server" code="0x0030" name="SetpointChangeSource" define="SETPOINT_CHANGE_SOURCE" type="SetpointChangeSourceEnum" optional="true" default="0" min="0x0" max="0x2">
+      <optionalConform/>
+    </attribute>
+    <attribute side="server" code="0x0031" name="SetpointChangeAmount" define="SETPOINT_CHANGE_AMOUNT" type="int16s" optional="true" isNullable="true">
+      <optionalConform/>
+    </attribute>
+    <attribute side="server" code="0x0032" name="SetpointChangeSourceTimestamp" define="SETPOINT_CHANGE_SOURCE_TIMESTAMP" type="epoch_s" optional="true" default="0">
+      <optionalConform/>
+    </attribute>
+    <attribute side="server" code="0x0034" name="OccupiedSetback" define="OCCUPIED_SETBACK" type="int8u" writable="true" optional="true" isNullable="true" max="254">
       <access op="write" privilege="manage"/>
+      <mandatoryConform>
+        <feature name="SB"/>
+      </mandatoryConform>
     </attribute>
-    <attribute code="0x0048" side="server" type="array" entryType="PresetTypeStruct" define="PRESET_TYPES" optional="true">PresetTypes</attribute>
-    <attribute code="0x0049" side="server" type="array" entryType="ScheduleTypeStruct" define="SCHEDULE_TYPES" optional="true">ScheduleTypes</attribute>
-    <attribute code="0x004A" side="server" type="int8u" define="NUMBER_OF_PRESETS" default="0" optional="true">NumberOfPresets</attribute>
-    <attribute code="0x004B" side="server" type="int8u" define="NUMBER_OF_SCHEDULES" default="0" optional="true">NumberOfSchedules</attribute>
-    <attribute code="0x004C" side="server" type="int8u" define="NUMBER_OF_SCHEDULE_TRANSITIONS" default="0" optional="true">NumberOfScheduleTransitions</attribute>
-    <attribute code="0x004D" side="server" type="int8u" define="NUMBER_OF_SCHEDULE_TRANSITION_PER_DAY" isNullable="true" optional="true">NumberOfScheduleTransitionPerDay</attribute>
-    <attribute code="0x004E" side="server" type="octet_string" define="ACTIVE_PRESET_HANDLE" isNullable="true" length="16" optional="true">ActivePresetHandle</attribute>
-    <attribute code="0x004F" side="server" type="octet_string" define="ACTIVE_SCHEDULE_HANDLE" isNullable="true" length="16" optional="true">ActiveScheduleHandle</attribute>
-    <attribute code="0x0050" side="server" type="array" entryType="PresetStruct" define="PRESETS" writable="true" optional="true" mustUseAtomicWrite="true">
-      <description>Presets</description>
+    <attribute side="server" code="0x0035" name="OccupiedSetbackMin" define="OCCUPIED_SETBACK_MIN" type="int8u" optional="true" isNullable="true" max="254">
+      <mandatoryConform>
+        <feature name="SB"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0036" name="OccupiedSetbackMax" define="OCCUPIED_SETBACK_MAX" type="int8u" optional="true" isNullable="true" max="254">
+      <mandatoryConform>
+        <feature name="SB"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0037" name="UnoccupiedSetback" define="UNOCCUPIED_SETBACK" type="int8u" writable="true" optional="true" isNullable="true" max="254">
       <access op="write" privilege="manage"/>
+      <mandatoryConform>
+        <andTerm>
+          <feature name="SB"/>
+          <feature name="OCC"/>
+        </andTerm>
+      </mandatoryConform>
     </attribute>
-    <attribute code="0x0051" side="server" type="array" entryType="ScheduleStruct" define="SCHEDULES" writable="true" optional="true" mustUseAtomicWrite="true">
-      <description>Schedules</description>
+    <attribute side="server" code="0x0038" name="UnoccupiedSetbackMin" define="UNOCCUPIED_SETBACK_MIN" type="int8u" optional="true" isNullable="true" max="254">
+      <mandatoryConform>
+        <andTerm>
+          <feature name="SB"/>
+          <feature name="OCC"/>
+        </andTerm>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0039" name="UnoccupiedSetbackMax" define="UNOCCUPIED_SETBACK_MAX" type="int8u" optional="true" isNullable="true" max="254">
+      <mandatoryConform>
+        <andTerm>
+          <feature name="SB"/>
+          <feature name="OCC"/>
+        </andTerm>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x003A" name="EmergencyHeatDelta" define="EMERGENCY_HEAT_DELTA" type="int8u" writable="true" optional="true" default="0xFF" min="0" max="255">
       <access op="write" privilege="manage"/>
+      <optionalConform/>
     </attribute>
-    <attribute code="0x0052" side="server" type="epoch_s" define="SETPOINT_HOLD_EXPIRY_TIMESTAMP" optional="true" isNullable="true">SetpointHoldExpiryTimestamp</attribute>
+    <attribute side="server" code="0x0040" name="ACType" define="AC_TYPE" type="ACTypeEnum" min="0x0" max="0x4" writable="true" default="0" optional="true">
+      <access op="write" privilege="manage"/>
+      <optionalConform/>
+    </attribute>
+    <attribute side="server" code="0x0041" name="ACCapacity" define="AC_CAPACITY" type="int16u" writable="true" default="0" optional="true" max="65535">
+      <access op="write" privilege="manage"/>
+      <optionalConform/>
+    </attribute>
+    <attribute side="server" code="0x0042" name="ACRefrigerantType" define="AC_REFRIGERANT_TYPE" type="ACRefrigerantTypeEnum" min="0x0" max="0x3" writable="true" default="0" optional="true">
+      <access op="write" privilege="manage"/>
+      <optionalConform/>
+    </attribute>
+    <attribute side="server" code="0x0043" name="ACCompressorType" define="AC_COMPRESSOR_TYPE" type="ACCompressorTypeEnum" min="0x0" max="0x3" writable="true" default="0" optional="true">
+      <access op="write" privilege="manage"/>
+      <optionalConform/>
+    </attribute>
+    <attribute side="server" code="0x0044" name="ACErrorCode" define="AC_ERROR_CODE" type="ACErrorCodeBitmap" writable="true" default="0" optional="true">
+      <access op="write" privilege="manage"/>
+      <optionalConform/>
+    </attribute>
+    <attribute side="server" code="0x0045" name="ACLouverPosition" define="AC_LOUVER_POSITION" type="ACLouverPositionEnum" min="0x0" max="0x5" writable="true" default="0" optional="true">
+      <access op="write" privilege="manage"/>
+      <optionalConform/>
+    </attribute>
+    <attribute side="server" code="0x0046" name="ACCoilTemperature" define="AC_COIL_TEMPERATURE" type="temperature" optional="true" isNullable="true">
+      <optionalConform/>
+    </attribute>
+    <attribute side="server" code="0x0047" name="ACCapacityformat" define="AC_CAPACITY_FORMAT" type="ACCapacityFormatEnum" min="0x00" max="0x00" writable="true" default="0" optional="true">
+      <access op="write" privilege="manage"/>
+      <optionalConform/>
+    </attribute>
+    <attribute code="0x0048" side="server" name="PresetTypes" type="array" entryType="PresetTypeStruct" define="PRESET_TYPES" optional="true">
+      <mandatoryConform>
+        <feature name="PRES"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute code="0x0049" side="server" name="ScheduleTypes" type="array" entryType="ScheduleTypeStruct" define="SCHEDULE_TYPES" optional="true">
+      <mandatoryConform>
+        <feature name="MSCH"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute code="0x004A" side="server" name="NumberOfPresets" type="int8u" define="NUMBER_OF_PRESETS" default="0" optional="true">
+      <mandatoryConform>
+        <feature name="PRES"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute code="0x004B" side="server" name="NumberOfSchedules" type="int8u" define="NUMBER_OF_SCHEDULES" default="0" optional="true">
+      <mandatoryConform>
+        <feature name="MSCH"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute code="0x004C" side="server" name="NumberOfScheduleTransitions" type="int8u" define="NUMBER_OF_SCHEDULE_TRANSITIONS" default="0" optional="true">
+      <mandatoryConform>
+        <feature name="MSCH"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute code="0x004D" side="server" name="NumberOfScheduleTransitionPerDay" type="int8u" define="NUMBER_OF_SCHEDULE_TRANSITION_PER_DAY" isNullable="true" optional="true">
+      <mandatoryConform>
+        <feature name="MSCH"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute code="0x004E" side="server" name="ActivePresetHandle" type="octet_string" define="ACTIVE_PRESET_HANDLE" isNullable="true" length="16" optional="true">
+      <mandatoryConform>
+        <feature name="PRES"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute code="0x004F" side="server" name="ActiveScheduleHandle" type="octet_string" define="ACTIVE_SCHEDULE_HANDLE" isNullable="true" length="16" optional="true">
+      <mandatoryConform>
+        <feature name="MSCH"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute code="0x0050" side="server" name="Presets" type="array" entryType="PresetStruct" define="PRESETS" writable="true" optional="true" mustUseAtomicWrite="true">
+      <access op="write" privilege="manage"/>
+      <mandatoryConform>
+        <feature name="PRES"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute code="0x0051" side="server" name="Schedules" type="array" entryType="ScheduleStruct" define="SCHEDULES" writable="true" optional="true" mustUseAtomicWrite="true">
+      <access op="write" privilege="manage"/>
+      <mandatoryConform>
+        <feature name="MSCH"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute code="0x0052" side="server" name="SetpointHoldExpiryTimestamp" type="epoch_s" define="SETPOINT_HOLD_EXPIRY_TIMESTAMP" optional="true" isNullable="true">
+      <optionalConform/>
+    </attribute>
     <!-- Client Commands -->
     <command source="client" code="0x00" name="SetpointRaiseLower" optional="false">
       <description>Upon receipt, the attributes for the indicated setpoint(s) SHALL have the amount specified in the Amount field added to them.</description>
       <arg id="0" name="Mode" type="SetpointRaiseLowerModeEnum" min="0x0" max="0x2"/>
       <arg id="1" name="Amount" type="int8s"/>
+      <mandatoryConform/>
     </command>
 
     <command source="client" code="0x01" name="SetWeeklySchedule" optional="true">
@@ -461,27 +622,42 @@ limitations under the License.
       <arg id="1" name="DayOfWeekForSequence" type="ScheduleDayOfWeekBitmap" min="0x0" max="0xFF"/>
       <arg id="2" name="ModeForSequence" type="ScheduleModeBitmap" min="0x0" max="0x3"/>
       <arg id="3" name="Transitions" type="WeeklyScheduleTransitionStruct" array="true" length="10"/>
+      <mandatoryConform>
+        <feature name="SCH"/>
+      </mandatoryConform>
     </command>
 
     <command source="client" code="0x02" name="GetWeeklySchedule" response="GetWeeklyScheduleResponse" optional="true">
       <description>The Current Weekly Schedule Command is sent from the server in response to the Get Weekly Schedule Command.</description>
       <arg id="0" name="DaysToReturn" type="ScheduleDayOfWeekBitmap" min="0x0" max="0xFF"/>
       <arg id="1" name="ModeToReturn" type="ScheduleModeBitmap" min="0x0" max="0x3"/>
+      <mandatoryConform>
+        <feature name="SCH"/>
+      </mandatoryConform>
     </command>
 
     <command source="client" code="0x03" name="ClearWeeklySchedule" optional="true">
       <description>This command is used to clear the weekly schedule.</description>
       <access op="invoke" privilege="manage"/>
+      <mandatoryConform>
+        <feature name="SCH"/>
+      </mandatoryConform>
     </command>
 
     <command source="client" code="0x05" name="SetActiveScheduleRequest" optional="true">
       <description>Upon receipt, if the Schedules attribute contains a ScheduleStruct whose ScheduleHandle field matches the value of the ScheduleHandle field, the server SHALL set the thermostat&apos;s ActiveScheduleHandle attribute to the value of the ScheduleHandle field.</description>
       <arg id="0" name="ScheduleHandle" type="octet_string" length="16"/>
+      <mandatoryConform>
+        <feature name="MSCH"/>
+      </mandatoryConform>
     </command>
 
     <command source="client" code="0x06" name="SetActivePresetRequest" optional="true">
       <description>ID</description>
       <arg id="0" name="PresetHandle" type="octet_string" length="16" isNullable="true"/>
+      <mandatoryConform>
+        <feature name="PRES"/>
+      </mandatoryConform>
     </command>
 
     <!-- Server Commands/Responses -->
@@ -491,6 +667,9 @@ limitations under the License.
       <arg id="1" name="DayOfWeekForSequence" type="ScheduleDayOfWeekBitmap" min="0x0" max="0xFF"/>
       <arg id="2" name="ModeForSequence" type="ScheduleModeBitmap" min="0x0" max="0x3"/>
       <arg id="3" name="Transitions" type="WeeklyScheduleTransitionStruct" array="true" length="10"/>
+      <mandatoryConform>
+        <feature name="SCH"/>
+      </mandatoryConform>
     </command>
 
     <command code="0xFD" source="server" name="AtomicResponse" optional="true">

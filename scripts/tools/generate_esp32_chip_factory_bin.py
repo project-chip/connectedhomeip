@@ -25,6 +25,7 @@ from enum import Enum
 from types import SimpleNamespace
 
 import cryptography.x509
+import esp_idf_nvs_partition_gen.nvs_partition_gen as nvs_partition_gen
 from esp_secure_cert.tlv_format import generate_partition_ds, generate_partition_no_ds, tlv_priv_key_t, tlv_priv_key_type_t
 
 CHIP_TOPDIR = os.path.dirname(os.path.realpath(__file__))[:-len(os.path.join('scripts', 'tools'))]
@@ -33,15 +34,6 @@ from spake2p import generate_verifier  # noqa: E402 isort:skip
 sys.path.insert(0, os.path.join(CHIP_TOPDIR, 'src', 'setup_payload', 'python'))
 from SetupPayload import CommissioningFlow, SetupPayload  # noqa: E402 isort:skip
 
-if os.getenv('IDF_PATH'):
-    sys.path.insert(0, os.path.join(os.getenv('IDF_PATH'),
-                                    'components',
-                                    'nvs_flash',
-                                    'nvs_partition_generator'))
-    import nvs_partition_gen
-else:
-    sys.stderr.write("Please set the IDF_PATH environment variable.")
-    exit(0)
 
 INVALID_PASSCODES = [00000000, 11111111, 22222222, 33333333, 44444444, 55555555,
                      66666666, 77777777, 88888888, 99999999, 12345678, 87654321]
@@ -209,6 +201,11 @@ FACTORY_DATA = {
         'encoding': 'string',
         'value': None,
     },
+    'device-type': {
+        'type': 'data',
+        'encoding': 'u32',
+        'value': None,
+    },
 }
 
 
@@ -372,6 +369,8 @@ def populate_factory_data(args, spake2p_params):
         FACTORY_DATA['product-url']['value'] = args.product_url
     if args.product_label:
         FACTORY_DATA['product-label']['value'] = args.product_label
+    if args.device_type is not None:
+        FACTORY_DATA['device-type']['value'] = args.device_type
 
     # SupportedModes are stored as multiple entries
     #  - sm-sz/<ep>                 : number of supported modes for the endpoint
@@ -553,6 +552,8 @@ def get_args():
     parser.add_argument("--part-number", type=str, help='human readable product number')
     parser.add_argument("--product-label", type=str, help='human readable product label')
     parser.add_argument("--product-url", type=str, help='link to product specific web page')
+
+    parser.add_argument("--device-type", type=any_base_int, help='commissionable device type')
 
     parser.add_argument('-s', '--size', type=any_base_int, default=0x6000,
                         help='The size of the partition.bin, default: 0x6000')

@@ -40,7 +40,6 @@ tests:
       attribute: "ServerList"
       response:
           value: [
-                  0x0003, # Identify
                   0x0004, # Groups
                   0x001D, # Descriptor
                   0x001E, # Binding

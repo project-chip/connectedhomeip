@@ -51,10 +51,10 @@ defined:
     definition.
 
 -   All attributes defined with these macros will be configured as
-    `ATTRIBUTE_MASK_EXTERNAL_STORAGE` in the ZCL database and therefore will
-    rely on the application to maintain storage for the attribute. Consequently,
-    reads or writes to these attributes must be handled within the application
-    by the `emberAfExternalAttributeWriteCallback` and
+    `MATTER_ATTRIBUTE_FLAG_EXTERNAL_STORAGE` in the ZCL database and therefore
+    will rely on the application to maintain storage for the attribute.
+    Consequently, reads or writes to these attributes must be handled within the
+    application by the `emberAfExternalAttributeWriteCallback` and
     `emberAfExternalAttributeReadCallback` functions. See the bridge
     application's `main.cpp` for an example of this implementation.
 
@@ -100,13 +100,13 @@ defined:
     Pull Docker Images
 
     ```
-    docker pull connectedhomeip/chip-build-vscode:latest
+    docker pull ghcr.io/project-chip/chip-build-crosscompile:119
     ```
 
     Run docker
 
     ```
-    docker run -it -v ~/connectedhomeip:/var/connectedhomeip connectedhomeip/chip-build-vscode:latest /bin/bash
+    docker run -it -v ~/connectedhomeip:/var/connectedhomeip ghcr.io/project-chip/chip-build-crosscompile:119 /bin/bash
     ```
 
     Build
@@ -115,8 +115,6 @@ defined:
     cd /var/connectedhomeip
 
     git config --global --add safe.directory /var/connectedhomeip
-    git config --global --add safe.directory /var/connectedhomeip/third_party/pigweed/repo
-    git config --global --add safe.directory /var/connectedhomeip/examples/common/QRCode/repo
 
     ./scripts/run_in_build_env.sh \
      "./scripts/build/build_examples.py \
@@ -128,13 +126,6 @@ defined:
 
     ```
     scp ./fabric-bridge-app ubuntu@xxx.xxx.xxx.xxx:/home/ubuntu
-    ```
-
--   To delete generated executable, libraries and object files use:
-
-    ```sh
-    cd ~/connectedhomeip/examples/fabric-bridge-app/linux
-    rm -rf out/
     ```
 
 ## Running the Complete Example on Ubuntu

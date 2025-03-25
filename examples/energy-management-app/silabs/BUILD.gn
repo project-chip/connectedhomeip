@@ -18,7 +18,7 @@ import("//build_overrides/efr32_sdk.gni")
 import("//build_overrides/pigweed.gni")
 
 import("${build_root}/config/defaults.gni")
-import("${efr32_sdk_build_root}/silabs_executable.gni")
+import("${silabs_sdk_build_root}/silabs_executable.gni")
 
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/src/platform/device.gni")
@@ -38,7 +38,7 @@ if (wifi_soc) {
   import("${chip_root}/third_party/silabs/SiWx917_sdk.gni")
   examples_plat_dir = "${chip_root}/examples/platform/silabs/SiWx917"
 } else {
-  import("${efr32_sdk_build_root}/efr32_sdk.gni")
+  import("${silabs_sdk_build_root}/efr32_sdk.gni")
   examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
 }
 
@@ -47,6 +47,21 @@ import("${examples_common_plat_dir}/args.gni")
 declare_args() {
   # Dump memory usage at link time.
   chip_print_memory_usage = false
+
+  # Enable test event triggers by default: Disable these in production devices
+  sl_enable_energy_evse_trigger = true
+  sl_enable_energy_reporting_trigger = true
+  sl_enable_water_heater_management_trigger = true
+  sl_enable_device_energy_management_trigger = true
+
+  # Device Energy Management feature support - only one of these can be true
+  # or both can be disabled if forecasting is not supported
+  sl_dem_support_power_forecast_reporting = true
+  sl_dem_support_state_forecast_reporting = false
+
+  # Only one of these examples should be enabled
+  sl_enable_example_evse_device = true
+  sl_enable_example_water_heater_device = false
 }
 
 if (slc_generate) {
@@ -101,7 +116,11 @@ if (wifi_soc) {
       "${examples_plat_dir}",
       "${chip_root}/src/lib",
       "${examples_common_plat_dir}",
-      "../energy-management-common/include",
+      "${chip_root}/examples/energy-management-app/energy-management-common/common/include",
+      "${chip_root}/examples/energy-management-app/energy-management-common/device-energy-management/include",
+      "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/include",
+      "${chip_root}/examples/energy-management-app/energy-management-common/energy-reporting/include",
+      "${chip_root}/examples/energy-management-app/energy-management-common/water-heater/include",
     ]
 
     if (use_wf200) {
@@ -131,34 +150,52 @@ silabs_executable("energy-management-app") {
   include_dirs = [ "include" ]
   defines = []
 
+  defines += [
+    "SL_MATTER_CONFIG_ENABLE_ENERGY_EVSE_TRIGGER=${sl_enable_energy_evse_trigger}",
+    "SL_MATTER_CONFIG_ENABLE_ENERGY_REPORTING_TRIGGER=${sl_enable_energy_reporting_trigger}",
+    "SL_MATTER_CONFIG_ENABLE_WATER_HEATER_MANAGEMENT_TRIGGER=${sl_enable_water_heater_management_trigger}",
+    "SL_MATTER_CONFIG_ENABLE_DEVICE_ENERGY_MANAGEMENT_TRIGGER=${sl_enable_device_energy_management_trigger}",
+    "SL_MATTER_CONFIG_DEM_SUPPORT_POWER_FORECAST_REPORTING=${sl_dem_support_power_forecast_reporting}",
+    "SL_MATTER_CONFIG_DEM_SUPPORT_STATE_FORECAST_REPORTING=${sl_dem_support_state_forecast_reporting}",
+    "SL_MATTER_CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE=${sl_enable_example_evse_device}",
+    "SL_CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE=${sl_enable_example_water_heater_device}",
+  ]
+
   if (silabs_board == "BRD2704A") {
     defines += [ "SL_STATUS_LED=0" ]
   }
 
   sources = [
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/ChargingTargetsMemMgr.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/DEMTestEventTriggers.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/DeviceEnergyManagementDelegateImpl.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/DeviceEnergyManagementManager.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/EVSEManufacturerImpl.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/ElectricalPowerMeasurementDelegate.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseDelegateImpl.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseEventTriggers.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseMain.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseManager.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseTargetsStore.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyReportingEventTriggers.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyTimeUtils.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/FakeReadings.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/PowerTopologyDelegate.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/device-energy-management-mode.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/energy-evse-mode.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/common/src/EnergyManagementAppCommonMain.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/common/src/EnergyTimeUtils.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/device-energy-management/src/DEMTestEventTriggers.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/device-energy-management/src/DeviceEnergyManagementDelegateImpl.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/device-energy-management/src/DeviceEnergyManagementManager.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/device-energy-management/src/device-energy-management-mode.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/src/ChargingTargetsMemMgr.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/src/EVSEManufacturerImpl.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/src/EnergyEvseDelegateImpl.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/src/EnergyEvseEventTriggers.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/src/EnergyEvseMain.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/src/EnergyEvseManager.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/src/EnergyEvseTargetsStore.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-evse/src/energy-evse-mode.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-reporting/src/ElectricalPowerMeasurementDelegate.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-reporting/src/EnergyReportingEventTriggers.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-reporting/src/FakeReadings.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/energy-reporting/src/PowerTopologyDelegate.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/water-heater/src/WhmDelegateImpl.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/water-heater/src/WhmInstance.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/water-heater/src/WhmMain.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/water-heater/src/WhmManufacturer.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/water-heater/src/water-heater-mode.cpp",
     "${examples_common_plat_dir}/main.cpp",
     "src/AppTask.cpp",
   ]
 
   deps = [
     ":sdk",
+    "${chip_root}/src/app:attribute-persistence",
     app_data_model,
   ]
 

@@ -1,0 +1,113 @@
+# Tests that are NOT executed in CI, along with the reason on
+# why they are not.
+not_automated:
+    - name: MinimalRepresentation.py
+      reason: Code/Test not being used or not shared code for any other tests
+    - name: TC_CNET_4_4.py
+      reason: It has no CI execution block, is not executed in CI
+    - name: TC_DGGEN_3_2.py
+      reason:
+          src/python_testing/test_testing/test_TC_DGGEN_3_2.py is the Unit test
+          of this test
+    - name: TC_LVL_2_3.py
+      reason:
+          The microwave-oven-app does not have level control cluster on endpoint
+          1 - https://github.com/project-chip/connectedhomeip/issues/36885
+    - name: TC_EEVSE_Utils.py
+      reason: Shared code for TC_EEVSE, not a standalone test
+    - name: TC_EWATERHTRBase.py
+      reason: Shared code for TC_EWATERHTR, not a standalone test
+    - name: TC_EnergyReporting_Utils.py
+      reason: Shared code for TC_EEM and TC_EPM, not a standalone test
+    - name: TC_OpstateCommon.py
+      reason: Shared code for TC_OPSTATE, not a standalone test
+    - name: TC_pics_checker.py
+      reason:
+          Currently isn't enabled because we don't have any examples with
+          conformant PICS
+    - name: TC_TMP_2_1.py
+      reason:
+          src/python_testing/test_testing/test_TC_TMP_2_1.py is the Unit test of
+          this test
+    - name: TC_OCC_3_1.py
+      reason:
+          There are CI issues for the test cases that implements manually
+          controlling sensor device for the occupancy state ON/OFF change
+    - name: TC_OCC_3_2.py
+      reason:
+          There are CI issues for the test cases that implements manually
+          controlling sensor device for the occupancy state ON/OFF change
+    - name: TestCommissioningTimeSync.py
+      reason: Code/Test not being used or not shared code for any other tests
+    - name: TestConformanceSupport.py
+      reason: Unit test - does not run against an app
+    - name: TestChoiceConformanceSupport.py
+      reason: Unit test - does not run against an app
+    - name: TC_DEMTestBase.py
+      reason: Shared code for TC_DEM, not a standalone test
+    - name: TestConformanceTest.py
+      reason:
+          Unit test of the conformance test (TC_DeviceConformance) - does not
+          run against an app
+    - name: TestIdChecks.py
+      reason: Unit test - does not run against an app
+    - name: TestSpecParsingDeviceType.py
+      reason: Unit test - does not run against an app
+    - name: TestConformanceTest.py
+      reason: Unit test - does not run against an app
+    - name: TestSpecParsingSelection.py
+      reason: Unit test - does not run against an app
+    - name: TestMatterTestingSupport.py
+      reason: Unit test - does not run against an app
+    - name: TestSpecParsingSupport.py
+      reason: Unit test - does not run against an app
+    - name: TestTimeSyncTrustedTimeSource.py
+      reason:
+          Unit test and shared code for
+          scripts/tests/TestTimeSyncTrustedTimeSourceRunner.py
+    - name: drlk_2_x_common.py
+      reason: Shared code for TC_DRLK, not a standalone test
+    - name: execute_python_tests.py
+      reason:
+          Python code that runs all the python tests from src/python_testing
+          (This code itself run via tests.yaml)
+    - name: hello_external_runner.py
+      reason: Code/Test not being used or not shared code for any other tests
+    - name: hello_test.py
+      reason: Is a template for tests
+    - name: test_plan_support.py
+      reason: Shared code for TC_*, not a standalone test
+    - name: test_plan_table_generator.py
+      reason: Code/Test not being used or not shared code for any other tests
+    - name: modebase_cluster_check.py
+      reason: Shared code for Modebase derived clusters, not a standalone test.
+
+# This is a list of slow tests (just arbitrarily picked around 20 seconds)
+# used in some script reporting for "be patient" messages as well as potentially
+# to consider improving. May not be exhaustive
+slow_tests:
+    - { name: mobile-device-test.py, duration: 3 minutes }
+    - { name: TC_AccessChecker.py, duration: 1.5 minutes }
+    - { name: TC_BRBINFO_4_1.py, duration: 2 minutes }
+    - { name: TC_CADMIN_1_19.py, duration: 30 seconds }
+    - { name: TC_CADMIN_1_22_24.py, duration: 3 minutes }
+    - { name: TC_CADMIN_1_9.py, duration: 40 seconds }
+    - { name: TC_CC_2_2.py, duration: 1.5 minutes }
+    - { name: TC_DEM_2_10.py, duration: 40 seconds }
+    - { name: TC_DeviceBasicComposition.py, duration: 25 seconds }
+    - { name: TC_DRLK_2_12.py, duration: 30 seconds }
+    - { name: TC_DRLK_2_3.py, duration: 30 seconds }
+    - { name: TC_EEVSE_2_6.py, duration: 30 seconds }
+    - { name: TC_FAN_3_1.py, duration: 15 seconds }
+    - { name: TC_MCORE_FS_1_4.py, duration: 20 seconds }
+    - { name: TC_OPSTATE_2_5.py, duration: 1.25 minutes }
+    - { name: TC_OPSTATE_2_6.py, duration: 35 seconds }
+    - { name: TC_PS_2_3.py, duration: 30 seconds }
+    - { name: TC_RR_1_1.py, duration: 25 seconds }
+    - { name: TC_SWTCH.py, duration: 1 minute }
+    - { name: TC_TestAttrAvail.py, duration: 30 seconds }
+    - { name: TC_TIMESYNC_2_10.py, duration: 20 seconds }
+    - { name: TC_TIMESYNC_2_11.py, duration: 30 seconds }
+    - { name: TC_TIMESYNC_2_12.py, duration: 20 seconds }
+    - { name: TC_TIMESYNC_2_7.py, duration: 20 seconds }
+    - { name: TC_TIMESYNC_2_8.py, duration: 1.5 minutes }

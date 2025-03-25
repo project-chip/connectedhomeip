@@ -7,12 +7,118 @@
     thousands of different inputs.
 -   Fuzz testing is often done with sanitizers enabled; to catch memory errors
     and undefined behavior.
--   The most commonly used fuzz testing frameworks for C/C++ are LibFuzzer and
+-   The most commonly used fuzz testing frameworks for C/C++ are libFuzzer and
     AFL.
 -   [Google's FuzzTest](https://github.com/google/fuzztest) is a newer framework
     that simplifies writing fuzz tests with user-friendly APIs and offers more
     control over input generation. It also integrates seamlessly with Google
     Test (GTest).
+
+## Fuzz testing with libFuzzer
+
+The following example demonstrates how to use libFuzzer to write a simple fuzz
+test. Each fuzzer function is defined using
+`LLVMFuzzerTestOneInput(const uint8_t * data, size_t len)`.
+
+The Fuzzer must be located in a Test Folder : `src/some_directory/tests/`
+
+```
+#include <cstddef>
+#include <cstdint>
+
+/**
+ *    @file
+ *      This file describes a Fuzzer for ...
+ */
+
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t * data, size_t len)
+{
+
+    // Instantiate values as needed
+    // Call target function for the fuzzer with the fuzzing input (data and len)
+
+    return 0;
+}
+
+```
+
+See
+[FuzzBase38Decode.cpp](https://github.com/project-chip/connectedhomeip/blob/master/src/setup_payload/tests/FuzzBase38Decode.cpp)
+for an example of a simple fuzz test.
+
+### Compiling and running
+
+-   Add to `src/some_directory/tests/BUILD.gn`
+
+    -   Example
+
+        ```
+        import("${chip_root}/build/chip/fuzz_test.gni")
+
+        if (enable_fuzz_test_targets) {
+            chip_fuzz_target("FuzzTargetName1") {
+                sources = [ "Fuzzer1.cpp" ]
+                public_deps = [
+                    // Dependencies go here.
+                ]
+            }
+            chip_fuzz_target("FuzzTargetName2") {
+                sources = [ "Fuzzer2.cpp" ]
+                public_deps = [
+                    // Dependencies go here.
+                ]
+            }
+        }
+        ```
+
+        -   CHIP_FUZZ_TARGET : the name of the fuzz target
+        -   SOURCES : file in the test folder containing the fuzzer
+            implementation
+        -   PUBLIC_DEPS : Code Dependencies needed to build fuzzer
+
+    -   Another example:
+        [src/setup_payload/tests/BUILD.gn](https://github.com/project-chip/connectedhomeip/blob/b367512f519e5e109346e81a0d84fd85cd9192f7/src/setup_payload/tests/BUILD.gn#L43)
+
+-   Add to `${chip_root}/BUILD.gn`
+
+    -   Add the Fuzzing Target in this part of the code :
+        [\${chip_root}/BUILD.gn](https://github.com/project-chip/connectedhomeip/blob/b367512f519e5e109346e81a0d84fd85cd9192f7/BUILD.gn#L52)
+
+    -   Add Fuzzing Target like that
+
+        ```
+        if (enable_fuzz_test_targets) {
+            group("fuzz_tests") {
+            deps = [
+                "${chip_root}/src/credentials/tests:fuzz-chip-cert",
+                "${chip_root}/src/lib/core/tests:fuzz-tlv-reader",
+                "${chip_root}/src/lib/dnssd/minimal_mdns/tests:fuzz-minmdns-packet-parsing",
+                "${chip_root}/src/lib/format/tests:fuzz-payload-decoder",
+                "${chip_root}/src/setup_payload/tests:fuzz-setup-payload-base38",
+                "${chip_root}/src/setup_payload/tests:fuzz-setup-payload-base38-decode",
+                // ADD HERE YOUR FUZZING TARGET
+                "${chip_root}/some_directory/tests:FuzzTargetName"
+                ]
+            }
+        }
+        ```
+
+-   Build all fuzzers
+    ```
+    ./scripts/build/build_examples.py --target <host>-<compiler>-tests-asan-libfuzzer-clang build
+    ```
+    e.g.
+    ```
+    ./scripts/build/build_examples.py --target darwin-arm64-tests-asan-libfuzzer-clang build
+    ```
+    \*\* Make sure to put the right host and compiler
+-   Fuzzers binaries are compiled into:
+
+    -   `out/<host>-<compiler>-tests-asan-libfuzzer-clang/tests`
+    -   e.g. `darwin-arm64-tests-asan-libfuzzer-clang`
+
+-   Running the fuzzer with a corpus
+    -   `path_to_fuzzer_in_test_folder path_to_corpus`
 
 ## `Google's FuzzTest`
 
@@ -149,6 +255,25 @@ $ ./fuzz-chip-cert-pw --fuzz=ChipCert.DecodeChipCertFuzzer
 ./fuzz-chip-cert-pw --help
 
 ```
+
+### FAQ
+
+#### What revision should the FuzzTest and Abseil submodules be for running `pw_fuzzer` with FuzzTest?
+
+-   Google FuzzTest is integrated into Matter using `pw_fuzzer`, which has
+    several dependencies. These dependencies are listed here:
+    [Step 0: Set up FuzzTest for your project](https://pigweed.dev/pw_fuzzer/guides/fuzztest.html#step-0-set-up-fuzztest-for-your-project).
+-   Matter integrates these dependencies as submodules, including Google
+    FuzzTest and Abseil.
+-   Since FuzzTest and Abseil only support the `bazel` and `CMake` build systems
+    and do not support GN, Pigweed maintainers use a script to generate GN files
+    for these dependencies.
+-   the revision of FuzzTest and Abseil submodules in Matter should match or at
+    least be as new as the specific version (SHA1) used when generating these GN
+    files.
+-   You can find the version used for the generated GN files here:
+    [FuzzTest Version](https://pigweed.dev/third_party/fuzztest/#version) and
+    [Abseil Version](https://pigweed.dev/third_party/abseil-cpp/#version).
 
 #### TO ADD:
 

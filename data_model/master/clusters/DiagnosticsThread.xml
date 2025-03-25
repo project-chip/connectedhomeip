@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -54,6 +54,8 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0035" name="Thread Network Diagnostics Cluster" revision="3">
   <revisionHistory>
@@ -145,25 +147,50 @@ Davis, CA 95616, USA
       </field>
       <field id="5" name="LQI" type="uint8">
         <mandatoryConform/>
-        <constraint type="between" from="0" to="255"/>
+        <constraint>
+          <between>
+            <from value="0"/>
+            <to value="255"/>
+          </between>
+        </constraint>
       </field>
       <field id="6" name="AverageRssi" type="int8" default="null">
         <quality nullable="true"/>
         <mandatoryConform/>
-        <constraint type="between" from="-128" to="0"/>
+        <constraint>
+          <between>
+            <from value="-128"/>
+            <to value="0"/>
+          </between>
+        </constraint>
       </field>
       <field id="7" name="LastRssi" type="int8" default="null">
         <quality nullable="true"/>
         <mandatoryConform/>
-        <constraint type="between" from="-128" to="0"/>
+        <constraint>
+          <between>
+            <from value="-128"/>
+            <to value="0"/>
+          </between>
+        </constraint>
       </field>
       <field id="8" name="FrameErrorRate" type="uint8" default="0">
         <mandatoryConform/>
-        <constraint type="between" from="0" to="100"/>
+        <constraint>
+          <between>
+            <from value="0"/>
+            <to value="100"/>
+          </between>
+        </constraint>
       </field>
       <field id="9" name="MessageErrorRate" type="uint8" default="0">
         <mandatoryConform/>
-        <constraint type="between" from="0" to="100"/>
+        <constraint>
+          <between>
+            <from value="0"/>
+            <to value="100"/>
+          </between>
+        </constraint>
       </field>
       <field id="10" name="RxOnWhenIdle" type="bool">
         <mandatoryConform/>
@@ -260,421 +287,441 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="Channel" type="uint16">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0001" name="RoutingRole" type="RoutingRoleEnum">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0002" name="NetworkName" type="String">
+    <attribute id="0x0002" name="NetworkName" type="string">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <mandatoryConform/>
-      <constraint type="max" value="16"/>
+      <constraint>
+        <maxLength value="16"/>
+      </constraint>
     </attribute>
     <attribute id="0x0003" name="PanId" type="uint16">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0004" name="ExtendedPanId" type="uint64">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0005" name="MeshLocalPrefix" type="ipv6pre">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0006" name="OverrunCount" type="uint64" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="false" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true"/>
       <mandatoryConform>
         <feature name="ERRCNT"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0007" name="NeighborTable" type="list" default="[]">
+    <attribute id="0x0007" name="NeighborTable" type="list" default="empty">
       <entry type="NeighborTableStruct"/>
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0008" name="RouteTable" type="list" default="[]">
+    <attribute id="0x0008" name="RouteTable" type="list" default="empty">
       <entry type="RouteTableStruct"/>
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0009" name="PartitionId" type="uint32">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x000A" name="Weighting" type="uint16">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <mandatoryConform/>
-      <constraint type="max" value="255"/>
+      <constraint>
+        <max value="255"/>
+      </constraint>
     </attribute>
     <attribute id="0x000B" name="DataVersion" type="uint16">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <mandatoryConform/>
-      <constraint type="max" value="255"/>
+      <constraint>
+        <max value="255"/>
+      </constraint>
     </attribute>
     <attribute id="0x000C" name="StableDataVersion" type="uint16">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <mandatoryConform/>
-      <constraint type="max" value="255"/>
+      <constraint>
+        <max value="255"/>
+      </constraint>
     </attribute>
     <attribute id="0x000D" name="LeaderRouterId" type="uint8">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <mandatoryConform/>
-      <constraint type="max" value="62"/>
+      <constraint>
+        <max value="62"/>
+      </constraint>
     </attribute>
     <attribute id="0x000E" name="DetachedRoleCount" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="false" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true"/>
       <optionalConform>
         <feature name="MLECNT"/>
       </optionalConform>
     </attribute>
     <attribute id="0x000F" name="ChildRoleCount" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="false" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true"/>
       <optionalConform>
         <feature name="MLECNT"/>
       </optionalConform>
     </attribute>
     <attribute id="0x0010" name="RouterRoleCount" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="false" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true"/>
       <optionalConform>
         <feature name="MLECNT"/>
       </optionalConform>
     </attribute>
     <attribute id="0x0011" name="LeaderRoleCount" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="false" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true"/>
       <optionalConform>
         <feature name="MLECNT"/>
       </optionalConform>
     </attribute>
     <attribute id="0x0012" name="AttachAttemptCount" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="false" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true"/>
       <optionalConform>
         <feature name="MLECNT"/>
       </optionalConform>
     </attribute>
     <attribute id="0x0013" name="PartitionIdChangeCount" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="false" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true"/>
       <optionalConform>
         <feature name="MLECNT"/>
       </optionalConform>
     </attribute>
     <attribute id="0x0014" name="BetterPartitionAttachAttemptCount" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="false" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true"/>
       <optionalConform>
         <feature name="MLECNT"/>
       </optionalConform>
     </attribute>
     <attribute id="0x0015" name="ParentChangeCount" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="false" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true"/>
       <optionalConform>
         <feature name="MLECNT"/>
       </optionalConform>
     </attribute>
     <attribute id="0x0016" name="TxTotalCount" type="uint32" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="false" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true"/>
       <optionalConform>
         <feature name="MACCNT"/>
       </optionalConform>
     </attribute>
     <attribute id="0x0017" name="TxUnicastCount" type="uint32" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="false" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true"/>
       <optionalConform>
         <feature name="MACCNT"/>
       </optionalConform>
     </attribute>
     <attribute id="0x0018" name="TxBroadcastCount" type="uint32" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="false" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true"/>
       <optionalConform>
         <feature name="MACCNT"/>
       </optionalConform>
     </attribute>
     <attribute id="0x0019" name="TxAckRequestedCount" type="uint32" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="false" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true"/>
       <optionalConform>
         <feature name="MACCNT"/>
       </optionalConform>
     </attribute>
     <attribute id="0x001A" name="TxAckedCount" type="uint32" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="false" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true"/>
       <optionalConform>
         <feature name="MACCNT"/>
       </optionalConform>
     </attribute>
     <attribute id="0x001B" name="TxNoAckRequestedCount" type="uint32" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="false" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true"/>
       <optionalConform>
         <feature name="MACCNT"/>
       </optionalConform>
     </attribute>
     <attribute id="0x001C" name="TxDataCount" type="uint32" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="false" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true"/>
       <optionalConform>
         <feature name="MACCNT"/>
       </optionalConform>
     </attribute>
     <attribute id="0x001D" name="TxDataPollCount" type="uint32" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="false" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true"/>
       <optionalConform>
         <feature name="MACCNT"/>
       </optionalConform>
     </attribute>
     <attribute id="0x001E" name="TxBeaconCount" type="uint32" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="false" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true"/>
       <optionalConform>
         <feature name="MACCNT"/>
       </optionalConform>
     </attribute>
     <attribute id="0x001F" name="TxBeaconRequestCount" type="uint32" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="false" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true"/>
       <optionalConform>
         <feature name="MACCNT"/>
       </optionalConform>
     </attribute>
     <attribute id="0x0020" name="TxOtherCount" type="uint32" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="false" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true"/>
       <optionalConform>
         <feature name="MACCNT"/>
       </optionalConform>
     </attribute>
     <attribute id="0x0021" name="TxRetryCount" type="uint32" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="false" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true"/>
       <optionalConform>
         <feature name="MACCNT"/>
       </optionalConform>
     </attribute>
     <attribute id="0x0022" name="TxDirectMaxRetryExpiryCount" type="uint32" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="false" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true"/>
       <optionalConform>
         <feature name="MACCNT"/>
       </optionalConform>
     </attribute>
     <attribute id="0x0023" name="TxIndirectMaxRetryExpiryCount" type="uint32" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="false" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true"/>
       <optionalConform>
         <feature name="MACCNT"/>
       </optionalConform>
     </attribute>
     <attribute id="0x0024" name="TxErrCcaCount" type="uint32" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="false" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true"/>
       <optionalConform>
         <feature name="MACCNT"/>
       </optionalConform>
     </attribute>
     <attribute id="0x0025" name="TxErrAbortCount" type="uint32" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="false" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true"/>
       <optionalConform>
         <feature name="MACCNT"/>
       </optionalConform>
     </attribute>
     <attribute id="0x0026" name="TxErrBusyChannelCount" type="uint32" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="false" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true"/>
       <optionalConform>
         <feature name="MACCNT"/>
       </optionalConform>
     </attribute>
     <attribute id="0x0027" name="RxTotalCount" type="uint32" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="false" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true"/>
       <optionalConform>
         <feature name="MACCNT"/>
       </optionalConform>
     </attribute>
     <attribute id="0x0028" name="RxUnicastCount" type="uint32" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="false" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true"/>
       <optionalConform>
         <feature name="MACCNT"/>
       </optionalConform>
     </attribute>
     <attribute id="0x0029" name="RxBroadcastCount" type="uint32" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="false" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true"/>
       <optionalConform>
         <feature name="MACCNT"/>
       </optionalConform>
     </attribute>
     <attribute id="0x002A" name="RxDataCount" type="uint32" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="false" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true"/>
       <optionalConform>
         <feature name="MACCNT"/>
       </optionalConform>
     </attribute>
     <attribute id="0x002B" name="RxDataPollCount" type="uint32" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="false" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true"/>
       <optionalConform>
         <feature name="MACCNT"/>
       </optionalConform>
     </attribute>
     <attribute id="0x002C" name="RxBeaconCount" type="uint32" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="false" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true"/>
       <optionalConform>
         <feature name="MACCNT"/>
       </optionalConform>
     </attribute>
     <attribute id="0x002D" name="RxBeaconRequestCount" type="uint32" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="false" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true"/>
       <optionalConform>
         <feature name="MACCNT"/>
       </optionalConform>
     </attribute>
     <attribute id="0x002E" name="RxOtherCount" type="uint32" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="false" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true"/>
       <optionalConform>
         <feature name="MACCNT"/>
       </optionalConform>
     </attribute>
     <attribute id="0x002F" name="RxAddressFilteredCount" type="uint32" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="false" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true"/>
       <optionalConform>
         <feature name="MACCNT"/>
       </optionalConform>
     </attribute>
     <attribute id="0x0030" name="RxDestAddrFilteredCount" type="uint32" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="false" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true"/>
       <optionalConform>
         <feature name="MACCNT"/>
       </optionalConform>
     </attribute>
     <attribute id="0x0031" name="RxDuplicatedCount" type="uint32" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="false" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true"/>
       <optionalConform>
         <feature name="MACCNT"/>
       </optionalConform>
     </attribute>
     <attribute id="0x0032" name="RxErrNoFrameCount" type="uint32" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="false" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true"/>
       <optionalConform>
         <feature name="MACCNT"/>
       </optionalConform>
     </attribute>
     <attribute id="0x0033" name="RxErrUnknownNeighborCount" type="uint32" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="false" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true"/>
       <optionalConform>
         <feature name="MACCNT"/>
       </optionalConform>
     </attribute>
     <attribute id="0x0034" name="RxErrInvalidSrcAddrCount" type="uint32" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="false" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true"/>
       <optionalConform>
         <feature name="MACCNT"/>
       </optionalConform>
     </attribute>
     <attribute id="0x0035" name="RxErrSecCount" type="uint32" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="false" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true"/>
       <optionalConform>
         <feature name="MACCNT"/>
       </optionalConform>
     </attribute>
     <attribute id="0x0036" name="RxErrFcsCount" type="uint32" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="false" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true"/>
       <optionalConform>
         <feature name="MACCNT"/>
       </optionalConform>
     </attribute>
     <attribute id="0x0037" name="RxErrOtherCount" type="uint32" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="false" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true"/>
       <optionalConform>
         <feature name="MACCNT"/>
       </optionalConform>
     </attribute>
     <attribute id="0x0038" name="ActiveTimestamp" type="uint64" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0039" name="PendingTimestamp" type="uint64" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x003A" name="Delay" type="uint32" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x003B" name="SecurityPolicy" type="SecurityPolicy">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x003C" name="ChannelPage0Mask" type="octstr">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <mandatoryConform/>
-      <constraint type="maxLength" value="4"/>
+      <constraint>
+        <allowed value="4"/>
+      </constraint>
     </attribute>
     <attribute id="0x003D" name="OperationalDatasetComponents" type="OperationalDatasetComponents">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x003E" name="ActiveNetworkFaultsList" type="list">
       <entry type="NetworkFaultEnum"/>
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
-      <constraint type="maxCount" value="4"/>
+      <constraint>
+        <maxCount value="4"/>
+      </constraint>
     </attribute>
     <attribute id="0x003F" name="ExtAddress" type="uint64">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
-      <mandatoryConform/>
+      <quality nullable="true"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform/>
+      </otherwiseConform>
     </attribute>
     <attribute id="0x0040" name="Rloc16" type="uint16">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
-      <mandatoryConform/>
+      <quality nullable="true"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform/>
+      </otherwiseConform>
     </attribute>
   </attributes>
   <commands>
@@ -699,12 +746,16 @@ Davis, CA 95616, USA
       <field id="0" name="Current" type="list">
         <entry type="NetworkFaultEnum"/>
         <mandatoryConform/>
-        <constraint type="maxCount" value="4"/>
+        <constraint>
+          <maxCount value="4"/>
+        </constraint>
       </field>
       <field id="1" name="Previous" type="list">
         <entry type="NetworkFaultEnum"/>
         <mandatoryConform/>
-        <constraint type="maxCount" value="4"/>
+        <constraint>
+          <maxCount value="4"/>
+        </constraint>
       </field>
     </event>
   </events>

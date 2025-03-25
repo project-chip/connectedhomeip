@@ -67,7 +67,7 @@ class ICDCheckInDelegateWrapper {
   }
 
   @SuppressWarnings("unused")
-  private void onKeyRefreshDone(int errorCode) {
+  private void onKeyRefreshDone(long errorCode) {
     delegate.onKeyRefreshDone(errorCode);
   }
 }

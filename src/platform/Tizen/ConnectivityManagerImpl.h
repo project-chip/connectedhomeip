@@ -134,7 +134,7 @@ private:
 
     // ===== Private members reserved for use by this class only.
 
-    char mEthIfName[IFNAMSIZ];
+    char mEthIfName[Inet::InterfaceId::kMaxIfNameLength];
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     ConnectivityManager::WiFiStationMode mWiFiStationMode;
@@ -143,7 +143,7 @@ private:
     System::Clock::Timestamp mLastAPDemandTime;
     System::Clock::Timeout mWiFiStationReconnectInterval;
     System::Clock::Timeout mWiFiAPIdleTimeout;
-    static char sWiFiIfName[IFNAMSIZ];
+    static char sWiFiIfName[Inet::InterfaceId::kMaxIfNameLength];
 #endif
 };
 

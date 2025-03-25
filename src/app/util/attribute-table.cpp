@@ -342,8 +342,8 @@ Status emAfWriteAttribute(const ConcreteAttributePath & path, const EmberAfWrite
     // if we dont support that attribute
     if (metadata == nullptr)
     {
-        ChipLogProgress(Zcl, "%p ep %x clus " ChipLogFormatMEI " attr " ChipLogFormatMEI " not supported",
-                        "WRITE ERR: ", path.mEndpointId, ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
+        ChipLogProgress(Zcl, "WRITE ERR: ep %x clus " ChipLogFormatMEI " attr " ChipLogFormatMEI " not supported", path.mEndpointId,
+                        ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
         return status;
     }
 
@@ -352,20 +352,20 @@ Status emAfWriteAttribute(const ConcreteAttributePath & path, const EmberAfWrite
     {
         if (input.dataType != metadata->attributeType)
         {
-            ChipLogProgress(Zcl, "%p invalid data type", "WRITE ERR: ");
+            ChipLogProgress(Zcl, "WRITE ERR: invalid data type");
             return Status::InvalidDataType;
         }
 
         if (metadata->IsReadOnly())
         {
-            ChipLogProgress(Zcl, "%p attr not writable", "WRITE ERR: ");
+            ChipLogProgress(Zcl, "WRITE ERR: attr not writable");
             return Status::UnsupportedWrite;
         }
     }
 
     // if the value the attribute is being set to is out of range
     // return Status::ConstraintError
-    if ((metadata->mask & ATTRIBUTE_MASK_MIN_MAX) != 0U)
+    if ((metadata->mask & MATTER_ATTRIBUTE_FLAG_MIN_MAX) != 0U)
     {
         EmberAfDefaultAttributeValue minv = metadata->defaultValue.ptrToMinMaxValue->minValue;
         EmberAfDefaultAttributeValue maxv = metadata->defaultValue.ptrToMinMaxValue->maxValue;

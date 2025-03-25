@@ -117,7 +117,7 @@ public:
     /**
      * @brief   Called at start up to apply hardware settings
      */
-    CHIP_ERROR Init();
+    CHIP_ERROR Init(chip::EndpointId powerSourceEndpointId);
 
     /**
      * @brief   Called at shutdown
@@ -143,7 +143,7 @@ public:
     /**
      * @brief   Allows a client application to initialise the PowerSource cluster
      */
-    CHIP_ERROR InitializePowerSourceCluster();
+    CHIP_ERROR InitializePowerSourceCluster(chip::EndpointId endpointId);
 
     /**
      * @brief   Allows a client application to send in power readings into the system
@@ -153,7 +153,7 @@ public:
      * @param[in]  aVoltage_mV       - Voltage measured in milli-volts
      * @param[in]  aActiveCurrent_mA - ActiveCurrent measured in milli-amps
      */
-    CHIP_ERROR SendPowerReading(EndpointId aEndpointId, int64_t aActivePower_mW, int64_t aVoltage_mV, int64_t aCurrent_mA);
+    CHIP_ERROR SendPowerReading(EndpointId aEndpointId, int64_t aActivePower_mW, int64_t aVoltage_mV, int64_t aCurrent_mA) override;
 
     /**
      * @brief   Allows a client application to send cumulative energy readings into the system
@@ -164,7 +164,7 @@ public:
      * @param[in]  aCumulativeEnergyExported -total energy exported in milli-watthours
      */
     CHIP_ERROR SendCumulativeEnergyReading(EndpointId aEndpointId, int64_t aCumulativeEnergyImported,
-                                           int64_t aCumulativeEnergyExported);
+                                           int64_t aCumulativeEnergyExported) override;
 
     /**
      * @brief   Allows a client application to send periodic energy readings into the system
@@ -175,7 +175,7 @@ public:
      * @param[in]  aPeriodicEnergyExported - energy exported in milli-watthours in last period
      */
     CHIP_ERROR SendPeriodicEnergyReading(EndpointId aEndpointId, int64_t aCumulativeEnergyImported,
-                                         int64_t aCumulativeEnergyExported);
+                                         int64_t aCumulativeEnergyExported) override;
 
     /**  Fake Meter data generation - used for testing EPM/EEM clusters */
     /**

@@ -18,6 +18,7 @@
 
 #include "Esp32AppServer.h"
 #include "CHIPDeviceManager.h"
+#include "Esp32ThreadInit.h"
 #include <app/InteractionModelEngine.h>
 #include <app/TestEventTriggerDelegate.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
@@ -25,6 +26,7 @@
 #include <app/clusters/water-heater-management-server/WaterHeaterManagementTestEventTriggerHandler.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <platform/ESP32/NetworkCommissioningDriver.h>
 
 #if CONFIG_CHIP_DEVICE_CONFIG_ENABLE_ENERGY_EVSE_TRIGGER
@@ -39,18 +41,6 @@
 #if CONFIG_CHIP_DEVICE_CONFIG_ENABLE_DEVICE_ENERGY_MANAGEMENT_TRIGGER
 #include <app/clusters/device-energy-management-server/DeviceEnergyManagementTestEventTriggerHandler.h>
 #endif
-
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-#if CONFIG_BT_ENABLED
-#include "esp_bt.h"
-#if CONFIG_BT_NIMBLE_ENABLED
-#if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0)
-#include "esp_nimble_hci.h"
-#endif // ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0)
-#include "nimble/nimble_port.h"
-#endif // CONFIG_BT_NIMBLE_ENABLED
-#endif // CONFIG_BT_ENABLED
-#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
 #ifdef CONFIG_ENABLE_CHIP_SHELL
 #include <lib/shell/commands/WiFi.h>
@@ -163,11 +153,14 @@ void Esp32AppServer::Init(AppDelegate * sAppDelegate)
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 #endif // CONFIG_TEST_EVENT_TRIGGER_ENABLED && CONFIG_ENABLE_OTA_REQUESTOR
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.dataModelProvider = app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
     if (sAppDelegate != nullptr)
     {
         initParams.appDelegate = sAppDelegate;
     }
     chip::Server::GetInstance().Init(initParams);
+
+    ESPOpenThreadInit();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #ifdef CONFIG_ENABLE_CHIP_SHELL

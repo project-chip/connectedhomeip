@@ -106,6 +106,10 @@ source_set("libwebsockets") {
     ]
 
     cflags = [ "-DLWS_PLAT_UNIX" ]
+
+    if (target_os == "ios") {
+      cflags += [ "-DLWS_DETECTED_PLAT_IOS" ]
+    }
   }
 
   public_configs = [ ":libwebsockets_config" ]

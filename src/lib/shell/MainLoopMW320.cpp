@@ -16,7 +16,6 @@
  */
 
 #include "streamer.h"
-#include <app/server/Server.h>
 #include <lib/shell/Engine.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/CommissionableDataProvider.h>
@@ -161,7 +160,7 @@ static void AtExitShell(void);
 static CHIP_ERROR ShutdownHandler(int argc, char ** argv)
 {
     streamer_printf(streamer_get(), "Shutdown and Goodbye\r\n");
-    Server::GetInstance().GenerateShutDownEvent();
+    DeviceLayer::PlatformMgr().ScheduleWork([](intptr_t) { DeviceLayer::PlatformMgr().HandleServerShuttingDown(); });
     // TODO: This is assuming that we did (on a different thread from this one)
     // RunEventLoop(), not StartEventLoopTask().  It will not work correctly
     // with StartEventLoopTask().
@@ -258,7 +257,7 @@ static void RegisterMetaCommands(void)
 
     std::atexit(AtExitShell);
 
-    Engine::Root().RegisterCommands(sCmds, ArraySize(sCmds));
+    Engine::Root().RegisterCommands(sCmds, MATTER_ARRAY_SIZE(sCmds));
 }
 
 // ----
@@ -273,7 +272,7 @@ void Engine::RunMainLoop()
     Engine::Root().RegisterDefaultCommands();
     RegisterMetaCommands();
 
-    while (true)
+    while (mRunning)
     {
         streamer_printf(streamer_get(), CHIP_SHELL_PROMPT);
 

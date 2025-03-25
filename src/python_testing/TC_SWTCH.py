@@ -17,33 +17,59 @@
 # See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
 # for details about the block below.
 #
+# TODO: https://github.com/project-chip/connectedhomeip/issues/36884
+#
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1 run2 run3 run4
-#
-# test-runner-run/run1/app: ${ALL_CLUSTERS_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --endpoint 1 --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto --PICS src/app/tests/suites/certification/ci-pics-values
-#
-# test-runner-run/run2/app: ${ALL_CLUSTERS_APP}
-# test-runner-run/run2/factoryreset: True
-# test-runner-run/run2/quiet: True
-# test-runner-run/run2/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run2/script-args: --endpoint 2 --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto --PICS src/app/tests/suites/certification/ci-pics-values
-#
-# test-runner-run/run3/app: ${ALL_CLUSTERS_APP}
-# test-runner-run/run3/factoryreset: True
-# test-runner-run/run3/quiet: True
-# test-runner-run/run3/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run3/script-args: --endpoint 3 --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto --PICS src/app/tests/suites/certification/ci-pics-values
-#
-# test-runner-run/run4/app: ${ALL_CLUSTERS_APP}
-# test-runner-run/run4/factoryreset: True
-# test-runner-run/run4/quiet: True
-# test-runner-run/run4/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run4/script-args: --endpoint 4 --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto --PICS src/app/tests/suites/certification/ci-pics-values
-#
+# test-runner-runs:
+#   run1:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --test-case test_TC_SWTCH_2_2
+#       --endpoint 1
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#     factory-reset: true
+#     quiet: true
+#   run2:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --test-case test_TC_SWTCH_2_3
+#       --test-case test_TC_SWTCH_2_4
+#       --test-case test_TC_SWTCH_2_6
+#       --endpoint 3
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#     factory-reset: true
+#     quiet: true
+#   run3:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --test-case test_TC_SWTCH_2_3
+#       --test-case test_TC_SWTCH_2_4
+#       --test-case test_TC_SWTCH_2_5
+#       --endpoint 4
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 #
 # These tests run on every endpoint regardless of whether a switch is present because they are set up to auto-select.
@@ -59,10 +85,10 @@ import chip.clusters as Clusters
 import test_plan_support
 from chip.clusters import ClusterObjects as ClusterObjects
 from chip.clusters.Attribute import EventReadResult
+from chip.testing.matter_testing import (AttributeValue, ClusterAttributeChangeAccumulator, EventChangeCallback, MatterBaseTest,
+                                         TestStep, await_sequence_of_reports, default_matter_test_main, has_feature,
+                                         run_if_endpoint_matches)
 from chip.tlv import uint
-from matter_testing_support import (AttributeValue, ClusterAttributeChangeAccumulator, EventChangeCallback, MatterBaseTest,
-                                    TestStep, await_sequence_of_reports, default_matter_test_main, has_feature,
-                                    run_if_endpoint_matches)
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
@@ -250,7 +276,8 @@ class TC_SwitchTests(MatterBaseTest):
         elapsed = 0.0
         time_remaining = timeout_sec
 
-        logging.info(f"Waiting {timeout_sec:.1f} seconds for no more events for cluster {expected_cluster} on endpoint {endpoint_id}")
+        logging.info(f"Waiting {timeout_sec:.1f} seconds for no more events for "
+                     f"cluster {expected_cluster} on endpoint {endpoint_id}")
         while time_remaining > 0:
             try:
                 item: EventReadResult = event_queue.get(block=True, timeout=time_remaining)
@@ -304,7 +331,7 @@ class TC_SwitchTests(MatterBaseTest):
     async def test_TC_SWTCH_2_2(self):
         post_prompt_settle_delay_seconds = 10.0
         cluster = Clusters.Switch
-        endpoint_id = self.matter_test_config.endpoint
+        endpoint_id = self.get_endpoint()
 
         # Step 1: Commissioning - already done
         self.step(1)
@@ -421,7 +448,7 @@ class TC_SwitchTests(MatterBaseTest):
         has_msl_feature = (feature_map & cluster.Bitmaps.Feature.kMomentarySwitchLongPress) != 0
         has_as_feature = (feature_map & cluster.Bitmaps.Feature.kActionSwitch) != 0
 
-        endpoint_id = self.matter_test_config.endpoint
+        endpoint_id = self.get_endpoint()
 
         self.step(2)
         event_listener = EventChangeCallback(cluster)
@@ -493,7 +520,7 @@ class TC_SwitchTests(MatterBaseTest):
         switch_pressed_position = self._default_pressed_position
         post_prompt_settle_delay_seconds = 10.0
 
-        endpoint_id = self.matter_test_config.endpoint
+        endpoint_id = self.get_endpoint()
         cluster = Clusters.Objects.Switch
 
         # Step 1: Commission DUT - already done
@@ -673,7 +700,7 @@ class TC_SwitchTests(MatterBaseTest):
         has_msr_feature = (feature_map & cluster.Bitmaps.Feature.kMomentarySwitchRelease)
         multi_press_max = await self.read_single_attribute_check_success(cluster, attribute=cluster.Attributes.MultiPressMax)
 
-        endpoint_id = self.matter_test_config.endpoint
+        endpoint_id = self.get_endpoint()
         pressed_position = self._default_pressed_position
 
         self.step(2)
@@ -851,7 +878,7 @@ class TC_SwitchTests(MatterBaseTest):
         has_msl_feature = (feature_map & cluster.Bitmaps.Feature.kMomentarySwitchLongPress)
         multi_press_max = await self.read_single_attribute_check_success(cluster, attribute=cluster.Attributes.MultiPressMax)
 
-        endpoint_id = self.matter_test_config.endpoint
+        endpoint_id = self.get_endpoint()
         pressed_position = self._default_pressed_position
 
         self.step(2)
@@ -892,6 +919,7 @@ class TC_SwitchTests(MatterBaseTest):
         self.step("7a")
         if not has_msl_feature:
             self.skip_all_remaining_steps("7b")
+            return
 
         # subscription is already established
         self.step("7b")

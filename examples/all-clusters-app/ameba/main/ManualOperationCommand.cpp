@@ -136,20 +136,22 @@ static void RegisterManualOperationCommands()
                                                              "Manual Operation commands. Usage: manual <subcommand>" };
 
     // Register commands
-    sShellManualOperationSubCommands.RegisterCommands(sManualOperationSubCommands, ArraySize(sManualOperationSubCommands));
+    sShellManualOperationSubCommands.RegisterCommands(sManualOperationSubCommands, MATTER_ARRAY_SIZE(sManualOperationSubCommands));
     sShellManualOperationalStateSubCommands.RegisterCommands(sManualOperationalStateSubCommands,
-                                                             ArraySize(sManualOperationalStateSubCommands));
-    sShellManualRVCSubCommands.RegisterCommands(sManualRVCSubCommands, ArraySize(sManualRVCSubCommands));
+                                                             MATTER_ARRAY_SIZE(sManualOperationalStateSubCommands));
+    sShellManualRVCSubCommands.RegisterCommands(sManualRVCSubCommands, MATTER_ARRAY_SIZE(sManualRVCSubCommands));
     sShellManualRVCOperationalStateSubCommands.RegisterCommands(sManualRVCOperationalStateSubCommands,
-                                                                ArraySize(sManualRVCOperationalStateSubCommands));
-    sShellManualRVCRunModeSubCommands.RegisterCommands(sManualRVCRunModeSubCommands, ArraySize(sManualRVCRunModeSubCommands));
-    sShellManualRVCCleanModeSubCommands.RegisterCommands(sManualRVCCleanModeSubCommands, ArraySize(sManualRVCCleanModeSubCommands));
+                                                                MATTER_ARRAY_SIZE(sManualRVCOperationalStateSubCommands));
+    sShellManualRVCRunModeSubCommands.RegisterCommands(sManualRVCRunModeSubCommands,
+                                                       MATTER_ARRAY_SIZE(sManualRVCRunModeSubCommands));
+    sShellManualRVCCleanModeSubCommands.RegisterCommands(sManualRVCCleanModeSubCommands,
+                                                         MATTER_ARRAY_SIZE(sManualRVCCleanModeSubCommands));
     sShellManualRefrigeratorAlarmStateSubCommands.RegisterCommands(sManualRefrigeratorAlarmStateSubCommands,
-                                                                   ArraySize(sManualRefrigeratorAlarmStateSubCommands));
+                                                                   MATTER_ARRAY_SIZE(sManualRefrigeratorAlarmStateSubCommands));
     sShellManualDishWasherAlarmStateSubCommands.RegisterCommands(sManualDishWasherAlarmSubCommands,
-                                                                 ArraySize(sManualDishWasherAlarmSubCommands));
-    sShellManualOvenCavityOperationalStateSubCommands.RegisterCommands(sManualOvenCavityOperationalStateSubCommands,
-                                                                       ArraySize(sManualOvenCavityOperationalStateSubCommands));
+                                                                 MATTER_ARRAY_SIZE(sManualDishWasherAlarmSubCommands));
+    sShellManualOvenCavityOperationalStateSubCommands.RegisterCommands(
+        sManualOvenCavityOperationalStateSubCommands, MATTER_ARRAY_SIZE(sManualOvenCavityOperationalStateSubCommands));
 
     Engine::Root().RegisterCommands(&sManualOperationCommand, 1);
 }

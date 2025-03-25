@@ -48,6 +48,7 @@ private:
     friend class AppTaskCommon;
 
     CHIP_ERROR Init(void);
+    void LinkLeds(LedManager & ledManager);
 
     static void LightingActionEventHandler(AppEvent * aEvent);
 #ifdef CONFIG_CHIP_ENABLE_POWER_ON_FACTORY_RESET

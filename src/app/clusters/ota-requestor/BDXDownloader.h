@@ -73,7 +73,7 @@ public:
     // instead.
     void EndDownload(CHIP_ERROR reason = CHIP_NO_ERROR) override;
     CHIP_ERROR FetchNextData() override;
-    // TODO: override SkipData
+    CHIP_ERROR SkipData(uint32_t numBytes) override;
 
     System::Clock::Timeout GetTimeout();
     // If True, there's been a timeout in the transfer as measured by no download progress after 'mTimeout' seconds.

@@ -194,9 +194,7 @@ tests:
           value: 2
 
     - label: "Step 1j: Simulate a not fully locked scenario on the DUT."
-      PICS:
-          DRLK.S.A0000 && DRLK.S.M.SimulateNotFullyLocked &&
-          PICS_SKIP_SAMPLE_APP
+      PICS: DRLK.S.A0000 && DRLK.S.M.SimulateNotFullyLocked && PICS_USER_PROMPT
       verification: |
           vendor will give instructions on how to simulate if applicable and if that is possible, then send the below command to read the lock state attribute.
 
@@ -317,7 +315,7 @@ tests:
 
     #Test plan issue: https://github.com/CHIP-Specifications/chip-test-plans/issues/2863
     - label: "Step 5c: TH reads DoorOpenEvents attribute from DUT"
-      PICS: DRLK.S.A0004 && PICS_SKIP_SAMPLE_APP
+      PICS: DRLK.S.A0004 && PICS_USER_PROMPT
       verification: |
           This is an Optional attribute, so its not compulsory to get the expected outcome
 
@@ -371,7 +369,7 @@ tests:
 
     #Test plan issue: https://github.com/CHIP-Specifications/chip-test-plans/issues/2863
     - label: "Step 6c: TH reads DoorOpenEvents attribute from DUT"
-      PICS: DRLK.S.A0005 && PICS_SKIP_SAMPLE_APP
+      PICS: DRLK.S.A0005 && PICS_USER_PROMPT
       verification: |
           This is an Optional attribute, so its not compulsory to get the expected outcome
 

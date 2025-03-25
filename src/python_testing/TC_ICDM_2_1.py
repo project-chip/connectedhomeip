@@ -19,19 +19,27 @@
 # for details about the block below.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${LIT_ICD_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# test-runner-runs:
+#   run1:
+#     app: ${LIT_ICD_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
 import re
 
 import chip.clusters as Clusters
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
@@ -230,8 +238,8 @@ class TC_ICDM_2_1(MatterBaseTest):
             uatHintInstructionDepedentBitmap = uat(
                 userActiveModeTriggerHint) & kUatInstructionDependentBitMask
 
-        asserts.assert_less_equal(
-            self.set_bits_count(uatHintInstructionDepedentBitmap), 1, "UserActiveModeTriggerHint has more than 1 bit that is dependent on the UserActiveModeTriggerInstruction")
+            asserts.assert_less_equal(
+                self.set_bits_count(uatHintInstructionDepedentBitmap), 1, "UserActiveModeTriggerHint has more than 1 bit that is dependent on the UserActiveModeTriggerInstruction")
 
         # Valdate UserActiveModeTriggerInstruction
         self.step(9)
@@ -260,7 +268,7 @@ class TC_ICDM_2_1(MatterBaseTest):
                 pattern = re.compile(r'^[0-9A-F]{6}$')
                 asserts.assert_true(pattern.match(userActiveModeTriggerInstruction),
                                     "UserActiveModeTriggerInstruction is not in the correct format for the associated UserActiveModeTriggerHint")
-        else:
+        elif self.check_pics("ICDM.S.A0006"):
             # Check if the UserActiveModeTriggerInstruction was required
             asserts.assert_false(uatHintInstructionDepedentBitmap in kUatInstructionMandatoryBitMask,
                                  "UserActiveModeTriggerHint requires the UserActiveModeTriggerInstruction")

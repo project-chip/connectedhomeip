@@ -18,6 +18,7 @@
 #pragma once
 
 #include <app/AppConfig.h>
+#include <app/DataVersionFilter.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/TLV.h>
@@ -53,6 +54,16 @@ public:
      *  @return A reference to DataVersionFilterIB::Builder
      */
     DataVersionFilterIB::Builder & GetDataVersionFilter() { return mDataVersionFilter; };
+
+    /**
+     * Add a DataVersionFilter to the list.  This is a convenience method
+     * that will handle calling CreateDataVersionFilter() and then using the
+     * result to encode the provided DataVersionFilter.
+     *
+     * The passed-in DataVersionFilter is assumed to pass the
+     * IsValidDataVersionFilter() test.
+     */
+    CHIP_ERROR EncodeDataVersionFilterIB(const DataVersionFilter & aFilter);
 
     /**
      *  @brief Mark the end of this DataVersionFilterIBs

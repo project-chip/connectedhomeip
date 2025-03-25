@@ -45,7 +45,7 @@ void ThermostatDelegate::InitializePresets()
 {
     // Initialize the presets with 2 built in presets - occupied and unoccupied.
     PresetScenarioEnum presetScenarioEnumArray[2] = { PresetScenarioEnum::kOccupied, PresetScenarioEnum::kUnoccupied };
-    static_assert(ArraySize(presetScenarioEnumArray) <= ArraySize(mPresets));
+    static_assert(MATTER_ARRAY_SIZE(presetScenarioEnumArray) <= MATTER_ARRAY_SIZE(mPresets));
 
     uint8_t index = 0;
     for (PresetScenarioEnum presetScenario : presetScenarioEnumArray)
@@ -91,7 +91,7 @@ CHIP_ERROR ThermostatDelegate::GetPresetTypeAtIndex(size_t index, PresetTypeStru
           .numberOfPresets    = kMaxNumberOfPresetsOfEachType,
           .presetTypeFeatures = to_underlying(PresetTypeFeaturesBitmap::kSupportsNames) },
     };
-    if (index < ArraySize(presetTypes))
+    if (index < MATTER_ARRAY_SIZE(presetTypes))
     {
         presetType = presetTypes[index];
         return CHIP_NO_ERROR;
@@ -182,7 +182,7 @@ void ThermostatDelegate::InitializePendingPresets()
 
 CHIP_ERROR ThermostatDelegate::AppendToPendingPresetList(const PresetStructWithOwnedMembers & preset)
 {
-    if (mNextFreeIndexInPendingPresetsList < ArraySize(mPendingPresets))
+    if (mNextFreeIndexInPendingPresetsList < MATTER_ARRAY_SIZE(mPendingPresets))
     {
         mPendingPresets[mNextFreeIndexInPendingPresetsList] = preset;
         if (preset.GetPresetHandle().IsNull())

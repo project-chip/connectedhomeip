@@ -48,13 +48,16 @@ target_sources(app PRIVATE
                ${TELINK_COMMON}/zephyr_ext/zephyr_key_matrix.c
                ${TELINK_COMMON}/zephyr_ext/zephyr_key_pool.c
                ${TELINK_COMMON}/zephyr_ext/zephyr_led_pool.c
-               ${TELINK_COMMON}/zephyr_ext/zephyr_pwm_pool.c
                ${TELINK_COMMON}/zephyr_ext/zephyr_ws2812.c)
 
 chip_configure_data_model(app
-    INCLUDE_SERVER
     ZAP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../lighting-common/lighting-app.zap
 )
+
+if(CONFIG_PWM)
+	target_sources(app PRIVATE 
+                   ${TELINK_COMMON}/zephyr_ext/zephyr_pwm_pool.c)
+endif()
 
 if(CONFIG_BOOTLOADER_MCUBOOT)
   target_sources(app PRIVATE ${TELINK_COMMON}/util/src/OTAUtil.cpp)

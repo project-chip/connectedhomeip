@@ -1,0 +1,239 @@
+# Copyright (c) 2025 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/efr32_sdk.gni")
+import("//build_overrides/pigweed.gni")
+
+import("${build_root}/config/defaults.gni")
+import("${silabs_sdk_build_root}/silabs_executable.gni")
+
+import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
+import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/third_party/silabs/silabs_board.gni")
+
+if (chip_enable_pw_rpc) {
+  import("//build_overrides/pigweed.gni")
+  import("$dir_pw_build/target_types.gni")
+}
+
+assert(current_os == "freertos")
+
+silabs_project_dir = "${chip_root}/examples/closure-app/silabs"
+examples_common_plat_dir = "${chip_root}/examples/platform/silabs"
+example_closure_dir = "${chip_root}/examples/closure-app"
+
+if (wifi_soc) {
+  import("${chip_root}/third_party/silabs/SiWx917_sdk.gni")
+  examples_plat_dir = "${chip_root}/examples/platform/silabs/SiWx917"
+} else {
+  import("${silabs_sdk_build_root}/efr32_sdk.gni")
+  examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
+}
+
+import("${examples_common_plat_dir}/args.gni")
+
+declare_args() {
+  # Dump memory usage at link time.
+  chip_print_memory_usage = false
+}
+
+if (slc_generate) {
+  # Generate Project Specific config (Board, hardware used etc..)
+  print(exec_script("${chip_root}/third_party/silabs/slc_gen/run_slc.py",
+                    [
+                      rebase_path(chip_root),
+                      "${silabs_board}",
+                      "${disable_lcd}",
+                      "${use_wstk_buttons}",
+                      "${use_wstk_leds}",
+                      "${use_external_flash}",
+                      "${silabs_mcu}",
+                      rebase_path(slc_gen_path),
+                    ],
+                    "list lines"))
+}
+
+if (wifi_soc) {
+  siwx917_sdk("sdk") {
+    sources = [
+      "${examples_common_plat_dir}/FreeRTOSConfig.h",
+      "${silabs_project_dir}/include/CHIPProjectConfig.h",
+    ]
+
+    include_dirs = [
+      "${chip_root}/src/platform/silabs/SiWx917",
+      "${silabs_project_dir}/include",
+      "${examples_plat_dir}",
+      "${chip_root}/src/lib",
+      "${examples_common_plat_dir}",
+    ]
+
+    defines = []
+    if (chip_enable_pw_rpc) {
+      defines += [
+        "HAL_VCOM_ENABLE=1",
+        "PW_RPC_ENABLED",
+      ]
+    }
+  }
+} else {
+  efr32_sdk("sdk") {
+    sources = [
+      "${examples_common_plat_dir}/FreeRTOSConfig.h",
+      "${silabs_project_dir}/include/CHIPProjectConfig.h",
+    ]
+
+    include_dirs = [
+      "${chip_root}/src/platform/silabs/efr32",
+      "${silabs_project_dir}/include",
+      "${examples_plat_dir}",
+      "${chip_root}/src/lib",
+      "${examples_common_plat_dir}",
+    ]
+
+    if (use_wf200) {
+      # TODO efr32_sdk should not need a header from this location
+      include_dirs += [ "${examples_plat_dir}/wf200" ]
+    }
+
+    if (chip_enable_ble_rs911x) {
+      # TODO efr32_sdk should not need a header from this location
+      include_dirs += [
+        "${examples_plat_dir}/rs911x",
+        "${examples_plat_dir}/rs911x/hal",
+      ]
+    }
+
+    defines = []
+    if (chip_enable_pw_rpc) {
+      defines += [
+        "HAL_VCOM_ENABLE=1",
+        "PW_RPC_ENABLED",
+      ]
+    }
+  }
+}
+silabs_executable("closure-app") {
+  output_name = "matter-silabs-closure-example.out"
+  include_dirs = [
+    "include",
+    "${example_closure_dir}/closure-common/closure-control/include",
+    "${example_closure_dir}/closure-common/common/include",
+  ]
+  defines = []
+
+  if (silabs_board == "BRD2704A") {
+    defines += [ "SL_STATUS_LED=0" ]
+  }
+
+  sources = [
+    "${example_closure_dir}/closure-common/closure-control/src/ClosureControlDelegateImpl.cpp",
+    "${example_closure_dir}/closure-common/closure-control/src/ClosureControlInstance.cpp",
+    "${example_closure_dir}/closure-common/closure-control/src/ClosureControlMain.cpp",
+    "${example_closure_dir}/closure-common/common/src/ClosureAppCommonMain.cpp",
+    "${examples_common_plat_dir}/main.cpp",
+    "src/AppTask.cpp",
+    "src/DataModelCallbacks.cpp",
+  ]
+
+  deps = [ ":sdk" ]
+
+  if (wifi_soc) {
+    deps += [ "${examples_plat_dir}:siwx917-common" ]
+  } else {
+    deps += [ "${examples_plat_dir}:efr32-common" ]
+  }
+
+  if (chip_enable_pw_rpc) {
+    defines += [
+      "PW_RPC_ENABLED",
+      "PW_RPC_ATTRIBUTE_SERVICE=1",
+      "PW_RPC_BUTTON_SERVICE=1",
+      "PW_RPC_DESCRIPTOR_SERVICE=1",
+      "PW_RPC_DEVICE_SERVICE=1",
+      "PW_RPC_LIGHTING_SERVICE=1",
+      "PW_RPC_OTCLI_SERVICE=1",
+      "PW_RPC_THREAD_SERVICE=1",
+      "PW_RPC_TRACING_SERVICE=1",
+    ]
+
+    sources += [
+      "${chip_root}/examples/common/pigweed/RpcService.cpp",
+      "${chip_root}/examples/common/pigweed/efr32/PigweedLoggerMutex.cpp",
+      "${examples_common_plat_dir}/PigweedLogger.cpp",
+      "${examples_common_plat_dir}/Rpc.cpp",
+    ]
+
+    deps += [
+      "$dir_pw_hdlc:rpc_channel_output",
+      "$dir_pw_stream:sys_io_stream",
+      "$dir_pw_trace",
+      "$dir_pw_trace_tokenized",
+      "$dir_pw_trace_tokenized:trace_rpc_service",
+      "${chip_root}/config/efr32/lib/pw_rpc:pw_rpc",
+      "${chip_root}/examples/common/pigweed:attributes_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:button_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:descriptor_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:device_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:ot_cli_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:thread_service.nanopb_rpc",
+    ]
+
+    if (wifi_soc) {
+      deps += [ "${examples_plat_dir}/pw_sys_io:pw_sys_io_siwx917" ]
+    } else {
+      deps += [ "${examples_common_plat_dir}/pw_sys_io:pw_sys_io_silabs" ]
+    }
+
+    deps += pw_build_LINK_DEPS
+
+    include_dirs += [
+      "${chip_root}/examples/common",
+      "${chip_root}/examples/common/pigweed/efr32",
+    ]
+  }
+
+  ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}.ld"
+
+  inputs = [ ldscript ]
+
+  ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
+
+  if (chip_print_memory_usage) {
+    ldflags += [
+      "-Wl,--print-memory-usage",
+      "-fstack-usage",
+    ]
+  }
+
+  # WiFi Settings
+  if (chip_enable_wifi) {
+    ldflags += [
+      "-Wl,--defsym",
+      "-Wl,SILABS_WIFI=1",
+    ]
+  }
+
+  output_dir = root_out_dir
+}
+
+group("silabs") {
+  deps = [ ":closure-app" ]
+}
+
+group("default") {
+  deps = [ ":silabs" ]
+}

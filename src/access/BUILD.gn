@@ -43,6 +43,7 @@ source_set("types") {
 
   public_deps = [
     ":access_config",
+    "${chip_root}/src/app:app_config",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/core:types",
   ]
@@ -76,5 +77,15 @@ static_library("access") {
       "AccessRestrictionProvider.cpp",
       "AccessRestrictionProvider.h",
     ]
+    public_deps += [ "${chip_root}/src/app/common:cluster-objects" ]
   }
+}
+
+source_set("provider-impl") {
+  sources = [ "ProviderDeviceTypeResolver.h" ]
+
+  public_deps = [
+    ":access",
+    "${chip_root}/src/app/data-model-provider",
+  ]
 }

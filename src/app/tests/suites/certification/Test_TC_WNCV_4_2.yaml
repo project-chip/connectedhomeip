@@ -73,7 +73,7 @@ tests:
       PICS: WNCV.S.F01 && WNCV.S.C08.Rsp
       arguments:
           values:
-              - name: "tiltPercent100thsValue"
+              - name: "TiltPercent100thsValue"
                 value: 3000
 
     ### Depends on a sleep/wait command how to do this with a real device for CI keep at 100ms
@@ -142,7 +142,7 @@ tests:
       PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.C08.Rsp
       arguments:
           values:
-              - name: "tiltPercent100thsValue"
+              - name: "TiltPercent100thsValue"
                 value: 6005
 
     ### Depends on a sleep/wait command how to do this with a real device for CI keep at 100ms

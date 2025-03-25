@@ -39,7 +39,6 @@ add_library(
 )
 
 chip_configure_data_model(chip_main
-    INCLUDE_SERVER
     ZAP_FILE ${matter_example_path}/../ota-requestor-common/ota-requestor-app.zap
 )
 
@@ -63,6 +62,7 @@ target_include_directories(
     ${chip_dir}/src/app/clusters/ota-requestor
     ${chip_dir}/examples/ota-requestor-app/ameba/main/include
     ${chip_dir}/examples/platform/ameba
+    ${chip_dir}/examples/platform/ameba/observer
     ${chip_dir}/examples/providers
     ${sdk_root}/component/soc/realtek/amebad/fwlib/include
 )

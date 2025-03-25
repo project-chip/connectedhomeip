@@ -14,6 +14,7 @@
 
 import os
 from enum import Enum, auto
+from typing import Optional
 
 from .builder import BuilderOutput
 from .gn import GnBuilder
@@ -108,7 +109,8 @@ class QpgBuilder(GnBuilder):
                  board: QpgBoard = QpgBoard.QPG6105,
                  flavour: QpgFlavour = QpgFlavour.EXT_FLASH,
                  enable_rpcs: bool = False,
-                 update_image: bool = False):
+                 update_image: bool = False,
+                 ):
         super(QpgBuilder, self).__init__(
             root=app.BuildRoot(root),
             runner=runner)

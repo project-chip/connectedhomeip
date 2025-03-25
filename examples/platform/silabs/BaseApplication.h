@@ -73,6 +73,7 @@ private:
     bool isComissioningStarted = false;
     void OnCommissioningSessionStarted() override;
     void OnCommissioningSessionStopped() override;
+    void OnCommissioningSessionEstablishmentError(CHIP_ERROR err) override;
     void OnCommissioningWindowClosed() override;
 
     // FabricTable::Delegate
@@ -175,6 +176,11 @@ public:
 
 protected:
     CHIP_ERROR Init();
+    CHIP_ERROR BaseInit();
+    /** @brief Template for to implement a Application specific init.
+     *              Function is called after the BaseApplication::Init function.
+     */
+    virtual CHIP_ERROR AppInit() = 0;
 
     /**
      * @brief Function called to start the function timer

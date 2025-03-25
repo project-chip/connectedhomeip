@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -65,10 +65,7 @@ Davis, CA 95616, USA
     <revision revision="4" summary="All Hubs changes"/>
     <revision revision="5" summary="New data model format and notation, FeatureMap support"/>
     <revision revision="6" summary="Added clarifications to Scenes support for Matter"/>
-    <revision revision="7" summary="Added Q quality for CurrentHue, CurrentSaturation, CurrentX, CurrentY, ColorTemperatureMireds,
-             EnhancedCurrentHue and RemainingTime attributes.
-             Added clarifications for behavior related to Step values.
-             Added constraints on minimum acceptable color temperature values in mireds."/>
+    <revision revision="7" summary="Added Q quality for CurrentHue, CurrentSaturation, CurrentX, CurrentY, ColorTemperatureMireds, EnhancedCurrentHue and RemainingTime attributes. Added clarifications for behavior related to Step values. Added constraints on minimum acceptable color temperature values in mireds."/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0300" name="Color Control"/>
@@ -246,78 +243,96 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="CurrentHue" type="uint8" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="true" sourceAttribution="false" quieterReporting="true"/>
+      <quality persistence="nonVolatile" reportable="true" quieterReporting="true"/>
       <mandatoryConform>
         <feature name="HS"/>
       </mandatoryConform>
-      <constraint type="max" value="254"/>
+      <constraint>
+        <max value="254"/>
+      </constraint>
     </attribute>
     <attribute id="0x0001" name="CurrentSaturation" type="uint8" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="true" persistence="nonVolatile" reportable="true" sourceAttribution="false" quieterReporting="true"/>
+      <quality scene="true" persistence="nonVolatile" reportable="true" quieterReporting="true"/>
       <mandatoryConform>
         <feature name="HS"/>
       </mandatoryConform>
-      <constraint type="max" value="254"/>
+      <constraint>
+        <max value="254"/>
+      </constraint>
     </attribute>
     <attribute id="0x0002" name="RemainingTime" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
+      <quality quieterReporting="true"/>
       <optionalConform/>
-      <constraint type="max" value="65534"/>
+      <constraint>
+        <max value="65534"/>
+      </constraint>
     </attribute>
-    <attribute id="0x0003" name="CurrentX" type="uint16" default="24939 (0.381)">
+    <attribute id="0x0003" name="CurrentX" type="uint16" default="24939">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="true" persistence="nonVolatile" reportable="true" sourceAttribution="false" quieterReporting="true"/>
+      <quality scene="true" persistence="nonVolatile" reportable="true" quieterReporting="true"/>
       <mandatoryConform>
         <feature name="XY"/>
       </mandatoryConform>
-      <constraint type="max" value="65279"/>
+      <constraint>
+        <max value="65279"/>
+      </constraint>
     </attribute>
-    <attribute id="0x0004" name="CurrentY" type="uint16" default="24701 (0.377)">
+    <attribute id="0x0004" name="CurrentY" type="uint16" default="24701">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="true" persistence="nonVolatile" reportable="true" sourceAttribution="false" quieterReporting="true"/>
+      <quality scene="true" persistence="nonVolatile" reportable="true" quieterReporting="true"/>
       <mandatoryConform>
         <feature name="XY"/>
       </mandatoryConform>
-      <constraint type="max" value="65279"/>
+      <constraint>
+        <max value="65279"/>
+      </constraint>
     </attribute>
-    <attribute id="0x0005" name="DriftCompensation" type="DriftCompensationEnum" default="-">
+    <attribute id="0x0005" name="DriftCompensation" type="DriftCompensationEnum" default="">
       <access read="true" readPrivilege="view"/>
       <optionalConform/>
     </attribute>
-    <attribute id="0x0006" name="CompensationText" type="string" default="-">
+    <attribute id="0x0006" name="CompensationText" type="string" default="">
       <access read="true" readPrivilege="view"/>
       <optionalConform/>
-      <constraint type="maxLength" value="254"/>
+      <constraint>
+        <maxLength value="254"/>
+      </constraint>
     </attribute>
-    <attribute id="0x0007" name="ColorTemperatureMireds" type="uint16" default="250 (4000K)">
+    <attribute id="0x0007" name="ColorTemperatureMireds" type="uint16" default="250">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="true" persistence="nonVolatile" reportable="true" sourceAttribution="false" quieterReporting="true"/>
+      <quality scene="true" persistence="nonVolatile" reportable="true" quieterReporting="true"/>
       <mandatoryConform>
         <feature name="CT"/>
       </mandatoryConform>
-      <constraint type="max" value="65279"/>
+      <constraint>
+        <max value="65279"/>
+      </constraint>
     </attribute>
     <attribute id="0x0008" name="ColorMode" type="ColorModeEnum" default="1">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x000F" name="Options" type="OptionsBitmap" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
       <mandatoryConform/>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0010" name="NumberOfPrimaries" type="uint8">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="fixed"/>
       <mandatoryConform/>
-      <constraint type="max" value="6"/>
+      <constraint>
+        <max value="6"/>
+      </constraint>
     </attribute>
     <attribute id="0x0011" name="Primary1X" type="uint16">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <otherwiseConform>
         <mandatoryConform>
           <greaterTerm>
@@ -327,11 +342,13 @@ Davis, CA 95616, USA
         </mandatoryConform>
         <optionalConform/>
       </otherwiseConform>
-      <constraint type="max" value="65279"/>
+      <constraint>
+        <max value="65279"/>
+      </constraint>
     </attribute>
     <attribute id="0x0012" name="Primary1Y" type="uint16">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <otherwiseConform>
         <mandatoryConform>
           <greaterTerm>
@@ -341,11 +358,13 @@ Davis, CA 95616, USA
         </mandatoryConform>
         <optionalConform/>
       </otherwiseConform>
-      <constraint type="max" value="65279"/>
+      <constraint>
+        <max value="65279"/>
+      </constraint>
     </attribute>
     <attribute id="0x0013" name="Primary1Intensity" type="uint8">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="fixed"/>
       <otherwiseConform>
         <mandatoryConform>
           <greaterTerm>
@@ -358,7 +377,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0015" name="Primary2X" type="uint16">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <otherwiseConform>
         <mandatoryConform>
           <greaterTerm>
@@ -368,11 +387,13 @@ Davis, CA 95616, USA
         </mandatoryConform>
         <optionalConform/>
       </otherwiseConform>
-      <constraint type="max" value="65279"/>
+      <constraint>
+        <max value="65279"/>
+      </constraint>
     </attribute>
     <attribute id="0x0016" name="Primary2Y" type="uint16">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <otherwiseConform>
         <mandatoryConform>
           <greaterTerm>
@@ -382,11 +403,13 @@ Davis, CA 95616, USA
         </mandatoryConform>
         <optionalConform/>
       </otherwiseConform>
-      <constraint type="max" value="65279"/>
+      <constraint>
+        <max value="65279"/>
+      </constraint>
     </attribute>
     <attribute id="0x0017" name="Primary2Intensity" type="uint8">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="fixed"/>
       <otherwiseConform>
         <mandatoryConform>
           <greaterTerm>
@@ -399,7 +422,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0019" name="Primary3X" type="uint16">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <otherwiseConform>
         <mandatoryConform>
           <greaterTerm>
@@ -409,11 +432,13 @@ Davis, CA 95616, USA
         </mandatoryConform>
         <optionalConform/>
       </otherwiseConform>
-      <constraint type="max" value="65279"/>
+      <constraint>
+        <max value="65279"/>
+      </constraint>
     </attribute>
     <attribute id="0x001A" name="Primary3Y" type="uint16">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <otherwiseConform>
         <mandatoryConform>
           <greaterTerm>
@@ -423,11 +448,13 @@ Davis, CA 95616, USA
         </mandatoryConform>
         <optionalConform/>
       </otherwiseConform>
-      <constraint type="max" value="65279"/>
+      <constraint>
+        <max value="65279"/>
+      </constraint>
     </attribute>
     <attribute id="0x001B" name="Primary3Intensity" type="uint8">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="fixed"/>
       <otherwiseConform>
         <mandatoryConform>
           <greaterTerm>
@@ -440,7 +467,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0020" name="Primary4X" type="uint16">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <otherwiseConform>
         <mandatoryConform>
           <greaterTerm>
@@ -450,11 +477,13 @@ Davis, CA 95616, USA
         </mandatoryConform>
         <optionalConform/>
       </otherwiseConform>
-      <constraint type="max" value="65279"/>
+      <constraint>
+        <max value="65279"/>
+      </constraint>
     </attribute>
     <attribute id="0x0021" name="Primary4Y" type="uint16">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <otherwiseConform>
         <mandatoryConform>
           <greaterTerm>
@@ -464,11 +493,13 @@ Davis, CA 95616, USA
         </mandatoryConform>
         <optionalConform/>
       </otherwiseConform>
-      <constraint type="max" value="65279"/>
+      <constraint>
+        <max value="65279"/>
+      </constraint>
     </attribute>
     <attribute id="0x0022" name="Primary4Intensity" type="uint8">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="fixed"/>
       <otherwiseConform>
         <mandatoryConform>
           <greaterTerm>
@@ -481,7 +512,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0024" name="Primary5X" type="uint16">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <otherwiseConform>
         <mandatoryConform>
           <greaterTerm>
@@ -491,11 +522,13 @@ Davis, CA 95616, USA
         </mandatoryConform>
         <optionalConform/>
       </otherwiseConform>
-      <constraint type="max" value="65279"/>
+      <constraint>
+        <max value="65279"/>
+      </constraint>
     </attribute>
     <attribute id="0x0025" name="Primary5Y" type="uint16">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <otherwiseConform>
         <mandatoryConform>
           <greaterTerm>
@@ -505,11 +538,13 @@ Davis, CA 95616, USA
         </mandatoryConform>
         <optionalConform/>
       </otherwiseConform>
-      <constraint type="max" value="65279"/>
+      <constraint>
+        <max value="65279"/>
+      </constraint>
     </attribute>
     <attribute id="0x0026" name="Primary5Intensity" type="uint8">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="fixed"/>
       <otherwiseConform>
         <mandatoryConform>
           <greaterTerm>
@@ -522,7 +557,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0028" name="Primary6X" type="uint16">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <otherwiseConform>
         <mandatoryConform>
           <greaterTerm>
@@ -532,11 +567,13 @@ Davis, CA 95616, USA
         </mandatoryConform>
         <optionalConform/>
       </otherwiseConform>
-      <constraint type="max" value="65279"/>
+      <constraint>
+        <max value="65279"/>
+      </constraint>
     </attribute>
     <attribute id="0x0029" name="Primary6Y" type="uint16">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <otherwiseConform>
         <mandatoryConform>
           <greaterTerm>
@@ -546,11 +583,13 @@ Davis, CA 95616, USA
         </mandatoryConform>
         <optionalConform/>
       </otherwiseConform>
-      <constraint type="max" value="65279"/>
+      <constraint>
+        <max value="65279"/>
+      </constraint>
     </attribute>
     <attribute id="0x002A" name="Primary6Intensity" type="uint8">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="fixed"/>
       <otherwiseConform>
         <mandatoryConform>
           <greaterTerm>
@@ -564,89 +603,109 @@ Davis, CA 95616, USA
     <attribute id="0x0030" name="WhitePointX" type="uint16">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <optionalConform/>
-      <constraint type="max" value="65279"/>
+      <constraint>
+        <max value="65279"/>
+      </constraint>
     </attribute>
     <attribute id="0x0031" name="WhitePointY" type="uint16">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <optionalConform/>
-      <constraint type="max" value="65279"/>
+      <constraint>
+        <max value="65279"/>
+      </constraint>
     </attribute>
     <attribute id="0x0032" name="ColorPointRX" type="uint16">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <optionalConform/>
-      <constraint type="max" value="65279"/>
+      <constraint>
+        <max value="65279"/>
+      </constraint>
     </attribute>
     <attribute id="0x0033" name="ColorPointRY" type="uint16">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <optionalConform/>
-      <constraint type="max" value="65279"/>
+      <constraint>
+        <max value="65279"/>
+      </constraint>
     </attribute>
     <attribute id="0x0034" name="ColorPointRIntensity" type="uint8">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0036" name="ColorPointGX" type="uint16">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <optionalConform/>
-      <constraint type="max" value="65279"/>
+      <constraint>
+        <max value="65279"/>
+      </constraint>
     </attribute>
     <attribute id="0x0037" name="ColorPointGY" type="uint16">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <optionalConform/>
-      <constraint type="max" value="65279"/>
+      <constraint>
+        <max value="65279"/>
+      </constraint>
     </attribute>
     <attribute id="0x0038" name="ColorPointGIntensity" type="uint8">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x003A" name="ColorPointBX" type="uint16">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <optionalConform/>
-      <constraint type="max" value="65279"/>
+      <constraint>
+        <max value="65279"/>
+      </constraint>
     </attribute>
     <attribute id="0x003B" name="ColorPointBY" type="uint16">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <optionalConform/>
-      <constraint type="max" value="65279"/>
+      <constraint>
+        <max value="65279"/>
+      </constraint>
     </attribute>
     <attribute id="0x003C" name="ColorPointBIntensity" type="uint8">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x4000" name="EnhancedCurrentHue" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="true" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
+      <quality scene="true" persistence="nonVolatile" quieterReporting="true"/>
       <mandatoryConform>
         <feature name="EHUE"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x4001" name="EnhancedColorMode" type="EnhancedColorModeEnum" default="1">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="true" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality scene="true" persistence="nonVolatile"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x4002" name="ColorLoopActive" type="uint8" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="true" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality scene="true" persistence="nonVolatile"/>
       <mandatoryConform>
         <feature name="CL"/>
       </mandatoryConform>
-      <constraint type="max" value="1"/>
+      <constraint>
+        <max value="1"/>
+      </constraint>
     </attribute>
     <attribute id="0x4003" name="ColorLoopDirection" type="uint8" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="true" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality scene="true" persistence="nonVolatile"/>
       <mandatoryConform>
         <feature name="CL"/>
       </mandatoryConform>
-      <constraint type="max" value="1"/>
+      <constraint>
+        <max value="1"/>
+      </constraint>
     </attribute>
     <attribute id="0x4004" name="ColorLoopTime" type="uint16" default="25">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="true" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality scene="true" persistence="nonVolatile"/>
       <mandatoryConform>
         <feature name="CL"/>
       </mandatoryConform>
@@ -666,21 +725,30 @@ Davis, CA 95616, USA
     <attribute id="0x400A" name="ColorCapabilities" type="ColorCapabilitiesBitmap" default="0">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
-      <constraint type="max" value="0x001F"/>
+      <constraint>
+        <max value="0x001F"/>
+      </constraint>
     </attribute>
     <attribute id="0x400B" name="ColorTempPhysicalMinMireds" type="uint16">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <feature name="CT"/>
       </mandatoryConform>
-      <constraint type="between" from="1" to="65279"/>
+      <constraint>
+        <between>
+          <from value="1"/>
+          <to value="65279"/>
+        </between>
+      </constraint>
     </attribute>
     <attribute id="0x400C" name="ColorTempPhysicalMaxMireds" type="uint16">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <feature name="CT"/>
       </mandatoryConform>
-      <constraint type="max" value="65279"/>
+      <constraint>
+        <max value="65279"/>
+      </constraint>
     </attribute>
     <attribute id="0x400D" name="CoupleColorTempToLevelMinMireds" type="uint16" default="MS">
       <access read="true" readPrivilege="view"/>
@@ -690,18 +758,28 @@ Davis, CA 95616, USA
           <attribute name="ColorTemperatureMireds"/>
         </orTerm>
       </mandatoryConform>
-      <constraint type="between" from="ColorTempPhysicalMinMireds" to="ColorTemperatureMireds"/>
+      <constraint>
+        <between>
+          <attribute name="ColorTempPhysicalMinMireds"/>
+          <attribute name="ColorTemperatureMireds"/>
+        </between>
+      </constraint>
     </attribute>
     <attribute id="0x4010" name="StartUpColorTemperatureMireds" type="uint16" default="MS">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="nonVolatile"/>
       <mandatoryConform>
         <orTerm>
           <feature name="CT"/>
           <attribute name="ColorTemperatureMireds"/>
         </orTerm>
       </mandatoryConform>
-      <constraint type="between" from="1" to="65279"/>
+      <constraint>
+        <between>
+          <from value="1"/>
+          <to value="65279"/>
+        </between>
+      </constraint>
     </attribute>
   </attributes>
   <commands>
@@ -712,22 +790,30 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="Hue" type="uint8">
         <mandatoryConform/>
-        <constraint type="max" value="254"/>
+        <constraint>
+          <max value="254"/>
+        </constraint>
       </field>
       <field id="1" name="Direction" type="DirectionEnum">
         <mandatoryConform/>
       </field>
       <field id="2" name="TransitionTime" type="uint16">
         <mandatoryConform/>
-        <constraint type="max" value="65534"/>
+        <constraint>
+          <max value="65534"/>
+        </constraint>
       </field>
       <field id="3" name="OptionsMask" type="OptionsBitmap" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="4" name="OptionsOverride" type="OptionsBitmap" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </command>
     <command id="0x01" name="MoveHue" direction="commandToServer" response="Y">
@@ -743,11 +829,15 @@ Davis, CA 95616, USA
       </field>
       <field id="2" name="OptionsMask" type="OptionsBitmap" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="3" name="OptionsOverride" type="OptionsBitmap" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </command>
     <command id="0x02" name="StepHue" direction="commandToServer" response="Y">
@@ -766,11 +856,15 @@ Davis, CA 95616, USA
       </field>
       <field id="3" name="OptionsMask" type="OptionsBitmap" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="4" name="OptionsOverride" type="OptionsBitmap" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </command>
     <command id="0x03" name="MoveToSaturation" direction="commandToServer" response="Y">
@@ -780,19 +874,27 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="Saturation" type="uint8">
         <mandatoryConform/>
-        <constraint type="max" value="254"/>
+        <constraint>
+          <max value="254"/>
+        </constraint>
       </field>
       <field id="1" name="TransitionTime" type="uint16">
         <mandatoryConform/>
-        <constraint type="max" value="65534"/>
+        <constraint>
+          <max value="65534"/>
+        </constraint>
       </field>
       <field id="2" name="OptionsMask" type="OptionsBitmap" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="3" name="OptionsOverride" type="OptionsBitmap" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </command>
     <command id="0x04" name="MoveSaturation" direction="commandToServer" response="Y">
@@ -808,11 +910,15 @@ Davis, CA 95616, USA
       </field>
       <field id="2" name="OptionsMask" type="OptionsBitmap" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="3" name="OptionsOverride" type="OptionsBitmap" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </command>
     <command id="0x05" name="StepSaturation" direction="commandToServer" response="Y">
@@ -831,11 +937,15 @@ Davis, CA 95616, USA
       </field>
       <field id="3" name="OptionsMask" type="OptionsBitmap" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="4" name="OptionsOverride" type="OptionsBitmap" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </command>
     <command id="0x06" name="MoveToHueAndSaturation" direction="commandToServer" response="Y">
@@ -845,23 +955,33 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="Hue" type="uint8">
         <mandatoryConform/>
-        <constraint type="max" value="254"/>
+        <constraint>
+          <max value="254"/>
+        </constraint>
       </field>
       <field id="1" name="Saturation" type="uint8">
         <mandatoryConform/>
-        <constraint type="max" value="254"/>
+        <constraint>
+          <max value="254"/>
+        </constraint>
       </field>
       <field id="2" name="TransitionTime" type="uint16">
         <mandatoryConform/>
-        <constraint type="max" value="65534"/>
+        <constraint>
+          <max value="65534"/>
+        </constraint>
       </field>
       <field id="3" name="OptionsMask" type="OptionsBitmap" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="4" name="OptionsOverride" type="OptionsBitmap" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </command>
     <command id="0x07" name="MoveToColor" direction="commandToServer" response="Y">
@@ -871,23 +991,33 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="ColorX" type="uint16">
         <mandatoryConform/>
-        <constraint type="max" value="65279"/>
+        <constraint>
+          <max value="65279"/>
+        </constraint>
       </field>
       <field id="1" name="ColorY" type="uint16">
         <mandatoryConform/>
-        <constraint type="max" value="65279"/>
+        <constraint>
+          <max value="65279"/>
+        </constraint>
       </field>
       <field id="2" name="TransitionTime" type="uint16">
         <mandatoryConform/>
-        <constraint type="max" value="65534"/>
+        <constraint>
+          <max value="65534"/>
+        </constraint>
       </field>
       <field id="3" name="OptionsMask" type="OptionsBitmap" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="4" name="OptionsOverride" type="OptionsBitmap" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </command>
     <command id="0x08" name="MoveColor" direction="commandToServer" response="Y">
@@ -903,11 +1033,15 @@ Davis, CA 95616, USA
       </field>
       <field id="2" name="OptionsMask" type="OptionsBitmap" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="3" name="OptionsOverride" type="OptionsBitmap" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </command>
     <command id="0x09" name="StepColor" direction="commandToServer" response="Y">
@@ -923,15 +1057,21 @@ Davis, CA 95616, USA
       </field>
       <field id="2" name="TransitionTime" type="uint16">
         <mandatoryConform/>
-        <constraint type="max" value="65534"/>
+        <constraint>
+          <max value="65534"/>
+        </constraint>
       </field>
       <field id="3" name="OptionsMask" type="OptionsBitmap" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="4" name="OptionsOverride" type="OptionsBitmap" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </command>
     <command id="0x0A" name="MoveToColorTemperature" direction="commandToServer" response="Y">
@@ -941,19 +1081,27 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="ColorTemperatureMireds" type="uint16">
         <mandatoryConform/>
-        <constraint type="max" value="65279"/>
+        <constraint>
+          <max value="65279"/>
+        </constraint>
       </field>
       <field id="1" name="TransitionTime" type="uint16">
         <mandatoryConform/>
-        <constraint type="max" value="65534"/>
+        <constraint>
+          <max value="65534"/>
+        </constraint>
       </field>
       <field id="2" name="OptionsMask" type="OptionsBitmap" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="3" name="OptionsOverride" type="OptionsBitmap" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </command>
     <command id="0x40" name="EnhancedMoveToHue" direction="commandToServer" response="Y">
@@ -969,15 +1117,21 @@ Davis, CA 95616, USA
       </field>
       <field id="2" name="TransitionTime" type="uint16">
         <mandatoryConform/>
-        <constraint type="max" value="65534"/>
+        <constraint>
+          <max value="65534"/>
+        </constraint>
       </field>
       <field id="3" name="OptionsMask" type="OptionsBitmap" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="4" name="OptionsOverride" type="OptionsBitmap" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </command>
     <command id="0x41" name="EnhancedMoveHue" direction="commandToServer" response="Y">
@@ -987,18 +1141,24 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="MoveMode" type="MoveModeEnum">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="1" name="Rate" type="uint16">
         <mandatoryConform/>
       </field>
       <field id="2" name="OptionsMask" type="OptionsBitmap" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="3" name="OptionsOverride" type="OptionsBitmap" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </command>
     <command id="0x42" name="EnhancedStepHue" direction="commandToServer" response="Y">
@@ -1008,22 +1168,30 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="StepMode" type="StepModeEnum">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="1" name="StepSize" type="uint16">
         <mandatoryConform/>
       </field>
       <field id="2" name="TransitionTime" type="uint16">
         <mandatoryConform/>
-        <constraint type="max" value="65534"/>
+        <constraint>
+          <max value="65534"/>
+        </constraint>
       </field>
       <field id="3" name="OptionsMask" type="OptionsBitmap" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="4" name="OptionsOverride" type="OptionsBitmap" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </command>
     <command id="0x43" name="EnhancedMoveToHueAndSaturation" direction="commandToServer" response="Y">
@@ -1036,19 +1204,27 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="Saturation" type="uint8">
         <mandatoryConform/>
-        <constraint type="max" value="254"/>
+        <constraint>
+          <max value="254"/>
+        </constraint>
       </field>
       <field id="2" name="TransitionTime" type="uint16">
         <mandatoryConform/>
-        <constraint type="max" value="65534"/>
+        <constraint>
+          <max value="65534"/>
+        </constraint>
       </field>
       <field id="3" name="OptionsMask" type="OptionsBitmap" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="4" name="OptionsOverride" type="OptionsBitmap" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </command>
     <command id="0x44" name="ColorLoopSet" direction="commandToServer" response="Y">
@@ -1073,11 +1249,15 @@ Davis, CA 95616, USA
       </field>
       <field id="5" name="OptionsMask" type="OptionsBitmap" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="6" name="OptionsOverride" type="OptionsBitmap" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </command>
     <command id="0x47" name="StopMoveStep" direction="commandToServer" response="Y">
@@ -1091,11 +1271,15 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="OptionsMask" type="OptionsBitmap" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="1" name="OptionsOverride" type="OptionsBitmap" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </command>
     <command id="0x4B" name="MoveColorTemperature" direction="commandToServer" response="Y">
@@ -1111,19 +1295,27 @@ Davis, CA 95616, USA
       </field>
       <field id="2" name="ColorTemperatureMinimumMireds" type="uint16">
         <mandatoryConform/>
-        <constraint type="max" value="65279"/>
+        <constraint>
+          <max value="65279"/>
+        </constraint>
       </field>
       <field id="3" name="ColorTemperatureMaximumMireds" type="uint16">
         <mandatoryConform/>
-        <constraint type="max" value="65279"/>
+        <constraint>
+          <max value="65279"/>
+        </constraint>
       </field>
       <field id="4" name="OptionsMask" type="OptionsBitmap" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="5" name="OptionsOverride" type="OptionsBitmap" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </command>
     <command id="0x4C" name="StepColorTemperature" direction="commandToServer" response="Y">
@@ -1139,23 +1331,33 @@ Davis, CA 95616, USA
       </field>
       <field id="2" name="TransitionTime" type="uint16">
         <mandatoryConform/>
-        <constraint type="max" value="65534"/>
+        <constraint>
+          <max value="65534"/>
+        </constraint>
       </field>
       <field id="3" name="ColorTemperatureMinimumMireds" type="uint16">
         <mandatoryConform/>
-        <constraint type="max" value="65279"/>
+        <constraint>
+          <max value="65279"/>
+        </constraint>
       </field>
       <field id="4" name="ColorTemperatureMaximumMireds" type="uint16">
         <mandatoryConform/>
-        <constraint type="max" value="65279"/>
+        <constraint>
+          <max value="65279"/>
+        </constraint>
       </field>
       <field id="5" name="OptionsMask" type="OptionsBitmap" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="6" name="OptionsOverride" type="OptionsBitmap" default="0">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </command>
   </commands>

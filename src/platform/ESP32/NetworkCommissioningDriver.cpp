@@ -143,7 +143,7 @@ CHIP_ERROR ESPWiFiDriver::RevertConfiguration()
     size_t credentialsLen = 0;
 
     CHIP_ERROR error = PersistedStorage::KeyValueStoreMgr().Get(kWiFiSSIDKeyName, network.ssid, sizeof(network.ssid), &ssidLen);
-    ReturnErrorCodeIf(error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, CHIP_NO_ERROR);
+    VerifyOrReturnError(error != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, CHIP_NO_ERROR);
     VerifyOrExit(CanCastTo<uint8_t>(ssidLen), error = CHIP_ERROR_INTERNAL);
     VerifyOrExit(PersistedStorage::KeyValueStoreMgr().Get(kWiFiCredentialsKeyName, network.credentials, sizeof(network.credentials),
                                                           &credentialsLen) == CHIP_NO_ERROR,
@@ -264,6 +264,18 @@ CHIP_ERROR ESPWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen,
     return ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Enabled);
 }
 
+#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+CHIP_ERROR ESPWiFiDriver::DisconnectFromNetwork()
+{
+    if (chip::DeviceLayer::Internal::ESP32Utils::IsStationProvisioned())
+    {
+        // Attaching to an empty network will disconnect the network.
+        ReturnErrorOnFailure(ConnectWiFiNetwork(nullptr, 0, nullptr, 0));
+    }
+    return CHIP_NO_ERROR;
+}
+#endif
+
 void ESPWiFiDriver::OnConnectWiFiNetwork()
 {
     if (mpConnectCallback)
@@ -375,6 +387,29 @@ void ESPWiFiDriver::OnScanWiFiNetworkDone()
         return;
     }
 
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 1, 3)
+    if (CHIP_NO_ERROR == DeviceLayer::SystemLayer().ScheduleLambda([ap_number]() {
+            ESPScanResponseIterator iter(ap_number);
+            if (GetInstance().mpScanCallback)
+            {
+                GetInstance().mpScanCallback->OnFinished(Status::kSuccess, CharSpan(), &iter);
+                GetInstance().mpScanCallback = nullptr;
+            }
+            else
+            {
+                ChipLogError(DeviceLayer, "can't find the ScanCallback function");
+            }
+            iter.Release();
+        }))
+    {
+    }
+    else
+    {
+        ChipLogError(DeviceLayer, "can't schedule the scan result processing");
+        mpScanCallback->OnFinished(Status::kUnknownError, CharSpan(), nullptr);
+        mpScanCallback = nullptr;
+    }
+#else
     // Since this is the dynamic memory allocation, restrict it to a configured limit
     ap_number = std::min(static_cast<uint16_t>(CHIP_DEVICE_CONFIG_MAX_SCAN_NETWORKS_RESULTS), ap_number);
 
@@ -418,6 +453,7 @@ void ESPWiFiDriver::OnScanWiFiNetworkDone()
         mpScanCallback->OnFinished(Status::kUnknownError, CharSpan(), nullptr);
         mpScanCallback = nullptr;
     }
+#endif // ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 1, 3)
 }
 
 void ESPWiFiDriver::OnNetworkStatusChange()

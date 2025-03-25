@@ -35,3 +35,9 @@
 //  Until this is improved in OpenThread we need to increase the retransmission
 //  interval to survive the stall.
 #define CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL (1000_ms32)
+
+// ========== Multicast groups Configuration Overrides =========
+#undef CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC
+#define CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC 2
+
+#define CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_SUBJECTS_PER_ENTRY (4 * CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC)

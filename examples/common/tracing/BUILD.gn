@@ -79,7 +79,6 @@ source_set("trace_handlers") {
 source_set("trace_handlers_decoder") {
   sources = [
     "TraceDecoder.cpp",
-    "TraceHandlers.cpp",
     "decoder/TraceDecoderProtocols.cpp",
     "decoder/bdx/Decoder.cpp",
     "decoder/echo/Decoder.cpp",
@@ -94,6 +93,8 @@ source_set("trace_handlers_decoder") {
   public_configs = [ ":default_config" ]
 
   deps = [
+    ":trace_handlers",
+    "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/core:types",
   ]
@@ -123,6 +124,7 @@ executable("chip-trace-decoder") {
   deps = [ "${chip_root}/src/platform/logging:stdio" ]
 
   public_deps = [
+    "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/core:types",
     "${chip_root}/third_party/jsoncpp",

@@ -164,7 +164,7 @@ static PacketBufferHandle MakeDataBuffer(size_t aDesiredLength, size_t aPatternS
     PacketBufferHandle lBuffer = PacketBufferHandle::New(aDesiredLength);
     VerifyOrReturnError(!lBuffer.IsNull(), lBuffer);
 
-    aDesiredLength = min(lBuffer->MaxDataLength(), aDesiredLength);
+    aDesiredLength = std::min(lBuffer->MaxDataLength(), aDesiredLength);
 
     FillDataBufferPattern(lBuffer->Start(), aDesiredLength, aPatternStartOffset, aFirstValue);
 

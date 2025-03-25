@@ -34,7 +34,7 @@ CHIP_ERROR MakeZclCharString(MutableByteSpan & buffer, const char * cString)
         return CHIP_ERROR_INBOUND_MESSAGE_TOO_BIG;
     }
     size_t len              = strlen(cString);
-    size_t availableStorage = min(buffer.size() - 1, kBufferMaximumSize);
+    size_t availableStorage = std::min(buffer.size() - 1, kBufferMaximumSize);
     if (len > availableStorage)
     {
         buffer.data()[0] = 0;

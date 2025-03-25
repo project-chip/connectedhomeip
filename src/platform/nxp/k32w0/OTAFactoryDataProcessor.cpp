@@ -18,8 +18,8 @@
 
 #include <lib/core/TLV.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <platform/nxp/common/legacy/CHIPDevicePlatformRamStorageConfig.h>
 #include <platform/nxp/k32w0/CHIPDevicePlatformConfig.h>
+#include <platform/nxp/k32w0/CHIPDevicePlatformRamStorageConfig.h>
 #include <platform/nxp/k32w0/FactoryDataProviderImpl.h>
 #include <platform/nxp/k32w0/OTAFactoryDataProcessor.h>
 
@@ -174,7 +174,7 @@ CHIP_ERROR OTAFactoryDataProcessor::Read()
     memcpy(&header, (void *) FactoryProvider::kFactoryDataStart, sizeof(FactoryProvider::Header));
 
     mFactoryData = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(FactoryProvider::kFactoryDataSize));
-    ReturnErrorCodeIf(mFactoryData == nullptr, CHIP_FACTORY_DATA_NULL);
+    VerifyOrReturnError(mFactoryData != nullptr, CHIP_FACTORY_DATA_NULL);
     memset(mFactoryData, 0, FactoryProvider::kFactoryDataSize);
     memcpy(mFactoryData, (void *) FactoryProvider::kFactoryDataStart, sizeof(FactoryProvider::Header) + header.size);
 
@@ -183,10 +183,10 @@ CHIP_ERROR OTAFactoryDataProcessor::Read()
 
 CHIP_ERROR OTAFactoryDataProcessor::Backup()
 {
-    ReturnErrorCodeIf(mFactoryData == nullptr, CHIP_FACTORY_DATA_NULL);
+    VerifyOrReturnError(mFactoryData != nullptr, CHIP_FACTORY_DATA_NULL);
 
     auto status = PDM_eSaveRecordData(kNvmId_FactoryDataBackup, (void *) mFactoryData, FactoryProvider::kFactoryDataSize);
-    ReturnErrorCodeIf(status != PDM_E_STATUS_OK, CHIP_FACTORY_DATA_PDM_SAVE_RECORD);
+    VerifyOrReturnError(status == PDM_E_STATUS_OK, CHIP_FACTORY_DATA_PDM_SAVE_RECORD);
     // PDM save will do an encryption in place, so a restore is neeeded in order
     // to have the decrypted data back in the mFactoryData buffer.
     ReturnErrorOnFailure(Restore());
@@ -196,13 +196,13 @@ CHIP_ERROR OTAFactoryDataProcessor::Backup()
 
 CHIP_ERROR OTAFactoryDataProcessor::Restore()
 {
-    ReturnErrorCodeIf(mFactoryData == nullptr, CHIP_FACTORY_DATA_NULL);
+    VerifyOrReturnError(mFactoryData != nullptr, CHIP_FACTORY_DATA_NULL);
 
     uint16_t bytesRead = 0;
 
     auto status =
         PDM_eReadDataFromRecord(kNvmId_FactoryDataBackup, (void *) mFactoryData, FactoryProvider::kFactoryDataSize, &bytesRead);
-    ReturnErrorCodeIf(status != PDM_E_STATUS_OK, CHIP_FACTORY_DATA_PDM_READ_RECORD);
+    VerifyOrReturnError(status == PDM_E_STATUS_OK, CHIP_FACTORY_DATA_PDM_READ_RECORD);
 
     return CHIP_NO_ERROR;
 }

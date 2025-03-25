@@ -12,7 +12,6 @@ The example supports building and running on the following devices:
 | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
 | [B91](https://wiki.telink-semi.cn/wiki/Hardware/B91_Generic_Starter_Kit_Hardware_Guide) [TLSR9518ADK80D](https://wiki.telink-semi.cn/wiki/chip-series/TLSR951x-Series) | `tlsr9518adk80d`, `tlsr9518adk80d-mars`, `tlsr9518adk80d-usb` | [TLSR9518ADK80D](https://github.com/telink-semi/zephyr/blob/develop/boards/riscv/tlsr9518adk80d/doc/index.rst) |
 | [B92](https://wiki.telink-semi.cn/wiki/Hardware/B92_Generic_Starter_Kit_Hardware_Guide) [TLSR9528A](https://wiki.telink-semi.cn/wiki/chip-series/TLSR952x-Series)      | `tlsr9528a`, `tlsr9528a_retention`                            | [TLSR9528A](https://github.com/telink-semi/zephyr/blob/develop/boards/riscv/tlsr9528a/doc/index.rst)           |
-| [B95](https://wiki.telink-semi.cn/wiki/Hardware/B95_Generic_Starter_Kit_Hardware_Guide) [TLSR9258A](https://wiki.telink-semi.cn/wiki/chip-series/TLSR925x-Series)      | `tlsr9258a`                                                   | [TLSR9258A](https://github.com/telink-semi/zephyr/blob/develop/boards/riscv/tlsr9258a/doc/index.rst)           |
 | [W91](https://wiki.telink-semi.cn/wiki/Hardware/W91_Generic_Starter_Kit_Hardware_Guide) [TLSR9118BDK40D](https://wiki.telink-semi.cn/wiki/chip-series/TLSR911x-Series) | `tlsr9118bdk40d`                                              | [TLSR9118BDK40D](https://github.com/telink-semi/zephyr/blob/develop/boards/riscv/tlsr9118bdk40d/doc/index.rst) |
 
 ## Build and flash
@@ -144,10 +143,10 @@ feature for another Telink example:
 
 After build application with enabled OTA feature, use next binary files:
 
--   zephyr.bin - main binary to flash PCB (Use at least 2MB PCB).
--   zephyr-ota.bin - binary for OTA Provider
+-   merged.bin - main binary to flash PCB (Use at least 2MB PCB).
+-   matter.ota - binary for OTA Provider
 
-All binaries has the same SW version. To test OTA “zephyr-ota.bin” should have
+All binaries has the same SW version. To test OTA “matter.ota” should have
 higher SW version than base SW. Set CONFIG_CHIP_DEVICE_SOFTWARE_VERSION=2 in
 corresponding “prj.conf” conﬁguration file.
 
@@ -162,7 +161,7 @@ Usage of OTA:
 -   Run the Linux OTA Provider with OTA image.
 
     ```
-    ./chip-ota-provider-app -f zephyr-ota.bin
+    ./chip-ota-provider-app -f matter.ota
     ```
 
 -   Provision the Linux OTA Provider using chip-tool

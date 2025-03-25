@@ -21,4 +21,4 @@ fi
 
 # Remove /tmp/chip_* files and directories
 rm -rf /tmp/chip_*
-echo "Removed /tmp/chip_* files and directories"
+echo "Removed /tmp/chip_* files and directories."

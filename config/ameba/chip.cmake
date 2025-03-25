@@ -32,6 +32,7 @@ list(
     -DMBEDTLS_CONFIG_FILE=<mbedtls_config.h>
     -D_POSIX_REALTIME_SIGNALS
     -DCHIP_SHELL_MAX_TOKENS=11
+    -DCONFIG_ENABLE_AMEBA_SNTP=1
 )
 
 list(
@@ -116,7 +117,6 @@ endif (matter_enable_persistentstorage_audit)
 
 # Build RPC
 if (matter_enable_rpc)
-#string(APPEND CHIP_GN_ARGS "remove_default_configs = [\"//third_party/connectedhomeip/third_party/pigweed/repo/pw_build:cpp17\"]\n")
 string(APPEND CHIP_GN_ARGS "chip_build_pw_rpc_lib = true\n")
 string(APPEND CHIP_GN_ARGS "pw_log_BACKEND = \"//third_party/connectedhomeip/third_party/pigweed/repo/pw_log_basic\"\n")
 string(APPEND CHIP_GN_ARGS "pw_assert_BACKEND = \"//third_party/connectedhomeip/third_party/pigweed/repo/pw_assert_log:check_backend\"\n")

@@ -64,6 +64,7 @@ mw320_executable("shell_mw320") {
   ]
 
   deps = [
+    "${chip_root}/src/app:attribute-persistence",
     "${chip_root}/src/platform:syscalls_stub",
     "${chip_root}/src/platform/logging:default",
   ]
@@ -83,6 +84,7 @@ mw320_executable("shell_mw320") {
   sources = [
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/air-quality-instance.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/chime-instance.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/concentration-measurement-instances.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/device-energy-management-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/energy-evse-stub.cpp",

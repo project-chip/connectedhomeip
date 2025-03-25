@@ -139,7 +139,49 @@ enum class ProductIdentifierTypeEnum : uint8_t
     kUnknownEnumValue = 5,
 };
 
+// Enum for StreamUsageEnum
+enum class StreamUsageEnum : uint8_t
+{
+    kInternal  = 0x00,
+    kRecording = 0x01,
+    kAnalysis  = 0x02,
+    kLiveView  = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
+};
+
+// Enum for WebRTCEndReasonEnum
+enum class WebRTCEndReasonEnum : uint8_t
+{
+    kIceFailed         = 0x00,
+    kIceTimeout        = 0x01,
+    kUserHangup        = 0x02,
+    kUserBusy          = 0x03,
+    kReplaced          = 0x04,
+    kNoUserMedia       = 0x05,
+    kInviteTimeout     = 0x06,
+    kAnsweredElsewhere = 0x07,
+    kOutOfResources    = 0x08,
+    kMediaTimeout      = 0x09,
+    kLowPower          = 0x0A,
+    kUnknownReason     = 0x0B,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 12,
+};
+
 // Bitmaps shared across multiple clusters.
+
+// Bitmap for WebRTCMetadataOptionsBitmap
+enum class WebRTCMetadataOptionsBitmap : uint8_t
+{
+    kDataTLV = 0x1,
+};
 
 } // namespace detail
 
@@ -406,6 +448,20 @@ enum class TestGlobalEnum : uint8_t
     kUnknownEnumValue = 3,
 };
 
+// Enum for ThreeLevelAutoEnum
+enum class ThreeLevelAutoEnum : uint8_t
+{
+    kAuto   = 0x00,
+    kLow    = 0x01,
+    kMedium = 0x02,
+    kHigh   = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
+};
+
 // Global bitmaps.
 
 // Bitmap for TestGlobalBitmap
@@ -544,8 +600,6 @@ enum class OnOffControlBitmap : uint8_t
 };
 } // namespace OnOff
 
-namespace OnOffSwitchConfiguration {} // namespace OnOffSwitchConfiguration
-
 namespace LevelControl {
 
 // Enum for MoveModeEnum
@@ -587,8 +641,6 @@ enum class OptionsBitmap : uint8_t
     kCoupleColorTempToLevel = 0x2,
 };
 } // namespace LevelControl
-
-namespace BinaryInputBasic {} // namespace BinaryInputBasic
 
 namespace PulseWidthModulation {} // namespace PulseWidthModulation
 
@@ -3203,6 +3255,7 @@ enum class ModeTag : uint16_t
     kManual        = 0x4000,
     kTimeOfUse     = 0x4001,
     kSolarCharging = 0x4002,
+    kV2x           = 0x4003,
     // kUnknownEnumValue intentionally not defined. This enum never goes
     // through DataModel::Decode, likely because it is a part of a derived
     // cluster. As a result having kUnknownEnumValue in this enum is error
@@ -3914,23 +3967,155 @@ enum class SafetyStatus : uint16_t
 };
 } // namespace WindowCovering
 
-namespace BarrierControl {
+namespace ClosureControl {
 
-// Bitmap for BarrierControlCapabilities
-enum class BarrierControlCapabilities : uint8_t
+// Enum for ClosureErrorEnum
+enum class ClosureErrorEnum : uint8_t
 {
-    kPartialBarrier = 0x1,
+    kBlocked              = 0x00,
+    kTemperatureLimited   = 0x01,
+    kMaintenanceRequired  = 0x02,
+    kInternalInterference = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
 };
 
-// Bitmap for BarrierControlSafetyStatus
-enum class BarrierControlSafetyStatus : uint16_t
+// Enum for LatchingEnum
+enum class LatchingEnum : uint8_t
 {
-    kRemoteLockout       = 0x1,
-    kTemperDetected      = 0x2,
-    kFailedCommunication = 0x4,
-    kPositionFailure     = 0x8,
+    kLatchedAndSecured    = 0x00,
+    kLatchedButNotSecured = 0x01,
+    kNotLatched           = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
 };
-} // namespace BarrierControl
+
+// Enum for MainStateEnum
+enum class MainStateEnum : uint8_t
+{
+    kStopped          = 0x00,
+    kMoving           = 0x01,
+    kWaitingForMotion = 0x02,
+    kError            = 0x03,
+    kCalibrating      = 0x04,
+    kProtected        = 0x05,
+    kDisengaged       = 0x06,
+    kSetupRequired    = 0x07,
+    kPendingFallback  = 0x08,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 9,
+};
+
+// Enum for PositioningEnum
+enum class PositioningEnum : uint8_t
+{
+    kFullyClosed          = 0x00,
+    kFullyOpened          = 0x01,
+    kPartiallyOpened      = 0x02,
+    kOpenedForPedestrian  = 0x03,
+    kOpenedForVentilation = 0x04,
+    kOpenedAtSignature    = 0x05,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 6,
+};
+
+// Enum for RestingProcedureEnum
+enum class RestingProcedureEnum : uint8_t
+{
+    kDoNothing           = 0x00,
+    kReturnToFullyOpened = 0x01,
+    kReturnToFullyClosed = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for TagLatchEnum
+enum class TagLatchEnum : uint8_t
+{
+    kLatch   = 0x00,
+    kUnlatch = 0x01,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 2,
+};
+
+// Enum for TagPositionEnum
+enum class TagPositionEnum : uint8_t
+{
+    kCloseInFull        = 0x00,
+    kOpenInFull         = 0x01,
+    kPedestrian         = 0x02,
+    kVentilation        = 0x03,
+    kSignature          = 0x04,
+    kSequenceNextStep   = 0x05,
+    kPedestrianNextStep = 0x06,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 7,
+};
+
+// Enum for TriggerConditionEnum
+enum class TriggerConditionEnum : uint8_t
+{
+    kAfterDelay                     = 0x00,
+    kAfterApplicativeTrigger        = 0x01,
+    kAfterDelayOrApplicativeTrigger = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for TriggerPositionEnum
+enum class TriggerPositionEnum : uint8_t
+{
+    kAtFullyClosed = 0x00,
+    kAtFullyOpened = 0x01,
+    kInBetween     = 0x02,
+    kAtVentilation = 0x03,
+    kAtPedestrian  = 0x04,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 5,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kPositioning      = 0x1,
+    kMotionLatching   = 0x2,
+    kInstantaneous    = 0x4,
+    kSpeed            = 0x8,
+    kVentilation      = 0x10,
+    kPedestrian       = 0x20,
+    kCalibration      = 0x40,
+    kProtection       = 0x80,
+    kManuallyOperable = 0x100,
+    kFallback         = 0x200,
+};
+} // namespace ClosureControl
 
 namespace ServiceArea {
 
@@ -5304,9 +5489,9 @@ enum class Feature : uint32_t
 {
     kContentSearch = 0x1,
     kURLPlayback   = 0x2,
-    kAdvancedSeek  = 0x3,
-    kTextTracks    = 0x4,
-    kAudioTracks   = 0x5,
+    kAdvancedSeek  = 0x4,
+    kTextTracks    = 0x8,
+    kAudioTracks   = 0x10,
 };
 
 // Bitmap for SupportedProtocolsBitmap
@@ -5414,6 +5599,316 @@ enum class StatusEnum : uint8_t
 };
 } // namespace ContentAppObserver
 
+namespace ZoneManagement {
+
+// Enum for StatusCodeEnum
+enum class StatusCodeEnum : uint8_t
+{
+    kZoneNotFound = 0x02,
+    kZoneInUse    = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 0,
+};
+
+// Enum for ZoneEventStoppedReasonEnum
+enum class ZoneEventStoppedReasonEnum : uint8_t
+{
+    kActionStopped = 0x00,
+    kTimeout       = 0x01,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 2,
+};
+
+// Enum for ZoneEventTriggeredReasonEnum
+enum class ZoneEventTriggeredReasonEnum : uint8_t
+{
+    kMotion = 0x00,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 1,
+};
+
+// Enum for ZoneSourceEnum
+enum class ZoneSourceEnum : uint8_t
+{
+    kMfg  = 0x00,
+    kUser = 0x01,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 2,
+};
+
+// Enum for ZoneTypeEnum
+enum class ZoneTypeEnum : uint8_t
+{
+    kTwoDCARTZone = 0x00,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 1,
+};
+
+// Enum for ZoneUseEnum
+enum class ZoneUseEnum : uint8_t
+{
+    kMotion  = 0x00,
+    kPrivacy = 0x01,
+    kFocus   = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kTwoDimensionalCartesianZone = 0x1,
+    kPerZoneSensitivity          = 0x2,
+};
+} // namespace ZoneManagement
+
+namespace CameraAvStreamManagement {
+
+// Enum for AudioCodecEnum
+enum class AudioCodecEnum : uint8_t
+{
+    kOpus  = 0x00,
+    kAacLc = 0x01,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 2,
+};
+
+// Enum for ImageCodecEnum
+enum class ImageCodecEnum : uint8_t
+{
+    kJpeg = 0x00,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 1,
+};
+
+using StreamUsageEnum = Clusters::detail::StreamUsageEnum;
+
+// Enum for TriStateAutoEnum
+enum class TriStateAutoEnum : uint8_t
+{
+    kOff  = 0x00,
+    kOn   = 0x01,
+    kAuto = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for TwoWayTalkSupportTypeEnum
+enum class TwoWayTalkSupportTypeEnum : uint8_t
+{
+    kNotSupported = 0x00,
+    kHalfDuplex   = 0x01,
+    kFullDuplex   = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for VideoCodecEnum
+enum class VideoCodecEnum : uint8_t
+{
+    kH264 = 0x00,
+    kHevc = 0x01,
+    kVvc  = 0x02,
+    kAv1  = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kAudio            = 0x1,
+    kVideo            = 0x2,
+    kSnapshot         = 0x4,
+    kPrivacy          = 0x8,
+    kSpeaker          = 0x10,
+    kImageControl     = 0x20,
+    kWatermark        = 0x40,
+    kOnScreenDisplay  = 0x80,
+    kLocalStorage     = 0x100,
+    kHighDynamicRange = 0x200,
+};
+} // namespace CameraAvStreamManagement
+
+namespace CameraAvSettingsUserLevelManagement {
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kDigitalPTZ        = 0x1,
+    kMechanicalPan     = 0x2,
+    kMechanicalTilt    = 0x4,
+    kMechanicalZoom    = 0x8,
+    kMechanicalPresets = 0x10,
+};
+} // namespace CameraAvSettingsUserLevelManagement
+
+namespace WebRTCTransportProvider {
+
+using StreamUsageEnum = Clusters::detail::StreamUsageEnum;
+
+using WebRTCEndReasonEnum = Clusters::detail::WebRTCEndReasonEnum;
+
+using WebRTCMetadataOptionsBitmap = Clusters::detail::WebRTCMetadataOptionsBitmap;
+} // namespace WebRTCTransportProvider
+
+namespace WebRTCTransportRequestor {
+
+using StreamUsageEnum = Clusters::detail::StreamUsageEnum;
+
+using WebRTCEndReasonEnum = Clusters::detail::WebRTCEndReasonEnum;
+
+using WebRTCMetadataOptionsBitmap = Clusters::detail::WebRTCMetadataOptionsBitmap;
+} // namespace WebRTCTransportRequestor
+
+namespace PushAvStreamTransport {
+
+// Enum for ContainerFormatEnum
+enum class ContainerFormatEnum : uint8_t
+{
+    kCmaf = 0x00,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 1,
+};
+
+// Enum for IngestMethodsEnum
+enum class IngestMethodsEnum : uint8_t
+{
+    kCMAFIngest = 0x00,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 1,
+};
+
+// Enum for StatusCodeEnum
+enum class StatusCodeEnum : uint8_t
+{
+    kAllocationNotPermitted     = 0x02,
+    kInvalidTLSEndpoint         = 0x03,
+    kInvalidStream              = 0x04,
+    kInvalidURL                 = 0x05,
+    kInvalidZone                = 0x06,
+    kUnsupportedContainerFormat = 0x07,
+    kUnsupportedIngestMethod    = 0x08,
+    kInvalidTriggerType         = 0x09,
+    kInvalidTransportStatus     = 0x10,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 0,
+};
+
+// Enum for StreamMultiplexingEnum
+enum class StreamMultiplexingEnum : uint8_t
+{
+    kInterleaved = 0x00,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 1,
+};
+
+using StreamUsageEnum = Clusters::detail::StreamUsageEnum;
+
+// Enum for TransportStatusEnum
+enum class TransportStatusEnum : uint8_t
+{
+    kActive   = 0x00,
+    kInactive = 0x01,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 2,
+};
+
+// Enum for TransportTriggerTypeEnum
+enum class TransportTriggerTypeEnum : uint8_t
+{
+    kCommand    = 0x00,
+    kMotion     = 0x01,
+    kContinuous = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for TriggerActivationReasonEnum
+enum class TriggerActivationReasonEnum : uint8_t
+{
+    kUserInitiated = 0x00,
+    kAutomation    = 0x01,
+    kEmergency     = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kPerZoneSensitivity = 0x1,
+};
+
+// Bitmap for SupportedContainerFormatsBitmap
+enum class SupportedContainerFormatsBitmap : uint8_t
+{
+    kCmaf = 0x1,
+};
+
+// Bitmap for SupportedIngestMethodsBitmap
+enum class SupportedIngestMethodsBitmap : uint8_t
+{
+    kCMAFIngest = 0x1,
+};
+} // namespace PushAvStreamTransport
+
+namespace Chime {} // namespace Chime
+
 namespace EcosystemInformation {} // namespace EcosystemInformation
 
 namespace CommissionerControl {
@@ -5425,7 +5920,22 @@ enum class SupportedDeviceCategoryBitmap : uint32_t
 };
 } // namespace CommissionerControl
 
-namespace ElectricalMeasurement {} // namespace ElectricalMeasurement
+namespace TlsCertificateManagement {} // namespace TlsCertificateManagement
+
+namespace TlsClientManagement {
+
+// Enum for TLSEndpointStatusEnum
+enum class TLSEndpointStatusEnum : uint8_t
+{
+    kProvisioned = 0x00,
+    kInUse       = 0x01,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 2,
+};
+} // namespace TlsClientManagement
 
 namespace UnitTesting {
 

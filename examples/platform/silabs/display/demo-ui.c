@@ -27,9 +27,8 @@
 #include "sl_memlcd.h"
 #include <app/icd/server/ICDServerConfig.h>
 #if SL_WIFI && !SLI_SI91X_MCU_INTERFACE
-#include "spi_multiplex.h"
+#include <platform/silabs/wifi/ncp/spi_multiplex.h>
 #endif // SL_WIFI && !SLI_SI91X_MCU_INTERFACE
-#include <stdio.h>
 #include <string.h>
 
 // Main Logo and App image
@@ -167,6 +166,5 @@ void demoUIClearMainScreen(uint8_t * name)
 {
     GLIB_clear(&glibContext);
     demoUIDisplayHeader((char *) name);
-    demoUIDisplayApp(false);
     demoUIDisplayProtocols();
 }

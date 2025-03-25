@@ -21,9 +21,9 @@
 #include <lib/support/BytesToHex.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#include <algorithm>
 #include <fstream>
 #include <json/json.h>
-#include <string>
 
 using namespace chip::Crypto;
 
@@ -31,13 +31,16 @@ namespace chip {
 namespace Credentials {
 
 namespace {
-CHIP_ERROR BytesToHexStr(const ByteSpan & bytes, MutableCharSpan & outHexStr)
+
+CHIP_ERROR BytesToHexStr(const ByteSpan & bytes, std::string & outHexStr)
 {
+    size_t hexLength = bytes.size() * 2;
+    outHexStr.resize(hexLength);
+
     Encoding::HexFlags flags = Encoding::HexFlags::kUppercase;
-    ReturnErrorOnFailure(BytesToHex(bytes.data(), bytes.size(), outHexStr.data(), outHexStr.size(), flags));
-    outHexStr.reduce_size(2 * bytes.size());
-    return CHIP_NO_ERROR;
+    return BytesToHex(bytes.data(), bytes.size(), &outHexStr[0], hexLength, flags);
 }
+
 } // anonymous namespace
 
 CHIP_ERROR TestDACRevocationDelegateImpl::SetDeviceAttestationRevocationSetPath(std::string_view path)
@@ -47,10 +50,62 @@ CHIP_ERROR TestDACRevocationDelegateImpl::SetDeviceAttestationRevocationSetPath(
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR TestDACRevocationDelegateImpl::SetDeviceAttestationRevocationData(const std::string & jsonData)
+{
+    mRevocationData = jsonData;
+    return CHIP_NO_ERROR;
+}
+
 void TestDACRevocationDelegateImpl::ClearDeviceAttestationRevocationSetPath()
 {
     // clear the string_view
     mDeviceAttestationRevocationSetPath = mDeviceAttestationRevocationSetPath.substr(0, 0);
+}
+
+void TestDACRevocationDelegateImpl::ClearDeviceAttestationRevocationData()
+{
+    mRevocationData.clear();
+}
+
+// Check if issuer and AKID matches with the crl signer OR crl signer delegator's subject and SKID
+bool TestDACRevocationDelegateImpl::CrossValidateCert(const Json::Value & revokedSet, const std::string & akidHexStr,
+                                                      const std::string & issuerNameBase64Str)
+{
+    std::string certBase64;
+    [[maybe_unused]] std::string certType;
+
+    if (revokedSet.isMember("crl_signer_delegator"))
+    {
+        certBase64 = revokedSet["crl_signer_delegator"].asString();
+        certType   = "CRL Signer delegator";
+    }
+    else
+    {
+        certBase64 = revokedSet["crl_signer_cert"].asString();
+        certType   = "CRL Signer";
+    }
+
+    uint8_t certDerBuf[kMax_x509_Certificate_Length] = { 0 };
+    MutableByteSpan certDER(certDerBuf);
+
+    // Verify we have enough room to store the decoded certificate
+    size_t maxDecodeLen = BASE64_MAX_DECODED_LEN(certBase64.size());
+    VerifyOrReturnValue(certDER.size() >= maxDecodeLen, false);
+
+    uint16_t derLen = Base64Decode(certBase64.c_str(), static_cast<uint16_t>(certBase64.size()), certDER.data());
+    VerifyOrReturnValue(derLen != UINT16_MAX, false);
+    certDER.reduce_size(derLen);
+
+    std::string subject;
+    std::string keyId;
+
+    VerifyOrReturnValue(CHIP_NO_ERROR == GetSubjectNameBase64Str(certDER, subject), false);
+    VerifyOrReturnValue(CHIP_NO_ERROR == GetSKIDHexStr(certDER, keyId), false);
+
+    ChipLogDetail(NotSpecified, "%s: Subject: %s", certType.c_str(), subject.c_str());
+    ChipLogDetail(NotSpecified, "%s: SKID: %s", certType.c_str(), keyId.c_str());
+
+    return (akidHexStr == keyId && issuerNameBase64Str == subject);
 }
 
 // This method parses the below JSON Scheme
@@ -63,52 +118,73 @@ void TestDACRevocationDelegateImpl::ClearDeviceAttestationRevocationSetPath()
 //       "serial1 bytes as base64",
 //       "serial2 bytes as base64"
 //     ]
+//     "crl_signer_cert": "<base64 encoded DER certificate>",
+//     "crl_signer_delegator": "<base64 encoded DER certificate>",
 //   }
 // ]
 //
-bool TestDACRevocationDelegateImpl::IsEntryInRevocationSet(const CharSpan & akidHexStr, const CharSpan & issuerNameBase64Str,
-                                                           const CharSpan & serialNumberHexStr)
+bool TestDACRevocationDelegateImpl::IsEntryInRevocationSet(const std::string & akidHexStr, const std::string & issuerNameBase64Str,
+                                                           const std::string & serialNumberHexStr)
 {
-    std::ifstream file(mDeviceAttestationRevocationSetPath.data());
-    if (!file.is_open())
-    {
-        ChipLogError(NotSpecified, "Failed to open file: %s", mDeviceAttestationRevocationSetPath.data());
-        return false;
-    }
-
-    // Parse the JSON data incrementally
-    Json::CharReaderBuilder readerBuilder;
     Json::Value jsonData;
-    std::string errs;
 
-    bool parsingSuccessful = Json::parseFromStream(readerBuilder, file, &jsonData, &errs);
-
-    // Close the file as it's no longer needed
-    file.close();
-
-    if (!parsingSuccessful)
+    // Try direct data first, then fall back to file
+    if (!mRevocationData.empty())
     {
-        ChipLogError(NotSpecified, "Failed to parse JSON: %s", errs.c_str());
+        std::string errs;
+        std::istringstream jsonStream(!mRevocationData.empty() ? mRevocationData : "[]");
+        if (!Json::parseFromStream(Json::CharReaderBuilder(), jsonStream, &jsonData, &errs))
+        {
+            ChipLogError(NotSpecified, "Failed to parse JSON data: %s", errs.c_str());
+            return false;
+        }
+    }
+    else if (!mDeviceAttestationRevocationSetPath.empty())
+    {
+        std::string errs;
+        std::ifstream file(mDeviceAttestationRevocationSetPath.c_str());
+        if (!file.is_open())
+        {
+            ChipLogError(NotSpecified, "Failed to open file: %s", mDeviceAttestationRevocationSetPath.c_str());
+            return false;
+        }
+
+        bool parsingSuccessful = Json::parseFromStream(Json::CharReaderBuilder(), file, &jsonData, &errs);
+        file.close();
+
+        if (!parsingSuccessful)
+        {
+            ChipLogError(NotSpecified, "Failed to parse JSON from file: %s", errs.c_str());
+            return false;
+        }
+    }
+    else
+    {
+        ChipLogDetail(NotSpecified, "No revocation data available");
+        // No revocation data available
         return false;
     }
 
-    std::string issuerName   = std::string(issuerNameBase64Str.data(), issuerNameBase64Str.size());
-    std::string serialNumber = std::string(serialNumberHexStr.data(), serialNumberHexStr.size());
-    std::string akid         = std::string(akidHexStr.data(), akidHexStr.size());
-
+    // 6.2.4.2. Determining Revocation Status of an Entity
     for (const auto & revokedSet : jsonData)
     {
-        if (revokedSet["issuer_name"].asString() != issuerName)
+        if (revokedSet["issuer_name"].asString() != issuerNameBase64Str)
         {
             continue;
         }
-        if (revokedSet["issuer_subject_key_id"].asString() != akid)
+        if (revokedSet["issuer_subject_key_id"].asString() != akidHexStr)
         {
             continue;
         }
+
+        // 4.a cross validate PAI with crl signer OR crl signer delegator
+        // 4.b cross validate DAC with crl signer OR crl signer delegator
+        VerifyOrReturnValue(CrossValidateCert(revokedSet, akidHexStr, issuerNameBase64Str), false);
+
+        // 4.c check if serial number is revoked
         for (const auto & revokedSerialNumber : revokedSet["revoked_serial_numbers"])
         {
-            if (revokedSerialNumber.asString() == serialNumber)
+            if (revokedSerialNumber.asString() == serialNumberHexStr)
             {
                 return true;
             }
@@ -117,17 +193,42 @@ bool TestDACRevocationDelegateImpl::IsEntryInRevocationSet(const CharSpan & akid
     return false;
 }
 
-CHIP_ERROR TestDACRevocationDelegateImpl::GetAKIDHexStr(const ByteSpan & certDer, MutableCharSpan & outAKIDHexStr)
+CHIP_ERROR TestDACRevocationDelegateImpl::GetKeyIDHexStr(const ByteSpan & certDer, std::string & outKeyIDHexStr,
+                                                         KeyIdType keyIdType)
 {
-    uint8_t akidBuf[kAuthorityKeyIdentifierLength];
-    MutableByteSpan akid(akidBuf);
+    static_assert(kAuthorityKeyIdentifierLength == kSubjectKeyIdentifierLength, "AKID and SKID length mismatch");
 
-    ReturnErrorOnFailure(ExtractAKIDFromX509Cert(certDer, akid));
+    uint8_t keyIdBuf[kAuthorityKeyIdentifierLength];
+    MutableByteSpan keyId(keyIdBuf);
 
-    return BytesToHexStr(akid, outAKIDHexStr);
+    switch (keyIdType)
+    {
+    case KeyIdType::kAKID:
+        ReturnErrorOnFailure(ExtractAKIDFromX509Cert(certDer, keyId));
+        break;
+
+    case KeyIdType::kSKID:
+        ReturnErrorOnFailure(ExtractSKIDFromX509Cert(certDer, keyId));
+        break;
+
+    default:
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    return BytesToHexStr(keyId, outKeyIDHexStr);
 }
 
-CHIP_ERROR TestDACRevocationDelegateImpl::GetSerialNumberHexStr(const ByteSpan & certDer, MutableCharSpan & outSerialNumberHexStr)
+CHIP_ERROR TestDACRevocationDelegateImpl::GetAKIDHexStr(const ByteSpan & certDer, std::string & outAKIDHexStr)
+{
+    return GetKeyIDHexStr(certDer, outAKIDHexStr, KeyIdType::kAKID);
+}
+
+CHIP_ERROR TestDACRevocationDelegateImpl::GetSKIDHexStr(const ByteSpan & certDer, std::string & outSKIDHexStr)
+{
+    return GetKeyIDHexStr(certDer, outSKIDHexStr, KeyIdType::kSKID);
+}
+
+CHIP_ERROR TestDACRevocationDelegateImpl::GetSerialNumberHexStr(const ByteSpan & certDer, std::string & outSerialNumberHexStr)
 {
     uint8_t serialNumberBuf[kMaxCertificateSerialNumberLength] = { 0 };
     MutableByteSpan serialNumber(serialNumberBuf);
@@ -136,31 +237,55 @@ CHIP_ERROR TestDACRevocationDelegateImpl::GetSerialNumberHexStr(const ByteSpan &
     return BytesToHexStr(serialNumber, outSerialNumberHexStr);
 }
 
-CHIP_ERROR TestDACRevocationDelegateImpl::GetIssuerNameBase64Str(const ByteSpan & certDer,
-                                                                 MutableCharSpan & outIssuerNameBase64String)
+CHIP_ERROR TestDACRevocationDelegateImpl::GetRDNBase64Str(const ByteSpan & certDer, std::string & outRDNBase64String,
+                                                          RDNType rdnType)
 {
-    uint8_t issuerBuf[kMaxCertificateDistinguishedNameLength] = { 0 };
-    MutableByteSpan issuer(issuerBuf);
+    uint8_t rdnBuf[kMaxCertificateDistinguishedNameLength] = { 0 };
+    MutableByteSpan rdn(rdnBuf);
 
-    ReturnErrorOnFailure(ExtractIssuerFromX509Cert(certDer, issuer));
-    VerifyOrReturnError(outIssuerNameBase64String.size() >= BASE64_ENCODED_LEN(issuer.size()), CHIP_ERROR_BUFFER_TOO_SMALL);
+    switch (rdnType)
+    {
+    case RDNType::kIssuer:
+        ReturnErrorOnFailure(ExtractIssuerFromX509Cert(certDer, rdn));
+        break;
 
-    uint16_t encodedLen = Base64Encode(issuer.data(), static_cast<uint16_t>(issuer.size()), outIssuerNameBase64String.data());
-    outIssuerNameBase64String.reduce_size(encodedLen);
+    case RDNType::kSubject:
+        ReturnErrorOnFailure(ExtractSubjectFromX509Cert(certDer, rdn));
+        break;
+
+    default:
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    // calculate the b64 length needed
+    size_t b64LenNeeded = BASE64_ENCODED_LEN(rdn.size());
+
+    // Ensure string has enough capacity for base64 encoded data
+    outRDNBase64String.resize(b64LenNeeded);
+
+    uint16_t encodedLen = Base64Encode(rdn.data(), static_cast<uint16_t>(rdn.size()), &outRDNBase64String[0]);
+    outRDNBase64String.resize(encodedLen);
+
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR TestDACRevocationDelegateImpl::GetIssuerNameBase64Str(const ByteSpan & certDer, std::string & outIssuerNameBase64String)
+{
+    return GetRDNBase64Str(certDer, outIssuerNameBase64String, RDNType::kIssuer);
+}
+
+CHIP_ERROR TestDACRevocationDelegateImpl::GetSubjectNameBase64Str(const ByteSpan & certDer,
+                                                                  std::string & outSubjectNameBase64String)
+{
+    return GetRDNBase64Str(certDer, outSubjectNameBase64String, RDNType::kSubject);
+}
+
+// @param certDer Certificate, in DER format, to check for revocation
 bool TestDACRevocationDelegateImpl::IsCertificateRevoked(const ByteSpan & certDer)
 {
-    static constexpr uint32_t maxIssuerBase64Len = BASE64_ENCODED_LEN(kMaxCertificateDistinguishedNameLength);
-
-    char issuerNameBuffer[maxIssuerBase64Len]                            = { 0 };
-    char serialNumberHexStrBuffer[2 * kMaxCertificateSerialNumberLength] = { 0 };
-    char akidHexStrBuffer[2 * kAuthorityKeyIdentifierLength]             = { 0 };
-
-    MutableCharSpan issuerName(issuerNameBuffer);
-    MutableCharSpan serialNumber(serialNumberHexStrBuffer);
-    MutableCharSpan akid(akidHexStrBuffer);
+    std::string serialNumber;
+    std::string akid;
+    std::string issuerName;
 
     VerifyOrReturnValue(CHIP_NO_ERROR == GetIssuerNameBase64Str(certDer, issuerName), false);
     ChipLogDetail(NotSpecified, "Issuer: %.*s", static_cast<int>(issuerName.size()), issuerName.data());
@@ -171,8 +296,6 @@ bool TestDACRevocationDelegateImpl::IsCertificateRevoked(const ByteSpan & certDe
     VerifyOrReturnValue(CHIP_NO_ERROR == GetAKIDHexStr(certDer, akid), false);
     ChipLogDetail(NotSpecified, "AKID: %.*s", static_cast<int>(akid.size()), akid.data());
 
-    // TODO: Cross-validate the CRLSignerCertificate and CRLSignerDelegator per spec: #34587
-
     return IsEntryInRevocationSet(akid, issuerName, serialNumber);
 }
 
@@ -182,25 +305,25 @@ void TestDACRevocationDelegateImpl::CheckForRevokedDACChain(
 {
     AttestationVerificationResult attestationError = AttestationVerificationResult::kSuccess;
 
-    if (mDeviceAttestationRevocationSetPath.empty())
+    if (mDeviceAttestationRevocationSetPath.empty() && mRevocationData.empty())
     {
-
         onCompletion->mCall(onCompletion->mContext, info, attestationError);
+        return;
     }
 
-    ChipLogDetail(NotSpecified, "Checking for revoked DAC in %s", mDeviceAttestationRevocationSetPath.data());
+    ChipLogDetail(NotSpecified, "Checking for revoked DAC in %s", mDeviceAttestationRevocationSetPath.c_str());
 
     if (IsCertificateRevoked(info.dacDerBuffer))
     {
-        ChipLogProgress(NotSpecified, "Found revoked DAC in %s", mDeviceAttestationRevocationSetPath.data());
+        ChipLogProgress(NotSpecified, "Found revoked DAC in %s", mDeviceAttestationRevocationSetPath.c_str());
         attestationError = AttestationVerificationResult::kDacRevoked;
     }
 
-    ChipLogDetail(NotSpecified, "Checking for revoked PAI in %s", mDeviceAttestationRevocationSetPath.data());
+    ChipLogDetail(NotSpecified, "Checking for revoked PAI in %s", mDeviceAttestationRevocationSetPath.c_str());
 
     if (IsCertificateRevoked(info.paiDerBuffer))
     {
-        ChipLogProgress(NotSpecified, "Found revoked PAI in %s", mDeviceAttestationRevocationSetPath.data());
+        ChipLogProgress(NotSpecified, "Found revoked PAI in %s", mDeviceAttestationRevocationSetPath.c_str());
 
         if (attestationError == AttestationVerificationResult::kDacRevoked)
         {

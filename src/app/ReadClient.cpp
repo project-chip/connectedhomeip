@@ -433,7 +433,7 @@ CHIP_ERROR ReadClient::BuildDataVersionFilterList(DataVersionFilterIBs::Builder 
 
         TLV::TLVWriter backup;
         aDataVersionFilterIBsBuilder.Checkpoint(backup);
-        CHIP_ERROR err = EncodeDataVersionFilter(aDataVersionFilterIBsBuilder, filter);
+        CHIP_ERROR err = aDataVersionFilterIBsBuilder.EncodeDataVersionFilterIB(filter);
         if (err == CHIP_NO_ERROR)
         {
 #if CHIP_PROGRESS_LOGGING
@@ -464,19 +464,6 @@ CHIP_ERROR ReadClient::BuildDataVersionFilterList(DataVersionFilterIBs::Builder 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ReadClient::EncodeDataVersionFilter(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
-                                               DataVersionFilter const & aFilter)
-{
-    // Caller has checked aFilter.IsValidDataVersionFilter()
-    DataVersionFilterIB::Builder & filterIB = aDataVersionFilterIBsBuilder.CreateDataVersionFilter();
-    ReturnErrorOnFailure(aDataVersionFilterIBsBuilder.GetError());
-    ClusterPathIB::Builder & path = filterIB.CreatePath();
-    ReturnErrorOnFailure(filterIB.GetError());
-    ReturnErrorOnFailure(path.Endpoint(aFilter.mEndpointId).Cluster(aFilter.mClusterId).EndOfClusterPathIB());
-    ReturnErrorOnFailure(filterIB.DataVersion(aFilter.mDataVersion.Value()).EndOfDataVersionFilterIB());
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR ReadClient::GenerateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
                                                      const Span<AttributePathParams> & aAttributePaths,
                                                      const Span<DataVersionFilter> & aDataVersionFilters,
@@ -497,14 +484,16 @@ CHIP_ERROR ReadClient::GenerateDataVersionFilterList(DataVersionFilterIBs::Build
 
 void ReadClient::OnActiveModeNotification()
 {
-    // This function just tries to complete the deferred resubscription logic in `OnLivenessTimeoutCallback`.
     VerifyOrDie(mpImEngine->InActiveReadClientList(this));
-    // If we are not in InactiveICDSubscription state, that means the liveness timeout has not been reached. Simply do nothing.
-    VerifyOrReturn(IsInactiveICDSubscription());
-
     // When we reach here, the subscription definitely exceeded the liveness timeout. Just continue the unfinished resubscription
     // logic in `OnLivenessTimeoutCallback`.
-    TriggerResubscriptionForLivenessTimeout(CHIP_ERROR_TIMEOUT);
+    if (IsInactiveICDSubscription())
+    {
+        TriggerResubscriptionForLivenessTimeout(CHIP_ERROR_TIMEOUT);
+        return;
+    }
+
+    TriggerResubscribeIfScheduled("check-in message");
 }
 
 void ReadClient::OnPeerTypeChange(PeerType aType)
@@ -1000,12 +989,15 @@ CHIP_ERROR ReadClient::ComputeLivenessCheckTimerTimeout(System::Clock::Timeout *
     // So recompute the round-trip timeout directly.  Assume MRP, since in practice that is likely what is happening.
     auto & peerMRPConfig = mReadPrepareParams.mSessionHolder->GetRemoteMRPConfig();
     // Peer will assume we are idle (hence we pass kZero to GetMessageReceiptTimeout()), but will assume we treat it as active
-    // for the response, so to match the retransmission timeout computation for the message back to the peeer, we should treat
-    // it as active.
-    auto roundTripTimeout = mReadPrepareParams.mSessionHolder->GetMessageReceiptTimeout(System::Clock::kZero) +
+    // for the response, so to match the retransmission timeout computation for the message back to the peer, we should treat
+    // it as active and handling non-initial message, isFirstMessageOnExchange needs to be set as false for
+    // GetRetransmissionTimeout.
+    auto roundTripTimeout =
+        mReadPrepareParams.mSessionHolder->GetMessageReceiptTimeout(System::Clock::kZero, true /*isFirstMessageOnExchange*/) +
         kExpectedIMProcessingTime +
         GetRetransmissionTimeout(peerMRPConfig.mActiveRetransTimeout, peerMRPConfig.mIdleRetransTimeout,
-                                 System::SystemClock().GetMonotonicTimestamp(), peerMRPConfig.mActiveThresholdTime);
+                                 System::SystemClock().GetMonotonicTimestamp(), peerMRPConfig.mActiveThresholdTime,
+                                 false /*isFirstMessageOnExchange*/);
     *aTimeout = System::Clock::Seconds16(mMaxInterval) + roundTripTimeout;
     return CHIP_NO_ERROR;
 }
@@ -1094,10 +1086,14 @@ CHIP_ERROR ReadClient::ProcessSubscribeResponse(System::PacketBufferHandle && aP
     VerifyOrReturnError(IsMatchingSubscriptionId(subscriptionId), CHIP_ERROR_INVALID_SUBSCRIPTION);
     ReturnErrorOnFailure(subscribeResponse.GetMaxInterval(&mMaxInterval));
 
+#if CHIP_PROGRESS_LOGGING
+    auto duration = System::Clock::Milliseconds32(System::SystemClock().GetMonotonicTimestamp() - mSubscribeRequestTime);
+#endif
     ChipLogProgress(DataManagement,
-                    "Subscription established with SubscriptionID = 0x%08" PRIx32 " MinInterval = %u"
+                    "Subscription established in %" PRIu32 "ms with SubscriptionID = 0x%08" PRIx32 " MinInterval = %u"
                     "s MaxInterval = %us Peer = %02x:" ChipLogFormatX64,
-                    mSubscriptionId, mMinIntervalFloorSeconds, mMaxInterval, GetFabricIndex(), ChipLogValueX64(GetPeerNodeId()));
+                    duration.count(), mSubscriptionId, mMinIntervalFloorSeconds, mMaxInterval, GetFabricIndex(),
+                    ChipLogValueX64(GetPeerNodeId()));
 
     ReturnErrorOnFailure(subscribeResponse.ExitContainer());
 
@@ -1156,6 +1152,10 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(const ReadPrepareParams & aReadPrepa
 CHIP_ERROR ReadClient::SendSubscribeRequestImpl(const ReadPrepareParams & aReadPrepareParams)
 {
     MATTER_LOG_METRIC_BEGIN(Tracing::kMetricDeviceSubscriptionSetup);
+
+#if CHIP_PROGRESS_LOGGING
+    mSubscribeRequestTime = System::SystemClock().GetMonotonicTimestamp();
+#endif
 
     VerifyOrReturnError(ClientState::Idle == mState, CHIP_ERROR_INCORRECT_STATE);
 
@@ -1306,7 +1306,7 @@ void ReadClient::HandleDeviceConnected(void * context, Messaging::ExchangeManage
     }
 }
 
-void ReadClient::HandleDeviceConnectionFailure(void * context, const OperationalSessionSetup::ConnnectionFailureInfo & failureInfo)
+void ReadClient::HandleDeviceConnectionFailure(void * context, const OperationalSessionSetup::ConnectionFailureInfo & failureInfo)
 {
     ReadClient * const _this = static_cast<ReadClient *>(context);
     VerifyOrDie(_this != nullptr);

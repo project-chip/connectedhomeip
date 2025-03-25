@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -55,8 +55,7 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 
-:imagesdir: service_device_management/images
-:xrefstyle: full
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0038" name="Time Synchronization Cluster" revision="2">
   <revisionHistory>
@@ -99,7 +98,11 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </item>
     </enum>
-    <enum name="Status Codes" type="status"/>
+    <enum name="StatusCodeEnum">
+      <item value="0x02" name="TimeNotAccepted" summary="Node rejected the attempt to set the UTC time">
+        <mandatoryConform/>
+      </item>
+    </enum>
     <enum name="TimeSourceEnum">
       <item value="0" name="None" summary="Node is not currently synchronized with a UTC Time source.">
         <mandatoryConform/>
@@ -167,7 +170,9 @@ Davis, CA 95616, USA
     <struct name="DSTOffsetStruct">
       <field id="0" name="Offset" type="int32">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="1" name="ValidStarting" type="epoch-us">
         <mandatoryConform/>
@@ -188,14 +193,24 @@ Davis, CA 95616, USA
     <struct name="TimeZoneStruct">
       <field id="0" name="Offset" type="int32">
         <mandatoryConform/>
-        <constraint type="between" from="-43200" to="50400"/>
+        <constraint>
+          <between>
+            <from value="-43200"/>
+            <to value="50400"/>
+          </between>
+        </constraint>
       </field>
       <field id="1" name="ValidAt" type="epoch-us">
         <mandatoryConform/>
       </field>
       <field id="2" name="Name" type="string">
         <optionalConform/>
-        <constraint type="lengthBetween" from="0" to="64"/>
+        <constraint>
+          <lengthBetween>
+            <from value="0"/>
+            <to value="64"/>
+          </lengthBetween>
+        </constraint>
       </field>
     </struct>
     <struct name="TrustedTimeSourceStruct">
@@ -213,66 +228,80 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="UTCTime" type="epoch-us" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true" nullable="true"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0001" name="Granularity" type="GranularityEnum" default="NoTimeGranularity">
+    <attribute id="0x0001" name="Granularity" type="GranularityEnum">
+      <enum default="NoTimeGranularity"/>
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
-    <attribute id="0x0002" name="TimeSource" type="TimeSourceEnum" default="None">
+    <attribute id="0x0002" name="TimeSource" type="TimeSourceEnum">
+      <enum default="None"/>
       <access read="true" readPrivilege="view"/>
       <optionalConform/>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0003" name="TrustedTimeSource" type="TrustedTimeSourceStruct" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="nonVolatile"/>
       <mandatoryConform>
         <feature name="TSC"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0004" name="DefaultNTP" type="string" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="nonVolatile"/>
       <mandatoryConform>
         <feature name="NTPC"/>
       </mandatoryConform>
-      <constraint type="maxLength" value="128"/>
+      <constraint>
+        <maxLength value="128"/>
+      </constraint>
     </attribute>
     <attribute id="0x0005" name="TimeZone" type="list" default="[{0,0}]">
       <entry type="TimeZoneStruct"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform>
         <feature name="TZ"/>
       </mandatoryConform>
-      <constraint type="countBetween" from="1" to="2"/>
+      <constraint>
+        <countBetween>
+          <from value="1"/>
+          <to value="2"/>
+        </countBetween>
+      </constraint>
     </attribute>
-    <attribute id="0x0006" name="DSTOffset" type="list" default="[]">
+    <attribute id="0x0006" name="DSTOffset" type="list" default="empty">
       <entry type="DSTOffsetStruct"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform>
         <feature name="TZ"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0007" name="LocalTime" type="epoch-us" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true" nullable="true"/>
       <mandatoryConform>
         <feature name="TZ"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0008" name="TimeZoneDatabase" type="TimeZoneDatabaseEnum" default="None">
+    <attribute id="0x0008" name="TimeZoneDatabase" type="TimeZoneDatabaseEnum">
+      <enum default="None"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="TZ"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0009" name="NTPServerAvailable" type="bool" default="False">
+    <attribute id="0x0009" name="NTPServerAvailable" type="bool" default="false">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <feature name="NTPS"/>
@@ -280,23 +309,30 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x000A" name="TimeZoneListMaxSize" type="uint8">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="TZ"/>
       </mandatoryConform>
-      <constraint type="between" from="1" to="2"/>
+      <constraint>
+        <between>
+          <from value="1"/>
+          <to value="2"/>
+        </between>
+      </constraint>
     </attribute>
     <attribute id="0x000B" name="DSTOffsetListMaxSize" type="uint8">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="TZ"/>
       </mandatoryConform>
-      <constraint type="min" value="1"/>
+      <constraint>
+        <min value="1"/>
+      </constraint>
     </attribute>
-    <attribute id="0x000C" name="SupportsDNSResolve" type="bool" default="False">
+    <attribute id="0x000C" name="SupportsDNSResolve" type="bool" default="false">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="NTPC"/>
       </mandatoryConform>
@@ -334,14 +370,19 @@ Davis, CA 95616, USA
       <field id="0" name="TimeZone" type="list">
         <entry type="TimeZoneStruct"/>
         <mandatoryConform/>
-        <constraint type="countBetween" from="1" to="2"/>
+        <constraint>
+          <countBetween>
+            <from value="1"/>
+            <to value="2"/>
+          </countBetween>
+        </constraint>
       </field>
     </command>
     <command id="0x03" name="SetTimeZoneResponse" direction="responseFromServer">
       <mandatoryConform>
         <feature name="TZ"/>
       </mandatoryConform>
-      <field id="0" name="DSTOffsetsRequired" type="bool" default="true">
+      <field id="0" name="DSTOffsetRequired" type="bool" default="true">
         <mandatoryConform/>
       </field>
     </command>
@@ -363,7 +404,9 @@ Davis, CA 95616, USA
       <field id="0" name="DefaultNTP" type="string">
         <quality nullable="true"/>
         <mandatoryConform/>
-        <constraint type="maxLength" value="128"/>
+        <constraint>
+          <maxLength value="128"/>
+        </constraint>
       </field>
     </command>
   </commands>
@@ -390,11 +433,15 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="Offset" type="int32">
         <mandatoryConform/>
-        <constraint type="between" from="-43200" to="50400"/>
+        <constraint>
+          <between>
+            <from value="-43200"/>
+            <to value="50400"/>
+          </between>
+        </constraint>
       </field>
       <field id="1" name="Name" type="string">
         <optionalConform/>
-        <constraint type="lengthBetween" from="0" to="64 bytes"/>
       </field>
     </event>
     <event id="0x03" name="TimeFailure" priority="info">

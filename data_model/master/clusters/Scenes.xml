@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -114,30 +114,9 @@ Davis, CA 95616, USA
       <field id="1" name="AttributeValueList" type="list">
         <entry type="AttributeValuePairStruct"/>
         <mandatoryConform/>
-        <constraint type="desc"/>
-      </field>
-    </struct>
-    <struct name="Logical Scene Table">
-      <field id="0" name="SceneGroupID" type="group-id">
-        <mandatoryConform/>
-      </field>
-      <field id="1" name="SceneID" type="uint8">
-        <mandatoryConform/>
-        <constraint type="max" value="254"/>
-      </field>
-      <field id="2" name="SceneName" type="string">
-        <mandatoryConform>
-          <feature name="SN"/>
-        </mandatoryConform>
-        <constraint type="maxLength" value="16"/>
-      </field>
-      <field id="3" name="SceneTransitionTime" type="uint32" default="0">
-        <mandatoryConform/>
-        <constraint type="max" value="60000000"/>
-      </field>
-      <field id="4" name="ExtensionFields" type="list" default="empty">
-        <entry type="ExtensionFieldSetStruct"/>
-        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </struct>
     <struct name="SceneInfoStruct">
@@ -147,19 +126,23 @@ Davis, CA 95616, USA
       <field id="1" name="CurrentScene" type="uint8" default="0xFF">
         <access fabricSensitive="true"/>
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="2" name="CurrentGroup" type="group-id" default="0">
         <access fabricSensitive="true"/>
         <mandatoryConform/>
       </field>
-      <field id="3" name="SceneValid" type="bool" default="False">
+      <field id="3" name="SceneValid" type="bool" default="false">
         <access fabricSensitive="true"/>
         <mandatoryConform/>
       </field>
       <field id="4" name="RemainingCapacity" type="uint8" default="MS">
         <mandatoryConform/>
-        <constraint type="max" value="253"/>
+        <constraint>
+          <max value="253"/>
+        </constraint>
       </field>
       <access fabricScoped="true"/>
     </struct>
@@ -167,20 +150,24 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="LastConfiguredBy" type="node-id" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0001" name="SceneTableSize" type="uint16" default="16">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0002" name="FabricSceneInfo" type="list">
       <entry type="SceneInfoStruct"/>
       <access read="true" readPrivilege="view" fabricScoped="true"/>
       <mandatoryConform/>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
   </attributes>
   <commands>
@@ -192,34 +179,46 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="SceneID" type="uint8">
         <mandatoryConform/>
-        <constraint type="max" value="254"/>
+        <constraint>
+          <max value="254"/>
+        </constraint>
       </field>
       <field id="2" name="TransitionTime" type="uint32">
         <mandatoryConform/>
-        <constraint type="max" value="60000000"/>
+        <constraint>
+          <max value="60000000"/>
+        </constraint>
       </field>
       <field id="3" name="SceneName" type="string">
         <mandatoryConform/>
-        <constraint type="maxLength" value="16"/>
+        <constraint>
+          <maxLength value="16"/>
+        </constraint>
       </field>
       <field id="4" name="ExtensionFieldSetStructs" type="list">
         <entry type="ExtensionFieldSetStruct"/>
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </command>
     <command id="0x00" name="AddSceneResponse" direction="responseFromServer">
       <mandatoryConform/>
       <field id="0" name="Status" type="status">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="1" name="GroupID" type="group-id">
         <mandatoryConform/>
       </field>
       <field id="2" name="SceneID" type="uint8">
         <mandatoryConform/>
-        <constraint type="max" value="254"/>
+        <constraint>
+          <max value="254"/>
+        </constraint>
       </field>
     </command>
     <command id="0x01" name="ViewScene" direction="commandToServer" response="ViewSceneResponse">
@@ -230,30 +229,58 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="SceneID" type="uint8">
         <mandatoryConform/>
-        <constraint type="max" value="254"/>
+        <constraint>
+          <max value="254"/>
+        </constraint>
       </field>
     </command>
     <command id="0x01" name="ViewSceneResponse" direction="responseFromServer">
       <mandatoryConform/>
       <field id="0" name="Status" type="status">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="1" name="GroupID" type="group-id">
         <mandatoryConform/>
       </field>
       <field id="2" name="SceneID" type="uint8">
         <mandatoryConform/>
-        <constraint type="max" value="254"/>
+        <constraint>
+          <max value="254"/>
+        </constraint>
       </field>
       <field id="3" name="TransitionTime" type="uint32">
-        <constraint type="max" value="60000000"/>
+        <mandatoryConform>
+          <equalTerm>
+            <field name="Status"/>
+            <status name="SUCCESS"/>
+          </equalTerm>
+        </mandatoryConform>
+        <constraint>
+          <max value="60000000"/>
+        </constraint>
       </field>
       <field id="4" name="SceneName" type="string">
-        <constraint type="maxLength" value="16"/>
+        <mandatoryConform>
+          <equalTerm>
+            <field name="Status"/>
+            <status name="SUCCESS"/>
+          </equalTerm>
+        </mandatoryConform>
+        <constraint>
+          <maxLength value="16"/>
+        </constraint>
       </field>
       <field id="5" name="ExtensionFieldSetStructs" type="list">
         <entry type="ExtensionFieldSetStruct"/>
+        <mandatoryConform>
+          <equalTerm>
+            <field name="Status"/>
+            <status name="SUCCESS"/>
+          </equalTerm>
+        </mandatoryConform>
       </field>
     </command>
     <command id="0x02" name="RemoveScene" direction="commandToServer" response="RemoveSceneResponse">
@@ -264,21 +291,27 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="SceneID" type="uint8">
         <mandatoryConform/>
-        <constraint type="max" value="254"/>
+        <constraint>
+          <max value="254"/>
+        </constraint>
       </field>
     </command>
     <command id="0x02" name="RemoveSceneResponse" direction="responseFromServer">
       <mandatoryConform/>
       <field id="0" name="Status" type="status">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="1" name="GroupID" type="group-id">
         <mandatoryConform/>
       </field>
       <field id="2" name="SceneID" type="uint8">
         <mandatoryConform/>
-        <constraint type="max" value="254"/>
+        <constraint>
+          <max value="254"/>
+        </constraint>
       </field>
     </command>
     <command id="0x03" name="RemoveAllScenes" direction="commandToServer" response="RemoveAllScenesResponse">
@@ -292,7 +325,9 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <field id="0" name="Status" type="status">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="1" name="GroupID" type="group-id">
         <mandatoryConform/>
@@ -306,21 +341,27 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="SceneID" type="uint8">
         <mandatoryConform/>
-        <constraint type="max" value="254"/>
+        <constraint>
+          <max value="254"/>
+        </constraint>
       </field>
     </command>
     <command id="0x04" name="StoreSceneResponse" direction="responseFromServer">
       <mandatoryConform/>
       <field id="0" name="Status" type="status">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="1" name="GroupID" type="group-id">
         <mandatoryConform/>
       </field>
       <field id="2" name="SceneID" type="uint8">
         <mandatoryConform/>
-        <constraint type="max" value="254"/>
+        <constraint>
+          <max value="254"/>
+        </constraint>
       </field>
     </command>
     <command id="0x05" name="RecallScene" direction="commandToServer" response="Y">
@@ -331,12 +372,16 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="SceneID" type="uint8">
         <mandatoryConform/>
-        <constraint type="max" value="254"/>
+        <constraint>
+          <max value="254"/>
+        </constraint>
       </field>
       <field id="2" name="TransitionTime" type="uint32">
         <quality nullable="true"/>
         <optionalConform/>
-        <constraint type="max" value="60000000"/>
+        <constraint>
+          <max value="60000000"/>
+        </constraint>
       </field>
     </command>
     <command id="0x06" name="GetSceneMembership" direction="commandToServer" response="GetSceneMembershipResponse">
@@ -350,7 +395,9 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <field id="0" name="Status" type="status">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="1" name="Capacity" type="uint8">
         <quality nullable="true"/>
@@ -361,6 +408,12 @@ Davis, CA 95616, USA
       </field>
       <field id="3" name="SceneList" type="list">
         <entry type="uint8"/>
+        <mandatoryConform>
+          <equalTerm>
+            <field name="Status"/>
+            <status name="SUCCESS"/>
+          </equalTerm>
+        </mandatoryConform>
       </field>
     </command>
     <command id="0x40" name="CopyScene" direction="commandToServer" response="CopySceneResponse">
@@ -368,19 +421,27 @@ Davis, CA 95616, USA
       <optionalConform/>
       <field id="0" name="Mode" type="CopyModeBitmap">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="1" name="GroupIdentifierFrom" type="group-id">
         <mandatoryConform/>
       </field>
-      <field id="2" name="SceneIdentifierFrom" type="max 254">
+      <field id="2" name="SceneIdentifierFrom" type="uint8">
         <mandatoryConform/>
+        <constraint>
+          <max value="254"/>
+        </constraint>
       </field>
       <field id="3" name="GroupIdentifierTo" type="group-id">
         <mandatoryConform/>
       </field>
-      <field id="4" name="SceneIdentifierTo" type="max 254">
+      <field id="4" name="SceneIdentifierTo" type="uint8">
         <mandatoryConform/>
+        <constraint>
+          <max value="254"/>
+        </constraint>
       </field>
     </command>
     <command id="0x40" name="CopySceneResponse" direction="responseFromServer">
@@ -389,14 +450,18 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="Status" type="status">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="1" name="GroupIdentifierFrom" type="group-id">
         <mandatoryConform/>
       </field>
       <field id="2" name="SceneIdentifierFrom" type="uint8">
         <mandatoryConform/>
-        <constraint type="max" value="254"/>
+        <constraint>
+          <max value="254"/>
+        </constraint>
       </field>
     </command>
   </commands>

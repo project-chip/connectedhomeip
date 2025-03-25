@@ -22,9 +22,9 @@
 #include "silabs_utils.h"
 
 // ---- Window Example App Config ----
-#define APP_TASK_NAME "APP"
+#define APP_TASK_NAME "Window"
 #define APP_EVENT_QUEUE_SIZE 20
-#define BLE_DEV_NAME "SiLabs-Window"
+#define BLE_DEV_NAME "SL-" APP_TASK_NAME
 
 #define LCD_SIZE 128
 #define LCD_MARGIN_SIZE 1

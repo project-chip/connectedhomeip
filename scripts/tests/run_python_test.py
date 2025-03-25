@@ -14,16 +14,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import contextlib
 import datetime
+import glob
 import io
 import logging
 import os
 import os.path
-import queue
+import pathlib
 import re
+import select
 import shlex
-import signal
-import subprocess
 import sys
 import threading
 import time
@@ -31,53 +32,76 @@ import typing
 
 import click
 import coloredlogs
+from chip.testing.metadata import Metadata, MetadataReader
+from chip.testing.tasks import Subprocess
 from colorama import Fore, Style
-from metadata_parser.metadata import Metadata, MetadataReader
 
 DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..'))
 
 MATTER_DEVELOPMENT_PAA_ROOT_CERTS = "credentials/development/paa-root-certs"
 
+TAG_PROCESS_APP = f"[{Fore.GREEN}APP {Style.RESET_ALL}]".encode()
+TAG_PROCESS_TEST = f"[{Fore.GREEN}TEST{Style.RESET_ALL}]".encode()
+TAG_STDOUT = f"[{Fore.YELLOW}STDOUT{Style.RESET_ALL}]".encode()
+TAG_STDERR = f"[{Fore.RED}STDERR{Style.RESET_ALL}]".encode()
 
-def EnqueueLogOutput(fp, tag, output_stream, q):
-    for line in iter(fp.readline, b''):
-        timestamp = time.time()
-        if len(line) > len('[1646290606.901990]') and line[0:1] == b'[':
-            try:
-                timestamp = float(line[1:18].decode())
-                line = line[19:]
-            except Exception:
-                pass
-        output_stream.write(
-            (f"[{datetime.datetime.fromtimestamp(timestamp).isoformat(sep=' ')}]").encode() + tag + line)
-        sys.stdout.flush()
-    fp.close()
+# RegExp which matches the timestamp in the output of CHIP application
+OUTPUT_TIMESTAMP_MATCH = re.compile(r'(?P<prefix>.*)\[(?P<ts>\d+\.\d+)\](?P<suffix>\[\d+:\d+\].*)'.encode())
 
 
-def RedirectQueueThread(fp, tag, stream_output, queue) -> threading.Thread:
-    log_queue_thread = threading.Thread(target=EnqueueLogOutput, args=(
-        fp, tag, stream_output, queue))
-    log_queue_thread.start()
-    return log_queue_thread
+def chip_output_extract_timestamp(line: bytes) -> (float, bytes):
+    """Try to extract timestamp from a CHIP application output line."""
+    if match := OUTPUT_TIMESTAMP_MATCH.match(line):
+        return float(match.group(2)), match.group(1) + match.group(3) + b'\n'
+    return time.time(), line
 
 
-def DumpProgramOutputToQueue(thread_list: typing.List[threading.Thread], tag: str, process: subprocess.Popen, stream_output, queue: queue.Queue):
-    thread_list.append(RedirectQueueThread(process.stdout,
-                                           (f"[{tag}][{Fore.YELLOW}STDOUT{Style.RESET_ALL}]").encode(), stream_output, queue))
-    thread_list.append(RedirectQueueThread(process.stderr,
-                                           (f"[{tag}][{Fore.RED}STDERR{Style.RESET_ALL}]").encode(), stream_output, queue))
+def process_chip_output(line: bytes, is_stderr: bool, process_tag: bytes = b"") -> bytes:
+    """Rewrite the output line to add the timestamp and the process tag."""
+    timestamp, line = chip_output_extract_timestamp(line)
+    timestamp = datetime.datetime.fromtimestamp(timestamp).isoformat(sep=' ')
+    return f"[{timestamp}]".encode() + process_tag + (TAG_STDERR if is_stderr else TAG_STDOUT) + line
+
+
+def process_chip_app_output(line, is_stderr):
+    return process_chip_output(line, is_stderr, TAG_PROCESS_APP)
+
+
+def process_test_script_output(line, is_stderr):
+    return process_chip_output(line, is_stderr, TAG_PROCESS_TEST)
+
+
+def forward_fifo(path: str, f_out: typing.BinaryIO, stop_event: threading.Event):
+    """Forward the content of a named pipe to a file-like object."""
+    if not os.path.exists(path):
+        with contextlib.suppress(OSError):
+            os.mkfifo(path)
+    with open(os.open(path, os.O_RDONLY | os.O_NONBLOCK), 'rb') as f_in:
+        while not stop_event.is_set():
+            if select.select([f_in], [], [], 0.5)[0]:
+                line = f_in.readline()
+                if not line:
+                    break
+                f_out.write(line)
+                f_out.flush()
+    with contextlib.suppress(OSError):
+        os.unlink(path)
 
 
 @click.command()
 @click.option("--app", type=click.Path(exists=True), default=None,
               help='Path to local application to use, omit to use external apps.')
-@click.option("--factoryreset", is_flag=True,
+@click.option("--factory-reset/--no-factory-reset", default=None,
               help='Remove app config and repl configs (/tmp/chip* and /tmp/repl*) before running the tests.')
-@click.option("--factoryreset-app-only", is_flag=True,
+@click.option("--factory-reset-app-only/--no-factory-reset-app-only", default=None,
               help='Remove app config and repl configs (/tmp/chip* and /tmp/repl*) before running the tests, but not the controller config')
 @click.option("--app-args", type=str, default='',
-              help='The extra arguments passed to the device. Can use placholders like {SCRIPT_BASE_NAME}')
+              help='The extra arguments passed to the device. Can use placeholders like {SCRIPT_BASE_NAME}')
+@click.option("--app-ready-pattern", type=str, default=None,
+              help='Delay test script start until given regular expression pattern is found in the application output.')
+@click.option("--app-stdin-pipe", type=str, default=None,
+              help='Path for a standard input redirection named pipe to be used by the test script.')
 @click.option("--script", type=click.Path(exists=True), default=os.path.join(DEFAULT_CHIP_ROOT,
                                                                              'src',
                                                                              'controller',
@@ -87,14 +111,15 @@ def DumpProgramOutputToQueue(thread_list: typing.List[threading.Thread], tag: st
                                                                              'mobile-device-test.py'), help='Test script to use.')
 @click.option("--script-args", type=str, default='',
               help='Script arguments, can use placeholders like {SCRIPT_BASE_NAME}.')
-@click.option("--script-start-delay", type=int, default=0,
-              help='Delay in seconds before starting the script.')
-@click.option("--script-gdb", is_flag=True,
+@click.option("--script-gdb/--no-script-gdb", default=None,
               help='Run script through gdb')
-@click.option("--quiet", is_flag=True, help="Do not print output from passing tests. Use this flag in CI to keep github log sizes manageable.")
+@click.option("--quiet/--no-quiet", default=None,
+              help="Do not print output from passing tests. Use this flag in CI to keep GitHub log size manageable.")
 @click.option("--load-from-env", default=None, help="YAML file that contains values for environment variables.")
-def main(app: str, factoryreset: bool, factoryreset_app_only: bool, app_args: str,
-         script: str, script_args: str, script_start_delay: int, script_gdb: bool, quiet: bool, load_from_env):
+@click.option("--run", type=str, multiple=True, help="Run only the specified test run(s).")
+def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: str,
+         app_ready_pattern: str, app_stdin_pipe: str, script: str, script_args: str,
+         script_gdb: bool, quiet: bool, load_from_env, run):
     if load_from_env:
         reader = MetadataReader(load_from_env)
         runs = reader.parse_script(script)
@@ -105,62 +130,67 @@ def main(app: str, factoryreset: bool, factoryreset_app_only: bool, app_args: st
                 run="cmd-run",
                 app=app,
                 app_args=app_args,
+                app_ready_pattern=app_ready_pattern,
+                app_stdin_pipe=app_stdin_pipe,
                 script_args=script_args,
-                script_start_delay=script_start_delay,
-                factoryreset=factoryreset,
-                factoryreset_app_only=factoryreset_app_only,
                 script_gdb=script_gdb,
-                quiet=quiet
             )
         ]
 
     if not runs:
-        raise Exception(
-            "No valid runs were found. Make sure you add runs to your file, see https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md document for reference/example.")
+        raise click.ClickException(
+            "No valid runs were found. Make sure you add runs to your file, see "
+            "https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md document for reference/example.")
+
+    if run:
+        # Filter runs based on the command line arguments
+        runs = [r for r in runs if r.run in run]
+
+    # Override runs Metadata with the command line options
+    for run in runs:
+        if factory_reset is not None:
+            run.factory_reset = factory_reset
+        if factory_reset_app_only is not None:
+            run.factory_reset_app_only = factory_reset_app_only
+        if script_gdb is not None:
+            run.script_gdb = script_gdb
+        if quiet is not None:
+            run.quiet = quiet
 
     for run in runs:
-        print(f"Executing {run.py_script_path.split('/')[-1]} {run.run}")
-        main_impl(run.app, run.factoryreset, run.factoryreset_app_only, run.app_args,
-                  run.py_script_path, run.script_args, run.script_start_delay, run.script_gdb, run.quiet)
+        logging.info("Executing %s %s", run.py_script_path.split('/')[-1], run.run)
+        main_impl(run.app, run.factory_reset, run.factory_reset_app_only, run.app_args or "",
+                  run.app_ready_pattern, run.app_stdin_pipe, run.py_script_path,
+                  run.script_args or "", run.script_gdb, run.quiet)
 
 
-def main_impl(app: str, factoryreset: bool, factoryreset_app_only: bool, app_args: str,
-              script: str, script_args: str, script_start_delay: int, script_gdb: bool, quiet: bool):
+def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: str,
+              app_ready_pattern: str, app_stdin_pipe: str, script: str, script_args: str,
+              script_gdb: bool, quiet: bool):
 
     app_args = app_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
     script_args = script_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
 
-    if factoryreset or factoryreset_app_only:
+    if factory_reset or factory_reset_app_only:
         # Remove native app config
-        retcode = subprocess.call("rm -rf /tmp/chip* /tmp/repl*", shell=True)
-        if retcode != 0:
-            raise Exception("Failed to remove /tmp/chip* for factory reset.")
+        for path in glob.glob('/tmp/chip*') + glob.glob('/tmp/repl*'):
+            pathlib.Path(path).unlink(missing_ok=True)
 
         # Remove native app KVS if that was used
-        kvs_match = re.search(r"--KVS (?P<kvs_path>[^ ]+)", app_args)
-        if kvs_match:
-            kvs_path_to_remove = kvs_match.group("kvs_path")
-            retcode = subprocess.call("rm -f %s" % kvs_path_to_remove, shell=True)
-            print("Trying to remove KVS path %s" % kvs_path_to_remove)
-            if retcode != 0:
-                raise Exception("Failed to remove %s for factory reset." % kvs_path_to_remove)
+        if match := re.search(r"--KVS (?P<path>[^ ]+)", app_args):
+            logging.info("Removing KVS path: %s" % match.group("path"))
+            pathlib.Path(match.group("path")).unlink(missing_ok=True)
 
-    if factoryreset:
+    if factory_reset:
         # Remove Python test admin storage if provided
-        storage_match = re.search(r"--storage-path (?P<storage_path>[^ ]+)", script_args)
-        if storage_match:
-            storage_path_to_remove = storage_match.group("storage_path")
-            retcode = subprocess.call("rm -f %s" % storage_path_to_remove, shell=True)
-            print("Trying to remove storage path %s" % storage_path_to_remove)
-            if retcode != 0:
-                raise Exception("Failed to remove %s for factory reset." % storage_path_to_remove)
-
-    coloredlogs.install(level='INFO')
-
-    log_queue = queue.Queue()
-    log_cooking_threads = []
+        if match := re.search(r"--storage-path (?P<path>[^ ]+)", script_args):
+            logging.info("Removing storage path: %s" % match.group("path"))
+            pathlib.Path(match.group("path")).unlink(missing_ok=True)
 
     app_process = None
+    app_stdin_forwarding_thread = None
+    app_stdin_forwarding_stop_event = threading.Event()
+    app_exit_code = 0
     app_pid = 0
 
     stream_output = sys.stdout.buffer
@@ -171,19 +201,29 @@ def main_impl(app: str, factoryreset: bool, factoryreset_app_only: bool, app_arg
         if not os.path.exists(app):
             if app is None:
                 raise FileNotFoundError(f"{app} not found")
-        app_args = [app] + shlex.split(app_args)
-        logging.info(f"Execute: {app_args}")
-        app_process = subprocess.Popen(
-            app_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE, bufsize=0)
-        app_process.stdin.close()
-        app_pid = app_process.pid
-        DumpProgramOutputToQueue(
-            log_cooking_threads, Fore.GREEN + "APP " + Style.RESET_ALL, app_process, stream_output, log_queue)
+        if app_ready_pattern:
+            app_ready_pattern = re.compile(app_ready_pattern.encode())
+        app_process = Subprocess(app, *shlex.split(app_args),
+                                 output_cb=process_chip_app_output,
+                                 f_stdout=stream_output,
+                                 f_stderr=stream_output)
+        app_process.start(expected_output=app_ready_pattern, timeout=30)
+        if app_stdin_pipe:
+            logging.info("Forwarding stdin from '%s' to app", app_stdin_pipe)
+            app_stdin_forwarding_thread = threading.Thread(
+                target=forward_fifo, args=(app_stdin_pipe, app_process.p.stdin, app_stdin_forwarding_stop_event))
+            app_stdin_forwarding_thread.start()
+        else:
+            app_process.p.stdin.close()
+        app_pid = app_process.p.pid
 
-    time.sleep(script_start_delay)
-
-    script_command = [script, "--paa-trust-store-path", os.path.join(DEFAULT_CHIP_ROOT, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
-                      '--log-format', '%(message)s', "--app-pid", str(app_pid)] + shlex.split(script_args)
+    script_command = [
+        script,
+        "--fail-on-skipped",
+        "--paa-trust-store-path", os.path.join(DEFAULT_CHIP_ROOT, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
+        "--log-format", '%(message)s',
+        "--app-pid", str(app_pid),
+    ] + shlex.split(script_args)
 
     if script_gdb:
         #
@@ -194,35 +234,31 @@ def main_impl(app: str, factoryreset: bool, factoryreset_app_only: bool, app_arg
         script_command = ("gdb -batch -return-child-result -q -ex run -ex "
                           "thread|apply|all|bt --args python3".split() + script_command)
     else:
-        script_command = "/usr/bin/env python3".split() + script_command
+        script_command = "/usr/bin/env python3 -X faulthandler".split() + script_command
 
     final_script_command = [i.replace('|', ' ') for i in script_command]
 
-    logging.info(f"Execute: {final_script_command}")
-    test_script_process = subprocess.Popen(
-        final_script_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
-    test_script_process.stdin.close()
-    DumpProgramOutputToQueue(log_cooking_threads, Fore.GREEN + "TEST" + Style.RESET_ALL,
-                             test_script_process, stream_output, log_queue)
-
+    test_script_process = Subprocess(final_script_command[0], *final_script_command[1:],
+                                     output_cb=process_test_script_output,
+                                     f_stdout=stream_output,
+                                     f_stderr=stream_output)
+    test_script_process.start()
+    test_script_process.p.stdin.close()
     test_script_exit_code = test_script_process.wait()
 
     if test_script_exit_code != 0:
-        logging.error("Test script exited with error %r" % test_script_exit_code)
+        logging.error("Test script exited with returncode %d" % test_script_exit_code)
 
-    test_app_exit_code = 0
     if app_process:
-        logging.warning("Stopping app with SIGINT")
-        app_process.send_signal(signal.SIGINT.value)
-        test_app_exit_code = app_process.wait()
-
-    # There are some logs not cooked, so we wait until we have processed all logs.
-    # This procedure should be very fast since the related processes are finished.
-    for thread in log_cooking_threads:
-        thread.join()
+        logging.info("Stopping app with SIGTERM")
+        if app_stdin_forwarding_thread:
+            app_stdin_forwarding_stop_event.set()
+            app_stdin_forwarding_thread.join()
+        app_process.terminate()
+        app_exit_code = app_process.returncode
 
     # We expect both app and test script should exit with 0
-    exit_code = test_script_exit_code if test_script_exit_code != 0 else test_app_exit_code
+    exit_code = test_script_exit_code or app_exit_code
 
     if quiet:
         if exit_code:
@@ -235,4 +271,5 @@ def main_impl(app: str, factoryreset: bool, factoryreset_app_only: bool, app_arg
 
 
 if __name__ == '__main__':
+    coloredlogs.install(level='INFO')
     main(auto_envvar_prefix='CHIP')

@@ -23,7 +23,6 @@
 #include <EnergyEvseManager.h>
 #include <EnergyTimeUtils.h>
 
-#include <EnergyTimeUtils.h>
 #include <FakeReadings.h>
 #include <app/clusters/device-energy-management-server/DeviceEnergyManagementTestEventTriggerHandler.h>
 #include <app/clusters/electrical-energy-measurement-server/EnergyReportingTestEventTriggerHandler.h>
@@ -47,7 +46,7 @@ using namespace chip::app::Clusters::PowerSource::Attributes;
 
 using Protocols::InteractionModel::Status;
 
-CHIP_ERROR EVSEManufacturer::Init()
+CHIP_ERROR EVSEManufacturer::Init(chip::EndpointId powerSourceEndpointId)
 {
     /* Manufacturers should modify this to do any custom initialisation */
 
@@ -63,13 +62,14 @@ CHIP_ERROR EVSEManufacturer::Init()
 
     ReturnErrorOnFailure(InitializePowerMeasurementCluster());
 
-    ReturnErrorOnFailure(InitializePowerSourceCluster());
+    ReturnErrorOnFailure(InitializePowerSourceCluster(powerSourceEndpointId));
 
     DeviceEnergyManagementDelegate * dem = GetEvseManufacturer()->GetDEMDelegate();
     VerifyOrReturnLogError(dem != nullptr, CHIP_ERROR_UNINITIALIZED);
 
     /* For Device Energy Management we need the ESA to be Online and ready to accept commands */
     dem->SetESAState(ESAStateEnum::kOnline);
+    dem->SetESAType(ESATypeEnum::kEvse);
 
     // Set the abs min and max power
     dem->SetAbsMinPower(1200000); // 1.2KW
@@ -351,31 +351,30 @@ CHIP_ERROR EVSEManufacturer::InitializePowerMeasurementCluster()
 /**
  * @brief   Allows a client application to initialise the PowerSource cluster
  */
-CHIP_ERROR EVSEManufacturer::InitializePowerSourceCluster()
+CHIP_ERROR EVSEManufacturer::InitializePowerSourceCluster(chip::EndpointId endpointId)
 {
     Protocols::InteractionModel::Status status;
 
-    status = PowerSource::Attributes::Status::Set(EndpointId(0) /*RootNode*/, PowerSourceStatusEnum::kActive);
+    status = PowerSource::Attributes::Status::Set(endpointId, PowerSourceStatusEnum::kActive);
     VerifyOrReturnError(status == Protocols::InteractionModel::Status::Success, CHIP_ERROR_INTERNAL);
-    status =
-        PowerSource::Attributes::FeatureMap::Set(EndpointId(0 /*RootNode*/), static_cast<uint32_t>(PowerSource::Feature::kWired));
+    status = PowerSource::Attributes::FeatureMap::Set(endpointId, static_cast<uint32_t>(PowerSource::Feature::kWired));
     VerifyOrReturnError(status == Protocols::InteractionModel::Status::Success, CHIP_ERROR_INTERNAL);
-    status = PowerSource::Attributes::WiredNominalVoltage::Set(EndpointId(0 /*RootNode*/), 230'000); // 230V in mv
+    status = PowerSource::Attributes::WiredNominalVoltage::Set(endpointId, 230'000); // 230V in mv
     VerifyOrReturnError(status == Protocols::InteractionModel::Status::Success, CHIP_ERROR_INTERNAL);
-    status = PowerSource::Attributes::WiredMaximumCurrent::Set(EndpointId(0 /*RootNode*/), 32'000); // 32A in mA
-    VerifyOrReturnError(status == Protocols::InteractionModel::Status::Success, CHIP_ERROR_INTERNAL);
-
-    status = PowerSource::Attributes::WiredCurrentType::Set(EndpointId(0 /*RootNode*/), PowerSource::WiredCurrentTypeEnum::kAc);
-    VerifyOrReturnError(status == Protocols::InteractionModel::Status::Success, CHIP_ERROR_INTERNAL);
-    status = PowerSource::Attributes::Description::Set(EndpointId(0 /*RootNode*/), CharSpan::fromCharString("Primary Mains Power"));
+    status = PowerSource::Attributes::WiredMaximumCurrent::Set(endpointId, 32'000); // 32A in mA
     VerifyOrReturnError(status == Protocols::InteractionModel::Status::Success, CHIP_ERROR_INTERNAL);
 
-    chip::EndpointId endpointArray[] = { 1 /* EVSE Endpoint */ };
+    status = PowerSource::Attributes::WiredCurrentType::Set(endpointId, PowerSource::WiredCurrentTypeEnum::kAc);
+    VerifyOrReturnError(status == Protocols::InteractionModel::Status::Success, CHIP_ERROR_INTERNAL);
+    status = PowerSource::Attributes::Description::Set(endpointId, CharSpan::fromCharString("Primary Mains Power"));
+    VerifyOrReturnError(status == Protocols::InteractionModel::Status::Success, CHIP_ERROR_INTERNAL);
+
+    chip::EndpointId endpointArray[] = { endpointId };
     Span<EndpointId> endpointList    = Span<EndpointId>(endpointArray);
 
     // Note per API - we do not need to maintain the span after the SetEndpointList has been called
     // since it takes a copy (see power-source-server.cpp)
-    PowerSourceServer::Instance().SetEndpointList(0 /* Root Node */, endpointList);
+    PowerSourceServer::Instance().SetEndpointList(endpointId, endpointList);
 
     return CHIP_NO_ERROR;
 }

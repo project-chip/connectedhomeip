@@ -20,7 +20,10 @@ import("${chip_root}/src/app/chip_data_model.gni")
 import("${chip_root}/src/platform/device.gni")
 
 chip_data_model("zap") {
-  if (chip_enable_wifi) {
+  if (chip_enable_wifi && chip_enable_openthread) {
+    # zap config for matter-over-wifi with BR
+    zap_file = "thermostat_matter_br.zap"
+  } else if (chip_enable_wifi) {
     # zap config for matter-over-wifi
     zap_file = "thermostat_matter_wifi.zap"
   } else {

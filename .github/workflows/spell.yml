@@ -16,8 +16,9 @@ name: Run misspell
 
 on:
     push:
-        branches-ignore:
-            - 'dependabot/**'
+        branches:
+            - master
+            - 'v*-branch'
         paths:
             - "**.md"
             - ".github/.wordlist.txt"
@@ -33,4 +34,4 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v4
-            - uses: rojopolis/spellcheck-github-actions@0.36.0
+            - uses: rojopolis/spellcheck-github-actions@0.47.0

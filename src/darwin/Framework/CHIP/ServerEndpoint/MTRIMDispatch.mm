@@ -18,7 +18,6 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/util/att-storage.h>
 #include <app/util/attribute-table.h>
 
 #include <app/util/af-types.h>
@@ -42,6 +41,15 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
 
 Protocols::InteractionModel::Status emAfWriteAttributeExternal(const ConcreteAttributePath & path,
     const EmberAfWriteDataInput & input)
+{
+    assertChipStackLockedByCurrentThread();
+
+    // All of our attributes are handled via AttributeAccessInterface, so this
+    // should be unreached.
+    return Protocols::InteractionModel::Status::UnsupportedAttribute;
+}
+
+Protocols::InteractionModel::Status emberAfWriteAttribute(const ConcreteAttributePath & path, const EmberAfWriteDataInput & input)
 {
     assertChipStackLockedByCurrentThread();
 

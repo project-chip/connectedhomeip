@@ -70,9 +70,8 @@ NetworkCommissioning::WiFiScanResponse ToScanResponse(const wifi_scan_result * r
 
     if (result != nullptr)
     {
-        static_assert(sizeof(response.ssid) == sizeof(result->ssid), "SSID length mismatch");
         static_assert(sizeof(response.bssid) == sizeof(result->mac), "BSSID length mismatch");
-
+        assert(sizeof(response.ssid) >= result->ssid_length);
         // TODO: Distinguish WPA versions
         response.security.Set(result->security == WIFI_SECURITY_TYPE_PSK ? NetworkCommissioning::WiFiSecurity::kWpaPersonal
                                                                          : NetworkCommissioning::WiFiSecurity::kUnencrypted);
@@ -216,9 +215,11 @@ CHIP_ERROR WiFiManager::Scan(const ByteSpan & ssid, ScanResultCallback resultCal
         memcpy(mScanSsidBuffer, ssid.data(), ssid.size());
         mScanSsidBuffer[ssid.size()] = 0; // indicate the end of ssid string
         mScanParams.ssids[0]         = mScanSsidBuffer;
-        mScanParams.ssids[1]         = nullptr; // indicate the end of ssids list
-        scanParams                   = &mScanParams;
-        scanParamsSize               = sizeof(*scanParams);
+#if (CONFIG_WIFI_MGMT_SCAN_SSID_FILT_MAX > 1)
+        mScanParams.ssids[1] = nullptr; // indicate the end of ssids list
+#endif
+        scanParams     = &mScanParams;
+        scanParamsSize = sizeof(*scanParams);
     }
     if (0 != net_mgmt(NET_REQUEST_WIFI_SCAN, mNetIf, scanParams, scanParamsSize))
     {
@@ -295,11 +296,12 @@ CHIP_ERROR WiFiManager::GetWiFiInfo(WiFiInfo & info) const
 
     if (status.state >= WIFI_STATE_ASSOCIATED)
     {
-        info.mSecurityType = MapToMatterSecurityType(status.security);
-        info.mWiFiVersion  = MapToMatterWiFiVersionCode(status.link_mode);
-        info.mRssi         = static_cast<int8_t>(status.rssi);
-        info.mChannel      = static_cast<uint16_t>(status.channel);
-        info.mSsidLen      = status.ssid_len;
+        info.mSecurityType   = MapToMatterSecurityType(status.security);
+        info.mWiFiVersion    = MapToMatterWiFiVersionCode(status.link_mode);
+        info.mRssi           = static_cast<int8_t>(status.rssi);
+        info.mChannel        = static_cast<uint16_t>(status.channel);
+        info.mSsidLen        = status.ssid_len;
+        info.mCurrentPhyRate = static_cast<uint64_t>(status.current_phy_rate);
         memcpy(info.mSsid, status.ssid, status.ssid_len);
         memcpy(info.mBssId, status.bssid, sizeof(status.bssid));
 
@@ -316,13 +318,17 @@ CHIP_ERROR WiFiManager::GetNetworkStatistics(NetworkStatistics & stats) const
 
     stats.mPacketMulticastRxCount = data.multicast.rx;
     stats.mPacketMulticastTxCount = data.multicast.tx;
-#if CONFIG_CHIP_NXP_PLATFORM
-    /* Zephyr 3.6 doesn't support the unicast stat in net_stats_wifi struct */
-    stats.mPacketUnicastRxCount = data.pkts.rx - data.multicast.rx - data.broadcast.rx;
-    stats.mPacketUnicastRxCount = data.pkts.tx - data.multicast.tx - data.broadcast.tx;
+#ifdef CONFIG_WIFI_NXP
+    // Workaround as unicast stats are missing on NXP wifi driver
+    stats.mPacketUnicastRxCount = data.pkts.rx - (data.broadcast.rx + data.multicast.rx);
+    stats.mPacketUnicastTxCount = data.pkts.tx - (data.broadcast.tx + data.multicast.tx);
+    // Most of the cases in stats.errors are overrun.
+    // TODO: Use Zephyr's overrun_count once it's supported by the WiFi Driver
+    stats.mOverRunCount = data.errors.rx + data.errors.tx;
 #else
     stats.mPacketUnicastRxCount = data.unicast.rx;
     stats.mPacketUnicastTxCount = data.unicast.tx;
+    stats.mOverRunCount         = data.overrun_count;
 #endif
     stats.mBeaconsSuccessCount = data.sta_mgmt.beacons_rx;
     stats.mBeaconsLostCount    = data.sta_mgmt.beacons_miss;

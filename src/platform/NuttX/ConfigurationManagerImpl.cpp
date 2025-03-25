@@ -143,13 +143,13 @@ CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
     {
         if ((addr->ifa_addr) && (addr->ifa_addr->sa_family == AF_PACKET))
         {
-            if (strncmp(addr->ifa_name, CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME, IFNAMSIZ) == 0)
+            if (strncmp(addr->ifa_name, CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME, Inet::InterfaceId::kMaxIfNameLength) == 0)
             {
                 mac = (struct sockaddr_ll *) addr->ifa_addr;
                 break;
             }
 
-            if (strncmp(addr->ifa_name, "lo", IFNAMSIZ) != 0 && !mac)
+            if (strncmp(addr->ifa_name, "lo", Inet::InterfaceId::kMaxIfNameLength) != 0 && !mac)
             {
                 mac = (struct sockaddr_ll *) addr->ifa_addr;
             }

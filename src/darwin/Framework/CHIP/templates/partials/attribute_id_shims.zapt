@@ -1,0 +1,691 @@
+    // Cluster BarrierControl deprecated attribute names
+    MTRClusterBarrierControlAttributeBarrierMovingStateID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterBarrierControlAttributeBarrierMovingStateID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000001,
+    MTRClusterBarrierControlAttributeBarrierSafetyStatusID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterBarrierControlAttributeBarrierSafetyStatusID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000002,
+    MTRClusterBarrierControlAttributeBarrierCapabilitiesID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterBarrierControlAttributeBarrierCapabilitiesID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000003,
+    MTRClusterBarrierControlAttributeBarrierOpenEventsID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterBarrierControlAttributeBarrierOpenEventsID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000004,
+    MTRClusterBarrierControlAttributeBarrierCloseEventsID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterBarrierControlAttributeBarrierCloseEventsID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000005,
+    MTRClusterBarrierControlAttributeBarrierCommandOpenEventsID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterBarrierControlAttributeBarrierCommandOpenEventsID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000006,
+    MTRClusterBarrierControlAttributeBarrierCommandCloseEventsID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterBarrierControlAttributeBarrierCommandCloseEventsID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000007,
+    MTRClusterBarrierControlAttributeBarrierOpenPeriodID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterBarrierControlAttributeBarrierOpenPeriodID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000008,
+    MTRClusterBarrierControlAttributeBarrierClosePeriodID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterBarrierControlAttributeBarrierClosePeriodID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000009,
+    MTRClusterBarrierControlAttributeBarrierPositionID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterBarrierControlAttributeBarrierPositionID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x0000000A,
+    MTRClusterBarrierControlAttributeGeneratedCommandListID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterBarrierControlAttributeGeneratedCommandListID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = MTRClusterGlobalAttributeGeneratedCommandListID,
+    MTRClusterBarrierControlAttributeAcceptedCommandListID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterBarrierControlAttributeAcceptedCommandListID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = MTRClusterGlobalAttributeAcceptedCommandListID,
+    MTRClusterBarrierControlAttributeAttributeListID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterBarrierControlAttributeAttributeListID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = MTRClusterGlobalAttributeAttributeListID,
+    MTRClusterBarrierControlAttributeFeatureMapID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterBarrierControlAttributeFeatureMapID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = MTRClusterGlobalAttributeFeatureMapID,
+    MTRClusterBarrierControlAttributeClusterRevisionID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterBarrierControlAttributeClusterRevisionID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = MTRClusterGlobalAttributeClusterRevisionID,
+
+    // Cluster BarrierControl attributes
+    MTRAttributeIDTypeClusterBarrierControlAttributeBarrierMovingStateID MTR_DEPRECATED("The BarrierMovingState attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000001,
+    MTRAttributeIDTypeClusterBarrierControlAttributeBarrierSafetyStatusID MTR_DEPRECATED("The BarrierSafetyStatus attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000002,
+    MTRAttributeIDTypeClusterBarrierControlAttributeBarrierCapabilitiesID MTR_DEPRECATED("The BarrierCapabilities attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000003,
+    MTRAttributeIDTypeClusterBarrierControlAttributeBarrierOpenEventsID MTR_DEPRECATED("The BarrierOpenEvents attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000004,
+    MTRAttributeIDTypeClusterBarrierControlAttributeBarrierCloseEventsID MTR_DEPRECATED("The BarrierCloseEvents attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000005,
+    MTRAttributeIDTypeClusterBarrierControlAttributeBarrierCommandOpenEventsID MTR_DEPRECATED("The BarrierCommandOpenEvents attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000006,
+    MTRAttributeIDTypeClusterBarrierControlAttributeBarrierCommandCloseEventsID MTR_DEPRECATED("The BarrierCommandCloseEvents attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000007,
+    MTRAttributeIDTypeClusterBarrierControlAttributeBarrierOpenPeriodID MTR_DEPRECATED("The BarrierOpenPeriod attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000008,
+    MTRAttributeIDTypeClusterBarrierControlAttributeBarrierClosePeriodID MTR_DEPRECATED("The BarrierClosePeriod attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000009,
+    MTRAttributeIDTypeClusterBarrierControlAttributeBarrierPositionID MTR_DEPRECATED("The BarrierPosition attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x0000000A,
+    MTRAttributeIDTypeClusterBarrierControlAttributeGeneratedCommandListID MTR_DEPRECATED("The GeneratedCommandList attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterBarrierControlAttributeAcceptedCommandListID MTR_DEPRECATED("The AcceptedCommandList attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterBarrierControlAttributeAttributeListID MTR_DEPRECATED("The AttributeList attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterBarrierControlAttributeFeatureMapID MTR_DEPRECATED("The FeatureMap attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterBarrierControlAttributeClusterRevisionID MTR_DEPRECATED("The ClusterRevision attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster BinaryInputBasic deprecated attribute names
+    MTRClusterBinaryInputBasicAttributeActiveTextID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterBinaryInputBasicAttributeActiveTextID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000004,
+    MTRClusterBinaryInputBasicAttributeDescriptionID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterBinaryInputBasicAttributeDescriptionID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x0000001C,
+    MTRClusterBinaryInputBasicAttributeInactiveTextID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterBinaryInputBasicAttributeInactiveTextID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x0000002E,
+    MTRClusterBinaryInputBasicAttributeOutOfServiceID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterBinaryInputBasicAttributeOutOfServiceID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000051,
+    MTRClusterBinaryInputBasicAttributePolarityID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterBinaryInputBasicAttributePolarityID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000054,
+    MTRClusterBinaryInputBasicAttributePresentValueID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterBinaryInputBasicAttributePresentValueID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000055,
+    MTRClusterBinaryInputBasicAttributeReliabilityID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterBinaryInputBasicAttributeReliabilityID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000067,
+    MTRClusterBinaryInputBasicAttributeStatusFlagsID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterBinaryInputBasicAttributeStatusFlagsID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x0000006F,
+    MTRClusterBinaryInputBasicAttributeApplicationTypeID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterBinaryInputBasicAttributeApplicationTypeID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000100,
+    MTRClusterBinaryInputBasicAttributeGeneratedCommandListID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterBinaryInputBasicAttributeGeneratedCommandListID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = MTRClusterGlobalAttributeGeneratedCommandListID,
+    MTRClusterBinaryInputBasicAttributeAcceptedCommandListID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterBinaryInputBasicAttributeAcceptedCommandListID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = MTRClusterGlobalAttributeAcceptedCommandListID,
+    MTRClusterBinaryInputBasicAttributeAttributeListID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterBinaryInputBasicAttributeAttributeListID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = MTRClusterGlobalAttributeAttributeListID,
+    MTRClusterBinaryInputBasicAttributeFeatureMapID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterBinaryInputBasicAttributeFeatureMapID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = MTRClusterGlobalAttributeFeatureMapID,
+    MTRClusterBinaryInputBasicAttributeClusterRevisionID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterBinaryInputBasicAttributeClusterRevisionID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = MTRClusterGlobalAttributeClusterRevisionID,
+
+    // Cluster BinaryInputBasic attributes
+    MTRAttributeIDTypeClusterBinaryInputBasicAttributeActiveTextID MTR_DEPRECATED("The ActiveText attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000004,
+    MTRAttributeIDTypeClusterBinaryInputBasicAttributeDescriptionID MTR_DEPRECATED("The Description attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x0000001C,
+    MTRAttributeIDTypeClusterBinaryInputBasicAttributeInactiveTextID MTR_DEPRECATED("The InactiveText attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x0000002E,
+    MTRAttributeIDTypeClusterBinaryInputBasicAttributeOutOfServiceID MTR_DEPRECATED("The OutOfService attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000051,
+    MTRAttributeIDTypeClusterBinaryInputBasicAttributePolarityID MTR_DEPRECATED("The Polarity attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000054,
+    MTRAttributeIDTypeClusterBinaryInputBasicAttributePresentValueID MTR_DEPRECATED("The PresentValue attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000055,
+    MTRAttributeIDTypeClusterBinaryInputBasicAttributeReliabilityID MTR_DEPRECATED("The Reliability attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000067,
+    MTRAttributeIDTypeClusterBinaryInputBasicAttributeStatusFlagsID MTR_DEPRECATED("The StatusFlags attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x0000006F,
+    MTRAttributeIDTypeClusterBinaryInputBasicAttributeApplicationTypeID MTR_DEPRECATED("The ApplicationType attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000100,
+    MTRAttributeIDTypeClusterBinaryInputBasicAttributeGeneratedCommandListID MTR_DEPRECATED("The GeneratedCommandList attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterBinaryInputBasicAttributeAcceptedCommandListID MTR_DEPRECATED("The AcceptedCommandList attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterBinaryInputBasicAttributeAttributeListID MTR_DEPRECATED("The AttributeList attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterBinaryInputBasicAttributeFeatureMapID MTR_DEPRECATED("The FeatureMap attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterBinaryInputBasicAttributeClusterRevisionID MTR_DEPRECATED("The ClusterRevision attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster ElectricalMeasurement deprecated attribute names
+    MTRClusterElectricalMeasurementAttributeMeasurementTypeID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasurementTypeID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000000,
+    MTRClusterElectricalMeasurementAttributeDcVoltageID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcVoltageID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000100,
+    MTRClusterElectricalMeasurementAttributeDcVoltageMinID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcVoltageMinID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000101,
+    MTRClusterElectricalMeasurementAttributeDcVoltageMaxID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcVoltageMaxID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000102,
+    MTRClusterElectricalMeasurementAttributeDcCurrentID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcCurrentID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000103,
+    MTRClusterElectricalMeasurementAttributeDcCurrentMinID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcCurrentMinID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000104,
+    MTRClusterElectricalMeasurementAttributeDcCurrentMaxID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcCurrentMaxID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000105,
+    MTRClusterElectricalMeasurementAttributeDcPowerID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcPowerID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000106,
+    MTRClusterElectricalMeasurementAttributeDcPowerMinID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcPowerMinID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000107,
+    MTRClusterElectricalMeasurementAttributeDcPowerMaxID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcPowerMaxID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000108,
+    MTRClusterElectricalMeasurementAttributeDcVoltageMultiplierID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcVoltageMultiplierID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000200,
+    MTRClusterElectricalMeasurementAttributeDcVoltageDivisorID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcVoltageDivisorID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000201,
+    MTRClusterElectricalMeasurementAttributeDcCurrentMultiplierID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcCurrentMultiplierID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000202,
+    MTRClusterElectricalMeasurementAttributeDcCurrentDivisorID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcCurrentDivisorID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000203,
+    MTRClusterElectricalMeasurementAttributeDcPowerMultiplierID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcPowerMultiplierID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000204,
+    MTRClusterElectricalMeasurementAttributeDcPowerDivisorID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcPowerDivisorID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000205,
+    MTRClusterElectricalMeasurementAttributeAcFrequencyID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcFrequencyID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000300,
+    MTRClusterElectricalMeasurementAttributeAcFrequencyMinID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcFrequencyMinID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000301,
+    MTRClusterElectricalMeasurementAttributeAcFrequencyMaxID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcFrequencyMaxID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000302,
+    MTRClusterElectricalMeasurementAttributeNeutralCurrentID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeNeutralCurrentID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000303,
+    MTRClusterElectricalMeasurementAttributeTotalActivePowerID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeTotalActivePowerID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000304,
+    MTRClusterElectricalMeasurementAttributeTotalReactivePowerID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeTotalReactivePowerID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000305,
+    MTRClusterElectricalMeasurementAttributeTotalApparentPowerID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeTotalApparentPowerID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000306,
+    MTRClusterElectricalMeasurementAttributeMeasured1stHarmonicCurrentID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasured1stHarmonicCurrentID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000307,
+    MTRClusterElectricalMeasurementAttributeMeasured3rdHarmonicCurrentID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasured3rdHarmonicCurrentID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000308,
+    MTRClusterElectricalMeasurementAttributeMeasured5thHarmonicCurrentID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasured5thHarmonicCurrentID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000309,
+    MTRClusterElectricalMeasurementAttributeMeasured7thHarmonicCurrentID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasured7thHarmonicCurrentID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x0000030A,
+    MTRClusterElectricalMeasurementAttributeMeasured9thHarmonicCurrentID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasured9thHarmonicCurrentID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x0000030B,
+    MTRClusterElectricalMeasurementAttributeMeasured11thHarmonicCurrentID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasured11thHarmonicCurrentID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x0000030C,
+    MTRClusterElectricalMeasurementAttributeMeasuredPhase1stHarmonicCurrentID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasuredPhase1stHarmonicCurrentID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x0000030D,
+    MTRClusterElectricalMeasurementAttributeMeasuredPhase3rdHarmonicCurrentID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasuredPhase3rdHarmonicCurrentID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x0000030E,
+    MTRClusterElectricalMeasurementAttributeMeasuredPhase5thHarmonicCurrentID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasuredPhase5thHarmonicCurrentID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x0000030F,
+    MTRClusterElectricalMeasurementAttributeMeasuredPhase7thHarmonicCurrentID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasuredPhase7thHarmonicCurrentID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000310,
+    MTRClusterElectricalMeasurementAttributeMeasuredPhase9thHarmonicCurrentID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasuredPhase9thHarmonicCurrentID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000311,
+    MTRClusterElectricalMeasurementAttributeMeasuredPhase11thHarmonicCurrentID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasuredPhase11thHarmonicCurrentID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000312,
+    MTRClusterElectricalMeasurementAttributeAcFrequencyMultiplierID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcFrequencyMultiplierID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000400,
+    MTRClusterElectricalMeasurementAttributeAcFrequencyDivisorID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcFrequencyDivisorID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000401,
+    MTRClusterElectricalMeasurementAttributePowerMultiplierID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributePowerMultiplierID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000402,
+    MTRClusterElectricalMeasurementAttributePowerDivisorID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributePowerDivisorID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000403,
+    MTRClusterElectricalMeasurementAttributeHarmonicCurrentMultiplierID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeHarmonicCurrentMultiplierID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000404,
+    MTRClusterElectricalMeasurementAttributePhaseHarmonicCurrentMultiplierID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributePhaseHarmonicCurrentMultiplierID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000405,
+    MTRClusterElectricalMeasurementAttributeInstantaneousVoltageID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeInstantaneousVoltageID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000500,
+    MTRClusterElectricalMeasurementAttributeInstantaneousLineCurrentID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeInstantaneousLineCurrentID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000501,
+    MTRClusterElectricalMeasurementAttributeInstantaneousActiveCurrentID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeInstantaneousActiveCurrentID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000502,
+    MTRClusterElectricalMeasurementAttributeInstantaneousReactiveCurrentID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeInstantaneousReactiveCurrentID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000503,
+    MTRClusterElectricalMeasurementAttributeInstantaneousPowerID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeInstantaneousPowerID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000504,
+    MTRClusterElectricalMeasurementAttributeRmsVoltageID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000505,
+    MTRClusterElectricalMeasurementAttributeRmsVoltageMinID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageMinID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000506,
+    MTRClusterElectricalMeasurementAttributeRmsVoltageMaxID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageMaxID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000507,
+    MTRClusterElectricalMeasurementAttributeRmsCurrentID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000508,
+    MTRClusterElectricalMeasurementAttributeRmsCurrentMinID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentMinID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000509,
+    MTRClusterElectricalMeasurementAttributeRmsCurrentMaxID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentMaxID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x0000050A,
+    MTRClusterElectricalMeasurementAttributeActivePowerID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x0000050B,
+    MTRClusterElectricalMeasurementAttributeActivePowerMinID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerMinID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x0000050C,
+    MTRClusterElectricalMeasurementAttributeActivePowerMaxID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerMaxID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x0000050D,
+    MTRClusterElectricalMeasurementAttributeReactivePowerID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeReactivePowerID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x0000050E,
+    MTRClusterElectricalMeasurementAttributeApparentPowerID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeApparentPowerID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x0000050F,
+    MTRClusterElectricalMeasurementAttributePowerFactorID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributePowerFactorID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000510,
+    MTRClusterElectricalMeasurementAttributeAverageRmsVoltageMeasurementPeriodID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsVoltageMeasurementPeriodID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000511,
+    MTRClusterElectricalMeasurementAttributeAverageRmsUnderVoltageCounterID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsUnderVoltageCounterID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000513,
+    MTRClusterElectricalMeasurementAttributeRmsExtremeOverVoltagePeriodID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeOverVoltagePeriodID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000514,
+    MTRClusterElectricalMeasurementAttributeRmsExtremeUnderVoltagePeriodID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeUnderVoltagePeriodID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000515,
+    MTRClusterElectricalMeasurementAttributeRmsVoltageSagPeriodID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSagPeriodID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000516,
+    MTRClusterElectricalMeasurementAttributeRmsVoltageSwellPeriodID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSwellPeriodID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000517,
+    MTRClusterElectricalMeasurementAttributeAcVoltageMultiplierID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcVoltageMultiplierID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000600,
+    MTRClusterElectricalMeasurementAttributeAcVoltageDivisorID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcVoltageDivisorID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000601,
+    MTRClusterElectricalMeasurementAttributeAcCurrentMultiplierID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcCurrentMultiplierID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000602,
+    MTRClusterElectricalMeasurementAttributeAcCurrentDivisorID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcCurrentDivisorID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000603,
+    MTRClusterElectricalMeasurementAttributeAcPowerMultiplierID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcPowerMultiplierID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000604,
+    MTRClusterElectricalMeasurementAttributeAcPowerDivisorID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcPowerDivisorID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000605,
+    MTRClusterElectricalMeasurementAttributeOverloadAlarmsMaskID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeOverloadAlarmsMaskID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000700,
+    MTRClusterElectricalMeasurementAttributeVoltageOverloadID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeVoltageOverloadID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000701,
+    MTRClusterElectricalMeasurementAttributeCurrentOverloadID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeCurrentOverloadID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000702,
+    MTRClusterElectricalMeasurementAttributeAcOverloadAlarmsMaskID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcOverloadAlarmsMaskID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000800,
+    MTRClusterElectricalMeasurementAttributeAcVoltageOverloadID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcVoltageOverloadID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000801,
+    MTRClusterElectricalMeasurementAttributeAcCurrentOverloadID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcCurrentOverloadID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000802,
+    MTRClusterElectricalMeasurementAttributeAcActivePowerOverloadID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcActivePowerOverloadID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000803,
+    MTRClusterElectricalMeasurementAttributeAcReactivePowerOverloadID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcReactivePowerOverloadID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000804,
+    MTRClusterElectricalMeasurementAttributeAverageRmsOverVoltageID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsOverVoltageID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000805,
+    MTRClusterElectricalMeasurementAttributeAverageRmsUnderVoltageID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsUnderVoltageID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000806,
+    MTRClusterElectricalMeasurementAttributeRmsExtremeOverVoltageID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeOverVoltageID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000807,
+    MTRClusterElectricalMeasurementAttributeRmsExtremeUnderVoltageID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeUnderVoltageID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000808,
+    MTRClusterElectricalMeasurementAttributeRmsVoltageSagID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSagID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000809,
+    MTRClusterElectricalMeasurementAttributeRmsVoltageSwellID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSwellID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x0000080A,
+    MTRClusterElectricalMeasurementAttributeLineCurrentPhaseBID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeLineCurrentPhaseBID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000901,
+    MTRClusterElectricalMeasurementAttributeActiveCurrentPhaseBID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeActiveCurrentPhaseBID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000902,
+    MTRClusterElectricalMeasurementAttributeReactiveCurrentPhaseBID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeReactiveCurrentPhaseBID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000903,
+    MTRClusterElectricalMeasurementAttributeRmsVoltagePhaseBID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltagePhaseBID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000905,
+    MTRClusterElectricalMeasurementAttributeRmsVoltageMinPhaseBID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageMinPhaseBID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000906,
+    MTRClusterElectricalMeasurementAttributeRmsVoltageMaxPhaseBID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageMaxPhaseBID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000907,
+    MTRClusterElectricalMeasurementAttributeRmsCurrentPhaseBID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentPhaseBID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000908,
+    MTRClusterElectricalMeasurementAttributeRmsCurrentMinPhaseBID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentMinPhaseBID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000909,
+    MTRClusterElectricalMeasurementAttributeRmsCurrentMaxPhaseBID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentMaxPhaseBID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x0000090A,
+    MTRClusterElectricalMeasurementAttributeActivePowerPhaseBID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerPhaseBID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x0000090B,
+    MTRClusterElectricalMeasurementAttributeActivePowerMinPhaseBID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerMinPhaseBID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x0000090C,
+    MTRClusterElectricalMeasurementAttributeActivePowerMaxPhaseBID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerMaxPhaseBID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x0000090D,
+    MTRClusterElectricalMeasurementAttributeReactivePowerPhaseBID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeReactivePowerPhaseBID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x0000090E,
+    MTRClusterElectricalMeasurementAttributeApparentPowerPhaseBID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeApparentPowerPhaseBID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x0000090F,
+    MTRClusterElectricalMeasurementAttributePowerFactorPhaseBID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributePowerFactorPhaseBID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000910,
+    MTRClusterElectricalMeasurementAttributeAverageRmsVoltageMeasurementPeriodPhaseBID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsVoltageMeasurementPeriodPhaseBID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000911,
+    MTRClusterElectricalMeasurementAttributeAverageRmsOverVoltageCounterPhaseBID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsOverVoltageCounterPhaseBID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000912,
+    MTRClusterElectricalMeasurementAttributeAverageRmsUnderVoltageCounterPhaseBID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsUnderVoltageCounterPhaseBID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000913,
+    MTRClusterElectricalMeasurementAttributeRmsExtremeOverVoltagePeriodPhaseBID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeOverVoltagePeriodPhaseBID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000914,
+    MTRClusterElectricalMeasurementAttributeRmsExtremeUnderVoltagePeriodPhaseBID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeUnderVoltagePeriodPhaseBID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000915,
+    MTRClusterElectricalMeasurementAttributeRmsVoltageSagPeriodPhaseBID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSagPeriodPhaseBID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000916,
+    MTRClusterElectricalMeasurementAttributeRmsVoltageSwellPeriodPhaseBID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSwellPeriodPhaseBID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000917,
+    MTRClusterElectricalMeasurementAttributeLineCurrentPhaseCID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeLineCurrentPhaseCID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000A01,
+    MTRClusterElectricalMeasurementAttributeActiveCurrentPhaseCID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeActiveCurrentPhaseCID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000A02,
+    MTRClusterElectricalMeasurementAttributeReactiveCurrentPhaseCID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeReactiveCurrentPhaseCID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000A03,
+    MTRClusterElectricalMeasurementAttributeRmsVoltagePhaseCID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltagePhaseCID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000A05,
+    MTRClusterElectricalMeasurementAttributeRmsVoltageMinPhaseCID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageMinPhaseCID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000A06,
+    MTRClusterElectricalMeasurementAttributeRmsVoltageMaxPhaseCID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageMaxPhaseCID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000A07,
+    MTRClusterElectricalMeasurementAttributeRmsCurrentPhaseCID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentPhaseCID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000A08,
+    MTRClusterElectricalMeasurementAttributeRmsCurrentMinPhaseCID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentMinPhaseCID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000A09,
+    MTRClusterElectricalMeasurementAttributeRmsCurrentMaxPhaseCID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentMaxPhaseCID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000A0A,
+    MTRClusterElectricalMeasurementAttributeActivePowerPhaseCID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerPhaseCID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000A0B,
+    MTRClusterElectricalMeasurementAttributeActivePowerMinPhaseCID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerMinPhaseCID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000A0C,
+    MTRClusterElectricalMeasurementAttributeActivePowerMaxPhaseCID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerMaxPhaseCID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000A0D,
+    MTRClusterElectricalMeasurementAttributeReactivePowerPhaseCID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeReactivePowerPhaseCID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000A0E,
+    MTRClusterElectricalMeasurementAttributeApparentPowerPhaseCID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeApparentPowerPhaseCID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000A0F,
+    MTRClusterElectricalMeasurementAttributePowerFactorPhaseCID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributePowerFactorPhaseCID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000A10,
+    MTRClusterElectricalMeasurementAttributeAverageRmsVoltageMeasurementPeriodPhaseCID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsVoltageMeasurementPeriodPhaseCID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000A11,
+    MTRClusterElectricalMeasurementAttributeAverageRmsOverVoltageCounterPhaseCID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsOverVoltageCounterPhaseCID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000A12,
+    MTRClusterElectricalMeasurementAttributeAverageRmsUnderVoltageCounterPhaseCID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsUnderVoltageCounterPhaseCID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000A13,
+    MTRClusterElectricalMeasurementAttributeRmsExtremeOverVoltagePeriodPhaseCID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeOverVoltagePeriodPhaseCID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000A14,
+    MTRClusterElectricalMeasurementAttributeRmsExtremeUnderVoltagePeriodPhaseCID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeUnderVoltagePeriodPhaseCID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000A15,
+    MTRClusterElectricalMeasurementAttributeRmsVoltageSagPeriodPhaseCID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSagPeriodPhaseCID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000A16,
+    MTRClusterElectricalMeasurementAttributeRmsVoltageSwellPeriodPhaseCID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSwellPeriodPhaseCID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000A17,
+    MTRClusterElectricalMeasurementAttributeGeneratedCommandListID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeGeneratedCommandListID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = MTRClusterGlobalAttributeGeneratedCommandListID,
+    MTRClusterElectricalMeasurementAttributeAcceptedCommandListID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcceptedCommandListID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = MTRClusterGlobalAttributeAcceptedCommandListID,
+    MTRClusterElectricalMeasurementAttributeAttributeListID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeAttributeListID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = MTRClusterGlobalAttributeAttributeListID,
+    MTRClusterElectricalMeasurementAttributeFeatureMapID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeFeatureMapID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = MTRClusterGlobalAttributeFeatureMapID,
+    MTRClusterElectricalMeasurementAttributeClusterRevisionID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterElectricalMeasurementAttributeClusterRevisionID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = MTRClusterGlobalAttributeClusterRevisionID,
+
+    // Cluster ElectricalMeasurement attributes
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasurementTypeID MTR_DEPRECATED("The MeasurementType attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000000,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcVoltageID MTR_DEPRECATED("The DcVoltage attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000100,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcVoltageMinID MTR_DEPRECATED("The DcVoltageMin attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000101,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcVoltageMaxID MTR_DEPRECATED("The DcVoltageMax attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000102,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcCurrentID MTR_DEPRECATED("The DcCurrent attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000103,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcCurrentMinID MTR_DEPRECATED("The DcCurrentMin attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000104,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcCurrentMaxID MTR_DEPRECATED("The DcCurrentMax attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000105,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcPowerID MTR_DEPRECATED("The DcPower attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000106,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcPowerMinID MTR_DEPRECATED("The DcPowerMin attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000107,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcPowerMaxID MTR_DEPRECATED("The DcPowerMax attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000108,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcVoltageMultiplierID MTR_DEPRECATED("The DcVoltageMultiplier attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000200,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcVoltageDivisorID MTR_DEPRECATED("The DcVoltageDivisor attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000201,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcCurrentMultiplierID MTR_DEPRECATED("The DcCurrentMultiplier attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000202,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcCurrentDivisorID MTR_DEPRECATED("The DcCurrentDivisor attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000203,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcPowerMultiplierID MTR_DEPRECATED("The DcPowerMultiplier attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000204,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcPowerDivisorID MTR_DEPRECATED("The DcPowerDivisor attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000205,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcFrequencyID MTR_DEPRECATED("The AcFrequency attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000300,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcFrequencyMinID MTR_DEPRECATED("The AcFrequencyMin attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000301,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcFrequencyMaxID MTR_DEPRECATED("The AcFrequencyMax attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000302,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeNeutralCurrentID MTR_DEPRECATED("The NeutralCurrent attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000303,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeTotalActivePowerID MTR_DEPRECATED("The TotalActivePower attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000304,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeTotalReactivePowerID MTR_DEPRECATED("The TotalReactivePower attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000305,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeTotalApparentPowerID MTR_DEPRECATED("The TotalApparentPower attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000306,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasured1stHarmonicCurrentID MTR_DEPRECATED("The Measured1stHarmonicCurrent attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000307,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasured3rdHarmonicCurrentID MTR_DEPRECATED("The Measured3rdHarmonicCurrent attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000308,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasured5thHarmonicCurrentID MTR_DEPRECATED("The Measured5thHarmonicCurrent attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000309,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasured7thHarmonicCurrentID MTR_DEPRECATED("The Measured7thHarmonicCurrent attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x0000030A,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasured9thHarmonicCurrentID MTR_DEPRECATED("The Measured9thHarmonicCurrent attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x0000030B,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasured11thHarmonicCurrentID MTR_DEPRECATED("The Measured11thHarmonicCurrent attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x0000030C,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasuredPhase1stHarmonicCurrentID MTR_DEPRECATED("The MeasuredPhase1stHarmonicCurrent attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x0000030D,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasuredPhase3rdHarmonicCurrentID MTR_DEPRECATED("The MeasuredPhase3rdHarmonicCurrent attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x0000030E,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasuredPhase5thHarmonicCurrentID MTR_DEPRECATED("The MeasuredPhase5thHarmonicCurrent attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x0000030F,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasuredPhase7thHarmonicCurrentID MTR_DEPRECATED("The MeasuredPhase7thHarmonicCurrent attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000310,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasuredPhase9thHarmonicCurrentID MTR_DEPRECATED("The MeasuredPhase9thHarmonicCurrent attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000311,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasuredPhase11thHarmonicCurrentID MTR_DEPRECATED("The MeasuredPhase11thHarmonicCurrent attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000312,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcFrequencyMultiplierID MTR_DEPRECATED("The AcFrequencyMultiplier attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000400,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcFrequencyDivisorID MTR_DEPRECATED("The AcFrequencyDivisor attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000401,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributePowerMultiplierID MTR_DEPRECATED("The PowerMultiplier attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000402,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributePowerDivisorID MTR_DEPRECATED("The PowerDivisor attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000403,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeHarmonicCurrentMultiplierID MTR_DEPRECATED("The HarmonicCurrentMultiplier attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000404,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributePhaseHarmonicCurrentMultiplierID MTR_DEPRECATED("The PhaseHarmonicCurrentMultiplier attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000405,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeInstantaneousVoltageID MTR_DEPRECATED("The InstantaneousVoltage attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000500,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeInstantaneousLineCurrentID MTR_DEPRECATED("The InstantaneousLineCurrent attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000501,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeInstantaneousActiveCurrentID MTR_DEPRECATED("The InstantaneousActiveCurrent attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000502,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeInstantaneousReactiveCurrentID MTR_DEPRECATED("The InstantaneousReactiveCurrent attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000503,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeInstantaneousPowerID MTR_DEPRECATED("The InstantaneousPower attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000504,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageID MTR_DEPRECATED("The RmsVoltage attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000505,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageMinID MTR_DEPRECATED("The RmsVoltageMin attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000506,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageMaxID MTR_DEPRECATED("The RmsVoltageMax attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000507,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentID MTR_DEPRECATED("The RmsCurrent attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000508,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentMinID MTR_DEPRECATED("The RmsCurrentMin attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000509,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentMaxID MTR_DEPRECATED("The RmsCurrentMax attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x0000050A,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerID MTR_DEPRECATED("The ActivePower attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x0000050B,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerMinID MTR_DEPRECATED("The ActivePowerMin attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x0000050C,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerMaxID MTR_DEPRECATED("The ActivePowerMax attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x0000050D,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeReactivePowerID MTR_DEPRECATED("The ReactivePower attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x0000050E,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeApparentPowerID MTR_DEPRECATED("The ApparentPower attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x0000050F,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributePowerFactorID MTR_DEPRECATED("The PowerFactor attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000510,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsVoltageMeasurementPeriodID MTR_DEPRECATED("The AverageRmsVoltageMeasurementPeriod attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000511,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsUnderVoltageCounterID MTR_DEPRECATED("The AverageRmsUnderVoltageCounter attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000513,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeOverVoltagePeriodID MTR_DEPRECATED("The RmsExtremeOverVoltagePeriod attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000514,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeUnderVoltagePeriodID MTR_DEPRECATED("The RmsExtremeUnderVoltagePeriod attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000515,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSagPeriodID MTR_DEPRECATED("The RmsVoltageSagPeriod attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000516,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSwellPeriodID MTR_DEPRECATED("The RmsVoltageSwellPeriod attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000517,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcVoltageMultiplierID MTR_DEPRECATED("The AcVoltageMultiplier attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000600,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcVoltageDivisorID MTR_DEPRECATED("The AcVoltageDivisor attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000601,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcCurrentMultiplierID MTR_DEPRECATED("The AcCurrentMultiplier attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000602,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcCurrentDivisorID MTR_DEPRECATED("The AcCurrentDivisor attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000603,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcPowerMultiplierID MTR_DEPRECATED("The AcPowerMultiplier attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000604,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcPowerDivisorID MTR_DEPRECATED("The AcPowerDivisor attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000605,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeOverloadAlarmsMaskID MTR_DEPRECATED("The OverloadAlarmsMask attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000700,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeVoltageOverloadID MTR_DEPRECATED("The VoltageOverload attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000701,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeCurrentOverloadID MTR_DEPRECATED("The CurrentOverload attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000702,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcOverloadAlarmsMaskID MTR_DEPRECATED("The AcOverloadAlarmsMask attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000800,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcVoltageOverloadID MTR_DEPRECATED("The AcVoltageOverload attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000801,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcCurrentOverloadID MTR_DEPRECATED("The AcCurrentOverload attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000802,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcActivePowerOverloadID MTR_DEPRECATED("The AcActivePowerOverload attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000803,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcReactivePowerOverloadID MTR_DEPRECATED("The AcReactivePowerOverload attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000804,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsOverVoltageID MTR_DEPRECATED("The AverageRmsOverVoltage attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000805,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsUnderVoltageID MTR_DEPRECATED("The AverageRmsUnderVoltage attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000806,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeOverVoltageID MTR_DEPRECATED("The RmsExtremeOverVoltage attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000807,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeUnderVoltageID MTR_DEPRECATED("The RmsExtremeUnderVoltage attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000808,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSagID MTR_DEPRECATED("The RmsVoltageSag attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000809,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSwellID MTR_DEPRECATED("The RmsVoltageSwell attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x0000080A,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeLineCurrentPhaseBID MTR_DEPRECATED("The LineCurrentPhaseB attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000901,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeActiveCurrentPhaseBID MTR_DEPRECATED("The ActiveCurrentPhaseB attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000902,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeReactiveCurrentPhaseBID MTR_DEPRECATED("The ReactiveCurrentPhaseB attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000903,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltagePhaseBID MTR_DEPRECATED("The RmsVoltagePhaseB attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000905,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageMinPhaseBID MTR_DEPRECATED("The RmsVoltageMinPhaseB attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000906,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageMaxPhaseBID MTR_DEPRECATED("The RmsVoltageMaxPhaseB attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000907,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentPhaseBID MTR_DEPRECATED("The RmsCurrentPhaseB attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000908,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentMinPhaseBID MTR_DEPRECATED("The RmsCurrentMinPhaseB attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000909,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentMaxPhaseBID MTR_DEPRECATED("The RmsCurrentMaxPhaseB attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x0000090A,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerPhaseBID MTR_DEPRECATED("The ActivePowerPhaseB attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x0000090B,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerMinPhaseBID MTR_DEPRECATED("The ActivePowerMinPhaseB attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x0000090C,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerMaxPhaseBID MTR_DEPRECATED("The ActivePowerMaxPhaseB attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x0000090D,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeReactivePowerPhaseBID MTR_DEPRECATED("The ReactivePowerPhaseB attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x0000090E,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeApparentPowerPhaseBID MTR_DEPRECATED("The ApparentPowerPhaseB attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x0000090F,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributePowerFactorPhaseBID MTR_DEPRECATED("The PowerFactorPhaseB attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000910,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsVoltageMeasurementPeriodPhaseBID MTR_DEPRECATED("The AverageRmsVoltageMeasurementPeriodPhaseB attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000911,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsOverVoltageCounterPhaseBID MTR_DEPRECATED("The AverageRmsOverVoltageCounterPhaseB attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000912,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsUnderVoltageCounterPhaseBID MTR_DEPRECATED("The AverageRmsUnderVoltageCounterPhaseB attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000913,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeOverVoltagePeriodPhaseBID MTR_DEPRECATED("The RmsExtremeOverVoltagePeriodPhaseB attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000914,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeUnderVoltagePeriodPhaseBID MTR_DEPRECATED("The RmsExtremeUnderVoltagePeriodPhaseB attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000915,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSagPeriodPhaseBID MTR_DEPRECATED("The RmsVoltageSagPeriodPhaseB attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000916,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSwellPeriodPhaseBID MTR_DEPRECATED("The RmsVoltageSwellPeriodPhaseB attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000917,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeLineCurrentPhaseCID MTR_DEPRECATED("The LineCurrentPhaseC attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000A01,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeActiveCurrentPhaseCID MTR_DEPRECATED("The ActiveCurrentPhaseC attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000A02,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeReactiveCurrentPhaseCID MTR_DEPRECATED("The ReactiveCurrentPhaseC attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000A03,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltagePhaseCID MTR_DEPRECATED("The RmsVoltagePhaseC attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000A05,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageMinPhaseCID MTR_DEPRECATED("The RmsVoltageMinPhaseC attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000A06,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageMaxPhaseCID MTR_DEPRECATED("The RmsVoltageMaxPhaseC attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000A07,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentPhaseCID MTR_DEPRECATED("The RmsCurrentPhaseC attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000A08,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentMinPhaseCID MTR_DEPRECATED("The RmsCurrentMinPhaseC attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000A09,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentMaxPhaseCID MTR_DEPRECATED("The RmsCurrentMaxPhaseC attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000A0A,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerPhaseCID MTR_DEPRECATED("The ActivePowerPhaseC attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000A0B,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerMinPhaseCID MTR_DEPRECATED("The ActivePowerMinPhaseC attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000A0C,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerMaxPhaseCID MTR_DEPRECATED("The ActivePowerMaxPhaseC attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000A0D,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeReactivePowerPhaseCID MTR_DEPRECATED("The ReactivePowerPhaseC attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000A0E,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeApparentPowerPhaseCID MTR_DEPRECATED("The ApparentPowerPhaseC attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000A0F,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributePowerFactorPhaseCID MTR_DEPRECATED("The PowerFactorPhaseC attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000A10,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsVoltageMeasurementPeriodPhaseCID MTR_DEPRECATED("The AverageRmsVoltageMeasurementPeriodPhaseC attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000A11,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsOverVoltageCounterPhaseCID MTR_DEPRECATED("The AverageRmsOverVoltageCounterPhaseC attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000A12,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsUnderVoltageCounterPhaseCID MTR_DEPRECATED("The AverageRmsUnderVoltageCounterPhaseC attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000A13,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeOverVoltagePeriodPhaseCID MTR_DEPRECATED("The RmsExtremeOverVoltagePeriodPhaseC attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000A14,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeUnderVoltagePeriodPhaseCID MTR_DEPRECATED("The RmsExtremeUnderVoltagePeriodPhaseC attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000A15,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSagPeriodPhaseCID MTR_DEPRECATED("The RmsVoltageSagPeriodPhaseC attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000A16,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSwellPeriodPhaseCID MTR_DEPRECATED("The RmsVoltageSwellPeriodPhaseC attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000A17,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeGeneratedCommandListID MTR_DEPRECATED("The GeneratedCommandList attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcceptedCommandListID MTR_DEPRECATED("The AcceptedCommandList attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeAttributeListID MTR_DEPRECATED("The AttributeList attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeFeatureMapID MTR_DEPRECATED("The FeatureMap attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterElectricalMeasurementAttributeClusterRevisionID MTR_DEPRECATED("The ClusterRevision attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster OnOffSwitchConfiguration deprecated attribute names
+    MTRClusterOnOffSwitchConfigurationAttributeSwitchTypeID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterOnOffSwitchConfigurationAttributeSwitchTypeID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000000,
+    MTRClusterOnOffSwitchConfigurationAttributeSwitchActionsID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterOnOffSwitchConfigurationAttributeSwitchActionsID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00000010,
+    MTRClusterOnOffSwitchConfigurationAttributeGeneratedCommandListID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterOnOffSwitchConfigurationAttributeGeneratedCommandListID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = MTRClusterGlobalAttributeGeneratedCommandListID,
+    MTRClusterOnOffSwitchConfigurationAttributeAcceptedCommandListID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterOnOffSwitchConfigurationAttributeAcceptedCommandListID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = MTRClusterGlobalAttributeAcceptedCommandListID,
+    MTRClusterOnOffSwitchConfigurationAttributeAttributeListID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterOnOffSwitchConfigurationAttributeAttributeListID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = MTRClusterGlobalAttributeAttributeListID,
+    MTRClusterOnOffSwitchConfigurationAttributeFeatureMapID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterOnOffSwitchConfigurationAttributeFeatureMapID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = MTRClusterGlobalAttributeFeatureMapID,
+    MTRClusterOnOffSwitchConfigurationAttributeClusterRevisionID
+        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterOnOffSwitchConfigurationAttributeClusterRevisionID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = MTRClusterGlobalAttributeClusterRevisionID,
+
+    // Cluster OnOffSwitchConfiguration attributes
+    MTRAttributeIDTypeClusterOnOffSwitchConfigurationAttributeSwitchTypeID MTR_DEPRECATED("The SwitchType attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000000,
+    MTRAttributeIDTypeClusterOnOffSwitchConfigurationAttributeSwitchActionsID MTR_DEPRECATED("The SwitchActions attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = 0x00000010,
+    MTRAttributeIDTypeClusterOnOffSwitchConfigurationAttributeGeneratedCommandListID MTR_DEPRECATED("The GeneratedCommandList attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterOnOffSwitchConfigurationAttributeAcceptedCommandListID MTR_DEPRECATED("The AcceptedCommandList attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterOnOffSwitchConfigurationAttributeAttributeListID MTR_DEPRECATED("The AttributeList attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterOnOffSwitchConfigurationAttributeFeatureMapID MTR_DEPRECATED("The FeatureMap attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterOnOffSwitchConfigurationAttributeClusterRevisionID MTR_DEPRECATED("The ClusterRevision attribute will be removed", ios(16.4, 18.2), macos(13.3, 15.2), watchos(9.4, 11.2), tvos(16.4, 18.2)) = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,

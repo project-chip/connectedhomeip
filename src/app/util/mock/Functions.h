@@ -43,6 +43,9 @@ void BumpVersion();
 /// Sets GetVersion to return 0
 void ResetVersion();
 
+/// Force the global cluster version to a specific value
+void SetVersionTo(DataVersion version);
+
 /// Gets the current value for the version that will
 /// be returned by emberAfDataVersionStorage
 DataVersion GetVersion();

@@ -289,8 +289,7 @@ tests:
 
           Verify the below message in the TH_CR2(chip-tool) Log:
 
-          Device commissioning completed with successoning step 'Cleanup'
-          [1657186359.584743][3509:3514] CHIP:TOO: Device commissioning completed with success
+          [1663841939.844009][13897:13897] CHIP:TOO: Run command failure: ../../examples/chip-tool/commands/pairing/PairingCommand.cpp:151: CHIP Error 0x00000003: Incorrect state
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_SKIP_SAMPLE_APP && CADMIN.S.C00.Rsp

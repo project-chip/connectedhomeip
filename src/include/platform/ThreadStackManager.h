@@ -55,6 +55,8 @@ class GenericPlatformManagerImpl;
 template <class>
 class GenericConfigurationManagerImpl;
 template <class>
+class GenericPlatformManagerImpl_CMSISOS;
+template <class>
 class GenericPlatformManagerImpl_FreeRTOS;
 template <class>
 class GenericConnectivityManagerImpl_Thread;
@@ -167,6 +169,8 @@ private:
     friend class Internal::GenericPlatformManagerImpl;
     template <class>
     friend class Internal::GenericConfigurationManagerImpl;
+    template <class>
+    friend class Internal::GenericPlatformManagerImpl_CMSISOS;
     template <class>
     friend class Internal::GenericPlatformManagerImpl_FreeRTOS;
     template <class>

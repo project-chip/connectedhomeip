@@ -20,7 +20,6 @@
 #ifdef MATTER_DM_PLUGIN_SWITCH_SERVER
 #include <app/clusters/switch-server/switch-server.h>
 #include <app/server/Server.h>
-#include <app/util/att-storage.h>
 #include <platform/PlatformManager.h>
 
 #include "SwitchEventHandler.h"

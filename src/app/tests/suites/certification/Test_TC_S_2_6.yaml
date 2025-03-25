@@ -28,8 +28,15 @@ config:
 tests:
     - label: "Precondition: Commission DUT to TH1"
       verification: |
-          Once DUT reach the  commissionable state send the following command on TH1:
-          pairing onnetwork 1 20202021
+          - DUT should be commissioned onto TH1, TH2, and TH3.
+          - The Scene Table capacity for a given fabric SHALL be less than half (rounded down towards 0) of the Scene Table entries (as indicated in the SceneTableSize attribute).
+          - MaxRemainingCapacity is (SceneTableSize-1)/2.
+          - TH1, TH2, and TH3 should be on separate, distinct fabrics.
+
+          Send the below command in respective DUT
+          ./chip-all-clusters-app
+
+          Once DUT reach the  commissionable state send the following command  ./chip-tool pairing onnetwork 1 20202021 command on TH1.
           Verify the commissioning completed with success on TH(chip-tool) from DUT
           [1650455358.501816][4366:4371] CHIP:TOO: Device commissioning completed with success
       disabled: true
@@ -38,7 +45,7 @@ tests:
       verification: |
           Open a commissioning window On TH1(Chiptool)using below command
 
-           pairing open-commissioning-window 1 1 400 2000 3841
+          ./chip-tool pairing open-commissioning-window 1 1 400 2000 3841
 
           Verify the Successfully opened pairing window On TH1(Chiptool)e device
 
@@ -52,7 +59,7 @@ tests:
       verification: |
           Now send the below command for commissionin DUT to TH2 with Manual pairing code generated in TH1 using open commission window
 
-          pairing code 2 36253605617 --commissioner-name beta
+          ./chip-tool pairing code 2 36253605617 --commissioner-name beta
 
           Verify the commissioning completed with success on TH2(chip-tool) from DUT
 
@@ -64,7 +71,7 @@ tests:
       verification: |
           Open a commissioning window On TH1(Chiptool)using below command
 
-           pairing open-commissioning-window 1 1 400 2000 3842
+          ./chip-tool pairing open-commissioning-window 1 1 400 2000 3842
 
           Verify the Successfully opened pairing window On TH1(Chiptool)e device
 
@@ -78,7 +85,7 @@ tests:
       verification: |
           send the below command for commissionin DUT to TH3 with Manual pairing code generated in TH1 using open commission window
 
-          pairing code 3 36545248276 --commissioner-name gamma
+          ./chip-tool pairing code 3 36545248276 --commissioner-name gamma
 
           Verify the commissioning completed with success on TH3(chip-tool) from DUT
 
@@ -91,7 +98,7 @@ tests:
           field set to 0x0000."
       PICS: S.S.C03.Rsp
       verification: |
-          scenesmanagement remove-all-scenes 0x0000 1 1
+          ./chip-tool scenesmanagement remove-all-scenes 0x0000 1 1
 
           Verify the RemoveAllScenesResponse with following fields:
           Status is SUCCESS
@@ -107,11 +114,11 @@ tests:
     - label: "Step 1b: Repeat Step 1a with TH2."
       PICS: S.S.C03.Rsp
       verification: |
-          scenesmanagement remove-all-scenes 0x0000 2 1 --commissioner-name beta
+          ./chip-tool scenesmanagement remove-all-scenes 0x0000 2 1 --commissioner-name beta
 
           Verify the RemoveAllScenesResponse with following fields:
           Status is SUCCESS
-          Group ID is 0x0000  on the TH(Chip-tool) log and below is the sample log provided for the raspi platform:
+          Group ID is 0x0000  on the TH2(Chip-tool) log and below is the sample log provided for the raspi platform:
 
           [1700826575.191275][15971:15973] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0062 Command=0x0000_0003
           [1700826575.191321][15971:15973] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0062 Command 0x0000_0003
@@ -124,11 +131,11 @@ tests:
     - label: "Step 1C: Repeat Step 1a with TH3."
       PICS: S.S.C03.Rsp
       verification: |
-          scenesmanagement remove-all-scenes 0x0000 3 1 --commissioner-name gamma
+          ./chip-tool scenesmanagement remove-all-scenes 0x0000 3 1 --commissioner-name gamma
 
           Verify the RemoveAllScenesResponse with following fields:
           Status is SUCCESS
-          Group ID is 0x0000  on the TH(Chip-tool) log and below is the sample log provided for the raspi platform:
+          Group ID is 0x0000  on the TH3(Chip-tool) log and below is the sample log provided for the raspi platform:
 
           [1700826595.190538][15975:15977] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0062 Command=0x0000_0003
           [1700826595.190578][15975:15977] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0062 Command 0x0000_0003
@@ -140,7 +147,7 @@ tests:
 
     - label: "Step 2a: TH1 reads from the DUT the SceneTableSize attribute"
       verification: |
-          scenesmanagement read scene-table-size 1 1
+          ./chip-tool scenesmanagement read scene-table-size 1 1
 
           Verify the "SceneTableSize" attribute value is SceneTableSize(minimum=16) which is recorded into SceneTableSize on the TH (Chip-tool) and below is the sample log provided for the raspi platform:
 
@@ -155,7 +162,7 @@ tests:
       verification: |
           Please use Interactive mode to Verify the subscription
           Here the command to enter interactive mode:--
-          interactive start
+          ./chip-tool interactive start
 
           Set up the subscription between DUT and TH by sending the command mentioned below, and verify that the subscription is activated successfully
 
@@ -229,13 +236,13 @@ tests:
           CHIP:DMG: Refresh LivenessCheckTime for 9224 milliseconds with SubscriptionId = 0xce6a96bc Peer = 01:0000000000000001
       disabled: true
 
-    - label: "Step 2d:  Repeat Step 2b and 2c with TH2 and TH3"
+    - label: "Step 2d:  Repeat Step 2b and 2c with TH2."
       verification: |
           TH2:
 
           Please use Interactive mode to Verify the subscription of an event
           Here the command to enter interactive mode:--
-          interactive start
+          ./chip-tool interactive start
 
           Set up the subscription between DUT and TH by sending the command mentioned below, and verify that the subscription is activated successfully
 
@@ -295,7 +302,7 @@ tests:
       verification: |
           Please use Interactive mode to Verify the subscription of an event
           Here the command to enter interactive mode:--
-          interactive start
+          ./chip-tool interactive start
 
           Set up the subscription between DUT and TH by sending the command mentioned below, and verify that the subscription is activated successfully
 
@@ -967,44 +974,40 @@ tests:
 
     - label:
           "Step 7: TH3 sends a StoreScene command to DUT with the GroupID field
-          set to 0x0000, the SceneID field set to 0x01."
+          set to 0x0000, the SceneID field set to 0xfe."
       PICS: S.S.C04.Rsp
       verification: |
-          scenesmanagement store-scene 0x0000 0x01 3 1 --commissioner-name gamma
+          scenesmanagement store-scene 0x0000 0xfe 3 1 --commissioner-name gamma
 
           Verify the StoreSceneResponse with following fields:
           Status is RESOURCE_EXHAUSTED(0x89) on the TH3(Chip-tool) log and below is the sample log provided for the raspi platform:
 
-          [1705915551.740537][21417:21419] CHIP:DMG: },
-          [1705915551.740557][21417:21419] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0062 Command=0x0000_0004
-          [1705915551.740566][21417:21419] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0062 Command 0x0000_0004
-          [1705915551.740585][21417:21419] CHIP:TOO:   StoreSceneResponse: {
-          [1705915551.740590][21417:21419] CHIP:TOO:     status: 137
-          [1705915551.740593][21417:21419] CHIP:TOO:     groupID: 0
-          [1705915551.740596][21417:21419] CHIP:TOO:     sceneID: 1
-          [1705915551.740598][21417:21419] CHIP:TOO:    }
+          [1718862868.462786][6330:6332] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0062 Command 0x0000_0004
+          [1718862868.462834][6330:6332] CHIP:TOO:   StoreSceneResponse: {
+          [1718862868.462862][6330:6332] CHIP:TOO:     status: 137
+          [1718862868.462885][6330:6332] CHIP:TOO:     groupID: 0
+          [1718862868.462908][6330:6332] CHIP:TOO:     sceneID: 254
+          [1718862868.462930][6330:6332] CHIP:TOO:    }
       disabled: true
 
     - label:
           "Step 8: TH sends a CopyScene command to DUT with the mode field set
           to 0x00, the group identifier from field set to 0x0000, the scene
           identifier from field set to 0x01, the group identifier to field set
-          to 0x0000 and the scene identifier to field set to 0xFE."
+          to 0x0000 and the scene identifier to field set to 0x02."
       PICS: S.S.C40.Rsp
       verification: |
-          scenesmanagement copy-scene 0x00 0x0000 0x02 0x0000 0x00 3 1 --commissioner-name gamma
+          scenesmanagement copy-scene 0x00 0x0000 0x01 0x0000 0x02 1 1
 
           Verify the CopySceneResponse with following fields:
-          Status is RESOURCE_EXHAUSTED(0x89) on the TH(Chip-tool) log and below is the sample log provided for the raspi platform:
+          Status is RESOURCE_EXHAUSTED(0x89), the group identifier from field set to 0x0000 and the scene identifier from field set to 1 on the TH(Chip-tool) log and below is the sample log provided for the raspi platform:
 
-          [1705915659.672801][21417:21419] CHIP:DMG: },
-          [1705915659.672875][21417:21419] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0062 Command=0x0000_0040
-          [1705915659.672891][21417:21419] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0062 Command 0x0000_0040
-          [1705915659.672923][21417:21419] CHIP:TOO:   CopySceneResponse: {
-          [1705915659.672937][21417:21419] CHIP:TOO:     status: 133
-          [1705915659.672950][21417:21419] CHIP:TOO:     groupIdentifierFrom: 0
-          [1705915659.672979][21417:21419] CHIP:TOO:     sceneIdentifierFrom: 2
-          [1705915659.672991][21417:21419] CHIP:TOO:    }
+          [1708499075.003907][25643:25645] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0062 Command 0x0000_0040
+          [1708499075.004059][25643:25645] CHIP:TOO:   CopySceneResponse: {
+          [1708499075.004128][25643:25645] CHIP:TOO:     status: 137
+          [1708499075.004185][25643:25645] CHIP:TOO:     groupIdentifierFrom: 0
+          [1708499075.004240][25643:25645] CHIP:TOO:     sceneIdentifierFrom: 1
+          [1708499075.004293][25643:25645] CHIP:TOO:    }
       disabled: true
 
     - label:
@@ -1140,32 +1143,30 @@ tests:
           "Step 11a: TH1 removes the TH2 fabric by sending the RemoveFabric
           command to the DUT with the FabricIndex set to th2FabricIndex"
       verification: |
-          operationalcredentials remove-fabric th2FabricIndex 1 0
+          operationalcredentials remove-fabric 2 1 0
 
-          On TH1(chip-tool) verify the success with the nocresponse with statuscode is success(0)
+          Verify the DUT sends a response to TH with the Status field set to 0x00 (SUCCESS) and the FabricIndex field set to th2FabricIndex  on TH1(Chip-tool) log and below is the sample log provided for the raspi platform:
 
-          [1784416866.004187][21433:21435] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
-          [1784416866.004214][21433:21435] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
-          [1784416866.004236][21433:21435] CHIP:TOO:   NOCResponse: {
-          [1784416866.004250][21433:21435] CHIP:TOO:     statusCode: 0
-          [1784416866.004255][21433:21435] CHIP:TOO:     fabricIndex: th2FabricIndex
-          [1784416866.004259][21433:21435] CHIP:TOO:    }
-          [1784416866.004270][21433:21435] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1708332262.744710][18447:18449] CHIP:DMG: },
+          [1708332262.744728][18447:18449] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
+          [1708332262.744737][18447:18449] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
+          [1708332262.744755][18447:18449] CHIP:TOO:   NOCResponse: {
+          [1708332262.744761][18447:18449] CHIP:TOO:     statusCode: 0
+          [1708332262.744765][18447:18449] CHIP:TOO:     fabricIndex: 2
+          [1708332262.744768][18447:18449] CHIP:TOO:    }
       disabled: true
 
     - label:
           "Step 11b: TH1 removes the TH3 fabric by sending the RemoveFabric
           command to the DUT with the FabricIndex set to th3FabricIndex"
       verification: |
-          operationalcredentials remove-fabric th3FabricIndex 1 0
+          operationalcredentials remove-fabric 3 1 0
 
-          On TH1(chip-tool) verify the success with the nocresponse with statuscode is success(0)
+          Verify the DUT sends a response to TH with the Status field set to 0x00 (SUCCESS) and the FabricIndex field set to th3FabricIndex  on TH1(Chip-tool) log and below is the sample log provided for the raspi platform:
 
-          [1784416866.004187][21433:21435] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
-          [1784416866.004214][21433:21435] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
-          [1784416866.004236][21433:21435] CHIP:TOO:   NOCResponse: {
-          [1784416866.004250][21433:21435] CHIP:TOO:     statusCode: 0
-          [1784416866.004255][21433:21435] CHIP:TOO:     fabricIndex: th3FabricIndex
-          [1784416866.004259][21433:21435] CHIP:TOO:    }
-          [1784416866.004270][21433:21435] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1708332339.212544][18440:18442] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
+          [1708332339.212553][18440:18442] CHIP:TOO:   NOCResponse: {
+          [1708332339.212557][18440:18442] CHIP:TOO:     statusCode: 0
+          [1708332339.212560][18440:18442] CHIP:TOO:     fabricIndex: 3
+          [1708332339.212562][18440:18442] CHIP:TOO:    }
       disabled: true

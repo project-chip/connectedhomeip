@@ -96,7 +96,7 @@ public:
     CompressedFabricId GetCompressedFabricId() const { return mCompressedFabricId; }
     CHIP_ERROR GetCompressedFabricIdBytes(MutableByteSpan & compressedFabricId) const
     {
-        ReturnErrorCodeIf(compressedFabricId.size() != sizeof(uint64_t), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(compressedFabricId.size() == sizeof(uint64_t), CHIP_ERROR_INVALID_ARGUMENT);
         Encoding::BigEndian::Put64(compressedFabricId.data(), GetCompressedFabricId());
         return CHIP_NO_ERROR;
     }
@@ -211,6 +211,8 @@ private:
         mFabricIndex = kUndefinedFabricIndex;
         mNodeId      = kUndefinedNodeId;
     }
+
+    void SetShouldAdvertiseIdentity(bool advertiseIdentity) { mShouldAdvertiseIdentity = advertiseIdentity; }
 
     static constexpr size_t MetadataTLVMaxSize()
     {
@@ -410,7 +412,15 @@ public:
         No
     };
 
-    // Returns CHIP_ERROR_NOT_FOUND if there is no fabric for that index.
+    /**
+     * @brief Delete the fabric with given `fabricIndex`.
+     *
+     * @param fabricIndex - Index of fabric for deletion
+     * @retval CHIP_NO_ERROR on success
+     * @retval CHIP_ERROR_NOT_FOUND if there is no fabric for that index
+     * @retval CHIP_ERROR_INVALID_ARGUMENT if any of the arguments are invalid such as too large or out of bounds
+     * @retval other CHIP_ERROR on internal errors
+     */
     CHIP_ERROR Delete(FabricIndex fabricIndex);
     void DeleteAllFabrics();
 
@@ -1026,6 +1036,18 @@ public:
      * Returns an error if the |fabricIndex| is already in use.
      */
     CHIP_ERROR SetFabricIndexForNextAddition(FabricIndex fabricIndex);
+
+    /**
+     * @brief Set the advertising behavior for the fabric identified by `fabricIndex`.
+     *
+     * It is the caller's responsibility to actually restart DNS-SD advertising
+     * as needed after updating this state.
+     *
+     * @param fabricIndex - Fabric Index for which to set the label
+     * @param advertiseIdentity - whether the identity for this fabric should be advertised.
+     * @retval CHIP_ERROR_INVALID_FABRIC_INDEX if fabricIndex does not refer to a fabric in the table
+     */
+    CHIP_ERROR SetShouldAdvertiseIdentity(FabricIndex fabricIndex, AdvertiseIdentity advertiseIdentity);
 
 private:
     enum class StateFlags : uint16_t

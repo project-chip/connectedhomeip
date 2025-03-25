@@ -18,10 +18,12 @@
 
 #pragma once
 
-#include <app/util/basic-types.h>
-#include <controller/CHIPDeviceController.h>
-#include <inipp/inipp.h>
+#include <lib/core/CASEAuthTag.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
+#include <lib/core/NodeId.h>
 #include <lib/support/logging/CHIPLogging.h>
+
+#include <inipp/inipp.h>
 
 class PersistentStorage : public chip::PersistentStorageDelegate
 {

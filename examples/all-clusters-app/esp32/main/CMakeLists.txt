@@ -16,111 +16,47 @@
 #
 # (Uses default behaviour of compiling all source files in directory, adding 'include' to include path.)
 # The list of src and include dirs must be in sync with that in all-clusters-app/esp32/main/component.mk
-set(PRIV_INCLUDE_DIRS_LIST
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/all-clusters-app/all-clusters-common/include"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/energy-management-app/energy-management-common/common/include"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/energy-management-app/energy-management-common/device-energy-management/include"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/energy-management-app/energy-management-common/energy-evse/include"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/energy-management-app/energy-management-common/energy-reporting/include"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/energy-management-app/energy-management-common/water-heater/include"
-                      "${CMAKE_CURRENT_LIST_DIR}/include"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/providers"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/third_party/nlfaultinjection/include"
+
+get_filename_component(CHIP_ROOT ${CMAKE_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
+get_filename_component(ALL_CLUSTERS_COMMON_DIR ${CHIP_ROOT}/examples/all-clusters-app/all-clusters-common REALPATH)
+get_filename_component(ENERGY_MANAGEMENT_COMMON_DIR ${CHIP_ROOT}/examples/energy-management-app/energy-management-common/ REALPATH)
+get_filename_component(APP_COMMON_GEN_DIR ${CHIP_ROOT}/zzz_generated/app-common/app-common/zap-generated REALPATH)
+
+set(PRIV_INCLUDE_DIRS_LIST "${ALL_CLUSTERS_COMMON_DIR}/include"
+                           "${ENERGY_MANAGEMENT_COMMON_DIR}/common/include"
+                           "${ENERGY_MANAGEMENT_COMMON_DIR}/device-energy-management/include"
+                           "${ENERGY_MANAGEMENT_COMMON_DIR}/energy-evse/include"
+                           "${ENERGY_MANAGEMENT_COMMON_DIR}/energy-reporting/include"
+                           "${ENERGY_MANAGEMENT_COMMON_DIR}/water-heater/include"
+                           "${CMAKE_CURRENT_LIST_DIR}/include"
+                           "${CHIP_ROOT}/examples/providers"
+                           "${CHIP_ROOT}/examples/platform/esp32"
+                           "${CHIP_ROOT}/third_party/nlfaultinjection/include"
 )
-set(SRC_DIRS_LIST
-                      "${CMAKE_CURRENT_LIST_DIR}"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/app-common/app-common/zap-generated/attributes"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/app-common/app-common/zap-generated"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/all-clusters-app/all-clusters-common/src"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/energy-management-app/energy-management-common/common/src"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/energy-management-app/energy-management-common/device-energy-management/src"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/energy-management-app/energy-management-common/energy-evse/src"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/energy-management-app/energy-management-common/energy-reporting/src"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/energy-management-app/energy-management-common/water-heater/src"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/providers"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/ota"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/common"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/shell_extension"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/icd/server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/util"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/reporting"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/administrator-commissioning-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/air-quality-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/test-cluster-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/boolean-state-configuration-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/descriptor"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/energy-evse-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/fault-injection-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/fan-control-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/fixed-label-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/user-label-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/on-off-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/level-control"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/identify-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/access-control-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/barrier-control-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/window-covering-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/general-commissioning-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/network-commissioning"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/groups-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/color-control-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/operational-credentials-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/operational-state-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/mode-select-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/mode-base-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/low-power-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/ota-requestor"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/thermostat-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/thermostat-user-interface-configuration-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/thread-network-diagnostics-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/scenes-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/smoke-co-alarm-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/refrigerator-alarm-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/software-diagnostics-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/switch-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/general-diagnostics-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/group-key-mgmt-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/basic-information"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/bindings"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/icd-management-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/diagnostic-logs-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/occupancy-sensor-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/device-energy-management-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/energy-evse-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/ethernet-network-diagnostics-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/localization-configuration-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/time-format-localization-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/wifi-network-diagnostics-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/wake-on-lan-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/pump-configuration-and-control-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/power-source-configuration-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/power-source-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/power-topology-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/resource-monitoring-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/temperature-control-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/time-synchronization-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/valve-configuration-and-control-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/dishwasher-alarm-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/laundry-washer-controls-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/laundry-washer-controls-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/laundry-dryer-controls-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/all-clusters-app/all-clusters-common/src"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/energy-preference-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/electrical-energy-measurement-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/electrical-power-measurement-server"
+set(SRC_DIRS_LIST     "${CMAKE_CURRENT_LIST_DIR}"
+                      "${APP_COMMON_GEN_DIR}/attributes"
+                      "${APP_COMMON_GEN_DIR}"
+                      "${ALL_CLUSTERS_COMMON_DIR}/src"
+                      "${ENERGY_MANAGEMENT_COMMON_DIR}/common/src"
+                      "${ENERGY_MANAGEMENT_COMMON_DIR}/device-energy-management/src"
+                      "${ENERGY_MANAGEMENT_COMMON_DIR}/energy-evse/src"
+                      "${ENERGY_MANAGEMENT_COMMON_DIR}/energy-reporting/src"
+                      "${ENERGY_MANAGEMENT_COMMON_DIR}/water-heater/src"
+                      "${CHIP_ROOT}/examples/providers"
+                      "${CHIP_ROOT}/examples/platform/esp32/ota"
+                      "${CHIP_ROOT}/examples/platform/esp32/common"
+                      "${CHIP_ROOT}/examples/platform/esp32/shell_extension"
 )
 
 
 if (CONFIG_ENABLE_PW_RPC)
 # Append additional directories for RPC build
 set(PRIV_INCLUDE_DIRS_LIST  "${PRIV_INCLUDE_DIRS_LIST}"
-                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/pw_sys_io/public"
-                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/common"
-                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/common/pigweed"
-                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/common/pigweed/esp32"
-                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/lib/support"
+                     "${CHIP_ROOT}/examples/platform/esp32/pw_sys_io/public"
+                     "${CHIP_ROOT}/examples/common"
+                     "${CHIP_ROOT}/examples/common/pigweed"
+                     "${CHIP_ROOT}/examples/common/pigweed/esp32"
+                     "${CHIP_ROOT}/src/lib/support"
 )
 
 if (${IDF_VERSION_MAJOR} LESS 5)
@@ -130,26 +66,24 @@ else()
 endif()
 
 set(SRC_DIRS_LIST  "${SRC_DIRS_LIST}"
-                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32"
-                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/common/pigweed"
-                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/common/pigweed/esp32"
+                     "${CHIP_ROOT}/examples/platform/esp32"
+                     "${CHIP_ROOT}/examples/common/pigweed"
+                     "${CHIP_ROOT}/examples/common/pigweed/esp32"
 )
 endif (CONFIG_ENABLE_PW_RPC)
 
 if (CONFIG_ENABLE_ICD_SERVER)
-    list(APPEND PRIV_INCLUDE_DIRS_LIST "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/icd")
-    list(APPEND SRC_DIRS_LIST "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/icd")
+    list(APPEND PRIV_INCLUDE_DIRS_LIST "${CHIP_ROOT}/examples/platform/esp32/icd")
+    list(APPEND SRC_DIRS_LIST "${CHIP_ROOT}/examples/platform/esp32/icd")
 endif()
 
 idf_component_register(PRIV_INCLUDE_DIRS ${PRIV_INCLUDE_DIRS_LIST}
                        SRC_DIRS ${SRC_DIRS_LIST})
 
-get_filename_component(CHIP_ROOT ${CMAKE_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
-
-include("${CHIP_ROOT}/build/chip/esp32/esp32_codegen.cmake")
-
-chip_app_component_codegen("${CHIP_ROOT}/examples/all-clusters-app/all-clusters-common/all-clusters-app.matter")
-chip_app_component_zapgen("${CHIP_ROOT}/examples/all-clusters-app/all-clusters-common/all-clusters-app.zap")
+include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
+chip_configure_data_model(${COMPONENT_LIB}
+    ZAP_FILE ${ALL_CLUSTERS_COMMON_DIR}/all-clusters-app.zap
+)
 
 set_property(TARGET ${COMPONENT_LIB} PROPERTY CXX_STANDARD 17)
 target_compile_options(${COMPONENT_LIB} PRIVATE "-DCHIP_HAVE_CONFIG_H")

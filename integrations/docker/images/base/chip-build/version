@@ -1,1 +1,1 @@
-75 : remove workaround for bloaty build, workaround involved cloning and installing abseil
+125 : [Tizen] Fix Tizen SDK installer when more than one CPU is selected

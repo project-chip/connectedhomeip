@@ -152,7 +152,7 @@ using namespace chip::Credentials;
 + (BOOL)keypair:(id<MTRKeypair>)keypair matchesCertificate:(NSData *)certificate
 {
     P256PublicKey keypairPubKey;
-    CHIP_ERROR err = MTRP256KeypairBridge::MatterPubKeyFromSecKeyRef(keypair.publicKey, &keypairPubKey);
+    CHIP_ERROR err = MTRP256KeypairBridge::MatterPubKeyFromMTRKeypair(keypair, &keypairPubKey);
     if (err != CHIP_NO_ERROR) {
         MTR_LOG_ERROR("Can't extract public key from keypair: %s", ErrorStr(err));
         return NO;
@@ -186,7 +186,7 @@ using namespace chip::Credentials;
         MTR_LOG_ERROR("Can't extract public key from second certificate: %s", ErrorStr(err));
         return NO;
     }
-    P256PublicKeySpan keySpan2(pubKey1.ConstBytes());
+    P256PublicKeySpan keySpan2(pubKey2.ConstBytes());
 
     if (!keySpan1.data_equal(keySpan2)) {
         return NO;

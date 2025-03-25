@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -55,14 +55,15 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 
-:sectnums:
+:xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0039" name="Bridged Device Basic Information Cluster" revision="4">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0039" name="Bridged Device Basic Information Cluster" revision="5">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
     <revision revision="2" summary="Added ProductAppearance attribute"/>
     <revision revision="3" summary="Added SpecificationVersion and MaxPathsPerInvoke attributes"/>
-    <revision revision="4" summary="Updated conformance for UniqueID to mandatory, ProductID to optional when bridging Matter devices, and add the BridgedICDSupport feature. Added DeviceLocation."/>
+    <revision revision="4" summary="Updated conformance for UniqueID to mandatory, ProductID to optional when bridging Matter devices, add the BridgedICDSupport feature"/>
+    <revision revision="5" summary="Added DeviceLocation and ConfigurationVersion attribute"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0039" name="Bridged Device Basic Information"/>
@@ -74,75 +75,186 @@ Davis, CA 95616, USA
     </feature>
   </features>
   <attributes>
-    <attribute id="0x0000" name="DataModelRevision">
+    <attribute id="0x0000" name="DataModelRevision" type="uint16" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <disallowConform/>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0001" name="VendorName" type="string" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <constraint>
+        <maxLength value="32"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0002" name="VendorID" type="vendor-id" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+    </attribute>
+    <attribute id="0x0003" name="ProductName" type="string" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <optionalConform/>
+      <constraint>
+        <maxLength value="32"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0004" name="ProductID" type="uint16" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+    </attribute>
+    <attribute id="0x0005" name="NodeLabel" type="string" default="&quot;&quot;">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <optionalConform/>
+      <constraint>
+        <maxLength value="32"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0006" name="Location" type="string" default="&quot;XX&quot;">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="admin"/>
+      <quality persistence="nonVolatile"/>
+      <disallowConform/>
+      <constraint>
+        <allowed value="2"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0007" name="HardwareVersion" type="uint16" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x0008" name="HardwareVersionString" type="string" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <optionalConform/>
+      <constraint>
+        <lengthBetween>
+          <from value="1"/>
+          <to value="64"/>
+        </lengthBetween>
+      </constraint>
+    </attribute>
+    <attribute id="0x0009" name="SoftwareVersion" type="uint32" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <optionalConform/>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x000A" name="SoftwareVersionString" type="string" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <optionalConform/>
+      <constraint>
+        <lengthBetween>
+          <from value="1"/>
+          <to value="64"/>
+        </lengthBetween>
+      </constraint>
+    </attribute>
+    <attribute id="0x000B" name="ManufacturingDate" type="string" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <optionalConform/>
+      <constraint>
+        <lengthBetween>
+          <from value="8"/>
+          <to value="16"/>
+        </lengthBetween>
+      </constraint>
+    </attribute>
+    <attribute id="0x000C" name="PartNumber" type="string" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <optionalConform/>
+      <constraint>
+        <maxLength value="32"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x000D" name="ProductURL" type="string" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <optionalConform/>
+      <constraint>
+        <maxLength value="256"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x000E" name="ProductLabel" type="string" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <optionalConform/>
+      <constraint>
+        <maxLength value="64"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x000F" name="SerialNumber" type="string" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <optionalConform/>
+      <constraint>
+        <maxLength value="32"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0010" name="LocalConfigDisabled" type="bool" default="false">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
       <disallowConform/>
     </attribute>
-    <attribute id="0x0001" name="VendorName">
-      <optionalConform/>
-    </attribute>
-    <attribute id="0x0002" name="VendorID">
-      <optionalConform/>
-    </attribute>
-    <attribute id="0x0003" name="ProductName">
-      <optionalConform/>
-    </attribute>
-    <attribute id="0x0004" name="ProductID"/>
-    <attribute id="0x0005" name="NodeLabel">
-      <optionalConform/>
-    </attribute>
-    <attribute id="0x0006" name="Location">
-      <disallowConform/>
-    </attribute>
-    <attribute id="0x0007" name="HardwareVersion">
-      <optionalConform/>
-    </attribute>
-    <attribute id="0x0008" name="HardwareVersionString">
-      <optionalConform/>
-    </attribute>
-    <attribute id="0x0009" name="SoftwareVersion">
-      <optionalConform/>
-    </attribute>
-    <attribute id="0x000A" name="SoftwareVersionString">
-      <optionalConform/>
-    </attribute>
-    <attribute id="0x000B" name="ManufacturingDate">
-      <optionalConform/>
-    </attribute>
-    <attribute id="0x000C" name="PartNumber">
-      <optionalConform/>
-    </attribute>
-    <attribute id="0x000D" name="ProductURL">
-      <optionalConform/>
-    </attribute>
-    <attribute id="0x000E" name="ProductLabel">
-      <optionalConform/>
-    </attribute>
-    <attribute id="0x000F" name="SerialNumber">
-      <optionalConform/>
-    </attribute>
-    <attribute id="0x0010" name="LocalConfigDisabled">
-      <disallowConform/>
-    </attribute>
-    <attribute id="0x0011" name="Reachable">
+    <attribute id="0x0011" name="Reachable" type="bool" default="true">
+      <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0012" name="UniqueID">
+    <attribute id="0x0012" name="UniqueID" type="string" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
+      <constraint>
+        <maxLength value="32"/>
+      </constraint>
     </attribute>
-    <attribute id="0x0013" name="CapabilityMinima">
+    <attribute id="0x0013" name="CapabilityMinima" type="CapabilityMinimaStruct" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
       <disallowConform/>
     </attribute>
-    <attribute id="0x0014" name="ProductAppearance">
+    <attribute id="0x0014" name="ProductAppearance" type="ProductAppearanceStruct" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
       <optionalConform/>
     </attribute>
-    <attribute id="0x0015" name="SpecificationVersion">
+    <attribute id="0x0015" name="SpecificationVersion" type="uint32" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
       <disallowConform/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
-    <attribute id="0x0016" name="MaxPathsPerInvoke">
+    <attribute id="0x0016" name="MaxPathsPerInvoke" type="uint16" default="1">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
       <disallowConform/>
+      <constraint>
+        <min value="1"/>
+      </constraint>
     </attribute>
-    <attribute id="0x0017" name="DeviceLocation">
+    <attribute id="0x0017" name="DeviceLocation" type="LocationDescriptorStruct" default="MS">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="admin"/>
+      <quality nullable="true" persistence="nonVolatile"/>
       <optionalConform/>
+    </attribute>
+    <attribute id="0x0018" name="ConfigurationVersion" type="uint32" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="nonVolatile"/>
+      <optionalConform/>
+      <constraint>
+        <min value="1"/>
+      </constraint>
     </attribute>
   </attributes>
   <commands>
@@ -156,7 +268,12 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="TimeoutMs" type="uint32">
         <mandatoryConform/>
-        <constraint type="between" from="30000" to="3600000"/>
+        <constraint>
+          <between>
+            <from value="30000"/>
+            <to value="3600000"/>
+          </between>
+        </constraint>
       </field>
     </command>
   </commands>
@@ -187,7 +304,9 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="PromisedActiveDuration" type="uint32">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </event>
   </events>

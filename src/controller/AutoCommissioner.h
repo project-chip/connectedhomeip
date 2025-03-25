@@ -16,10 +16,13 @@
  *    limitations under the License.
  */
 #pragma once
+
+#include <app/AttributePathParams.h>
 #include <controller/CommissioneeDeviceProxy.h>
 #include <controller/CommissioningDelegate.h>
 #include <credentials/DeviceAttestationConstructor.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <lib/support/ScopedBuffer.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
 
 namespace chip {
@@ -116,7 +119,9 @@ private:
     CommissioneeDeviceProxy * mCommissioneeDeviceProxy               = nullptr;
     OperationalCredentialsDelegate * mOperationalCredentialsDelegate = nullptr;
     OperationalDeviceProxy mOperationalDeviceProxy;
-    // Memory space for the commisisoning parameters that come in as ByteSpans - the caller is not guaranteed to retain this memory
+
+    // BEGIN memory space for commissioning parameters that are Spans or similar pointers:
+    // The caller is not guaranteed to retain the memory these parameters point to.
     uint8_t mSsid[CommissioningParameters::kMaxSsidLen];
     uint8_t mCredentials[CommissioningParameters::kMaxCredentialsLen];
     uint8_t mThreadOperationalDataset[CommissioningParameters::kMaxThreadDatasetLen];
@@ -135,6 +140,11 @@ private:
 
     static constexpr size_t kMaxDefaultNtpSize = 128;
     char mDefaultNtp[kMaxDefaultNtpSize];
+
+    uint8_t mICDSymmetricKey[Crypto::kAES_CCM128_Key_Length];
+    Platform::ScopedMemoryBufferWithSize<app::AttributePathParams> mExtraReadPaths;
+
+    // END memory space for commisisoning parameters
 
     bool mNeedsNetworkSetup = false;
     ReadCommissioningInfo mDeviceCommissioningInfo;
@@ -155,8 +165,6 @@ private:
     uint8_t mAttestationElements[Credentials::kMaxRspLen];
     uint16_t mAttestationSignatureLen = 0;
     uint8_t mAttestationSignature[Crypto::kMax_ECDSA_Signature_Length];
-
-    uint8_t mICDSymmetricKey[Crypto::kAES_CCM128_Key_Length];
 };
 } // namespace Controller
 } // namespace chip

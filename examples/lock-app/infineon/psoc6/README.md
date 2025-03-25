@@ -175,7 +175,7 @@ cloud, giving every IoT device its own unique identity.
 
 For the description of OPTIGA™ Trust M Provisioning with test DAC generation and
 PAI and CD storage, please refer to
-[Infineon OPTIGA™ Trust M Provisioning](../../../../docs/guides/infineon_trustm_provisioning.md)
+[Infineon OPTIGA™ Trust M Provisioning](../../../../docs/platforms/infineon/infineon_trustm_provisioning.md)
 
 After completing OPTIGA™ Trust M Provisioning, proceed to
 [Flashing the Application](#flashing-the-application) section to continue with
@@ -185,4 +185,4 @@ subsequent steps.
 
 For the description of Software Update process with infineon PSoC6 example
 applications see
-[Infineon PSoC6 OTA Software Update](../../../../docs/guides/infineon_psoc6_software_update.md)
+[Infineon PSoC6 OTA Software Update](../../../../docs/platforms/infineon/infineon_psoc6_software_update.md)

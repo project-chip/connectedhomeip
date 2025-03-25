@@ -66,6 +66,7 @@ target_sources(${APP_TARGET} PRIVATE
                ${MBED_COMMON}/util/DFUManager.cpp
                ${ALL_CLUSTERS_COMMON}/src/bridged-actions-stub.cpp
                ${ALL_CLUSTERS_COMMON}/src/air-quality-instance.cpp
+               ${ALL_CLUSTERS_COMMON}/src/chime-instance.cpp
                ${ALL_CLUSTERS_COMMON}/src/concentration-measurement-instances.cpp
                ${ALL_CLUSTERS_COMMON}/src/fan-stub.cpp
                ${ALL_CLUSTERS_COMMON}/src/device-energy-management-stub.cpp
@@ -87,7 +88,6 @@ target_sources(${APP_TARGET} PRIVATE
 )
 
 chip_configure_data_model(${APP_TARGET}
-    INCLUDE_SERVER
     ZAP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../all-clusters-common/all-clusters-app.zap
 )
 

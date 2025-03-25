@@ -14,7 +14,7 @@
 #    limitations under the License.
 #
 
-from ctypes import CFUNCTYPE, c_char_p, c_uint8, c_uint16, c_uint32
+from ctypes import CFUNCTYPE, c_char_p, c_uint8, c_uint16, c_uint32, c_uint64, create_string_buffer
 from typing import Optional
 
 from chip.native import GetLibraryHandle, NativeLibraryHandleMethodArguments, PyChipError
@@ -42,6 +42,20 @@ class SetupPayload:
         self.attribute_visitor = SetupPayload.AttributeVisitor(AddAttribute)
         self.vendor_attribute_visitor = SetupPayload.VendorAttributeVisitor(
             AddVendorAttribute)
+
+    def GenerateQrCode(self, passcode: int, vendorId: int = 0xFFF1, productId: int = 0x8001, discriminator: int = 3840,
+                       customFlow: int = 0, capabilities: int = 4, version: int = 0) -> str:
+        buffer = create_string_buffer(256)
+        self.chipLib.pychip_SetupPayload_GenerateQrCode(buffer, 256, passcode, vendorId, productId,
+                                                        discriminator, customFlow, capabilities, version).raise_on_error()
+        return buffer.value.decode()
+
+    def GenerateManualPairingCode(self, passcode: int, vendorId: int = 0xFFF1, productId: int = 0x8001, discriminator: int = 3840,
+                                  customFlow: int = 0, capabilities: int = 4, version: int = 0) -> str:
+        buffer = create_string_buffer(256)
+        self.chipLib.pychip_SetupPayload_GenerateManualPairingCode(buffer, 256, passcode, vendorId, productId,
+                                                                   discriminator, customFlow, capabilities, version).raise_on_error()
+        return buffer.value.decode()
 
     def ParseQrCode(self, qrCode: str):
         self.Clear()
@@ -99,6 +113,12 @@ class SetupPayload:
         if chipLib.pychip_SetupPayload_ParseQrCode.argtypes is not None:
             return
         setter = NativeLibraryHandleMethodArguments(chipLib)
+        setter.Set("pychip_SetupPayload_GenerateQrCode",
+                   PyChipError,
+                   [c_char_p, c_uint64, c_uint32, c_uint16, c_uint16, c_uint16, c_uint8, c_uint8, c_uint8])
+        setter.Set("pychip_SetupPayload_GenerateManualPairingCode",
+                   PyChipError,
+                   [c_char_p, c_uint64, c_uint32, c_uint16, c_uint16, c_uint16, c_uint8, c_uint8, c_uint8])
         setter.Set("pychip_SetupPayload_ParseQrCode",
                    PyChipError,
                    [c_char_p, SetupPayload.AttributeVisitor, SetupPayload.VendorAttributeVisitor])

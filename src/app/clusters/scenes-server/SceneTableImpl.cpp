@@ -276,7 +276,7 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
         ReturnErrorOnFailure(reader.EnterContainer(fabricSceneContainer));
         ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TagScene::kSceneCount)));
         ReturnErrorOnFailure(reader.Get(scene_count));
-        scene_count = min(scene_count, static_cast<uint8_t>(max_scenes_per_fabric));
+        scene_count = std::min(scene_count, static_cast<uint8_t>(max_scenes_per_fabric));
         ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Array, TLV::ContextTag(TagScene::kStorageIDArray)));
         TLV::TLVType sceneMapContainer;
         ReturnErrorOnFailure(reader.EnterContainer(sceneMapContainer));
@@ -577,7 +577,7 @@ CHIP_ERROR DefaultSceneTableImpl::GetRemainingCapacity(FabricIndex fabric_index,
         remaining_capacity_fabric = static_cast<uint8_t>(mMaxScenesPerFabric - fabric.scene_count);
     }
 
-    capacity = min(remaining_capacity_fabric, remaining_capacity_global);
+    capacity = std::min(remaining_capacity_fabric, remaining_capacity_global);
 
     return CHIP_NO_ERROR;
 }

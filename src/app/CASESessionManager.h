@@ -142,6 +142,7 @@ public:
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
                                 TransportPayloadCapability transportPayloadCapability = TransportPayloadCapability::kMRPPayload);
 
+    void ReleaseSession(const ScopedNodeId & peerId);
     void ReleaseSessionsForFabric(FabricIndex fabricIndex);
 
     void ReleaseAllSessions();

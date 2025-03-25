@@ -21,6 +21,7 @@
 
 #import <Matter/MTRAccessGrant.h>
 #import <Matter/MTRAsyncCallbackWorkQueue.h>
+#import <Matter/MTRAttributeValueWaiter.h>
 #import <Matter/MTRBackwardsCompatShims.h>
 #import <Matter/MTRBaseClusters.h>
 #import <Matter/MTRBaseDevice.h>
@@ -33,8 +34,10 @@
 #import <Matter/MTRClusterStateCacheContainer.h>
 #import <Matter/MTRClusters.h>
 #import <Matter/MTRCommandPayloadsObjc.h>
+#import <Matter/MTRCommandWithRequiredResponse.h>
 #import <Matter/MTRCommissionableBrowserDelegate.h>
 #import <Matter/MTRCommissionableBrowserResult.h>
+#import <Matter/MTRCommissioneeInfo.h>
 #import <Matter/MTRCommissioningParameters.h>
 #import <Matter/MTRDefines.h>
 #import <Matter/MTRDevice.h>
@@ -48,8 +51,10 @@
 #import <Matter/MTRDeviceControllerStartupParams.h>
 #import <Matter/MTRDeviceControllerStorageDelegate.h>
 #import <Matter/MTRDeviceStorageBehaviorConfiguration.h>
+#import <Matter/MTRDeviceType.h>
 #import <Matter/MTRDeviceTypeRevision.h>
 #import <Matter/MTRDiagnosticLogsType.h>
+#import <Matter/MTREndpointInfo.h>
 #import <Matter/MTRError.h>
 #import <Matter/MTRFabricInfo.h>
 #import <Matter/MTRKeypair.h>
@@ -60,6 +65,7 @@
 #import <Matter/MTROTAProviderDelegate.h>
 #import <Matter/MTROnboardingPayloadParser.h>
 #import <Matter/MTROperationalCertificateIssuer.h>
+#import <Matter/MTRProductIdentity.h>
 #import <Matter/MTRQRCodeSetupPayloadParser.h>
 #import <Matter/MTRServerAttribute.h>
 #import <Matter/MTRServerCluster.h>

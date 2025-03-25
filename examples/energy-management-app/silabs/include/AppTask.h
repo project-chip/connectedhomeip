@@ -28,7 +28,7 @@
 
 #include "AppEvent.h"
 #include "BaseApplication.h"
-#include "EnergyEvseManager.h"
+
 #include "FreeRTOS.h"
 #include "timers.h" // provides FreeRTOS timer support
 #include <ble/BLEEndPoint.h>
@@ -80,16 +80,16 @@ public:
 
 private:
     static AppTask sAppTask;
-    static void EvseActionEventHandler(AppEvent * aEvent);
+    static void EnergyManagementActionEventHandler(AppEvent * aEvent);
 
     static void UpdateClusterState(intptr_t context);
 
     /**
-     * @brief AppTask initialisation function
+     * @brief Override of BaseApplication::AppInit() virtual method, called by BaseApplication::Init()
      *
      * @return CHIP_ERROR
      */
-    CHIP_ERROR Init();
+    CHIP_ERROR AppInit() override;
 
     /**
      * @brief PB0 Button event processing function

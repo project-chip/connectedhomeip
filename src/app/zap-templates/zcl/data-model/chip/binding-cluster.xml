@@ -31,9 +31,9 @@ limitations under the License.
     <code>0x001e</code>
     <define>BINDING_CLUSTER</define>
     <description>The Binding Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for supporting the binding table.</description>
-    <attribute side="server" code="0x0000" define="BINDING_LIST" type="array" entryType="TargetStruct" writable="true" optional="false">
-        <description>Binding</description>
-        <access op="write" role="manage"/>
+    <attribute side="server" code="0x0000" name="Binding" define="BINDING_LIST" type="array" entryType="TargetStruct" writable="true">
+      <access op="write" role="manage"/>
+      <mandatoryConform/>
     </attribute>
   </cluster>
 

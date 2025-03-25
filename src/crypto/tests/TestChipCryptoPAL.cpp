@@ -73,6 +73,10 @@
 
 #if CHIP_CRYPTO_PSA
 #include <psa/crypto.h>
+extern "C" {
+psa_status_t psa_initialize_key_slots(void);
+void psa_wipe_all_key_slots(void);
+}
 #endif
 
 using namespace chip;
@@ -210,6 +214,7 @@ const AesCtrTestEntry theAesCtrTestVector[] = {
     }
 };
 
+#if !(CHIP_CRYPTO_KEYSTORE_APP)
 struct TestAesKey
 {
 public:
@@ -245,6 +250,7 @@ public:
     DefaultSessionKeystore keystore;
     Hmac128KeyHandle key;
 };
+#endif
 
 static void TestAES_CTR_128_Encrypt(const AesCtrTestEntry * vector)
 {
@@ -287,14 +293,17 @@ static void TestAES_CTR_128_Decrypt(const AesCtrTestEntry * vector)
 
 struct TestChipCryptoPAL : public ::testing::Test
 {
-    static void SetUpTestSuite()
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+
+    void SetUp() override
     {
-        ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
 #if CHIP_CRYPTO_PSA
         psa_crypto_init();
+        psa_wipe_all_key_slots();
+        psa_initialize_key_slots();
 #endif
     }
-    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 };
 
 TEST_F(TestChipCryptoPAL, TestAES_CTR_128CryptTestVectors)
@@ -316,7 +325,7 @@ TEST_F(TestChipCryptoPAL, TestAES_CTR_128CryptTestVectors)
 TEST_F(TestChipCryptoPAL, TestAES_CCM_128EncryptTestVectors)
 {
     HeapChecker heapChecker;
-    int numOfTestVectors = ArraySize(ccm_128_test_vectors);
+    int numOfTestVectors = MATTER_ARRAY_SIZE(ccm_128_test_vectors);
     int numOfTestsRan    = 0;
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
     {
@@ -360,7 +369,7 @@ TEST_F(TestChipCryptoPAL, TestAES_CCM_128EncryptTestVectors)
 TEST_F(TestChipCryptoPAL, TestAES_CCM_128DecryptTestVectors)
 {
     HeapChecker heapChecker;
-    int numOfTestVectors = ArraySize(ccm_128_test_vectors);
+    int numOfTestVectors = MATTER_ARRAY_SIZE(ccm_128_test_vectors);
     int numOfTestsRan    = 0;
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
     {
@@ -395,7 +404,7 @@ TEST_F(TestChipCryptoPAL, TestAES_CCM_128DecryptTestVectors)
 TEST_F(TestChipCryptoPAL, TestAES_CCM_128EncryptInvalidNonceLen)
 {
     HeapChecker heapChecker;
-    int numOfTestVectors = ArraySize(ccm_128_test_vectors);
+    int numOfTestVectors = MATTER_ARRAY_SIZE(ccm_128_test_vectors);
     int numOfTestsRan    = 0;
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
     {
@@ -424,7 +433,7 @@ TEST_F(TestChipCryptoPAL, TestAES_CCM_128EncryptInvalidNonceLen)
 TEST_F(TestChipCryptoPAL, TestAES_CCM_128EncryptInvalidTagLen)
 {
     HeapChecker heapChecker;
-    int numOfTestVectors = ArraySize(ccm_128_test_vectors);
+    int numOfTestVectors = MATTER_ARRAY_SIZE(ccm_128_test_vectors);
     int numOfTestsRan    = 0;
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
     {
@@ -453,7 +462,7 @@ TEST_F(TestChipCryptoPAL, TestAES_CCM_128EncryptInvalidTagLen)
 TEST_F(TestChipCryptoPAL, TestAES_CCM_128DecryptInvalidNonceLen)
 {
     HeapChecker heapChecker;
-    int numOfTestVectors = ArraySize(ccm_128_test_vectors);
+    int numOfTestVectors = MATTER_ARRAY_SIZE(ccm_128_test_vectors);
     int numOfTestsRan    = 0;
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
     {
@@ -554,7 +563,7 @@ TEST_F(TestChipCryptoPAL, TestAsn1Conversions)
     static_assert(sizeof(kDerSigConvDerCase4) == (sizeof(kDerSigConvRawCase4) + chip::Crypto::kMax_ECDSA_X9Dot62_Asn1_Overhead),
                   "kDerSigConvDerCase4 must have worst case overhead");
 
-    int numOfTestVectors = ArraySize(kDerSigConvTestVectors);
+    int numOfTestVectors = MATTER_ARRAY_SIZE(kDerSigConvTestVectors);
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
     {
         const der_sig_conv_vector * vector = &kDerSigConvTestVectors[vectorIndex];
@@ -592,7 +601,7 @@ TEST_F(TestChipCryptoPAL, TestAsn1Conversions)
 TEST_F(TestChipCryptoPAL, TestRawIntegerToDerValidCases)
 {
     HeapChecker heapChecker;
-    int numOfTestCases = ArraySize(kRawIntegerToDerVectors);
+    int numOfTestCases = MATTER_ARRAY_SIZE(kRawIntegerToDerVectors);
 
     for (int testIdx = 0; testIdx < numOfTestCases; testIdx++)
     {
@@ -801,7 +810,7 @@ TEST_F(TestChipCryptoPAL, TestReadDerLengthInvalidCases)
 TEST_F(TestChipCryptoPAL, TestHash_SHA256)
 {
     HeapChecker heapChecker;
-    unsigned int numOfTestCases     = ArraySize(hash_sha256_test_vectors);
+    unsigned int numOfTestCases     = MATTER_ARRAY_SIZE(hash_sha256_test_vectors);
     unsigned int numOfTestsExecuted = 0;
 
     for (numOfTestsExecuted = 0; numOfTestsExecuted < numOfTestCases; numOfTestsExecuted++)
@@ -812,13 +821,13 @@ TEST_F(TestChipCryptoPAL, TestHash_SHA256)
         bool success = memcmp(v.hash, out_buffer, sizeof(out_buffer)) == 0;
         EXPECT_TRUE(success);
     }
-    EXPECT_EQ(numOfTestsExecuted, ArraySize(hash_sha256_test_vectors));
+    EXPECT_EQ(numOfTestsExecuted, MATTER_ARRAY_SIZE(hash_sha256_test_vectors));
 }
 
 TEST_F(TestChipCryptoPAL, TestHash_SHA256_Stream)
 {
     HeapChecker heapChecker;
-    unsigned int numOfTestCases     = ArraySize(hash_sha256_test_vectors);
+    unsigned int numOfTestCases     = MATTER_ARRAY_SIZE(hash_sha256_test_vectors);
     unsigned int numOfTestsExecuted = 0;
     CHIP_ERROR error                = CHIP_NO_ERROR;
 
@@ -858,7 +867,7 @@ TEST_F(TestChipCryptoPAL, TestHash_SHA256_Stream)
         EXPECT_TRUE(success);
     }
 
-    EXPECT_EQ(numOfTestsExecuted, ArraySize(hash_sha256_test_vectors));
+    EXPECT_EQ(numOfTestsExecuted, MATTER_ARRAY_SIZE(hash_sha256_test_vectors));
 
     // Test partial digests
     uint8_t source_buf[2 * kSHA256_Hash_Length];
@@ -946,7 +955,7 @@ TEST_F(TestChipCryptoPAL, TestHash_SHA256_Stream)
 TEST_F(TestChipCryptoPAL, TestHMAC_SHA256_RawKey)
 {
     HeapChecker heapChecker;
-    int numOfTestCases     = ArraySize(hmac_sha256_test_vectors_raw_key);
+    int numOfTestCases     = MATTER_ARRAY_SIZE(hmac_sha256_test_vectors_raw_key);
     int numOfTestsExecuted = 0;
     TestHMAC_sha mHMAC;
 
@@ -964,10 +973,11 @@ TEST_F(TestChipCryptoPAL, TestHMAC_SHA256_RawKey)
     EXPECT_EQ(numOfTestsExecuted, numOfTestCases);
 }
 
+#if !(CHIP_CRYPTO_KEYSTORE_APP)
 TEST_F(TestChipCryptoPAL, TestHMAC_SHA256_KeyHandle)
 {
     HeapChecker heapChecker;
-    int numOfTestCases     = ArraySize(hmac_sha256_test_vectors_key_handle);
+    int numOfTestCases     = MATTER_ARRAY_SIZE(hmac_sha256_test_vectors_key_handle);
     int numOfTestsExecuted = 0;
     TestHMAC_sha mHMAC;
 
@@ -994,11 +1004,12 @@ TEST_F(TestChipCryptoPAL, TestHMAC_SHA256_KeyHandle)
     }
     EXPECT_EQ(numOfTestsExecuted, numOfTestCases);
 }
+#endif
 
 TEST_F(TestChipCryptoPAL, TestHKDF_SHA256)
 {
     HeapChecker heapChecker;
-    int numOfTestCases     = ArraySize(hkdf_sha256_test_vectors);
+    int numOfTestCases     = MATTER_ARRAY_SIZE(hkdf_sha256_test_vectors);
     int numOfTestsExecuted = 0;
     TestHKDF_sha mHKDF;
 
@@ -1288,7 +1299,7 @@ TEST_F(TestChipCryptoPAL, TestAddEntropySources)
 TEST_F(TestChipCryptoPAL, TestPBKDF2_SHA256_TestVectors)
 {
     HeapChecker heapChecker;
-    int numOfTestVectors = ArraySize(pbkdf2_sha256_test_vectors);
+    int numOfTestVectors = MATTER_ARRAY_SIZE(pbkdf2_sha256_test_vectors);
     int numOfTestsRan    = 0;
     TestPBKDF2_sha256 pbkdf1;
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
@@ -1600,7 +1611,7 @@ TEST_F(TestChipCryptoPAL, TestSPAKE2P_spake2p_FEMul)
     HeapChecker heapChecker;
     uint8_t fe_out[kMAX_FE_Length];
 
-    int numOfTestVectors = ArraySize(fe_mul_tvs);
+    int numOfTestVectors = MATTER_ARRAY_SIZE(fe_mul_tvs);
     int numOfTestsRan    = 0;
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
     {
@@ -1635,7 +1646,7 @@ TEST_F(TestChipCryptoPAL, TestSPAKE2P_spake2p_FELoadWrite)
     HeapChecker heapChecker;
     uint8_t fe_out[kMAX_FE_Length];
 
-    int numOfTestVectors = ArraySize(fe_rw_tvs);
+    int numOfTestVectors = MATTER_ARRAY_SIZE(fe_rw_tvs);
     int numOfTestsRan    = 0;
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
     {
@@ -1665,7 +1676,7 @@ TEST_F(TestChipCryptoPAL, TestSPAKE2P_spake2p_Mac)
     uint8_t mac[kMAX_Hash_Length];
     MutableByteSpan mac_span{ mac };
 
-    int numOfTestVectors = ArraySize(hmac_tvs);
+    int numOfTestVectors = MATTER_ARRAY_SIZE(hmac_tvs);
     int numOfTestsRan    = 0;
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
     {
@@ -1696,7 +1707,7 @@ TEST_F(TestChipCryptoPAL, TestSPAKE2P_spake2p_PointMul)
     uint8_t output[kMAX_Point_Length];
     size_t out_len = sizeof(output);
 
-    int numOfTestVectors = ArraySize(point_mul_tvs);
+    int numOfTestVectors = MATTER_ARRAY_SIZE(point_mul_tvs);
     int numOfTestsRan    = 0;
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
     {
@@ -1734,7 +1745,7 @@ TEST_F(TestChipCryptoPAL, TestSPAKE2P_spake2p_PointMulAdd)
     uint8_t output[kMAX_Point_Length];
     size_t out_len = sizeof(output);
 
-    int numOfTestVectors = ArraySize(point_muladd_tvs);
+    int numOfTestVectors = MATTER_ARRAY_SIZE(point_muladd_tvs);
     int numOfTestsRan    = 0;
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
     {
@@ -1778,7 +1789,7 @@ TEST_F(TestChipCryptoPAL, TestSPAKE2P_spake2p_PointLoadWrite)
     uint8_t output[kMAX_Point_Length];
     size_t out_len = sizeof(output);
 
-    int numOfTestVectors = ArraySize(point_rw_tvs);
+    int numOfTestVectors = MATTER_ARRAY_SIZE(point_rw_tvs);
     int numOfTestsRan    = 0;
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
     {
@@ -1807,7 +1818,7 @@ TEST_F(TestChipCryptoPAL, TestSPAKE2P_spake2p_PointLoadWrite)
 TEST_F(TestChipCryptoPAL, TestSPAKE2P_spake2p_PointIsValid)
 {
     HeapChecker heapChecker;
-    int numOfTestVectors = ArraySize(point_valid_tvs);
+    int numOfTestVectors = MATTER_ARRAY_SIZE(point_valid_tvs);
     int numOfTestsRan    = 0;
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
     {
@@ -1870,9 +1881,8 @@ TEST_F(TestChipCryptoPAL, TestSPAKE2P_RFC)
     size_t Pverifier_len = sizeof(Pverifier);
     uint8_t Vverifier[kMAX_Hash_Length];
     size_t Vverifier_len = sizeof(Vverifier);
-    DefaultSessionKeystore keystore;
 
-    int numOfTestVectors = ArraySize(rfc_tvs);
+    int numOfTestVectors = MATTER_ARRAY_SIZE(rfc_tvs);
     int numOfTestsRan    = 0;
     // static_assert(sizeof(Spake2p_Context) < 1024, "Allocate more bytes for Spake2p Context");
     // printf("Sizeof spake2pcontext %lu\n", sizeof(Spake2p_Context));
@@ -1967,7 +1977,9 @@ TEST_F(TestChipCryptoPAL, TestSPAKE2P_RFC)
         error = Verifier.KeyConfirm(Pverifier, Pverifier_len);
         EXPECT_EQ(error, CHIP_NO_ERROR);
 
+#if !(CHIP_CRYPTO_KEYSTORE_APP)
         // Import HKDF key from the test vector to the keystore
+        DefaultSessionKeystore keystore;
         HkdfKeyHandle vectorKe;
         error = keystore.CreateKey(ByteSpan(vector->Ke, vector->Ke_len), vectorKe);
         EXPECT_EQ(error, CHIP_NO_ERROR);
@@ -1988,7 +2000,7 @@ TEST_F(TestChipCryptoPAL, TestSPAKE2P_RFC)
         keystore.DestroyKey(vectorKe);
         keystore.DestroyKey(PKe);
         keystore.DestroyKey(VKe);
-
+#endif
         numOfTestsRan += 1;
     }
     EXPECT_GT(numOfTestsRan, 0);
@@ -2866,14 +2878,14 @@ TEST_F(TestChipCryptoPAL, TestX509_ReplaceCertIfResignedCertFound)
     const TestCase kTestCases[] = {
         { sTestCert_PAI_FFF2_8001_Cert, nullptr, 5, sTestCert_PAI_FFF2_8001_Cert },
         { sTestCert_PAI_FFF2_8001_Cert, TestCandidateCertsList3, 0, sTestCert_PAI_FFF2_8001_Cert },
-        { sTestCert_PAI_FFF1_8000_Cert, TestCandidateCertsList1, ArraySize(TestCandidateCertsList1), sTestCert_PAI_FFF1_8000_Cert },
-        { sTestCert_PAI_FFF2_8001_Cert, TestCandidateCertsList2, ArraySize(TestCandidateCertsList2), sTestCert_PAI_FFF2_8001_Cert },
-        { sTestCert_PAI_FFF2_8001_Cert, TestCandidateCertsList3, ArraySize(TestCandidateCertsList3), sTestCert_PAI_FFF2_8001_Resigned_Cert },
-        { sTestCert_PAI_FFF2_8001_Cert, TestCandidateCertsList4, ArraySize(TestCandidateCertsList4), sTestCert_PAI_FFF2_8001_Resigned_Cert },
-        { sTestCert_PAI_FFF2_8001_Cert, TestCandidateCertsList5, ArraySize(TestCandidateCertsList5), sTestCert_PAI_FFF2_8001_Cert },
-        { sTestCert_PAI_FFF2_8001_Cert, TestCandidateCertsList6, ArraySize(TestCandidateCertsList6), sTestCert_PAI_FFF2_8001_Cert },
-        { sTestCert_PAI_FFF2_8001_Cert, TestCandidateCertsList7, ArraySize(TestCandidateCertsList7), sTestCert_PAI_FFF2_8001_Resigned_Cert },
-        { sTestCert_PAI_FFF2_NoPID_Cert, TestCandidateCertsList7, ArraySize(TestCandidateCertsList7), sTestCert_PAI_FFF2_NoPID_Resigned_Cert },
+        { sTestCert_PAI_FFF1_8000_Cert, TestCandidateCertsList1, MATTER_ARRAY_SIZE(TestCandidateCertsList1), sTestCert_PAI_FFF1_8000_Cert },
+        { sTestCert_PAI_FFF2_8001_Cert, TestCandidateCertsList2, MATTER_ARRAY_SIZE(TestCandidateCertsList2), sTestCert_PAI_FFF2_8001_Cert },
+        { sTestCert_PAI_FFF2_8001_Cert, TestCandidateCertsList3, MATTER_ARRAY_SIZE(TestCandidateCertsList3), sTestCert_PAI_FFF2_8001_Resigned_Cert },
+        { sTestCert_PAI_FFF2_8001_Cert, TestCandidateCertsList4, MATTER_ARRAY_SIZE(TestCandidateCertsList4), sTestCert_PAI_FFF2_8001_Resigned_Cert },
+        { sTestCert_PAI_FFF2_8001_Cert, TestCandidateCertsList5, MATTER_ARRAY_SIZE(TestCandidateCertsList5), sTestCert_PAI_FFF2_8001_Cert },
+        { sTestCert_PAI_FFF2_8001_Cert, TestCandidateCertsList6, MATTER_ARRAY_SIZE(TestCandidateCertsList6), sTestCert_PAI_FFF2_8001_Cert },
+        { sTestCert_PAI_FFF2_8001_Cert, TestCandidateCertsList7, MATTER_ARRAY_SIZE(TestCandidateCertsList7), sTestCert_PAI_FFF2_8001_Resigned_Cert },
+        { sTestCert_PAI_FFF2_NoPID_Cert, TestCandidateCertsList7, MATTER_ARRAY_SIZE(TestCandidateCertsList7), sTestCert_PAI_FFF2_NoPID_Resigned_Cert },
     };
     // clang-format on
 
@@ -2890,16 +2902,16 @@ TEST_F(TestChipCryptoPAL, TestX509_ReplaceCertIfResignedCertFound)
     // Error case: invalid input argument for referenceCertificate
     {
         ByteSpan outCert;
-        CHIP_ERROR result =
-            ReplaceCertIfResignedCertFound(ByteSpan(), TestCandidateCertsList7, ArraySize(TestCandidateCertsList7), outCert);
+        CHIP_ERROR result = ReplaceCertIfResignedCertFound(ByteSpan(), TestCandidateCertsList7,
+                                                           MATTER_ARRAY_SIZE(TestCandidateCertsList7), outCert);
         EXPECT_EQ(result, CHIP_ERROR_INVALID_ARGUMENT);
     }
 
     // Error case: invalid input argument for one of the certificates in the candidateCertificates list
     {
         ByteSpan outCert;
-        CHIP_ERROR result =
-            ReplaceCertIfResignedCertFound(ByteSpan(), TestCandidateCertsList8, ArraySize(TestCandidateCertsList8), outCert);
+        CHIP_ERROR result = ReplaceCertIfResignedCertFound(ByteSpan(), TestCandidateCertsList8,
+                                                           MATTER_ARRAY_SIZE(TestCandidateCertsList8), outCert);
         EXPECT_EQ(result, CHIP_ERROR_INVALID_ARGUMENT);
     }
 }

@@ -38,7 +38,6 @@ target_include_directories(app PRIVATE
 target_sources(app PRIVATE
                src/AppTask.cpp
                src/Device.cpp
-               src/DeviceCallbacks.cpp
                ${TELINK_COMMON}/common/src/mainCommon.cpp
                ${TELINK_COMMON}/common/src/AppTaskCommon.cpp
                ${TELINK_COMMON}/util/src/LEDManager.cpp
@@ -52,7 +51,6 @@ target_sources(app PRIVATE
                ${TELINK_COMMON}/zephyr_ext/zephyr_ws2812.c)
 
 chip_configure_data_model(app
-    INCLUDE_SERVER
     ZAP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../bridge-common/bridge-app.zap
 )
 

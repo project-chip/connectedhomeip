@@ -19,12 +19,20 @@
 # for details about the block below.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${ALL_CLUSTERS_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# test-runner-runs:
+#   run1:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import queue
@@ -35,15 +43,10 @@ from datetime import datetime, timedelta, timezone
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError
+from chip.testing.matter_testing import MatterBaseTest, SimpleEventCallback, async_test_body, default_matter_test_main
+from chip.testing.timeoperations import get_wait_seconds_from_set_time, utc_time_in_matter_epoch
 from chip.tlv import uint
-from matter_testing_support import (MatterBaseTest, SimpleEventCallback, async_test_body, default_matter_test_main,
-                                    utc_time_in_matter_epoch)
 from mobly import asserts
-
-
-def get_wait_seconds_from_set_time(set_time_matter_us: int, wait_seconds: int):
-    seconds_passed = int((utc_time_in_matter_epoch() - set_time_matter_us)/1000000)
-    return wait_seconds - seconds_passed
 
 
 class TC_TIMESYNC_2_10(MatterBaseTest):
