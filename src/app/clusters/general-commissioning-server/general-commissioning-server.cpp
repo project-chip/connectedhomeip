@@ -674,6 +674,16 @@ void MatterGeneralCommissioningPluginServerInitCallback()
     Server::GetInstance().GetFabricTable().AddFabricDelegate(&fabricDelegate);
 }
 
+void MatterGeneralCommissioningPluginServerShutdownCallback()
+{
+    static GeneralCommissioningFabricTableDelegate fabricDelegate;
+    Server::GetInstance().GetFabricTable().RemoveFabricDelegate(&fabricDelegate);
+
+    DeviceLayer::PlatformMgrImpl().RemoveEventHandler(OnPlatformEventHandler);
+    AttributeAccessInterfaceRegistry::Instance().Unregister(&gGeneralCommissioningInstance);
+    ReturnOnFailure(CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(&gGeneralCommissioningInstance));
+}
+
 namespace chip {
 namespace app {
 namespace Clusters {

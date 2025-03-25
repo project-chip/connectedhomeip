@@ -498,3 +498,15 @@ void MatterIcdManagementPluginServerInitCallback()
     // Configure ICD Management
     ICDManagementServer::Init(storage, symmetricKeystore, icdConfigurationData);
 }
+
+void MatterIcdManagementPluginServerShutdownCallback()
+{
+    AttributeAccessInterfaceRegistry::Instance().Unregister(&gAttribute);
+
+    ICDManagementServer::Shutdown();
+
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+    FabricTable & fabricTable = Server::GetInstance().GetFabricTable();
+    fabricTable.RemoveFabricDelegate(&gFabricDelegate);
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
+}

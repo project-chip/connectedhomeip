@@ -34,6 +34,13 @@ void MatterSampleMeiPluginServerInitCallback()
     VerifyOrReturn(AttributeAccessInterfaceRegistry::Instance().Register(&SampleMeiServer::Instance()), CHIP_ERROR_INCORRECT_STATE);
 }
 
+void MatterSampleMeiPluginServerInitCallback()
+{
+    ReturnOnFailure(CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(&SampleMeiServer::Instance()));
+    VerifyOrReturn(AttributeAccessInterfaceRegistry::Instance().Unregister(&SampleMeiServer::Instance()),
+                   CHIP_ERROR_INCORRECT_STATE);
+}
+
 void emberAfSampleMeiClusterServerInitCallback(chip::EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "Creating Sample MEI cluster, Ep %d", endpoint);
