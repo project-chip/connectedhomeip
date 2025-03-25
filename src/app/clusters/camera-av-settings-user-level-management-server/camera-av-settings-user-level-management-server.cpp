@@ -153,7 +153,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::Init()
                 "CameraAVSettingsUserLevelManagement[ep=%d]: Feature configuration error. If PanMax is enabled, then Mechanical Pan feature is required",
                 mEndpointId));
     }  
-    
+
     LoadPersistentAttributes();
 
     // Set default MPTZ
@@ -179,15 +179,24 @@ bool CameraAvSettingsUserLevelMgmtServer::SupportsOptAttr(OptionalAttributes aOp
 // Mutators that may be invoked by a delegate in responding to command callbacks, or due to local on device changes
 //
 void CameraAvSettingsUserLevelMgmtServer::setPan(Optional<int16_t> pan) {
-    mMptzPosition.pan = pan;
+    if (pan.HasValue()) 
+    {
+        mMptzPosition.pan = pan;
+    }
 }
 
 void CameraAvSettingsUserLevelMgmtServer::setTilt(Optional<int16_t> tilt) {
-    mMptzPosition.tilt = tilt;
+    if (tilt.HasValue())
+    {
+         mMptzPosition.tilt = tilt;
+    }
 }
 
 void CameraAvSettingsUserLevelMgmtServer::setZoom(Optional<uint8_t> zoom) {
-    mMptzPosition.zoom = zoom;
+    if (zoom.HasValue())
+    {
+        mMptzPosition.zoom = zoom;
+    }
 }
 
 // Helper function for setting the next preset ID to use
@@ -512,6 +521,17 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZSetPosition(HandlerContext &
     // Call the delegate
     status = mDelegate->MPTZSetPosition(pan, tilt, zoom);
 
+    if (status != Status::Success)
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+        return;
+    }
+
+    // Set the local values of pan, tilt, and zoom
+    setPan(pan);
+    setTilt(tilt);
+    setZoom(zoom);
+
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
@@ -593,8 +613,19 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRelativeMove(HandlerContext 
     }
 
     // Call the delegate to simply set the newly calculated MPTZ values based on the deltas received
-    status = mDelegate->MPTZSetPosition(Optional(static_cast<int16_t>(newPan)), Optional(static_cast<int16_t>(newTilt)), 
-                                        Optional(static_cast<uint8_t>(newZoom)));
+    status = mDelegate->MPTZRelativeMove(Optional(static_cast<int16_t>(newPan)), Optional(static_cast<int16_t>(newTilt)), 
+                                         Optional(static_cast<uint8_t>(newZoom)));
+
+    if (status != Status::Success)
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+        return;
+    }
+
+    // Set the local values of pan, tilt, and zoom
+    setPan(Optional(static_cast<int16_t>(newPan)));
+    setTilt(Optional(static_cast<int16_t>(newTilt)));
+    setZoom(Optional(static_cast<int8_t>(newZoom)));
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
@@ -604,6 +635,16 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZMoveToPreset(HandlerContext 
 {
     Status status           = Status::Success;
     uint8_t preset = commandData.presetID;
+
+    // This is effectively a manipulation of the current PTZ settings, ensure that the device is in a state wherein a PTZ change is possible
+    //
+    if (!mDelegate->CanChangeMPTZ())
+    {
+        ChipLogDetail(Zcl, "Device not able to process move to MPTZ preset");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Busy);
+        return;
+    }
+
 
     // Do we have any presets?
     //
@@ -625,14 +666,17 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZMoveToPreset(HandlerContext 
 
     auto presetValues = it->GetMptzPosition();
 
-    // Call the delegate to simply set the  MPTZ values based on the preset
-    status = mDelegate->MPTZSetPosition(presetValues.pan, presetValues.tilt, presetValues.zoom); 
+    // Inform the delegate that the device is requested to move to PTZ values given by the selected preset id
+    // Call the delegate to allow the devcice to handle the physical changes, on success set the MPTZ values based on the preset
+    status = mDelegate->MPTZMoveToPreset(preset, presetValues.pan, presetValues.tilt, presetValues.zoom); 
 
     if (status != Status::Success)
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
         return;
     }
+
+    mMptzPosition = presetValues;
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::Success);
 }
@@ -698,7 +742,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRemovePreset(HandlerContext 
 
     if (it == mMptzPresetHelper.end()) {
         ChipLogError(Zcl, "No matching presets, RemovePreset not possible");
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
         return;        
     } 
 

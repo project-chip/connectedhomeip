@@ -55,33 +55,23 @@ Status AVSettingsUserLevelManagementDelegate::PersistentAttributesLoadedCallback
 
 Status AVSettingsUserLevelManagementDelegate::MPTZSetPosition(Optional<int16_t> pan, Optional<int16_t> tilt, Optional<uint8_t> zoom) 
 {
-  // Set the Server values as received in the command.  The Cluster implementation has validated that the Feature Flags are
-  // set and the values themselves are in range
+  // The Cluster implementation has validated that the Feature Flags are set and the values themselves are in range. Do any needed
+  // hardware interactions to actually set the camera to the new values of PTZ.  Then return a Status response. The server itself will
+  // persist the new values. 
   //
-  if (pan.HasValue())
-  {
-    gAVSettingsUserLevelManagementCluster->setPan(pan);
-  }
-  
-  if (tilt.HasValue())
-  {
-    gAVSettingsUserLevelManagementCluster->setTilt(tilt);
-  }
-
-  if (zoom.HasValue())
-  {
-    gAVSettingsUserLevelManagementCluster->setZoom(zoom);
-  }
-
   return Status::Success;
 }
 
-Status AVSettingsUserLevelManagementDelegate::MPTZRelativeMove()
+Status AVSettingsUserLevelManagementDelegate::MPTZRelativeMove(Optional<int16_t> pan, Optional<int16_t> tilt, Optional<uint8_t> zoom)
 {
+  // The Cluster implementation has validated that the Feature Flags are set and the values themselves are in range. Do any needed
+  // hardware interactions to actually set the camera to the new values of PTZ.  Then return a Status response. The server itself will
+  // persist the new values. 
+  //
   return Status::Success;
 }
 
-Status AVSettingsUserLevelManagementDelegate::MPTZMoveToPreset() 
+Status AVSettingsUserLevelManagementDelegate::MPTZMoveToPreset(uint8_t preset, Optional<int16_t> pan, Optional<int16_t> tilt, Optional<uint8_t> zoom) 
 {
   return Status::Success;
 }

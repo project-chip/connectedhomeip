@@ -112,8 +112,23 @@ public:
 
     // Attribute Accessors and Mutators
     const MPTZStructType & GetMptzPosition() const { return mMptzPosition; }
+
+    /**
+     * Allows for a delegate or application to set the pan value given physical changes on the device itself, possibly due to direct
+     * user changes
+     */
     void setPan(Optional<int16_t>);
+
+    /**
+     * Allows for a delegate or application to set the tilt value given physical changes on the device itself, possibly due to direct
+     * user changes
+     */
     void setTilt(Optional<int16_t>);
+
+    /**
+     * Allows for a delegate or application to set the zoom value given physical changes on the device itself, possibly due to direct
+     * user changes
+     */
     void setZoom(Optional<uint8_t>);
 
 
@@ -211,11 +226,33 @@ public:
     virtual bool CanChangeMPTZ() = 0;
 
     /**
-     * delegate command handlers
+     * Delegate command handlers
+     */
+
+    /**
+     * Allows any needed app handling given provided and already validated pan, tilt, and zoom values that are to be set based on receoption
+     * of an MPTZSetPosition command.  
+     * Returns a failure status if the physical device cannot realize these values. On a success response the server 
+     * will update the server held attribute values for PTZ. 
+     * @param pan The validated value of the pan that is to be set
+     * @param tilt The validated value of the tilt that is to be set
+     * @param zoom The validated value of the zoom that is to be set
      */
     virtual Protocols::InteractionModel::Status MPTZSetPosition(Optional<int16_t> pan, Optional<int16_t> tilt, Optional<uint8_t> zoom) = 0;
-    virtual Protocols::InteractionModel::Status MPTZRelativeMove() = 0;
-    virtual Protocols::InteractionModel::Status MPTZMoveToPreset() = 0;
+
+    /**
+     * Allows any needed app handling given provided and already validated pan, tilt, and zoom values that are to be set based on receoption
+     * of an MPTZRelativeMove command.  The server has already validated the received relative values, and provides the app with the new, 
+     * requested settings for PTZ. 
+     * Returns a failure status if the physical device cannot realize these values. On a success response the server 
+     * will update the server held attribute values for PTZ. 
+     * @param pan The validated value of the pan that is to be set
+     * @param tilt The validated value of the tilt that is to be set
+     * @param zoom The validated value of the zoom that is to be set
+     */
+    virtual Protocols::InteractionModel::Status MPTZRelativeMove(Optional<int16_t> pan, Optional<int16_t> tilt, Optional<uint8_t> zoom) = 0;
+
+    virtual Protocols::InteractionModel::Status MPTZMoveToPreset(uint8_t preset, Optional<int16_t> pan, Optional<int16_t> tilt, Optional<uint8_t> zoom) = 0;
     virtual Protocols::InteractionModel::Status MPTZSavePreset() = 0;
     virtual Protocols::InteractionModel::Status MPTZRemovePreset() = 0;
     virtual Protocols::InteractionModel::Status DPTZSetViewport() = 0;
