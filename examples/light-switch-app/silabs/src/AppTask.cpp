@@ -285,10 +285,10 @@ void AppTask::AppEventHandler(AppEvent * aEvent)
         }
         else
         {
-            aEvent->Type    = AppEvent::kEventType_TriggerToggle;
+            aEvent->Type = AppEvent::kEventType_TriggerToggle;
             LightSwitchMgr::GetInstance().SwitchActionEventHandler(aEvent);
         }
-        aEvent->Type    = AppEvent::kEventType_ActionButtonReleased;
+        aEvent->Type = AppEvent::kEventType_ActionButtonReleased;
         LightSwitchMgr::GetInstance().SwitchActionEventHandler(aEvent);
         break;
     case AppEvent::kEventType_TriggerLevelControlAction:
