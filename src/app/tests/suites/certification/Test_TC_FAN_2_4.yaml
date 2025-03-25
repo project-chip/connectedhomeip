@@ -39,6 +39,8 @@ tests:
       response:
           constraints:
               type: bitmap8
+              minValue: 0
+              maxValue: 3
 
     - label: "Step 3: TH reads from the DUT the the WindSetting attribute"
       PICS: FAN.S.A000A
@@ -47,3 +49,5 @@ tests:
       response:
           constraints:
               type: bitmap8
+              minValue: 0
+              maxValue: 2
