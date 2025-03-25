@@ -174,7 +174,6 @@ tests:
       response:
           error: CONSTRAINT_ERROR
 
-
       # Since in Step 6 one of the ACL List Entries had an invalid item, then the whole ACL Entries List was rejected, As such no change will happen to the already-existing AccessControl Entries, and thus no AccessControlEntryChanged event will be generated
       # SKIP for Now, as YAML does not provide a way to check that the received ReportDataMessage does NOT contain an EventReportIB
       # Example of Output of this Step
