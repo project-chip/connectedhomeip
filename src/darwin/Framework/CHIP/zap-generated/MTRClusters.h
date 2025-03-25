@@ -3358,7 +3358,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
 
 /**
  * Cluster Commodity Price
- *
+ *    The Commodity Price Cluster provides the mechanism for communicating Gas, Energy, or Water pricing information within the premises.
  */
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRClusterCommodityPrice : MTRGenericCluster
@@ -7115,7 +7115,7 @@ MTR_PROVISIONALLY_AVAILABLE
 
 /**
  * Cluster Commodity Tariff
- *
+ *    The CommodityTariffCluster provides the mechanism for communicating Commodity Tariff information within the premises.
  */
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRClusterCommodityTariff : MTRGenericCluster
@@ -7362,7 +7362,7 @@ MTR_PROVISIONALLY_AVAILABLE
 
 /**
  * Cluster Meter Identification
- *
+ *    This Meter Identification Cluster provides attributes for determining advanced information about utility metering device.
  */
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRClusterMeterIdentification : MTRGenericCluster
@@ -7406,7 +7406,7 @@ MTR_PROVISIONALLY_AVAILABLE
 
 /**
  * Cluster Commodity Metering
- *
+ *    The Commodity Metering Cluster provides the mechanism for communicating commodity consumption information within a premises.
  */
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRClusterCommodityMetering : MTRGenericCluster

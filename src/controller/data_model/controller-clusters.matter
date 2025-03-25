@@ -4825,7 +4825,7 @@ provisional cluster WaterHeaterManagement = 148 {
   command access(invoke: manage) CancelBoost(): DefaultSuccess = 1;
 }
 
-/**  */
+/** The Commodity Price Cluster provides the mechanism for communicating Gas, Energy, or Water pricing information within the premises. */
 provisional cluster CommodityPrice = 149 {
   revision 4;
 
@@ -10616,7 +10616,7 @@ provisional cluster Chime = 1366 {
   command PlayChimeSound(): DefaultSuccess = 0;
 }
 
-/**  */
+/** The CommodityTariffCluster provides the mechanism for communicating Commodity Tariff information within the premises. */
 cluster CommodityTariff = 1792 {
   revision 1;
 
@@ -11045,7 +11045,7 @@ provisional cluster TlsClientManagement = 2050 {
   fabric command access(invoke: administer) RemoveEndpoint(RemoveEndpointRequest): DefaultSuccess = 4;
 }
 
-/**  */
+/** This Meter Identification Cluster provides attributes for determining advanced information about utility metering device. */
 provisional cluster MeterIdentification = 2822 {
   revision 1;
 
@@ -11072,7 +11072,7 @@ provisional cluster MeterIdentification = 2822 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-/**  */
+/** The Commodity Metering Cluster provides the mechanism for communicating commodity consumption information within a premises. */
 cluster CommodityMetering = 2823 {
   revision 1;
 
