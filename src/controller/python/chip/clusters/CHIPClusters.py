@@ -3335,16 +3335,16 @@ class ChipClusters:
             },
             0x0000000C: {
                 "commandId": 0x0000000C,
-                "commandName": "SetVidVerificationStatement",
+                "commandName": "SetVIDVerificationStatement",
                 "args": {
                     "vendorID": "int",
-                    "vidVerificationStatement": "bytes",
+                    "VIDVerificationStatement": "bytes",
                     "vvsc": "bytes",
                 },
             },
             0x0000000D: {
                 "commandId": 0x0000000D,
-                "commandName": "SignVidVerificationRequest",
+                "commandName": "SignVIDVerificationRequest",
                 "args": {
                     "fabricIndex": "int",
                     "clientChallenge": "bytes",

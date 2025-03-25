@@ -1,1 +1,1 @@
-123 : [Tizen] Add arm64 target - Docker part
+125 : [Tizen] Fix Tizen SDK installer when more than one CPU is selected

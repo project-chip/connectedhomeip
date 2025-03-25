@@ -31,9 +31,9 @@ import chip.FabricAdmin  # Needed before chip.CertificateAuthority
 
 # isort: on
 
-# ensure matter IDL is availale for import, otherwise set relative paths
+# ensure matter IDL is available for import, otherwise set relative paths
 try:
-    from matter_idl import matter_idl_types
+    from matter.idl import matter_idl_types
 except ImportError:
     SCRIPT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
     import sys
@@ -41,7 +41,7 @@ except ImportError:
     sys.path.append(os.path.join(SCRIPT_PATH, 'py_matter_idl'))
     sys.path.append(os.path.join(SCRIPT_PATH, 'py_matter_yamltests'))
 
-    from matter_idl import matter_idl_types
+    from matter.idl import matter_idl_types
 
     __ALL__ = (matter_idl_types)
 

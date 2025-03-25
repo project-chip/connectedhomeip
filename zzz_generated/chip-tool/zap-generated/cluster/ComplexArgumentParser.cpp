@@ -2220,13 +2220,13 @@ ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.label, value["label"]));
     valueCopy.removeMember("label");
 
-    if (value.isMember("vidVerificationStatement"))
+    if (value.isMember("VIDVerificationStatement"))
     {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "vidVerificationStatement");
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "VIDVerificationStatement");
         ReturnErrorOnFailure(
-            ComplexArgumentParser::Setup(labelWithMember, request.vidVerificationStatement, value["vidVerificationStatement"]));
+            ComplexArgumentParser::Setup(labelWithMember, request.VIDVerificationStatement, value["VIDVerificationStatement"]));
     }
-    valueCopy.removeMember("vidVerificationStatement");
+    valueCopy.removeMember("VIDVerificationStatement");
 
     if (value.isMember("fabricIndex"))
     {
@@ -2245,7 +2245,7 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::OperationalCredentials
     ComplexArgumentParser::Finalize(request.fabricID);
     ComplexArgumentParser::Finalize(request.nodeID);
     ComplexArgumentParser::Finalize(request.label);
-    ComplexArgumentParser::Finalize(request.vidVerificationStatement);
+    ComplexArgumentParser::Finalize(request.VIDVerificationStatement);
     ComplexArgumentParser::Finalize(request.fabricIndex);
 }
 

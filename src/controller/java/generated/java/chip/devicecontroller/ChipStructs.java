@@ -3077,7 +3077,7 @@ public static class OperationalCredentialsClusterFabricDescriptorStruct {
   public Long fabricID;
   public Long nodeID;
   public String label;
-  public Optional<byte[]> vidVerificationStatement;
+  public Optional<byte[]> VIDVerificationStatement;
   public Integer fabricIndex;
   private static final long ROOT_PUBLIC_KEY_ID = 1L;
   private static final long VENDOR_ID_ID = 2L;
@@ -3093,7 +3093,7 @@ public static class OperationalCredentialsClusterFabricDescriptorStruct {
     Long fabricID,
     Long nodeID,
     String label,
-    Optional<byte[]> vidVerificationStatement,
+    Optional<byte[]> VIDVerificationStatement,
     Integer fabricIndex
   ) {
     this.rootPublicKey = rootPublicKey;
@@ -3101,7 +3101,7 @@ public static class OperationalCredentialsClusterFabricDescriptorStruct {
     this.fabricID = fabricID;
     this.nodeID = nodeID;
     this.label = label;
-    this.vidVerificationStatement = vidVerificationStatement;
+    this.VIDVerificationStatement = VIDVerificationStatement;
     this.fabricIndex = fabricIndex;
   }
 
@@ -3112,7 +3112,7 @@ public static class OperationalCredentialsClusterFabricDescriptorStruct {
     values.add(new StructElement(FABRIC_ID_ID, new UIntType(fabricID)));
     values.add(new StructElement(NODE_ID_ID, new UIntType(nodeID)));
     values.add(new StructElement(LABEL_ID, new StringType(label)));
-    values.add(new StructElement(VID_VERIFICATION_STATEMENT_ID, vidVerificationStatement.<BaseTLVType>map((nonOptionalvidVerificationStatement) -> new ByteArrayType(nonOptionalvidVerificationStatement)).orElse(new EmptyType())));
+    values.add(new StructElement(VID_VERIFICATION_STATEMENT_ID, VIDVerificationStatement.<BaseTLVType>map((nonOptionalVIDVerificationStatement) -> new ByteArrayType(nonOptionalVIDVerificationStatement)).orElse(new EmptyType())));
     values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
 
     return new StructType(values);
@@ -3127,7 +3127,7 @@ public static class OperationalCredentialsClusterFabricDescriptorStruct {
     Long fabricID = null;
     Long nodeID = null;
     String label = null;
-    Optional<byte[]> vidVerificationStatement = Optional.empty();
+    Optional<byte[]> VIDVerificationStatement = Optional.empty();
     Integer fabricIndex = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == ROOT_PUBLIC_KEY_ID) {
@@ -3158,7 +3158,7 @@ public static class OperationalCredentialsClusterFabricDescriptorStruct {
       } else if (element.contextTagNum() == VID_VERIFICATION_STATEMENT_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
           ByteArrayType castingValue = element.value(ByteArrayType.class);
-          vidVerificationStatement = Optional.of(castingValue.value(byte[].class));
+          VIDVerificationStatement = Optional.of(castingValue.value(byte[].class));
         }
       } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -3173,7 +3173,7 @@ public static class OperationalCredentialsClusterFabricDescriptorStruct {
       fabricID,
       nodeID,
       label,
-      vidVerificationStatement,
+      VIDVerificationStatement,
       fabricIndex
     );
   }
@@ -3197,8 +3197,8 @@ public static class OperationalCredentialsClusterFabricDescriptorStruct {
     output.append("\tlabel: ");
     output.append(label);
     output.append("\n");
-    output.append("\tvidVerificationStatement: ");
-    output.append(vidVerificationStatement.isPresent() ? Arrays.toString(vidVerificationStatement.get()) : "");
+    output.append("\tVIDVerificationStatement: ");
+    output.append(VIDVerificationStatement.isPresent() ? Arrays.toString(VIDVerificationStatement.get()) : "");
     output.append("\n");
     output.append("\tfabricIndex: ");
     output.append(fabricIndex);

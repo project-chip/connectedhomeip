@@ -1171,6 +1171,7 @@ PyFunction
 pylint
 PyObject
 pypi
+pyproject
 PyRun
 pytest
 PYTHONPATH

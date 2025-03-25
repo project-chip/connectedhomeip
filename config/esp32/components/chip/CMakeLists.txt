@@ -345,8 +345,8 @@ endif()
 
 set(args_gn "${CMAKE_CURRENT_BINARY_DIR}/args.gn")
 add_custom_command(OUTPUT "${args_gn}"
-                   COMMAND ${python} 
-                           ${CMAKE_CURRENT_LIST_DIR}/create_args_gn.py 
+                   COMMAND ${python}
+                           ${CMAKE_CURRENT_LIST_DIR}/create_args_gn.py
                            "${CMAKE_BINARY_DIR}"
                            "${idf_path}"
                            "${CMAKE_CURRENT_LIST_DIR}/chip.c"
@@ -468,10 +468,19 @@ endif()
 
 # Build Matter OTA image
 if (CONFIG_CHIP_OTA_IMAGE_BUILD)
-    chip_ota_image(chip-ota-image
-        INPUT_FILES ${BUILD_DIR}/${CMAKE_PROJECT_NAME}.bin
-        OUTPUT_FILE ${BUILD_DIR}/${CMAKE_PROJECT_NAME}-ota.bin
-    )
-    # Adding dependecy as app target so that this runs after images are ready
-    add_dependencies(chip-ota-image app)
+    if (CONFIG_OPENTHREAD_BORDER_ROUTER AND CONFIG_AUTO_UPDATE_RCP)
+        chip_ota_image(chip-ota-image
+            INPUT_FILES ${BUILD_DIR}/ota_with_rcp_image
+            OUTPUT_FILE ${BUILD_DIR}/ota_with_rcp_image-ota.bin
+        )
+        # Adding dependecy as app target so that this runs after images are ready
+        add_dependencies(chip-ota-image gen_ota_image)
+    else()
+        chip_ota_image(chip-ota-image
+            INPUT_FILES ${BUILD_DIR}/${CMAKE_PROJECT_NAME}.bin
+            OUTPUT_FILE ${BUILD_DIR}/${CMAKE_PROJECT_NAME}-ota.bin
+        )
+        # Adding dependecy as app target so that this runs after images are ready
+        add_dependencies(chip-ota-image app)
+    endif()
 endif()
