@@ -167,13 +167,12 @@ tests:
           "Step 9: TH1 reads DUT Endpoint 0 AccessControl cluster
           AccessControlExtensionChanged event"
       PICS: PICS_SKIP_SAMPLE_APP && ACL.S.E01
-      disabled: true
-
       command: "readEvent"
       event: "AccessControlExtensionChanged"
       eventNumber: "LastReceivedEventNumber + 1"
-      response:
-          value: {}
+      response: 
+            value:
+              {}
 
     - label:
           "Step 10: TH1 writes DUT Endpoint 0 AccessControl cluster Extension
@@ -197,13 +196,12 @@ tests:
           "Step 11: TH1 reads DUT Endpoint 0 AccessControl cluster
           AccessControlExtensionChanged event"
       PICS: PICS_SKIP_SAMPLE_APP && ACL.S.E01
-      disabled: true
-
       command: "readEvent"
       event: "AccessControlExtensionChanged"
       eventNumber: "LastReceivedEventNumber + 1"
       response:
-          value: {}
+          value:
+              {}
 
     - label:
           "Step 12: TH1 writes DUT Endpoint 0 AccessControl cluster Extension
@@ -227,8 +225,9 @@ tests:
                   AdminNodeID: CommissionerNodeId,
                   AdminPasscodeID: null,
                   ChangeType: 2,
-                  LatestValue: {
-                          # The Extension data D_OK_SINGLE that was "Changed" in Step in 7 will be removed
+                  LatestValue:
+                      {
+                        # The Extension data D_OK_SINGLE that was "Changed" in Step in 7 will be removed 
                           Data: D_OK_SINGLE,
                           FabricIndex: CurrentFabricIndexValue,
                       },
