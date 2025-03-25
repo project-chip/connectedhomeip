@@ -19,13 +19,17 @@
 #include "camera-device.h"
 #include <AppMain.h>
 #include <fcntl.h> // For file descriptor operations
+#include <fstream>
 #include <gst/gst.h>
 #include <gst/video/videooverlay.h>
 #include <iostream>
 #include <lib/support/logging/CHIPLogging.h>
 #include <linux/videodev2.h> // For V4L2 definitions
 #include <sys/ioctl.h>
-// #include <gst/app/gstappsrc.h>
+
+#define SNAPSHOT_FILE_PATH "./capture_snapshot.jpg"
+#define SNAPSHOT_FILE_RES_WIDTH (168)
+#define SNAPSHOT_FILE_RES_HEIGHT (112)
 
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Chime;
@@ -208,6 +212,55 @@ CameraError CameraDevice::SnapshotStreamDeallocate(const uint16_t streamID)
     return CameraError::SUCCESS;
 }
 
+// Function to create the GStreamer pipeline
+GstElement * CameraDevice::CreateSnapshotPipeline(const std::string & device, int width, int height, int quality,
+                                                  const std::string & filename, CameraError & error)
+{
+    GstElement *pipeline, *source, *jpeg_caps, *videorate, *videorate_caps, *queue, *filesink;
+
+    // Create the pipeline elements
+    pipeline       = gst_pipeline_new("snapshot-pipeline");
+    source         = gst_element_factory_make("v4l2src", "source");
+    jpeg_caps      = gst_element_factory_make("capsfilter", "jpeg_caps");
+    videorate      = gst_element_factory_make("videorate", "videorate");
+    videorate_caps = gst_element_factory_make("capsfilter", "timelapse_framerate");
+    queue          = gst_element_factory_make("queue", "queue");
+    filesink       = gst_element_factory_make("multifilesink", "sink");
+
+    if (!pipeline || !source || !jpeg_caps || !videorate || !videorate_caps || !queue || !filesink)
+    {
+        ChipLogError(NotSpecified, "Not all elements could be created.");
+        gst_object_unref(pipeline);
+        error = CameraError::ERROR_INIT_FAILED;
+        return nullptr;
+    }
+
+    // Add elements to the pipeline
+    gst_bin_add_many(GST_BIN(pipeline), source, jpeg_caps, videorate, videorate_caps, queue, filesink, NULL);
+
+    // Link the elements
+    if (gst_element_link_many(source, jpeg_caps, videorate, videorate_caps, queue, filesink, NULL) != TRUE)
+    {
+        ChipLogError(NotSpecified, "Elements could not be linked.");
+        gst_object_unref(pipeline);
+        error = CameraError::ERROR_INIT_FAILED;
+        return nullptr;
+    }
+
+    // Set the source device and caps
+    g_object_set(source, "device", device.c_str(), "do-timestamp", TRUE, NULL);
+
+    GstCaps * caps = gst_caps_new_simple("image/jpeg", "width", G_TYPE_INT, width, "height", G_TYPE_INT, height, "framerate",
+                                         GST_TYPE_FRACTION, 30, 1, "quality", G_TYPE_INT, quality, NULL);
+    g_object_set(jpeg_caps, "caps", caps, NULL);
+    gst_caps_unref(caps);
+
+    // Set the output file location
+    g_object_set(filesink, "location", filename.c_str(), NULL);
+
+    return pipeline;
+}
+
 // Helper function to create a GStreamer pipeline
 GstElement * CameraDevice::CreatePipeline(const std::string & pipelineString, CameraError & error)
 {
@@ -248,7 +301,34 @@ CameraError CameraDevice::SetV4l2Control(uint32_t controlId, int value)
 CameraError CameraDevice::CaptureSnapshot(const uint16_t streamID, const VideoResolutionStruct & resolution,
                                           ImageSnapshot & outImageSnapshot)
 {
-    return CameraError::ERROR_NOT_IMPLEMENTED;
+    // Read from image file stored from snapshot stream.
+    std::ifstream file(SNAPSHOT_FILE_PATH, std::ios::binary | std::ios::ate);
+    if (!file.is_open())
+    {
+        ChipLogError(Zcl, "Error opening snapshot image file: ");
+        return CameraError::ERROR_CAPTURE_SNAPSHOT_FAILED;
+    }
+
+    std::streamsize size = file.tellg();
+    file.seekg(0, std::ios::beg);
+
+    // Ensure space for image snapshot data in outImageSnapshot
+    outImageSnapshot.data.resize(static_cast<size_t>(size));
+
+    if (!file.read(reinterpret_cast<char *>(outImageSnapshot.data.data()), size))
+    {
+        ChipLogError(Zcl, "Error reading image file: ");
+        file.close();
+        return CameraError::ERROR_CAPTURE_SNAPSHOT_FAILED;
+    }
+
+    file.close();
+
+    outImageSnapshot.imageRes.width  = SNAPSHOT_FILE_RES_WIDTH;
+    outImageSnapshot.imageRes.height = SNAPSHOT_FILE_RES_HEIGHT;
+    outImageSnapshot.imageCodec      = ImageCodecEnum::kJpeg;
+
+    return CameraError::SUCCESS;
 }
 
 CameraError CameraDevice::StartVideoStream(uint16_t streamID)
@@ -336,32 +416,14 @@ CameraError CameraDevice::StartSnapshotStream(uint16_t streamID)
                            [streamID](const SnapshotStream & s) { return s.id == streamID; });
     if (it == snapshotStreams.end())
     {
+        ChipLogError(NotSpecified, "Snapshot streamID : %u not found", streamID);
         return CameraError::ERROR_SNAPSHOT_STREAM_START_FAILED;
     }
-
-#if 0
-    // Construct the GStreamer pipeline string
-    std::string pipelineString = "v4l2src device=/dev/video0 ! "
-                                 //"video/x-raw,width=" + std::to_string(it->videoRes.width) +
-                                 "image/jpeg,width=" + std::to_string(it->videoRes.width) +
-                                 ",height=" + std::to_string(it->videoRes.height) + ",framerate=1/1 ! ";
-
-    if (it->codec == ImageCodecEnum::kJpeg)
-    {
-        pipelineString += "jpegenc quality=" + std::to_string(it->quality) + " ! ";
-    }
-    else
-    {
-        return CameraError::ERROR_SNAPSHOT_STREAM_START_FAILED;
-    }
-#endif
-
-    std::string pipelineString = "v4l2src device=/dev/video0 ! videoconvert ! jpegenc snapshot=true ! ";
-    pipelineString += "filesink location=./capture_snapshot.jpg";
 
     // Create the GStreamer pipeline
-    CameraError error    = CameraError::SUCCESS;
-    it->snapshotPipeline = CreatePipeline(pipelineString, error);
+    CameraError error = CameraError::SUCCESS;
+    it->snapshotPipeline =
+        CreateSnapshotPipeline("/dev/video0", it->videoRes.width, it->videoRes.height, it->quality, "capture_snapshot.jpg", error);
     if (it->snapshotPipeline == nullptr)
     {
         return error;
@@ -470,7 +532,7 @@ void CameraDevice::InitializeAudioStreams()
 
 void CameraDevice::InitializeSnapshotStreams()
 {
-    snapshotStreams.push_back({ 1, false, ImageCodecEnum::kJpeg, { 168, 112 }, 90, nullptr });
+    snapshotStreams.push_back({ 1, false, ImageCodecEnum::kJpeg, { 320, 240 }, 90, nullptr });
 }
 
 ChimeDelegate & CameraDevice::GetChimeDelegate()
