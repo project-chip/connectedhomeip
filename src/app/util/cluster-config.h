@@ -23,7 +23,7 @@ namespace Clusters {
 
 /// Defines a structure that describes the configuration of a cluster
 /// on a specific endpoint
-template<typename FeatureMapType>
+template <typename FeatureMapType>
 struct ClusterEndpointConfiguration
 {
     EndpointId endpointNumber;
