@@ -28,6 +28,7 @@
 #endif // CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
 
 #include "OtaSupport.h"
+#include "EmbeddedTypes.h"
 
 #ifndef CONFIG_CHIP_MAX_ENTRIES_TEST
 #define CONFIG_CHIP_MAX_ENTRIES_TEST 0

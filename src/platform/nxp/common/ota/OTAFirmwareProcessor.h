@@ -50,6 +50,9 @@ private:
 
     OTADataAccumulator mAccumulator;
     bool mDescriptorProcessed = false;
+#if OTA_ENCRYPTION_ENABLE
+    uint32_t mUnalignmentNum;
+#endif
 
     alignas(4) uint8_t mPostedOperationsStorage[NB_PENDING_TRANSACTIONS * TRANSACTION_SZ];
 };

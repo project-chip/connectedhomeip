@@ -29,6 +29,10 @@ CHIP_ERROR OTAFirmwareProcessor::Init()
     VerifyOrReturnError(mCallbackProcessDescriptor != nullptr, CHIP_ERROR_OTA_PROCESSOR_CB_NOT_REGISTERED);
     mAccumulator.Init(sizeof(Descriptor));
 
+#if OTA_ENCRYPTION_ENABLE
+    mUnalignmentNum = 0;
+#endif
+
     VerifyOrReturnError(gOtaSuccess_c == OTA_SelectExternalStoragePartition(), CHIP_ERROR_OTA_PROCESSOR_EXTERNAL_STORAGE);
 
 #if CONFIG_CHIP_OTA_POSTED_OPERATIONS_IN_IDLE
@@ -54,6 +58,10 @@ CHIP_ERROR OTAFirmwareProcessor::Clear()
     mAccumulator.Clear();
     mDescriptorProcessed = false;
 
+#if OTA_ENCRYPTION_ENABLE
+    mUnalignmentNum = 0;
+#endif
+
     return CHIP_NO_ERROR;
 }
 
@@ -66,7 +74,33 @@ CHIP_ERROR OTAFirmwareProcessor::ProcessInternal(ByteSpan & block)
     if (!mDescriptorProcessed)
     {
         ReturnErrorOnFailure(ProcessDescriptor(block));
+#if OTA_ENCRYPTION_ENABLE
+        /* 16 bytes to used to store undecrypted data because of unalignment */
+        mAccumulator.Init(requestedOtaMaxBlockSize + 16);
+#endif
     }
+
+#if OTA_ENCRYPTION_ENABLE
+    MutableByteSpan mBlock = MutableByteSpan(mAccumulator.data(), mAccumulator.GetThreshold());
+    memcpy(&mBlock[0], &mBlock[requestedOtaMaxBlockSize], mUnalignmentNum);
+    memcpy(&mBlock[mUnalignmentNum], block.data(), block.size());
+
+    if (mUnalignmentNum + block.size() < requestedOtaMaxBlockSize)
+    {
+        uint32_t mAlignmentNum = (mUnalignmentNum + block.size()) / 16;
+        mAlignmentNum          = mAlignmentNum * 16;
+        mUnalignmentNum        = (mUnalignmentNum + block.size()) % 16;
+        memcpy(&mBlock[requestedOtaMaxBlockSize], &mBlock[mAlignmentNum], mUnalignmentNum);
+        mBlock.reduce_size(mAlignmentNum);
+    }
+    else
+    {
+        mUnalignmentNum = mUnalignmentNum + block.size() - requestedOtaMaxBlockSize;
+        mBlock.reduce_size(requestedOtaMaxBlockSize);
+    }
+
+    OTATlvProcessor::vOtaProcessInternalEncryption(mBlock);
+#endif
 
     ulCrtAddr += block.size();
 
@@ -86,7 +120,11 @@ CHIP_ERROR OTAFirmwareProcessor::ProcessInternal(ByteSpan & block)
         OTAImageProcessorImpl::FetchNextData(0);
     }
 
+#if OTA_ENCRYPTION_ENABLE
+    status = OTA_PushImageChunk((uint8_t *) mBlock.data(), (uint16_t) mBlock.size(), NULL, NULL);
+#else
     status = OTA_PushImageChunk((uint8_t *) block.data(), (uint16_t) block.size(), NULL, NULL);
+#endif
     if (gOtaSuccess_c != status)
     {
         ChipLogError(SoftwareUpdate, "Failed to write image block. Status: %d", status);
