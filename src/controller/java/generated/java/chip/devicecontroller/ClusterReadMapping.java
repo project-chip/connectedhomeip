@@ -8101,18 +8101,7 @@ public class ClusterReadMapping {
        return result;
     }
     private static Map<String, InteractionInfo> readScenesManagementInteractionInfo() {
-       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readScenesManagementLastConfiguredByCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readScenesManagementLastConfiguredByAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.ScenesManagementCluster) cluster).readLastConfiguredByAttribute(
-              (ChipClusters.ScenesManagementCluster.LastConfiguredByAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedScenesManagementClusterLastConfiguredByAttributeCallback(),
-          readScenesManagementLastConfiguredByCommandParams
-        );
-        result.put("readLastConfiguredByAttribute", readScenesManagementLastConfiguredByAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readScenesManagementSceneTableSizeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readScenesManagementSceneTableSizeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readScenesManagementSceneTableSizeAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
             ((ChipClusters.ScenesManagementCluster) cluster).readSceneTableSizeAttribute(

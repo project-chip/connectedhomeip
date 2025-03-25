@@ -18,7 +18,7 @@
 
 HERE="$(dirname "$0")"
 CHIP_ROOT="$(realpath "$HERE"/..)"
-BUILD_VERSION="latest"
+BUILD_VERSION=$(sed 's/ .*//' "$CHIP_ROOT/integrations/docker/images/base/chip-build/version")
 IMAGE_TAG="matter-dev-environment:local"
 USER_UID=$UID
 
@@ -32,7 +32,7 @@ Options:
     -h,--help        Show this help
     -t,--tag         Image tag - default is matter-dev-environment:local
     -u,--uid         User UIDa - default is the current user ID
-    -v,--version     Build version - default is the latest
+    -v,--version     Build version - default is the version of the base chip-build docker image
 EOF
 }
 

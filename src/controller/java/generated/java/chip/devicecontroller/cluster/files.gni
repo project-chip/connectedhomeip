@@ -145,7 +145,7 @@ structs_sources = [
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/RvcRunModeClusterModeOptionStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/RvcRunModeClusterModeTagStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/ScenesManagementClusterAttributeValuePairStruct.kt",
-  "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/ScenesManagementClusterExtensionFieldSet.kt",
+  "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/ScenesManagementClusterExtensionFieldSetStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/ScenesManagementClusterSceneInfoStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/ServiceAreaClusterAreaInfoStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/ServiceAreaClusterAreaStruct.kt",
