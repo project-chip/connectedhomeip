@@ -92,21 +92,28 @@ def find_tree_roots(tree_endpoints: list[int], endpoint_dict: dict[int, Any]) ->
 
 def parts_list_cycles(tree_endpoints: list[int], endpoint_dict: dict[int, Any]) -> list[int]:
     """Returns a list of all the endpoints in the tree_endpoints list that contain cycles"""
-    def parts_list_cycle_detect(visited: set, current_id: int) -> bool:
-        if current_id in visited:
-            return True
+    def parts_list_cycle_detect(visited: set, current_id: int, stack: set) -> bool:
         visited.add(current_id)
+        stack.add(current_id)
         for child in endpoint_dict[current_id][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]:
-            child_has_cycles = parts_list_cycle_detect(visited, child)
+            if child in stack:
+                return True
+            if child in visited:
+                continue
+            child_has_cycles = parts_list_cycle_detect(visited, child, stack)
             if child_has_cycles:
                 return True
+        stack.remove(current_id)
         return False
 
     cycles = []
+    visited = set()
+    stack = set()
     # This is quick enough that we can do all the endpoints without searching for the roots
     for endpoint_id in tree_endpoints:
-        visited = set()
-        if parts_list_cycle_detect(visited, endpoint_id):
+        if endpoint_id in visited:
+            continue
+        if parts_list_cycle_detect(visited, endpoint_id, stack):
             cycles.append(endpoint_id)
     return cycles
 
