@@ -174,15 +174,15 @@ tests:
       response:
           error: CONSTRAINT_ERROR
 
+
       # Since in Step 6 one of the ACL List Entries had an invalid item, then the whole ACL Entries List was rejected, As such no change will happen to the already-existing AccessControl Entries, and thus no AccessControlEntryChanged event will be generated
       # SKIP for Now, as YAML does not provide a way to check that the received ReportDataMessage does NOT contain an EventReportIB
       # Example of Output of this Step
       # 2025-03-25 16:36:59.453 ERROR   16:36:59.296 - TEST OUT  : 		    [DMG] ReportDataMessage =
       # 2025-03-25 16:36:59.453 ERROR   16:36:59.296 - TEST OUT  : 		    [DMG] {
-      # 2025-03-25 16:36:59.453 ERROR   16:36:59.296 - TEST OUT  : 		    [DMG] 	SuppressResponse = true, 
+      # 2025-03-25 16:36:59.453 ERROR   16:36:59.296 - TEST OUT  : 		    [DMG] 	SuppressResponse = true,
       # 2025-03-25 16:36:59.453 ERROR   16:36:59.296 - TEST OUT  : 		    [DMG] 	InteractionModelRevision = 12
       # 2025-03-25 16:36:59.453 ERROR   16:36:59.296 - TEST OUT  : 		    [DMG] }
-
     - label:
           "Step 7: TH1 reads DUT Endpoint 0 AccessControl cluster
           AccessControlEntryChanged event"
@@ -192,5 +192,4 @@ tests:
       eventNumber: "LastReceivedEventNumber + 1"
       response:
           - values:
-                - value:
-                      {}
+                - value: {}
