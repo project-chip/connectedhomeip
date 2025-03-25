@@ -3407,14 +3407,6 @@
               "reportableChange": 0
             }
           ]
-        },
-        {
-          "name": "Binding",
-          "code": 30,
-          "mfgCode": null,
-          "define": "BINDING_CLUSTER",
-          "side": "client",
-          "enabled": 1
         }
       ]
     }
