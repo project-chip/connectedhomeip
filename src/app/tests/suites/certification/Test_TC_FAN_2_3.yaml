@@ -40,7 +40,7 @@ tests:
           constraints:
               type: bitmap8
               minValue: 0
-              maxValue: 2
+              maxValue: 7
 
     - label: "Step 3: TH reads from the DUT the the RockSetting attribute"
       PICS: FAN.S.A0008
@@ -50,4 +50,4 @@ tests:
           constraints:
               type: bitmap8
               minValue: 0
-              maxValue: 2
+              maxValue: 4
