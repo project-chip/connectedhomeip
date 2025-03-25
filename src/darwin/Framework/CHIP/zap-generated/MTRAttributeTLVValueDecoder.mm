@@ -18135,6 +18135,897 @@ static id _Nullable DecodeAttributeValueForChimeCluster(AttributeId aAttributeId
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeAttributeValueForCommodityTariffCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::CommodityTariff;
+    switch (aAttributeId) {
+    case Attributes::TariffInfo::Id: {
+        using TypeInfo = Attributes::TariffInfo::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        MTRCommodityTariffClusterTariffInformationStruct * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [MTRCommodityTariffClusterTariffInformationStruct new];
+            if (cppValue.Value().tariffLabel.IsNull()) {
+                value.tariffLabel = nil;
+            } else {
+                value.tariffLabel = AsString(cppValue.Value().tariffLabel.Value());
+                if (value.tariffLabel == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    *aError = err;
+                    return nil;
+                }
+            }
+            if (cppValue.Value().providerName.IsNull()) {
+                value.providerName = nil;
+            } else {
+                value.providerName = AsString(cppValue.Value().providerName.Value());
+                if (value.providerName == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    *aError = err;
+                    return nil;
+                }
+            }
+            if (cppValue.Value().currency.HasValue()) {
+                if (cppValue.Value().currency.Value().IsNull()) {
+                    value.currency = nil;
+                } else {
+                    value.currency = [MTRCommodityTariffClusterCurrencyStruct new];
+                    value.currency.currency = [NSNumber numberWithUnsignedShort:cppValue.Value().currency.Value().Value().currency];
+                    value.currency.decimalPoints = [NSNumber numberWithUnsignedChar:cppValue.Value().currency.Value().Value().decimalPoints];
+                }
+            } else {
+                value.currency = nil;
+            }
+            if (cppValue.Value().blockMode.IsNull()) {
+                value.blockMode = nil;
+            } else {
+                value.blockMode = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().blockMode.Value())];
+            }
+        }
+        return value;
+    }
+    case Attributes::TariffUnit::Id: {
+        using TypeInfo = Attributes::TariffUnit::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value())];
+        }
+        return value;
+    }
+    case Attributes::StartDate::Id: {
+        using TypeInfo = Attributes::StartDate::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [NSNumber numberWithUnsignedInt:cppValue.Value()];
+        }
+        return value;
+    }
+    case Attributes::DayEntries::Id: {
+        using TypeInfo = Attributes::DayEntries::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            { // Scope for our temporary variables
+                auto * array_1 = [NSMutableArray new];
+                auto iter_1 = cppValue.Value().begin();
+                while (iter_1.Next()) {
+                    auto & entry_1 = iter_1.GetValue();
+                    MTRCommodityTariffClusterDayEntryStruct * newElement_1;
+                    newElement_1 = [MTRCommodityTariffClusterDayEntryStruct new];
+                    newElement_1.dayEntryID = [NSNumber numberWithUnsignedInt:entry_1.dayEntryID];
+                    newElement_1.startTime = [NSNumber numberWithUnsignedShort:entry_1.startTime];
+                    if (entry_1.duration.HasValue()) {
+                        newElement_1.duration = [NSNumber numberWithUnsignedShort:entry_1.duration.Value()];
+                    } else {
+                        newElement_1.duration = nil;
+                    }
+                    if (entry_1.randomizationOffset.HasValue()) {
+                        newElement_1.randomizationOffset = [NSNumber numberWithShort:entry_1.randomizationOffset.Value()];
+                    } else {
+                        newElement_1.randomizationOffset = nil;
+                    }
+                    if (entry_1.randomizationType.HasValue()) {
+                        newElement_1.randomizationType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_1.randomizationType.Value())];
+                    } else {
+                        newElement_1.randomizationType = nil;
+                    }
+                    [array_1 addObject:newElement_1];
+                }
+                CHIP_ERROR err = iter_1.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    *aError = err;
+                    return nil;
+                }
+                value = array_1;
+            }
+        }
+        return value;
+    }
+    case Attributes::DayPatterns::Id: {
+        using TypeInfo = Attributes::DayPatterns::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            { // Scope for our temporary variables
+                auto * array_1 = [NSMutableArray new];
+                auto iter_1 = cppValue.Value().begin();
+                while (iter_1.Next()) {
+                    auto & entry_1 = iter_1.GetValue();
+                    MTRCommodityTariffClusterDayPatternStruct * newElement_1;
+                    newElement_1 = [MTRCommodityTariffClusterDayPatternStruct new];
+                    newElement_1.dayPatternID = [NSNumber numberWithUnsignedInt:entry_1.dayPatternID];
+                    newElement_1.daysOfWeek = [NSNumber numberWithUnsignedChar:entry_1.daysOfWeek.Raw()];
+                    { // Scope for our temporary variables
+                        auto * array_3 = [NSMutableArray new];
+                        auto iter_3 = entry_1.dayEntryIDs.begin();
+                        while (iter_3.Next()) {
+                            auto & entry_3 = iter_3.GetValue();
+                            NSNumber * newElement_3;
+                            newElement_3 = [NSNumber numberWithUnsignedInt:entry_3];
+                            [array_3 addObject:newElement_3];
+                        }
+                        CHIP_ERROR err = iter_3.GetStatus();
+                        if (err != CHIP_NO_ERROR) {
+                            *aError = err;
+                            return nil;
+                        }
+                        newElement_1.dayEntryIDs = array_3;
+                    }
+                    [array_1 addObject:newElement_1];
+                }
+                CHIP_ERROR err = iter_1.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    *aError = err;
+                    return nil;
+                }
+                value = array_1;
+            }
+        }
+        return value;
+    }
+    case Attributes::CalendarPeriods::Id: {
+        using TypeInfo = Attributes::CalendarPeriods::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            { // Scope for our temporary variables
+                auto * array_1 = [NSMutableArray new];
+                auto iter_1 = cppValue.Value().begin();
+                while (iter_1.Next()) {
+                    auto & entry_1 = iter_1.GetValue();
+                    MTRCommodityTariffClusterCalendarPeriodStruct * newElement_1;
+                    newElement_1 = [MTRCommodityTariffClusterCalendarPeriodStruct new];
+                    if (entry_1.startDate.IsNull()) {
+                        newElement_1.startDate = nil;
+                    } else {
+                        newElement_1.startDate = [NSNumber numberWithUnsignedInt:entry_1.startDate.Value()];
+                    }
+                    { // Scope for our temporary variables
+                        auto * array_3 = [NSMutableArray new];
+                        auto iter_3 = entry_1.dayPatternIDs.begin();
+                        while (iter_3.Next()) {
+                            auto & entry_3 = iter_3.GetValue();
+                            NSNumber * newElement_3;
+                            newElement_3 = [NSNumber numberWithUnsignedInt:entry_3];
+                            [array_3 addObject:newElement_3];
+                        }
+                        CHIP_ERROR err = iter_3.GetStatus();
+                        if (err != CHIP_NO_ERROR) {
+                            *aError = err;
+                            return nil;
+                        }
+                        newElement_1.dayPatternIDs = array_3;
+                    }
+                    [array_1 addObject:newElement_1];
+                }
+                CHIP_ERROR err = iter_1.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    *aError = err;
+                    return nil;
+                }
+                value = array_1;
+            }
+        }
+        return value;
+    }
+    case Attributes::IndividualDays::Id: {
+        using TypeInfo = Attributes::IndividualDays::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            { // Scope for our temporary variables
+                auto * array_1 = [NSMutableArray new];
+                auto iter_1 = cppValue.Value().begin();
+                while (iter_1.Next()) {
+                    auto & entry_1 = iter_1.GetValue();
+                    MTRCommodityTariffClusterDayStruct * newElement_1;
+                    newElement_1 = [MTRCommodityTariffClusterDayStruct new];
+                    newElement_1.date = [NSNumber numberWithUnsignedInt:entry_1.date];
+                    newElement_1.dayType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_1.dayType)];
+                    { // Scope for our temporary variables
+                        auto * array_3 = [NSMutableArray new];
+                        auto iter_3 = entry_1.dayEntryIDs.begin();
+                        while (iter_3.Next()) {
+                            auto & entry_3 = iter_3.GetValue();
+                            NSNumber * newElement_3;
+                            newElement_3 = [NSNumber numberWithUnsignedInt:entry_3];
+                            [array_3 addObject:newElement_3];
+                        }
+                        CHIP_ERROR err = iter_3.GetStatus();
+                        if (err != CHIP_NO_ERROR) {
+                            *aError = err;
+                            return nil;
+                        }
+                        newElement_1.dayEntryIDs = array_3;
+                    }
+                    [array_1 addObject:newElement_1];
+                }
+                CHIP_ERROR err = iter_1.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    *aError = err;
+                    return nil;
+                }
+                value = array_1;
+            }
+        }
+        return value;
+    }
+    case Attributes::CurrentDay::Id: {
+        using TypeInfo = Attributes::CurrentDay::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        MTRCommodityTariffClusterDayStruct * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [MTRCommodityTariffClusterDayStruct new];
+            value.date = [NSNumber numberWithUnsignedInt:cppValue.Value().date];
+            value.dayType = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().dayType)];
+            { // Scope for our temporary variables
+                auto * array_2 = [NSMutableArray new];
+                auto iter_2 = cppValue.Value().dayEntryIDs.begin();
+                while (iter_2.Next()) {
+                    auto & entry_2 = iter_2.GetValue();
+                    NSNumber * newElement_2;
+                    newElement_2 = [NSNumber numberWithUnsignedInt:entry_2];
+                    [array_2 addObject:newElement_2];
+                }
+                CHIP_ERROR err = iter_2.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    *aError = err;
+                    return nil;
+                }
+                value.dayEntryIDs = array_2;
+            }
+        }
+        return value;
+    }
+    case Attributes::NextDay::Id: {
+        using TypeInfo = Attributes::NextDay::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        MTRCommodityTariffClusterDayStruct * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [MTRCommodityTariffClusterDayStruct new];
+            value.date = [NSNumber numberWithUnsignedInt:cppValue.Value().date];
+            value.dayType = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().dayType)];
+            { // Scope for our temporary variables
+                auto * array_2 = [NSMutableArray new];
+                auto iter_2 = cppValue.Value().dayEntryIDs.begin();
+                while (iter_2.Next()) {
+                    auto & entry_2 = iter_2.GetValue();
+                    NSNumber * newElement_2;
+                    newElement_2 = [NSNumber numberWithUnsignedInt:entry_2];
+                    [array_2 addObject:newElement_2];
+                }
+                CHIP_ERROR err = iter_2.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    *aError = err;
+                    return nil;
+                }
+                value.dayEntryIDs = array_2;
+            }
+        }
+        return value;
+    }
+    case Attributes::CurrentDayEntry::Id: {
+        using TypeInfo = Attributes::CurrentDayEntry::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        MTRCommodityTariffClusterDayEntryStruct * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [MTRCommodityTariffClusterDayEntryStruct new];
+            value.dayEntryID = [NSNumber numberWithUnsignedInt:cppValue.Value().dayEntryID];
+            value.startTime = [NSNumber numberWithUnsignedShort:cppValue.Value().startTime];
+            if (cppValue.Value().duration.HasValue()) {
+                value.duration = [NSNumber numberWithUnsignedShort:cppValue.Value().duration.Value()];
+            } else {
+                value.duration = nil;
+            }
+            if (cppValue.Value().randomizationOffset.HasValue()) {
+                value.randomizationOffset = [NSNumber numberWithShort:cppValue.Value().randomizationOffset.Value()];
+            } else {
+                value.randomizationOffset = nil;
+            }
+            if (cppValue.Value().randomizationType.HasValue()) {
+                value.randomizationType = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().randomizationType.Value())];
+            } else {
+                value.randomizationType = nil;
+            }
+        }
+        return value;
+    }
+    case Attributes::CurrentDayEntryDate::Id: {
+        using TypeInfo = Attributes::CurrentDayEntryDate::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [NSNumber numberWithUnsignedInt:cppValue.Value()];
+        }
+        return value;
+    }
+    case Attributes::NextDayEntry::Id: {
+        using TypeInfo = Attributes::NextDayEntry::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        MTRCommodityTariffClusterDayEntryStruct * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [MTRCommodityTariffClusterDayEntryStruct new];
+            value.dayEntryID = [NSNumber numberWithUnsignedInt:cppValue.Value().dayEntryID];
+            value.startTime = [NSNumber numberWithUnsignedShort:cppValue.Value().startTime];
+            if (cppValue.Value().duration.HasValue()) {
+                value.duration = [NSNumber numberWithUnsignedShort:cppValue.Value().duration.Value()];
+            } else {
+                value.duration = nil;
+            }
+            if (cppValue.Value().randomizationOffset.HasValue()) {
+                value.randomizationOffset = [NSNumber numberWithShort:cppValue.Value().randomizationOffset.Value()];
+            } else {
+                value.randomizationOffset = nil;
+            }
+            if (cppValue.Value().randomizationType.HasValue()) {
+                value.randomizationType = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().randomizationType.Value())];
+            } else {
+                value.randomizationType = nil;
+            }
+        }
+        return value;
+    }
+    case Attributes::NextDayEntryDate::Id: {
+        using TypeInfo = Attributes::NextDayEntryDate::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [NSNumber numberWithUnsignedInt:cppValue.Value()];
+        }
+        return value;
+    }
+    case Attributes::TariffComponents::Id: {
+        using TypeInfo = Attributes::TariffComponents::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            { // Scope for our temporary variables
+                auto * array_1 = [NSMutableArray new];
+                auto iter_1 = cppValue.Value().begin();
+                while (iter_1.Next()) {
+                    auto & entry_1 = iter_1.GetValue();
+                    MTRCommodityTariffClusterTariffComponentStruct * newElement_1;
+                    newElement_1 = [MTRCommodityTariffClusterTariffComponentStruct new];
+                    newElement_1.tariffComponentID = [NSNumber numberWithUnsignedInt:entry_1.tariffComponentID];
+                    if (entry_1.price.HasValue()) {
+                        if (entry_1.price.Value().IsNull()) {
+                            newElement_1.price = nil;
+                        } else {
+                            newElement_1.price = [MTRCommodityTariffClusterTariffPriceStruct new];
+                            newElement_1.price.priceType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_1.price.Value().Value().priceType)];
+                            if (entry_1.price.Value().Value().price.HasValue()) {
+                                newElement_1.price.price = [NSNumber numberWithLongLong:entry_1.price.Value().Value().price.Value()];
+                            } else {
+                                newElement_1.price.price = nil;
+                            }
+                            if (entry_1.price.Value().Value().priceLevel.HasValue()) {
+                                newElement_1.price.priceLevel = [NSNumber numberWithShort:entry_1.price.Value().Value().priceLevel.Value()];
+                            } else {
+                                newElement_1.price.priceLevel = nil;
+                            }
+                        }
+                    } else {
+                        newElement_1.price = nil;
+                    }
+                    if (entry_1.friendlyCredit.HasValue()) {
+                        newElement_1.friendlyCredit = [NSNumber numberWithBool:entry_1.friendlyCredit.Value()];
+                    } else {
+                        newElement_1.friendlyCredit = nil;
+                    }
+                    if (entry_1.auxiliaryLoad.HasValue()) {
+                        newElement_1.auxiliaryLoad = [MTRCommodityTariffClusterAuxiliaryLoadSwitchSettingsStruct new];
+                        newElement_1.auxiliaryLoad.number = [NSNumber numberWithUnsignedChar:entry_1.auxiliaryLoad.Value().number];
+                        newElement_1.auxiliaryLoad.requiredState = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_1.auxiliaryLoad.Value().requiredState)];
+                    } else {
+                        newElement_1.auxiliaryLoad = nil;
+                    }
+                    if (entry_1.peakPeriod.HasValue()) {
+                        newElement_1.peakPeriod = [MTRCommodityTariffClusterPeakPeriodStruct new];
+                        newElement_1.peakPeriod.severity = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_1.peakPeriod.Value().severity)];
+                        newElement_1.peakPeriod.peakPeriod = [NSNumber numberWithUnsignedShort:entry_1.peakPeriod.Value().peakPeriod];
+                    } else {
+                        newElement_1.peakPeriod = nil;
+                    }
+                    if (entry_1.powerThreshold.HasValue()) {
+                        newElement_1.powerThreshold = [MTRDataTypePowerThresholdStruct new];
+                        if (entry_1.powerThreshold.Value().powerThreshold.HasValue()) {
+                            newElement_1.powerThreshold.powerThreshold = [NSNumber numberWithLongLong:entry_1.powerThreshold.Value().powerThreshold.Value()];
+                        } else {
+                            newElement_1.powerThreshold.powerThreshold = nil;
+                        }
+                        if (entry_1.powerThreshold.Value().apparentPowerThreshold.HasValue()) {
+                            newElement_1.powerThreshold.apparentPowerThreshold = [NSNumber numberWithLongLong:entry_1.powerThreshold.Value().apparentPowerThreshold.Value()];
+                        } else {
+                            newElement_1.powerThreshold.apparentPowerThreshold = nil;
+                        }
+                        if (entry_1.powerThreshold.Value().powerThresholdSource.IsNull()) {
+                            newElement_1.powerThreshold.powerThresholdSource = nil;
+                        } else {
+                            newElement_1.powerThreshold.powerThresholdSource = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_1.powerThreshold.Value().powerThresholdSource.Value())];
+                        }
+                    } else {
+                        newElement_1.powerThreshold = nil;
+                    }
+                    if (entry_1.threshold.IsNull()) {
+                        newElement_1.threshold = nil;
+                    } else {
+                        newElement_1.threshold = [NSNumber numberWithUnsignedInt:entry_1.threshold.Value()];
+                    }
+                    if (entry_1.label.HasValue()) {
+                        if (entry_1.label.Value().IsNull()) {
+                            newElement_1.label = nil;
+                        } else {
+                            newElement_1.label = AsString(entry_1.label.Value().Value());
+                            if (newElement_1.label == nil) {
+                                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                                *aError = err;
+                                return nil;
+                            }
+                        }
+                    } else {
+                        newElement_1.label = nil;
+                    }
+                    if (entry_1.predicted.HasValue()) {
+                        newElement_1.predicted = [NSNumber numberWithBool:entry_1.predicted.Value()];
+                    } else {
+                        newElement_1.predicted = nil;
+                    }
+                    [array_1 addObject:newElement_1];
+                }
+                CHIP_ERROR err = iter_1.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    *aError = err;
+                    return nil;
+                }
+                value = array_1;
+            }
+        }
+        return value;
+    }
+    case Attributes::TariffPeriods::Id: {
+        using TypeInfo = Attributes::TariffPeriods::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            { // Scope for our temporary variables
+                auto * array_1 = [NSMutableArray new];
+                auto iter_1 = cppValue.Value().begin();
+                while (iter_1.Next()) {
+                    auto & entry_1 = iter_1.GetValue();
+                    MTRCommodityTariffClusterTariffPeriodStruct * newElement_1;
+                    newElement_1 = [MTRCommodityTariffClusterTariffPeriodStruct new];
+                    if (entry_1.label.IsNull()) {
+                        newElement_1.label = nil;
+                    } else {
+                        newElement_1.label = AsString(entry_1.label.Value());
+                        if (newElement_1.label == nil) {
+                            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                            *aError = err;
+                            return nil;
+                        }
+                    }
+                    { // Scope for our temporary variables
+                        auto * array_3 = [NSMutableArray new];
+                        auto iter_3 = entry_1.dayEntryIDs.begin();
+                        while (iter_3.Next()) {
+                            auto & entry_3 = iter_3.GetValue();
+                            NSNumber * newElement_3;
+                            newElement_3 = [NSNumber numberWithUnsignedInt:entry_3];
+                            [array_3 addObject:newElement_3];
+                        }
+                        CHIP_ERROR err = iter_3.GetStatus();
+                        if (err != CHIP_NO_ERROR) {
+                            *aError = err;
+                            return nil;
+                        }
+                        newElement_1.dayEntryIDs = array_3;
+                    }
+                    { // Scope for our temporary variables
+                        auto * array_3 = [NSMutableArray new];
+                        auto iter_3 = entry_1.tariffComponentIDs.begin();
+                        while (iter_3.Next()) {
+                            auto & entry_3 = iter_3.GetValue();
+                            NSNumber * newElement_3;
+                            newElement_3 = [NSNumber numberWithUnsignedInt:entry_3];
+                            [array_3 addObject:newElement_3];
+                        }
+                        CHIP_ERROR err = iter_3.GetStatus();
+                        if (err != CHIP_NO_ERROR) {
+                            *aError = err;
+                            return nil;
+                        }
+                        newElement_1.tariffComponentIDs = array_3;
+                    }
+                    [array_1 addObject:newElement_1];
+                }
+                CHIP_ERROR err = iter_1.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    *aError = err;
+                    return nil;
+                }
+                value = array_1;
+            }
+        }
+        return value;
+    }
+    case Attributes::CurrentTariffComponents::Id: {
+        using TypeInfo = Attributes::CurrentTariffComponents::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            { // Scope for our temporary variables
+                auto * array_1 = [NSMutableArray new];
+                auto iter_1 = cppValue.Value().begin();
+                while (iter_1.Next()) {
+                    auto & entry_1 = iter_1.GetValue();
+                    MTRCommodityTariffClusterTariffComponentStruct * newElement_1;
+                    newElement_1 = [MTRCommodityTariffClusterTariffComponentStruct new];
+                    newElement_1.tariffComponentID = [NSNumber numberWithUnsignedInt:entry_1.tariffComponentID];
+                    if (entry_1.price.HasValue()) {
+                        if (entry_1.price.Value().IsNull()) {
+                            newElement_1.price = nil;
+                        } else {
+                            newElement_1.price = [MTRCommodityTariffClusterTariffPriceStruct new];
+                            newElement_1.price.priceType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_1.price.Value().Value().priceType)];
+                            if (entry_1.price.Value().Value().price.HasValue()) {
+                                newElement_1.price.price = [NSNumber numberWithLongLong:entry_1.price.Value().Value().price.Value()];
+                            } else {
+                                newElement_1.price.price = nil;
+                            }
+                            if (entry_1.price.Value().Value().priceLevel.HasValue()) {
+                                newElement_1.price.priceLevel = [NSNumber numberWithShort:entry_1.price.Value().Value().priceLevel.Value()];
+                            } else {
+                                newElement_1.price.priceLevel = nil;
+                            }
+                        }
+                    } else {
+                        newElement_1.price = nil;
+                    }
+                    if (entry_1.friendlyCredit.HasValue()) {
+                        newElement_1.friendlyCredit = [NSNumber numberWithBool:entry_1.friendlyCredit.Value()];
+                    } else {
+                        newElement_1.friendlyCredit = nil;
+                    }
+                    if (entry_1.auxiliaryLoad.HasValue()) {
+                        newElement_1.auxiliaryLoad = [MTRCommodityTariffClusterAuxiliaryLoadSwitchSettingsStruct new];
+                        newElement_1.auxiliaryLoad.number = [NSNumber numberWithUnsignedChar:entry_1.auxiliaryLoad.Value().number];
+                        newElement_1.auxiliaryLoad.requiredState = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_1.auxiliaryLoad.Value().requiredState)];
+                    } else {
+                        newElement_1.auxiliaryLoad = nil;
+                    }
+                    if (entry_1.peakPeriod.HasValue()) {
+                        newElement_1.peakPeriod = [MTRCommodityTariffClusterPeakPeriodStruct new];
+                        newElement_1.peakPeriod.severity = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_1.peakPeriod.Value().severity)];
+                        newElement_1.peakPeriod.peakPeriod = [NSNumber numberWithUnsignedShort:entry_1.peakPeriod.Value().peakPeriod];
+                    } else {
+                        newElement_1.peakPeriod = nil;
+                    }
+                    if (entry_1.powerThreshold.HasValue()) {
+                        newElement_1.powerThreshold = [MTRDataTypePowerThresholdStruct new];
+                        if (entry_1.powerThreshold.Value().powerThreshold.HasValue()) {
+                            newElement_1.powerThreshold.powerThreshold = [NSNumber numberWithLongLong:entry_1.powerThreshold.Value().powerThreshold.Value()];
+                        } else {
+                            newElement_1.powerThreshold.powerThreshold = nil;
+                        }
+                        if (entry_1.powerThreshold.Value().apparentPowerThreshold.HasValue()) {
+                            newElement_1.powerThreshold.apparentPowerThreshold = [NSNumber numberWithLongLong:entry_1.powerThreshold.Value().apparentPowerThreshold.Value()];
+                        } else {
+                            newElement_1.powerThreshold.apparentPowerThreshold = nil;
+                        }
+                        if (entry_1.powerThreshold.Value().powerThresholdSource.IsNull()) {
+                            newElement_1.powerThreshold.powerThresholdSource = nil;
+                        } else {
+                            newElement_1.powerThreshold.powerThresholdSource = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_1.powerThreshold.Value().powerThresholdSource.Value())];
+                        }
+                    } else {
+                        newElement_1.powerThreshold = nil;
+                    }
+                    if (entry_1.threshold.IsNull()) {
+                        newElement_1.threshold = nil;
+                    } else {
+                        newElement_1.threshold = [NSNumber numberWithUnsignedInt:entry_1.threshold.Value()];
+                    }
+                    if (entry_1.label.HasValue()) {
+                        if (entry_1.label.Value().IsNull()) {
+                            newElement_1.label = nil;
+                        } else {
+                            newElement_1.label = AsString(entry_1.label.Value().Value());
+                            if (newElement_1.label == nil) {
+                                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                                *aError = err;
+                                return nil;
+                            }
+                        }
+                    } else {
+                        newElement_1.label = nil;
+                    }
+                    if (entry_1.predicted.HasValue()) {
+                        newElement_1.predicted = [NSNumber numberWithBool:entry_1.predicted.Value()];
+                    } else {
+                        newElement_1.predicted = nil;
+                    }
+                    [array_1 addObject:newElement_1];
+                }
+                CHIP_ERROR err = iter_1.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    *aError = err;
+                    return nil;
+                }
+                value = array_1;
+            }
+        }
+        return value;
+    }
+    case Attributes::NextTariffComponents::Id: {
+        using TypeInfo = Attributes::NextTariffComponents::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            { // Scope for our temporary variables
+                auto * array_1 = [NSMutableArray new];
+                auto iter_1 = cppValue.Value().begin();
+                while (iter_1.Next()) {
+                    auto & entry_1 = iter_1.GetValue();
+                    MTRCommodityTariffClusterTariffComponentStruct * newElement_1;
+                    newElement_1 = [MTRCommodityTariffClusterTariffComponentStruct new];
+                    newElement_1.tariffComponentID = [NSNumber numberWithUnsignedInt:entry_1.tariffComponentID];
+                    if (entry_1.price.HasValue()) {
+                        if (entry_1.price.Value().IsNull()) {
+                            newElement_1.price = nil;
+                        } else {
+                            newElement_1.price = [MTRCommodityTariffClusterTariffPriceStruct new];
+                            newElement_1.price.priceType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_1.price.Value().Value().priceType)];
+                            if (entry_1.price.Value().Value().price.HasValue()) {
+                                newElement_1.price.price = [NSNumber numberWithLongLong:entry_1.price.Value().Value().price.Value()];
+                            } else {
+                                newElement_1.price.price = nil;
+                            }
+                            if (entry_1.price.Value().Value().priceLevel.HasValue()) {
+                                newElement_1.price.priceLevel = [NSNumber numberWithShort:entry_1.price.Value().Value().priceLevel.Value()];
+                            } else {
+                                newElement_1.price.priceLevel = nil;
+                            }
+                        }
+                    } else {
+                        newElement_1.price = nil;
+                    }
+                    if (entry_1.friendlyCredit.HasValue()) {
+                        newElement_1.friendlyCredit = [NSNumber numberWithBool:entry_1.friendlyCredit.Value()];
+                    } else {
+                        newElement_1.friendlyCredit = nil;
+                    }
+                    if (entry_1.auxiliaryLoad.HasValue()) {
+                        newElement_1.auxiliaryLoad = [MTRCommodityTariffClusterAuxiliaryLoadSwitchSettingsStruct new];
+                        newElement_1.auxiliaryLoad.number = [NSNumber numberWithUnsignedChar:entry_1.auxiliaryLoad.Value().number];
+                        newElement_1.auxiliaryLoad.requiredState = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_1.auxiliaryLoad.Value().requiredState)];
+                    } else {
+                        newElement_1.auxiliaryLoad = nil;
+                    }
+                    if (entry_1.peakPeriod.HasValue()) {
+                        newElement_1.peakPeriod = [MTRCommodityTariffClusterPeakPeriodStruct new];
+                        newElement_1.peakPeriod.severity = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_1.peakPeriod.Value().severity)];
+                        newElement_1.peakPeriod.peakPeriod = [NSNumber numberWithUnsignedShort:entry_1.peakPeriod.Value().peakPeriod];
+                    } else {
+                        newElement_1.peakPeriod = nil;
+                    }
+                    if (entry_1.powerThreshold.HasValue()) {
+                        newElement_1.powerThreshold = [MTRDataTypePowerThresholdStruct new];
+                        if (entry_1.powerThreshold.Value().powerThreshold.HasValue()) {
+                            newElement_1.powerThreshold.powerThreshold = [NSNumber numberWithLongLong:entry_1.powerThreshold.Value().powerThreshold.Value()];
+                        } else {
+                            newElement_1.powerThreshold.powerThreshold = nil;
+                        }
+                        if (entry_1.powerThreshold.Value().apparentPowerThreshold.HasValue()) {
+                            newElement_1.powerThreshold.apparentPowerThreshold = [NSNumber numberWithLongLong:entry_1.powerThreshold.Value().apparentPowerThreshold.Value()];
+                        } else {
+                            newElement_1.powerThreshold.apparentPowerThreshold = nil;
+                        }
+                        if (entry_1.powerThreshold.Value().powerThresholdSource.IsNull()) {
+                            newElement_1.powerThreshold.powerThresholdSource = nil;
+                        } else {
+                            newElement_1.powerThreshold.powerThresholdSource = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_1.powerThreshold.Value().powerThresholdSource.Value())];
+                        }
+                    } else {
+                        newElement_1.powerThreshold = nil;
+                    }
+                    if (entry_1.threshold.IsNull()) {
+                        newElement_1.threshold = nil;
+                    } else {
+                        newElement_1.threshold = [NSNumber numberWithUnsignedInt:entry_1.threshold.Value()];
+                    }
+                    if (entry_1.label.HasValue()) {
+                        if (entry_1.label.Value().IsNull()) {
+                            newElement_1.label = nil;
+                        } else {
+                            newElement_1.label = AsString(entry_1.label.Value().Value());
+                            if (newElement_1.label == nil) {
+                                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                                *aError = err;
+                                return nil;
+                            }
+                        }
+                    } else {
+                        newElement_1.label = nil;
+                    }
+                    if (entry_1.predicted.HasValue()) {
+                        newElement_1.predicted = [NSNumber numberWithBool:entry_1.predicted.Value()];
+                    } else {
+                        newElement_1.predicted = nil;
+                    }
+                    [array_1 addObject:newElement_1];
+                }
+                CHIP_ERROR err = iter_1.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    *aError = err;
+                    return nil;
+                }
+                value = array_1;
+            }
+        }
+        return value;
+    }
+    case Attributes::DefaultRandomizationOffset::Id: {
+        using TypeInfo = Attributes::DefaultRandomizationOffset::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [NSNumber numberWithShort:cppValue.Value()];
+        }
+        return value;
+    }
+    case Attributes::DefaultRandomizationType::Id: {
+        using TypeInfo = Attributes::DefaultRandomizationType::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value())];
+        }
+        return value;
+    }
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeAttributeValueForEcosystemInformationCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::EcosystemInformation;
@@ -20561,6 +21452,9 @@ id _Nullable MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::T
     }
     case Clusters::Chime::Id: {
         return DecodeAttributeValueForChimeCluster(aPath.mAttributeId, aReader, aError);
+    }
+    case Clusters::CommodityTariff::Id: {
+        return DecodeAttributeValueForCommodityTariffCluster(aPath.mAttributeId, aReader, aError);
     }
     case Clusters::EcosystemInformation::Id: {
         return DecodeAttributeValueForEcosystemInformationCluster(aPath.mAttributeId, aReader, aError);

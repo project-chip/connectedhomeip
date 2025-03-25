@@ -400,6 +400,9 @@ static constexpr ClusterId Id = 0x00000555;
 namespace Chime {
 static constexpr ClusterId Id = 0x00000556;
 } // namespace Chime
+namespace CommodityTariff {
+static constexpr ClusterId Id = 0x00000700;
+} // namespace CommodityTariff
 namespace EcosystemInformation {
 static constexpr ClusterId Id = 0x00000750;
 } // namespace EcosystemInformation

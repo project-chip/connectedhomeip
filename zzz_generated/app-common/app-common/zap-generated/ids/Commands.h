@@ -2071,6 +2071,28 @@ static constexpr CommandId Id = 0x00000000;
 } // namespace Commands
 } // namespace Chime
 
+namespace CommodityTariff {
+namespace Commands {
+
+namespace GetTariffComponent {
+static constexpr CommandId Id = 0x00000000;
+} // namespace GetTariffComponent
+
+namespace GetTariffComponentResponse {
+static constexpr CommandId Id = 0x00000000;
+} // namespace GetTariffComponentResponse
+
+namespace GetDayEntry {
+static constexpr CommandId Id = 0x00000001;
+} // namespace GetDayEntry
+
+namespace GetDayEntryResponse {
+static constexpr CommandId Id = 0x00000001;
+} // namespace GetDayEntryResponse
+
+} // namespace Commands
+} // namespace CommodityTariff
+
 namespace CommissionerControl {
 namespace Commands {
 

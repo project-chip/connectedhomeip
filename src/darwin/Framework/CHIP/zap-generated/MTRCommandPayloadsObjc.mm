@@ -36998,6 +36998,456 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
+@implementation MTRCommodityTariffClusterGetTariffComponentParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _tariffComponentID = @(0);
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRCommodityTariffClusterGetTariffComponentParams alloc] init];
+
+    other.tariffComponentID = self.tariffComponentID;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: tariffComponentID:%@; >", NSStringFromClass([self class]), _tariffComponentID];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRCommodityTariffClusterGetTariffComponentParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::CommodityTariff::Commands::GetTariffComponent::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.tariffComponentID = self.tariffComponentID.unsignedIntValue;
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRCommodityTariffClusterGetTariffComponentResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _label = nil;
+
+        _dayEntryIDs = [NSArray array];
+
+        _tariffComponent = [MTRCommodityTariffClusterTariffComponentStruct new];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRCommodityTariffClusterGetTariffComponentResponseParams alloc] init];
+
+    other.label = self.label;
+    other.dayEntryIDs = self.dayEntryIDs;
+    other.tariffComponent = self.tariffComponent;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: label:%@; dayEntryIDs:%@; tariffComponent:%@; >", NSStringFromClass([self class]), _label, _dayEntryIDs, _tariffComponent];
+    return descriptionString;
+}
+
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::CommodityTariff::Commands::GetTariffComponentResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRCommodityTariffClusterGetTariffComponentResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::CommodityTariff::Commands::GetTariffComponentResponse::DecodableType &)decodableStruct
+{
+    {
+        if (decodableStruct.label.IsNull()) {
+            self.label = nil;
+        } else {
+            self.label = AsString(decodableStruct.label.Value());
+            if (self.label == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                return err;
+            }
+        }
+    }
+    {
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = decodableStruct.dayEntryIDs.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                return err;
+            }
+            self.dayEntryIDs = array_0;
+        }
+    }
+    {
+        self.tariffComponent = [MTRCommodityTariffClusterTariffComponentStruct new];
+        self.tariffComponent.tariffComponentID = [NSNumber numberWithUnsignedInt:decodableStruct.tariffComponent.tariffComponentID];
+        if (decodableStruct.tariffComponent.price.HasValue()) {
+            if (decodableStruct.tariffComponent.price.Value().IsNull()) {
+                self.tariffComponent.price = nil;
+            } else {
+                self.tariffComponent.price = [MTRCommodityTariffClusterTariffPriceStruct new];
+                self.tariffComponent.price.priceType = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.tariffComponent.price.Value().Value().priceType)];
+                if (decodableStruct.tariffComponent.price.Value().Value().price.HasValue()) {
+                    self.tariffComponent.price.price = [NSNumber numberWithLongLong:decodableStruct.tariffComponent.price.Value().Value().price.Value()];
+                } else {
+                    self.tariffComponent.price.price = nil;
+                }
+                if (decodableStruct.tariffComponent.price.Value().Value().priceLevel.HasValue()) {
+                    self.tariffComponent.price.priceLevel = [NSNumber numberWithShort:decodableStruct.tariffComponent.price.Value().Value().priceLevel.Value()];
+                } else {
+                    self.tariffComponent.price.priceLevel = nil;
+                }
+            }
+        } else {
+            self.tariffComponent.price = nil;
+        }
+        if (decodableStruct.tariffComponent.friendlyCredit.HasValue()) {
+            self.tariffComponent.friendlyCredit = [NSNumber numberWithBool:decodableStruct.tariffComponent.friendlyCredit.Value()];
+        } else {
+            self.tariffComponent.friendlyCredit = nil;
+        }
+        if (decodableStruct.tariffComponent.auxiliaryLoad.HasValue()) {
+            self.tariffComponent.auxiliaryLoad = [MTRCommodityTariffClusterAuxiliaryLoadSwitchSettingsStruct new];
+            self.tariffComponent.auxiliaryLoad.number = [NSNumber numberWithUnsignedChar:decodableStruct.tariffComponent.auxiliaryLoad.Value().number];
+            self.tariffComponent.auxiliaryLoad.requiredState = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.tariffComponent.auxiliaryLoad.Value().requiredState)];
+        } else {
+            self.tariffComponent.auxiliaryLoad = nil;
+        }
+        if (decodableStruct.tariffComponent.peakPeriod.HasValue()) {
+            self.tariffComponent.peakPeriod = [MTRCommodityTariffClusterPeakPeriodStruct new];
+            self.tariffComponent.peakPeriod.severity = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.tariffComponent.peakPeriod.Value().severity)];
+            self.tariffComponent.peakPeriod.peakPeriod = [NSNumber numberWithUnsignedShort:decodableStruct.tariffComponent.peakPeriod.Value().peakPeriod];
+        } else {
+            self.tariffComponent.peakPeriod = nil;
+        }
+        if (decodableStruct.tariffComponent.powerThreshold.HasValue()) {
+            self.tariffComponent.powerThreshold = [MTRDataTypePowerThresholdStruct new];
+            if (decodableStruct.tariffComponent.powerThreshold.Value().powerThreshold.HasValue()) {
+                self.tariffComponent.powerThreshold.powerThreshold = [NSNumber numberWithLongLong:decodableStruct.tariffComponent.powerThreshold.Value().powerThreshold.Value()];
+            } else {
+                self.tariffComponent.powerThreshold.powerThreshold = nil;
+            }
+            if (decodableStruct.tariffComponent.powerThreshold.Value().apparentPowerThreshold.HasValue()) {
+                self.tariffComponent.powerThreshold.apparentPowerThreshold = [NSNumber numberWithLongLong:decodableStruct.tariffComponent.powerThreshold.Value().apparentPowerThreshold.Value()];
+            } else {
+                self.tariffComponent.powerThreshold.apparentPowerThreshold = nil;
+            }
+            if (decodableStruct.tariffComponent.powerThreshold.Value().powerThresholdSource.IsNull()) {
+                self.tariffComponent.powerThreshold.powerThresholdSource = nil;
+            } else {
+                self.tariffComponent.powerThreshold.powerThresholdSource = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.tariffComponent.powerThreshold.Value().powerThresholdSource.Value())];
+            }
+        } else {
+            self.tariffComponent.powerThreshold = nil;
+        }
+        if (decodableStruct.tariffComponent.threshold.IsNull()) {
+            self.tariffComponent.threshold = nil;
+        } else {
+            self.tariffComponent.threshold = [NSNumber numberWithUnsignedInt:decodableStruct.tariffComponent.threshold.Value()];
+        }
+        if (decodableStruct.tariffComponent.label.HasValue()) {
+            if (decodableStruct.tariffComponent.label.Value().IsNull()) {
+                self.tariffComponent.label = nil;
+            } else {
+                self.tariffComponent.label = AsString(decodableStruct.tariffComponent.label.Value().Value());
+                if (self.tariffComponent.label == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    return err;
+                }
+            }
+        } else {
+            self.tariffComponent.label = nil;
+        }
+        if (decodableStruct.tariffComponent.predicted.HasValue()) {
+            self.tariffComponent.predicted = [NSNumber numberWithBool:decodableStruct.tariffComponent.predicted.Value()];
+        } else {
+            self.tariffComponent.predicted = nil;
+        }
+    }
+    return CHIP_NO_ERROR;
+}
+
+@end
+
+@implementation MTRCommodityTariffClusterGetDayEntryParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _dayEntryID = @(0);
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRCommodityTariffClusterGetDayEntryParams alloc] init];
+
+    other.dayEntryID = self.dayEntryID;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: dayEntryID:%@; >", NSStringFromClass([self class]), _dayEntryID];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRCommodityTariffClusterGetDayEntryParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::CommodityTariff::Commands::GetDayEntry::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.dayEntryID = self.dayEntryID.unsignedIntValue;
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRCommodityTariffClusterGetDayEntryResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _dayEntry = [MTRCommodityTariffClusterDayEntryStruct new];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRCommodityTariffClusterGetDayEntryResponseParams alloc] init];
+
+    other.dayEntry = self.dayEntry;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: dayEntry:%@; >", NSStringFromClass([self class]), _dayEntry];
+    return descriptionString;
+}
+
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::CommodityTariff::Commands::GetDayEntryResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRCommodityTariffClusterGetDayEntryResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::CommodityTariff::Commands::GetDayEntryResponse::DecodableType &)decodableStruct
+{
+    {
+        self.dayEntry = [MTRCommodityTariffClusterDayEntryStruct new];
+        self.dayEntry.dayEntryID = [NSNumber numberWithUnsignedInt:decodableStruct.dayEntry.dayEntryID];
+        self.dayEntry.startTime = [NSNumber numberWithUnsignedShort:decodableStruct.dayEntry.startTime];
+        if (decodableStruct.dayEntry.duration.HasValue()) {
+            self.dayEntry.duration = [NSNumber numberWithUnsignedShort:decodableStruct.dayEntry.duration.Value()];
+        } else {
+            self.dayEntry.duration = nil;
+        }
+        if (decodableStruct.dayEntry.randomizationOffset.HasValue()) {
+            self.dayEntry.randomizationOffset = [NSNumber numberWithShort:decodableStruct.dayEntry.randomizationOffset.Value()];
+        } else {
+            self.dayEntry.randomizationOffset = nil;
+        }
+        if (decodableStruct.dayEntry.randomizationType.HasValue()) {
+            self.dayEntry.randomizationType = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.dayEntry.randomizationType.Value())];
+        } else {
+            self.dayEntry.randomizationType = nil;
+        }
+    }
+    return CHIP_NO_ERROR;
+}
+
+@end
+
 @implementation MTRCommissionerControlClusterRequestCommissioningApprovalParams
 - (instancetype)init
 {

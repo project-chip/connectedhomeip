@@ -5939,6 +5939,87 @@ static BOOL AttributeIsSpecifiedInChimeCluster(AttributeId aAttributeId)
     }
     }
 }
+static BOOL AttributeIsSpecifiedInCommodityTariffCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::CommodityTariff;
+    switch (aAttributeId) {
+    case Attributes::TariffInfo::Id: {
+        return YES;
+    }
+    case Attributes::TariffUnit::Id: {
+        return YES;
+    }
+    case Attributes::StartDate::Id: {
+        return YES;
+    }
+    case Attributes::DayEntries::Id: {
+        return YES;
+    }
+    case Attributes::DayPatterns::Id: {
+        return YES;
+    }
+    case Attributes::CalendarPeriods::Id: {
+        return YES;
+    }
+    case Attributes::IndividualDays::Id: {
+        return YES;
+    }
+    case Attributes::CurrentDay::Id: {
+        return YES;
+    }
+    case Attributes::NextDay::Id: {
+        return YES;
+    }
+    case Attributes::CurrentDayEntry::Id: {
+        return YES;
+    }
+    case Attributes::CurrentDayEntryDate::Id: {
+        return YES;
+    }
+    case Attributes::NextDayEntry::Id: {
+        return YES;
+    }
+    case Attributes::NextDayEntryDate::Id: {
+        return YES;
+    }
+    case Attributes::TariffComponents::Id: {
+        return YES;
+    }
+    case Attributes::TariffPeriods::Id: {
+        return YES;
+    }
+    case Attributes::CurrentTariffComponents::Id: {
+        return YES;
+    }
+    case Attributes::NextTariffComponents::Id: {
+        return YES;
+    }
+    case Attributes::DefaultRandomizationOffset::Id: {
+        return YES;
+    }
+    case Attributes::DefaultRandomizationType::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInEcosystemInformationCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::EcosystemInformation;
@@ -6788,6 +6869,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::Chime::Id: {
         return AttributeIsSpecifiedInChimeCluster(aAttributeId);
+    }
+    case Clusters::CommodityTariff::Id: {
+        return AttributeIsSpecifiedInCommodityTariffCluster(aAttributeId);
     }
     case Clusters::EcosystemInformation::Id: {
         return AttributeIsSpecifiedInEcosystemInformationCluster(aAttributeId);

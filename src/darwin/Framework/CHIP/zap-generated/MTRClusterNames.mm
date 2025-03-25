@@ -393,6 +393,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeChimeID:
         result = @"Chime";
         break;
+    case MTRClusterIDTypeCommodityTariffID:
+        result = @"CommodityTariff";
+        break;
     case MTRClusterIDTypeEcosystemInformationID:
         result = @"EcosystemInformation";
         break;
@@ -8197,6 +8200,113 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
         }
         break;
 
+    case MTRClusterIDTypeCommodityTariffID:
+
+        switch (attributeID) {
+
+            // Cluster CommodityTariff attributes
+        case MTRAttributeIDTypeClusterCommodityTariffAttributeTariffInfoID:
+            result = @"TariffInfo";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityTariffAttributeTariffUnitID:
+            result = @"TariffUnit";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityTariffAttributeStartDateID:
+            result = @"StartDate";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityTariffAttributeDayEntriesID:
+            result = @"DayEntries";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityTariffAttributeDayPatternsID:
+            result = @"DayPatterns";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityTariffAttributeCalendarPeriodsID:
+            result = @"CalendarPeriods";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityTariffAttributeIndividualDaysID:
+            result = @"IndividualDays";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityTariffAttributeCurrentDayID:
+            result = @"CurrentDay";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityTariffAttributeNextDayID:
+            result = @"NextDay";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityTariffAttributeCurrentDayEntryID:
+            result = @"CurrentDayEntry";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityTariffAttributeCurrentDayEntryDateID:
+            result = @"CurrentDayEntryDate";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityTariffAttributeNextDayEntryID:
+            result = @"NextDayEntry";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityTariffAttributeNextDayEntryDateID:
+            result = @"NextDayEntryDate";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityTariffAttributeTariffComponentsID:
+            result = @"TariffComponents";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityTariffAttributeTariffPeriodsID:
+            result = @"TariffPeriods";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityTariffAttributeCurrentTariffComponentsID:
+            result = @"CurrentTariffComponents";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityTariffAttributeNextTariffComponentsID:
+            result = @"NextTariffComponents";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityTariffAttributeDefaultRandomizationOffsetID:
+            result = @"DefaultRandomizationOffset";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityTariffAttributeDefaultRandomizationTypeID:
+            result = @"DefaultRandomizationType";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityTariffAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityTariffAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityTariffAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityTariffAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityTariffAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeEcosystemInformationID:
 
         switch (attributeID) {
@@ -11294,6 +11404,24 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
         }
         break;
 
+    case MTRClusterIDTypeCommodityTariffID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterCommodityTariffCommandGetTariffComponentID:
+            result = @"GetTariffComponent";
+            break;
+
+        case MTRCommandIDTypeClusterCommodityTariffCommandGetDayEntryID:
+            result = @"GetDayEntry";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeEcosystemInformationID:
 
         switch (commandID) {
@@ -13087,6 +13215,24 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
     case MTRClusterIDTypeChimeID:
 
         switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeCommodityTariffID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterCommodityTariffCommandGetTariffComponentResponseID:
+            result = @"GetTariffComponentResponse";
+            break;
+
+        case MTRCommandIDTypeClusterCommodityTariffCommandGetDayEntryResponseID:
+            result = @"GetDayEntryResponse";
+            break;
 
         default:
             result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
@@ -14996,6 +15142,16 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
         break;
 
     case MTRClusterIDTypeChimeID:
+
+        switch (eventID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeCommodityTariffID:
 
         switch (eventID) {
 

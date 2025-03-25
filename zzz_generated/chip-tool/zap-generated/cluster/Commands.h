@@ -160,6 +160,7 @@
 | WebRTCTransportRequestor                                            | 0x0554 |
 | PushAvStreamTransport                                               | 0x0555 |
 | Chime                                                               | 0x0556 |
+| CommodityTariff                                                     | 0x0700 |
 | EcosystemInformation                                                | 0x0750 |
 | CommissionerControl                                                 | 0x0751 |
 | TlsCertificateManagement                                            | 0x0801 |
@@ -15560,6 +15561,117 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
+| Cluster CommodityTariff                                             | 0x0700 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * GetTariffComponent                                                |   0x00 |
+| * GetDayEntry                                                       |   0x01 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * TariffInfo                                                        | 0x0000 |
+| * TariffUnit                                                        | 0x0001 |
+| * StartDate                                                         | 0x0002 |
+| * DayEntries                                                        | 0x0003 |
+| * DayPatterns                                                       | 0x0004 |
+| * CalendarPeriods                                                   | 0x0005 |
+| * IndividualDays                                                    | 0x0006 |
+| * CurrentDay                                                        | 0x0007 |
+| * NextDay                                                           | 0x0008 |
+| * CurrentDayEntry                                                   | 0x0009 |
+| * CurrentDayEntryDate                                               | 0x000A |
+| * NextDayEntry                                                      | 0x000B |
+| * NextDayEntryDate                                                  | 0x000C |
+| * TariffComponents                                                  | 0x000D |
+| * TariffPeriods                                                     | 0x000E |
+| * CurrentTariffComponents                                           | 0x000F |
+| * NextTariffComponents                                              | 0x0010 |
+| * DefaultRandomizationOffset                                        | 0x0011 |
+| * DefaultRandomizationType                                          | 0x0012 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command GetTariffComponent
+ */
+class CommodityTariffGetTariffComponent : public ClusterCommand
+{
+public:
+    CommodityTariffGetTariffComponent(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("get-tariff-component", credsIssuerConfig)
+    {
+        AddArgument("TariffComponentID", 0, UINT32_MAX, &mRequest.tariffComponentID);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::CommodityTariff::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::CommodityTariff::Commands::GetTariffComponent::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::CommodityTariff::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::CommodityTariff::Commands::GetTariffComponent::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::CommodityTariff::Commands::GetTariffComponent::Type mRequest;
+};
+
+/*
+ * Command GetDayEntry
+ */
+class CommodityTariffGetDayEntry : public ClusterCommand
+{
+public:
+    CommodityTariffGetDayEntry(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("get-day-entry", credsIssuerConfig)
+    {
+        AddArgument("DayEntryID", 0, UINT32_MAX, &mRequest.dayEntryID);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::CommodityTariff::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::CommodityTariff::Commands::GetDayEntry::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::CommodityTariff::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::CommodityTariff::Commands::GetDayEntry::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::CommodityTariff::Commands::GetDayEntry::Type mRequest;
+};
+
+/*----------------------------------------------------------------------------*\
 | Cluster EcosystemInformation                                        | 0x0750 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -28899,6 +29011,156 @@ void registerClusterChime(Commands & commands, CredentialIssuerCommands * credsI
 
     commands.RegisterCluster(clusterName, clusterCommands);
 }
+void registerClusterCommodityTariff(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::CommodityTariff;
+
+    const char * clusterName = "CommodityTariff";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                //
+        make_unique<CommodityTariffGetTariffComponent>(credsIssuerConfig), //
+        make_unique<CommodityTariffGetDayEntry>(credsIssuerConfig),        //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                       //
+        make_unique<ReadAttribute>(Id, "tariff-info", Attributes::TariffInfo::Id, credsIssuerConfig),                            //
+        make_unique<ReadAttribute>(Id, "tariff-unit", Attributes::TariffUnit::Id, credsIssuerConfig),                            //
+        make_unique<ReadAttribute>(Id, "start-date", Attributes::StartDate::Id, credsIssuerConfig),                              //
+        make_unique<ReadAttribute>(Id, "day-entries", Attributes::DayEntries::Id, credsIssuerConfig),                            //
+        make_unique<ReadAttribute>(Id, "day-patterns", Attributes::DayPatterns::Id, credsIssuerConfig),                          //
+        make_unique<ReadAttribute>(Id, "calendar-periods", Attributes::CalendarPeriods::Id, credsIssuerConfig),                  //
+        make_unique<ReadAttribute>(Id, "individual-days", Attributes::IndividualDays::Id, credsIssuerConfig),                    //
+        make_unique<ReadAttribute>(Id, "current-day", Attributes::CurrentDay::Id, credsIssuerConfig),                            //
+        make_unique<ReadAttribute>(Id, "next-day", Attributes::NextDay::Id, credsIssuerConfig),                                  //
+        make_unique<ReadAttribute>(Id, "current-day-entry", Attributes::CurrentDayEntry::Id, credsIssuerConfig),                 //
+        make_unique<ReadAttribute>(Id, "current-day-entry-date", Attributes::CurrentDayEntryDate::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "next-day-entry", Attributes::NextDayEntry::Id, credsIssuerConfig),                       //
+        make_unique<ReadAttribute>(Id, "next-day-entry-date", Attributes::NextDayEntryDate::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "tariff-components", Attributes::TariffComponents::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "tariff-periods", Attributes::TariffPeriods::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "current-tariff-components", Attributes::CurrentTariffComponents::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "next-tariff-components", Attributes::NextTariffComponents::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "default-randomization-offset", Attributes::DefaultRandomizationOffset::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "default-randomization-type", Attributes::DefaultRandomizationType::Id,
+                                   credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::TariffInformationStruct::Type>>>(
+            Id, "tariff-info", Attributes::TariffInfo::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::TariffUnitEnum>>>(
+            Id, "tariff-unit", 0, UINT8_MAX, Attributes::TariffUnit::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(
+            Id, "start-date", 0, UINT32_MAX, Attributes::StartDate::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::Nullable<
+            chip::app::DataModel::List<const chip::app::Clusters::CommodityTariff::Structs::DayEntryStruct::Type>>>>(
+            Id, "day-entries", Attributes::DayEntries::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::Nullable<
+            chip::app::DataModel::List<const chip::app::Clusters::CommodityTariff::Structs::DayPatternStruct::Type>>>>(
+            Id, "day-patterns", Attributes::DayPatterns::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::Nullable<
+            chip::app::DataModel::List<const chip::app::Clusters::CommodityTariff::Structs::CalendarPeriodStruct::Type>>>>(
+            Id, "calendar-periods", Attributes::CalendarPeriods::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::Nullable<
+            chip::app::DataModel::List<const chip::app::Clusters::CommodityTariff::Structs::DayStruct::Type>>>>(
+            Id, "individual-days", Attributes::IndividualDays::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::DayStruct::Type>>>(
+            Id, "current-day", Attributes::CurrentDay::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::DayStruct::Type>>>(
+            Id, "next-day", Attributes::NextDay::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::DayEntryStruct::Type>>>(
+            Id, "current-day-entry", Attributes::CurrentDayEntry::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "current-day-entry-date", 0, UINT32_MAX,
+                                                                              Attributes::CurrentDayEntryDate::Id,
+                                                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::DayEntryStruct::Type>>>(
+            Id, "next-day-entry", Attributes::NextDayEntry::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "next-day-entry-date", 0, UINT32_MAX,
+                                                                              Attributes::NextDayEntryDate::Id,
+                                                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::Nullable<
+            chip::app::DataModel::List<const chip::app::Clusters::CommodityTariff::Structs::TariffComponentStruct::Type>>>>(
+            Id, "tariff-components", Attributes::TariffComponents::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::Nullable<
+            chip::app::DataModel::List<const chip::app::Clusters::CommodityTariff::Structs::TariffPeriodStruct::Type>>>>(
+            Id, "tariff-periods", Attributes::TariffPeriods::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::Nullable<
+            chip::app::DataModel::List<const chip::app::Clusters::CommodityTariff::Structs::TariffComponentStruct::Type>>>>(
+            Id, "current-tariff-components", Attributes::CurrentTariffComponents::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::Nullable<
+            chip::app::DataModel::List<const chip::app::Clusters::CommodityTariff::Structs::TariffComponentStruct::Type>>>>(
+            Id, "next-tariff-components", Attributes::NextTariffComponents::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<int16_t>>>(Id, "default-randomization-offset", INT16_MIN,
+                                                                             INT16_MAX, Attributes::DefaultRandomizationOffset::Id,
+                                                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<
+            WriteAttribute<chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::DayEntryRandomizationTypeEnum>>>(
+            Id, "default-randomization-type", 0, UINT8_MAX, Attributes::DefaultRandomizationType::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                               //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                //
+        make_unique<SubscribeAttribute>(Id, "tariff-info", Attributes::TariffInfo::Id, credsIssuerConfig),                     //
+        make_unique<SubscribeAttribute>(Id, "tariff-unit", Attributes::TariffUnit::Id, credsIssuerConfig),                     //
+        make_unique<SubscribeAttribute>(Id, "start-date", Attributes::StartDate::Id, credsIssuerConfig),                       //
+        make_unique<SubscribeAttribute>(Id, "day-entries", Attributes::DayEntries::Id, credsIssuerConfig),                     //
+        make_unique<SubscribeAttribute>(Id, "day-patterns", Attributes::DayPatterns::Id, credsIssuerConfig),                   //
+        make_unique<SubscribeAttribute>(Id, "calendar-periods", Attributes::CalendarPeriods::Id, credsIssuerConfig),           //
+        make_unique<SubscribeAttribute>(Id, "individual-days", Attributes::IndividualDays::Id, credsIssuerConfig),             //
+        make_unique<SubscribeAttribute>(Id, "current-day", Attributes::CurrentDay::Id, credsIssuerConfig),                     //
+        make_unique<SubscribeAttribute>(Id, "next-day", Attributes::NextDay::Id, credsIssuerConfig),                           //
+        make_unique<SubscribeAttribute>(Id, "current-day-entry", Attributes::CurrentDayEntry::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "current-day-entry-date", Attributes::CurrentDayEntryDate::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "next-day-entry", Attributes::NextDayEntry::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "next-day-entry-date", Attributes::NextDayEntryDate::Id, credsIssuerConfig),       //
+        make_unique<SubscribeAttribute>(Id, "tariff-components", Attributes::TariffComponents::Id, credsIssuerConfig),         //
+        make_unique<SubscribeAttribute>(Id, "tariff-periods", Attributes::TariffPeriods::Id, credsIssuerConfig),               //
+        make_unique<SubscribeAttribute>(Id, "current-tariff-components", Attributes::CurrentTariffComponents::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "next-tariff-components", Attributes::NextTariffComponents::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "default-randomization-offset", Attributes::DefaultRandomizationOffset::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "default-randomization-type", Attributes::DefaultRandomizationType::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.RegisterCluster(clusterName, clusterCommands);
+}
 void registerClusterEcosystemInformation(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
     using namespace chip::app::Clusters::EcosystemInformation;
@@ -29956,6 +30218,7 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterWebRTCTransportRequestor(commands, credsIssuerConfig);
     registerClusterPushAvStreamTransport(commands, credsIssuerConfig);
     registerClusterChime(commands, credsIssuerConfig);
+    registerClusterCommodityTariff(commands, credsIssuerConfig);
     registerClusterEcosystemInformation(commands, credsIssuerConfig);
     registerClusterCommissionerControl(commands, credsIssuerConfig);
     registerClusterTlsCertificateManagement(commands, credsIssuerConfig);

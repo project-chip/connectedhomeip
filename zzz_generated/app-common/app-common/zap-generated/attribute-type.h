@@ -99,6 +99,7 @@ enum
     ZCL_IPV6ADR_ATTRIBUTE_TYPE           = 0xF4, // IPv6 Address
     ZCL_IPV6PRE_ATTRIBUTE_TYPE           = 0xF5, // IPv6 Prefix
     ZCL_HWADR_ATTRIBUTE_TYPE             = 0xF6, // Hardware Address
+    ZCL_MONEY_ATTRIBUTE_TYPE             = 0xF7, // Amount of Money
     ZCL_UNKNOWN_ATTRIBUTE_TYPE           = 0xFF, // Unknown
 };
 
@@ -133,6 +134,8 @@ inline bool IsSignedAttributeType(uint8_t attributeType)
     case ZCL_VOLTAGE_MV_ATTRIBUTE_TYPE:
         return true;
     case ZCL_ENERGY_MWH_ATTRIBUTE_TYPE:
+        return true;
+    case ZCL_MONEY_ATTRIBUTE_TYPE:
         return true;
     default:
         return false;

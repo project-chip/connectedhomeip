@@ -137,6 +137,7 @@ Generally regenerate using one of:
 |       1364 |      0x554 | WebRTCTransportRequestor                                |
 |       1365 |      0x555 | PushAvStreamTransport                                   |
 |       1366 |      0x556 | Chime                                                   |
+|       1792 |      0x700 | CommodityTariff                                         |
 |       1872 |      0x750 | EcosystemInformation                                    |
 |       1873 |      0x751 | CommissionerControl                                     |
 |       2049 |      0x801 | TlsCertificateManagement                                |

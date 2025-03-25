@@ -23,6 +23,39 @@
 using namespace chip::app::Clusters;
 
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::Globals::Structs::PowerThresholdStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("PowerThreshold", indent + 1, value.powerThreshold);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PowerThreshold'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ApparentPowerThreshold", indent + 1, value.apparentPowerThreshold);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ApparentPowerThreshold'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("PowerThresholdSource", indent + 1, value.powerThresholdSource);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PowerThresholdSource'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::Globals::Structs::TestGlobalStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -457,39 +490,6 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'OperationalStateLabel'");
-            return err;
-        }
-    }
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::Globals::Structs::PowerThresholdStruct::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    {
-        CHIP_ERROR err = LogValue("PowerThreshold", indent + 1, value.powerThreshold);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PowerThreshold'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("ApparentPowerThreshold", indent + 1, value.apparentPowerThreshold);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ApparentPowerThreshold'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("PowerThresholdSource", indent + 1, value.powerThresholdSource);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PowerThresholdSource'");
             return err;
         }
     }
@@ -6304,6 +6304,413 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::CommodityTariff::Structs::CurrencyStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("Currency", indent + 1, value.currency);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Currency'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("DecimalPoints", indent + 1, value.decimalPoints);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'DecimalPoints'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::CommodityTariff::Structs::TariffInformationStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("TariffLabel", indent + 1, value.tariffLabel);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'TariffLabel'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ProviderName", indent + 1, value.providerName);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ProviderName'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Currency", indent + 1, value.currency);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Currency'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("BlockMode", indent + 1, value.blockMode);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'BlockMode'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::CommodityTariff::Structs::PeakPeriodStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("Severity", indent + 1, value.severity);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Severity'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("PeakPeriod", indent + 1, value.peakPeriod);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PeakPeriod'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(
+    const char * label, size_t indent,
+    const chip::app::Clusters::CommodityTariff::Structs::AuxiliaryLoadSwitchSettingsStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("Number", indent + 1, value.number);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Number'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("RequiredState", indent + 1, value.requiredState);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'RequiredState'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::CommodityTariff::Structs::TariffPriceStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("PriceType", indent + 1, value.priceType);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PriceType'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Price", indent + 1, value.price);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Price'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("PriceLevel", indent + 1, value.priceLevel);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PriceLevel'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::CommodityTariff::Structs::TariffComponentStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("TariffComponentID", indent + 1, value.tariffComponentID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'TariffComponentID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Price", indent + 1, value.price);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Price'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("FriendlyCredit", indent + 1, value.friendlyCredit);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FriendlyCredit'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("AuxiliaryLoad", indent + 1, value.auxiliaryLoad);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'AuxiliaryLoad'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("PeakPeriod", indent + 1, value.peakPeriod);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PeakPeriod'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("PowerThreshold", indent + 1, value.powerThreshold);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PowerThreshold'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Threshold", indent + 1, value.threshold);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Threshold'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Label", indent + 1, value.label);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Label'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Predicted", indent + 1, value.predicted);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Predicted'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::CommodityTariff::Structs::CalendarPeriodStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("StartDate", indent + 1, value.startDate);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'StartDate'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("DayPatternIDs", indent + 1, value.dayPatternIDs);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'DayPatternIDs'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::CommodityTariff::Structs::DayEntryStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("DayEntryID", indent + 1, value.dayEntryID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'DayEntryID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("StartTime", indent + 1, value.startTime);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'StartTime'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Duration", indent + 1, value.duration);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Duration'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("RandomizationOffset", indent + 1, value.randomizationOffset);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'RandomizationOffset'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("RandomizationType", indent + 1, value.randomizationType);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'RandomizationType'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::CommodityTariff::Structs::DayPatternStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("DayPatternID", indent + 1, value.dayPatternID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'DayPatternID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("DaysOfWeek", indent + 1, value.daysOfWeek);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'DaysOfWeek'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("DayEntryIDs", indent + 1, value.dayEntryIDs);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'DayEntryIDs'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::CommodityTariff::Structs::DayStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("Date", indent + 1, value.date);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Date'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("DayType", indent + 1, value.dayType);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'DayType'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("DayEntryIDs", indent + 1, value.dayEntryIDs);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'DayEntryIDs'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::CommodityTariff::Structs::TariffPeriodStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("Label", indent + 1, value.label);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Label'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("DayEntryIDs", indent + 1, value.dayEntryIDs);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'DayEntryIDs'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("TariffComponentIDs", indent + 1, value.tariffComponentIDs);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'TariffComponentIDs'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::EcosystemInformation::Structs::EcosystemDeviceStruct::DecodableType & value)
@@ -10350,6 +10757,24 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("streamConfigurations", indent + 1, value.streamConfigurations));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const CommodityTariff::Commands::GetTariffComponentResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("label", indent + 1, value.label));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("dayEntryIDs", indent + 1, value.dayEntryIDs));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("tariffComponent", indent + 1, value.tariffComponent));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const CommodityTariff::Commands::GetDayEntryResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("dayEntry", indent + 1, value.dayEntry));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
@@ -19641,6 +20066,149 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         }
         break;
     }
+    case CommodityTariff::Id: {
+        switch (path.mAttributeId)
+        {
+        case CommodityTariff::Attributes::TariffInfo::Id: {
+            chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::TariffInformationStruct::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TariffInfo", 1, value);
+        }
+        case CommodityTariff::Attributes::TariffUnit::Id: {
+            chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::TariffUnitEnum> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TariffUnit", 1, value);
+        }
+        case CommodityTariff::Attributes::StartDate::Id: {
+            chip::app::DataModel::Nullable<uint32_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("StartDate", 1, value);
+        }
+        case CommodityTariff::Attributes::DayEntries::Id: {
+            chip::app::DataModel::Nullable<
+                chip::app::DataModel::DecodableList<chip::app::Clusters::CommodityTariff::Structs::DayEntryStruct::DecodableType>>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("DayEntries", 1, value);
+        }
+        case CommodityTariff::Attributes::DayPatterns::Id: {
+            chip::app::DataModel::Nullable<
+                chip::app::DataModel::DecodableList<chip::app::Clusters::CommodityTariff::Structs::DayPatternStruct::DecodableType>>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("DayPatterns", 1, value);
+        }
+        case CommodityTariff::Attributes::CalendarPeriods::Id: {
+            chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+                chip::app::Clusters::CommodityTariff::Structs::CalendarPeriodStruct::DecodableType>>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("CalendarPeriods", 1, value);
+        }
+        case CommodityTariff::Attributes::IndividualDays::Id: {
+            chip::app::DataModel::Nullable<
+                chip::app::DataModel::DecodableList<chip::app::Clusters::CommodityTariff::Structs::DayStruct::DecodableType>>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("IndividualDays", 1, value);
+        }
+        case CommodityTariff::Attributes::CurrentDay::Id: {
+            chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::DayStruct::DecodableType> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("CurrentDay", 1, value);
+        }
+        case CommodityTariff::Attributes::NextDay::Id: {
+            chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::DayStruct::DecodableType> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("NextDay", 1, value);
+        }
+        case CommodityTariff::Attributes::CurrentDayEntry::Id: {
+            chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::DayEntryStruct::DecodableType> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("CurrentDayEntry", 1, value);
+        }
+        case CommodityTariff::Attributes::CurrentDayEntryDate::Id: {
+            chip::app::DataModel::Nullable<uint32_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("CurrentDayEntryDate", 1, value);
+        }
+        case CommodityTariff::Attributes::NextDayEntry::Id: {
+            chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::DayEntryStruct::DecodableType> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("NextDayEntry", 1, value);
+        }
+        case CommodityTariff::Attributes::NextDayEntryDate::Id: {
+            chip::app::DataModel::Nullable<uint32_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("NextDayEntryDate", 1, value);
+        }
+        case CommodityTariff::Attributes::TariffComponents::Id: {
+            chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+                chip::app::Clusters::CommodityTariff::Structs::TariffComponentStruct::DecodableType>>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TariffComponents", 1, value);
+        }
+        case CommodityTariff::Attributes::TariffPeriods::Id: {
+            chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+                chip::app::Clusters::CommodityTariff::Structs::TariffPeriodStruct::DecodableType>>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TariffPeriods", 1, value);
+        }
+        case CommodityTariff::Attributes::CurrentTariffComponents::Id: {
+            chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+                chip::app::Clusters::CommodityTariff::Structs::TariffComponentStruct::DecodableType>>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("CurrentTariffComponents", 1, value);
+        }
+        case CommodityTariff::Attributes::NextTariffComponents::Id: {
+            chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+                chip::app::Clusters::CommodityTariff::Structs::TariffComponentStruct::DecodableType>>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("NextTariffComponents", 1, value);
+        }
+        case CommodityTariff::Attributes::DefaultRandomizationOffset::Id: {
+            chip::app::DataModel::Nullable<int16_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("DefaultRandomizationOffset", 1, value);
+        }
+        case CommodityTariff::Attributes::DefaultRandomizationType::Id: {
+            chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::DayEntryRandomizationTypeEnum> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("DefaultRandomizationType", 1, value);
+        }
+        case CommodityTariff::Attributes::GeneratedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, CommodityTariff::Id);
+        }
+        case CommodityTariff::Attributes::AcceptedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, CommodityTariff::Id);
+        }
+        case CommodityTariff::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, CommodityTariff::Id);
+        }
+        case CommodityTariff::Attributes::FeatureMap::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FeatureMap", 1, value);
+        }
+        case CommodityTariff::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+        break;
+    }
     case EcosystemInformation::Id: {
         switch (path.mAttributeId)
         {
@@ -21100,6 +21668,22 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             PushAvStreamTransport::Commands::FindTransportResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FindTransportResponse", 1, value);
+        }
+        }
+        break;
+    }
+    case CommodityTariff::Id: {
+        switch (path.mCommandId)
+        {
+        case CommodityTariff::Commands::GetTariffComponentResponse::Id: {
+            CommodityTariff::Commands::GetTariffComponentResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("GetTariffComponentResponse", 1, value);
+        }
+        case CommodityTariff::Commands::GetDayEntryResponse::Id: {
+            CommodityTariff::Commands::GetDayEntryResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("GetDayEntryResponse", 1, value);
         }
         }
         break;

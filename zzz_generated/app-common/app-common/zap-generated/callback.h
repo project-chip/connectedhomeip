@@ -661,6 +661,11 @@ void emberAfChimeClusterInitCallback(chip::EndpointId endpoint);
 /**
  * @param endpoint    Endpoint that is being initialized
  */
+void emberAfCommodityTariffClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
 void emberAfEcosystemInformationClusterInitCallback(chip::EndpointId endpoint);
 
 /**
@@ -5531,6 +5536,45 @@ MatterChimeClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAtt
 void emberAfChimeClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
+// Commodity Tariff Cluster
+//
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfCommodityTariffClusterServerInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterCommodityTariffClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfCommodityTariffClusterClientInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterCommodityTariffClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/**
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterCommodityTariffClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                              EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/**
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfCommodityTariffClusterServerTickCallback(chip::EndpointId endpoint);
+
+//
 // Ecosystem Information Cluster
 //
 
@@ -7028,6 +7072,18 @@ bool emberAfPushAvStreamTransportClusterManuallyTriggerTransportCallback(
 bool emberAfPushAvStreamTransportClusterFindTransportCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::PushAvStreamTransport::Commands::FindTransport::DecodableType & commandData);
+/**
+ * @brief Commodity Tariff Cluster GetTariffComponent Command callback (from client)
+ */
+bool emberAfCommodityTariffClusterGetTariffComponentCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::CommodityTariff::Commands::GetTariffComponent::DecodableType & commandData);
+/**
+ * @brief Commodity Tariff Cluster GetDayEntry Command callback (from client)
+ */
+bool emberAfCommodityTariffClusterGetDayEntryCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::CommodityTariff::Commands::GetDayEntry::DecodableType & commandData);
 /**
  * @brief TLS Certificate Management Cluster ProvisionRootCertificate Command callback (from client)
  */

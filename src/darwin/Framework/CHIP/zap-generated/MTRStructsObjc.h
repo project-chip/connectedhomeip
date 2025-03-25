@@ -20,6 +20,13 @@
 NS_ASSUME_NONNULL_BEGIN
 
 MTR_PROVISIONALLY_AVAILABLE
+@interface MTRDataTypePowerThresholdStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nullable powerThreshold MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable apparentPowerThreshold MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable powerThresholdSource MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
 @interface MTRDataTypeTestGlobalStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSString * _Nonnull name MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable myBitmap MTR_PROVISIONALLY_AVAILABLE;
@@ -37,13 +44,6 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
 @interface MTRDataTypeAtomicAttributeStatusStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull attributeID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 @property (nonatomic, copy) NSNumber * _Nonnull statusCode MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
-@end
-
-MTR_PROVISIONALLY_AVAILABLE
-@interface MTRDataTypePowerThresholdStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nullable powerThreshold MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nullable apparentPowerThreshold MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nullable powerThresholdSource MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
@@ -2413,6 +2413,88 @@ MTR_PROVISIONALLY_AVAILABLE
 @interface MTRChimeClusterChimeSoundStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull chimeID MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSString * _Nonnull name MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRCommodityTariffClusterCurrencyStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull currency MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull decimalPoints MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRCommodityTariffClusterTariffInformationStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSString * _Nullable tariffLabel MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable providerName MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) MTRCommodityTariffClusterCurrencyStruct * _Nullable currency MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable blockMode MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRCommodityTariffClusterPeakPeriodStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull severity MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull peakPeriod MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRCommodityTariffClusterAuxiliaryLoadSwitchSettingsStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull number MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull requiredState MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRCommodityTariffClusterTariffPriceStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull priceType MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable price MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable priceLevel MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRCommodityTariffClusterTariffComponentStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull tariffComponentID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) MTRCommodityTariffClusterTariffPriceStruct * _Nullable price MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable friendlyCredit MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) MTRCommodityTariffClusterAuxiliaryLoadSwitchSettingsStruct * _Nullable auxiliaryLoad MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) MTRCommodityTariffClusterPeakPeriodStruct * _Nullable peakPeriod MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) MTRDataTypePowerThresholdStruct * _Nullable powerThreshold MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable threshold MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable label MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable predicted MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRCommodityTariffClusterCalendarPeriodStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nullable startDate MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nonnull dayPatternIDs MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRCommodityTariffClusterDayEntryStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull dayEntryID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull startTime MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable duration MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable randomizationOffset MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable randomizationType MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRCommodityTariffClusterDayPatternStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull dayPatternID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull daysOfWeek MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nonnull dayEntryIDs MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRCommodityTariffClusterDayStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull date MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull dayType MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nonnull dayEntryIDs MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRCommodityTariffClusterTariffPeriodStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSString * _Nullable label MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nonnull dayEntryIDs MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nonnull tariffComponentIDs MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE

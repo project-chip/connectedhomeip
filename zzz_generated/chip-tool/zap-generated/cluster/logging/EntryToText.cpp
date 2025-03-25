@@ -275,6 +275,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "PushAvStreamTransport";
     case chip::app::Clusters::Chime::Id:
         return "Chime";
+    case chip::app::Clusters::CommodityTariff::Id:
+        return "CommodityTariff";
     case chip::app::Clusters::EcosystemInformation::Id:
         return "EcosystemInformation";
     case chip::app::Clusters::CommissionerControl::Id:
@@ -4433,6 +4435,61 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Unknown";
         }
     }
+    case chip::app::Clusters::CommodityTariff::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::CommodityTariff::Attributes::TariffInfo::Id:
+            return "TariffInfo";
+        case chip::app::Clusters::CommodityTariff::Attributes::TariffUnit::Id:
+            return "TariffUnit";
+        case chip::app::Clusters::CommodityTariff::Attributes::StartDate::Id:
+            return "StartDate";
+        case chip::app::Clusters::CommodityTariff::Attributes::DayEntries::Id:
+            return "DayEntries";
+        case chip::app::Clusters::CommodityTariff::Attributes::DayPatterns::Id:
+            return "DayPatterns";
+        case chip::app::Clusters::CommodityTariff::Attributes::CalendarPeriods::Id:
+            return "CalendarPeriods";
+        case chip::app::Clusters::CommodityTariff::Attributes::IndividualDays::Id:
+            return "IndividualDays";
+        case chip::app::Clusters::CommodityTariff::Attributes::CurrentDay::Id:
+            return "CurrentDay";
+        case chip::app::Clusters::CommodityTariff::Attributes::NextDay::Id:
+            return "NextDay";
+        case chip::app::Clusters::CommodityTariff::Attributes::CurrentDayEntry::Id:
+            return "CurrentDayEntry";
+        case chip::app::Clusters::CommodityTariff::Attributes::CurrentDayEntryDate::Id:
+            return "CurrentDayEntryDate";
+        case chip::app::Clusters::CommodityTariff::Attributes::NextDayEntry::Id:
+            return "NextDayEntry";
+        case chip::app::Clusters::CommodityTariff::Attributes::NextDayEntryDate::Id:
+            return "NextDayEntryDate";
+        case chip::app::Clusters::CommodityTariff::Attributes::TariffComponents::Id:
+            return "TariffComponents";
+        case chip::app::Clusters::CommodityTariff::Attributes::TariffPeriods::Id:
+            return "TariffPeriods";
+        case chip::app::Clusters::CommodityTariff::Attributes::CurrentTariffComponents::Id:
+            return "CurrentTariffComponents";
+        case chip::app::Clusters::CommodityTariff::Attributes::NextTariffComponents::Id:
+            return "NextTariffComponents";
+        case chip::app::Clusters::CommodityTariff::Attributes::DefaultRandomizationOffset::Id:
+            return "DefaultRandomizationOffset";
+        case chip::app::Clusters::CommodityTariff::Attributes::DefaultRandomizationType::Id:
+            return "DefaultRandomizationType";
+        case chip::app::Clusters::CommodityTariff::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::CommodityTariff::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::CommodityTariff::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::CommodityTariff::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::CommodityTariff::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::EcosystemInformation::Id: {
         switch (id)
         {
@@ -5966,6 +6023,17 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "Unknown";
         }
     }
+    case chip::app::Clusters::CommodityTariff::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::CommodityTariff::Commands::GetTariffComponent::Id:
+            return "GetTariffComponent";
+        case chip::app::Clusters::CommodityTariff::Commands::GetDayEntry::Id:
+            return "GetDayEntry";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::CommissionerControl::Id: {
         switch (id)
         {
@@ -6573,6 +6641,17 @@ char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId i
             return "AllocatePushTransportResponse";
         case chip::app::Clusters::PushAvStreamTransport::Commands::FindTransportResponse::Id:
             return "FindTransportResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::CommodityTariff::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::CommodityTariff::Commands::GetTariffComponentResponse::Id:
+            return "GetTariffComponentResponse";
+        case chip::app::Clusters::CommodityTariff::Commands::GetDayEntryResponse::Id:
+            return "GetDayEntryResponse";
         default:
             return "Unknown";
         }

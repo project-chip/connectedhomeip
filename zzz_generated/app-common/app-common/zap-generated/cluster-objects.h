@@ -404,6 +404,32 @@ namespace Globals {
 // Global structs.
 namespace Structs {
 
+namespace PowerThresholdStruct {
+enum class Fields : uint8_t
+{
+    kPowerThreshold         = 0,
+    kApparentPowerThreshold = 1,
+    kPowerThresholdSource   = 2,
+};
+
+struct Type
+{
+public:
+    Optional<int64_t> powerThreshold;
+    Optional<int64_t> apparentPowerThreshold;
+    DataModel::Nullable<Globals::PowerThresholdSourceEnum> powerThresholdSource;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace PowerThresholdStruct
+
 namespace TestGlobalStruct {
 enum class Fields : uint8_t
 {
@@ -479,32 +505,6 @@ public:
 using DecodableType = Type;
 
 } // namespace AtomicAttributeStatusStruct
-
-namespace PowerThresholdStruct {
-enum class Fields : uint8_t
-{
-    kPowerThreshold         = 0,
-    kApparentPowerThreshold = 1,
-    kPowerThresholdSource   = 2,
-};
-
-struct Type
-{
-public:
-    Optional<int64_t> powerThreshold;
-    Optional<int64_t> apparentPowerThreshold;
-    DataModel::Nullable<Globals::PowerThresholdSourceEnum> powerThresholdSource;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-using DecodableType = Type;
-
-} // namespace PowerThresholdStruct
 
 } // namespace Structs
 
@@ -45083,6 +45083,818 @@ struct TypeInfo
 };
 } // namespace Attributes
 } // namespace Chime
+namespace CommodityTariff {
+namespace Structs {
+namespace CurrencyStruct {
+enum class Fields : uint8_t
+{
+    kCurrency      = 0,
+    kDecimalPoints = 1,
+};
+
+struct Type
+{
+public:
+    uint16_t currency     = static_cast<uint16_t>(0);
+    uint8_t decimalPoints = static_cast<uint8_t>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace CurrencyStruct
+namespace TariffInformationStruct {
+enum class Fields : uint8_t
+{
+    kTariffLabel  = 0,
+    kProviderName = 1,
+    kCurrency     = 2,
+    kBlockMode    = 3,
+};
+
+struct Type
+{
+public:
+    DataModel::Nullable<chip::CharSpan> tariffLabel;
+    DataModel::Nullable<chip::CharSpan> providerName;
+    Optional<DataModel::Nullable<Structs::CurrencyStruct::Type>> currency;
+    DataModel::Nullable<BlockModeEnum> blockMode;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace TariffInformationStruct
+namespace PeakPeriodStruct {
+enum class Fields : uint8_t
+{
+    kSeverity   = 0,
+    kPeakPeriod = 1,
+};
+
+struct Type
+{
+public:
+    PeakPeriodSeverityEnum severity = static_cast<PeakPeriodSeverityEnum>(0);
+    uint16_t peakPeriod             = static_cast<uint16_t>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace PeakPeriodStruct
+namespace AuxiliaryLoadSwitchSettingsStruct {
+enum class Fields : uint8_t
+{
+    kNumber        = 0,
+    kRequiredState = 1,
+};
+
+struct Type
+{
+public:
+    uint8_t number                         = static_cast<uint8_t>(0);
+    AuxiliaryLoadSettingEnum requiredState = static_cast<AuxiliaryLoadSettingEnum>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace AuxiliaryLoadSwitchSettingsStruct
+namespace TariffPriceStruct {
+enum class Fields : uint8_t
+{
+    kPriceType  = 0,
+    kPrice      = 1,
+    kPriceLevel = 2,
+};
+
+struct Type
+{
+public:
+    TariffPriceTypeEnum priceType = static_cast<TariffPriceTypeEnum>(0);
+    Optional<int64_t> price;
+    Optional<int16_t> priceLevel;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace TariffPriceStruct
+namespace TariffComponentStruct {
+enum class Fields : uint8_t
+{
+    kTariffComponentID = 0,
+    kPrice             = 1,
+    kFriendlyCredit    = 2,
+    kAuxiliaryLoad     = 3,
+    kPeakPeriod        = 4,
+    kPowerThreshold    = 5,
+    kThreshold         = 6,
+    kLabel             = 7,
+    kPredicted         = 8,
+};
+
+struct Type
+{
+public:
+    uint32_t tariffComponentID = static_cast<uint32_t>(0);
+    Optional<DataModel::Nullable<Structs::TariffPriceStruct::Type>> price;
+    Optional<bool> friendlyCredit;
+    Optional<Structs::AuxiliaryLoadSwitchSettingsStruct::Type> auxiliaryLoad;
+    Optional<Structs::PeakPeriodStruct::Type> peakPeriod;
+    Optional<Globals::Structs::PowerThresholdStruct::Type> powerThreshold;
+    DataModel::Nullable<uint32_t> threshold;
+    Optional<DataModel::Nullable<chip::CharSpan>> label;
+    Optional<bool> predicted;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace TariffComponentStruct
+namespace CalendarPeriodStruct {
+enum class Fields : uint8_t
+{
+    kStartDate     = 0,
+    kDayPatternIDs = 1,
+};
+
+struct Type
+{
+public:
+    DataModel::Nullable<uint32_t> startDate;
+    DataModel::List<const uint32_t> dayPatternIDs;
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    DataModel::Nullable<uint32_t> startDate;
+    DataModel::DecodableList<uint32_t> dayPatternIDs;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+};
+
+} // namespace CalendarPeriodStruct
+namespace DayEntryStruct {
+enum class Fields : uint8_t
+{
+    kDayEntryID          = 0,
+    kStartTime           = 1,
+    kDuration            = 2,
+    kRandomizationOffset = 3,
+    kRandomizationType   = 4,
+};
+
+struct Type
+{
+public:
+    uint32_t dayEntryID = static_cast<uint32_t>(0);
+    uint16_t startTime  = static_cast<uint16_t>(0);
+    Optional<uint16_t> duration;
+    Optional<int16_t> randomizationOffset;
+    Optional<DayEntryRandomizationTypeEnum> randomizationType;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace DayEntryStruct
+namespace DayPatternStruct {
+enum class Fields : uint8_t
+{
+    kDayPatternID = 0,
+    kDaysOfWeek   = 1,
+    kDayEntryIDs  = 2,
+};
+
+struct Type
+{
+public:
+    uint32_t dayPatternID                               = static_cast<uint32_t>(0);
+    chip::BitMask<DayPatternDayOfWeekBitmap> daysOfWeek = static_cast<chip::BitMask<DayPatternDayOfWeekBitmap>>(0);
+    DataModel::List<const uint32_t> dayEntryIDs;
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    uint32_t dayPatternID                               = static_cast<uint32_t>(0);
+    chip::BitMask<DayPatternDayOfWeekBitmap> daysOfWeek = static_cast<chip::BitMask<DayPatternDayOfWeekBitmap>>(0);
+    DataModel::DecodableList<uint32_t> dayEntryIDs;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+};
+
+} // namespace DayPatternStruct
+namespace DayStruct {
+enum class Fields : uint8_t
+{
+    kDate        = 0,
+    kDayType     = 1,
+    kDayEntryIDs = 2,
+};
+
+struct Type
+{
+public:
+    uint32_t date       = static_cast<uint32_t>(0);
+    DayTypeEnum dayType = static_cast<DayTypeEnum>(0);
+    DataModel::List<const uint32_t> dayEntryIDs;
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    uint32_t date       = static_cast<uint32_t>(0);
+    DayTypeEnum dayType = static_cast<DayTypeEnum>(0);
+    DataModel::DecodableList<uint32_t> dayEntryIDs;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+};
+
+} // namespace DayStruct
+namespace TariffPeriodStruct {
+enum class Fields : uint8_t
+{
+    kLabel              = 0,
+    kDayEntryIDs        = 1,
+    kTariffComponentIDs = 2,
+};
+
+struct Type
+{
+public:
+    DataModel::Nullable<chip::CharSpan> label;
+    DataModel::List<const uint32_t> dayEntryIDs;
+    DataModel::List<const uint32_t> tariffComponentIDs;
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    DataModel::Nullable<chip::CharSpan> label;
+    DataModel::DecodableList<uint32_t> dayEntryIDs;
+    DataModel::DecodableList<uint32_t> tariffComponentIDs;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+};
+
+} // namespace TariffPeriodStruct
+} // namespace Structs
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace GetTariffComponent {
+struct Type;
+struct DecodableType;
+} // namespace GetTariffComponent
+
+namespace GetTariffComponentResponse {
+struct Type;
+struct DecodableType;
+} // namespace GetTariffComponentResponse
+
+namespace GetDayEntry {
+struct Type;
+struct DecodableType;
+} // namespace GetDayEntry
+
+namespace GetDayEntryResponse {
+struct Type;
+struct DecodableType;
+} // namespace GetDayEntryResponse
+
+} // namespace Commands
+
+namespace Commands {
+namespace GetTariffComponent {
+enum class Fields : uint8_t
+{
+    kTariffComponentID = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::GetTariffComponent::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+
+    uint32_t tariffComponentID = static_cast<uint32_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = Clusters::CommodityTariff::Commands::GetTariffComponentResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::GetTariffComponent::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+
+    uint32_t tariffComponentID = static_cast<uint32_t>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetTariffComponent
+namespace GetTariffComponentResponse {
+enum class Fields : uint8_t
+{
+    kLabel           = 0,
+    kDayEntryIDs     = 1,
+    kTariffComponent = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::GetTariffComponentResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+
+    DataModel::Nullable<chip::CharSpan> label;
+    DataModel::List<const uint32_t> dayEntryIDs;
+    Structs::TariffComponentStruct::Type tariffComponent;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::GetTariffComponentResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+
+    DataModel::Nullable<chip::CharSpan> label;
+    DataModel::DecodableList<uint32_t> dayEntryIDs;
+    Structs::TariffComponentStruct::DecodableType tariffComponent;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetTariffComponentResponse
+namespace GetDayEntry {
+enum class Fields : uint8_t
+{
+    kDayEntryID = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::GetDayEntry::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+
+    uint32_t dayEntryID = static_cast<uint32_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = Clusters::CommodityTariff::Commands::GetDayEntryResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::GetDayEntry::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+
+    uint32_t dayEntryID = static_cast<uint32_t>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetDayEntry
+namespace GetDayEntryResponse {
+enum class Fields : uint8_t
+{
+    kDayEntry = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::GetDayEntryResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+
+    Structs::DayEntryStruct::Type dayEntry;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::GetDayEntryResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+
+    Structs::DayEntryStruct::DecodableType dayEntry;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetDayEntryResponse
+} // namespace Commands
+
+namespace Attributes {
+
+namespace TariffInfo {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::TariffInformationStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::TariffInformationStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<
+        chip::app::Clusters::CommodityTariff::Structs::TariffInformationStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TariffInfo::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace TariffInfo
+namespace TariffUnit {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::TariffUnitEnum>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::TariffUnitEnum>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::TariffUnitEnum> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TariffUnit::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace TariffUnit
+namespace StartDate {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint32_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::StartDate::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace StartDate
+namespace DayEntries {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::Nullable<
+        chip::app::DataModel::List<const chip::app::Clusters::CommodityTariff::Structs::DayEntryStruct::Type>>;
+    using DecodableType = chip::app::DataModel::Nullable<
+        chip::app::DataModel::DecodableList<chip::app::Clusters::CommodityTariff::Structs::DayEntryStruct::DecodableType>>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<
+        chip::app::DataModel::DecodableList<chip::app::Clusters::CommodityTariff::Structs::DayEntryStruct::DecodableType>> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DayEntries::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace DayEntries
+namespace DayPatterns {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::Nullable<
+        chip::app::DataModel::List<const chip::app::Clusters::CommodityTariff::Structs::DayPatternStruct::Type>>;
+    using DecodableType = chip::app::DataModel::Nullable<
+        chip::app::DataModel::DecodableList<chip::app::Clusters::CommodityTariff::Structs::DayPatternStruct::DecodableType>>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<
+        chip::app::DataModel::DecodableList<chip::app::Clusters::CommodityTariff::Structs::DayPatternStruct::DecodableType>> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DayPatterns::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace DayPatterns
+namespace CalendarPeriods {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::Nullable<
+        chip::app::DataModel::List<const chip::app::Clusters::CommodityTariff::Structs::CalendarPeriodStruct::Type>>;
+    using DecodableType = chip::app::DataModel::Nullable<
+        chip::app::DataModel::DecodableList<chip::app::Clusters::CommodityTariff::Structs::CalendarPeriodStruct::DecodableType>>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<
+        chip::app::DataModel::DecodableList<chip::app::Clusters::CommodityTariff::Structs::CalendarPeriodStruct::DecodableType>> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CalendarPeriods::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace CalendarPeriods
+namespace IndividualDays {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::Nullable<
+        chip::app::DataModel::List<const chip::app::Clusters::CommodityTariff::Structs::DayStruct::Type>>;
+    using DecodableType = chip::app::DataModel::Nullable<
+        chip::app::DataModel::DecodableList<chip::app::Clusters::CommodityTariff::Structs::DayStruct::DecodableType>>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<
+        chip::app::DataModel::DecodableList<chip::app::Clusters::CommodityTariff::Structs::DayStruct::DecodableType>> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::IndividualDays::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace IndividualDays
+namespace CurrentDay {
+struct TypeInfo
+{
+    using Type          = chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::DayStruct::Type>;
+    using DecodableType = chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::DayStruct::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::DayStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentDay::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace CurrentDay
+namespace NextDay {
+struct TypeInfo
+{
+    using Type          = chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::DayStruct::Type>;
+    using DecodableType = chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::DayStruct::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::DayStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NextDay::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace NextDay
+namespace CurrentDayEntry {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::DayEntryStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::DayEntryStruct::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::DayEntryStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentDayEntry::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace CurrentDayEntry
+namespace CurrentDayEntryDate {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint32_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentDayEntryDate::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace CurrentDayEntryDate
+namespace NextDayEntry {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::DayEntryStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::DayEntryStruct::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::Structs::DayEntryStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NextDayEntry::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace NextDayEntry
+namespace NextDayEntryDate {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint32_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NextDayEntryDate::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace NextDayEntryDate
+namespace TariffComponents {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::Nullable<
+        chip::app::DataModel::List<const chip::app::Clusters::CommodityTariff::Structs::TariffComponentStruct::Type>>;
+    using DecodableType = chip::app::DataModel::Nullable<
+        chip::app::DataModel::DecodableList<chip::app::Clusters::CommodityTariff::Structs::TariffComponentStruct::DecodableType>>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<
+        chip::app::DataModel::DecodableList<chip::app::Clusters::CommodityTariff::Structs::TariffComponentStruct::DecodableType>> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TariffComponents::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace TariffComponents
+namespace TariffPeriods {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::Nullable<
+        chip::app::DataModel::List<const chip::app::Clusters::CommodityTariff::Structs::TariffPeriodStruct::Type>>;
+    using DecodableType = chip::app::DataModel::Nullable<
+        chip::app::DataModel::DecodableList<chip::app::Clusters::CommodityTariff::Structs::TariffPeriodStruct::DecodableType>>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<
+        chip::app::DataModel::DecodableList<chip::app::Clusters::CommodityTariff::Structs::TariffPeriodStruct::DecodableType>> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TariffPeriods::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace TariffPeriods
+namespace CurrentTariffComponents {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::Nullable<
+        chip::app::DataModel::List<const chip::app::Clusters::CommodityTariff::Structs::TariffComponentStruct::Type>>;
+    using DecodableType = chip::app::DataModel::Nullable<
+        chip::app::DataModel::DecodableList<chip::app::Clusters::CommodityTariff::Structs::TariffComponentStruct::DecodableType>>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<
+        chip::app::DataModel::DecodableList<chip::app::Clusters::CommodityTariff::Structs::TariffComponentStruct::DecodableType>> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentTariffComponents::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace CurrentTariffComponents
+namespace NextTariffComponents {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::Nullable<
+        chip::app::DataModel::List<const chip::app::Clusters::CommodityTariff::Structs::TariffComponentStruct::Type>>;
+    using DecodableType = chip::app::DataModel::Nullable<
+        chip::app::DataModel::DecodableList<chip::app::Clusters::CommodityTariff::Structs::TariffComponentStruct::DecodableType>>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<
+        chip::app::DataModel::DecodableList<chip::app::Clusters::CommodityTariff::Structs::TariffComponentStruct::DecodableType>> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NextTariffComponents::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace NextTariffComponents
+namespace DefaultRandomizationOffset {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<int16_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<int16_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<int16_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DefaultRandomizationOffset::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace DefaultRandomizationOffset
+namespace DefaultRandomizationType {
+struct TypeInfo
+{
+    using Type          = chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::DayEntryRandomizationTypeEnum>;
+    using DecodableType = chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::DayEntryRandomizationTypeEnum>;
+    using DecodableArgType =
+        const chip::app::DataModel::Nullable<chip::app::Clusters::CommodityTariff::DayEntryRandomizationTypeEnum> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DefaultRandomizationType::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace DefaultRandomizationType
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+};
+} // namespace AcceptedCommandList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::TariffInfo::TypeInfo::DecodableType tariffInfo;
+        Attributes::TariffUnit::TypeInfo::DecodableType tariffUnit;
+        Attributes::StartDate::TypeInfo::DecodableType startDate;
+        Attributes::DayEntries::TypeInfo::DecodableType dayEntries;
+        Attributes::DayPatterns::TypeInfo::DecodableType dayPatterns;
+        Attributes::CalendarPeriods::TypeInfo::DecodableType calendarPeriods;
+        Attributes::IndividualDays::TypeInfo::DecodableType individualDays;
+        Attributes::CurrentDay::TypeInfo::DecodableType currentDay;
+        Attributes::NextDay::TypeInfo::DecodableType nextDay;
+        Attributes::CurrentDayEntry::TypeInfo::DecodableType currentDayEntry;
+        Attributes::CurrentDayEntryDate::TypeInfo::DecodableType currentDayEntryDate;
+        Attributes::NextDayEntry::TypeInfo::DecodableType nextDayEntry;
+        Attributes::NextDayEntryDate::TypeInfo::DecodableType nextDayEntryDate;
+        Attributes::TariffComponents::TypeInfo::DecodableType tariffComponents;
+        Attributes::TariffPeriods::TypeInfo::DecodableType tariffPeriods;
+        Attributes::CurrentTariffComponents::TypeInfo::DecodableType currentTariffComponents;
+        Attributes::NextTariffComponents::TypeInfo::DecodableType nextTariffComponents;
+        Attributes::DefaultRandomizationOffset::TypeInfo::DecodableType defaultRandomizationOffset;
+        Attributes::DefaultRandomizationType::TypeInfo::DecodableType defaultRandomizationType;
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace CommodityTariff
 namespace EcosystemInformation {
 namespace Structs {
 namespace DeviceTypeStruct = Clusters::detail::Structs::DeviceTypeStruct;
