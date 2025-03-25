@@ -46,8 +46,8 @@ class ProvideOfferCommand : public CHIPCommand
 public:
     ProvideOfferCommand(CredentialIssuerCommands * credIssuerCommands) : CHIPCommand("provide-offer", credIssuerCommands)
     {
-        AddArgument("WebRTCSessionID", 0, UINT16_MAX, &mWebRTCSessionId);
-        AddArgument("StreamUsage", 0, UINT8_MAX, &mStreamUsage);
+        AddArgument("webrtc-session-id", 0, UINT16_MAX, &mWebRTCSessionId);
+        AddArgument("stream-usage", 0, UINT8_MAX, &mStreamUsage);
     }
 
     /////////// CHIPCommand Interface /////////

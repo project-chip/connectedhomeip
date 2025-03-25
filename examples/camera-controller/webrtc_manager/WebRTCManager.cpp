@@ -83,6 +83,7 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
     rtc::Configuration config;
     mPeerConnection = std::make_shared<rtc::PeerConnection>(config);
 
+    // Use cout to print out to console
     mPeerConnection->onLocalDescription([this](rtc::Description description) {
         mLocalDescription = std::string(description);
         std::cout << "Local Description:" << std::endl;
@@ -127,17 +128,11 @@ CHIP_ERROR WebRTCManager::SendProvideOffer(DataModel::Nullable<uint16_t> webRTCS
 {
     ChipLogProgress(NotSpecified, "Sending ProvideOffer command to the peer device");
 
-    DataModel::Nullable<uint16_t> videoStreamId;
-    videoStreamId.SetNull();
-
-    DataModel::Nullable<uint16_t> audioStreamId;
-    audioStreamId.SetNull();
-
     CHIP_ERROR err = mWebRTCProviderClient.ProvideOffer(webRTCSessionID, mLocalDescription, streamUsage, kWebRTCRequesterEndpointId,
-                                                        chip::MakeOptional(videoStreamId), // "Null" for video
-                                                        chip::MakeOptional(audioStreamId), // "Null" for audio
-                                                        chip::NullOptional,                // Omit ICEServers (Optional not present)
-                                                        chip::NullOptional // Omit ICETransportPolicy (Optional not present)
+                                                        MakeOptional(DataModel::NullNullable), // "Null" for video
+                                                        MakeOptional(DataModel::NullNullable), // "Null" for audio
+                                                        NullOptional, // Omit ICEServers (Optional not present)
+                                                        NullOptional  // Omit ICETransportPolicy (Optional not present)
     );
 
     if (err != CHIP_NO_ERROR)

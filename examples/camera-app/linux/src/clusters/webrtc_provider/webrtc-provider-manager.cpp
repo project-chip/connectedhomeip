@@ -190,6 +190,7 @@ WebRTCProviderManager::ValidateStreamUsage(StreamUsageEnum streamUsage,
                                            const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
                                            const Optional<DataModel::Nullable<uint16_t>> & audioStreamId)
 {
+    // TODO: Validates the requested stream usage against the camera's resource management and stream priority policies.
     return CHIP_NO_ERROR;
 }
 

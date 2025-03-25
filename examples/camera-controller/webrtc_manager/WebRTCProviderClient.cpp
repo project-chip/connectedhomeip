@@ -94,23 +94,23 @@ void WebRTCProviderClient::OnDone(CommandSender * client)
     switch (mCommandType)
     {
     case CommandType::kSolicitOffer:
-        ChipLogProgress(NotSpecified, "WebRTCProviderClient: Command SolicitOffer has been successfully processed.");
+        ChipLogProgress(NotSpecified, "WebRTCProviderClient: Command SolicitOffer has completed.");
         break;
 
     case CommandType::kProvideOffer:
-        ChipLogProgress(NotSpecified, "WebRTCProviderClient: Command ProvideOffer has been successfully processed.");
+        ChipLogProgress(NotSpecified, "WebRTCProviderClient: Command ProvideOffer has completed.");
         break;
 
     case CommandType::kProvideAnswer:
-        ChipLogProgress(NotSpecified, "WebRTCProviderClient: Command ProvideAnswer has been successfully processed.");
+        ChipLogProgress(NotSpecified, "WebRTCProviderClient: Command ProvideAnswer has completed.");
         break;
 
     case CommandType::kProvideICECandidates:
-        ChipLogProgress(NotSpecified, "WebRTCProviderClient: Command ProvideICECandidates has been successfully processed.");
+        ChipLogProgress(NotSpecified, "WebRTCProviderClient: Command ProvideICECandidates has completed.");
         break;
 
     case CommandType::kEndSession:
-        ChipLogProgress(NotSpecified, "WebRTCProviderClient: Command EndSession has been successfully processed.");
+        ChipLogProgress(NotSpecified, "WebRTCProviderClient: Command EndSession has completed.");
         break;
 
     default:
