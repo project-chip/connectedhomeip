@@ -64,9 +64,10 @@ import tempfile
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
-from chip.testing.apps import AppServerSubprocess
-from chip.testing.matter_testing import MatterBaseTest, SetupParameters, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+from matter.testing.apps import AppServerSubprocess
+from matter.testing.matter_testing import MatterBaseTest, SetupParameters, TestStep, async_test_body, default_matter_test_main
 
 _DEVICE_TYPE_AGGREGATOR = 0x000E
 

@@ -30,12 +30,13 @@ from typing import TYPE_CHECKING, Callable
 import chip.clusters as Clusters
 from chip.clusters import Attribute
 from chip.clusters import ClusterObjects as ClusterObjects
-from chip.testing.global_attribute_ids import GlobalAttributeIds
 from mobly import asserts
+
+from matter.testing.global_attribute_ids import GlobalAttributeIds
 
 # conditional import to avoid circular dependency but still allow type checking
 if TYPE_CHECKING:
-    from chip.testing.matter_testing import MatterBaseTest
+    from matter.testing.matter_testing import MatterBaseTest
 
 EndpointCheckFunction = Callable[[
     Clusters.Attribute.AsyncReadTransaction.ReadResponse, int], bool]
@@ -286,7 +287,7 @@ def run_on_singleton_matching_endpoint(accept_function: EndpointCheckFunction):
     def run_on_singleton_matching_endpoint_internal(body):
         def matching_runner(self: "MatterBaseTest", *args, **kwargs):
             # Import locally to avoid circular dependency
-            from chip.testing.matter_testing import MatterBaseTest
+            from matter.testing.matter_testing import MatterBaseTest
             assert isinstance(self, MatterBaseTest)
 
             runner_with_timeout = asyncio.wait_for(

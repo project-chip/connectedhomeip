@@ -52,10 +52,10 @@ from chip import ChipDeviceCtrl
 from chip.exceptions import ChipStackError
 from chip.interaction_model import Status
 from chip.tlv import TLVReader
-from matter_testing_infrastructure.chip.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body,
-                                                                       default_matter_test_main)
 from mdns_discovery import mdns_discovery
 from mobly import asserts
+
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 opcreds = Clusters.OperationalCredentials
 nonce = random.randbytes(32)

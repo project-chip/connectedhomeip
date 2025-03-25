@@ -40,10 +40,10 @@ from enum import Enum, IntFlag
 from itertools import chain
 from typing import Any, Iterable, List, Optional, Tuple
 
-import chip.testing.conversions as conversions
-import chip.testing.decorators as decorators
-import chip.testing.matchers as matchers
-import chip.testing.timeoperations as timeoperations
+import matter.testing.conversions as conversions
+import matter.testing.decorators as decorators
+import matter.testing.matchers as matchers
+import matter.testing.timeoperations as timeoperations
 
 # isort: off
 
@@ -66,13 +66,14 @@ from chip.exceptions import ChipStackError
 from chip.interaction_model import InteractionModelError, Status
 from chip.setup_payload import SetupPayload
 from chip.storage import PersistentStorage
-from chip.testing.commissioning import CommissioningInfo, CustomCommissioningParameters, SetupPayloadInfo, commission_devices
-from chip.testing.global_attribute_ids import GlobalAttributeIds
-from chip.testing.pics import read_pics_from_file
 from chip.tracing import TracingContext
 from mobly import asserts, base_test, signals, utils
 from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
 from mobly.test_runner import TestRunner
+
+from matter.testing.commissioning import CommissioningInfo, CustomCommissioningParameters, SetupPayloadInfo, commission_devices
+from matter.testing.global_attribute_ids import GlobalAttributeIds
+from matter.testing.pics import read_pics_from_file
 
 try:
     from matter.testing.yamltests.hooks import TestRunnerHooks
@@ -2028,7 +2029,7 @@ def default_matter_test_main():
     In this case, only one test class in a test script is allowed.
     To make your test script executable, add the following to your file:
     .. code-block:: python
-      from chip.testing.matter_testing import default_matter_test_main
+      from matter.testing.matter_testing import default_matter_test_main
       ...
       if __name__ == '__main__':
         default_matter_test_main()

@@ -44,8 +44,10 @@ from chip.clusters import ClusterObjects as ClusterObjects
 from chip.clusters.Attribute import AttributePath, TypedAttributePath
 from chip.exceptions import ChipStackError
 from chip.interaction_model import Status
-from chip.testing.matter_testing import AttributeChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+from matter.testing.matter_testing import (AttributeChangeCallback, MatterBaseTest, TestStep, async_test_body,
+                                           default_matter_test_main)
 
 '''
 Category:

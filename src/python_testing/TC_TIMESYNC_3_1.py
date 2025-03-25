@@ -35,8 +35,9 @@
 # === END CI TEST ARGUMENTS ===
 
 import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
+
+from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 
 
 class TC_TIMESYNC_3_1(MatterBaseTest):

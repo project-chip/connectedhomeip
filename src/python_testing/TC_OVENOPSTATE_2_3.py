@@ -38,8 +38,9 @@
 # === END CI TEST ARGUMENTS ===
 
 import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from TC_OpstateCommon import TC_OPSTATE_BASE, TestInfo
+
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
 class TC_OVENOPSTATE_2_3(MatterBaseTest, TC_OPSTATE_BASE):

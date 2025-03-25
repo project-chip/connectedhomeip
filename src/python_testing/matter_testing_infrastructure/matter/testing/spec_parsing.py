@@ -28,14 +28,15 @@ from importlib.abc import Traversable
 from typing import Callable, Optional, Union
 
 import chip.clusters as Clusters
-import chip.testing.conformance as conformance_support
-from chip.testing.conformance import (OPTIONAL_CONFORM, TOP_LEVEL_CONFORMANCE_TAGS, ConformanceDecision, ConformanceException,
-                                      ConformanceParseParameters, feature, is_disallowed, mandatory, optional, or_operation,
-                                      parse_callable_from_xml, parse_device_type_callable_from_xml)
-from chip.testing.global_attribute_ids import GlobalAttributeIds
-from chip.testing.matter_testing import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
-                                         EventPathLocation, FeaturePathLocation, ProblemLocation, ProblemNotice, ProblemSeverity)
 from chip.tlv import uint
+
+import matter.testing.conformance as conformance_support
+from matter.testing.conformance import (OPTIONAL_CONFORM, TOP_LEVEL_CONFORMANCE_TAGS, ConformanceDecision, ConformanceException,
+                                        ConformanceParseParameters, feature, is_disallowed, mandatory, optional, or_operation,
+                                        parse_callable_from_xml, parse_device_type_callable_from_xml)
+from matter.testing.global_attribute_ids import GlobalAttributeIds
+from matter.testing.matter_testing import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
+                                           EventPathLocation, FeaturePathLocation, ProblemLocation, ProblemNotice, ProblemSeverity)
 
 _PRIVILEGE_STR = {
     None: "N/A",
@@ -581,7 +582,7 @@ def get_data_model_directory(data_model_directory: Union[PrebuiltDataModelDirect
         return data_model_directory
 
     # If it's a prebuilt directory, build the path based on the version and data model level
-    zip_path = pkg_resources.files(importlib.import_module('chip.testing')).joinpath(
+    zip_path = pkg_resources.files(importlib.import_module('matter.testing')).joinpath(
         'data_model').joinpath(data_model_directory.dirname).joinpath('allfiles.zip')
     path = zipfile.Path(zip_path)
 

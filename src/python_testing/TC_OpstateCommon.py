@@ -27,8 +27,9 @@ from chip.clusters import ClusterObjects as ClusterObjects
 from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import ClusterAttributeChangeAccumulator, EventChangeCallback, TestStep
 from mobly import asserts
+
+from matter.testing.matter_testing import ClusterAttributeChangeAccumulator, EventChangeCallback, TestStep
 
 
 def get_pid(name):

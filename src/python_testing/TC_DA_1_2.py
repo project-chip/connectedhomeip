@@ -42,9 +42,6 @@ import re
 
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.basic_composition import BasicCompositionTests
-from chip.testing.conversions import hex_from_bytes
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 from chip.tlv import TLVReader
 from cryptography import x509
 from cryptography.exceptions import InvalidSignature
@@ -57,6 +54,10 @@ from pyasn1.codec.der.decoder import decode as der_decoder
 from pyasn1.error import PyAsn1Error
 from pyasn1.type import univ
 from pyasn1_modules import rfc5652
+
+from matter.testing.basic_composition import BasicCompositionTests
+from matter.testing.conversions import hex_from_bytes
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 
 
 def get_value_for_oid(oid_dotted_str: str, cert: x509.Certificate) -> str:
