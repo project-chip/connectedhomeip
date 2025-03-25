@@ -18,7 +18,7 @@
 
 #
 #    Description:
-#      Builds a Python wheel package for CHIP.
+#      Builds a Python wheel package for Matter.
 #
 
 from __future__ import absolute_import
@@ -31,13 +31,14 @@ import shutil
 from setuptools import Distribution, setup
 
 parser = argparse.ArgumentParser(
-    description='build the pip package for chip using chip components generated during the build and python source code')
-parser.add_argument('--package_name', default='chip',
+    description='Build PIP package for Matter using Matter core components '
+                'generated during the build and python source code')
+parser.add_argument('--package-name', default='matter',
                     help='configure the python package name')
-parser.add_argument('--build_number', default='0.0',
-                    help='configure the chip build number')
-parser.add_argument('--build_dir', help='directory to build in')
-parser.add_argument('--dist_dir', help='directory to place distribution in')
+parser.add_argument('--build-number', default='1.0.0',
+                    help='configure the python package build number')
+parser.add_argument('--build-dir', help='directory to build in')
+parser.add_argument('--dist-dir', help='directory to place distribution in')
 parser.add_argument('--manifest', help='list of files to package')
 parser.add_argument(
     '--plat-name', help='platform name to embed in generated filenames')
@@ -65,7 +66,7 @@ class BinaryDistribution(Distribution):
 
 packageName = args.package_name
 libName = args.lib_name
-chipPackageVer = args.build_number
+packageVersion = args.build_number
 
 # Record the current directory at the start of execution.
 curDir = os.curdir
@@ -76,14 +77,14 @@ distDir = os.path.abspath(args.dist_dir)
 
 # Use a temporary directory within the build directory to assemble the components
 # for the installable package.
-tmpDir = os.path.join(buildDir, "chip-wheel-components")
+tmpDir = os.path.join(buildDir, "matter-wheel-components")
 
 manifest = json.load(open(manifestFile, "r"))
 
 try:
 
     #
-    # Perform a series of setup steps prior to creating the chip package...
+    # Perform a series of setup steps prior to creating the package...
     #
 
     # Create the temporary components directory.
@@ -112,27 +113,25 @@ try:
     requiredPackages = manifest['package_reqs']
 
     #
-    # Build the chip package...
+    # Build the package...
     #
     packages = manifest['packages']
 
     print("packageName: {}".format(packageName))
     print("libName: {}".format(libName))
 
-    # Invoke the setuptools 'bdist_wheel' command to generate a wheel containing
-    # the CHIP python packages, shared libraries and scripts.
+    # Invoke the setuptools 'bdist_wheel' command to generate a wheel
+    # containing Matter Python packages, shared libraries and scripts.
     setup(
         name=packageName,
-        version=chipPackageVer,
-        description="Python-base APIs and tools for CHIP.",
+        version=packageVersion,
+        description="Python-base APIs and tools for Matter.",
         url="https://github.com/project-chip/connectedhomeip",
         license="Apache",
         classifiers=[
             "Intended Audience :: Developers",
             "License :: OSI Approved :: Apache Software License",
-            "Programming Language :: Python :: 3.7",
-            "Programming Language :: Python :: 3.8",
-            "Programming Language :: Python :: 3.9",
+            "Programming Language :: Python :: 3"
         ],
         python_requires=">=3.7",
         packages=packages,
