@@ -17,17 +17,17 @@
 #   INPUT     - the name of the ".matter" file to use for generation
 #   GENERATOR - generator to use for codegen.py
 #   OUTPUTS   - EXPECTED output names. MUST match actual outputs
-# 
+#
 #   OUTPUT_PATH  - [OUT] output variable will contain the directory where the
 #                  files will be generated
 #   OUTPUT_FILES - [OUT] output variable will contain the path of generated files.
 #                  suitable to be added within a build target
 #
 function(chip_codegen TARGET_NAME)
-    cmake_parse_arguments(ARG 
-         "" 
-         "INPUT;GENERATOR;OUTPUT_PATH;OUTPUT_FILES" 
-         "OUTPUTS" 
+    cmake_parse_arguments(ARG
+         ""
+         "INPUT;GENERATOR;OUTPUT_PATH;OUTPUT_FILES"
+         "OUTPUTS"
          ${ARGN}
     )
 

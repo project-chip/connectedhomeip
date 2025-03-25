@@ -76,6 +76,9 @@ class TestCaseStorage(GeneratorStorage):
 
         path = self.get_existing_data_path(relative_path)
         if path:
+            if REGENERATE_GOLDEN_IMAGES and not os.path.exists(path):
+                return ""
+
             with open(path, 'rt') as golden:
                 return golden.read()
 
@@ -87,7 +90,11 @@ class TestCaseStorage(GeneratorStorage):
         if REGENERATE_GOLDEN_IMAGES:
             print("RE-GENERATING %r" % relative_path)
             # Expect writing only on regeneration
-            with open(self.get_existing_data_path(relative_path), 'wt') as golden:
+            path = os.path.abspath(self.get_existing_data_path(relative_path))
+            dir_path = os.path.dirname(path)
+            if not os.path.exists(dir_path):
+                os.makedirs(dir_path)
+            with open(path, 'wt') as golden:
                 golden.write(content)
                 return
 
