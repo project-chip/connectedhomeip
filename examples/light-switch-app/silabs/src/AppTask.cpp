@@ -234,8 +234,6 @@ void AppTask::AppEventHandler(AppEvent * aEvent)
         {
             sActionButtonSuppressed = true;
             LightSwitchMgr::GetInstance().changeStepMode();
-            ChipLogProgress(AppServer, "Step direction changed. Current Step Direction : %s",
-                            ((LightSwitchMgr::GetInstance().getStepMode() == StepModeEnum::kUp) ? "kUp" : "kDown"));
         }
         else
         {
@@ -264,14 +262,11 @@ void AppTask::AppEventHandler(AppEvent * aEvent)
     }
     case AppEvent::kEventType_ActionButtonPressed:
         sActionButtonPressed = true;
-        aEvent->Handler      = LightSwitchMgr::SwitchActionEventHandler;
-        AppTask::GetAppTask().PostEvent(aEvent);
+        LightSwitchMgr::GetInstance().SwitchActionEventHandler(aEvent);
         if (sFunctionButtonPressed)
         {
             sActionButtonSuppressed = true;
             LightSwitchMgr::GetInstance().changeStepMode();
-            ChipLogProgress(AppServer, "Step direction changed. Current Step Direction : %s",
-                            ((LightSwitchMgr::GetInstance().getStepMode() == StepModeEnum::kUp) ? "kUp" : "kDown"));
         }
         else if (sAppTask.longPressTimer)
         {
@@ -291,16 +286,13 @@ void AppTask::AppEventHandler(AppEvent * aEvent)
         else
         {
             aEvent->Type    = AppEvent::kEventType_TriggerToggle;
-            aEvent->Handler = LightSwitchMgr::SwitchActionEventHandler;
-            AppTask::GetAppTask().PostEvent(aEvent);
+            LightSwitchMgr::GetInstance().SwitchActionEventHandler(aEvent);
         }
         aEvent->Type    = AppEvent::kEventType_ActionButtonReleased;
-        aEvent->Handler = LightSwitchMgr::SwitchActionEventHandler;
-        AppTask::GetAppTask().PostEvent(aEvent);
+        LightSwitchMgr::GetInstance().SwitchActionEventHandler(aEvent);
         break;
     case AppEvent::kEventType_TriggerLevelControlAction:
-        aEvent->Handler = LightSwitchMgr::SwitchActionEventHandler;
-        AppTask::GetAppTask().PostEvent(aEvent);
+        LightSwitchMgr::GetInstance().SwitchActionEventHandler(aEvent);
     default:
         break;
     }

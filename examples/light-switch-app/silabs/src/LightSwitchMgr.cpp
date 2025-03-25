@@ -107,6 +107,8 @@ StepModeEnum LightSwitchMgr::getStepMode()
 void LightSwitchMgr::changeStepMode()
 {
     stepDirection = (stepDirection == StepModeEnum::kUp) ? StepModeEnum::kDown : StepModeEnum::kUp;
+    ChipLogProgress(AppServer, "Step direction changed. Current Step Direction : %s",
+        ((LightSwitchMgr::GetInstance().getStepMode() == StepModeEnum::kUp) ? "kUp" : "kDown"));
 }
 
 void LightSwitchMgr::TriggerLightSwitchAction(LightSwitchAction action, bool isGroupCommand)
