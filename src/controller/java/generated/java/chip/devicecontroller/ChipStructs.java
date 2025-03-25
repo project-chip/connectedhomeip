@@ -7122,67 +7122,6 @@ public static class CommodityPriceClusterCommodityPriceStruct {
     return output.toString();
   }
 }
-public static class CommodityPriceClusterCurrencyStruct {
-  public Integer currency;
-  public Integer decimalPoints;
-  private static final long CURRENCY_ID = 0L;
-  private static final long DECIMAL_POINTS_ID = 1L;
-
-  public CommodityPriceClusterCurrencyStruct(
-    Integer currency,
-    Integer decimalPoints
-  ) {
-    this.currency = currency;
-    this.decimalPoints = decimalPoints;
-  }
-
-  public StructType encodeTlv() {
-    ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(CURRENCY_ID, new UIntType(currency)));
-    values.add(new StructElement(DECIMAL_POINTS_ID, new UIntType(decimalPoints)));
-
-    return new StructType(values);
-  }
-
-  public static CommodityPriceClusterCurrencyStruct decodeTlv(BaseTLVType tlvValue) {
-    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
-      return null;
-    }
-    Integer currency = null;
-    Integer decimalPoints = null;
-    for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == CURRENCY_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          currency = castingValue.value(Integer.class);
-        }
-      } else if (element.contextTagNum() == DECIMAL_POINTS_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          decimalPoints = castingValue.value(Integer.class);
-        }
-      }
-    }
-    return new CommodityPriceClusterCurrencyStruct(
-      currency,
-      decimalPoints
-    );
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder output = new StringBuilder();
-    output.append("CommodityPriceClusterCurrencyStruct {\n");
-    output.append("\tcurrency: ");
-    output.append(currency);
-    output.append("\n");
-    output.append("\tdecimalPoints: ");
-    output.append(decimalPoints);
-    output.append("\n");
-    output.append("}\n");
-    return output.toString();
-  }
-}
 public static class CommodityPriceClusterPriceStruct {
   public Long amount;
   public ChipStructs.CommodityPriceClusterCurrencyStruct currency;
@@ -7239,6 +7178,67 @@ public static class CommodityPriceClusterPriceStruct {
     output.append("\n");
     output.append("\tcurrency: ");
     output.append(currency);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class CommodityPriceClusterCurrencyStruct {
+  public Integer currency;
+  public Integer decimalPoints;
+  private static final long CURRENCY_ID = 0L;
+  private static final long DECIMAL_POINTS_ID = 1L;
+
+  public CommodityPriceClusterCurrencyStruct(
+    Integer currency,
+    Integer decimalPoints
+  ) {
+    this.currency = currency;
+    this.decimalPoints = decimalPoints;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(CURRENCY_ID, new UIntType(currency)));
+    values.add(new StructElement(DECIMAL_POINTS_ID, new UIntType(decimalPoints)));
+
+    return new StructType(values);
+  }
+
+  public static CommodityPriceClusterCurrencyStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer currency = null;
+    Integer decimalPoints = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == CURRENCY_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          currency = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == DECIMAL_POINTS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          decimalPoints = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new CommodityPriceClusterCurrencyStruct(
+      currency,
+      decimalPoints
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("CommodityPriceClusterCurrencyStruct {\n");
+    output.append("\tcurrency: ");
+    output.append(currency);
+    output.append("\n");
+    output.append("\tdecimalPoints: ");
+    output.append(decimalPoints);
     output.append("\n");
     output.append("}\n");
     return output.toString();
@@ -16999,6 +16999,67 @@ public static class CommodityTariffClusterTariffPeriodStruct {
     return output.toString();
   }
 }
+public static class CommodityTariffClusterCurrencyStruct {
+  public Integer currency;
+  public Integer decimalPoints;
+  private static final long CURRENCY_ID = 0L;
+  private static final long DECIMAL_POINTS_ID = 1L;
+
+  public CommodityTariffClusterCurrencyStruct(
+    Integer currency,
+    Integer decimalPoints
+  ) {
+    this.currency = currency;
+    this.decimalPoints = decimalPoints;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(CURRENCY_ID, new UIntType(currency)));
+    values.add(new StructElement(DECIMAL_POINTS_ID, new UIntType(decimalPoints)));
+
+    return new StructType(values);
+  }
+
+  public static CommodityTariffClusterCurrencyStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer currency = null;
+    Integer decimalPoints = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == CURRENCY_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          currency = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == DECIMAL_POINTS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          decimalPoints = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new CommodityTariffClusterCurrencyStruct(
+      currency,
+      decimalPoints
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("CommodityTariffClusterCurrencyStruct {\n");
+    output.append("\tcurrency: ");
+    output.append(currency);
+    output.append("\n");
+    output.append("\tdecimalPoints: ");
+    output.append(decimalPoints);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class CommodityTariffClusterPowerThresholdStruct {
   public Optional<Long> powerThreshold;
   public Optional<Long> apparentPowerThreshold;
@@ -17070,67 +17131,6 @@ public static class CommodityTariffClusterPowerThresholdStruct {
     output.append("\n");
     output.append("\tpowerThresholdSource: ");
     output.append(powerThresholdSource);
-    output.append("\n");
-    output.append("}\n");
-    return output.toString();
-  }
-}
-public static class CommodityTariffClusterCurrencyStruct {
-  public Integer currency;
-  public Integer decimalPoints;
-  private static final long CURRENCY_ID = 0L;
-  private static final long DECIMAL_POINTS_ID = 1L;
-
-  public CommodityTariffClusterCurrencyStruct(
-    Integer currency,
-    Integer decimalPoints
-  ) {
-    this.currency = currency;
-    this.decimalPoints = decimalPoints;
-  }
-
-  public StructType encodeTlv() {
-    ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(CURRENCY_ID, new UIntType(currency)));
-    values.add(new StructElement(DECIMAL_POINTS_ID, new UIntType(decimalPoints)));
-
-    return new StructType(values);
-  }
-
-  public static CommodityTariffClusterCurrencyStruct decodeTlv(BaseTLVType tlvValue) {
-    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
-      return null;
-    }
-    Integer currency = null;
-    Integer decimalPoints = null;
-    for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == CURRENCY_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          currency = castingValue.value(Integer.class);
-        }
-      } else if (element.contextTagNum() == DECIMAL_POINTS_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          decimalPoints = castingValue.value(Integer.class);
-        }
-      }
-    }
-    return new CommodityTariffClusterCurrencyStruct(
-      currency,
-      decimalPoints
-    );
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder output = new StringBuilder();
-    output.append("CommodityTariffClusterCurrencyStruct {\n");
-    output.append("\tcurrency: ");
-    output.append(currency);
-    output.append("\n");
-    output.append("\tdecimalPoints: ");
-    output.append(decimalPoints);
     output.append("\n");
     output.append("}\n");
     return output.toString();
