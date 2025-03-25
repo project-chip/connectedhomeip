@@ -29,6 +29,7 @@ config("openthread_rt1060_config") {
   include_dirs = [
     "${openthread_nxp_root}/src/common",
     "${openthread_nxp_root}/src/common/br",
+    "${openthread_nxp_root}/src/common/lwip",
     "${openthread_nxp_root}/src/common/spinel",
     "${openthread_nxp_root}/src/imx_rt/rt1060",
     "${openthread_nxp_root}/third_party/mbedtls/configs",
@@ -57,11 +58,16 @@ config("openthread_rt1060_config") {
       "OT_APP_BR_LWIP_HOOKS_EN=1",
       "OPENTHREAD_CONFIG_RADIO_LINK_TREL_ENABLE=1",
       "OPENTHREAD_CONFIG_DNS_UPSTREAM_QUERY_ENABLE=1",
+      "OPENTHREAD_CONFIG_NAT64_TRANSLATOR_ENABLE=1",
+      "OPENTHREAD_CONFIG_NAT64_IDLE_TIMEOUT_SECONDS=60",
+      "OPENTHREAD_CONFIG_NAT64_PORT_TRANSLATION_ENABLE=1",
+      "OPENTHREAD_CONFIG_NAT64_BORDER_ROUTING_ENABLE=1",
+      "DISABLE_TCPIP_INIT=1",
+      "OPENTHREAD_CONFIG_BORDER_AGENT_EPHEMERAL_KEY_ENABLE=1",
     ]
 
     if (nxp_enable_matter_cli) {
       defines += [
-        "OPENTHREAD_CONFIG_BORDER_AGENT_EPHEMERAL_KEY_ENABLE=1",
         "OT_APP_CLI_EPHEMERAL_KEY_ADDON=1",
         "OT_APP_CLI_LWIP_ADDON=1",
       ]
@@ -105,6 +111,8 @@ source_set("libopenthread-rt1060") {
       "${openthread_nxp_root}/src/common/br/trel_plat.c",
       "${openthread_nxp_root}/src/common/br/udp_plat.c",
       "${openthread_nxp_root}/src/common/br/utils.c",
+      "${openthread_nxp_root}/src/common/lwip/ot_lwip.c",
+      "${openthread_nxp_root}/src/common/lwip/token_bucket.c",
     ]
 
     if (nxp_enable_matter_cli) {
