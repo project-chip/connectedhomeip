@@ -160,7 +160,7 @@ limitations under the License.
   </enum>
   <struct name="MeasurementRangeStruct">
     <cluster code="0x0090"/>
-    <item fieldId="0" name="MeasurementType" type="MeasurementTypeEnum" min="0x0000" max="0x000E"/>
+    <item fieldId="0" name="MeasurementType" type="MeasurementTypeEnum" min="0x0000" max="0x0010"/>
     <item fieldId="1" name="Min" type="int64s" min="-4611686018427387904" max="4611686018427387904"/>
     <item fieldId="2" name="Max" type="int64s" min="-4611686018427387904" max="4611686018427387904"/>
     <item fieldId="3" name="StartTimestamp" type="epoch_s" optional="true"/>

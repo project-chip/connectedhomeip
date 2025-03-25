@@ -90,6 +90,8 @@ function atomicType(arg)
     return 'uint32_t';
   case 'temperature':
     return 'int16_t';
+  case 'money':
+    return 'int64_t';
   default:
     throw 'not overriding';
   }
