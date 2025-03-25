@@ -144,6 +144,8 @@ private:
     void InitializeSnapshotStreams();
 
     GstElement * CreatePipeline(const std::string & pipelineString, CameraError & error);
+    GstElement * CreateSnapshotPipeline(const std::string & device, int width, int height, int quality,
+                                        const std::string & filename, CameraError & error);
     CameraError SetV4l2Control(uint32_t controlId, int value);
 
     // Various cluster server delegates
