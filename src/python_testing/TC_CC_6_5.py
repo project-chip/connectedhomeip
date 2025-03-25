@@ -1,10 +1,16 @@
+
 import asyncio
-from typing import List
 import chip.clusters as Clusters
 from chip.interaction_model import Status
-from matter_testing_infrastructure.chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter_testing_infrastructure.chip.testing.matter_testing import (
+    MatterBaseTest,
+    TestStep,
+    async_test_body,
+    default_matter_test_main
+)
 from mobly import asserts
-kCCAttributeValueIDs = [0x0001, 0x0003, 0x0004, 0x0007, 0x4000, 0x4001, 0x4002, 0x4003, 0x4004]
+
+
 class TC_CC_6_5(MatterBaseTest):
     def desc_TC_CC_6_5(self) -> str:
         """Returns a description of this test"""
