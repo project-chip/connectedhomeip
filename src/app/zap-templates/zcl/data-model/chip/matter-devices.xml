@@ -2541,6 +2541,9 @@ limitations under the License.
             <endpoint conformance="M" constraint="min 1">
                     <deviceType>0x0071</deviceType>
             </endpoint>
+             <endpoint conformance="O" constraint="max 1">
+                    <deviceType>0x0078</deviceType>
+            </endpoint>
         </endpointComposition>
         <clusters lockOthers="true">
             <include cluster="Identify" client="false" server="false" clientLocked="true" serverLocked="false"></include>
