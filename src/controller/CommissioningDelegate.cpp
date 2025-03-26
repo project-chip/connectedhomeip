@@ -43,6 +43,9 @@ const char * StageToString(CommissioningStage stage)
     case kConfigRegulatory:
         return "ConfigRegulatory";
 
+    case kConfigureTCAcknowledgments:
+        return "ConfigureTCAcknowledgments";
+
     case kConfigureUTCTime:
         return "ConfigureUTCTime";
 

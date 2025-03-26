@@ -213,10 +213,10 @@ enum TestGlobalEnum : enum8 {
 }
 
 enum ThreeLevelAutoEnum : enum8 {
-  kLow = 0;
-  kMedium = 1;
-  kHigh = 2;
-  kAutomatic = 3;
+  kAuto = 0;
+  kLow = 1;
+  kMedium = 2;
+  kHigh = 3;
 }
 
 bitmap TestGlobalBitmap : bitmap32 {
@@ -488,6 +488,131 @@ cluster OnOff = 6 {
   command OnWithRecallGlobalScene(): DefaultSuccess = 65;
   /** The OnWithTimedOff command allows devices to be turned on for a specific duration with a guarded off duration so that SHOULD the device be subsequently switched off, further OnWithTimedOff commands, received during this time, are prevented from turning the devices back on. */
   command OnWithTimedOff(OnWithTimedOffRequest): DefaultSuccess = 66;
+}
+
+/** Attributes and commands for controlling devices that can be set to a level between fully 'On' and fully 'Off.' */
+cluster LevelControl = 8 {
+  revision 6;
+
+  enum MoveModeEnum : enum8 {
+    kUp = 0;
+    kDown = 1;
+  }
+
+  enum StepModeEnum : enum8 {
+    kUp = 0;
+    kDown = 1;
+  }
+
+  bitmap Feature : bitmap32 {
+    kOnOff = 0x1;
+    kLighting = 0x2;
+    kFrequency = 0x4;
+  }
+
+  bitmap OptionsBitmap : bitmap8 {
+    kExecuteIfOff = 0x1;
+    kCoupleColorTempToLevel = 0x2;
+  }
+
+  readonly attribute nullable int8u currentLevel = 0;
+  readonly attribute optional int16u remainingTime = 1;
+  readonly attribute optional int8u minLevel = 2;
+  readonly attribute optional int8u maxLevel = 3;
+  readonly attribute optional int16u currentFrequency = 4;
+  readonly attribute optional int16u minFrequency = 5;
+  readonly attribute optional int16u maxFrequency = 6;
+  attribute OptionsBitmap options = 15;
+  attribute optional int16u onOffTransitionTime = 16;
+  attribute nullable int8u onLevel = 17;
+  attribute optional nullable int16u onTransitionTime = 18;
+  attribute optional nullable int16u offTransitionTime = 19;
+  attribute optional nullable int8u defaultMoveRate = 20;
+  attribute access(write: manage) optional nullable int8u startUpCurrentLevel = 16384;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct MoveToLevelRequest {
+    int8u level = 0;
+    nullable int16u transitionTime = 1;
+    OptionsBitmap optionsMask = 2;
+    OptionsBitmap optionsOverride = 3;
+  }
+
+  request struct MoveRequest {
+    MoveModeEnum moveMode = 0;
+    nullable int8u rate = 1;
+    OptionsBitmap optionsMask = 2;
+    OptionsBitmap optionsOverride = 3;
+  }
+
+  request struct StepRequest {
+    StepModeEnum stepMode = 0;
+    int8u stepSize = 1;
+    nullable int16u transitionTime = 2;
+    OptionsBitmap optionsMask = 3;
+    OptionsBitmap optionsOverride = 4;
+  }
+
+  request struct StopRequest {
+    OptionsBitmap optionsMask = 0;
+    OptionsBitmap optionsOverride = 1;
+  }
+
+  request struct MoveToLevelWithOnOffRequest {
+    int8u level = 0;
+    nullable int16u transitionTime = 1;
+    OptionsBitmap optionsMask = 2;
+    OptionsBitmap optionsOverride = 3;
+  }
+
+  request struct MoveWithOnOffRequest {
+    MoveModeEnum moveMode = 0;
+    nullable int8u rate = 1;
+    OptionsBitmap optionsMask = 2;
+    OptionsBitmap optionsOverride = 3;
+  }
+
+  request struct StepWithOnOffRequest {
+    StepModeEnum stepMode = 0;
+    int8u stepSize = 1;
+    nullable int16u transitionTime = 2;
+    OptionsBitmap optionsMask = 3;
+    OptionsBitmap optionsOverride = 4;
+  }
+
+  request struct StopWithOnOffRequest {
+    OptionsBitmap optionsMask = 0;
+    OptionsBitmap optionsOverride = 1;
+  }
+
+  request struct MoveToClosestFrequencyRequest {
+    int16u frequency = 0;
+  }
+
+  /** Command description for MoveToLevel */
+  command MoveToLevel(MoveToLevelRequest): DefaultSuccess = 0;
+  /** Command description for Move */
+  command Move(MoveRequest): DefaultSuccess = 1;
+  /** Command description for Step */
+  command Step(StepRequest): DefaultSuccess = 2;
+  /** Command description for Stop */
+  command Stop(StopRequest): DefaultSuccess = 3;
+  /** Command description for MoveToLevelWithOnOff */
+  command MoveToLevelWithOnOff(MoveToLevelWithOnOffRequest): DefaultSuccess = 4;
+  /** Command description for MoveWithOnOff */
+  command MoveWithOnOff(MoveWithOnOffRequest): DefaultSuccess = 5;
+  /** Command description for StepWithOnOff */
+  command StepWithOnOff(StepWithOnOffRequest): DefaultSuccess = 6;
+  /** Command description for StopWithOnOff */
+  command StopWithOnOff(StopWithOnOffRequest): DefaultSuccess = 7;
+  /** Change the currrent frequency to the provided one, or a close
+        approximation if the exact provided one is not possible. */
+  command MoveToClosestFrequency(MoveToClosestFrequencyRequest): DefaultSuccess = 8;
 }
 
 /** The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters. */
@@ -959,7 +1084,7 @@ cluster GeneralCommissioning = 48 {
   provisional readonly attribute access(read: administer) optional int16u TCMinRequiredVersion = 6;
   provisional readonly attribute access(read: administer) optional bitmap16 TCAcknowledgements = 7;
   provisional readonly attribute access(read: administer) optional boolean TCAcknowledgementsRequired = 8;
-  provisional readonly attribute access(read: administer) optional int32u TCUpdateDeadline = 9;
+  provisional readonly attribute access(read: administer) optional nullable int32u TCUpdateDeadline = 9;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1367,7 +1492,7 @@ cluster GeneralDiagnostics = 51 {
   /** Take a snapshot of system time and epoch time. */
   command TimeSnapshot(): TimeSnapshotResponse = 1;
   /** Request a variable length payload response. */
-  command PayloadTestRequest(PayloadTestRequestRequest): PayloadTestResponse = 3;
+  command access(invoke: manage) PayloadTestRequest(PayloadTestRequestRequest): PayloadTestResponse = 3;
 }
 
 /** The Software Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
@@ -1948,7 +2073,7 @@ cluster AdministratorCommissioning = 60 {
 
 /** This cluster is used to add or remove Operational Credentials on a Commissionee or Node, as well as manage the associated Fabrics. */
 cluster OperationalCredentials = 62 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum CertificateChainTypeEnum : enum8 {
     kDACCertificate = 1;
@@ -1974,12 +2099,14 @@ cluster OperationalCredentials = 62 {
     fabric_id fabricID = 3;
     node_id nodeID = 4;
     char_string<32> label = 5;
+    optional octet_string<85> VIDVerificationStatement = 6;
     fabric_idx fabricIndex = 254;
   }
 
   fabric_scoped struct NOCStruct {
-    fabric_sensitive octet_string noc = 1;
-    nullable fabric_sensitive octet_string icac = 2;
+    octet_string<400> noc = 1;
+    nullable octet_string<400> icac = 2;
+    optional octet_string<400> vvsc = 3;
     fabric_idx fabricIndex = 254;
   }
 
@@ -2001,7 +2128,7 @@ cluster OperationalCredentials = 62 {
   }
 
   response struct AttestationResponse = 1 {
-    octet_string<900> attestationElements = 0;
+    octet_string attestationElements = 0;
     octet_string<64> attestationSignature = 1;
   }
 
@@ -2020,7 +2147,7 @@ cluster OperationalCredentials = 62 {
 
   response struct CSRResponse = 5 {
     octet_string NOCSRElements = 0;
-    octet_string attestationSignature = 1;
+    octet_string<64> attestationSignature = 1;
   }
 
   request struct AddNOCRequest {
@@ -2032,8 +2159,8 @@ cluster OperationalCredentials = 62 {
   }
 
   request struct UpdateNOCRequest {
-    octet_string NOCValue = 0;
-    optional octet_string ICACValue = 1;
+    octet_string<400> NOCValue = 0;
+    optional octet_string<400> ICACValue = 1;
   }
 
   response struct NOCResponse = 8 {
@@ -2051,7 +2178,24 @@ cluster OperationalCredentials = 62 {
   }
 
   request struct AddTrustedRootCertificateRequest {
-    octet_string rootCACertificate = 0;
+    octet_string<400> rootCACertificate = 0;
+  }
+
+  request struct SetVIDVerificationStatementRequest {
+    optional vendor_id vendorID = 0;
+    optional octet_string<85> VIDVerificationStatement = 1;
+    optional octet_string<400> vvsc = 2;
+  }
+
+  request struct SignVIDVerificationRequestRequest {
+    fabric_idx fabricIndex = 0;
+    octet_string<32> clientChallenge = 1;
+  }
+
+  response struct SignVIDVerificationResponse = 14 {
+    fabric_idx fabricIndex = 0;
+    int8u fabricBindingVersion = 1;
+    octet_string signature = 2;
   }
 
   /** Sender is requesting attestation information from the receiver. */
@@ -2062,7 +2206,7 @@ cluster OperationalCredentials = 62 {
   command access(invoke: administer) CSRRequest(CSRRequestRequest): CSRResponse = 4;
   /** Sender is requesting to add the new node operational certificates. */
   command access(invoke: administer) AddNOC(AddNOCRequest): NOCResponse = 6;
-  /** Sender is requesting to update the node operational certificates. */
+  /** This command SHALL replace the NOC and optional associated ICAC (if present) scoped under the accessing fabric upon successful validation of all arguments and preconditions. */
   fabric command access(invoke: administer) UpdateNOC(UpdateNOCRequest): NOCResponse = 7;
   /** This command SHALL be used by an Administrative Node to set the user-visible Label field for a given Fabric, as reflected by entries in the Fabrics attribute. */
   fabric command access(invoke: administer) UpdateFabricLabel(UpdateFabricLabelRequest): NOCResponse = 9;
@@ -2070,6 +2214,10 @@ cluster OperationalCredentials = 62 {
   command access(invoke: administer) RemoveFabric(RemoveFabricRequest): NOCResponse = 10;
   /** This command SHALL add a Trusted Root CA Certificate, provided as its CHIP Certificate representation. */
   command access(invoke: administer) AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
+  /** This command SHALL be used to update any of the accessing fabric's associated VendorID, VidVerificatioNStatement or VVSC (Vendor Verification Signing Certificate). */
+  fabric command access(invoke: administer) SetVIDVerificationStatement(SetVIDVerificationStatementRequest): DefaultSuccess = 12;
+  /** This command SHALL be used to request that the server authenticate the fabric associated with the FabricIndex given. */
+  command access(invoke: administer) SignVIDVerificationRequest(SignVIDVerificationRequestRequest): SignVIDVerificationResponse = 13;
 }
 
 /** The Group Key Management Cluster is the mechanism by which group keys are managed. */
@@ -2241,10 +2389,10 @@ cluster IcdManagement = 70 {
   readonly attribute access(read: administer) optional MonitoringRegistrationStruct registeredClients[] = 3;
   readonly attribute access(read: administer) optional int32u ICDCounter = 4;
   readonly attribute optional int16u clientsSupportedPerFabric = 5;
-  provisional readonly attribute optional UserActiveModeTriggerBitmap userActiveModeTriggerHint = 6;
-  provisional readonly attribute optional char_string<128> userActiveModeTriggerInstruction = 7;
-  provisional readonly attribute optional OperatingModeEnum operatingMode = 8;
-  provisional readonly attribute optional int32u maximumCheckInBackOff = 9;
+  readonly attribute optional UserActiveModeTriggerBitmap userActiveModeTriggerHint = 6;
+  readonly attribute optional char_string<128> userActiveModeTriggerInstruction = 7;
+  readonly attribute optional OperatingModeEnum operatingMode = 8;
+  readonly attribute optional int32u maximumCheckInBackOff = 9;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2309,7 +2457,7 @@ provisional cluster ScenesManagement = 98 {
     optional int64s valueSigned64 = 8;
   }
 
-  struct ExtensionFieldSet {
+  struct ExtensionFieldSetStruct {
     cluster_id clusterID = 0;
     AttributeValuePairStruct attributeValueList[] = 1;
   }
@@ -2323,7 +2471,6 @@ provisional cluster ScenesManagement = 98 {
     fabric_idx fabricIndex = 254;
   }
 
-  readonly attribute optional nullable node_id lastConfiguredBy = 0;
   readonly attribute int16u sceneTableSize = 1;
   readonly attribute SceneInfoStruct fabricSceneInfo[] = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -2337,8 +2484,8 @@ provisional cluster ScenesManagement = 98 {
     group_id groupID = 0;
     int8u sceneID = 1;
     int32u transitionTime = 2;
-    char_string sceneName = 3;
-    ExtensionFieldSet extensionFieldSets[] = 4;
+    char_string<16> sceneName = 3;
+    ExtensionFieldSetStruct extensionFieldSetStructs[] = 4;
   }
 
   response struct AddSceneResponse = 0 {
@@ -2357,8 +2504,8 @@ provisional cluster ScenesManagement = 98 {
     group_id groupID = 1;
     int8u sceneID = 2;
     optional int32u transitionTime = 3;
-    optional char_string sceneName = 4;
-    optional ExtensionFieldSet extensionFieldSets[] = 5;
+    optional char_string<16> sceneName = 4;
+    optional ExtensionFieldSetStruct extensionFieldSetStructs[] = 5;
   }
 
   request struct RemoveSceneRequest {
@@ -2423,7 +2570,7 @@ provisional cluster ScenesManagement = 98 {
     int8u sceneIdentifierFrom = 2;
   }
 
-  /** Add a scene to the scene table. Extension field sets are supported, and are inputed as '{"ClusterID": VALUE, "AttributeValueList":[{"AttributeID": VALUE, "Value*": VALUE}]}' */
+  /** Add a scene to the scene table. Extension field sets are input as '{"ClusterID": VALUE, "AttributeValueList":[{"AttributeID": VALUE, "Value*": VALUE}]}'. */
   fabric command access(invoke: manage) AddScene(AddSceneRequest): AddSceneResponse = 0;
   /** Retrieves the requested scene entry from its Scene table. */
   fabric command ViewScene(ViewSceneRequest): ViewSceneResponse = 1;
@@ -2435,10 +2582,10 @@ provisional cluster ScenesManagement = 98 {
   fabric command access(invoke: manage) StoreScene(StoreSceneRequest): StoreSceneResponse = 4;
   /** Set the attributes and corresponding state for each other cluster implemented on the endpoint accordingly to the resquested scene entry in the Scene Table */
   fabric command RecallScene(RecallSceneRequest): DefaultSuccess = 5;
-  /** Get an unused scene identifier when no commissioning tool is in the network, or for a commissioning tool to get the used scene identifiers within a certain group */
+  /** This command can be used to get the used scene identifiers within a certain group, for the endpoint that implements this cluster. */
   fabric command GetSceneMembership(GetSceneMembershipRequest): GetSceneMembershipResponse = 6;
-  /** Allows a client to efficiently copy scenes from one group/scene identifier pair to another group/scene identifier pair. */
-  fabric command CopyScene(CopySceneRequest): CopySceneResponse = 64;
+  /** This command allows a client to efficiently copy scenes from one group/scene identifier pair to another group/scene identifier pair. */
+  fabric command access(invoke: manage) CopyScene(CopySceneRequest): CopySceneResponse = 64;
 }
 
 /** Attributes and commands for controlling the color properties of a color-capable light. */
@@ -3131,15 +3278,16 @@ endpoint 0 {
     callback attribute idleModeDuration;
     callback attribute activeModeDuration;
     callback attribute activeModeThreshold;
-    ram      attribute featureMap default = 0x0000;
+    callback attribute featureMap;
     ram      attribute clusterRevision default = 3;
   }
 }
 endpoint 1 {
-  device type ma_onofflightswitch = 259, version 1;
+  device type ma_dimmerswitch = 260, version 1;
 
   binding cluster Identify;
   binding cluster OnOff;
+  binding cluster LevelControl;
   binding cluster ScenesManagement;
   binding cluster ColorControl;
 

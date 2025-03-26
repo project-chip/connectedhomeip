@@ -18,7 +18,7 @@
 #pragma once
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
 #include <platform/NetworkCommissioning.h>
-#include <platform/silabs/wifi/WifiInterfaceAbstraction.h>
+#include <platform/silabs/wifi/WifiInterface.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -123,6 +123,7 @@ public:
     CHIP_ERROR ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen);
 
     chip::BitFlags<WiFiSecurity> ConvertSecuritytype(wfx_sec_t security);
+    uint32_t GetSupportedWiFiBandsMask() const override;
 
     void OnConnectWiFiNetwork();
     void UpdateNetworkingStatus();

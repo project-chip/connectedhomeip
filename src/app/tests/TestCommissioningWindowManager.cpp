@@ -41,9 +41,6 @@ using chip::CommissioningWindowAdvertisement;
 using chip::CommissioningWindowManager;
 using chip::Server;
 
-// Mock function for linking
-void InitDataModelHandler() {}
-
 namespace {
 bool sAdminFabricIndexDirty = false;
 bool sAdminVendorIdDirty    = false;

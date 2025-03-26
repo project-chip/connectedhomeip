@@ -59,8 +59,12 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     case Attributes::FeatureMap::Id:
         ReturnErrorOnFailure(aEncoder.Encode(mFeature));
         break;
-    case Attributes::HoldTime::Id: {
-
+    case Attributes::HoldTime::Id:
+    case Attributes::PIROccupiedToUnoccupiedDelay::Id:
+    case Attributes::UltrasonicOccupiedToUnoccupiedDelay::Id:
+    case Attributes::PhysicalContactOccupiedToUnoccupiedDelay::Id: {
+        // HoldTime is equivalent to the legacy *OccupiedToUnoccupiedDelay attributes.
+        // The AAI will read/write these attributes at the same storage for one endpoint.
         uint16_t * holdTime = GetHoldTimeForEndpoint(aPath.mEndpointId);
 
         if (holdTime == nullptr)
@@ -132,7 +136,7 @@ Structs::HoldTimeLimitsStruct::Type * GetHoldTimeLimitsForEndpoint(EndpointId en
         return nullptr;
     }
 
-    if (index >= ArraySize(sHoldTimeLimitsStructs))
+    if (index >= MATTER_ARRAY_SIZE(sHoldTimeLimitsStructs))
     {
         ChipLogError(NotSpecified, "Internal error: invalid/unexpected hold time limits index.");
         return nullptr;
@@ -167,7 +171,7 @@ uint16_t * GetHoldTimeForEndpoint(EndpointId endpoint)
         return nullptr;
     }
 
-    if (index >= ArraySize(sHoldTimeLimitsStructs))
+    if (index >= MATTER_ARRAY_SIZE(sHoldTimeLimitsStructs))
     {
         ChipLogError(NotSpecified, "Internal error: invalid/unexpected hold time index.");
         return nullptr;
@@ -189,12 +193,6 @@ CHIP_ERROR SetHoldTime(EndpointId endpointId, uint16_t newHoldTime)
     {
         MatterReportingAttributeChangeCallback(endpointId, OccupancySensing::Id, Attributes::HoldTime::Id);
     }
-
-    // Blindly try to write RAM-backed legacy attributes (will fail silently if absent)
-    // to keep them in sync.
-    (void) Attributes::PIROccupiedToUnoccupiedDelay::Set(endpointId, newHoldTime);
-    (void) Attributes::UltrasonicOccupiedToUnoccupiedDelay::Set(endpointId, newHoldTime);
-    (void) Attributes::PhysicalContactOccupiedToUnoccupiedDelay::Set(endpointId, newHoldTime);
 
     return CHIP_NO_ERROR;
 }

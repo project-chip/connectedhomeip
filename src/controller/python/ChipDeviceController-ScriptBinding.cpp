@@ -159,7 +159,8 @@ PyChipError pychip_DeviceController_SetCheckMatchingFabric(bool check);
 struct IcdRegistrationParameters;
 PyChipError pychip_DeviceController_SetIcdRegistrationParameters(bool enabled, const IcdRegistrationParameters * params);
 PyChipError pychip_DeviceController_ResetCommissioningParameters();
-PyChipError pychip_DeviceController_CloseSession(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid);
+PyChipError pychip_DeviceController_MarkSessionDefunct(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid);
+PyChipError pychip_DeviceController_MarkSessionForEviction(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid);
 PyChipError pychip_DeviceController_EstablishPASESessionIP(chip::Controller::DeviceCommissioner * devCtrl, const char * peerAddrStr,
                                                            uint32_t setupPINCode, chip::NodeId nodeid, uint16_t port);
 PyChipError pychip_DeviceController_EstablishPASESessionBLE(chip::Controller::DeviceCommissioner * devCtrl, uint32_t setupPINCode,
@@ -182,6 +183,10 @@ PyChipError pychip_DeviceController_OpenCommissioningWindow(chip::Controller::De
 
 bool pychip_DeviceController_GetIPForDiscoveredDevice(chip::Controller::DeviceCommissioner * devCtrl, int idx, char * addrStr,
                                                       uint32_t len);
+
+PyChipError pychip_DeviceController_SetTermsAcknowledgements(uint16_t tcVersion, uint16_t tcUserResponse);
+
+PyChipError pychip_DeviceController_SetSkipCommissioningComplete(bool skipCommissioningComplete);
 
 // Pairing Delegate
 PyChipError
@@ -572,6 +577,19 @@ PyChipError pychip_DeviceController_SetDefaultNtp(const char * defaultNTP)
     return ToPyChipError(CHIP_NO_ERROR);
 }
 
+PyChipError pychip_DeviceController_SetTermsAcknowledgements(uint16_t tcVersion, uint16_t tcUserResponse)
+{
+    sCommissioningParameters.SetTermsAndConditionsAcknowledgement(
+        { .acceptedTermsAndConditions = tcUserResponse, .acceptedTermsAndConditionsVersion = tcVersion });
+    return ToPyChipError(CHIP_NO_ERROR);
+}
+
+PyChipError pychip_DeviceController_SetSkipCommissioningComplete(bool skipCommissioningComplete)
+{
+    sCommissioningParameters.SetSkipCommissioningComplete(skipCommissioningComplete);
+    return ToPyChipError(CHIP_NO_ERROR);
+}
+
 PyChipError pychip_DeviceController_SetTrustedTimeSource(chip::NodeId nodeId, chip::EndpointId endpoint)
 {
     chip::app::Clusters::TimeSynchronization::Structs::FabricScopedTrustedTimeSourceStruct::Type timeSource = { .nodeID = nodeId,
@@ -644,7 +662,7 @@ PyChipError pychip_DeviceController_ResetCommissioningParameters()
     return ToPyChipError(CHIP_NO_ERROR);
 }
 
-PyChipError pychip_DeviceController_CloseSession(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid)
+PyChipError pychip_DeviceController_MarkSessionDefunct(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid)
 {
     //
     // Since we permit multiple controllers per fabric and each is associated with a unique fabric index, closing a session
@@ -655,6 +673,19 @@ PyChipError pychip_DeviceController_CloseSession(chip::Controller::DeviceCommiss
                                                                      if (session->IsActiveSession())
                                                                      {
                                                                          session->MarkAsDefunct();
+                                                                     }
+                                                                 });
+
+    return ToPyChipError(CHIP_NO_ERROR);
+}
+
+PyChipError pychip_DeviceController_MarkSessionForEviction(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid)
+{
+    devCtrl->SessionMgr()->ForEachMatchingSessionOnLogicalFabric(ScopedNodeId(nodeid, devCtrl->GetFabricIndex()),
+                                                                 [](auto * session) {
+                                                                     if (session->IsActiveSession())
+                                                                     {
+                                                                         session->MarkForEviction();
                                                                      }
                                                                  });
 

@@ -21,6 +21,7 @@ openthread_root =
 nxp_platform = "mcxw71_k32w1"
 nxp_sdk_name = "mcxw71_k32w1_sdk"
 nxp_device_layer = "nxp/${nxp_platform}"
+nxp_nvm_component = "nvs"
 nxp_use_lwip = false
 
 # ARM architecture flags will be set based on NXP board.
@@ -47,7 +48,7 @@ chip_progress_logging = true
 
 chip_mdns = "platform"
 
-chip_system_config_use_open_thread_inet_endpoints = true
+chip_system_config_use_openthread_inet_endpoints = true
 chip_with_lwip = false
 mbedtls_target = "${nxp_sdk_build_root}:nxp_mbedtls"
 openthread_external_mbedtls = mbedtls_target

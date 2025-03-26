@@ -22,7 +22,6 @@
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/server/Dnssd.h>
-#include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/endpoint-config-api.h>
 #include <crypto/CHIPCryptoPAL.h>
@@ -31,6 +30,7 @@
 #include <lib/core/NodeId.h>
 #include <lib/core/Optional.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 
 #include <credentials/DeviceAttestationCredsProvider.h>
 
@@ -70,6 +70,12 @@
 #include <TracingCommandLineArgument.h> // nogncheck
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_DIAGNOSTIC_TRIGGER
+#include <app/clusters/software-diagnostics-server/SoftwareDiagnosticsTestEventTriggerHandler.h>
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_DIAGNOSTIC_TRIGGER
+#include <app/clusters/wifi-network-diagnostics-server/WiFiDiagnosticsTestEventTriggerHandler.h>
+#endif
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 #include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
 #endif
@@ -92,7 +98,7 @@
 #include <app/clusters/device-energy-management-server/DeviceEnergyManagementTestEventTriggerHandler.h>
 #endif
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-#include <app/icd/server/ICDManager.h>
+#include <app/icd/server/ICDManager.h> // nogncheck
 #endif
 #include <app/TestEventTriggerDelegate.h>
 
@@ -103,6 +109,10 @@
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
 #include "ExampleAccessRestrictionProvider.h"
+#endif
+
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+#include <app/server/TermsAndConditionsManager.h> // nogncheck
 #endif
 
 #if CHIP_DEVICE_LAYER_TARGET_DARWIN
@@ -257,6 +267,7 @@ void InitNetworkCommissioning()
 #endif // CHIP_APP_MAIN_HAS_ETHERNET_DRIVER
     }
 }
+
 } // anonymous namespace
 
 #if defined(ENABLE_CHIP_SHELL)
@@ -516,6 +527,20 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
     }
 #endif // CHIP_ENABLE_OPENTHREAD
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    if (LinuxDeviceOptions::GetInstance().icdActiveModeDurationMs.HasValue() ||
+        LinuxDeviceOptions::GetInstance().icdIdleModeDurationMs.HasValue())
+    {
+        err = Server::GetInstance().GetICDManager().SetModeDurations(LinuxDeviceOptions::GetInstance().icdActiveModeDurationMs,
+                                                                     LinuxDeviceOptions::GetInstance().icdIdleModeDurationMs);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(NotSpecified, "Invalid arguments to set ICD mode durations");
+            SuccessOrExit(err);
+        }
+    }
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
 exit:
     if (err != CHIP_NO_ERROR)
     {
@@ -535,6 +560,16 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
     static chip::CommonCaseDeviceServerInitParams initParams;
     VerifyOrDie(initParams.InitializeStaticResourcesBeforeServerInit() == CHIP_NO_ERROR);
     initParams.dataModelProvider = app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
+
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+    if (LinuxDeviceOptions::GetInstance().tcVersion.HasValue() && LinuxDeviceOptions::GetInstance().tcRequired.HasValue())
+    {
+        uint16_t version  = LinuxDeviceOptions::GetInstance().tcVersion.Value();
+        uint16_t required = LinuxDeviceOptions::GetInstance().tcRequired.Value();
+        Optional<app::TermsAndConditions> requiredAcknowledgements(app::TermsAndConditions(required, version));
+        app::TermsAndConditionsManager::GetInstance()->Init(initParams.persistentStorageDelegate, requiredAcknowledgements);
+    }
+#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
 
 #if defined(ENABLE_CHIP_SHELL)
     Engine::Root().Init();
@@ -585,6 +620,14 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
                 CHIP_NO_ERROR);
     VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sTestEventTriggerHandler) == CHIP_NO_ERROR);
 
+#if CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_DIAGNOSTIC_TRIGGER
+    static SoftwareDiagnosticsTestEventTriggerHandler sSoftwareDiagnosticsTestEventTriggerHandler;
+    sTestEventTriggerDelegate.AddHandler(&sSoftwareDiagnosticsTestEventTriggerHandler);
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_DIAGNOSTIC_TRIGGER
+    static WiFiDiagnosticsTestEventTriggerHandler sWiFiDiagnosticsTestEventTriggerHandler;
+    sTestEventTriggerDelegate.AddHandler(&sWiFiDiagnosticsTestEventTriggerHandler);
+#endif
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     // We want to allow triggering OTA queries if OTA requestor is enabled
     static OTATestEventTriggerHandler sOtaTestEventTriggerHandler;

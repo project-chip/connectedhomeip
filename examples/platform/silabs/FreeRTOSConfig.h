@@ -174,11 +174,8 @@ extern uint32_t SystemCoreClock;
 
 /* Software timer related definitions. */
 #define configUSE_TIMERS (1)
-#ifdef SLI_SI917
+// Keep the timerTask at the highest prio as some of our stacks tasks leverage eventing with timers.
 #define configTIMER_TASK_PRIORITY (55) /* Highest priority */
-#else
-#define configTIMER_TASK_PRIORITY (40) /* Highest priority */
-#endif                                 // SLI_SI917
 #define configTIMER_QUEUE_LENGTH (10)
 #define configTIMER_TASK_STACK_DEPTH (1024)
 
@@ -203,7 +200,10 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define configENABLE_FPU 1
 #define configENABLE_MPU 0
 /* FreeRTOS Secure Side Only and TrustZone Security Extension */
+#ifndef configRUN_FREERTOS_SECURE_ONLY
+// prevent redefinition with Series 3
 #define configRUN_FREERTOS_SECURE_ONLY 1
+#endif
 #define configENABLE_TRUSTZONE 0
 /* FreeRTOS MPU specific definitions. */
 #define configINCLUDE_APPLICATION_DEFINED_PRIVILEGED_FUNCTIONS (0)
@@ -310,7 +310,7 @@ standard names. */
 /* Thread local storage pointers used by the SDK */
 
 #ifndef configNUM_USER_THREAD_LOCAL_STORAGE_POINTERS
-#define configNUM_USER_THREAD_LOCAL_STORAGE_POINTERS 2
+#define configNUM_USER_THREAD_LOCAL_STORAGE_POINTERS 0
 #endif
 
 #ifndef configNUM_SDK_THREAD_LOCAL_STORAGE_POINTERS

@@ -36,7 +36,6 @@ constexpr uint16_t MAX_POWER_ADJUSTMENTS = 5;
 
 chip::app::Clusters::DeviceEnergyManagement::Structs::SlotStruct::Type sSlots[MAX_SLOTS];
 chip::app::Clusters::DeviceEnergyManagement::Structs::ForecastStruct::Type sForecastStruct;
-chip::app::DataModel::Nullable<chip::app::Clusters::DeviceEnergyManagement::Structs::ForecastStruct::Type> sForecast;
 
 chip::app::Clusters::DeviceEnergyManagement::Structs::PowerAdjustStruct::Type sPowerAdjustments[MAX_POWER_ADJUSTMENTS];
 chip::app::Clusters::DeviceEnergyManagement::Structs::PowerAdjustCapabilityStruct::Type sPowerAdjustCapabilityStruct;

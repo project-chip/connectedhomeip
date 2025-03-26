@@ -70,6 +70,16 @@ class GeneralCommissioningCluster(
     object SubscriptionEstablished : BasicCommissioningInfoAttributeSubscriptionState()
   }
 
+  class TCUpdateDeadlineAttribute(val value: UInt?)
+
+  sealed class TCUpdateDeadlineAttributeSubscriptionState {
+    data class Success(val value: UInt?) : TCUpdateDeadlineAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : TCUpdateDeadlineAttributeSubscriptionState()
+
+    object SubscriptionEstablished : TCUpdateDeadlineAttributeSubscriptionState()
+  }
+
   class GeneratedCommandListAttribute(val value: List<UInt>)
 
   sealed class GeneratedCommandListAttributeSubscriptionState {
@@ -1170,7 +1180,7 @@ class GeneralCommissioningCluster(
     }
   }
 
-  suspend fun readTCUpdateDeadlineAttribute(): UInt? {
+  suspend fun readTCUpdateDeadlineAttribute(): TCUpdateDeadlineAttribute {
     val ATTRIBUTE_ID: UInt = 9u
 
     val attributePath =
@@ -1197,19 +1207,24 @@ class GeneralCommissioningCluster(
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
     val decodedValue: UInt? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUInt(AnonymousTag)
+      if (!tlvReader.isNull()) {
+        if (tlvReader.isNextTag(AnonymousTag)) {
+          tlvReader.getUInt(AnonymousTag)
+        } else {
+          null
+        }
       } else {
+        tlvReader.getNull(AnonymousTag)
         null
       }
 
-    return decodedValue
+    return TCUpdateDeadlineAttribute(decodedValue)
   }
 
   suspend fun subscribeTCUpdateDeadlineAttribute(
     minInterval: Int,
     maxInterval: Int,
-  ): Flow<UIntSubscriptionState> {
+  ): Flow<TCUpdateDeadlineAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 9u
     val attributePaths =
       listOf(
@@ -1228,7 +1243,7 @@ class GeneralCommissioningCluster(
       when (subscriptionState) {
         is SubscriptionState.SubscriptionErrorNotification -> {
           emit(
-            UIntSubscriptionState.Error(
+            TCUpdateDeadlineAttributeSubscriptionState.Error(
               Exception(
                 "Subscription terminated with error code: ${subscriptionState.terminationCause}"
               )
@@ -1248,16 +1263,21 @@ class GeneralCommissioningCluster(
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
           val decodedValue: UInt? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getUInt(AnonymousTag)
+            if (!tlvReader.isNull()) {
+              if (tlvReader.isNextTag(AnonymousTag)) {
+                tlvReader.getUInt(AnonymousTag)
+              } else {
+                null
+              }
             } else {
+              tlvReader.getNull(AnonymousTag)
               null
             }
 
-          decodedValue?.let { emit(UIntSubscriptionState.Success(it)) }
+          decodedValue?.let { emit(TCUpdateDeadlineAttributeSubscriptionState.Success(it)) }
         }
         SubscriptionState.SubscriptionEstablished -> {
-          emit(UIntSubscriptionState.SubscriptionEstablished)
+          emit(TCUpdateDeadlineAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }

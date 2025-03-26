@@ -49,7 +49,7 @@ class TC_VALCC_3_3(MatterBaseTest):
 
     def steps_TC_VALCC_3_3(self) -> list[TestStep]:
         steps = [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commission DUT if required", is_commissioning=True),
             TestStep(2, "Read AttributeList attribute", "Verify that the DUT response contains the AttributeList attribute."),
             TestStep(3, "If the DefaultOpenLevel is not supported, skip all remaining steps in this test"),
             TestStep(4, "TH reads from the DUT the DefaultOpenLevel attribute. Store the value as defaultOpenLevel."),
@@ -57,12 +57,12 @@ class TC_VALCC_3_3(MatterBaseTest):
             TestStep(6, "Send a close command to the DUT and wait until the CurrentState is reported as closed", "DUT returns SUCCESS"),
             # TODO: this test should probably SET the default open attribute as well and un-set it at the end, so we're not testing against the default.
             TestStep(7, "Send Open command with no fields populated", "DUT returns SUCCESS"),
-            TestStep(8, "Wait until TH receives the following data reports (ordering not checked): TargetState set to NULL, TargetLevel set to NULL, CurrentState set to Open, CurrentLevel set to defaultOpenLevel",
+            TestStep(8, "Wait until TH receives the following reports (ordering does not matter): TargetState set to NULL, TargetLevel set to NULL, CurrentState set to Open, CurrentLevel set to defaultOpenLevel",
                      "Expected attribute reports are received"),
             TestStep(9, "Read CurrentState and TargetState attribute", "CurrentState is Open, TargetState is NULL"),
             TestStep(10, "Read CurrentLevel and TargetLevel attribute", "CurrentLevel is defaultOpenLevel, TargetLevel is NULL"),
             TestStep(11, "Send Close command", "DUT returns SUCCESS"),
-            TestStep(12, "Wait until TH receives the following data reports (ordering not checked): TargetState set to NULL, TargetLevel set to NULL, CurrentState set to Closed, CurrentLevel set to 0",
+            TestStep(12, "Wait until TH receives the following reports (ordering does not matter): TargetState set to NULL, TargetLevel set to NULL, CurrentState set to Closed, CurrentLevel set to 0",
                      "Expected attribute reports are received"),
             TestStep(13, "Read CurrentState and TargetState attribute", "CurrentState is Closed, TargetState is NULL"),
             TestStep(14, "Read CurrentLevel and TargetLevel attribute", "CurrentLevel is 0, TargetLevel is NULL"),

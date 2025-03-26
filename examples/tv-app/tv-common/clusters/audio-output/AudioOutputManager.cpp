@@ -62,6 +62,11 @@ bool AudioOutputManager::HandleRenameOutput(const uint8_t & index, const chip::C
     {
         if (output.index == index)
         {
+            if (sizeof(mCharDataBuffer[index]) < name.size())
+            {
+                return audioOutputRenamed;
+            }
+
             audioOutputRenamed = true;
             memcpy(this->Data(index), name.data(), name.size());
             output.name = chip::CharSpan(this->Data(index), name.size());

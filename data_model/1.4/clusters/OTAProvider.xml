@@ -54,6 +54,8 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0029" name="OTA Software Update Provider Cluster" revision="1">
   <revisionHistory>
@@ -127,9 +129,9 @@ Davis, CA 95616, USA
       </field>
       <field id="5" name="Location" type="string">
         <optionalConform/>
-        <constraint type="maxLength" value="2"/>
+        <constraint type="allowed" value="2"/>
       </field>
-      <field id="6" name="RequestorCanConsent" type="bool" default="False">
+      <field id="6" name="RequestorCanConsent" type="bool" default="false">
         <optionalConform/>
       </field>
       <field id="7" name="MetadataForProvider" type="octstr">
@@ -160,7 +162,7 @@ Davis, CA 95616, USA
         <optionalConform/>
         <constraint type="lengthBetween" from="8" to="32"/>
       </field>
-      <field id="6" name="UserConsentNeeded" type="bool" default="False">
+      <field id="6" name="UserConsentNeeded" type="bool" default="false">
         <optionalConform/>
       </field>
       <field id="7" name="MetadataForRequestor" type="octstr">

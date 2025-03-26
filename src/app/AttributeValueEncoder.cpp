@@ -109,5 +109,34 @@ void AttributeValueEncoder::EnsureListEnded()
     }
 }
 
+bool AttributeValueEncoder::ShouldEncodeListItem(TLV::TLVWriter & aCheckpoint)
+{
+    // EncodeListItem (our caller) must be called after EnsureListStarted(),
+    // thus mCurrentEncodingListIndex and mEncodeState.mCurrentEncodingListIndex
+    // are not invalid values.
+    if (mCurrentEncodingListIndex < mEncodeState.CurrentEncodingListIndex())
+    {
+        // We have encoded this element in previous chunks, skip it.
+        mCurrentEncodingListIndex++;
+        return false;
+    }
+
+    mAttributeReportIBsBuilder.Checkpoint(aCheckpoint);
+    return true;
+}
+
+void AttributeValueEncoder::PostEncodeListItem(CHIP_ERROR aEncodeStatus, const TLV::TLVWriter & aCheckpoint)
+{
+    if (aEncodeStatus != CHIP_NO_ERROR)
+    {
+        mAttributeReportIBsBuilder.Rollback(aCheckpoint);
+        return;
+    }
+
+    mCurrentEncodingListIndex++;
+    mEncodeState.SetCurrentEncodingListIndex(mCurrentEncodingListIndex);
+    mEncodedAtLeastOneListItem = true;
+}
+
 } // namespace app
 } // namespace chip

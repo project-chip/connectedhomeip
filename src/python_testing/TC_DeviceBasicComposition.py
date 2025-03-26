@@ -189,7 +189,6 @@ from chip.testing.taglist_and_topology_test import (create_device_type_list_for_
                                                     find_tag_list_problems, find_tree_roots, flat_list_ok,
                                                     get_direct_children_of_root, parts_list_cycles, separate_endpoint_types)
 from chip.tlv import uint
-from mobly import asserts
 
 
 def get_vendor_id(mei: int) -> int:
@@ -692,25 +691,25 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         if not success:
             self.fail_current_test("At least one attribute string was not valid UTF-8")
 
-    def test_all_event_strings_valid(self):
-        asserts.skip("TODO: Validate every string in the read events is valid UTF-8 and has no nulls")
+    # def test_all_event_strings_valid(self):
+    #     asserts.skip("TODO: Validate every string in the read events is valid UTF-8 and has no nulls")
 
-    def test_all_schema_scalars(self):
-        asserts.skip("TODO: Validate all int/uint are in range of the schema (or null if nullable) for known attributes")
+    # def test_all_schema_scalars(self):
+    #     asserts.skip("TODO: Validate all int/uint are in range of the schema (or null if nullable) for known attributes")
 
-    def test_all_commands_reported_are_executable(self):
-        asserts.skip("TODO: Validate all commands reported in AcceptedCommandList are actually executable")
+    # def test_all_commands_reported_are_executable(self):
+    #     asserts.skip("TODO: Validate all commands reported in AcceptedCommandList are actually executable")
 
-    def test_dump_all_pics_for_all_endpoints(self):
-        asserts.skip("TODO: Make a test that generates the basic PICS list for each endpoint based on actually reported contents")
+    # def test_dump_all_pics_for_all_endpoints(self):
+    #     asserts.skip("TODO: Make a test that generates the basic PICS list for each endpoint based on actually reported contents")
 
-    def test_all_schema_mandatory_elements_present(self):
-        asserts.skip(
-            "TODO: Make a test that ensures every known cluster has the mandatory elements present (commands, attributes) based on features")
+    # def test_all_schema_mandatory_elements_present(self):
+    #     asserts.skip(
+    #         "TODO: Make a test that ensures every known cluster has the mandatory elements present (commands, attributes) based on features")
 
-    def test_all_endpoints_have_valid_composition(self):
-        asserts.skip(
-            "TODO: Make a test that verifies each endpoint has valid set of device types, and that the device type conformance is respected for each")
+    # def test_all_endpoints_have_valid_composition(self):
+    #     asserts.skip(
+    #         "TODO: Make a test that verifies each endpoint has valid set of device types, and that the device type conformance is respected for each")
 
     def test_TC_SM_1_2(self):
         self.print_step(1, "Wildcard read of device - already done")

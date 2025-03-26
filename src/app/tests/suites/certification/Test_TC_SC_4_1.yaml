@@ -44,28 +44,35 @@ config:
         defaultValue: 5000
 
 tests:
-    - label: "Step 1: Wait for the commissioned device to be retrieved"
+    - label:
+          "Step 1: If (CADMIN.S.C01.Rsp) present, wait for the commissioned
+          device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      PICS: CADMIN.S.C01.Rsp
       arguments:
           values:
               - name: "nodeId"
                 value: nodeId
 
     - label:
-          "Step 1a: DUT is put in Commissioning Mode using Open Basic
-          Commissioning Window command "
+          "Step 1a: If (CADMIN.S.C01.Rsp) present, DUT is put in Commissioning
+          Mode using Open Basic Commissioning Window command "
       cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
+      PICS: CADMIN.S.C01.Rsp
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
               - name: "CommissioningTimeout"
                 value: 180
 
-    - label: "Waiting after opening commissioning window"
+    - label:
+          "If (CADMIN.S.C01.Rsp) present, waiting after opening commissioning
+          window"
       cluster: "DelayCommands"
       command: "WaitForMs"
+      PICS: CADMIN.S.C01.Rsp
       arguments:
           values:
               - name: "ms"
@@ -85,6 +92,16 @@ tests:
                     maxLength: 16
                     isUpperCase: true
                     isHexString: true
+
+    - label:
+          "Step 2aa: If (ICDM.S.A0002) TH reads from the DUT the
+          ActiveModeThreshold attribute"
+      PICS: ICDM.S.A0002
+      cluster: "ICDManagement"
+      command: "readAttribute"
+      attribute: "ActiveModeThreshold"
+      response:
+          saveAs: ActiveModeThresholdValue
 
     - label: "Step 2b: Service type must be _matterc._udp"
       verification: |
@@ -112,6 +129,7 @@ tests:
             port = [5540]
             txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "VP=65521+32769"]
 
+          If "ICDM.S.A0002" check "SAT=ActiveModeThreshold Value"
 
           If we use Thread setup, then the Service Domain will be 422F10CDC290A406.local
           verify CM flag is 1
@@ -208,10 +226,11 @@ tests:
                 value: deviceType
 
     - label:
-          "Step 2g: Check Commissioning Mode (_CM) subtype _CM must be present"
+          "Step 2g: If (CADMIN.S.C01.Rsp) present, check Commissioning Mode
+          (_CM) subtype _CM must be present"
       cluster: "DiscoveryCommands"
       command: "FindCommissionableByCommissioningMode"
-
+      PICS: CADMIN.S.C01.Rsp
     - label:
           "Step 2h: key D must be present and represents the discriminator which
           must be encoded as a variable-length decimal value with up to 4 digits
@@ -290,9 +309,12 @@ tests:
                 constraints:
                     maxValue: 65535
 
-    - label: "Step 2n: TXT key for commissioning mode (CM) CM=1 must be present"
+    - label:
+          "Step 2n: If (CADMIN.S.C01.Rsp) present, TXT key for commissioning
+          mode (CM) CM=1 must be present"
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
+      PICS: CADMIN.S.C01.Rsp
       response:
           values:
               - name: "commissioningMode"
@@ -400,9 +422,9 @@ tests:
                 value: nodeId
 
     - label:
-          "Step 3a: DUT put in Commissioning Mode using Open Basic Commissioning
-          Window command, starting advertising Commissionable Node Discovery
-          service using DNS-SD"
+          "Step 3a: If (CADMIN.S.C01.Rsp) present, DUT put in Commissioning Mode
+          using Open Basic Commissioning Window command, starting advertising
+          Commissionable Node Discovery service using DNS-SD"
       PICS: CADMIN.S.C01.Rsp
       cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
@@ -412,9 +434,12 @@ tests:
               - name: "CommissioningTimeout"
                 value: 180
 
-    - label: "Waiting after opening commissioning window"
+    - label:
+          "If (CADMIN.S.C01.Rsp) present, waiting after opening commissioning
+          window"
       cluster: "DelayCommands"
       command: "WaitForMs"
+      PICS: CADMIN.S.C01.Rsp
       arguments:
           values:
               - name: "ms"
@@ -435,6 +460,16 @@ tests:
                     isUpperCase: true
                     isHexString: true
                     notValue: deviceInstanceNameBeforeReboot
+
+    - label:
+          "Step 4aa: If (ICDM.S.A0002) TH reads from the DUT the
+          ActiveModeThreshold attribute"
+      PICS: ICDM.S.A0002
+      cluster: "ICDManagement"
+      command: "readAttribute"
+      attribute: "ActiveModeThreshold"
+      response:
+          saveAs: ActiveModeThresholdValue
 
     - label: "Step 4b: service type must be _matterc._udp"
       verification: |
@@ -457,6 +492,7 @@ tests:
             port = [5540]
             txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "VP=65521+32769"]
 
+          If "ICDM.S.A0002" check "SAT=ActiveModeThreshold Value"
 
           Service Domain 422F10CDC290A406.local
           verify CM flag is 1
@@ -553,9 +589,12 @@ tests:
               - name: "value"
                 value: deviceType
 
-    - label: "Step 4h: Check Commissioning Mode (_CM) subtype _CM is present"
+    - label:
+          "Step 4h: If (CADMIN.S.C01.Rsp) present, check Commissioning Mode
+          (_CM) subtype _CM is present"
       cluster: "DiscoveryCommands"
       command: "FindCommissionableByCommissioningMode"
+      PICS: CADMIN.S.C01.Rsp
 
     - label:
           "Step 4i: key D must be present and represents the discriminator which
@@ -636,9 +675,11 @@ tests:
                     maxValue: 65535
 
     - label:
-          "Step 4o: TXT key for commissioning mode (CM) key CM=1 must be present"
+          "Step 4o: If (CADMIN.S.C01.Rsp) present, TXT key for commissioning
+          mode (CM) key CM=1 must be present"
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
+      PICS: CADMIN.S.C01.Rsp
       response:
           values:
               - name: "commissioningMode"
@@ -1094,6 +1135,16 @@ tests:
                     maxLength: 16
                     isUpperCase: true
                     isHexString: true
+
+    - label:
+          "Step 10aa: If ( && ICDM.S.A0002) TH reads from the DUT the
+          ActiveModeThreshold attribute"
+      PICS: ICDM.S.A0002
+      cluster: "ICDManagement"
+      command: "readAttribute"
+      attribute: "ActiveModeThreshold"
+      response:
+          saveAs: ActiveModeThresholdValue
 
     - label: "Step 10b: service type must be _matterc._udp"
       verification: |

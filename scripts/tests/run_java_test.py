@@ -31,6 +31,7 @@ from java.bdx_test import BDXTest
 from java.commissioning_test import CommissioningTest
 from java.discover_test import DiscoverTest
 from java.im_test import IMTest
+from java.ota_test import OTATest
 
 
 @click.command()
@@ -159,6 +160,16 @@ def main(app: str, app_args: str, tool_path: str, tool_cluster: str, tool_args: 
         logging.info("Testing BDX")
 
         test = BDXTest(log_cooking_threads, log_queue, command, tool_args)
+        try:
+            test.RunTest()
+        except Exception as e:
+            logging.error(e)
+            sys.exit(1)
+
+    elif tool_cluster == 'ota':
+        logging.info("Testing OTA")
+
+        test = OTATest(log_cooking_threads, log_queue, command, tool_args)
         try:
             test.RunTest()
         except Exception as e:

@@ -81,6 +81,14 @@ const Clusters::Descriptor::Structs::SemanticTagStruct::Type freezerTagList[]   
 #include "temperature-control/static-supported-temperature-levels.h"
 #endif // MATTER_DM_PLUGIN_TEMPERATURE_CONTROL_SERVER
 
+#ifdef MATTER_DM_PLUGIN_WINDOW_COVERING_SERVER
+#include "window-covering/chef-window-covering.h"
+#endif // MATTER_DM_PLUGIN_WINDOW_COVERING_SERVER
+
+#ifdef MATTER_DM_PLUGIN_OVEN_MODE_SERVER
+#include "oven-mode/chef-oven-mode.h"
+#endif // MATTER_DM_PLUGIN_OVEN_MODE_SERVER
+
 Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
                                                                          const EmberAfAttributeMetadata * attributeMetadata,
                                                                          uint8_t * buffer, uint16_t maxReadLength)
@@ -248,6 +256,11 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     {
         ChipLogProgress(Zcl, "OnOff attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u", ChipLogValueMEI(attributeId),
                         type, *value, size);
+#ifdef MATTER_DM_PLUGIN_FAN_CONTROL_SERVER // Handle OnOff for fan
+#ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER
+        HandleOnOffAttributeChangeForFan(attributePath.mEndpointId, bool(*value));
+#endif // MATTER_DM_PLUGIN_ON_OFF_SERVER
+#endif // MATTER_DM_PLUGIN_FAN_CONTROL_SERVER
     }
     else if (clusterId == LevelControl::Id)
     {
@@ -336,11 +349,11 @@ void emberAfWakeOnLanClusterInitCallback(EndpointId endpoint)
 
 void ApplicationInit()
 {
-    ChipLogProgress(NotSpecified, "Chef Application Init !!!")
+    ChipLogProgress(NotSpecified, "Chef Application Init !!!");
 
 #ifdef MATTER_DM_PLUGIN_REFRIGERATOR_ALARM_SERVER
-        // set Parent Endpoint and Composition Type for an Endpoint
-        EndpointId kRefEndpointId       = 1;
+    // set Parent Endpoint and Composition Type for an Endpoint
+    EndpointId kRefEndpointId           = 1;
     EndpointId kColdCabinetEndpointId   = 2;
     EndpointId kFreezeCabinetEndpointId = 3;
     SetTreeCompositionForEndpoint(kRefEndpointId);
@@ -350,11 +363,21 @@ void ApplicationInit()
     SetTagList(kColdCabinetEndpointId, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(refrigeratorTagList));
     SetTagList(kFreezeCabinetEndpointId, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(freezerTagList));
 #endif // MATTER_DM_PLUGIN_REFRIGERATOR_ALARM_SERVER
+
+#ifdef MATTER_DM_PLUGIN_WINDOW_COVERING_SERVER
+    ChipLogProgress(NotSpecified, "Initializing WindowCovering cluster delegate.");
+    ChefWindowCovering::InitChefWindowCoveringCluster();
+#endif // MATTER_DM_PLUGIN_WINDOW_COVERING_SERVER
+
+#ifdef MATTER_DM_PLUGIN_OVEN_MODE_SERVER
+    ChipLogProgress(NotSpecified, "Initializing OvenMode cluster.");
+    ChefOvenMode::InitChefOvenModeCluster();
+#endif // MATTER_DM_PLUGIN_OVEN_MODE_SERVER
 }
 
 void ApplicationShutdown()
 {
-    ChipLogProgress(NotSpecified, "Chef Application Down !!!")
+    ChipLogProgress(NotSpecified, "Chef Application Down !!!");
 }
 
 // No-op function, used to force linking this file,

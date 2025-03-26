@@ -76,33 +76,41 @@ static int app_entropy_source(void * data, unsigned char * output, size_t len, s
 
 void PlatformManagerImpl::OperationalHoursSavingTimerEventHandler(k_timer * timer)
 {
-    PlatformMgr().ScheduleWork(UpdateOperationalHours);
+    PlatformMgr().ScheduleWork([](intptr_t arg) {
+        CHIP_ERROR error = sInstance.UpdateOperationalHours(nullptr);
+        if (error != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "Failed to update operational hours: %" CHIP_ERROR_FORMAT, error.Format());
+        }
+    });
 }
 
-void PlatformManagerImpl::UpdateOperationalHours(intptr_t arg)
+CHIP_ERROR PlatformManagerImpl::UpdateOperationalHours(uint32_t * totalOperationalHours)
 {
     uint64_t upTimeS;
 
-    if (GetDiagnosticDataProvider().GetUpTime(upTimeS) != CHIP_NO_ERROR)
+    ReturnErrorOnFailure(GetDiagnosticDataProvider().GetUpTime(upTimeS));
+
+    uint32_t totalTime       = 0;
+    const uint32_t upTimeH   = upTimeS / 3600 < UINT32_MAX ? static_cast<uint32_t>(upTimeS / 3600) : UINT32_MAX;
+    const uint64_t deltaTime = upTimeH - mSavedOperationalHoursSinceBoot;
+
+    ReturnErrorOnFailure(ConfigurationMgr().GetTotalOperationalHours(totalTime));
+
+    totalTime = totalTime + deltaTime < UINT32_MAX ? static_cast<uint32_t>(totalTime + deltaTime) : UINT32_MAX;
+
+    if (deltaTime > 0)
     {
-        ChipLogError(DeviceLayer, "Failed to get up time of the node");
-        return;
+        ConfigurationMgr().StoreTotalOperationalHours(totalTime);
+        mSavedOperationalHoursSinceBoot = upTimeH;
     }
 
-    uint64_t totalOperationalHours = 0;
-    const uint32_t upTimeH         = upTimeS / 3600 < UINT32_MAX ? static_cast<uint32_t>(upTimeS / 3600) : UINT32_MAX;
-    const uint64_t deltaTime       = upTimeH - sInstance.mSavedOperationalHoursSinceBoot;
+    if (totalOperationalHours != nullptr)
+    {
+        *totalOperationalHours = totalTime;
+    }
 
-    if (ConfigurationMgr().GetTotalOperationalHours(reinterpret_cast<uint32_t &>(totalOperationalHours)) == CHIP_NO_ERROR)
-    {
-        ConfigurationMgr().StoreTotalOperationalHours(
-            static_cast<uint32_t>(totalOperationalHours + deltaTime < UINT32_MAX ? totalOperationalHours + deltaTime : UINT32_MAX));
-        sInstance.mSavedOperationalHoursSinceBoot = upTimeH;
-    }
-    else
-    {
-        ChipLogError(DeviceLayer, "Failed to get total operational hours of the node");
-    }
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)

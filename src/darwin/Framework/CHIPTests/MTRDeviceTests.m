@@ -3350,7 +3350,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTAssertTrue(storedAttributeCountDifferenceFromMTRDeviceReport > 300);
 }
 
-- (void)doEncodeDecodeRoundTrip:(id<NSSecureCoding>)encodable
+- (NSData *)_encodeEncodable:(id<NSSecureCoding>)encodable
 {
     // We know all our encodables are in fact NSObject.
     NSObject * obj = (NSObject *) encodable;
@@ -3358,6 +3358,15 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     NSError * encodeError;
     NSData * encodedData = [NSKeyedArchiver archivedDataWithRootObject:encodable requiringSecureCoding:YES error:&encodeError];
     XCTAssertNil(encodeError, @"Failed to encode %@", NSStringFromClass(obj.class));
+    return encodedData;
+}
+
+- (void)doEncodeDecodeRoundTrip:(id<NSSecureCoding>)encodable
+{
+    NSData * encodedData = [self _encodeEncodable:encodable];
+
+    // We know all our encodables are in fact NSObject.
+    NSObject * obj = (NSObject *) encodable;
 
     NSError * decodeError;
     id decodedValue = [NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithObject:obj.class] fromData:encodedData error:&decodeError];
@@ -3365,6 +3374,19 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTAssertTrue([decodedValue isKindOfClass:obj.class], @"Expected %@ but got %@", NSStringFromClass(obj.class), NSStringFromClass([decodedValue class]));
 
     XCTAssertEqualObjects(obj, decodedValue, @"Decoding for %@ did not round-trip correctly", NSStringFromClass([obj class]));
+}
+
+- (void)_ensureDecodeFails:(id<NSSecureCoding>)encodable
+{
+    NSData * encodedData = [self _encodeEncodable:encodable];
+
+    // We know all our encodables are in fact NSObject.
+    NSObject * obj = (NSObject *) encodable;
+
+    NSError * decodeError;
+    id decodedValue = [NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithObject:obj.class] fromData:encodedData error:&decodeError];
+    XCTAssertNil(decodedValue);
+    XCTAssertNotNil(decodeError);
 }
 
 - (void)test032_MTRPathClassesEncoding
@@ -5722,6 +5744,420 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         XCTAssertEqual(MTRInvokeResponseIsWellFormed(test[@"input"]), [test[@"valid"] boolValue],
             "input: %@", test[@"input"]);
     }
+}
+
+- (void)test045_MTRDeviceInvokeGroups
+{
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId deviceController:sController];
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    // First test: Do an invoke with a single group with three commands, ensure
+    // that we get reasonable responses for them all.
+
+    __auto_type * onPath = [MTRCommandPath commandPathWithEndpointID:@(1)
+                                                           clusterID:@(MTRClusterIDTypeOnOffID)
+                                                           commandID:@(MTRCommandIDTypeClusterOnOffCommandOnID)];
+    __auto_type * togglePath = [MTRCommandPath commandPathWithEndpointID:@(1)
+                                                               clusterID:@(MTRClusterIDTypeOnOffID)
+                                                               commandID:@(MTRCommandIDTypeClusterOnOffCommandToggleID)];
+    __auto_type * offPath = [MTRCommandPath commandPathWithEndpointID:@(1)
+                                                            clusterID:@(MTRClusterIDTypeOnOffID)
+                                                            commandID:@(MTRCommandIDTypeClusterOnOffCommandOffID)];
+
+    __auto_type * onCommand = [[MTRCommandWithRequiredResponse alloc] initWithPath:onPath commandFields:nil requiredResponse:nil];
+    __auto_type * toggleCommand = [[MTRCommandWithRequiredResponse alloc] initWithPath:togglePath commandFields:nil requiredResponse:nil];
+    __auto_type * offCommand = [[MTRCommandWithRequiredResponse alloc] initWithPath:offPath commandFields:nil requiredResponse:nil];
+
+    XCTestExpectation * simpleInvokeDone = [self expectationWithDescription:@"Invoke of a single 3-command group done"];
+    [device invokeCommands:@[ @[ onCommand, toggleCommand, offCommand ] ]
+                     queue:queue
+                completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                    XCTAssertNil(error);
+                    XCTAssertNotNil(values);
+                    XCTAssertTrue(MTRInvokeResponsesAreWellFormed(values));
+
+                    // Successful invoke is represented as a value with the relevant
+                    // command path and neither data nor error.
+                    __auto_type expectedValues = @[
+                        @ { MTRCommandPathKey : onPath },
+                        @ { MTRCommandPathKey : togglePath },
+                        @ { MTRCommandPathKey : offPath },
+                    ];
+                    XCTAssertEqualObjects(values, expectedValues);
+                    [simpleInvokeDone fulfill];
+                }];
+
+    // 3 commands, so use triple the timeout.
+    [self waitForExpectations:@[ simpleInvokeDone ] timeout:(3 * kTimeoutInSeconds)];
+
+    // Second test: Do an invoke with three groups.  First command in the first
+    // group fails, but we should still run all commands in that group.  We
+    // should not run any commands in any other groups.
+    __auto_type * failingTogglePath = [MTRCommandPath commandPathWithEndpointID:@(1000) // No such endpoint
+                                                                      clusterID:@(MTRClusterIDTypeOnOffID)
+                                                                      commandID:@(MTRCommandIDTypeClusterOnOffCommandToggleID)];
+    __auto_type * failingToggleCommand = [[MTRCommandWithRequiredResponse alloc] initWithPath:failingTogglePath commandFields:nil requiredResponse:nil];
+
+    XCTestExpectation * failingWithStatusInvokeDone = [self expectationWithDescription:@"Invoke of commands where one fails with a status done"];
+    [device invokeCommands:@[ @[ failingToggleCommand, offCommand ], @[ onCommand, toggleCommand ], @[ failingToggleCommand ] ]
+                     queue:queue
+                completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                    XCTAssertNil(error);
+                    XCTAssertNotNil(values);
+                    XCTAssertTrue(MTRInvokeResponsesAreWellFormed(values));
+
+                    // We should not have anything for groups after the first one
+                    XCTAssertEqual(values.count, 2);
+                    NSDictionary<NSString *, id> * firstValue = values[0];
+                    XCTAssertEqualObjects(firstValue[MTRCommandPathKey], failingTogglePath);
+                    XCTAssertNil(firstValue[MTRDataKey]);
+                    XCTAssertNotNil(firstValue[MTRErrorKey]);
+                    XCTAssertTrue([MTRErrorTestUtils error:firstValue[MTRErrorKey] isInteractionModelError:MTRInteractionErrorCodeUnsupportedEndpoint]);
+
+                    XCTAssertEqualObjects(values[1], @ { MTRCommandPathKey : offPath });
+
+                    [failingWithStatusInvokeDone fulfill];
+                }];
+
+    // 2 commands actually run, so use double the timeout.
+    [self waitForExpectations:@[ failingWithStatusInvokeDone ] timeout:(2 * kTimeoutInSeconds)];
+
+    // Third test: Do an invoke with three groups.  One of the commands in the
+    // first group expects a data response but gets a status, which should be
+    // treated as a failure.
+    __auto_type * onCommandExpectingData = [[MTRCommandWithRequiredResponse alloc] initWithPath:onPath commandFields:nil requiredResponse:@{
+        @(0) : @ {
+            MTRTypeKey : MTRUnsignedIntegerValueType,
+            MTRValueKey : @(0),
+        }
+    }];
+
+    XCTestExpectation * failingWithMissingDataInvokeDone = [self expectationWithDescription:@"Invoke of commands where one fails with missing data done"];
+    [device invokeCommands:@[ @[ toggleCommand, onCommandExpectingData, offCommand ], @[ onCommand, toggleCommand ], @[ failingToggleCommand ] ]
+                     queue:queue
+                completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                    XCTAssertNil(error);
+                    XCTAssertNotNil(values);
+                    XCTAssertTrue(MTRInvokeResponsesAreWellFormed(values));
+
+                    // We should not have anything for groups after the first one
+                    __auto_type * expectedValues = @[
+                        @ { MTRCommandPathKey : togglePath },
+                        @ { MTRCommandPathKey : onPath },
+                        @ { MTRCommandPathKey : offPath },
+                    ];
+                    XCTAssertEqualObjects(values, expectedValues);
+
+                    [failingWithMissingDataInvokeDone fulfill];
+                }];
+
+    // 3 commands actually run, so use triple the timeout.
+    [self waitForExpectations:@[ failingWithMissingDataInvokeDone ] timeout:(3 * kTimeoutInSeconds)];
+
+    // Fourth test: do an invoke with two groups.  One of the commands in the
+    // first group expects to not get a falure status and gets data, which
+    // should be treated as success.
+    __auto_type * updateFabricLabelPath = [MTRCommandPath commandPathWithEndpointID:@(0)
+                                                                          clusterID:@(MTRClusterIDTypeOperationalCredentialsID)
+                                                                          commandID:@(MTRCommandIDTypeClusterOperationalCredentialsCommandUpdateFabricLabelID)];
+    __auto_type * nocResponsePath = [MTRCommandPath commandPathWithEndpointID:@(0)
+                                                                    clusterID:@(MTRClusterIDTypeOperationalCredentialsID)
+                                                                    commandID:@(MTRCommandIDTypeClusterOperationalCredentialsCommandNOCResponseID)];
+    __auto_type * updateFabricLabelFields = @{
+        MTRTypeKey : MTRStructureValueType,
+        MTRValueKey : @[
+            @{
+                MTRContextTagKey : @(0),
+                MTRDataKey : @ {
+                    MTRTypeKey : MTRUTF8StringValueType,
+                    MTRValueKey : @"newlabel",
+                },
+            },
+        ]
+    };
+    __auto_type * updateFabricLabelNotExpectingFailureCommand = [[MTRCommandWithRequiredResponse alloc] initWithPath:updateFabricLabelPath commandFields:updateFabricLabelFields requiredResponse:nil];
+
+    XCTestExpectation * updateFabricLabelNotExpectingFailureExpectation = [self expectationWithDescription:@"Invoke of commands where no failure is expected and data response is received done"];
+    [device invokeCommands:@[ @[ updateFabricLabelNotExpectingFailureCommand, onCommand ], @[ offCommand ] ]
+                     queue:queue
+                completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                    XCTAssertNil(error);
+                    XCTAssertNotNil(values);
+                    XCTAssertTrue(MTRInvokeResponsesAreWellFormed(values));
+
+                    XCTAssertEqual(values.count, 3);
+
+                    NSDictionary<NSString *, id> * updateFabricLabelResponse = values[0];
+                    XCTAssertEqualObjects(updateFabricLabelResponse[MTRCommandPathKey], nocResponsePath);
+                    NSDictionary<NSString *, id> * responseData = updateFabricLabelResponse[MTRDataKey];
+                    XCTAssertEqualObjects(responseData[MTRTypeKey], MTRStructureValueType);
+                    NSArray<NSDictionary<NSString *, id> *> * responseFields = responseData[MTRValueKey];
+                    XCTAssertTrue(responseFields.count > 0);
+
+                    for (NSDictionary<NSString *, id> * field in responseFields) {
+                        if ([@(0) isEqual:field[MTRContextTagKey]]) {
+                            // Check that this in fact succeeded.
+                            NSDictionary<NSString *, id> * fieldValue = field[MTRDataKey];
+                            XCTAssertEqualObjects(fieldValue[MTRTypeKey], MTRUnsignedIntegerValueType);
+                            XCTAssertEqualObjects(fieldValue[MTRValueKey], @(MTROperationalCredentialsNodeOperationalCertStatusOK));
+                        }
+                    }
+
+                    XCTAssertEqualObjects(values[1], @ { MTRCommandPathKey : onPath });
+                    XCTAssertEqualObjects(values[2], @ { MTRCommandPathKey : offPath });
+
+                    [updateFabricLabelNotExpectingFailureExpectation fulfill];
+                }];
+
+    // 3 commands actually run, so use triple the timeout.
+    [self waitForExpectations:@[ updateFabricLabelNotExpectingFailureExpectation ] timeout:(3 * kTimeoutInSeconds)];
+
+    // Fifth test: do an invoke with two groups.  One of the commands in the
+    // first group expects to get a data response and gets it, which should be
+    // treated as success.
+    __auto_type * updateFabricLabelExpectingOKCommand = [[MTRCommandWithRequiredResponse alloc] initWithPath:updateFabricLabelPath commandFields:updateFabricLabelFields requiredResponse:@{
+        @(0) : @ {
+            MTRTypeKey : MTRUnsignedIntegerValueType,
+            MTRValueKey : @(MTROperationalCredentialsNodeOperationalCertStatusOK),
+        },
+    }];
+
+    XCTestExpectation * updateFabricLabelExpectingOKExpectation = [self expectationWithDescription:@"Invoke of commands where data response is expected and received done"];
+    [device invokeCommands:@[ @[ updateFabricLabelExpectingOKCommand, onCommand ], @[ offCommand ] ]
+                     queue:queue
+                completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                    XCTAssertNil(error);
+                    XCTAssertNotNil(values);
+                    XCTAssertTrue(MTRInvokeResponsesAreWellFormed(values));
+
+                    XCTAssertEqual(values.count, 3);
+
+                    NSDictionary<NSString *, id> * updateFabricLabelResponse = values[0];
+                    XCTAssertEqualObjects(updateFabricLabelResponse[MTRCommandPathKey], nocResponsePath);
+                    NSDictionary<NSString *, id> * responseData = updateFabricLabelResponse[MTRDataKey];
+                    XCTAssertEqualObjects(responseData[MTRTypeKey], MTRStructureValueType);
+                    NSArray<NSDictionary<NSString *, id> *> * responseFields = responseData[MTRValueKey];
+                    XCTAssertTrue(responseFields.count > 0);
+
+                    for (NSDictionary<NSString *, id> * field in responseFields) {
+                        if ([@(0) isEqual:field[MTRContextTagKey]]) {
+                            // Check that this in fact succeeded.
+                            NSDictionary<NSString *, id> * fieldValue = field[MTRDataKey];
+                            XCTAssertEqualObjects(fieldValue[MTRTypeKey], MTRUnsignedIntegerValueType);
+                            XCTAssertEqualObjects(fieldValue[MTRValueKey], @(MTROperationalCredentialsNodeOperationalCertStatusOK));
+                        }
+                    }
+
+                    XCTAssertEqualObjects(values[1], @ { MTRCommandPathKey : onPath });
+                    XCTAssertEqualObjects(values[2], @ { MTRCommandPathKey : offPath });
+
+                    [updateFabricLabelExpectingOKExpectation fulfill];
+                }];
+
+    // 3 commands actually run, so use triple the timeout.
+    [self waitForExpectations:@[ updateFabricLabelExpectingOKExpectation ] timeout:(3 * kTimeoutInSeconds)];
+
+    // Sixth test: do an invoke with two groups.  One of the commands in the
+    // first group expects to get a data response with a field that it does not get, which should be
+    // treated as failure.
+    __auto_type * updateFabricLabelExpectingNonexistentFieldCommand = [[MTRCommandWithRequiredResponse alloc] initWithPath:updateFabricLabelPath commandFields:updateFabricLabelFields requiredResponse:@{
+        @(20) : @ {
+            MTRTypeKey : MTRUnsignedIntegerValueType,
+            MTRValueKey : @(MTROperationalCredentialsNodeOperationalCertStatusOK),
+        },
+    }];
+
+    XCTestExpectation * updateFabricLabelExpectingNonexistentFieldExpectation = [self expectationWithDescription:@"Invoke of commands where data response is expected but the received one is missing a field done"];
+    [device invokeCommands:@[ @[ updateFabricLabelExpectingNonexistentFieldCommand, onCommand ], @[ offCommand ] ]
+                     queue:queue
+                completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                    XCTAssertNil(error);
+                    XCTAssertNotNil(values);
+                    XCTAssertTrue(MTRInvokeResponsesAreWellFormed(values));
+
+                    XCTAssertEqual(values.count, 2);
+
+                    NSDictionary<NSString *, id> * updateFabricLabelResponse = values[0];
+                    XCTAssertEqualObjects(updateFabricLabelResponse[MTRCommandPathKey], nocResponsePath);
+                    NSDictionary<NSString *, id> * responseData = updateFabricLabelResponse[MTRDataKey];
+                    XCTAssertEqualObjects(responseData[MTRTypeKey], MTRStructureValueType);
+                    NSArray<NSDictionary<NSString *, id> *> * responseFields = responseData[MTRValueKey];
+                    XCTAssertTrue(responseFields.count > 0);
+
+                    for (NSDictionary<NSString *, id> * field in responseFields) {
+                        if ([@(0) isEqual:field[MTRContextTagKey]]) {
+                            // Check that this in fact succeeded.
+                            NSDictionary<NSString *, id> * fieldValue = field[MTRDataKey];
+                            XCTAssertEqualObjects(fieldValue[MTRTypeKey], MTRUnsignedIntegerValueType);
+                            XCTAssertEqualObjects(fieldValue[MTRValueKey], @(MTROperationalCredentialsNodeOperationalCertStatusOK));
+                        }
+                    }
+
+                    XCTAssertEqualObjects(values[1], @ { MTRCommandPathKey : onPath });
+
+                    [updateFabricLabelExpectingNonexistentFieldExpectation fulfill];
+                }];
+
+    // 2 commands actually run, so use double the timeout.
+    [self waitForExpectations:@[ updateFabricLabelExpectingNonexistentFieldExpectation ] timeout:(2 * kTimeoutInSeconds)];
+
+    // Seventh test: do an invoke with two groups.  One of the commands in the    // first group expects to get a data response with a field value that does
+    // not match what it gets, which should be treated as a failure.
+    __auto_type * updateFabricLabelExpectingWrongValueCommand = [[MTRCommandWithRequiredResponse alloc] initWithPath:updateFabricLabelPath commandFields:updateFabricLabelFields requiredResponse:@{
+        @(0) : @ {
+            MTRTypeKey : MTRUnsignedIntegerValueType,
+            MTRValueKey : @(MTROperationalCredentialsNodeOperationalCertStatusFabricConflict),
+        },
+    }];
+
+    XCTestExpectation * updateFabricLabelExpectingWrongValueExpectation = [self expectationWithDescription:@"Invoke of commands where data response is expected but with the wrong value done"];
+    [device invokeCommands:@[ @[ updateFabricLabelExpectingWrongValueCommand, onCommand ], @[ offCommand ] ]
+                     queue:queue
+                completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                    XCTAssertNil(error);
+                    XCTAssertNotNil(values);
+                    XCTAssertTrue(MTRInvokeResponsesAreWellFormed(values));
+
+                    XCTAssertEqual(values.count, 2);
+
+                    NSDictionary<NSString *, id> * updateFabricLabelResponse = values[0];
+                    XCTAssertEqualObjects(updateFabricLabelResponse[MTRCommandPathKey], nocResponsePath);
+                    NSDictionary<NSString *, id> * responseData = updateFabricLabelResponse[MTRDataKey];
+                    XCTAssertEqualObjects(responseData[MTRTypeKey], MTRStructureValueType);
+                    NSArray<NSDictionary<NSString *, id> *> * responseFields = responseData[MTRValueKey];
+                    XCTAssertTrue(responseFields.count > 0);
+
+                    for (NSDictionary<NSString *, id> * field in responseFields) {
+                        if ([@(0) isEqual:field[MTRContextTagKey]]) {
+                            // Check that this in fact succeeded.
+                            NSDictionary<NSString *, id> * fieldValue = field[MTRDataKey];
+                            XCTAssertEqualObjects(fieldValue[MTRTypeKey], MTRUnsignedIntegerValueType);
+                            XCTAssertEqualObjects(fieldValue[MTRValueKey], @(MTROperationalCredentialsNodeOperationalCertStatusOK));
+                        }
+                    }
+
+                    XCTAssertEqualObjects(values[1], @ { MTRCommandPathKey : onPath });
+
+                    [updateFabricLabelExpectingWrongValueExpectation fulfill];
+                }];
+
+    // 2 commands actually run, so use double the timeout.
+    [self waitForExpectations:@[ updateFabricLabelExpectingWrongValueExpectation ] timeout:(2 * kTimeoutInSeconds)];
+}
+
+- (void)test046_MTRCommandWithRequiredResponseEncoding
+{
+    // Basic test with no command fields or required response.
+    __auto_type * onPath = [MTRCommandPath commandPathWithEndpointID:@(1)
+                                                           clusterID:@(MTRClusterIDTypeOnOffID)
+                                                           commandID:@(MTRCommandIDTypeClusterOnOffCommandOnID)];
+    __auto_type * onCommand = [[MTRCommandWithRequiredResponse alloc] initWithPath:onPath commandFields:nil requiredResponse:nil];
+    [self doEncodeDecodeRoundTrip:onCommand];
+
+    // Test with both command fields and an interesting required response.
+    //
+    // NSSecureCoding tracks object identity, so we need to create new objects
+    // for every instance of a thing we decode/encode with a given coder to make
+    // sure all codepaths are exercised. Use a block that returns a new
+    // dictionary each time to handle this.
+    __auto_type structureWithAllTypes = ^{
+        return @{
+            MTRTypeKey : MTRStructureValueType,
+            MTRValueKey : @[
+                @{
+                    MTRContextTagKey : @(0),
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRSignedIntegerValueType,
+                        MTRValueKey : @(5),
+                    },
+                },
+                @{
+                    MTRContextTagKey : @(1),
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRUnsignedIntegerValueType,
+                        MTRValueKey : @(5),
+                    },
+                },
+                @{
+                    MTRContextTagKey : @(2),
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRBooleanValueType,
+                        MTRValueKey : @(YES),
+                    },
+                },
+                @{
+                    MTRContextTagKey : @(3),
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRUTF8StringValueType,
+                        MTRValueKey : @("abc"),
+                    },
+                },
+                @{
+                    MTRContextTagKey : @(4),
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTROctetStringValueType,
+                        MTRValueKey : [[NSData alloc] initWithBase64EncodedString:@"APJj" options:0],
+                    },
+                },
+                @{
+                    MTRContextTagKey : @(5),
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRFloatValueType,
+                        MTRValueKey : @(1.0),
+                    },
+                },
+                @{
+                    MTRContextTagKey : @(6),
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRDoubleValueType,
+                        MTRValueKey : @(5.0),
+                    },
+                },
+                @{
+                    MTRContextTagKey : @(7),
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRNullValueType,
+                    },
+                },
+                @{
+                    MTRContextTagKey : @(8),
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRArrayValueType,
+                        MTRValueKey : @[
+                            @{
+                                MTRDataKey : @ {
+                                    MTRTypeKey : MTRUnsignedIntegerValueType,
+                                    MTRValueKey : @(9),
+                                },
+                            },
+                        ],
+                    }
+                },
+            ],
+        };
+    };
+
+    // Invalid commandFields (not a dictionary)
+    onCommand.commandFields = (id) @[];
+    [self _ensureDecodeFails:onCommand];
+
+    // Invalid required response (not a dictionary)
+    onCommand.commandFields = nil;
+    onCommand.requiredResponse = (id) @[];
+    [self _ensureDecodeFails:onCommand];
+
+    // Invalid required response (key is not NSNumber)
+    onCommand.requiredResponse = @{
+        @("abc") : structureWithAllTypes(),
+    };
+    [self _ensureDecodeFails:onCommand];
+
+    onCommand.commandFields = structureWithAllTypes();
+    onCommand.requiredResponse = @{
+        @(1) : structureWithAllTypes(),
+        @(13) : structureWithAllTypes(),
+    };
+    [self doEncodeDecodeRoundTrip:onCommand];
 }
 
 @end

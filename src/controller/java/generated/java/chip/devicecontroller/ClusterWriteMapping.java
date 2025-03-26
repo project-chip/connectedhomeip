@@ -1632,6 +1632,8 @@ public class ClusterWriteMapping {
     );
     writeWindowCoveringInteractionInfo.put("writeModeAttribute", writeWindowCoveringModeAttributeInteractionInfo);
     writeAttributeMap.put("windowCovering", writeWindowCoveringInteractionInfo);
+    Map<String, InteractionInfo> writeClosureControlInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("closureControl", writeClosureControlInteractionInfo);
     Map<String, InteractionInfo> writeServiceAreaInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("serviceArea", writeServiceAreaInteractionInfo);
     Map<String, InteractionInfo> writePumpConfigurationAndControlInteractionInfo = new LinkedHashMap<>();
@@ -3740,33 +3742,37 @@ public class ClusterWriteMapping {
     );
     writeCameraAvStreamManagementInteractionInfo.put("writeStatusLightBrightnessAttribute", writeCameraAvStreamManagementStatusLightBrightnessAttributeInteractionInfo);
     writeAttributeMap.put("cameraAvStreamManagement", writeCameraAvStreamManagementInteractionInfo);
+    Map<String, InteractionInfo> writeCameraAvSettingsUserLevelManagementInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("cameraAvSettingsUserLevelManagement", writeCameraAvSettingsUserLevelManagementInteractionInfo);
     Map<String, InteractionInfo> writeWebRTCTransportProviderInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("webRTCTransportProvider", writeWebRTCTransportProviderInteractionInfo);
     Map<String, InteractionInfo> writeWebRTCTransportRequestorInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("webRTCTransportRequestor", writeWebRTCTransportRequestorInteractionInfo);
+    Map<String, InteractionInfo> writePushAvStreamTransportInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("pushAvStreamTransport", writePushAvStreamTransportInteractionInfo);
     Map<String, InteractionInfo> writeChimeInteractionInfo = new LinkedHashMap<>();
-    Map<String, CommandParameterInfo> writeChimeActiveChimeIDCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo chimeactiveChimeIDCommandParameterInfo =
+    Map<String, CommandParameterInfo> writeChimeSelectedChimeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo chimeselectedChimeCommandParameterInfo =
         new CommandParameterInfo(
             "value", 
             Integer.class, 
             Integer.class 
         );
-    writeChimeActiveChimeIDCommandParams.put(
+    writeChimeSelectedChimeCommandParams.put(
         "value",
-        chimeactiveChimeIDCommandParameterInfo
+        chimeselectedChimeCommandParameterInfo
     );
-    InteractionInfo writeChimeActiveChimeIDAttributeInteractionInfo = new InteractionInfo(
+    InteractionInfo writeChimeSelectedChimeAttributeInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
-        ((ChipClusters.ChimeCluster) cluster).writeActiveChimeIDAttribute(
+        ((ChipClusters.ChimeCluster) cluster).writeSelectedChimeAttribute(
           (DefaultClusterCallback) callback,
           (Integer) commandArguments.get("value")
         );
       },
       () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-      writeChimeActiveChimeIDCommandParams
+      writeChimeSelectedChimeCommandParams
     );
-    writeChimeInteractionInfo.put("writeActiveChimeIDAttribute", writeChimeActiveChimeIDAttributeInteractionInfo);
+    writeChimeInteractionInfo.put("writeSelectedChimeAttribute", writeChimeSelectedChimeAttributeInteractionInfo);
     Map<String, CommandParameterInfo> writeChimeEnabledCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo chimeenabledCommandParameterInfo =
         new CommandParameterInfo(
@@ -3794,6 +3800,10 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("ecosystemInformation", writeEcosystemInformationInteractionInfo);
     Map<String, InteractionInfo> writeCommissionerControlInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("commissionerControl", writeCommissionerControlInteractionInfo);
+    Map<String, InteractionInfo> writeTlsCertificateManagementInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("tlsCertificateManagement", writeTlsCertificateManagementInteractionInfo);
+    Map<String, InteractionInfo> writeTlsClientManagementInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("tlsClientManagement", writeTlsClientManagementInteractionInfo);
     Map<String, InteractionInfo> writeUnitTestingInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeUnitTestingBooleanCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo unitTestingbooleanCommandParameterInfo =

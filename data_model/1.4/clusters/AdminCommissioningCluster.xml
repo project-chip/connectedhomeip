@@ -54,6 +54,8 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x003C" name="Administrator Commissioning Cluster" revision="1">
   <revisionHistory>
@@ -82,7 +84,17 @@ Davis, CA 95616, USA
         </mandatoryConform>
       </item>
     </enum>
-    <enum name="Status Codes" type="status"/>
+    <enum name="StatusCodeEnum">
+      <item value="0x02" name="Busy" summary="Could not be completed because another commissioning is in progress">
+        <mandatoryConform/>
+      </item>
+      <item value="0x03" name="PAKEParameterError" summary="Provided PAKE parameters were incorrectly formatted or otherwise invalid">
+        <mandatoryConform/>
+      </item>
+      <item value="0x04" name="WindowNotOpen" summary="No commissioning window was currently open">
+        <mandatoryConform/>
+      </item>
+    </enum>
   </dataTypes>
   <attributes>
     <attribute id="0x0000" name="WindowStatus" type="CommissioningWindowStatusEnum">
@@ -91,12 +103,12 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0001" name="AdminFabricIndex" type="fabric-idx">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0002" name="AdminVendorId" type="vendor-id">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <mandatoryConform/>
     </attribute>
   </attributes>

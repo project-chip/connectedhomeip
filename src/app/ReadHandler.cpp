@@ -15,14 +15,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-/**
- *    @file
- *      This file defines read handler for a CHIP Interaction Data model
- *
- */
-
 #include <app/AppConfig.h>
+#include <app/AttributePathExpandIterator.h>
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/EventPathIB.h>
 #include <app/MessageDef/StatusResponseMessage.h>
@@ -31,6 +25,7 @@
 #include <app/data-model-provider/Provider.h>
 #include <app/icd/server/ICDServerConfig.h>
 #include <lib/core/TLVUtilities.h>
+#include <lib/support/CodeUtils.h>
 #include <messaging/ExchangeContext.h>
 
 #include <app/ReadHandler.h>
@@ -54,9 +49,9 @@ uint16_t ReadHandler::GetPublisherSelectedIntervalLimit()
 }
 
 ReadHandler::ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeContext * apExchangeContext,
-                         InteractionType aInteractionType, Observer * observer, DataModel::Provider * apDataModel) :
-    mAttributePathExpandIterator(apDataModel, nullptr),
-    mExchangeCtx(*this), mManagementCallback(apCallback)
+                         InteractionType aInteractionType, Observer * observer) :
+    mExchangeCtx(*this),
+    mManagementCallback(apCallback)
 {
     VerifyOrDie(apExchangeContext != nullptr);
 
@@ -80,8 +75,8 @@ ReadHandler::ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeCon
 }
 
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-ReadHandler::ReadHandler(ManagementCallback & apCallback, Observer * observer, DataModel::Provider * apDataModel) :
-    mAttributePathExpandIterator(apDataModel, nullptr), mExchangeCtx(*this), mManagementCallback(apCallback)
+ReadHandler::ReadHandler(ManagementCallback & apCallback, Observer * observer) :
+    mExchangeCtx(*this), mManagementCallback(apCallback)
 {
     mInteractionType = InteractionType::Subscribe;
     mFlags.ClearAll();
@@ -511,8 +506,8 @@ CHIP_ERROR ReadHandler::ProcessAttributePaths(AttributePathIBs::Parser & aAttrib
     if (CHIP_END_OF_TLV == err)
     {
         mManagementCallback.GetInteractionModelEngine()->RemoveDuplicateConcreteAttributePath(mpAttributePathList);
-        mAttributePathExpandIterator.ResetTo(mpAttributePathList);
-        err = CHIP_NO_ERROR;
+        mAttributePathExpandPosition = AttributePathExpandIterator::Position::StartIterating(mpAttributePathList);
+        err                          = CHIP_NO_ERROR;
     }
     return err;
 }
@@ -854,15 +849,17 @@ void ReadHandler::PersistSubscription()
 
 void ReadHandler::ResetPathIterator()
 {
-    mAttributePathExpandIterator.ResetTo(mpAttributePathList);
+    mAttributePathExpandPosition = AttributePathExpandIterator::Position::StartIterating(mpAttributePathList);
     mAttributeEncoderState.Reset();
 }
 
-void ReadHandler::AttributePathIsDirty(const AttributePathParams & aAttributeChanged)
+void ReadHandler::AttributePathIsDirty(DataModel::Provider * apDataModel, const AttributePathParams & aAttributeChanged)
 {
-    ConcreteAttributePath path;
-
     mDirtyGeneration = mManagementCallback.GetInteractionModelEngine()->GetReportingEngine().GetDirtySetGeneration();
+
+    // We want to get the value, but not advance the iterator position.
+    AttributePathExpandIterator::Position tempPosition = mAttributePathExpandPosition;
+    ConcreteAttributePath path;
 
     // We won't reset the path iterator for every AttributePathIsDirty call to reduce the number of full data reports.
     // The iterator will be reset after finishing each report session.
@@ -873,7 +870,7 @@ void ReadHandler::AttributePathIsDirty(const AttributePathParams & aAttributeCha
     // TODO (#16699): Currently we can only guarantee the reports generated from a single path in the request are consistent. The
     // data might be inconsistent if the user send a request with two paths from the same cluster. We need to clearify the behavior
     // or make it consistent.
-    if (mAttributePathExpandIterator.Get(path) &&
+    if (AttributePathExpandIterator(apDataModel, tempPosition).Next(path) &&
         (aAttributeChanged.HasWildcardEndpointId() || aAttributeChanged.mEndpointId == path.mEndpointId) &&
         (aAttributeChanged.HasWildcardClusterId() || aAttributeChanged.mClusterId == path.mClusterId))
     {
@@ -883,7 +880,8 @@ void ReadHandler::AttributePathIsDirty(const AttributePathParams & aAttributeCha
         // If we're currently in the middle of generating reports for a given cluster and that in turn is marked dirty, let's reset
         // our iterator to point back to the beginning of that cluster. This ensures that the receiver will get a coherent view of
         // the state of the cluster as present on the server
-        mAttributePathExpandIterator.ResetCurrentCluster();
+        mAttributePathExpandPosition.IterateFromTheStartOfTheCurrentClusterIfAttributeWildcard();
+
         mAttributeEncoderState.Reset();
     }
 

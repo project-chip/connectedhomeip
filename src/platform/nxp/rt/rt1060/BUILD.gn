@@ -60,7 +60,6 @@ static_library("nxp_platform") {
     "-Wno-conversion",
     "-Wno-sign-compare",
   ]
-  deps = []
   defines = []
   sources = [
     "../../../FreeRTOS/SystemTimeSupport.cpp",
@@ -85,6 +84,7 @@ static_library("nxp_platform") {
     "CHIPDevicePlatformConfig.h",
     "PlatformManagerImpl.cpp",
   ]
+  deps = [ "${chip_root}/src/app:app_config" ]
 
   if (chip_enable_ble) {
     sources += [
@@ -134,7 +134,10 @@ static_library("nxp_platform") {
       "../../common/ThreadStackManagerImpl.h",
     ]
 
-    deps += [ "${chip_root}/src/app/common:ids" ]
+    deps += [
+      "${chip_root}/src/app:app_config",
+      "${chip_root}/src/app/common:ids",
+    ]
 
     if (!nxp_build_matter_standalone_lib) {
       deps += [ "${chip_root}/third_party/openthread:openthread" ]

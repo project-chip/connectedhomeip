@@ -112,7 +112,8 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::_UnlockChipStack()
         chipDie();
 #endif
     }
-    mChipStackIsLocked = false;
+    mChipStackIsLocked        = false;
+    mChipStackLockOwnerThread = pthread_t();
 #endif
 
     int err = pthread_mutex_unlock(&mChipStackLock);

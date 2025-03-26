@@ -17,12 +17,15 @@
 # See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
 # for details about the block below.
 #
+# TODO: https://github.com/project-chip/connectedhomeip/issues/36884
+#
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
 #     app: ${ALL_CLUSTERS_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
+#       --test-case test_TC_SWTCH_2_2
 #       --endpoint 1
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -37,7 +40,10 @@
 #     app: ${ALL_CLUSTERS_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
-#       --endpoint 2
+#       --test-case test_TC_SWTCH_2_3
+#       --test-case test_TC_SWTCH_2_4
+#       --test-case test_TC_SWTCH_2_6
+#       --endpoint 3
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
 #       --discriminator 1234
@@ -51,20 +57,9 @@
 #     app: ${ALL_CLUSTERS_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
-#       --endpoint 3
-#       --storage-path admin_storage.json
-#       --commissioning-method on-network
-#       --discriminator 1234
-#       --passcode 20202021
-#       --trace-to json:${TRACE_TEST_JSON}.json
-#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#       --PICS src/app/tests/suites/certification/ci-pics-values
-#     factory-reset: true
-#     quiet: true
-#   run4:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-#     script-args: >
+#       --test-case test_TC_SWTCH_2_3
+#       --test-case test_TC_SWTCH_2_4
+#       --test-case test_TC_SWTCH_2_5
 #       --endpoint 4
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -281,7 +276,8 @@ class TC_SwitchTests(MatterBaseTest):
         elapsed = 0.0
         time_remaining = timeout_sec
 
-        logging.info(f"Waiting {timeout_sec:.1f} seconds for no more events for cluster {expected_cluster} on endpoint {endpoint_id}")
+        logging.info(f"Waiting {timeout_sec:.1f} seconds for no more events for "
+                     f"cluster {expected_cluster} on endpoint {endpoint_id}")
         while time_remaining > 0:
             try:
                 item: EventReadResult = event_queue.get(block=True, timeout=time_remaining)

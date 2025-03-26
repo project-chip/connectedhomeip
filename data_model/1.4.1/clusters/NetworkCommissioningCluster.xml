@@ -1,0 +1,596 @@
+<?xml version="1.0"?>
+<!--
+Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+The information within this document is the property of the Connectivity
+Standards Alliance and its use and disclosure are restricted, except as
+expressly set forth herein.
+
+Connectivity Standards Alliance hereby grants you a fully-paid, non-exclusive,
+nontransferable, worldwide, limited and revocable license (without the right to
+sublicense), under Connectivity Standards Alliance's applicable copyright
+rights, to view, download, save, reproduce and use the document solely for your
+own internal purposes and in accordance with the terms of the license set forth
+herein. This license does not authorize you to, and you expressly warrant that
+you shall not: (a) permit others (outside your organization) to use this
+document; (b) post or publish this document; (c) modify, adapt, translate, or
+otherwise change this document in any manner or create any derivative work
+based on this document; (d) remove or modify any notice or label on this
+document, including this Copyright Notice, License and Disclaimer. The
+Connectivity Standards Alliance does not grant you any license hereunder other
+than as expressly stated herein.
+
+Elements of this document may be subject to third party intellectual property
+rights, including without limitation, patent, copyright or trademark rights,
+and any such third party may or may not be a member of the Connectivity
+Standards Alliance. Connectivity Standards Alliance members grant other
+Connectivity Standards Alliance members certain intellectual property rights as
+set forth in the Connectivity Standards Alliance IPR Policy. Connectivity
+Standards Alliance members do not grant you any rights under this license. The
+Connectivity Standards Alliance is not responsible for, and shall not be held
+responsible in any manner for, identifying or failing to identify any or all
+such third party intellectual property rights. Please visit www.csa-iot.org for
+more information on how to become a member of the Connectivity Standards
+Alliance.
+
+This document and the information contained herein are provided on an “AS IS”
+basis and the Connectivity Standards Alliance DISCLAIMS ALL WARRANTIES EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO (A) ANY WARRANTY THAT THE USE OF THE
+INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OF THIRD PARTIES (INCLUDING
+WITHOUT LIMITATION ANY INTELLECTUAL PROPERTY RIGHTS INCLUDING PATENT, COPYRIGHT
+OR TRADEMARK RIGHTS); OR (B) ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, TITLE OR NONINFRINGEMENT. IN NO EVENT WILL THE
+CONNECTIVITY STANDARDS ALLIANCE BE LIABLE FOR ANY LOSS OF PROFITS, LOSS OF
+BUSINESS, LOSS OF USE OF DATA, INTERRUPTION OF BUSINESS, OR FOR ANY OTHER
+DIRECT, INDIRECT, SPECIAL OR EXEMPLARY, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL
+DAMAGES OF ANY KIND, IN CONTRACT OR IN TORT, IN CONNECTION WITH THIS DOCUMENT
+OR THE INFORMATION CONTAINED HEREIN, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+LOSS OR DAMAGE.
+
+All company, brand and product names in this document may be trademarks that
+are the sole property of their respective owners.
+
+This notice and disclaimer must be included on all copies of this document.
+
+Connectivity Standards Alliance
+508 Second Street, Suite 206
+Davis, CA 95616, USA
+
+:xrefstyle: basic
+-->
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0031" name="Network Commissioning Cluster" revision="2">
+  <revisionHistory>
+    <revision revision="1" summary="Initial revision"/>
+    <revision revision="2" summary="Support determining capabilities for Wi-Fi and Thread interfaces. Additional Wi-Fi directed scanning requirements."/>
+  </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0031" name="Network Commissioning"/>
+  </clusterIds>
+  <classification hierarchy="base" role="utility" picsCode="CNET" scope="Node"/>
+  <features>
+    <feature bit="0" code="WI" name="WiFiNetworkInterface" summary="Wi-Fi related features">
+      <optionalConform choice="a"/>
+    </feature>
+    <feature bit="1" code="TH" name="ThreadNetworkInterface" summary="Thread related features">
+      <optionalConform choice="a"/>
+    </feature>
+    <feature bit="2" code="ET" name="EthernetNetworkInterface" summary="Ethernet related features">
+      <optionalConform choice="a"/>
+    </feature>
+  </features>
+  <dataTypes>
+    <enum name="NetworkCommissioningStatusEnum">
+      <item value="0" name="Success" summary="OK, no error">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="OutOfRange" summary="Value Outside Range">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="BoundsExceeded" summary="A collection would exceed its size limit">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="NetworkIDNotFound" summary="The NetworkID is not among the collection of added networks">
+        <mandatoryConform/>
+      </item>
+      <item value="4" name="DuplicateNetworkID" summary="The NetworkID is already among the collection of added networks">
+        <mandatoryConform/>
+      </item>
+      <item value="5" name="NetworkNotFound" summary="Cannot find AP: SSID Not found">
+        <mandatoryConform/>
+      </item>
+      <item value="6" name="RegulatoryError" summary="Cannot find AP: Mismatch on band/channels/regulatory domain / 2.4GHz vs 5GHz">
+        <mandatoryConform/>
+      </item>
+      <item value="7" name="AuthFailure" summary="Cannot associate due to authentication failure">
+        <mandatoryConform/>
+      </item>
+      <item value="8" name="UnsupportedSecurity" summary="Cannot associate due to unsupported security mode">
+        <mandatoryConform/>
+      </item>
+      <item value="9" name="OtherConnectionFailure" summary="Other association failure">
+        <mandatoryConform/>
+      </item>
+      <item value="10" name="IPV6Failed" summary="Failure to generate an IPv6 address">
+        <mandatoryConform/>
+      </item>
+      <item value="11" name="IPBindFailed" summary="Failure to bind Wi-Fi +&lt;-&gt;+ IP interfaces">
+        <mandatoryConform/>
+      </item>
+      <item value="12" name="UnknownError" summary="Unknown error">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="WiFiBandEnum">
+      <item value="0" name="2G4" summary="2.4GHz - 2.401GHz to 2.495GHz (802.11b/g/n/ax)">
+        <optionalConform choice="b" more="true" min="1"/>
+      </item>
+      <item value="1" name="3G65" summary="3.65GHz - 3.655GHz to 3.695GHz (802.11y)">
+        <optionalConform choice="b" more="true" min="1"/>
+      </item>
+      <item value="2" name="5G" summary="5GHz - 5.150GHz to 5.895GHz (802.11a/n/ac/ax)">
+        <optionalConform choice="b" more="true" min="1"/>
+      </item>
+      <item value="3" name="6G" summary="6GHz - 5.925GHz to 7.125GHz (802.11ax / Wi-Fi 6E)">
+        <optionalConform choice="b" more="true" min="1"/>
+      </item>
+      <item value="4" name="60G" summary="60GHz - 57.24GHz to 70.20GHz (802.11ad/ay)">
+        <optionalConform choice="b" more="true" min="1"/>
+      </item>
+      <item value="5" name="1G" summary="Sub-1GHz - 755MHz to 931MHz (802.11ah)">
+        <optionalConform choice="b" more="true" min="1"/>
+      </item>
+    </enum>
+    <bitmap name="ThreadCapabilitiesBitmap">
+      <bitfield name="IsBorderRouterCapable" bit="0" summary="Thread Border Router functionality is present">
+        <optionalConform/>
+      </bitfield>
+      <bitfield name="IsRouterCapable" bit="1" summary="Router mode is supported (interface could be in router or REED mode)">
+        <optionalConform/>
+      </bitfield>
+      <bitfield name="IsSleepyEndDeviceCapable" bit="2" summary="Sleepy end-device mode is supported">
+        <optionalConform/>
+      </bitfield>
+      <bitfield name="IsFullThreadDevice" bit="3" summary="Device is a full Thread device (opposite of Minimal Thread Device)">
+        <optionalConform/>
+      </bitfield>
+      <bitfield name="IsSynchronizedSleepyEndDeviceCapable" bit="4" summary="Synchronized sleepy end-device mode is supported">
+        <optionalConform/>
+      </bitfield>
+    </bitmap>
+    <bitmap name="WiFiSecurityBitmap">
+      <bitfield name="Unencrypted" bit="0" summary="Supports unencrypted Wi-Fi">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="WEP" bit="1" summary="Supports Wi-Fi using WEP security">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="WPA-PERSONAL" bit="2" summary="Supports Wi-Fi using WPA-Personal security">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="WPA2-PERSONAL" bit="3" summary="Supports Wi-Fi using WPA2-Personal security">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="WPA3-PERSONAL" bit="4" summary="Supports Wi-Fi using WPA3-Personal security">
+        <mandatoryConform/>
+      </bitfield>
+    </bitmap>
+    <struct name="NetworkInfoStruct">
+      <field id="0" name="NetworkID" type="octstr">
+        <mandatoryConform/>
+        <constraint>
+          <lengthBetween>
+            <from value="1"/>
+            <to value="32"/>
+          </lengthBetween>
+        </constraint>
+      </field>
+      <field id="1" name="Connected" type="bool">
+        <mandatoryConform/>
+      </field>
+    </struct>
+    <struct name="ThreadInterfaceScanResultStruct">
+      <field id="0" name="PanId" type="uint16">
+        <mandatoryConform>
+          <feature name="TH"/>
+        </mandatoryConform>
+        <constraint>
+          <max value="65534"/>
+        </constraint>
+      </field>
+      <field id="1" name="ExtendedPanId" type="uint64">
+        <mandatoryConform>
+          <feature name="TH"/>
+        </mandatoryConform>
+      </field>
+      <field id="2" name="NetworkName" type="string">
+        <mandatoryConform>
+          <feature name="TH"/>
+        </mandatoryConform>
+        <constraint>
+          <lengthBetween>
+            <from value="1"/>
+            <to value="16"/>
+          </lengthBetween>
+        </constraint>
+      </field>
+      <field id="3" name="Channel" type="uint16">
+        <mandatoryConform>
+          <feature name="TH"/>
+        </mandatoryConform>
+      </field>
+      <field id="4" name="Version" type="uint8">
+        <mandatoryConform>
+          <feature name="TH"/>
+        </mandatoryConform>
+      </field>
+      <field id="5" name="ExtendedAddress" type="hwadr">
+        <mandatoryConform>
+          <feature name="TH"/>
+        </mandatoryConform>
+        <constraint>
+          <allowed value="6"/>
+        </constraint>
+        <constraint>
+          <allowed value="8"/>
+        </constraint>
+      </field>
+      <field id="6" name="RSSI" type="int8">
+        <mandatoryConform>
+          <feature name="TH"/>
+        </mandatoryConform>
+      </field>
+      <field id="7" name="LQI" type="uint8">
+        <mandatoryConform>
+          <feature name="TH"/>
+        </mandatoryConform>
+      </field>
+    </struct>
+    <struct name="WiFiInterfaceScanResultStruct">
+      <field id="0" name="Security" type="WiFiSecurityBitmap">
+        <mandatoryConform>
+          <feature name="WI"/>
+        </mandatoryConform>
+      </field>
+      <field id="1" name="SSID" type="octstr">
+        <mandatoryConform>
+          <feature name="WI"/>
+        </mandatoryConform>
+        <constraint>
+          <maxLength value="32"/>
+        </constraint>
+      </field>
+      <field id="2" name="BSSID" type="octstr">
+        <mandatoryConform>
+          <feature name="WI"/>
+        </mandatoryConform>
+        <constraint>
+          <allowed value="6"/>
+        </constraint>
+      </field>
+      <field id="3" name="Channel" type="uint16">
+        <mandatoryConform>
+          <feature name="WI"/>
+        </mandatoryConform>
+      </field>
+      <field id="4" name="WiFiBand" type="WiFiBandEnum">
+        <optionalConform>
+          <feature name="WI"/>
+        </optionalConform>
+      </field>
+      <field id="5" name="RSSI" type="int8">
+        <optionalConform>
+          <feature name="WI"/>
+        </optionalConform>
+      </field>
+    </struct>
+  </dataTypes>
+  <attributes>
+    <attribute id="0x0000" name="MaxNetworks" type="uint8">
+      <access read="true" readPrivilege="admin"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform/>
+      <constraint>
+        <min value="1"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0001" name="Networks" type="list" default="empty">
+      <entry type="NetworkInfoStruct"/>
+      <access read="true" readPrivilege="admin"/>
+      <mandatoryConform/>
+      <constraint>
+        <maxCount>
+          <attribute name="MaxNetworks"/>
+        </maxCount>
+      </constraint>
+    </attribute>
+    <attribute id="0x0002" name="ScanMaxTimeSeconds" type="uint8">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <orTerm>
+          <feature name="WI"/>
+          <feature name="TH"/>
+        </orTerm>
+      </mandatoryConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0003" name="ConnectMaxTimeSeconds" type="uint8">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <orTerm>
+          <feature name="WI"/>
+          <feature name="TH"/>
+        </orTerm>
+      </mandatoryConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0004" name="InterfaceEnabled" type="bool" default="true">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="admin"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0005" name="LastNetworkingStatus" type="NetworkCommissioningStatusEnum" default="null">
+      <access read="true" readPrivilege="admin"/>
+      <quality nullable="true"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0006" name="LastNetworkID" type="octstr" default="null">
+      <access read="true" readPrivilege="admin"/>
+      <quality nullable="true"/>
+      <mandatoryConform/>
+      <constraint>
+        <lengthBetween>
+          <from value="1"/>
+          <to value="32"/>
+        </lengthBetween>
+      </constraint>
+    </attribute>
+    <attribute id="0x0007" name="LastConnectErrorValue" type="int32" default="null">
+      <access read="true" readPrivilege="admin"/>
+      <quality nullable="true"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0008" name="SupportedWiFiBands" type="list" default="MS">
+      <entry type="WiFiBandEnum"/>
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <feature name="WI"/>
+      </mandatoryConform>
+      <constraint>
+        <minCount value="1"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0009" name="SupportedThreadFeatures" type="ThreadCapabilitiesBitmap" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <feature name="TH"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x000A" name="ThreadVersion" type="uint16" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <feature name="TH"/>
+      </mandatoryConform>
+    </attribute>
+  </attributes>
+  <commands>
+    <command id="0x00" name="ScanNetworks" direction="commandToServer" response="ScanNetworksResponse">
+      <access invokePrivilege="admin"/>
+      <mandatoryConform>
+        <orTerm>
+          <feature name="WI"/>
+          <feature name="TH"/>
+        </orTerm>
+      </mandatoryConform>
+      <field id="0" name="SSID" type="octstr" default="null">
+        <quality nullable="true"/>
+        <optionalConform>
+          <feature name="WI"/>
+        </optionalConform>
+        <constraint>
+          <lengthBetween>
+            <from value="1"/>
+            <to value="32"/>
+          </lengthBetween>
+        </constraint>
+      </field>
+      <field id="1" name="Breadcrumb" type="uint64">
+        <optionalConform/>
+      </field>
+    </command>
+    <command id="0x01" name="ScanNetworksResponse" direction="responseFromServer">
+      <mandatoryConform>
+        <orTerm>
+          <feature name="WI"/>
+          <feature name="TH"/>
+        </orTerm>
+      </mandatoryConform>
+      <field id="0" name="NetworkingStatus" type="NetworkCommissioningStatusEnum">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="1" name="DebugText" type="string">
+        <optionalConform/>
+        <constraint>
+          <maxLength value="512"/>
+        </constraint>
+      </field>
+      <field id="2" name="WiFiScanResults" type="list">
+        <entry type="WiFiInterfaceScanResultStruct"/>
+        <mandatoryConform>
+          <feature name="WI"/>
+        </mandatoryConform>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="3" name="ThreadScanResults" type="list">
+        <entry type="ThreadInterfaceScanResultStruct"/>
+        <mandatoryConform>
+          <feature name="TH"/>
+        </mandatoryConform>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x02" name="AddOrUpdateWiFiNetwork" direction="commandToServer" response="NetworkConfigResponse">
+      <access invokePrivilege="admin"/>
+      <mandatoryConform>
+        <feature name="WI"/>
+      </mandatoryConform>
+      <field id="0" name="SSID" type="octstr">
+        <mandatoryConform/>
+        <constraint>
+          <maxLength value="32"/>
+        </constraint>
+      </field>
+      <field id="1" name="Credentials" type="octstr">
+        <mandatoryConform/>
+        <constraint>
+          <maxLength value="64"/>
+        </constraint>
+      </field>
+      <field id="2" name="Breadcrumb" type="uint64">
+        <optionalConform/>
+      </field>
+    </command>
+    <command id="0x03" name="AddOrUpdateThreadNetwork" direction="commandToServer" response="NetworkConfigResponse">
+      <access invokePrivilege="admin"/>
+      <mandatoryConform>
+        <feature name="TH"/>
+      </mandatoryConform>
+      <field id="0" name="OperationalDataset" type="octstr">
+        <mandatoryConform/>
+        <constraint>
+          <maxLength value="254"/>
+        </constraint>
+      </field>
+      <field id="1" name="Breadcrumb" type="uint64">
+        <optionalConform/>
+      </field>
+    </command>
+    <command id="0x04" name="RemoveNetwork" direction="commandToServer" response="NetworkConfigResponse">
+      <access invokePrivilege="admin"/>
+      <mandatoryConform>
+        <orTerm>
+          <feature name="WI"/>
+          <feature name="TH"/>
+        </orTerm>
+      </mandatoryConform>
+      <field id="0" name="NetworkID" type="octstr">
+        <mandatoryConform/>
+        <constraint>
+          <lengthBetween>
+            <from value="1"/>
+            <to value="32"/>
+          </lengthBetween>
+        </constraint>
+      </field>
+      <field id="1" name="Breadcrumb" type="uint64">
+        <optionalConform/>
+      </field>
+    </command>
+    <command id="0x05" name="NetworkConfigResponse" direction="responseFromServer">
+      <mandatoryConform>
+        <orTerm>
+          <feature name="WI"/>
+          <feature name="TH"/>
+        </orTerm>
+      </mandatoryConform>
+      <field id="0" name="NetworkingStatus" type="NetworkCommissioningStatusEnum">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="1" name="DebugText" type="string">
+        <optionalConform/>
+        <constraint>
+          <maxLength value="512"/>
+        </constraint>
+      </field>
+      <field id="2" name="NetworkIndex" type="uint8">
+        <optionalConform/>
+        <constraint>
+          <max value="MaxNetworks - 1"/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x06" name="ConnectNetwork" direction="commandToServer" response="ConnectNetworkResponse">
+      <access invokePrivilege="admin"/>
+      <mandatoryConform>
+        <orTerm>
+          <feature name="WI"/>
+          <feature name="TH"/>
+        </orTerm>
+      </mandatoryConform>
+      <field id="0" name="NetworkID" type="octstr">
+        <mandatoryConform/>
+        <constraint>
+          <lengthBetween>
+            <from value="1"/>
+            <to value="32"/>
+          </lengthBetween>
+        </constraint>
+      </field>
+      <field id="1" name="Breadcrumb" type="uint64">
+        <optionalConform/>
+      </field>
+    </command>
+    <command id="0x07" name="ConnectNetworkResponse" direction="responseFromServer">
+      <mandatoryConform>
+        <orTerm>
+          <feature name="WI"/>
+          <feature name="TH"/>
+        </orTerm>
+      </mandatoryConform>
+      <field id="0" name="NetworkingStatus" type="NetworkCommissioningStatusEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="DebugText" type="string">
+        <optionalConform/>
+      </field>
+      <field id="2" name="ErrorValue" type="int32">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x08" name="ReorderNetwork" direction="commandToServer" response="NetworkConfigResponse">
+      <access invokePrivilege="admin"/>
+      <mandatoryConform>
+        <orTerm>
+          <feature name="WI"/>
+          <feature name="TH"/>
+        </orTerm>
+      </mandatoryConform>
+      <field id="0" name="NetworkID" type="octstr">
+        <mandatoryConform/>
+        <constraint>
+          <lengthBetween>
+            <from value="1"/>
+            <to value="32"/>
+          </lengthBetween>
+        </constraint>
+      </field>
+      <field id="1" name="NetworkIndex" type="uint8">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="2" name="Breadcrumb" type="uint64">
+        <optionalConform/>
+      </field>
+    </command>
+  </commands>
+</cluster>

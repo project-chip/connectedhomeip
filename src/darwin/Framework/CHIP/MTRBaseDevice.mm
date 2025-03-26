@@ -1445,7 +1445,10 @@ exit:
     }
 
     if (logCall) {
-        MTR_LOG("%@ invoke %@ 0x%llx 0x%llx: %@", self, endpointID, clusterID.unsignedLongLongValue, commandID.unsignedLongLongValue, commandFields);
+        MTR_LOG("%@ invoke %@ 0x%llx (%@) 0x%llx (%@): %@", self, endpointID,
+            clusterID.unsignedLongLongValue, MTRClusterNameForID(static_cast<MTRClusterIDType>(clusterID.unsignedLongLongValue)),
+            commandID.unsignedLongLongValue, MTRRequestCommandNameForID(static_cast<MTRClusterIDType>(clusterID.unsignedLongLongValue), static_cast<MTRCommandIDType>(commandID.unsignedLongLongValue)),
+            commandFields);
     }
 
     auto * bridge = new MTRDataValueDictionaryCallbackBridge(queue, completion,
@@ -1523,7 +1526,7 @@ exit:
                 // Clamp to a number of seconds that will not overflow 32-bit
                 // int when converted to ms.
                 auto serverTimeoutInSeconds = System::Clock::Seconds16(serverSideProcessingTimeout.unsignedShortValue);
-                invokeTimeout.SetValue(session->ComputeRoundTripTimeout(serverTimeoutInSeconds));
+                invokeTimeout.SetValue(session->ComputeRoundTripTimeout(serverTimeoutInSeconds, true /*isFirstMessageOnExchange*/));
             }
             ReturnErrorOnFailure(commandSender->SendCommandRequest(session, invokeTimeout));
 

@@ -136,7 +136,7 @@ TEST_F(TestInetEndPoint, TestInetInterface)
 {
     InterfaceIterator intIterator;
     InterfaceAddressIterator addrIterator;
-    char intName[chip::Inet::InterfaceId::kMaxIfNameLength];
+    char intName[InterfaceId::kMaxIfNameLength];
     InterfaceId intId;
     IPAddress addr;
     InterfaceType intType;
@@ -277,8 +277,13 @@ TEST_F(TestInetEndPoint, TestInetEndPointInternal)
 
     err = InterfaceId::Null().GetLinkLocalAddr(&addr);
 
-    // We should skip the following checks if the interface does not have the Link local address
-    ASSERT_NE(err, INET_ERROR_ADDRESS_NOT_FOUND);
+    // We should skip the following checks if the interface does not have the Link local address.
+    // This can happen if you don't have network interfaces connected to any link (like happened
+    // to the author of this comment at YYZ before CSA 2025 Chicago Member Meeting).
+    if (err == INET_ERROR_ADDRESS_NOT_FOUND)
+    {
+        return;
+    }
 
     EXPECT_EQ(err, CHIP_NO_ERROR);
     intId = InterfaceId::FromIPAddress(addr);

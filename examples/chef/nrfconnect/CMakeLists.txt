@@ -97,6 +97,7 @@ target_sources(app PRIVATE
     ${CHEF}/common/clusters/low-power/LowPowerManager.cpp
     ${CHEF}/common/clusters/media-input/MediaInputManager.cpp
     ${CHEF}/common/clusters/media-playback/MediaPlaybackManager.cpp
+    ${CHEF}/common/clusters/oven-mode/chef-oven-mode.cpp
     ${CHEF}/common/clusters/refrigerator-and-temperature-controlled-cabinet-mode/tcc-mode.cpp
     ${CHEF}/common/clusters/resource-monitoring/chef-resource-monitoring-delegates.cpp
     ${CHEF}/common/clusters/switch/SwitchEventHandler.cpp
@@ -104,6 +105,7 @@ target_sources(app PRIVATE
     ${CHEF}/common/clusters/temperature-control/static-supported-temperature-levels.cpp
     ${CHEF}/common/clusters/target-navigator/TargetNavigatorManager.cpp
     ${CHEF}/common/clusters/wake-on-lan/WakeOnLanManager.cpp
+    ${CHEF}/common/clusters/window-covering/chef-window-covering.cpp
     ${CHEF}/common/stubs.cpp
     ${CHEF}/nrfconnect/main.cpp
 )

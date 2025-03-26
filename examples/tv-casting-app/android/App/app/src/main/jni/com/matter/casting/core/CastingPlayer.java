@@ -29,6 +29,19 @@ import java.util.List;
  * about the service discovered/resolved.
  */
 public interface CastingPlayer {
+
+  /** @brief CastingPlayer's Conenction State */
+  public enum ConnectionState {
+    /** State when CastingPlayer is not connected */
+    NOT_CONNECTED,
+
+    /** State when CastingPlayer is attempting to connect */
+    CONNECTING,
+
+    /** State when CastingPlayer is connnected */
+    CONNECTED,
+  }
+
   boolean isConnected();
 
   String getDeviceId();
@@ -152,4 +165,16 @@ public interface CastingPlayer {
 
   /** @brief Sets the internal connection state of this CastingPlayer to "disconnected" */
   void disconnect();
+
+  /**
+   * @brief Get CastingPlayer's current ConnectionState.
+   * @return Current ConnectionState.
+   */
+  ConnectionState getConnectionState();
+
+  /**
+   * @brief Get the Current ConnectionState of a CastingPlayer from the native layer.
+   * @returns A String representation of the CastingPlayer's current connectation.
+   */
+  String getConnectionStateNative();
 }

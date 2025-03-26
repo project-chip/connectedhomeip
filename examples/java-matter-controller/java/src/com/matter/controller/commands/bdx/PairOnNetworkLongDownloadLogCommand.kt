@@ -9,6 +9,7 @@ import com.matter.controller.commands.pairing.PairingCommand
 import com.matter.controller.commands.pairing.PairingModeType
 import com.matter.controller.commands.pairing.PairingNetworkType
 import java.io.File
+import java.util.concurrent.TimeUnit
 import java.util.logging.Level
 import java.util.logging.Logger
 
@@ -85,6 +86,12 @@ class PairOnNetworkLongDownloadLogCommand(
       )
     logger.log(Level.INFO, "Waiting response : ${getTimeoutMillis()}")
     waitCompleteMs(getTimeoutMillis())
+    // For waiting both side terminating.
+    try {
+      TimeUnit.SECONDS.sleep(WAIT_FOR_TERMINATE)
+    } catch (e: InterruptedException) {
+      throw RuntimeException(e)
+    }
   }
 
   companion object {
@@ -92,5 +99,6 @@ class PairOnNetworkLongDownloadLogCommand(
 
     private const val MATTER_PORT = 5540
     private const val MS_TO_SEC = 1000
+    private const val WAIT_FOR_TERMINATE = 1L
   }
 }

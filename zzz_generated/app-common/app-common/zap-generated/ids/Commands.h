@@ -550,6 +550,18 @@ namespace AddTrustedRootCertificate {
 static constexpr CommandId Id = 0x0000000B;
 } // namespace AddTrustedRootCertificate
 
+namespace SetVIDVerificationStatement {
+static constexpr CommandId Id = 0x0000000C;
+} // namespace SetVIDVerificationStatement
+
+namespace SignVIDVerificationRequest {
+static constexpr CommandId Id = 0x0000000D;
+} // namespace SignVIDVerificationRequest
+
+namespace SignVIDVerificationResponse {
+static constexpr CommandId Id = 0x0000000E;
+} // namespace SignVIDVerificationResponse
+
 } // namespace Commands
 } // namespace OperationalCredentials
 
@@ -1281,6 +1293,32 @@ static constexpr CommandId Id = 0x00000008;
 } // namespace Commands
 } // namespace WindowCovering
 
+namespace ClosureControl {
+namespace Commands {
+
+namespace Stop {
+static constexpr CommandId Id = 0x00000000;
+} // namespace Stop
+
+namespace MoveTo {
+static constexpr CommandId Id = 0x00000001;
+} // namespace MoveTo
+
+namespace Calibrate {
+static constexpr CommandId Id = 0x00000002;
+} // namespace Calibrate
+
+namespace ConfigureFallback {
+static constexpr CommandId Id = 0x00000003;
+} // namespace ConfigureFallback
+
+namespace CancelFallback {
+static constexpr CommandId Id = 0x00000004;
+} // namespace CancelFallback
+
+} // namespace Commands
+} // namespace ClosureControl
+
 namespace ServiceArea {
 namespace Commands {
 
@@ -1872,24 +1910,62 @@ namespace SnapshotStreamAllocateResponse {
 static constexpr CommandId Id = 0x00000008;
 } // namespace SnapshotStreamAllocateResponse
 
-namespace SnapshotStreamDeallocate {
+namespace SnapshotStreamModify {
 static constexpr CommandId Id = 0x00000009;
+} // namespace SnapshotStreamModify
+
+namespace SnapshotStreamDeallocate {
+static constexpr CommandId Id = 0x0000000A;
 } // namespace SnapshotStreamDeallocate
 
 namespace SetStreamPriorities {
-static constexpr CommandId Id = 0x0000000A;
+static constexpr CommandId Id = 0x0000000B;
 } // namespace SetStreamPriorities
 
 namespace CaptureSnapshot {
-static constexpr CommandId Id = 0x0000000B;
+static constexpr CommandId Id = 0x0000000C;
 } // namespace CaptureSnapshot
 
 namespace CaptureSnapshotResponse {
-static constexpr CommandId Id = 0x0000000C;
+static constexpr CommandId Id = 0x0000000D;
 } // namespace CaptureSnapshotResponse
 
 } // namespace Commands
 } // namespace CameraAvStreamManagement
+
+namespace CameraAvSettingsUserLevelManagement {
+namespace Commands {
+
+namespace MPTZSetPosition {
+static constexpr CommandId Id = 0x00000000;
+} // namespace MPTZSetPosition
+
+namespace MPTZRelativeMove {
+static constexpr CommandId Id = 0x00000001;
+} // namespace MPTZRelativeMove
+
+namespace MPTZMoveToPreset {
+static constexpr CommandId Id = 0x00000002;
+} // namespace MPTZMoveToPreset
+
+namespace MPTZSavePreset {
+static constexpr CommandId Id = 0x00000003;
+} // namespace MPTZSavePreset
+
+namespace MPTZRemovePreset {
+static constexpr CommandId Id = 0x00000004;
+} // namespace MPTZRemovePreset
+
+namespace DPTZSetViewport {
+static constexpr CommandId Id = 0x00000005;
+} // namespace DPTZSetViewport
+
+namespace DPTZRelativeMove {
+static constexpr CommandId Id = 0x00000006;
+} // namespace DPTZRelativeMove
+
+} // namespace Commands
+} // namespace CameraAvSettingsUserLevelManagement
 
 namespace WebRTCTransportProvider {
 namespace Commands {
@@ -1914,9 +1990,9 @@ namespace ProvideAnswer {
 static constexpr CommandId Id = 0x00000005;
 } // namespace ProvideAnswer
 
-namespace ProvideICECandidate {
+namespace ProvideICECandidates {
 static constexpr CommandId Id = 0x00000006;
-} // namespace ProvideICECandidate
+} // namespace ProvideICECandidates
 
 namespace EndSession {
 static constexpr CommandId Id = 0x00000007;
@@ -1936,9 +2012,9 @@ namespace Answer {
 static constexpr CommandId Id = 0x00000002;
 } // namespace Answer
 
-namespace ICECandidate {
+namespace ICECandidates {
 static constexpr CommandId Id = 0x00000003;
-} // namespace ICECandidate
+} // namespace ICECandidates
 
 namespace End {
 static constexpr CommandId Id = 0x00000004;
@@ -1946,6 +2022,44 @@ static constexpr CommandId Id = 0x00000004;
 
 } // namespace Commands
 } // namespace WebRTCTransportRequestor
+
+namespace PushAvStreamTransport {
+namespace Commands {
+
+namespace AllocatePushTransport {
+static constexpr CommandId Id = 0x00000000;
+} // namespace AllocatePushTransport
+
+namespace AllocatePushTransportResponse {
+static constexpr CommandId Id = 0x00000001;
+} // namespace AllocatePushTransportResponse
+
+namespace DeallocatePushTransport {
+static constexpr CommandId Id = 0x00000002;
+} // namespace DeallocatePushTransport
+
+namespace ModifyPushTransport {
+static constexpr CommandId Id = 0x00000003;
+} // namespace ModifyPushTransport
+
+namespace SetTransportStatus {
+static constexpr CommandId Id = 0x00000004;
+} // namespace SetTransportStatus
+
+namespace ManuallyTriggerTransport {
+static constexpr CommandId Id = 0x00000005;
+} // namespace ManuallyTriggerTransport
+
+namespace FindTransport {
+static constexpr CommandId Id = 0x00000006;
+} // namespace FindTransport
+
+namespace FindTransportResponse {
+static constexpr CommandId Id = 0x00000007;
+} // namespace FindTransportResponse
+
+} // namespace Commands
+} // namespace PushAvStreamTransport
 
 namespace Chime {
 namespace Commands {
@@ -1974,6 +2088,98 @@ static constexpr CommandId Id = 0x00000002;
 
 } // namespace Commands
 } // namespace CommissionerControl
+
+namespace TlsCertificateManagement {
+namespace Commands {
+
+namespace ProvisionRootCertificate {
+static constexpr CommandId Id = 0x00000000;
+} // namespace ProvisionRootCertificate
+
+namespace ProvisionRootCertificateResponse {
+static constexpr CommandId Id = 0x00000001;
+} // namespace ProvisionRootCertificateResponse
+
+namespace FindRootCertificate {
+static constexpr CommandId Id = 0x00000002;
+} // namespace FindRootCertificate
+
+namespace FindRootCertificateResponse {
+static constexpr CommandId Id = 0x00000003;
+} // namespace FindRootCertificateResponse
+
+namespace LookupRootCertificate {
+static constexpr CommandId Id = 0x00000004;
+} // namespace LookupRootCertificate
+
+namespace LookupRootCertificateResponse {
+static constexpr CommandId Id = 0x00000005;
+} // namespace LookupRootCertificateResponse
+
+namespace RemoveRootCertificate {
+static constexpr CommandId Id = 0x00000006;
+} // namespace RemoveRootCertificate
+
+namespace TLSClientCSR {
+static constexpr CommandId Id = 0x00000007;
+} // namespace TLSClientCSR
+
+namespace TLSClientCSRResponse {
+static constexpr CommandId Id = 0x00000008;
+} // namespace TLSClientCSRResponse
+
+namespace ProvisionClientCertificate {
+static constexpr CommandId Id = 0x00000009;
+} // namespace ProvisionClientCertificate
+
+namespace FindClientCertificate {
+static constexpr CommandId Id = 0x0000000A;
+} // namespace FindClientCertificate
+
+namespace FindClientCertificateResponse {
+static constexpr CommandId Id = 0x0000000B;
+} // namespace FindClientCertificateResponse
+
+namespace LookupClientCertificate {
+static constexpr CommandId Id = 0x0000000C;
+} // namespace LookupClientCertificate
+
+namespace LookupClientCertificateResponse {
+static constexpr CommandId Id = 0x0000000D;
+} // namespace LookupClientCertificateResponse
+
+namespace RemoveClientCertificate {
+static constexpr CommandId Id = 0x0000000E;
+} // namespace RemoveClientCertificate
+
+} // namespace Commands
+} // namespace TlsCertificateManagement
+
+namespace TlsClientManagement {
+namespace Commands {
+
+namespace ProvisionEndpoint {
+static constexpr CommandId Id = 0x00000000;
+} // namespace ProvisionEndpoint
+
+namespace ProvisionEndpointResponse {
+static constexpr CommandId Id = 0x00000001;
+} // namespace ProvisionEndpointResponse
+
+namespace FindEndpoint {
+static constexpr CommandId Id = 0x00000002;
+} // namespace FindEndpoint
+
+namespace FindEndpointResponse {
+static constexpr CommandId Id = 0x00000003;
+} // namespace FindEndpointResponse
+
+namespace RemoveEndpoint {
+static constexpr CommandId Id = 0x00000004;
+} // namespace RemoveEndpoint
+
+} // namespace Commands
+} // namespace TlsClientManagement
 
 namespace UnitTesting {
 namespace Commands {
