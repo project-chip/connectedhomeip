@@ -2442,9 +2442,6 @@ static BOOL AttributeIsSpecifiedInScenesManagementCluster(AttributeId aAttribute
 {
     using namespace Clusters::ScenesManagement;
     switch (aAttributeId) {
-    case Attributes::LastConfiguredBy::Id: {
-        return YES;
-    }
     case Attributes::SceneTableSize::Id: {
         return YES;
     }

@@ -49,9 +49,6 @@
 
 #define SYSTEM_STATE_LED &sl_led_led0
 
-#define APP_FUNCTION_BUTTON 0
-#define APP_LIGHT_SWITCH 1
-
 namespace {
 constexpr chip::EndpointId kLightSwitchEndpoint   = 1;
 constexpr chip::EndpointId kGenericSwitchEndpoint = 2;
@@ -74,11 +71,7 @@ AppTask AppTask::sAppTask;
 CHIP_ERROR AppTask::AppInit()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(AppTask::ButtonEventHandler);
-
-#ifdef DISPLAY_ENABLED
-    GetLCD().Init((uint8_t *) "Light Switch");
-#endif
+    chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(LightSwitchMgr::ButtonEventHandler);
 
     err = LightSwitchMgr::GetInstance().Init(kLightSwitchEndpoint, kGenericSwitchEndpoint);
     if (err != CHIP_NO_ERROR)
@@ -120,48 +113,5 @@ void AppTask::AppTaskMain(void * pvParameter)
             sAppTask.DispatchEvent(&event);
             eventReceived = osMessageQueueGet(sAppEventQueue, &event, NULL, 0);
         }
-    }
-}
-
-void AppTask::SwitchActionEventHandler(AppEvent * aEvent)
-{
-    VerifyOrReturn(aEvent->Type == AppEvent::kEventType_Button);
-
-    static bool mCurrentButtonState = false;
-
-    if (aEvent->ButtonEvent.Action == static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonPressed))
-    {
-        mCurrentButtonState = !mCurrentButtonState;
-        LightSwitchMgr::LightSwitchAction action =
-            mCurrentButtonState ? LightSwitchMgr::LightSwitchAction::On : LightSwitchMgr::LightSwitchAction::Off;
-
-        LightSwitchMgr::GetInstance().TriggerLightSwitchAction(action);
-        LightSwitchMgr::GetInstance().GenericSwitchOnInitialPress();
-
-#ifdef DISPLAY_ENABLED
-        sAppTask.GetLCD().WriteDemoUI(mCurrentButtonState);
-#endif
-    }
-    else if (aEvent->ButtonEvent.Action == static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonReleased))
-    {
-        LightSwitchMgr::GetInstance().GenericSwitchOnShortRelease();
-    }
-}
-
-void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
-{
-    AppEvent button_event           = {};
-    button_event.Type               = AppEvent::kEventType_Button;
-    button_event.ButtonEvent.Action = btnAction;
-
-    if (button == APP_LIGHT_SWITCH)
-    {
-        button_event.Handler = SwitchActionEventHandler;
-        sAppTask.PostEvent(&button_event);
-    }
-    else if (button == APP_FUNCTION_BUTTON)
-    {
-        button_event.Handler = BaseApplication::ButtonHandler;
-        sAppTask.PostEvent(&button_event);
     }
 }

@@ -60,9 +60,7 @@ public:
     void SetWifiCredentials(const WifiCredentials & credentials) override;
     CHIP_ERROR GetWifiCredentials(WifiCredentials & credentials) override;
     CHIP_ERROR ConnectToAccessPoint(void) override;
-#if CHIP_DEVICE_CONFIG_ENABLE_IPV4
     bool HasAnIPv4Address() override;
-#endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
     bool HasAnIPv6Address() override;
     void CancelScanNetworks() override;
     bool IsWifiProvisioned() override;

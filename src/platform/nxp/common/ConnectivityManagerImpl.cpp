@@ -259,7 +259,7 @@ void ConnectivityManagerImpl::ProcessWlanEvent(enum wlan_event_reason wlanEvent)
     {
     case WLAN_REASON_SUCCESS:
         ChipLogProgress(DeviceLayer, "Connected to WLAN network = %d", is_sta_ipv6_connected());
-        if (sInstance._GetWiFiStationState() == kWiFiStationState_Connecting)
+        if (sInstance._GetWiFiStationState() != kWiFiStationState_Connected)
         {
             sInstance._SetWiFiStationState(kWiFiStationState_Connecting_Succeeded);
             sInstance._SetWiFiStationState(kWiFiStationState_Connected);
@@ -318,7 +318,7 @@ void ConnectivityManagerImpl::ProcessWlanEvent(enum wlan_event_reason wlanEvent)
             sInstance.OnStationDisconnected();
             if (delegate)
             {
-                delegate->OnAssociationFailureDetected(associationFailureCause, wlan_status_code);
+                delegate->OnDisconnectionDetected(wlan_status_code);
             }
         }
         break;
@@ -329,7 +329,7 @@ void ConnectivityManagerImpl::ProcessWlanEvent(enum wlan_event_reason wlanEvent)
         sInstance.OnStationDisconnected();
         if (delegate)
         {
-            delegate->OnAssociationFailureDetected(associationFailureCause, wlan_status_code);
+            delegate->OnDisconnectionDetected(wlan_status_code);
         }
         break;
 
@@ -552,10 +552,22 @@ void ConnectivityManagerImpl::BrHandleStateChange()
             DeviceLayer::ConfigurationMgr().GetPrimaryMACAddress(mac);
             chip::Dnssd::MakeHostName(mHostname, sizeof(mHostname), mac);
 
+            BrInitAppLock(LockThreadStack, UnlockThreadStack);
             BrInitPlatform(ThreadStackMgrImpl().OTInstance(), extNetIfPtr, thrNetIfPtr);
+            BrUpdateLwipThrIf();
             BrInitMdnsHost(mHostname);
         }
     }
+}
+
+void ConnectivityManagerImpl::LockThreadStack()
+{
+    ThreadStackMgrImpl().LockThreadStack();
+}
+
+void ConnectivityManagerImpl::UnlockThreadStack()
+{
+    ThreadStackMgrImpl().UnlockThreadStack();
 }
 
 Inet::InterfaceId ConnectivityManagerImpl::GetThreadInterface()

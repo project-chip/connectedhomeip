@@ -122,10 +122,6 @@ CHIP_ERROR AppTask::AppInit()
 
     chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(AppTask::ButtonEventHandler);
 
-#ifdef DISPLAY_ENABLED
-    GetLCD().Init((uint8_t *) "Lock-App", true);
-#endif
-
 #if defined(ENABLE_CHIP_SHELL)
     err = RegisterLockEvents();
     if (err != CHIP_NO_ERROR)

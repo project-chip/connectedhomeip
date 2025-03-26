@@ -1,1 +1,1 @@
-121 : [Telink] Update Docker image (Zephyr 3.3 & 3.7 support)
+125 : [Tizen] Fix Tizen SDK installer when more than one CPU is selected

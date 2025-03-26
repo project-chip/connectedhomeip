@@ -80,10 +80,6 @@ CHIP_ERROR AppTask::AppInit()
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(AppTask::ButtonEventHandler);
 
-#ifdef DISPLAY_ENABLED
-    GetLCD().Init((uint8_t *) "Refrigrator-App");
-#endif
-
     err = RefrigeratorMgr().Init();
     if (err != CHIP_NO_ERROR)
     {

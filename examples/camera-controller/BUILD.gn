@@ -107,7 +107,7 @@ static_library("camera-controller-utils") {
   output_dir = root_out_dir
 }
 
-executable("camera-controller") {
+executable("chip-camera-controller") {
   sources = [ "main.cpp" ]
 
   deps = [
@@ -124,5 +124,5 @@ executable("camera-controller") {
 }
 
 group("default") {
-  deps = [ ":camera-controller" ]
+  deps = [ ":chip-camera-controller" ]
 }
