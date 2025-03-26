@@ -503,6 +503,18 @@ public:
      */
     Optional<System::Clock::Timeout> GetSubscriptionTimeout();
 
+    /**
+     * Force the ReadClient to resubscribe immediately.
+     *
+     * This method can be called even when the subscription is active.
+     * It will simulate a liveness timeout to trigger the resubscription
+     * process according to the resubscription policy.
+     *
+     * @retval #CHIP_NO_ERROR On success.
+     * @retval #CHIP_ERROR_INCORRECT_STATE If the ReadClient is not in a state where resubscription is applicable.
+     */
+    CHIP_ERROR ForceResubscribe();
+
 private:
     friend class TestReadInteraction;
     friend class InteractionModelEngine;
