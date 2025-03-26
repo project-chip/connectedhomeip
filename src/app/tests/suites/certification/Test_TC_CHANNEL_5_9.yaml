@@ -39,8 +39,7 @@ tests:
           constraints:
               type: list
 
-    - label:
-          "Step 2: TH sends a ChangeChannel command to the DUT with a channel
+    - label: "Step 2: TH sends a ChangeChannel command to the DUT with a channel
           name from the list in step 1"
       PICS: CHANNEL.S.C00.Rsp
       command: "ChangeChannel"
