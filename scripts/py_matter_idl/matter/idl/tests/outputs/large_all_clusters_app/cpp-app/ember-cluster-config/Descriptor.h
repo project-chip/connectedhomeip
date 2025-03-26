@@ -13,11 +13,11 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace Descriptor {
-namespace ApplicationConfig {
+namespace EmberApplicationConfig {
 
 using FeatureBitmapType = uint32_t;
 
-inline constexpr std::array<FeatureBitmapType, 4> kFixedEndpoints = { {
+inline constexpr std::array<ClusteConfiguration<FeatureBitmapType>, 4> kFixedEndpoints = { {
     {
         .endpointNumber = 0,
         .featureMap = BitFlags<FeatureBitmapType> {
@@ -44,7 +44,7 @@ inline constexpr std::array<FeatureBitmapType, 4> kFixedEndpoints = { {
     },
 } };
 
-} // namespace ApplicationConfig
+} // namespace EmberApplicationConfig
 } // namespace Descriptor
 } // namespace Clusters
 } // namespace app
