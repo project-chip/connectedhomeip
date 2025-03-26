@@ -373,16 +373,78 @@ Status OnOffServer::setOnOffValue(chip::EndpointId endpoint, chip::CommandId com
         return status;
     }
 
-    // if the value is already what we want to set it to then do nothing
-    if ((!currentValue && command == Commands::Off::Id) || (currentValue && command == Commands::On::Id))
+#ifdef MATTER_DM_PLUGIN_LEVEL_CONTROL
+    // the level control cluster supports on/off transitions or effects, e.g., controlled via
+    // the OnOffTransitionTime attribute: in a transition to "off", the level control cluster
+    // changes the CurrentLevel attribute using a timer until it reaches the minimum supported value
+    // and only then changes the OnOff value in the OnOff cluster. therefore, comparing the current
+    // OnOff state with the required state is not sufficient for OnOff cluster values that support
+    // level control:
+    // - the current state might be "On"
+    // - even though the level control cluster changes the state towards "Off"
+    // - and thus any other "On" value should prevent the cluster from turning off.
+    //
+    // this restriction does not exist for the "Off" command since level movements by definition
+    // are only available while the OnOff state is "On".
+    if (!LevelControlWithOnOffFeaturePresent(endpoint) || (command == Commands::Off::Id))
+#endif
     {
-        ChipLogProgress(Zcl, "Endpoint %x On/off already set to new value", endpoint);
-        return Status::Success;
+        // if the value is already what we want to set it to then do nothing
+        if ((!currentValue && command == Commands::Off::Id) || (currentValue && command == Commands::On::Id))
+        {
+            ChipLogProgress(Zcl, "Endpoint %x On/off already set to new value", endpoint);
+            return Status::Success;
+        }
     }
 
-    // we either got a toggle, or an on when off, or an off when on,
-    // so we need to swap the value
-    newValue = !currentValue;
+    switch (command)
+    {
+    case Commands::Off::Id:
+        newValue = false;
+        break;
+
+    case Commands::On::Id:
+        newValue = true;
+        break;
+
+    case Commands::Toggle::Id:
+        newValue = !currentValue;
+#ifdef MATTER_DM_PLUGIN_LEVEL_CONTROL
+        if (LevelControlWithOnOffFeaturePresent(endpoint))
+        {
+            bool targetValueOn    = false;
+            bool transitionActive = LevelControlIsOnOffTransitionActive(endpoint, &targetValueOn);
+            if (transitionActive)
+            {
+                newValue = !targetValueOn;
+            }
+        }
+#endif
+        break;
+
+    case Commands::OffWithEffect::Id:
+    case Commands::OnWithRecallGlobalScene::Id:
+    case Commands::OnWithTimedOff::Id:
+    default:
+        // this function is only supposed to be called for the commands On, Off, and Toggle
+        ChipLogProgress(Zcl, "ERR: unknown/unsupported command " ChipLogFormatMEI, ChipLogValueMEI(command));
+        return Status::Failure;
+        break;
+    }
+
+#ifdef MATTER_DM_PLUGIN_LEVEL_CONTROL
+    if (LevelControlWithOnOffFeaturePresent(endpoint))
+    {
+        bool targetValueOn    = false;
+        bool transitionActive = LevelControlIsOnOffTransitionActive(endpoint, &targetValueOn);
+        if (!transitionActive && (newValue == currentValue))
+        {
+            ChipLogProgress(Zcl, "Endpoint %x On/off already set to new value", endpoint);
+            return Status::Success;
+        }
+    }
+#endif
+
     ChipLogProgress(Zcl, "Toggle ep%x on/off from state %x to %x", endpoint, currentValue, newValue);
 
     // the sequence of updating on/off attribute and kick off level change effect should
@@ -415,11 +477,14 @@ Status OnOffServer::setOnOffValue(chip::EndpointId endpoint, chip::CommandId com
         }
 
         // write the new on/off value
-        status = Attributes::OnOff::Set(endpoint, newValue);
-        if (status != Status::Success)
+        if (newValue != currentValue)
         {
-            ChipLogProgress(Zcl, "ERR: writing on/off %x", to_underlying(status));
-            return status;
+            status = Attributes::OnOff::Set(endpoint, newValue);
+            if (status != Status::Success)
+            {
+                ChipLogProgress(Zcl, "ERR: writing on/off %x", to_underlying(status));
+                return status;
+            }
         }
 
 #ifdef MATTER_DM_PLUGIN_LEVEL_CONTROL
@@ -461,11 +526,14 @@ Status OnOffServer::setOnOffValue(chip::EndpointId endpoint, chip::CommandId com
 #endif
         {
             // write the new on/off value
-            status = Attributes::OnOff::Set(endpoint, newValue);
-            if (status != Status::Success)
+            if (newValue != currentValue)
             {
-                ChipLogProgress(Zcl, "ERR: writing on/off %x", to_underlying(status));
-                return status;
+                status = Attributes::OnOff::Set(endpoint, newValue);
+                if (status != Status::Success)
+                {
+                    ChipLogProgress(Zcl, "ERR: writing on/off %x", to_underlying(status));
+                    return status;
+                }
             }
 
             if (SupportsLightingApplications(endpoint))
@@ -517,7 +585,7 @@ void OnOffServer::initOnOffServer(chip::EndpointId endpoint)
         Status status             = getOnOffValueForStartUp(endpoint, onOffValueForStartUp);
         if (status == Status::Success)
         {
-            status = setOnOffValue(endpoint, onOffValueForStartUp, true);
+            status = setOnOffValue(endpoint, onOffValueForStartUp ? Commands::On::Id : Commands::Off::Id, true);
         }
 
 #ifdef MATTER_DM_PLUGIN_MODE_SELECT
