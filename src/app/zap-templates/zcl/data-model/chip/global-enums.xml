@@ -59,19 +59,6 @@ TODO: Make these structures global rather than defining them for each cluster.
     <item name="Medium" value="0x02"/>
     <item name="High" value="0x03"/>
   </enum>
-  
-  <enum name="TariffPriceTypeEnum" type="enum8">
-    <item name="Standard" value="0x00"/>
-    <item name="Critical" value="0x01"/>
-    <item name="Virtual" value="0x02"/>
-    <item name="Incentive" value="0x03"/>
-    <item name="IncentiveSignal" value="0x04"/>
-  </enum>
-
-  <enum name="TariffUnitEnum" type="enum8">
-    <item name="kWh" value="0x00"/>
-    <item name="kVAh" value="0x01"/>
-  </enum>
 
   <enum name="StreamUsageEnum" type="enum8">
     <cluster code="0x0551"/>
