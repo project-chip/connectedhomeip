@@ -190,7 +190,7 @@ if [ "$install_pytest_requirements" = "yes" ]; then
 fi
 
 if [ -n "$extra_packages" ]; then
-    WHEEL+=("$extra_packages")
+    WHEEL+=($extra_packages)
 fi
 
 if [ -n "$install_virtual_env" ]; then
