@@ -166,5 +166,5 @@ tests:
           [1742964438.436] [2438:10984843:main] [DL] BLE Layer shutdown
           [1742964438.436] [2438:10984843:main] [DL] System Layer shutdown
 
-        - Factory reset the TH
+          - Factory reset the TH
       disabled: true
