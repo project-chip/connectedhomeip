@@ -81,8 +81,10 @@ class TC_G_2_3(MatterBaseTest):
                 TestStep("4a", "TH reads GroupTable attribute from the GroupKeyManagement cluster from DUT on EP0"),
                 TestStep("4b", "Verify that the GroupTable contains an entry with the GroupName as Gp3"),
                 TestStep("5", "TH sends GetGroupMembership command to DUT on PIXIT.G.ENDPOINT with the following fields : GroupList as NULL"),
-                TestStep("6", "TH sends GetGroupMembership command to DUT on PIXIT.G.ENDPOINT with the following fields : GroupList as [0x0002]"),
-                TestStep("7", "TH sends GetGroupMembership command to DUT on PIXIT.G.ENDPOINT as unicast with the following fields: GroupList as [0x0002, 0x0003]"),
+                TestStep(
+                    "6", "TH sends GetGroupMembership command to DUT on PIXIT.G.ENDPOINT with the following fields : GroupList as [0x0002]"),
+                TestStep(
+                    "7", "TH sends GetGroupMembership command to DUT on PIXIT.G.ENDPOINT as unicast with the following fields: GroupList as [0x0002, 0x0003]"),
                 TestStep("8", "TH sends RemoveAllGroups command to DUT on PIXIT.G.ENDPOINT as unicast method"),
                 TestStep("9a", "TH writes the GroupKeyMap attribute in the GroupKeyManagement cluster of DUT on EP0 to binds GroupId(0x0006 to 0x0006 + maxgroups-1 ) with GroupKeySetID 1"),
                 TestStep("9b", "TH sends Identify command to DUT on PIXIT.G.ENDPOINT with the IdentifyTime as (0x0078) 120 seconds"),
@@ -105,7 +107,8 @@ class TC_G_2_3(MatterBaseTest):
                 TestStep("21b", "TH reads immediately IdentifyTime attribute from DUT"),
                 TestStep("22", "TH sends AddGroupIfIdentifying command to DUT on PIXIT.G.ENDPOINT as unicast method with the following fields: GroupId as 0x0004 GroupName as Gp4"),
                 TestStep("23", "TH reads GroupTable attribute from the GroupKeyManagement cluster of DUT on EP0")]
-        
+
+
     @async_test_body
     async def test_TC_G_2_3(self):
         # Pre-Conditions: Commissioning
@@ -130,6 +133,7 @@ class TC_G_2_3(MatterBaseTest):
             epochKey2="0123456789abcdef".encode(),
             epochStartTime2=1110002)
         
+
         cmd = Clusters.GroupKeyManagement.Commands.KeySetWrite(groupKey)
         resp = await self.send_single_cmd(dev_ctrl=th1, node_id=self.dut_node_id, cmd=cmd)
 
@@ -144,7 +148,7 @@ class TC_G_2_3(MatterBaseTest):
         await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.RemoveAllGroups())
 
         self.step("1d")
-        kGroupId2=2
+        kGroupId2 = 2
         kGroupNameGp2 = "Gp2"
         groupTableList: List[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute(
             dev_ctrl=th1, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.GroupKeyManagement.Attributes.GroupTable)
@@ -164,7 +168,7 @@ class TC_G_2_3(MatterBaseTest):
             logging.exception("Error while retrieving the groupName %s", e)
 
         self.step("3")
-        kGroupId3=3
+        kGroupId3 = 3
         kGroupNameGp3 = "Gp3"
         groupTableList: List[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute(
             dev_ctrl=th1, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.GroupKeyManagement.Attributes.GroupTable)
@@ -256,7 +260,7 @@ class TC_G_2_3(MatterBaseTest):
 
         self.step("15")
         startGroupId = 8
-        groupList = [startGroupId + i for i in range(maxgroups -2)]
+        groupList = [startGroupId + i for i in range(maxgroups - 2)]
         try:
             for kGroupId in groupList:
                 await th1.SendCommand(
@@ -287,7 +291,8 @@ class TC_G_2_3(MatterBaseTest):
         self.step("17")
         groupTableList: List[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute(
             dev_ctrl=th1, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.GroupKeyManagement.Attributes.GroupTable)
-        asserts.assert_true(all(entry.groupId != kGroupId13 for entry in groupTableList), f"Group ID {kGroupId13} was unexpectedly found in the group table")
+        asserts.assert_true(all(entry.groupId != kGroupId13 for entry in groupTableList),
+                            f"Group ID {kGroupId13} was unexpectedly found in the group table")
 
         self.step("18")
         cmd = Clusters.Groups.Commands.RemoveAllGroups()
@@ -337,7 +342,9 @@ class TC_G_2_3(MatterBaseTest):
         self.step("23")
         groupTableList: List[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute(
             dev_ctrl=th1, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.GroupKeyManagement.Attributes.GroupTable)
-        asserts.assert_true(all(entry.groupId != kGroupId for entry in groupTableList), f"Group ID {kGroupId} was unexpectedly found in the group table")
+        asserts.assert_true(all(entry.groupId != kGroupId for entry in groupTableList),
+                            f"Group ID {kGroupId} was unexpectedly found in the group table")
+
 
 if __name__ == "__main__":
     default_matter_test_main()
