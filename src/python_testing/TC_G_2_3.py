@@ -44,6 +44,7 @@ from chip.interaction_model import InteractionModelError, Status
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
+
 class TC_G_2_3(MatterBaseTest):
 
     def desc_TC_G_2_3(self):
@@ -132,7 +133,6 @@ class TC_G_2_3(MatterBaseTest):
             epochStartTime1=1110001,
             epochKey2="0123456789abcdef".encode(),
             epochStartTime2=1110002)
-        
 
         cmd = Clusters.GroupKeyManagement.Commands.KeySetWrite(groupKey)
         resp = await self.send_single_cmd(dev_ctrl=th1, node_id=self.dut_node_id, cmd=cmd)
