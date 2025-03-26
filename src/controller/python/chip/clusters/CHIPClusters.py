@@ -4075,20 +4075,6 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
             },
-            0x00000002: {
-                "attributeName": "StartUpMode",
-                "attributeId": 0x00000002,
-                "type": "int",
-                "reportable": True,
-                "writable": True,
-            },
-            0x00000003: {
-                "attributeName": "OnMode",
-                "attributeId": 0x00000003,
-                "type": "int",
-                "reportable": True,
-                "writable": True,
-            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,

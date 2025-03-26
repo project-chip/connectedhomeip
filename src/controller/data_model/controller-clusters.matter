@@ -3236,8 +3236,6 @@ cluster OvenMode = 73 {
 
   readonly attribute ModeOptionStruct supportedModes[] = 0;
   readonly attribute int8u currentMode = 1;
-  attribute optional nullable int8u startUpMode = 2;
-  attribute optional nullable int8u onMode = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3254,8 +3252,7 @@ cluster OvenMode = 73 {
     optional char_string<64> statusText = 1;
   }
 
-  /** This command is used to change device modes.
-        On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
+  /** This command is used to change device modes. */
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
 }
 

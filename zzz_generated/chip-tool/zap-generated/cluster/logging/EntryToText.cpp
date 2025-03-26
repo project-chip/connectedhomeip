@@ -1567,10 +1567,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "SupportedModes";
         case chip::app::Clusters::OvenMode::Attributes::CurrentMode::Id:
             return "CurrentMode";
-        case chip::app::Clusters::OvenMode::Attributes::StartUpMode::Id:
-            return "StartUpMode";
-        case chip::app::Clusters::OvenMode::Attributes::OnMode::Id:
-            return "OnMode";
         case chip::app::Clusters::OvenMode::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::OvenMode::Attributes::AcceptedCommandList::Id:
