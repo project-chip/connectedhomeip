@@ -1,6 +1,7 @@
 // DO NOT EDIT - Generated file
 //
-// Application configuration for EthernetNetworkDiagnostics
+// Application configuration for EthernetNetworkDiagnostics based on EMBER configuration
+// from inputs/large_lighting_app.matter
 #pragma once
 
 #include <app-common/zap-generated/cluster-enums.h>

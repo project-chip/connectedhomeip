@@ -1,6 +1,7 @@
 // DO NOT EDIT - Generated file
 //
-// Application configuration for Thermostat
+// Application configuration for Thermostat based on EMBER configuration
+// from inputs/large_all_clusters_app.matter
 #pragma once
 
 #include <app-common/zap-generated/cluster-enums.h>

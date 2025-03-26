@@ -188,5 +188,9 @@ class CppApplicationGenerator(CodeGenerator):
             self.internal_render_one_output(
                 template_path="ServerClusterConfig.jinja",
                 output_file_name=f"app/ember-cluster-config/{name}.h",
-                vars={"cluster_name": name, "config": config},
+                vars={
+                    "cluster_name": name,
+                    "config": config,
+                    "input_name": self.idl.parse_file_name
+                },
             )

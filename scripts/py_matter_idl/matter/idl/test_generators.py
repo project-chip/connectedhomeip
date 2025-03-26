@@ -144,7 +144,7 @@ class GeneratorTest:
             with checker.subTest(idl=test.input_idl):
                 storage = TestCaseStorage(test, checker)
                 with open(os.path.join(TESTS_DIR, test.input_idl), 'rt') as stream:
-                    idl = CreateParser().parse(stream.read())
+                    idl = CreateParser().parse(stream.read(), file_name=test.input_idl)
 
                 generator = self._create_generator(storage, idl)
                 generator.render(dry_run=False)

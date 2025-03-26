@@ -1,6 +1,7 @@
 // DO NOT EDIT - Generated file
 //
-// Application configuration for ModeSelect
+// Application configuration for ModeSelect based on EMBER configuration
+// from inputs/large_all_clusters_app.matter
 #pragma once
 
 #include <app-common/zap-generated/cluster-enums.h>

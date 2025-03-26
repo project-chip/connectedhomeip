@@ -1,6 +1,7 @@
 // DO NOT EDIT - Generated file
 //
-// Application configuration for GeneralDiagnostics
+// Application configuration for GeneralDiagnostics based on EMBER configuration
+// from inputs/large_lighting_app.matter
 #pragma once
 
 #include <app-common/zap-generated/cluster-enums.h>
