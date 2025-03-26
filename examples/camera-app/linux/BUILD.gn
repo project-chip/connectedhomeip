@@ -62,12 +62,8 @@ executable("chip-camera-app") {
     "include/clusters/camera-avstream-mgmt",
     "${chip_root}/examples/camera-app/camera-common/include",
 
-    #TODO: Adjust paths
     "/usr/include/gstreamer-1.0",
-    "/usr/include/glib-2.0",
-    "/usr/lib/x86_64-linux-gnu/glib-2.0/include",
     "/usr/include/gobject-2.0",
-    "/usr/include/gst-app-1.0",
   ]
 
   cflags = [ "-Wconversion" ]
@@ -77,9 +73,7 @@ executable("chip-camera-app") {
   # Manually specify GStreamer libraries
   libs += [
     "gstreamer-1.0",
-    "glib-2.0",
     "gobject-2.0",
-    "gstapp-1.0",
   ]
 }
 
