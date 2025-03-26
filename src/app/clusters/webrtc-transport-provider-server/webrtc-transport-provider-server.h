@@ -123,8 +123,9 @@ public:
      *   method returns `CHIP_NO_ERROR`. If an error is returned, `outSession` is left unmodified or
      *   set to an invalid state.
      *
-     * @param[in] sessionHandle
-     *   The secure session handle representing the connection with the requestor.
+     * @param[in]  peerId
+     *   Identifies the peer (requestor) connection over which this command was received. The delegate can
+     *   use this `PeerId` to retrieve or track any existing secure session state as needed.
      *
      * @param[in] originatingEndpointId
      *   The endpoint ID from which the ProvideOffer command was received. This can be used to to invoke
@@ -136,7 +137,7 @@ public:
      *   - Appropriate error otherwise.
      */
     virtual CHIP_ERROR HandleProvideOffer(const ProvideOfferRequestArgs & args, WebRTCSessionStruct & outSession,
-                                          const SessionHandle & sessionHandle, EndpointId originatingEndpointId) = 0;
+                                          const ScopedNodeId & peerId, EndpointId originatingEndpointId) = 0;
 
     /**
      * @brief

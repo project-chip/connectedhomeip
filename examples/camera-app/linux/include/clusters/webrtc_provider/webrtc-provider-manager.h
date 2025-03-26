@@ -39,7 +39,7 @@ public:
     CHIP_ERROR
     HandleProvideOffer(const ProvideOfferRequestArgs & args,
                        chip::app::Clusters::WebRTCTransportProvider::WebRTCSessionStruct & outSession,
-                       const chip::SessionHandle & sessionHandle, chip::EndpointId originatingEndpointId) override;
+                       const chip::ScopedNodeId & peerId, chip::EndpointId originatingEndpointId) override;
 
     CHIP_ERROR HandleProvideAnswer(uint16_t sessionId, const std::string & sdpAnswer) override;
 
@@ -55,14 +55,15 @@ public:
 
 private:
     void ScheduleAnswerSend();
-    CHIP_ERROR SendAnswerCommand(uint16_t sessionId, const std::string & sdpAnswer, const chip::SessionHandle & sessionHandle,
+    CHIP_ERROR SendAnswerCommand(uint16_t sessionId, const std::string & sdpAnswer, const chip::ScopedNodeId & peerId,
                                  chip::EndpointId originatingEndpointId);
 
     std::shared_ptr<rtc::PeerConnection> mPeerConnection;
     std::shared_ptr<rtc::DataChannel> mDataChannel;
 
-    chip::SessionHolder mSessionHolder;
+    chip::ScopedNodeId mPeerId;
     chip::EndpointId mOriginatingEndpointId;
+
     uint16_t mCurrentSessionId = 0;
     std::string mSdpAnswer;
 };

@@ -42,13 +42,11 @@ public:
     {}
 
     /**
-     * @brief Initializes the WebRTCProviderClient with a DeviceCommissioner, NodeId, and EndpointId.
-     *
-     * @param commissioner A reference to the DeviceCommissioner managing device connections.
-     * @param nodeId The Node ID of the remote device (or Matter bridge).
-     * @param endpointId The endpoint on which to send commands (if not the root endpoint).
+     * @brief Initializes the WebRTCProviderClient with a ScopedNodeId, and EndpointId.
+     * @param peerId         The PeerId (fabric + nodeId) for the remote device.
+     * @param endpointId     The Matter endpoint on the remote device for WebRTCTransportProvider cluster.
      */
-    void Init(chip::Controller::DeviceCommissioner & commissioner, chip::NodeId nodeId, chip::EndpointId endpointId);
+    void Init(const chip::ScopedNodeId & peerId, chip::EndpointId endpointId);
 
     /**
      * @brief Sends a ProvideOffer command to the remote device (WebRTCTransportProvider cluster).
@@ -100,40 +98,43 @@ private:
     };
 
     template <class T>
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, chip::EndpointId endpointId, chip::ClusterId clusterId,
-                           chip::CommandId commandId, const T & value)
+    CHIP_ERROR SendCommand(chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle,
+                           chip::ClusterId clusterId, chip::CommandId commandId, const T & requestData)
     {
-        chip::app::CommandPathParams commandPath = { endpointId, clusterId, commandId,
-                                                     (chip::app::CommandPathFlags::kEndpointIdValid) };
-        mCommandSender = std::make_unique<chip::app::CommandSender>(this, device->GetExchangeManager(), false, false,
-                                                                    device->GetSecureSession().Value()->AllowsLargePayload());
-
+        mCommandSender =
+            std::make_unique<chip::app::CommandSender>(this, &exchangeMgr,
+                                                       /* isTimedRequest = */ false,
+                                                       /* suppressResponse   = */ false, sessionHandle->AllowsLargePayload());
         VerifyOrReturnError(mCommandSender != nullptr, CHIP_ERROR_NO_MEMORY);
 
-        chip::app::CommandSender::AddRequestDataParameters addRequestDataParams(chip::NullOptional);
-        ReturnErrorOnFailure(mCommandSender->AddRequestData(commandPath, value, addRequestDataParams));
-        ReturnErrorOnFailure(mCommandSender->SendCommandRequest(device->GetSecureSession().Value()));
+        chip::app::CommandPathParams commandPath = { mEndpointId, clusterId, commandId,
+                                                     chip::app::CommandPathFlags::kEndpointIdValid };
 
-        return CHIP_NO_ERROR;
+        chip::app::CommandSender::AddRequestDataParameters addRequestDataParams(chip::NullOptional);
+        ReturnErrorOnFailure(mCommandSender->AddRequestData(commandPath, requestData, addRequestDataParams));
+
+        return mCommandSender->SendCommandRequest(sessionHandle);
     }
 
-    CHIP_ERROR SendCommandForType(CommandType commandType, chip::DeviceProxy * device);
+    CHIP_ERROR SendCommandForType(chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle,
+                                  CommandType commandType);
 
     static void OnDeviceConnectedFn(void * context, chip::Messaging::ExchangeManager & exchangeMgr,
                                     const chip::SessionHandle & sessionHandle);
     static void OnDeviceConnectionFailureFn(void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR error);
 
     // Private data members
-    chip::Controller::DeviceCommissioner * mCommissioner = nullptr;
-    std::unique_ptr<chip::app::CommandSender> mCommandSender;
-    chip::NodeId mDestinationId  = chip::kUndefinedNodeId;
-    chip::EndpointId mEndpointId = chip::kRootEndpointId;
+    chip::ScopedNodeId mPeerId;
+    chip::EndpointId mEndpointId = chip::kInvalidEndpointId;
     CommandType mCommandType     = CommandType::kUndefined;
+    std::unique_ptr<chip::app::CommandSender> mCommandSender;
 
-    // string buffer for storing the SDP so that ProvideOffer::sdp can safely reference it.
-    std::string mSdp;
+    // Data needed to send the ProvideOffer command
+    chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideOffer::Type mProvideOfferData;
+
+    // We store the SDP here so that mProvideOfferData.sdp points to a stable buffer.
+    std::string mSdpString;
 
     chip::Callback::Callback<chip::OnDeviceConnected> mOnDeviceConnectedCallback;
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
-    chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideOffer::Type mProvideOffer;
 };

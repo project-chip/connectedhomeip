@@ -54,14 +54,8 @@ CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & ar
 }
 
 CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestArgs & args, WebRTCSessionStruct & outSession,
-                                                     const SessionHandle & sessionHandle, EndpointId originatingEndpointId)
+                                                     const chip::ScopedNodeId & peerId, EndpointId originatingEndpointId)
 {
-    // Serial protocol enforcement
-    if (mCurrentSessionId != 0)
-    {
-        return CHIP_ERROR_BUSY;
-    }
-
     // Initialize a new WebRTC session from the SolicitOfferRequestArgs
     outSession.id          = args.sessionId;
     outSession.peerNodeID  = args.peerNodeId;
@@ -109,8 +103,7 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
     // Process the SDP Offer, begin the ICE Candidate gathering phase, create the SDP Answer, and invoke Answer.
     CloseConnection();
 
-    // Retain session using SessionHolder
-    mSessionHolder.Grab(sessionHandle); // Proper retention call
+    mPeerId                = peerId;
     mOriginatingEndpointId = originatingEndpointId;
     mCurrentSessionId      = args.sessionId;
 
@@ -176,9 +169,9 @@ CHIP_ERROR WebRTCProviderManager::HandleEndSession(uint16_t sessionId, WebRTCEnd
 {
     if (mCurrentSessionId == sessionId)
     {
-        mSessionHolder.Release();
         mOriginatingEndpointId = 0;
         mOriginatingEndpointId = 0;
+        mPeerId                = ScopedNodeId();
         mSdpAnswer.clear();
     }
 
@@ -197,28 +190,21 @@ WebRTCProviderManager::ValidateStreamUsage(StreamUsageEnum streamUsage,
 void WebRTCProviderManager::ScheduleAnswerSend()
 {
     DeviceLayer::SystemLayer().ScheduleLambda([this]() {
-        auto sessionOpt = mSessionHolder.Get();
-        if (!sessionOpt.HasValue())
-        {
-            ChipLogError(NotSpecified, "No active session for answer");
-            return;
-        }
-
-        CHIP_ERROR err = SendAnswerCommand(mCurrentSessionId, mSdpAnswer, sessionOpt.Value(), mOriginatingEndpointId);
+        CHIP_ERROR err = SendAnswerCommand(mCurrentSessionId, mSdpAnswer, mPeerId, mOriginatingEndpointId);
 
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(NotSpecified, "Answer failed: %" CHIP_ERROR_FORMAT, err.Format());
         }
 
-        mSessionHolder.Release();
         mOriginatingEndpointId = 0;
         mOriginatingEndpointId = 0;
+        mPeerId                = ScopedNodeId();
     });
 }
 
-CHIP_ERROR WebRTCProviderManager::SendAnswerCommand(uint16_t sessionId, const std::string & sdpAnswer,
-                                                    const SessionHandle & sessionHandle, EndpointId originatingEndpointId)
+CHIP_ERROR WebRTCProviderManager::SendAnswerCommand(uint16_t sessionId, const std::string & sdpAnswer, const ScopedNodeId & peerId,
+                                                    EndpointId originatingEndpointId)
 {
     auto onSuccess = [](const ConcreteCommandPath & commandPath, const StatusIB & status, const auto & dataResponse) {
         ChipLogProgress(NotSpecified, "Answer command succeeds");
@@ -229,10 +215,19 @@ CHIP_ERROR WebRTCProviderManager::SendAnswerCommand(uint16_t sessionId, const st
     };
 
     Messaging::ExchangeManager & exchangeMgr = Server::GetInstance().GetExchangeManager();
+    auto sessionHandle                       = exchangeMgr.GetSessionManager()->FindSecureSessionForNode(peerId);
+    if (!sessionHandle.HasValue())
+    {
+        ChipLogError(NotSpecified, "No secure session found for PeerId, cannot send Answer");
+        return CHIP_ERROR_NOT_CONNECTED;
+    }
 
+    // Build the command
     WebRTCTransportRequestor::Commands::Answer::Type command;
     command.webRTCSessionID = sessionId;
     command.sdp             = CharSpan::fromCharString(sdpAnswer.c_str());
 
-    return Controller::InvokeCommandRequest(&exchangeMgr, sessionHandle, originatingEndpointId, command, onSuccess, onFailure);
+    // Now invoke the command using the found session handle
+    return Controller::InvokeCommandRequest(&exchangeMgr, sessionHandle.Value(), originatingEndpointId, command, onSuccess,
+                                            onFailure);
 }

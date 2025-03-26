@@ -47,7 +47,7 @@ constexpr EndpointId kWebRTCRequesterEndpointId = 1;
 
 } // namespace
 
-WebRTCManager::WebRTCManager() {}
+WebRTCManager::WebRTCManager() : mWebRTCRequestorServer(kWebRTCRequesterEndpointId, mWebRTCRequestorDelegate) {}
 
 WebRTCManager::~WebRTCManager()
 {
@@ -75,7 +75,16 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
     ChipLogProgress(NotSpecified, "Attempting to establish WebRTC connection to node 0x" ChipLogFormatX64 " on endpoint 0x%x",
                     ChipLogValueX64(nodeId), endpointId);
 
-    mWebRTCProviderClient.Init(commissioner, nodeId, endpointId);
+    FabricIndex fabricIndex       = commissioner.GetFabricIndex();
+    const FabricInfo * fabricInfo = commissioner.GetFabricTable()->FindFabricWithIndex(fabricIndex);
+    VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    uint64_t fabricId = fabricInfo->GetFabricId();
+    ChipLogProgress(NotSpecified, "Commissioner is on Fabric ID 0x" ChipLogFormatX64, ChipLogValueX64(fabricId));
+
+    chip::ScopedNodeId peerId(nodeId, fabricIndex);
+
+    mWebRTCProviderClient.Init(peerId, endpointId);
 
     rtc::InitLogger(rtc::LogLevel::Warning);
 
@@ -83,7 +92,7 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
     rtc::Configuration config;
     mPeerConnection = std::make_shared<rtc::PeerConnection>(config);
 
-    // Use cout to print out to console
+    // Use std::cout to print out to console
     mPeerConnection->onLocalDescription([this](rtc::Description description) {
         mLocalDescription = std::string(description);
         std::cout << "Local Description:" << std::endl;

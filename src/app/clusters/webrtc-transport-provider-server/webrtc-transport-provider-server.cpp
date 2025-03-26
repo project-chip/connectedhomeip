@@ -432,11 +432,14 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
                 std::string(req.ICETransportPolicy.Value().data(), req.ICETransportPolicy.Value().size()));
         }
 
-        SessionHandle sessionHandle = ctx.mCommandHandler.GetExchangeContext()->GetSessionHandle();
+        // Build a ScopedNodeId using the secure session’s fabric & node ID.
+        FabricIndex peerFabricIndex = ctx.mCommandHandler.GetAccessingFabricIndex();
+
+        ScopedNodeId peerId(peerNodeId, peerFabricIndex);
 
         // Delegate processing: process the SDP offer, gather ICE candidates, create SDP answer, etc.
-        auto delegateStatus =
-            Protocols::InteractionModel::ClusterStatusCode(mDelegate.HandleProvideOffer(args, outSession, sessionHandle, 1));
+        auto delegateStatus = Protocols::InteractionModel::ClusterStatusCode(
+            mDelegate.HandleProvideOffer(args, outSession, peerId, req.originatingEndpointID));
         if (!delegateStatus.IsSuccess())
         {
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, delegateStatus);
