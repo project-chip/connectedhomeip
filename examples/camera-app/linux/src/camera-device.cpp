@@ -324,9 +324,17 @@ CameraError CameraDevice::CaptureSnapshot(const uint16_t streamID, const VideoRe
 
     file.close();
 
-    outImageSnapshot.imageRes.width  = SNAPSHOT_FILE_RES_WIDTH;
-    outImageSnapshot.imageRes.height = SNAPSHOT_FILE_RES_HEIGHT;
-    outImageSnapshot.imageCodec      = ImageCodecEnum::kJpeg;
+    auto it = std::find_if(snapshotStreams.begin(), snapshotStreams.end(),
+                           [streamID](const SnapshotStream & s) { return s.id == streamID; });
+    if (it == snapshotStreams.end())
+    {
+        ChipLogError(NotSpecified, "Snapshot streamID : %u not found", streamID);
+        return CameraError::ERROR_CAPTURE_SNAPSHOT_FAILED;
+    }
+
+    outImageSnapshot.imageRes.width  = it->videoRes.width;
+    outImageSnapshot.imageRes.height = it->videoRes.height;
+    outImageSnapshot.imageCodec      = it->codec;
 
     return CameraError::SUCCESS;
 }
