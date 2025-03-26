@@ -47,7 +47,7 @@ constexpr EndpointId kWebRTCRequesterEndpointId = 1;
 
 } // namespace
 
-WebRTCManager::WebRTCManager() : mWebRTCRequestorServer(kWebRTCRequesterEndpointId, mWebRTCRequestorDelegate) {}
+WebRTCManager::WebRTCManager() {}
 
 WebRTCManager::~WebRTCManager()
 {
