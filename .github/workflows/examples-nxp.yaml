@@ -40,7 +40,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nxp:123
+            image: ghcr.io/project-chip/chip-build-nxp:124
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
@@ -149,7 +149,7 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target nxp-rt1060-freertos-thermostat-thread-wifi-evkc-iwx12 \
+                      --target nxp-rt1060-freertos-thermostat-thread-wifi-matter-shell-evkc-iwx12 \
                       build \
                       --copy-artifacts-to out/artifacts \
                   "
@@ -181,7 +181,7 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target nxp-rt1170-freertos-thermostat-thread-wifi-iwx12 \
+                      --target nxp-rt1170-freertos-thermostat-thread-wifi-matter-shell-iwx12 \
                       build \
                       --copy-artifacts-to out/artifacts \
                   "
@@ -210,7 +210,7 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target nxp-rw61x-freertos-thermostat-thread-wifi \
+                      --target nxp-rw61x-freertos-thermostat-thread-wifi-matter-shell \
                       build \
                       --copy-artifacts-to out/artifacts \
                   "

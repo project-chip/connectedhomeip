@@ -9386,12 +9386,12 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
             result = @"AddTrustedRootCertificate";
             break;
 
-        case MTRCommandIDTypeClusterOperationalCredentialsCommandSetVidVerificationStatementID:
-            result = @"SetVidVerificationStatement";
+        case MTRCommandIDTypeClusterOperationalCredentialsCommandSetVIDVerificationStatementID:
+            result = @"SetVIDVerificationStatement";
             break;
 
-        case MTRCommandIDTypeClusterOperationalCredentialsCommandSignVidVerificationRequestID:
-            result = @"SignVidVerificationRequest";
+        case MTRCommandIDTypeClusterOperationalCredentialsCommandSignVIDVerificationRequestID:
+            result = @"SignVIDVerificationRequest";
             break;
 
         default:
@@ -11868,8 +11868,8 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
             result = @"NOCResponse";
             break;
 
-        case MTRCommandIDTypeClusterOperationalCredentialsCommandSignVidVerificationResponseID:
-            result = @"SignVidVerificationResponse";
+        case MTRCommandIDTypeClusterOperationalCredentialsCommandSignVIDVerificationResponseID:
+            result = @"SignVIDVerificationResponse";
             break;
 
         default:
