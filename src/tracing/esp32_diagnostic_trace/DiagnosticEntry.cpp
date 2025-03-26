@@ -50,6 +50,8 @@ CHIP_ERROR Encode(TLVWriter & writer, const DiagnosticEntry & entry)
     // Write value based on type
     switch (entry.type)
     {
+    case ValueType::kInvalidType:
+        return CHIP_ERROR_INVALID_ARGUMENT;
     case ValueType::kCharString:
         if (entry.stringValue != nullptr)
         {
@@ -105,6 +107,8 @@ CHIP_ERROR Decode(TLVReader & reader, DiagnosticEntry & entry)
     ReturnErrorOnFailure(reader.Next());
     switch (entry.type)
     {
+    case ValueType::kInvalidType:
+        return CHIP_ERROR_INVALID_ARGUMENT;
     case ValueType::kCharString: {
         uint32_t valueSize = reader.GetLength();
         if (valueSize > kMaxStringValueSize)

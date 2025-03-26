@@ -27,6 +27,7 @@ static constexpr size_t kMaxStringValueSize = 64;
 
 enum class ValueType
 {
+    kInvalidType = 0,
     kCharString,
     kUnsignedInteger,
     kSignedInteger
