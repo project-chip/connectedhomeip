@@ -1100,6 +1100,7 @@ def build_xml_namespaces(data_model_directory: typing.Union[PrebuiltDataModelDir
 
     return namespaces, problems
 
+
 def parse_single_device_type(root: ElementTree.Element) -> tuple[dict[int, XmlDeviceType], list[ProblemNotice]]:
     problems: list[ProblemNotice] = []
     device_types: dict[int, XmlDeviceType] = {}
