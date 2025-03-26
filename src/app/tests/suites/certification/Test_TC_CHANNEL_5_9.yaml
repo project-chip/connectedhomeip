@@ -39,13 +39,15 @@ tests:
           constraints:
               type: list
 
-    - label: "Step 2: TH sends a ChangeChannel command to the DUT with a channel name from the list in step 1"
+    - label:
+          "Step 2: TH sends a ChangeChannel command to the DUT with a channel
+          name from the list in step 1"
       PICS: CHANNEL.S.C00.Rsp
       command: "ChangeChannel"
       arguments:
           values:
               - name: "Match"
-                value: "PBS"  # Example, choose from the available ChannelList
+                value: "PBS" # Example, choose from the available ChannelList
 
     - label: "Step 2a: Verify that the channel has changed on the device"
       cluster: "LogCommands"
@@ -54,7 +56,8 @@ tests:
       arguments:
           values:
               - name: "message"
-                value: "Please enter 'y' if the channel has changed on the device"
+                value:
+                    "Please enter 'y' if the channel has changed on the device"
               - name: "expectedValue"
                 value: "y"
 
@@ -63,4 +66,4 @@ tests:
       command: "readAttribute"
       attribute: "CurrentChannel"
       response:
-          value: {Name: "PBS"}  # Should match the name sent in Step 2
+          value: { Name: "PBS" } # Should match the name sent in Step 2
