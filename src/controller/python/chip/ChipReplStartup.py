@@ -26,7 +26,8 @@ import coloredlogs
 from rich import inspect, pretty
 from rich.console import Console
 
-from . import CertificateAuthority, FabricAdmin
+from . import FabricAdmin  # noqa: F401
+from . import CertificateAuthority
 from . import clusters as Clusters  # noqa: F401
 from .ChipStack import ChipStack
 from .logging import RedirectToPythonLogging
