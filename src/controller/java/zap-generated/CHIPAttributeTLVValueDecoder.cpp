@@ -9962,23 +9962,23 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                             jninewElement_0_nodeID, newElement_0_nodeID);
                 jobject newElement_0_label;
                 LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0.label, newElement_0_label));
-                jobject newElement_0_vidVerificationStatement;
-                if (!entry_0.vidVerificationStatement.HasValue())
+                jobject newElement_0_VIDVerificationStatement;
+                if (!entry_0.VIDVerificationStatement.HasValue())
                 {
-                    chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_vidVerificationStatement);
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_VIDVerificationStatement);
                 }
                 else
                 {
-                    jobject newElement_0_vidVerificationStatementInsideOptional;
-                    jbyteArray newElement_0_vidVerificationStatementInsideOptionalByteArray =
-                        env->NewByteArray(static_cast<jsize>(entry_0.vidVerificationStatement.Value().size()));
-                    env->SetByteArrayRegion(newElement_0_vidVerificationStatementInsideOptionalByteArray, 0,
-                                            static_cast<jsize>(entry_0.vidVerificationStatement.Value().size()),
-                                            reinterpret_cast<const jbyte *>(entry_0.vidVerificationStatement.Value().data()));
-                    newElement_0_vidVerificationStatementInsideOptional =
-                        newElement_0_vidVerificationStatementInsideOptionalByteArray;
-                    chip::JniReferences::GetInstance().CreateOptional(newElement_0_vidVerificationStatementInsideOptional,
-                                                                      newElement_0_vidVerificationStatement);
+                    jobject newElement_0_VIDVerificationStatementInsideOptional;
+                    jbyteArray newElement_0_VIDVerificationStatementInsideOptionalByteArray =
+                        env->NewByteArray(static_cast<jsize>(entry_0.VIDVerificationStatement.Value().size()));
+                    env->SetByteArrayRegion(newElement_0_VIDVerificationStatementInsideOptionalByteArray, 0,
+                                            static_cast<jsize>(entry_0.VIDVerificationStatement.Value().size()),
+                                            reinterpret_cast<const jbyte *>(entry_0.VIDVerificationStatement.Value().data()));
+                    newElement_0_VIDVerificationStatementInsideOptional =
+                        newElement_0_VIDVerificationStatementInsideOptionalByteArray;
+                    chip::JniReferences::GetInstance().CreateOptional(newElement_0_VIDVerificationStatementInsideOptional,
+                                                                      newElement_0_VIDVerificationStatement);
                 }
                 jobject newElement_0_fabricIndex;
                 std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
@@ -10014,7 +10014,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
                     newElement_0 = env->NewObject(fabricDescriptorStructStructClass_1, fabricDescriptorStructStructCtor_1,
                                                   newElement_0_rootPublicKey, newElement_0_vendorID, newElement_0_fabricID,
-                                                  newElement_0_nodeID, newElement_0_label, newElement_0_vidVerificationStatement,
+                                                  newElement_0_nodeID, newElement_0_label, newElement_0_VIDVerificationStatement,
                                                   newElement_0_fabricIndex);
                 }
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
@@ -16733,29 +16733,6 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
         using namespace app::Clusters::ScenesManagement;
         switch (aPath.mAttributeId)
         {
-        case Attributes::LastConfiguredBy::Id: {
-            using TypeInfo = Attributes::LastConfiguredBy::TypeInfo;
-            TypeInfo::DecodableType cppValue;
-            *aError = app::DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
-                return nullptr;
-            }
-            jobject value;
-            if (cppValue.IsNull())
-            {
-                value = nullptr;
-            }
-            else
-            {
-                std::string valueClassName     = "java/lang/Long";
-                std::string valueCtorSignature = "(J)V";
-                jlong jnivalue                 = static_cast<jlong>(cppValue.Value());
-                chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                            jnivalue, value);
-            }
-            return value;
-        }
         case Attributes::SceneTableSize::Id: {
             using TypeInfo = Attributes::SceneTableSize::TypeInfo;
             TypeInfo::DecodableType cppValue;

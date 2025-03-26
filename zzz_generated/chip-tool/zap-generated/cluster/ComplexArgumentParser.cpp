@@ -2220,13 +2220,13 @@ ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.label, value["label"]));
     valueCopy.removeMember("label");
 
-    if (value.isMember("vidVerificationStatement"))
+    if (value.isMember("VIDVerificationStatement"))
     {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "vidVerificationStatement");
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "VIDVerificationStatement");
         ReturnErrorOnFailure(
-            ComplexArgumentParser::Setup(labelWithMember, request.vidVerificationStatement, value["vidVerificationStatement"]));
+            ComplexArgumentParser::Setup(labelWithMember, request.VIDVerificationStatement, value["VIDVerificationStatement"]));
     }
-    valueCopy.removeMember("vidVerificationStatement");
+    valueCopy.removeMember("VIDVerificationStatement");
 
     if (value.isMember("fabricIndex"))
     {
@@ -2245,7 +2245,7 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::OperationalCredentials
     ComplexArgumentParser::Finalize(request.fabricID);
     ComplexArgumentParser::Finalize(request.nodeID);
     ComplexArgumentParser::Finalize(request.label);
-    ComplexArgumentParser::Finalize(request.vidVerificationStatement);
+    ComplexArgumentParser::Finalize(request.VIDVerificationStatement);
     ComplexArgumentParser::Finalize(request.fabricIndex);
 }
 
@@ -2663,7 +2663,7 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::ScenesManagement::Stru
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::Type & request,
+                                        chip::app::Clusters::ScenesManagement::Structs::ExtensionFieldSetStruct::Type & request,
                                         Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -2672,9 +2672,9 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     Json::Value valueCopy(value);
 
     ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("ExtensionFieldSet.clusterID", "clusterID", value.isMember("clusterID")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ExtensionFieldSet.attributeValueList", "attributeValueList",
-                                                                  value.isMember("attributeValueList")));
+        ComplexArgumentParser::EnsureMemberExist("ExtensionFieldSetStruct.clusterID", "clusterID", value.isMember("clusterID")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ExtensionFieldSetStruct.attributeValueList",
+                                                                  "attributeValueList", value.isMember("attributeValueList")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "clusterID");
@@ -2688,7 +2688,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::Type & request)
+void ComplexArgumentParser::Finalize(chip::app::Clusters::ScenesManagement::Structs::ExtensionFieldSetStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.clusterID);
     ComplexArgumentParser::Finalize(request.attributeValueList);

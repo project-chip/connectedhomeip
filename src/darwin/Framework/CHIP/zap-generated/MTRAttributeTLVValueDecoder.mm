@@ -4673,8 +4673,8 @@ static id _Nullable DecodeAttributeValueForOperationalCredentialsCluster(Attribu
                     *aError = err;
                     return nil;
                 }
-                if (entry_0.vidVerificationStatement.HasValue()) {
-                    newElement_0.vidVerificationStatement = AsData(entry_0.vidVerificationStatement.Value());
+                if (entry_0.VIDVerificationStatement.HasValue()) {
+                    newElement_0.vidVerificationStatement = AsData(entry_0.VIDVerificationStatement.Value());
                 } else {
                     newElement_0.vidVerificationStatement = nil;
                 }
@@ -6995,21 +6995,6 @@ static id _Nullable DecodeAttributeValueForScenesManagementCluster(AttributeId a
 {
     using namespace Clusters::ScenesManagement;
     switch (aAttributeId) {
-    case Attributes::LastConfiguredBy::Id: {
-        using TypeInfo = Attributes::LastConfiguredBy::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nullable value;
-        if (cppValue.IsNull()) {
-            value = nil;
-        } else {
-            value = [NSNumber numberWithUnsignedLongLong:cppValue.Value()];
-        }
-        return value;
-    }
     case Attributes::SceneTableSize::Id: {
         using TypeInfo = Attributes::SceneTableSize::TypeInfo;
         TypeInfo::DecodableType cppValue;
