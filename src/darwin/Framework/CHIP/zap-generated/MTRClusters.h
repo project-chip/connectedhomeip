@@ -2930,8 +2930,6 @@ MTR_PROVISIONALLY_AVAILABLE
 - (void)getSceneMembershipWithParams:(MTRScenesManagementClusterGetSceneMembershipParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRScenesManagementClusterGetSceneMembershipResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)copySceneWithParams:(MTRScenesManagementClusterCopySceneParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRScenesManagementClusterCopySceneResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeLastConfiguredByWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeSceneTableSizeWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeFabricSceneInfoWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
@@ -3360,7 +3358,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
 
 /**
  * Cluster Commodity Price
- *
+ *    The Commodity Price Cluster provides the mechanism for communicating Gas, Energy, or Water pricing information within the premises.
  */
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRClusterCommodityPrice : MTRGenericCluster
@@ -7117,7 +7115,7 @@ MTR_PROVISIONALLY_AVAILABLE
 
 /**
  * Cluster Commodity Tariff
- *
+ *    The CommodityTariffCluster provides the mechanism for communicating Commodity Tariff information within the premises.
  */
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRClusterCommodityTariff : MTRGenericCluster
@@ -7364,7 +7362,7 @@ MTR_PROVISIONALLY_AVAILABLE
 
 /**
  * Cluster Meter Identification
- *
+ *    This Meter Identification Cluster provides attributes for determining advanced information about utility metering device.
  */
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRClusterMeterIdentification : MTRGenericCluster
@@ -7408,7 +7406,7 @@ MTR_PROVISIONALLY_AVAILABLE
 
 /**
  * Cluster Commodity Metering
- *
+ *    The Commodity Metering Cluster provides the mechanism for communicating commodity consumption information within a premises.
  */
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRClusterCommodityMetering : MTRGenericCluster

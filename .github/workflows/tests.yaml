@@ -88,15 +88,19 @@ jobs:
               #
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/py_matter_idl/matter_idl/zapxml_parser.py \
+                    "./scripts/py_matter_idl/matter/idl/zapxml_parser.py \
                       --no-print \
                       --log-level info \
                       src/app/zap-templates/zcl/data-model/chip/global-attributes.xml \
                       src/app/zap-templates/zcl/data-model/chip/chime-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/closure-control-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/commodity-metering-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/commodity-price-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/commodity-tariff-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/global-bitmaps.xml \
                       src/app/zap-templates/zcl/data-model/chip/global-enums.xml \
                       src/app/zap-templates/zcl/data-model/chip/global-structs.xml \
+                      src/app/zap-templates/zcl/data-model/chip/meter-identification-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/push-av-stream-transport-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/semantic-tag-namespace-enums.xml \
                       src/app/zap-templates/zcl/data-model/chip/access-control-definitions.xml \

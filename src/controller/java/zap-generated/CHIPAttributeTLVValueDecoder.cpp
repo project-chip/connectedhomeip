@@ -16721,29 +16721,6 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
         using namespace app::Clusters::ScenesManagement;
         switch (aPath.mAttributeId)
         {
-        case Attributes::LastConfiguredBy::Id: {
-            using TypeInfo = Attributes::LastConfiguredBy::TypeInfo;
-            TypeInfo::DecodableType cppValue;
-            *aError = app::DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
-                return nullptr;
-            }
-            jobject value;
-            if (cppValue.IsNull())
-            {
-                value = nullptr;
-            }
-            else
-            {
-                std::string valueClassName     = "java/lang/Long";
-                std::string valueCtorSignature = "(J)V";
-                jlong jnivalue                 = static_cast<jlong>(cppValue.Value());
-                chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                            jnivalue, value);
-            }
-            return value;
-        }
         case Attributes::SceneTableSize::Id: {
             using TypeInfo = Attributes::SceneTableSize::TypeInfo;
             TypeInfo::DecodableType cppValue;
@@ -19463,6 +19440,40 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         jnivalue_endSystimeInsideOptional, value_endSystimeInsideOptional);
                     chip::JniReferences::GetInstance().CreateOptional(value_endSystimeInsideOptional, value_endSystime);
                 }
+                jobject value_apparentEnergy;
+                if (!cppValue.Value().apparentEnergy.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, value_apparentEnergy);
+                }
+                else
+                {
+                    jobject value_apparentEnergyInsideOptional;
+                    std::string value_apparentEnergyInsideOptionalClassName     = "java/lang/Long";
+                    std::string value_apparentEnergyInsideOptionalCtorSignature = "(J)V";
+                    jlong jnivalue_apparentEnergyInsideOptional = static_cast<jlong>(cppValue.Value().apparentEnergy.Value());
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        value_apparentEnergyInsideOptionalClassName.c_str(),
+                        value_apparentEnergyInsideOptionalCtorSignature.c_str(), jnivalue_apparentEnergyInsideOptional,
+                        value_apparentEnergyInsideOptional);
+                    chip::JniReferences::GetInstance().CreateOptional(value_apparentEnergyInsideOptional, value_apparentEnergy);
+                }
+                jobject value_reactiveEnergy;
+                if (!cppValue.Value().reactiveEnergy.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, value_reactiveEnergy);
+                }
+                else
+                {
+                    jobject value_reactiveEnergyInsideOptional;
+                    std::string value_reactiveEnergyInsideOptionalClassName     = "java/lang/Long";
+                    std::string value_reactiveEnergyInsideOptionalCtorSignature = "(J)V";
+                    jlong jnivalue_reactiveEnergyInsideOptional = static_cast<jlong>(cppValue.Value().reactiveEnergy.Value());
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        value_reactiveEnergyInsideOptionalClassName.c_str(),
+                        value_reactiveEnergyInsideOptionalCtorSignature.c_str(), jnivalue_reactiveEnergyInsideOptional,
+                        value_reactiveEnergyInsideOptional);
+                    chip::JniReferences::GetInstance().CreateOptional(value_reactiveEnergyInsideOptional, value_reactiveEnergy);
+                }
 
                 {
                     jclass energyMeasurementStructStructClass_1;
@@ -19479,7 +19490,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     jmethodID energyMeasurementStructStructCtor_1;
                     err = chip::JniReferences::GetInstance().FindMethod(
                         env, energyMeasurementStructStructClass_1, "<init>",
-                        "(Ljava/lang/Long;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;)V",
+                        "(Ljava/lang/Long;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/"
+                        "util/Optional;Ljava/util/Optional;)V",
                         &energyMeasurementStructStructCtor_1);
                     if (err != CHIP_NO_ERROR || energyMeasurementStructStructCtor_1 == nullptr)
                     {
@@ -19490,7 +19502,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
 
                     value = env->NewObject(energyMeasurementStructStructClass_1, energyMeasurementStructStructCtor_1, value_energy,
-                                           value_startTimestamp, value_endTimestamp, value_startSystime, value_endSystime);
+                                           value_startTimestamp, value_endTimestamp, value_startSystime, value_endSystime,
+                                           value_apparentEnergy, value_reactiveEnergy);
                 }
             }
             return value;
@@ -19581,6 +19594,40 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         jnivalue_endSystimeInsideOptional, value_endSystimeInsideOptional);
                     chip::JniReferences::GetInstance().CreateOptional(value_endSystimeInsideOptional, value_endSystime);
                 }
+                jobject value_apparentEnergy;
+                if (!cppValue.Value().apparentEnergy.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, value_apparentEnergy);
+                }
+                else
+                {
+                    jobject value_apparentEnergyInsideOptional;
+                    std::string value_apparentEnergyInsideOptionalClassName     = "java/lang/Long";
+                    std::string value_apparentEnergyInsideOptionalCtorSignature = "(J)V";
+                    jlong jnivalue_apparentEnergyInsideOptional = static_cast<jlong>(cppValue.Value().apparentEnergy.Value());
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        value_apparentEnergyInsideOptionalClassName.c_str(),
+                        value_apparentEnergyInsideOptionalCtorSignature.c_str(), jnivalue_apparentEnergyInsideOptional,
+                        value_apparentEnergyInsideOptional);
+                    chip::JniReferences::GetInstance().CreateOptional(value_apparentEnergyInsideOptional, value_apparentEnergy);
+                }
+                jobject value_reactiveEnergy;
+                if (!cppValue.Value().reactiveEnergy.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, value_reactiveEnergy);
+                }
+                else
+                {
+                    jobject value_reactiveEnergyInsideOptional;
+                    std::string value_reactiveEnergyInsideOptionalClassName     = "java/lang/Long";
+                    std::string value_reactiveEnergyInsideOptionalCtorSignature = "(J)V";
+                    jlong jnivalue_reactiveEnergyInsideOptional = static_cast<jlong>(cppValue.Value().reactiveEnergy.Value());
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        value_reactiveEnergyInsideOptionalClassName.c_str(),
+                        value_reactiveEnergyInsideOptionalCtorSignature.c_str(), jnivalue_reactiveEnergyInsideOptional,
+                        value_reactiveEnergyInsideOptional);
+                    chip::JniReferences::GetInstance().CreateOptional(value_reactiveEnergyInsideOptional, value_reactiveEnergy);
+                }
 
                 {
                     jclass energyMeasurementStructStructClass_1;
@@ -19597,7 +19644,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     jmethodID energyMeasurementStructStructCtor_1;
                     err = chip::JniReferences::GetInstance().FindMethod(
                         env, energyMeasurementStructStructClass_1, "<init>",
-                        "(Ljava/lang/Long;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;)V",
+                        "(Ljava/lang/Long;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/"
+                        "util/Optional;Ljava/util/Optional;)V",
                         &energyMeasurementStructStructCtor_1);
                     if (err != CHIP_NO_ERROR || energyMeasurementStructStructCtor_1 == nullptr)
                     {
@@ -19608,7 +19656,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
 
                     value = env->NewObject(energyMeasurementStructStructClass_1, energyMeasurementStructStructCtor_1, value_energy,
-                                           value_startTimestamp, value_endTimestamp, value_startSystime, value_endSystime);
+                                           value_startTimestamp, value_endTimestamp, value_startSystime, value_endSystime,
+                                           value_apparentEnergy, value_reactiveEnergy);
                 }
             }
             return value;
@@ -19699,6 +19748,40 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         jnivalue_endSystimeInsideOptional, value_endSystimeInsideOptional);
                     chip::JniReferences::GetInstance().CreateOptional(value_endSystimeInsideOptional, value_endSystime);
                 }
+                jobject value_apparentEnergy;
+                if (!cppValue.Value().apparentEnergy.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, value_apparentEnergy);
+                }
+                else
+                {
+                    jobject value_apparentEnergyInsideOptional;
+                    std::string value_apparentEnergyInsideOptionalClassName     = "java/lang/Long";
+                    std::string value_apparentEnergyInsideOptionalCtorSignature = "(J)V";
+                    jlong jnivalue_apparentEnergyInsideOptional = static_cast<jlong>(cppValue.Value().apparentEnergy.Value());
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        value_apparentEnergyInsideOptionalClassName.c_str(),
+                        value_apparentEnergyInsideOptionalCtorSignature.c_str(), jnivalue_apparentEnergyInsideOptional,
+                        value_apparentEnergyInsideOptional);
+                    chip::JniReferences::GetInstance().CreateOptional(value_apparentEnergyInsideOptional, value_apparentEnergy);
+                }
+                jobject value_reactiveEnergy;
+                if (!cppValue.Value().reactiveEnergy.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, value_reactiveEnergy);
+                }
+                else
+                {
+                    jobject value_reactiveEnergyInsideOptional;
+                    std::string value_reactiveEnergyInsideOptionalClassName     = "java/lang/Long";
+                    std::string value_reactiveEnergyInsideOptionalCtorSignature = "(J)V";
+                    jlong jnivalue_reactiveEnergyInsideOptional = static_cast<jlong>(cppValue.Value().reactiveEnergy.Value());
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        value_reactiveEnergyInsideOptionalClassName.c_str(),
+                        value_reactiveEnergyInsideOptionalCtorSignature.c_str(), jnivalue_reactiveEnergyInsideOptional,
+                        value_reactiveEnergyInsideOptional);
+                    chip::JniReferences::GetInstance().CreateOptional(value_reactiveEnergyInsideOptional, value_reactiveEnergy);
+                }
 
                 {
                     jclass energyMeasurementStructStructClass_1;
@@ -19715,7 +19798,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     jmethodID energyMeasurementStructStructCtor_1;
                     err = chip::JniReferences::GetInstance().FindMethod(
                         env, energyMeasurementStructStructClass_1, "<init>",
-                        "(Ljava/lang/Long;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;)V",
+                        "(Ljava/lang/Long;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/"
+                        "util/Optional;Ljava/util/Optional;)V",
                         &energyMeasurementStructStructCtor_1);
                     if (err != CHIP_NO_ERROR || energyMeasurementStructStructCtor_1 == nullptr)
                     {
@@ -19726,7 +19810,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
 
                     value = env->NewObject(energyMeasurementStructStructClass_1, energyMeasurementStructStructCtor_1, value_energy,
-                                           value_startTimestamp, value_endTimestamp, value_startSystime, value_endSystime);
+                                           value_startTimestamp, value_endTimestamp, value_startSystime, value_endSystime,
+                                           value_apparentEnergy, value_reactiveEnergy);
                 }
             }
             return value;
@@ -19817,6 +19902,40 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         jnivalue_endSystimeInsideOptional, value_endSystimeInsideOptional);
                     chip::JniReferences::GetInstance().CreateOptional(value_endSystimeInsideOptional, value_endSystime);
                 }
+                jobject value_apparentEnergy;
+                if (!cppValue.Value().apparentEnergy.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, value_apparentEnergy);
+                }
+                else
+                {
+                    jobject value_apparentEnergyInsideOptional;
+                    std::string value_apparentEnergyInsideOptionalClassName     = "java/lang/Long";
+                    std::string value_apparentEnergyInsideOptionalCtorSignature = "(J)V";
+                    jlong jnivalue_apparentEnergyInsideOptional = static_cast<jlong>(cppValue.Value().apparentEnergy.Value());
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        value_apparentEnergyInsideOptionalClassName.c_str(),
+                        value_apparentEnergyInsideOptionalCtorSignature.c_str(), jnivalue_apparentEnergyInsideOptional,
+                        value_apparentEnergyInsideOptional);
+                    chip::JniReferences::GetInstance().CreateOptional(value_apparentEnergyInsideOptional, value_apparentEnergy);
+                }
+                jobject value_reactiveEnergy;
+                if (!cppValue.Value().reactiveEnergy.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, value_reactiveEnergy);
+                }
+                else
+                {
+                    jobject value_reactiveEnergyInsideOptional;
+                    std::string value_reactiveEnergyInsideOptionalClassName     = "java/lang/Long";
+                    std::string value_reactiveEnergyInsideOptionalCtorSignature = "(J)V";
+                    jlong jnivalue_reactiveEnergyInsideOptional = static_cast<jlong>(cppValue.Value().reactiveEnergy.Value());
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        value_reactiveEnergyInsideOptionalClassName.c_str(),
+                        value_reactiveEnergyInsideOptionalCtorSignature.c_str(), jnivalue_reactiveEnergyInsideOptional,
+                        value_reactiveEnergyInsideOptional);
+                    chip::JniReferences::GetInstance().CreateOptional(value_reactiveEnergyInsideOptional, value_reactiveEnergy);
+                }
 
                 {
                     jclass energyMeasurementStructStructClass_1;
@@ -19833,7 +19952,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     jmethodID energyMeasurementStructStructCtor_1;
                     err = chip::JniReferences::GetInstance().FindMethod(
                         env, energyMeasurementStructStructClass_1, "<init>",
-                        "(Ljava/lang/Long;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;)V",
+                        "(Ljava/lang/Long;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/"
+                        "util/Optional;Ljava/util/Optional;)V",
                         &energyMeasurementStructStructCtor_1);
                     if (err != CHIP_NO_ERROR || energyMeasurementStructStructCtor_1 == nullptr)
                     {
@@ -19844,7 +19964,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
 
                     value = env->NewObject(energyMeasurementStructStructClass_1, energyMeasurementStructStructCtor_1, value_energy,
-                                           value_startTimestamp, value_endTimestamp, value_startSystime, value_endSystime);
+                                           value_startTimestamp, value_endTimestamp, value_startSystime, value_endSystime,
+                                           value_apparentEnergy, value_reactiveEnergy);
                 }
             }
             return value;
@@ -43270,6 +43391,13 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(newElement_0_peerNodeIDClassName.c_str(),
                                                                             newElement_0_peerNodeIDCtorSignature.c_str(),
                                                                             jninewElement_0_peerNodeID, newElement_0_peerNodeID);
+                jobject newElement_0_peerEndpointID;
+                std::string newElement_0_peerEndpointIDClassName     = "java/lang/Integer";
+                std::string newElement_0_peerEndpointIDCtorSignature = "(I)V";
+                jint jninewElement_0_peerEndpointID                  = static_cast<jint>(entry_0.peerEndpointID);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    newElement_0_peerEndpointIDClassName.c_str(), newElement_0_peerEndpointIDCtorSignature.c_str(),
+                    jninewElement_0_peerEndpointID, newElement_0_peerEndpointID);
                 jobject newElement_0_streamUsage;
                 std::string newElement_0_streamUsageClassName     = "java/lang/Integer";
                 std::string newElement_0_streamUsageCtorSignature = "(I)V";
@@ -43335,7 +43463,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     err = chip::JniReferences::GetInstance().FindMethod(
                         env, webRTCSessionStructStructClass_1, "<init>",
                         "(Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/"
-                        "Integer;Ljava/lang/Integer;)V",
+                        "Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V",
                         &webRTCSessionStructStructCtor_1);
                     if (err != CHIP_NO_ERROR || webRTCSessionStructStructCtor_1 == nullptr)
                     {
@@ -43344,10 +43472,10 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         return nullptr;
                     }
 
-                    newElement_0 =
-                        env->NewObject(webRTCSessionStructStructClass_1, webRTCSessionStructStructCtor_1, newElement_0_id,
-                                       newElement_0_peerNodeID, newElement_0_streamUsage, newElement_0_videoStreamID,
-                                       newElement_0_audioStreamID, newElement_0_metadataOptions, newElement_0_fabricIndex);
+                    newElement_0 = env->NewObject(webRTCSessionStructStructClass_1, webRTCSessionStructStructCtor_1,
+                                                  newElement_0_id, newElement_0_peerNodeID, newElement_0_peerEndpointID,
+                                                  newElement_0_streamUsage, newElement_0_videoStreamID, newElement_0_audioStreamID,
+                                                  newElement_0_metadataOptions, newElement_0_fabricIndex);
                 }
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
@@ -43499,6 +43627,13 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(newElement_0_peerNodeIDClassName.c_str(),
                                                                             newElement_0_peerNodeIDCtorSignature.c_str(),
                                                                             jninewElement_0_peerNodeID, newElement_0_peerNodeID);
+                jobject newElement_0_peerEndpointID;
+                std::string newElement_0_peerEndpointIDClassName     = "java/lang/Integer";
+                std::string newElement_0_peerEndpointIDCtorSignature = "(I)V";
+                jint jninewElement_0_peerEndpointID                  = static_cast<jint>(entry_0.peerEndpointID);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    newElement_0_peerEndpointIDClassName.c_str(), newElement_0_peerEndpointIDCtorSignature.c_str(),
+                    jninewElement_0_peerEndpointID, newElement_0_peerEndpointID);
                 jobject newElement_0_streamUsage;
                 std::string newElement_0_streamUsageClassName     = "java/lang/Integer";
                 std::string newElement_0_streamUsageCtorSignature = "(I)V";
@@ -43564,7 +43699,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     err = chip::JniReferences::GetInstance().FindMethod(
                         env, webRTCSessionStructStructClass_1, "<init>",
                         "(Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/"
-                        "Integer;Ljava/lang/Integer;)V",
+                        "Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V",
                         &webRTCSessionStructStructCtor_1);
                     if (err != CHIP_NO_ERROR || webRTCSessionStructStructCtor_1 == nullptr)
                     {
@@ -43573,10 +43708,10 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         return nullptr;
                     }
 
-                    newElement_0 =
-                        env->NewObject(webRTCSessionStructStructClass_1, webRTCSessionStructStructCtor_1, newElement_0_id,
-                                       newElement_0_peerNodeID, newElement_0_streamUsage, newElement_0_videoStreamID,
-                                       newElement_0_audioStreamID, newElement_0_metadataOptions, newElement_0_fabricIndex);
+                    newElement_0 = env->NewObject(webRTCSessionStructStructClass_1, webRTCSessionStructStructCtor_1,
+                                                  newElement_0_id, newElement_0_peerNodeID, newElement_0_peerEndpointID,
+                                                  newElement_0_streamUsage, newElement_0_videoStreamID, newElement_0_audioStreamID,
+                                                  newElement_0_metadataOptions, newElement_0_fabricIndex);
                 }
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }

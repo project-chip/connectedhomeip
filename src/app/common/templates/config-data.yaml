@@ -37,6 +37,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Sample MEI
     - Microwave Oven Control
     - Chime
+    - Camera AV Stream Management
     - Commissioner Control
     - Commodity Price
     - Energy EVSE
@@ -50,6 +51,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Thread Network Directory
     - Water Heater Management
     - Water Heater Mode
+    - WebRTC Transport Provider
     - General Commissioning
     - General Diagnostics
     - Software Diagnostics

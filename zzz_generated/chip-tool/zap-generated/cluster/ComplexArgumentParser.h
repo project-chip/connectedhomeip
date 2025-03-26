@@ -101,6 +101,11 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::detail::Structs
 
 static void Finalize(chip::app::Clusters::detail::Structs::OperationalStateStruct::Type & request);
 
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Globals::Structs::SuppliedAttributionData::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::Globals::Structs::SuppliedAttributionData::Type & request);
+
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::detail::Structs::ViewportStruct::Type & request,
                         Json::Value & value);
 
@@ -327,10 +332,10 @@ static CHIP_ERROR Setup(const char * label,
 
 static void Finalize(chip::app::Clusters::ScenesManagement::Structs::AttributeValuePairStruct::Type & request);
 
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::Type & request,
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ScenesManagement::Structs::ExtensionFieldSetStruct::Type & request,
                         Json::Value & value);
 
-static void Finalize(chip::app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::Type & request);
+static void Finalize(chip::app::Clusters::ScenesManagement::Structs::ExtensionFieldSetStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ScenesManagement::Structs::SceneInfoStruct::Type & request,
                         Json::Value & value);

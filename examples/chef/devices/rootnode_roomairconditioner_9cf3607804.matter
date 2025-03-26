@@ -270,7 +270,7 @@ struct CurrencyStruct {
 
 struct PowerThresholdStruct {
   optional power_mw powerThreshold = 0;
-  optional power_mw apparentPowerThreshold = 1;
+  optional power_mva apparentPowerThreshold = 1;
   nullable PowerThresholdSourceEnum powerThresholdSource = 2;
 }
 
@@ -306,13 +306,19 @@ struct LocationDescriptorStruct {
 }
 
 struct PriceStruct {
-  int64s amount = 0;
+  money amount = 0;
   CurrencyStruct currency = 1;
 }
 
 struct AtomicAttributeStatusStruct {
   attrib_id attributeID = 0;
   status statusCode = 1;
+}
+
+fabric_scoped struct SuppliedAttributionData {
+  enum8 contextInformation = 0;
+  optional int32u sourceContext = 1;
+  fabric_idx fabricIndex = 254;
 }
 
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
@@ -1969,7 +1975,7 @@ cluster ThermostatUserInterfaceConfiguration = 516 {
 
 /** Attributes and commands for configuring the measurement of temperature, and reporting temperature measurements. */
 cluster TemperatureMeasurement = 1026 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 4;
 
   readonly attribute nullable temperature measuredValue = 0;
   readonly attribute nullable temperature minMeasuredValue = 1;

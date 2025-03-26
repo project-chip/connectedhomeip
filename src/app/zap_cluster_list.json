@@ -173,7 +173,9 @@
             "bridged-device-basic-information-server"
         ],
         "CAMERA_AV_SETTINGS_USER_LEVEL_MANAGEMENT_CLUSTER": [],
-        "CAMERA_AV_STREAM_MANAGEMENT_CLUSTER": [],
+        "CAMERA_AV_STREAM_MANAGEMENT_CLUSTER": [
+            "camera-av-stream-management-server"
+        ],
         "CARBON_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER": [
             "concentration-measurement-server"
         ],
@@ -187,7 +189,7 @@
         "COMMISSIONER_CONTROL_CLUSTER": ["commissioner-control-server"],
         "COMMISSIONING_CLUSTER": [],
         "COMMODITY_METERING_CLUSTER": [],
-        "COMMODITY_PRICE_CLUSTER": ["commodity-price-server"],
+        "COMMODITY_PRICE_CLUSTER": [],
         "COMMODITY_TARIFF_CLUSTER": [],
         "CONTENT_LAUNCHER_CLUSTER": ["content-launch-server"],
         "CONTENT_CONTROL_CLUSTER": ["content-control-server"],
@@ -333,7 +335,9 @@
         "WAKE_ON_LAN_CLUSTER": ["wake-on-lan-server"],
         "LAUNDRY_WASHER_CONTROLS_CLUSTER": ["laundry-washer-controls-server"],
         "LAUNDRY_DRYER_CONTROLS_CLUSTER": ["laundry-dryer-controls-server"],
-        "WEB_RTC_TRANSPORT_PROVIDER_CLUSTER": [],
+        "WEB_RTC_TRANSPORT_PROVIDER_CLUSTER": [
+            "webrtc-transport-provider-server"
+        ],
         "WEB_RTC_TRANSPORT_REQUESTOR_CLUSTER": [],
         "WIFI_NETWORK_DIAGNOSTICS_CLUSTER": ["wifi-network-diagnostics-server"],
         "WIFI_NETWORK_MANAGEMENT_CLUSTER": ["wifi-network-management-server"],

@@ -6101,7 +6101,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command AddScene
  *
- * Add a scene to the scene table. Extension field sets are supported, and are inputed as '{"ClusterID": VALUE, "AttributeValueList":[{"AttributeID": VALUE, "Value*": VALUE}]}'
+ * Add a scene to the scene table. Extension field sets are input as '{"ClusterID": VALUE, "AttributeValueList":[{"AttributeID": VALUE, "Value*": VALUE}]}'.
  */
 - (void)addSceneWithParams:(MTRScenesManagementClusterAddSceneParams *)params completion:(void (^)(MTRScenesManagementClusterAddSceneResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 /**
@@ -6137,21 +6137,15 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command GetSceneMembership
  *
- * Get an unused scene identifier when no commissioning tool is in the network, or for a commissioning tool to get the used scene identifiers within a certain group
+ * This command can be used to get the used scene identifiers within a certain group, for the endpoint that implements this cluster.
  */
 - (void)getSceneMembershipWithParams:(MTRScenesManagementClusterGetSceneMembershipParams *)params completion:(void (^)(MTRScenesManagementClusterGetSceneMembershipResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Command CopyScene
  *
- * Allows a client to efficiently copy scenes from one group/scene identifier pair to another group/scene identifier pair.
+ * This command allows a client to efficiently copy scenes from one group/scene identifier pair to another group/scene identifier pair.
  */
 - (void)copySceneWithParams:(MTRScenesManagementClusterCopySceneParams *)params completion:(void (^)(MTRScenesManagementClusterCopySceneResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-
-- (void)readAttributeLastConfiguredByWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)subscribeAttributeLastConfiguredByWithParams:(MTRSubscribeParams *)params
-                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
-+ (void)readAttributeLastConfiguredByWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeSceneTableSizeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeSceneTableSizeWithParams:(MTRSubscribeParams *)params
@@ -7045,7 +7039,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
 /**
  * Cluster Commodity Price
  *
- *
+ * The Commodity Price Cluster provides the mechanism for communicating Gas, Energy, or Water pricing information within the premises.
  */
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRBaseClusterCommodityPrice : MTRGenericBaseCluster
@@ -15252,7 +15246,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Cluster Commodity Tariff
  *
- *
+ * The CommodityTariffCluster provides the mechanism for communicating Commodity Tariff information within the premises.
  */
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRBaseClusterCommodityTariff : MTRGenericBaseCluster
@@ -15796,7 +15790,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Cluster Meter Identification
  *
- *
+ * This Meter Identification Cluster provides attributes for determining advanced information about utility metering device.
  */
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRBaseClusterMeterIdentification : MTRGenericBaseCluster
@@ -15881,7 +15875,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Cluster Commodity Metering
  *
- *
+ * The Commodity Metering Cluster provides the mechanism for communicating commodity consumption information within a premises.
  */
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRBaseClusterCommodityMetering : MTRGenericBaseCluster
@@ -18780,6 +18774,26 @@ typedef NS_OPTIONS(uint16_t, MTRValveConfigurationAndControlValveFaultBitmap) {
     MTRValveConfigurationAndControlValveFaultBitmapCurrentExceeded MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x20,
 } MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 
+typedef NS_ENUM(uint16_t, MTRElectricalPowerMeasurementMeasurementType) {
+    MTRElectricalPowerMeasurementMeasurementTypeUnspecified MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x00,
+    MTRElectricalPowerMeasurementMeasurementTypeVoltage MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x01,
+    MTRElectricalPowerMeasurementMeasurementTypeActiveCurrent MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x02,
+    MTRElectricalPowerMeasurementMeasurementTypeReactiveCurrent MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x03,
+    MTRElectricalPowerMeasurementMeasurementTypeApparentCurrent MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x04,
+    MTRElectricalPowerMeasurementMeasurementTypeActivePower MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x05,
+    MTRElectricalPowerMeasurementMeasurementTypeReactivePower MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x06,
+    MTRElectricalPowerMeasurementMeasurementTypeApparentPower MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x07,
+    MTRElectricalPowerMeasurementMeasurementTypeRMSVoltage MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x08,
+    MTRElectricalPowerMeasurementMeasurementTypeRMSCurrent MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x09,
+    MTRElectricalPowerMeasurementMeasurementTypeRMSPower MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x0A,
+    MTRElectricalPowerMeasurementMeasurementTypeFrequency MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x0B,
+    MTRElectricalPowerMeasurementMeasurementTypePowerFactor MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x0C,
+    MTRElectricalPowerMeasurementMeasurementTypeNeutralCurrent MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x0D,
+    MTRElectricalPowerMeasurementMeasurementTypeElectricalEnergy MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x0E,
+    MTRElectricalPowerMeasurementMeasurementTypeReactiveEnergy MTR_PROVISIONALLY_AVAILABLE = 0x0F,
+    MTRElectricalPowerMeasurementMeasurementTypeApparentEnergy MTR_PROVISIONALLY_AVAILABLE = 0x10,
+} MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
+
 typedef NS_ENUM(uint8_t, MTRElectricalPowerMeasurementPowerMode) {
     MTRElectricalPowerMeasurementPowerModeUnknown MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x00,
     MTRElectricalPowerMeasurementPowerModeDC MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x01,
@@ -18794,11 +18808,33 @@ typedef NS_OPTIONS(uint32_t, MTRElectricalPowerMeasurementFeature) {
     MTRElectricalPowerMeasurementFeaturePowerQuality MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x10,
 } MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 
+typedef NS_ENUM(uint16_t, MTRElectricalEnergyMeasurementMeasurementType) {
+    MTRElectricalEnergyMeasurementMeasurementTypeUnspecified MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x00,
+    MTRElectricalEnergyMeasurementMeasurementTypeVoltage MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x01,
+    MTRElectricalEnergyMeasurementMeasurementTypeActiveCurrent MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x02,
+    MTRElectricalEnergyMeasurementMeasurementTypeReactiveCurrent MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x03,
+    MTRElectricalEnergyMeasurementMeasurementTypeApparentCurrent MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x04,
+    MTRElectricalEnergyMeasurementMeasurementTypeActivePower MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x05,
+    MTRElectricalEnergyMeasurementMeasurementTypeReactivePower MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x06,
+    MTRElectricalEnergyMeasurementMeasurementTypeApparentPower MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x07,
+    MTRElectricalEnergyMeasurementMeasurementTypeRMSVoltage MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x08,
+    MTRElectricalEnergyMeasurementMeasurementTypeRMSCurrent MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x09,
+    MTRElectricalEnergyMeasurementMeasurementTypeRMSPower MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x0A,
+    MTRElectricalEnergyMeasurementMeasurementTypeFrequency MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x0B,
+    MTRElectricalEnergyMeasurementMeasurementTypePowerFactor MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x0C,
+    MTRElectricalEnergyMeasurementMeasurementTypeNeutralCurrent MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x0D,
+    MTRElectricalEnergyMeasurementMeasurementTypeElectricalEnergy MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 0x0E,
+    MTRElectricalEnergyMeasurementMeasurementTypeReactiveEnergy MTR_PROVISIONALLY_AVAILABLE = 0x0F,
+    MTRElectricalEnergyMeasurementMeasurementTypeApparentEnergy MTR_PROVISIONALLY_AVAILABLE = 0x10,
+} MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
+
 typedef NS_OPTIONS(uint32_t, MTRElectricalEnergyMeasurementFeature) {
     MTRElectricalEnergyMeasurementFeatureImportedEnergy MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x1,
     MTRElectricalEnergyMeasurementFeatureExportedEnergy MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x2,
     MTRElectricalEnergyMeasurementFeatureCumulativeEnergy MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x4,
     MTRElectricalEnergyMeasurementFeaturePeriodicEnergy MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x8,
+    MTRElectricalEnergyMeasurementFeatureApparentEnergy MTR_PROVISIONALLY_AVAILABLE = 0x10,
+    MTRElectricalEnergyMeasurementFeatureReactiveEnergy MTR_PROVISIONALLY_AVAILABLE = 0x20,
 } MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 
 typedef NS_ENUM(uint8_t, MTRWaterHeaterManagementBoostState) {
@@ -21400,6 +21436,26 @@ typedef NS_ENUM(uint8_t, MTRMeterIdentificationMeterType) {
 
 typedef NS_OPTIONS(uint32_t, MTRMeterIdentificationFeature) {
     MTRMeterIdentificationFeaturePowerThreshold MTR_PROVISIONALLY_AVAILABLE = 0x1,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_ENUM(uint16_t, MTRCommodityMeteringMeasurementType) {
+    MTRCommodityMeteringMeasurementTypeUnspecified MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRCommodityMeteringMeasurementTypeVoltage MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRCommodityMeteringMeasurementTypeActiveCurrent MTR_PROVISIONALLY_AVAILABLE = 0x02,
+    MTRCommodityMeteringMeasurementTypeReactiveCurrent MTR_PROVISIONALLY_AVAILABLE = 0x03,
+    MTRCommodityMeteringMeasurementTypeApparentCurrent MTR_PROVISIONALLY_AVAILABLE = 0x04,
+    MTRCommodityMeteringMeasurementTypeActivePower MTR_PROVISIONALLY_AVAILABLE = 0x05,
+    MTRCommodityMeteringMeasurementTypeReactivePower MTR_PROVISIONALLY_AVAILABLE = 0x06,
+    MTRCommodityMeteringMeasurementTypeApparentPower MTR_PROVISIONALLY_AVAILABLE = 0x07,
+    MTRCommodityMeteringMeasurementTypeRMSVoltage MTR_PROVISIONALLY_AVAILABLE = 0x08,
+    MTRCommodityMeteringMeasurementTypeRMSCurrent MTR_PROVISIONALLY_AVAILABLE = 0x09,
+    MTRCommodityMeteringMeasurementTypeRMSPower MTR_PROVISIONALLY_AVAILABLE = 0x0A,
+    MTRCommodityMeteringMeasurementTypeFrequency MTR_PROVISIONALLY_AVAILABLE = 0x0B,
+    MTRCommodityMeteringMeasurementTypePowerFactor MTR_PROVISIONALLY_AVAILABLE = 0x0C,
+    MTRCommodityMeteringMeasurementTypeNeutralCurrent MTR_PROVISIONALLY_AVAILABLE = 0x0D,
+    MTRCommodityMeteringMeasurementTypeElectricalEnergy MTR_PROVISIONALLY_AVAILABLE = 0x0E,
+    MTRCommodityMeteringMeasurementTypeReactiveEnergy MTR_PROVISIONALLY_AVAILABLE = 0x0F,
+    MTRCommodityMeteringMeasurementTypeApparentEnergy MTR_PROVISIONALLY_AVAILABLE = 0x10,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRUnitTestingSimple) {

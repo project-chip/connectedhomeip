@@ -9046,7 +9046,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer status, Integer groupID, Integer sceneID, Optional<Long> transitionTime, Optional<String> sceneName, Optional<ArrayList<ChipStructs.ScenesManagementClusterExtensionFieldSet>> extensionFieldSets) {
+    public void onSuccess(Integer status, Integer groupID, Integer sceneID, Optional<Long> transitionTime, Optional<String> sceneName, Optional<ArrayList<ChipStructs.ScenesManagementClusterExtensionFieldSetStruct>> extensionFieldSetStructs) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 
       CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "Integer");
@@ -9059,7 +9059,7 @@ public class ClusterInfoMapping {
       responseValues.put(transitionTimeResponseValue, transitionTime);
       CommandResponseInfo sceneNameResponseValue = new CommandResponseInfo("sceneName", "Optional<String>");
       responseValues.put(sceneNameResponseValue, sceneName);
-      // extensionFieldSets: ExtensionFieldSet
+      // extensionFieldSetStructs: ExtensionFieldSetStruct
       // Conversion from this type to Java is not properly implemented yet
 
       callback.onSuccess(responseValues);
@@ -9201,27 +9201,6 @@ public class ClusterInfoMapping {
       callback.onFailure(error);
     }
   }
-  public static class DelegatedScenesManagementClusterLastConfiguredByAttributeCallback implements ChipClusters.ScenesManagementCluster.LastConfiguredByAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(@Nullable Long value) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Long");
-      responseValues.put(commandResponseInfo, value);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedScenesManagementClusterFabricSceneInfoAttributeCallback implements ChipClusters.ScenesManagementCluster.FabricSceneInfoAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -28064,8 +28043,8 @@ public class ClusterInfoMapping {
            , (String)
              commandArguments.get("sceneName")
 
-           , (ArrayList<ChipStructs.ScenesManagementClusterExtensionFieldSet>)
-             commandArguments.get("extensionFieldSets")
+           , (ArrayList<ChipStructs.ScenesManagementClusterExtensionFieldSetStruct>)
+             commandArguments.get("extensionFieldSetStructs")
 
             );
         },
@@ -32322,6 +32301,9 @@ public class ClusterInfoMapping {
     CommandParameterInfo webRTCTransportProvidersolicitOfferstreamUsageCommandParameterInfo = new CommandParameterInfo("streamUsage", Integer.class, Integer.class);
     webRTCTransportProvidersolicitOfferCommandParams.put("streamUsage",webRTCTransportProvidersolicitOfferstreamUsageCommandParameterInfo);
 
+    CommandParameterInfo webRTCTransportProvidersolicitOfferoriginatingEndpointIDCommandParameterInfo = new CommandParameterInfo("originatingEndpointID", Integer.class, Integer.class);
+    webRTCTransportProvidersolicitOfferCommandParams.put("originatingEndpointID",webRTCTransportProvidersolicitOfferoriginatingEndpointIDCommandParameterInfo);
+
     CommandParameterInfo webRTCTransportProvidersolicitOffervideoStreamIDCommandParameterInfo = new CommandParameterInfo("videoStreamID", Optional.class, Integer.class);
     webRTCTransportProvidersolicitOfferCommandParams.put("videoStreamID",webRTCTransportProvidersolicitOffervideoStreamIDCommandParameterInfo);
 
@@ -32340,6 +32322,9 @@ public class ClusterInfoMapping {
           .solicitOffer((ChipClusters.WebRTCTransportProviderCluster.SolicitOfferResponseCallback) callback
            , (Integer)
              commandArguments.get("streamUsage")
+
+           , (Integer)
+             commandArguments.get("originatingEndpointID")
 
            , (Optional<Integer>)
              commandArguments.get("videoStreamID")
@@ -32374,6 +32359,9 @@ public class ClusterInfoMapping {
     CommandParameterInfo webRTCTransportProviderprovideOfferstreamUsageCommandParameterInfo = new CommandParameterInfo("streamUsage", Integer.class, Integer.class);
     webRTCTransportProviderprovideOfferCommandParams.put("streamUsage",webRTCTransportProviderprovideOfferstreamUsageCommandParameterInfo);
 
+    CommandParameterInfo webRTCTransportProviderprovideOfferoriginatingEndpointIDCommandParameterInfo = new CommandParameterInfo("originatingEndpointID", Integer.class, Integer.class);
+    webRTCTransportProviderprovideOfferCommandParams.put("originatingEndpointID",webRTCTransportProviderprovideOfferoriginatingEndpointIDCommandParameterInfo);
+
     CommandParameterInfo webRTCTransportProviderprovideOffervideoStreamIDCommandParameterInfo = new CommandParameterInfo("videoStreamID", Optional.class, Integer.class);
     webRTCTransportProviderprovideOfferCommandParams.put("videoStreamID",webRTCTransportProviderprovideOffervideoStreamIDCommandParameterInfo);
 
@@ -32398,6 +32386,9 @@ public class ClusterInfoMapping {
 
            , (Integer)
              commandArguments.get("streamUsage")
+
+           , (Integer)
+             commandArguments.get("originatingEndpointID")
 
            , (Optional<Integer>)
              commandArguments.get("videoStreamID")

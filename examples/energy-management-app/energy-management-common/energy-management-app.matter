@@ -270,7 +270,7 @@ struct CurrencyStruct {
 
 struct PowerThresholdStruct {
   optional power_mw powerThreshold = 0;
-  optional power_mw apparentPowerThreshold = 1;
+  optional power_mva apparentPowerThreshold = 1;
   nullable PowerThresholdSourceEnum powerThresholdSource = 2;
 }
 
@@ -306,13 +306,19 @@ struct LocationDescriptorStruct {
 }
 
 struct PriceStruct {
-  int64s amount = 0;
+  money amount = 0;
   CurrencyStruct currency = 1;
 }
 
 struct AtomicAttributeStatusStruct {
   attrib_id attributeID = 0;
   status statusCode = 1;
+}
+
+fabric_scoped struct SuppliedAttributionData {
+  enum8 contextInformation = 0;
+  optional int32u sourceContext = 1;
+  fabric_idx fabricIndex = 254;
 }
 
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
@@ -1802,7 +1808,27 @@ cluster GroupKeyManagement = 63 {
 
 /** This cluster provides a mechanism for querying data about electrical power as measured by the server. */
 cluster ElectricalPowerMeasurement = 144 {
-  revision 1;
+  revision 3;
+
+  enum MeasurementTypeEnum : enum16 {
+    kUnspecified = 0;
+    kVoltage = 1;
+    kActiveCurrent = 2;
+    kReactiveCurrent = 3;
+    kApparentCurrent = 4;
+    kActivePower = 5;
+    kReactivePower = 6;
+    kApparentPower = 7;
+    kRMSVoltage = 8;
+    kRMSCurrent = 9;
+    kRMSPower = 10;
+    kFrequency = 11;
+    kPowerFactor = 12;
+    kNeutralCurrent = 13;
+    kElectricalEnergy = 14;
+    kReactiveEnergy = 15;
+    kApparentEnergy = 16;
+  }
 
   enum PowerModeEnum : enum8 {
     kUnknown = 0;
@@ -1850,8 +1876,8 @@ cluster ElectricalPowerMeasurement = 144 {
   readonly attribute optional nullable amperage_ma reactiveCurrent = 6;
   readonly attribute optional nullable amperage_ma apparentCurrent = 7;
   readonly attribute nullable power_mw activePower = 8;
-  readonly attribute optional nullable power_mw reactivePower = 9;
-  readonly attribute optional nullable power_mw apparentPower = 10;
+  readonly attribute optional nullable power_mvar reactivePower = 9;
+  readonly attribute optional nullable power_mva apparentPower = 10;
   readonly attribute optional nullable voltage_mv RMSVoltage = 11;
   readonly attribute optional nullable amperage_ma RMSCurrent = 12;
   readonly attribute optional nullable power_mw RMSPower = 13;
@@ -1870,13 +1896,35 @@ cluster ElectricalPowerMeasurement = 144 {
 
 /** This cluster provides a mechanism for querying data about the electrical energy imported or provided by the server. */
 cluster ElectricalEnergyMeasurement = 145 {
-  revision 1;
+  revision 2;
+
+  enum MeasurementTypeEnum : enum16 {
+    kUnspecified = 0;
+    kVoltage = 1;
+    kActiveCurrent = 2;
+    kReactiveCurrent = 3;
+    kApparentCurrent = 4;
+    kActivePower = 5;
+    kReactivePower = 6;
+    kApparentPower = 7;
+    kRMSVoltage = 8;
+    kRMSCurrent = 9;
+    kRMSPower = 10;
+    kFrequency = 11;
+    kPowerFactor = 12;
+    kNeutralCurrent = 13;
+    kElectricalEnergy = 14;
+    kReactiveEnergy = 15;
+    kApparentEnergy = 16;
+  }
 
   bitmap Feature : bitmap32 {
     kImportedEnergy = 0x1;
     kExportedEnergy = 0x2;
     kCumulativeEnergy = 0x4;
     kPeriodicEnergy = 0x8;
+    kApparentEnergy = 0x10;
+    kReactiveEnergy = 0x20;
   }
 
   struct CumulativeEnergyResetStruct {
@@ -1892,6 +1940,8 @@ cluster ElectricalEnergyMeasurement = 145 {
     optional epoch_s endTimestamp = 2;
     optional systime_ms startSystime = 3;
     optional systime_ms endSystime = 4;
+    optional energy_mvah apparentEnergy = 5;
+    optional energy_mvarh reactiveEnergy = 6;
   }
 
   info event CumulativeEnergyMeasured = 0 {

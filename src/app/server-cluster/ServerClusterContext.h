@@ -38,8 +38,6 @@ struct ServerClusterContext
     PersistentStorageDelegate * const storage                     = nullptr; /// read/write persistent storage
     DataModel::InteractionModelContext * const interactionContext = nullptr; /// outside-world communication
 
-    ServerClusterContext(ServerClusterContext &&) = default;
-
     bool operator!=(const ServerClusterContext & other) const
     {
         return (provider != other.provider)                     //

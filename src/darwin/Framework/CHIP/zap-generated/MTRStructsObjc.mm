@@ -295,6 +295,39 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRDataTypeSuppliedAttributionData
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _contextInformation = @(0);
+
+        _sourceContext = nil;
+
+        _fabricIndex = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDataTypeSuppliedAttributionData alloc] init];
+
+    other.contextInformation = self.contextInformation;
+    other.sourceContext = self.sourceContext;
+    other.fabricIndex = self.fabricIndex;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: contextInformation:%@; sourceContext:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _contextInformation, _sourceContext, _fabricIndex];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRDescriptorClusterDeviceTypeStruct
 - (instancetype)init
 {
@@ -4519,7 +4552,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRScenesManagementClusterExtensionFieldSet
+@implementation MTRScenesManagementClusterExtensionFieldSetStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4533,7 +4566,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRScenesManagementClusterExtensionFieldSet alloc] init];
+    auto other = [[MTRScenesManagementClusterExtensionFieldSetStruct alloc] init];
 
     other.clusterID = self.clusterID;
     other.attributeValueList = self.attributeValueList;
@@ -4929,6 +4962,10 @@ NS_ASSUME_NONNULL_BEGIN
         _startSystime = nil;
 
         _endSystime = nil;
+
+        _apparentEnergy = nil;
+
+        _reactiveEnergy = nil;
     }
     return self;
 }
@@ -4942,13 +4979,15 @@ NS_ASSUME_NONNULL_BEGIN
     other.endTimestamp = self.endTimestamp;
     other.startSystime = self.startSystime;
     other.endSystime = self.endSystime;
+    other.apparentEnergy = self.apparentEnergy;
+    other.reactiveEnergy = self.reactiveEnergy;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: energy:%@; startTimestamp:%@; endTimestamp:%@; startSystime:%@; endSystime:%@; >", NSStringFromClass([self class]), _energy, _startTimestamp, _endTimestamp, _startSystime, _endSystime];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: energy:%@; startTimestamp:%@; endTimestamp:%@; startSystime:%@; endSystime:%@; apparentEnergy:%@; reactiveEnergy:%@; >", NSStringFromClass([self class]), _energy, _startTimestamp, _endTimestamp, _startSystime, _endSystime, _apparentEnergy, _reactiveEnergy];
     return descriptionString;
 }
 
@@ -9689,6 +9728,8 @@ NS_ASSUME_NONNULL_BEGIN
 
         _peerNodeID = @(0);
 
+        _peerEndpointID = @(0);
+
         _streamUsage = @(0);
 
         _videoStreamID = nil;
@@ -9708,6 +9749,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.id = self.id;
     other.peerNodeID = self.peerNodeID;
+    other.peerEndpointID = self.peerEndpointID;
     other.streamUsage = self.streamUsage;
     other.videoStreamID = self.videoStreamID;
     other.audioStreamID = self.audioStreamID;
@@ -9719,7 +9761,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: id:%@; peerNodeID:%@; streamUsage:%@; videoStreamID:%@; audioStreamID:%@; metadataOptions:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _id, _peerNodeID, _streamUsage, _videoStreamID, _audioStreamID, _metadataOptions, _fabricIndex];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: id:%@; peerNodeID:%@; peerEndpointID:%@; streamUsage:%@; videoStreamID:%@; audioStreamID:%@; metadataOptions:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _id, _peerNodeID, _peerEndpointID, _streamUsage, _videoStreamID, _audioStreamID, _metadataOptions, _fabricIndex];
     return descriptionString;
 }
 
@@ -9770,6 +9812,8 @@ NS_ASSUME_NONNULL_BEGIN
 
         _peerNodeID = @(0);
 
+        _peerEndpointID = @(0);
+
         _streamUsage = @(0);
 
         _videoStreamID = nil;
@@ -9789,6 +9833,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.id = self.id;
     other.peerNodeID = self.peerNodeID;
+    other.peerEndpointID = self.peerEndpointID;
     other.streamUsage = self.streamUsage;
     other.videoStreamID = self.videoStreamID;
     other.audioStreamID = self.audioStreamID;
@@ -9800,7 +9845,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: id:%@; peerNodeID:%@; streamUsage:%@; videoStreamID:%@; audioStreamID:%@; metadataOptions:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _id, _peerNodeID, _streamUsage, _videoStreamID, _audioStreamID, _metadataOptions, _fabricIndex];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: id:%@; peerNodeID:%@; peerEndpointID:%@; streamUsage:%@; videoStreamID:%@; audioStreamID:%@; metadataOptions:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _id, _peerNodeID, _peerEndpointID, _streamUsage, _videoStreamID, _audioStreamID, _metadataOptions, _fabricIndex];
     return descriptionString;
 }
 

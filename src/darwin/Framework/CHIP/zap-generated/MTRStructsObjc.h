@@ -79,6 +79,13 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
 @property (nonatomic, copy) NSNumber * _Nonnull statusCode MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 @end
 
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRDataTypeSuppliedAttributionData : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull contextInformation MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable sourceContext MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_PROVISIONALLY_AVAILABLE;
+@end
+
 MTR_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
 @interface MTRDescriptorClusterDeviceTypeStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull deviceType MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
@@ -1126,7 +1133,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRScenesManagementClusterExtensionFieldSet : NSObject <NSCopying>
+@interface MTRScenesManagementClusterExtensionFieldSetStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull clusterID MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSArray * _Nonnull attributeValueList MTR_PROVISIONALLY_AVAILABLE;
 @end
@@ -1216,6 +1223,8 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
 @property (nonatomic, copy) NSNumber * _Nullable endTimestamp MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 @property (nonatomic, copy) NSNumber * _Nullable startSystime MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 @property (nonatomic, copy) NSNumber * _Nullable endSystime MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
+@property (nonatomic, copy) NSNumber * _Nullable apparentEnergy MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable reactiveEnergy MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
@@ -2321,6 +2330,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @interface MTRWebRTCTransportProviderClusterWebRTCSessionStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull id MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull peerNodeID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull peerEndpointID MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull streamUsage MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable videoStreamID MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable audioStreamID MTR_PROVISIONALLY_AVAILABLE;
@@ -2340,6 +2350,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @interface MTRWebRTCTransportRequestorClusterWebRTCSessionStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull id MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull peerNodeID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull peerEndpointID MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull streamUsage MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable videoStreamID MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable audioStreamID MTR_PROVISIONALLY_AVAILABLE;

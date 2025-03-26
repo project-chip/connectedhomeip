@@ -5502,13 +5502,13 @@ public static class ScenesManagementClusterAttributeValuePairStruct {
     return output.toString();
   }
 }
-public static class ScenesManagementClusterExtensionFieldSet {
+public static class ScenesManagementClusterExtensionFieldSetStruct {
   public Long clusterID;
   public ArrayList<ChipStructs.ScenesManagementClusterAttributeValuePairStruct> attributeValueList;
   private static final long CLUSTER_ID_ID = 0L;
   private static final long ATTRIBUTE_VALUE_LIST_ID = 1L;
 
-  public ScenesManagementClusterExtensionFieldSet(
+  public ScenesManagementClusterExtensionFieldSetStruct(
     Long clusterID,
     ArrayList<ChipStructs.ScenesManagementClusterAttributeValuePairStruct> attributeValueList
   ) {
@@ -5524,7 +5524,7 @@ public static class ScenesManagementClusterExtensionFieldSet {
     return new StructType(values);
   }
 
-  public static ScenesManagementClusterExtensionFieldSet decodeTlv(BaseTLVType tlvValue) {
+  public static ScenesManagementClusterExtensionFieldSetStruct decodeTlv(BaseTLVType tlvValue) {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
@@ -5543,7 +5543,7 @@ public static class ScenesManagementClusterExtensionFieldSet {
         }
       }
     }
-    return new ScenesManagementClusterExtensionFieldSet(
+    return new ScenesManagementClusterExtensionFieldSetStruct(
       clusterID,
       attributeValueList
     );
@@ -5552,7 +5552,7 @@ public static class ScenesManagementClusterExtensionFieldSet {
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
-    output.append("ScenesManagementClusterExtensionFieldSet {\n");
+    output.append("ScenesManagementClusterExtensionFieldSetStruct {\n");
     output.append("\tclusterID: ");
     output.append(clusterID);
     output.append("\n");
@@ -6417,24 +6417,32 @@ public static class ElectricalEnergyMeasurementClusterEnergyMeasurementStruct {
   public Optional<Long> endTimestamp;
   public Optional<Long> startSystime;
   public Optional<Long> endSystime;
+  public Optional<Long> apparentEnergy;
+  public Optional<Long> reactiveEnergy;
   private static final long ENERGY_ID = 0L;
   private static final long START_TIMESTAMP_ID = 1L;
   private static final long END_TIMESTAMP_ID = 2L;
   private static final long START_SYSTIME_ID = 3L;
   private static final long END_SYSTIME_ID = 4L;
+  private static final long APPARENT_ENERGY_ID = 5L;
+  private static final long REACTIVE_ENERGY_ID = 6L;
 
   public ElectricalEnergyMeasurementClusterEnergyMeasurementStruct(
     Long energy,
     Optional<Long> startTimestamp,
     Optional<Long> endTimestamp,
     Optional<Long> startSystime,
-    Optional<Long> endSystime
+    Optional<Long> endSystime,
+    Optional<Long> apparentEnergy,
+    Optional<Long> reactiveEnergy
   ) {
     this.energy = energy;
     this.startTimestamp = startTimestamp;
     this.endTimestamp = endTimestamp;
     this.startSystime = startSystime;
     this.endSystime = endSystime;
+    this.apparentEnergy = apparentEnergy;
+    this.reactiveEnergy = reactiveEnergy;
   }
 
   public StructType encodeTlv() {
@@ -6444,6 +6452,8 @@ public static class ElectricalEnergyMeasurementClusterEnergyMeasurementStruct {
     values.add(new StructElement(END_TIMESTAMP_ID, endTimestamp.<BaseTLVType>map((nonOptionalendTimestamp) -> new UIntType(nonOptionalendTimestamp)).orElse(new EmptyType())));
     values.add(new StructElement(START_SYSTIME_ID, startSystime.<BaseTLVType>map((nonOptionalstartSystime) -> new UIntType(nonOptionalstartSystime)).orElse(new EmptyType())));
     values.add(new StructElement(END_SYSTIME_ID, endSystime.<BaseTLVType>map((nonOptionalendSystime) -> new UIntType(nonOptionalendSystime)).orElse(new EmptyType())));
+    values.add(new StructElement(APPARENT_ENERGY_ID, apparentEnergy.<BaseTLVType>map((nonOptionalapparentEnergy) -> new IntType(nonOptionalapparentEnergy)).orElse(new EmptyType())));
+    values.add(new StructElement(REACTIVE_ENERGY_ID, reactiveEnergy.<BaseTLVType>map((nonOptionalreactiveEnergy) -> new IntType(nonOptionalreactiveEnergy)).orElse(new EmptyType())));
 
     return new StructType(values);
   }
@@ -6457,6 +6467,8 @@ public static class ElectricalEnergyMeasurementClusterEnergyMeasurementStruct {
     Optional<Long> endTimestamp = Optional.empty();
     Optional<Long> startSystime = Optional.empty();
     Optional<Long> endSystime = Optional.empty();
+    Optional<Long> apparentEnergy = Optional.empty();
+    Optional<Long> reactiveEnergy = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == ENERGY_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Int) {
@@ -6483,6 +6495,16 @@ public static class ElectricalEnergyMeasurementClusterEnergyMeasurementStruct {
           UIntType castingValue = element.value(UIntType.class);
           endSystime = Optional.of(castingValue.value(Long.class));
         }
+      } else if (element.contextTagNum() == APPARENT_ENERGY_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          apparentEnergy = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == REACTIVE_ENERGY_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          reactiveEnergy = Optional.of(castingValue.value(Long.class));
+        }
       }
     }
     return new ElectricalEnergyMeasurementClusterEnergyMeasurementStruct(
@@ -6490,7 +6512,9 @@ public static class ElectricalEnergyMeasurementClusterEnergyMeasurementStruct {
       startTimestamp,
       endTimestamp,
       startSystime,
-      endSystime
+      endSystime,
+      apparentEnergy,
+      reactiveEnergy
     );
   }
 
@@ -6512,6 +6536,12 @@ public static class ElectricalEnergyMeasurementClusterEnergyMeasurementStruct {
     output.append("\n");
     output.append("\tendSystime: ");
     output.append(endSystime);
+    output.append("\n");
+    output.append("\tapparentEnergy: ");
+    output.append(apparentEnergy);
+    output.append("\n");
+    output.append("\treactiveEnergy: ");
+    output.append(reactiveEnergy);
     output.append("\n");
     output.append("}\n");
     return output.toString();
@@ -7092,67 +7122,6 @@ public static class CommodityPriceClusterCommodityPriceStruct {
     return output.toString();
   }
 }
-public static class CommodityPriceClusterCurrencyStruct {
-  public Integer currency;
-  public Integer decimalPoints;
-  private static final long CURRENCY_ID = 0L;
-  private static final long DECIMAL_POINTS_ID = 1L;
-
-  public CommodityPriceClusterCurrencyStruct(
-    Integer currency,
-    Integer decimalPoints
-  ) {
-    this.currency = currency;
-    this.decimalPoints = decimalPoints;
-  }
-
-  public StructType encodeTlv() {
-    ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(CURRENCY_ID, new UIntType(currency)));
-    values.add(new StructElement(DECIMAL_POINTS_ID, new UIntType(decimalPoints)));
-
-    return new StructType(values);
-  }
-
-  public static CommodityPriceClusterCurrencyStruct decodeTlv(BaseTLVType tlvValue) {
-    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
-      return null;
-    }
-    Integer currency = null;
-    Integer decimalPoints = null;
-    for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == CURRENCY_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          currency = castingValue.value(Integer.class);
-        }
-      } else if (element.contextTagNum() == DECIMAL_POINTS_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          decimalPoints = castingValue.value(Integer.class);
-        }
-      }
-    }
-    return new CommodityPriceClusterCurrencyStruct(
-      currency,
-      decimalPoints
-    );
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder output = new StringBuilder();
-    output.append("CommodityPriceClusterCurrencyStruct {\n");
-    output.append("\tcurrency: ");
-    output.append(currency);
-    output.append("\n");
-    output.append("\tdecimalPoints: ");
-    output.append(decimalPoints);
-    output.append("\n");
-    output.append("}\n");
-    return output.toString();
-  }
-}
 public static class CommodityPriceClusterPriceStruct {
   public Long amount;
   public ChipStructs.CommodityPriceClusterCurrencyStruct currency;
@@ -7209,6 +7178,67 @@ public static class CommodityPriceClusterPriceStruct {
     output.append("\n");
     output.append("\tcurrency: ");
     output.append(currency);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class CommodityPriceClusterCurrencyStruct {
+  public Integer currency;
+  public Integer decimalPoints;
+  private static final long CURRENCY_ID = 0L;
+  private static final long DECIMAL_POINTS_ID = 1L;
+
+  public CommodityPriceClusterCurrencyStruct(
+    Integer currency,
+    Integer decimalPoints
+  ) {
+    this.currency = currency;
+    this.decimalPoints = decimalPoints;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(CURRENCY_ID, new UIntType(currency)));
+    values.add(new StructElement(DECIMAL_POINTS_ID, new UIntType(decimalPoints)));
+
+    return new StructType(values);
+  }
+
+  public static CommodityPriceClusterCurrencyStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer currency = null;
+    Integer decimalPoints = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == CURRENCY_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          currency = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == DECIMAL_POINTS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          decimalPoints = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new CommodityPriceClusterCurrencyStruct(
+      currency,
+      decimalPoints
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("CommodityPriceClusterCurrencyStruct {\n");
+    output.append("\tcurrency: ");
+    output.append(currency);
+    output.append("\n");
+    output.append("\tdecimalPoints: ");
+    output.append(decimalPoints);
     output.append("\n");
     output.append("}\n");
     return output.toString();
@@ -14940,6 +14970,7 @@ public static class WebRTCTransportProviderClusterICEServerStruct {
 public static class WebRTCTransportProviderClusterWebRTCSessionStruct {
   public Integer id;
   public Long peerNodeID;
+  public Integer peerEndpointID;
   public Integer streamUsage;
   public @Nullable Integer videoStreamID;
   public @Nullable Integer audioStreamID;
@@ -14947,15 +14978,17 @@ public static class WebRTCTransportProviderClusterWebRTCSessionStruct {
   public Integer fabricIndex;
   private static final long ID_ID = 1L;
   private static final long PEER_NODE_ID_ID = 2L;
-  private static final long STREAM_USAGE_ID = 3L;
-  private static final long VIDEO_STREAM_ID_ID = 4L;
-  private static final long AUDIO_STREAM_ID_ID = 5L;
-  private static final long METADATA_OPTIONS_ID = 6L;
+  private static final long PEER_ENDPOINT_ID_ID = 3L;
+  private static final long STREAM_USAGE_ID = 4L;
+  private static final long VIDEO_STREAM_ID_ID = 5L;
+  private static final long AUDIO_STREAM_ID_ID = 6L;
+  private static final long METADATA_OPTIONS_ID = 7L;
   private static final long FABRIC_INDEX_ID = 254L;
 
   public WebRTCTransportProviderClusterWebRTCSessionStruct(
     Integer id,
     Long peerNodeID,
+    Integer peerEndpointID,
     Integer streamUsage,
     @Nullable Integer videoStreamID,
     @Nullable Integer audioStreamID,
@@ -14964,6 +14997,7 @@ public static class WebRTCTransportProviderClusterWebRTCSessionStruct {
   ) {
     this.id = id;
     this.peerNodeID = peerNodeID;
+    this.peerEndpointID = peerEndpointID;
     this.streamUsage = streamUsage;
     this.videoStreamID = videoStreamID;
     this.audioStreamID = audioStreamID;
@@ -14975,6 +15009,7 @@ public static class WebRTCTransportProviderClusterWebRTCSessionStruct {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(ID_ID, new UIntType(id)));
     values.add(new StructElement(PEER_NODE_ID_ID, new UIntType(peerNodeID)));
+    values.add(new StructElement(PEER_ENDPOINT_ID_ID, new UIntType(peerEndpointID)));
     values.add(new StructElement(STREAM_USAGE_ID, new UIntType(streamUsage)));
     values.add(new StructElement(VIDEO_STREAM_ID_ID, videoStreamID != null ? new UIntType(videoStreamID) : new NullType()));
     values.add(new StructElement(AUDIO_STREAM_ID_ID, audioStreamID != null ? new UIntType(audioStreamID) : new NullType()));
@@ -14990,6 +15025,7 @@ public static class WebRTCTransportProviderClusterWebRTCSessionStruct {
     }
     Integer id = null;
     Long peerNodeID = null;
+    Integer peerEndpointID = null;
     Integer streamUsage = null;
     @Nullable Integer videoStreamID = null;
     @Nullable Integer audioStreamID = null;
@@ -15005,6 +15041,11 @@ public static class WebRTCTransportProviderClusterWebRTCSessionStruct {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
           peerNodeID = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == PEER_ENDPOINT_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          peerEndpointID = castingValue.value(Integer.class);
         }
       } else if (element.contextTagNum() == STREAM_USAGE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -15036,6 +15077,7 @@ public static class WebRTCTransportProviderClusterWebRTCSessionStruct {
     return new WebRTCTransportProviderClusterWebRTCSessionStruct(
       id,
       peerNodeID,
+      peerEndpointID,
       streamUsage,
       videoStreamID,
       audioStreamID,
@@ -15053,6 +15095,9 @@ public static class WebRTCTransportProviderClusterWebRTCSessionStruct {
     output.append("\n");
     output.append("\tpeerNodeID: ");
     output.append(peerNodeID);
+    output.append("\n");
+    output.append("\tpeerEndpointID: ");
+    output.append(peerEndpointID);
     output.append("\n");
     output.append("\tstreamUsage: ");
     output.append(streamUsage);
@@ -15167,6 +15212,7 @@ public static class WebRTCTransportRequestorClusterICEServerStruct {
 public static class WebRTCTransportRequestorClusterWebRTCSessionStruct {
   public Integer id;
   public Long peerNodeID;
+  public Integer peerEndpointID;
   public Integer streamUsage;
   public @Nullable Integer videoStreamID;
   public @Nullable Integer audioStreamID;
@@ -15174,15 +15220,17 @@ public static class WebRTCTransportRequestorClusterWebRTCSessionStruct {
   public Integer fabricIndex;
   private static final long ID_ID = 1L;
   private static final long PEER_NODE_ID_ID = 2L;
-  private static final long STREAM_USAGE_ID = 3L;
-  private static final long VIDEO_STREAM_ID_ID = 4L;
-  private static final long AUDIO_STREAM_ID_ID = 5L;
-  private static final long METADATA_OPTIONS_ID = 6L;
+  private static final long PEER_ENDPOINT_ID_ID = 3L;
+  private static final long STREAM_USAGE_ID = 4L;
+  private static final long VIDEO_STREAM_ID_ID = 5L;
+  private static final long AUDIO_STREAM_ID_ID = 6L;
+  private static final long METADATA_OPTIONS_ID = 7L;
   private static final long FABRIC_INDEX_ID = 254L;
 
   public WebRTCTransportRequestorClusterWebRTCSessionStruct(
     Integer id,
     Long peerNodeID,
+    Integer peerEndpointID,
     Integer streamUsage,
     @Nullable Integer videoStreamID,
     @Nullable Integer audioStreamID,
@@ -15191,6 +15239,7 @@ public static class WebRTCTransportRequestorClusterWebRTCSessionStruct {
   ) {
     this.id = id;
     this.peerNodeID = peerNodeID;
+    this.peerEndpointID = peerEndpointID;
     this.streamUsage = streamUsage;
     this.videoStreamID = videoStreamID;
     this.audioStreamID = audioStreamID;
@@ -15202,6 +15251,7 @@ public static class WebRTCTransportRequestorClusterWebRTCSessionStruct {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(ID_ID, new UIntType(id)));
     values.add(new StructElement(PEER_NODE_ID_ID, new UIntType(peerNodeID)));
+    values.add(new StructElement(PEER_ENDPOINT_ID_ID, new UIntType(peerEndpointID)));
     values.add(new StructElement(STREAM_USAGE_ID, new UIntType(streamUsage)));
     values.add(new StructElement(VIDEO_STREAM_ID_ID, videoStreamID != null ? new UIntType(videoStreamID) : new NullType()));
     values.add(new StructElement(AUDIO_STREAM_ID_ID, audioStreamID != null ? new UIntType(audioStreamID) : new NullType()));
@@ -15217,6 +15267,7 @@ public static class WebRTCTransportRequestorClusterWebRTCSessionStruct {
     }
     Integer id = null;
     Long peerNodeID = null;
+    Integer peerEndpointID = null;
     Integer streamUsage = null;
     @Nullable Integer videoStreamID = null;
     @Nullable Integer audioStreamID = null;
@@ -15232,6 +15283,11 @@ public static class WebRTCTransportRequestorClusterWebRTCSessionStruct {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
           peerNodeID = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == PEER_ENDPOINT_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          peerEndpointID = castingValue.value(Integer.class);
         }
       } else if (element.contextTagNum() == STREAM_USAGE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -15263,6 +15319,7 @@ public static class WebRTCTransportRequestorClusterWebRTCSessionStruct {
     return new WebRTCTransportRequestorClusterWebRTCSessionStruct(
       id,
       peerNodeID,
+      peerEndpointID,
       streamUsage,
       videoStreamID,
       audioStreamID,
@@ -15280,6 +15337,9 @@ public static class WebRTCTransportRequestorClusterWebRTCSessionStruct {
     output.append("\n");
     output.append("\tpeerNodeID: ");
     output.append(peerNodeID);
+    output.append("\n");
+    output.append("\tpeerEndpointID: ");
+    output.append(peerEndpointID);
     output.append("\n");
     output.append("\tstreamUsage: ");
     output.append(streamUsage);
@@ -16939,6 +16999,67 @@ public static class CommodityTariffClusterTariffPeriodStruct {
     return output.toString();
   }
 }
+public static class CommodityTariffClusterCurrencyStruct {
+  public Integer currency;
+  public Integer decimalPoints;
+  private static final long CURRENCY_ID = 0L;
+  private static final long DECIMAL_POINTS_ID = 1L;
+
+  public CommodityTariffClusterCurrencyStruct(
+    Integer currency,
+    Integer decimalPoints
+  ) {
+    this.currency = currency;
+    this.decimalPoints = decimalPoints;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(CURRENCY_ID, new UIntType(currency)));
+    values.add(new StructElement(DECIMAL_POINTS_ID, new UIntType(decimalPoints)));
+
+    return new StructType(values);
+  }
+
+  public static CommodityTariffClusterCurrencyStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer currency = null;
+    Integer decimalPoints = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == CURRENCY_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          currency = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == DECIMAL_POINTS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          decimalPoints = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new CommodityTariffClusterCurrencyStruct(
+      currency,
+      decimalPoints
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("CommodityTariffClusterCurrencyStruct {\n");
+    output.append("\tcurrency: ");
+    output.append(currency);
+    output.append("\n");
+    output.append("\tdecimalPoints: ");
+    output.append(decimalPoints);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class CommodityTariffClusterPowerThresholdStruct {
   public Optional<Long> powerThreshold;
   public Optional<Long> apparentPowerThreshold;
@@ -17010,67 +17131,6 @@ public static class CommodityTariffClusterPowerThresholdStruct {
     output.append("\n");
     output.append("\tpowerThresholdSource: ");
     output.append(powerThresholdSource);
-    output.append("\n");
-    output.append("}\n");
-    return output.toString();
-  }
-}
-public static class CommodityTariffClusterCurrencyStruct {
-  public Integer currency;
-  public Integer decimalPoints;
-  private static final long CURRENCY_ID = 0L;
-  private static final long DECIMAL_POINTS_ID = 1L;
-
-  public CommodityTariffClusterCurrencyStruct(
-    Integer currency,
-    Integer decimalPoints
-  ) {
-    this.currency = currency;
-    this.decimalPoints = decimalPoints;
-  }
-
-  public StructType encodeTlv() {
-    ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(CURRENCY_ID, new UIntType(currency)));
-    values.add(new StructElement(DECIMAL_POINTS_ID, new UIntType(decimalPoints)));
-
-    return new StructType(values);
-  }
-
-  public static CommodityTariffClusterCurrencyStruct decodeTlv(BaseTLVType tlvValue) {
-    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
-      return null;
-    }
-    Integer currency = null;
-    Integer decimalPoints = null;
-    for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == CURRENCY_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          currency = castingValue.value(Integer.class);
-        }
-      } else if (element.contextTagNum() == DECIMAL_POINTS_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          decimalPoints = castingValue.value(Integer.class);
-        }
-      }
-    }
-    return new CommodityTariffClusterCurrencyStruct(
-      currency,
-      decimalPoints
-    );
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder output = new StringBuilder();
-    output.append("CommodityTariffClusterCurrencyStruct {\n");
-    output.append("\tcurrency: ");
-    output.append(currency);
-    output.append("\n");
-    output.append("\tdecimalPoints: ");
-    output.append(decimalPoints);
     output.append("\n");
     output.append("}\n");
     return output.toString();

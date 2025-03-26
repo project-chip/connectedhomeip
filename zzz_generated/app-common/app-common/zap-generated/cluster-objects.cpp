@@ -497,6 +497,7 @@ CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optiona
 
     encoder.Encode(to_underlying(Fields::kId), id);
     encoder.Encode(to_underlying(Fields::kPeerNodeID), peerNodeID);
+    encoder.Encode(to_underlying(Fields::kPeerEndpointID), peerEndpointID);
     encoder.Encode(to_underlying(Fields::kStreamUsage), streamUsage);
     encoder.Encode(to_underlying(Fields::kVideoStreamID), videoStreamID);
     encoder.Encode(to_underlying(Fields::kAudioStreamID), audioStreamID);
@@ -530,6 +531,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kPeerNodeID))
         {
             err = DataModel::Decode(reader, peerNodeID);
+        }
+        else if (__context_tag == to_underlying(Fields::kPeerEndpointID))
+        {
+            err = DataModel::Decode(reader, peerEndpointID);
         }
         else if (__context_tag == to_underlying(Fields::kStreamUsage))
         {
@@ -954,6 +959,68 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 }
 
 } // namespace AtomicAttributeStatusStruct
+
+namespace SuppliedAttributionData {
+CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    return DoEncode(aWriter, aTag, NullOptional);
+}
+
+CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
+{
+    return DoEncode(aWriter, aTag, MakeOptional(aAccessingFabricIndex));
+}
+
+CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const
+{
+
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+
+    encoder.Encode(to_underlying(Fields::kContextInformation), contextInformation);
+    encoder.Encode(to_underlying(Fields::kSourceContext), sourceContext);
+    if (aAccessingFabricIndex.HasValue())
+    {
+        encoder.Encode(to_underlying(Fields::kFabricIndex), fabricIndex);
+    }
+
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kContextInformation))
+        {
+            err = DataModel::Decode(reader, contextInformation);
+        }
+        else if (__context_tag == to_underlying(Fields::kSourceContext))
+        {
+            err = DataModel::Decode(reader, sourceContext);
+        }
+        else if (__context_tag == to_underlying(Fields::kFabricIndex))
+        {
+            err = DataModel::Decode(reader, fabricIndex);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace SuppliedAttributionData
 
 } // namespace Structs
 } // namespace Globals
@@ -13503,7 +13570,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
 } // namespace AttributeValuePairStruct
 
-namespace ExtensionFieldSet {
+namespace ExtensionFieldSetStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -13542,7 +13609,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     }
 }
 
-} // namespace ExtensionFieldSet
+} // namespace ExtensionFieldSetStruct
 
 namespace SceneInfoStruct {
 CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -13641,7 +13708,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kSceneID), sceneID);
     encoder.Encode(to_underlying(Fields::kTransitionTime), transitionTime);
     encoder.Encode(to_underlying(Fields::kSceneName), sceneName);
-    encoder.Encode(to_underlying(Fields::kExtensionFieldSets), extensionFieldSets);
+    encoder.Encode(to_underlying(Fields::kExtensionFieldSetStructs), extensionFieldSetStructs);
     return encoder.Finalize();
 }
 
@@ -13675,9 +13742,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, sceneName);
         }
-        else if (__context_tag == to_underlying(Fields::kExtensionFieldSets))
+        else if (__context_tag == to_underlying(Fields::kExtensionFieldSetStructs))
         {
-            err = DataModel::Decode(reader, extensionFieldSets);
+            err = DataModel::Decode(reader, extensionFieldSetStructs);
         }
         else
         {
@@ -13779,7 +13846,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kSceneID), sceneID);
     encoder.Encode(to_underlying(Fields::kTransitionTime), transitionTime);
     encoder.Encode(to_underlying(Fields::kSceneName), sceneName);
-    encoder.Encode(to_underlying(Fields::kExtensionFieldSets), extensionFieldSets);
+    encoder.Encode(to_underlying(Fields::kExtensionFieldSetStructs), extensionFieldSetStructs);
     return encoder.Finalize();
 }
 
@@ -13817,9 +13884,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, sceneName);
         }
-        else if (__context_tag == to_underlying(Fields::kExtensionFieldSets))
+        else if (__context_tag == to_underlying(Fields::kExtensionFieldSetStructs))
         {
-            err = DataModel::Decode(reader, extensionFieldSets);
+            err = DataModel::Decode(reader, extensionFieldSetStructs);
         }
         else
         {
@@ -14300,8 +14367,6 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 {
     switch (path.mAttributeId)
     {
-    case Attributes::LastConfiguredBy::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, lastConfiguredBy);
     case Attributes::SceneTableSize::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, sceneTableSize);
     case Attributes::FabricSceneInfo::TypeInfo::GetAttributeId():
@@ -15202,6 +15267,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kEndTimestamp), endTimestamp);
     encoder.Encode(to_underlying(Fields::kStartSystime), startSystime);
     encoder.Encode(to_underlying(Fields::kEndSystime), endSystime);
+    encoder.Encode(to_underlying(Fields::kApparentEnergy), apparentEnergy);
+    encoder.Encode(to_underlying(Fields::kReactiveEnergy), reactiveEnergy);
     return encoder.Finalize();
 }
 
@@ -15238,6 +15305,14 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kEndSystime))
         {
             err = DataModel::Decode(reader, endSystime);
+        }
+        else if (__context_tag == to_underlying(Fields::kApparentEnergy))
+        {
+            err = DataModel::Decode(reader, apparentEnergy);
+        }
+        else if (__context_tag == to_underlying(Fields::kReactiveEnergy))
+        {
+            err = DataModel::Decode(reader, reactiveEnergy);
         }
         else
         {
@@ -31501,6 +31576,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kStreamUsage), streamUsage);
+    encoder.Encode(to_underlying(Fields::kOriginatingEndpointID), originatingEndpointID);
     encoder.Encode(to_underlying(Fields::kVideoStreamID), videoStreamID);
     encoder.Encode(to_underlying(Fields::kAudioStreamID), audioStreamID);
     encoder.Encode(to_underlying(Fields::kICEServers), ICEServers);
@@ -31526,6 +31602,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         if (__context_tag == to_underlying(Fields::kStreamUsage))
         {
             err = DataModel::Decode(reader, streamUsage);
+        }
+        else if (__context_tag == to_underlying(Fields::kOriginatingEndpointID))
+        {
+            err = DataModel::Decode(reader, originatingEndpointID);
         }
         else if (__context_tag == to_underlying(Fields::kVideoStreamID))
         {
@@ -31611,6 +31691,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kWebRTCSessionID), webRTCSessionID);
     encoder.Encode(to_underlying(Fields::kSdp), sdp);
     encoder.Encode(to_underlying(Fields::kStreamUsage), streamUsage);
+    encoder.Encode(to_underlying(Fields::kOriginatingEndpointID), originatingEndpointID);
     encoder.Encode(to_underlying(Fields::kVideoStreamID), videoStreamID);
     encoder.Encode(to_underlying(Fields::kAudioStreamID), audioStreamID);
     encoder.Encode(to_underlying(Fields::kICEServers), ICEServers);
@@ -31644,6 +31725,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kStreamUsage))
         {
             err = DataModel::Decode(reader, streamUsage);
+        }
+        else if (__context_tag == to_underlying(Fields::kOriginatingEndpointID))
+        {
+            err = DataModel::Decode(reader, originatingEndpointID);
         }
         else if (__context_tag == to_underlying(Fields::kVideoStreamID))
         {

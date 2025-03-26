@@ -270,7 +270,7 @@ struct CurrencyStruct {
 
 struct PowerThresholdStruct {
   optional power_mw powerThreshold = 0;
-  optional power_mw apparentPowerThreshold = 1;
+  optional power_mva apparentPowerThreshold = 1;
   nullable PowerThresholdSourceEnum powerThresholdSource = 2;
 }
 
@@ -306,13 +306,19 @@ struct LocationDescriptorStruct {
 }
 
 struct PriceStruct {
-  int64s amount = 0;
+  money amount = 0;
   CurrencyStruct currency = 1;
 }
 
 struct AtomicAttributeStatusStruct {
   attrib_id attributeID = 0;
   status statusCode = 1;
+}
+
+fabric_scoped struct SuppliedAttributionData {
+  enum8 contextInformation = 0;
+  optional int32u sourceContext = 1;
+  fabric_idx fabricIndex = 254;
 }
 
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
@@ -4240,7 +4246,7 @@ provisional cluster ScenesManagement = 98 {
     optional int64s valueSigned64 = 8;
   }
 
-  struct ExtensionFieldSet {
+  struct ExtensionFieldSetStruct {
     cluster_id clusterID = 0;
     AttributeValuePairStruct attributeValueList[] = 1;
   }
@@ -4254,7 +4260,6 @@ provisional cluster ScenesManagement = 98 {
     fabric_idx fabricIndex = 254;
   }
 
-  readonly attribute optional nullable node_id lastConfiguredBy = 0;
   readonly attribute int16u sceneTableSize = 1;
   readonly attribute SceneInfoStruct fabricSceneInfo[] = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -4268,8 +4273,8 @@ provisional cluster ScenesManagement = 98 {
     group_id groupID = 0;
     int8u sceneID = 1;
     int32u transitionTime = 2;
-    char_string sceneName = 3;
-    ExtensionFieldSet extensionFieldSets[] = 4;
+    char_string<16> sceneName = 3;
+    ExtensionFieldSetStruct extensionFieldSetStructs[] = 4;
   }
 
   response struct AddSceneResponse = 0 {
@@ -4288,8 +4293,8 @@ provisional cluster ScenesManagement = 98 {
     group_id groupID = 1;
     int8u sceneID = 2;
     optional int32u transitionTime = 3;
-    optional char_string sceneName = 4;
-    optional ExtensionFieldSet extensionFieldSets[] = 5;
+    optional char_string<16> sceneName = 4;
+    optional ExtensionFieldSetStruct extensionFieldSetStructs[] = 5;
   }
 
   request struct RemoveSceneRequest {
@@ -4354,7 +4359,7 @@ provisional cluster ScenesManagement = 98 {
     int8u sceneIdentifierFrom = 2;
   }
 
-  /** Add a scene to the scene table. Extension field sets are supported, and are inputed as '{"ClusterID": VALUE, "AttributeValueList":[{"AttributeID": VALUE, "Value*": VALUE}]}' */
+  /** Add a scene to the scene table. Extension field sets are input as '{"ClusterID": VALUE, "AttributeValueList":[{"AttributeID": VALUE, "Value*": VALUE}]}'. */
   fabric command access(invoke: manage) AddScene(AddSceneRequest): AddSceneResponse = 0;
   /** Retrieves the requested scene entry from its Scene table. */
   fabric command ViewScene(ViewSceneRequest): ViewSceneResponse = 1;
@@ -4366,9 +4371,9 @@ provisional cluster ScenesManagement = 98 {
   fabric command access(invoke: manage) StoreScene(StoreSceneRequest): StoreSceneResponse = 4;
   /** Set the attributes and corresponding state for each other cluster implemented on the endpoint accordingly to the resquested scene entry in the Scene Table */
   fabric command RecallScene(RecallSceneRequest): DefaultSuccess = 5;
-  /** Get an unused scene identifier when no commissioning tool is in the network, or for a commissioning tool to get the used scene identifiers within a certain group */
+  /** This command can be used to get the used scene identifiers within a certain group, for the endpoint that implements this cluster. */
   fabric command GetSceneMembership(GetSceneMembershipRequest): GetSceneMembershipResponse = 6;
-  /** Allows a client to efficiently copy scenes from one group/scene identifier pair to another group/scene identifier pair. */
+  /** This command allows a client to efficiently copy scenes from one group/scene identifier pair to another group/scene identifier pair. */
   fabric command access(invoke: manage) CopyScene(CopySceneRequest): CopySceneResponse = 64;
 }
 
@@ -4600,7 +4605,27 @@ cluster ValveConfigurationAndControl = 129 {
 
 /** This cluster provides a mechanism for querying data about electrical power as measured by the server. */
 cluster ElectricalPowerMeasurement = 144 {
-  revision 1;
+  revision 3;
+
+  enum MeasurementTypeEnum : enum16 {
+    kUnspecified = 0;
+    kVoltage = 1;
+    kActiveCurrent = 2;
+    kReactiveCurrent = 3;
+    kApparentCurrent = 4;
+    kActivePower = 5;
+    kReactivePower = 6;
+    kApparentPower = 7;
+    kRMSVoltage = 8;
+    kRMSCurrent = 9;
+    kRMSPower = 10;
+    kFrequency = 11;
+    kPowerFactor = 12;
+    kNeutralCurrent = 13;
+    kElectricalEnergy = 14;
+    kReactiveEnergy = 15;
+    kApparentEnergy = 16;
+  }
 
   enum PowerModeEnum : enum8 {
     kUnknown = 0;
@@ -4648,8 +4673,8 @@ cluster ElectricalPowerMeasurement = 144 {
   readonly attribute optional nullable amperage_ma reactiveCurrent = 6;
   readonly attribute optional nullable amperage_ma apparentCurrent = 7;
   readonly attribute nullable power_mw activePower = 8;
-  readonly attribute optional nullable power_mw reactivePower = 9;
-  readonly attribute optional nullable power_mw apparentPower = 10;
+  readonly attribute optional nullable power_mvar reactivePower = 9;
+  readonly attribute optional nullable power_mva apparentPower = 10;
   readonly attribute optional nullable voltage_mv RMSVoltage = 11;
   readonly attribute optional nullable amperage_ma RMSCurrent = 12;
   readonly attribute optional nullable power_mw RMSPower = 13;
@@ -4668,13 +4693,35 @@ cluster ElectricalPowerMeasurement = 144 {
 
 /** This cluster provides a mechanism for querying data about the electrical energy imported or provided by the server. */
 cluster ElectricalEnergyMeasurement = 145 {
-  revision 1;
+  revision 2;
+
+  enum MeasurementTypeEnum : enum16 {
+    kUnspecified = 0;
+    kVoltage = 1;
+    kActiveCurrent = 2;
+    kReactiveCurrent = 3;
+    kApparentCurrent = 4;
+    kActivePower = 5;
+    kReactivePower = 6;
+    kApparentPower = 7;
+    kRMSVoltage = 8;
+    kRMSCurrent = 9;
+    kRMSPower = 10;
+    kFrequency = 11;
+    kPowerFactor = 12;
+    kNeutralCurrent = 13;
+    kElectricalEnergy = 14;
+    kReactiveEnergy = 15;
+    kApparentEnergy = 16;
+  }
 
   bitmap Feature : bitmap32 {
     kImportedEnergy = 0x1;
     kExportedEnergy = 0x2;
     kCumulativeEnergy = 0x4;
     kPeriodicEnergy = 0x8;
+    kApparentEnergy = 0x10;
+    kReactiveEnergy = 0x20;
   }
 
   struct CumulativeEnergyResetStruct {
@@ -4690,6 +4737,8 @@ cluster ElectricalEnergyMeasurement = 145 {
     optional epoch_s endTimestamp = 2;
     optional systime_ms startSystime = 3;
     optional systime_ms endSystime = 4;
+    optional energy_mvah apparentEnergy = 5;
+    optional energy_mvarh reactiveEnergy = 6;
   }
 
   info event CumulativeEnergyMeasured = 0 {
@@ -4777,7 +4826,7 @@ provisional cluster WaterHeaterManagement = 148 {
   command access(invoke: manage) CancelBoost(): DefaultSuccess = 1;
 }
 
-/**  */
+/** The Commodity Price Cluster provides the mechanism for communicating Gas, Energy, or Water pricing information within the premises. */
 provisional cluster CommodityPrice = 149 {
   revision 4;
 
@@ -4791,7 +4840,7 @@ provisional cluster CommodityPrice = 149 {
   }
 
   struct CommodityPriceComponentStruct {
-    int64s price = 0;
+    money price = 0;
     TariffPriceTypeEnum source = 1;
     optional char_string<32> description = 2;
     optional int32u tariffComponentID = 3;
@@ -7789,7 +7838,7 @@ cluster IlluminanceMeasurement = 1024 {
 
 /** Attributes and commands for configuring the measurement of temperature, and reporting temperature measurements. */
 cluster TemperatureMeasurement = 1026 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 4;
 
   readonly attribute nullable temperature measuredValue = 0;
   readonly attribute nullable temperature minMeasuredValue = 1;
@@ -10186,10 +10235,11 @@ provisional cluster WebRTCTransportProvider = 1363 {
   fabric_scoped struct WebRTCSessionStruct {
     int16u id = 1;
     node_id peerNodeID = 2;
-    StreamUsageEnum streamUsage = 3;
-    nullable int16u videoStreamID = 4;
-    nullable int16u audioStreamID = 5;
-    WebRTCMetadataOptionsBitmap metadataOptions = 6;
+    endpoint_no peerEndpointID = 3;
+    StreamUsageEnum streamUsage = 4;
+    nullable int16u videoStreamID = 5;
+    nullable int16u audioStreamID = 6;
+    WebRTCMetadataOptionsBitmap metadataOptions = 7;
     fabric_idx fabricIndex = 254;
   }
 
@@ -10203,11 +10253,12 @@ provisional cluster WebRTCTransportProvider = 1363 {
 
   request struct SolicitOfferRequest {
     StreamUsageEnum streamUsage = 0;
-    optional nullable int16u videoStreamID = 1;
-    optional nullable int16u audioStreamID = 2;
-    optional ICEServerStruct ICEServers[] = 3;
-    optional char_string ICETransportPolicy = 4;
-    optional WebRTCMetadataOptionsBitmap metadataOptions = 5;
+    endpoint_no originatingEndpointID = 1;
+    optional nullable int16u videoStreamID = 2;
+    optional nullable int16u audioStreamID = 3;
+    optional ICEServerStruct ICEServers[] = 4;
+    optional char_string ICETransportPolicy = 5;
+    optional WebRTCMetadataOptionsBitmap metadataOptions = 6;
   }
 
   response struct SolicitOfferResponse = 2 {
@@ -10221,11 +10272,12 @@ provisional cluster WebRTCTransportProvider = 1363 {
     nullable int16u webRTCSessionID = 0;
     char_string sdp = 1;
     StreamUsageEnum streamUsage = 2;
-    optional nullable int16u videoStreamID = 3;
-    optional nullable int16u audioStreamID = 4;
-    optional ICEServerStruct ICEServers[] = 5;
-    optional char_string ICETransportPolicy = 6;
-    optional WebRTCMetadataOptionsBitmap metadataOptions = 7;
+    endpoint_no originatingEndpointID = 3;
+    optional nullable int16u videoStreamID = 4;
+    optional nullable int16u audioStreamID = 5;
+    optional ICEServerStruct ICEServers[] = 6;
+    optional char_string ICETransportPolicy = 7;
+    optional WebRTCMetadataOptionsBitmap metadataOptions = 8;
   }
 
   response struct ProvideOfferResponse = 4 {
@@ -10301,10 +10353,11 @@ provisional cluster WebRTCTransportRequestor = 1364 {
   fabric_scoped struct WebRTCSessionStruct {
     int16u id = 1;
     node_id peerNodeID = 2;
-    StreamUsageEnum streamUsage = 3;
-    nullable int16u videoStreamID = 4;
-    nullable int16u audioStreamID = 5;
-    WebRTCMetadataOptionsBitmap metadataOptions = 6;
+    endpoint_no peerEndpointID = 3;
+    StreamUsageEnum streamUsage = 4;
+    nullable int16u videoStreamID = 5;
+    nullable int16u audioStreamID = 6;
+    WebRTCMetadataOptionsBitmap metadataOptions = 7;
     fabric_idx fabricIndex = 254;
   }
 
@@ -10564,7 +10617,7 @@ provisional cluster Chime = 1366 {
   command PlayChimeSound(): DefaultSuccess = 0;
 }
 
-/**  */
+/** The CommodityTariffCluster provides the mechanism for communicating Commodity Tariff information within the premises. */
 cluster CommodityTariff = 1792 {
   revision 1;
 
@@ -10633,7 +10686,7 @@ cluster CommodityTariff = 1792 {
 
   struct TariffPriceStruct {
     TariffPriceTypeEnum priceType = 0;
-    optional int64s price = 1;
+    optional money price = 1;
     optional int16s priceLevel = 2;
   }
 
@@ -10993,7 +11046,7 @@ provisional cluster TlsClientManagement = 2050 {
   fabric command access(invoke: administer) RemoveEndpoint(RemoveEndpointRequest): DefaultSuccess = 4;
 }
 
-/**  */
+/** This Meter Identification Cluster provides attributes for determining advanced information about utility metering device. */
 provisional cluster MeterIdentification = 2822 {
   revision 1;
 
@@ -11020,9 +11073,29 @@ provisional cluster MeterIdentification = 2822 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-/**  */
+/** The Commodity Metering Cluster provides the mechanism for communicating commodity consumption information within a premises. */
 cluster CommodityMetering = 2823 {
   revision 1;
+
+  enum MeasurementTypeEnum : enum16 {
+    kUnspecified = 0;
+    kVoltage = 1;
+    kActiveCurrent = 2;
+    kReactiveCurrent = 3;
+    kApparentCurrent = 4;
+    kActivePower = 5;
+    kReactivePower = 6;
+    kApparentPower = 7;
+    kRMSVoltage = 8;
+    kRMSCurrent = 9;
+    kRMSPower = 10;
+    kFrequency = 11;
+    kPowerFactor = 12;
+    kNeutralCurrent = 13;
+    kElectricalEnergy = 14;
+    kReactiveEnergy = 15;
+    kApparentEnergy = 16;
+  }
 
   struct MeteredQuantityStruct {
     int32u tariffComponentIDs[] = 0;
