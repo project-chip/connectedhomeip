@@ -223,9 +223,6 @@ static constexpr ClusterId Id = 0x00000091;
 namespace WaterHeaterManagement {
 static constexpr ClusterId Id = 0x00000094;
 } // namespace WaterHeaterManagement
-namespace DemandResponseLoadControl {
-static constexpr ClusterId Id = 0x00000096;
-} // namespace DemandResponseLoadControl
 namespace Messages {
 static constexpr ClusterId Id = 0x00000097;
 } // namespace Messages
