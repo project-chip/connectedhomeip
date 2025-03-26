@@ -55,11 +55,6 @@ jobs:
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
         steps:
-            - name: Install Missing Dependencies
-              run: |
-                apt-get update
-                apt-get install -y gobject-introspection libgirepository1.0-dev gir1.2-glib-2.0
-
             - name: Checkout
               uses: actions/checkout@v4
             # To use act like:

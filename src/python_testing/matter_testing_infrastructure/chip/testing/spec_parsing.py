@@ -22,7 +22,7 @@ import typing
 import xml.etree.ElementTree as ElementTree
 import zipfile
 from copy import deepcopy
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum, StrEnum, auto
 from importlib.abc import Traversable
 from typing import Callable, Optional, Union
@@ -172,43 +172,20 @@ class XmlDeviceTypeClusterRequirements:
         return f'{self.name}: {str(self.conformance)}'
 
 
-"""
-XML namespaces and XML Tags dataclass implementation below this line
-"""
+@dataclass
+class XmlTag:
+    """Represents a tag within a namespace"""
+    id: int = 0
+    name: str = ""
+    description: Optional[str] = None
 
 
 @dataclass
 class XmlNamespace:
     """Represents a namespace definition from XML"""
-
-    def __init__(self):
-        self.id: int = 0
-        self.name: str = ""
-        self.tags: dict[int, XmlTag] = {}
-
-    def __str__(self) -> str:
-        tags_str = '\n  '.join(f"{tag_id:04X}: {tag.name}"
-                               for tag_id, tag in sorted(self.tags.items()))
-        return f"Namespace 0x{self.id:04X} ({self.name})\n  {tags_str}"
-
-
-@dataclass
-class XmlTag:
-    """Represents a tag within a namespace"""
-
-    def __init__(self):
-        self.id: int = 0
-        self.name: str = ""
-        self.description: Optional[str] = None
-
-    def __str__(self) -> str:
-        desc = f" - {self.description}" if self.description else ""
-        return f"{self.name}{desc}"
-
-
-"""
-XML namespaces and XML Tags implementation above this line
-"""
+    id: int = 0
+    name: str = ""
+    tags: dict[int, XmlTag] = field(default_factory=dict)
 
 
 @dataclass
@@ -983,11 +960,6 @@ def combine_derived_clusters_with_base(xml_clusters: dict[uint, XmlCluster], pur
             xml_clusters[id] = new
 
 
-"""
-Added XML namespace parsing functions below
-"""
-
-
 def parse_namespace(et: ElementTree.Element) -> tuple[XmlNamespace, list[ProblemNotice]]:
     """Parse a single namespace XML definition"""
     problems: list[ProblemNotice] = []
@@ -1127,12 +1099,6 @@ def build_xml_namespaces(data_model_directory: typing.Union[PrebuiltDataModelDir
             logging.warning("  - %s", str(problem))
 
     return namespaces, problems
-
-
-"""
-Added XML namespace parsing functions above
-"""
-
 
 def parse_single_device_type(root: ElementTree.Element) -> tuple[dict[int, XmlDeviceType], list[ProblemNotice]]:
     problems: list[ProblemNotice] = []
