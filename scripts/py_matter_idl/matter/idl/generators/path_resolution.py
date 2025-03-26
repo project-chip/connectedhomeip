@@ -16,8 +16,8 @@
 
 from typing import Generator
 
-from matter.idl.matter_idl_types import Idl
 from matter.idl.generators.cluster_selection import server_side_clusters
+from matter.idl.matter_idl_types import Idl
 
 
 def expand_path_for_idl(idl: Idl, path: str) -> Generator[str, None, None]:
