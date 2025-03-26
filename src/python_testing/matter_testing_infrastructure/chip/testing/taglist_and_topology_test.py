@@ -107,12 +107,10 @@ def parts_list_cycles(tree_endpoints: list[int], endpoint_dict: dict[int, Any]) 
         return False
 
     cycles = []
-    visited = set()
-    stack = set()
     # This is quick enough that we can do all the endpoints without searching for the roots
     for endpoint_id in tree_endpoints:
-        if endpoint_id in visited:
-            continue
+        visited = set()
+        stack = set()
         if parts_list_cycle_detect(visited, endpoint_id, stack):
             cycles.append(endpoint_id)
     return cycles
