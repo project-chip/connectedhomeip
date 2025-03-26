@@ -22,8 +22,6 @@ Git:
 -->
 <configurator xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../zcl.xsd">
   <domain name="CHIP"/>
-
-  Data types
   
   <struct name="LandmarkInfoStruct" apiMaturity="provisional">
     <cluster code="0x0150"/>
