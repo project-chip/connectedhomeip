@@ -68,6 +68,8 @@ SequenceNumber_t OffsetSeqNum(SequenceNumber_t & tgtSeqNum, SequenceNumber_t & b
 
 class WiFiPAFTP // PAFTP Engine
 {
+    friend class TestWiFiPAFLayer;
+
 public:
     typedef enum
     {

@@ -77,6 +77,7 @@ public:
     void EpDoClose(uint8_t flags, CHIP_ERROR err) { return mEndPoint->DoClose(flags, err); }
     CHIP_ERROR EpDriveStandAloneAck() { return mEndPoint->DriveStandAloneAck(); }
     CHIP_ERROR EpDoSendStandAloneAck() { return mEndPoint->DoSendStandAloneAck(); }
+    void SetRxNextSeqNum(SequenceNumber_t seq) { mEndPoint->mPafTP.mRxNextSeqNum = seq; }
 
 private:
     WiFiPAFEndPoint * mEndPoint;
@@ -279,18 +280,65 @@ TEST_F(TestWiFiPAFLayer, CheckRunAsCommissionee)
     EXPECT_EQ(SendMessage(sessionInfo, std::move(buf)), CHIP_NO_ERROR);
     EXPECT_EQ(HandleWriteConfirmed(sessionInfo, true), CHIP_NO_ERROR);
 
-    // Receive a packet
+    // Receive a packet, sn#1
     constexpr uint8_t buf_rx[] = {
         to_underlying(WiFiPAFTP::HeaderFlags::kStartMessage) | to_underlying(WiFiPAFTP::HeaderFlags::kEndMessage) |
             to_underlying(WiFiPAFTP::HeaderFlags::kFragmentAck),
         0x01,
-        0x01,
+        0x01, // sn
         0x00,
         0x00, // payload
     };
     auto packet_rx = System::PacketBufferHandle::NewWithData(buf_rx, sizeof(buf_rx));
     EXPECT_EQ(packet_rx->DataLength(), static_cast<size_t>(5));
+    SetRxNextSeqNum(1);
     EXPECT_EQ(newEndPoint->Receive(std::move(packet_rx)), CHIP_NO_ERROR);
+
+    // Receive the duplicate packet
+    packet_rx = System::PacketBufferHandle::NewWithData(buf_rx, sizeof(buf_rx));
+    EXPECT_EQ(packet_rx->DataLength(), static_cast<size_t>(5));
+    EXPECT_EQ(newEndPoint->Receive(std::move(packet_rx)), CHIP_NO_ERROR);
+
+    // Test Reordering
+    // Receive pkt sn#3
+    constexpr uint8_t buf_rx_sn3[] = {
+        to_underlying(WiFiPAFTP::HeaderFlags::kStartMessage) | to_underlying(WiFiPAFTP::HeaderFlags::kEndMessage) |
+            to_underlying(WiFiPAFTP::HeaderFlags::kFragmentAck),
+        0x1,
+        0x03, // sn
+        0x00,
+        0x00, // payload
+    };
+    packet_rx = System::PacketBufferHandle::NewWithData(buf_rx_sn3, sizeof(buf_rx_sn3));
+    EXPECT_EQ(packet_rx->DataLength(), static_cast<size_t>(5));
+    EXPECT_EQ(newEndPoint->Receive(std::move(packet_rx)), CHIP_NO_ERROR);
+
+    // Receive pkt sn#2
+    constexpr uint8_t buf_rx_sn2[] = {
+        to_underlying(WiFiPAFTP::HeaderFlags::kStartMessage) | to_underlying(WiFiPAFTP::HeaderFlags::kEndMessage) |
+            to_underlying(WiFiPAFTP::HeaderFlags::kFragmentAck),
+        0x01,
+        0x02, // sn
+        0x00,
+        0x00, // payload
+    };
+    packet_rx = System::PacketBufferHandle::NewWithData(buf_rx_sn2, sizeof(buf_rx_sn2));
+    EXPECT_EQ(packet_rx->DataLength(), static_cast<size_t>(5));
+    EXPECT_EQ(newEndPoint->Receive(std::move(packet_rx)), CHIP_NO_ERROR);
+
+    // Test, send chained packet
+    constexpr uint8_t buf_chain[] = {
+        to_underlying(WiFiPAFTP::HeaderFlags::kStartMessage) | to_underlying(WiFiPAFTP::HeaderFlags::kEndMessage),
+        0x01,
+        0x01,
+        0x00,
+        0x00, // payload
+    };
+    auto packet_c1 = System::PacketBufferHandle::NewWithData(buf_chain, sizeof(buf_chain));
+    auto packet_c2 = System::PacketBufferHandle::NewWithData(buf_chain, sizeof(buf_chain));
+    packet_c1->AddToEnd(std::move(packet_c2));
+    EXPECT_EQ(packet_c1->HasChainedBuffer(), true);
+    EXPECT_EQ(newEndPoint->Send(std::move(packet_c1)), CHIP_NO_ERROR);
 
     // Close the session
     EXPECT_EQ(RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo), CHIP_NO_ERROR);
