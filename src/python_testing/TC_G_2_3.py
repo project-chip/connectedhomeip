@@ -109,7 +109,6 @@ class TC_G_2_3(MatterBaseTest):
                 TestStep("22", "TH sends AddGroupIfIdentifying command to DUT on PIXIT.G.ENDPOINT as unicast method with the following fields: GroupId as 0x0004 GroupName as Gp4"),
                 TestStep("23", "TH reads GroupTable attribute from the GroupKeyManagement cluster of DUT on EP0")]
 
-
     @async_test_body
     async def test_TC_G_2_3(self):
         # Pre-Conditions: Commissioning
