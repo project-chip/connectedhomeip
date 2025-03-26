@@ -93,7 +93,7 @@ Protocols::InteractionModel::Status ClosureControlDelegate::Stop()
 }
 
 // Return default success, will add command handling in next phase
-Protocols::InteractionModel::Status ClosureControlDelegate::MoveTo(const Optional<TargetPositionEnum> & pos,
+Protocols::InteractionModel::Status ClosureControlDelegate::MoveTo(const Optional<TargetPositionEnum> & position,
                                                                    const Optional<TargetLatchEnum> & latch,
                                                                    const Optional<Globals::ThreeLevelAutoEnum> & speed)
 {
