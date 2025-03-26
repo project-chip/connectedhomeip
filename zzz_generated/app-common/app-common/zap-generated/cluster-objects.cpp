@@ -8950,7 +8950,7 @@ CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optiona
     encoder.Encode(to_underlying(Fields::kFabricID), fabricID);
     encoder.Encode(to_underlying(Fields::kNodeID), nodeID);
     encoder.Encode(to_underlying(Fields::kLabel), label);
-    encoder.Encode(to_underlying(Fields::kVidVerificationStatement), vidVerificationStatement);
+    encoder.Encode(to_underlying(Fields::kVIDVerificationStatement), VIDVerificationStatement);
     if (aAccessingFabricIndex.HasValue())
     {
         encoder.Encode(to_underlying(Fields::kFabricIndex), fabricIndex);
@@ -8993,9 +8993,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, label);
         }
-        else if (__context_tag == to_underlying(Fields::kVidVerificationStatement))
+        else if (__context_tag == to_underlying(Fields::kVIDVerificationStatement))
         {
-            err = DataModel::Decode(reader, vidVerificationStatement);
+            err = DataModel::Decode(reader, VIDVerificationStatement);
         }
         else if (__context_tag == to_underlying(Fields::kFabricIndex))
         {
@@ -9538,12 +9538,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     }
 }
 } // namespace AddTrustedRootCertificate.
-namespace SetVidVerificationStatement {
+namespace SetVIDVerificationStatement {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kVendorID), vendorID);
-    encoder.Encode(to_underlying(Fields::kVidVerificationStatement), vidVerificationStatement);
+    encoder.Encode(to_underlying(Fields::kVIDVerificationStatement), VIDVerificationStatement);
     encoder.Encode(to_underlying(Fields::kVvsc), vvsc);
     return encoder.Finalize();
 }
@@ -9566,9 +9566,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, vendorID);
         }
-        else if (__context_tag == to_underlying(Fields::kVidVerificationStatement))
+        else if (__context_tag == to_underlying(Fields::kVIDVerificationStatement))
         {
-            err = DataModel::Decode(reader, vidVerificationStatement);
+            err = DataModel::Decode(reader, VIDVerificationStatement);
         }
         else if (__context_tag == to_underlying(Fields::kVvsc))
         {
@@ -9581,8 +9581,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace SetVidVerificationStatement.
-namespace SignVidVerificationRequest {
+} // namespace SetVIDVerificationStatement.
+namespace SignVIDVerificationRequest {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -9620,8 +9620,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace SignVidVerificationRequest.
-namespace SignVidVerificationResponse {
+} // namespace SignVIDVerificationRequest.
+namespace SignVIDVerificationResponse {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -9664,7 +9664,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace SignVidVerificationResponse.
+} // namespace SignVIDVerificationResponse.
 } // namespace Commands
 
 namespace Attributes {
@@ -37310,7 +37310,7 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
             return true;
         case Clusters::OperationalCredentials::Commands::UpdateFabricLabel::Id:
             return true;
-        case Clusters::OperationalCredentials::Commands::SetVidVerificationStatement::Id:
+        case Clusters::OperationalCredentials::Commands::SetVIDVerificationStatement::Id:
             return true;
         default:
             return false;

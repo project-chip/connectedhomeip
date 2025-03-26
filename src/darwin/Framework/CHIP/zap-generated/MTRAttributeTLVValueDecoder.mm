@@ -4657,8 +4657,8 @@ static id _Nullable DecodeAttributeValueForOperationalCredentialsCluster(Attribu
                     *aError = err;
                     return nil;
                 }
-                if (entry_0.vidVerificationStatement.HasValue()) {
-                    newElement_0.vidVerificationStatement = AsData(entry_0.vidVerificationStatement.Value());
+                if (entry_0.VIDVerificationStatement.HasValue()) {
+                    newElement_0.vidVerificationStatement = AsData(entry_0.VIDVerificationStatement.Value());
                 } else {
                     newElement_0.vidVerificationStatement = nil;
                 }

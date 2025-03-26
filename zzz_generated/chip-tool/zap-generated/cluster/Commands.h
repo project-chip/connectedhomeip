@@ -3672,8 +3672,8 @@ private:
 | * UpdateFabricLabel                                                 |   0x09 |
 | * RemoveFabric                                                      |   0x0A |
 | * AddTrustedRootCertificate                                         |   0x0B |
-| * SetVidVerificationStatement                                       |   0x0C |
-| * SignVidVerificationRequest                                        |   0x0D |
+| * SetVIDVerificationStatement                                       |   0x0C |
+| * SignVIDVerificationRequest                                        |   0x0D |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * NOCs                                                              | 0x0000 |
@@ -3999,16 +3999,16 @@ private:
 };
 
 /*
- * Command SetVidVerificationStatement
+ * Command SetVIDVerificationStatement
  */
-class OperationalCredentialsSetVidVerificationStatement : public ClusterCommand
+class OperationalCredentialsSetVIDVerificationStatement : public ClusterCommand
 {
 public:
-    OperationalCredentialsSetVidVerificationStatement(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("set-vid-verification-statement", credsIssuerConfig)
+    OperationalCredentialsSetVIDVerificationStatement(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("set-vidverification-statement", credsIssuerConfig)
     {
         AddArgument("VendorID", 0, UINT16_MAX, &mRequest.vendorID);
-        AddArgument("VidVerificationStatement", &mRequest.vidVerificationStatement);
+        AddArgument("VIDVerificationStatement", &mRequest.VIDVerificationStatement);
         AddArgument("Vvsc", &mRequest.vvsc);
         ClusterCommand::AddArguments();
     }
@@ -4017,7 +4017,7 @@ public:
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::OperationalCredentials::Id;
         constexpr chip::CommandId commandId =
-            chip::app::Clusters::OperationalCredentials::Commands::SetVidVerificationStatement::Id;
+            chip::app::Clusters::OperationalCredentials::Commands::SetVIDVerificationStatement::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
                         commandId, endpointIds.at(0));
@@ -4028,7 +4028,7 @@ public:
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::OperationalCredentials::Id;
         constexpr chip::CommandId commandId =
-            chip::app::Clusters::OperationalCredentials::Commands::SetVidVerificationStatement::Id;
+            chip::app::Clusters::OperationalCredentials::Commands::SetVIDVerificationStatement::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
                         groupId);
@@ -4037,17 +4037,17 @@ public:
     }
 
 private:
-    chip::app::Clusters::OperationalCredentials::Commands::SetVidVerificationStatement::Type mRequest;
+    chip::app::Clusters::OperationalCredentials::Commands::SetVIDVerificationStatement::Type mRequest;
 };
 
 /*
- * Command SignVidVerificationRequest
+ * Command SignVIDVerificationRequest
  */
-class OperationalCredentialsSignVidVerificationRequest : public ClusterCommand
+class OperationalCredentialsSignVIDVerificationRequest : public ClusterCommand
 {
 public:
-    OperationalCredentialsSignVidVerificationRequest(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("sign-vid-verification-request", credsIssuerConfig)
+    OperationalCredentialsSignVIDVerificationRequest(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("sign-vidverification-request", credsIssuerConfig)
     {
         AddArgument("FabricIndex", 0, UINT8_MAX, &mRequest.fabricIndex);
         AddArgument("ClientChallenge", &mRequest.clientChallenge);
@@ -4057,7 +4057,7 @@ public:
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::OperationalCredentials::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::OperationalCredentials::Commands::SignVidVerificationRequest::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::OperationalCredentials::Commands::SignVIDVerificationRequest::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
                         commandId, endpointIds.at(0));
@@ -4067,7 +4067,7 @@ public:
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::OperationalCredentials::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::OperationalCredentials::Commands::SignVidVerificationRequest::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::OperationalCredentials::Commands::SignVIDVerificationRequest::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
                         groupId);
@@ -4076,7 +4076,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::OperationalCredentials::Commands::SignVidVerificationRequest::Type mRequest;
+    chip::app::Clusters::OperationalCredentials::Commands::SignVIDVerificationRequest::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -20317,8 +20317,8 @@ void registerClusterOperationalCredentials(Commands & commands, CredentialIssuer
         make_unique<OperationalCredentialsUpdateFabricLabel>(credsIssuerConfig),           //
         make_unique<OperationalCredentialsRemoveFabric>(credsIssuerConfig),                //
         make_unique<OperationalCredentialsAddTrustedRootCertificate>(credsIssuerConfig),   //
-        make_unique<OperationalCredentialsSetVidVerificationStatement>(credsIssuerConfig), //
-        make_unique<OperationalCredentialsSignVidVerificationRequest>(credsIssuerConfig),  //
+        make_unique<OperationalCredentialsSetVIDVerificationStatement>(credsIssuerConfig), //
+        make_unique<OperationalCredentialsSignVIDVerificationRequest>(credsIssuerConfig),  //
         //
         // Attributes
         //
