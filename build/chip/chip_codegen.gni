@@ -69,7 +69,6 @@ template("_chip_build_time_codegen") {
 
     # ensure any change in codegen files will result in a rebuild
     inputs += matter_idl_generator_files
-    inputs += matter_idl_generator_templates
 
     sources = [ _idl_file ]
 
