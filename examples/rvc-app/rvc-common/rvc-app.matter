@@ -1552,7 +1552,7 @@ provisional cluster ServiceArea = 336 {
     int32u areaID = 0;
     OperationalStatusEnum status = 1;
     optional nullable elapsed_s totalOperationalTime = 2;
-    optional nullable elapsed_s estimatedTime = 3;
+    optional nullable elapsed_s initialTimeEstimate = 3;
   }
 
   readonly attribute AreaStruct supportedAreas[] = 0;
@@ -1574,7 +1574,7 @@ provisional cluster ServiceArea = 336 {
 
   response struct SelectAreasResponse = 1 {
     SelectAreasStatus status = 0;
-    char_string<256> statusText = 1;
+    long_char_string<256> statusText = 1;
   }
 
   request struct SkipAreaRequest {
@@ -1583,12 +1583,12 @@ provisional cluster ServiceArea = 336 {
 
   response struct SkipAreaResponse = 3 {
     SkipAreaStatus status = 0;
-    char_string<256> statusText = 1;
+    long_char_string<256> statusText = 1;
   }
 
-  /** Command used to select a set of device areas, where the device is to operate. */
+  /** This command is used to select a set of device areas, where the device is to operate. */
   command SelectAreas(SelectAreasRequest): SelectAreasResponse = 0;
-  /** This command is used to skip an area where the device operates. */
+  /** This command is used to skip the given area, and to attempt operating at other areas on the SupportedAreas attribute list. */
   command SkipArea(SkipAreaRequest): SkipAreaResponse = 2;
 }
 

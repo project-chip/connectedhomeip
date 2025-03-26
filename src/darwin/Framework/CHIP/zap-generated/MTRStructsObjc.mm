@@ -6914,7 +6914,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _totalOperationalTime = nil;
 
-        _estimatedTime = nil;
+        _initialTimeEstimate = nil;
     }
     return self;
 }
@@ -6926,14 +6926,14 @@ NS_ASSUME_NONNULL_BEGIN
     other.areaID = self.areaID;
     other.status = self.status;
     other.totalOperationalTime = self.totalOperationalTime;
-    other.estimatedTime = self.estimatedTime;
+    other.initialTimeEstimate = self.initialTimeEstimate;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: areaID:%@; status:%@; totalOperationalTime:%@; estimatedTime:%@; >", NSStringFromClass([self class]), _areaID, _status, _totalOperationalTime, _estimatedTime];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: areaID:%@; status:%@; totalOperationalTime:%@; initialTimeEstimate:%@; >", NSStringFromClass([self class]), _areaID, _status, _totalOperationalTime, _initialTimeEstimate];
     return descriptionString;
 }
 

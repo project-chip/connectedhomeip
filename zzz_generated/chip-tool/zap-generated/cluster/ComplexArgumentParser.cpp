@@ -4467,12 +4467,13 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     }
     valueCopy.removeMember("totalOperationalTime");
 
-    if (value.isMember("estimatedTime"))
+    if (value.isMember("initialTimeEstimate"))
     {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "estimatedTime");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.estimatedTime, value["estimatedTime"]));
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "initialTimeEstimate");
+        ReturnErrorOnFailure(
+            ComplexArgumentParser::Setup(labelWithMember, request.initialTimeEstimate, value["initialTimeEstimate"]));
     }
-    valueCopy.removeMember("estimatedTime");
+    valueCopy.removeMember("initialTimeEstimate");
 
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
@@ -4482,7 +4483,7 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::ServiceArea::Structs::
     ComplexArgumentParser::Finalize(request.areaID);
     ComplexArgumentParser::Finalize(request.status);
     ComplexArgumentParser::Finalize(request.totalOperationalTime);
-    ComplexArgumentParser::Finalize(request.estimatedTime);
+    ComplexArgumentParser::Finalize(request.initialTimeEstimate);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
