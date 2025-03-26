@@ -16,39 +16,43 @@
  *    limitations under the License.
  */
 
-#include <esp_diagnostics_metrics.h>
-#include <esp_log.h>
-#include <lib/support/CHIPMem.h>
-#include <lib/support/CHIPMemString.h>
-#include <string.h>
+#pragma once
 
-namespace Insights {
+#include "tracing/esp32_diagnostic_trace/Diagnostics.h"
+#include <map>
+
+namespace chip {
+namespace Tracing {
+namespace Diagnostics {
 
 /**
  * This class is used to monotonically increment the counters as per the label of the counter macro
- * 'MATTER_TRACE_COUNTER(label)' and report the metrics to esp-insights.
+ * 'MATTER_TRACE_COUNTER(label)'
  * As per the label of the counter macro, it adds the counter in the linked list with the name label if not
  * present and returns the same instance and increments the value if the counter is already present
  * in the list.
  */
 
-class ESPInsightsCounter
+class ESPDiagnosticCounter
 {
-private:
-    static ESPInsightsCounter * mHead; // head of the counter list
-    const char * label;                // unique key ,it is used as a static string.
-    int instanceCount;
-    ESPInsightsCounter * mNext; // pointer to point to the next entry in the list
-    bool registered = false;
-
-    ESPInsightsCounter(const char * labelParam) : label(labelParam), instanceCount(1), mNext(nullptr) {}
-
 public:
-    static ESPInsightsCounter * GetInstance(const char * label);
+    static ESPDiagnosticCounter & GetInstance(const char * label)
+    {
+        static ESPDiagnosticCounter instance;
+        IncreaseCount(label);
+        return instance;
+    }
 
-    int GetInstanceCount() const;
+    uint32_t GetInstanceCount(const char * label) const;
 
-    void ReportMetrics();
+    CHIP_ERROR ReportMetrics(const char * label, DiagnosticStorageInterface * storageInstance);
+
+private:
+    ESPDiagnosticCounter() {}
+    static std::map<const char *, uint32_t> mCounterList;
+    static void IncreaseCount(const char * label);
 };
 
-} // namespace Insights
+} // namespace Diagnostics
+} // namespace Tracing
+} // namespace chip
