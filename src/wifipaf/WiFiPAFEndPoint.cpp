@@ -364,8 +364,6 @@ void WiFiPAFEndPoint::QueueTx(PacketBufferHandle && data, PacketType_t type)
 
 CHIP_ERROR WiFiPAFEndPoint::Send(PacketBufferHandle && data)
 {
-    ChipLogDebugWiFiPAFEndPoint(WiFiPAF, "entered Send");
-
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrExit(!data.IsNull(), err = CHIP_ERROR_INVALID_ARGUMENT);
@@ -391,7 +389,6 @@ CHIP_ERROR WiFiPAFEndPoint::Send(PacketBufferHandle && data)
     err = DriveSending();
     SuccessOrExit(err);
 exit:
-    ChipLogDebugWiFiPAFEndPoint(WiFiPAF, "exiting Send");
     if (err != CHIP_NO_ERROR)
     {
         DoClose(kWiFiPAFCloseFlag_AbortTransmission, err);
@@ -469,11 +466,8 @@ CHIP_ERROR WiFiPAFEndPoint::ContinueMessageSend()
 
 CHIP_ERROR WiFiPAFEndPoint::HandleHandshakeConfirmationReceived()
 {
-    ChipLogDebugWiFiPAFEndPoint(WiFiPAF, "entered HandleHandshakeConfirmationReceived");
-
     // Free capabilities request/response payload.
     mSendQueue.FreeHead();
-    ChipLogDebugWiFiPAFEndPoint(WiFiPAF, "exiting HandleHandshakeConfirmationReceived");
 
     return CHIP_NO_ERROR;
 }
@@ -481,9 +475,6 @@ CHIP_ERROR WiFiPAFEndPoint::HandleHandshakeConfirmationReceived()
 CHIP_ERROR WiFiPAFEndPoint::HandleFragmentConfirmationReceived(bool result)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-
-    ChipLogDebugWiFiPAFEndPoint(WiFiPAF, "entered HandleFragmentConfirmationReceived");
-
     // Ensure we're in correct state to receive confirmation of non-handshake GATT send.
     VerifyOrExit(IsConnected(mState), err = CHIP_ERROR_INCORRECT_STATE);
 
@@ -532,8 +523,6 @@ exit:
 
 CHIP_ERROR WiFiPAFEndPoint::HandleSendConfirmationReceived(bool result)
 {
-    ChipLogDebugWiFiPAFEndPoint(WiFiPAF, "entered HandleSendConfirmationReceived");
-
     // Mark outstanding operation as finished.
     mConnStateFlags.Clear(ConnectionStateFlag::kOperationInFlight);
 
@@ -565,7 +554,7 @@ CHIP_ERROR WiFiPAFEndPoint::DriveStandAloneAck()
 
 CHIP_ERROR WiFiPAFEndPoint::DoSendStandAloneAck()
 {
-    ChipLogDebugWiFiPAFEndPoint(WiFiPAF, "entered DoSendStandAloneAck; sending stand-alone ack");
+    ChipLogDebugWiFiPAFEndPoint(WiFiPAF, "sending stand-alone ack");
 
     // Encode and transmit stand-alone ack.
     mPafTP.EncodeStandAloneAck(mAckToSend);
@@ -583,8 +572,6 @@ CHIP_ERROR WiFiPAFEndPoint::DoSendStandAloneAck()
 
 CHIP_ERROR WiFiPAFEndPoint::DriveSending()
 {
-    ChipLogDebugWiFiPAFEndPoint(WiFiPAF, "entered DriveSending");
-
     // If receiver's window is almost closed and we don't have an ack to send, OR we do have an ack to send but
     // receiver's window is completely empty, OR another operation is in flight, awaiting confirmation...
     if ((mRemoteReceiveWindowSize <= WIFIPAF_WINDOW_NO_ACK_SEND_THRESHOLD &&
@@ -901,14 +888,14 @@ CHIP_ERROR WiFiPAFEndPoint::Receive(PacketBufferHandle && data)
     if (err != CHIP_NO_ERROR)
     {
         // Failed to get SeqNum. => Pass down to PAFTP engine directly
-        return _Receive(std::move(data));
+        return RxPacketProcess(std::move(data));
     }
     /*
         If reorder-queue is not empty => Need to queue the packet whose SeqNum is the next one at
         offset 0 to fill the hole.
     */
     if ((ExpRxNextSeqNum == seqNum) && (ItemsInReorderQueue == 0))
-        return _Receive(std::move(data));
+        return RxPacketProcess(std::move(data));
 
     ChipLogError(WiFiPAF, "Reorder the packet: [%u, %u]", ExpRxNextSeqNum, seqNum);
     // Start reordering packets
@@ -947,7 +934,7 @@ CHIP_ERROR WiFiPAFEndPoint::Receive(PacketBufferHandle && data)
         }
         // Consume the saved packets
         ChipLogProgress(WiFiPAF, "Rx processing from the re-order queue [%u]", qidx);
-        err                = _Receive(System::PacketBufferHandle::Adopt(ReorderQueue[qidx]));
+        err                = RxPacketProcess(System::PacketBufferHandle::Adopt(ReorderQueue[qidx]));
         ReorderQueue[qidx] = nullptr;
         ItemsInReorderQueue--;
     }
@@ -964,9 +951,8 @@ CHIP_ERROR WiFiPAFEndPoint::Receive(PacketBufferHandle && data)
     return err;
 }
 
-CHIP_ERROR WiFiPAFEndPoint::_Receive(PacketBufferHandle && data)
+CHIP_ERROR WiFiPAFEndPoint::RxPacketProcess(PacketBufferHandle && data)
 {
-    ChipLogDebugWiFiPAFEndPoint(WiFiPAF, "+++++++++++++++++++++ entered receive");
     ChipLogDebugBufferWiFiPAFEndPoint(WiFiPAF, data);
 
     CHIP_ERROR err               = CHIP_NO_ERROR;
@@ -1134,7 +1120,6 @@ CHIP_ERROR WiFiPAFEndPoint::SendWrite(PacketBufferHandle && buf)
 {
     mConnStateFlags.Set(ConnectionStateFlag::kOperationInFlight);
 
-    ChipLogDebugWiFiPAFEndPoint(WiFiPAF, "==> %s():", __FUNCTION__);
     ChipLogDebugBufferWiFiPAFEndPoint(WiFiPAF, buf);
     Encoding::LittleEndian::Reader reader(buf->Start(), buf->DataLength());
     DebugPktAckSn(PktDirect_t::kTx, reader, buf->Start());
@@ -1178,8 +1163,6 @@ CHIP_ERROR WiFiPAFEndPoint::RestartAckReceivedTimer()
 
 CHIP_ERROR WiFiPAFEndPoint::StartSendAckTimer()
 {
-    ChipLogDebugWiFiPAFEndPoint(WiFiPAF, "entered StartSendAckTimer");
-
     if (!mTimerStateFlags.Has(TimerStateFlag::kSendAckTimerRunning))
     {
         ChipLogDebugWiFiPAFEndPoint(WiFiPAF, "starting new SendAckTimer");

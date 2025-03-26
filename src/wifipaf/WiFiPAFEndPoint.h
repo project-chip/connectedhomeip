@@ -90,7 +90,7 @@ public:
     ~WiFiPAFEndPoint() = default;
 
 private:
-    CHIP_ERROR _Receive(PacketBufferHandle && data);
+    CHIP_ERROR RxPacketProcess(PacketBufferHandle && data);
     enum class PktDirect_t : uint8_t
     {
         kTx,
