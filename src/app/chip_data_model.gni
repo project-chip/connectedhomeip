@@ -97,7 +97,7 @@ template("chip_data_model") {
       "app/PluginApplicationCallbacks.h",
       "app/callback-stub.cpp",
       "app/cluster-init-callback.cpp",
-      "app/cluster-config/{{server_cluster_name}}.h",
+      "app/ember-cluster-config/{{server_cluster_name}}.h",
     ]
 
     if (!defined(deps)) {

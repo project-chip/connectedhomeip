@@ -15,7 +15,7 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace {{ cluster_name }} {
-namespace ApplicationConfig {
+namespace EmberApplicationConfig {
 
 {% if config.feature_bitmap_type -%}
 using FeatureBitmapType = Feature;
@@ -23,7 +23,7 @@ using FeatureBitmapType = Feature;
 using FeatureBitmapType = uint32_t;
 {%- endif %}
 
-inline constexpr std::array<FeatureBitmapType, {{config.endpoint_configs | length}}> kFixedEndpoints = { {
+inline constexpr std::array<ClusteConfiguration<FeatureBitmapType>, {{config.endpoint_configs | length}}> kFixedEndpoints = { {
 {%- for endpoint_config in config.endpoint_configs %}
     {
         .endpointNumber = {{ endpoint_config.endpoint_number }},
@@ -39,7 +39,7 @@ inline constexpr std::array<FeatureBitmapType, {{config.endpoint_configs | lengt
 {%- endfor %}
 } };
 
-} // namespace ApplicationConfig
+} // namespace EmberApplicationConfig
 } // namespace {{ cluster_name }}
 } // namespace Clusters
 } // namespace app
