@@ -14,9 +14,7 @@
 
 # TODO: Add the test cases for indirect CRLs
 
-name:
-    29.1.9. [TC-DA-1.9] Device Attestation Revocation
-    [DUT-Commissioner]
+name: 29.1.9. [TC-DA-1.9] Device Attestation Revocation [DUT-Commissioner]
 
 PICS:
     - MCORE.ROLE.COMMISSIONER
