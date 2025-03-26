@@ -358,29 +358,39 @@ enum class Fields : uint8_t
 {
     kId              = 1,
     kPeerNodeID      = 2,
-    kPeerFabricIndex = 3,
+    kPeerEndpointID  = 3,
     kStreamUsage     = 4,
     kVideoStreamID   = 5,
     kAudioStreamID   = 6,
     kMetadataOptions = 7,
+    kFabricIndex     = 254,
 };
 
 struct Type
 {
 public:
-    uint16_t id                       = static_cast<uint16_t>(0);
-    chip::NodeId peerNodeID           = static_cast<chip::NodeId>(0);
-    chip::FabricIndex peerFabricIndex = static_cast<chip::FabricIndex>(0);
-    StreamUsageEnum streamUsage       = static_cast<StreamUsageEnum>(0);
+    uint16_t id                     = static_cast<uint16_t>(0);
+    chip::NodeId peerNodeID         = static_cast<chip::NodeId>(0);
+    chip::EndpointId peerEndpointID = static_cast<chip::EndpointId>(0);
+    StreamUsageEnum streamUsage     = static_cast<StreamUsageEnum>(0);
     DataModel::Nullable<uint16_t> videoStreamID;
     DataModel::Nullable<uint16_t> audioStreamID;
-    chip::BitMask<WebRTCMetadataOptions> metadataOptions = static_cast<chip::BitMask<WebRTCMetadataOptions>>(0);
+    chip::BitMask<WebRTCMetadataOptionsBitmap> metadataOptions = static_cast<chip::BitMask<WebRTCMetadataOptionsBitmap>>(0);
+    chip::FabricIndex fabricIndex                              = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
-    static constexpr bool kIsFabricScoped = false;
+    static constexpr bool kIsFabricScoped = true;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    auto GetFabricIndex() const { return fabricIndex; }
+
+    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
+
+    CHIP_ERROR EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
+
+private:
+    CHIP_ERROR DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const;
 };
 
 using DecodableType = Type;
@@ -11732,12 +11742,13 @@ namespace Structs {
 namespace FabricDescriptorStruct {
 enum class Fields : uint8_t
 {
-    kRootPublicKey = 1,
-    kVendorID      = 2,
-    kFabricID      = 3,
-    kNodeID        = 4,
-    kLabel         = 5,
-    kFabricIndex   = 254,
+    kRootPublicKey            = 1,
+    kVendorID                 = 2,
+    kFabricID                 = 3,
+    kNodeID                   = 4,
+    kLabel                    = 5,
+    kVIDVerificationStatement = 6,
+    kFabricIndex              = 254,
 };
 
 struct Type
@@ -11748,6 +11759,7 @@ public:
     chip::FabricId fabricID = static_cast<chip::FabricId>(0);
     chip::NodeId nodeID     = static_cast<chip::NodeId>(0);
     chip::CharSpan label;
+    Optional<chip::ByteSpan> VIDVerificationStatement;
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -11773,6 +11785,7 @@ enum class Fields : uint8_t
 {
     kNoc         = 1,
     kIcac        = 2,
+    kVvsc        = 3,
     kFabricIndex = 254,
 };
 
@@ -11781,6 +11794,7 @@ struct Type
 public:
     chip::ByteSpan noc;
     DataModel::Nullable<chip::ByteSpan> icac;
+    Optional<chip::ByteSpan> vvsc;
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -11865,6 +11879,21 @@ namespace AddTrustedRootCertificate {
 struct Type;
 struct DecodableType;
 } // namespace AddTrustedRootCertificate
+
+namespace SetVIDVerificationStatement {
+struct Type;
+struct DecodableType;
+} // namespace SetVIDVerificationStatement
+
+namespace SignVIDVerificationRequest {
+struct Type;
+struct DecodableType;
+} // namespace SignVIDVerificationRequest
+
+namespace SignVIDVerificationResponse {
+struct Type;
+struct DecodableType;
+} // namespace SignVIDVerificationResponse
 
 } // namespace Commands
 
@@ -12283,6 +12312,117 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace AddTrustedRootCertificate
+namespace SetVIDVerificationStatement {
+enum class Fields : uint8_t
+{
+    kVendorID                 = 0,
+    kVIDVerificationStatement = 1,
+    kVvsc                     = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::SetVIDVerificationStatement::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
+
+    Optional<chip::VendorId> vendorID;
+    Optional<chip::ByteSpan> VIDVerificationStatement;
+    Optional<chip::ByteSpan> vvsc;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::SetVIDVerificationStatement::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
+
+    Optional<chip::VendorId> vendorID;
+    Optional<chip::ByteSpan> VIDVerificationStatement;
+    Optional<chip::ByteSpan> vvsc;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SetVIDVerificationStatement
+namespace SignVIDVerificationRequest {
+enum class Fields : uint8_t
+{
+    kFabricIndex     = 0,
+    kClientChallenge = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::SignVIDVerificationRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
+
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
+    chip::ByteSpan clientChallenge;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = Clusters::OperationalCredentials::Commands::SignVIDVerificationResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::SignVIDVerificationRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
+
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
+    chip::ByteSpan clientChallenge;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SignVIDVerificationRequest
+namespace SignVIDVerificationResponse {
+enum class Fields : uint8_t
+{
+    kFabricIndex          = 0,
+    kFabricBindingVersion = 1,
+    kSignature            = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::SignVIDVerificationResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
+
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
+    uint8_t fabricBindingVersion  = static_cast<uint8_t>(0);
+    chip::ByteSpan signature;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::SignVIDVerificationResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
+
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
+    uint8_t fabricBindingVersion  = static_cast<uint8_t>(0);
+    chip::ByteSpan signature;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SignVIDVerificationResponse
 } // namespace Commands
 
 namespace Attributes {
@@ -18218,7 +18358,7 @@ public:
 using DecodableType = Type;
 
 } // namespace AttributeValuePairStruct
-namespace ExtensionFieldSet {
+namespace ExtensionFieldSetStruct {
 enum class Fields : uint8_t
 {
     kClusterID          = 0,
@@ -18247,7 +18387,7 @@ public:
     static constexpr bool kIsFabricScoped = false;
 };
 
-} // namespace ExtensionFieldSet
+} // namespace ExtensionFieldSetStruct
 namespace SceneInfoStruct {
 enum class Fields : uint8_t
 {
@@ -18373,11 +18513,11 @@ namespace Commands {
 namespace AddScene {
 enum class Fields : uint8_t
 {
-    kGroupID            = 0,
-    kSceneID            = 1,
-    kTransitionTime     = 2,
-    kSceneName          = 3,
-    kExtensionFieldSets = 4,
+    kGroupID                  = 0,
+    kSceneID                  = 1,
+    kTransitionTime           = 2,
+    kSceneName                = 3,
+    kExtensionFieldSetStructs = 4,
 };
 
 struct Type
@@ -18391,7 +18531,7 @@ public:
     uint8_t sceneID         = static_cast<uint8_t>(0);
     uint32_t transitionTime = static_cast<uint32_t>(0);
     chip::CharSpan sceneName;
-    DataModel::List<const Structs::ExtensionFieldSet::Type> extensionFieldSets;
+    DataModel::List<const Structs::ExtensionFieldSetStruct::Type> extensionFieldSetStructs;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -18410,7 +18550,7 @@ public:
     uint8_t sceneID         = static_cast<uint8_t>(0);
     uint32_t transitionTime = static_cast<uint32_t>(0);
     chip::CharSpan sceneName;
-    DataModel::DecodableList<Structs::ExtensionFieldSet::DecodableType> extensionFieldSets;
+    DataModel::DecodableList<Structs::ExtensionFieldSetStruct::DecodableType> extensionFieldSetStructs;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace AddScene
@@ -18490,12 +18630,12 @@ public:
 namespace ViewSceneResponse {
 enum class Fields : uint8_t
 {
-    kStatus             = 0,
-    kGroupID            = 1,
-    kSceneID            = 2,
-    kTransitionTime     = 3,
-    kSceneName          = 4,
-    kExtensionFieldSets = 5,
+    kStatus                   = 0,
+    kGroupID                  = 1,
+    kSceneID                  = 2,
+    kTransitionTime           = 3,
+    kSceneName                = 4,
+    kExtensionFieldSetStructs = 5,
 };
 
 struct Type
@@ -18510,7 +18650,7 @@ public:
     uint8_t sceneID       = static_cast<uint8_t>(0);
     Optional<uint32_t> transitionTime;
     Optional<chip::CharSpan> sceneName;
-    Optional<DataModel::List<const Structs::ExtensionFieldSet::Type>> extensionFieldSets;
+    Optional<DataModel::List<const Structs::ExtensionFieldSetStruct::Type>> extensionFieldSetStructs;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -18530,7 +18670,7 @@ public:
     uint8_t sceneID       = static_cast<uint8_t>(0);
     Optional<uint32_t> transitionTime;
     Optional<chip::CharSpan> sceneName;
-    Optional<DataModel::DecodableList<Structs::ExtensionFieldSet::DecodableType>> extensionFieldSets;
+    Optional<DataModel::DecodableList<Structs::ExtensionFieldSetStruct::DecodableType>> extensionFieldSetStructs;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ViewSceneResponse
@@ -18944,18 +19084,6 @@ public:
 
 namespace Attributes {
 
-namespace LastConfiguredBy {
-struct TypeInfo
-{
-    using Type             = chip::app::DataModel::Nullable<chip::NodeId>;
-    using DecodableType    = chip::app::DataModel::Nullable<chip::NodeId>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<chip::NodeId> &;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ScenesManagement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::LastConfiguredBy::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace LastConfiguredBy
 namespace SceneTableSize {
 struct TypeInfo
 {
@@ -19021,7 +19149,6 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::LastConfiguredBy::TypeInfo::DecodableType lastConfiguredBy;
         Attributes::SceneTableSize::TypeInfo::DecodableType sceneTableSize = static_cast<uint16_t>(0);
         Attributes::FabricSceneInfo::TypeInfo::DecodableType fabricSceneInfo;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
@@ -41599,9 +41726,8 @@ enum class Fields : uint8_t
 {
     kSensorWidth  = 0,
     kSensorHeight = 1,
-    kHDRCapable   = 2,
-    kMaxFPS       = 3,
-    kMaxHDRFPS    = 4,
+    kMaxFPS       = 2,
+    kMaxHDRFPS    = 3,
 };
 
 struct Type
@@ -41609,9 +41735,8 @@ struct Type
 public:
     uint16_t sensorWidth  = static_cast<uint16_t>(0);
     uint16_t sensorHeight = static_cast<uint16_t>(0);
-    bool HDRCapable       = static_cast<bool>(0);
     uint16_t maxFPS       = static_cast<uint16_t>(0);
-    uint16_t maxHDRFPS    = static_cast<uint16_t>(0);
+    Optional<uint16_t> maxHDRFPS;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -41673,6 +41798,11 @@ namespace SnapshotStreamAllocateResponse {
 struct Type;
 struct DecodableType;
 } // namespace SnapshotStreamAllocateResponse
+
+namespace SnapshotStreamModify {
+struct Type;
+struct DecodableType;
+} // namespace SnapshotStreamModify
 
 namespace SnapshotStreamDeallocate {
 struct Type;
@@ -41978,12 +42108,14 @@ public:
 namespace SnapshotStreamAllocate {
 enum class Fields : uint8_t
 {
-    kImageCodec    = 0,
-    kMaxFrameRate  = 1,
-    kBitRate       = 2,
-    kMinResolution = 3,
-    kMaxResolution = 4,
-    kQuality       = 5,
+    kImageCodec       = 0,
+    kMaxFrameRate     = 1,
+    kBitRate          = 2,
+    kMinResolution    = 3,
+    kMaxResolution    = 4,
+    kQuality          = 5,
+    kWatermarkEnabled = 6,
+    kOSDEnabled       = 7,
 };
 
 struct Type
@@ -41999,6 +42131,8 @@ public:
     Structs::VideoResolutionStruct::Type minResolution;
     Structs::VideoResolutionStruct::Type maxResolution;
     uint8_t quality = static_cast<uint8_t>(0);
+    Optional<bool> watermarkEnabled;
+    Optional<bool> OSDEnabled;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -42019,6 +42153,8 @@ public:
     Structs::VideoResolutionStruct::DecodableType minResolution;
     Structs::VideoResolutionStruct::DecodableType maxResolution;
     uint8_t quality = static_cast<uint8_t>(0);
+    Optional<bool> watermarkEnabled;
+    Optional<bool> OSDEnabled;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SnapshotStreamAllocate
@@ -42054,6 +42190,44 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SnapshotStreamAllocateResponse
+namespace SnapshotStreamModify {
+enum class Fields : uint8_t
+{
+    kSnapshotStreamID = 0,
+    kWatermarkEnabled = 1,
+    kOSDEnabled       = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::SnapshotStreamModify::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
+
+    uint16_t snapshotStreamID = static_cast<uint16_t>(0);
+    Optional<bool> watermarkEnabled;
+    Optional<bool> OSDEnabled;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::SnapshotStreamModify::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
+
+    uint16_t snapshotStreamID = static_cast<uint16_t>(0);
+    Optional<bool> watermarkEnabled;
+    Optional<bool> OSDEnabled;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SnapshotStreamModify
 namespace SnapshotStreamDeallocate {
 enum class Fields : uint8_t
 {
@@ -42369,18 +42543,19 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace HDRModeEnabled
-namespace FabricsUsingCamera {
+namespace SupportedStreamUsages {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::FabricIndex>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::FabricIndex>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::FabricIndex> &;
+    using Type          = chip::app::DataModel::List<const chip::app::Clusters::CameraAvStreamManagement::StreamUsageEnum>;
+    using DecodableType = chip::app::DataModel::DecodableList<chip::app::Clusters::CameraAvStreamManagement::StreamUsageEnum>;
+    using DecodableArgType =
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::CameraAvStreamManagement::StreamUsageEnum> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FabricsUsingCamera::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SupportedStreamUsages::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace FabricsUsingCamera
+} // namespace SupportedStreamUsages
 namespace AllocatedVideoStreams {
 struct TypeInfo
 {
@@ -42755,7 +42930,7 @@ struct TypeInfo
         Attributes::MaxNetworkBandwidth::TypeInfo::DecodableType maxNetworkBandwidth = static_cast<uint32_t>(0);
         Attributes::CurrentFrameRate::TypeInfo::DecodableType currentFrameRate       = static_cast<uint16_t>(0);
         Attributes::HDRModeEnabled::TypeInfo::DecodableType HDRModeEnabled           = static_cast<bool>(0);
-        Attributes::FabricsUsingCamera::TypeInfo::DecodableType fabricsUsingCamera;
+        Attributes::SupportedStreamUsages::TypeInfo::DecodableType supportedStreamUsages;
         Attributes::AllocatedVideoStreams::TypeInfo::DecodableType allocatedVideoStreams;
         Attributes::AllocatedAudioStreams::TypeInfo::DecodableType allocatedAudioStreams;
         Attributes::AllocatedSnapshotStreams::TypeInfo::DecodableType allocatedSnapshotStreams;
@@ -42794,173 +42969,6 @@ struct TypeInfo
     };
 };
 } // namespace Attributes
-namespace Events {
-namespace VideoStreamChanged {
-static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
-
-enum class Fields : uint8_t
-{
-    kVideoStreamID  = 0,
-    kStreamUsage    = 1,
-    kVideoCodec     = 2,
-    kMinFrameRate   = 3,
-    kMaxFrameRate   = 4,
-    kMinResolution  = 5,
-    kMaxResolution  = 6,
-    kMinBitRate     = 7,
-    kMaxBitRate     = 8,
-    kMinFragmentLen = 9,
-    kMaxFragmentLen = 10,
-};
-
-struct Type
-{
-public:
-    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return Events::VideoStreamChanged::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
-
-    uint16_t videoStreamID = static_cast<uint16_t>(0);
-    Optional<StreamUsageEnum> streamUsage;
-    Optional<VideoCodecEnum> videoCodec;
-    Optional<uint16_t> minFrameRate;
-    Optional<uint16_t> maxFrameRate;
-    Optional<Structs::VideoResolutionStruct::Type> minResolution;
-    Optional<Structs::VideoResolutionStruct::Type> maxResolution;
-    Optional<uint32_t> minBitRate;
-    Optional<uint32_t> maxBitRate;
-    Optional<uint16_t> minFragmentLen;
-    Optional<uint16_t> maxFragmentLen;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-struct DecodableType
-{
-public:
-    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return Events::VideoStreamChanged::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
-
-    uint16_t videoStreamID = static_cast<uint16_t>(0);
-    Optional<StreamUsageEnum> streamUsage;
-    Optional<VideoCodecEnum> videoCodec;
-    Optional<uint16_t> minFrameRate;
-    Optional<uint16_t> maxFrameRate;
-    Optional<Structs::VideoResolutionStruct::DecodableType> minResolution;
-    Optional<Structs::VideoResolutionStruct::DecodableType> maxResolution;
-    Optional<uint32_t> minBitRate;
-    Optional<uint32_t> maxBitRate;
-    Optional<uint16_t> minFragmentLen;
-    Optional<uint16_t> maxFragmentLen;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-} // namespace VideoStreamChanged
-namespace AudioStreamChanged {
-static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
-
-enum class Fields : uint8_t
-{
-    kAudioStreamID = 0,
-    kStreamUsage   = 1,
-    kAudioCodec    = 2,
-    kChannelCount  = 3,
-    kSampleRate    = 4,
-    kBitRate       = 5,
-    kBitDepth      = 6,
-};
-
-struct Type
-{
-public:
-    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return Events::AudioStreamChanged::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
-
-    uint16_t audioStreamID = static_cast<uint16_t>(0);
-    Optional<StreamUsageEnum> streamUsage;
-    Optional<AudioCodecEnum> audioCodec;
-    Optional<uint8_t> channelCount;
-    Optional<uint32_t> sampleRate;
-    Optional<uint32_t> bitRate;
-    Optional<uint8_t> bitDepth;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-struct DecodableType
-{
-public:
-    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return Events::AudioStreamChanged::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
-
-    uint16_t audioStreamID = static_cast<uint16_t>(0);
-    Optional<StreamUsageEnum> streamUsage;
-    Optional<AudioCodecEnum> audioCodec;
-    Optional<uint8_t> channelCount;
-    Optional<uint32_t> sampleRate;
-    Optional<uint32_t> bitRate;
-    Optional<uint8_t> bitDepth;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-} // namespace AudioStreamChanged
-namespace SnapshotStreamChanged {
-static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
-
-enum class Fields : uint8_t
-{
-    kSnapshotStreamID = 0,
-    kImageCodec       = 1,
-    kFrameRate        = 2,
-    kBitRate          = 3,
-    kMinResolution    = 4,
-    kMaxResolution    = 5,
-    kQuality          = 6,
-};
-
-struct Type
-{
-public:
-    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return Events::SnapshotStreamChanged::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
-
-    uint16_t snapshotStreamID = static_cast<uint16_t>(0);
-    Optional<ImageCodecEnum> imageCodec;
-    Optional<uint16_t> frameRate;
-    Optional<uint32_t> bitRate;
-    Optional<Structs::VideoResolutionStruct::Type> minResolution;
-    Optional<Structs::VideoResolutionStruct::Type> maxResolution;
-    Optional<uint8_t> quality;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-struct DecodableType
-{
-public:
-    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return Events::SnapshotStreamChanged::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
-
-    uint16_t snapshotStreamID = static_cast<uint16_t>(0);
-    Optional<ImageCodecEnum> imageCodec;
-    Optional<uint16_t> frameRate;
-    Optional<uint32_t> bitRate;
-    Optional<Structs::VideoResolutionStruct::DecodableType> minResolution;
-    Optional<Structs::VideoResolutionStruct::DecodableType> maxResolution;
-    Optional<uint8_t> quality;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-} // namespace SnapshotStreamChanged
-} // namespace Events
 } // namespace CameraAvStreamManagement
 namespace CameraAvSettingsUserLevelManagement {
 namespace Structs {
@@ -43515,10 +43523,10 @@ struct Type;
 struct DecodableType;
 } // namespace ProvideAnswer
 
-namespace ProvideICECandidate {
+namespace ProvideICECandidates {
 struct Type;
 struct DecodableType;
-} // namespace ProvideICECandidate
+} // namespace ProvideICECandidates
 
 namespace EndSession {
 struct Type;
@@ -43531,12 +43539,13 @@ namespace Commands {
 namespace SolicitOffer {
 enum class Fields : uint8_t
 {
-    kStreamUsage        = 0,
-    kVideoStreamID      = 1,
-    kAudioStreamID      = 2,
-    kICEServers         = 3,
-    kICETransportPolicy = 4,
-    kMetadataOptions    = 5,
+    kStreamUsage           = 0,
+    kOriginatingEndpointID = 1,
+    kVideoStreamID         = 2,
+    kAudioStreamID         = 3,
+    kICEServers            = 4,
+    kICETransportPolicy    = 5,
+    kMetadataOptions       = 6,
 };
 
 struct Type
@@ -43546,12 +43555,13 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SolicitOffer::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportProvider::Id; }
 
-    StreamUsageEnum streamUsage = static_cast<StreamUsageEnum>(0);
+    StreamUsageEnum streamUsage            = static_cast<StreamUsageEnum>(0);
+    chip::EndpointId originatingEndpointID = static_cast<chip::EndpointId>(0);
     Optional<DataModel::Nullable<uint16_t>> videoStreamID;
     Optional<DataModel::Nullable<uint16_t>> audioStreamID;
     Optional<DataModel::List<const Structs::ICEServerStruct::Type>> ICEServers;
     Optional<chip::CharSpan> ICETransportPolicy;
-    Optional<chip::BitMask<WebRTCMetadataOptions>> metadataOptions;
+    Optional<chip::BitMask<WebRTCMetadataOptionsBitmap>> metadataOptions;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -43566,12 +43576,13 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SolicitOffer::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportProvider::Id; }
 
-    StreamUsageEnum streamUsage = static_cast<StreamUsageEnum>(0);
+    StreamUsageEnum streamUsage            = static_cast<StreamUsageEnum>(0);
+    chip::EndpointId originatingEndpointID = static_cast<chip::EndpointId>(0);
     Optional<DataModel::Nullable<uint16_t>> videoStreamID;
     Optional<DataModel::Nullable<uint16_t>> audioStreamID;
     Optional<DataModel::DecodableList<Structs::ICEServerStruct::DecodableType>> ICEServers;
     Optional<chip::CharSpan> ICETransportPolicy;
-    Optional<chip::BitMask<WebRTCMetadataOptions>> metadataOptions;
+    Optional<chip::BitMask<WebRTCMetadataOptionsBitmap>> metadataOptions;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SolicitOffer
@@ -43619,14 +43630,15 @@ public:
 namespace ProvideOffer {
 enum class Fields : uint8_t
 {
-    kWebRTCSessionID    = 0,
-    kSdp                = 1,
-    kStreamUsage        = 2,
-    kVideoStreamID      = 3,
-    kAudioStreamID      = 4,
-    kICEServers         = 5,
-    kICETransportPolicy = 6,
-    kMetadataOptions    = 7,
+    kWebRTCSessionID       = 0,
+    kSdp                   = 1,
+    kStreamUsage           = 2,
+    kOriginatingEndpointID = 3,
+    kVideoStreamID         = 4,
+    kAudioStreamID         = 5,
+    kICEServers            = 6,
+    kICETransportPolicy    = 7,
+    kMetadataOptions       = 8,
 };
 
 struct Type
@@ -43638,12 +43650,13 @@ public:
 
     DataModel::Nullable<uint16_t> webRTCSessionID;
     chip::CharSpan sdp;
-    StreamUsageEnum streamUsage = static_cast<StreamUsageEnum>(0);
+    StreamUsageEnum streamUsage            = static_cast<StreamUsageEnum>(0);
+    chip::EndpointId originatingEndpointID = static_cast<chip::EndpointId>(0);
     Optional<DataModel::Nullable<uint16_t>> videoStreamID;
     Optional<DataModel::Nullable<uint16_t>> audioStreamID;
     Optional<DataModel::List<const Structs::ICEServerStruct::Type>> ICEServers;
     Optional<chip::CharSpan> ICETransportPolicy;
-    Optional<chip::BitMask<WebRTCMetadataOptions>> metadataOptions;
+    Optional<chip::BitMask<WebRTCMetadataOptionsBitmap>> metadataOptions;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -43660,12 +43673,13 @@ public:
 
     DataModel::Nullable<uint16_t> webRTCSessionID;
     chip::CharSpan sdp;
-    StreamUsageEnum streamUsage = static_cast<StreamUsageEnum>(0);
+    StreamUsageEnum streamUsage            = static_cast<StreamUsageEnum>(0);
+    chip::EndpointId originatingEndpointID = static_cast<chip::EndpointId>(0);
     Optional<DataModel::Nullable<uint16_t>> videoStreamID;
     Optional<DataModel::Nullable<uint16_t>> audioStreamID;
     Optional<DataModel::DecodableList<Structs::ICEServerStruct::DecodableType>> ICEServers;
     Optional<chip::CharSpan> ICETransportPolicy;
-    Optional<chip::BitMask<WebRTCMetadataOptions>> metadataOptions;
+    Optional<chip::BitMask<WebRTCMetadataOptionsBitmap>> metadataOptions;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ProvideOffer
@@ -43685,8 +43699,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportProvider::Id; }
 
     uint16_t webRTCSessionID = static_cast<uint16_t>(0);
-    uint16_t videoStreamID   = static_cast<uint16_t>(0);
-    uint16_t audioStreamID   = static_cast<uint16_t>(0);
+    Optional<DataModel::Nullable<uint16_t>> videoStreamID;
+    Optional<DataModel::Nullable<uint16_t>> audioStreamID;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -43702,8 +43716,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportProvider::Id; }
 
     uint16_t webRTCSessionID = static_cast<uint16_t>(0);
-    uint16_t videoStreamID   = static_cast<uint16_t>(0);
-    uint16_t audioStreamID   = static_cast<uint16_t>(0);
+    Optional<DataModel::Nullable<uint16_t>> videoStreamID;
+    Optional<DataModel::Nullable<uint16_t>> audioStreamID;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ProvideOfferResponse
@@ -43742,22 +43756,22 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ProvideAnswer
-namespace ProvideICECandidate {
+namespace ProvideICECandidates {
 enum class Fields : uint8_t
 {
     kWebRTCSessionID = 0,
-    kICECandidate    = 1,
+    kICECandidates   = 1,
 };
 
 struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::ProvideICECandidate::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ProvideICECandidates::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportProvider::Id; }
 
     uint16_t webRTCSessionID = static_cast<uint16_t>(0);
-    chip::CharSpan ICECandidate;
+    DataModel::List<const chip::CharSpan> ICECandidates;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -43769,14 +43783,14 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::ProvideICECandidate::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ProvideICECandidates::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportProvider::Id; }
 
     uint16_t webRTCSessionID = static_cast<uint16_t>(0);
-    chip::CharSpan ICECandidate;
+    DataModel::DecodableList<chip::CharSpan> ICECandidates;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace ProvideICECandidate
+}; // namespace ProvideICECandidates
 namespace EndSession {
 enum class Fields : uint8_t
 {
@@ -43898,10 +43912,10 @@ struct Type;
 struct DecodableType;
 } // namespace Answer
 
-namespace ICECandidate {
+namespace ICECandidates {
 struct Type;
 struct DecodableType;
-} // namespace ICECandidate
+} // namespace ICECandidates
 
 namespace End {
 struct Type;
@@ -43987,22 +44001,22 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace Answer
-namespace ICECandidate {
+namespace ICECandidates {
 enum class Fields : uint8_t
 {
     kWebRTCSessionID = 0,
-    kICECandidate    = 1,
+    kICECandidates   = 1,
 };
 
 struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::ICECandidate::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ICECandidates::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportRequestor::Id; }
 
     uint16_t webRTCSessionID = static_cast<uint16_t>(0);
-    chip::CharSpan ICECandidate;
+    DataModel::List<const chip::CharSpan> ICECandidates;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -44014,14 +44028,14 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::ICECandidate::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ICECandidates::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportRequestor::Id; }
 
     uint16_t webRTCSessionID = static_cast<uint16_t>(0);
-    chip::CharSpan ICECandidate;
+    DataModel::DecodableList<chip::CharSpan> ICECandidates;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace ICECandidate
+}; // namespace ICECandidates
 namespace End {
 enum class Fields : uint8_t
 {
@@ -44955,7 +44969,7 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace InstalledChimeSounds
-namespace ActiveChimeID {
+namespace SelectedChime {
 struct TypeInfo
 {
     using Type             = uint8_t;
@@ -44963,10 +44977,10 @@ struct TypeInfo
     using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Chime::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ActiveChimeID::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SelectedChime::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace ActiveChimeID
+} // namespace SelectedChime
 namespace Enabled {
 struct TypeInfo
 {
@@ -45019,7 +45033,7 @@ struct TypeInfo
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
         Attributes::InstalledChimeSounds::TypeInfo::DecodableType installedChimeSounds;
-        Attributes::ActiveChimeID::TypeInfo::DecodableType activeChimeID = static_cast<uint8_t>(0);
+        Attributes::SelectedChime::TypeInfo::DecodableType selectedChime = static_cast<uint8_t>(0);
         Attributes::Enabled::TypeInfo::DecodableType enabled             = static_cast<bool>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
@@ -45479,7 +45493,7 @@ struct Type
 {
 public:
     uint16_t caid = static_cast<uint16_t>(0);
-    chip::ByteSpan certificate;
+    Optional<chip::ByteSpan> certificate;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -45503,8 +45517,8 @@ struct Type
 {
 public:
     uint16_t ccdid = static_cast<uint16_t>(0);
-    chip::ByteSpan clientCertificate;
-    DataModel::List<const chip::ByteSpan> intermediateCertificates;
+    Optional<chip::ByteSpan> clientCertificate;
+    Optional<DataModel::List<const chip::ByteSpan>> intermediateCertificates;
 
     static constexpr bool kIsFabricScoped = false;
 
@@ -45515,8 +45529,8 @@ struct DecodableType
 {
 public:
     uint16_t ccdid = static_cast<uint16_t>(0);
-    chip::ByteSpan clientCertificate;
-    DataModel::DecodableList<chip::ByteSpan> intermediateCertificates;
+    Optional<chip::ByteSpan> clientCertificate;
+    Optional<DataModel::DecodableList<chip::ByteSpan>> intermediateCertificates;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -45578,11 +45592,6 @@ namespace ProvisionClientCertificate {
 struct Type;
 struct DecodableType;
 } // namespace ProvisionClientCertificate
-
-namespace ProvisionClientCertificateResponse {
-struct Type;
-struct DecodableType;
-} // namespace ProvisionClientCertificateResponse
 
 namespace FindClientCertificate {
 struct Type;
@@ -45928,7 +45937,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
-    using ResponseType = Clusters::TlsCertificateManagement::Commands::ProvisionClientCertificateResponse::DecodableType;
+    using ResponseType = DataModel::NullObjectType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -45944,38 +45953,6 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ProvisionClientCertificate
-namespace ProvisionClientCertificateResponse {
-enum class Fields : uint8_t
-{
-    kCcdid = 0,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::ProvisionClientCertificateResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::TlsCertificateManagement::Id; }
-
-    uint16_t ccdid = static_cast<uint16_t>(0);
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::ProvisionClientCertificateResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::TlsCertificateManagement::Id; }
-
-    uint16_t ccdid = static_cast<uint16_t>(0);
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace ProvisionClientCertificateResponse
 namespace FindClientCertificate {
 enum class Fields : uint8_t
 {
@@ -45989,7 +45966,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::FindClientCertificate::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TlsCertificateManagement::Id; }
 
-    uint16_t ccdid = static_cast<uint16_t>(0);
+    DataModel::Nullable<uint16_t> ccdid;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -46004,7 +45981,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::FindClientCertificate::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TlsCertificateManagement::Id; }
 
-    uint16_t ccdid = static_cast<uint16_t>(0);
+    DataModel::Nullable<uint16_t> ccdid;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace FindClientCertificate
@@ -46152,18 +46129,20 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxRootCertificates
-namespace CurrentRootCertificates {
+namespace ProvisionedRootCertificates {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::TlsCertificateManagement::Structs::TLSCertStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::TlsCertificateManagement::Structs::TLSCertStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::TlsCertificateManagement::Structs::TLSCertStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TlsCertificateManagement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentRootCertificates::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ProvisionedRootCertificates::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace CurrentRootCertificates
+} // namespace ProvisionedRootCertificates
 namespace MaxClientCertificates {
 struct TypeInfo
 {
@@ -46176,18 +46155,21 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxClientCertificates
-namespace CurrentClientCertificates {
+namespace ProvisionedClientCertificates {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type = chip::app::DataModel::List<
+        const chip::app::Clusters::TlsCertificateManagement::Structs::TLSClientCertificateDetailStruct::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<
+        chip::app::Clusters::TlsCertificateManagement::Structs::TLSClientCertificateDetailStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::TlsCertificateManagement::Structs::TLSClientCertificateDetailStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TlsCertificateManagement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentClientCertificates::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ProvisionedClientCertificates::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace CurrentClientCertificates
+} // namespace ProvisionedClientCertificates
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -46227,10 +46209,10 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::MaxRootCertificates::TypeInfo::DecodableType maxRootCertificates             = static_cast<uint8_t>(0);
-        Attributes::CurrentRootCertificates::TypeInfo::DecodableType currentRootCertificates     = static_cast<uint8_t>(0);
-        Attributes::MaxClientCertificates::TypeInfo::DecodableType maxClientCertificates         = static_cast<uint8_t>(0);
-        Attributes::CurrentClientCertificates::TypeInfo::DecodableType currentClientCertificates = static_cast<uint8_t>(0);
+        Attributes::MaxRootCertificates::TypeInfo::DecodableType maxRootCertificates = static_cast<uint8_t>(0);
+        Attributes::ProvisionedRootCertificates::TypeInfo::DecodableType provisionedRootCertificates;
+        Attributes::MaxClientCertificates::TypeInfo::DecodableType maxClientCertificates = static_cast<uint8_t>(0);
+        Attributes::ProvisionedClientCertificates::TypeInfo::DecodableType provisionedClientCertificates;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
@@ -46240,6 +46222,324 @@ struct TypeInfo
 };
 } // namespace Attributes
 } // namespace TlsCertificateManagement
+namespace TlsClientManagement {
+namespace Structs {
+namespace TLSEndpointStruct {
+enum class Fields : uint8_t
+{
+    kEndpointID = 0,
+    kHostname   = 1,
+    kPort       = 2,
+    kCaid       = 3,
+    kCcdid      = 4,
+    kStatus     = 5,
+};
+
+struct Type
+{
+public:
+    uint16_t endpointID = static_cast<uint16_t>(0);
+    chip::ByteSpan hostname;
+    uint16_t port = static_cast<uint16_t>(0);
+    uint16_t caid = static_cast<uint16_t>(0);
+    DataModel::Nullable<uint16_t> ccdid;
+    TLSEndpointStatusEnum status = static_cast<TLSEndpointStatusEnum>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace TLSEndpointStruct
+} // namespace Structs
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace ProvisionEndpoint {
+struct Type;
+struct DecodableType;
+} // namespace ProvisionEndpoint
+
+namespace ProvisionEndpointResponse {
+struct Type;
+struct DecodableType;
+} // namespace ProvisionEndpointResponse
+
+namespace FindEndpoint {
+struct Type;
+struct DecodableType;
+} // namespace FindEndpoint
+
+namespace FindEndpointResponse {
+struct Type;
+struct DecodableType;
+} // namespace FindEndpointResponse
+
+namespace RemoveEndpoint {
+struct Type;
+struct DecodableType;
+} // namespace RemoveEndpoint
+
+} // namespace Commands
+
+namespace Commands {
+namespace ProvisionEndpoint {
+enum class Fields : uint8_t
+{
+    kHostname   = 0,
+    kPort       = 1,
+    kCaid       = 2,
+    kCcdid      = 3,
+    kEndpointID = 4,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ProvisionEndpoint::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TlsClientManagement::Id; }
+
+    chip::ByteSpan hostname;
+    uint16_t port = static_cast<uint16_t>(0);
+    uint16_t caid = static_cast<uint16_t>(0);
+    DataModel::Nullable<uint16_t> ccdid;
+    DataModel::Nullable<uint16_t> endpointID;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = Clusters::TlsClientManagement::Commands::ProvisionEndpointResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ProvisionEndpoint::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TlsClientManagement::Id; }
+
+    chip::ByteSpan hostname;
+    uint16_t port = static_cast<uint16_t>(0);
+    uint16_t caid = static_cast<uint16_t>(0);
+    DataModel::Nullable<uint16_t> ccdid;
+    DataModel::Nullable<uint16_t> endpointID;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ProvisionEndpoint
+namespace ProvisionEndpointResponse {
+enum class Fields : uint8_t
+{
+    kEndpointID = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ProvisionEndpointResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TlsClientManagement::Id; }
+
+    uint16_t endpointID = static_cast<uint16_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ProvisionEndpointResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TlsClientManagement::Id; }
+
+    uint16_t endpointID = static_cast<uint16_t>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ProvisionEndpointResponse
+namespace FindEndpoint {
+enum class Fields : uint8_t
+{
+    kEndpointID = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::FindEndpoint::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TlsClientManagement::Id; }
+
+    DataModel::Nullable<uint16_t> endpointID;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = Clusters::TlsClientManagement::Commands::FindEndpointResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::FindEndpoint::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TlsClientManagement::Id; }
+
+    DataModel::Nullable<uint16_t> endpointID;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace FindEndpoint
+namespace FindEndpointResponse {
+enum class Fields : uint8_t
+{
+    kEndpoints = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::FindEndpointResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TlsClientManagement::Id; }
+
+    DataModel::List<const Structs::TLSEndpointStruct::Type> endpoints;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::FindEndpointResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TlsClientManagement::Id; }
+
+    DataModel::DecodableList<Structs::TLSEndpointStruct::DecodableType> endpoints;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace FindEndpointResponse
+namespace RemoveEndpoint {
+enum class Fields : uint8_t
+{
+    kEndpointID = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::RemoveEndpoint::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TlsClientManagement::Id; }
+
+    uint16_t endpointID = static_cast<uint16_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::RemoveEndpoint::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TlsClientManagement::Id; }
+
+    uint16_t endpointID = static_cast<uint16_t>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace RemoveEndpoint
+} // namespace Commands
+
+namespace Attributes {
+
+namespace MaxProvisioned {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TlsClientManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxProvisioned::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MaxProvisioned
+namespace ProvisionedEndpoints {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::TlsClientManagement::Structs::TLSEndpointStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::TlsClientManagement::Structs::TLSEndpointStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::TlsClientManagement::Structs::TLSEndpointStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TlsClientManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ProvisionedEndpoints::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ProvisionedEndpoints
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::TlsClientManagement::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::TlsClientManagement::Id; }
+};
+} // namespace AcceptedCommandList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::TlsClientManagement::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::TlsClientManagement::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::TlsClientManagement::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::TlsClientManagement::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::MaxProvisioned::TypeInfo::DecodableType maxProvisioned = static_cast<uint8_t>(0);
+        Attributes::ProvisionedEndpoints::TypeInfo::DecodableType provisionedEndpoints;
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace TlsClientManagement
 namespace UnitTesting {
 namespace Structs {
 namespace SimpleStruct {

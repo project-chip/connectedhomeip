@@ -30,6 +30,7 @@
 #include <app/data-model-provider/MetadataList.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/Provider.h>
+#include <app/server-cluster/ServerClusterContext.h>
 #include <app/util/DataModelHandler.h>
 #include <app/util/IMClusterCommandHandler.h>
 #include <app/util/af-types.h>
@@ -42,6 +43,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/ScopedBuffer.h>
 #include <lib/support/SpanSearchValue.h>
 
 #include <cstdint>
@@ -127,6 +129,13 @@ DefaultAttributePersistenceProvider gDefaultAttributePersistence;
 
 } // namespace
 
+CHIP_ERROR CodegenDataModelProvider::Shutdown()
+{
+    Reset();
+    mRegistry.ClearContext();
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR CodegenDataModelProvider::Startup(DataModel::InteractionModelContext context)
 {
     ReturnErrorOnFailure(DataModel::Provider::Startup(context));
@@ -155,13 +164,22 @@ CHIP_ERROR CodegenDataModelProvider::Startup(DataModel::InteractionModelContext 
 
     InitDataModelForTesting();
 
-    return CHIP_NO_ERROR;
+    return mRegistry.SetContext(ServerClusterContext{
+        .provider           = this,
+        .storage            = mPersistentStorageDelegate,
+        .interactionContext = &mContext,
+    });
 }
 
-std::optional<DataModel::ActionReturnStatus> CodegenDataModelProvider::Invoke(const DataModel::InvokeRequest & request,
-                                                                              TLV::TLVReader & input_arguments,
-                                                                              CommandHandler * handler)
+std::optional<DataModel::ActionReturnStatus> CodegenDataModelProvider::InvokeCommand(const DataModel::InvokeRequest & request,
+                                                                                     TLV::TLVReader & input_arguments,
+                                                                                     CommandHandler * handler)
 {
+    if (auto * cluster = mRegistry.Get(request.path); cluster != nullptr)
+    {
+        return cluster->InvokeCommand(request, input_arguments, handler);
+    }
+
     CommandHandlerInterface * handler_interface =
         CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(request.path.mEndpointId, request.path.mClusterId);
 
@@ -244,6 +262,43 @@ CHIP_ERROR CodegenDataModelProvider::ServerClusters(EndpointId endpointId,
     VerifyOrReturnValue(endpoint->clusterCount > 0, CHIP_NO_ERROR);
     VerifyOrReturnValue(endpoint->cluster != nullptr, CHIP_NO_ERROR);
 
+    // We build the cluster list by merging two lists:
+    //   - mRegistry items from ServerClusterInterfaces
+    //   - ember metadata clusters
+    //
+    // This is done because `ServerClusterInterface` allows full control for all its metadata,
+    // in particular `data version` and `flags`.
+    //
+    // To allow cluster implementations to be incrementally converted to storing their own data versions,
+    // instead of relying on the out-of-band emberAfDataVersionStorage, first check for clusters that are
+    // using the new data version storage and are registered via ServerClusterInterfaceRegistry, then fill
+    // in the data versions for the rest via the out-of-band mechanism.
+
+    // assume the clusters on endpoint does not change in between these two loops
+    auto clusters               = mRegistry.ClustersOnEndpoint(endpointId);
+    size_t registryClusterCount = 0;
+    for ([[maybe_unused]] auto _ : clusters)
+    {
+        registryClusterCount++;
+    }
+
+    ReturnErrorOnFailure(builder.EnsureAppendCapacity(registryClusterCount));
+
+    DataModel::ListBuilder<ClusterId> knownClustersBuilder;
+    ReturnErrorOnFailure(knownClustersBuilder.EnsureAppendCapacity(registryClusterCount));
+    for (auto * cluster : mRegistry.ClustersOnEndpoint(endpointId))
+    {
+        const ConcreteClusterPath path = cluster->GetPath();
+        ReturnErrorOnFailure(builder.Append({
+            .clusterId   = path.mClusterId,
+            .dataVersion = cluster->GetDataVersion(),
+            .flags       = cluster->GetClusterFlags(),
+        }));
+        ReturnErrorOnFailure(knownClustersBuilder.Append(path.mClusterId));
+    }
+
+    DataModel::ReadOnlyBuffer<ClusterId> knownClusters = knownClustersBuilder.TakeBuffer();
+
     ReturnErrorOnFailure(builder.EnsureAppendCapacity(emberAfClusterCountForEndpointType(endpoint, /* server = */ true)));
 
     const EmberAfCluster * begin = endpoint->cluster;
@@ -254,6 +309,25 @@ CHIP_ERROR CodegenDataModelProvider::ServerClusters(EndpointId endpointId,
         {
             continue;
         }
+
+        // linear search as this is a somewhat compact number list, so performance is probably not too bad
+        // This results in smaller code than some memory allocation + std::sort + std::binary_search
+        bool found = false;
+        for (ClusterId clusterId : knownClusters)
+        {
+            if (clusterId == cluster->clusterId)
+            {
+                found = true;
+                break;
+            }
+        }
+        if (found)
+        {
+            // value already filled from the ServerClusterRegistry. That one has the correct/overriden
+            // flags and data version
+            continue;
+        }
+
         ReturnErrorOnFailure(builder.Append(ServerClusterEntryFrom(endpointId, *cluster)));
     }
 
@@ -263,6 +337,11 @@ CHIP_ERROR CodegenDataModelProvider::ServerClusters(EndpointId endpointId,
 CHIP_ERROR CodegenDataModelProvider::Attributes(const ConcreteClusterPath & path,
                                                 DataModel::ListBuilder<DataModel::AttributeEntry> & builder)
 {
+    if (auto * cluster = mRegistry.Get(path); cluster != nullptr)
+    {
+        return cluster->Attributes(path, builder);
+    }
+
     const EmberAfCluster * cluster = FindServerCluster(path);
 
     VerifyOrReturnValue(cluster != nullptr, CHIP_ERROR_NOT_FOUND);
@@ -274,7 +353,7 @@ CHIP_ERROR CodegenDataModelProvider::Attributes(const ConcreteClusterPath & path
     //
     // We have Attributes from ember + global attributes that are NOT in ember metadata.
     // We have to report them all
-    constexpr size_t kGlobalAttributeNotInMetadataCount = ArraySize(GlobalAttributesNotInMetadata);
+    constexpr size_t kGlobalAttributeNotInMetadataCount = MATTER_ARRAY_SIZE(GlobalAttributesNotInMetadata);
 
     ReturnErrorOnFailure(builder.EnsureAppendCapacity(cluster->attributeCount + kGlobalAttributeNotInMetadataCount));
 
@@ -351,6 +430,11 @@ const EmberAfCluster * CodegenDataModelProvider::FindServerCluster(const Concret
 CHIP_ERROR CodegenDataModelProvider::AcceptedCommands(const ConcreteClusterPath & path,
                                                       DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
+    if (auto * cluster = mRegistry.Get(path); cluster != nullptr)
+    {
+        return cluster->AcceptedCommands(path, builder);
+    }
+
     // Some CommandHandlerInterface instances are registered of ALL endpoints, so make sure first that
     // the cluster actually exists on this endpoint before asking the CommandHandlerInterface what commands
     // it claims to support.
@@ -435,6 +519,11 @@ CHIP_ERROR CodegenDataModelProvider::AcceptedCommands(const ConcreteClusterPath 
 CHIP_ERROR CodegenDataModelProvider::GeneratedCommands(const ConcreteClusterPath & path,
                                                        DataModel::ListBuilder<CommandId> & builder)
 {
+    if (auto * cluster = mRegistry.Get(path); cluster != nullptr)
+    {
+        return cluster->GeneratedCommands(path, builder);
+    }
+
     // Some CommandHandlerInterface instances are registered of ALL endpoints, so make sure first that
     // the cluster actually exists on this endpoint before asking the CommandHandlerInterface what commands
     // it claims to support.

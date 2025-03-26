@@ -194,7 +194,7 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::ScenesManagement::Structs::AttributeValuePairStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::DecodableType & value);
+                           const chip::app::Clusters::ScenesManagement::Structs::ExtensionFieldSetStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::ScenesManagement::Structs::SceneInfoStruct::DecodableType & value);
@@ -518,6 +518,9 @@ LogValue(const char * label, size_t indent,
          const chip::app::Clusters::TlsCertificateManagement::Structs::TLSClientCertificateDetailStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::TlsClientManagement::Structs::TLSEndpointStruct::DecodableType & value);
+
+static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::UnitTesting::Structs::SimpleStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
@@ -783,13 +786,6 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::ZoneManagement::Events::ZoneStopped::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::CameraAvStreamManagement::Events::VideoStreamChanged::DecodableType & value);
-static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::CameraAvStreamManagement::Events::AudioStreamChanged::DecodableType & value);
-static CHIP_ERROR
-LogValue(const char * label, size_t indent,
-         const chip::app::Clusters::CameraAvStreamManagement::Events::SnapshotStreamChanged::DecodableType & value);
-static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::PushAvStreamTransport::Events::PushTransportBegin::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::PushAvStreamTransport::Events::PushTransportEnd::DecodableType & value);
@@ -859,6 +855,9 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::OperationalCredentials::Commands::CSRResponse::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType & value);
+static CHIP_ERROR
+LogValue(const char * label, size_t indent,
+         const chip::app::Clusters::OperationalCredentials::Commands::SignVIDVerificationResponse::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadResponse::DecodableType & value);
 static CHIP_ERROR
@@ -1012,13 +1011,15 @@ LogValue(const char * label, size_t indent,
          const chip::app::Clusters::TlsCertificateManagement::Commands::TLSClientCSRResponse::DecodableType & value);
 static CHIP_ERROR
 LogValue(const char * label, size_t indent,
-         const chip::app::Clusters::TlsCertificateManagement::Commands::ProvisionClientCertificateResponse::DecodableType & value);
-static CHIP_ERROR
-LogValue(const char * label, size_t indent,
          const chip::app::Clusters::TlsCertificateManagement::Commands::FindClientCertificateResponse::DecodableType & value);
 static CHIP_ERROR
 LogValue(const char * label, size_t indent,
          const chip::app::Clusters::TlsCertificateManagement::Commands::LookupClientCertificateResponse::DecodableType & value);
+static CHIP_ERROR
+LogValue(const char * label, size_t indent,
+         const chip::app::Clusters::TlsClientManagement::Commands::ProvisionEndpointResponse::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::TlsClientManagement::Commands::FindEndpointResponse::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::UnitTesting::Commands::TestSpecificResponse::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,

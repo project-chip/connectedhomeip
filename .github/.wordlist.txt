@@ -333,6 +333,7 @@ CurrentHue
 CurrentLevel
 CurrentSaturation
 customAcl
+customizable
 customizations
 cvfJ
 cxx
@@ -1060,6 +1061,7 @@ otatesting
 otaURL
 OTBR
 otcli
+OU
 outform
 outgoingCommands
 overridable
@@ -1169,8 +1171,10 @@ PyFunction
 pylint
 PyObject
 pypi
+pyproject
 PyRun
 pytest
+PYTHONPATH
 QEMU
 Qorvo
 QPG
@@ -1198,6 +1202,7 @@ READMEs
 readonly
 readthedocs
 Reag
+Realtek
 rebase
 recommand
 recommanded
@@ -1349,6 +1354,7 @@ SRP
 SRV
 SSBL
 SSID
+SSL
 startoffset
 StartScan
 startsWith
@@ -1516,6 +1522,7 @@ unfocus
 Unicast
 UniFlash
 UnitLocalization
+unittest
 unpair
 unprovisioned
 Unsecure

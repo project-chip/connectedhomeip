@@ -38,7 +38,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-infineon:112
+            image: ghcr.io/project-chip/chip-build-infineon:119
             env:
                # TODO: this should probably be part of the dockerfile itself
                CY_TOOLS_PATHS: /opt/Tools/ModusToolbox/tools_3.2

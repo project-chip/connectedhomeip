@@ -23,6 +23,7 @@
 #include <protocols/bdx/BdxTransferServerDelegate.h>
 #include <protocols/bdx/DiagnosticLogs.h>
 
+#import "MTRDeviceControllerFactory_Internal.h"
 #import "MTRDeviceController_Internal.h"
 #import "MTRError_Internal.h"
 #import "MTRLogging_Internal.h"
@@ -56,6 +57,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithType:(MTRDiagnosticLogType)type
                  fabricIndex:(NSNumber *)fabricIndex
                       nodeID:(NSNumber *)nodeID
+                     timeout:(NSTimeInterval)timeout
                        queue:(dispatch_queue_t)queue
                   completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
                         done:(void (^)(MTRDownload * finishedDownload))done;
@@ -68,8 +70,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)checkInteractionModelResponse:(MTRDiagnosticLogsClusterRetrieveLogsResponseParams * _Nullable)response error:(NSError * _Nullable)error;
 
+// TODO: The lifetime management for these objects is very odd.  Nothing
+// _really_ prevents a BDX transfer starting after a failure: call, for example.
+// We should move more of the state into a single place that will know the exact
+// state of the object.
 - (void)success;
-- (void)failure:(NSError * _Nullable)error;
+- (void)failure:(NSError *)error;
+- (void)cancelTimeoutTimer;
+- (void)abort:(NSError *)error;
 @end
 
 @interface MTRDownloads : NSObject
@@ -82,6 +90,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (MTRDownload * _Nullable)add:(MTRDiagnosticLogType)type
                    fabricIndex:(NSNumber *)fabricIndex
                         nodeID:(NSNumber *)nodeID
+                       timeout:(NSTimeInterval)timeout
                          queue:(dispatch_queue_t)queue
                     completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
                           done:(void (^)(MTRDownload * finishedDownload))done;
@@ -140,22 +149,38 @@ public:
     CHIP_ERROR OnTransferEnd(chip::bdx::BDXTransferProxy * transfer, CHIP_ERROR error) override;
     CHIP_ERROR OnTransferData(chip::bdx::BDXTransferProxy * transfer, const chip::ByteSpan & data) override;
 
-    CHIP_ERROR StartBDXTransferTimeout(MTRDownload * download, uint16_t timeoutInSeconds);
-    void CancelBDXTransferTimeout(MTRDownload * download);
-
 private:
-    static void OnTransferTimeout(chip::System::Layer * layer, void * context);
     MTRDiagnosticLogsDownloader * __weak mDelegate;
 };
 
 @implementation MTRDownload
+
+static void OnTransferTimeout(chip::System::Layer * layer, void * context)
+{
+    assertChipStackLockedByCurrentThread();
+
+    auto * download = (__bridge MTRDownload *) context;
+    VerifyOrReturn(nil != download);
+
+    auto * controller = [[MTRDeviceControllerFactory sharedInstance] runningControllerForFabricIndex:download.fabricIndex.unsignedCharValue];
+
+    MTR_LOG("%@ Diagnostic log transfer timed out for %016llX-%016llX (%llu), abortHandler: %@", download,
+        controller.compressedFabricID.unsignedLongLongValue, download.nodeID.unsignedLongLongValue,
+        download.nodeID.unsignedLongLongValue, download.abortHandler);
+
+    [download abort:[MTRError errorForCHIPErrorCode:CHIP_ERROR_TIMEOUT]];
+}
+
 - (instancetype)initWithType:(MTRDiagnosticLogType)type
                  fabricIndex:(NSNumber *)fabricIndex
                       nodeID:(NSNumber *)nodeID
+                     timeout:(NSTimeInterval)timeout
                        queue:(dispatch_queue_t)queue
                   completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
                         done:(void (^)(MTRDownload * finishedDownload))done;
 {
+    assertChipStackLockedByCurrentThread();
+
     self = [super init];
     if (self) {
         auto * fileDesignator = [self _toFileDesignatorString:type nodeID:nodeID];
@@ -183,6 +208,22 @@ private:
         _fileURL = fileURL;
         _fileHandle = nil;
         _finalize = bdxTransferDone;
+
+        if (timeout <= 0) {
+            timeout = 0;
+        } else if (timeout > UINT16_MAX) {
+            MTR_LOG("Warning: timeout is too large. It will be truncated to UINT16_MAX.");
+            timeout = UINT16_MAX;
+        }
+
+        if (timeout > 0) {
+            CHIP_ERROR timerStartErr = chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(static_cast<uint16_t>(timeout)),
+                OnTransferTimeout, (__bridge void *) self);
+            if (timerStartErr != CHIP_NO_ERROR) {
+                MTR_LOG_ERROR("Failed to start timer for diagnostic log download timeout");
+                return nil;
+            }
+        }
     }
     return self;
 }
@@ -258,14 +299,38 @@ private:
     return [_fileDesignator isEqualToString:fileDesignator] && [_fabricIndex isEqualToNumber:fabricIndex] && [_nodeID isEqualToNumber:nodeID];
 }
 
-- (void)failure:(NSError * _Nullable)error
+- (void)failure:(NSError *)error
 {
+    MTR_LOG("%@ Diagnostic log transfer failure: %@", self, error);
     _finalize(error);
 }
 
 - (void)success
 {
     _finalize(nil);
+}
+
+- (void)cancelTimeoutTimer
+{
+    assertChipStackLockedByCurrentThread();
+    chip::DeviceLayer::SystemLayer().CancelTimer(OnTransferTimeout, (__bridge void *) self);
+}
+
+- (void)abort:(NSError *)error
+{
+    assertChipStackLockedByCurrentThread();
+
+    [self cancelTimeoutTimer];
+
+    // If there is no abortHandler, it means that the BDX transfer has not
+    // started, so we can just call failure: directly.
+    //
+    // If there is an abortHandler, we need to call it to abort the transfer.
+    if (self.abortHandler == nil) {
+        [self failure:error];
+    } else {
+        self.abortHandler(error);
+    }
 }
 
 - (NSURL *)_toFileURL:(MTRDiagnosticLogType)type nodeID:(NSNumber *)nodeID
@@ -342,13 +407,14 @@ private:
 - (MTRDownload * _Nullable)add:(MTRDiagnosticLogType)type
                    fabricIndex:(NSNumber *)fabricIndex
                         nodeID:(NSNumber *)nodeID
+                       timeout:(NSTimeInterval)timeout
                          queue:(dispatch_queue_t)queue
                     completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
                           done:(void (^)(MTRDownload * finishedDownload))done
 {
     assertChipStackLockedByCurrentThread();
 
-    auto download = [[MTRDownload alloc] initWithType:type fabricIndex:fabricIndex nodeID:nodeID queue:queue completion:completion done:done];
+    auto download = [[MTRDownload alloc] initWithType:type fabricIndex:fabricIndex nodeID:nodeID timeout:timeout queue:queue completion:completion done:done];
     VerifyOrReturnValue(nil != download, nil);
 
     [_downloads addObject:download];
@@ -365,7 +431,10 @@ private:
             continue;
         }
 
-        [download failure:[MTRError errorForCHIPErrorCode:CHIP_ERROR_CANCELLED]];
+        [download abort:[MTRError errorForCHIPErrorCode:CHIP_ERROR_CANCELLED]];
+        // Remove directly instead of waiting for the async bits to catch up,
+        // since those async bits might run after controller shutdown finishes
+        // and then not be able to dispatch the async task to do the removal.
         [self remove:download];
     }
 }
@@ -374,6 +443,7 @@ private:
 {
     assertChipStackLockedByCurrentThread();
 
+    [download cancelTimeoutTimer];
     [_downloads removeObject:download];
 }
 @end
@@ -417,29 +487,19 @@ private:
 {
     assertChipStackLockedByCurrentThread();
 
-    uint16_t timeoutInSeconds = 0;
-    if (timeout <= 0) {
-        timeoutInSeconds = 0;
-    } else if (timeout > UINT16_MAX) {
-        MTR_LOG("Warning: timeout is too large. It will be truncated to UINT16_MAX.");
-        timeoutInSeconds = UINT16_MAX;
-    } else {
-        timeoutInSeconds = static_cast<uint16_t>(timeout);
-    }
+    // Fow now, we only support one download at a time per controller; abort
+    // any existing ones so we can start this new one.
+    [self abortDownloadsForController:controller];
 
     // This block is always called when a download is finished.
     auto done = ^(MTRDownload * finishedDownload) {
         [controller asyncDispatchToMatterQueue:^() {
             [self->_downloads remove:finishedDownload];
-
-            if (timeoutInSeconds > 0) {
-                self->_bridge->CancelBDXTransferTimeout(finishedDownload);
-            }
         } errorHandler:nil];
     };
 
     auto fabricIndex = @(controller.fabricIndex);
-    auto download = [_downloads add:type fabricIndex:fabricIndex nodeID:nodeID queue:queue completion:completion done:done];
+    auto download = [_downloads add:type fabricIndex:fabricIndex nodeID:nodeID timeout:timeout queue:queue completion:completion done:done];
     VerifyOrReturn(nil != download,
         dispatch_async(queue, ^{ completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INTERNAL]); }));
 
@@ -457,10 +517,8 @@ private:
 
     [cluster retrieveLogsRequestWithParams:params expectedValues:nil expectedValueInterval:nil completion:interactionModelDone];
 
-    if (timeoutInSeconds > 0) {
-        auto err = _bridge->StartBDXTransferTimeout(download, timeoutInSeconds);
-        VerifyOrReturn(CHIP_NO_ERROR == err, [download failure:[MTRError errorForCHIPErrorCode:err]]);
-    }
+    MTR_LOG("%@ Started log download attempt for node %016llX-%016llX (%llu)", download,
+        controller.compressedFabricID.unsignedLongLongValue, nodeID.unsignedLongLongValue, nodeID.unsignedLongLongValue);
 }
 
 - (void)abortDownloadsForController:(MTRDeviceController_Concrete *)controller;
@@ -477,9 +535,15 @@ private:
                                           abortHandler:(AbortHandler)abortHandler;
 {
     assertChipStackLockedByCurrentThread();
-    MTR_LOG("BDX Transfer Session Begin for log download: %@", fileDesignator);
 
     auto * download = [_downloads get:fileDesignator fabricIndex:fabricIndex nodeID:nodeID];
+
+    auto * controller = [[MTRDeviceControllerFactory sharedInstance] runningControllerForFabricIndex:fabricIndex.unsignedCharValue];
+
+    MTR_LOG("%@ BDX Transfer Session Begin for log download: %016llX-%016llX (%llu), %@", download,
+        controller.compressedFabricID.unsignedLongLongValue, nodeID.unsignedLongLongValue, nodeID.unsignedLongLongValue,
+        fileDesignator);
+
     VerifyOrReturn(nil != download, completion([MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_FOUND]));
 
     download.abortHandler = abortHandler;
@@ -493,9 +557,15 @@ private:
                                            completion:(MTRStatusCompletion)completion
 {
     assertChipStackLockedByCurrentThread();
-    MTR_LOG("BDX Transfer Session Data for log download: %@: %@", fileDesignator, data);
 
     auto * download = [_downloads get:fileDesignator fabricIndex:fabricIndex nodeID:nodeID];
+
+    auto * controller = [[MTRDeviceControllerFactory sharedInstance] runningControllerForFabricIndex:fabricIndex.unsignedCharValue];
+
+    MTR_LOG("%@ BDX Transfer Session Data for log download: %016llX-%016llX (%llu), %@: %@", download,
+        controller.compressedFabricID.unsignedLongLongValue, nodeID.unsignedLongLongValue, nodeID.unsignedLongLongValue,
+        fileDesignator, data);
+
     VerifyOrReturn(nil != download, completion([MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_FOUND]));
 
     NSError * error = nil;
@@ -511,9 +581,15 @@ private:
                                                error:(NSError * _Nullable)error
 {
     assertChipStackLockedByCurrentThread();
-    MTR_LOG("BDX Transfer Session End for log download: %@: %@", fileDesignator, error);
 
     auto * download = [_downloads get:fileDesignator fabricIndex:fabricIndex nodeID:nodeID];
+
+    auto * controller = [[MTRDeviceControllerFactory sharedInstance] runningControllerForFabricIndex:fabricIndex.unsignedCharValue];
+
+    MTR_LOG("%@ BDX Transfer Session End for log download: %016llX-%016llX (%llu), %@: %@", download,
+        controller.compressedFabricID.unsignedLongLongValue, nodeID.unsignedLongLongValue, nodeID.unsignedLongLongValue,
+        fileDesignator, error);
+
     VerifyOrReturn(nil != download);
 
     VerifyOrReturn(nil == error, [download failure:error]);
@@ -620,35 +696,4 @@ CHIP_ERROR DiagnosticLogsDownloaderBridge::OnTransferData(chip::bdx::BDXTransfer
                                                         data:data
                                                   completion:completionHandler];
     return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DiagnosticLogsDownloaderBridge::StartBDXTransferTimeout(MTRDownload * download, uint16_t timeoutInSeconds)
-{
-    assertChipStackLockedByCurrentThread();
-    return chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(timeoutInSeconds), OnTransferTimeout, (__bridge void *) download);
-}
-
-void DiagnosticLogsDownloaderBridge::CancelBDXTransferTimeout(MTRDownload * download)
-{
-    assertChipStackLockedByCurrentThread();
-    chip::DeviceLayer::SystemLayer().CancelTimer(OnTransferTimeout, (__bridge void *) download);
-}
-
-void DiagnosticLogsDownloaderBridge::OnTransferTimeout(chip::System::Layer * layer, void * context)
-{
-    assertChipStackLockedByCurrentThread();
-
-    auto * download = (__bridge MTRDownload *) context;
-    VerifyOrReturn(nil != download);
-
-    // If there is no abortHandler, it means that the BDX transfer has not started.
-    // When a BDX transfer has started we need to abort the transfer and we would error out
-    // at next poll. We would end up calling OnTransferEnd and eventually [download failure:error].
-    // But if the transfer has not started we would stop right now.
-    auto error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_TIMEOUT];
-    if (download.abortHandler == nil) {
-        [download failure:error];
-    } else {
-        download.abortHandler(error);
-    }
 }

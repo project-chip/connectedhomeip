@@ -33,9 +33,9 @@ jobs:
     zap_templates:
         name: ZAP templates generation
 
-        runs-on: ubuntu-20.04
+        runs-on: ubuntu-latest
         container:
-            image: ghcr.io/project-chip/chip-build:112
+            image: ghcr.io/project-chip/chip-build:119
         defaults:
             run:
                 shell: sh

@@ -254,7 +254,9 @@ public:
     // GetAckTimeout is the estimate for how long it could take for the other
     // side to receive our message (accounting for our MRP retransmits if it
     // gets lost) and send a response.
-    virtual System::Clock::Milliseconds32 GetAckTimeout() const = 0;
+    //
+    // The MRP retransmit delay computation depends on whether this is the first message on the exchange.
+    virtual System::Clock::Milliseconds32 GetAckTimeout(bool isFirstMessageOnExchange) const = 0;
 
     // GetReceiptTimeout is the estimate for how long it could take for us to
     // receive a message after the other side sends it, accounting for the MRP
@@ -265,7 +267,9 @@ public:
     // System::SystemClock().GetMonotonicTimestamp() (to indicate "peer is
     // responding to a message it just received") and System::Clock::kZero (to
     // indicate "peer is reaching out to us, not in response to anything").
-    virtual System::Clock::Milliseconds32 GetMessageReceiptTimeout(System::Clock::Timestamp ourLastActivity) const = 0;
+    // isFirstMessageOnExchange indicates whether the caller is handling the first message on exchange
+    virtual System::Clock::Milliseconds32 GetMessageReceiptTimeout(System::Clock::Timestamp ourLastActivity,
+                                                                   bool isFirstMessageOnExchange) const = 0;
 
     const ReliableMessageProtocolConfig & GetRemoteMRPConfig() const { return GetRemoteSessionParameters().GetMRPConfig(); }
 
@@ -273,7 +277,9 @@ public:
     // receive a message, process it and send it back. This is computed based on the session type, the type of transport, sleepy
     // characteristics of the target and a caller-provided value for the time it takes to process a message at the upper layer on
     // the target For group sessions, this function will always return 0.
-    System::Clock::Timeout ComputeRoundTripTimeout(System::Clock::Timeout upperlayerProcessingTimeout);
+    // isFirstMessageOnExchange parameter indicates whether this ComputeRoundTripTimeout() call is for an initial message or not.
+    System::Clock::Timeout ComputeRoundTripTimeout(System::Clock::Timeout upperlayerProcessingTimeout,
+                                                   bool isFirstMessageOnExchange);
 
     FabricIndex GetFabricIndex() const { return mFabricIndex; }
 

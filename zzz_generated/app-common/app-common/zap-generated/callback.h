@@ -676,6 +676,11 @@ void emberAfTlsCertificateManagementClusterInitCallback(chip::EndpointId endpoin
 /**
  * @param endpoint    Endpoint that is being initialized
  */
+void emberAfTlsClientManagementClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
 void emberAfUnitTestingClusterInitCallback(chip::EndpointId endpoint);
 
 /**
@@ -5635,6 +5640,44 @@ chip::Protocols::InteractionModel::Status MatterTlsCertificateManagementClusterS
 void emberAfTlsCertificateManagementClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
+// TLS Client Management Cluster
+//
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfTlsClientManagementClusterServerInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterTlsClientManagementClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfTlsClientManagementClusterClientInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterTlsClientManagementClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/**
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterTlsClientManagementClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/**
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfTlsClientManagementClusterServerTickCallback(chip::EndpointId endpoint);
+
+//
 // Unit Testing Cluster
 //
 
@@ -5895,78 +5938,6 @@ bool emberAfAccessControlClusterReviewFabricRestrictionsCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::AccessControl::Commands::ReviewFabricRestrictions::DecodableType & commandData);
 /**
- * @brief Actions Cluster InstantAction Command callback (from client)
- */
-bool emberAfActionsClusterInstantActionCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Actions::Commands::InstantAction::DecodableType & commandData);
-/**
- * @brief Actions Cluster InstantActionWithTransition Command callback (from client)
- */
-bool emberAfActionsClusterInstantActionWithTransitionCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Actions::Commands::InstantActionWithTransition::DecodableType & commandData);
-/**
- * @brief Actions Cluster StartAction Command callback (from client)
- */
-bool emberAfActionsClusterStartActionCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Actions::Commands::StartAction::DecodableType & commandData);
-/**
- * @brief Actions Cluster StartActionWithDuration Command callback (from client)
- */
-bool emberAfActionsClusterStartActionWithDurationCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Actions::Commands::StartActionWithDuration::DecodableType & commandData);
-/**
- * @brief Actions Cluster StopAction Command callback (from client)
- */
-bool emberAfActionsClusterStopActionCallback(chip::app::CommandHandler * commandObj,
-                                             const chip::app::ConcreteCommandPath & commandPath,
-                                             const chip::app::Clusters::Actions::Commands::StopAction::DecodableType & commandData);
-/**
- * @brief Actions Cluster PauseAction Command callback (from client)
- */
-bool emberAfActionsClusterPauseActionCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Actions::Commands::PauseAction::DecodableType & commandData);
-/**
- * @brief Actions Cluster PauseActionWithDuration Command callback (from client)
- */
-bool emberAfActionsClusterPauseActionWithDurationCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Actions::Commands::PauseActionWithDuration::DecodableType & commandData);
-/**
- * @brief Actions Cluster ResumeAction Command callback (from client)
- */
-bool emberAfActionsClusterResumeActionCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Actions::Commands::ResumeAction::DecodableType & commandData);
-/**
- * @brief Actions Cluster EnableAction Command callback (from client)
- */
-bool emberAfActionsClusterEnableActionCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Actions::Commands::EnableAction::DecodableType & commandData);
-/**
- * @brief Actions Cluster EnableActionWithDuration Command callback (from client)
- */
-bool emberAfActionsClusterEnableActionWithDurationCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Actions::Commands::EnableActionWithDuration::DecodableType & commandData);
-/**
- * @brief Actions Cluster DisableAction Command callback (from client)
- */
-bool emberAfActionsClusterDisableActionCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Actions::Commands::DisableAction::DecodableType & commandData);
-/**
- * @brief Actions Cluster DisableActionWithDuration Command callback (from client)
- */
-bool emberAfActionsClusterDisableActionWithDurationCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Actions::Commands::DisableActionWithDuration::DecodableType & commandData);
-/**
  * @brief Basic Information Cluster MfgSpecificPing Command callback (from client)
  */
 bool emberAfBasicInformationClusterMfgSpecificPingCallback(
@@ -6098,6 +6069,18 @@ bool emberAfOperationalCredentialsClusterRemoveFabricCallback(
 bool emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::OperationalCredentials::Commands::AddTrustedRootCertificate::DecodableType & commandData);
+/**
+ * @brief Operational Credentials Cluster SetVIDVerificationStatement Command callback (from client)
+ */
+bool emberAfOperationalCredentialsClusterSetVIDVerificationStatementCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::OperationalCredentials::Commands::SetVIDVerificationStatement::DecodableType & commandData);
+/**
+ * @brief Operational Credentials Cluster SignVIDVerificationRequest Command callback (from client)
+ */
+bool emberAfOperationalCredentialsClusterSignVIDVerificationRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::OperationalCredentials::Commands::SignVIDVerificationRequest::DecodableType & commandData);
 /**
  * @brief Group Key Management Cluster KeySetWrite Command callback (from client)
  */
@@ -6427,36 +6410,6 @@ bool emberAfWindowCoveringClusterGoToTiltValueCallback(
 bool emberAfWindowCoveringClusterGoToTiltPercentageCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::WindowCovering::Commands::GoToTiltPercentage::DecodableType & commandData);
-/**
- * @brief Closure Control Cluster Stop Command callback (from client)
- */
-bool emberAfClosureControlClusterStopCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ClosureControl::Commands::Stop::DecodableType & commandData);
-/**
- * @brief Closure Control Cluster MoveTo Command callback (from client)
- */
-bool emberAfClosureControlClusterMoveToCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ClosureControl::Commands::MoveTo::DecodableType & commandData);
-/**
- * @brief Closure Control Cluster Calibrate Command callback (from client)
- */
-bool emberAfClosureControlClusterCalibrateCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ClosureControl::Commands::Calibrate::DecodableType & commandData);
-/**
- * @brief Closure Control Cluster ConfigureFallback Command callback (from client)
- */
-bool emberAfClosureControlClusterConfigureFallbackCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ClosureControl::Commands::ConfigureFallback::DecodableType & commandData);
-/**
- * @brief Closure Control Cluster CancelFallback Command callback (from client)
- */
-bool emberAfClosureControlClusterCancelFallbackCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ClosureControl::Commands::CancelFallback::DecodableType & commandData);
 /**
  * @brief Thermostat Cluster SetpointRaiseLower Command callback (from client)
  */
@@ -6931,60 +6884,6 @@ bool emberAfZoneManagementClusterRemoveZoneCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ZoneManagement::Commands::RemoveZone::DecodableType & commandData);
 /**
- * @brief Camera AV Stream Management Cluster AudioStreamAllocate Command callback (from client)
- */
-bool emberAfCameraAvStreamManagementClusterAudioStreamAllocateCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CameraAvStreamManagement::Commands::AudioStreamAllocate::DecodableType & commandData);
-/**
- * @brief Camera AV Stream Management Cluster AudioStreamDeallocate Command callback (from client)
- */
-bool emberAfCameraAvStreamManagementClusterAudioStreamDeallocateCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CameraAvStreamManagement::Commands::AudioStreamDeallocate::DecodableType & commandData);
-/**
- * @brief Camera AV Stream Management Cluster VideoStreamAllocate Command callback (from client)
- */
-bool emberAfCameraAvStreamManagementClusterVideoStreamAllocateCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CameraAvStreamManagement::Commands::VideoStreamAllocate::DecodableType & commandData);
-/**
- * @brief Camera AV Stream Management Cluster VideoStreamModify Command callback (from client)
- */
-bool emberAfCameraAvStreamManagementClusterVideoStreamModifyCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CameraAvStreamManagement::Commands::VideoStreamModify::DecodableType & commandData);
-/**
- * @brief Camera AV Stream Management Cluster VideoStreamDeallocate Command callback (from client)
- */
-bool emberAfCameraAvStreamManagementClusterVideoStreamDeallocateCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CameraAvStreamManagement::Commands::VideoStreamDeallocate::DecodableType & commandData);
-/**
- * @brief Camera AV Stream Management Cluster SnapshotStreamAllocate Command callback (from client)
- */
-bool emberAfCameraAvStreamManagementClusterSnapshotStreamAllocateCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CameraAvStreamManagement::Commands::SnapshotStreamAllocate::DecodableType & commandData);
-/**
- * @brief Camera AV Stream Management Cluster SnapshotStreamDeallocate Command callback (from client)
- */
-bool emberAfCameraAvStreamManagementClusterSnapshotStreamDeallocateCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CameraAvStreamManagement::Commands::SnapshotStreamDeallocate::DecodableType & commandData);
-/**
- * @brief Camera AV Stream Management Cluster SetStreamPriorities Command callback (from client)
- */
-bool emberAfCameraAvStreamManagementClusterSetStreamPrioritiesCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CameraAvStreamManagement::Commands::SetStreamPriorities::DecodableType & commandData);
-/**
- * @brief Camera AV Stream Management Cluster CaptureSnapshot Command callback (from client)
- */
-bool emberAfCameraAvStreamManagementClusterCaptureSnapshotCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CameraAvStreamManagement::Commands::CaptureSnapshot::DecodableType & commandData);
-/**
  * @brief Camera AV Settings User Level Management Cluster MPTZSetPosition Command callback (from client)
  */
 bool emberAfCameraAvSettingsUserLevelManagementClusterMPTZSetPositionCallback(
@@ -7027,36 +6926,6 @@ bool emberAfCameraAvSettingsUserLevelManagementClusterDPTZRelativeMoveCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::DPTZRelativeMove::DecodableType & commandData);
 /**
- * @brief WebRTC Transport Provider Cluster SolicitOffer Command callback (from client)
- */
-bool emberAfWebRTCTransportProviderClusterSolicitOfferCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::WebRTCTransportProvider::Commands::SolicitOffer::DecodableType & commandData);
-/**
- * @brief WebRTC Transport Provider Cluster ProvideOffer Command callback (from client)
- */
-bool emberAfWebRTCTransportProviderClusterProvideOfferCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideOffer::DecodableType & commandData);
-/**
- * @brief WebRTC Transport Provider Cluster ProvideAnswer Command callback (from client)
- */
-bool emberAfWebRTCTransportProviderClusterProvideAnswerCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideAnswer::DecodableType & commandData);
-/**
- * @brief WebRTC Transport Provider Cluster ProvideICECandidate Command callback (from client)
- */
-bool emberAfWebRTCTransportProviderClusterProvideICECandidateCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideICECandidate::DecodableType & commandData);
-/**
- * @brief WebRTC Transport Provider Cluster EndSession Command callback (from client)
- */
-bool emberAfWebRTCTransportProviderClusterEndSessionCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::WebRTCTransportProvider::Commands::EndSession::DecodableType & commandData);
-/**
  * @brief WebRTC Transport Requestor Cluster Offer Command callback (from client)
  */
 bool emberAfWebRTCTransportRequestorClusterOfferCallback(
@@ -7069,11 +6938,11 @@ bool emberAfWebRTCTransportRequestorClusterAnswerCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::WebRTCTransportRequestor::Commands::Answer::DecodableType & commandData);
 /**
- * @brief WebRTC Transport Requestor Cluster ICECandidate Command callback (from client)
+ * @brief WebRTC Transport Requestor Cluster ICECandidates Command callback (from client)
  */
-bool emberAfWebRTCTransportRequestorClusterICECandidateCallback(
+bool emberAfWebRTCTransportRequestorClusterICECandidatesCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::WebRTCTransportRequestor::Commands::ICECandidate::DecodableType & commandData);
+    const chip::app::Clusters::WebRTCTransportRequestor::Commands::ICECandidates::DecodableType & commandData);
 /**
  * @brief WebRTC Transport Requestor Cluster End Command callback (from client)
  */
@@ -7170,6 +7039,24 @@ bool emberAfTlsCertificateManagementClusterLookupClientCertificateCallback(
 bool emberAfTlsCertificateManagementClusterRemoveClientCertificateCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::TlsCertificateManagement::Commands::RemoveClientCertificate::DecodableType & commandData);
+/**
+ * @brief TLS Client Management Cluster ProvisionEndpoint Command callback (from client)
+ */
+bool emberAfTlsClientManagementClusterProvisionEndpointCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::TlsClientManagement::Commands::ProvisionEndpoint::DecodableType & commandData);
+/**
+ * @brief TLS Client Management Cluster FindEndpoint Command callback (from client)
+ */
+bool emberAfTlsClientManagementClusterFindEndpointCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::TlsClientManagement::Commands::FindEndpoint::DecodableType & commandData);
+/**
+ * @brief TLS Client Management Cluster RemoveEndpoint Command callback (from client)
+ */
+bool emberAfTlsClientManagementClusterRemoveEndpointCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::TlsClientManagement::Commands::RemoveEndpoint::DecodableType & commandData);
 /**
  * @brief Unit Testing Cluster Test Command callback (from client)
  */
