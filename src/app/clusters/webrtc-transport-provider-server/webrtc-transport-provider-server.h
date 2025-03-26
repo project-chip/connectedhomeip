@@ -128,8 +128,9 @@ public:
      *   use this `PeerId` to retrieve or track any existing secure session state as needed.
      *
      * @param[in] originatingEndpointId
-     *   The endpoint ID from which the ProvideOffer command was received. This can be used to to invoke
-     *   the commands on the Requestor cluster.
+     *   This field SHALL indicate the endpoint that originates the ProvideOffer command.
+     *   When the server acts as a client to invoke commands on the Requestor cluster,
+     *   this endpoint SHALL be used as the target endpoint on the Requestor device.
      *
      * @return
      *   - CHIP_NO_ERROR if the request succeeds and `outSession` is populated.
