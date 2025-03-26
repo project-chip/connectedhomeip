@@ -309,7 +309,7 @@ limitations under the License.
       <feature bit="8" code="PRES" name="Presets" summary="Thermostat supports setpoint presets">
         <optionalConform/>
       </feature>
-      <feature bit="9" code="TEVT" name="Events" summary="Thermostat supports events">
+      <feature bit="9" code="TEVT" name="Events" apiMaturity="provisional" summary="Thermostat supports events">
         <optionalConform/>
       </feature>
     </features>
