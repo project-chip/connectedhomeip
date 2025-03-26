@@ -2858,54 +2858,6 @@ static BOOL AttributeIsSpecifiedInCommodityPriceCluster(AttributeId aAttributeId
     }
     }
 }
-static BOOL AttributeIsSpecifiedInDemandResponseLoadControlCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::DemandResponseLoadControl;
-    switch (aAttributeId) {
-    case Attributes::LoadControlPrograms::Id: {
-        return YES;
-    }
-    case Attributes::NumberOfLoadControlPrograms::Id: {
-        return YES;
-    }
-    case Attributes::Events::Id: {
-        return YES;
-    }
-    case Attributes::ActiveEvents::Id: {
-        return YES;
-    }
-    case Attributes::NumberOfEventsPerProgram::Id: {
-        return YES;
-    }
-    case Attributes::NumberOfTransitions::Id: {
-        return YES;
-    }
-    case Attributes::DefaultRandomStart::Id: {
-        return YES;
-    }
-    case Attributes::DefaultRandomDuration::Id: {
-        return YES;
-    }
-    case Attributes::GeneratedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::AcceptedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::AttributeList::Id: {
-        return YES;
-    }
-    case Attributes::FeatureMap::Id: {
-        return YES;
-    }
-    case Attributes::ClusterRevision::Id: {
-        return YES;
-    }
-    default: {
-        return NO;
-    }
-    }
-}
 static BOOL AttributeIsSpecifiedInMessagesCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::Messages;
@@ -6818,9 +6770,6 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::CommodityPrice::Id: {
         return AttributeIsSpecifiedInCommodityPriceCluster(aAttributeId);
-    }
-    case Clusters::DemandResponseLoadControl::Id: {
-        return AttributeIsSpecifiedInDemandResponseLoadControlCluster(aAttributeId);
     }
     case Clusters::Messages::Id: {
         return AttributeIsSpecifiedInMessagesCluster(aAttributeId);

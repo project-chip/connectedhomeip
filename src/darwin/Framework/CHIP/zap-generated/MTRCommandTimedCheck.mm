@@ -1497,9 +1497,6 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     case Clusters::CommodityPrice::Id: {
         return CommandNeedsTimedInvokeInCommodityPriceCluster(commandID);
     }
-    case Clusters::DemandResponseLoadControl::Id: {
-        return CommandNeedsTimedInvokeInDemandResponseLoadControlCluster(commandID);
-    }
     case Clusters::Messages::Id: {
         return CommandNeedsTimedInvokeInMessagesCluster(commandID);
     }
