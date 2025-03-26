@@ -229,7 +229,7 @@ CHIP_ERROR Instance::EncodeAccuracy(const AttributeValueEncoder::ListEncodeHelpe
     ReturnErrorOnFailure(mDelegate.StartAccuracyRead());
     for (uint8_t i = 0; true; i++)
     {
-        Globals::Structs::MeasurementAccuracyStruct::Type accuracy;
+        Structs::MeasurementAccuracyStruct::Type accuracy;
 
         err = mDelegate.GetAccuracyByIndex(i, accuracy);
         if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
