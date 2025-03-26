@@ -1,3 +1,20 @@
+#
+#    Copyright (c) 2021 Project CHIP Authors
+#    All rights reserved.
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+#
+
 import argparse
 import atexit
 import builtins
@@ -5,15 +22,15 @@ import logging
 import os
 import pathlib
 
-import chip.CertificateAuthority
-import chip.clusters as Clusters  # noqa: F401
-import chip.FabricAdmin
-import chip.logging
-import chip.native
 import coloredlogs
-from chip.ChipStack import ChipStack
 from rich import inspect, pretty
 from rich.console import Console
+
+from . import CertificateAuthority, FabricAdmin
+from . import clusters as Clusters  # noqa: F401
+from .ChipStack import ChipStack
+from .logging import RedirectToPythonLogging
+from .native import Init as NativeInit
 
 _fabricAdmins = None
 
@@ -42,7 +59,7 @@ def ReplInit(debug):
     console.rule()
 
     coloredlogs.install(level='DEBUG')
-    chip.logging.RedirectToPythonLogging()
+    RedirectToPythonLogging()
 
     if debug:
         logging.getLogger().setLevel(logging.DEBUG)
@@ -133,7 +150,7 @@ or run `os.chdir` to the root of your CHIP repository checkout.
         # nothing we can do ... things will NOT work
         return
 
-    chip.native.Init(bluetoothAdapter=args.ble_adapter)
+    NativeInit(bluetoothAdapter=args.ble_adapter)
 
     global certificateAuthorityManager
     global chipStack
@@ -143,7 +160,7 @@ or run `os.chdir` to the root of your CHIP repository checkout.
     ReplInit(args.debug)
 
     chipStack = ChipStack(persistentStoragePath=args.storagepath, enableServerInteractions=args.server_interactions)
-    certificateAuthorityManager = chip.CertificateAuthority.CertificateAuthorityManager(chipStack, chipStack.GetStorageManager())
+    certificateAuthorityManager = CertificateAuthority.CertificateAuthorityManager(chipStack, chipStack.GetStorageManager())
 
     certificateAuthorityManager.LoadAuthoritiesFromStorage()
 
