@@ -31,7 +31,7 @@
 #       --discriminator 1234
 #       --passcode 20202021
 #       --PICS src/app/tests/suites/certification/ci-pics-values
-#       --int-arg PIXIT.REFALM.AlarmThreshold:5
+#       --int-arg PIXIT.REFALM.AlarmThreshold:1
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # === END CI TEST ARGUMENTS ===
@@ -146,7 +146,6 @@ class TC_REFALM_2_2(MatterBaseTest):
     def _ask_for_closed_door(self):
         if self.is_pics_sdk_ci_only:
             self._send_close_door_commnad()
-            sleep(1)
         else:
             user_response = self.wait_for_user_input(prompt_msg="Ensure that the door on the DUT is closed. Enter 'y' or 'n' after completition",
                                                      default_value="y")
@@ -225,7 +224,7 @@ class TC_REFALM_2_2(MatterBaseTest):
         self.step(4)
         self._ask_for_open_door()
 
-        # wait  PIXIT.REFALM.AlarmThreshold (5s)
+        # wait  PIXIT.REFALM.AlarmThreshold (1s)
         self.step(5)
         self._wait_thresshold()
 
