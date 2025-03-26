@@ -296,40 +296,65 @@ CHIP_ERROR WriteClient::PutPreencodedAttribute(const ConcreteDataAttributePath &
 
         TLV::TLVReader dataReader;
         TLV::TLVReader valueReader;
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        dataReader.Init(data);
-        dataReader.OpenContainer(valueReader);
+        CHIP_ERROR err                       = CHIP_NO_ERROR;
+        uint16_t numSuccessfullyEncodedItems = kInvalidListIndex;
+        ConcreteDataAttributePath path       = attributePath;
 
         //    ListIndex nextItemToAppendIndex      = kInvalidListIndex;
-        uint16_t numSuccessfullyEncodedItems = kInvalidListIndex;
-        bool chunkingNeeded                  = false;
-
-        ConcreteDataAttributePath path = attributePath;
+        bool chunkingNeeded = false;
 
         //  dataReader.Init(data);
         //   dataReader.OpenContainer(valueReader);
 
         // Encode an empty list for the chunking protocol.
-        // ReturnErrorOnFailure(EncodeSingleAttributeDataIB(path, DataModel::List<uint8_t>()));
-        ReturnErrorOnFailure(
-            TryPutPreencodedListIntoSingleAttributeWritePayload(path, valueReader, chunkingNeeded, numSuccessfullyEncodedItems));
-
-        if (!chunkingNeeded)
+        bool encodeEmptyListAsReplaceAll =
+            (path.mClusterId == Clusters::OtaSoftwareUpdateRequestor::Id &&
+             path.mAttributeId == Clusters::OtaSoftwareUpdateRequestor::Attributes::DefaultOTAProviders::Id);
+        if (encodeEmptyListAsReplaceAll)
         {
-            return CHIP_NO_ERROR;
+            ReturnErrorOnFailure(EnsureMessage());
+            ReturnErrorOnFailure(EncodeSingleAttributeDataIB(path, DataModel::List<uint8_t>()));
+            numSuccessfullyEncodedItems = 0;
         }
+        else
+        {
+            dataReader.Init(data);
+            dataReader.OpenContainer(valueReader);
 
-        // Start a new WriteRequest chunk.
-        ReturnErrorOnFailure(StartNewMessage());
-        //   nextItemToAppendIndex = numSuccessfullyEncodedItems;
+            ReturnErrorOnFailure(StartNewMessage());
 
+            ReturnErrorOnFailure(TryPutPreencodedListIntoSingleAttributeWritePayload(path, valueReader, chunkingNeeded,
+                                                                                     numSuccessfullyEncodedItems));
+
+            if (!chunkingNeeded)
+            {
+                return CHIP_NO_ERROR;
+            }
+
+            // Start a new WriteRequest chunk.
+            ReturnErrorOnFailure(StartNewMessage());
+            //   nextItemToAppendIndex = numSuccessfullyEncodedItems;
+        }
         path.mListOp = ConcreteDataAttributePath::ListOperation::AppendItem;
         // TODO HOW WOULD I KNOW WHERE TO CONTINUE? if chunking is needed, where to put the index?
         // This ?
+
+        //    TLV::TLVReader dataReader2;
+        //  dataReader2.Init(valueReader.GetReadPoint(), valueReader.GetRemainingLength());
+        //   TLV::TLVUpdater UpdateReader2;
+        // UpdateReader2.Init(dataReader, )
+
+        dataReader.Init(data);
+        dataReader.OpenContainer(valueReader);
+        ListIndex nextItemToAppendIndex = 0;
+
         while ((err = valueReader.Next()) == CHIP_NO_ERROR)
         {
-            ReturnErrorOnFailure(PutSinglePreencodedAttributeWritePayload(path, valueReader));
+            if (nextItemToAppendIndex >= numSuccessfullyEncodedItems)
+            {
+                ReturnErrorOnFailure(PutSinglePreencodedAttributeWritePayload(path, valueReader));
+            }
+            nextItemToAppendIndex++;
         }
 
         if (err == CHIP_END_OF_TLV)
@@ -338,6 +363,7 @@ CHIP_ERROR WriteClient::PutPreencodedAttribute(const ConcreteDataAttributePath &
         }
         return err;
     }
+    ReturnErrorOnFailure(EnsureMessage());
 
     // We are writing a non-list attribute, or we are writing a single element of a list.
     ReturnErrorOnFailure(EnsureMessage());
