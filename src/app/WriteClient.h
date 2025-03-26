@@ -197,11 +197,7 @@ public:
         // TODO remove this special case when Matter 1.3 is Sunsetted
         bool encodeEmptyListAsReplaceAll =
             (path.mClusterId == Clusters::OtaSoftwareUpdateRequestor::Id &&
-             path.mAttributeId == Clusters::OtaSoftwareUpdateRequestor::Attributes::DefaultOTAProviders::Id) ||
-            // TODO, fix the ListNullablesAndOptionalsStruct in test-cluster-server, do we need to keep this for backward
-            // compatibility?
-            (path.mClusterId == Clusters::UnitTesting::Id &&
-             path.mAttributeId == Clusters::UnitTesting::Attributes::ListNullablesAndOptionalsStruct::Id);
+             path.mAttributeId == Clusters::OtaSoftwareUpdateRequestor::Attributes::DefaultOTAProviders::Id);
 
         if (encodeEmptyListAsReplaceAll)
         {
