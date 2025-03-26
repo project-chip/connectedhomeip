@@ -552,10 +552,58 @@ CHIP_ERROR TestAttrAccess::WriteListNullablesAndOptionalsStructAttribute(const C
         ReturnErrorOnFailure(aDecoder.Decode(list));
 
         ReturnErrorOnFailure(list.ComputeSize(&count));
-        // We are assuming we are using list chunking feature for attribute writes.
-        VerifyOrReturnError(count == 0, CHIP_ERROR_INVALID_ARGUMENT);
+        // BACKWARD COMPATIBILITY: If count is 0, this means we have an empty initial ReplaceAll List, which is used by Legacy
+        // controllers. All relevant items will arrive as part of AppendItem Operations
+        if (count == 0)
+        {
+            return CHIP_NO_ERROR;
+        }
+        // If count is greater than 0, this means we have a non-empty ReplaceAll List; We should process this list.
+        else if (count > 0)
+        {
+            auto iterator = list.begin();
+            while (iterator.Next())
+            {
+                auto value = iterator.GetValue();
 
-        return CHIP_NO_ERROR;
+                // We only support some values so far.
+                VerifyOrReturnError(value.nullableString.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
+                VerifyOrReturnError(value.nullableStruct.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
+
+                VerifyOrReturnError(!value.optionalString.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+                VerifyOrReturnError(!value.nullableOptionalString.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+                VerifyOrReturnError(!value.optionalStruct.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+                VerifyOrReturnError(!value.nullableOptionalStruct.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+                VerifyOrReturnError(!value.optionalList.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+                VerifyOrReturnError(!value.nullableOptionalList.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+
+                // Start our value off as null, just in case we fail to decode things.
+                gNullablesAndOptionalsStruct.nullableList.SetNull();
+                if (!value.nullableList.IsNull())
+                {
+                    ReturnErrorOnFailure(value.nullableList.Value().ComputeSize(&count));
+                    VerifyOrReturnError(count <= MATTER_ARRAY_SIZE(gSimpleEnums), CHIP_ERROR_INVALID_ARGUMENT);
+                    auto iter2       = value.nullableList.Value().begin();
+                    gSimpleEnumCount = 0;
+                    while (iter2.Next())
+                    {
+                        gSimpleEnums[gSimpleEnumCount] = iter2.GetValue();
+                        ++gSimpleEnumCount;
+                    }
+                    ReturnErrorOnFailure(iter2.GetStatus());
+                    gNullablesAndOptionalsStruct.nullableList.SetNonNull(Span<SimpleEnum>(gSimpleEnums, gSimpleEnumCount));
+                }
+                gNullablesAndOptionalsStruct.nullableInt         = value.nullableInt;
+                gNullablesAndOptionalsStruct.optionalInt         = value.optionalInt;
+                gNullablesAndOptionalsStruct.nullableOptionalInt = value.nullableOptionalInt;
+            }
+
+            // BACKWARD COMPATIBILITY WORKAROUND: we need to reset "count" to 0 to be able to process AppendItem operations, in a
+            // way that will not change the code for AppendItem condition (below). This is done to ensure backward compatibility in
+            // case it is being used for internal testing.
+            count = 0;
+            return CHIP_NO_ERROR;
+        }
     }
     if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
     {
