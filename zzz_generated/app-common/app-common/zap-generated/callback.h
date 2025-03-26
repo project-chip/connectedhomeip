@@ -6245,17 +6245,17 @@ bool emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::OperationalCredentials::Commands::AddTrustedRootCertificate::DecodableType & commandData);
 /**
- * @brief Operational Credentials Cluster SetVidVerificationStatement Command callback (from client)
+ * @brief Operational Credentials Cluster SetVIDVerificationStatement Command callback (from client)
  */
-bool emberAfOperationalCredentialsClusterSetVidVerificationStatementCallback(
+bool emberAfOperationalCredentialsClusterSetVIDVerificationStatementCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::OperationalCredentials::Commands::SetVidVerificationStatement::DecodableType & commandData);
+    const chip::app::Clusters::OperationalCredentials::Commands::SetVIDVerificationStatement::DecodableType & commandData);
 /**
- * @brief Operational Credentials Cluster SignVidVerificationRequest Command callback (from client)
+ * @brief Operational Credentials Cluster SignVIDVerificationRequest Command callback (from client)
  */
-bool emberAfOperationalCredentialsClusterSignVidVerificationRequestCallback(
+bool emberAfOperationalCredentialsClusterSignVIDVerificationRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::OperationalCredentials::Commands::SignVidVerificationRequest::DecodableType & commandData);
+    const chip::app::Clusters::OperationalCredentials::Commands::SignVIDVerificationRequest::DecodableType & commandData);
 /**
  * @brief Group Key Management Cluster KeySetWrite Command callback (from client)
  */
