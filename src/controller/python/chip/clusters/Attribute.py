@@ -37,8 +37,8 @@ from ..interaction_model import (AttributePathIBstruct, DataVersionFilterIBstruc
 from ..interaction_model import Status as InteractionModelStatus
 from ..native import ErrorSDKPart, GetLibraryHandle, NativeLibraryHandleMethodArguments, PyChipError
 from ..tlv import TLVReader
-from .ClusterObjects import Cluster, ClusterAttributeDescriptor, ClusterEvent
 from . import Objects as GeneratedObjects
+from .ClusterObjects import Cluster, ClusterAttributeDescriptor, ClusterEvent
 
 LOGGER = logging.getLogger(__name__)
 
