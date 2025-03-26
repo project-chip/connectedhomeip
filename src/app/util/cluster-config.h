@@ -16,18 +16,27 @@
 #pragma once
 
 #include <lib/core/DataModelTypes.h>
+#include <lib/support/BitFlags.h>
+
+#include <cstdint>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 
+/// An enumeration acting as a placeholder of "no features defined
+/// for a cluster, enforcing that the feature map type is always
+/// a form of bitflags"
+enum NoFeatureFlagsDefined : uint32_t {
+};
+
 /// Defines a structure that describes the configuration of a cluster
 /// on a specific endpoint
-template <typename FeatureMapType>
+template <typename FeatureEnumType>
 struct ClusterEndpointConfiguration
 {
     EndpointId endpointNumber;
-    FeatureMapType featureMap;
+    BitFlags<FeatureEnumType> featureMap;
     uint32_t clusterRevision;
 };
 

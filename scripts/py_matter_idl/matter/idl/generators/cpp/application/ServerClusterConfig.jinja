@@ -5,7 +5,6 @@
 
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app/util/cluster-config.h>
-#include <lib/support/BitFlags.h>
 
 #include <array>
 
@@ -16,27 +15,22 @@ namespace {{ cluster_name }} {
 namespace ApplicationConfig {
 
 {% if config.feature_bitmap_type -%}
-using FeatureBitmapType = BitFlags<Feature>; {#- Bitmap is ALWAYS named Feature, even if the data type is <CLUSTER_NAME>Feature #}
+using FeatureBitmapType = Feature;
 {%- else -%}
 using FeatureBitmapType = uint32_t;
 {%- endif %}
 
-inline constexpr std::array<ClusterEndpointConfiguration<FeatureBitmapType>, {{config.endpoint_configs | length}}> kFixedEndpoints = { {
+inline constexpr std::array<FeatureBitmapType, {{config.endpoint_configs | length}}> kFixedEndpoints = { {
 {%- for endpoint_config in config.endpoint_configs %}
     {
         .endpointNumber = {{ endpoint_config.endpoint_number }},
-        .featureMap = {# Ensure a space here before brace/value #}
-    {%- if config.feature_bitmap_type -%}
-          FeatureBitmapType {
-      {%- for feature in endpoint_config.features %}
-            Feature::{{ feature.name }}
-        {%- if not loop.last -%}, {%- endif %} // feature bit {{ "0x%0X" | format(feature.value) }}
-      {%- endfor %}
-        }
-    {%- else -%}
-        {{ "0x%0X" | format(endpoint_config.feature_map) }}
-    {%- endif -%}
-        ,
+        .featureMap = BitFlags<FeatureBitmapType> {
+          {%- for feature in endpoint_config.features %}
+            FeatureBitmapType::{{ feature.name }}
+            {%- if not loop.last -%}, {% endif -%}
+            // feature bit {{ "0x%0X" | format(feature.value) }}
+          {%- endfor %}
+        },
         .clusterRevision = {{ endpoint_config.cluster_revision }},
     },
 {%- endfor %}

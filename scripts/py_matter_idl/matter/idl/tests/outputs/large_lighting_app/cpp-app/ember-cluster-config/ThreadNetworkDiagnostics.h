@@ -1,0 +1,37 @@
+// DO NOT EDIT - Generated file
+//
+// Application configuration for ThreadNetworkDiagnostics
+#pragma once
+
+#include <app-common/zap-generated/cluster-enums.h>
+#include <app/util/cluster-config.h>
+
+#include <array>
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace ThreadNetworkDiagnostics {
+namespace ApplicationConfig {
+
+using FeatureBitmapType = Feature;
+
+inline constexpr std::array<FeatureBitmapType, 1> kFixedEndpoints = { {
+    {
+        .endpointNumber = 0,
+        .featureMap = BitFlags<FeatureBitmapType> {
+            FeatureBitmapType::kPacketCounts, // feature bit 0x1
+            FeatureBitmapType::kErrorCounts, // feature bit 0x2
+            FeatureBitmapType::kMLECounts, // feature bit 0x4
+            FeatureBitmapType::kMACCounts// feature bit 0x8
+        },
+        .clusterRevision = 1,
+    },
+} };
+
+} // namespace ApplicationConfig
+} // namespace ThreadNetworkDiagnostics
+} // namespace Clusters
+} // namespace app
+} // namespace namespace chip
+
