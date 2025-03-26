@@ -59,8 +59,21 @@ __LOG_LEVELS__ = {
 @click.argument('path', nargs=-1, type=str)
 def main(log_level, idl, path: list[str]):
     """
-    Parses MATTER IDL files (.matter) and performs SDK code generation
-    as set up by the program arguments.
+    Parses MATTER IDL files (.matter) and performs generated path expansion
+    based on the IDL contents: replaces placeholders inside paths passed in as arguments
+    and outputs these paths one per line.
+
+    For example an command like:
+
+    codegen_paths.py --idl some_fake.idl Foo Bar/test-{{server_cluster_name}.h Baz.h
+
+    May result in output such as:
+
+    Foo
+    Bar/test-NetworkDiagnostics.h
+    Bar/test-Descriptor.h
+    Bar/test-BasicInformation.h
+    Baz.h
     """
     if _has_coloredlogs:
         coloredlogs.install(level=__LOG_LEVELS__[
@@ -74,6 +87,11 @@ def main(log_level, idl, path: list[str]):
 
     for p in path:
         for expanded in expand_path_for_idl(CreateParser().parse(open(idl, "rt").read()), p):
+            # The intent of codegen_paths is to print out the "expanded" paths from the inputs,
+            # one per line.
+            #
+            # This output can then be consumed by GN or CMAKE as a "newline separated lists
+            # of paths"
             print(expanded)
 
 
