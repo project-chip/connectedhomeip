@@ -64,6 +64,8 @@ bool Instance::SupportsOptAttr(OptionalAttributes aOptionalAttrs) const
 // AttributeAccessInterface
 CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
     switch (aPath.mAttributeId)
     {
     case FeatureMap::Id:
@@ -188,15 +190,25 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
         VerifyOrReturnError(
             HasFeature(ElectricalPowerMeasurement::Feature::kHarmonics), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
             ChipLogError(Zcl, "Electrical Power Measurement: can not get HarmonicCurrents, feature is not supported"));
-        ReturnErrorOnFailure(
-            aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR { return this->EncodeHarmonicCurrents(encoder); }));
+        err = aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR { return this->EncodeHarmonicCurrents(encoder); });
+        if (CHIP_ERROR_NOT_FOUND == err)
+        {
+            ReturnErrorOnFailure(aEncoder.EncodeNull());
+            err = CHIP_NO_ERROR;
+        }
+        ReturnErrorOnFailure(err);
         break;
     case HarmonicPhases::Id:
         VerifyOrReturnError(
             HasFeature(ElectricalPowerMeasurement::Feature::kPowerQuality), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
             ChipLogError(Zcl, "Electrical Power Measurement: can not get HarmonicPhases, feature is not supported"));
-        ReturnErrorOnFailure(
-            aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR { return this->EncodeHarmonicPhases(encoder); }));
+        err = aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR { return this->EncodeHarmonicPhases(encoder); });
+        if (CHIP_ERROR_NOT_FOUND == err)
+        {
+            ReturnErrorOnFailure(aEncoder.EncodeNull());
+            err = CHIP_NO_ERROR;
+        }
+        ReturnErrorOnFailure(err);
         break;
     case PowerFactor::Id:
         if (!SupportsOptAttr(OptionalAttributes::kOptionalAttributePowerFactor))
@@ -287,6 +299,8 @@ CHIP_ERROR Instance::EncodeHarmonicCurrents(const AttributeValueEncoder::ListEnc
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     ReturnErrorOnFailure(mDelegate.StartHarmonicCurrentsRead());
+
+    bool isEmpty = true;
     for (uint8_t i = 0; true; i++)
     {
         Structs::HarmonicMeasurementStruct::Type current;
@@ -303,11 +317,18 @@ CHIP_ERROR Instance::EncodeHarmonicCurrents(const AttributeValueEncoder::ListEnc
 
         err = encoder.Encode(current);
         SuccessOrExit(err);
+        isEmpty = false;
     }
 
 exit:
     // Tell the delegate the read is complete
     err = mDelegate.EndHarmonicCurrentsRead();
+
+    // If no error occurred and the harmonic current has not yet been measured, inform the upper layer with a NOT_FOUND error.
+    if (CHIP_NO_ERROR == err && isEmpty)
+    {
+        err = CHIP_ERROR_NOT_FOUND;
+    }
     return err;
 }
 
@@ -316,6 +337,8 @@ CHIP_ERROR Instance::EncodeHarmonicPhases(const AttributeValueEncoder::ListEncod
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     ReturnErrorOnFailure(mDelegate.StartHarmonicPhasesRead());
+
+    bool isEmpty = true;
     for (uint8_t i = 0; true; i++)
     {
         Structs::HarmonicMeasurementStruct::Type phase;
@@ -332,11 +355,18 @@ CHIP_ERROR Instance::EncodeHarmonicPhases(const AttributeValueEncoder::ListEncod
 
         err = encoder.Encode(phase);
         SuccessOrExit(err);
+        isEmpty = false;
     }
 
 exit:
     // Tell the delegate the read is complete
     err = mDelegate.EndHarmonicPhasesRead();
+
+    // If no error occurred and the harmonic phase has not yet been measured, inform the upper layer with a NOT_FOUND error.
+    if (CHIP_NO_ERROR == err && isEmpty)
+    {
+        err = CHIP_ERROR_NOT_FOUND;
+    }
     return err;
 }
 
