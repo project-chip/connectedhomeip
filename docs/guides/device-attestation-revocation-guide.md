@@ -44,7 +44,9 @@ pre-generated using the `generate_revocation_set.py` script.
 
 ### Test Vectors
 
-Please use `credentials/test/revoked-attestation-certificates/revocation-sets/revocation-set.json` as revocation set
+Please use
+`credentials/test/revoked-attestation-certificates/revocation-sets/revocation-set.json`
+as revocation set
 
 | Description           | DAC Provider                                                                                                                           | Expected Result                                    |
 | --------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
