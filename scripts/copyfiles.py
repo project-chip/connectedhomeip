@@ -66,17 +66,41 @@ def main(log_level, source_dir: str, target_dir: str, filenames: list[str]):
             datefmt='%Y-%m-%d %H:%M:%S'
         )
 
+    # code ALWAYS uses absolute paths since we replace path prefixes
+    source_dir = os.path.abspath(source_dir)
+    target_dir = os.path.abspath(target_dir)
+
     # We are copying to target ...
     if not os.path.exists(target_dir):
         logging.info("Creating output directory %s", target_dir)
         os.makedirs(target_dir)
 
     for filename in filenames:
+        # Take the relative path from the filename into the source
+        #
+        # Example if:
+        #   source_dir  => "/SOME/ABSOLUTE/PATH"
+        #   filename  => "/SOME/ABSOLUTE/PATH/that/is/used.h"
+        #
+        # then:
+        #  relative_path => "that/is/used.h"
+        #
+        filename = os.path.abspath(filename)
         relative_path = os.path.relpath(filename, source_dir)
         if not filename.endswith(relative_path):
             logging.error("%s does not seem relative to %s: relative path is %s", filename, source_dir, relative_path)
             sys.exit(1)
 
+        # Prepend the destination directory to relative path. So that if we have:
+        #
+        # Example if:
+        #   source_dir  => "/SOME/ABSOLUTE/PATH"
+        #   target_dir  => "/OTHER/LOCATION"
+        #   filename  => "/SOME/ABSOLUTE/PATH/that/is/used.h"
+        # Then:
+        #   relative_path => "that/is/used.h"
+        #   destination => "/OTHER_LOCATION/that/is/used.h"
+        #
         destination = os.path.join(target_dir, relative_path)
 
         destination_dir = os.path.dirname(destination)
