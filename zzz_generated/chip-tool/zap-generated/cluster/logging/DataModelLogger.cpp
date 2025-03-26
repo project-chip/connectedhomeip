@@ -527,6 +527,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
+        CHIP_ERROR err = LogValue("PeerEndpointID", indent + 1, value.peerEndpointID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PeerEndpointID'");
+            return err;
+        }
+    }
+    {
         CHIP_ERROR err = LogValue("StreamUsage", indent + 1, value.streamUsage);
         if (err != CHIP_NO_ERROR)
         {
@@ -2008,10 +2016,10 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = LogValue("VidVerificationStatement", indent + 1, value.vidVerificationStatement);
+        CHIP_ERROR err = LogValue("VIDVerificationStatement", indent + 1, value.VIDVerificationStatement);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'VidVerificationStatement'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'VIDVerificationStatement'");
             return err;
         }
     }
@@ -2401,8 +2409,9 @@ DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::DecodableType & value)
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::ScenesManagement::Structs::ExtensionFieldSetStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -9763,7 +9772,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const OperationalCredentials::Commands::SignVidVerificationResponse::DecodableType & value)
+                                     const OperationalCredentials::Commands::SignVIDVerificationResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("fabricIndex", indent + 1, value.fabricIndex));
@@ -9902,7 +9911,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     ReturnErrorOnFailure(DataModelLogger::LogValue("sceneID", indent + 1, value.sceneID));
     ReturnErrorOnFailure(DataModelLogger::LogValue("transitionTime", indent + 1, value.transitionTime));
     ReturnErrorOnFailure(DataModelLogger::LogValue("sceneName", indent + 1, value.sceneName));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("extensionFieldSets", indent + 1, value.extensionFieldSets));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("extensionFieldSetStructs", indent + 1, value.extensionFieldSetStructs));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
@@ -10356,15 +10365,6 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     ReturnErrorOnFailure(DataModelLogger::LogValue("ccdid", indent + 1, value.ccdid));
     ReturnErrorOnFailure(DataModelLogger::LogValue("csr", indent + 1, value.csr));
     ReturnErrorOnFailure(DataModelLogger::LogValue("nonce", indent + 1, value.nonce));
-    DataModelLogger::LogString(indent, "}");
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR
-DataModelLogger::LogValue(const char * label, size_t indent,
-                          const TlsCertificateManagement::Commands::ProvisionClientCertificateResponse::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    ReturnErrorOnFailure(DataModelLogger::LogValue("ccdid", indent + 1, value.ccdid));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
@@ -14302,11 +14302,6 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
     case ScenesManagement::Id: {
         switch (path.mAttributeId)
         {
-        case ScenesManagement::Attributes::LastConfiguredBy::Id: {
-            chip::app::DataModel::Nullable<chip::NodeId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("LastConfiguredBy", 1, value);
-        }
         case ScenesManagement::Attributes::SceneTableSize::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
@@ -19571,10 +19566,10 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("InstalledChimeSounds", 1, value);
         }
-        case Chime::Attributes::ActiveChimeID::Id: {
+        case Chime::Attributes::SelectedChime::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ActiveChimeID", 1, value);
+            return DataModelLogger::LogValue("SelectedChime", 1, value);
         }
         case Chime::Attributes::Enabled::Id: {
             bool value;
@@ -19698,20 +19693,24 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MaxRootCertificates", 1, value);
         }
-        case TlsCertificateManagement::Attributes::CurrentRootCertificates::Id: {
-            uint8_t value;
+        case TlsCertificateManagement::Attributes::ProvisionedRootCertificates::Id: {
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::TlsCertificateManagement::Structs::TLSCertStruct::DecodableType>
+                value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("CurrentRootCertificates", 1, value);
+            return DataModelLogger::LogValue("ProvisionedRootCertificates", 1, value);
         }
         case TlsCertificateManagement::Attributes::MaxClientCertificates::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MaxClientCertificates", 1, value);
         }
-        case TlsCertificateManagement::Attributes::CurrentClientCertificates::Id: {
-            uint8_t value;
+        case TlsCertificateManagement::Attributes::ProvisionedClientCertificates::Id: {
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::TlsCertificateManagement::Structs::TLSClientCertificateDetailStruct::DecodableType>
+                value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("CurrentClientCertificates", 1, value);
+            return DataModelLogger::LogValue("ProvisionedClientCertificates", 1, value);
         }
         case TlsCertificateManagement::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -20509,10 +20508,10 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("NOCResponse", 1, value);
         }
-        case OperationalCredentials::Commands::SignVidVerificationResponse::Id: {
-            OperationalCredentials::Commands::SignVidVerificationResponse::DecodableType value;
+        case OperationalCredentials::Commands::SignVIDVerificationResponse::Id: {
+            OperationalCredentials::Commands::SignVIDVerificationResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("SignVidVerificationResponse", 1, value);
+            return DataModelLogger::LogValue("SignVIDVerificationResponse", 1, value);
         }
         }
         break;
@@ -21045,11 +21044,6 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             TlsCertificateManagement::Commands::TLSClientCSRResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("TLSClientCSRResponse", 1, value);
-        }
-        case TlsCertificateManagement::Commands::ProvisionClientCertificateResponse::Id: {
-            TlsCertificateManagement::Commands::ProvisionClientCertificateResponse::DecodableType value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ProvisionClientCertificateResponse", 1, value);
         }
         case TlsCertificateManagement::Commands::FindClientCertificateResponse::Id: {
             TlsCertificateManagement::Commands::FindClientCertificateResponse::DecodableType value;

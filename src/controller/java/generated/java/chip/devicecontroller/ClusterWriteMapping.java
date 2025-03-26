@@ -3751,28 +3751,28 @@ public class ClusterWriteMapping {
     Map<String, InteractionInfo> writePushAvStreamTransportInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("pushAvStreamTransport", writePushAvStreamTransportInteractionInfo);
     Map<String, InteractionInfo> writeChimeInteractionInfo = new LinkedHashMap<>();
-    Map<String, CommandParameterInfo> writeChimeActiveChimeIDCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo chimeactiveChimeIDCommandParameterInfo =
+    Map<String, CommandParameterInfo> writeChimeSelectedChimeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo chimeselectedChimeCommandParameterInfo =
         new CommandParameterInfo(
             "value", 
             Integer.class, 
             Integer.class 
         );
-    writeChimeActiveChimeIDCommandParams.put(
+    writeChimeSelectedChimeCommandParams.put(
         "value",
-        chimeactiveChimeIDCommandParameterInfo
+        chimeselectedChimeCommandParameterInfo
     );
-    InteractionInfo writeChimeActiveChimeIDAttributeInteractionInfo = new InteractionInfo(
+    InteractionInfo writeChimeSelectedChimeAttributeInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
-        ((ChipClusters.ChimeCluster) cluster).writeActiveChimeIDAttribute(
+        ((ChipClusters.ChimeCluster) cluster).writeSelectedChimeAttribute(
           (DefaultClusterCallback) callback,
           (Integer) commandArguments.get("value")
         );
       },
       () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-      writeChimeActiveChimeIDCommandParams
+      writeChimeSelectedChimeCommandParams
     );
-    writeChimeInteractionInfo.put("writeActiveChimeIDAttribute", writeChimeActiveChimeIDAttributeInteractionInfo);
+    writeChimeInteractionInfo.put("writeSelectedChimeAttribute", writeChimeSelectedChimeAttributeInteractionInfo);
     Map<String, CommandParameterInfo> writeChimeEnabledCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo chimeenabledCommandParameterInfo =
         new CommandParameterInfo(
