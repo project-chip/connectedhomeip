@@ -254,8 +254,8 @@ def _BuildAttributeIndex():
         it takes about 300ms for a single query.
         This is acceptable during init, but unacceptable when the server returns lots of attributes at the same time.
     '''
-    for clusterName, obj in inspect.getmembers(sys.modules['matter.clusters.Objects']):
-        if ('matter.clusters.Objects' in str(obj)) and inspect.isclass(obj):
+    for clusterName, obj in inspect.getmembers(sys.modules['chip.clusters.Objects']):
+        if ('chip.clusters.Objects' in str(obj)) and inspect.isclass(obj):
             for objName, subclass in inspect.getmembers(obj):
                 if inspect.isclass(subclass) and (('Attributes') in str(subclass)):
                     for attributeName, attribute in inspect.getmembers(subclass):
@@ -269,14 +269,14 @@ def _BuildAttributeIndex():
                                 continue
 
                             _AttributeIndex[(attribute.cluster_id, attribute.attribute_id)] = (eval(
-                                'matter.clusters.Objects.' + clusterName + '.Attributes.' + attributeName), obj)
+                                'chip.clusters.Objects.' + clusterName + '.Attributes.' + attributeName), obj)
 
 
 def _BuildClusterIndex():
     ''' Build internal cluster index for locating the corresponding cluster object by path in the future.
     '''
-    for clusterName, obj in inspect.getmembers(sys.modules['matter.clusters.Objects']):
-        if ('matter.clusters.Objects' in str(obj)) and inspect.isclass(obj) and issubclass(obj, Cluster):
+    for clusterName, obj in inspect.getmembers(sys.modules['chip.clusters.Objects']):
+        if ('chip.clusters.Objects' in str(obj)) and inspect.isclass(obj) and issubclass(obj, Cluster):
             _ClusterIndex[obj.id] = obj
 
 
@@ -626,8 +626,8 @@ def _BuildEventIndex():
     We do this because this operation will take a long time when there are lots of events, it takes about 300ms for a single query.
     This is acceptable during init, but unacceptable when the server returns lots of events at the same time.
     '''
-    for clusterName, obj in inspect.getmembers(sys.modules['matter.clusters.Objects']):
-        if ('matter.clusters.Objects' in str(obj)) and inspect.isclass(obj):
+    for clusterName, obj in inspect.getmembers(sys.modules['chip.clusters.Objects']):
+        if ('chip.clusters.Objects' in str(obj)) and inspect.isclass(obj):
             for objName, subclass in inspect.getmembers(obj):
                 if inspect.isclass(subclass) and (('Events' == objName)):
                     for eventName, event in inspect.getmembers(subclass):
@@ -641,7 +641,7 @@ def _BuildEventIndex():
                                 continue
 
                             _EventIndex[str(EventPath(ClusterId=event.cluster_id, EventId=event.event_id))] = eval(
-                                'matter.clusters.Objects.' + clusterName + '.Events.' + eventName)
+                                'chip.clusters.Objects.' + clusterName + '.Events.' + eventName)
 
 
 class AsyncReadTransaction:
