@@ -1,0 +1,170 @@
+# Copyright (c) 2025 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# TODO: Add the test cases for indirect CRLs
+
+name:
+    29.1.9. [TC-DA-1.9] Device Attestation Revocation
+    [DUT-Commissioner]
+
+PICS:
+    - MCORE.ROLE.COMMISSIONER
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Precondition/Test case description"
+      verification: |
+          (for all steps, PIs use equivalent command on their respective platform)
+          Validate that the DUT properly handles revoked device attestation certificates during commissioning, including certificates revoked through indirect CRLs.
+          set the $CHIP_ROOT environment variable to the location of the connectedhomeip directory (cd to the connectedhomeip directory, use command `export CHIP_ROOT=$(pwd -P)`
+          For testing Device Attestation Revocation feature, commissioners must allow commissioning the end device with Vendor Id 0xFFF1.
+          For each test data set scenario outlined in the TC-DA-1.9, perform the following actions
+          - Start the TH using the required device attestation certificate set.
+          - Have the DUT commission the TH. If either DAC or PAI certificate has been revoked, verify that the DUT warns the user that they are commissioning a non-genuine device, or otherwise indicates a failure of device attestation, within its error handling APIs or user interface. If either the DAC or PAI is not revoked, verify that the DUT successfully commissions the TH.
+          - factory reset the TH.
+      disabled: true
+
+    - label:
+          "Step 1: Precondition: For each of the following test cases, start the
+          TH using the appropriate certificate set, commission the TH using the
+          DUT, then factory reset the TH:"
+      verification: |
+          Perform the following actions (PIs use equivalent command on their respective platform)
+          - Start the TH using the required certificate set and PID. For chip-all-clusters-app, use the command given in the chip-all-clusters app command column
+          - Have the DUT commission the TH. Verify that the TH is successfully commissioned for each test case
+          - factory reset the TH
+            command when using chip-all-clusters-app: sudo rm -rf /tmp/chip_*
+      disabled: true
+
+    - label: "Step 2: Test case 1: DAC of the TH has been revoked"
+      verification: |
+          Perform the following actions (PIs use equivalent command on their respective platform)
+
+          - On TH, run all-clusters-app with the following command line arguments:
+          ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/test/revoked-attestation-certificates/dac-provider-test-vectors/revoked-dac-01.json
+
+          - Once TH(all-clusters-app) reach the commissionable state please send below mentioned command on DUT(chip-tool). Please use equivalent command on the respective platform
+          ./chip-tool pairing onnetwork-long 2 20202021 3840 --dac-revocation-set-path $CHIP_ROOT/credentials/test/revoked-attestation-certificates/revocation-sets/revocation-set.json
+
+          - Verify that TH(all-clusters-app) is not commissioned.
+
+          [1742963842.121] [2195:10977512:chip] [SVR] Failsafe timer expired
+          [1742963842.121] [2195:10977512:chip] [IN] SecureSession[0x158006a80]: MarkForEviction Type:1 LSID:9545
+          [1742963842.121] [2195:10977512:chip] [SC] SecureSession[0x158006a80, LSID:9545]: State change 'kActive' --> 'kPendingEviction'
+          [1742963842.121] [2195:10977512:chip] [IN] SecureSession[0x158006a80]: Released - Type:1 LSID:9545
+          [1742963842.121] [2195:10977512:chip] [SVR] Commissioning failed (attempt 1): src/app/server/CommissioningWindowManager.cpp:89: CHIP Error 0x00000032: Timeout
+
+          - Verify DUT(chip-tool) does not commissions the TH and generates the following error.
+
+          [1742963463.083] [1672:10971402:chip] [-] Found revoked DAC in /Users/shubhampatil/esp/connectedhomeip/credentials/test/revoked-attestation-certificates/revocation-sets/revocation-set.json
+          ...
+          [1742963463.083] [1672:10971402:chip] [CTL] Failed in verifying 'Attestation Information' command received from the device: err 302. Look at AttestationVerificationResult enum to understand the errors
+          [1742963463.083] [1672:10971402:chip] [CTL] Error on commissioning step 'AttestationRevocationCheck': 'src/controller/CHIPDeviceController.cpp:1337: CHIP Error 0x000000AC: Internal error'
+
+          - Factory reset the TH
+      disabled: true
+
+    - label: "Step 3: Test case 2: PAI of the TH has been revoked"
+      verification: |
+          Perform the following actions (PIs use equivalent command on their respective platform)
+
+          - On TH, run all-clusters-app with the following command line arguments:
+          ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/test/revoked-attestation-certificates/dac-provider-test-vectors/revoked-pai.json
+
+          - Once TH(all-clusters-app) reach the commissionable state please send below mentioned command on DUT(chip-tool). Please use equivalent command on the respective platform
+          ./chip-tool pairing onnetwork-long 2 20202021 3840 --dac-revocation-set-path $CHIP_ROOT/credentials/test/revoked-attestation-certificates/revocation-sets/revocation-set.json
+
+          - Verify that TH(all-clusters-app) is not commissioned.
+
+          [1742963842.121] [2195:10977512:chip] [SVR] Failsafe timer expired
+          [1742963842.121] [2195:10977512:chip] [IN] SecureSession[0x158006a80]: MarkForEviction Type:1 LSID:9545
+          [1742963842.121] [2195:10977512:chip] [SC] SecureSession[0x158006a80, LSID:9545]: State change 'kActive' --> 'kPendingEviction'
+          [1742963842.121] [2195:10977512:chip] [IN] SecureSession[0x158006a80]: Released - Type:1 LSID:9545
+          [1742963842.121] [2195:10977512:chip] [SVR] Commissioning failed (attempt 1): src/app/server/CommissioningWindowManager.cpp:89: CHIP Error 0x00000032: Timeout
+
+          - Verify DUT(chip-tool) does not commissions the TH and generates the following error.
+
+          [1742963842.120] [2215:10977509:chip] [-] Found revoked PAI in /Users/shubhampatil/esp/connectedhomeip/credentials/test/revoked-attestation-certificates/revocation-sets/revocation-set.json
+          [1742963842.120] [2215:10977509:chip] [CTL] Failed in verifying 'Attestation Information' command received from the device: err 202. Look at AttestationVerificationResult enum to understand the errors
+          [1742963842.120] [2215:10977509:chip] [CTL] Error on commissioning step 'AttestationRevocationCheck': 'src/controller/CHIPDeviceController.cpp:1337: CHIP Error 0x000000AC: Internal error'
+
+          - Factory reset the TH
+      disabled: true
+
+    - label: "Step 4: Test case 3: DAC and PAI of the TH has been revoked"
+      verification: |
+          Perform the following actions (PIs use equivalent command on their respective platform)
+
+          - On TH, run all-clusters-app with the following command line arguments:
+          ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/test/revoked-attestation-certificates/dac-provider-test-vectors/revoked-dac-and-pai.json
+
+          - Once TH(all-clusters-app) reach the commissionable state please send below mentioned command on DUT(chip-tool). Please use equivalent command on the respective platform
+          ./chip-tool pairing onnetwork-long 2 20202021 3840 --dac-revocation-set-path $CHIP_ROOT/credentials/test/revoked-attestation-certificates/revocation-sets/revocation-set.json
+
+          - Verify that TH(all-clusters-app) is not commissioned.
+
+          [1742963842.121] [2195:10977512:chip] [SVR] Failsafe timer expired
+          [1742963842.121] [2195:10977512:chip] [IN] SecureSession[0x158006a80]: MarkForEviction Type:1 LSID:9545
+          [1742963842.121] [2195:10977512:chip] [SC] SecureSession[0x158006a80, LSID:9545]: State change 'kActive' --> 'kPendingEviction'
+          [1742963842.121] [2195:10977512:chip] [IN] SecureSession[0x158006a80]: Released - Type:1 LSID:9545
+          [1742963842.121] [2195:10977512:chip] [SVR] Commissioning failed (attempt 1): src/app/server/CommissioningWindowManager.cpp:89: CHIP Error 0x00000032: Timeout
+
+          - Verify DUT(chip-tool) does not commissions the TH and generates the following error.
+
+          [1742964283.140] [2345:10982441:chip] [-] Found revoked DAC in /Users/shubhampatil/esp/connectedhomeip/credentials/test/revoked-attestation-certificates/revocation-sets/revocation-set.json
+          ...
+          [1742964283.140] [2345:10982441:chip] [-] Found revoked PAI in /Users/shubhampatil/esp/connectedhomeip/credentials/test/revoked-attestation-certificates/revocation-sets/revocation-set.json
+          [1742964283.140] [2345:10982441:chip] [CTL] Failed in verifying 'Attestation Information' command received from the device: err 208. Look at AttestationVerificationResult enum to understand the errors
+          [1742964283.140] [2345:10982441:chip] [CTL] Error on commissioning step 'AttestationRevocationCheck': 'src/controller/CHIPDeviceController.cpp:1337: CHIP Error 0x000000AC: Internal error'
+
+          - Factory reset the TH
+      disabled: true
+
+    - label: "Step 5: Test case 4: DAC and PAI has not been revoked"
+      verification: |
+          Perform the following actions (PIs use equivalent command on their respective platform)
+
+          - On TH, run all-clusters-app with the following command line arguments:
+          ./chip-all-clusters-app --trace_decode 1
+
+          - Once TH(all-clusters-app) reach the commissionable state please send below mentioned command on DUT(chip-tool). Please use equivalent command on the respective platform
+          ./chip-tool pairing onnetwork-long 2 20202021 3840 --dac-revocation-set-path $CHIP_ROOT/credentials/test/revoked-attestation-certificates/revocation-sets/revocation-set.json
+
+          - Verify that TH(all-clusters-app) has been successfully commissioned by the DUT(chip-tool)
+
+          [1742964438.435] [2434:10984854:chip] [SVR] Commissioning completed successfully
+          [1742964438.435] [2434:10984854:chip] [DIS] Updating services using commissioning mode 0
+          [1742964438.435] [2434:10984854:chip] [DIS] Advertise operational node C8413A3DA6D209C5-0000000000000002
+          [1742964438.435] [2434:10984854:chip] [DIS] Registering service C8413A3DA6D209C5-0000000000000002 on host 920F868BAEF5.local. with port 5540 and type: _matter._tcp,_IC8413A3DA6D209C5 on interface id: 0
+
+          - Verify DUT(chip-tool) commissions the TH.
+
+          [1742964438.435] [2438:10984848:chip] [CTL] Commissioning complete for node ID 0x0000000000000002: success
+          [1742964438.435] [2438:10984848:chip] [TOO] Device commissioning completed with success
+          ...
+          [1742964438.435] [2438:10984843:main] [BLE] ConnectionDelegate CancelConnection
+          [1742964438.435] [2438:10984843:main] [FP] Shutting down FabricTable
+          [1742964438.435] [2438:10984843:main] [TS] Pending Last Known Good Time: 2023-10-14T01:16:48
+          [1742964438.436] [2438:10984843:main] [TS] Previous Last Known Good Time: 2023-10-14T01:16:48
+          [1742964438.436] [2438:10984843:main] [TS] Reverted Last Known Good Time to previous value
+          [1742964438.436] [2438:10984843:main] [DL] Inet Layer shutdown
+          [1742964438.436] [2438:10984843:main] [DL] BLE Layer shutdown
+          [1742964438.436] [2438:10984843:main] [DL] System Layer shutdown
+
+        - Factory reset the TH
+      disabled: true
