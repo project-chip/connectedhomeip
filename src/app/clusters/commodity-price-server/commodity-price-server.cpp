@@ -152,5 +152,3 @@ void Instance::HandleGetDetailedForecastRequest(HandlerContext & ctx,
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-
-void MatterCommodityPricePluginServerInitCallback() {}
