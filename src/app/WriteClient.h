@@ -211,7 +211,8 @@ public:
             // StartNewMessage was called to make sure we always create a new chunk when we have a new Attribute to Encode, this
             // might be more efficient
             // TODO should we keep this or just use EnsureMessage; if we choose EnsureMessage, we will have to adapt
-            // EnsureListStarted to make sure we create a New Chunk if it fails (could happens when a new Attribute is added)
+            // EnsureListStarted to make sure we create a New Chunk if it fails (could happens when a new Attribute is added to the
+            // same chunk)
             ReturnErrorOnFailure(StartNewMessage());
 
             // TODO CHANGE NAME OF numEncodedItems
