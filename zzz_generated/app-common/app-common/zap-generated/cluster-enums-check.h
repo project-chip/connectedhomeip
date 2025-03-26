@@ -294,9 +294,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(detail::MeasurementMedi
         return EnumType::kUnknownEnumValue;
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::MeasurementTypeEnum val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(detail::MeasurementTypeEnum val)
 {
-    using EnumType = Globals::MeasurementTypeEnum;
+    using EnumType = detail::MeasurementTypeEnum;
     switch (val)
     {
     case EnumType::kUnspecified:
@@ -321,7 +321,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::MeasurementTyp
         return EnumType::kUnknownEnumValue;
     }
 }
-
 static auto __attribute__((unused)) EnsureKnownEnumValue(detail::MeasurementUnitEnum val)
 {
     using EnumType = detail::MeasurementUnitEnum;
