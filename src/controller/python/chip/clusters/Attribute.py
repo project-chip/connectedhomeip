@@ -38,6 +38,7 @@ from ..interaction_model import Status as InteractionModelStatus
 from ..native import ErrorSDKPart, GetLibraryHandle, NativeLibraryHandleMethodArguments, PyChipError
 from ..tlv import TLVReader
 from .ClusterObjects import Cluster, ClusterAttributeDescriptor, ClusterEvent
+from . import Objects as GeneratedObjects
 
 LOGGER = logging.getLogger(__name__)
 
@@ -269,7 +270,7 @@ def _BuildAttributeIndex():
                                 continue
 
                             _AttributeIndex[(attribute.cluster_id, attribute.attribute_id)] = (eval(
-                                'chip.clusters.Objects.' + clusterName + '.Attributes.' + attributeName), obj)
+                                'GeneratedObjects.' + clusterName + '.Attributes.' + attributeName), obj)
 
 
 def _BuildClusterIndex():
@@ -641,7 +642,7 @@ def _BuildEventIndex():
                                 continue
 
                             _EventIndex[str(EventPath(ClusterId=event.cluster_id, EventId=event.event_id))] = eval(
-                                'chip.clusters.Objects.' + clusterName + '.Events.' + eventName)
+                                'GeneratedObjects.' + clusterName + '.Events.' + eventName)
 
 
 class AsyncReadTransaction:
