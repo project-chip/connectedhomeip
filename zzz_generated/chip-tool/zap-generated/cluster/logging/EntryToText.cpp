@@ -2017,8 +2017,6 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
     case chip::app::Clusters::ScenesManagement::Id: {
         switch (id)
         {
-        case chip::app::Clusters::ScenesManagement::Attributes::LastConfiguredBy::Id:
-            return "LastConfiguredBy";
         case chip::app::Clusters::ScenesManagement::Attributes::SceneTableSize::Id:
             return "SceneTableSize";
         case chip::app::Clusters::ScenesManagement::Attributes::FabricSceneInfo::Id:
@@ -5038,10 +5036,10 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "RemoveFabric";
         case chip::app::Clusters::OperationalCredentials::Commands::AddTrustedRootCertificate::Id:
             return "AddTrustedRootCertificate";
-        case chip::app::Clusters::OperationalCredentials::Commands::SetVidVerificationStatement::Id:
-            return "SetVidVerificationStatement";
-        case chip::app::Clusters::OperationalCredentials::Commands::SignVidVerificationRequest::Id:
-            return "SignVidVerificationRequest";
+        case chip::app::Clusters::OperationalCredentials::Commands::SetVIDVerificationStatement::Id:
+            return "SetVIDVerificationStatement";
+        case chip::app::Clusters::OperationalCredentials::Commands::SignVIDVerificationRequest::Id:
+            return "SignVIDVerificationRequest";
         default:
             return "Unknown";
         }
@@ -6163,8 +6161,8 @@ char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId i
             return "CSRResponse";
         case chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::Id:
             return "NOCResponse";
-        case chip::app::Clusters::OperationalCredentials::Commands::SignVidVerificationResponse::Id:
-            return "SignVidVerificationResponse";
+        case chip::app::Clusters::OperationalCredentials::Commands::SignVIDVerificationResponse::Id:
+            return "SignVIDVerificationResponse";
         default:
             return "Unknown";
         }

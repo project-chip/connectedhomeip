@@ -6070,17 +6070,17 @@ bool emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::OperationalCredentials::Commands::AddTrustedRootCertificate::DecodableType & commandData);
 /**
- * @brief Operational Credentials Cluster SetVidVerificationStatement Command callback (from client)
+ * @brief Operational Credentials Cluster SetVIDVerificationStatement Command callback (from client)
  */
-bool emberAfOperationalCredentialsClusterSetVidVerificationStatementCallback(
+bool emberAfOperationalCredentialsClusterSetVIDVerificationStatementCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::OperationalCredentials::Commands::SetVidVerificationStatement::DecodableType & commandData);
+    const chip::app::Clusters::OperationalCredentials::Commands::SetVIDVerificationStatement::DecodableType & commandData);
 /**
- * @brief Operational Credentials Cluster SignVidVerificationRequest Command callback (from client)
+ * @brief Operational Credentials Cluster SignVIDVerificationRequest Command callback (from client)
  */
-bool emberAfOperationalCredentialsClusterSignVidVerificationRequestCallback(
+bool emberAfOperationalCredentialsClusterSignVIDVerificationRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::OperationalCredentials::Commands::SignVidVerificationRequest::DecodableType & commandData);
+    const chip::app::Clusters::OperationalCredentials::Commands::SignVIDVerificationRequest::DecodableType & commandData);
 /**
  * @brief Group Key Management Cluster KeySetWrite Command callback (from client)
  */
@@ -6883,66 +6883,6 @@ bool emberAfZoneManagementClusterGetTwoDCartesianZoneCallback(
 bool emberAfZoneManagementClusterRemoveZoneCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ZoneManagement::Commands::RemoveZone::DecodableType & commandData);
-/**
- * @brief Camera AV Stream Management Cluster AudioStreamAllocate Command callback (from client)
- */
-bool emberAfCameraAvStreamManagementClusterAudioStreamAllocateCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CameraAvStreamManagement::Commands::AudioStreamAllocate::DecodableType & commandData);
-/**
- * @brief Camera AV Stream Management Cluster AudioStreamDeallocate Command callback (from client)
- */
-bool emberAfCameraAvStreamManagementClusterAudioStreamDeallocateCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CameraAvStreamManagement::Commands::AudioStreamDeallocate::DecodableType & commandData);
-/**
- * @brief Camera AV Stream Management Cluster VideoStreamAllocate Command callback (from client)
- */
-bool emberAfCameraAvStreamManagementClusterVideoStreamAllocateCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CameraAvStreamManagement::Commands::VideoStreamAllocate::DecodableType & commandData);
-/**
- * @brief Camera AV Stream Management Cluster VideoStreamModify Command callback (from client)
- */
-bool emberAfCameraAvStreamManagementClusterVideoStreamModifyCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CameraAvStreamManagement::Commands::VideoStreamModify::DecodableType & commandData);
-/**
- * @brief Camera AV Stream Management Cluster VideoStreamDeallocate Command callback (from client)
- */
-bool emberAfCameraAvStreamManagementClusterVideoStreamDeallocateCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CameraAvStreamManagement::Commands::VideoStreamDeallocate::DecodableType & commandData);
-/**
- * @brief Camera AV Stream Management Cluster SnapshotStreamAllocate Command callback (from client)
- */
-bool emberAfCameraAvStreamManagementClusterSnapshotStreamAllocateCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CameraAvStreamManagement::Commands::SnapshotStreamAllocate::DecodableType & commandData);
-/**
- * @brief Camera AV Stream Management Cluster SnapshotStreamModify Command callback (from client)
- */
-bool emberAfCameraAvStreamManagementClusterSnapshotStreamModifyCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CameraAvStreamManagement::Commands::SnapshotStreamModify::DecodableType & commandData);
-/**
- * @brief Camera AV Stream Management Cluster SnapshotStreamDeallocate Command callback (from client)
- */
-bool emberAfCameraAvStreamManagementClusterSnapshotStreamDeallocateCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CameraAvStreamManagement::Commands::SnapshotStreamDeallocate::DecodableType & commandData);
-/**
- * @brief Camera AV Stream Management Cluster SetStreamPriorities Command callback (from client)
- */
-bool emberAfCameraAvStreamManagementClusterSetStreamPrioritiesCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CameraAvStreamManagement::Commands::SetStreamPriorities::DecodableType & commandData);
-/**
- * @brief Camera AV Stream Management Cluster CaptureSnapshot Command callback (from client)
- */
-bool emberAfCameraAvStreamManagementClusterCaptureSnapshotCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CameraAvStreamManagement::Commands::CaptureSnapshot::DecodableType & commandData);
 /**
  * @brief Camera AV Settings User Level Management Cluster MPTZSetPosition Command callback (from client)
  */

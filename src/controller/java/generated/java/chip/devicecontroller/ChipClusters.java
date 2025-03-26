@@ -16117,11 +16117,11 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void setVidVerificationStatement(DefaultClusterCallback callback, Optional<Integer> vendorID, Optional<byte[]> vidVerificationStatement, Optional<byte[]> vvsc) {
-      setVidVerificationStatement(callback, vendorID, vidVerificationStatement, vvsc, 0);
+    public void setVIDVerificationStatement(DefaultClusterCallback callback, Optional<Integer> vendorID, Optional<byte[]> VIDVerificationStatement, Optional<byte[]> vvsc) {
+      setVIDVerificationStatement(callback, vendorID, VIDVerificationStatement, vvsc, 0);
     }
 
-    public void setVidVerificationStatement(DefaultClusterCallback callback, Optional<Integer> vendorID, Optional<byte[]> vidVerificationStatement, Optional<byte[]> vvsc, int timedInvokeTimeoutMs) {
+    public void setVIDVerificationStatement(DefaultClusterCallback callback, Optional<Integer> vendorID, Optional<byte[]> VIDVerificationStatement, Optional<byte[]> vvsc, int timedInvokeTimeoutMs) {
       final long commandId = 12L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -16129,9 +16129,9 @@ public class ChipClusters {
       BaseTLVType vendorIDtlvValue = vendorID.<BaseTLVType>map((nonOptionalvendorID) -> new UIntType(nonOptionalvendorID)).orElse(new EmptyType());
       elements.add(new StructElement(vendorIDFieldID, vendorIDtlvValue));
 
-      final long vidVerificationStatementFieldID = 1L;
-      BaseTLVType vidVerificationStatementtlvValue = vidVerificationStatement.<BaseTLVType>map((nonOptionalvidVerificationStatement) -> new ByteArrayType(nonOptionalvidVerificationStatement)).orElse(new EmptyType());
-      elements.add(new StructElement(vidVerificationStatementFieldID, vidVerificationStatementtlvValue));
+      final long VIDVerificationStatementFieldID = 1L;
+      BaseTLVType VIDVerificationStatementtlvValue = VIDVerificationStatement.<BaseTLVType>map((nonOptionalVIDVerificationStatement) -> new ByteArrayType(nonOptionalVIDVerificationStatement)).orElse(new EmptyType());
+      elements.add(new StructElement(VIDVerificationStatementFieldID, VIDVerificationStatementtlvValue));
 
       final long vvscFieldID = 2L;
       BaseTLVType vvsctlvValue = vvsc.<BaseTLVType>map((nonOptionalvvsc) -> new ByteArrayType(nonOptionalvvsc)).orElse(new EmptyType());
@@ -16145,11 +16145,11 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void signVidVerificationRequest(SignVidVerificationResponseCallback callback, Integer fabricIndex, byte[] clientChallenge) {
-      signVidVerificationRequest(callback, fabricIndex, clientChallenge, 0);
+    public void signVIDVerificationRequest(SignVIDVerificationResponseCallback callback, Integer fabricIndex, byte[] clientChallenge) {
+      signVIDVerificationRequest(callback, fabricIndex, clientChallenge, 0);
     }
 
-    public void signVidVerificationRequest(SignVidVerificationResponseCallback callback, Integer fabricIndex, byte[] clientChallenge, int timedInvokeTimeoutMs) {
+    public void signVIDVerificationRequest(SignVIDVerificationResponseCallback callback, Integer fabricIndex, byte[] clientChallenge, int timedInvokeTimeoutMs) {
       final long commandId = 13L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -16209,7 +16209,7 @@ public class ChipClusters {
       void onSuccess(Integer statusCode, Optional<Integer> fabricIndex, Optional<String> debugText);
     }
 
-    public interface SignVidVerificationResponseCallback extends BaseClusterCallback {
+    public interface SignVIDVerificationResponseCallback extends BaseClusterCallback {
       void onSuccess(Integer fabricIndex, Integer fabricBindingVersion, byte[] signature);
     }
 
@@ -25846,7 +25846,6 @@ public class ChipClusters {
   public static class ScenesManagementCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 98L;
 
-    private static final long LAST_CONFIGURED_BY_ATTRIBUTE_ID = 0L;
     private static final long SCENE_TABLE_SIZE_ATTRIBUTE_ID = 1L;
     private static final long FABRIC_SCENE_INFO_ATTRIBUTE_ID = 2L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
@@ -25866,11 +25865,11 @@ public class ChipClusters {
       return 0L;
     }
 
-    public void addScene(AddSceneResponseCallback callback, Integer groupID, Integer sceneID, Long transitionTime, String sceneName, ArrayList<ChipStructs.ScenesManagementClusterExtensionFieldSet> extensionFieldSets) {
-      addScene(callback, groupID, sceneID, transitionTime, sceneName, extensionFieldSets, 0);
+    public void addScene(AddSceneResponseCallback callback, Integer groupID, Integer sceneID, Long transitionTime, String sceneName, ArrayList<ChipStructs.ScenesManagementClusterExtensionFieldSetStruct> extensionFieldSetStructs) {
+      addScene(callback, groupID, sceneID, transitionTime, sceneName, extensionFieldSetStructs, 0);
     }
 
-    public void addScene(AddSceneResponseCallback callback, Integer groupID, Integer sceneID, Long transitionTime, String sceneName, ArrayList<ChipStructs.ScenesManagementClusterExtensionFieldSet> extensionFieldSets, int timedInvokeTimeoutMs) {
+    public void addScene(AddSceneResponseCallback callback, Integer groupID, Integer sceneID, Long transitionTime, String sceneName, ArrayList<ChipStructs.ScenesManagementClusterExtensionFieldSetStruct> extensionFieldSetStructs, int timedInvokeTimeoutMs) {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -25890,9 +25889,9 @@ public class ChipClusters {
       BaseTLVType sceneNametlvValue = new StringType(sceneName);
       elements.add(new StructElement(sceneNameFieldID, sceneNametlvValue));
 
-      final long extensionFieldSetsFieldID = 4L;
-      BaseTLVType extensionFieldSetstlvValue = ArrayType.generateArrayType(extensionFieldSets, (elementextensionFieldSets) -> elementextensionFieldSets.encodeTlv());
-      elements.add(new StructElement(extensionFieldSetsFieldID, extensionFieldSetstlvValue));
+      final long extensionFieldSetStructsFieldID = 4L;
+      BaseTLVType extensionFieldSetStructstlvValue = ArrayType.generateArrayType(extensionFieldSetStructs, (elementextensionFieldSetStructs) -> elementextensionFieldSetStructs.encodeTlv());
+      elements.add(new StructElement(extensionFieldSetStructsFieldID, extensionFieldSetStructstlvValue));
 
       StructType commandArgs = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
@@ -25956,8 +25955,8 @@ public class ChipClusters {
           Optional<Long> transitionTime = Optional.empty();
           final long sceneNameFieldID = 4L;
           Optional<String> sceneName = Optional.empty();
-          final long extensionFieldSetsFieldID = 5L;
-          Optional<ArrayList<ChipStructs.ScenesManagementClusterExtensionFieldSet>> extensionFieldSets = Optional.empty();
+          final long extensionFieldSetStructsFieldID = 5L;
+          Optional<ArrayList<ChipStructs.ScenesManagementClusterExtensionFieldSetStruct>> extensionFieldSetStructs = Optional.empty();
           for (StructElement element: invokeStructValue.value()) {
             if (element.contextTagNum() == statusFieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -25984,14 +25983,14 @@ public class ChipClusters {
                 StringType castingValue = element.value(StringType.class);
                 sceneName = Optional.of(castingValue.value(String.class));
               }
-            } else if (element.contextTagNum() == extensionFieldSetsFieldID) {
+            } else if (element.contextTagNum() == extensionFieldSetStructsFieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.Array) {
                 ArrayType castingValue = element.value(ArrayType.class);
-                extensionFieldSets = Optional.of(castingValue.map((elementcastingValue) -> ChipStructs.ScenesManagementClusterExtensionFieldSet.decodeTlv(elementcastingValue)));
+                extensionFieldSetStructs = Optional.of(castingValue.map((elementcastingValue) -> ChipStructs.ScenesManagementClusterExtensionFieldSetStruct.decodeTlv(elementcastingValue)));
               }
             }
           }
-          callback.onSuccess(status, groupID, sceneID, transitionTime, sceneName, extensionFieldSets);
+          callback.onSuccess(status, groupID, sceneID, transitionTime, sceneName, extensionFieldSetStructs);
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
@@ -26272,7 +26271,7 @@ public class ChipClusters {
     }
 
     public interface ViewSceneResponseCallback extends BaseClusterCallback {
-      void onSuccess(Integer status, Integer groupID, Integer sceneID, Optional<Long> transitionTime, Optional<String> sceneName, Optional<ArrayList<ChipStructs.ScenesManagementClusterExtensionFieldSet>> extensionFieldSets);
+      void onSuccess(Integer status, Integer groupID, Integer sceneID, Optional<Long> transitionTime, Optional<String> sceneName, Optional<ArrayList<ChipStructs.ScenesManagementClusterExtensionFieldSetStruct>> extensionFieldSetStructs);
     }
 
     public interface RemoveSceneResponseCallback extends BaseClusterCallback {
@@ -26295,10 +26294,6 @@ public class ChipClusters {
       void onSuccess(Integer status, Integer groupIdentifierFrom, Integer sceneIdentifierFrom);
     }
 
-    public interface LastConfiguredByAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable Long value);
-    }
-
     public interface FabricSceneInfoAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<ChipStructs.ScenesManagementClusterSceneInfoStruct> value);
     }
@@ -26317,32 +26312,6 @@ public class ChipClusters {
 
     public interface AttributeListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
-    }
-
-    public void readLastConfiguredByAttribute(
-        LastConfiguredByAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, LAST_CONFIGURED_BY_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, LAST_CONFIGURED_BY_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeLastConfiguredByAttribute(
-        LastConfiguredByAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, LAST_CONFIGURED_BY_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, LAST_CONFIGURED_BY_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readSceneTableSizeAttribute(
@@ -62557,11 +62526,11 @@ public class ChipClusters {
       return 0L;
     }
 
-    public void solicitOffer(SolicitOfferResponseCallback callback, Integer streamUsage, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID, Optional<ArrayList<ChipStructs.WebRTCTransportProviderClusterICEServerStruct>> ICEServers, Optional<String> ICETransportPolicy, Optional<Integer> metadataOptions) {
-      solicitOffer(callback, streamUsage, videoStreamID, audioStreamID, ICEServers, ICETransportPolicy, metadataOptions, 0);
+    public void solicitOffer(SolicitOfferResponseCallback callback, Integer streamUsage, Integer originatingEndpointID, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID, Optional<ArrayList<ChipStructs.WebRTCTransportProviderClusterICEServerStruct>> ICEServers, Optional<String> ICETransportPolicy, Optional<Integer> metadataOptions) {
+      solicitOffer(callback, streamUsage, originatingEndpointID, videoStreamID, audioStreamID, ICEServers, ICETransportPolicy, metadataOptions, 0);
     }
 
-    public void solicitOffer(SolicitOfferResponseCallback callback, Integer streamUsage, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID, Optional<ArrayList<ChipStructs.WebRTCTransportProviderClusterICEServerStruct>> ICEServers, Optional<String> ICETransportPolicy, Optional<Integer> metadataOptions, int timedInvokeTimeoutMs) {
+    public void solicitOffer(SolicitOfferResponseCallback callback, Integer streamUsage, Integer originatingEndpointID, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID, Optional<ArrayList<ChipStructs.WebRTCTransportProviderClusterICEServerStruct>> ICEServers, Optional<String> ICETransportPolicy, Optional<Integer> metadataOptions, int timedInvokeTimeoutMs) {
       final long commandId = 1L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -62569,23 +62538,27 @@ public class ChipClusters {
       BaseTLVType streamUsagetlvValue = new UIntType(streamUsage);
       elements.add(new StructElement(streamUsageFieldID, streamUsagetlvValue));
 
-      final long videoStreamIDFieldID = 1L;
+      final long originatingEndpointIDFieldID = 1L;
+      BaseTLVType originatingEndpointIDtlvValue = new UIntType(originatingEndpointID);
+      elements.add(new StructElement(originatingEndpointIDFieldID, originatingEndpointIDtlvValue));
+
+      final long videoStreamIDFieldID = 2L;
       BaseTLVType videoStreamIDtlvValue = videoStreamID != null ? videoStreamID.<BaseTLVType>map((nonOptionalvideoStreamID) -> new UIntType(nonOptionalvideoStreamID)).orElse(new EmptyType()) : new NullType();
       elements.add(new StructElement(videoStreamIDFieldID, videoStreamIDtlvValue));
 
-      final long audioStreamIDFieldID = 2L;
+      final long audioStreamIDFieldID = 3L;
       BaseTLVType audioStreamIDtlvValue = audioStreamID != null ? audioStreamID.<BaseTLVType>map((nonOptionalaudioStreamID) -> new UIntType(nonOptionalaudioStreamID)).orElse(new EmptyType()) : new NullType();
       elements.add(new StructElement(audioStreamIDFieldID, audioStreamIDtlvValue));
 
-      final long ICEServersFieldID = 3L;
+      final long ICEServersFieldID = 4L;
       BaseTLVType ICEServerstlvValue = ICEServers.<BaseTLVType>map((nonOptionalICEServers) -> ArrayType.generateArrayType(nonOptionalICEServers, (elementnonOptionalICEServers) -> elementnonOptionalICEServers.encodeTlv())).orElse(new EmptyType());
       elements.add(new StructElement(ICEServersFieldID, ICEServerstlvValue));
 
-      final long ICETransportPolicyFieldID = 4L;
+      final long ICETransportPolicyFieldID = 5L;
       BaseTLVType ICETransportPolicytlvValue = ICETransportPolicy.<BaseTLVType>map((nonOptionalICETransportPolicy) -> new StringType(nonOptionalICETransportPolicy)).orElse(new EmptyType());
       elements.add(new StructElement(ICETransportPolicyFieldID, ICETransportPolicytlvValue));
 
-      final long metadataOptionsFieldID = 5L;
+      final long metadataOptionsFieldID = 6L;
       BaseTLVType metadataOptionstlvValue = metadataOptions.<BaseTLVType>map((nonOptionalmetadataOptions) -> new UIntType(nonOptionalmetadataOptions)).orElse(new EmptyType());
       elements.add(new StructElement(metadataOptionsFieldID, metadataOptionstlvValue));
 
@@ -62628,11 +62601,11 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void provideOffer(ProvideOfferResponseCallback callback, @Nullable Integer webRTCSessionID, String sdp, Integer streamUsage, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID, Optional<ArrayList<ChipStructs.WebRTCTransportProviderClusterICEServerStruct>> ICEServers, Optional<String> ICETransportPolicy, Optional<Integer> metadataOptions) {
-      provideOffer(callback, webRTCSessionID, sdp, streamUsage, videoStreamID, audioStreamID, ICEServers, ICETransportPolicy, metadataOptions, 0);
+    public void provideOffer(ProvideOfferResponseCallback callback, @Nullable Integer webRTCSessionID, String sdp, Integer streamUsage, Integer originatingEndpointID, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID, Optional<ArrayList<ChipStructs.WebRTCTransportProviderClusterICEServerStruct>> ICEServers, Optional<String> ICETransportPolicy, Optional<Integer> metadataOptions) {
+      provideOffer(callback, webRTCSessionID, sdp, streamUsage, originatingEndpointID, videoStreamID, audioStreamID, ICEServers, ICETransportPolicy, metadataOptions, 0);
     }
 
-    public void provideOffer(ProvideOfferResponseCallback callback, @Nullable Integer webRTCSessionID, String sdp, Integer streamUsage, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID, Optional<ArrayList<ChipStructs.WebRTCTransportProviderClusterICEServerStruct>> ICEServers, Optional<String> ICETransportPolicy, Optional<Integer> metadataOptions, int timedInvokeTimeoutMs) {
+    public void provideOffer(ProvideOfferResponseCallback callback, @Nullable Integer webRTCSessionID, String sdp, Integer streamUsage, Integer originatingEndpointID, @Nullable Optional<Integer> videoStreamID, @Nullable Optional<Integer> audioStreamID, Optional<ArrayList<ChipStructs.WebRTCTransportProviderClusterICEServerStruct>> ICEServers, Optional<String> ICETransportPolicy, Optional<Integer> metadataOptions, int timedInvokeTimeoutMs) {
       final long commandId = 3L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -62648,23 +62621,27 @@ public class ChipClusters {
       BaseTLVType streamUsagetlvValue = new UIntType(streamUsage);
       elements.add(new StructElement(streamUsageFieldID, streamUsagetlvValue));
 
-      final long videoStreamIDFieldID = 3L;
+      final long originatingEndpointIDFieldID = 3L;
+      BaseTLVType originatingEndpointIDtlvValue = new UIntType(originatingEndpointID);
+      elements.add(new StructElement(originatingEndpointIDFieldID, originatingEndpointIDtlvValue));
+
+      final long videoStreamIDFieldID = 4L;
       BaseTLVType videoStreamIDtlvValue = videoStreamID != null ? videoStreamID.<BaseTLVType>map((nonOptionalvideoStreamID) -> new UIntType(nonOptionalvideoStreamID)).orElse(new EmptyType()) : new NullType();
       elements.add(new StructElement(videoStreamIDFieldID, videoStreamIDtlvValue));
 
-      final long audioStreamIDFieldID = 4L;
+      final long audioStreamIDFieldID = 5L;
       BaseTLVType audioStreamIDtlvValue = audioStreamID != null ? audioStreamID.<BaseTLVType>map((nonOptionalaudioStreamID) -> new UIntType(nonOptionalaudioStreamID)).orElse(new EmptyType()) : new NullType();
       elements.add(new StructElement(audioStreamIDFieldID, audioStreamIDtlvValue));
 
-      final long ICEServersFieldID = 5L;
+      final long ICEServersFieldID = 6L;
       BaseTLVType ICEServerstlvValue = ICEServers.<BaseTLVType>map((nonOptionalICEServers) -> ArrayType.generateArrayType(nonOptionalICEServers, (elementnonOptionalICEServers) -> elementnonOptionalICEServers.encodeTlv())).orElse(new EmptyType());
       elements.add(new StructElement(ICEServersFieldID, ICEServerstlvValue));
 
-      final long ICETransportPolicyFieldID = 6L;
+      final long ICETransportPolicyFieldID = 7L;
       BaseTLVType ICETransportPolicytlvValue = ICETransportPolicy.<BaseTLVType>map((nonOptionalICETransportPolicy) -> new StringType(nonOptionalICETransportPolicy)).orElse(new EmptyType());
       elements.add(new StructElement(ICETransportPolicyFieldID, ICETransportPolicytlvValue));
 
-      final long metadataOptionsFieldID = 7L;
+      final long metadataOptionsFieldID = 8L;
       BaseTLVType metadataOptionstlvValue = metadataOptions.<BaseTLVType>map((nonOptionalmetadataOptions) -> new UIntType(nonOptionalmetadataOptions)).orElse(new EmptyType());
       elements.add(new StructElement(metadataOptionsFieldID, metadataOptionstlvValue));
 

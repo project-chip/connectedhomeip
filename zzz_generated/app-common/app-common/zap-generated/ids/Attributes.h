@@ -3022,10 +3022,6 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace ScenesManagement {
 namespace Attributes {
 
-namespace LastConfiguredBy {
-static constexpr AttributeId Id = 0x00000000;
-} // namespace LastConfiguredBy
-
 namespace SceneTableSize {
 static constexpr AttributeId Id = 0x00000001;
 } // namespace SceneTableSize
