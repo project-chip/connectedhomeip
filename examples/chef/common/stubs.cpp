@@ -39,7 +39,6 @@ using namespace chip::app::Clusters;
 #include "refrigerator-and-temperature-controlled-cabinet-mode/tcc-mode.h"
 #endif // MATTER_DM_PLUGIN_REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_SERVER
 
-#ifdef MATTER_DM_PLUGIN_REFRIGERATOR_ALARM_SERVER
 namespace {
 
 // Please refer to https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces
@@ -53,7 +52,6 @@ const Clusters::Descriptor::Structs::SemanticTagStruct::Type gRefrigeratorTagLis
 const Clusters::Descriptor::Structs::SemanticTagStruct::Type gFreezerTagList[]      = { { .namespaceID = kNamespaceRefrigerator,
                                                                                           .tag         = kTagFreezer } };
 } // namespace
-#endif // MATTER_DM_PLUGIN_REFRIGERATOR_ALARM_SERVER
 
 #ifdef MATTER_DM_PLUGIN_RVC_OPERATIONAL_STATE_SERVER
 #include "chef-rvc-operational-state-delegate.h"

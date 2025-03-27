@@ -50,10 +50,10 @@ CHIP_ERROR DataModelUtils::getAllEndpointsHavingDeviceType(DeviceTypeId devieTyp
     for (const auto & ep : allEndpoints)
     {
         bool isOfDeviceType;
-        ReturnErrorOnFailure(isEndpointOfDeviceType(ep, devieType, isOfDeviceType));
+        ReturnErrorOnFailure(isEndpointOfDeviceType(ep.id, devieType, isOfDeviceType));
         if (isOfDeviceType)
         {
-            ReturnErrorOnFailure(builder.Append(ep));
+            ReturnErrorOnFailure(builder.Append(ep.id));
         }
     }
     return CHIP_NO_ERROR;
