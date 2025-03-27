@@ -156,6 +156,8 @@ std::unique_ptr<EcosystemDeviceStruct> EcosystemDeviceStruct::Builder::Build()
     return ret;
 }
 
+// Adding comment to just touch the file to see if CI run clang check on this file
+
 CHIP_ERROR EcosystemDeviceStruct::Encode(const AttributeValueEncoder::ListEncodeHelper & aEncoder)
 {
     Structs::EcosystemDeviceStruct::Type deviceStruct;
