@@ -59,8 +59,6 @@
 
 #define CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE 0
 
-#define CHIP_CONFIG_DATA_MANAGEMENT_CLIENT_EXPERIMENTAL 1
-
 /* TODO: Ideally, these #defines should be enabled by default for Linux
  AND the python tool would provide runtime options to enable/disable them */
 #define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY 1

@@ -471,6 +471,21 @@ public class ChipDeviceController {
   }
 
   /**
+   * Establish a secure PASE connection using the scanned QR code or manual entry code.
+   *
+   * @param deviceId the ID of the node to connect to
+   * @param setupCode the scanned QR code or manual entry code
+   * @param useOnlyOnNetworkDiscovery the flag to indicate the commissionable device is available on
+   *     the network
+   */
+  public void establishPaseConnection(
+      long deviceId, String setupCode, boolean useOnlyOnNetworkDiscovery) {
+    Log.d(TAG, "Establishing PASE connection using Code: " + setupCode);
+    establishPaseConnectionByCode(
+        deviceControllerPtr, deviceId, setupCode, useOnlyOnNetworkDiscovery);
+  }
+
+  /**
    * Initiates the automatic commissioning flow using the specified network credentials. It is
    * expected that a secure session has already been established via {@link
    * #establishPaseConnection(long, int, long)}.
@@ -866,6 +881,20 @@ public class ChipDeviceController {
       OpenCommissioningCallback callback) {
     return openPairingWindowWithPINCallback(
         deviceControllerPtr, devicePtr, duration, iteration, discriminator, setupPinCode, callback);
+  }
+
+  /**
+   * This function is used for downloading logs from the device.
+   *
+   * @param deviceId The 64-bit node ID of the device.
+   * @param type The log type being downloaded. See detailed in {@link DiagnosticLogType}.
+   * @param timeout This function sets the timeout. If set to 0, there will be no timeout.
+   * @param callback The callback is registered to convey the status during log downloads. See
+   *     detailed in {@link DownloadLogCallback}.
+   */
+  public boolean downloadLogFromNode(
+      long deviceId, DiagnosticLogType type, long timeout, DownloadLogCallback callback) {
+    return downloadLogFromNode(deviceControllerPtr, deviceId, type.getValue(), timeout, callback);
   }
 
   public int getFabricIndex() {
@@ -1624,6 +1653,9 @@ public class ChipDeviceController {
   private native void establishPaseConnectionByAddress(
       long deviceControllerPtr, long deviceId, String address, int port, long setupPincode);
 
+  private native void establishPaseConnectionByCode(
+      long deviceControllerPtr, long deviceId, String setupCode, boolean useOnlyOnNetworkDiscovery);
+
   private native void commissionDevice(
       long deviceControllerPtr,
       long deviceId,
@@ -1708,6 +1740,13 @@ public class ChipDeviceController {
       int discriminator,
       @Nullable Long setupPinCode,
       OpenCommissioningCallback callback);
+
+  private native boolean downloadLogFromNode(
+      long deviceControllerPtr,
+      long deviceId,
+      int typeEnum,
+      long timeout,
+      DownloadLogCallback callback);
 
   private native byte[] getAttestationChallenge(long deviceControllerPtr, long devicePtr);
 

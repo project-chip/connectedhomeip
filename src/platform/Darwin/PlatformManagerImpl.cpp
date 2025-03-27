@@ -35,7 +35,11 @@
 #include <platform/PlatformManager.h>
 
 // Include the non-inline definitions for the GenericPlatformManagerImpl<> template,
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
 #include <platform/internal/GenericPlatformManagerImpl.ipp>
+#else
+#include <platform/internal/GenericPlatformManagerImpl_POSIX.ipp>
+#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
 
 #include <CoreFoundation/CoreFoundation.h>
 #include <tracing/metric_event.h>
@@ -64,7 +68,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     ReturnErrorOnFailure(Internal::PosixConfig::Init());
 #endif // CHIP_DISABLE_PLATFORM_KVS
 
-#if !CHIP_SYSTEM_CONFIG_USE_LIBEV
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
     // Ensure there is a dispatch queue available
     static_cast<System::LayerSocketsLoop &>(DeviceLayer::SystemLayer()).SetDispatchQueue(GetWorkQueue());
 #endif
@@ -83,6 +87,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     return CHIP_NO_ERROR;
 }
 
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
 CHIP_ERROR PlatformManagerImpl::_StartEventLoopTask()
 {
     auto expected = WorkQueueState::kSuspended;
@@ -128,12 +133,6 @@ void PlatformManagerImpl::_RunEventLoop()
     mRunLoopSem = nullptr;
 }
 
-void PlatformManagerImpl::_Shutdown()
-{
-    // Call up to the base class _Shutdown() to perform the bulk of the shutdown.
-    GenericPlatformManagerImpl<ImplClass>::_Shutdown();
-}
-
 CHIP_ERROR PlatformManagerImpl::_PostEvent(const ChipDeviceEvent * event)
 {
     const ChipDeviceEvent eventCopy = *event;
@@ -142,6 +141,7 @@ CHIP_ERROR PlatformManagerImpl::_PostEvent(const ChipDeviceEvent * event)
     });
     return CHIP_NO_ERROR;
 }
+#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
 
 #if CHIP_STACK_LOCK_TRACKING_ENABLED
 bool PlatformManagerImpl::_IsChipStackLockedByCurrentThread() const

@@ -16,7 +16,7 @@
  */
 #pragma once
 
-#include <app/ConcreteAttributePath.h>
+#include <app/AttributePathParams.h>
 
 namespace chip {
 namespace app {
@@ -39,7 +39,7 @@ public:
     /// Mark all attributes matching the given path (which may be a wildcard) dirty.
     ///
     /// Wildcards are supported.
-    virtual void MarkDirty(const ConcreteAttributePath & path) = 0;
+    virtual void MarkDirty(const AttributePathParams & path) = 0;
 };
 
 } // namespace DataModel

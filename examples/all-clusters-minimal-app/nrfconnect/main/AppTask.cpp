@@ -22,14 +22,16 @@
 #include "LEDUtil.h"
 #include "binding-handler.h"
 
-#include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
+#include <data-model-providers/codegen/Instance.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
 
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <static-supported-modes-manager.h>
 
 #if CONFIG_CHIP_OTA_REQUESTOR
 #include "OTAUtil.h"
@@ -63,6 +65,7 @@ static k_timer sFunctionTimer;
 
 LEDWidget sStatusLED;
 FactoryResetLEDsWrapper<3> sFactoryResetLEDs{ { FACTORY_RESET_SIGNAL_LED, FACTORY_RESET_SIGNAL_LED1, FACTORY_RESET_SIGNAL_LED2 } };
+app::Clusters::ModeSelect::StaticSupportedModesManager sStaticSupportedModesManager;
 
 bool sIsNetworkProvisioned = false;
 bool sIsNetworkEnabled     = false;
@@ -171,6 +174,7 @@ CHIP_ERROR AppTask::Init()
     initParams.operationalKeystore = &sPSAOperationalKeystore;
 #endif
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.dataModelProvider = app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
     AppFabricTableDelegate::Init();
 
@@ -198,6 +202,7 @@ CHIP_ERROR AppTask::Init()
     {
         LOG_ERR("PlatformMgr().StartEventLoopTask() failed");
     }
+    app::Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
 
     return err;
 }
@@ -403,10 +408,10 @@ void AppTask::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* arg */
     switch (event->Type)
     {
     case DeviceEventType::kCHIPoBLEAdvertisingChange:
-#ifdef CONFIG_CHIP_NFC_COMMISSIONING
+#ifdef CONFIG_CHIP_NFC_ONBOARDING_PAYLOAD
         if (event->CHIPoBLEAdvertisingChange.Result == kActivity_Started)
         {
-            if (NFCMgr().IsTagEmulationStarted())
+            if (NFCOnboardingPayloadMgr().IsTagEmulationStarted())
             {
                 LOG_INF("NFC Tag emulation is already started");
             }
@@ -417,7 +422,7 @@ void AppTask::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* arg */
         }
         else if (event->CHIPoBLEAdvertisingChange.Result == kActivity_Stopped)
         {
-            NFCMgr().StopTagEmulation();
+            NFCOnboardingPayloadMgr().StopTagEmulation();
         }
 #endif
         sHaveBLEConnections = ConnectivityMgr().NumBLEConnections() != 0;

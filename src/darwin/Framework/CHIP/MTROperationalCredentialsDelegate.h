@@ -1,6 +1,5 @@
 /**
- *
- *    Copyright (c) 2021-2023 Project CHIP Authors
+ *    Copyright (c) 2021-2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,12 +14,10 @@
  *    limitations under the License.
  */
 
-#include <memory>
-
 #import <Foundation/Foundation.h>
 #import <Security/Security.h>
 
-#import "MTRDeviceController.h"
+#import "MTRDeviceController_Concrete.h"
 #import "MTRError_Internal.h"
 #import "MTRKeypair.h"
 #import "MTROperationalCertificateIssuer.h"
@@ -32,13 +29,15 @@
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CASEAuthTag.h>
 
+#include <memory>
+
 NS_ASSUME_NONNULL_BEGIN
 
 class MTROperationalCredentialsDelegate : public chip::Controller::OperationalCredentialsDelegate {
 public:
     using ChipP256KeypairPtr = chip::Crypto::P256Keypair *;
 
-    MTROperationalCredentialsDelegate(MTRDeviceController * deviceController);
+    MTROperationalCredentialsDelegate(MTRDeviceController_Concrete * deviceController);
     ~MTROperationalCredentialsDelegate() {}
 
     CHIP_ERROR Init(ChipP256KeypairPtr nocSigner, NSData * ipk, NSData * rootCert, NSData * _Nullable icaCert);
@@ -61,11 +60,6 @@ public:
     void SetDeviceCommissioner(chip::Controller::DeviceCommissioner * _Nullable cppCommissioner)
     {
         mCppCommissioner = cppCommissioner;
-    }
-
-    chip::Optional<chip::Controller::CommissioningParameters> GetCommissioningParameters()
-    {
-        return mCppCommissioner == nullptr ? chip::NullOptional : mCppCommissioner->GetCommissioningParameters();
     }
 
     void SetOperationalCertificateIssuer(
@@ -147,7 +141,7 @@ private:
     NSData * _Nullable mRootCert;
     NSData * _Nullable mIntermediateCert;
 
-    MTRDeviceController * __weak mWeakController;
+    MTRDeviceController_Concrete * __weak mWeakController;
     chip::Controller::DeviceCommissioner * _Nullable mCppCommissioner = nullptr;
     id<MTROperationalCertificateIssuer> _Nullable mOperationalCertificateIssuer;
     dispatch_queue_t _Nullable mOperationalCertificateIssuerQueue;

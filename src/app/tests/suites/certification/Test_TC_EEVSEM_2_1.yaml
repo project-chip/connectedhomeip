@@ -147,7 +147,7 @@ tests:
     - label:
           "Step 9: Manually put the device in a state from which it will
           SUCCESSFULLY transition to PIXIT.EEVSEM.MODE_CHANGE_OK"
-      PICS: PICS_SKIP_SAMPLE_APP
+      PICS: PICS_SKIP_SAMPLE_APP && EEVSEM.S.M.CAN_MANUALLY_CONTROLLED
       verification: |
           Manual operation required
       cluster: "LogCommands"

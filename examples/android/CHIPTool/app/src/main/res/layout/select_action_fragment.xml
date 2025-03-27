@@ -113,6 +113,14 @@
             android:text="@string/unpair_device_btn_text" />
 
         <Button
+            android:id="@+id/diagnosticLogBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/diagnostic_log_btn_text" />
+
+        <Button
             android:id="@+id/groupSettingBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -135,6 +143,14 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:text="@string/icd_btn_text" />
+
+        <Button
+            android:id="@+id/modeSelectBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/mode_select_btn_text" />
     </LinearLayout>
 
 </ScrollView>

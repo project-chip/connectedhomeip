@@ -40,13 +40,23 @@
 #include <zephyr/bluetooth/addr.h>
 #include <zephyr/bluetooth/gatt.h>
 #include <zephyr/drivers/flash.h>
+#if defined(CONFIG_ZEPHYR_VERSION_3_3)
 #include <zephyr/random/rand32.h>
+#else
+#include <zephyr/random/random.h>
+#endif
 #include <zephyr/storage/flash_map.h>
 #include <zephyr/sys/byteorder.h>
 #include <zephyr/sys/util.h>
 
 extern "C" {
+#if defined(CONFIG_BT_B9X)
+extern __attribute__((noinline)) int b9x_bt_blc_mac_init(uint8_t * bt_mac);
+#elif defined(CONFIG_BT_TLX)
+extern __attribute__((noinline)) int tlx_bt_blc_mac_init(uint8_t * bt_mac);
+#elif defined(CONFIG_BT_W91)
 extern __attribute__((noinline)) void telink_bt_blc_mac_init(uint8_t * bt_mac);
+#endif
 }
 
 #if defined(CONFIG_PM) && !defined(CONFIG_CHIP_ENABLE_PM_DURING_BLE)
@@ -117,7 +127,13 @@ CHIP_ERROR InitBLEMACAddress()
     int error = 0;
     bt_addr_le_t addr;
 
+#if defined(CONFIG_BT_B9X)
+    b9x_bt_blc_mac_init(addr.a.val);
+#elif defined(CONFIG_BT_TLX)
+    tlx_bt_blc_mac_init(addr.a.val);
+#elif defined(CONFIG_BT_W91)
     telink_bt_blc_mac_init(addr.a.val);
+#endif
 
     if (BT_ADDR_IS_STATIC(&addr.a)) // in case of Random static address, create a new id
     {

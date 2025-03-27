@@ -32,7 +32,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::WiFiNetworkManagement::Attributes;
 using namespace chip::app::Clusters::WiFiNetworkManagement::Commands;
-using namespace std::placeholders;
+using IMStatus = chip::Protocols::InteractionModel::Status;
 
 namespace chip {
 namespace app {
@@ -143,6 +143,12 @@ void WiFiNetworkManagementServer::InvokeCommand(HandlerContext & ctx)
 void WiFiNetworkManagementServer::HandleNetworkPassphraseRequest(HandlerContext & ctx,
                                                                  const NetworkPassphraseRequest::DecodableType & req)
 {
+    if (ctx.mCommandHandler.GetSubjectDescriptor().authMode != Access::AuthMode::kCase)
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, IMStatus::UnsupportedAccess);
+        return;
+    }
+
     if (HaveNetworkCredentials())
     {
         NetworkPassphraseResponse::Type response;
@@ -151,8 +157,7 @@ void WiFiNetworkManagementServer::HandleNetworkPassphraseRequest(HandlerContext 
     }
     else
     {
-        // TODO: Status code TBC: https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/9234
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidInState);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, IMStatus::InvalidInState);
     }
 }
 

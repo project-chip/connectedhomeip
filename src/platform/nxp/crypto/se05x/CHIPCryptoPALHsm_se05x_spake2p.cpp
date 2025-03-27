@@ -283,8 +283,8 @@ CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::BeginVerifier(const uint8_t * my_id
 #if ENABLE_SE05X_SPAKE_PROVER
 CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::BeginProver(const uint8_t * my_identity, size_t my_identity_len,
                                                          const uint8_t * peer_identity, size_t peer_identity_len,
-                                                         const uint8_t * w0in, size_t w0in_len, const uint8_t * w1in,
-                                                         size_t w1in_len)
+                                                         const uint8_t * w0sin, size_t w0sin_len, const uint8_t * w1sin,
+                                                         size_t w1sin_len)
 {
     smStatus_t smstatus  = SM_NOT_OK;
     uint8_t w0in_mod[32] = {
@@ -296,8 +296,8 @@ CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::BeginProver(const uint8_t * my_iden
     };
     size_t w1in_mod_len = 32;
 
-    VerifyOrReturnError(w0in != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(w1in != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(w0sin != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(w1sin != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     if (my_identity_len > 0)
     {
         VerifyOrReturnError(my_identity != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -311,9 +311,9 @@ CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::BeginProver(const uint8_t * my_iden
 
     ChipLogProgress(Crypto, "SE05x: HSM - BeginProver");
 
-    ReturnErrorOnFailure(FELoad(w0in, w0in_len, w0));
+    ReturnErrorOnFailure(FELoad(w0sin, w0sin_len, w0));
     ReturnErrorOnFailure(FEWrite(w0, w0in_mod, w0in_mod_len));
-    ReturnErrorOnFailure(FELoad(w1in, w1in_len, w1));
+    ReturnErrorOnFailure(FELoad(w1sin, w1sin_len, w1));
     ReturnErrorOnFailure(FEWrite(w1, w1in_mod, w1in_mod_len));
     ReturnErrorOnFailure(create_init_crypto_obj(chip::Crypto::CHIP_SPAKE2P_ROLE::PROVER, &hsm_pake_context));
 

@@ -287,7 +287,7 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
     }
 
     if (needsDescriptorAttributes) {
-        attributeCount += ArraySize(sDescriptorAttributesMetadata);
+        attributeCount += MATTER_ARRAY_SIZE(sDescriptorAttributesMetadata);
     }
 
     // And add one for ClusterRevision
@@ -312,7 +312,7 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
             // Size in bytes does not matter, since we plan to
             // handle this entirely via AttributeAccessInterface.
             0,
-            // ATTRIBUTE_MASK_NULLABLE is not relevant because we
+            // MATTER_ATTRIBUTE_FLAG_NULLABLE is not relevant because we
             // are handling this all via AttributeAccessInterface.
             0)));
     }
@@ -346,8 +346,8 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
 
     _deviceController = controller;
 
-    MTR_LOG("Associated %@, attribute count %llu, with controller", [self _descriptionWhileLocked],
-        static_cast<unsigned long long>(attributeCount));
+    MTR_LOG("Associated %@, attribute count %llu, with controller %@", [self _descriptionWhileLocked],
+        static_cast<unsigned long long>(attributeCount), controller);
 
     return YES;
 }

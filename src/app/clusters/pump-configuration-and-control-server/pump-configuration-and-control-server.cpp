@@ -25,7 +25,6 @@
 #include <app/InteractionModelEngine.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
-#include <app/util/ember-compatibility-functions.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -81,8 +80,8 @@ static void setEffectiveModes(EndpointId endpoint)
         // if this is not suitable, the application should override this value in
         // the post attribute change callback for the operation mode attribute
         const EmberAfAttributeMetadata * effectiveControlModeMetaData;
-        effectiveControlModeMetaData = GetAttributeMetadata(
-            app::ConcreteAttributePath(endpoint, PumpConfigurationAndControl::Id, Attributes::EffectiveControlMode::Id));
+        effectiveControlModeMetaData =
+            emberAfLocateAttributeMetadata(endpoint, PumpConfigurationAndControl::Id, Attributes::EffectiveControlMode::Id);
         controlMode = static_cast<ControlModeEnum>(effectiveControlModeMetaData->defaultValue.defaultValue);
     }
 

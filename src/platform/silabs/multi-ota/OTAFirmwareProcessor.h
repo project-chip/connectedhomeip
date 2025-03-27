@@ -44,7 +44,7 @@ private:
 
     OTADataAccumulator mAccumulator;
     bool mDescriptorProcessed = false;
-#if OTA_ENCRYPTION_ENABLE
+#ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
     uint32_t mUnalignmentNum;
 #endif
     static constexpr size_t kAlignmentBytes = 64;

@@ -1,0 +1,58 @@
+# Copyright (c) 2024 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 4.1.6. [TC-OO-2.6] OffOnly Feature with DUT as Server
+
+PICS:
+    - OO.S
+    - OO.S.F02
+
+config:
+    nodeId: 0x12344321
+    cluster: "On/Off"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 1: TH reads the FeatureMap attribute from DUT"
+      PICS: OO.S.F02
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x4]
+
+    - label:
+          "Step 2: TH sends On command to the On/Off Cluster of DUT on
+          PIXIT.OO.ENDPOINT"
+      PICS: OO.S.F02 && OO.S.C01.Rsp
+      command: "On"
+      response:
+          error: UNSUPPORTED_COMMAND
+
+    - label:
+          "Step 3: TH sends Toggle command to the On/Off Cluster of DUT on
+          PIXIT.OO.ENDPOINT"
+      PICS: OO.S.F02 && OO.S.C02.Rsp
+      command: "Toggle"
+      response:
+          error: UNSUPPORTED_COMMAND

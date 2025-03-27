@@ -98,6 +98,7 @@ static_library("ESP32_custom") {
   ]
 
   deps = [
+    "${chip_root}/src/app:app_config",
     "${chip_root}/src/lib/dnssd:platform_header",
     "${chip_root}/src/platform/logging:headers",
     "${chip_root}/src/setup_payload",

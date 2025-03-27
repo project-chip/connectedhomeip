@@ -89,6 +89,30 @@ void ICDNotifier::NotifyActiveRequestWithdrawal(ICDListener::KeepActiveFlags req
     }
 }
 
+#if CHIP_CONFIG_ENABLE_ICD_DSLS
+void ICDNotifier::NotifySITModeRequestNotification()
+{
+    for (auto subscriber : mSubscribers)
+    {
+        if (subscriber != nullptr)
+        {
+            subscriber->OnSITModeRequest();
+        }
+    }
+}
+
+void ICDNotifier::NotifySITModeRequestWithdrawal()
+{
+    for (auto subscriber : mSubscribers)
+    {
+        if (subscriber != nullptr)
+        {
+            subscriber->OnSITModeRequestWithdrawal();
+        }
+    }
+}
+#endif // CHIP_CONFIG_ENABLE_ICD_DSLS
+
 void ICDNotifier::NotifyICDManagementEvent(ICDListener::ICDManagementEvents event)
 {
     for (auto subscriber : mSubscribers)

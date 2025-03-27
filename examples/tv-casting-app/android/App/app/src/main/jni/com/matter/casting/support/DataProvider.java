@@ -20,7 +20,7 @@ package com.matter.casting.support;
 import android.util.Log;
 
 public interface DataProvider<T> {
-  public static final String TAG = DataProvider.class.getSimpleName();
+  String TAG = DataProvider.class.getSimpleName();
 
   default T _get() {
     T val = null;
@@ -32,5 +32,5 @@ public interface DataProvider<T> {
     return val;
   }
 
-  public abstract T get();
+  T get();
 }

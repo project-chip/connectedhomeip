@@ -15,8 +15,8 @@
 import("//build_overrides/chip.gni")
 import("//build_overrides/pigweed.gni")
 
-pw_log_BACKEND = "$dir_pw_log_basic"
-pw_assert_BACKEND = "$dir_pw_assert_log"
+pw_log_BACKEND = "${chip_root}/src/pw_backends/log"
+pw_assert_BACKEND = "${chip_root}/src/pw_backends/assert"
 pw_sys_io_BACKEND =
     "${chip_root}/examples/platform/bouffalolab/common/rpc/pw_sys_io:pw_sys_io"
 

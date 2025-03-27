@@ -7,7 +7,7 @@ document is tested on **Ubuntu for Raspberry Pi Server 20.04 LTS (aarch64)** and
 
 To cross-compile this example on an x64 host and run it on **NXP i.MX 8M Mini**
 **EVK**, see the associated
-[README document](../../../docs/guides/nxp/nxp_imx8m_linux_examples.md) for
+[README document](../../../docs/platforms/nxp/nxp_imx8m_linux_examples.md) for
 details.
 
 <hr>
@@ -69,11 +69,6 @@ details.
 
 ## Running the Complete Example on Raspberry Pi 4
 
-> If you want to test Echo protocol, please enable Echo handler
->
->     gn gen out/debug --args='chip_app_use_echo=true'
->     ninja -C out/debug
-
 -   Prerequisites
 
     1. A Raspberry Pi 4 board
@@ -112,7 +107,7 @@ details.
                   $ cd ~/connectedhomeip/examples/contact-sensor-app/linux
                   $ sudo out/debug/chip-contact-sensor-app --ble-device [bluetooth device number]
                   # In this example, the device we want to use is hci1
-                  $ sudo out/debug/chip-contact-sensor-app --ble-device 1
+                  $ sudo out/debug/contact-sensor-app --ble-device 1
 
         -   Test the device using ChipDeviceController on your laptop /
             workstation etc.

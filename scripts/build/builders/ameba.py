@@ -85,8 +85,12 @@ class AmebaBuilder(Builder):
                       title='Generating ' + self.identifier)
 
     def _build(self):
-        self._Execute(['ninja', '-C', self.output_dir],
-                      title='Building ' + self.identifier)
+        cmd = ['ninja', '-C', self.output_dir]
+
+        if self.ninja_jobs is not None:
+            cmd.append('-j' + str(self.ninja_jobs))
+
+        self._Execute(cmd, title='Building ' + self.identifier)
 
     def build_outputs(self):
         yield BuilderOutput(

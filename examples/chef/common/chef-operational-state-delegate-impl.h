@@ -21,7 +21,11 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/operational-state-server/operational-state-server.h>
 
+#include <app/util/attribute-metadata.h>
 #include <protocols/interaction_model/StatusCode.h>
+
+#ifdef MATTER_DM_PLUGIN_OPERATIONAL_STATE_SERVER
+using chip::Protocols::InteractionModel::Status;
 
 namespace chip {
 namespace app {
@@ -107,13 +111,15 @@ private:
         GenericOperationalState(to_underlying(OperationalStateEnum::kPaused)),
         GenericOperationalState(to_underlying(OperationalStateEnum::kError)),
     };
-
-    const uint32_t kExampleCountDown = 30;
+    const CharSpan opPhaseList[3] = { "pre-soak"_span, "rinse"_span, "spin"_span };
 
 public:
+    const uint32_t kExampleCountDown = 30;
+
     OperationalStateDelegate()
     {
         GenericOperationalStateDelegateImpl::mOperationalStateList = Span<const GenericOperationalState>(opStateList);
+        GenericOperationalStateDelegateImpl::mOperationalPhaseList = Span<const CharSpan>(opPhaseList);
     }
 
     /**
@@ -138,6 +144,7 @@ public:
 };
 
 Instance * GetOperationalStateInstance();
+OperationalStateDelegate * GetOperationalStateDelegate();
 
 void Shutdown();
 
@@ -145,3 +152,12 @@ void Shutdown();
 } // namespace Clusters
 } // namespace app
 } // namespace chip
+
+chip::Protocols::InteractionModel::Status chefOperationalStateWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
+                                                                            const EmberAfAttributeMetadata * attributeMetadata,
+                                                                            uint8_t * buffer);
+chip::Protocols::InteractionModel::Status chefOperationalStateReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
+                                                                           const EmberAfAttributeMetadata * attributeMetadata,
+                                                                           uint8_t * buffer, uint16_t maxReadLength);
+
+#endif // MATTER_DM_PLUGIN_OPERATIONAL_STATE_SERVER

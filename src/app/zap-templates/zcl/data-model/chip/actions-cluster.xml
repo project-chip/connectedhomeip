@@ -89,11 +89,17 @@ limitations under the License.
     <code>0x0025</code>
     <define>ACTIONS_CLUSTER</define>
     <description>This cluster provides a standardized way for a Node (typically a Bridge, but could be any Node) to expose action information.</description>
-
-    <attribute side="server" code="0x0000" define="ACTION_LIST" type="array" entryType="ActionStruct" length="256" writable="false" optional="false">ActionList</attribute>
-    <attribute side="server" code="0x0001" define="ENDPOINT_LIST" type="array" entryType="EndpointListStruct" length="256" writable="false" optional="false">EndpointLists</attribute>
-    <attribute side="server" code="0x0002" define="SETUP_URL" type="LONG_CHAR_STRING" length="512" writable="false" optional="true">SetupURL</attribute>
-
+    
+    <attribute side="server" code="0x0000" name="ActionList" define="ACTION_LIST" type="array" entryType="ActionStruct" length="256">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0001" name="EndpointLists" define="ENDPOINT_LIST" type="array" entryType="EndpointListStruct" length="256">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0002" name="SetupURL" define="SETUP_URL" type="LONG_CHAR_STRING" length="512" optional="true">
+      <optionalConform/>
+    </attribute>
+    
     <command source="client" code="0x00" name="InstantAction" optional="true">
       <description>This command triggers an action (state change) on the involved endpoints.</description>
       <arg name="ActionID" type="int16u"/>
@@ -173,17 +179,19 @@ limitations under the License.
 
     <event side="server" code="0x00" priority="info" name="StateChanged" optional="false">
       <description>This event SHALL be generated when there is a change in the Status of an ActionID.</description>
-      <field id="0" name="ActionID" type="int16u" />
-      <field id="1" name="InvokeID" type="int32u" />
+      <field id="0" name="ActionID" type="int16u"/>
+      <field id="1" name="InvokeID" type="int32u"/>
       <field id="2" name="NewState" type="ActionStateEnum" />
+      <mandatoryConform/>
     </event>
 
     <event side="server" code="0x01" priority="info" name="ActionFailed" optional="false">
       <description>This event SHALL be generated when there is some error which prevents the action from its normal planned execution.</description>
-      <field id="0" name="ActionID" type="int16u" />
-      <field id="1" name="InvokeID" type="int32u" />
-      <field id="2" name="NewState" type="ActionStateEnum" />
-      <field id="3" name="Error"    type="ActionErrorEnum" />
+      <field id="0" name="ActionID" type="int16u"/>
+      <field id="1" name="InvokeID" type="int32u"/>
+      <field id="2" name="NewState" type="ActionStateEnum"/>
+      <field id="3" name="Error"    type="ActionErrorEnum"/>
+      <mandatoryConform/>
     </event>
 
   </cluster>

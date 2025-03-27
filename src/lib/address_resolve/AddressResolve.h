@@ -143,8 +143,14 @@ public:
     }
 
 private:
-    static constexpr uint32_t kMinLookupTimeMsDefault = 200;
-    static constexpr uint32_t kMaxLookupTimeMsDefault = 45000;
+    static_assert((CHIP_CONFIG_ADDRESS_RESOLVE_MIN_LOOKUP_TIME_MS) <= (CHIP_CONFIG_ADDRESS_RESOLVE_MAX_LOOKUP_TIME_MS),
+                  "AddressResolveMinLookupTime must be equal or less than AddressResolveMaxLookupTime");
+    static_assert((CHIP_CONFIG_ADDRESS_RESOLVE_MIN_LOOKUP_TIME_MS) >= 0,
+                  "AddressResolveMinLookupTime must be equal or greater than 0");
+    static_assert((CHIP_CONFIG_ADDRESS_RESOLVE_MAX_LOOKUP_TIME_MS) < UINT32_MAX,
+                  "AddressResolveMaxLookupTime must be less than UINT32_MAX");
+    static constexpr uint32_t kMinLookupTimeMsDefault = CHIP_CONFIG_ADDRESS_RESOLVE_MIN_LOOKUP_TIME_MS;
+    static constexpr uint32_t kMaxLookupTimeMsDefault = CHIP_CONFIG_ADDRESS_RESOLVE_MAX_LOOKUP_TIME_MS;
 
     PeerId mPeerId;
     System::Clock::Milliseconds32 mMinLookupTimeMs{ kMinLookupTimeMsDefault };

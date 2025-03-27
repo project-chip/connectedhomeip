@@ -35,7 +35,6 @@ MTR_EXTERN NSErrorDomain const MTRInteractionErrorDomain MTR_AVAILABLE(ios(16.1)
  * Errors reported by the server side of a Matter interaction via the normal
  * Matter error-reporting mechanisms use MTRInteractionErrorDomain instead.
  */
-// clang-format off
 typedef NS_ERROR_ENUM(MTRErrorDomain, MTRErrorCode){
     /**
      * MTRErrorCodeGeneralError represents a generic Matter error with no
@@ -61,7 +60,7 @@ typedef NS_ERROR_ENUM(MTRErrorDomain, MTRErrorCode){
      * MTRErrorCodeFabricExists is returned when trying to commission a device
      * into a fabric when it's already part of that fabric.
      */
-    MTRErrorCodeFabricExists         = 11,
+    MTRErrorCodeFabricExists = 11,
 
     /**
      * MTRErrorCodeUnknownSchema means the schema for the given cluster/attribute,
@@ -95,9 +94,25 @@ typedef NS_ERROR_ENUM(MTRErrorDomain, MTRErrorCode){
     /**
      * The operation was cancelled.
      */
-    MTRErrorCodeCancelled MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))= 16,
+    MTRErrorCodeCancelled MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 16,
+
+    /**
+     * Access to some resource was denied.
+     */
+    MTRErrorCodeAccessDenied MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 17,
+
+    /**
+     * A request was made to some entity, and that entity cannot handle the
+     * request right now, but might be able to at a different point in time.
+     */
+    MTRErrorCodeBusy MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 18,
+
+    /**
+     * Something was requested that could not be located.
+     */
+    MTRErrorCodeNotFound MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = 19,
 };
-// clang-format on
+#define MTRMaxErrorCode MTRErrorCodeNotFound
 
 /**
  * MTRInteractionErrorDomain contains errors that represent a Matter
@@ -109,38 +124,36 @@ typedef NS_ERROR_ENUM(MTRErrorDomain, MTRErrorCode){
  * was reported.  This key will be absent if there was no cluster-specific
  * status.
  */
-// clang-format off
 typedef NS_ERROR_ENUM(MTRInteractionErrorDomain, MTRInteractionErrorCode){
     // These values come from the general status code table in the Matter
     // Interaction Model specification.
-    MTRInteractionErrorCodeFailure                                   = 0x01,
-    MTRInteractionErrorCodeInvalidSubscription                       = 0x7d,
-    MTRInteractionErrorCodeUnsupportedAccess                         = 0x7e,
-    MTRInteractionErrorCodeUnsupportedEndpoint                       = 0x7f,
-    MTRInteractionErrorCodeInvalidAction                             = 0x80,
-    MTRInteractionErrorCodeUnsupportedCommand                        = 0x81,
-    MTRInteractionErrorCodeInvalidCommand                            = 0x85,
-    MTRInteractionErrorCodeUnsupportedAttribute                      = 0x86,
-    MTRInteractionErrorCodeConstraintError                           = 0x87,
-    MTRInteractionErrorCodeUnsupportedWrite                          = 0x88,
-    MTRInteractionErrorCodeResourceExhausted                         = 0x89,
-    MTRInteractionErrorCodeNotFound                                  = 0x8b,
-    MTRInteractionErrorCodeUnreportableAttribute                     = 0x8c,
-    MTRInteractionErrorCodeInvalidDataType                           = 0x8d,
-    MTRInteractionErrorCodeUnsupportedRead                           = 0x8f,
-    MTRInteractionErrorCodeDataVersionMismatch                       = 0x92,
-    MTRInteractionErrorCodeTimeout                                   = 0x94,
-    MTRInteractionErrorCodeBusy                                      = 0x9c,
-    MTRInteractionErrorCodeUnsupportedCluster                        = 0xc3,
-    MTRInteractionErrorCodeNoUpstreamSubscription                    = 0xc5,
-    MTRInteractionErrorCodeNeedsTimedInteraction                     = 0xc6,
-    MTRInteractionErrorCodeUnsupportedEvent                          = 0xc7,
-    MTRInteractionErrorCodePathsExhausted                            = 0xc8,
-    MTRInteractionErrorCodeTimedRequestMismatch                      = 0xc9,
-    MTRInteractionErrorCodeFailsafeRequired                          = 0xca,
-    MTRInteractionErrorCodeInvalidInState        MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))= 0xcb,
-    MTRInteractionErrorCodeNoCommandResponse     MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))= 0xcc,
+    MTRInteractionErrorCodeFailure                                                                            = 0x01,
+    MTRInteractionErrorCodeInvalidSubscription                                                                = 0x7d,
+    MTRInteractionErrorCodeUnsupportedAccess                                                                  = 0x7e,
+    MTRInteractionErrorCodeUnsupportedEndpoint                                                                = 0x7f,
+    MTRInteractionErrorCodeInvalidAction                                                                      = 0x80,
+    MTRInteractionErrorCodeUnsupportedCommand                                                                 = 0x81,
+    MTRInteractionErrorCodeInvalidCommand                                                                     = 0x85,
+    MTRInteractionErrorCodeUnsupportedAttribute                                                               = 0x86,
+    MTRInteractionErrorCodeConstraintError                                                                    = 0x87,
+    MTRInteractionErrorCodeUnsupportedWrite                                                                   = 0x88,
+    MTRInteractionErrorCodeResourceExhausted                                                                  = 0x89,
+    MTRInteractionErrorCodeNotFound                                                                           = 0x8b,
+    MTRInteractionErrorCodeUnreportableAttribute                                                              = 0x8c,
+    MTRInteractionErrorCodeInvalidDataType                                                                    = 0x8d,
+    MTRInteractionErrorCodeUnsupportedRead                                                                    = 0x8f,
+    MTRInteractionErrorCodeDataVersionMismatch                                                                = 0x92,
+    MTRInteractionErrorCodeTimeout                                                                            = 0x94,
+    MTRInteractionErrorCodeBusy                                                                               = 0x9c,
+    MTRInteractionErrorCodeUnsupportedCluster                                                                 = 0xc3,
+    MTRInteractionErrorCodeNoUpstreamSubscription                                                             = 0xc5,
+    MTRInteractionErrorCodeNeedsTimedInteraction                                                              = 0xc6,
+    MTRInteractionErrorCodeUnsupportedEvent                                                                   = 0xc7,
+    MTRInteractionErrorCodePathsExhausted                                                                     = 0xc8,
+    MTRInteractionErrorCodeTimedRequestMismatch                                                               = 0xc9,
+    MTRInteractionErrorCodeFailsafeRequired                                                                   = 0xca,
+    MTRInteractionErrorCodeInvalidInState MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))    = 0xcb,
+    MTRInteractionErrorCodeNoCommandResponse MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0xcc,
 };
-// clang-format on
 
 NS_ASSUME_NONNULL_END

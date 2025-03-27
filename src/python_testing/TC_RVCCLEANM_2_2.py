@@ -19,19 +19,36 @@
 # for details about the block below.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${CHIP_RVC_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values --endpoint 1 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# test-runner-runs:
+#   run1:
+#     app: ${CHIP_RVC_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values
+#       --endpoint 1
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-from time import sleep
+import enum
 
 import chip.clusters as Clusters
-from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
+
+
+class RvcStatusEnum(enum.IntEnum):
+    # TODO remove this class once InvalidInMode response code is implemented in python SDK
+    Success = 0x0
+    UnsupportedMode = 0x1
+    GenericFailure = 0x2
+    InvalidInMode = 0x3
 
 
 class TC_RVCCLEANM_2_2(MatterBaseTest):
@@ -64,6 +81,11 @@ class TC_RVCCLEANM_2_2(MatterBaseTest):
             Clusters.RvcCleanMode.Attributes.SupportedModes)
         return ret
 
+    async def read_feature_map_attribute(self):
+        ret = await self.read_mod_attribute_expect_success(Clusters.RvcCleanMode,
+                                                           Clusters.RvcCleanMode.Attributes.FeatureMap)
+        return ret
+
     async def send_clean_change_to_mode_cmd(self, newMode) -> Clusters.Objects.RvcCleanMode.Commands.ChangeToModeResponse:
         ret = await self.send_single_cmd(cmd=Clusters.Objects.RvcCleanMode.Commands.ChangeToMode(newMode=newMode), endpoint=self.endpoint)
         return ret
@@ -80,17 +102,10 @@ class TC_RVCCLEANM_2_2(MatterBaseTest):
     def pics_TC_RVCCLEANM_2_2(self) -> list[str]:
         return ["RVCCLEANM.S"]
 
-    # Sends and out-of-band command to the rvc-app
-    def write_to_app_pipe(self, command):
-        with open(self.app_pipe, "w") as app_pipe:
-            app_pipe.write(command + "\n")
-        # Delay for pipe command to be processed (otherwise tests are flaky)
-        # TODO(#31239): centralize pipe write logic and remove the need of sleep
-        sleep(0.001)
-
     @async_test_body
     async def test_TC_RVCCLEANM_2_2(self):
-        self.endpoint = self.matter_test_config.endpoint
+        self.directmodech_bit_mask = Clusters.RvcCleanMode.Bitmaps.Feature.kDirectModeChange
+        self.endpoint = self.get_endpoint()
         self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
         if self.is_ci:
             app_pid = self.matter_test_config.app_pid
@@ -106,7 +121,7 @@ class TC_RVCCLEANM_2_2(MatterBaseTest):
 
         # Ensure that the device is in the correct state
         if self.is_ci:
-            self.write_to_app_pipe('{"Name": "Reset"}')
+            self.write_to_app_pipe({"Name": "Reset"})
 
         self.print_step(
             2, "Manually put the device in a state in which the RVC Run Mode cluster’s CurrentMode attribute is set to a mode without the Idle mode tag.")
@@ -157,11 +172,22 @@ class TC_RVCCLEANM_2_2(MatterBaseTest):
                 self.new_clean_mode_th = mode
                 break
 
-        self.print_step(7, "Send ChangeToMode command")
+        self.print_step("7a", "Read FeatureMap Attribute")
+        feature_map = await self.read_feature_map_attribute()
+        directmode_enabled = feature_map & self.directmodech_bit_mask
+
+        self.print_step("7b", "Send ChangeToMode command")
         response = await self.send_clean_change_to_mode_cmd(self.new_clean_mode_th)
-        asserts.assert_equal(response.status, 3,
-                             "The response should contain a ChangeToModeResponse command "
-                             "with the Status set to InvalidInMode(0x03).")
+        asserts.assert_true(type_matches(response, Clusters.RvcCleanMode.Commands.ChangeToModeResponse),
+                            "The response should ChangeToModeResponse command")
+        if directmode_enabled:
+            asserts.assert_equal(response.status, RvcStatusEnum.Success,
+                                 "The response should contain a ChangeToModeResponse command "
+                                 "with the Status set to Success(0x0).")
+        else:
+            asserts.assert_equal(response.status, RvcStatusEnum.InvalidInMode,
+                                 "The response should contain a ChangeToModeResponse command "
+                                 "with the Status set to InvalidInMode(0x03).")
 
 
 if __name__ == "__main__":

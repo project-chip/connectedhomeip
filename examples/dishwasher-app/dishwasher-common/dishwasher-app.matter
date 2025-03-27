@@ -212,6 +212,13 @@ enum TestGlobalEnum : enum8 {
   kFinalValue = 2;
 }
 
+enum ThreeLevelAutoEnum : enum8 {
+  kAuto = 0;
+  kLow = 1;
+  kMedium = 2;
+  kHigh = 3;
+}
+
 bitmap TestGlobalBitmap : bitmap32 {
   kFirstBit = 0x1;
   kSecondBit = 0x2;
@@ -507,14 +514,10 @@ cluster AccessControl = 31 {
     fabric_idx fabricIndex = 254;
   }
 
-  fabric_sensitive info event access(read: administer) AccessRestrictionEntryChanged = 2 {
-    fabric_idx fabricIndex = 254;
-  }
-
-  fabric_sensitive info event access(read: administer) FabricRestrictionReviewUpdate = 3 {
+  fabric_sensitive info event access(read: administer) FabricRestrictionReviewUpdate = 2 {
     int64u token = 0;
-    nullable long_char_string instruction = 1;
-    nullable long_char_string redirectURL = 2;
+    optional long_char_string instruction = 1;
+    optional long_char_string ARLRequestFlowUrl = 2;
     fabric_idx fabricIndex = 254;
   }
 
@@ -541,7 +544,7 @@ cluster AccessControl = 31 {
   }
 
   /** This command signals to the service associated with the device vendor that the fabric administrator would like a review of the current restrictions on the accessing fabric. */
-  fabric command access(invoke: administer) ReviewFabricRestrictions(ReviewFabricRestrictionsRequest): DefaultSuccess = 0;
+  fabric command access(invoke: administer) ReviewFabricRestrictions(ReviewFabricRestrictionsRequest): ReviewFabricRestrictionsResponse = 0;
 }
 
 /** This cluster provides attributes and events for determining basic information about Nodes, which supports both
@@ -642,67 +645,6 @@ cluster BasicInformation = 40 {
 }
 
 /** Nodes should be expected to be deployed to any and all regions of the world. These global regions
-      may have differing common languages, units of measurements, and numerical formatting
-      standards. As such, Nodes that visually or audibly convey information need a mechanism by which
-      they can be configured to use a user’s preferred language, units, etc */
-cluster LocalizationConfiguration = 43 {
-  revision 1; // NOTE: Default/not specifically set
-
-  attribute access(write: manage) char_string<35> activeLocale = 0;
-  readonly attribute char_string supportedLocales[] = 1;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
-/** Nodes should be expected to be deployed to any and all regions of the world. These global regions
-      may have differing preferences for how dates and times are conveyed. As such, Nodes that visually
-      or audibly convey time information need a mechanism by which they can be configured to use a
-      user’s preferred format. */
-cluster TimeFormatLocalization = 44 {
-  revision 1; // NOTE: Default/not specifically set
-
-  enum CalendarTypeEnum : enum8 {
-    kBuddhist = 0;
-    kChinese = 1;
-    kCoptic = 2;
-    kEthiopian = 3;
-    kGregorian = 4;
-    kHebrew = 5;
-    kIndian = 6;
-    kIslamic = 7;
-    kJapanese = 8;
-    kKorean = 9;
-    kPersian = 10;
-    kTaiwanese = 11;
-    kUseActiveLocale = 255;
-  }
-
-  enum HourFormatEnum : enum8 {
-    k12hr = 0;
-    k24hr = 1;
-    kUseActiveLocale = 255;
-  }
-
-  bitmap Feature : bitmap32 {
-    kCalendarFormat = 0x1;
-  }
-
-  attribute access(write: manage) HourFormatEnum hourFormat = 0;
-  attribute access(write: manage) optional CalendarTypeEnum activeCalendarType = 1;
-  readonly attribute optional CalendarTypeEnum supportedCalendarTypes[] = 2;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
-/** Nodes should be expected to be deployed to any and all regions of the world. These global regions
       may have differing preferences for the units in which values are conveyed in communication to a
       user. As such, Nodes that visually or audibly convey measurable values to the user need a
       mechanism by which they can be configured to use a user’s preferred unit. */
@@ -767,6 +709,7 @@ cluster GeneralCommissioning = 48 {
   provisional readonly attribute access(read: administer) optional int16u TCMinRequiredVersion = 6;
   provisional readonly attribute access(read: administer) optional bitmap16 TCAcknowledgements = 7;
   provisional readonly attribute access(read: administer) optional boolean TCAcknowledgementsRequired = 8;
+  provisional readonly attribute access(read: administer) optional nullable int32u TCUpdateDeadline = 9;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1127,7 +1070,7 @@ cluster GeneralDiagnostics = 51 {
   /** Take a snapshot of system time and epoch time. */
   command TimeSnapshot(): TimeSnapshotResponse = 1;
   /** Request a variable length payload response. */
-  command PayloadTestRequest(PayloadTestRequestRequest): PayloadTestResponse = 3;
+  command access(invoke: manage) PayloadTestRequest(PayloadTestRequestRequest): PayloadTestResponse = 3;
 }
 
 /** The Wi-Fi Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
@@ -1259,7 +1202,7 @@ cluster AdministratorCommissioning = 60 {
 
 /** This cluster is used to add or remove Operational Credentials on a Commissionee or Node, as well as manage the associated Fabrics. */
 cluster OperationalCredentials = 62 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum CertificateChainTypeEnum : enum8 {
     kDACCertificate = 1;
@@ -1285,12 +1228,14 @@ cluster OperationalCredentials = 62 {
     fabric_id fabricID = 3;
     node_id nodeID = 4;
     char_string<32> label = 5;
+    optional octet_string<85> VIDVerificationStatement = 6;
     fabric_idx fabricIndex = 254;
   }
 
   fabric_scoped struct NOCStruct {
-    fabric_sensitive octet_string noc = 1;
-    nullable fabric_sensitive octet_string icac = 2;
+    octet_string<400> noc = 1;
+    nullable octet_string<400> icac = 2;
+    optional octet_string<400> vvsc = 3;
     fabric_idx fabricIndex = 254;
   }
 
@@ -1312,7 +1257,7 @@ cluster OperationalCredentials = 62 {
   }
 
   response struct AttestationResponse = 1 {
-    octet_string<900> attestationElements = 0;
+    octet_string attestationElements = 0;
     octet_string<64> attestationSignature = 1;
   }
 
@@ -1331,7 +1276,7 @@ cluster OperationalCredentials = 62 {
 
   response struct CSRResponse = 5 {
     octet_string NOCSRElements = 0;
-    octet_string attestationSignature = 1;
+    octet_string<64> attestationSignature = 1;
   }
 
   request struct AddNOCRequest {
@@ -1343,8 +1288,8 @@ cluster OperationalCredentials = 62 {
   }
 
   request struct UpdateNOCRequest {
-    octet_string NOCValue = 0;
-    optional octet_string ICACValue = 1;
+    octet_string<400> NOCValue = 0;
+    optional octet_string<400> ICACValue = 1;
   }
 
   response struct NOCResponse = 8 {
@@ -1362,7 +1307,24 @@ cluster OperationalCredentials = 62 {
   }
 
   request struct AddTrustedRootCertificateRequest {
-    octet_string rootCACertificate = 0;
+    octet_string<400> rootCACertificate = 0;
+  }
+
+  request struct SetVIDVerificationStatementRequest {
+    optional vendor_id vendorID = 0;
+    optional octet_string<85> VIDVerificationStatement = 1;
+    optional octet_string<400> vvsc = 2;
+  }
+
+  request struct SignVIDVerificationRequestRequest {
+    fabric_idx fabricIndex = 0;
+    octet_string<32> clientChallenge = 1;
+  }
+
+  response struct SignVIDVerificationResponse = 14 {
+    fabric_idx fabricIndex = 0;
+    int8u fabricBindingVersion = 1;
+    octet_string signature = 2;
   }
 
   /** Sender is requesting attestation information from the receiver. */
@@ -1373,7 +1335,7 @@ cluster OperationalCredentials = 62 {
   command access(invoke: administer) CSRRequest(CSRRequestRequest): CSRResponse = 4;
   /** Sender is requesting to add the new node operational certificates. */
   command access(invoke: administer) AddNOC(AddNOCRequest): NOCResponse = 6;
-  /** Sender is requesting to update the node operational certificates. */
+  /** This command SHALL replace the NOC and optional associated ICAC (if present) scoped under the accessing fabric upon successful validation of all arguments and preconditions. */
   fabric command access(invoke: administer) UpdateNOC(UpdateNOCRequest): NOCResponse = 7;
   /** This command SHALL be used by an Administrative Node to set the user-visible Label field for a given Fabric, as reflected by entries in the Fabrics attribute. */
   fabric command access(invoke: administer) UpdateFabricLabel(UpdateFabricLabelRequest): NOCResponse = 9;
@@ -1381,6 +1343,10 @@ cluster OperationalCredentials = 62 {
   command access(invoke: administer) RemoveFabric(RemoveFabricRequest): NOCResponse = 10;
   /** This command SHALL add a Trusted Root CA Certificate, provided as its CHIP Certificate representation. */
   command access(invoke: administer) AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
+  /** This command SHALL be used to update any of the accessing fabric's associated VendorID, VidVerificatioNStatement or VVSC (Vendor Verification Signing Certificate). */
+  fabric command access(invoke: administer) SetVIDVerificationStatement(SetVIDVerificationStatementRequest): DefaultSuccess = 12;
+  /** This command SHALL be used to request that the server authenticate the fabric associated with the FabricIndex given. */
+  command access(invoke: administer) SignVIDVerificationRequest(SignVIDVerificationRequestRequest): SignVIDVerificationResponse = 13;
 }
 
 /** The Group Key Management Cluster is the mechanism by which group keys are managed. */
@@ -1531,16 +1497,6 @@ endpoint 0 {
   device type ma_rootdevice = 22, version 1;
 
 
-  server cluster Identify {
-    ram      attribute identifyTime default = 0x0000;
-    ram      attribute identifyType default = 0x00;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
-
-    handle command Identify;
-    handle command TriggerEffect;
-  }
-
   server cluster Groups {
     ram      attribute nameSupport;
     ram      attribute featureMap default = 0;
@@ -1616,25 +1572,6 @@ endpoint 0 {
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
-  }
-
-  server cluster LocalizationConfiguration {
-    persist  attribute activeLocale default = "en-US";
-    callback attribute supportedLocales;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
-  }
-
-  server cluster TimeFormatLocalization {
-    persist  attribute hourFormat default = 0;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
   }
 
   server cluster UnitLocalization {

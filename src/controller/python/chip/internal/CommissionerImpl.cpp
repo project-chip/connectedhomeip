@@ -26,6 +26,7 @@
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/FileAttestationTrustStore.h>
 #include <crypto/RawKeySessionKeystore.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/TestGroupData.h>
@@ -131,10 +132,12 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
         // TODO: add option to pass in custom PAA Trust Store path to the python controller app
         const chip::Credentials::AttestationTrustStore * testingRootStore =
             GetTestFileAttestationTrustStore("./credentials/development/paa-root-certs");
-        chip::Credentials::SetDeviceAttestationVerifier(chip::Credentials::GetDefaultDACVerifier(testingRootStore));
+        chip::Credentials::DeviceAttestationVerifier * dacVerifier = chip::Credentials::GetDefaultDACVerifier(testingRootStore);
+        chip::Credentials::SetDeviceAttestationVerifier(dacVerifier);
 
         factoryParams.fabricIndependentStorage = &gServerStorage;
         factoryParams.sessionKeystore          = &gSessionKeystore;
+        factoryParams.dataModelProvider        = chip::app::CodegenDataModelProviderInstance(&gServerStorage);
 
         // Initialize group data provider for local group key state and IPKs
         gGroupDataProvider.SetStorageDelegate(&gServerStorage);
@@ -182,6 +185,7 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
             commissionerParams.controllerRCAC                 = rcacSpan;
             commissionerParams.controllerICAC                 = icacSpan;
             commissionerParams.controllerNOC                  = nocSpan;
+            commissionerParams.deviceAttestationVerifier      = dacVerifier;
 
             SuccessOrExit(err = DeviceControllerFactory::GetInstance().Init(factoryParams));
             SuccessOrExit(err = DeviceControllerFactory::GetInstance().SetupCommissioner(commissionerParams, *result));

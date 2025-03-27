@@ -28,17 +28,26 @@ using namespace chip::app::Clusters::OperationalState;
 using namespace chip::app::Clusters::RvcOperationalState;
 using chip::Protocols::InteractionModel::Status;
 
+#ifdef MATTER_DM_PLUGIN_RVC_RUN_MODE_SERVER
+#include <chef-rvc-mode-delegate.h>
+#endif // MATTER_DM_PLUGIN_RVC_RUN_MODE_SERVER
+
 static std::unique_ptr<RvcOperationalStateDelegate> gRvcOperationalStateDelegate;
 static std::unique_ptr<RvcOperationalState::Instance> gRvcOperationalStateInstance;
+
+RvcOperationalStateDelegate * getRvcOperationalStateDelegate()
+{
+    return gRvcOperationalStateDelegate.get();
+}
 
 static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data);
 
 DataModel::Nullable<uint32_t> RvcOperationalStateDelegate::GetCountdownTime()
 {
-    if (mRunningTime > mPhaseDuration.Value())
+    if (mCountdownTime.IsNull() || mRunningTime > mCountdownTime.Value())
         return DataModel::NullNullable;
 
-    return DataModel::MakeNullable((uint32_t) (mPhaseDuration.Value() - mRunningTime));
+    return DataModel::MakeNullable((uint32_t) (mCountdownTime.Value() - mRunningTime));
 }
 
 CHIP_ERROR RvcOperationalStateDelegate::GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState)
@@ -62,8 +71,31 @@ CHIP_ERROR RvcOperationalStateDelegate::GetOperationalPhaseAtIndex(size_t index,
 
 void RvcOperationalStateDelegate::HandlePauseStateCallback(GenericOperationalError & err)
 {
+    OperationalState::OperationalStateEnum state =
+        static_cast<OperationalState::OperationalStateEnum>(gRvcOperationalStateInstance->GetCurrentOperationalState());
+
+    if (state == OperationalState::OperationalStateEnum::kPaused)
+    {
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kNoError));
+        return;
+    }
+
+    if (state == OperationalState::OperationalStateEnum::kStopped || state == OperationalState::OperationalStateEnum::kError)
+    {
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kCommandInvalidInState));
+        return;
+    }
+
+    if (state != OperationalState::OperationalStateEnum::kRunning)
+    {
+        ChipLogDetail(DeviceLayer, "HandlePauseStateCallback: RVC not running. Current state = %d. Returning.",
+                      to_underlying(state));
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kCommandInvalidInState));
+        return;
+    }
+
     // placeholder implementation
-    auto error = GetInstance()->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kPaused));
+    auto error = gRvcOperationalStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kPaused));
     if (error == CHIP_NO_ERROR)
     {
         err.Set(to_underlying(OperationalState::ErrorStateEnum::kNoError));
@@ -76,8 +108,25 @@ void RvcOperationalStateDelegate::HandlePauseStateCallback(GenericOperationalErr
 
 void RvcOperationalStateDelegate::HandleResumeStateCallback(GenericOperationalError & err)
 {
+    OperationalState::OperationalStateEnum state =
+        static_cast<OperationalState::OperationalStateEnum>(gRvcOperationalStateInstance->GetCurrentOperationalState());
+
+    if (state == OperationalState::OperationalStateEnum::kStopped || state == OperationalState::OperationalStateEnum::kError)
+    {
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kUnableToStartOrResume));
+        return;
+    }
+
+    if (state != OperationalState::OperationalStateEnum::kPaused)
+    {
+        ChipLogDetail(DeviceLayer, "HandleResumeStateCallback: RVC not in paused state. Current state = %d. Returning.",
+                      to_underlying(state));
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kCommandInvalidInState));
+        return;
+    }
+
     // placeholder implementation
-    auto error = GetInstance()->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
+    auto error = gRvcOperationalStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
     if (error == CHIP_NO_ERROR)
     {
         err.Set(to_underlying(OperationalState::ErrorStateEnum::kNoError));
@@ -99,11 +148,34 @@ void RvcOperationalStateDelegate::HandleStartStateCallback(GenericOperationalErr
         return;
     }
 
+    RvcOperationalState::OperationalStateEnum current_state =
+        static_cast<RvcOperationalState::OperationalStateEnum>(gRvcOperationalStateInstance->GetCurrentOperationalState());
+
+    if (current_state == RvcOperationalState::OperationalStateEnum::kRunning ||
+        current_state == RvcOperationalState::OperationalStateEnum::kPaused)
+    {
+        ChipLogDetail(DeviceLayer, "HandleStartStateCallback: RVC is already started. Current state = %d. Returning.",
+                      to_underlying(current_state));
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kNoError));
+        return;
+    }
+
+    if (to_underlying(current_state) != to_underlying(RvcOperationalState::OperationalStateEnum::kCharging) &&
+        to_underlying(current_state) != to_underlying(RvcOperationalState::OperationalStateEnum::kStopped))
+    {
+        ChipLogError(
+            DeviceLayer,
+            "HandleStartStateCallback: RVC must be in either charging or stopped state before starting. current state = %d",
+            to_underlying(current_state));
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kCommandInvalidInState));
+        return;
+    }
     // placeholder implementation
     auto error = GetInstance()->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
     if (error == CHIP_NO_ERROR)
     {
-        (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), onOperationalStateTimerTick, this);
+        // Start RVC run cycle.
+        (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), onOperationalStateTimerTick, GetInstance());
         err.Set(to_underlying(OperationalState::ErrorStateEnum::kNoError));
     }
     else
@@ -114,6 +186,18 @@ void RvcOperationalStateDelegate::HandleStartStateCallback(GenericOperationalErr
 
 void RvcOperationalStateDelegate::HandleStopStateCallback(GenericOperationalError & err)
 {
+
+    RvcOperationalState::OperationalStateEnum current_state =
+        static_cast<RvcOperationalState::OperationalStateEnum>(gRvcOperationalStateInstance->GetCurrentOperationalState());
+
+    if (current_state != RvcOperationalState::OperationalStateEnum::kRunning &&
+        current_state != RvcOperationalState::OperationalStateEnum::kPaused)
+    {
+        ChipLogDetail(DeviceLayer, "HandleStopStateCallback: RVC not started. Current state = %d. Returning.",
+                      to_underlying(current_state));
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kNoError));
+        return;
+    }
     // placeholder implementation
     auto error = GetInstance()->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
     if (error == CHIP_NO_ERROR)
@@ -130,6 +214,35 @@ void RvcOperationalStateDelegate::HandleStopStateCallback(GenericOperationalErro
 
         mRunningTime = 0;
         mPausedTime  = 0;
+        mCountdownTime.SetNull();
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kNoError));
+        GetInstance()->UpdateCountdownTimeFromDelegate();
+    }
+    else
+    {
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kUnableToCompleteOperation));
+    }
+}
+
+void RvcOperationalStateDelegate::HandleGoHomeCommandCallback(OperationalState::GenericOperationalError & err)
+{
+
+    RvcOperationalState::OperationalStateEnum current_state =
+        static_cast<RvcOperationalState::OperationalStateEnum>(gRvcOperationalStateInstance->GetCurrentOperationalState());
+
+    if (current_state == RvcOperationalState::OperationalStateEnum::kRunning ||
+        current_state == RvcOperationalState::OperationalStateEnum::kPaused)
+    {
+        ChipLogDetail(DeviceLayer, "HandleGoHomeCommandCallback: RVC was started, current state = %d. Stopping RVC.",
+                      to_underlying(current_state));
+        gRvcOperationalStateDelegate->HandleStopStateCallback(err);
+    }
+
+    // Skip SeekingCharger and Docking states and directly go into charging.
+    auto error =
+        gRvcOperationalStateInstance->SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kCharging));
+    if (error == CHIP_NO_ERROR)
+    {
         err.Set(to_underlying(OperationalState::ErrorStateEnum::kNoError));
     }
     else
@@ -137,6 +250,7 @@ void RvcOperationalStateDelegate::HandleStopStateCallback(GenericOperationalErro
         err.Set(to_underlying(OperationalState::ErrorStateEnum::kUnableToCompleteOperation));
     }
 }
+
 static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data)
 {
     RvcOperationalStateDelegate * delegate = reinterpret_cast<RvcOperationalStateDelegate *>(data);
@@ -145,27 +259,79 @@ static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data
     OperationalState::OperationalStateEnum state =
         static_cast<OperationalState::OperationalStateEnum>(instance->GetCurrentOperationalState());
 
-    auto countdown_time = delegate->GetCountdownTime();
+    if (state != OperationalState::OperationalStateEnum::kRunning &&
+        state != OperationalState::OperationalStateEnum::kPaused) // Timer shouldn't run when RVC is not in Running or Paused.
+    {
+        return;
+    }
 
-    if (countdown_time.ValueOr(1) > 0)
+    if (gRvcOperationalStateDelegate->mCountdownTime.IsNull())
     {
         if (state == OperationalState::OperationalStateEnum::kRunning)
         {
-            delegate->mRunningTime++;
+            gRvcOperationalStateDelegate->mCountdownTime.SetNonNull(
+                static_cast<uint32_t>(gRvcOperationalStateDelegate->kExampleCountDown));
+            gRvcOperationalStateDelegate->mRunningTime = 0;
+            gRvcOperationalStateDelegate->mPausedTime  = 0;
+            instance->UpdateCountdownTimeFromDelegate();
         }
-        else if (state == OperationalState::OperationalStateEnum::kPaused)
-        {
-            delegate->mPausedTime++;
+        else
+        { // kPaused
+            ChipLogError(DeviceLayer, "RVC timer tick: Invalid state. Device is in kPaused but mCountdownTime is NULL.");
+            return;
         }
     }
 
-    if (state == OperationalState::OperationalStateEnum::kRunning || state == OperationalState::OperationalStateEnum::kPaused)
+    if (state == OperationalState::OperationalStateEnum::kRunning)
+    {
+        gRvcOperationalStateDelegate->mRunningTime++;
+    }
+    else if (state == OperationalState::OperationalStateEnum::kPaused)
+    {
+        gRvcOperationalStateDelegate->mPausedTime++;
+    }
+
+    uint32_t mPausedTime  = gRvcOperationalStateDelegate->mPausedTime;
+    uint32_t mRunningTime = gRvcOperationalStateDelegate->mRunningTime;
+
+    ChipLogDetail(DeviceLayer, "RVC timer tick: Current state = %d. CountdownTime = %d. PauseTime = %d. RunningTime = %d.",
+                  to_underlying(state), gRvcOperationalStateDelegate->mCountdownTime.Value(), mPausedTime, mRunningTime);
+    if (state == OperationalState::OperationalStateEnum::kRunning)
+    {
+        // Reported CountDownTime is the remaining time to run = mCountdownTime.Value() - mRunningTime.
+        instance->UpdateCountdownTimeFromDelegate();
+    }
+
+    if (gRvcOperationalStateDelegate->mCountdownTime.Value() > mRunningTime)
     {
         (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), onOperationalStateTimerTick, delegate);
     }
     else
     {
         (void) DeviceLayer::SystemLayer().CancelTimer(onOperationalStateTimerTick, delegate);
+
+        CHIP_ERROR err =
+            gRvcOperationalStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
+        if (err == CHIP_NO_ERROR)
+        {
+            OperationalState::GenericOperationalError current_err(to_underlying(OperationalState::ErrorStateEnum::kNoError));
+            gRvcOperationalStateInstance->GetCurrentOperationalError(current_err);
+
+            Optional<DataModel::Nullable<uint32_t>> totalTime((DataModel::Nullable<uint32_t>(mPausedTime + mRunningTime)));
+            Optional<DataModel::Nullable<uint32_t>> pausedTime((DataModel::Nullable<uint32_t>(mPausedTime)));
+
+            gRvcOperationalStateInstance->OnOperationCompletionDetected(static_cast<uint8_t>(current_err.errorStateID), totalTime,
+                                                                        pausedTime);
+
+            gRvcOperationalStateDelegate->mRunningTime = 0;
+            gRvcOperationalStateDelegate->mPausedTime  = 0;
+            gRvcOperationalStateDelegate->mCountdownTime.SetNull();
+            instance->UpdateCountdownTimeFromDelegate();
+
+#ifdef MATTER_DM_PLUGIN_RVC_RUN_MODE_SERVER
+            getRvcRunModeInstance()->UpdateCurrentMode(RvcRunMode::ModeIdle);
+#endif // MATTER_DM_PLUGIN_RVC_RUN_MODE_SERVER
+        }
     }
 }
 
@@ -200,8 +366,17 @@ chip::Protocols::InteractionModel::Status chefRvcOperationalStateWriteCallback(c
     }
     break;
     case chip::app::Clusters::RvcOperationalState::Attributes::OperationalState::Id: {
-        uint8_t m      = static_cast<uint8_t>(buffer[0]);
-        CHIP_ERROR err = gRvcOperationalStateInstance->SetOperationalState(m);
+        uint8_t currentState = gRvcOperationalStateInstance->GetCurrentOperationalState();
+        uint8_t m            = static_cast<uint8_t>(buffer[0]);
+        CHIP_ERROR err       = gRvcOperationalStateInstance->SetOperationalState(m);
+
+        if (currentState == to_underlying(OperationalState::OperationalStateEnum::kStopped) &&
+            m == to_underlying(OperationalState::OperationalStateEnum::kRunning))
+        {
+            gRvcOperationalStateDelegate->mCountdownTime.SetNonNull(
+                static_cast<uint32_t>(gRvcOperationalStateDelegate->kExampleCountDown));
+        }
+
         if (CHIP_NO_ERROR == err)
         {
             break;

@@ -24,17 +24,19 @@
 
 #include <DeviceInfoProviderImpl.h>
 
-#include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 
 #include <app/TestEventTriggerDelegate.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
+#include <data-model-providers/codegen/Instance.h>
 
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <static-supported-modes-manager.h>
 #include <static-supported-temperature-levels.h>
 
 #ifdef CONFIG_CHIP_WIFI
@@ -95,6 +97,7 @@ bool sIsNetworkEnabled     = false;
 bool sHaveBLEConnections   = false;
 
 app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
+app::Clusters::ModeSelect::StaticSupportedModesManager sStaticSupportedModesManager;
 
 #ifdef CONFIG_CHIP_CRYPTO_PSA
 chip::Crypto::PSAOperationalKeystore sPSAOperationalKeystore{};
@@ -224,6 +227,7 @@ CHIP_ERROR AppTask::Init()
     initParams.operationalKeystore = &sPSAOperationalKeystore;
 #endif
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.dataModelProvider        = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
     AppFabricTableDelegate::Init();
@@ -257,6 +261,7 @@ CHIP_ERROR AppTask::Init()
     }
 
     app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
+    app::Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
     return err;
 }
 
@@ -484,10 +489,10 @@ void AppTask::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* arg */
     switch (event->Type)
     {
     case DeviceEventType::kCHIPoBLEAdvertisingChange:
-#ifdef CONFIG_CHIP_NFC_COMMISSIONING
+#ifdef CONFIG_CHIP_NFC_ONBOARDING_PAYLOAD
         if (event->CHIPoBLEAdvertisingChange.Result == kActivity_Started)
         {
-            if (NFCMgr().IsTagEmulationStarted())
+            if (NFCOnboardingPayloadMgr().IsTagEmulationStarted())
             {
                 LOG_INF("NFC Tag emulation is already started");
             }
@@ -498,7 +503,7 @@ void AppTask::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* arg */
         }
         else if (event->CHIPoBLEAdvertisingChange.Result == kActivity_Stopped)
         {
-            NFCMgr().StopTagEmulation();
+            NFCOnboardingPayloadMgr().StopTagEmulation();
         }
 #endif
         sHaveBLEConnections = ConnectivityMgr().NumBLEConnections() != 0;

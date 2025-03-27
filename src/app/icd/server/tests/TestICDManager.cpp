@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <app-common/zap-generated/cluster-enums.h>
 #include <pw_unit_test/framework.h>
 
 #include <app/SubscriptionsInfoProvider.h>
@@ -122,6 +123,7 @@ public:
 
     bool SubjectHasActiveSubscription(FabricIndex aFabricIndex, NodeId subject) { return mHasActiveSubscription; };
     bool SubjectHasPersistedSubscription(FabricIndex aFabricIndex, NodeId subject) { return mHasPersistedSubscription; };
+    bool FabricHasAtLeastOneActiveSubscription(FabricIndex aFabricIndex) { return false; };
 
 private:
     bool mHasActiveSubscription    = false;
@@ -260,8 +262,10 @@ TEST_F(TestICDManager, TestICDModeDurationsWith0ActiveModeDurationWithoutActiveS
     ICDConfigurationData & icdConfigData = ICDConfigurationData::GetInstance();
     ICDConfigurationDataTestAccess privateIcdConfigData(&icdConfigData);
 
-    // Set FeatureMap - Configures CIP, UAT and LITS to 1
-    mICDManager.SetTestFeatureMapValue(0x07);
+    using Feature = Clusters::IcdManagement::Feature;
+    BitFlags<Feature> featureMap;
+    featureMap.Set(Feature::kLongIdleTimeSupport).Set(Feature::kUserActiveModeTrigger).Set(Feature::kCheckInProtocolSupport);
+    privateIcdConfigData.SetFeatureMap(featureMap);
 
     // Set that there are no matching subscriptions
     mSubInfoProvider.SetHasActiveSubscription(false);
@@ -269,7 +273,7 @@ TEST_F(TestICDManager, TestICDModeDurationsWith0ActiveModeDurationWithoutActiveS
 
     // Set New durations for test case
     Milliseconds32 oldActiveModeDuration = icdConfigData.GetActiveModeDuration();
-    privateIcdConfigData.SetModeDurations(MakeOptional<Milliseconds32>(0), NullOptional);
+    mICDManager.SetModeDurations(MakeOptional<Milliseconds32>(0), NullOptional);
 
     // Verify That ICDManager starts in Idle
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::IdleMode);
@@ -327,7 +331,7 @@ TEST_F(TestICDManager, TestICDModeDurationsWith0ActiveModeDurationWithoutActiveS
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::IdleMode);
 
     // Reset Old durations
-    privateIcdConfigData.SetModeDurations(MakeOptional(oldActiveModeDuration), NullOptional);
+    mICDManager.SetModeDurations(MakeOptional(oldActiveModeDuration), NullOptional);
 }
 
 /**
@@ -340,8 +344,10 @@ TEST_F(TestICDManager, TestICDModeDurationsWith0ActiveModeDurationWithActiveSub)
     ICDConfigurationData & icdConfigData = ICDConfigurationData::GetInstance();
     ICDConfigurationDataTestAccess privateIcdConfigData(&icdConfigData);
 
-    // Set FeatureMap - Configures CIP, UAT and LITS to 1
-    mICDManager.SetTestFeatureMapValue(0x07);
+    using Feature = Clusters::IcdManagement::Feature;
+    BitFlags<Feature> featureMap;
+    featureMap.Set(Feature::kLongIdleTimeSupport).Set(Feature::kUserActiveModeTrigger).Set(Feature::kCheckInProtocolSupport);
+    privateIcdConfigData.SetFeatureMap(featureMap);
 
     // Set that there are not matching subscriptions
     mSubInfoProvider.SetHasActiveSubscription(true);
@@ -349,7 +355,7 @@ TEST_F(TestICDManager, TestICDModeDurationsWith0ActiveModeDurationWithActiveSub)
 
     // Set New durations for test case
     Milliseconds32 oldActiveModeDuration = icdConfigData.GetActiveModeDuration();
-    privateIcdConfigData.SetModeDurations(MakeOptional<Milliseconds32>(0), NullOptional);
+    mICDManager.SetModeDurations(MakeOptional<Milliseconds32>(0), NullOptional);
 
     // Verify That ICDManager starts in Idle
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::IdleMode);
@@ -418,7 +424,7 @@ TEST_F(TestICDManager, TestICDModeDurationsWith0ActiveModeDurationWithActiveSub)
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::IdleMode);
 
     // Reset Old durations
-    privateIcdConfigData.SetModeDurations(MakeOptional<Milliseconds32>(oldActiveModeDuration), NullOptional);
+    mICDManager.SetModeDurations(MakeOptional<Milliseconds32>(oldActiveModeDuration), NullOptional);
 }
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
@@ -479,10 +485,12 @@ TEST_F(TestICDManager, TestICDMRegisterUnregisterEvents)
 {
     typedef ICDListener::ICDManagementEvents ICDMEvent;
     ICDNotifier notifier = ICDNotifier::GetInstance();
+    ICDConfigurationDataTestAccess privateIcdConfigData(&ICDConfigurationData::GetInstance());
 
-    // Set FeatureMap
-    // Configures CIP, UAT and LITS to 1
-    mICDManager.SetTestFeatureMapValue(0x07);
+    using Feature = Clusters::IcdManagement::Feature;
+    BitFlags<Feature> featureMap;
+    featureMap.Set(Feature::kLongIdleTimeSupport).Set(Feature::kUserActiveModeTrigger).Set(Feature::kCheckInProtocolSupport);
+    privateIcdConfigData.SetFeatureMap(featureMap);
 
     // Check ICDManager starts in SIT mode if no entries are present
     EXPECT_EQ(ICDConfigurationData::GetInstance().GetICDMode(), ICDConfigurationData::ICDMode::SIT);
@@ -694,6 +702,69 @@ TEST_F(TestICDManager, TestICDMStayActive)
     // confirm the promised time is 20000 since the device is already planing to stay active longer than the requested time
     EXPECT_EQ(stayActivePromisedMs, 20000UL);
 }
+
+#if CHIP_CONFIG_ENABLE_ICD_DSLS
+/**
+ * @brief Test verifies the logic of the ICDManager related to DSLS (Dynamic SIT LIT Support)
+ */
+TEST_F(TestICDManager, TestICDMDSLS)
+{
+    typedef ICDListener::ICDManagementEvents ICDMEvent;
+    ICDNotifier notifier = ICDNotifier::GetInstance();
+    ICDConfigurationDataTestAccess privateIcdConfigData(&ICDConfigurationData::GetInstance());
+
+    using Feature = Clusters::IcdManagement::Feature;
+    BitFlags<Feature> featureMap;
+    featureMap.Set(Feature::kLongIdleTimeSupport)
+        .Set(Feature::kUserActiveModeTrigger)
+        .Set(Feature::kCheckInProtocolSupport)
+        .Set(Feature::kDynamicSitLitSupport);
+    privateIcdConfigData.SetFeatureMap(featureMap);
+
+    // Check ICDManager starts in SIT mode if no entries are present
+    EXPECT_EQ(ICDConfigurationData::GetInstance().GetICDMode(), ICDConfigurationData::ICDMode::SIT);
+
+    // Create table with one fabric
+    ICDMonitoringTable table1(testStorage, kTestFabricIndex1, kMaxTestClients, &(mKeystore));
+
+    // Add an entry to the fabric
+    ICDMonitoringEntry entry1(&(mKeystore));
+    entry1.checkInNodeID    = kClientNodeId11;
+    entry1.monitoredSubject = kClientNodeId12;
+    EXPECT_EQ(CHIP_NO_ERROR, entry1.SetKey(ByteSpan(kKeyBuffer1a)));
+    EXPECT_EQ(CHIP_NO_ERROR, table1.Set(0, entry1));
+
+    // Trigger register event after first entry was added
+    notifier.NotifyICDManagementEvent(ICDMEvent::kTableUpdated);
+
+    // Check ICDManager is now in the LIT operating mode
+    EXPECT_EQ(ICDConfigurationData::GetInstance().GetICDMode(), ICDConfigurationData::ICDMode::LIT);
+
+    // Simulate SIT Mode Request - device must switch to SIT mode even if there is a client registered
+    notifier.NotifySITModeRequestNotification();
+
+    // Check ICDManager is now in the SIT operating mode
+    EXPECT_EQ(ICDConfigurationData::GetInstance().GetICDMode(), ICDConfigurationData::ICDMode::SIT);
+
+    // Advance time so active mode interval expires.
+    AdvanceClockAndRunEventLoop(ICDConfigurationData::GetInstance().GetActiveModeDuration() + 1_ms32);
+
+    // Check ICDManager is still in the SIT operating mode
+    EXPECT_EQ(ICDConfigurationData::GetInstance().GetICDMode(), ICDConfigurationData::ICDMode::SIT);
+
+    // Withdraw SIT mode
+    notifier.NotifySITModeRequestWithdrawal();
+
+    // Check ICDManager is now in the LIT operating mode
+    EXPECT_EQ(ICDConfigurationData::GetInstance().GetICDMode(), ICDConfigurationData::ICDMode::LIT);
+
+    // Advance time so active mode interval expires.
+    AdvanceClockAndRunEventLoop(ICDConfigurationData::GetInstance().GetActiveModeDuration() + 1_ms32);
+
+    // Check ICDManager is still in the LIT operating mode
+    EXPECT_EQ(ICDConfigurationData::GetInstance().GetICDMode(), ICDConfigurationData::ICDMode::LIT);
+}
+#endif // CHIP_CONFIG_ENABLE_ICD_DSLS
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
@@ -929,9 +1000,12 @@ TEST_F(TestICDManager, TestICDStateObserverOnEnterActiveMode)
 TEST_F(TestICDManager, TestICDStateObserverOnICDModeChange)
 {
     typedef ICDListener::ICDManagementEvents ICDMEvent;
+    ICDConfigurationDataTestAccess privateIcdConfigData(&ICDConfigurationData::GetInstance());
 
-    // Set FeatureMap - Configures CIP, UAT and LITS to 1
-    mICDManager.SetTestFeatureMapValue(0x07);
+    using Feature = Clusters::IcdManagement::Feature;
+    BitFlags<Feature> featureMap;
+    featureMap.Set(Feature::kLongIdleTimeSupport).Set(Feature::kUserActiveModeTrigger).Set(Feature::kCheckInProtocolSupport);
+    privateIcdConfigData.SetFeatureMap(featureMap);
 
     // Since we don't have a registration, we stay in SIT mode. No changes
     EXPECT_FALSE(mICDStateObserver.mOnICDModeChangeCalled);
@@ -975,8 +1049,12 @@ TEST_F(TestICDManager, TestICDStateObserverOnICDModeChange)
 
 TEST_F(TestICDManager, TestICDStateObserverOnICDModeChangeOnInit)
 {
-    // Set FeatureMap - Configures CIP, UAT and LITS to 1
-    mICDManager.SetTestFeatureMapValue(0x07);
+    ICDConfigurationDataTestAccess privateIcdConfigData(&ICDConfigurationData::GetInstance());
+
+    using Feature = Clusters::IcdManagement::Feature;
+    BitFlags<Feature> featureMap;
+    featureMap.Set(Feature::kLongIdleTimeSupport).Set(Feature::kUserActiveModeTrigger).Set(Feature::kCheckInProtocolSupport);
+    privateIcdConfigData.SetFeatureMap(featureMap);
 
     ICDMonitoringTable table(testStorage, kTestFabricIndex1, kMaxTestClients, &(mKeystore));
 
@@ -1022,8 +1100,8 @@ TEST_F(TestICDManager, TestICDStateObserverOnTransitionToIdleModeGreaterActiveMo
 
     // Set New durations for test case - ActiveModeDuration must be longuer than ICD_ACTIVE_TIME_JITTER_MS
     Milliseconds32 oldActiveModeDuration = ICDConfigurationData::GetInstance().GetActiveModeDuration();
-    privateIcdConfigData.SetModeDurations(
-        MakeOptional<Milliseconds32>(Milliseconds32(200) + Milliseconds32(ICD_ACTIVE_TIME_JITTER_MS)), NullOptional);
+    mICDManager.SetModeDurations(MakeOptional<Milliseconds32>(Milliseconds32(200) + Milliseconds32(ICD_ACTIVE_TIME_JITTER_MS)),
+                                 NullOptional);
 
     // Advance clock just before IdleMode timer expires
     AdvanceClockAndRunEventLoop(ICDConfigurationData::GetInstance().GetIdleModeDuration() - 1_s);
@@ -1060,7 +1138,7 @@ TEST_F(TestICDManager, TestICDStateObserverOnTransitionToIdleModeGreaterActiveMo
     EXPECT_FALSE(mICDStateObserver.mOnTransitionToIdleCalled);
 
     // Reset Old durations
-    privateIcdConfigData.SetModeDurations(MakeOptional(oldActiveModeDuration), NullOptional);
+    mICDManager.SetModeDurations(MakeOptional(oldActiveModeDuration), NullOptional);
 }
 
 /**
@@ -1073,7 +1151,7 @@ TEST_F(TestICDManager, TestICDStateObserverOnTransitionToIdleModeEqualActiveMode
 
     // Set New durations for test case - ActiveModeDuration must be equal to ICD_ACTIVE_TIME_JITTER_MS
     Milliseconds32 oldActiveModeDuration = ICDConfigurationData::GetInstance().GetActiveModeDuration();
-    privateIcdConfigData.SetModeDurations(MakeOptional<Milliseconds32>(Milliseconds32(ICD_ACTIVE_TIME_JITTER_MS)), NullOptional);
+    mICDManager.SetModeDurations(MakeOptional<Milliseconds32>(Milliseconds32(ICD_ACTIVE_TIME_JITTER_MS)), NullOptional);
 
     // Advance clock just before IdleMode timer expires
     AdvanceClockAndRunEventLoop(ICDConfigurationData::GetInstance().GetIdleModeDuration() - 1_s);
@@ -1093,7 +1171,7 @@ TEST_F(TestICDManager, TestICDStateObserverOnTransitionToIdleModeEqualActiveMode
     EXPECT_TRUE(mICDStateObserver.mOnTransitionToIdleCalled);
 
     // Reset Old durations
-    privateIcdConfigData.SetModeDurations(MakeOptional(oldActiveModeDuration), NullOptional);
+    mICDManager.SetModeDurations(MakeOptional(oldActiveModeDuration), NullOptional);
 }
 
 /**
@@ -1105,7 +1183,7 @@ TEST_F(TestICDManager, TestICDStateObserverOnTransitionToIdleMode0ActiveModeDura
 
     // Set New durations for test case - ActiveModeDuration equal 0
     Milliseconds32 oldActiveModeDuration = ICDConfigurationData::GetInstance().GetActiveModeDuration();
-    privateIcdConfigData.SetModeDurations(MakeOptional<Milliseconds32>(0), NullOptional);
+    mICDManager.SetModeDurations(MakeOptional<Milliseconds32>(0), NullOptional);
 
     // Advance clock just before IdleMode timer expires
     AdvanceClockAndRunEventLoop(ICDConfigurationData::GetInstance().GetIdleModeDuration() - 1_s);
@@ -1125,7 +1203,7 @@ TEST_F(TestICDManager, TestICDStateObserverOnTransitionToIdleMode0ActiveModeDura
     EXPECT_TRUE(mICDStateObserver.mOnTransitionToIdleCalled);
 
     // Reset Old durations
-    privateIcdConfigData.SetModeDurations(MakeOptional(oldActiveModeDuration), NullOptional);
+    mICDManager.SetModeDurations(MakeOptional(oldActiveModeDuration), NullOptional);
 }
 
 /**

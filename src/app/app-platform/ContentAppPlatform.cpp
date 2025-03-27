@@ -420,7 +420,7 @@ std::set<NodeId> ContentAppPlatform::GetNodeIdsForContentApp(uint16_t vendorId, 
     return {};
 }
 
-std::set<NodeId> ContentAppPlatform::GetNodeIdsForAllowVendorId(uint16_t vendorId)
+std::set<NodeId> ContentAppPlatform::GetNodeIdsForAllowedVendorId(uint16_t vendorId)
 {
     std::set<NodeId> result;
     std::string vendorPrefix = std::to_string(vendorId) + ":";
@@ -660,6 +660,7 @@ CHIP_ERROR ContentAppPlatform::GetACLEntryIndex(size_t * foundIndex, FabricIndex
 // and create bindings on the given client so that it knows what it has access to.
 CHIP_ERROR ContentAppPlatform::ManageClientAccess(Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle,
                                                   uint16_t targetVendorId, uint16_t targetProductId, NodeId localNodeId,
+                                                  CharSpan rotatingId, uint32_t passcode,
                                                   std::vector<Binding::Structs::TargetStruct::Type> bindings,
                                                   Controller::WriteResponseSuccessCallback successCb,
                                                   Controller::WriteResponseFailureCallback failureCb)
@@ -799,13 +800,32 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(Messaging::ExchangeManager & e
                         .cluster     = NullOptional,
                         .fabricIndex = kUndefinedFabricIndex,
                     });
+
+                    accessAllowed = true;
                 }
-                accessAllowed = true;
             }
             if (accessAllowed)
             {
                 // notify content app about this nodeId
-                app->AddClientNode(subjectNodeId);
+                bool isNodeAdded = app->AddClientNode(subjectNodeId);
+
+                if (isNodeAdded && rotatingId.size() != 0)
+                {
+                    // handle login
+                    auto setupPIN             = std::to_string(passcode);
+                    auto accountLoginDelegate = app->GetAccountLoginDelegate();
+                    if (accountLoginDelegate != nullptr)
+                    {
+                        bool condition = accountLoginDelegate->HandleLogin(rotatingId, { setupPIN.data(), setupPIN.size() },
+                                                                           MakeOptional(subjectNodeId));
+                        ChipLogProgress(Controller, "AccountLogin::Login command sent and returned: %s",
+                                        condition ? "success" : "failure");
+                    }
+                    else
+                    {
+                        ChipLogError(Controller, "AccountLoginDelegate not found for app");
+                    }
+                }
             }
         }
     }

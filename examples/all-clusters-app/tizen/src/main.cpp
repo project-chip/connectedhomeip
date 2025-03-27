@@ -22,6 +22,7 @@
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/util/endpoint-config-api.h>
 #include <platform/Tizen/NetworkCommissioningDriver.h>
+#include <static-supported-modes-manager.h>
 #include <static-supported-temperature-levels.h>
 
 #include <TizenServiceAppMain.h>
@@ -40,6 +41,7 @@ NetworkCommissioning::TizenEthernetDriver sEthernetDriver;
 Clusters::NetworkCommissioning::Instance sEthernetNetworkCommissioningInstance(kNetworkCommissioningEndpointMain, &sEthernetDriver);
 
 app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
+Clusters::ModeSelect::StaticSupportedModesManager sStaticSupportedModesManager;
 } // namespace
 
 void ApplicationInit()
@@ -49,6 +51,7 @@ void ApplicationInit()
 
     sEthernetNetworkCommissioningInstance.Init();
     app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
+    Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
 }
 
 void ApplicationShutdown() {}

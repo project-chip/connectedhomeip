@@ -67,7 +67,7 @@ public:
 
         AppContext::SetUp();
         ASSERT_EQ(mEventCounter.Init(0), CHIP_NO_ERROR);
-        chip::app::EventManagement::CreateEventManagement(&GetExchangeManager(), ArraySize(logStorageResources),
+        chip::app::EventManagement::CreateEventManagement(&GetExchangeManager(), MATTER_ARRAY_SIZE(logStorageResources),
                                                           gCircularEventBuffer, logStorageResources, &mEventCounter);
     }
 

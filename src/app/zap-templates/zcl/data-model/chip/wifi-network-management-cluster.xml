@@ -17,7 +17,7 @@ limitations under the License.
 <configurator>
     <domain name="CHIP"/>
 
-    <cluster apiMaturity="provisional">
+    <cluster>
         <domain>Network Infrastructure</domain>
         <name>Wi-Fi Network Management</name>
         <code>0x0451</code>
@@ -30,19 +30,23 @@ limitations under the License.
         <!-- cluster revision -->
         <globalAttribute side="either" code="0xFFFD" value="1"/>
 
-        <attribute side="server" code="0x0000" define="SSID" type="octet_string" length="32" writable="false" isNullable="true" optional="false">SSID</attribute>
-        <attribute side="server" code="0x0001" define="PASSPHRASE_SURROGATE" type="int64u" writable="false" isNullable="true" optional="false">
-            <description>PassphraseSurrogate</description>
+        <attribute side="server" code="0x0000" name="SSID" define="SSID" type="octet_string" length="32" writable="false" isNullable="true" optional="false">
+            <mandatoryConform/>
+        </attribute>
+        <attribute side="server" code="0x0001" name="PassphraseSurrogate" define="PASSPHRASE_SURROGATE" type="int64u" writable="false" isNullable="true" optional="false">
             <access op="read" privilege="manage"/>
+            <mandatoryConform/>
         </attribute>
 
         <command source="client" code="0x00" name="NetworkPassphraseRequest" optional="false" response="NetworkPassphraseResponse">
             <description>Request the current WPA-Personal passphrase or PSK associated with the managed Wi-Fi network.</description>
             <access op="invoke" privilege="manage"/>
+            <mandatoryConform/>
         </command>
         <command source="server" code="0x01" name="NetworkPassphraseResponse" optional="false">
             <description>This is the response to a NetworkPassphraseRequest.</description>
             <arg name="Passphrase" type="octet_string" length="64"/>
+            <mandatoryConform/>
         </command>
     </cluster>
 </configurator>

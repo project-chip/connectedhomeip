@@ -21,7 +21,7 @@ limitations under the License.
     <field name="FabricSynchronization" mask="0x1"/>
   </bitmap>
 
-  <cluster apiMaturity="provisional">
+  <cluster>
     <domain>General</domain>
     <name>Commissioner Control</name>
     <code>0x0751</code>
@@ -32,45 +32,46 @@ limitations under the License.
 
     <!-- cluster revision -->
     <globalAttribute side="either" code="0xFFFD" value="1"/>
-    <attribute side="server" code="0x0000" define="SUPPORTED_DEVICE_CATEGORIES" type="SupportedDeviceCategoryBitmap" default="0" min="0x00000000" max="0x00000001">
-      <description>SupportedDeviceCategories</description>
+    <attribute side="server" code="0x0000" name="SupportedDeviceCategories" define="SUPPORTED_DEVICE_CATEGORIES" type="SupportedDeviceCategoryBitmap" default="0" min="0x00000000" max="0x00000001">
       <access op="read" privilege="manage"/>
+      <mandatoryConform/>
     </attribute>
 
     <command source="client" code="0x00" name="RequestCommissioningApproval" optional="false">
       <description>This command is sent by a client to request approval for a future CommissionNode call.</description>
-      <arg id="0" name="RequestId" type="int64u"/>
-      <arg id="1" name="VendorId" type="vendor_id"/>
-      <arg id="2" name="ProductId" type="int16u"/>
+      <arg id="0" name="RequestID" type="int64u"/>
+      <arg id="1" name="VendorID" type="vendor_id"/>
+      <arg id="2" name="ProductID" type="int16u"/>
       <arg id="3" name="Label" type="char_string" optional="true" length="64"/>
       <access op="invoke" privilege="manage"/>
+      <mandatoryConform/>
     </command>
 
     <command source="client" code="0x01" name="CommissionNode" response="ReverseOpenCommissioningWindow" optional="false">
       <description>This command is sent by a client to request that the server begins commissioning a previously approved request.</description>
-      <arg id="0" name="RequestId" type="int64u"/>
-      <arg id="2" name="ResponseTimeoutSeconds" type="int16u" min="30" max="120" default="30"/>
-      <arg id="3" name="IpAddress" type="octet_string" optional="true" min="4" max="16"/>
-      <!-- Note: ipadr is not supported yet, use its base type (octet_string) here -->
-      <arg id="4" name="Port" type="int16u" optional="true"/>
+      <arg id="0" name="RequestID" type="int64u"/>
+      <arg id="1" name="ResponseTimeoutSeconds" type="int16u" min="30" max="120" default="30"/>
       <access op="invoke" privilege="manage"/>
+      <mandatoryConform/>
     </command>
 
-    <command source="server" code="0x02" name="ReverseOpenCommissioningWindow" optional="false">
+    <command source="server" code="0x02" name="ReverseOpenCommissioningWindow" optional="false" disableDefaultResponse="true">
       <description>When received within the timeout specified by CommissionNode, the client SHALL open a commissioning window on to the node which the client called RequestCommissioningApproval to have commissioned.</description>
       <arg id="0" name="CommissioningTimeout" type="int16u"/>
       <arg id="1" name="PAKEPasscodeVerifier" type="octet_string"/>
       <arg id="2" name="Discriminator" type="int16u" min="0" max="4095"/>
       <arg id="3" name="Iterations" type="int32u" min="1000" max="100000"/>
       <arg id="4" name="Salt" type="octet_string" length="32" minLength="16"/>
+      <mandatoryConform/>
     </command>
 
     <event code="0x00" name="CommissioningRequestResult" priority="info" side="server" isFabricSensitive="true">
       <description>This event SHALL be sent by the server following a RequestCommissioningApproval command which the server responded to with SUCCESS.</description>
-      <field id="0" name="RequestId" type="int64u"/>
-      <field id="1" name="ClientNodeId" type="node_id"/>
-      <field id="2" name="StatusCode" type="enum8"/>
+      <field id="0" name="RequestID" type="int64u"/>
+      <field id="1" name="ClientNodeID" type="node_id"/>
+      <field id="2" name="StatusCode" type="status"/>
       <access op="read" privilege="manage"/>
+      <mandatoryConform/>
     </event>
 
   </cluster>

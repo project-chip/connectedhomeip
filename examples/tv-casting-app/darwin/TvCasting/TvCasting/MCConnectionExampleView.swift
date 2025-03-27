@@ -65,6 +65,13 @@ struct MCConnectionExampleView: View {
                         .padding()
                 }
             }
+            Spacer()  // Push the error code to the bottom
+            if let errorCode = viewModel.errorCodeDescription {
+
+                Text("\(errorCode)")
+                    .foregroundColor(.red)
+                    .padding()
+            }
         }
         .navigationTitle("Connecting...")
         .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .top)
@@ -80,6 +87,9 @@ struct MCConnectionExampleView: View {
                 self.Log.info("MCConnectionExampleView calling MCConnectionExampleViewModel.connect() with useCommissionerGeneratedPasscode: \(String(describing: self.useCommissionerGeneratedPasscode))")
                 viewModel.connect(selectedCastingPlayer: self.selectedCastingPlayer, useCommissionerGeneratedPasscode: self.useCommissionerGeneratedPasscode)
             }
+        })
+        .onDisappear(perform: {
+            viewModel.cancelConnectionAttempt(selectedCastingPlayer: self.selectedCastingPlayer)
         })
     }
 }

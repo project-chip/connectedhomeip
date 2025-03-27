@@ -53,7 +53,6 @@ target_sources(app PRIVATE
                )
 
 chip_configure_data_model(app
-    INCLUDE_SERVER
     ZAP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../common/window-app.zap
 )
 

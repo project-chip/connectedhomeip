@@ -41,7 +41,7 @@
 
 #define configUSE_PREEMPTION 1
 
-#if defined(chip_with_low_power) && (chip_with_low_power == 1)
+#if defined(nxp_use_low_power) && (nxp_use_low_power == 1)
 #define configUSE_TICKLESS_IDLE 1
 #else
 #define configUSE_TICKLESS_IDLE 0

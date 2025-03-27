@@ -19,12 +19,19 @@
 # for details about the block below.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${ALL_CLUSTERS_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# test-runner-runs:
+#   run1:
+#     app: ${ALL_CLUSTERS_APP}
+#     factory-reset: true
+#     quiet: true
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # === END CI TEST ARGUMENTS ===
 
 import logging
@@ -35,7 +42,7 @@ from chip.clusters import ClusterObjects as ClusterObjects
 from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction, TypedAttributePath
 from chip.exceptions import ChipStackError
 from chip.interaction_model import Status
-from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
 
@@ -88,11 +95,11 @@ def WaitForEventReport(q: queue.Queue, expected_event: ClusterObjects.ClusterEve
 
 
 class TC_ACE_1_2(MatterBaseTest):
-    def __init__(self, *args):
+
+    def setup_class(self):
+        super().setup_class()
         self.breadcrumb = 1
         self.breadcrumb_queue = queue.Queue()
-        self.subscription_breadcrumb = None
-        super().__init__(*args)
 
     async def write_acl(self, acl):
         # This returns an attribute status
@@ -102,9 +109,11 @@ class TC_ACE_1_2(MatterBaseTest):
     async def steps_subscribe_breadcrumb(self, print_steps: bool):
         if print_steps:
             self.print_step(3, "TH2 subscribes to the Breadcrumb attribute")
-        self.subscription_breadcrumb = await self.TH2.ReadAttribute(nodeid=self.dut_node_id, attributes=[(0, Clusters.GeneralCommissioning.Attributes.Breadcrumb)], reportInterval=(1, 5), keepSubscriptions=False, autoResubscribe=False)
+        subscription_breadcrumb = await self.TH2.ReadAttribute(
+            nodeid=self.dut_node_id, attributes=[(0, Clusters.GeneralCommissioning.Attributes.Breadcrumb)],
+            reportInterval=(1, 5), keepSubscriptions=False, autoResubscribe=False)
         breadcrumb_cb = AttributeChangeCallback(Clusters.GeneralCommissioning.Attributes.Breadcrumb, self.breadcrumb_queue)
-        self.subscription_breadcrumb.SetAttributeUpdateCallback(breadcrumb_cb)
+        subscription_breadcrumb.SetAttributeUpdateCallback(breadcrumb_cb)
 
     async def steps_receive_breadcrumb(self, print_steps: bool):
         if print_steps:

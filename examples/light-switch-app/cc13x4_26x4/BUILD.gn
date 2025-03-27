@@ -1,0 +1,117 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/openthread.gni")
+import("//build_overrides/ti_simplelink_sdk.gni")
+
+import("${build_root}/config/defaults.gni")
+
+import("${chip_root}/src/platform/device.gni")
+
+import("${ti_simplelink_sdk_build_root}/ti_simplelink_executable.gni")
+import("${ti_simplelink_sdk_build_root}/ti_simplelink_sdk.gni")
+
+assert(current_os == "freertos")
+
+project_dir = "${chip_root}/examples/light-switch-app/cc13x4_26x4"
+
+ti_simplelink_sdk("sdk") {
+  include_dirs = [ "${project_dir}/include" ]
+  public_configs = [ ":light-switch_app_config" ]
+}
+
+ti_sysconfig("sysconfig") {
+  sources = [ "${project_dir}/chip.syscfg" ]
+
+  outputs = [
+    "ti_radio_config.c",
+    "ti_radio_config.h",
+    "ti_drivers_config.c",
+    "ti_drivers_config.h",
+    "ti_ble_config.c",
+    "ti_ble_config.h",
+    "ti_dmm_application_policy.c",
+    "ti_dmm_application_policy.h",
+
+    # CCFG generation disabled for OTA-able application
+    #"ti_devices_config.c",
+    #"ti_devices_config.h",
+  ]
+
+  public_configs = [ ":sdk_cc13x4_26x4_dmm_config" ]
+
+  cflags = [
+    "-Wno-comment",
+    "@" + rebase_path("${target_gen_dir}/sysconfig/ti_utils_build_compiler.opt",
+                      root_build_dir),
+  ]
+}
+
+ti_simplelink_executable("light-switch_app") {
+  output_name = "chip-${ti_simplelink_board}-light-switch-example.out"
+
+  sources = [
+    "${chip_root}/examples/providers/DeviceInfoProviderImpl.cpp",
+    "${chip_root}/src/app/clusters/general-diagnostics-server/GenericFaultTestEventTriggerHandler.cpp",
+    "${project_dir}/src/AppTask.cpp",
+    "${project_dir}/src/BindingHandler.cpp",
+    "${project_dir}/src/LightSwitchManager.cpp",
+    "${project_dir}/src/ZclCallbacks.cpp",
+    "${project_dir}/src/main.cpp",
+  ]
+
+  public = [
+    "${chip_root}/src/platform/cc13xx_26xx/DefaultTestEventTriggerDelegate.h",
+  ]
+
+  deps = [
+    ":sdk",
+    ":sysconfig",
+    "${chip_root}/examples/light-switch-app/light-switch-common",
+    "${chip_root}/examples/platform/cc13x4_26x4:cc13x4_26x4-attestation-credentials",
+    "${chip_root}/src/lib",
+    "${chip_root}/third_party/openthread:openthread",
+  ]
+  defines = []
+  if (custom_factory_data) {
+    defines += [ "CC13XX_26XX_FACTORY_DATA" ]
+  }
+
+  if (chip_enable_icd_server) {
+    defines += [ "TI_ICD_ENABLE_SERVER" ]
+  }
+
+  include_dirs = [
+    "${project_dir}",
+    "${chip_root}/examples/providers/",
+  ]
+
+  cflags = [
+    "-Wno-implicit-fallthrough",
+    "-Wno-sign-compare",
+    "-Wconversion",
+  ]
+
+  output_dir = root_out_dir
+}
+
+group("cc13x4_26x4") {
+  deps = [ ":light-switch_app" ]
+}
+
+group("default") {
+  deps = [ ":cc13x4_26x4" ]
+}

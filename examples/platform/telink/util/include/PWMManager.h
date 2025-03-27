@@ -110,7 +110,7 @@ private:
     PwmBackend * m_backend;
 };
 
-#if CONFIG_WS2812_STRIP
+#if CONFIG_WS2812_STRIP_GPIO_TELINK
 
 class Ws2812Strip : public PwmBackend
 {
@@ -130,7 +130,7 @@ private:
     Ws2812Strip(){};
 };
 
-#else
+#elif CONFIG_PWM
 
 class PwmPool : public PwmBackend
 {
@@ -150,4 +150,24 @@ private:
     PwmPool(){};
 };
 
-#endif // CONFIG_WS2812_STRIP
+#else
+
+class PwmDummy : public PwmBackend
+{
+public:
+    static PwmDummy & getInstance();
+    bool linkHW();
+
+    void setPwmHW(size_t pwm, bool state);
+    void setPwmHW(size_t pwm, uint32_t permille);
+    void setPwmHWBlink(size_t pwm, size_t onMs, size_t offMs);
+    void setPwmHWBreath(size_t pwm, size_t breathMs);
+
+    PwmDummy(PwmDummy const &)       = delete;
+    void operator=(PwmDummy const &) = delete;
+
+private:
+    PwmDummy(){};
+};
+
+#endif // CONFIG_WS2812_STRIP_GPIO_TELINK

@@ -24,7 +24,7 @@ doc is tested on **Ubuntu for Raspberry Pi Server 20.04 LTS (aarch64)** and
 
 -   Build the example application:
 
-          $ cd ~/connectedhomeip/examples/lighting-app/linux
+          $ cd ~/connectedhomeip/examples/microwave-oven-app/linux
           $ git submodule update --init
           $ source third_party/connectedhomeip/scripts/activate.sh
           $ gn gen out/debug
@@ -32,12 +32,12 @@ doc is tested on **Ubuntu for Raspberry Pi Server 20.04 LTS (aarch64)** and
 
 -   To delete generated executable, libraries and object files use:
 
-          $ cd ~/connectedhomeip/examples/lighting-app/linux
+          $ cd ~/connectedhomeip/examples/microwave-oven-app/linux
           $ rm -rf out/
 
 -   Build the example with pigweed RPC
 
-          $ cd ~/connectedhomeip/examples/lighting-app/linux
+          $ cd ~/connectedhomeip/examples/microwave-oven-app/linux
           $ git submodule update --init
           $ source third_party/connectedhomeip/scripts/activate.sh
           $ gn gen out/debug --args='import("//with_pw_rpc.gni")'
@@ -104,10 +104,10 @@ doc is tested on **Ubuntu for Raspberry Pi Server 20.04 LTS (aarch64)** and
 
         -   Run Linux Lighting Example App
 
-                  $ cd ~/connectedhomeip/examples/lighting-app/linux
-                  $ sudo out/debug/chip-lighting-app --ble-device [bluetooth device number]
+                  $ cd ~/connectedhomeip/examples/microwave-oven-app/linux
+                  $ sudo out/debug/chip-microwave-oven-app --ble-device [bluetooth device number]
                   # In this example, the device we want to use is hci1
-                  $ sudo out/debug/chip-lighting-app --ble-device 1
+                  $ sudo out/debug/chip-microwave-oven-app --ble-device 1
 
         -   Test the device using ChipDeviceController on your laptop /
             workstation etc.

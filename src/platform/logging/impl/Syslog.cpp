@@ -23,6 +23,14 @@
 #include <mutex>
 #include <syslog.h>
 
+#ifndef CHIP_SYSLOG_IDENT
+#define CHIP_SYSLOG_IDENT nullptr
+#endif
+
+#ifndef CHIP_SYSLOG_FACILITY
+#define CHIP_SYSLOG_FACILITY LOG_DAEMON
+#endif
+
 namespace chip {
 namespace Logging {
 namespace Platform {
@@ -51,7 +59,7 @@ void LogV(const char * module, uint8_t category, const char * msg, va_list v)
 
     if (!sInitialized)
     {
-        openlog(nullptr, 0, LOG_DAEMON);
+        openlog(CHIP_SYSLOG_IDENT, LOG_CONS | LOG_PID, CHIP_SYSLOG_FACILITY);
         sInitialized = true;
     }
 

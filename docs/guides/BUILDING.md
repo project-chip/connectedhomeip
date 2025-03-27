@@ -94,7 +94,8 @@ satisfied with the following command:
 ```
 sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev \
      libglib2.0-dev libavahi-client-dev ninja-build python3-venv python3-dev \
-     python3-pip unzip libgirepository1.0-dev libcairo2-dev libreadline-dev
+     python3-pip unzip libgirepository1.0-dev libcairo2-dev libreadline-dev \
+     default-jre
 ```
 
 #### UI builds
@@ -212,7 +213,7 @@ up in `$PATH`.
 
 ZAP releases are copied to CIPD by an automated bot. You can check if a release
 was copied by looking at tags created for
-[ZAP CIPD Packages](https://chrome-infra-packages.appspot.com/p/fuchsia/third_party/zap)
+[ZAP CIPD Packages](https://chrome-infra-packages.appspot.com/p/fuchsia/third_party/3pp/zap)
 in various platforms.
 
 ### Custom ZAP
@@ -381,6 +382,30 @@ They pick up environment variables such as `$CFLAGS`, `$CXXFLAGS` and
 `$LIB_FUZZING_ENGINE`.
 
 You likely want `libfuzzer` + `asan` builds instead for local testing.
+
+### `pw_fuzzer` `FuzzTests`
+
+An Alternative way for writing and running Fuzz Tests is Google's `FuzzTest`
+framework, integrated through `pw_fuzzer`. The Tests will have to be built and
+executed manually.
+
+```
+./scripts/build/build_examples.py --target linux-x64-tests-clang-pw-fuzztest build
+```
+
+NOTE: `asan` is enabled by default in FuzzTest, so please do not add it in
+build_examples.py invocation.
+
+Tests will be located in:
+`out/linux-x64-tests-clang-pw-fuzztest/chip_pw_fuzztest/tests/` where
+`chip_pw_fuzztest` is the name of the toolchain used.
+
+-   Details on How To Run Fuzz Tests in
+    [Running FuzzTests](https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/fuzz_testing.md#running-fuzztests)
+
+FAQ: In the event of a build failure related to missing files or dependencies
+for pw_fuzzer, check the
+[FuzzTest FAQ](https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/fuzz_testing.md#FAQ)
 
 ## Build custom configuration
 
@@ -564,30 +589,77 @@ SDK source code has been executed. It also provides information on how often the
 Matter SDK executes segments of the code and produces a copy of the source file,
 annotated with execution frequencies.
 
-Run the following command to initiate the script:
+### How to Run
+
+```
+./scripts/build_coverage.sh [OPTIONS]
+```
+
+By default, the script
+
+Builds the Matter SDK with coverage instrumentation (unless you specify a custom
+--output_root). Runs the unit tests to generate coverage data. Produces an HTML
+coverage report located at:
+
+```
+out/coverage/coverage/html/index.html
+```
+
+You can extend the coverage scope and test types with the following options:
+
+Option Description -c, --code=<scope> Specify the scope to collect coverage
+data. - core (default): Coverage from the core Matter SDK stack - clusters:
+Coverage from cluster implementations - all: Coverage from the entire Matter SDK
+
+--yaml Also run YAML-based tests, in addition to unit tests.
+
+--python Also run Python-based tests, in addition to unit tests.
+
+-o, --output_root=DIR If specified, skip the build phase and only run coverage
+on the provided build output directory. This directory must have been built with
+use_coverage=true and have had tests run already.
+
+--target=<testname> When running unit tests, specifies a particular test target
+to run (e.g., TestEmberAttributeBuffer.run).
+
+-h, --help Print script usage and exit.
+
+### Examples
+
+Run coverage with the default scope (core) and only unit tests:
 
 ```
 ./scripts/build_coverage.sh
 ```
 
-By default, the code coverage script is performed at the unit testing level.
-Unit tests are created by developers, thus giving them the best overview of what
-tests to include in unit testing. You can extend the coverage test by scope and
-ways of execution with the following parameters:
+Run coverage including YAML tests (plus the always-enabled unit tests):
 
 ```
-  -c, --code                Specify which scope to collect coverage data.
-                            'core': collect coverage data from core stack in Matter SDK. --default
-                            'clusters': collect coverage data from clusters implementation in Matter SDK.
-                            'all': collect coverage data from Matter SDK.
-  -t, --tests               Specify which tools to run the coverage check.
-                            'unit': Run unit test to drive the coverage check. --default
-                            'yaml': Run yaml test to drive the coverage check.
-                            'all': Run unit & yaml test to drive the coverage check.
+./scripts/build_coverage.sh --yaml
 ```
 
-Also, see the up-to-date unit testing coverage report of the Matter SDK
-(collected daily) at:
+Run coverage including Python tests (plus the always-enabled unit tests):
+
+```
+./scripts/build_coverage.sh --python
+```
+
+Run coverage including both YAML and Python tests:
+
+```
+./scripts/build_coverage.sh --yaml --python
+```
+
+Change coverage scope to all (core + clusters) and run YAML tests:
+
+```
+./scripts/build_coverage.sh --code=all --yaml
+```
+
+### Viewing Coverage Results
+
+After the script completes, open the following file in your web browser to view
+the HTML coverage report:
 [matter coverage](https://matter-build-automation.ue.r.appspot.com).
 
 ## Maintaining Matter

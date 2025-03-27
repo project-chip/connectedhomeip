@@ -161,7 +161,11 @@ public class NsdManagerServiceBrowser implements ServiceBrowser {
 
     @Override
     public void onServiceLost(NsdServiceInfo serviceInfo) {
-      Log.i(TAG, "Lost service '" + serviceType + "'");
+      Log.i(
+          TAG,
+          "Lost service '" + (serviceInfo != null ? serviceInfo.getServiceName() : "null") + "'");
+      boolean ret = serviceNameList.remove(serviceInfo.getServiceName());
+      Log.i(TAG, "Remove List: " + ret);
     }
 
     @Override

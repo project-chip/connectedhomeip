@@ -29,7 +29,6 @@ IGNORE: Set[str] = {
     '/java/',
     '/Jni',
     '/mock/',
-    '/pybindings/',
     '/python/',
     '/Test',
     '/tests/',
@@ -120,6 +119,7 @@ ALLOW: Dict[str, Set[str]] = {
     # Only uses <chrono> for zero-cost types.
     'src/system/SystemClock.h': {'chrono'},
     'src/platform/mbed/MbedEventTimeout.h': {'chrono'},
+    'src/lib/core/StringBuilderAdapters.h': {'chrono'},
 
     'src/app/app-platform/ContentApp.h': {'list', 'string'},
     'src/app/app-platform/ContentAppPlatform.cpp': {'string'},
@@ -136,6 +136,10 @@ ALLOW: Dict[str, Set[str]] = {
     'src/app/clusters/media-input-server/media-input-delegate.h': {'list'},
     'src/app/clusters/media-playback-server/media-playback-delegate.h': {'list'},
     'src/app/clusters/target-navigator-server/target-navigator-delegate.h': {'list'},
+    # WebRTCTransportProvider is for Camera and is intended to run on devices that are capable of handling these types.
+    'src/app/clusters/webrtc-transport-provider-server/webrtc-transport-provider-server.h': {'string', 'vector'},
+    # Camera AV Stream Management cluster is expected to run on resource-capable devices
+    'src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.h': {'vector'},
 
     'src/credentials/attestation_verifier/FileAttestationTrustStore.h': {'vector'},
     'src/credentials/attestation_verifier/FileAttestationTrustStore.cpp': {'string'},
@@ -181,9 +185,14 @@ ALLOW: Dict[str, Set[str]] = {
     'src/lib/support/jsontlv/JsonToTlv.h': {'string'},
     'src/lib/support/jsontlv/TlvToJson.h': {'string'},
     'src/lib/support/jsontlv/TextFormat.h': {'string'},
+    'src/lib/support/TemporaryFileStream.h': {'ostream', 'streambuf', 'string'},
     'src/app/icd/client/DefaultICDClientStorage.cpp': {'vector'},
     'src/app/icd/client/DefaultICDClientStorage.h': {'vector'},
     'src/app/icd/client/DefaultICDStorageKey.h': {'vector'},
     'src/controller/CHIPDeviceController.cpp': {'string'},
     'src/qrcodetool/setup_payload_commands.cpp': {'string'},
+    'src/access/AccessRestrictionProvider.h': {'vector', 'map'},
+
+    # nrfconnect test runner
+    'src/test_driver/nrfconnect/main/runner.cpp': {'vector'},
 }

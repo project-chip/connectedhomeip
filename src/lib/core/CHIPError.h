@@ -837,8 +837,25 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_TLV_CONTAINER_OPEN                          CHIP_CORE_ERROR(0x27)
 
-// AVAILABLE: 0x28
-// AVAILABLE: 0x29
+/**
+ *  @def CHIP_ERROR_IN_USE
+ *
+ *  @brief
+ *    A value is already used. Generally indicates an unavailable resource.
+ *    As opposed to CHIP_ERROR_BUSY, the use is not considered transient/temporary.
+ *
+ */
+#define CHIP_ERROR_IN_USE                                      CHIP_CORE_ERROR(0x28)
+
+/**
+ *  @def CHIP_ERROR_HAD_FAILURES
+ *
+ *  @brief
+ *    Report a multi-part operation as having had failures.
+ *    This is used as an aggregate of a single CHIP_ERROR when several underlying
+ *    calls may have failed and no single point of failure is reported.
+ */
+#define CHIP_ERROR_HAD_FAILURES                                CHIP_CORE_ERROR(0x29)
 
 /**
  *  @def CHIP_ERROR_INVALID_MESSAGE_TYPE
@@ -858,7 +875,15 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_UNEXPECTED_TLV_ELEMENT                      CHIP_CORE_ERROR(0x2b)
 
-// AVAILABLE: 0x2c
+/**
+ *  @def CHIP_ERROR_ALREADY_INITIALIZED
+ *
+ *  @brief
+ *    Mark that an object has already beein initialized and cannot be
+ *    initialized again
+ *
+ */
+#define CHIP_ERROR_ALREADY_INITIALIZED                        CHIP_CORE_ERROR(0x2c)
 
 /**
  *  @def CHIP_ERROR_NOT_IMPLEMENTED
@@ -1484,7 +1509,14 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_VERSION_MISMATCH                            CHIP_CORE_ERROR(0xa7)
 
-// AVAILABLE: 0xa8
+/**
+ *  @def CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL
+ *
+ *  @brief
+ *    The CHIP message is not granted access for further processing due to Access Restriction List.
+ */
+#define CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL                    CHIP_CORE_ERROR(0xa8)
+
 // AVAILABLE: 0xa9
 // AVAILABLE: 0xaa
 
@@ -1814,6 +1846,7 @@ using CHIP_ERROR = ::chip::ChipError;
 namespace chip {
 
 extern void RegisterCHIPLayerErrorFormatter();
+extern void DeregisterCHIPLayerErrorFormatter();
 extern bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err);
 
 } // namespace chip

@@ -229,6 +229,11 @@ private:
         T valueLE     = GetInitialCounterValue();
         uint16_t size = sizeof(valueLE);
 
+        // clang-tidy claims that we're returning without writing to 'aStartValue',
+        // assign 0 to supppress the warning. In case of error, the value wont't be
+        // used anyway.
+        aStartValue = 0;
+
         VerifyOrReturnError(mKey.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
         CHIP_ERROR err = mStorage->SyncGetKeyValue(mKey.KeyName(), &valueLE, size);

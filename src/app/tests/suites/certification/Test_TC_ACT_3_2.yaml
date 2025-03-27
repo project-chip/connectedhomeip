@@ -33,7 +33,7 @@ tests:
           "Step 0: Preparation: TH as server exposes an Actions server cluster
           on EP 1, with one action (supporting all possible commands) and
           corresponding ActionLists and EndpointLists attributes: ActionList:
-          contains one list element (ActionListStruct):  ActionIO = 0x1001  Name
+          contains one list element (ActionListStruct):  ActionID = 0x1001  Name
           = 'some test'  Type = other  EndpointListID =
           0xE001  SupportedCommands = 0x0fff // suppports all commands  State =
           Inactive EndpointLists: contains one list element

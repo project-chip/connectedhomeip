@@ -42,7 +42,7 @@ void ESPOpenThreadInit()
         .host_config  = ESP_OPENTHREAD_DEFAULT_HOST_CONFIG(),
         .port_config  = ESP_OPENTHREAD_DEFAULT_PORT_CONFIG(),
     };
-#ifdef CONFIG_OPENTHREAD_BORDER_ROUTER
+#if defined(CONFIG_OPENTHREAD_BORDER_ROUTER) && defined(CONFIG_AUTO_UPDATE_RCP)
     esp_vfs_spiffs_conf_t rcp_fw_conf = {
         .base_path = "/rcp_fw", .partition_label = "rcp_fw", .max_files = 10, .format_if_mount_failed = false
     };
@@ -53,7 +53,7 @@ void ESPOpenThreadInit()
     }
     esp_rcp_update_config_t rcp_update_config = ESP_OPENTHREAD_RCP_UPDATE_CONFIG();
     openthread_init_br_rcp(&rcp_update_config);
-#endif // CONFIG_OPENTHREAD_BORDER_ROUTER
+#endif // CONFIG_OPENTHREAD_BORDER_ROUTER && CONFIG_AUTO_UPDATE_RCP
     set_openthread_platform_config(&config);
 
     if (ThreadStackMgr().InitThreadStack() != CHIP_NO_ERROR)

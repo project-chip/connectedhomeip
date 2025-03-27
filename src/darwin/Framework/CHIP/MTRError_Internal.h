@@ -16,9 +16,9 @@
  */
 
 #import <Foundation/Foundation.h>
-#import <Matter/MTRError.h>
 
 #import "MTRDefines_Internal.h"
+#import "MTRError_Testable.h"
 
 #include <app/MessageDef/StatusIB.h>
 #include <lib/core/CHIPError.h>
@@ -26,13 +26,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-#ifndef YES_NO
-#define YES_NO(x) ((x) ? @"YES" : @"NO")
-#endif
-
 MTR_DIRECT_MEMBERS
-@interface MTRError : NSObject
-+ (NSError *)errorWithCode:(MTRErrorCode)code;
+@interface MTRError ()
 + (NSError * _Nullable)errorForCHIPErrorCode:(CHIP_ERROR)errorCode;
 + (NSError * _Nullable)errorForCHIPErrorCode:(CHIP_ERROR)errorCode logContext:(id _Nullable)contextToLog;
 + (NSError * _Nullable)errorForIMStatus:(const chip::app::StatusIB &)status;

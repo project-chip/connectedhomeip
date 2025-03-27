@@ -19,16 +19,25 @@
 # for details about the block below.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${ALL_CLUSTERS_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# test-runner-runs:
+#   run1:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --endpoint 1
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import chip.clusters as Clusters
-from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
 
@@ -56,16 +65,16 @@ class TC_OCC_2_2(MatterBaseTest):
 
     @async_test_body
     async def test_TC_OCC_2_2(self):
+        endpoint = self.get_endpoint()
 
-        endpoint = self.user_params.get("endpoint", 1)
+        self.step(1)  # Already done, immediately go to step 2
+
+        self.step(2)
 
         attributes = Clusters.OccupancySensing.Attributes
         feature_map = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
-
-        self.step(1)
         attribute_list = await self.read_occ_attribute_expect_success(endpoint=endpoint, attribute=attributes.AttributeList)
 
-        self.step(2)
         # OccupancySensorType will be determined by FeatureMap matching table at 2.7.6.2.
         asserts.assert_in(attributes.OccupancySensorType.attribute_id, attribute_list,
                           "OccupancySensorType attribute is a mandatory attribute.")

@@ -22,3 +22,8 @@ chip_project_config_include_dirs = [
 ]
 
 chip_config_network_layer_ble = false
+
+# This enables AccessRestrictionList (ARL) support used by the NIM sample app
+chip_enable_access_restrictions = true
+
+matter_enable_tracing_support = true

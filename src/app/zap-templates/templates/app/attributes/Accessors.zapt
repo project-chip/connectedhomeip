@@ -7,11 +7,10 @@
 
 #pragma once
 
+#include <app-common/zap-generated/cluster-enums.h>
 #include <app/data-model/Nullable.h>
-#include <app/util/af-types.h>
-#include <app/util/ember-strings.h>
-#include <app-common/zap-generated/cluster-objects.h>
-#include <lib/support/Span.h>
+#include <app/util/basic-types.h>
+#include <app/util/MarkAttributeDirty.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
@@ -28,16 +27,16 @@ namespace Attributes {
 {{/first}}
 {{#unless (isStrEqual storagePolicy "attributeAccessInterface")}}
 namespace {{asUpperCamelCase label}} {
-Protocols::InteractionModel::Status Get(chip::EndpointId endpoint, {{accessorGetterType this}} value); // {{type}}
+Protocols::InteractionModel::Status Get(EndpointId endpoint, {{accessorGetterType this}} value); // {{type}}
 {{! NOTE: Adding an optional arg instead of an overload can break API
     consumers that are using the function type (e.g. in templates). }}
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, {{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotNullable=true forceNotOptional=true}} value);
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, {{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotNullable=true forceNotOptional=true}} value, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, {{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotNullable=true forceNotOptional=true}} value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, {{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotNullable=true forceNotOptional=true}} value, MarkAttributeDirty markDirty);
 {{#if isNullable}}
-Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(chip::EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, {{zapTypeToEncodableClusterObjectType type ns=parent.name isArgument=true forceNotOptional=true}} value);
-Protocols::InteractionModel::Status Set(chip::EndpointId endpoint, {{zapTypeToEncodableClusterObjectType type ns=parent.name isArgument=true forceNotOptional=true}} value, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
+Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, {{zapTypeToEncodableClusterObjectType type ns=parent.name isArgument=true forceNotOptional=true}} value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, {{zapTypeToEncodableClusterObjectType type ns=parent.name isArgument=true forceNotOptional=true}} value, MarkAttributeDirty markDirty);
 {{/if}}
 } // namespace {{asUpperCamelCase label}}
 

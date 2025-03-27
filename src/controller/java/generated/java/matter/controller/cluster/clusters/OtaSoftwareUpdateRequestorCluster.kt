@@ -124,11 +124,11 @@ class OtaSoftwareUpdateRequestorCluster(
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_PROVIDER_NODE_I_D_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_PROVIDER_NODE_I_D_REQ), providerNodeID)
+    val TAG_PROVIDER_NODE_ID_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_PROVIDER_NODE_ID_REQ), providerNodeID)
 
-    val TAG_VENDOR_I_D_REQ: Int = 1
-    tlvWriter.put(ContextSpecificTag(TAG_VENDOR_I_D_REQ), vendorID)
+    val TAG_VENDOR_ID_REQ: Int = 1
+    tlvWriter.put(ContextSpecificTag(TAG_VENDOR_ID_REQ), vendorID)
 
     val TAG_ANNOUNCEMENT_REASON_REQ: Int = 2
     tlvWriter.put(ContextSpecificTag(TAG_ANNOUNCEMENT_REASON_REQ), announcementReason)

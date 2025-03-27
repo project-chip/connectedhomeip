@@ -1,0 +1,58 @@
+# Copyright (c) 2024 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("//build_overrides/efr32_sdk.gni")
+import("${silabs_sdk_build_root}/silabs_board.gni")
+
+if (wifi_soc) {
+  import("${silabs_sdk_build_root}/SiWx917_sdk.gni")
+} else {
+  import("${silabs_sdk_build_root}/efr32_sdk.gni")
+}
+
+# Seperate import since the matter_support_root is defined in the ef32_sdk.gni / SiWx917_sdk.gni
+import("${matter_support_root}/provision/args.gni")
+source_set("storage") {
+  sources = [ "ProvisionStorageCustom.cpp" ]
+
+  if (use_provision_flash_storage) {
+    sources += [ "ProvisionStorageFlash.cpp" ]
+  } else {
+    sources += [ "ProvisionStorageDefault.cpp" ]
+  }
+
+  if (wifi_soc) {
+    if (sl_si91x_crypto_flavor == "psa") {
+      libs = [ "${sl_provision_root}/libs/libProvisionPSA_si917.a" ]
+    } else {
+      libs = [ "${sl_provision_root}/libs/libProvision_si917.a" ]
+    }
+  } else {
+    if (use_provision_flash_storage) {
+      libs =
+          [ "${sl_provision_root}/libs/libProvisionFlash_${silabs_family}.a" ]
+    } else {
+      libs = [ "${sl_provision_root}/libs/libProvision_${silabs_family}.a" ]
+    }
+  }
+
+  deps = [ "${chip_root}/src/lib" ]
+
+  public_deps = [ "${sl_provision_root}:headers" ]
+
+  if (sl_enable_test_event_trigger) {
+    public_configs = [ "${chip_root}/examples/platform/silabs/test-event-trigger:test-event-trigger-config" ]
+  }
+}

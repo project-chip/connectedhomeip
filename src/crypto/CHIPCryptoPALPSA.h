@@ -27,54 +27,13 @@
 #pragma once
 
 #include "CHIPCryptoPAL.h"
-#include <lib/core/DataModelTypes.h>
+#include "PSAKeyAllocator.h"
 #include <lib/support/SafePointerCast.h>
 
 #include <psa/crypto.h>
 
 namespace chip {
 namespace Crypto {
-
-/**
- * @def CHIP_CONFIG_CRYPTO_PSA_KEY_ID_BASE
- *
- * @brief
- *   Base of the PSA key identifier range used by Matter.
- *
- * Cryptographic keys stored in the PSA Internal Trusted Storage must have
- * a user-assigned identifer from the range PSA_KEY_ID_USER_MIN to
- * PSA_KEY_ID_USER_MAX. This option allows to override the base used to derive
- * key identifiers used by Matter to avoid overlapping with other firmware
- * components that also use PSA crypto API. The default value was selected
- * not to interfere with OpenThread's default base that is 0x20000.
- *
- * Note that volatile keys like ephemeral keys used for ECDH have identifiers
- * auto-assigned by the PSA backend.
- */
-#ifndef CHIP_CONFIG_CRYPTO_PSA_KEY_ID_BASE
-#define CHIP_CONFIG_CRYPTO_PSA_KEY_ID_BASE 0x30000
-#endif // CHIP_CONFIG_CRYPTO_PSA_KEY_ID_BASE
-
-/**
- * @brief Defines subranges of the PSA key identifier space used by Matter.
- */
-enum class KeyIdBase : psa_key_id_t
-{
-    Minimum     = CHIP_CONFIG_CRYPTO_PSA_KEY_ID_BASE,
-    Operational = Minimum, ///< Base of the PSA key ID range for Node Operational Certificate private keys
-    Maximum     = Operational + kMaxValidFabricIndex,
-};
-
-static_assert(to_underlying(KeyIdBase::Minimum) >= PSA_KEY_ID_USER_MIN && to_underlying(KeyIdBase::Maximum) <= PSA_KEY_ID_USER_MAX,
-              "PSA key ID base out of allowed range");
-
-/**
- * @brief Calculates PSA key ID for Node Operational Certificate private key for the given fabric.
- */
-constexpr psa_key_id_t MakeOperationalKeyId(FabricIndex fabricIndex)
-{
-    return to_underlying(KeyIdBase::Operational) + static_cast<psa_key_id_t>(fabricIndex);
-}
 
 /**
  * @brief Concrete P256 keypair context used by PSA crypto backend.

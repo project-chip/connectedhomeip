@@ -38,6 +38,19 @@
     XCTAssertEqualObjects(MTRAttributeNameForID(MTRClusterIDTypeOnOffID, 12345678), @"<Unknown attributeID 12345678>");
 }
 
+- (void)testCommandNames
+{
+    XCTAssertEqualObjects(MTRRequestCommandNameForID(MTRClusterIDTypeOnOffID, MTRCommandIDTypeClusterOnOffCommandOnID), @"On");
+    XCTAssertEqualObjects(MTRRequestCommandNameForID(MTRClusterIDTypeOnOffID, MTRCommandIDTypeClusterOnOffCommandToggleID), @"Toggle");
+    XCTAssertEqualObjects(MTRRequestCommandNameForID(MTRClusterIDTypeGroupsID, MTRCommandIDTypeClusterGroupsCommandAddGroupID), @"AddGroup");
+    XCTAssertEqualObjects(MTRRequestCommandNameForID(12345678, 0), @"<Unknown clusterID 12345678>");
+    XCTAssertEqualObjects(MTRRequestCommandNameForID(MTRClusterIDTypeAccessControlID, 12345678), @"<Unknown commandID 12345678>");
+
+    XCTAssertEqualObjects(MTRResponseCommandNameForID(MTRClusterIDTypeGroupsID, MTRCommandIDTypeClusterGroupsCommandAddGroupResponseID), @"AddGroupResponse");
+    XCTAssertEqualObjects(MTRResponseCommandNameForID(12345678, 0), @"<Unknown clusterID 12345678>");
+    XCTAssertEqualObjects(MTRResponseCommandNameForID(MTRClusterIDTypeAccessControlID, 12345678), @"<Unknown commandID 12345678>");
+}
+
 - (void)testEventNames
 {
     XCTAssertEqualObjects(MTREventNameForID(MTRClusterIDTypeAccessControlID, MTREventIDTypeClusterAccessControlEventAccessControlEntryChangedID), @"AccessControlEntryChanged");

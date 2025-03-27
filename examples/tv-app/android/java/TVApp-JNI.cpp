@@ -258,15 +258,15 @@ SampleTvAppInstallationService gSampleTvAppInstallationService;
 
 class MyPostCommissioningListener : public PostCommissioningListener
 {
-    void CommissioningCompleted(uint16_t vendorId, uint16_t productId, NodeId nodeId, Messaging::ExchangeManager & exchangeMgr,
-                                const SessionHandle & sessionHandle) override
+    void CommissioningCompleted(uint16_t vendorId, uint16_t productId, NodeId nodeId, CharSpan rotatingId, uint32_t passcode,
+                                Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle) override
     {
         // read current binding list
         chip::Controller::ClusterBase cluster(exchangeMgr, sessionHandle, kTargetBindingClusterEndpointId);
 
         ContentAppPlatform::GetInstance().StoreNodeIdForContentApp(vendorId, productId, nodeId);
 
-        cacheContext(vendorId, productId, nodeId, exchangeMgr, sessionHandle);
+        cacheContext(vendorId, productId, nodeId, rotatingId, passcode, exchangeMgr, sessionHandle);
 
         CHIP_ERROR err =
             cluster.ReadAttribute<Binding::Attributes::Binding::TypeInfo>(this, OnReadSuccessResponse, OnReadFailureResponse);
@@ -350,17 +350,23 @@ class MyPostCommissioningListener : public PostCommissioningListener
 
         Optional<SessionHandle> opt   = mSecureSession.Get();
         SessionHandle & sessionHandle = opt.Value();
+        auto rotatingIdSpan           = CharSpan{ mRotatingId.data(), mRotatingId.size() };
         ContentAppPlatform::GetInstance().ManageClientAccess(*mExchangeMgr, sessionHandle, mVendorId, mProductId, localNodeId,
-                                                             bindings, OnSuccessResponse, OnFailureResponse);
+                                                             rotatingIdSpan, mPasscode, bindings, OnSuccessResponse,
+                                                             OnFailureResponse);
         clearContext();
     }
 
-    void cacheContext(uint16_t vendorId, uint16_t productId, NodeId nodeId, Messaging::ExchangeManager & exchangeMgr,
-                      const SessionHandle & sessionHandle)
+    void cacheContext(uint16_t vendorId, uint16_t productId, NodeId nodeId, CharSpan rotatingId, uint32_t passcode,
+                      Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
     {
-        mVendorId    = vendorId;
-        mProductId   = productId;
-        mNodeId      = nodeId;
+        mVendorId   = vendorId;
+        mProductId  = productId;
+        mNodeId     = nodeId;
+        mRotatingId = std::string{
+            rotatingId.data(), rotatingId.size()
+        }; // Allocates and copies to string instead of storing span to make sure lifetime is valid.
+        mPasscode    = passcode;
         mExchangeMgr = &exchangeMgr;
         mSecureSession.ShiftToSession(sessionHandle);
     }
@@ -370,12 +376,17 @@ class MyPostCommissioningListener : public PostCommissioningListener
         mVendorId    = 0;
         mProductId   = 0;
         mNodeId      = 0;
+        mRotatingId  = {};
+        mPasscode    = 0;
         mExchangeMgr = nullptr;
         mSecureSession.SessionReleased();
     }
-    uint16_t mVendorId                        = 0;
-    uint16_t mProductId                       = 0;
-    NodeId mNodeId                            = 0;
+
+    uint16_t mVendorId  = 0;
+    uint16_t mProductId = 0;
+    NodeId mNodeId      = 0;
+    std::string mRotatingId;
+    uint32_t mPasscode                        = 0;
     Messaging::ExchangeManager * mExchangeMgr = nullptr;
     SessionHolder mSecureSession;
 };

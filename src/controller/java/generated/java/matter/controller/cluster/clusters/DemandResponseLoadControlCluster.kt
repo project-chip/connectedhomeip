@@ -157,8 +157,8 @@ class DemandResponseLoadControlCluster(
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_LOAD_CONTROL_PROGRAM_I_D_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_LOAD_CONTROL_PROGRAM_I_D_REQ), loadControlProgramID)
+    val TAG_LOAD_CONTROL_PROGRAM_ID_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_LOAD_CONTROL_PROGRAM_ID_REQ), loadControlProgramID)
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
@@ -206,8 +206,8 @@ class DemandResponseLoadControlCluster(
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_EVENT_I_D_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_EVENT_I_D_REQ), eventID)
+    val TAG_EVENT_ID_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_EVENT_ID_REQ), eventID)
 
     val TAG_CANCEL_CONTROL_REQ: Int = 1
     tlvWriter.put(ContextSpecificTag(TAG_CANCEL_CONTROL_REQ), cancelControl)

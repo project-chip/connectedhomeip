@@ -25,27 +25,29 @@
  */
 @interface MCCommissionerDeclaration : NSObject
 
-/** The allowed values for the ErrorCode field are the following */
+/** The allowed values for the ErrorCode field are the following. Indicates errors incurred
+ * during commissioning.
+ */
 typedef NS_ENUM(NSInteger, CdError) {
-    kNoError = 0,
-    kCommissionableDiscoveryFailed = 1,
-    kPaseConnectionFailed = 2,
-    kPaseAuthFailed = 3,
-    kDacValidationFailed = 4,
-    kAlreadyOnFabric = 5,
-    kOperationalDiscoveryFailed = 6,
-    kCaseConnectionFailed = 7,
-    kCaseAuthFailed = 8,
-    kConfigurationFailed = 9,
-    kBindingConfigurationFailed = 10,
-    kCommissionerPasscodeNotSupported = 11,
-    kInvalidIdentificationDeclarationParams = 12,
-    kAppInstallConsentPending = 13,
-    kAppInstalling = 14,
-    kAppInstallFailed = 15,
-    kAppInstalledRetryNeeded = 16,
-    kCommissionerPasscodeDisabled = 17,
-    kUnexpectedCommissionerPasscodeReady = 18
+    noError = 0,
+    commissionableDiscoveryFailed = 1,
+    paseConnectionFailed = 2,
+    paseAuthFailed = 3,
+    dacValidationFailed = 4,
+    alreadyOnFabric = 5,
+    operationalDiscoveryFailed = 6,
+    caseConnectionFailed = 7,
+    caseAuthFailed = 8,
+    configurationFailed = 9,
+    bindingConfigurationFailed = 10,
+    commissionerPasscodeNotSupported = 11,
+    invalidIdentificationDeclarationParams = 12,
+    appInstallConsentPending = 13,
+    appInstalling = 14,
+    appInstallFailed = 15,
+    appInstalledRetryNeeded = 16,
+    commissionerPasscodeDisabled = 17,
+    unexpectedCommissionerPasscodeReady = 18
 };
 
 /** Feature: All - Indicates errors incurred during commissioning. */
@@ -76,13 +78,24 @@ typedef NS_ENUM(NSInteger, CdError) {
  * also displays a QR code.
  */
 @property (nonatomic, readonly) BOOL qRCodeDisplayed;
+/**
+ * Feature: Commissioner-Generated Passcode - Flag to indicate when the CastingplAYER/Commissioner
+ * user has decided to exit the commissioning process.
+ */
+@property (nonatomic, readonly) BOOL cancelPasscode;
 
 - (instancetype)initWithOptions:(NSInteger)errorCode
                   needsPasscode:(BOOL)needsPasscode
                     noAppsFound:(BOOL)noAppsFound
         passcodeDialogDisplayed:(BOOL)passcodeDialogDisplayed
            commissionerPasscode:(BOOL)commissionerPasscode
-                qRCodeDisplayed:(BOOL)qRCodeDisplayed;
+                qRCodeDisplayed:(BOOL)qRCodeDisplayed
+                 cancelPasscode:(BOOL)cancelPasscode;
+
+/**
+ * Function to return the error code as a string.
+ */
+- (NSString *)getErrorCodeString;
 
 - (NSString *)description;
 - (void)logDetail;

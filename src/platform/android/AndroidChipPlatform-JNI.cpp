@@ -28,11 +28,14 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/KeyValueStoreManager.h>
 #include <platform/internal/BLEManager.h>
+
+#include <android/log.h>
 
 #include "AndroidChipPlatform-JNI.h"
 #include "BLEManagerImpl.h"
@@ -45,6 +48,8 @@
 using namespace chip;
 
 #define JNI_METHOD(RETURN, METHOD_NAME) extern "C" JNIEXPORT RETURN JNICALL Java_chip_platform_AndroidChipPlatform_##METHOD_NAME
+#define JNI_LOGGING_METHOD(RETURN, METHOD_NAME)                                                                                    \
+    extern "C" JNIEXPORT RETURN JNICALL Java_chip_platform_AndroidChipLogging_##METHOD_NAME
 #define JNI_MDNSCALLBACK_METHOD(RETURN, METHOD_NAME)                                                                               \
     extern "C" JNIEXPORT RETURN JNICALL Java_chip_platform_ChipMdnsCallbackImpl_##METHOD_NAME
 
@@ -55,6 +60,8 @@ static bool JavaBytesToUUID(JNIEnv * env, jbyteArray value, chip::Ble::ChipBleUU
 namespace {
 JavaVM * sJVM = nullptr;
 JniGlobalReference sAndroidChipPlatformExceptionCls;
+jmethodID sOnLogMessageMethod = nullptr;
+JniGlobalReference sJavaLogCallbackObject;
 } // namespace
 
 CHIP_ERROR AndroidChipPlatformJNI_OnLoad(JavaVM * jvm, void * reserved)
@@ -243,6 +250,100 @@ JNI_METHOD(void, nativeSetDnssdDelegates)(JNIEnv * env, jclass self, jobject res
 {
     chip::DeviceLayer::StackLock lock;
     chip::Dnssd::InitializeWithObjects(resolver, browser, chipMdnsCallback);
+}
+
+JNI_LOGGING_METHOD(void, setLogFilter)(JNIEnv * env, jclass clazz, jint level)
+{
+    using namespace chip::Logging;
+
+    uint8_t category = kLogCategory_Detail;
+    switch (level)
+    {
+    case ANDROID_LOG_VERBOSE:
+    case ANDROID_LOG_DEBUG:
+        category = kLogCategory_Detail;
+        break;
+    case ANDROID_LOG_INFO:
+        category = kLogCategory_Progress;
+        break;
+    case ANDROID_LOG_WARN:
+    case ANDROID_LOG_ERROR:
+        category = kLogCategory_Error;
+        break;
+    default:
+        break;
+    }
+    SetLogFilter(category);
+}
+
+static void ENFORCE_FORMAT(3, 0) logRedirectCallback(const char * module, uint8_t category, const char * msg, va_list args)
+{
+    using namespace chip::Logging;
+
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturn(env != nullptr);
+    VerifyOrReturn(sJavaLogCallbackObject.HasValidObjectRef());
+    VerifyOrReturn(sOnLogMessageMethod != nullptr);
+
+    JniLocalReferenceScope scope(env);
+    int priority = ANDROID_LOG_DEBUG;
+    switch (category)
+    {
+    case kLogCategory_Error:
+        priority = ANDROID_LOG_ERROR;
+        break;
+    case kLogCategory_Progress:
+        priority = ANDROID_LOG_INFO;
+        break;
+    case kLogCategory_Detail:
+        priority = ANDROID_LOG_DEBUG;
+        break;
+    default:
+        break;
+    }
+
+    jint jPriority = static_cast<jint>(priority);
+    jobject jModule;
+    VerifyOrReturn(JniReferences::GetInstance().CharToStringUTF(CharSpan::fromCharString(module), jModule) == CHIP_NO_ERROR);
+    VerifyOrReturn(jModule != nullptr);
+
+    char buffer[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
+    vsnprintf(buffer, sizeof(buffer), msg, args);
+    jobject jMsg;
+    VerifyOrReturn(JniReferences::GetInstance().CharToStringUTF(CharSpan::fromCharString(buffer), jMsg) == CHIP_NO_ERROR);
+    VerifyOrReturn(jMsg != nullptr);
+
+    env->CallVoidMethod(sJavaLogCallbackObject.ObjectRef(), sOnLogMessageMethod, static_cast<jstring>(jModule), jPriority,
+                        static_cast<jstring>(jMsg));
+}
+
+JNI_LOGGING_METHOD(void, setLogCallback)(JNIEnv * env, jclass clazz, jobject callback)
+{
+    using namespace chip::Logging;
+
+    if (sOnLogMessageMethod == nullptr)
+    {
+        jclass callbackClass = env->GetObjectClass(callback);
+        sOnLogMessageMethod  = env->GetMethodID(callbackClass, "onLogMessage", "(Ljava/lang/String;ILjava/lang/String;)V");
+    }
+    VerifyOrReturn(sOnLogMessageMethod != nullptr,
+                   ChipLogError(DeviceLayer, "Failed to access AndroidChipLogging.LogCallback 'onLogMessage' method"));
+
+    if (sJavaLogCallbackObject.HasValidObjectRef())
+    {
+        sJavaLogCallbackObject.Reset();
+    }
+
+    if (env->IsSameObject(callback, NULL))
+    {
+        SetLogRedirectCallback(nullptr);
+    }
+    else
+    {
+        VerifyOrReturn(sJavaLogCallbackObject.Init(callback) == CHIP_NO_ERROR,
+                       ChipLogError(DeviceLayer, "Failed to init sJavaLogCallbackObject"));
+        SetLogRedirectCallback(logRedirectCallback);
+    }
 }
 
 JNI_MDNSCALLBACK_METHOD(void, handleServiceResolve)

@@ -56,14 +56,16 @@ private:
     dispatch_queue_t mListenerQueue;
     nw_connection_t mConnection;
     dispatch_semaphore_t mConnectionSemaphore;
-    dispatch_queue_t mDispatchQueue;
+    dispatch_queue_t mConnectionQueue;
     dispatch_semaphore_t mSendSemaphore;
+    dispatch_queue_t mSystemQueue;
 
     CHIP_ERROR ConfigureProtocol(IPAddressType aAddressType, const nw_parameters_t & aParameters);
     CHIP_ERROR StartListener();
     CHIP_ERROR GetConnection(const IPPacketInfo * aPktInfo);
-    CHIP_ERROR GetEndPoint(nw_endpoint_t & aEndpoint, const IPAddressType aAddressType, const IPAddress & aAddress, uint16_t aPort);
-    CHIP_ERROR StartConnection(nw_connection_t & aConnection);
+    nw_endpoint_t GetEndPoint(const IPAddressType aAddressType, const IPAddress & aAddress, uint16_t aPort,
+                              InterfaceId interfaceIndex = InterfaceId::Null());
+    CHIP_ERROR StartConnection(nw_connection_t aConnection);
     void GetPacketInfo(const nw_connection_t & aConnection, IPPacketInfo & aPacketInfo);
     void HandleDataReceived(const nw_connection_t & aConnection);
     CHIP_ERROR ReleaseListener();

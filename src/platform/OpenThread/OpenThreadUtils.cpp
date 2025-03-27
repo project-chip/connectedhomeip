@@ -80,7 +80,7 @@ bool FormatOpenThreadError(char * buf, uint16_t bufSize, CHIP_ERROR err)
 /**
  * Register a text error formatter for OpenThread errors.
  */
-void RegisterOpenThreadErrorFormatter(void)
+void RegisterOpenThreadErrorFormatter()
 {
     static ErrorFormatter sOpenThreadErrorFormatter = { FormatOpenThreadError, NULL };
 

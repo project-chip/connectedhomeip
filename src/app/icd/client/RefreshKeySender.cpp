@@ -36,6 +36,11 @@ RefreshKeySender::RefreshKeySender(CheckInDelegate * checkInDelegate, const ICDC
     mOnConnectedCallback(HandleDeviceConnected, this), mOnConnectionFailureCallback(HandleDeviceConnectionFailure, this)
 {}
 
+const ICDClientInfo & RefreshKeySender::GetICDClientInfo()
+{
+    return mICDClientInfo;
+}
+
 CHIP_ERROR RefreshKeySender::RegisterClientWithNewKey(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
 {
     auto onSuccess = [&](const ConcreteCommandPath & commandPath, const StatusIB & status, const auto & dataResponse) {
@@ -77,16 +82,17 @@ CHIP_ERROR RefreshKeySender::RegisterClientWithNewKey(Messaging::ExchangeManager
     EndpointId endpointId = 0;
 
     Clusters::IcdManagement::Commands::RegisterClient::Type registerClientCommand;
-    registerClientCommand.checkInNodeID    = mICDClientInfo.peer_node.GetNodeId();
+    registerClientCommand.checkInNodeID    = mICDClientInfo.check_in_node.GetNodeId();
     registerClientCommand.monitoredSubject = mICDClientInfo.monitored_subject;
     registerClientCommand.key              = mNewKey.Span();
+    registerClientCommand.clientType       = mICDClientInfo.client_type;
     return Controller::InvokeCommandRequest(&exchangeMgr, sessionHandle, endpointId, registerClientCommand, onSuccess, onFailure);
 }
 
 CHIP_ERROR RefreshKeySender::EstablishSessionToPeer()
 {
     ChipLogProgress(ICD, "Trying to establish a CASE session for re-registering an ICD client");
-    auto * caseSessionManager = InteractionModelEngine::GetInstance()->GetCASESessionManager();
+    auto * caseSessionManager = mpImEngine->GetCASESessionManager();
     VerifyOrReturnError(caseSessionManager != nullptr, CHIP_ERROR_INVALID_CASE_PARAMETER);
     caseSessionManager->FindOrEstablishSession(mICDClientInfo.peer_node, &mOnConnectedCallback, &mOnConnectionFailureCallback);
     return CHIP_NO_ERROR;

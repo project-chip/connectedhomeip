@@ -35,11 +35,11 @@
 #include "support/CHIPMem.h"
 
 #include <app/clusters/thread-border-router-management-server/thread-border-router-management-server.h>
-#include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <platform/ESP32/ESP32Utils.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 
 #if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 #include <platform/ESP32/ESP32FactoryDataProvider.h>
@@ -88,6 +88,8 @@ static void InitServer(intptr_t context)
     sThreadBRDelegate = chip::Platform::New<ThreadBorderRouterManagement::GenericOpenThreadBorderRouterDelegate>(storageDelegate);
     sThreadBRMgmtInstance = chip::Platform::New<ThreadBorderRouterManagement::ServerInstance>(
         kThreadBRMgmtEndpoint, sThreadBRDelegate, chip::Server::GetInstance().GetFailSafeContext());
+    char borderRouterName[] = "Espressif-ThreadBR";
+    sThreadBRDelegate->SetThreadBorderRouterName(CharSpan(borderRouterName));
     sThreadBRMgmtInstance->Init();
 }
 
@@ -147,7 +149,6 @@ extern "C" void app_main()
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 #endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
     esp_openthread_set_backbone_netif(esp_netif_get_handle_from_ifkey("WIFI_STA_DEF"));
-    ESPOpenThreadInit();
 
     chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
 }

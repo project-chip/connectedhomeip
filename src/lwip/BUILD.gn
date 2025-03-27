@@ -32,9 +32,10 @@ assert(lwip_platform == "external" || lwip_platform == "standalone" ||
            lwip_platform == "nxp" || lwip_platform == "silabs" ||
            lwip_platform == "qpg" || lwip_platform == "mbed" ||
            lwip_platform == "psoc6" || lwip_platform == "cyw30739" ||
-           lwip_platform == "bl602" || lwip_platform == "mw320" ||
-           lwip_platform == "bl702" || lwip_platform == "bl702l" ||
-           lwip_platform == "mt793x" || lwip_platform == "asr",
+           lwip_platform == "mw320" || lwip_platform == "bl602" ||
+           lwip_platform == "bl616" || lwip_platform == "bl702" ||
+           lwip_platform == "bl702l" || lwip_platform == "mt793x" ||
+           lwip_platform == "asr",
        "Unsupported lwIP platform: ${lwip_platform}")
 
 if (lwip_platform != "external") {
@@ -59,6 +60,9 @@ if (lwip_platform == "cc13xx_26xx") {
   import("//build_overrides/cyw30739_sdk.gni")
 } else if (lwip_platform == "bl602") {
   import("//build_overrides/bouffalolab_iot_sdk.gni")
+} else if (lwip_platform == "bl616") {
+  import("//build_overrides/bouffalolab_iot_sdk.gni")
+  import("${chip_root}/src/platform/device.gni")
 } else if (lwip_platform == "bl702") {
   import("//build_overrides/bouffalolab_iot_sdk.gni")
   import("${chip_root}/src/platform/device.gni")
@@ -152,6 +156,16 @@ if (current_os == "zephyr" || current_os == "mbed") {
   group("all") {
     deps = [ ":lwip" ]
   }
+} else if (lwip_platform == "bl616" && defined(chip_enable_openthread) &&
+           chip_enable_openthread == false) {
+  group("lwip") {
+    public_deps = [ ":lwip_buildconfig" ]
+    public_deps += [ "${bouffalolab_iot_sdk_build_root}/bl616:bouffalo_sdk" ]
+  }
+
+  group("all") {
+    deps = [ ":lwip" ]
+  }
 } else if (lwip_platform == "bl702" && defined(chip_enable_openthread) &&
            chip_enable_openthread == false) {
   group("lwip") {
@@ -202,6 +216,7 @@ if (current_os == "zephyr" || current_os == "mbed") {
     if (lwip_platform == "standalone") {
       public += [ "standalone/arch/sys_arch.h" ]
       sources += [ "standalone/sys_arch.c" ]
+      sources += [ "standalone/pbuf_pool_assert.c" ]
     } else if (lwip_platform == "cyw30739") {
     } else if (lwip_platform == "mt793x") {
     } else {
@@ -217,10 +232,8 @@ if (current_os == "zephyr" || current_os == "mbed") {
       public_deps += [ "${ti_simplelink_sdk_build_root}:ti_simplelink_sdk" ]
     } else if (lwip_platform == "cc32xx") {
       public_deps += [ "${ti_simplelink_sdk_build_root}:ti_simplelink_sdk" ]
-      sources +=
-          [ "${chip_root}/third_party/lwip/repo/lwip/src/apps/mdns/mdns.c" ]
     } else if (lwip_platform == "silabs") {
-      public_deps += [ "${efr32_sdk_build_root}:efr32_sdk" ]
+      public_deps += [ "${silabs_sdk_build_root}:silabs_sdk" ]
 
       sources += [
         "${lwip_platform}/lwipopts-rs911x.h",

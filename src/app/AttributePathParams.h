@@ -25,34 +25,39 @@
 
 namespace chip {
 namespace app {
-#if CHIP_CONFIG_ENABLE_READ_CLIENT
-class ReadClient;
-#endif // CHIP_CONFIG_ENABLE_READ_CLIENT
+
 struct AttributePathParams
 {
+    AttributePathParams() = default;
+
+    constexpr explicit AttributePathParams(EndpointId aEndpointId) :
+        AttributePathParams(aEndpointId, kInvalidClusterId, kInvalidAttributeId, kInvalidListIndex)
+    {}
+
     //
     // TODO: (Issue #10596) Need to ensure that we do not encode the NodeId over the wire
     // if it is either not 'set', or is set to a value that matches accessing fabric
     // on which the interaction is undertaken.
-    AttributePathParams(EndpointId aEndpointId, ClusterId aClusterId) :
+    constexpr AttributePathParams(EndpointId aEndpointId, ClusterId aClusterId) :
         AttributePathParams(aEndpointId, aClusterId, kInvalidAttributeId, kInvalidListIndex)
     {}
 
-    AttributePathParams(EndpointId aEndpointId, ClusterId aClusterId, AttributeId aAttributeId) :
+    constexpr AttributePathParams(EndpointId aEndpointId, ClusterId aClusterId, AttributeId aAttributeId) :
         AttributePathParams(aEndpointId, aClusterId, aAttributeId, kInvalidListIndex)
     {}
 
-    AttributePathParams(ClusterId aClusterId, AttributeId aAttributeId) :
+    constexpr AttributePathParams(ClusterId aClusterId, AttributeId aAttributeId) :
         AttributePathParams(kInvalidEndpointId, aClusterId, aAttributeId, kInvalidListIndex)
     {}
 
-    AttributePathParams(EndpointId aEndpointId, ClusterId aClusterId, AttributeId aAttributeId, ListIndex aListIndex) :
+    constexpr AttributePathParams(EndpointId aEndpointId, ClusterId aClusterId, AttributeId aAttributeId, ListIndex aListIndex) :
         mClusterId(aClusterId), mAttributeId(aAttributeId), mEndpointId(aEndpointId), mListIndex(aListIndex)
     {}
 
-    AttributePathParams() {}
-
-    bool IsWildcardPath() const { return HasWildcardEndpointId() || HasWildcardClusterId() || HasWildcardAttributeId(); }
+    [[nodiscard]] bool IsWildcardPath() const
+    {
+        return HasWildcardEndpointId() || HasWildcardClusterId() || HasWildcardAttributeId();
+    }
 
     bool operator==(const AttributePathParams & aOther) const
     {
@@ -66,12 +71,12 @@ struct AttributePathParams
      * be wildcard. This does not verify that the attribute being targeted is actually of list type when the list index is not
      * wildcard.
      */
-    bool IsValidAttributePath() const { return HasWildcardListIndex() || !HasWildcardAttributeId(); }
+    [[nodiscard]] bool IsValidAttributePath() const { return HasWildcardListIndex() || !HasWildcardAttributeId(); }
 
-    inline bool HasWildcardEndpointId() const { return mEndpointId == kInvalidEndpointId; }
-    inline bool HasWildcardClusterId() const { return mClusterId == kInvalidClusterId; }
-    inline bool HasWildcardAttributeId() const { return mAttributeId == kInvalidAttributeId; }
-    inline bool HasWildcardListIndex() const { return mListIndex == kInvalidListIndex; }
+    [[nodiscard]] inline bool HasWildcardEndpointId() const { return mEndpointId == kInvalidEndpointId; }
+    [[nodiscard]] inline bool HasWildcardClusterId() const { return mClusterId == kInvalidClusterId; }
+    [[nodiscard]] inline bool HasWildcardAttributeId() const { return mAttributeId == kInvalidAttributeId; }
+    [[nodiscard]] inline bool HasWildcardListIndex() const { return mListIndex == kInvalidListIndex; }
     inline void SetWildcardEndpointId() { mEndpointId = kInvalidEndpointId; }
     inline void SetWildcardClusterId() { mClusterId = kInvalidClusterId; }
     inline void SetWildcardAttributeId()
@@ -80,7 +85,7 @@ struct AttributePathParams
         mListIndex   = kInvalidListIndex;
     }
 
-    bool IsAttributePathSupersetOf(const AttributePathParams & other) const
+    [[nodiscard]] bool IsAttributePathSupersetOf(const AttributePathParams & other) const
     {
         VerifyOrReturnError(HasWildcardEndpointId() || mEndpointId == other.mEndpointId, false);
         VerifyOrReturnError(HasWildcardClusterId() || mClusterId == other.mClusterId, false);
@@ -90,7 +95,7 @@ struct AttributePathParams
         return true;
     }
 
-    bool IsAttributePathSupersetOf(const ConcreteAttributePath & other) const
+    [[nodiscard]] bool IsAttributePathSupersetOf(const ConcreteAttributePath & other) const
     {
         VerifyOrReturnError(HasWildcardEndpointId() || mEndpointId == other.mEndpointId, false);
         VerifyOrReturnError(HasWildcardClusterId() || mClusterId == other.mClusterId, false);

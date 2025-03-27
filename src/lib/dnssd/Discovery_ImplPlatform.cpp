@@ -22,6 +22,7 @@
 
 #include <app/icd/server/ICDServerConfig.h>
 #include <crypto/RandUtils.h>
+#include <inet/InetConfig.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/dnssd/IPAddressSorter.h>
@@ -43,7 +44,7 @@ static void HandleNodeResolve(void * context, DnssdService * result, const Span<
 {
     DiscoveryContext * discoveryContext = static_cast<DiscoveryContext *>(context);
 
-    if (error != CHIP_NO_ERROR)
+    if (error != CHIP_NO_ERROR && error != CHIP_ERROR_IN_PROGRESS)
     {
         discoveryContext->Release();
         return;
@@ -55,7 +56,13 @@ static void HandleNodeResolve(void * context, DnssdService * result, const Span<
 
     nodeData.Get<CommissionNodeData>().LogDetail();
     discoveryContext->OnNodeDiscovered(nodeData);
-    discoveryContext->Release();
+
+    // CHIP_ERROR_IN_PROGRESS indicates that more results are coming, so don't release
+    // the context yet.
+    if (error == CHIP_NO_ERROR)
+    {
+        discoveryContext->Release();
+    }
 }
 
 static void HandleNodeOperationalBrowse(void * context, DnssdService * result, CHIP_ERROR error)
@@ -347,7 +354,7 @@ void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, DnssdService * r
     size_t addressesFound = 0;
     for (auto & ip : addresses)
     {
-        if (addressesFound == ArraySize(nodeData.resolutionData.ipAddress))
+        if (addressesFound == MATTER_ARRAY_SIZE(nodeData.resolutionData.ipAddress))
         {
             // Out of space.
             ChipLogProgress(Discovery, "Can't add more IPs to ResolvedNodeData");
@@ -390,7 +397,7 @@ void DnssdService::ToDiscoveredCommissionNodeData(const Span<Inet::IPAddress> & 
     size_t addressesFound = 0;
     for (auto & ip : addresses)
     {
-        if (addressesFound == ArraySize(discoveredData.ipAddress))
+        if (addressesFound == MATTER_ARRAY_SIZE(discoveredData.ipAddress))
         {
             // Out of space.
             ChipLogProgress(Discovery, "Can't add more IPs to DiscoveredNodeData");
@@ -408,7 +415,6 @@ void DnssdService::ToDiscoveredCommissionNodeData(const Span<Inet::IPAddress> & 
     {
         ByteSpan key(reinterpret_cast<const uint8_t *>(mTextEntries[i].mKey), strlen(mTextEntries[i].mKey));
         ByteSpan val(mTextEntries[i].mData, mTextEntries[i].mDataSize);
-        FillNodeDataFromTxt(key, val, discoveredData);
         FillNodeDataFromTxt(key, val, discoveredData);
     }
 }
@@ -447,8 +453,7 @@ void DiscoveryImplPlatform::HandleDnssdInit(void * context, CHIP_ERROR initError
         publisher->mState = State::kInitialized;
 
         // Post an event that will start advertising
-        DeviceLayer::ChipDeviceEvent event;
-        event.Type = DeviceLayer::DeviceEventType::kDnssdInitialized;
+        DeviceLayer::ChipDeviceEvent event{ .Type = DeviceLayer::DeviceEventType::kDnssdInitialized };
 
         CHIP_ERROR error = DeviceLayer::PlatformMgr().PostEvent(&event);
         if (error != CHIP_NO_ERROR)
@@ -472,9 +477,8 @@ void DiscoveryImplPlatform::HandleDnssdError(void * context, CHIP_ERROR error)
         // Restore dnssd state before restart, also needs to call ChipDnssdShutdown()
         publisher->Shutdown();
 
-        DeviceLayer::ChipDeviceEvent event;
-        event.Type = DeviceLayer::DeviceEventType::kDnssdRestartNeeded;
-        error      = DeviceLayer::PlatformMgr().PostEvent(&event);
+        DeviceLayer::ChipDeviceEvent event{ .Type = DeviceLayer::DeviceEventType::kDnssdRestartNeeded };
+        error = DeviceLayer::PlatformMgr().PostEvent(&event);
 
         if (error != CHIP_NO_ERROR)
         {
@@ -524,7 +528,7 @@ CHIP_ERROR DiscoveryImplPlatform::PublishService(const char * serviceType, TextE
                                                  const OperationalAdvertisingParameters & params)
 {
     return PublishService(serviceType, textEntries, textEntrySize, subTypes, subTypeSize, params.GetPort(), params.GetInterfaceId(),
-                          params.GetMac(), DnssdServiceProtocol::kDnssdProtocolTcp, params.GetPeerId());
+                          params.GetMac(), DnssdServiceProtocol::kDnssdProtocolTcp, params.GetPeerId(), params.IsIPv4Enabled());
 }
 
 CHIP_ERROR DiscoveryImplPlatform::PublishService(const char * serviceType, TextEntry * textEntries, size_t textEntrySize,
@@ -532,13 +536,13 @@ CHIP_ERROR DiscoveryImplPlatform::PublishService(const char * serviceType, TextE
                                                  const CommissionAdvertisingParameters & params)
 {
     return PublishService(serviceType, textEntries, textEntrySize, subTypes, subTypeSize, params.GetPort(), params.GetInterfaceId(),
-                          params.GetMac(), DnssdServiceProtocol::kDnssdProtocolUdp, PeerId());
+                          params.GetMac(), DnssdServiceProtocol::kDnssdProtocolUdp, PeerId(), params.IsIPv4Enabled());
 }
 
 CHIP_ERROR DiscoveryImplPlatform::PublishService(const char * serviceType, TextEntry * textEntries, size_t textEntrySize,
                                                  const char ** subTypes, size_t subTypeSize, uint16_t port,
                                                  Inet::InterfaceId interfaceId, const chip::ByteSpan & mac,
-                                                 DnssdServiceProtocol protocol, PeerId peerId)
+                                                 DnssdServiceProtocol protocol, PeerId peerId, bool ipv4Enabled)
 {
     DnssdService service;
     ReturnErrorOnFailure(MakeHostName(service.mHostName, sizeof(service.mHostName), mac));
@@ -546,11 +550,17 @@ CHIP_ERROR DiscoveryImplPlatform::PublishService(const char * serviceType, TextE
                              ? MakeInstanceName(service.mName, sizeof(service.mName), peerId)
                              : GetCommissionableInstanceName(service.mName, sizeof(service.mName)));
     Platform::CopyString(service.mType, serviceType);
-#if INET_CONFIG_ENABLE_IPV4
-    service.mAddressType = Inet::IPAddressType::kAny;
-#else
-    service.mAddressType = Inet::IPAddressType::kIPv6;
-#endif
+#if !INET_CONFIG_ENABLE_IPV4
+    ipv4Enabled = false;
+#endif // INET_CONFIG_ENABLE_IPV4
+    if (ipv4Enabled)
+    {
+        service.mAddressType = Inet::IPAddressType::kAny;
+    }
+    else
+    {
+        service.mAddressType = Inet::IPAddressType::kIPv6;
+    }
     service.mInterface     = interfaceId;
     service.mProtocol      = protocol;
     service.mPort          = port;

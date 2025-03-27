@@ -24,6 +24,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/ConnectivityManager.h>
+#include <platform/DiagnosticDataProvider.h>
 #include <platform/internal/BLEManager.h>
 
 #include <platform/internal/GenericConnectivityManagerImpl_UDP.ipp>
@@ -48,21 +49,23 @@
 extern "C" {
 #include "wlan.h"
 #include "wm_net.h"
-#include <wm_os.h>
 }
 
 #include <platform/internal/GenericConnectivityManagerImpl_WiFi.ipp>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
-#include <openthread/mdns_server.h>
+#include <openthread/mdns.h>
 
+#include "border_agent.h"
 #include "br_rtos_manager.h"
+#include "infra_if.h"
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_THREAD */
 
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_WPA */
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#include "ConnectivityManagerImpl.h"
 #include <platform/internal/GenericConnectivityManagerImpl_Thread.ipp>
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_THREAD */
 
@@ -91,10 +94,6 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     // Initialize the generic base classes that require it.
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>::_Init();
-#endif
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
-    StartWiFiManagement();
 #endif
 
     SuccessOrExit(err);
@@ -159,6 +158,11 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     {
         NetworkCommissioning::NXPWiFiDriver::GetInstance().ScanWiFINetworkDoneFromMatterTaskContext(
             event->Platform.ScanWiFiNetworkCount);
+    }
+    else if (event->Type == kPlatformNxpStartWlanInitWaitTimerEvent)
+    {
+        DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(kWlanInitWaitMs), ConnectNetworkTimerHandler,
+                                              (void *) event->Platform.pNetworkDataEvent);
     }
 #endif
 }
@@ -231,6 +235,11 @@ bool ConnectivityManagerImpl::_IsWiFiStationApplicationControlled()
 
 void ConnectivityManagerImpl::ProcessWlanEvent(enum wlan_event_reason wlanEvent)
 {
+    WiFiDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetWiFiDiagnosticsDelegate();
+    uint8_t associationFailureCause =
+        chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCauseEnum::kUnknown);
+    uint16_t wlan_status_code = wlan_get_status_code(wlanEvent);
+
 #if CHIP_DETAIL_LOGGING
     enum wlan_connection_state state;
     int result;
@@ -250,7 +259,7 @@ void ConnectivityManagerImpl::ProcessWlanEvent(enum wlan_event_reason wlanEvent)
     {
     case WLAN_REASON_SUCCESS:
         ChipLogProgress(DeviceLayer, "Connected to WLAN network = %d", is_sta_ipv6_connected());
-        if (sInstance._GetWiFiStationState() == kWiFiStationState_Connecting)
+        if (sInstance._GetWiFiStationState() != kWiFiStationState_Connected)
         {
             sInstance._SetWiFiStationState(kWiFiStationState_Connecting_Succeeded);
             sInstance._SetWiFiStationState(kWiFiStationState_Connected);
@@ -267,6 +276,12 @@ void ConnectivityManagerImpl::ProcessWlanEvent(enum wlan_event_reason wlanEvent)
     case WLAN_REASON_CONNECT_FAILED:
         ChipLogError(DeviceLayer, "WLAN (re)connect failed");
         sInstance._SetWiFiStationState(kWiFiStationState_NotConnected);
+        associationFailureCause =
+            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCauseEnum::kAssociationFailed);
+        if (delegate)
+        {
+            delegate->OnAssociationFailureDetected(associationFailureCause, wlan_status_code);
+        }
         UpdateInternetConnectivityState();
         break;
 
@@ -274,6 +289,12 @@ void ConnectivityManagerImpl::ProcessWlanEvent(enum wlan_event_reason wlanEvent)
         ChipLogError(DeviceLayer, "WLAN network not found");
         NetworkCommissioning::NXPWiFiDriver::GetInstance().OnConnectWiFiNetwork(NetworkCommissioning::Status::kNetworkNotFound,
                                                                                 CharSpan(), wlanEvent);
+        associationFailureCause =
+            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCauseEnum::kSsidNotFound);
+        if (delegate)
+        {
+            delegate->OnAssociationFailureDetected(associationFailureCause, wlan_status_code);
+        }
         break;
 
     case WLAN_REASON_NETWORK_AUTH_FAILED:
@@ -281,6 +302,12 @@ void ConnectivityManagerImpl::ProcessWlanEvent(enum wlan_event_reason wlanEvent)
         NetworkCommissioning::NXPWiFiDriver::GetInstance().OnConnectWiFiNetwork(NetworkCommissioning::Status::kAuthFailure,
                                                                                 CharSpan(), wlanEvent);
         ChipLogError(DeviceLayer, "Authentication to WLAN network failed end");
+        associationFailureCause =
+            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCauseEnum::kAuthenticationFailed);
+        if (delegate)
+        {
+            delegate->OnAssociationFailureDetected(associationFailureCause, wlan_status_code);
+        }
         break;
 
     case WLAN_REASON_LINK_LOST:
@@ -289,6 +316,10 @@ void ConnectivityManagerImpl::ProcessWlanEvent(enum wlan_event_reason wlanEvent)
         {
             sInstance._SetWiFiStationState(kWiFiStationState_NotConnected);
             sInstance.OnStationDisconnected();
+            if (delegate)
+            {
+                delegate->OnDisconnectionDetected(wlan_status_code);
+            }
         }
         break;
 
@@ -296,6 +327,10 @@ void ConnectivityManagerImpl::ProcessWlanEvent(enum wlan_event_reason wlanEvent)
         ChipLogProgress(DeviceLayer, "Disconnected from WLAN network");
         sInstance._SetWiFiStationState(kWiFiStationState_NotConnected);
         sInstance.OnStationDisconnected();
+        if (delegate)
+        {
+            delegate->OnDisconnectionDetected(wlan_status_code);
+        }
         break;
 
     case WLAN_REASON_INITIALIZED:
@@ -319,7 +354,6 @@ int ConnectivityManagerImpl::_WlanEventCallback(enum wlan_event_reason wlanEvent
 
 void ConnectivityManagerImpl::OnStationConnected()
 {
-    CHIP_ERROR err;
     ChipDeviceEvent event;
 
     event.Type                          = DeviceEventType::kWiFiConnectivityChange;
@@ -328,16 +362,30 @@ void ConnectivityManagerImpl::OnStationConnected()
 
     /* Update the connectivity state in case the connected event has been received after getting an IP addr */
     UpdateInternetConnectivityState();
+    WiFiDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetWiFiDiagnosticsDelegate();
+
+    if (delegate)
+    {
+        delegate->OnConnectionStatusChanged(
+            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::ConnectionStatusEnum::kConnected));
+    }
 }
 
 void ConnectivityManagerImpl::OnStationDisconnected()
 {
-    CHIP_ERROR err;
     ChipDeviceEvent event;
 
     event.Type                          = DeviceEventType::kWiFiConnectivityChange;
     event.WiFiConnectivityChange.Result = kConnectivity_Lost;
     (void) PlatformMgr().PostEvent(&event);
+
+    WiFiDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetWiFiDiagnosticsDelegate();
+
+    if (delegate)
+    {
+        delegate->OnConnectionStatusChanged(
+            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::ConnectionStatusEnum::kNotConnected));
+    }
 
     /* Update the connectivity state in case the connected event has been received after getting an IP addr */
     UpdateInternetConnectivityState();
@@ -353,9 +401,6 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState()
     const ip6_addr_t * addr6;
     CHIP_ERROR err;
     ChipDeviceEvent event;
-#if CHIP_ENABLE_OPENTHREAD
-    otIp6Address newIpAddress;
-#endif
 
     // If the WiFi station is currently in the connected state...
     if (_IsWiFiStationConnected())
@@ -392,11 +437,6 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState()
                 {
                     haveIPv6Conn = true;
                     addr6        = netif_ip6_addr(netif, i);
-#if CHIP_ENABLE_OPENTHREAD
-                    // We are using ot mDNS sever and need to add IP address to server list
-                    memcpy(&newIpAddress.mFields.m32, addr6->addr, sizeof(Inet::IPAddress));
-                    otMdnsServerAddAddress(ThreadStackMgrImpl().OTInstance(), &newIpAddress);
-#endif
                     break;
                 }
             }
@@ -428,13 +468,14 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState()
         event.Type                            = DeviceEventType::kInternetConnectivityChange;
         event.InternetConnectivityChange.IPv4 = kConnectivity_NoChange;
         event.InternetConnectivityChange.IPv6 = GetConnectivityChange(hadIPv6Conn, haveIPv6Conn);
+
         if (haveIPv6Conn)
         {
             event.InternetConnectivityChange.ipAddress = IPAddress(*addr6);
-
 #if CHIP_ENABLE_OPENTHREAD
-            // Start the Border Router services including MDNS Server
-            StartBrServices();
+            // In case of boot, start the Border Router services including MDNS Server
+            // The posted event will signal the application to restart the Matter mDNS server instance
+            BrHandleStateChange();
 #endif
         }
         err = PlatformMgr().PostEvent(&event);
@@ -463,7 +504,6 @@ void ConnectivityManagerImpl::_NetifExtCallback(struct netif * netif, netif_nsc_
 void ConnectivityManagerImpl::StartWiFiManagement()
 {
     struct netif * netif = nullptr;
-    EventBits_t bits;
     int32_t result;
 
     LOCK_TCPIP_CORE();
@@ -484,35 +524,50 @@ void ConnectivityManagerImpl::StartWiFiManagement()
     }
 }
 #if CHIP_ENABLE_OPENTHREAD
-void ConnectivityManagerImpl::StartBrServices()
+void ConnectivityManagerImpl::BrHandleStateChange()
 {
     if (mBorderRouterInit == false)
     {
         struct netif * extNetIfPtr = static_cast<struct netif *>(net_get_mlan_handle());
         struct netif * thrNetIfPtr = ThreadStackMgrImpl().ThreadNetIf();
-        otInstance * thrInstancePtr;
 
-        // Initalize internal interface variables, these can be used by other modules like the DNSSD Impl to
-        // get the underlying IP interface
-        Inet::InterfaceId tmpExtIf(extNetIfPtr);
-        Inet::InterfaceId tmpThrIf(thrNetIfPtr);
-        mExternalNetIf = tmpExtIf;
-        mThreadNetIf   = tmpThrIf;
+        otMdnsHost mdnsHost;
+        uint8_t macBuffer[ConfigurationManager::kPrimaryMACAddressLength];
+        MutableByteSpan mac(macBuffer);
 
         // Need to wait for the wifi to be connected because the mlan netif can be !=null but not initialized
         // properly. If the thread netif is !=null it means that it was fully initialized
 
-        // Lock OT task
+        // Lock OT task ?
         if ((thrNetIfPtr) && (mWiFiStationState == kWiFiStationState_Connected))
         {
+            // Initalize internal interface variables, these can be used by other modules like the DNSSD Impl to
+            // get the underlying IP interface
+            Inet::InterfaceId tmpExtIf(extNetIfPtr);
+            Inet::InterfaceId tmpThrIf(thrNetIfPtr);
+            mExternalNetIf    = tmpExtIf;
+            mThreadNetIf      = tmpThrIf;
             mBorderRouterInit = true;
-            // Check if OT instance is init
-            thrInstancePtr = ThreadStackMgrImpl().OTInstance();
 
-            BrInitServices(thrInstancePtr, extNetIfPtr, thrNetIfPtr);
-            otMdnsServerStart(thrInstancePtr);
+            DeviceLayer::ConfigurationMgr().GetPrimaryMACAddress(mac);
+            chip::Dnssd::MakeHostName(mHostname, sizeof(mHostname), mac);
+
+            BrInitAppLock(LockThreadStack, UnlockThreadStack);
+            BrInitPlatform(ThreadStackMgrImpl().OTInstance(), extNetIfPtr, thrNetIfPtr);
+            BrUpdateLwipThrIf();
+            BrInitMdnsHost(mHostname);
         }
     }
+}
+
+void ConnectivityManagerImpl::LockThreadStack()
+{
+    ThreadStackMgrImpl().LockThreadStack();
+}
+
+void ConnectivityManagerImpl::UnlockThreadStack()
+{
+    ThreadStackMgrImpl().UnlockThreadStack();
 }
 
 Inet::InterfaceId ConnectivityManagerImpl::GetThreadInterface()
@@ -532,11 +587,19 @@ CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, uint
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     CHIP_ERROR ret                     = CHIP_NO_ERROR;
     struct wlan_network * pNetworkData = (struct wlan_network *) malloc(sizeof(struct wlan_network));
-    int result;
 
     VerifyOrExit(pNetworkData != NULL, ret = CHIP_ERROR_NO_MEMORY);
     VerifyOrExit(ssidLen <= IEEEtypes_SSID_SIZE, ret = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(mWiFiStationState != kWiFiStationState_Connecting, ret = CHIP_ERROR_BUSY);
+
+    // Need to enable the WIFI interface here when Thread is enabled as a secondary network interface. We don't want to enable
+    // WIFI from the init phase anymore and we will only do it in case the commissioner is provisioning the device with
+    // the WIFI credentials.
+    if (mWifiManagerInit == false)
+    {
+        StartWiFiManagement();
+        mWifiManagerInit = true;
+    }
 
     memset(pNetworkData, 0, sizeof(struct wlan_network));
 
@@ -591,10 +654,10 @@ void ConnectivityManagerImpl::ConnectNetworkTimerHandler(::chip::System::Layer *
     }
     else
     {
-        PlatformMgr().LockChipStack();
-        DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_WIFI_STATION_RECONNECT_INTERVAL),
-                                              ConnectNetworkTimerHandler, context);
-        PlatformMgr().UnlockChipStack();
+        /* Post an event to start a delay timer asynchronously in the Matter task context */
+        event.Type                       = DeviceEventType::kPlatformNxpStartWlanInitWaitTimerEvent;
+        event.Platform.pNetworkDataEvent = (struct wlan_network *) context;
+        (void) PlatformMgr().PostEvent(&event);
     }
 }
 

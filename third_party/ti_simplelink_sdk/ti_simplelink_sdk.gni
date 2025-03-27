@@ -360,6 +360,8 @@ template("ti_simplelink_sdk") {
     libs = []
 
     defines = [
+      "BLE_MANAGER_TASK_PRIORITY=5",
+      "BLE_STACK_TASK_PRIORITY=6",
       "INCLUDE_BGET_STATS",
       "USE_DMM",
       "NVOCMP_FREERTOS_MUTEX=1",
@@ -523,10 +525,10 @@ template("ti_simplelink_sdk") {
       sources = [
         "${chip_root}/src/platform/cc13xx_26xx/TI_heap_wrapper.c",
         "${chip_root}/src/platform/cc13xx_26xx/chipOBleProfile.c",
+        "${chip_root}/src/platform/cc13xx_26xx/icall_FreeRTOS.c",
         "${ti_simplelink_sdk_root}/source/ti/ble5stack/common/cc26xx/freertos/bget.c",
         "${ti_simplelink_sdk_root}/source/ti/ble5stack/common/cc26xx/rcosc/rcosc_calibration.c",
         "${ti_simplelink_sdk_root}/source/ti/dmm/apps/common/ble_remote_display/stack/osal_icall_ble.c",
-        "${ti_simplelink_sdk_root}/source/ti/dmm/apps/common/freertos/icall_FreeRTOS.c",
         "${ti_simplelink_sdk_root}/source/ti/dmm/apps/common/freertos/util.c",
         "${ti_simplelink_sdk_root}/source/ti/dmm/apps/common/thread/source/activity/dmm_thread_activity.c",
         "${ti_simplelink_sdk_root}/source/ti/dmm/dmm_priority_ble_thread.c",

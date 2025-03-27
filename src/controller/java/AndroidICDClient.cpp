@@ -58,7 +58,7 @@ jobject getICDClientInfo(JNIEnv * env, const char * icdClientInfoSign, jint jFab
                         ChipLogError(Controller, "Find ICDClientInfo class: %" CHIP_ERROR_FORMAT, err.Format()));
 
     env->ExceptionClear();
-    constructor = env->GetMethodID(infoClass, "<init>", "(JJJJ[B[B)V");
+    constructor = env->GetMethodID(infoClass, "<init>", "(JJJJJ[B[B)V");
     VerifyOrReturnValue(constructor != nullptr, nullptr, ChipLogError(Controller, "Find GetMethodID error!"));
 
     while (iter->Next(info))
@@ -84,9 +84,10 @@ jobject getICDClientInfo(JNIEnv * env, const char * icdClientInfoSign, jint jFab
         VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
                             ChipLogError(Controller, "ICD HMAC KEY N2J_ByteArray error!: %" CHIP_ERROR_FORMAT, err.Format()));
 
-        jICDClientInfo = (jobject) env->NewObject(infoClass, constructor, static_cast<jlong>(info.peer_node.GetNodeId()),
-                                                  static_cast<jlong>(info.start_icd_counter), static_cast<jlong>(info.offset),
-                                                  static_cast<jlong>(info.monitored_subject), jIcdAesKey, jIcdHmacKey);
+        jICDClientInfo = static_cast<jobject>(
+            env->NewObject(infoClass, constructor, static_cast<jlong>(info.peer_node.GetNodeId()),
+                           static_cast<jlong>(info.check_in_node.GetNodeId()), static_cast<jlong>(info.start_icd_counter),
+                           static_cast<jlong>(info.offset), static_cast<jlong>(info.monitored_subject), jIcdAesKey, jIcdHmacKey));
 
         err = chip::JniReferences::GetInstance().AddToList(jInfo, jICDClientInfo);
         VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
@@ -154,6 +155,7 @@ CHIP_ERROR ParseICDClientInfo(JNIEnv * env, jint jFabricIndex, jobject jIcdClien
     VerifyOrReturnError(jIcdClientInfo != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     jmethodID getPeerNodeIdMethod       = nullptr;
+    jmethodID getCheckInNodeIdMethod    = nullptr;
     jmethodID getStartCounterMethod     = nullptr;
     jmethodID getOffsetMethod           = nullptr;
     jmethodID getMonitoredSubjectMethod = nullptr;
@@ -162,6 +164,8 @@ CHIP_ERROR ParseICDClientInfo(JNIEnv * env, jint jFabricIndex, jobject jIcdClien
 
     ReturnErrorOnFailure(
         chip::JniReferences::GetInstance().FindMethod(env, jIcdClientInfo, "getPeerNodeId", "()J", &getPeerNodeIdMethod));
+    ReturnErrorOnFailure(
+        chip::JniReferences::GetInstance().FindMethod(env, jIcdClientInfo, "getCheckInNodeId", "()J", &getCheckInNodeIdMethod));
     ReturnErrorOnFailure(
         chip::JniReferences::GetInstance().FindMethod(env, jIcdClientInfo, "getStartCounter", "()J", &getStartCounterMethod));
     ReturnErrorOnFailure(chip::JniReferences::GetInstance().FindMethod(env, jIcdClientInfo, "getOffset", "()J", &getOffsetMethod));
@@ -173,17 +177,20 @@ CHIP_ERROR ParseICDClientInfo(JNIEnv * env, jint jFabricIndex, jobject jIcdClien
         chip::JniReferences::GetInstance().FindMethod(env, jIcdClientInfo, "getIcdHmacKey", "()[B", &getIcdHmacKeyMethod));
 
     jlong jPeerNodeId       = env->CallLongMethod(jIcdClientInfo, getPeerNodeIdMethod);
+    jlong jCheckInNodeId    = env->CallLongMethod(jIcdClientInfo, getCheckInNodeIdMethod);
     jlong jStartCounter     = env->CallLongMethod(jIcdClientInfo, getStartCounterMethod);
     jlong jOffset           = env->CallLongMethod(jIcdClientInfo, getOffsetMethod);
     jlong jMonitoredSubject = env->CallLongMethod(jIcdClientInfo, getMonitoredSubjectMethod);
     jbyteArray jIcdAesKey   = static_cast<jbyteArray>(env->CallObjectMethod(jIcdClientInfo, getIcdAesKeyMethod));
     jbyteArray jIcdHmacKey  = static_cast<jbyteArray>(env->CallObjectMethod(jIcdClientInfo, getIcdHmacKeyMethod));
 
-    chip::ScopedNodeId scopedNodeId(static_cast<chip::NodeId>(jPeerNodeId), static_cast<chip::FabricIndex>(jFabricIndex));
+    chip::ScopedNodeId peerNodeId(static_cast<chip::NodeId>(jPeerNodeId), static_cast<chip::FabricIndex>(jFabricIndex));
+    chip::ScopedNodeId checkInNodeId(static_cast<chip::NodeId>(jCheckInNodeId), static_cast<chip::FabricIndex>(jFabricIndex));
     chip::JniByteArray jniIcdAesKey(env, jIcdAesKey);
     chip::JniByteArray jniIcdHmacKey(env, jIcdHmacKey);
 
-    icdClientInfo.peer_node         = scopedNodeId;
+    icdClientInfo.peer_node         = peerNodeId;
+    icdClientInfo.check_in_node     = checkInNodeId;
     icdClientInfo.start_icd_counter = static_cast<uint32_t>(jStartCounter);
     icdClientInfo.offset            = static_cast<uint32_t>(jOffset);
     icdClientInfo.monitored_subject = static_cast<uint64_t>(jMonitoredSubject);

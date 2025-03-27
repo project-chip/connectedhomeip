@@ -23,10 +23,9 @@
 
 #pragma once
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
-
 #include "FreeRTOS.h"
 #include <functional>
+#include <lib/core/CHIPError.h>
 
 #define CHIP_PLAT_NO_NVM 0
 #define CHIP_PLAT_NVM_FWK 1
@@ -41,14 +40,12 @@
 
 #if (CHIP_PLAT_NVM_SUPPORT == CHIP_PLAT_NVM_FWK)
 #include "NVM_Interface.h"
+#include "ram_storage.h"
 #elif (CHIP_PLAT_NVM_SUPPORT == CHIP_PLAT_LITTLEFS)
 #include "fwk_filesystem.h"
-#endif
-
-#if (CHIP_PLAT_NVM_SUPPORT == CHIP_PLAT_KEY_STORAGE)
-#include "fwk_key_storage.h"
-#else
 #include "ram_storage.h"
+#elif (CHIP_PLAT_NVM_SUPPORT == CHIP_PLAT_KEY_STORAGE)
+#include "fwk_key_storage.h"
 #endif
 
 namespace chip {
@@ -60,7 +57,7 @@ namespace Internal {
 
 constexpr inline uint16_t config_key(uint8_t chipId, uint8_t pdmId)
 {
-    return static_cast<uint16_t>(chipId) << 8 | pdmId;
+    return (uint16_t) (static_cast<uint16_t>(chipId) << 8 | pdmId);
 }
 
 /**
@@ -189,11 +186,14 @@ public:
 private:
 #if (CHIP_PLAT_NVM_SUPPORT == CHIP_PLAT_KEY_STORAGE)
     static CHIP_ERROR MapKeyStorageStatus(ks_error_t ksStatus);
-#else
+#elif (CHIP_PLAT_NVM_SUPPORT != CHIP_PLAT_NO_NVM)
     static CHIP_ERROR MapRamStorageStatus(rsError rsStatus);
 #endif
     static int SaveIntKeysToFS(void);
     static int SaveStringKeysToFS(void);
+#if (CHIP_DEVICE_CONFIG_KVS_WEAR_STATS == 1)
+    static CHIP_ERROR InitStorageWearStats(void);
+#endif
 };
 
 } // namespace Internal

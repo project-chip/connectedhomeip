@@ -214,13 +214,23 @@ bool ParseSubType(int argc, char ** argv, Dnssd::DiscoveryFilter & filter)
     case 'C':
         filterType = Dnssd::DiscoveryFilterType::kCommissioningMode;
         break;
+    case 'I':
+        filterType = Dnssd::DiscoveryFilterType::kCompressedFabricId;
+        break;
     default:
         return false;
     }
 
-    uint16_t code;
-    VerifyOrReturnError(ArgParser::ParseInt(subtype + 2, code), false);
-
+    uint64_t code = 0;
+    if (filterType == Dnssd::DiscoveryFilterType::kCompressedFabricId)
+    {
+        VerifyOrReturnError(ArgParser::ParseInt(subtype + 2, code, 16), false);
+        VerifyOrReturnValue(code != 0, false);
+    }
+    else
+    {
+        VerifyOrReturnError(ArgParser::ParseInt(subtype + 2, code), false);
+    }
     filter = Dnssd::DiscoveryFilter(filterType, code);
     return true;
 }
@@ -287,10 +297,11 @@ void RegisterDnsCommands()
     static constexpr Command subCommands[] = {
         { &ResolveHandler, "resolve",
           "Resolve Matter operational service. Usage: dns resolve fabricid nodeid (e.g. dns resolve 5544332211 1)" },
-        { &SubShellCommand<ArraySize(browseSubCommands), browseSubCommands>, "browse", "Browse Matter DNS services" },
+        { &SubShellCommand<MATTER_ARRAY_SIZE(browseSubCommands), browseSubCommands>, "browse", "Browse Matter DNS services" },
     };
 
-    static constexpr Command dnsCommand = { &SubShellCommand<ArraySize(subCommands), subCommands>, "dns", "DNS client commands" };
+    static constexpr Command dnsCommand = { &SubShellCommand<MATTER_ARRAY_SIZE(subCommands), subCommands>, "dns",
+                                            "DNS client commands" };
 
     Engine::Root().RegisterCommands(&dnsCommand, 1);
 }

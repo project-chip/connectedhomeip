@@ -30,11 +30,11 @@ jobs:
        - name: Setup python
          uses: actions/setup-python@v5
          with:
-           python-version: 3.11
+           python-version: 3.12
        - name: Install dependencies
          run: |
-           python -m pip install --upgrade pip
-           pip install click coloredlogs lark
+           python3 -m venv venv
+           venv/bin/pip3 install click coloredlogs lark
        - name: Create old/new copies
          run: |
            mkdir -p out
@@ -45,5 +45,4 @@ jobs:
            patch -p1 <out/patch.diff
        - name: Check backwards compatibility
          run: |
-           scripts/backwards_compatibility_checker.py out/old_version.matter out/new_version.matter
-
+           venv/bin/python3 scripts/backwards_compatibility_checker.py out/old_version.matter out/new_version.matter

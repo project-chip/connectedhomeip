@@ -17,6 +17,7 @@
  */
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 
@@ -41,10 +42,6 @@ void MatterPostAttributeChangeCallback(const app::ConcreteAttributePath & attrib
             }
         }
         break;
-    case OnOffSwitchConfiguration::Id:
-        printf("OnOff Switch Configuration attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u\n",
-               ChipLogValueMEI(attributePath.mAttributeId), type, *value, size);
-        return;
     default:
         printf("Unhandled cluster ID: 0x%04lx\n", attributePath.mClusterId);
         return;

@@ -42,7 +42,7 @@ struct GetConnectedDeviceCallback
     ~GetConnectedDeviceCallback();
 
     static void OnDeviceConnectedFn(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
-    static void OnDeviceConnectionFailureFn(void * context, const OperationalSessionSetup::ConnnectionFailureInfo & failureInfo);
+    static void OnDeviceConnectionFailureFn(void * context, const OperationalSessionSetup::ConnectionFailureInfo & failureInfo);
 
     Callback::Callback<OnDeviceConnected> mOnSuccess;
     Callback::Callback<OperationalSessionSetup::OnSetupFailure> mOnFailure;

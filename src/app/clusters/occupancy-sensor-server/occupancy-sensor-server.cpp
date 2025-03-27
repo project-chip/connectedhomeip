@@ -59,8 +59,12 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     case Attributes::FeatureMap::Id:
         ReturnErrorOnFailure(aEncoder.Encode(mFeature));
         break;
-    case Attributes::HoldTime::Id: {
-
+    case Attributes::HoldTime::Id:
+    case Attributes::PIROccupiedToUnoccupiedDelay::Id:
+    case Attributes::UltrasonicOccupiedToUnoccupiedDelay::Id:
+    case Attributes::PhysicalContactOccupiedToUnoccupiedDelay::Id: {
+        // HoldTime is equivalent to the legacy *OccupiedToUnoccupiedDelay attributes.
+        // The AAI will read/write these attributes at the same storage for one endpoint.
         uint16_t * holdTime = GetHoldTimeForEndpoint(aPath.mEndpointId);
 
         if (holdTime == nullptr)
@@ -94,8 +98,10 @@ CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & aPath, AttributeVal
 
     switch (aPath.mAttributeId)
     {
-    case Attributes::HoldTime::Id: {
-
+    case Attributes::HoldTime::Id:
+    case Attributes::PIROccupiedToUnoccupiedDelay::Id:
+    case Attributes::UltrasonicOccupiedToUnoccupiedDelay::Id:
+    case Attributes::PhysicalContactOccupiedToUnoccupiedDelay::Id: {
         uint16_t newHoldTime;
 
         ReturnErrorOnFailure(aDecoder.Decode(newHoldTime));
@@ -130,7 +136,7 @@ Structs::HoldTimeLimitsStruct::Type * GetHoldTimeLimitsForEndpoint(EndpointId en
         return nullptr;
     }
 
-    if (index >= ArraySize(sHoldTimeLimitsStructs))
+    if (index >= MATTER_ARRAY_SIZE(sHoldTimeLimitsStructs))
     {
         ChipLogError(NotSpecified, "Internal error: invalid/unexpected hold time limits index.");
         return nullptr;
@@ -165,7 +171,7 @@ uint16_t * GetHoldTimeForEndpoint(EndpointId endpoint)
         return nullptr;
     }
 
-    if (index >= ArraySize(sHoldTimeLimitsStructs))
+    if (index >= MATTER_ARRAY_SIZE(sHoldTimeLimitsStructs))
     {
         ChipLogError(NotSpecified, "Internal error: invalid/unexpected hold time index.");
         return nullptr;
@@ -173,16 +179,20 @@ uint16_t * GetHoldTimeForEndpoint(EndpointId endpoint)
     return &sHoldTime[index];
 }
 
-CHIP_ERROR SetHoldTime(EndpointId endpointId, const uint16_t & holdTime)
+CHIP_ERROR SetHoldTime(EndpointId endpointId, uint16_t newHoldTime)
 {
     VerifyOrReturnError(kInvalidEndpointId != endpointId, CHIP_ERROR_INVALID_ARGUMENT);
 
     uint16_t * holdTimeForEndpoint = GetHoldTimeForEndpoint(endpointId);
     VerifyOrReturnError(holdTimeForEndpoint != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    *holdTimeForEndpoint = holdTime;
+    uint16_t previousHoldTime = *holdTimeForEndpoint;
+    *holdTimeForEndpoint      = newHoldTime;
 
-    MatterReportingAttributeChangeCallback(endpointId, OccupancySensing::Id, Attributes::HoldTime::Id);
+    if (previousHoldTime != newHoldTime)
+    {
+        MatterReportingAttributeChangeCallback(endpointId, OccupancySensing::Id, Attributes::HoldTime::Id);
+    }
 
     return CHIP_NO_ERROR;
 }

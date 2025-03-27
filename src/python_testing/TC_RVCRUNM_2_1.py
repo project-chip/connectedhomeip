@@ -19,24 +19,34 @@
 # for details about the block below.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${CHIP_RVC_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values --endpoint 1 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto --int-arg PIXIT.RVCRUNM.MODE_CHANGE_OK:0 PIXIT.RVCRUNM.MODE_CHANGE_FAIL:2
+# test-runner-runs:
+#   run1:
+#     app: ${CHIP_RVC_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --endpoint 1
+#       --int-arg PIXIT.RVCRUNM.MODE_CHANGE_OK:0
+#       --int-arg PIXIT.RVCRUNM.MODE_CHANGE_FAIL:2
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
-from time import sleep
 
 import chip.clusters as Clusters
-from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
+from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
 
 # This test requires several additional command line arguments
 # run with
-# --int-arg PIXIT.RVCRUNM.MODE_CHANGE_OK:<mode id> PIXIT.RVCRUNM.MODE_CHANGE_FAIL:<mode id>
+# --int-arg PIXIT.RVCRUNM.MODE_CHANGE_OK:<mode id> --int-arg PIXIT.RVCRUNM.MODE_CHANGE_FAIL:<mode id>
 # For running in CI, it is expected that OK=0 and FAIL=2
 
 
@@ -60,14 +70,6 @@ class TC_RVCRUNM_2_1(MatterBaseTest):
                             "Unexpected return type for ChangeToMode")
         return ret
 
-    # Sends and out-of-band command to the rvc-app
-    def write_to_app_pipe(self, command):
-        with open(self.app_pipe, "w") as app_pipe:
-            app_pipe.write(command + "\n")
-        # Delay for pipe command to be processed (otherwise tests are flaky)
-        # TODO(#31239): centralize pipe write logic and remove the need of sleep
-        sleep(0.001)
-
     def pics_TC_RVCRUNM_2_1(self) -> list[str]:
         return ["RVCRUNM.S"]
 
@@ -81,7 +83,7 @@ class TC_RVCRUNM_2_1(MatterBaseTest):
                             "PIXIT.RVCRUNM.MODE_CHANGE_FAIL must be included on the command line in "
                             "the --int-arg flag as PIXIT.RVCRUNM.MODE_CHANGE_FAIL:<mode id>")
 
-        self.endpoint = self.matter_test_config.endpoint
+        self.endpoint = self.get_endpoint()
         self.mode_ok = self.matter_test_config.global_test_params['PIXIT.RVCRUNM.MODE_CHANGE_OK']
         self.mode_fail = self.matter_test_config.global_test_params['PIXIT.RVCRUNM.MODE_CHANGE_FAIL']
         self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
@@ -102,7 +104,7 @@ class TC_RVCRUNM_2_1(MatterBaseTest):
 
         # Ensure that the device is in the correct state
         if self.is_ci:
-            self.write_to_app_pipe('{"Name": "Reset"}')
+            self.write_to_app_pipe({"Name": "Reset"})
 
         self.print_step(2, "Read SupportedModes attribute")
         supported_modes = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.SupportedModes)

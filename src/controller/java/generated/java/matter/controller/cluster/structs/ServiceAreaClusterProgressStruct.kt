@@ -41,7 +41,7 @@ class ServiceAreaClusterProgressStruct(
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_AREA_I_D), areaID)
+      put(ContextSpecificTag(TAG_AREA_ID), areaID)
       put(ContextSpecificTag(TAG_STATUS), status)
       if (totalOperationalTime != null) {
         if (totalOperationalTime.isPresent) {
@@ -64,14 +64,14 @@ class ServiceAreaClusterProgressStruct(
   }
 
   companion object {
-    private const val TAG_AREA_I_D = 0
+    private const val TAG_AREA_ID = 0
     private const val TAG_STATUS = 1
     private const val TAG_TOTAL_OPERATIONAL_TIME = 2
     private const val TAG_ESTIMATED_TIME = 3
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ServiceAreaClusterProgressStruct {
       tlvReader.enterStructure(tlvTag)
-      val areaID = tlvReader.getUInt(ContextSpecificTag(TAG_AREA_I_D))
+      val areaID = tlvReader.getUInt(ContextSpecificTag(TAG_AREA_ID))
       val status = tlvReader.getUByte(ContextSpecificTag(TAG_STATUS))
       val totalOperationalTime =
         if (!tlvReader.isNull()) {

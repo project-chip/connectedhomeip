@@ -21,6 +21,7 @@
 #include "ValveControlDelegate.h"
 #include "WindowCoveringManager.h"
 #include "air-quality-instance.h"
+#include "app-common/zap-generated/ids/Clusters.h"
 #include "device-energy-management-modes.h"
 #include "dishwasher-mode.h"
 #include "energy-evse-modes.h"
@@ -39,6 +40,7 @@
 #include "tcc-mode.h"
 #include "thermostat-delegate-impl.h"
 #include "water-heater-mode.h"
+
 #include <Options.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/CommandHandler.h>
@@ -51,13 +53,12 @@
 #include <app/clusters/time-synchronization-server/time-synchronization-server.h>
 #include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-server.h>
 #include <app/server/Server.h>
-#include <app/util/att-storage.h>
 #include <app/util/attribute-storage.h>
 #include <lib/support/CHIPMem.h>
-#include <new>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/PlatformManager.h>
+#include <static-supported-modes-manager.h>
 #include <static-supported-temperature-levels.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/SessionManager.h>
@@ -71,6 +72,8 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::DeviceLayer;
 
+using chip::Protocols::InteractionModel::Status;
+
 namespace {
 
 constexpr char kChipEventFifoPathPrefix[] = "/tmp/chip_all_clusters_fifo_";
@@ -80,6 +83,7 @@ AllClustersCommandDelegate sAllClustersCommandDelegate;
 Clusters::WindowCovering::WindowCoveringManager sWindowCoveringManager;
 
 Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
+Clusters::ModeSelect::StaticSupportedModesManager sStaticSupportedModesManager;
 Clusters::ValveConfigurationAndControl::ValveControlDelegate sValveDelegate;
 Clusters::TimeSynchronization::ExtendedTimeSyncDelegate sTimeSyncDelegate;
 
@@ -119,6 +123,7 @@ const Clusters::Descriptor::Structs::SemanticTagStruct::Type gEp3TagList[] = { {
                                                                                  .tag         = kTagSwitchesUp } };
 const Clusters::Descriptor::Structs::SemanticTagStruct::Type gEp4TagList[] = { { .namespaceID = kNamespaceSwitches,
                                                                                  .tag         = kTagSwitchesDown } };
+
 } // namespace
 
 #ifdef MATTER_DM_PLUGIN_DISHWASHER_ALARM_SERVER
@@ -246,11 +251,12 @@ void ApplicationInit()
     MatterDishwasherAlarmServerInit();
 #endif
     Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
+    Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
 
     Clusters::ValveConfigurationAndControl::SetDefaultDelegate(chip::EndpointId(1), &sValveDelegate);
     Clusters::TimeSynchronization::SetDefaultDelegate(&sTimeSyncDelegate);
 
-    Clusters::WaterHeaterManagement::WhmApplicationInit();
+    Clusters::WaterHeaterManagement::WhmApplicationInit(chip::EndpointId(1));
 
     SetTagList(/* endpoint= */ 0, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp0TagList));
     SetTagList(/* endpoint= */ 1, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp1TagList));
@@ -282,7 +288,6 @@ void ApplicationShutdown()
     Clusters::WaterHeaterMode::Shutdown();
 
     Clusters::WaterHeaterManagement::WhmApplicationShutdown();
-    Clusters::WaterHeaterMode::Shutdown();
 
     if (sChipNamedPipeCommands.Stop() != CHIP_NO_ERROR)
     {
@@ -333,4 +338,29 @@ void emberAfThermostatClusterInitCallback(EndpointId endpoint)
     auto & delegate = ThermostatDelegate::GetInstance();
 
     SetDefaultDelegate(endpoint, &delegate);
+}
+
+Status emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
+                                            const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
+                                            uint16_t maxReadLength)
+{
+
+    VerifyOrReturnValue(clusterId == Clusters::UnitTesting::Id, Status::Failure);
+    VerifyOrReturnValue(attributeMetadata != nullptr, Status::Failure);
+
+    if (attributeMetadata->attributeId == Clusters::UnitTesting::Attributes::FailureInt32U::Id)
+    {
+        uint8_t forced_code = 0;
+        Status status;
+
+        status = Clusters::UnitTesting::Attributes::ReadFailureCode::Get(endpoint, &forced_code);
+        if (status == Status::Success)
+        {
+            status = static_cast<Status>(forced_code);
+        }
+        return status;
+    }
+
+    // Finally we just do not support external attributes in all-clusters at this point
+    return Status::Failure;
 }

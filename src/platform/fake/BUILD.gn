@@ -35,6 +35,7 @@ static_library("fake") {
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
   ]
+  deps = [ "${chip_root}/src/app:app_config" ]
   public_deps = [
     "${chip_root}/src/lib/dnssd:platform_header",
     "${chip_root}/src/platform:platform_base",

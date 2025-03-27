@@ -38,7 +38,7 @@
 
 #include <lwip/tcpip.h>
 
-#include MBEDTLS_PORT_INCLUDE
+#include "els_pkc_mbedtls.h"
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 #include "OtaSupport.h"
@@ -112,7 +112,6 @@ void PlatformManagerImpl::HardwareInit(void)
 CHIP_ERROR PlatformManagerImpl::ServiceInit(void)
 {
     status_t status;
-    hal_rng_status_t rngStatus;
     CHIP_ERROR chipRes = CHIP_NO_ERROR;
 
     status = CRYPTO_InitHardware();
@@ -196,9 +195,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     err = ServiceInit();
     SuccessOrExit(err);
 
-#ifdef SPINEL_INTERFACE_RPMSG
-    otPlatRadioInitSpinelInterface();
-#endif /* SPINEL_INTERFACE_RPMSG */
     PLATFORM_InitOt();
     /*
      * Initialize the RCP here: the WiFi initialization requires to enable/disable
@@ -208,10 +204,11 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     otPlatLogInit();
     otPlatRadioInit();
     otPlatSetResetFunction(initiateResetInIdle);
+    otPlatRandomInit();
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
-    osError = os_setup_idle_function(chip::DeviceLayer::PlatformManagerImpl::IdleHook);
+    osError = OSA_SetupIdleFunction(chip::DeviceLayer::PlatformManagerImpl::IdleHook);
     if (osError != WM_SUCCESS)
     {
         ChipLogError(DeviceLayer, "Failed to setup idle function");

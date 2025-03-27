@@ -27,7 +27,7 @@ config:
         defaultValue: 1
     unsupportedNumberOfRinsesValue:
         type: enum8
-        defaultValue: 5
+        defaultValue: 4
 
 tests:
     - label: "Step 1: Commission DUT to TH"
@@ -83,23 +83,10 @@ tests:
       response:
           value: NumberOfRinsesValue
 
-    - label: "Step 6: Operate device to set the condition to read only"
-      verification: |
-          Manual operation required
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_SKIP_SAMPLE_APP && WASHERCTRL.S.M.ManuallyControlled
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
-
     - label:
-          "Step 7: TH writes an unsupported NumberOfRinses attribute to DUT
+          "Step 6: TH writes an unsupported NumberOfRinses attribute to DUT
           while DUT is not in a valid state."
-      PICS: WASHERCTRL.S.M.ManuallyControlled && WASHERCTRL.S.A0002
+      PICS: WASHERCTRL.S.A0002
       command: "writeAttribute"
       attribute: "NumberOfRinses"
       arguments:

@@ -56,7 +56,7 @@ namespace DeviceLayer {
 
 PlatformManagerImpl PlatformManagerImpl::sInstance;
 
-#if defined(chip_with_low_power) && (chip_with_low_power == 1)
+#if defined(nxp_use_low_power) && (nxp_use_low_power == 1)
 extern "C" void InitLowPower();
 #endif
 
@@ -97,7 +97,7 @@ CHIP_ERROR PlatformManagerImpl::InitBoardFwk(void)
     BOARD_ADCWakeupInit();
 #endif
 
-#if defined(chip_with_low_power) && (chip_with_low_power == 1)
+#if defined(nxp_use_low_power) && (nxp_use_low_power == 1)
     /* Low Power Init */
     InitLowPower();
 #endif

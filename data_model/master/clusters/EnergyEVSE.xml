@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -69,10 +69,7 @@ Davis, CA 95616, USA
   <classification hierarchy="base" role="application" picsCode="EEVSE" scope="Endpoint"/>
   <features>
     <feature bit="0" code="PREF" name="ChargingPreferences" summary="EVSE supports storing user charging preferences">
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform/>
-      </otherwiseConform>
+      <mandatoryConform/>
     </feature>
     <feature bit="1" code="SOC" name="SoCReporting" summary="EVSE supports reporting of vehicle State of Charge (SoC)">
       <otherwiseConform>
@@ -97,8 +94,6 @@ Davis, CA 95616, USA
     </feature>
   </features>
   <dataTypes>
-    <number name="ChargingTargets Field" type=""/>
-    <number name="DayOfWeekForSequence Field" type=""/>
     <enum name="EnergyTransferStoppedReasonEnum">
       <item value="0" name="EVStopped" summary="The EV decided to stop">
         <mandatoryConform/>
@@ -184,7 +179,7 @@ Davis, CA 95616, USA
       <item value="5" name="SessionEnding" summary="The EVSE is transitioning from any plugged-in state to NotPluggedIn">
         <mandatoryConform/>
       </item>
-      <item value="6" name="Fault" summary="There is a fault (see FaultState Attribute attribute)">
+      <item value="6" name="Fault" summary="There is a fault, further details in the FaultState attribute">
         <mandatoryConform/>
       </item>
     </enum>
@@ -200,12 +195,10 @@ Davis, CA 95616, USA
           <feature name="V2X"/>
         </optionalConform>
       </item>
-      <item value="3" name="DisabledError" summary="The EV is not currently allowed to charge or discharge due to an error.
-                                The error must be cleared before operation can continue.">
+      <item value="3" name="DisabledError" summary="The EV is not currently allowed to charge or discharge due to an error. The error must be cleared before operation can continue.">
         <mandatoryConform/>
       </item>
-      <item value="4" name="DisabledDiagnostics" summary="The EV is not currently allowed to charge or discharge due
-                                to self-diagnostics mode.">
+      <item value="4" name="DisabledDiagnostics" summary="The EV is not currently allowed to charge or discharge due to self-diagnostics mode.">
         <mandatoryConform/>
       </item>
       <item value="5" name="Enabled" summary="The EV is currently allowed to charge and discharge">
@@ -240,25 +233,28 @@ Davis, CA 95616, USA
     <struct name="ChargingTargetScheduleStruct">
       <field id="0" name="DayOfWeekForSequence" type="TargetDayOfWeekBitmap">
         <mandatoryConform/>
-        <constraint type="desc"/>
       </field>
       <field id="1" name="ChargingTargets" type="list">
         <entry type="ChargingTargetStruct"/>
         <mandatoryConform/>
-        <constraint type="maxCount" value="10"/>
+        <constraint>
+          <maxCount value="10"/>
+        </constraint>
       </field>
     </struct>
     <struct name="ChargingTargetStruct">
       <field id="0" name="TargetTimeMinutesPastMidnight" type="uint16" default="0">
         <mandatoryConform/>
-        <constraint type="max" value="1439"/>
+        <constraint>
+          <max value="1439"/>
+        </constraint>
       </field>
       <field id="1" name="TargetSoC" type="percent" default="0">
         <otherwiseConform>
           <mandatoryConform>
             <feature name="SOC"/>
           </mandatoryConform>
-          <optionalConform choice="a" more="true"/>
+          <optionalConform choice="a" more="true" min="1"/>
         </otherwiseConform>
       </field>
       <field id="2" name="AddedEnergy" type="energy-mWh" default="0">
@@ -266,16 +262,18 @@ Davis, CA 95616, USA
           <optionalConform>
             <feature name="SOC"/>
           </optionalConform>
-          <optionalConform choice="a" more="true"/>
+          <optionalConform choice="a" more="true" min="1"/>
         </otherwiseConform>
-        <constraint type="min" value="0"/>
+        <constraint>
+          <min value="0"/>
+        </constraint>
       </field>
     </struct>
   </dataTypes>
   <attributes>
     <attribute id="0x0000" name="State" type="StateEnum">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0001" name="SupplyState" type="SupplyStateEnum">
@@ -288,137 +286,161 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0003" name="ChargingEnabledUntil" type="epoch-s" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="nonVolatile"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0004" name="DischargingEnabledUntil" type="epoch-s" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="nonVolatile"/>
       <mandatoryConform>
         <feature name="V2X"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0005" name="CircuitCapacity" type="amperage-mA" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform/>
-      <constraint type="min" value="0"/>
+      <constraint>
+        <min value="0"/>
+      </constraint>
     </attribute>
     <attribute id="0x0006" name="MinimumChargeCurrent" type="amperage-mA" default="6000">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform/>
-      <constraint type="min" value="0"/>
+      <constraint>
+        <min value="0"/>
+      </constraint>
     </attribute>
     <attribute id="0x0007" name="MaximumChargeCurrent" type="amperage-mA" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform/>
-      <constraint type="min" value="0"/>
+      <constraint>
+        <min value="0"/>
+      </constraint>
     </attribute>
     <attribute id="0x0008" name="MaximumDischargeCurrent" type="amperage-mA" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform>
         <feature name="V2X"/>
       </mandatoryConform>
-      <constraint type="min" value="0"/>
+      <constraint>
+        <min value="0"/>
+      </constraint>
     </attribute>
     <attribute id="0x0009" name="UserMaximumChargeCurrent" type="amperage-mA" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <optionalConform/>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x000A" name="RandomizationDelayWindow" type="elapsed-s" default="600">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <optionalConform/>
-      <constraint type="max" value="86400"/>
+      <constraint>
+        <max value="86400"/>
+      </constraint>
     </attribute>
     <attribute id="0x0023" name="NextChargeStartTime" type="epoch-s" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <mandatoryConform>
         <feature name="PREF"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0024" name="NextChargeTargetTime" type="epoch-s" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <mandatoryConform>
         <feature name="PREF"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0025" name="NextChargeRequiredEnergy" type="energy-mWh" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <mandatoryConform>
         <feature name="PREF"/>
       </mandatoryConform>
-      <constraint type="min" value="0"/>
+      <constraint>
+        <min value="0"/>
+      </constraint>
     </attribute>
     <attribute id="0x0026" name="NextChargeTargetSoC" type="percent" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <mandatoryConform>
         <feature name="PREF"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0027" name="ApproximateEVEfficiency" type="uint16" default="null">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="nonVolatile"/>
       <optionalConform>
         <feature name="PREF"/>
       </optionalConform>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0030" name="StateOfCharge" type="percent" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <mandatoryConform>
         <feature name="SOC"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0031" name="BatteryCapacity" type="energy-mWh" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <mandatoryConform>
         <feature name="SOC"/>
       </mandatoryConform>
-      <constraint type="min" value="0"/>
+      <constraint>
+        <min value="0"/>
+      </constraint>
     </attribute>
     <attribute id="0x0032" name="VehicleID" type="string" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <mandatoryConform>
         <feature name="PNC"/>
       </mandatoryConform>
-      <constraint type="maxLength" value="32"/>
+      <constraint>
+        <maxLength value="32"/>
+      </constraint>
     </attribute>
     <attribute id="0x0040" name="SessionID" type="uint32" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="nonVolatile"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0041" name="SessionDuration" type="elapsed-s" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
+      <quality nullable="true" persistence="nonVolatile" quieterReporting="true"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0042" name="SessionEnergyCharged" type="energy-mWh" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
+      <quality nullable="true" persistence="nonVolatile" quieterReporting="true"/>
       <mandatoryConform/>
-      <constraint type="min" value="0"/>
+      <constraint>
+        <min value="0"/>
+      </constraint>
     </attribute>
     <attribute id="0x0043" name="SessionEnergyDischarged" type="energy-mWh" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="true"/>
+      <quality nullable="true" persistence="nonVolatile" quieterReporting="true"/>
       <mandatoryConform>
         <feature name="V2X"/>
       </mandatoryConform>
-      <constraint type="min" value="0"/>
+      <constraint>
+        <min value="0"/>
+      </constraint>
     </attribute>
   </attributes>
   <commands>
@@ -429,7 +451,9 @@ Davis, CA 95616, USA
       <field id="0" name="ChargingTargetSchedules" type="list">
         <entry type="ChargingTargetScheduleStruct"/>
         <mandatoryConform/>
-        <constraint type="maxCount" value="7"/>
+        <constraint>
+          <maxCount value="7"/>
+        </constraint>
       </field>
     </command>
     <command id="0x01" name="Disable" direction="commandToServer" response="Y">
@@ -445,11 +469,15 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="MinimumChargeCurrent" type="amperage-mA">
         <mandatoryConform/>
-        <constraint type="min" value="0"/>
+        <constraint>
+          <min value="0"/>
+        </constraint>
       </field>
       <field id="2" name="MaximumChargeCurrent" type="amperage-mA">
         <mandatoryConform/>
-        <constraint type="min" value="0"/>
+        <constraint>
+          <min value="0"/>
+        </constraint>
       </field>
     </command>
     <command id="0x03" name="EnableDischarging" direction="commandToServer" response="Y">
@@ -463,7 +491,9 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="MaximumDischargeCurrent" type="amperage-mA">
         <mandatoryConform/>
-        <constraint type="min" value="0"/>
+        <constraint>
+          <min value="0"/>
+        </constraint>
       </field>
     </command>
     <command id="0x04" name="StartDiagnostics" direction="commandToServer" response="Y">
@@ -478,7 +508,9 @@ Davis, CA 95616, USA
       <field id="0" name="ChargingTargetSchedules" type="list">
         <entry type="ChargingTargetScheduleStruct"/>
         <mandatoryConform/>
-        <constraint type="maxCount" value="7"/>
+        <constraint>
+          <maxCount value="7"/>
+        </constraint>
       </field>
     </command>
     <command id="0x06" name="GetTargets" direction="commandToServer" response="GetTargetsResponse">
@@ -516,13 +548,17 @@ Davis, CA 95616, USA
       </field>
       <field id="3" name="SessionEnergyCharged" type="energy-mWh">
         <mandatoryConform/>
-        <constraint type="min" value="0"/>
+        <constraint>
+          <min value="0"/>
+        </constraint>
       </field>
       <field id="4" name="SessionEnergyDischarged" type="energy-mWh">
         <mandatoryConform>
           <feature name="V2X"/>
         </mandatoryConform>
-        <constraint type="min" value="0"/>
+        <constraint>
+          <min value="0"/>
+        </constraint>
       </field>
     </event>
     <event id="0x02" name="EnergyTransferStarted" priority="info">
@@ -536,13 +572,17 @@ Davis, CA 95616, USA
       </field>
       <field id="2" name="MaximumCurrent" type="amperage-mA">
         <mandatoryConform/>
-        <constraint type="min" value="0"/>
+        <constraint>
+          <min value="0"/>
+        </constraint>
       </field>
       <field id="3" name="MaximumDischargeCurrent" type="amperage-mA">
         <mandatoryConform>
           <feature name="V2X"/>
         </mandatoryConform>
-        <constraint type="min" value="0"/>
+        <constraint>
+          <min value="0"/>
+        </constraint>
       </field>
     </event>
     <event id="0x03" name="EnergyTransferStopped" priority="info">
@@ -559,13 +599,17 @@ Davis, CA 95616, USA
       </field>
       <field id="4" name="EnergyTransferred" type="energy-mWh">
         <mandatoryConform/>
-        <constraint type="min" value="0"/>
+        <constraint>
+          <min value="0"/>
+        </constraint>
       </field>
       <field id="5" name="EnergyDischarged" type="energy-mWh">
         <mandatoryConform>
           <feature name="V2X"/>
         </mandatoryConform>
-        <constraint type="min" value="0"/>
+        <constraint>
+          <min value="0"/>
+        </constraint>
       </field>
     </event>
     <event id="0x04" name="Fault" priority="critical">
@@ -592,7 +636,9 @@ Davis, CA 95616, USA
       </optionalConform>
       <field id="0" name="UID" type="octstr">
         <mandatoryConform/>
-        <constraint type="maxLength" value="10"/>
+        <constraint>
+          <maxLength value="10"/>
+        </constraint>
       </field>
     </event>
   </events>

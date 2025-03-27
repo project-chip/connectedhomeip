@@ -203,6 +203,14 @@ limitations under the License.
     <attribute side="server" code="0x0033" define="GLOBAL_ENUM" type="TestGlobalEnum" writable="true">global_enum</attribute>
     <attribute side="server" code="0x0034" define="GLOBAL_STRUCT" type="TestGlobalStruct" writable="true">global_struct</attribute>
 
+    <!-- These attributes are intended to return internal failures when read.
+         They are internal SDK-test code that are intended to only run through EMBER interfaces instead of
+         code-backed support (to be able to test ember-based error paths)
+      -->
+    <attribute side="server" code="0x3000" define="INT8U" type="int8u" writable="true" min="1" max="0xcb" default="1" optional="true">readFailureCode</attribute>
+    <attribute side="server" code="0x3001" define="INT32U" type="int32u" writable="true" default="0" optional="true">failureInt32U</attribute>
+
+
     <attribute side="server" code="0x4000" define="NULLABLE_BOOLEAN" type="boolean" writable="true" default="false" isNullable="true" optional="false">nullable_boolean</attribute>
     <attribute side="server" code="0x4001" define="NULLABLE_BITMAP8" type="Bitmap8MaskMap" writable="true" default="0" isNullable="true" optional="false">nullable_bitmap8</attribute>
     <attribute side="server" code="0x4002" define="NULLABLE_BITMAP16" type="Bitmap16MaskMap" writable="true" default="0" isNullable="true" optional="false">nullable_bitmap16</attribute>

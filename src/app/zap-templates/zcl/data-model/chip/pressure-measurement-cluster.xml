@@ -31,16 +31,44 @@ limitations under the License.
         <optionalConform/>
       </feature>
     </features>
-
-    <attribute side="server" code="0x0000" define="PRESSURE_MEASURED_VALUE" type="int16s" writable="false" reportable="true" optional="false" isNullable="true">MeasuredValue</attribute>
-    <attribute side="server" code="0x0001" define="PRESSURE_MIN_MEASURED_VALUE" type="int16s" writable="false" optional="false" isNullable="true">MinMeasuredValue</attribute>
-    <attribute side="server" code="0x0002" define="PRESSURE_MAX_MEASURED_VALUE" type="int16s" writable="false" optional="false" isNullable="true">MaxMeasuredValue</attribute>
-    <attribute side="server" code="0x0003" define="PRESSURE_TOLERANCE" type="int16u" min="0x0000" max="0x0800" writable="false" optional="true" default="0">Tolerance</attribute>
-    <attribute side="server" code="0x0010" define="PRESSURE_SCALED_VALUE" type="int16s" writable="false" optional="true" default="0" isNullable="true">ScaledValue</attribute>
-    <attribute side="server" code="0x0011" define="PRESSURE_MIN_SCALED_VALUE" type="int16s" writable="false" optional="true" default="0" isNullable="true">MinScaledValue</attribute>
-    <attribute side="server" code="0x0012" define="PRESSURE_MAX_SCALED_VALUE" type="int16s" writable="false" optional="true" default="0" isNullable="true">MaxScaledValue</attribute>
-    <attribute side="server" code="0x0013" define="PRESSURE_SCALED_TOLERANCE" type="int16u" min="0x0000" max="0x0800" writable="false" reportable="true" optional="true" default="0">ScaledTolerance</attribute>
-    <attribute side="server" code="0x0014" define="PRESSURE_SCALE" type="int8s" writable="false" optional="true" default="0">Scale</attribute>
+    
+    <attribute side="server" code="0x0000" name="MeasuredValue" define="PRESSURE_MEASURED_VALUE" type="int16s" reportable="true" isNullable="true">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0001" name="MinMeasuredValue" define="PRESSURE_MIN_MEASURED_VALUE" type="int16s" isNullable="true">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0002" name="MaxMeasuredValue" define="PRESSURE_MAX_MEASURED_VALUE" type="int16s" isNullable="true">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0003" name="Tolerance" define="PRESSURE_TOLERANCE" type="int16u" min="0x0000" max="0x0800" optional="true" default="0">
+      <optionalConform/>
+    </attribute>
+    <attribute side="server" code="0x0010" name="ScaledValue" define="PRESSURE_SCALED_VALUE" type="int16s" optional="true" default="0" isNullable="true">
+      <mandatoryConform>
+        <feature name="EXT"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0011" name="MinScaledValue" define="PRESSURE_MIN_SCALED_VALUE" type="int16s" optional="true" default="0" isNullable="true">
+      <mandatoryConform>
+        <feature name="EXT"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0012" name="MaxScaledValue" define="PRESSURE_MAX_SCALED_VALUE" type="int16s" optional="true" default="0" isNullable="true">
+      <mandatoryConform>
+        <feature name="EXT"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x0013" name="ScaledTolerance" define="PRESSURE_SCALED_TOLERANCE" type="int16u" min="0x0000" max="0x0800" optional="true" reportable="true" default="0">
+      <optionalConform>
+        <feature name="EXT"/>
+      </optionalConform>
+    </attribute>
+    <attribute side="server" code="0x0014" name="Scale" define="PRESSURE_SCALE" type="int8s" optional="true" default="0">
+      <mandatoryConform>
+        <feature name="EXT"/>
+      </mandatoryConform>
+    </attribute>
   </cluster>
 
 </configurator>

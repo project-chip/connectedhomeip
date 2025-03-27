@@ -18,9 +18,12 @@
 
 #pragma once
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/attribute-storage.h>
 
 #include <string>
+
+namespace bridge {
 
 class BridgedDevice
 {
@@ -40,11 +43,22 @@ public:
         std::string softwareVersionString;
     };
 
-    BridgedDevice(chip::NodeId nodeId);
+    struct AdminCommissioningAttributes
+    {
+        chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum commissioningWindowStatus =
+            chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen;
+        std::optional<chip::FabricIndex> openerFabricIndex = std::nullopt;
+        std::optional<chip::VendorId> openerVendorId       = std::nullopt;
+    };
+
+    BridgedDevice(chip::ScopedNodeId scopedNodeId);
     virtual ~BridgedDevice() = default;
 
     [[nodiscard]] bool IsReachable() const { return mReachable; }
     void SetReachable(bool reachable);
+    // Reachability attribute changed and requires marking attribute as dirty and sending
+    // event.
+    void ReachableChanged(bool reachable);
 
     void LogActiveChangeEvent(uint32_t promisedActiveDurationMs);
 
@@ -53,12 +67,15 @@ public:
 
     inline void SetEndpointId(chip::EndpointId id) { mEndpointId = id; };
     inline chip::EndpointId GetEndpointId() { return mEndpointId; };
-    inline chip::NodeId GetNodeId() { return mNodeId; };
+    inline chip::ScopedNodeId GetScopedNodeId() { return mScopedNodeId; };
     inline void SetParentEndpointId(chip::EndpointId id) { mParentEndpointId = id; };
     inline chip::EndpointId GetParentEndpointId() { return mParentEndpointId; };
 
     [[nodiscard]] const BridgedAttributes & GetBridgedAttributes() const { return mAttributes; }
     void SetBridgedAttributes(const BridgedAttributes & value) { mAttributes = value; }
+
+    void SetAdminCommissioningAttributes(const AdminCommissioningAttributes & aAdminCommissioningAttributes);
+    const AdminCommissioningAttributes & GetAdminCommissioningAttributes() const { return mAdminCommissioningAttributes; }
 
     /// Convenience method to set just the unique id of a bridged device as it
     /// is one of the few attributes that is not always bulk-set
@@ -68,9 +85,12 @@ protected:
     bool mReachable = false;
     bool mIsIcd     = false;
 
-    chip::NodeId mNodeId               = 0;
+    chip::ScopedNodeId mScopedNodeId;
     chip::EndpointId mEndpointId       = 0;
     chip::EndpointId mParentEndpointId = 0;
 
     BridgedAttributes mAttributes;
+    AdminCommissioningAttributes mAdminCommissioningAttributes;
 };
+
+} // namespace bridge

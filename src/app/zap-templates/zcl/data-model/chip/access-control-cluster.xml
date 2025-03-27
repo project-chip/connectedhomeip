@@ -109,33 +109,55 @@ limitations under the License.
       and enforce Access Control for the Node&apos;s endpoints and their associated
       cluster instances.</description>
 
-    <attribute side="server" code="0x0000" define="ACL" type="array" entryType="AccessControlEntryStruct" writable="true">
-      <description>ACL</description>
+    <attribute side="server" code="0x0000" name="ACL" define="ACL" type="array" entryType="AccessControlEntryStruct" writable="true">
       <access op="read" privilege="administer"/>
       <access op="write" privilege="administer"/>
+      <mandatoryConform/>
     </attribute>
 
-    <attribute side="server" code="0x0001" define="EXTENSION" type="array" entryType="AccessControlExtensionStruct" writable="true" optional="true">
-      <description>Extension</description>
+    <attribute side="server" code="0x0001" name="Extension" define="EXTENSION" type="array" entryType="AccessControlExtensionStruct" writable="true" optional="true">
       <access op="read" privilege="administer"/>
       <access op="write" privilege="administer"/>
+      <mandatoryConform>
+        <feature name="EXTS"/>
+      </mandatoryConform>
     </attribute>
 
-    <attribute side="server" code="0x0002" define="SUBJECTS_PER_ACCESS_CONTROL_ENTRY" type="int16u" min="4" default="4">SubjectsPerAccessControlEntry</attribute>
-    <attribute side="server" code="0x0003" define="TARGETS_PER_ACCESS_CONTROL_ENTRY" type="int16u" min="3" default="3">TargetsPerAccessControlEntry</attribute>
-    <attribute side="server" code="0x0004" define="ACCESS_CONTROL_ENTRIES_PER_FABRIC" type="int16u" min="4" default="4">AccessControlEntriesPerFabric</attribute>
-    <attribute code="0x0005" side="server" define="COMMISSIONING_ARL" type="array" entryType="CommissioningAccessRestrictionEntryStruct" optional="true">CommissioningARL</attribute>
-    <attribute code="0x0006" side="server" define="ARL" type="array" entryType="AccessRestrictionEntryStruct" optional="true">ARL</attribute>
-
-    <command code="0x00" source="client" name="ReviewFabricRestrictions" isFabricScoped="true" optional="true">
+    <attribute side="server" code="0x0002" name="SubjectsPerAccessControlEntry" define="SUBJECTS_PER_ACCESS_CONTROL_ENTRY" type="int16u" min="4" default="4">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0003" name="TargetsPerAccessControlEntry" define="TARGETS_PER_ACCESS_CONTROL_ENTRY" type="int16u" min="3" default="3">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0004" name="AccessControlEntriesPerFabric" define="ACCESS_CONTROL_ENTRIES_PER_FABRIC" type="int16u" min="4" default="4">
+      <mandatoryConform/>
+    </attribute>
+    <attribute code="0x0005" side="server" name="CommissioningARL" define="COMMISSIONING_ARL" type="array" entryType="CommissioningAccessRestrictionEntryStruct" optional="true">
+      <mandatoryConform>
+        <feature name="MNGD"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute code="0x0006" side="server" name="ARL" define="ARL" type="array" entryType="AccessRestrictionEntryStruct" optional="true">
+      <mandatoryConform>
+        <feature name="MNGD"/>
+      </mandatoryConform>
+    </attribute>
+    
+    <command code="0x00" source="client" name="ReviewFabricRestrictions" isFabricScoped="true" optional="true" response="ReviewFabricRestrictionsResponse">
       <description>This command signals to the service associated with the device vendor that the fabric administrator would like a review of the current restrictions on the accessing fabric.</description>
        <access op="invoke" privilege="administer"/>
       <arg id="0" name="ARL" array="true" type="CommissioningAccessRestrictionEntryStruct"/>
-     </command>
+      <mandatoryConform>
+        <feature name="MNGD"/>
+      </mandatoryConform>
+    </command>
 
     <command code="0x01" source="server" name="ReviewFabricRestrictionsResponse" optional="true" disableDefaultResponse="true">
       <description>Returns the review token for the request, which can be used to correlate with a FabricRestrictionReviewUpdate event.</description>
       <arg id="0" name="Token" type="int64u"/>
+      <mandatoryConform>
+        <feature name="MNGD"/>
+      </mandatoryConform>
     </command>
 
     <event side="server" code="0x0000" name="AccessControlEntryChanged" priority="info" isFabricSensitive="true">
@@ -145,6 +167,7 @@ limitations under the License.
       <field id="3" name="ChangeType" type="ChangeTypeEnum" min="0x00" max="0x02"/>
       <field id="4" name="LatestValue" type="AccessControlEntryStruct" isNullable="true"/>
       <access op="read" privilege="administer"/>
+      <mandatoryConform/>
     </event>
 
     <event side="server" code="0x0001" name="AccessControlExtensionChanged" priority="info" isFabricSensitive="true" optional="true">
@@ -154,19 +177,20 @@ limitations under the License.
       <field id="3" name="ChangeType" type="ChangeTypeEnum" min="0x00" max="0x02"/>
       <field id="4" name="LatestValue" type="AccessControlExtensionStruct" isNullable="true"/>
       <access op="read" privilege="administer"/>
+      <mandatoryConform>
+        <feature name="EXTS"/>
+      </mandatoryConform>
     </event>
 
-    <event code="0x0002" name="AccessRestrictionEntryChanged" priority="info" side="server" isFabricSensitive="true" optional="true">
-      <description>The cluster SHALL send AccessRestrictionEntryChanged events whenever its ARL attribute data is changed by the device maker.</description>
-      <access op="read" privilege="administer"/>
-    </event>
-
-    <event code="0x0003" name="FabricRestrictionReviewUpdate" priority="info" side="server" isFabricSensitive="true" optional="true">
+    <event side="server" code="0x0002" name="FabricRestrictionReviewUpdate" priority="info" isFabricSensitive="true" optional="true">
       <description>The cluster SHALL send FabricRestrictionReviewUpdate events to indicate completion of a fabric restriction review.</description>
       <field id="0" name="Token" type="int64u"/>
-      <field id="1" name="Instruction" type="long_char_string" isNullable="true" length="512"/>
-      <field id="2" name="RedirectURL" type="long_char_string" isNullable="true" length="256"/>
+      <field id="1" name="Instruction" type="long_char_string" optional="true" length="512"/>
+      <field id="2" name="ARLRequestFlowUrl" type="long_char_string" optional="true" length="256"/>
       <access op="read" privilege="administer"/>
+      <mandatoryConform>
+        <feature name="MNGD"/>
+      </mandatoryConform>
     </event>
   </cluster>
 </configurator>

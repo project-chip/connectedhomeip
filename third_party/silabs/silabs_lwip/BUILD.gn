@@ -41,7 +41,7 @@ lwip_target("silabs_lwip") {
 
   public_deps = [
     "${chip_root}/src/lwip:lwip_buildconfig",
-    "${efr32_sdk_build_root}:efr32_sdk",
+    "${silabs_sdk_build_root}:silabs_sdk",
   ]
 
   public_configs = [

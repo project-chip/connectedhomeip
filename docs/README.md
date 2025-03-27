@@ -2,6 +2,10 @@
 
 ## Building and Developing
 
+-   A quick start guide to building a demo application and controller is
+    available in the [Getting started](./getting_started/) guide
+-   A guide to new cluster and device type development is available in the
+    [New Cluster and Device Type Developement Guide](./cluster_and_device_type_dev/)
 -   Documentation about building from the command line can be found in
     [the build guide](guides/BUILDING.md)
 -   Documentation about running [cirque](https://github.com/openweave/cirque)
@@ -10,6 +14,11 @@
 -   Documentation about standard build & development flows using
     [Visual Studio Code](https://code.visualstudio.com/) can be found in
     [the development guide](./VSCODE_DEVELOPMENT.md)
+
+## Issue triage
+
+Project issues are triaged and maintained according to the
+[issue triage](./issue_triage.md) guide.
 
 ## Platform Guides
 

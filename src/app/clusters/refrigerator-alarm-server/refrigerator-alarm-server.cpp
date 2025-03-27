@@ -32,7 +32,6 @@ using namespace chip::app::Clusters::RefrigeratorAlarm::Attributes;
 using namespace chip::DeviceLayer;
 using chip::Protocols::InteractionModel::Status;
 
-using namespace std;
 RefrigeratorAlarmServer RefrigeratorAlarmServer::instance;
 
 RefrigeratorAlarmServer & RefrigeratorAlarmServer::Instance()

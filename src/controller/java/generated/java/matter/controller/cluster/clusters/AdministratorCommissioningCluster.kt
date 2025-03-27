@@ -120,8 +120,8 @@ class AdministratorCommissioningCluster(
     val TAG_COMMISSIONING_TIMEOUT_REQ: Int = 0
     tlvWriter.put(ContextSpecificTag(TAG_COMMISSIONING_TIMEOUT_REQ), commissioningTimeout)
 
-    val TAG_P_A_K_E_PASSCODE_VERIFIER_REQ: Int = 1
-    tlvWriter.put(ContextSpecificTag(TAG_P_A_K_E_PASSCODE_VERIFIER_REQ), PAKEPasscodeVerifier)
+    val TAG_PAKE_PASSCODE_VERIFIER_REQ: Int = 1
+    tlvWriter.put(ContextSpecificTag(TAG_PAKE_PASSCODE_VERIFIER_REQ), PAKEPasscodeVerifier)
 
     val TAG_DISCRIMINATOR_REQ: Int = 2
     tlvWriter.put(ContextSpecificTag(TAG_DISCRIMINATOR_REQ), discriminator)

@@ -867,8 +867,8 @@ class MediaPlaybackCluster(
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_TRACK_I_D_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_TRACK_I_D_REQ), trackID)
+    val TAG_TRACK_ID_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_TRACK_ID_REQ), trackID)
 
     val TAG_AUDIO_OUTPUT_INDEX_REQ: Int = 1
     tlvWriter.put(ContextSpecificTag(TAG_AUDIO_OUTPUT_INDEX_REQ), audioOutputIndex)
@@ -891,8 +891,8 @@ class MediaPlaybackCluster(
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_TRACK_I_D_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_TRACK_I_D_REQ), trackID)
+    val TAG_TRACK_ID_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_TRACK_ID_REQ), trackID)
     tlvWriter.endStructure()
 
     val request: InvokeRequest =

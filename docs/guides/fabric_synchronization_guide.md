@@ -2,7 +2,9 @@
 
 -   [Fabric Synchronization Guide](#fabric-synchronization-guide)
     -   [Fabric Sync Example Applications](#fabric-sync-example-applications)
-    -   [Run Fabric Sync Demo on RP4](#run-fabric-sync-demo-on-rp4)
+    -   [Bootstrap Fabric Sync Demo on Linux](#bootstrap-fabric-sync-demo-on-linux)
+    -   [Bootstrap Fabric Sync Demo on RP4](#bootstrap-fabric-sync-demo-on-rp4)
+    -   [Run Fabric Sync Demo](#run-fabric-sync-demo)
 
 ## Fabric Sync Example Applications
 
@@ -38,11 +40,29 @@ enables a seamless and efficient synchronization process.
 
     [Fabric-Bridge](https://github.com/project-chip/connectedhomeip/tree/master/examples/fabric-bridge-app/linux/README.md)
 
-## Run Fabric Sync Demo on RP4
+## Bootstrap Fabric Sync Demo on Linux
 
-### Setup Fabric Source
+### Start Fabric Synchronization on Ecosystem 1
 
-Connect to the Fabric Source server:
+Run the Fabric Synchronization script:
+
+```
+./examples/fabric-admin/scripts/run_fabric_sync.sh
+```
+
+### Start Fabric Synchronization on Ecosystem 2
+
+Run the Fabric Synchronization script:
+
+```
+./examples/fabric-admin/scripts/run_fabric_sync.sh
+```
+
+## Bootstrap Fabric Sync Demo on RP4
+
+### Start Fabric Synchronization on Ecosystem 1
+
+Connect to the Ecosystem 1 server:
 
 ```
 ssh ubuntu@xxx.xxx.xxx.xxx
@@ -50,15 +70,15 @@ ssh ubuntu@xxx.xxx.xxx.xxx
 
 Password: <password>
 
-Run the Fabric Source script:
+Run the Fabric Synchronization script:
 
 ```
-./run_fabric_source.sh
+./run_fabric_sync.sh
 ```
 
-### Setup Fabric Sink
+### Start Fabric Synchronization on Ecosystem 2
 
-Connect to the Fabric Sink server:
+Connect to the Ecosystem 2 server:
 
 ```
 ssh ubuntu@xxx.xxx.xxx.xxx
@@ -66,29 +86,48 @@ ssh ubuntu@xxx.xxx.xxx.xxx
 
 Password: <password>
 
-Run the Fabric Sink script:
+Run the Fabric Synchronization script:
 
 ```
-./run_fabric_sink.sh
+./run_fabric_sync.sh
 ```
+
+## Run Fabric Sync Demo
 
 ### Fabric Sync Setup
 
-Enable Fabric Auto Sync:
+Fabric Sync Setup is the process of enabling two ecosystems that support the
+Fabric Synchronization feature to commission each other's Fabric Bridge nodes
+into their respective private fabrics.
 
-In Fabric-Sync console:
+In Ecosystem 1 Fabric-Admin console:
 
-```
-fabricsync enable-auto-sync 1
-```
-
-Pair the Fabric-Source bridge to Fabric-Sync with node ID 1:
+Pair the local bridge of Ecosystem 1 with node ID 1:
 
 ```
-fabricsync add-bridge 1 <fabric-source-bridge-ip>
+fabricsync add-local-bridge 1
 ```
 
-### Pair Light Example to Fabric-Source
+Pair the Ecosystem 2 bridge to Ecosystem 1 with node ID 2:
+
+```
+fabricsync add-bridge 2 <setup-pin-code> <e2-fabric-bridge-ip> <e2-fabric-bridge-port>
+```
+
+This command will initiate the reverse commissioning process. After a few
+seconds, you should see the following message, indicating that the local bridge
+of Ecosystem 1 has successfully paired with Ecosystem 2 on Endpoint 2:
+
+```
+>>> A new device is added on Endpoint 2.
+```
+
+Note: We only need to add the local bridge to the ecosystem to trigger the
+Fabric Sync Setup process. In the example above, the Fabric Sync Setup process
+is initiated by the command 'add-bridge' from Ecosystem 1. Adding the local
+bridge on the other side is optional.
+
+### Pair Light Example to Ecosystem 2
 
 Since Fabric-Bridge also functions as a Matter server, running it alongside the
 Light Example app on the same machine would cause conflicts. Therefore, you need
@@ -111,38 +150,56 @@ KVS
 Pair the Light Example with node ID 3 using its payload number:
 
 ```
-pairing already-discovered 3 20202021 <ip> 5540
+pairing already-discovered 3 20202021 <ip> 5543
 ```
 
-After the Light Example is successfully paired in Fabric-Source, it will be
-synced to Fabric-Sink with a new assigned node ID.
+After the device is successfully added, you will observe the following message
+on Ecosystem 2 with the newly assigned Node ID:
+
+```
+>>> New device with Node ID: 0x3 has been successfully added.
+```
+
+Additionally, you should also get notified when a new device is added to
+Ecosystem 2 from the Ecosystem 1:
+
+```
+>>> A new device is added on Endpoint 3.
+```
+
+### Synchronize Light Example to Ecosystem 1
+
+After the Light Example is successfully paired in Ecosystem 2, we can start to
+synchronize the light device to Ecosystem 1 using the new assigned dynamic
+endpointid on Ecosystem 2.
+
+```
+fabricsync sync-device <endpointid>
+```
 
 Toggle the Light Example:
 
-From Fabric-Source:
+From Ecosystem 1:
 
 ```
 onoff on <node-id> 1
 onoff off <node-id> 1
 ```
 
-From Fabric-Sink: (Use the node ID assigned)
+From Ecosystem 2: (Use the node ID assigned)
 
 ```
 onoff on x 1
 onoff off x 1
 ```
 
-### Remove Light Example from Fabric-Source
+### Remove Light Example from Ecosystem
 
 Unpair the Light Example:
 
 ```
 pairing unpair <node-id>
 ```
-
-After the Light Example is successfully unpaired from Fabric-Source, it will
-also be removed from the Fabric-Sink.
 
 ### Pair Commercial Switch to Fabric-Source
 
@@ -154,32 +211,36 @@ In Fabric-Source console:
 pairing code-wifi <node-id> <ssid> <passwd> <payload>
 ```
 
-After the switch is successfully paired in Fabric-Source, it will be synced to
-Fabric-Sink with a new assigned node ID.
+### Synchronize Switch to Ecosystem 1
+
+After the switch is successfully paired in Ecosystem 2, we can start to
+synchronize it to Ecosystem 1 using the new assigned dynamic endpointid on
+Ecosystem 2..
+
+```
+fabricsync sync-device <endpointid>
+```
 
 Toggle the switch:
 
-From Fabric-Source:
+From Ecosystem 1:
 
 ```
 onoff on <node-id> 1
 onoff off <node-id> 1
 ```
 
-From Fabric-Sink: (Use the node ID assigned)
+From Ecosystem 2: (Use the node ID assigned)
 
 ```
 onoff on <node-id> 1
 onoff off <node-id> 1
 ```
 
-### Remove Switch from Fabric-Source
+### Remove Switch from Ecosystem
 
 Unpair the switch:
 
 ```
 pairing unpair <node-id>
 ```
-
-After the switch is successfully unpaired from Fabric-Source, it will also be
-removed from the Fabric-Sink.

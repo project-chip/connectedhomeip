@@ -52,8 +52,8 @@ extern "C" {
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 #endif
 
-#include <ProvisionChannel.h>
-#include <ProvisionManager.h>
+#include <headers/ProvisionChannel.h>
+#include <headers/ProvisionManager.h>
 
 using namespace ::chip;
 using namespace ::chip::Ble;
@@ -94,14 +94,14 @@ namespace {
 #define BLE_CONFIG_RF_PATH_GAIN_RX (0)
 
 // Default Connection  parameters
-#define BLE_CONFIG_MIN_INTERVAL (16) // Time = Value x 1.25 ms = 30ms
+#define BLE_CONFIG_MIN_INTERVAL (16) // Time = Value x 1.25 ms = 20ms
 #define BLE_CONFIG_MAX_INTERVAL (80) // Time = Value x 1.25 ms = 100ms
 #define BLE_CONFIG_LATENCY (0)
 #define BLE_CONFIG_TIMEOUT (100)          // Time = Value x 10 ms = 1s
 #define BLE_CONFIG_MIN_CE_LENGTH (0)      // Leave to min value
 #define BLE_CONFIG_MAX_CE_LENGTH (0xFFFF) // Leave to max value
 
-TimerHandle_t sbleAdvTimeoutTimer; // FreeRTOS sw timer.
+osTimerId_t sbleAdvTimeoutTimer; // SW timer
 
 const uint8_t UUID_CHIPoBLEService[]      = { 0xFB, 0x34, 0x9B, 0x5F, 0x80, 0x00, 0x00, 0x80,
                                               0x00, 0x10, 0x00, 0x00, 0xF6, 0xFF, 0x00, 0x00 };
@@ -122,13 +122,8 @@ CHIP_ERROR BLEManagerImpl::_Init()
     memset(mIndConfId, kUnusedIndex, sizeof(mIndConfId));
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
 
-    // Create FreeRTOS sw timer for BLE timeouts and interval change.
-    sbleAdvTimeoutTimer = xTimerCreate("BleAdvTimer",       // Just a text name, not used by the RTOS kernel
-                                       pdMS_TO_TICKS(1),    // == default timer period
-                                       false,               // no timer reload (==one-shot)
-                                       (void *) this,       // init timer id = ble obj context
-                                       BleAdvTimeoutHandler // timer callback handler
-    );
+    // SW timer for BLE timeouts and interval change.
+    sbleAdvTimeoutTimer = osTimerNew(BleAdvTimeoutHandler, osTimerOnce, NULL, NULL);
 
     mFlags.ClearAll().Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART);
     mFlags.Set(Flags::kFastAdvertisingEnabled, true);
@@ -348,7 +343,7 @@ CHIP_ERROR BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const C
 
 void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
 {
-    // Nothing to do
+    CloseConnection(conId);
 }
 
 CHIP_ERROR BLEManagerImpl::MapBLEError(int bleErr)
@@ -375,7 +370,7 @@ void BLEManagerImpl::DriveBLEState(void)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Check if BLE stack is initialized
-    VerifyOrExit(mFlags.Has(Flags::kEFRBLEStackInitialized), /* */);
+    VerifyOrExit(mFlags.Has(Flags::kSiLabsBLEStackInitialize), /* */);
 
     // Start advertising if needed...
     if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && mFlags.Has(Flags::kAdvertisingEnabled) &&
@@ -454,7 +449,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     advData[index++] = ShortUUID_CHIPoBLEService[0];                                            // AD value
     advData[index++] = ShortUUID_CHIPoBLEService[1];
 
-#if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
+#if CHIP_DEVICE_CONFIG_EXT_ADVERTISING
     // Check for extended advertisement interval and redact VID/PID if past the initial period.
     if (mFlags.Has(Flags::kExtAdvertisingEnabled))
     {
@@ -558,7 +553,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     }
     else
     {
-#if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
+#if CHIP_DEVICE_CONFIG_EXT_ADVERTISING
         if (!mFlags.Has(Flags::kExtAdvertisingEnabled))
         {
             interval_min = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MIN;
@@ -662,7 +657,7 @@ void BLEManagerImpl::UpdateMtu(volatile sl_bt_msg_t * evt)
 
 void BLEManagerImpl::HandleBootEvent(void)
 {
-    mFlags.Set(Flags::kEFRBLEStackInitialized);
+    mFlags.Set(Flags::kSiLabsBLEStackInitialize);
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
 }
 
@@ -675,6 +670,26 @@ void BLEManagerImpl::HandleConnectEvent(volatile sl_bt_msg_t * evt)
     ChipLogProgress(DeviceLayer, "Connect Event for handle : %d", connHandle);
 
     AddConnection(connHandle, bondingHandle);
+
+    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+}
+
+void BLEManagerImpl::HandleConnectParams(volatile sl_bt_msg_t * evt)
+{
+    sl_bt_evt_connection_parameters_t * con_param_evt = (sl_bt_evt_connection_parameters_t *) &(evt->data);
+
+    uint16_t desiredTimeout = con_param_evt->timeout < BLE_CONFIG_TIMEOUT ? BLE_CONFIG_TIMEOUT : con_param_evt->timeout;
+
+    // For better stability, renegotiate the connection parameters if the received ones from the central are outside
+    // of our defined constraints
+    if (desiredTimeout != con_param_evt->timeout || con_param_evt->interval < BLE_CONFIG_MIN_INTERVAL ||
+        con_param_evt->interval > BLE_CONFIG_MAX_INTERVAL)
+    {
+        ChipLogProgress(DeviceLayer, "Renegotiate BLE connection parameters to minInterval:%d, maxInterval:%d, timeout:%d",
+                        BLE_CONFIG_MIN_INTERVAL, BLE_CONFIG_MAX_INTERVAL, desiredTimeout);
+        sl_bt_connection_set_parameters(con_param_evt->connection, BLE_CONFIG_MIN_INTERVAL, BLE_CONFIG_MAX_INTERVAL,
+                                        BLE_CONFIG_LATENCY, desiredTimeout, BLE_CONFIG_MIN_CE_LENGTH, BLE_CONFIG_MAX_CE_LENGTH);
+    }
 
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
 }
@@ -991,19 +1006,19 @@ uint8_t BLEManagerImpl::GetTimerHandle(uint8_t connectionHandle, bool allocate)
     return freeIndex;
 }
 
-void BLEManagerImpl::BleAdvTimeoutHandler(TimerHandle_t xTimer)
+void BLEManagerImpl::BleAdvTimeoutHandler(void * arg)
 {
     if (BLEMgrImpl().mFlags.Has(Flags::kFastAdvertisingEnabled))
     {
         ChipLogDetail(DeviceLayer, "bleAdv Timeout : Start slow advertisement");
         BLEMgrImpl().mFlags.Set(Flags::kAdvertising);
         BLEMgr().SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
-#if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
+#if CHIP_DEVICE_CONFIG_EXT_ADVERTISING
         BLEMgrImpl().mFlags.Clear(Flags::kExtAdvertisingEnabled);
         BLEMgrImpl().StartBleAdvTimeoutTimer(CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_CHANGE_TIME_MS);
 #endif
     }
-#if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
+#if CHIP_DEVICE_CONFIG_EXT_ADVERTISING
     else
     {
         ChipLogDetail(DeviceLayer, "bleAdv Timeout : Start extended advertisement");
@@ -1016,7 +1031,7 @@ void BLEManagerImpl::BleAdvTimeoutHandler(TimerHandle_t xTimer)
 
 void BLEManagerImpl::CancelBleAdvTimeoutTimer(void)
 {
-    if (xTimerStop(sbleAdvTimeoutTimer, pdMS_TO_TICKS(0)) == pdFAIL)
+    if (osTimerStop(sbleAdvTimeoutTimer) != osOK)
     {
         ChipLogError(DeviceLayer, "Failed to stop BledAdv timeout timer");
     }
@@ -1024,15 +1039,7 @@ void BLEManagerImpl::CancelBleAdvTimeoutTimer(void)
 
 void BLEManagerImpl::StartBleAdvTimeoutTimer(uint32_t aTimeoutInMs)
 {
-    if (xTimerIsTimerActive(sbleAdvTimeoutTimer))
-    {
-        CancelBleAdvTimeoutTimer();
-    }
-
-    // timer is not active, change its period to required value (== restart).
-    // FreeRTOS- Block for a maximum of 100 ticks if the change period command
-    // cannot immediately be sent to the timer command queue.
-    if (xTimerChangePeriod(sbleAdvTimeoutTimer, pdMS_TO_TICKS(aTimeoutInMs), pdMS_TO_TICKS(100)) != pdPASS)
+    if (osTimerStart(sbleAdvTimeoutTimer, pdMS_TO_TICKS(aTimeoutInMs)) != osOK)
     {
         ChipLogError(DeviceLayer, "Failed to start BledAdv timeout timer");
     }
@@ -1074,11 +1081,20 @@ extern "C" void sl_bt_on_event(sl_bt_msg_t * evt)
     }
     break;
     case sl_bt_evt_connection_parameters_id: {
-        // ChipLogProgress(DeviceLayer, "Connection parameter ID received");
+        ChipLogProgress(DeviceLayer, "Connection parameter ID received - i:%d, l:%d, t:%d, sm:%d",
+                        evt->data.evt_connection_parameters.interval, evt->data.evt_connection_parameters.latency,
+                        evt->data.evt_connection_parameters.timeout, evt->data.evt_connection_parameters.security_mode);
+        chip::DeviceLayer::Internal::BLEMgrImpl().HandleConnectParams(evt);
     }
     break;
     case sl_bt_evt_connection_phy_status_id: {
-        // ChipLogProgress(DeviceLayer, "PHY update procedure is completed");
+        ChipLogProgress(DeviceLayer, "Connection phy status ID received - phy:%d", evt->data.evt_connection_phy_status.phy);
+    }
+    break;
+    case sl_bt_evt_connection_data_length_id: {
+        ChipLogProgress(DeviceLayer, "Connection data length ID received - txL:%d, txT:%d, rxL:%d, rxL:%d",
+                        evt->data.evt_connection_data_length.tx_data_len, evt->data.evt_connection_data_length.tx_time_us,
+                        evt->data.evt_connection_data_length.rx_data_len, evt->data.evt_connection_data_length.rx_time_us);
     }
     break;
     case sl_bt_evt_connection_closed_id: {

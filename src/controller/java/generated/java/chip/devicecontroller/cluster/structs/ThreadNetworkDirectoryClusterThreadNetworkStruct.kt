@@ -40,7 +40,7 @@ class ThreadNetworkDirectoryClusterThreadNetworkStruct(
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_EXTENDED_PAN_I_D), extendedPanID)
+      put(ContextSpecificTag(TAG_EXTENDED_PAN_ID), extendedPanID)
       put(ContextSpecificTag(TAG_NETWORK_NAME), networkName)
       put(ContextSpecificTag(TAG_CHANNEL), channel)
       put(ContextSpecificTag(TAG_ACTIVE_TIMESTAMP), activeTimestamp)
@@ -49,7 +49,7 @@ class ThreadNetworkDirectoryClusterThreadNetworkStruct(
   }
 
   companion object {
-    private const val TAG_EXTENDED_PAN_I_D = 0
+    private const val TAG_EXTENDED_PAN_ID = 0
     private const val TAG_NETWORK_NAME = 1
     private const val TAG_CHANNEL = 2
     private const val TAG_ACTIVE_TIMESTAMP = 3
@@ -59,7 +59,7 @@ class ThreadNetworkDirectoryClusterThreadNetworkStruct(
       tlvReader: TlvReader,
     ): ThreadNetworkDirectoryClusterThreadNetworkStruct {
       tlvReader.enterStructure(tlvTag)
-      val extendedPanID = tlvReader.getByteArray(ContextSpecificTag(TAG_EXTENDED_PAN_I_D))
+      val extendedPanID = tlvReader.getByteArray(ContextSpecificTag(TAG_EXTENDED_PAN_ID))
       val networkName = tlvReader.getString(ContextSpecificTag(TAG_NETWORK_NAME))
       val channel = tlvReader.getUInt(ContextSpecificTag(TAG_CHANNEL))
       val activeTimestamp = tlvReader.getULong(ContextSpecificTag(TAG_ACTIVE_TIMESTAMP))

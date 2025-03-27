@@ -50,6 +50,8 @@ public:
 
     CHIP_ERROR GetNetworkInterfaces(NetworkInterface ** netifpp) override;
     void ReleaseNetworkInterfaces(NetworkInterface * netifp) override;
+    CHIP_ERROR GetThreadMetrics(ThreadMetrics ** threadMetricsOut) override;
+    void ReleaseThreadMetrics(ThreadMetrics * threadMetrics) override;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     CHIP_ERROR GetWiFiBssId(MutableByteSpan & BssId) override;

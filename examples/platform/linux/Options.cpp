@@ -23,9 +23,11 @@
 
 #include "Options.h"
 
-#include <app/server/OnboardingCodesUtil.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 
 #include <crypto/CHIPCryptoPAL.h>
+#include <json/json.h>
+#include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/Base64.h>
 #include <lib/support/BytesToHex.h>
@@ -33,6 +35,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 
+#include <app/tests/suites/credentials/TestHarnessDACProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
 #if ENABLE_TRACING
@@ -45,8 +48,17 @@
 #include <system/SystemFaultInjection.h>
 #endif
 
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+#include <messaging/ReliableMessageProtocolConfig.h>
+#endif
+
 using namespace chip;
 using namespace chip::ArgParser;
+using namespace chip::Platform;
+
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+using namespace chip::Access;
+#endif
 
 namespace {
 LinuxDeviceOptions gDeviceOptions;
@@ -82,6 +94,10 @@ enum
     kDeviceOption_TraceFile,
     kDeviceOption_TraceLog,
     kDeviceOption_TraceDecode,
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+    kDeviceOption_CommissioningArlEntries,
+    kDeviceOption_ArlEntries,
+#endif
     kOptionCSRResponseCSRIncorrectType,
     kOptionCSRResponseCSRNonceIncorrectType,
     kOptionCSRResponseCSRNonceTooLong,
@@ -102,6 +118,9 @@ enum
     kDeviceOption_WiFiSupports5g,
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     kDeviceOption_SubscriptionResumptionRetryIntervalSec,
+    kDeviceOption_IdleRetransmitTimeout,
+    kDeviceOption_ActiveRetransmitTimeout,
+    kDeviceOption_ActiveThresholdTime,
 #endif
 #if CHIP_WITH_NLFAULTINJECTION
     kDeviceOption_FaultInjection,
@@ -109,6 +128,15 @@ enum
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     kDeviceOption_WiFi_PAF,
 #endif
+    kDeviceOption_DacProvider,
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+    kDeviceOption_TermsAndConditions_Version,
+    kDeviceOption_TermsAndConditions_Required,
+#endif
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    kDeviceOption_icdActiveModeDurationMs,
+    kDeviceOption_icdIdleModeDuration,
+#endif // CHIP_ENABLE_ICD_SERVER
 };
 
 constexpr unsigned kAppUsageLength = 64;
@@ -123,7 +151,7 @@ OptionDef sDeviceOptionDefs[] = {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     { "wifipaf", kArgumentRequired, kDeviceOption_WiFi_PAF },
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #if CHIP_ENABLE_OPENTHREAD
     { "thread", kNoArgument, kDeviceOption_Thread },
 #endif // CHIP_ENABLE_OPENTHREAD
@@ -154,6 +182,10 @@ OptionDef sDeviceOptionDefs[] = {
     { "trace_log", kArgumentRequired, kDeviceOption_TraceLog },
     { "trace_decode", kArgumentRequired, kDeviceOption_TraceDecode },
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+    { "commissioning-arl-entries", kArgumentRequired, kDeviceOption_CommissioningArlEntries },
+    { "arl-entries", kArgumentRequired, kDeviceOption_ArlEntries },
+#endif // CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
     { "cert_error_csr_incorrect_type", kNoArgument, kOptionCSRResponseCSRIncorrectType },
     { "cert_error_csr_existing_keypair", kNoArgument, kOptionCSRResponseCSRExistingKeyPair },
     { "cert_error_csr_nonce_incorrect_type", kNoArgument, kOptionCSRResponseCSRNonceIncorrectType },
@@ -173,10 +205,22 @@ OptionDef sDeviceOptionDefs[] = {
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     { "subscription-capacity", kArgumentRequired, kDeviceOption_SubscriptionCapacity },
     { "subscription-resumption-retry-interval", kArgumentRequired, kDeviceOption_SubscriptionResumptionRetryIntervalSec },
+    { "idle-retransmit-timeout", kArgumentRequired, kDeviceOption_IdleRetransmitTimeout },
+    { "active-retransmit-timeout", kArgumentRequired, kDeviceOption_ActiveRetransmitTimeout },
+    { "active-threshold-time", kArgumentRequired, kDeviceOption_ActiveThresholdTime },
 #endif
 #if CHIP_WITH_NLFAULTINJECTION
     { "faults", kArgumentRequired, kDeviceOption_FaultInjection },
 #endif
+    { "dac_provider", kArgumentRequired, kDeviceOption_DacProvider },
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+    { "tc-version", kArgumentRequired, kDeviceOption_TermsAndConditions_Version },
+    { "tc-required", kArgumentRequired, kDeviceOption_TermsAndConditions_Required },
+#endif
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    { "icdActiveModeDurationMs", kArgumentRequired, kDeviceOption_icdActiveModeDurationMs },
+    { "icdIdleModeDuration", kArgumentRequired, kDeviceOption_icdIdleModeDuration },
+#endif // CHIP_ENABLE_ICD_SERVER
     {}
 };
 
@@ -280,6 +324,14 @@ const char * sDeviceOptionHelp =
     "  --trace_decode <1/0>\n"
     "       A value of 1 enables traces decoding, 0 disables this (default 0).\n"
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+    "  --commissioning-arl-entries <CommissioningARL JSON>\n"
+    "       Enable ACL cluster access restrictions used during commissioning with the provided JSON. Example:\n"
+    "       \"[{\\\"endpoint\\\": 1,\\\"cluster\\\": 1105,\\\"restrictions\\\": [{\\\"type\\\": 0,\\\"id\\\": 0}]}]\"\n"
+    "  --arl-entries <ARL JSON>\n"
+    "       Enable ACL cluster access restrictions applied to fabric index 1 with the provided JSON. Example:\n"
+    "       \"[{\\\"endpoint\\\": 1,\\\"cluster\\\": 1105,\\\"restrictions\\\": [{\\\"type\\\": 0,\\\"id\\\": 0}]}]\"\n"
+#endif // CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
     "  --cert_error_csr_incorrect_type\n"
     "       Configure the CSRResponse to be built with an invalid CSR type.\n"
     "  --cert_error_csr_existing_keypair\n"
@@ -313,12 +365,78 @@ const char * sDeviceOptionHelp =
     "       Max number of subscriptions the device will allow\n"
     "  --subscription-resumption-retry-interval\n"
     "       subscription timeout resumption retry interval in seconds\n"
+    "  --idle-retransmit-timeout <timeout>\n"
+    "      Sets the MRP idle retry interval (in milliseconds).\n"
+    "      This interval is used by the peer to calculate the retransmission timeout when the current device is considered idle.\n"
+    "\n"
+    "  --active-retransmit-timeout <timeout>\n"
+    "      Sets the MRP active retry interval (in milliseconds).\n"
+    "      This interval is used by the peer to calculate the retransmission timeout when the current device is considered "
+    "active.\n"
+    "\n"
+    "  --active-threshold-time <time>\n"
+    "      Sets the MRP active threshold (in milliseconds).\n"
+    "      Specifies the time after which the device transitions from active to idle.\n"
+    "\n"
+#endif
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+    "  --tc-version\n"
+    "       Sets the minimum required version of the Terms and Conditions\n"
+    "\n"
+    "  --tc-required\n"
+    "       Sets the required acknowledgements for the Terms and Conditions as a 16-bit enumeration.\n"
+    "       Each bit represents an ordinal corresponding to a specific acknowledgment requirement.\n"
+    "\n"
 #endif
 #if CHIP_WITH_NLFAULTINJECTION
     "  --faults <fault-string,...>\n"
     "       Inject specified fault(s) at runtime.\n"
 #endif
+    "  --dac_provider <filepath>\n"
+    "       A json file with data used by the example dac provider to validate device attestation procedure.\n"
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    "  --icdActiveModeDurationMs <icdActiveModeDurationMs>\n"
+    "       Sets the ICD active mode duration (in milliseconds). (Default: 300) \n"
+    "       This defines the how long the the server typically will stay in active mode after \n"
+    "       initial transition out of idle mode.\n"
+    "  --icdIdleModeDuration <icdIdleModeDuration>\n"
+    "       Sets the ICD idle mode durations (in seconds). (Default: 300)\n"
+    "       This defines the how long the ICD server can stay in idle mode.\n"
+#endif
     "\n";
+
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+bool ParseAccessRestrictionEntriesFromJson(const char * jsonString, std::vector<AccessRestrictionProvider::Entry> & entries)
+{
+    Json::Value root;
+    Json::Reader reader;
+    VerifyOrReturnValue(reader.parse(jsonString, root), false);
+
+    for (Json::Value::const_iterator eIt = root.begin(); eIt != root.end(); eIt++)
+    {
+        AccessRestrictionProvider::Entry entry;
+
+        entry.endpointNumber = static_cast<EndpointId>((*eIt)["endpoint"].asUInt());
+        entry.clusterId      = static_cast<ClusterId>((*eIt)["cluster"].asUInt());
+
+        Json::Value restrictions = (*eIt)["restrictions"];
+        for (Json::Value::const_iterator rIt = restrictions.begin(); rIt != restrictions.end(); rIt++)
+        {
+            AccessRestrictionProvider::Restriction restriction;
+            restriction.restrictionType = static_cast<AccessRestrictionProvider::Type>((*rIt)["type"].asUInt());
+            if ((*rIt).isMember("id"))
+            {
+                restriction.id.SetValue((*rIt)["id"].asUInt());
+            }
+            entry.restrictions.push_back(restriction);
+        }
+
+        entries.push_back(entry);
+    }
+
+    return true;
+}
+#endif // CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
 
 bool Base64ArgToVector(const char * arg, size_t maxSize, std::vector<uint8_t> & outVector)
 {
@@ -529,6 +647,28 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         break;
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+    // TODO(#35189): change to use a path to JSON files instead
+    case kDeviceOption_CommissioningArlEntries: {
+        std::vector<AccessRestrictionProvider::Entry> entries;
+        retval = ParseAccessRestrictionEntriesFromJson(aValue, entries);
+        if (retval)
+        {
+            LinuxDeviceOptions::GetInstance().commissioningArlEntries.SetValue(std::move(entries));
+        }
+    }
+    break;
+    case kDeviceOption_ArlEntries: {
+        std::vector<AccessRestrictionProvider::Entry> entries;
+        retval = ParseAccessRestrictionEntriesFromJson(aValue, entries);
+        if (retval)
+        {
+            LinuxDeviceOptions::GetInstance().arlEntries.SetValue(std::move(entries));
+        }
+    }
+    break;
+#endif // CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+
     case kOptionCSRResponseCSRIncorrectType:
         LinuxDeviceOptions::GetInstance().mCSRResponseOptions.csrIncorrectType = true;
         break;
@@ -586,6 +726,32 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
     case kDeviceOption_SubscriptionResumptionRetryIntervalSec:
         LinuxDeviceOptions::GetInstance().subscriptionResumptionRetryIntervalSec = static_cast<int32_t>(atoi(aValue));
         break;
+    case kDeviceOption_IdleRetransmitTimeout: {
+        auto mrpConfig            = GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig());
+        auto idleRetransTimeout   = System::Clock::Milliseconds32(static_cast<uint32_t>(strtoul(aValue, nullptr, 0)));
+        auto activeRetransTimeout = mrpConfig.mActiveRetransTimeout;
+        auto activeThresholdTime  = mrpConfig.mActiveThresholdTime;
+        OverrideLocalMRPConfig(idleRetransTimeout, activeRetransTimeout, activeThresholdTime);
+        break;
+    }
+
+    case kDeviceOption_ActiveRetransmitTimeout: {
+        auto mrpConfig            = GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig());
+        auto idleRetransTimeout   = mrpConfig.mIdleRetransTimeout;
+        auto activeRetransTimeout = System::Clock::Milliseconds32(static_cast<uint32_t>(strtoul(aValue, nullptr, 0)));
+        auto activeThresholdTime  = mrpConfig.mActiveThresholdTime;
+        OverrideLocalMRPConfig(idleRetransTimeout, activeRetransTimeout, activeThresholdTime);
+        break;
+    }
+
+    case kDeviceOption_ActiveThresholdTime: {
+        auto mrpConfig            = GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig());
+        auto idleRetransTimeout   = mrpConfig.mIdleRetransTimeout;
+        auto activeRetransTimeout = mrpConfig.mActiveRetransTimeout;
+        auto activeThresholdTime  = System::Clock::Milliseconds16(static_cast<uint16_t>(strtoul(aValue, nullptr, 0)));
+        OverrideLocalMRPConfig(idleRetransTimeout, activeRetransTimeout, activeThresholdTime);
+        break;
+    }
 #endif
 #if CHIP_WITH_NLFAULTINJECTION
     case kDeviceOption_FaultInjection: {
@@ -593,7 +759,7 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
                                                                          Inet::FaultInjection::GetManager,
                                                                          System::FaultInjection::GetManager };
         Platform::ScopedMemoryString mutableArg(aValue, strlen(aValue)); // ParseFaultInjectionStr may mutate
-        if (!nl::FaultInjection::ParseFaultInjectionStr(mutableArg.Get(), faultManagerFns, ArraySize(faultManagerFns)))
+        if (!nl::FaultInjection::ParseFaultInjectionStr(mutableArg.Get(), faultManagerFns, MATTER_ARRAY_SIZE(faultManagerFns)))
         {
             PrintArgError("%s: Invalid fault injection specification\n", aProgram);
             retval = false;
@@ -605,6 +771,54 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
     case kDeviceOption_WiFi_PAF: {
         LinuxDeviceOptions::GetInstance().mWiFiPAF        = true;
         LinuxDeviceOptions::GetInstance().mWiFiPAFExtCmds = aValue;
+        break;
+    }
+#endif
+    case kDeviceOption_DacProvider: {
+        LinuxDeviceOptions::GetInstance().dacProviderFile.SetValue(aValue);
+        static chip::Credentials::Examples::TestHarnessDACProvider testDacProvider;
+        testDacProvider.Init(gDeviceOptions.dacProviderFile.Value().c_str());
+
+        LinuxDeviceOptions::GetInstance().dacProvider = &testDacProvider;
+        break;
+    }
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+    case kDeviceOption_TermsAndConditions_Version: {
+        LinuxDeviceOptions::GetInstance().tcVersion.SetValue(static_cast<uint16_t>(atoi(aValue)));
+        break;
+    }
+
+    case kDeviceOption_TermsAndConditions_Required: {
+        LinuxDeviceOptions::GetInstance().tcRequired.SetValue(static_cast<uint16_t>(atoi(aValue)));
+        break;
+    }
+#endif
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    case kDeviceOption_icdActiveModeDurationMs: {
+        uint32_t value = static_cast<uint32_t>(strtoul(aValue, nullptr, 0));
+        if (value < 1)
+        {
+            PrintArgError("%s: invalid value specified for icdActiveModeDurationMs: %s\n", aProgram, aValue);
+            retval = false;
+        }
+        else
+        {
+            LinuxDeviceOptions::GetInstance().icdActiveModeDurationMs.SetValue(chip::System::Clock::Milliseconds32(value));
+        }
+        break;
+    }
+    case kDeviceOption_icdIdleModeDuration: {
+        uint32_t value = static_cast<uint32_t>(strtoul(aValue, nullptr, 0));
+        if ((value < 1) || (value > 86400))
+        {
+            PrintArgError("%s: invalid value specified for icdIdleModeDuration: %s\n", aProgram, aValue);
+            retval = false;
+        }
+        else
+        {
+            // Covert from seconds to mini seconds
+            LinuxDeviceOptions::GetInstance().icdIdleModeDurationMs.SetValue(chip::System::Clock::Milliseconds32(value * 1000));
+        }
         break;
     }
 #endif
@@ -651,5 +865,6 @@ LinuxDeviceOptions & LinuxDeviceOptions::GetInstance()
     {
         gDeviceOptions.dacProvider = chip::Credentials::Examples::GetExampleDACProvider();
     }
+
     return gDeviceOptions;
 }

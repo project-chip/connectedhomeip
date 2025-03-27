@@ -167,7 +167,7 @@ TEST_F(TestOTAImageHeader, TestSmallBlocks)
 
         for (size_t offset = 0; offset < kImageSize && error == CHIP_ERROR_BUFFER_TOO_SMALL; offset += blockSize)
         {
-            ByteSpan block(&kOtaImage[offset], chip::min(kImageSize - offset, blockSize));
+            ByteSpan block(&kOtaImage[offset], std::min(kImageSize - offset, blockSize));
             error = parser.AccumulateAndDecode(block, header);
         }
 

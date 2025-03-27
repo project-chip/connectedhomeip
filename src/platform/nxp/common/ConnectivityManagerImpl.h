@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include <lib/dnssd/Constants.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/GenericConnectivityManagerImpl.h>
 #include <platform/internal/GenericConnectivityManagerImpl_UDP.h>
@@ -93,6 +94,7 @@ public:
 #if CHIP_ENABLE_OPENTHREAD
     Inet::InterfaceId GetExternalInterface();
     Inet::InterfaceId GetThreadInterface();
+    const char * GetHostName() { return sInstance.mHostname; }
 #endif
 
 #endif
@@ -136,16 +138,21 @@ private:
     bool mBorderRouterInit = false;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
+    bool mWifiManagerInit = false;
+
     enum WiFiEventGroup{
         kWiFiEventGroup_WiFiStationModeBit = (1 << 0),
     };
 
     BitFlags<GenericConnectivityManagerImpl_WiFi::ConnectivityFlags> mFlags;
     static netif_ext_callback_t sNetifCallback;
+    static constexpr uint32_t kWlanInitWaitMs = CHIP_DEVICE_CONFIG_WIFI_STATION_RECONNECT_INTERVAL;
 
 #if CHIP_ENABLE_OPENTHREAD
     Inet::InterfaceId mThreadNetIf;
     Inet::InterfaceId mExternalNetIf;
+
+    char mHostname[chip::Dnssd::kHostNameMaxLength + 1] = "";
 #endif
 
     static int _WlanEventCallback(enum wlan_event_reason event, void * data);
@@ -155,9 +162,12 @@ private:
     void OnStationDisconnected(void);
     void UpdateInternetConnectivityState(void);
 #if CHIP_ENABLE_OPENTHREAD
-    void StartBrServices(void);
+    void BrHandleStateChange();
+    static void LockThreadStack();
+    static void UnlockThreadStack();
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_THREAD */
-#endif /* CHIP_DEVICE_CONFIG_ENABLE_WPA */
+#endif
+    /* CHIP_DEVICE_CONFIG_ENABLE_WPA */
 };
 
 inline bool ConnectivityManagerImpl::_HaveIPv4InternetConnectivity(void)

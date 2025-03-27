@@ -66,6 +66,7 @@ qpg_executable("lighting_app") {
     "${chip_root}/examples/lighting-app/lighting-common:color-format",
     "${chip_root}/examples/lighting-app/qpg/zap/",
     "${chip_root}/examples/providers:device_info_provider",
+    "${chip_root}/src/app/util/persistence:deferred",
     "${chip_root}/src/lib",
     "${chip_root}/src/platform/logging:default",
     "${chip_root}/src/setup_payload",

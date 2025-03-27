@@ -63,6 +63,7 @@ using namespace chip::app::Clusters;
 namespace {
 
 const int kNodeLabelSize = 32;
+const int kUniqueIdSize  = 32;
 // Current ZCL implementation of Struct uses a max-size array of 254 bytes
 const int kDescriptorAttributeArraySize = 254;
 
@@ -126,6 +127,7 @@ DECLARE_DYNAMIC_ATTRIBUTE(Descriptor::Attributes::DeviceTypeList::Id, ARRAY, kDe
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(bridgedDeviceBasicAttrs)
 DECLARE_DYNAMIC_ATTRIBUTE(BridgedDeviceBasicInformation::Attributes::NodeLabel::Id, CHAR_STRING, kNodeLabelSize, 0), /* NodeLabel */
     DECLARE_DYNAMIC_ATTRIBUTE(BridgedDeviceBasicInformation::Attributes::Reachable::Id, BOOLEAN, 1, 0),              /* Reachable */
+    DECLARE_DYNAMIC_ATTRIBUTE(BridgedDeviceBasicInformation::Attributes::UniqueID::Id, CHAR_STRING, kUniqueIdSize, 0),
     DECLARE_DYNAMIC_ATTRIBUTE(BridgedDeviceBasicInformation::Attributes::FeatureMap::Id, BITMAP32, 4, 0), /* feature map */
     DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
@@ -150,8 +152,8 @@ DECLARE_DYNAMIC_CLUSTER(OnOff::Id, onOffAttrs, ZAP_CLUSTER_MASK(SERVER), onOffIn
 
 // Declare Bridged Light endpoint
 DECLARE_DYNAMIC_ENDPOINT(bridgedLightEndpoint, bridgedLightClusters);
-DataVersion gLight1DataVersions[ArraySize(bridgedLightClusters)];
-DataVersion gLight2DataVersions[ArraySize(bridgedLightClusters)];
+DataVersion gLight1DataVersions[MATTER_ARRAY_SIZE(bridgedLightClusters)];
+DataVersion gLight2DataVersions[MATTER_ARRAY_SIZE(bridgedLightClusters)];
 
 DeviceOnOff Light1("Light 1", "Office");
 DeviceOnOff Light2("Light 2", "Office");
@@ -160,10 +162,10 @@ DeviceTempSensor TempSensor1("TempSensor 1", "Office", minMeasuredValue, maxMeas
 DeviceTempSensor TempSensor2("TempSensor 2", "Office", minMeasuredValue, maxMeasuredValue, initialMeasuredValue);
 
 // Declare Bridged endpoints used for Action clusters
-DataVersion gActionLight1DataVersions[ArraySize(bridgedLightClusters)];
-DataVersion gActionLight2DataVersions[ArraySize(bridgedLightClusters)];
-DataVersion gActionLight3DataVersions[ArraySize(bridgedLightClusters)];
-DataVersion gActionLight4DataVersions[ArraySize(bridgedLightClusters)];
+DataVersion gActionLight1DataVersions[MATTER_ARRAY_SIZE(bridgedLightClusters)];
+DataVersion gActionLight2DataVersions[MATTER_ARRAY_SIZE(bridgedLightClusters)];
+DataVersion gActionLight3DataVersions[MATTER_ARRAY_SIZE(bridgedLightClusters)];
+DataVersion gActionLight4DataVersions[MATTER_ARRAY_SIZE(bridgedLightClusters)];
 
 DeviceOnOff ActionLight1("Action Light 1", "Room 1");
 DeviceOnOff ActionLight2("Action Light 2", "Room 1");
@@ -207,8 +209,8 @@ DECLARE_DYNAMIC_CLUSTER(TemperatureMeasurement::Id, tempSensorAttrs, ZAP_CLUSTER
 
 // Declare Bridged Light endpoint
 DECLARE_DYNAMIC_ENDPOINT(bridgedTempSensorEndpoint, bridgedTempSensorClusters);
-DataVersion gTempSensor1DataVersions[ArraySize(bridgedTempSensorClusters)];
-DataVersion gTempSensor2DataVersions[ArraySize(bridgedTempSensorClusters)];
+DataVersion gTempSensor1DataVersions[MATTER_ARRAY_SIZE(bridgedTempSensorClusters)];
+DataVersion gTempSensor2DataVersions[MATTER_ARRAY_SIZE(bridgedTempSensorClusters)];
 
 // ---------------------------------------------------------------------------
 //
@@ -235,9 +237,9 @@ DECLARE_DYNAMIC_CLUSTER(Descriptor::Id, descriptorAttrs, ZAP_CLUSTER_MASK(SERVER
     DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
 DECLARE_DYNAMIC_ENDPOINT(bridgedComposedDeviceEndpoint, bridgedComposedDeviceClusters);
-DataVersion gComposedDeviceDataVersions[ArraySize(bridgedComposedDeviceClusters)];
-DataVersion gComposedTempSensor1DataVersions[ArraySize(bridgedTempSensorClusters)];
-DataVersion gComposedTempSensor2DataVersions[ArraySize(bridgedTempSensorClusters)];
+DataVersion gComposedDeviceDataVersions[MATTER_ARRAY_SIZE(bridgedComposedDeviceClusters)];
+DataVersion gComposedTempSensor1DataVersions[MATTER_ARRAY_SIZE(bridgedTempSensorClusters)];
+DataVersion gComposedTempSensor2DataVersions[MATTER_ARRAY_SIZE(bridgedTempSensorClusters)];
 
 } // namespace
 
@@ -277,6 +279,12 @@ int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const Span<const E
                 {
                     ChipLogProgress(DeviceLayer, "Added device %s to dynamic endpoint %d (index=%d)", dev->GetName(),
                                     gCurrentEndpointId, index);
+
+                    if (dev->GetUniqueId()[0] == '\0')
+                    {
+                        dev->GenerateUniqueId();
+                    }
+
                     return index;
                 }
                 if (err != CHIP_ERROR_ENDPOINT_EXISTS)
@@ -456,6 +464,11 @@ Protocols::InteractionModel::Status HandleReadBridgedDeviceBasicAttribute(Device
     {
         MutableByteSpan zclNameSpan(buffer, maxReadLength);
         MakeZclCharString(zclNameSpan, dev->GetName());
+    }
+    else if ((attributeId == UniqueID::Id) && (maxReadLength == 32))
+    {
+        MutableByteSpan zclUniqueIdSpan(buffer, maxReadLength);
+        MakeZclCharString(zclUniqueIdSpan, dev->GetUniqueId());
     }
     else if ((attributeId == ClusterRevision::Id) && (maxReadLength == 2))
     {

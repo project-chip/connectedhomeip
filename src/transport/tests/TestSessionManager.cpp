@@ -28,6 +28,7 @@
 #define CHIP_ENABLE_TEST_ENCRYPTED_BUFFER_API // Up here in case some other header
                                               // includes SessionManager.h indirectly
 
+#include <access/SubjectDescriptor.h>
 #include <credentials/PersistentStorageOpCertStore.h>
 #include <credentials/tests/CHIPCert_unit_test_vectors.h>
 #include <crypto/DefaultSessionKeystore.h>
@@ -112,10 +113,12 @@ public:
         }
 
         ReceiveHandlerCallCount++;
+        lastSubjectDescriptor = session->GetSubjectDescriptor();
     }
 
     int ReceiveHandlerCallCount = 0;
     bool LargeMessageSent       = false;
+    Access::SubjectDescriptor lastSubjectDescriptor{};
 };
 
 class TestSessionManager : public ::testing::Test
@@ -141,7 +144,7 @@ TEST_F(TestSessionManager, CheckSimpleInitTest)
                                   &fabricTableHolder.GetFabricTable(), sessionKeystore));
 }
 
-TEST_F(TestSessionManager, CheckMessageTest)
+TEST_F(TestSessionManager, CheckMessageOverPaseTest)
 {
     uint16_t payload_len = sizeof(PAYLOAD);
 
@@ -213,7 +216,10 @@ TEST_F(TestSessionManager, CheckMessageTest)
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
     mContext.DrainAndServiceIO();
-    EXPECT_EQ(callback.ReceiveHandlerCallCount, 1);
+    ASSERT_EQ(callback.ReceiveHandlerCallCount, 1);
+
+    // This was a PASE session so we expect the subject descriptor to indicate it's for commissioning.
+    EXPECT_TRUE(callback.lastSubjectDescriptor.isCommissioning);
 
     // Let's send the max sized message and make sure it is received
     chip::System::PacketBufferHandle large_buffer = chip::MessagePacketBuffer::NewWithData(LARGE_PAYLOAD, kMaxAppMessageLen);
@@ -992,19 +998,19 @@ TEST_F(TestSessionManager, TestFindSecureSessionForNode)
     CHIP_ERROR err = sessionManager.InjectCaseSessionWithTestKey(aliceToBobSession, 2, 1, aliceNodeId, bobNodeId, aliceFabricIndex,
                                                                  peer, CryptoContext::SessionRole::kInitiator);
     EXPECT_EQ(err, CHIP_NO_ERROR);
-    aliceToBobSession->AsSecureSession()->MarkActive();
+    aliceToBobSession->AsSecureSession()->MarkActiveRx();
 
     SessionHolder newAliceToBobSession;
     err = sessionManager.InjectCaseSessionWithTestKey(newAliceToBobSession, 3, 4, aliceNodeId, bobNodeId, aliceFabricIndex, peer,
                                                       CryptoContext::SessionRole::kInitiator);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    while (System::SystemClock().GetMonotonicTimestamp() <= aliceToBobSession->AsSecureSession()->GetLastActivityTime())
+    while (System::SystemClock().GetMonotonicTimestamp() <= aliceToBobSession->AsSecureSession()->GetLastPeerActivityTime())
     {
         // Wait for the clock to advance so the new session is
         // more-recently-active.
     }
-    newAliceToBobSession->AsSecureSession()->MarkActive();
+    newAliceToBobSession->AsSecureSession()->MarkActiveRx();
 
     auto foundSession = sessionManager.FindSecureSessionForNode(ScopedNodeId(bobNodeId, aliceFabricIndex),
                                                                 MakeOptional(SecureSession::Type::kCASE));

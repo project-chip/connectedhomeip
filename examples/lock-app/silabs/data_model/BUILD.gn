@@ -1,0 +1,8 @@
+import("//build_overrides/chip.gni")
+import("${chip_root}/src/app/chip_data_model.gni")
+import("${chip_root}/src/platform/device.gni")
+
+chip_data_model("silabs-lock") {
+  zap_file = "lock-app.zap"
+  is_server = true
+}

@@ -20,6 +20,7 @@
 #include <app/clusters/ota-requestor/OTADownloader.h>
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/KeyValueStoreManager.h>
 
 #include <zephyr/dfu/mcuboot.h>
 #include <zephyr/storage/flash_map.h>
@@ -28,7 +29,25 @@
 
 static struct stream_flash_ctx stream;
 
+using namespace ::chip::DeviceLayer::PersistedStorage;
+
 namespace chip {
+namespace {
+
+void PostOTAStateChangeEvent(DeviceLayer::OtaState newState)
+{
+    DeviceLayer::ChipDeviceEvent otaChange;
+    otaChange.Type                     = DeviceLayer::DeviceEventType::kOtaStateChanged;
+    otaChange.OtaStateChanged.newState = newState;
+    CHIP_ERROR error                   = DeviceLayer::PlatformMgr().PostEvent(&otaChange);
+
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(SoftwareUpdate, "Error while posting OtaChange event %" CHIP_ERROR_FORMAT, error.Format());
+    }
+}
+} // namespace
+
 namespace DeviceLayer {
 
 CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
@@ -37,14 +56,10 @@ CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 
     return DeviceLayer::SystemLayer().ScheduleLambda([this] { mDownloader->OnPreparedForDownload(PrepareDownloadImpl()); });
 }
+const struct device * flash_dev;
 
-CHIP_ERROR OTAImageProcessorImpl::PrepareDownloadImpl()
+CHIP_ERROR OTAImageProcessorImpl::InitFlashStream(size_t offset)
 {
-    mHeaderParser.Init();
-    mParams = {};
-
-    const struct device * flash_dev;
-
     flash_dev = DEVICE_DT_GET(DT_CHOSEN(zephyr_flash_controller));
     if (flash_dev == NULL)
     {
@@ -52,8 +67,8 @@ CHIP_ERROR OTAImageProcessorImpl::PrepareDownloadImpl()
         return System::MapErrorZephyr(-EFAULT);
     }
 
-    int err = stream_flash_init(&stream, flash_dev, mBuffer, sizeof(mBuffer), FIXED_PARTITION_OFFSET(slot1_partition),
-                                FIXED_PARTITION_SIZE(slot1_partition), NULL);
+    int err = stream_flash_init(&stream, flash_dev, mBuffer, sizeof(mBuffer), FIXED_PARTITION_OFFSET(slot1_partition) + offset,
+                                FIXED_PARTITION_SIZE(slot1_partition) - offset, NULL);
 
     if (err)
     {
@@ -61,6 +76,17 @@ CHIP_ERROR OTAImageProcessorImpl::PrepareDownloadImpl()
     }
 
     return System::MapErrorZephyr(err);
+}
+
+CHIP_ERROR OTAImageProcessorImpl::PrepareDownloadImpl()
+{
+    mHeaderParser.Init();
+    mParams = {};
+
+    CHIP_ERROR error = InitFlashStream(0);
+
+    PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadInProgress);
+    return error;
 }
 
 CHIP_ERROR OTAImageProcessorImpl::Finalize()
@@ -72,13 +98,14 @@ CHIP_ERROR OTAImageProcessorImpl::Finalize()
         ChipLogError(SoftwareUpdate, "stream_flash_buffered_write failed (err %d)", err);
     }
 
+    PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadComplete);
     return System::MapErrorZephyr(err);
 }
 
 CHIP_ERROR OTAImageProcessorImpl::Abort()
 {
     ChipLogError(SoftwareUpdate, "Image upgrade aborted");
-
+    PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadAborted);
     return CHIP_NO_ERROR;
 }
 
@@ -87,6 +114,7 @@ CHIP_ERROR OTAImageProcessorImpl::Apply()
     // Schedule update of image
     int err = boot_request_upgrade(BOOT_UPGRADE_PERMANENT);
 
+    PostOTAStateChangeEvent(DeviceLayer::kOtaApplyInProgress);
 #ifdef CONFIG_CHIP_OTA_REQUESTOR_REBOOT_ON_APPLY
     if (!err)
     {
@@ -101,6 +129,7 @@ CHIP_ERROR OTAImageProcessorImpl::Apply()
     }
     else
     {
+        PostOTAStateChangeEvent(DeviceLayer::kOtaApplyFailed);
         return System::MapErrorZephyr(err);
     }
 #else
@@ -116,8 +145,16 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & aBlock)
 
     if (error == CHIP_NO_ERROR)
     {
-        error = System::MapErrorZephyr(stream_flash_buffered_write(&stream, aBlock.data(), aBlock.size(), false));
-        mParams.downloadedBytes += aBlock.size();
+        if (downloadedBytesRestored)
+        {
+            mParams.downloadedBytes = downloadedBytesRestored;
+        }
+        else
+        {
+            error = System::MapErrorZephyr(stream_flash_buffered_write(&stream, aBlock.data(), aBlock.size(), false));
+            mParams.downloadedBytes += aBlock.size();
+        }
+        ReturnErrorOnFailure(KeyValueStoreMgr().Put(kDownloadedBytes, &mParams.downloadedBytes, sizeof(mParams.downloadedBytes)));
     }
 
     // Report the result back to the downloader asynchronously.
@@ -126,11 +163,20 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & aBlock)
         {
             ChipLogDetail(SoftwareUpdate, "Downloaded %u/%u bytes", static_cast<unsigned>(mParams.downloadedBytes),
                           static_cast<unsigned>(mParams.totalFileBytes));
-            mDownloader->FetchNextData();
+            if (downloadedBytesRestored)
+            {
+                mDownloader->SkipData(downloadedBytesRestored - aBlock.size());
+                downloadedBytesRestored = 0;
+            }
+            else
+            {
+                mDownloader->FetchNextData();
+            }
         }
         else
         {
             mDownloader->EndDownload(error);
+            PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadFailed);
         }
     });
 }
@@ -138,10 +184,10 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & aBlock)
 bool OTAImageProcessorImpl::IsFirstImageRun()
 {
     OTARequestorInterface * requestor = GetRequestorInstance();
-    ReturnErrorCodeIf(requestor == nullptr, false);
+    VerifyOrReturnError(requestor != nullptr, false);
 
     uint32_t currentVersion;
-    ReturnErrorCodeIf(ConfigurationMgr().GetSoftwareVersion(currentVersion) != CHIP_NO_ERROR, false);
+    VerifyOrReturnError(ConfigurationMgr().GetSoftwareVersion(currentVersion) == CHIP_NO_ERROR, false);
 
     return requestor->GetCurrentUpdateState() == OTARequestorInterface::OTAUpdateStateEnum::kApplying &&
         requestor->GetTargetVersion() == currentVersion;
@@ -149,7 +195,36 @@ bool OTAImageProcessorImpl::IsFirstImageRun()
 
 CHIP_ERROR OTAImageProcessorImpl::ConfirmCurrentImage()
 {
+    PostOTAStateChangeEvent(DeviceLayer::kOtaApplyComplete);
     return System::MapErrorZephyr(boot_write_img_confirmed());
+}
+
+CHIP_ERROR OTAImageProcessorImpl::RestoreBytes(ByteSpan & aBlock)
+{
+    uint8_t * ImageDigestBuffer = new uint8_t[aBlock.size()];
+    MutableByteSpan mImageDigest(ImageDigestBuffer, aBlock.size());
+
+    if (KeyValueStoreMgr().Get(kImageDigest, mImageDigest.data(), mImageDigest.size()) == CHIP_NO_ERROR &&
+        KeyValueStoreMgr().Get(kDownloadedBytes, &downloadedBytesRestored, sizeof(downloadedBytesRestored)) == CHIP_NO_ERROR &&
+        mImageDigest.data_equal(aBlock) && downloadedBytesRestored < mParams.totalFileBytes)
+    {
+        // Align to the nearest lower multiple of sector size (4 KB) for Flash erase/write
+        downloadedBytesRestored = ROUND_DOWN(downloadedBytesRestored, 0x1000);
+        ChipLogDetail(SoftwareUpdate, "Restored %u/%u bytes", static_cast<unsigned>(downloadedBytesRestored),
+                      static_cast<unsigned>(mParams.totalFileBytes))
+
+            // Reinit Flash Stream with offset
+            ReturnErrorOnFailure(System::MapErrorZephyr(stream_flash_buffered_write(&stream, NULL, 0, true)));
+        ReturnErrorOnFailure(InitFlashStream(downloadedBytesRestored));
+    }
+    else
+    {
+        downloadedBytesRestored = 0;
+        ReturnErrorOnFailure(KeyValueStoreMgr().Put(kImageDigest, aBlock.data(), aBlock.size()));
+    }
+    delete[] ImageDigestBuffer;
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & aBlock)
@@ -160,10 +235,14 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & aBlock)
         CHIP_ERROR error = mHeaderParser.AccumulateAndDecode(aBlock, header);
 
         // Needs more data to decode the header
-        ReturnErrorCodeIf(error == CHIP_ERROR_BUFFER_TOO_SMALL, CHIP_NO_ERROR);
+        VerifyOrReturnError(error != CHIP_ERROR_BUFFER_TOO_SMALL, CHIP_NO_ERROR);
         ReturnErrorOnFailure(error);
 
         mParams.totalFileBytes = header.mPayloadSize;
+
+        // Restore interrupted OTA process
+        RestoreBytes(header.mImageDigest);
+
         mHeaderParser.Clear();
     }
 

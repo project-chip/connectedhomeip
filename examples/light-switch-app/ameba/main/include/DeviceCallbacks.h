@@ -39,7 +39,5 @@ public:
 
 private:
     void OnInternetConnectivityChange(const chip::DeviceLayer::ChipDeviceEvent * event);
-    void OnOffSwitchConfigurationAttributeChangeCallback(chip::EndpointId endpointId, chip::AttributeId attributeId, uint8_t type,
-                                                         uint8_t * value, uint16_t size);
     void OnIdentifyPostAttributeChangeCallback(chip::EndpointId endpointId, chip::AttributeId attributeId, uint8_t * value);
 };

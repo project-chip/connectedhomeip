@@ -24,10 +24,18 @@
 
 #include <memory>
 
+namespace bridge {
+
 class BridgedDeviceManager
 {
 public:
     BridgedDeviceManager() = default;
+
+    static BridgedDeviceManager & Instance()
+    {
+        static BridgedDeviceManager instance;
+        return instance;
+    }
 
     /**
      * @brief Initializes the BridgedDeviceManager.
@@ -82,28 +90,27 @@ public:
     BridgedDevice * GetDevice(chip::EndpointId endpointId) const;
 
     /**
-     * @brief Gets a device from its NodeId.
+     * @brief Gets a device from its ScopedNodeId.
      *
      * This function iterates through the available devices and returns the device that matches the
-     * specified NodeId. If no device matches the NodeId, it returns nullptr.
+     * specified ScopedNodeId. If no device matches the ScopedNodeId, it returns nullptr.
      *
-     * @param nodeId The NodeId of the device to be retrieved.
+     * @param scopedNodeId The ScopedNodeId of the device to be retrieved.
      * @return BridgedDevice* A pointer to the device if found, nullptr otherwise.
      */
-    BridgedDevice * GetDeviceByNodeId(chip::NodeId nodeId) const;
+    BridgedDevice * GetDeviceByScopedNodeId(chip::ScopedNodeId scopedNodeId) const;
 
     /**
-     * @brief Removes a device from a dynamic endpoint by its NodeId.
+     * @brief Removes a device from a dynamic endpoint by its ScopedNodeId.
      *
-     * This function attempts to remove a device from a dynamic endpoint by iterating through the
-     * available endpoints and checking if the device matches the specified NodeId. If the device is
-     * found, it clears the dynamic endpoint, logs the removal, and returns the index of the removed
-     * endpoint. If the device is not found, it returns -1.
+     * This function attempts to remove a device and the associated dynamic endpoint by iterating through
+     * the available device and checking if the device matches the specified ScopedNodeId. If the device is
+     * found, it removes the dynamic endpoint.
      *
-     * @param nodeId The NodeId of the device to be removed.
-     * @return int The index of the removed dynamic endpoint if successful, -1 otherwise.
+     * @param scopedNodeId The ScopedNodeId of the device to be removed.
+     * @return unsigned of the index of the removed dynamic endpoint if successful, nullopt otherwise.
      */
-    std::optional<unsigned> RemoveDeviceByNodeId(chip::NodeId nodeId);
+    std::optional<unsigned> RemoveDeviceByScopedNodeId(chip::ScopedNodeId scopedNodeId);
 
     /**
      * Finds the device with the given unique id (if any)
@@ -111,8 +118,6 @@ public:
     BridgedDevice * GetDeviceByUniqueId(const std::string & id);
 
 private:
-    friend BridgedDeviceManager & BridgeDeviceMgr();
-
     /**
      * Creates a new unique ID that is not used by any other mDevice
      */
@@ -125,13 +130,4 @@ private:
     std::unique_ptr<BridgedDevice> mDevices[CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT + 1];
 };
 
-/**
- * Returns the public interface of the BridgedDeviceManager singleton object.
- *
- * Applications should use this to access features of the BridgedDeviceManager
- * object.
- */
-inline BridgedDeviceManager & BridgeDeviceMgr()
-{
-    return BridgedDeviceManager::sInstance;
-}
+} // namespace bridge

@@ -28,7 +28,7 @@ Two types of switch devices are supported: latching switch (e.g. rocker switch) 
 Interactions with the switch device are exposed as attributes (for the latching switch) and as events (for both types of switches). An interested party MAY subscribe to these attributes/events and thus be informed of the interactions, and can perform actions based on this, for example by sending commands to perform an action such as controlling a light or a window shade.</description>
 
     <globalAttribute side="server" code="0xFFFC" value="0" />
-    <globalAttribute side="either" code="0xFFFD" value="1" />
+    <globalAttribute side="either" code="0xFFFD" value="2" />
 
     <features>
       <feature bit="0" code="LS" name="LatchingSwitch" summary="Switch is latching">
@@ -78,38 +78,72 @@ Interactions with the switch device are exposed as attributes (for the latching 
       </feature>
     </features>
 
-    <attribute side="server" code="0x0000" define="NUMBER_OF_POSITIONS" type="int8u" writable="false" optional="false" default="2" min="2">NumberOfPositions</attribute>
-    <attribute side="server" code="0x0001" define="CURRENT_POSITION" type="int8u" writable="false" reportable="true" optional="false">CurrentPosition</attribute>
-    <attribute side="server" code="0x0002" define="MULTI_PRESS_MAX" type="int8u" writable="false" optional="true" default="2" min="2">MultiPressMax</attribute>
+    <attribute side="server" code="0x0000" name="NumberOfPositions" define="NUMBER_OF_POSITIONS" type="int8u" default="2" min="2">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0001" name="CurrentPosition" define="CURRENT_POSITION" type="int8u" reportable="true">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0002" name="MultiPressMax" define="MULTI_PRESS_MAX" type="int8u" optional="true" default="2" min="2">
+      <mandatoryConform>
+        <feature name="MSM"/>
+      </mandatoryConform>
+    </attribute>
     <event side="server" code="0x00" priority="info" name="SwitchLatched" optional="true">
       <description>SwitchLatched</description>
       <field id="0" name="NewPosition" type="int8u" />
+      <mandatoryConform>
+        <feature name="LS"/>
+      </mandatoryConform>
     </event>
     <event side="server" code="0x01" priority="info" name="InitialPress" optional="true">
       <description>InitialPress</description>
       <field id="0" name="NewPosition" type="int8u" />
+      <mandatoryConform>
+        <feature name="MS"/>
+      </mandatoryConform>
     </event>
     <event side="server" code="0x02" priority="info" name="LongPress" optional="true">
       <description>LongPress</description>
       <field id="0" name="NewPosition" type="int8u" />
+      <mandatoryConform>
+        <feature name="MSL"/>
+      </mandatoryConform>
     </event>
     <event side="server" code="0x03" priority="info" name="ShortRelease" optional="true">
       <description>ShortRelease</description>
       <field id="0" name="PreviousPosition" type="int8u" />
+      <mandatoryConform>
+        <feature name="MSR"/>
+      </mandatoryConform>
     </event>
     <event side="server" code="0x04" priority="info" name="LongRelease" optional="true">
       <description>LongRelease</description>
       <field id="0" name="PreviousPosition" type="int8u" />
+      <mandatoryConform>
+        <feature name="MSL"/>
+      </mandatoryConform>
     </event>
     <event side="server" code="0x05" priority="info" name="MultiPressOngoing" optional="true">
       <description>MultiPressOngoing</description>
       <field id="0" name="NewPosition" type="int8u" />
       <field id="1" name="CurrentNumberOfPressesCounted" type="int8u" />
+      <mandatoryConform>
+        <andTerm>
+          <feature name="MSM"/>
+          <notTerm>
+            <feature name="AS"/>
+          </notTerm>
+        </andTerm>
+      </mandatoryConform>
     </event>
     <event side="server" code="0x06" priority="info" name="MultiPressComplete" optional="true">
       <description>MultiPressComplete</description>
       <field id="0" name="PreviousPosition" type="int8u" />
-      <field id="1" name="TotalNumberOfPressesCounted" type="int8u" />
+      <field id="1" name="TotalNumberOfPressesCounted" type="int8u"/>
+      <mandatoryConform>
+        <feature name="MSM"/>
+      </mandatoryConform>
     </event>
 
   </cluster>

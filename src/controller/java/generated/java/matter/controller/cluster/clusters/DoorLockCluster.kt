@@ -99,6 +99,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
     val creatorFabricIndex: UByte?,
     val lastModifiedFabricIndex: UByte?,
     val nextCredentialIndex: UShort?,
+    val credentialData: ByteArray?,
   )
 
   class LockStateAttribute(val value: UByte?)
@@ -227,8 +228,8 @@ class DoorLockCluster(private val controller: MatterController, private val endp
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_P_I_N_CODE_REQ: Int = 0
-    PINCode?.let { tlvWriter.put(ContextSpecificTag(TAG_P_I_N_CODE_REQ), PINCode) }
+    val TAG_PIN_CODE_REQ: Int = 0
+    PINCode?.let { tlvWriter.put(ContextSpecificTag(TAG_PIN_CODE_REQ), PINCode) }
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
@@ -248,8 +249,8 @@ class DoorLockCluster(private val controller: MatterController, private val endp
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_P_I_N_CODE_REQ: Int = 0
-    PINCode?.let { tlvWriter.put(ContextSpecificTag(TAG_P_I_N_CODE_REQ), PINCode) }
+    val TAG_PIN_CODE_REQ: Int = 0
+    PINCode?.let { tlvWriter.put(ContextSpecificTag(TAG_PIN_CODE_REQ), PINCode) }
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
@@ -276,8 +277,8 @@ class DoorLockCluster(private val controller: MatterController, private val endp
     val TAG_TIMEOUT_REQ: Int = 0
     tlvWriter.put(ContextSpecificTag(TAG_TIMEOUT_REQ), timeout)
 
-    val TAG_P_I_N_CODE_REQ: Int = 1
-    PINCode?.let { tlvWriter.put(ContextSpecificTag(TAG_P_I_N_CODE_REQ), PINCode) }
+    val TAG_PIN_CODE_REQ: Int = 1
+    PINCode?.let { tlvWriter.put(ContextSpecificTag(TAG_PIN_CODE_REQ), PINCode) }
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
@@ -907,8 +908,8 @@ class DoorLockCluster(private val controller: MatterController, private val endp
     val TAG_USER_NAME_REQ: Int = 2
     userName?.let { tlvWriter.put(ContextSpecificTag(TAG_USER_NAME_REQ), userName) }
 
-    val TAG_USER_UNIQUE_I_D_REQ: Int = 3
-    userUniqueID?.let { tlvWriter.put(ContextSpecificTag(TAG_USER_UNIQUE_I_D_REQ), userUniqueID) }
+    val TAG_USER_UNIQUE_ID_REQ: Int = 3
+    userUniqueID?.let { tlvWriter.put(ContextSpecificTag(TAG_USER_UNIQUE_ID_REQ), userUniqueID) }
 
     val TAG_USER_STATUS_REQ: Int = 4
     userStatus?.let { tlvWriter.put(ContextSpecificTag(TAG_USER_STATUS_REQ), userStatus) }
@@ -961,7 +962,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
     val TAG_USER_NAME: Int = 1
     var userName_decoded: String? = null
 
-    val TAG_USER_UNIQUE_I_D: Int = 2
+    val TAG_USER_UNIQUE_ID: Int = 2
     var userUniqueID_decoded: UInt? = null
 
     val TAG_USER_STATUS: Int = 3
@@ -1007,7 +1008,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
           }
       }
 
-      if (tag == ContextSpecificTag(TAG_USER_UNIQUE_I_D)) {
+      if (tag == ContextSpecificTag(TAG_USER_UNIQUE_ID)) {
         userUniqueID_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -1320,6 +1321,9 @@ class DoorLockCluster(private val controller: MatterController, private val endp
     val TAG_NEXT_CREDENTIAL_INDEX: Int = 4
     var nextCredentialIndex_decoded: UShort? = null
 
+    val TAG_CREDENTIAL_DATA: Int = 5
+    var credentialData_decoded: ByteArray? = null
+
     while (!tlvReader.isEndOfContainer()) {
       val tag = tlvReader.peekElement().tag
 
@@ -1385,6 +1389,25 @@ class DoorLockCluster(private val controller: MatterController, private val endp
               null
             }
           }
+      }
+
+      if (tag == ContextSpecificTag(TAG_CREDENTIAL_DATA)) {
+        credentialData_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (!tlvReader.isNull()) {
+              if (tlvReader.isNextTag(tag)) {
+                tlvReader.getByteArray(tag)
+              } else {
+                null
+              }
+            } else {
+              tlvReader.getNull(tag)
+              null
+            }
+          }
       } else {
         tlvReader.skipElement()
       }
@@ -1402,6 +1425,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       creatorFabricIndex_decoded,
       lastModifiedFabricIndex_decoded,
       nextCredentialIndex_decoded,
+      credentialData_decoded,
     )
   }
 
@@ -1435,8 +1459,8 @@ class DoorLockCluster(private val controller: MatterController, private val endp
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_P_I_N_CODE_REQ: Int = 0
-    PINCode?.let { tlvWriter.put(ContextSpecificTag(TAG_P_I_N_CODE_REQ), PINCode) }
+    val TAG_PIN_CODE_REQ: Int = 0
+    PINCode?.let { tlvWriter.put(ContextSpecificTag(TAG_PIN_CODE_REQ), PINCode) }
     tlvWriter.endStructure()
 
     val request: InvokeRequest =

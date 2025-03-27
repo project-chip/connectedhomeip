@@ -110,13 +110,13 @@ class AccountLoginCluster(
 
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
-    val TAG_SETUP_P_I_N: Int = 0
+    val TAG_SETUP_PIN: Int = 0
     var setupPIN_decoded: String? = null
 
     while (!tlvReader.isEndOfContainer()) {
       val tag = tlvReader.peekElement().tag
 
-      if (tag == ContextSpecificTag(TAG_SETUP_P_I_N)) {
+      if (tag == ContextSpecificTag(TAG_SETUP_PIN)) {
         setupPIN_decoded = tlvReader.getString(tag)
       } else {
         tlvReader.skipElement()
@@ -146,8 +146,8 @@ class AccountLoginCluster(
     val TAG_TEMP_ACCOUNT_IDENTIFIER_REQ: Int = 0
     tlvWriter.put(ContextSpecificTag(TAG_TEMP_ACCOUNT_IDENTIFIER_REQ), tempAccountIdentifier)
 
-    val TAG_SETUP_P_I_N_REQ: Int = 1
-    tlvWriter.put(ContextSpecificTag(TAG_SETUP_P_I_N_REQ), setupPIN)
+    val TAG_SETUP_PIN_REQ: Int = 1
+    tlvWriter.put(ContextSpecificTag(TAG_SETUP_PIN_REQ), setupPIN)
 
     val TAG_NODE_REQ: Int = 2
     node?.let { tlvWriter.put(ContextSpecificTag(TAG_NODE_REQ), node) }

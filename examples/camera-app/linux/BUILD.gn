@@ -1,0 +1,67 @@
+# Copyright (c) 2025 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+import("${chip_root}/build/chip/tools.gni")
+
+assert(chip_build_tools)
+
+config("config") {
+  cflags = [
+    "-Wconversion",
+    "-Wno-shadow",
+  ]
+
+  include_dirs = [
+    "include",
+    "include/clusters/chime",
+    "${chip_root}/examples/camera-app/camera-common/include",
+    "${chip_root}/third_party/libdatachannel/repo/include",
+  ]
+}
+
+executable("chip-camera-app") {
+  configs += [ ":config" ]
+
+  sources = [
+    "${chip_root}/examples/camera-app/linux/src/camera-device.cpp",
+    "${chip_root}/examples/camera-app/linux/src/clusters/chime/chime-manager.cpp",
+    "include/CHIPProjectAppConfig.h",
+    "main.cpp",
+  ]
+
+  deps = [
+    "${chip_root}/examples/camera-app/camera-common",
+    "${chip_root}/examples/camera-app/camera-common:camera-lib",
+    "${chip_root}/examples/platform/linux:app-main",
+    "${chip_root}/src/lib",
+    "${chip_root}/third_party/libdatachannel:libdatachannel",
+  ]
+
+  libs = [ "datachannel" ]
+  lib_dirs =
+      [ rebase_path("${chip_root}/third_party/libdatachannel/repo/build") ]
+
+  output_dir = root_out_dir
+}
+
+group("linux") {
+  deps = [ ":chip-camera-app" ]
+}
+
+group("default") {
+  deps = [ ":chip-camera-app" ]
+}

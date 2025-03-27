@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2020-2022 Project CHIP Authors
+#    Copyright (c) 2020-2025 Project CHIP Authors
 #    Copyright (c) 2019-2020 Google, LLC.
 #    Copyright (c) 2013-2018 Nest Labs, Inc.
 #    All rights reserved.
@@ -48,6 +48,7 @@ import dacite  # type: ignore
 from . import FabricAdmin
 from . import clusters as Clusters
 from . import discovery
+from .bdx import Bdx
 from .clusters import Attribute as ClusterAttribute
 from .clusters import ClusterObjects as ClusterObjects
 from .clusters import Command as ClusterCommand
@@ -60,6 +61,8 @@ __all__ = ["ChipDeviceController", "CommissioningParameters"]
 
 # Defined in $CHIP_ROOT/src/lib/core/CHIPError.h
 CHIP_ERROR_TIMEOUT: int = 50
+
+_RCACCallbackType = CFUNCTYPE(None, POINTER(c_uint8), c_size_t)
 
 LOGGER = logging.getLogger(__name__)
 
@@ -478,6 +481,7 @@ class ChipDeviceControllerBase():
 
             if err.is_success:
                 self._commissioning_context.future.set_result(nodeId)
+
             else:
                 self._commissioning_context.future.set_exception(err.to_exception())
 
@@ -549,6 +553,7 @@ class ChipDeviceControllerBase():
 
         self.cbHandleCommissioningCompleteFunct = _DevicePairingDelegate_OnCommissioningCompleteFunct(
             HandleCommissioningComplete)
+
         self._dmLib.pychip_ScriptDevicePairingDelegate_SetCommissioningCompleteCallback(
             self.pairingDelegate, self.cbHandleCommissioningCompleteFunct)
 
@@ -697,12 +702,52 @@ class ChipDeviceControllerBase():
 
         self._ChipStack.Call(lambda: self._dmLib.pychip_ExpireSessions(self.devCtrl, nodeid)).raise_on_error()
 
-    # TODO: This needs to be called MarkSessionDefunct
-    def CloseSession(self, nodeid):
+    def MarkSessionDefunct(self, nodeid):
+        '''
+        Marks a previously active session with the specified node as defunct to temporarily prevent it
+        from being used with new exchanges to send or receive messages. This should be called when there
+        is suspicion of a loss-of-sync with the session state on the associated peer, such as evidence
+        of transport failure.
+
+        If messages are received thereafter on this session, the session will be put back into the Active state.
+
+        This function should only be called on an active session.
+        This will NOT detach any existing SessionHolders.
+
+        Parameters:
+            nodeid (int): The node ID of the device whose session should be marked as defunct.
+
+        Raises:
+            RuntimeError: If the controller is not active.
+            PyChipError: If the operation fails.
+        '''
         self.CheckIsActive()
 
         self._ChipStack.Call(
-            lambda: self._dmLib.pychip_DeviceController_CloseSession(
+            lambda: self._dmLib.pychip_DeviceController_MarkSessionDefunct(
+                self.devCtrl, nodeid)
+        ).raise_on_error()
+
+    def MarkSessionForEviction(self, nodeid):
+        '''
+        Marks the session with the specified node for eviction. It will first detach all SessionHolders
+        attached to this session by calling 'OnSessionReleased' on each of them. This will force them
+        to release their reference to the session. If there are no more references left, the session
+        will then be de-allocated.
+
+        Once marked for eviction, the session SHALL NOT ever become active again.
+
+        Parameters:
+            nodeid (int): The node ID of the device whose session should be marked for eviction.
+
+        Raises:
+            RuntimeError: If the controller is not active.
+            PyChipError: If the operation fails.
+        '''
+        self.CheckIsActive()
+
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_MarkSessionForEviction(
                 self.devCtrl, nodeid)
         ).raise_on_error()
 
@@ -1062,6 +1107,8 @@ class ChipDeviceControllerBase():
                 self._future = future
 
             def _deviceAvailable(self):
+                if self._future.cancelled():
+                    return
                 if self._returnDevice.value is not None:
                     self._future.set_result(self._returnDevice)
                 else:
@@ -1341,6 +1388,36 @@ class ChipDeviceControllerBase():
         # An empty list is the expected return for sending group write attribute.
         return []
 
+    def TestOnlyPrepareToReceiveBdxData(self) -> asyncio.Future:
+        '''
+        Sets up the system to expect a node to initiate a BDX transfer. The transfer will send data here.
+
+        Returns:
+            - a future that will yield a BdxTransfer with the init message from the transfer.
+        '''
+        self.CheckIsActive()
+
+        eventLoop = asyncio.get_running_loop()
+        future = eventLoop.create_future()
+
+        Bdx.PrepareToReceiveBdxData(future).raise_on_error()
+        return future
+
+    def TestOnlyPrepareToSendBdxData(self, data: bytes) -> asyncio.Future:
+        '''
+        Sets up the system to expect a node to initiate a BDX transfer. The transfer will send data to the node.
+
+        Returns:
+            - a future that will yield a BdxTransfer with the init message from the transfer.
+        '''
+        self.CheckIsActive()
+
+        eventLoop = asyncio.get_running_loop()
+        future = eventLoop.create_future()
+
+        Bdx.PrepareToSendBdxData(future, data).raise_on_error()
+        return future
+
     def _parseAttributePathTuple(self, pathTuple: typing.Union[
         None,  # Empty tuple, all wildcard
         typing.Tuple[int],  # Endpoint
@@ -1431,20 +1508,23 @@ class ChipDeviceControllerBase():
                 else:
                     raise ValueError("Unsupported Attribute Path")
 
-    async def Read(self, nodeid: int, attributes: typing.Optional[typing.List[typing.Union[
-        None,  # Empty tuple, all wildcard
-        typing.Tuple[int],  # Endpoint
-        # Wildcard endpoint, Cluster id present
-        typing.Tuple[typing.Type[ClusterObjects.Cluster]],
-        # Wildcard endpoint, Cluster + Attribute present
-        typing.Tuple[typing.Type[ClusterObjects.ClusterAttributeDescriptor]],
-        # Wildcard attribute id
-        typing.Tuple[int, typing.Type[ClusterObjects.Cluster]],
-        # Concrete path
-        typing.Tuple[int, typing.Type[ClusterObjects.ClusterAttributeDescriptor]],
-        # Directly specified attribute path
-        ClusterAttribute.AttributePath
-    ]]] = None,
+    async def Read(
+        self,
+        nodeid: int,
+        attributes: typing.Optional[typing.List[typing.Union[
+            None,  # Empty tuple, all wildcard
+            typing.Tuple[int],  # Endpoint
+            # Wildcard endpoint, Cluster id present
+            typing.Tuple[typing.Type[ClusterObjects.Cluster]],
+            # Wildcard endpoint, Cluster + Attribute present
+            typing.Tuple[typing.Type[ClusterObjects.ClusterAttributeDescriptor]],
+            # Wildcard attribute id
+            typing.Tuple[int, typing.Type[ClusterObjects.Cluster]],
+            # Concrete path
+            typing.Tuple[int, typing.Type[ClusterObjects.ClusterAttributeDescriptor]],
+            # Directly specified attribute path
+            ClusterAttribute.AttributePath
+        ]]] = None,
         dataVersionFilters: typing.Optional[typing.List[typing.Tuple[int, typing.Type[ClusterObjects.Cluster], int]]] = None, events: typing.Optional[typing.List[
             typing.Union[
             None,  # Empty tuple, all wildcard
@@ -1459,10 +1539,11 @@ class ChipDeviceControllerBase():
             # Concrete path
             typing.Tuple[int, typing.Type[ClusterObjects.ClusterEvent], int]
             ]]] = None,
-            eventNumberFilter: typing.Optional[int] = None,
-            returnClusterObject: bool = False, reportInterval: typing.Optional[typing.Tuple[int, int]] = None,
-            fabricFiltered: bool = True, keepSubscriptions: bool = False, autoResubscribe: bool = True,
-            payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
+        eventNumberFilter: typing.Optional[int] = None,
+        returnClusterObject: bool = False, reportInterval: typing.Optional[typing.Tuple[int, int]] = None,
+        fabricFiltered: bool = True, keepSubscriptions: bool = False, autoResubscribe: bool = True,
+        payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD
+    ):
         '''
         Read a list of attributes and/or events from a target node
 
@@ -1532,33 +1613,42 @@ class ChipDeviceControllerBase():
         eventPaths = [self._parseEventPathTuple(
             v) for v in events] if events else None
 
-        ClusterAttribute.Read(future=future, eventLoop=eventLoop, device=device.deviceProxy, devCtrl=self,
+        transaction = ClusterAttribute.AsyncReadTransaction(future, eventLoop, self, returnClusterObject)
+        ClusterAttribute.Read(transaction, device=device.deviceProxy,
                               attributes=attributePaths, dataVersionFilters=clusterDataVersionFilters, events=eventPaths,
-                              eventNumberFilter=eventNumberFilter, returnClusterObject=returnClusterObject,
+                              eventNumberFilter=eventNumberFilter,
                               subscriptionParameters=ClusterAttribute.SubscriptionParameters(
                                   reportInterval[0], reportInterval[1]) if reportInterval else None,
                               fabricFiltered=fabricFiltered,
                               keepSubscriptions=keepSubscriptions, autoResubscribe=autoResubscribe).raise_on_error()
-        return await future
+        await future
 
-    async def ReadAttribute(self, nodeid: int, attributes: typing.Optional[typing.List[typing.Union[
-        None,  # Empty tuple, all wildcard
-        typing.Tuple[int],  # Endpoint
-        # Wildcard endpoint, Cluster id present
-        typing.Tuple[typing.Type[ClusterObjects.Cluster]],
-        # Wildcard endpoint, Cluster + Attribute present
-        typing.Tuple[typing.Type[ClusterObjects.ClusterAttributeDescriptor]],
-        # Wildcard attribute id
-        typing.Tuple[int, typing.Type[ClusterObjects.Cluster]],
-        # Concrete path
-        typing.Tuple[int, typing.Type[ClusterObjects.ClusterAttributeDescriptor]],
-        # Directly specified attribute path
-        ClusterAttribute.AttributePath
-    ]]], dataVersionFilters: typing.Optional[typing.List[typing.Tuple[int, typing.Type[ClusterObjects.Cluster], int]]] = None,
-            returnClusterObject: bool = False,
-            reportInterval: typing.Optional[typing.Tuple[int, int]] = None,
-            fabricFiltered: bool = True, keepSubscriptions: bool = False, autoResubscribe: bool = True,
-            payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
+        if result := transaction.GetSubscriptionHandler():
+            return result
+        return transaction.GetReadResponse()
+
+    async def ReadAttribute(
+        self,
+        nodeid: int,
+        attributes: typing.Optional[typing.List[typing.Union[
+            None,  # Empty tuple, all wildcard
+            typing.Tuple[int],  # Endpoint
+            # Wildcard endpoint, Cluster id present
+            typing.Tuple[typing.Type[ClusterObjects.Cluster]],
+            # Wildcard endpoint, Cluster + Attribute present
+            typing.Tuple[typing.Type[ClusterObjects.ClusterAttributeDescriptor]],
+            # Wildcard attribute id
+            typing.Tuple[int, typing.Type[ClusterObjects.Cluster]],
+            # Concrete path
+            typing.Tuple[int, typing.Type[ClusterObjects.ClusterAttributeDescriptor]],
+            # Directly specified attribute path
+            ClusterAttribute.AttributePath
+        ]]], dataVersionFilters: typing.Optional[typing.List[typing.Tuple[int, typing.Type[ClusterObjects.Cluster], int]]] = None,
+        returnClusterObject: bool = False,
+        reportInterval: typing.Optional[typing.Tuple[int, int]] = None,
+        fabricFiltered: bool = True, keepSubscriptions: bool = False, autoResubscribe: bool = True,
+        payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD
+    ):
         '''
         Read a list of attributes from a target node, this is a wrapper of DeviceController.Read()
 
@@ -1627,24 +1717,28 @@ class ChipDeviceControllerBase():
         else:
             return res.attributes
 
-    async def ReadEvent(self, nodeid: int, events: typing.List[typing.Union[
-        None,  # Empty tuple, all wildcard
-        typing.Tuple[str, int],  # all wildcard with urgency set
-        typing.Tuple[int, int],  # Endpoint,
-        # Wildcard endpoint, Cluster id present
-        typing.Tuple[typing.Type[ClusterObjects.Cluster], int],
-        # Wildcard endpoint, Cluster + Event present
-        typing.Tuple[typing.Type[ClusterObjects.ClusterEvent], int],
-        # Wildcard event id
-        typing.Tuple[int, typing.Type[ClusterObjects.Cluster], int],
-        # Concrete path
-        typing.Tuple[int, typing.Type[ClusterObjects.ClusterEvent], int]
-    ]], eventNumberFilter: typing.Optional[int] = None,
-            fabricFiltered: bool = True,
-            reportInterval: typing.Optional[typing.Tuple[int, int]] = None,
-            keepSubscriptions: bool = False,
-            autoResubscribe: bool = True,
-            payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
+    async def ReadEvent(
+        self,
+        nodeid: int,
+        events: typing.List[typing.Union[
+            None,  # Empty tuple, all wildcard
+            typing.Tuple[str, int],  # all wildcard with urgency set
+            typing.Tuple[int, int],  # Endpoint,
+            # Wildcard endpoint, Cluster id present
+            typing.Tuple[typing.Type[ClusterObjects.Cluster], int],
+            # Wildcard endpoint, Cluster + Event present
+            typing.Tuple[typing.Type[ClusterObjects.ClusterEvent], int],
+            # Wildcard event id
+            typing.Tuple[int, typing.Type[ClusterObjects.Cluster], int],
+            # Concrete path
+            typing.Tuple[int, typing.Type[ClusterObjects.ClusterEvent], int]
+        ]], eventNumberFilter: typing.Optional[int] = None,
+        fabricFiltered: bool = True,
+        reportInterval: typing.Optional[typing.Tuple[int, int]] = None,
+        keepSubscriptions: bool = False,
+        autoResubscribe: bool = True,
+        payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD
+    ):
         '''
         Read a list of events from a target node, this is a wrapper of DeviceController.Read()
 
@@ -1710,6 +1804,19 @@ class ChipDeviceControllerBase():
             lambda: self._dmLib.pychip_OpCreds_InitGroupTestingData(
                 self.devCtrl)
         ).raise_on_error()
+
+    def CreateManualCode(self, discriminator: int, passcode: int) -> str:
+        """ Creates a standard flow manual code from the given discriminator and passcode."""
+        # 64 bytes is WAY more than required, but let's be safe
+        in_size = 64
+        out_size = c_size_t(0)
+        buf = create_string_buffer(in_size)
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_CreateManualCode(discriminator, passcode, buf, in_size, pointer(out_size))
+        ).raise_on_error()
+        if out_size.value == 0 or out_size.value > in_size:
+            raise MemoryError("Invalid output size for manual code")
+        return buf.value.decode()
 
     # ----- Private Members -----
     def _InitLib(self):
@@ -1806,9 +1913,13 @@ class ChipDeviceControllerBase():
                 c_void_p, c_uint64, _DeviceUnpairingCompleteFunct]
             self._dmLib.pychip_DeviceController_UnpairDevice.restype = PyChipError
 
-            self._dmLib.pychip_DeviceController_CloseSession.argtypes = [
+            self._dmLib.pychip_DeviceController_MarkSessionDefunct.argtypes = [
                 c_void_p, c_uint64]
-            self._dmLib.pychip_DeviceController_CloseSession.restype = PyChipError
+            self._dmLib.pychip_DeviceController_MarkSessionDefunct.restype = PyChipError
+
+            self._dmLib.pychip_DeviceController_MarkSessionForEviction.argtypes = [
+                c_void_p, c_uint64]
+            self._dmLib.pychip_DeviceController_MarkSessionForEviction.restype = PyChipError
 
             self._dmLib.pychip_DeviceController_GetAddressAndPort.argtypes = [
                 c_void_p, c_uint64, c_char_p, c_uint64, POINTER(c_uint16)]
@@ -1895,6 +2006,10 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_GetCompletionError.argtypes = []
             self._dmLib.pychip_GetCompletionError.restype = PyChipError
 
+            self._dmLib.pychip_GetCommissioningRCACData.argtypes = [ctypes.POINTER(
+                ctypes.c_uint8), ctypes.POINTER(ctypes.c_size_t), ctypes.c_size_t]
+            self._dmLib.pychip_GetCommissioningRCACData.restype = None
+
             self._dmLib.pychip_DeviceController_IssueNOCChain.argtypes = [
                 c_void_p, py_object, c_char_p, c_size_t, c_uint64]
             self._dmLib.pychip_DeviceController_IssueNOCChain.restype = PyChipError
@@ -1937,6 +2052,18 @@ class ChipDeviceControllerBase():
 
             self._dmLib.pychip_DeviceProxy_GetRemoteSessionParameters.restype = PyChipError
             self._dmLib.pychip_DeviceProxy_GetRemoteSessionParameters.argtypes = [c_void_p, c_char_p]
+
+            self._dmLib.pychip_CreateManualCode.restype = PyChipError
+            self._dmLib.pychip_CreateManualCode.argtypes = [c_uint16, c_uint32, c_char_p, c_size_t, POINTER(c_size_t)]
+
+            self._dmLib.pychip_DeviceController_SetSkipCommissioningComplete.restype = PyChipError
+            self._dmLib.pychip_DeviceController_SetSkipCommissioningComplete.argtypes = [c_bool]
+
+            self._dmLib.pychip_DeviceController_SetTermsAcknowledgements.restype = PyChipError
+            self._dmLib.pychip_DeviceController_SetTermsAcknowledgements.argtypes = [c_uint16, c_uint16]
+
+            self._dmLib.pychip_DeviceController_SetDACRevocationSetPath.restype = PyChipError
+            self._dmLib.pychip_DeviceController_SetDACRevocationSetPath.argtypes = [c_char_p]
 
 
 class ChipDeviceController(ChipDeviceControllerBase):
@@ -2066,6 +2193,20 @@ class ChipDeviceController(ChipDeviceControllerBase):
             lambda: self._dmLib.pychip_DeviceController_SetDSTOffset(offset, validStarting, validUntil)
         ).raise_on_error()
 
+    def SetTCAcknowledgements(self, tcAcceptedVersion: int, tcUserResponse: int):
+        ''' Set the TC acknowledgements to set during commissioning'''
+        self.CheckIsActive()
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_SetTermsAcknowledgements(tcAcceptedVersion, tcUserResponse)
+        ).raise_on_error()
+
+    def SetSkipCommissioningComplete(self, skipCommissioningComplete: bool):
+        ''' Set whether to skip the commissioning complete callback'''
+        self.CheckIsActive()
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_SetSkipCommissioningComplete(skipCommissioningComplete)
+        ).raise_on_error()
+
     def SetDefaultNTP(self, defaultNTP: str):
         ''' Set the DefaultNTP to set during commissioning'''
         self.CheckIsActive()
@@ -2163,6 +2304,34 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
             return await asyncio.futures.wrap_future(ctx.future)
 
+    def get_rcac(self):
+        '''
+        Passes captured RCAC data back to Python test modules for validation
+        - Setting buffer size to max size mentioned in spec:
+        - Ref: https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/06c4d55962954546ecf093c221fe1dab57645028/policies/matter_certificate_policy.adoc#615-key-sizes
+        '''
+        rcac_size = 400
+        rcac_buffer = (ctypes.c_uint8 * rcac_size)()  # Allocate buffer
+
+        actual_rcac_size = ctypes.c_size_t()
+
+        # Now calling the C++ function with the buffer size set as an additional parameter
+        self._dmLib.pychip_GetCommissioningRCACData(
+            ctypes.cast(rcac_buffer, ctypes.POINTER(ctypes.c_uint8)),
+            ctypes.byref(actual_rcac_size),
+            ctypes.c_size_t(rcac_size)  # Pass the buffer size
+        )
+
+        # Check if data is available
+        if actual_rcac_size.value > 0:
+            # Convert the data to a Python bytes object
+            rcac_data = bytearray(rcac_buffer[:actual_rcac_size.value])
+            rcac_bytes = bytes(rcac_data)
+        else:
+            LOGGER.exception("RCAC returned from C++ did not contain any data")
+            return None
+        return rcac_bytes
+
     async def CommissionWithCode(self, setupPayload: str, nodeid: int, discoveryType: DiscoveryType = DiscoveryType.DISCOVERY_ALL) -> int:
         ''' Commission with the given nodeid from the setupPayload.
             setupPayload may be a QR or manual code.
@@ -2221,6 +2390,18 @@ class ChipDeviceController(ChipDeviceControllerBase):
             )
 
             return await asyncio.futures.wrap_future(ctx.future)
+
+    def SetDACRevocationSetPath(self, dacRevocationSetPath: typing.Optional[str]):
+        ''' Set the path to the device attestation revocation set JSON file.
+
+        Args:
+            dacRevocationSetPath: Path to the JSON file containing the device attestation revocation set
+        '''
+        self.CheckIsActive()
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_SetDACRevocationSetPath(
+                c_char_p(str.encode(dacRevocationSetPath) if dacRevocationSetPath else None))
+        ).raise_on_error()
 
 
 class BareChipDeviceController(ChipDeviceControllerBase):

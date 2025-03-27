@@ -55,6 +55,12 @@ class OperationalCredentialsCluster(
 
   class NOCResponse(val statusCode: UByte, val fabricIndex: UByte?, val debugText: String?)
 
+  class SignVIDVerificationResponse(
+    val fabricIndex: UByte,
+    val fabricBindingVersion: UByte,
+    val signature: ByteArray,
+  )
+
   class NOCsAttribute(val value: List<OperationalCredentialsClusterNOCStruct>)
 
   sealed class NOCsAttributeSubscriptionState {
@@ -244,12 +250,12 @@ class OperationalCredentialsCluster(
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_C_S_R_NONCE_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_C_S_R_NONCE_REQ), CSRNonce)
+    val TAG_CSR_NONCE_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_CSR_NONCE_REQ), CSRNonce)
 
-    val TAG_IS_FOR_UPDATE_N_O_C_REQ: Int = 1
+    val TAG_IS_FOR_UPDATE_NOC_REQ: Int = 1
     isForUpdateNOC?.let {
-      tlvWriter.put(ContextSpecificTag(TAG_IS_FOR_UPDATE_N_O_C_REQ), isForUpdateNOC)
+      tlvWriter.put(ContextSpecificTag(TAG_IS_FOR_UPDATE_NOC_REQ), isForUpdateNOC)
     }
     tlvWriter.endStructure()
 
@@ -265,7 +271,7 @@ class OperationalCredentialsCluster(
 
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
-    val TAG_N_O_C_S_R_ELEMENTS: Int = 0
+    val TAG_NOCSR_ELEMENTS: Int = 0
     var NOCSRElements_decoded: ByteArray? = null
 
     val TAG_ATTESTATION_SIGNATURE: Int = 1
@@ -274,7 +280,7 @@ class OperationalCredentialsCluster(
     while (!tlvReader.isEndOfContainer()) {
       val tag = tlvReader.peekElement().tag
 
-      if (tag == ContextSpecificTag(TAG_N_O_C_S_R_ELEMENTS)) {
+      if (tag == ContextSpecificTag(TAG_NOCSR_ELEMENTS)) {
         NOCSRElements_decoded = tlvReader.getByteArray(tag)
       }
 
@@ -311,14 +317,14 @@ class OperationalCredentialsCluster(
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_N_O_C_VALUE_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_N_O_C_VALUE_REQ), NOCValue)
+    val TAG_NOC_VALUE_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_NOC_VALUE_REQ), NOCValue)
 
-    val TAG_I_C_A_C_VALUE_REQ: Int = 1
-    ICACValue?.let { tlvWriter.put(ContextSpecificTag(TAG_I_C_A_C_VALUE_REQ), ICACValue) }
+    val TAG_ICAC_VALUE_REQ: Int = 1
+    ICACValue?.let { tlvWriter.put(ContextSpecificTag(TAG_ICAC_VALUE_REQ), ICACValue) }
 
-    val TAG_I_P_K_VALUE_REQ: Int = 2
-    tlvWriter.put(ContextSpecificTag(TAG_I_P_K_VALUE_REQ), IPKValue)
+    val TAG_IPK_VALUE_REQ: Int = 2
+    tlvWriter.put(ContextSpecificTag(TAG_IPK_VALUE_REQ), IPKValue)
 
     val TAG_CASE_ADMIN_SUBJECT_REQ: Int = 3
     tlvWriter.put(ContextSpecificTag(TAG_CASE_ADMIN_SUBJECT_REQ), caseAdminSubject)
@@ -405,11 +411,11 @@ class OperationalCredentialsCluster(
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_N_O_C_VALUE_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_N_O_C_VALUE_REQ), NOCValue)
+    val TAG_NOC_VALUE_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_NOC_VALUE_REQ), NOCValue)
 
-    val TAG_I_C_A_C_VALUE_REQ: Int = 1
-    ICACValue?.let { tlvWriter.put(ContextSpecificTag(TAG_I_C_A_C_VALUE_REQ), ICACValue) }
+    val TAG_ICAC_VALUE_REQ: Int = 1
+    ICACValue?.let { tlvWriter.put(ContextSpecificTag(TAG_ICAC_VALUE_REQ), ICACValue) }
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
@@ -645,8 +651,8 @@ class OperationalCredentialsCluster(
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_ROOT_C_A_CERTIFICATE_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_ROOT_C_A_CERTIFICATE_REQ), rootCACertificate)
+    val TAG_ROOT_CA_CERTIFICATE_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_ROOT_CA_CERTIFICATE_REQ), rootCACertificate)
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
@@ -658,6 +664,120 @@ class OperationalCredentialsCluster(
 
     val response: InvokeResponse = controller.invoke(request)
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+  }
+
+  suspend fun setVIDVerificationStatement(
+    vendorID: UShort?,
+    VIDVerificationStatement: ByteArray?,
+    vvsc: ByteArray?,
+    timedInvokeTimeout: Duration? = null,
+  ) {
+    val commandId: UInt = 12u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_VENDOR_ID_REQ: Int = 0
+    vendorID?.let { tlvWriter.put(ContextSpecificTag(TAG_VENDOR_ID_REQ), vendorID) }
+
+    val TAG_VID_VERIFICATION_STATEMENT_REQ: Int = 1
+    VIDVerificationStatement?.let {
+      tlvWriter.put(
+        ContextSpecificTag(TAG_VID_VERIFICATION_STATEMENT_REQ),
+        VIDVerificationStatement,
+      )
+    }
+
+    val TAG_VVSC_REQ: Int = 2
+    vvsc?.let { tlvWriter.put(ContextSpecificTag(TAG_VVSC_REQ), vvsc) }
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timedInvokeTimeout,
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+  }
+
+  suspend fun signVIDVerificationRequest(
+    fabricIndex: UByte,
+    clientChallenge: ByteArray,
+    timedInvokeTimeout: Duration? = null,
+  ): SignVIDVerificationResponse {
+    val commandId: UInt = 13u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_FABRIC_INDEX_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_FABRIC_INDEX_REQ), fabricIndex)
+
+    val TAG_CLIENT_CHALLENGE_REQ: Int = 1
+    tlvWriter.put(ContextSpecificTag(TAG_CLIENT_CHALLENGE_REQ), clientChallenge)
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timedInvokeTimeout,
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+
+    val tlvReader = TlvReader(response.payload)
+    tlvReader.enterStructure(AnonymousTag)
+    val TAG_FABRIC_INDEX: Int = 0
+    var fabricIndex_decoded: UByte? = null
+
+    val TAG_FABRIC_BINDING_VERSION: Int = 1
+    var fabricBindingVersion_decoded: UByte? = null
+
+    val TAG_SIGNATURE: Int = 2
+    var signature_decoded: ByteArray? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_FABRIC_INDEX)) {
+        fabricIndex_decoded = tlvReader.getUByte(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_FABRIC_BINDING_VERSION)) {
+        fabricBindingVersion_decoded = tlvReader.getUByte(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_SIGNATURE)) {
+        signature_decoded = tlvReader.getByteArray(tag)
+      } else {
+        tlvReader.skipElement()
+      }
+    }
+
+    if (fabricIndex_decoded == null) {
+      throw IllegalStateException("fabricIndex not found in TLV")
+    }
+
+    if (fabricBindingVersion_decoded == null) {
+      throw IllegalStateException("fabricBindingVersion not found in TLV")
+    }
+
+    if (signature_decoded == null) {
+      throw IllegalStateException("signature not found in TLV")
+    }
+
+    tlvReader.exitContainer()
+
+    return SignVIDVerificationResponse(
+      fabricIndex_decoded,
+      fabricBindingVersion_decoded,
+      signature_decoded,
+    )
   }
 
   suspend fun readNOCsAttribute(): NOCsAttribute {

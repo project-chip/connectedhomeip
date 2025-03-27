@@ -16,8 +16,9 @@ name: Cirque
 
 on:
     push:
-        branches-ignore:
-            - 'dependabot/**'
+        branches:
+            - master
+            - 'v*-branch'
     pull_request:
     merge_group:
     workflow_dispatch:
@@ -74,7 +75,7 @@ jobs:
             - name: Get Cirque Bootstrap cache key
               id: cirque-bootstrap-cache-key
               run: echo "val=$(scripts/tests/cirque_tests.sh cachekeyhash)" >> $GITHUB_OUTPUT
-            - uses: Wandalen/wretry.action@v1.4.10
+            - uses: Wandalen/wretry.action@v3.8.0
               name: Cirque Bootstrap cache
               if: ${{ !env.ACT }}
               continue-on-error: true

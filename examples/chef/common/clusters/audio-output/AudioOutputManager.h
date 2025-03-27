@@ -27,7 +27,7 @@ class AudioOutputManager : public chip::app::Clusters::AudioOutput::Delegate
     using OutputInfoType = chip::app::Clusters::AudioOutput::Structs::OutputInfoStruct::Type;
 
 public:
-    AudioOutputManager();
+    AudioOutputManager(chip::EndpointId endpoint);
 
     uint8_t HandleGetCurrentOutput() override;
     CHIP_ERROR HandleGetOutputList(chip::app::AttributeValueEncoder & aEncoder) override;
@@ -54,6 +54,6 @@ public:
     };
 
 protected:
-    uint8_t mCurrentOutput = 1;
+    chip::EndpointId mEndpoint;
     std::vector<struct OutputData> mOutputs;
 };

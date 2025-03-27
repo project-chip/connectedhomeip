@@ -18,9 +18,6 @@
 
 #pragma once
 
-// TODO(#32628): Remove the CHIPCore.h header when the esp32 build is correctly fixed
-#include <lib/core/CHIPCore.h>
-
 #include <app/ReadHandler.h>
 #include <app/icd/server/ICDStateObserver.h>
 #include <lib/core/CHIPError.h>
@@ -150,6 +147,7 @@ public:
                      IsEngineRunScheduled()));
         }
 
+        bool CanStartReporting() const { return mReadHandler->CanStartReporting(); }
         bool IsChunkedReport() const { return mReadHandler->IsChunkedReport(); }
         bool IsEngineRunScheduled() const { return mFlags.Has(ReadHandlerNodeFlags::EngineRunScheduled); }
         void SetEngineRunScheduled(bool aEngineRunScheduled)

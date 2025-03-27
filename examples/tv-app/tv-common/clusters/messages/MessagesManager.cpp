@@ -21,7 +21,6 @@
 #include <string>
 #include <vector>
 
-using namespace std;
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters::Messages;

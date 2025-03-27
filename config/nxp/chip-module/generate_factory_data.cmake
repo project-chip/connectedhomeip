@@ -218,7 +218,9 @@ function(nxp_generate_factory_data)
     # Localize all scripts needed to generate factory data partition
     set(GENERATE_CERTS_SCRIPT_PATH ${CHIP_ROOT}/scripts/tools/nxp/generate_certs.py)
     set(GENERATE_FDATA_SCRIPT_PATH ${CHIP_ROOT}/scripts/tools/nxp/factory_data_generator/generate.py)
-    set(OUTPUT_FILE_PATH ${APPLICATION_BINARY_DIR}/zephyr)
+    if (NOT OUTPUT_FILE_PATH)
+        set(OUTPUT_FILE_PATH ${APPLICATION_BINARY_DIR}/zephyr)
+    endif()
 
     if(CONFIG_CHIP_FACTORY_DATA_CERT_SOURCE_GENERATED)
         # Generate certificates

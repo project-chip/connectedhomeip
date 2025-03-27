@@ -16,6 +16,7 @@ import logging
 import os
 import shlex
 from enum import Enum, auto
+from typing import Optional
 
 from .builder import Builder, BuilderOutput
 
@@ -117,7 +118,7 @@ class NrfBoard(Enum):
     NRF52840DK = auto()
     NRF52840DONGLE = auto()
     NRF5340DK = auto()
-    NATIVE_POSIX_64 = auto()
+    NATIVE_SIM = auto()
 
     def GnArgName(self):
         if self == NrfBoard.NRF52840DK:
@@ -126,8 +127,8 @@ class NrfBoard(Enum):
             return 'nrf52840dongle_nrf52840'
         elif self == NrfBoard.NRF5340DK:
             return 'nrf5340dk_nrf5340_cpuapp'
-        elif self == NrfBoard.NATIVE_POSIX_64:
-            return 'native_posix_64'
+        elif self == NrfBoard.NATIVE_SIM:
+            return 'native_sim'
         else:
             raise Exception('Unknown board type: %r' % self)
 
@@ -139,7 +140,8 @@ class NrfConnectBuilder(Builder):
                  runner,
                  app: NrfApp = NrfApp.LIGHT,
                  board: NrfBoard = NrfBoard.NRF52840DK,
-                 enable_rpcs: bool = False):
+                 enable_rpcs: bool = False,
+                 ):
         super(NrfConnectBuilder, self).__init__(root, runner)
         self.app = app
         self.board = board
@@ -189,16 +191,12 @@ class NrfConnectBuilder(Builder):
 
             build_flags = " -- " + " ".join(flags) if len(flags) > 0 else ""
 
-            cmd = '''
-source "$ZEPHYR_BASE/zephyr-env.sh";
-export ZEPHYR_TOOLCHAIN_VARIANT=zephyr;'''
-            if zephyr_sdk_dir:
-                cmd += f'''
-export ZEPHYR_SDK_INSTALL_DIR={zephyr_sdk_dir};'''
+            cmd = 'source "$ZEPHYR_BASE/zephyr-env.sh";\nexport ZEPHYR_TOOLCHAIN_VARIANT=zephyr;'
 
-            cmd += '''
-west build --cmake-only -d {outdir} -b {board} --sysbuild {sourcedir}{build_flags}
-        '''.format(
+            if zephyr_sdk_dir:
+                cmd += f'\nexport ZEPHYR_SDK_INSTALL_DIR={zephyr_sdk_dir};'
+
+            cmd += '\nwest build --cmake-only -d {outdir} -b {board} --sysbuild {sourcedir}{build_flags}\n'.format(
                 outdir=shlex.quote(self.output_dir),
                 board=self.board.GnArgName(),
                 sourcedir=shlex.quote(os.path.join(
@@ -211,14 +209,18 @@ west build --cmake-only -d {outdir} -b {board} --sysbuild {sourcedir}{build_flag
     def _build(self):
         logging.info('Compiling NrfConnect at %s', self.output_dir)
 
-        self._Execute(['ninja', '-C', self.output_dir],
-                      title='Building ' + self.identifier)
+        cmd = ['ninja', '-C', self.output_dir]
+
+        if self.ninja_jobs is not None:
+            cmd.append('-j' + str(self.ninja_jobs))
+
+        self._Execute(cmd, title='Building ' + self.identifier)
 
         if self.app == NrfApp.UNIT_TESTS:
             # Note: running zephyr/zephyr.elf has the same result except it creates
             # a flash.bin in the current directory. ctest has more options and does not
             # pollute the source directory
-            self._Execute(['ctest', '--build-nocmake', '-V', '--output-on-failure', '--test-dir', self.output_dir],
+            self._Execute(['ctest', '--build-nocmake', '-V', '--output-on-failure', '--test-dir', os.path.join(self.output_dir, 'nrfconnect'), '--no-tests=error'],
                           title='Run Tests ' + self.identifier)
 
     def _bundle(self):

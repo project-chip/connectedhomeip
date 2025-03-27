@@ -16,7 +16,7 @@
 
 #import "MTRTestResetCommissioneeHelper.h"
 
-void ResetCommissionee(MTRBaseDevice * device, dispatch_queue_t queue, XCTestCase * testcaseUnused, uint16_t commandTimeout)
+void ResetCommissioneeWithNodeID(MTRBaseDevice * device, dispatch_queue_t queue, XCTestCase * testcaseUnused, uint16_t commandTimeout, NSNumber * _Nullable nodeID)
 {
     // Put the device back in the state we found it: open commissioning window, no fabrics commissioned.
     // Get our current fabric index, for later deletion.
@@ -65,5 +65,11 @@ void ResetCommissionee(MTRBaseDevice * device, dispatch_queue_t queue, XCTestCas
                              [removeFabricExpectation fulfill];
                          }];
 
-    XCTAssertEqual([XCTWaiter waitForExpectations:@[ removeFabricExpectation ] timeout:commandTimeout], XCTWaiterResultCompleted);
+    XCTAssertEqual([XCTWaiter waitForExpectations:@[ removeFabricExpectation ] timeout:commandTimeout], XCTWaiterResultCompleted,
+        "Resetting commissionnee 0x%llx", nodeID.unsignedLongLongValue);
+}
+
+void ResetCommissionee(MTRBaseDevice * device, dispatch_queue_t queue, XCTestCase * testcaseUnused, uint16_t commandTimeout)
+{
+    return ResetCommissioneeWithNodeID(device, queue, testcaseUnused, commandTimeout, nil);
 }

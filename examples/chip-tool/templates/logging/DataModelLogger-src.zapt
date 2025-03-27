@@ -1,6 +1,7 @@
 {{> header}}
 
 #include <commands/clusters/DataModelLogger.h>
+#include <zap-generated/cluster/logging/EntryToText.h>
 
 using namespace chip::app::Clusters;
 
@@ -75,7 +76,19 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             {
                 {{zapTypeToDecodableClusterObjectType type ns=parent.name forceNotOptional=true}} value;
                 ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+{{#if (isEqual name "ServerList")}}
+                return DataModelLogger::LogClusterId("{{name}}", 1, value);
+{{else if (isEqual name "ClientList")}}
+                return DataModelLogger::LogClusterId("{{name}}", 1, value);
+{{else if (isEqual name "AttributeList")}}
+                return DataModelLogger::LogAttributeId("{{name}}", 1, value, {{asUpperCamelCase parent.name}}::Id);
+{{else if (isEqual name "AcceptedCommandList")}}
+                return DataModelLogger::LogAcceptedCommandId("{{name}}", 1, value, {{asUpperCamelCase parent.name}}::Id);
+{{else if (isEqual name "GeneratedCommandList")}}
+                return DataModelLogger::LogGeneratedCommandId("{{name}}", 1, value, {{asUpperCamelCase parent.name}}::Id);
+{{else}}
                 return DataModelLogger::LogValue("{{name}}", 1, value);
+{{/if}}
             }
 {{#last}}
           }
@@ -87,7 +100,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         default:
           break;
     }
-    ChipLogProgress(chipTool, "  Don't know how to log atribute value");
+    ChipLogProgress(chipTool, "  Don't know how to log attribute value");
     return CHIP_NO_ERROR;
 }
 

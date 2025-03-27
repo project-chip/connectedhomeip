@@ -72,7 +72,7 @@ size_t ASN1Writer::GetLengthWritten() const
 
 CHIP_ERROR ASN1Writer::PutInteger(int64_t val)
 {
-    ReturnErrorCodeIf(IsNullWriter(), CHIP_NO_ERROR);
+    VerifyOrReturnError(!IsNullWriter(), CHIP_NO_ERROR);
 
     uint8_t encodedVal[sizeof(int64_t)];
     uint8_t valStart, valLen;
@@ -94,7 +94,7 @@ CHIP_ERROR ASN1Writer::PutInteger(int64_t val)
 
 CHIP_ERROR ASN1Writer::PutBoolean(bool val)
 {
-    ReturnErrorCodeIf(IsNullWriter(), CHIP_NO_ERROR);
+    VerifyOrReturnError(!IsNullWriter(), CHIP_NO_ERROR);
 
     ReturnErrorOnFailure(EncodeHead(kASN1TagClass_Universal, kASN1UniversalTag_Boolean, false, 1));
 
@@ -170,7 +170,7 @@ static uint8_t HighestBit(uint32_t v)
 
 CHIP_ERROR ASN1Writer::PutBitString(uint32_t val)
 {
-    ReturnErrorCodeIf(IsNullWriter(), CHIP_NO_ERROR);
+    VerifyOrReturnError(!IsNullWriter(), CHIP_NO_ERROR);
 
     uint8_t len;
     if (val == 0)
@@ -218,7 +218,7 @@ CHIP_ERROR ASN1Writer::PutBitString(uint32_t val)
 
 CHIP_ERROR ASN1Writer::PutBitString(uint8_t unusedBitCount, const uint8_t * encodedBits, uint16_t encodedBitsLen)
 {
-    ReturnErrorCodeIf(IsNullWriter(), CHIP_NO_ERROR);
+    VerifyOrReturnError(!IsNullWriter(), CHIP_NO_ERROR);
 
     ReturnErrorOnFailure(EncodeHead(kASN1TagClass_Universal, kASN1UniversalTag_BitString, false, encodedBitsLen + 1));
 
@@ -236,7 +236,7 @@ CHIP_ERROR ASN1Writer::PutBitString(uint8_t unusedBitCount, chip::TLV::TLVReader
 
     VerifyOrReturnError(CanCastTo<int32_t>(encodedBits.size() + 1), ASN1_ERROR_LENGTH_OVERFLOW);
 
-    ReturnErrorCodeIf(IsNullWriter(), CHIP_NO_ERROR);
+    VerifyOrReturnError(!IsNullWriter(), CHIP_NO_ERROR);
 
     ReturnErrorOnFailure(
         EncodeHead(kASN1TagClass_Universal, kASN1UniversalTag_BitString, false, static_cast<int32_t>(encodedBits.size() + 1)));
@@ -250,7 +250,7 @@ CHIP_ERROR ASN1Writer::PutBitString(uint8_t unusedBitCount, chip::TLV::TLVReader
 
 CHIP_ERROR ASN1Writer::PutTime(const ASN1UniversalTime & val)
 {
-    ReturnErrorCodeIf(IsNullWriter(), CHIP_NO_ERROR);
+    VerifyOrReturnError(!IsNullWriter(), CHIP_NO_ERROR);
 
     char buf[ASN1UniversalTime::kASN1TimeStringMaxLength];
     MutableCharSpan bufSpan(buf);
@@ -276,7 +276,7 @@ CHIP_ERROR ASN1Writer::PutNull()
 
 CHIP_ERROR ASN1Writer::PutConstructedType(const uint8_t * val, uint16_t valLen)
 {
-    ReturnErrorCodeIf(IsNullWriter(), CHIP_NO_ERROR);
+    VerifyOrReturnError(!IsNullWriter(), CHIP_NO_ERROR);
 
     // Make sure we have enough space to write
     VerifyOrReturnError((mWritePoint + valLen) <= mBufEnd, ASN1_ERROR_OVERFLOW);
@@ -298,7 +298,7 @@ CHIP_ERROR ASN1Writer::EndConstructedType()
 
 CHIP_ERROR ASN1Writer::StartEncapsulatedType(uint8_t cls, uint8_t tag, bool bitStringEncoding)
 {
-    ReturnErrorCodeIf(IsNullWriter(), CHIP_NO_ERROR);
+    VerifyOrReturnError(!IsNullWriter(), CHIP_NO_ERROR);
 
     ReturnErrorOnFailure(EncodeHead(cls, tag, false, kUnknownLength));
 
@@ -321,7 +321,7 @@ CHIP_ERROR ASN1Writer::EndEncapsulatedType()
 
 CHIP_ERROR ASN1Writer::PutValue(uint8_t cls, uint8_t tag, bool isConstructed, const uint8_t * val, uint16_t valLen)
 {
-    ReturnErrorCodeIf(IsNullWriter(), CHIP_NO_ERROR);
+    VerifyOrReturnError(!IsNullWriter(), CHIP_NO_ERROR);
 
     ReturnErrorOnFailure(EncodeHead(cls, tag, isConstructed, valLen));
 
@@ -337,7 +337,7 @@ CHIP_ERROR ASN1Writer::PutValue(uint8_t cls, uint8_t tag, bool isConstructed, ch
 
     VerifyOrReturnError(CanCastTo<int32_t>(val.size()), ASN1_ERROR_LENGTH_OVERFLOW);
 
-    ReturnErrorCodeIf(IsNullWriter(), CHIP_NO_ERROR);
+    VerifyOrReturnError(!IsNullWriter(), CHIP_NO_ERROR);
 
     ReturnErrorOnFailure(EncodeHead(cls, tag, isConstructed, static_cast<int32_t>(val.size())));
 
@@ -348,7 +348,7 @@ CHIP_ERROR ASN1Writer::PutValue(uint8_t cls, uint8_t tag, bool isConstructed, ch
 
 CHIP_ERROR ASN1Writer::EncodeHead(uint8_t cls, uint8_t tag, bool isConstructed, int32_t len)
 {
-    ReturnErrorCodeIf(IsNullWriter(), CHIP_NO_ERROR);
+    VerifyOrReturnError(!IsNullWriter(), CHIP_NO_ERROR);
 
     uint8_t bytesForLen;
     uint32_t totalLen;
@@ -399,7 +399,7 @@ CHIP_ERROR ASN1Writer::EncodeHead(uint8_t cls, uint8_t tag, bool isConstructed, 
 
 CHIP_ERROR ASN1Writer::WriteDeferredLength()
 {
-    ReturnErrorCodeIf(IsNullWriter(), CHIP_NO_ERROR);
+    VerifyOrReturnError(!IsNullWriter(), CHIP_NO_ERROR);
 
     VerifyOrReturnError(mDeferredLengthCount > 0, ASN1_ERROR_INVALID_STATE);
 

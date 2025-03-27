@@ -202,7 +202,7 @@ combination with JLinkRTTClient as follows:
 
 -   It is assumed here that you already have an OpenThread border router
     configured and running. If not see the following guide
-    [Openthread_border_router](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/openthread_border_router_pi.md)
+    [Openthread_border_router](https://github.com/project-chip/connectedhomeip/blob/master/docs/platforms/openthread/openthread_border_router_pi.md)
     for more information on how to setup a border router on a raspberryPi.
 
     Take note that the RCP code is available directly through
@@ -250,6 +250,7 @@ combination with JLinkRTTClient as follows:
         -   _Press and Release_ : Start, or restart, BLE advertisement in fast mode. It will advertise in this mode
             for 30 seconds. The device will then switch to a slower interval advertisement.
             After 15 minutes, the advertisement stops.
+            Additionally, it will cycle through the QR code, application status screen and device status screen, respectively.
 
         -   _Pressed and hold for 6 s_ : Initiates the factory reset of the device.
             Releasing the button within the 6-second window cancels the factory reset
@@ -317,7 +318,7 @@ tracking code inside the `trackAlloc` and `trackFree` function
 
 For the description of Software Update process with EFR32 example applications
 see
-[EFR32 OTA Software Update](../../../docs/guides/silabs_efr32_software_update.md)
+[EFR32 OTA Software Update](../../../docs/platforms/silabs/silabs_efr32_software_update.md)
 
 ## Building options
 

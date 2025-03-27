@@ -161,8 +161,8 @@ class TimeSynchronizationCluster(
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_U_T_C_TIME_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_U_T_C_TIME_REQ), UTCTime)
+    val TAG_UTC_TIME_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_UTC_TIME_REQ), UTCTime)
 
     val TAG_GRANULARITY_REQ: Int = 1
     tlvWriter.put(ContextSpecificTag(TAG_GRANULARITY_REQ), granularity)
@@ -237,13 +237,13 @@ class TimeSynchronizationCluster(
 
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
-    val TAG_D_S_T_OFFSET_REQUIRED: Int = 0
+    val TAG_DST_OFFSET_REQUIRED: Int = 0
     var DSTOffsetRequired_decoded: Boolean? = null
 
     while (!tlvReader.isEndOfContainer()) {
       val tag = tlvReader.peekElement().tag
 
-      if (tag == ContextSpecificTag(TAG_D_S_T_OFFSET_REQUIRED)) {
+      if (tag == ContextSpecificTag(TAG_DST_OFFSET_REQUIRED)) {
         DSTOffsetRequired_decoded = tlvReader.getBoolean(tag)
       } else {
         tlvReader.skipElement()
@@ -268,8 +268,8 @@ class TimeSynchronizationCluster(
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_D_S_T_OFFSET_REQ: Int = 0
-    tlvWriter.startArray(ContextSpecificTag(TAG_D_S_T_OFFSET_REQ))
+    val TAG_DST_OFFSET_REQ: Int = 0
+    tlvWriter.startArray(ContextSpecificTag(TAG_DST_OFFSET_REQ))
     for (item in DSTOffset.iterator()) {
       item.toTlv(AnonymousTag, tlvWriter)
     }
@@ -293,8 +293,8 @@ class TimeSynchronizationCluster(
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_DEFAULT_N_T_P_REQ: Int = 0
-    defaultNTP?.let { tlvWriter.put(ContextSpecificTag(TAG_DEFAULT_N_T_P_REQ), defaultNTP) }
+    val TAG_DEFAULT_NTP_REQ: Int = 0
+    defaultNTP?.let { tlvWriter.put(ContextSpecificTag(TAG_DEFAULT_NTP_REQ), defaultNTP) }
     tlvWriter.endStructure()
 
     val request: InvokeRequest =

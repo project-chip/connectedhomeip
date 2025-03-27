@@ -66,7 +66,7 @@
 #endif
 
 // pw RPC uses UART DMA by default
-#ifdef PW_RPC_ENABLED
+#ifdef CONFIG_ENABLE_PW_RPC
 #define CONSUMER_TASK_HANDLE RpcTaskHandle
 #ifndef STREAMER_UART_USE_DMA
 #define STREAMER_UART_USE_DMA 1
@@ -76,7 +76,7 @@
 #ifndef STREAMER_UART_USE_DMA
 #define STREAMER_UART_USE_DMA 0
 #endif
-#endif // PW_RPC_ENABLED
+#endif // CONFIG_ENABLE_PW_RPC
 
 #if STREAMER_UART_USE_DMA
 typedef serial_port_uart_dma_config_t streamer_serial_port_uart_config_t;
@@ -221,6 +221,9 @@ ssize_t streamer_nxp_read(streamer_t * streamer, char * buffer, size_t length)
         if (bytesRead == 0)
         {
             readDone = true;
+            /* Return -1 to cancel the cli command, this command is empty as we are reading uart input until it
+            is empty but for matter shell empty command is meaning stop the shell loop */
+            return -1;
         }
     }
 

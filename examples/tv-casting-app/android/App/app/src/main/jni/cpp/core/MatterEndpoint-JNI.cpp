@@ -18,7 +18,6 @@
 
 #include "MatterEndpoint-JNI.h"
 
-#include "../JNIDACProvider.h"
 #include "../support/MatterCallback-JNI.h"
 #include "../support/RotatingDeviceIdUniqueIdProvider-JNI.h"
 #include "clusters/Clusters.h"           // from tv-casting-common

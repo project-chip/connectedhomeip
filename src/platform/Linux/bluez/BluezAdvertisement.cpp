@@ -29,7 +29,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/GLibTypeDeleter.h>
-#include <platform/Linux/dbus/bluez/DbusBluez.h>
+#include <platform/Linux/dbus/bluez/DBusBluez.h>
 #include <platform/PlatformManager.h>
 
 #include "BluezEndpoint.h"
@@ -161,7 +161,7 @@ CHIP_ERROR BluezAdvertisement::SetupServiceData(ServiceDataFlags aFlags)
     deviceInfo.SetAdditionalDataFlag(true);
 #endif
 
-#if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
+#if CHIP_DEVICE_CONFIG_EXT_ADVERTISING
     if (aFlags & kServiceDataExtendedAnnouncement)
     {
         deviceInfo.SetExtendedAnnouncementFlag(true);

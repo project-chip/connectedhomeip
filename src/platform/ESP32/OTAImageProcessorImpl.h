@@ -27,6 +27,18 @@
 #include <esp_encrypted_img.h>
 #endif // CONFIG_ENABLE_ENCRYPTED_OTA
 
+#ifdef CONFIG_ENABLE_DELTA_OTA
+#include "esp_app_format.h"
+#include <esp_delta_ota.h>
+#define IMG_HEADER_LEN sizeof(esp_image_header_t)
+#endif // CONFIG_ENABLE_DELTA_OTA
+
+#if defined(CONFIG_AUTO_UPDATE_RCP) && defined(CONFIG_OPENTHREAD_BORDER_ROUTER)
+#include "esp_check.h"
+#include "esp_rcp_ota.h"
+#include "esp_rcp_update.h"
+#endif
+
 namespace chip {
 
 class OTAImageProcessorImpl : public OTAImageProcessorInterface
@@ -64,6 +76,19 @@ private:
     MutableByteSpan mBlock;
     const esp_partition_t * mOTAUpdatePartition = nullptr;
     esp_ota_handle_t mOTAUpdateHandle;
+#ifdef CONFIG_ENABLE_DELTA_OTA
+    esp_delta_ota_handle_t mDeltaOTAUpdateHandle;
+    esp_delta_ota_cfg_t deltaOtaCfg;
+    bool patchHeaderVerified = false;
+    bool chipIdVerified      = false;
+
+    static void DeltaOTACleanUp(intptr_t context);
+    static bool VerifyChipId(esp_chip_id_t chipId);
+    static bool VerifyPatchHeader(void * imgHeaderData);
+    esp_err_t VerifyHeaderData(const uint8_t * buf, size_t size, int * index);
+    static esp_err_t DeltaOTAReadCallback(uint8_t * buf_p, size_t size, int src_offset);
+    static esp_err_t DeltaOTAWriteCallback(const uint8_t * buf_p, size_t size, void * arg);
+#endif // CONFIG_ENABLE_DELTA_OTA
     OTAImageHeaderParser mHeaderParser;
 
 #ifdef CONFIG_ENABLE_ENCRYPTED_OTA
@@ -80,6 +105,13 @@ private:
     bool mEncryptedOTAEnabled                 = false;
     esp_decrypt_handle_t mOTADecryptionHandle = nullptr;
 #endif // CONFIG_ENABLE_ENCRYPTED_OTA
+
+#if defined(CONFIG_AUTO_UPDATE_RCP) && defined(CONFIG_OPENTHREAD_BORDER_ROUTER)
+    esp_rcp_ota_handle_t mRcpOtaHandle;
+    bool mRcpFirmwareDownloaded;
+    uint32_t mBrFirmwareSize;
+    esp_err_t ProcessRcpImage(const uint8_t * buffer, uint32_t bufLen);
+#endif
 };
 
 } // namespace chip

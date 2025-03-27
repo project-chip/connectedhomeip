@@ -115,8 +115,8 @@ class IcdManagementCluster(
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_CHECK_IN_NODE_I_D_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_CHECK_IN_NODE_I_D_REQ), checkInNodeID)
+    val TAG_CHECK_IN_NODE_ID_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_CHECK_IN_NODE_ID_REQ), checkInNodeID)
 
     val TAG_MONITORED_SUBJECT_REQ: Int = 1
     tlvWriter.put(ContextSpecificTag(TAG_MONITORED_SUBJECT_REQ), monitoredSubject)
@@ -145,13 +145,13 @@ class IcdManagementCluster(
 
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
-    val TAG_I_C_D_COUNTER: Int = 0
+    val TAG_ICD_COUNTER: Int = 0
     var ICDCounter_decoded: UInt? = null
 
     while (!tlvReader.isEndOfContainer()) {
       val tag = tlvReader.peekElement().tag
 
-      if (tag == ContextSpecificTag(TAG_I_C_D_COUNTER)) {
+      if (tag == ContextSpecificTag(TAG_ICD_COUNTER)) {
         ICDCounter_decoded = tlvReader.getUInt(tag)
       } else {
         tlvReader.skipElement()
@@ -177,8 +177,8 @@ class IcdManagementCluster(
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_CHECK_IN_NODE_I_D_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_CHECK_IN_NODE_I_D_REQ), checkInNodeID)
+    val TAG_CHECK_IN_NODE_ID_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_CHECK_IN_NODE_ID_REQ), checkInNodeID)
 
     val TAG_VERIFICATION_KEY_REQ: Int = 1
     verificationKey?.let {

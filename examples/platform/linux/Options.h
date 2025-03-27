@@ -28,15 +28,22 @@
 #include <string>
 #include <vector>
 
+#include <access/AccessConfig.h>
+#include <app/AppConfig.h>
 #include <inet/InetInterface.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/Optional.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <platform/CHIPDeviceConfig.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/SetupPayload.h>
 
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <testing/CustomCSRResponse.h>
+
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+#include <access/AccessRestrictionProvider.h>
+#endif
 
 struct LinuxDeviceOptions
 {
@@ -44,6 +51,7 @@ struct LinuxDeviceOptions
     chip::Optional<uint16_t> discriminator;
     chip::Optional<std::vector<uint8_t>> spake2pVerifier;
     chip::Optional<std::vector<uint8_t>> spake2pSalt;
+    chip::Optional<std::string> dacProviderFile;
     uint32_t spake2pIterations = 0; // When not provided (0), will default elsewhere
     uint32_t mBleDevice        = 0;
     bool wifiSupports5g        = false;
@@ -81,6 +89,18 @@ struct LinuxDeviceOptions
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     int32_t subscriptionCapacity                   = CHIP_IM_MAX_NUM_SUBSCRIPTIONS;
     int32_t subscriptionResumptionRetryIntervalSec = -1;
+#endif
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+    chip::Optional<std::vector<chip::Access::AccessRestrictionProvider::Entry>> commissioningArlEntries;
+    chip::Optional<std::vector<chip::Access::AccessRestrictionProvider::Entry>> arlEntries;
+#endif
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+    chip::Optional<uint16_t> tcVersion;
+    chip::Optional<uint16_t> tcRequired;
+#endif
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    chip::Optional<chip::System::Clock::Milliseconds32> icdActiveModeDurationMs;
+    chip::Optional<chip::System::Clock::Milliseconds32> icdIdleModeDurationMs;
 #endif
     static LinuxDeviceOptions & GetInstance();
 };

@@ -19,12 +19,21 @@
 # for details about the block below.
 #
 # === BEGIN CI TEST ARGUMENTS ===
-# test-runner-runs: run1
-# test-runner-run/run1/app: ${CHIP_RVC_APP}
-# test-runner-run/run1/factoryreset: True
-# test-runner-run/run1/quiet: True
-# test-runner-run/run1/app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-# test-runner-run/run1/script-args: --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values --endpoint 1 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+# test-runner-runs:
+#   run1:
+#     app: ${CHIP_RVC_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values
+#       --endpoint 1
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
@@ -32,7 +41,7 @@ from time import sleep
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
-from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
+from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
 
 
@@ -138,14 +147,6 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
                                          endpoint=self.endpoint)
         return ret
 
-    # Sends and out-of-band command to the rvc-app
-    def write_to_app_pipe(self, command):
-        with open(self.app_pipe, "w") as app_pipe:
-            app_pipe.write(command + "\n")
-        # Delay for pipe command to be processed (otherwise tests are flaky)
-        # TODO(#31239): centralize pipe write logic and remove the need of sleep
-        sleep(0.001)
-
     # Prints the instruction and waits for a user input to continue
     def print_instruction(self, step_number, instruction):
         self.print_step(step_number, instruction)
@@ -157,7 +158,7 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
     @async_test_body
     async def test_TC_RVCOPSTATE_2_3(self):
 
-        self.endpoint = self.matter_test_config.endpoint
+        self.endpoint = self.get_endpoint()
         asserts.assert_false(self.endpoint is None, "--endpoint <endpoint> must be included on the command line in.")
         self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
         if self.is_ci:
@@ -182,7 +183,7 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
 
         # Ensure that the device is in the correct state
         if self.is_ci:
-            self.write_to_app_pipe('{"Name": "Reset"}')
+            self.write_to_app_pipe({"Name": "Reset"})
 
         test_step = "Manually put the device in a state where it can receive a Pause command"
         self.print_step(2, test_step)
@@ -269,7 +270,7 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
             test_step = "Manually put the device in the Stopped(0x00) operational state"
             self.print_step(24, test_step)
             if self.is_ci:
-                self.write_to_app_pipe('{"Name": "Reset"}')
+                self.write_to_app_pipe({"Name": "Reset"})
             else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
@@ -283,7 +284,7 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
             test_step = "Manually put the device in the Error(0x03) operational state"
             self.print_step(28, test_step)
             if self.is_ci:
-                self.write_to_app_pipe('{"Name": "ErrorEvent", "Error": "Stuck"}')
+                self.write_to_app_pipe({"Name": "ErrorEvent", "Error": "Stuck"})
             else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
@@ -297,10 +298,10 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
             test_step = "Manually put the device in the Charging(0x41) operational state"
             self.print_step(32, test_step)
             if self.is_ci:
-                self.write_to_app_pipe('{"Name": "Reset"}')
+                self.write_to_app_pipe({"Name": "Reset"})
                 await self.send_run_change_to_mode_cmd(1)
                 await self.send_run_change_to_mode_cmd(0)
-                self.write_to_app_pipe('{"Name": "ChargerFound"}')
+                self.write_to_app_pipe({"Name": "ChargerFound"})
             else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 
@@ -320,7 +321,7 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
             test_step = "Manually put the device in the Docked(0x42) operational state"
             self.print_step(38, test_step)
             if self.is_ci:
-                self.write_to_app_pipe('{"Name": "Charged"}')
+                self.write_to_app_pipe({"Name": "Charged"})
             else:
                 self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
 

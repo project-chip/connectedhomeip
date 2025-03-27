@@ -51,7 +51,7 @@ class ScenesManagementCluster(
     val sceneID: UByte,
     val transitionTime: UInt?,
     val sceneName: String?,
-    val extensionFieldSets: List<ScenesManagementClusterExtensionFieldSet>?,
+    val extensionFieldSetStructs: List<ScenesManagementClusterExtensionFieldSetStruct>?,
   )
 
   class RemoveSceneResponse(val status: UByte, val groupID: UShort, val sceneID: UByte)
@@ -72,16 +72,6 @@ class ScenesManagementCluster(
     val groupIdentifierFrom: UShort,
     val sceneIdentifierFrom: UByte,
   )
-
-  class LastConfiguredByAttribute(val value: ULong?)
-
-  sealed class LastConfiguredByAttributeSubscriptionState {
-    data class Success(val value: ULong?) : LastConfiguredByAttributeSubscriptionState()
-
-    data class Error(val exception: Exception) : LastConfiguredByAttributeSubscriptionState()
-
-    object SubscriptionEstablished : LastConfiguredByAttributeSubscriptionState()
-  }
 
   class FabricSceneInfoAttribute(val value: List<ScenesManagementClusterSceneInfoStruct>)
 
@@ -139,7 +129,7 @@ class ScenesManagementCluster(
     sceneID: UByte,
     transitionTime: UInt,
     sceneName: String,
-    extensionFieldSets: List<ScenesManagementClusterExtensionFieldSet>,
+    extensionFieldSetStructs: List<ScenesManagementClusterExtensionFieldSetStruct>,
     timedInvokeTimeout: Duration? = null,
   ): AddSceneResponse {
     val commandId: UInt = 0u
@@ -147,11 +137,11 @@ class ScenesManagementCluster(
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_GROUP_I_D_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_GROUP_I_D_REQ), groupID)
+    val TAG_GROUP_ID_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_GROUP_ID_REQ), groupID)
 
-    val TAG_SCENE_I_D_REQ: Int = 1
-    tlvWriter.put(ContextSpecificTag(TAG_SCENE_I_D_REQ), sceneID)
+    val TAG_SCENE_ID_REQ: Int = 1
+    tlvWriter.put(ContextSpecificTag(TAG_SCENE_ID_REQ), sceneID)
 
     val TAG_TRANSITION_TIME_REQ: Int = 2
     tlvWriter.put(ContextSpecificTag(TAG_TRANSITION_TIME_REQ), transitionTime)
@@ -159,9 +149,9 @@ class ScenesManagementCluster(
     val TAG_SCENE_NAME_REQ: Int = 3
     tlvWriter.put(ContextSpecificTag(TAG_SCENE_NAME_REQ), sceneName)
 
-    val TAG_EXTENSION_FIELD_SETS_REQ: Int = 4
-    tlvWriter.startArray(ContextSpecificTag(TAG_EXTENSION_FIELD_SETS_REQ))
-    for (item in extensionFieldSets.iterator()) {
+    val TAG_EXTENSION_FIELD_SET_STRUCTS_REQ: Int = 4
+    tlvWriter.startArray(ContextSpecificTag(TAG_EXTENSION_FIELD_SET_STRUCTS_REQ))
+    for (item in extensionFieldSetStructs.iterator()) {
       item.toTlv(AnonymousTag, tlvWriter)
     }
     tlvWriter.endArray()
@@ -182,10 +172,10 @@ class ScenesManagementCluster(
     val TAG_STATUS: Int = 0
     var status_decoded: UByte? = null
 
-    val TAG_GROUP_I_D: Int = 1
+    val TAG_GROUP_ID: Int = 1
     var groupID_decoded: UShort? = null
 
-    val TAG_SCENE_I_D: Int = 2
+    val TAG_SCENE_ID: Int = 2
     var sceneID_decoded: UByte? = null
 
     while (!tlvReader.isEndOfContainer()) {
@@ -195,11 +185,11 @@ class ScenesManagementCluster(
         status_decoded = tlvReader.getUByte(tag)
       }
 
-      if (tag == ContextSpecificTag(TAG_GROUP_I_D)) {
+      if (tag == ContextSpecificTag(TAG_GROUP_ID)) {
         groupID_decoded = tlvReader.getUShort(tag)
       }
 
-      if (tag == ContextSpecificTag(TAG_SCENE_I_D)) {
+      if (tag == ContextSpecificTag(TAG_SCENE_ID)) {
         sceneID_decoded = tlvReader.getUByte(tag)
       } else {
         tlvReader.skipElement()
@@ -233,11 +223,11 @@ class ScenesManagementCluster(
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_GROUP_I_D_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_GROUP_I_D_REQ), groupID)
+    val TAG_GROUP_ID_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_GROUP_ID_REQ), groupID)
 
-    val TAG_SCENE_I_D_REQ: Int = 1
-    tlvWriter.put(ContextSpecificTag(TAG_SCENE_I_D_REQ), sceneID)
+    val TAG_SCENE_ID_REQ: Int = 1
+    tlvWriter.put(ContextSpecificTag(TAG_SCENE_ID_REQ), sceneID)
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
@@ -255,10 +245,10 @@ class ScenesManagementCluster(
     val TAG_STATUS: Int = 0
     var status_decoded: UByte? = null
 
-    val TAG_GROUP_I_D: Int = 1
+    val TAG_GROUP_ID: Int = 1
     var groupID_decoded: UShort? = null
 
-    val TAG_SCENE_I_D: Int = 2
+    val TAG_SCENE_ID: Int = 2
     var sceneID_decoded: UByte? = null
 
     val TAG_TRANSITION_TIME: Int = 3
@@ -267,8 +257,9 @@ class ScenesManagementCluster(
     val TAG_SCENE_NAME: Int = 4
     var sceneName_decoded: String? = null
 
-    val TAG_EXTENSION_FIELD_SETS: Int = 5
-    var extensionFieldSets_decoded: List<ScenesManagementClusterExtensionFieldSet>? = null
+    val TAG_EXTENSION_FIELD_SET_STRUCTS: Int = 5
+    var extensionFieldSetStructs_decoded: List<ScenesManagementClusterExtensionFieldSetStruct>? =
+      null
 
     while (!tlvReader.isEndOfContainer()) {
       val tag = tlvReader.peekElement().tag
@@ -277,11 +268,11 @@ class ScenesManagementCluster(
         status_decoded = tlvReader.getUByte(tag)
       }
 
-      if (tag == ContextSpecificTag(TAG_GROUP_I_D)) {
+      if (tag == ContextSpecificTag(TAG_GROUP_ID)) {
         groupID_decoded = tlvReader.getUShort(tag)
       }
 
-      if (tag == ContextSpecificTag(TAG_SCENE_I_D)) {
+      if (tag == ContextSpecificTag(TAG_SCENE_ID)) {
         sceneID_decoded = tlvReader.getUByte(tag)
       }
 
@@ -313,17 +304,19 @@ class ScenesManagementCluster(
           }
       }
 
-      if (tag == ContextSpecificTag(TAG_EXTENSION_FIELD_SETS)) {
-        extensionFieldSets_decoded =
+      if (tag == ContextSpecificTag(TAG_EXTENSION_FIELD_SET_STRUCTS)) {
+        extensionFieldSetStructs_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
             null
           } else {
             if (tlvReader.isNextTag(tag)) {
-              buildList<ScenesManagementClusterExtensionFieldSet> {
+              buildList<ScenesManagementClusterExtensionFieldSetStruct> {
                 tlvReader.enterArray(tag)
                 while (!tlvReader.isEndOfContainer()) {
-                  add(ScenesManagementClusterExtensionFieldSet.fromTlv(AnonymousTag, tlvReader))
+                  add(
+                    ScenesManagementClusterExtensionFieldSetStruct.fromTlv(AnonymousTag, tlvReader)
+                  )
                 }
                 tlvReader.exitContainer()
               }
@@ -356,7 +349,7 @@ class ScenesManagementCluster(
       sceneID_decoded,
       transitionTime_decoded,
       sceneName_decoded,
-      extensionFieldSets_decoded,
+      extensionFieldSetStructs_decoded,
     )
   }
 
@@ -370,11 +363,11 @@ class ScenesManagementCluster(
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_GROUP_I_D_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_GROUP_I_D_REQ), groupID)
+    val TAG_GROUP_ID_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_GROUP_ID_REQ), groupID)
 
-    val TAG_SCENE_I_D_REQ: Int = 1
-    tlvWriter.put(ContextSpecificTag(TAG_SCENE_I_D_REQ), sceneID)
+    val TAG_SCENE_ID_REQ: Int = 1
+    tlvWriter.put(ContextSpecificTag(TAG_SCENE_ID_REQ), sceneID)
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
@@ -392,10 +385,10 @@ class ScenesManagementCluster(
     val TAG_STATUS: Int = 0
     var status_decoded: UByte? = null
 
-    val TAG_GROUP_I_D: Int = 1
+    val TAG_GROUP_ID: Int = 1
     var groupID_decoded: UShort? = null
 
-    val TAG_SCENE_I_D: Int = 2
+    val TAG_SCENE_ID: Int = 2
     var sceneID_decoded: UByte? = null
 
     while (!tlvReader.isEndOfContainer()) {
@@ -405,11 +398,11 @@ class ScenesManagementCluster(
         status_decoded = tlvReader.getUByte(tag)
       }
 
-      if (tag == ContextSpecificTag(TAG_GROUP_I_D)) {
+      if (tag == ContextSpecificTag(TAG_GROUP_ID)) {
         groupID_decoded = tlvReader.getUShort(tag)
       }
 
-      if (tag == ContextSpecificTag(TAG_SCENE_I_D)) {
+      if (tag == ContextSpecificTag(TAG_SCENE_ID)) {
         sceneID_decoded = tlvReader.getUByte(tag)
       } else {
         tlvReader.skipElement()
@@ -442,8 +435,8 @@ class ScenesManagementCluster(
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_GROUP_I_D_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_GROUP_I_D_REQ), groupID)
+    val TAG_GROUP_ID_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_GROUP_ID_REQ), groupID)
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
@@ -461,7 +454,7 @@ class ScenesManagementCluster(
     val TAG_STATUS: Int = 0
     var status_decoded: UByte? = null
 
-    val TAG_GROUP_I_D: Int = 1
+    val TAG_GROUP_ID: Int = 1
     var groupID_decoded: UShort? = null
 
     while (!tlvReader.isEndOfContainer()) {
@@ -471,7 +464,7 @@ class ScenesManagementCluster(
         status_decoded = tlvReader.getUByte(tag)
       }
 
-      if (tag == ContextSpecificTag(TAG_GROUP_I_D)) {
+      if (tag == ContextSpecificTag(TAG_GROUP_ID)) {
         groupID_decoded = tlvReader.getUShort(tag)
       } else {
         tlvReader.skipElement()
@@ -501,11 +494,11 @@ class ScenesManagementCluster(
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_GROUP_I_D_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_GROUP_I_D_REQ), groupID)
+    val TAG_GROUP_ID_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_GROUP_ID_REQ), groupID)
 
-    val TAG_SCENE_I_D_REQ: Int = 1
-    tlvWriter.put(ContextSpecificTag(TAG_SCENE_I_D_REQ), sceneID)
+    val TAG_SCENE_ID_REQ: Int = 1
+    tlvWriter.put(ContextSpecificTag(TAG_SCENE_ID_REQ), sceneID)
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
@@ -523,10 +516,10 @@ class ScenesManagementCluster(
     val TAG_STATUS: Int = 0
     var status_decoded: UByte? = null
 
-    val TAG_GROUP_I_D: Int = 1
+    val TAG_GROUP_ID: Int = 1
     var groupID_decoded: UShort? = null
 
-    val TAG_SCENE_I_D: Int = 2
+    val TAG_SCENE_ID: Int = 2
     var sceneID_decoded: UByte? = null
 
     while (!tlvReader.isEndOfContainer()) {
@@ -536,11 +529,11 @@ class ScenesManagementCluster(
         status_decoded = tlvReader.getUByte(tag)
       }
 
-      if (tag == ContextSpecificTag(TAG_GROUP_I_D)) {
+      if (tag == ContextSpecificTag(TAG_GROUP_ID)) {
         groupID_decoded = tlvReader.getUShort(tag)
       }
 
-      if (tag == ContextSpecificTag(TAG_SCENE_I_D)) {
+      if (tag == ContextSpecificTag(TAG_SCENE_ID)) {
         sceneID_decoded = tlvReader.getUByte(tag)
       } else {
         tlvReader.skipElement()
@@ -575,11 +568,11 @@ class ScenesManagementCluster(
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_GROUP_I_D_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_GROUP_I_D_REQ), groupID)
+    val TAG_GROUP_ID_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_GROUP_ID_REQ), groupID)
 
-    val TAG_SCENE_I_D_REQ: Int = 1
-    tlvWriter.put(ContextSpecificTag(TAG_SCENE_I_D_REQ), sceneID)
+    val TAG_SCENE_ID_REQ: Int = 1
+    tlvWriter.put(ContextSpecificTag(TAG_SCENE_ID_REQ), sceneID)
 
     val TAG_TRANSITION_TIME_REQ: Int = 2
     transitionTime?.let {
@@ -607,8 +600,8 @@ class ScenesManagementCluster(
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
 
-    val TAG_GROUP_I_D_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_GROUP_I_D_REQ), groupID)
+    val TAG_GROUP_ID_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_GROUP_ID_REQ), groupID)
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
@@ -629,7 +622,7 @@ class ScenesManagementCluster(
     val TAG_CAPACITY: Int = 1
     var capacity_decoded: UByte? = null
 
-    val TAG_GROUP_I_D: Int = 2
+    val TAG_GROUP_ID: Int = 2
     var groupID_decoded: UShort? = null
 
     val TAG_SCENE_LIST: Int = 3
@@ -657,7 +650,7 @@ class ScenesManagementCluster(
           }
       }
 
-      if (tag == ContextSpecificTag(TAG_GROUP_I_D)) {
+      if (tag == ContextSpecificTag(TAG_GROUP_ID)) {
         groupID_decoded = tlvReader.getUShort(tag)
       }
 
@@ -789,109 +782,6 @@ class ScenesManagementCluster(
       groupIdentifierFrom_decoded,
       sceneIdentifierFrom_decoded,
     )
-  }
-
-  suspend fun readLastConfiguredByAttribute(): LastConfiguredByAttribute {
-    val ATTRIBUTE_ID: UInt = 0u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Lastconfiguredby attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: ULong? =
-      if (!tlvReader.isNull()) {
-        if (tlvReader.isNextTag(AnonymousTag)) {
-          tlvReader.getULong(AnonymousTag)
-        } else {
-          null
-        }
-      } else {
-        tlvReader.getNull(AnonymousTag)
-        null
-      }
-
-    return LastConfiguredByAttribute(decodedValue)
-  }
-
-  suspend fun subscribeLastConfiguredByAttribute(
-    minInterval: Int,
-    maxInterval: Int,
-  ): Flow<LastConfiguredByAttributeSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 0u
-    val attributePaths =
-      listOf(
-        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-      )
-
-    val subscribeRequest: SubscribeRequest =
-      SubscribeRequest(
-        eventPaths = emptyList(),
-        attributePaths = attributePaths,
-        minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
-      )
-
-    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
-      when (subscriptionState) {
-        is SubscriptionState.SubscriptionErrorNotification -> {
-          emit(
-            LastConfiguredByAttributeSubscriptionState.Error(
-              Exception(
-                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
-              )
-            )
-          )
-        }
-        is SubscriptionState.NodeStateUpdate -> {
-          val attributeData =
-            subscriptionState.updateState.successes
-              .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
-
-          requireNotNull(attributeData) {
-            "Lastconfiguredby attribute not found in Node State update"
-          }
-
-          // Decode the TLV data into the appropriate type
-          val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: ULong? =
-            if (!tlvReader.isNull()) {
-              if (tlvReader.isNextTag(AnonymousTag)) {
-                tlvReader.getULong(AnonymousTag)
-              } else {
-                null
-              }
-            } else {
-              tlvReader.getNull(AnonymousTag)
-              null
-            }
-
-          decodedValue?.let { emit(LastConfiguredByAttributeSubscriptionState.Success(it)) }
-        }
-        SubscriptionState.SubscriptionEstablished -> {
-          emit(LastConfiguredByAttributeSubscriptionState.SubscriptionEstablished)
-        }
-      }
-    }
   }
 
   suspend fun readSceneTableSizeAttribute(): UShort {

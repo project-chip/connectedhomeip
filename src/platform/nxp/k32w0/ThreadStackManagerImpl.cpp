@@ -36,7 +36,7 @@
 
 #include <lib/support/CHIPPlatformMemory.h>
 
-#if defined(chip_with_low_power) && (chip_with_low_power == 1)
+#if defined(nxp_use_low_power) && (nxp_use_low_power == 1)
 extern "C" bool isThreadInitialized();
 #endif
 
@@ -75,7 +75,7 @@ void ThreadStackManagerImpl::ProcessThreadActivity()
     auto * bleManager = &chip::DeviceLayer::Internal::BLEMgrImpl();
     bleManager->DoBleProcessing();
 
-#if defined(chip_with_low_power) && (chip_with_low_power == 1)
+#if defined(nxp_use_low_power) && (nxp_use_low_power == 1)
     if (isThreadInitialized())
 #endif
     {

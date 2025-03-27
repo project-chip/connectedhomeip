@@ -20,8 +20,8 @@ import("$dir_pw_build/python_dist.gni")
 
 # This target creates a single Python package and wheel for yamltests. It will
 # merge all Python dependencies Matter. The output is located in:
-#   out/obj/matter_yamltests_distribution/  <- source files here
-#   out/obj/matter_yamltests_distribution._build_wheel/matter_yamltests-0.0.1-py3-none-any.whl
+#   out/obj/scripts/matter_yamltests_distribution/  <- source files here
+#   out/obj/scripts/matter_yamltests_distribution._build_wheel/matter_yamltests-0.0.1-py3-none-any.whl
 pw_python_distribution("matter_yamltests_distribution") {
   packages = [ "${chip_root}/scripts/py_matter_yamltests:matter_yamltests" ]
   generate_setup_cfg = {

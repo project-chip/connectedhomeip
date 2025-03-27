@@ -1,0 +1,645 @@
+<?xml version="1.0"?>
+<!--
+Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+The information within this document is the property of the Connectivity
+Standards Alliance and its use and disclosure are restricted, except as
+expressly set forth herein.
+
+Connectivity Standards Alliance hereby grants you a fully-paid, non-exclusive,
+nontransferable, worldwide, limited and revocable license (without the right to
+sublicense), under Connectivity Standards Alliance's applicable copyright
+rights, to view, download, save, reproduce and use the document solely for your
+own internal purposes and in accordance with the terms of the license set forth
+herein. This license does not authorize you to, and you expressly warrant that
+you shall not: (a) permit others (outside your organization) to use this
+document; (b) post or publish this document; (c) modify, adapt, translate, or
+otherwise change this document in any manner or create any derivative work
+based on this document; (d) remove or modify any notice or label on this
+document, including this Copyright Notice, License and Disclaimer. The
+Connectivity Standards Alliance does not grant you any license hereunder other
+than as expressly stated herein.
+
+Elements of this document may be subject to third party intellectual property
+rights, including without limitation, patent, copyright or trademark rights,
+and any such third party may or may not be a member of the Connectivity
+Standards Alliance. Connectivity Standards Alliance members grant other
+Connectivity Standards Alliance members certain intellectual property rights as
+set forth in the Connectivity Standards Alliance IPR Policy. Connectivity
+Standards Alliance members do not grant you any rights under this license. The
+Connectivity Standards Alliance is not responsible for, and shall not be held
+responsible in any manner for, identifying or failing to identify any or all
+such third party intellectual property rights. Please visit www.csa-iot.org for
+more information on how to become a member of the Connectivity Standards
+Alliance.
+
+This document and the information contained herein are provided on an “AS IS”
+basis and the Connectivity Standards Alliance DISCLAIMS ALL WARRANTIES EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO (A) ANY WARRANTY THAT THE USE OF THE
+INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OF THIRD PARTIES (INCLUDING
+WITHOUT LIMITATION ANY INTELLECTUAL PROPERTY RIGHTS INCLUDING PATENT, COPYRIGHT
+OR TRADEMARK RIGHTS); OR (B) ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, TITLE OR NONINFRINGEMENT. IN NO EVENT WILL THE
+CONNECTIVITY STANDARDS ALLIANCE BE LIABLE FOR ANY LOSS OF PROFITS, LOSS OF
+BUSINESS, LOSS OF USE OF DATA, INTERRUPTION OF BUSINESS, OR FOR ANY OTHER
+DIRECT, INDIRECT, SPECIAL OR EXEMPLARY, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL
+DAMAGES OF ANY KIND, IN CONTRACT OR IN TORT, IN CONNECTION WITH THIS DOCUMENT
+OR THE INFORMATION CONTAINED HEREIN, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+LOSS OR DAMAGE.
+
+All company, brand and product names in this document may be trademarks that
+are the sole property of their respective owners.
+
+This notice and disclaimer must be included on all copies of this document.
+
+Connectivity Standards Alliance
+508 Second Street, Suite 206
+Davis, CA 95616, USA
+
+:xrefstyle: basic
+-->
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0099" name="Energy EVSE Cluster" revision="3">
+  <revisionHistory>
+    <revision revision="1" summary="Initial revision"/>
+    <revision revision="2" summary="Updates after 0.7 Ballot review"/>
+    <revision revision="3" summary="Added Q quality for SessionDuration, SessionEnergyCharged and SessionEnergyDischarged. Updates to V2X and associated areas. Make PREF mandatory."/>
+  </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0099" name="Energy EVSE"/>
+  </clusterIds>
+  <classification hierarchy="base" role="application" picsCode="EEVSE" scope="Endpoint"/>
+  <features>
+    <feature bit="0" code="PREF" name="ChargingPreferences" summary="EVSE supports storing user charging preferences">
+      <mandatoryConform/>
+    </feature>
+    <feature bit="1" code="SOC" name="SoCReporting" summary="EVSE supports reporting of vehicle State of Charge (SoC)">
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform/>
+      </otherwiseConform>
+    </feature>
+    <feature bit="2" code="PNC" name="PlugAndCharge" summary="EVSE supports PLC to support Plug and Charge">
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform/>
+      </otherwiseConform>
+    </feature>
+    <feature bit="3" code="RFID" name="RFID" summary="EVSE is fitted with an RFID reader">
+      <optionalConform/>
+    </feature>
+    <feature bit="4" code="V2X" name="V2X" summary="EVSE supports bi-directional charging / discharging">
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform/>
+      </otherwiseConform>
+    </feature>
+  </features>
+  <dataTypes>
+    <enum name="EnergyTransferStoppedReasonEnum">
+      <item value="0" name="EVStopped" summary="The EV decided to stop">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="EVSEStopped" summary="The EVSE decided to stop">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="Other" summary="An other unknown reason">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="FaultStateEnum">
+      <item value="0" name="NoError" summary="The EVSE is not in an error state.">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="MeterFailure" summary="The EVSE is unable to obtain electrical measurements.">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="OverVoltage" summary="The EVSE input voltage level is too high.">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="UnderVoltage" summary="The EVSE input voltage level is too low.">
+        <mandatoryConform/>
+      </item>
+      <item value="4" name="OverCurrent" summary="The EVSE detected charging current higher than allowed by charger.">
+        <mandatoryConform/>
+      </item>
+      <item value="5" name="ContactWetFailure" summary="The EVSE detected voltage on charging pins when the contactor is open.">
+        <mandatoryConform/>
+      </item>
+      <item value="6" name="ContactDryFailure" summary="The EVSE detected absence of voltage after enabling contactor.">
+        <mandatoryConform/>
+      </item>
+      <item value="7" name="GroundFault" summary="The EVSE has an unbalanced current supply.">
+        <mandatoryConform/>
+      </item>
+      <item value="8" name="PowerLoss" summary="The EVSE has detected a loss in power.">
+        <mandatoryConform/>
+      </item>
+      <item value="9" name="PowerQuality" summary="The EVSE has detected another power quality issue (e.g. phase imbalance).">
+        <mandatoryConform/>
+      </item>
+      <item value="10" name="PilotShortCircuit" summary="The EVSE pilot signal amplitude short circuited to ground.">
+        <mandatoryConform/>
+      </item>
+      <item value="11" name="EmergencyStop" summary="The emergency stop button was pressed.">
+        <mandatoryConform/>
+      </item>
+      <item value="12" name="EVDisconnected" summary="The EVSE detected that the cable has been disconnected.">
+        <mandatoryConform/>
+      </item>
+      <item value="13" name="WrongPowerSupply" summary="The EVSE could not determine proper power supply level.">
+        <mandatoryConform/>
+      </item>
+      <item value="14" name="LiveNeutralSwap" summary="The EVSE detected Live and Neutral are swapped.">
+        <mandatoryConform/>
+      </item>
+      <item value="15" name="OverTemperature" summary="The EVSE internal temperature is too high.">
+        <mandatoryConform/>
+      </item>
+      <item value="255" name="Other" summary="Any other reason.">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="StateEnum">
+      <item value="0" name="NotPluggedIn" summary="The EV is not plugged in.">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="PluggedInNoDemand" summary="The EV is plugged in, but not demanding current.">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="PluggedInDemand" summary="The EV is plugged in and is demanding current, but EVSE is not allowing current to flow.">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="PluggedInCharging" summary="The EV is plugged in, charging is in progress, and current is flowing">
+        <mandatoryConform/>
+      </item>
+      <item value="4" name="PluggedInDischarging" summary="The EV is plugged in, discharging is in progress, and current is flowing">
+        <mandatoryConform>
+          <feature name="V2X"/>
+        </mandatoryConform>
+      </item>
+      <item value="5" name="SessionEnding" summary="The EVSE is transitioning from any plugged-in state to NotPluggedIn">
+        <mandatoryConform/>
+      </item>
+      <item value="6" name="Fault" summary="There is a fault (see FaultState attribute)">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="SupplyStateEnum">
+      <item value="0" name="Disabled" summary="The EV is not currently allowed to charge or discharge">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="ChargingEnabled" summary="The EV is currently allowed to charge">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="DischargingEnabled" summary="The EV is currently allowed to discharge">
+        <optionalConform>
+          <feature name="V2X"/>
+        </optionalConform>
+      </item>
+      <item value="3" name="DisabledError" summary="The EV is not currently allowed to charge or discharge due to an error. The error must be cleared before operation can continue.">
+        <mandatoryConform/>
+      </item>
+      <item value="4" name="DisabledDiagnostics" summary="The EV is not currently allowed to charge or discharge due to self-diagnostics mode.">
+        <mandatoryConform/>
+      </item>
+      <item value="5" name="Enabled" summary="The EV is currently allowed to charge and discharge">
+        <optionalConform>
+          <feature name="V2X"/>
+        </optionalConform>
+      </item>
+    </enum>
+    <bitmap name="TargetDayOfWeekBitmap">
+      <bitfield name="Sunday" bit="0" summary="Sunday">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Monday" bit="1" summary="Monday">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Tuesday" bit="2" summary="Tuesday">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Wednesday" bit="3" summary="Wednesday">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Thursday" bit="4" summary="Thursday">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Friday" bit="5" summary="Friday">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Saturday" bit="6" summary="Saturday">
+        <mandatoryConform/>
+      </bitfield>
+    </bitmap>
+    <struct name="ChargingTargetScheduleStruct">
+      <field id="0" name="DayOfWeekForSequence" type="TargetDayOfWeekBitmap">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="ChargingTargets" type="list">
+        <entry type="ChargingTargetStruct"/>
+        <mandatoryConform/>
+        <constraint>
+          <maxCount value="10"/>
+        </constraint>
+      </field>
+    </struct>
+    <struct name="ChargingTargetStruct">
+      <field id="0" name="TargetTimeMinutesPastMidnight" type="uint16" default="0">
+        <mandatoryConform/>
+        <constraint>
+          <max value="1439"/>
+        </constraint>
+      </field>
+      <field id="1" name="TargetSoC" type="percent" default="0">
+        <otherwiseConform>
+          <mandatoryConform>
+            <feature name="SOC"/>
+          </mandatoryConform>
+          <optionalConform choice="a" more="true" min="1"/>
+        </otherwiseConform>
+      </field>
+      <field id="2" name="AddedEnergy" type="energy-mWh" default="0">
+        <otherwiseConform>
+          <optionalConform>
+            <feature name="SOC"/>
+          </optionalConform>
+          <optionalConform choice="a" more="true" min="1"/>
+        </otherwiseConform>
+        <constraint>
+          <min value="0"/>
+        </constraint>
+      </field>
+    </struct>
+  </dataTypes>
+  <attributes>
+    <attribute id="0x0000" name="State" type="StateEnum">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0001" name="SupplyState" type="SupplyStateEnum">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0002" name="FaultState" type="FaultStateEnum">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0003" name="ChargingEnabledUntil" type="epoch-s" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" persistence="nonVolatile"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0004" name="DischargingEnabledUntil" type="epoch-s" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" persistence="nonVolatile"/>
+      <mandatoryConform>
+        <feature name="V2X"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0005" name="CircuitCapacity" type="amperage-mA" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform/>
+      <constraint>
+        <min value="0"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0006" name="MinimumChargeCurrent" type="amperage-mA" default="6000">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform/>
+      <constraint>
+        <min value="0"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0007" name="MaximumChargeCurrent" type="amperage-mA" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform/>
+      <constraint>
+        <min value="0"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0008" name="MaximumDischargeCurrent" type="amperage-mA" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform>
+        <feature name="V2X"/>
+      </mandatoryConform>
+      <constraint>
+        <min value="0"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0009" name="UserMaximumChargeCurrent" type="amperage-mA" default="0">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <optionalConform/>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x000A" name="RandomizationDelayWindow" type="elapsed-s" default="600">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <optionalConform/>
+      <constraint>
+        <max value="86400"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0023" name="NextChargeStartTime" type="epoch-s" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform>
+        <feature name="PREF"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0024" name="NextChargeTargetTime" type="epoch-s" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform>
+        <feature name="PREF"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0025" name="NextChargeRequiredEnergy" type="energy-mWh" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform>
+        <feature name="PREF"/>
+      </mandatoryConform>
+      <constraint>
+        <min value="0"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0026" name="NextChargeTargetSoC" type="percent" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform>
+        <feature name="PREF"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0027" name="ApproximateEVEfficiency" type="uint16" default="null">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality nullable="true" persistence="nonVolatile"/>
+      <optionalConform>
+        <feature name="PREF"/>
+      </optionalConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0030" name="StateOfCharge" type="percent" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform>
+        <feature name="SOC"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0031" name="BatteryCapacity" type="energy-mWh" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform>
+        <feature name="SOC"/>
+      </mandatoryConform>
+      <constraint>
+        <min value="0"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0032" name="VehicleID" type="string" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform>
+        <feature name="PNC"/>
+      </mandatoryConform>
+      <constraint>
+        <maxLength value="32"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0040" name="SessionID" type="uint32" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" persistence="nonVolatile"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0041" name="SessionDuration" type="elapsed-s" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" persistence="nonVolatile" quieterReporting="true"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0042" name="SessionEnergyCharged" type="energy-mWh" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" persistence="nonVolatile" quieterReporting="true"/>
+      <mandatoryConform/>
+      <constraint>
+        <min value="0"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0043" name="SessionEnergyDischarged" type="energy-mWh" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" persistence="nonVolatile" quieterReporting="true"/>
+      <mandatoryConform>
+        <feature name="V2X"/>
+      </mandatoryConform>
+      <constraint>
+        <min value="0"/>
+      </constraint>
+    </attribute>
+  </attributes>
+  <commands>
+    <command id="0x00" name="GetTargetsResponse" direction="responseFromServer">
+      <mandatoryConform>
+        <feature name="PREF"/>
+      </mandatoryConform>
+      <field id="0" name="ChargingTargetSchedules" type="list">
+        <entry type="ChargingTargetScheduleStruct"/>
+        <mandatoryConform/>
+        <constraint>
+          <maxCount value="7"/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x01" name="Disable" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate" timed="true"/>
+      <mandatoryConform/>
+    </command>
+    <command id="0x02" name="EnableCharging" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate" timed="true"/>
+      <mandatoryConform/>
+      <field id="0" name="ChargingEnabledUntil" type="epoch-s" default="null">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="MinimumChargeCurrent" type="amperage-mA">
+        <mandatoryConform/>
+        <constraint>
+          <min value="0"/>
+        </constraint>
+      </field>
+      <field id="2" name="MaximumChargeCurrent" type="amperage-mA">
+        <mandatoryConform/>
+        <constraint>
+          <min value="0"/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x03" name="EnableDischarging" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate" timed="true"/>
+      <mandatoryConform>
+        <feature name="V2X"/>
+      </mandatoryConform>
+      <field id="0" name="DischargingEnabledUntil" type="epoch-s" default="null">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="MaximumDischargeCurrent" type="amperage-mA">
+        <mandatoryConform/>
+        <constraint>
+          <min value="0"/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x04" name="StartDiagnostics" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate" timed="true"/>
+      <optionalConform/>
+    </command>
+    <command id="0x05" name="SetTargets" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate" timed="true"/>
+      <mandatoryConform>
+        <feature name="PREF"/>
+      </mandatoryConform>
+      <field id="0" name="ChargingTargetSchedules" type="list">
+        <entry type="ChargingTargetScheduleStruct"/>
+        <mandatoryConform/>
+        <constraint>
+          <maxCount value="7"/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x06" name="GetTargets" direction="commandToServer" response="GetTargetsResponse">
+      <access invokePrivilege="operate" timed="true"/>
+      <mandatoryConform>
+        <feature name="PREF"/>
+      </mandatoryConform>
+    </command>
+    <command id="0x07" name="ClearTargets" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate" timed="true"/>
+      <mandatoryConform>
+        <feature name="PREF"/>
+      </mandatoryConform>
+    </command>
+  </commands>
+  <events>
+    <event id="0x00" name="EVConnected" priority="info">
+      <access readPrivilege="view"/>
+      <mandatoryConform/>
+      <field id="0" name="SessionID" type="uint32">
+        <mandatoryConform/>
+      </field>
+    </event>
+    <event id="0x01" name="EVNotDetected" priority="info">
+      <access readPrivilege="view"/>
+      <mandatoryConform/>
+      <field id="0" name="SessionID" type="uint32">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="State" type="StateEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="SessionDuration" type="elapsed-s">
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="SessionEnergyCharged" type="energy-mWh">
+        <mandatoryConform/>
+        <constraint>
+          <min value="0"/>
+        </constraint>
+      </field>
+      <field id="4" name="SessionEnergyDischarged" type="energy-mWh">
+        <mandatoryConform>
+          <feature name="V2X"/>
+        </mandatoryConform>
+        <constraint>
+          <min value="0"/>
+        </constraint>
+      </field>
+    </event>
+    <event id="0x02" name="EnergyTransferStarted" priority="info">
+      <access readPrivilege="view"/>
+      <mandatoryConform/>
+      <field id="0" name="SessionID" type="uint32">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="State" type="StateEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="MaximumCurrent" type="amperage-mA">
+        <mandatoryConform/>
+        <constraint>
+          <min value="0"/>
+        </constraint>
+      </field>
+      <field id="3" name="MaximumDischargeCurrent" type="amperage-mA">
+        <mandatoryConform>
+          <feature name="V2X"/>
+        </mandatoryConform>
+        <constraint>
+          <min value="0"/>
+        </constraint>
+      </field>
+    </event>
+    <event id="0x03" name="EnergyTransferStopped" priority="info">
+      <access readPrivilege="view"/>
+      <mandatoryConform/>
+      <field id="0" name="SessionID" type="uint32">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="State" type="StateEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="Reason" type="EnergyTransferStoppedReasonEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="4" name="EnergyTransferred" type="energy-mWh">
+        <mandatoryConform/>
+        <constraint>
+          <min value="0"/>
+        </constraint>
+      </field>
+      <field id="5" name="EnergyDischarged" type="energy-mWh">
+        <mandatoryConform>
+          <feature name="V2X"/>
+        </mandatoryConform>
+        <constraint>
+          <min value="0"/>
+        </constraint>
+      </field>
+    </event>
+    <event id="0x04" name="Fault" priority="critical">
+      <access readPrivilege="view"/>
+      <mandatoryConform/>
+      <field id="0" name="SessionID" type="uint32">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="State" type="StateEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="FaultStatePreviousState" type="FaultStateEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="4" name="FaultStateCurrentState" type="FaultStateEnum">
+        <mandatoryConform/>
+      </field>
+    </event>
+    <event id="0x05" name="RFID" priority="info">
+      <access readPrivilege="view"/>
+      <optionalConform>
+        <feature name="RFID"/>
+      </optionalConform>
+      <field id="0" name="UID" type="octstr">
+        <mandatoryConform/>
+        <constraint>
+          <maxLength value="10"/>
+        </constraint>
+      </field>
+    </event>
+  </events>
+</cluster>

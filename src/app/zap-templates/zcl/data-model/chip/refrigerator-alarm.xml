@@ -28,17 +28,24 @@ limitations under the License.
     <define>REFRIGERATOR_ALARM_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
-
-    <attribute side="server" code="0x0000" define="MASK" type="AlarmBitmap" default="0" writable="false" optional="false">Mask</attribute>
-    <attribute side="server" code="0x0002" define="STATE" type="AlarmBitmap" default="0" writable="false" optional="false">State</attribute>
-    <attribute side="server" code="0x0003" define="SUPPORTED" type="AlarmBitmap" default="0" writable="false" optional="false">Supported</attribute>
+    
+    <attribute side="server" code="0x0000" name="Mask" define="MASK" type="AlarmBitmap" default="0">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0002" name="State" define="STATE" type="AlarmBitmap" default="0">
+      <mandatoryConform/>
+    </attribute>
+    <attribute side="server" code="0x0003" name="Supported" define="SUPPORTED" type="AlarmBitmap" default="0">
+      <mandatoryConform/>
+    </attribute>
 
     <event side="server" code="0x00" priority="info" name="Notify" optional="false">
-        <description>Notify</description>
-        <field id="0" name="Active" type="AlarmBitmap" />
-        <field id="1" name="Inactive" type="AlarmBitmap" />
-        <field id="2" name="State" type="AlarmBitmap" />
-        <field id="3" name="Mask" type="AlarmBitmap" />
+      <description>Notify</description>
+      <field id="0" name="Active" type="AlarmBitmap" />
+      <field id="1" name="Inactive" type="AlarmBitmap" />
+      <field id="2" name="State" type="AlarmBitmap" />
+      <field id="3" name="Mask" type="AlarmBitmap" />
+      <mandatoryConform/>
     </event>
   </cluster>
 </configurator>

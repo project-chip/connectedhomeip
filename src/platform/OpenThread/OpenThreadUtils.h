@@ -59,7 +59,7 @@ namespace Internal {
 #endif // CHIP_CONFIG_OPENTHREAD_ERROR_MAX
 
 extern CHIP_ERROR MapOpenThreadError(otError otErr);
-extern void RegisterOpenThreadErrorFormatter(void);
+extern void RegisterOpenThreadErrorFormatter();
 
 /**
  * Log information related to a state change in the OpenThread stack.

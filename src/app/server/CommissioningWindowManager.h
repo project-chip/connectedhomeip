@@ -58,16 +58,7 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    static constexpr System::Clock::Seconds32 MaxCommissioningTimeout()
-    {
-#if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
-        // Specification section 2.3.1 - Extended Announcement Duration up to 48h
-        return System::Clock::Seconds32(60 * 60 * 48);
-#else
-        // Specification section 5.4.2.3. Announcement Duration says 15 minutes.
-        return System::Clock::Seconds32(15 * 60);
-#endif
-    }
+    System::Clock::Seconds32 MaxCommissioningTimeout() const;
 
     System::Clock::Seconds32 MinCommissioningTimeout() const
     {

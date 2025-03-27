@@ -269,9 +269,9 @@ class ChannelCluster(private val controller: MatterController, private val endpo
     val TAG_RECORDING_FLAG_REQ: Int = 4
     recordingFlag?.let { tlvWriter.put(ContextSpecificTag(TAG_RECORDING_FLAG_REQ), recordingFlag) }
 
-    val TAG_EXTERNAL_I_D_LIST_REQ: Int = 5
+    val TAG_EXTERNAL_ID_LIST_REQ: Int = 5
     externalIDList?.let {
-      tlvWriter.startArray(ContextSpecificTag(TAG_EXTERNAL_I_D_LIST_REQ))
+      tlvWriter.startArray(ContextSpecificTag(TAG_EXTERNAL_ID_LIST_REQ))
       for (item in externalIDList.iterator()) {
         item.toTlv(AnonymousTag, tlvWriter)
       }
@@ -352,8 +352,8 @@ class ChannelCluster(private val controller: MatterController, private val endpo
     val TAG_SHOULD_RECORD_SERIES_REQ: Int = 1
     tlvWriter.put(ContextSpecificTag(TAG_SHOULD_RECORD_SERIES_REQ), shouldRecordSeries)
 
-    val TAG_EXTERNAL_I_D_LIST_REQ: Int = 2
-    tlvWriter.startArray(ContextSpecificTag(TAG_EXTERNAL_I_D_LIST_REQ))
+    val TAG_EXTERNAL_ID_LIST_REQ: Int = 2
+    tlvWriter.startArray(ContextSpecificTag(TAG_EXTERNAL_ID_LIST_REQ))
     for (item in externalIDList.iterator()) {
       item.toTlv(AnonymousTag, tlvWriter)
     }
@@ -392,8 +392,8 @@ class ChannelCluster(private val controller: MatterController, private val endpo
     val TAG_SHOULD_RECORD_SERIES_REQ: Int = 1
     tlvWriter.put(ContextSpecificTag(TAG_SHOULD_RECORD_SERIES_REQ), shouldRecordSeries)
 
-    val TAG_EXTERNAL_I_D_LIST_REQ: Int = 2
-    tlvWriter.startArray(ContextSpecificTag(TAG_EXTERNAL_I_D_LIST_REQ))
+    val TAG_EXTERNAL_ID_LIST_REQ: Int = 2
+    tlvWriter.startArray(ContextSpecificTag(TAG_EXTERNAL_ID_LIST_REQ))
     for (item in externalIDList.iterator()) {
       item.toTlv(AnonymousTag, tlvWriter)
     }

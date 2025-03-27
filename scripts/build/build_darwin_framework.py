@@ -91,7 +91,8 @@ def build_darwin_framework(args):
         'CHIP_IS_ASAN': args.asan,
         'CHIP_IS_BLE': args.ble,
         'CHIP_IS_CLANG': args.clang,
-        'CHIP_ENABLE_ENCODING_SENTINEL_ENUM_VALUES': args.enable_encoding_sentinel_enum_values
+        'CHIP_ENABLE_ENCODING_SENTINEL_ENUM_VALUES': args.enable_encoding_sentinel_enum_values,
+        'CHIP_USE_NETWORK_FRAMEWORK': args.use_network_framework
     }
     for option in options:
         command += ["{}={}".format(option, "YES" if options[option] else "NO")]
@@ -176,6 +177,8 @@ if __name__ == "__main__":
     parser.add_argument('--clang', action=argparse.BooleanOptionalAction)
     parser.add_argument('--enable-encoding-sentinel-enum-values', action=argparse.BooleanOptionalAction)
     parser.add_argument('--compdb', action=argparse.BooleanOptionalAction)
+    parser.add_argument('--use-network-framework',
+                        action=argparse.BooleanOptionalAction)
 
     args = parser.parse_args()
     build_darwin_framework(args)

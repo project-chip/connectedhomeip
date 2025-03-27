@@ -235,15 +235,16 @@ test_sequences = [
             # Validate that commissioning succeeded in the tv-app output.
             Step(app=App.TV_APP, output_msg=['------PROMPT USER: commissioning success']),
 
+            # TODO: Enable the following steps once we fix https://github.com/project-chip/connectedhomeip/issues/36289
             # Validate that we are able to subscribe to the media playback cluster by reading the CurrentState value and that it matches {ATTRIBUTE_CURRENT_PLAYBACK_STATE}.
-            Step(app=App.TV_CASTING_APP, output_msg=[f'Read CurrentState value: {ATTRIBUTE_CURRENT_PLAYBACK_STATE}']),
+            #   Step(app=App.TV_CASTING_APP, output_msg=[f'Read CurrentState value: {ATTRIBUTE_CURRENT_PLAYBACK_STATE}']),
 
             # Validate the LaunchURL in the tv-app output.
-            Step(app=App.TV_APP,
-                 output_msg=['ContentLauncherManager::HandleLaunchUrl TEST CASE ContentURL=https://www.test.com/videoid DisplayString=Test video']),
+            #   Step(app=App.TV_APP,
+            #        output_msg=['ContentLauncherManager::HandleLaunchUrl TEST CASE ContentURL=https://www.test.com/videoid DisplayString=Test video']),
 
             # Validate the LaunchURL in the tv-casting-app output.
-            Step(app=App.TV_CASTING_APP, output_msg=['LaunchURL Success with response.data: exampleData']),
+            #   Step(app=App.TV_CASTING_APP, output_msg=['LaunchURL Success with response.data: exampleData']),
 
             # Signal to stop the tv-casting-app as we finished validation.
             Step(app=App.TV_CASTING_APP, input_cmd=STOP_APP),

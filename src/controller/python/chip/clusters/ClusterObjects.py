@@ -214,6 +214,7 @@ ALL_ATTRIBUTES: typing.Dict = {}
 # These need to be separate because there can be overlap in command ids for commands and responses.
 ALL_ACCEPTED_COMMANDS: typing.Dict = {}
 ALL_GENERATED_COMMANDS: typing.Dict = {}
+ALL_EVENTS: typing.Dict = {}
 
 
 class ClusterCommand(ClusterObject):
@@ -256,17 +257,13 @@ class Cluster(ClusterObject):
     especially the TLV decoding logic. Also ThreadNetworkDiagnostics has an attribute with the same name so we
     picked data_version as its name.
     '''
+    id: Any
 
     def __init_subclass__(cls, *args, **kwargs) -> None:
         """Register a subclass."""
         super().__init_subclass__(*args, **kwargs)
         # register this cluster in the ALL_CLUSTERS dict for quick lookups
-        try:
-            ALL_CLUSTERS[cls.id] = cls
-        except NotImplementedError:
-            # handle case where the Cluster class is not (fully) subclassed
-            # and accessing the id property throws a NotImplementedError.
-            pass
+        ALL_CLUSTERS[cls.id] = cls
 
     @property
     def data_version(self) -> int:
@@ -300,16 +297,11 @@ class ClusterAttributeDescriptor:
     def __init_subclass__(cls, *args, **kwargs) -> None:
         """Register a subclass."""
         super().__init_subclass__(*args, **kwargs)
-        try:
-            if cls.standard_attribute:
-                if cls.cluster_id not in ALL_ATTRIBUTES:
-                    ALL_ATTRIBUTES[cls.cluster_id] = {}
-                # register this clusterattribute in the ALL_ATTRIBUTES dict for quick lookups
-                ALL_ATTRIBUTES[cls.cluster_id][cls.attribute_id] = cls
-        except NotImplementedError:
-            # handle case where the ClusterAttribute class is not (fully) subclassed
-            # and accessing the id property throws a NotImplementedError.
-            pass
+        if cls.standard_attribute:
+            if cls.cluster_id not in ALL_ATTRIBUTES:
+                ALL_ATTRIBUTES[cls.cluster_id] = {}
+            # register this clusterattribute in the ALL_ATTRIBUTES dict for quick lookups
+            ALL_ATTRIBUTES[cls.cluster_id][cls.attribute_id] = cls
 
     @classmethod
     def ToTLV(cls, tag: Union[int, None], value):
@@ -369,6 +361,15 @@ class ClusterAttributeDescriptor:
 
 
 class ClusterEvent(ClusterObject):
+    def __init_subclass__(cls, *args, **kwargs) -> None:
+        """Register a subclass."""
+        super().__init_subclass__(*args, **kwargs)
+
+        if cls.cluster_id not in ALL_EVENTS:
+            ALL_EVENTS[cls.cluster_id] = {}
+        # register this clusterattribute in the ALL_ATTRIBUTES dict for quick lookups
+        ALL_EVENTS[cls.cluster_id][cls.event_id] = cls
+
     @ChipUtility.classproperty
     def cluster_id(self) -> int:
         raise NotImplementedError()

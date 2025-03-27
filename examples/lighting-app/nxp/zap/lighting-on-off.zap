@@ -1,6 +1,6 @@
 {
   "fileFormat": 2,
-  "featureLevel": 103,
+  "featureLevel": 106,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -41,14 +41,16 @@
         "code": 22,
         "profileId": 259,
         "label": "MA-rootdevice",
-        "name": "MA-rootdevice"
+        "name": "MA-rootdevice",
+        "deviceTypeOrder": 0
       },
       "deviceTypes": [
         {
           "code": 22,
           "profileId": 259,
           "label": "MA-rootdevice",
-          "name": "MA-rootdevice"
+          "name": "MA-rootdevice",
+          "deviceTypeOrder": 0
         }
       ],
       "deviceVersions": [
@@ -657,24 +659,6 @@
               "source": "client",
               "isIncoming": 0,
               "isEnabled": 1
-            }
-          ],
-          "attributes": [
-            {
-              "name": "ClusterRevision",
-              "code": 65533,
-              "mfgCode": null,
-              "side": "client",
-              "type": "int16u",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "1",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
             }
           ]
         },
@@ -3003,14 +2987,16 @@
         "code": 256,
         "profileId": 259,
         "label": "MA-onofflight",
-        "name": "MA-onofflight"
+        "name": "MA-onofflight",
+        "deviceTypeOrder": 0
       },
       "deviceTypes": [
         {
           "code": 256,
           "profileId": 259,
           "label": "MA-onofflight",
-          "name": "MA-onofflight"
+          "name": "MA-onofflight",
+          "deviceTypeOrder": 0
         }
       ],
       "deviceVersions": [
@@ -3655,7 +3641,7 @@
               "storageOption": "NVM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0x01",
+              "defaultValue": "0xFE",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,

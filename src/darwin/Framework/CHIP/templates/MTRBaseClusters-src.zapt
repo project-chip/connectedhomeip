@@ -9,6 +9,7 @@
 #import "MTRClusterStateCacheContainer_Internal.h"
 #import "MTRCommandPayloadsObjc.h"
 #import "MTRDevice_Internal.h"
+#import "MTRLogging_Internal.h"
 #import "MTRStructsObjc.h"
 #import "NSStringSpanConversion.h"
 #import "NSDataSpanConversion.h"

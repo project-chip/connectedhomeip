@@ -3,12 +3,34 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const ch
   DataModelLogger::LogString(label, indent, "{");
 {{#zcl_struct_items}}
   {
+{{#if (isEqual type "devtype_id") }}
+{{#if isNullable }}
+      if (value.{{asLowerCamelCase label}}.IsNull())
+      {
+          CHIP_ERROR err = LogValue("{{asUpperCamelCase label}}", indent + 1, value.{{asLowerCamelCase label}});
+          if (err != CHIP_NO_ERROR)
+          {
+              DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for '{{asUpperCamelCase label}}'");
+              return err;
+          }
+      }
+      else
+      {
+          std::string item = std::to_string(value.{{asLowerCamelCase label}}.Value()) + " (" + DeviceTypeIdToText(value.{{asLowerCamelCase label}}.Value()) + ")";
+          DataModelLogger::LogString("{{asUpperCamelCase label}}", indent + 1, item);
+      }
+{{else}}
+      std::string item = std::to_string(value.{{asLowerCamelCase label}}) + " (" + DeviceTypeIdToText(value.{{asLowerCamelCase label}}) + ")";
+      DataModelLogger::LogString("{{asUpperCamelCase label}}", indent + 1, item);
+{{/if}}
+{{else}}
       CHIP_ERROR err = LogValue("{{asUpperCamelCase label}}", indent + 1, value.{{asLowerCamelCase label}});
       if (err != CHIP_NO_ERROR)
       {
           DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for '{{asUpperCamelCase label}}'");
           return err;
       }
+{{/if}}
   }
 {{/zcl_struct_items}}
   DataModelLogger::LogString(indent, "}");

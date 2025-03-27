@@ -31,11 +31,14 @@ NXP/Zephyr SDK.
 
 The example supports:
 
--   Matter over Wi-Fi
+-   Matter over Wi-Fi with BLE commissioning
+-   Matter OTA requestor
+-   Matter Factory Data
 
 The supported boards are:
 
 -   `rd_rw612_bga`
+-   `frdm_rw612`
 
 <a name="building"></a>
 
@@ -49,20 +52,23 @@ Prerequisites:
 -   Follow instruction from [BUILDING.md](../../../../docs/guides/BUILDING.md)
     to setup the Matter environment
 -   Follow instruction from
-    [Getting Started Guide](https://docs.zephyrproject.org/latest/develop/getting_started/index.html)
+    [Getting Started Guide](https://docs.zephyrproject.org/4.0.0/develop/getting_started/index.html)
     to setup a Zephyr workspace, however, the west init command to use is as
     follows:
 
 ```shell
-$ west init zephyrproject -m https://github.com/nxp-zephyr-ear/zephyr.git --mr zephyr_rw61x_v3.6_RFP
+$ west init zephyrproject -m https://github.com/nxp-zephyr/nxp-zsdk.git --mr nxp-v4.0.0
 ```
 
-> **Note**: Currently, supported NXP platforms in Zephyr targeting Matter are
-> not available in the official Zephyr repo, you'll have to use the NXP fork
-> `https://github.com/nxp-zephyr-ear/zephyr` github repo. Reach to your NXP
-> contact for more details.
+> **Note**: While some of NXP platforms are supported in Zephyr upstream, we
+> recommend using nxp-zsdk downstream to get access to all NXP features that are
+> not upstream yet. While you can decide to use nxp-zsdk top of tree, we
+> recommend using a proper release tag delivered by NXP. This will ensure a
+> certain level of quality of the nxp-zsdk in use. Currently, we highly
+> recommend using the `nxp-v4.0.0` tag, based on Zephyr 4.0 release. Reach to
+> your NXP contact for more details.
 
-Steps to build the example, targeting `rd_rw612_bga` board:
+Steps to build the example:
 
 1. Activate your Matter env:
 
@@ -79,15 +85,23 @@ source <path to zephyr repo>/zephyr-env.sh
 3. Run west build command:
 
 ```shell
-west build -b rd_rw612_bga -p  <path to example folder>
+west build -b <board> -p auto -d build_zephyr <path to example folder>
 ```
 
-By default, a folder `build` will be created in the same folder you run the
-command from. The binaries will be created in `build/zephyr` with the name
-`zephyr.elf` and `zephyr.bin`.
+As an example with the `frdm_rw612` board:
+
+```shell
+west build -b frdm_rw612 -p auto -d build_zephyr examples/all-clusters-app/nxp/zephyr
+```
+
+A folder `build_zephyr` will be created in the same folder you run the command
+from. The binaries will be created in `build_zephyr/zephyr` with the name
+`zephyr.elf` and `zephyr.bin`. We recommend using the `-d build_zephyr` if you
+are building from Matter repo root folder as a build folder already exists and
+is tracked by git.
 
 You can get more details on `west build` with
-[Zephyr's building guide](https://docs.zephyrproject.org/latest/develop/west/build-flash-debug.html#building-west-build)
+[Zephyr's building guide](https://docs.zephyrproject.org/3.7.0/develop/west/build-flash-debug.html#building-west-build)
 
 <a name="flashing-and-debugging"></a>
 
@@ -95,14 +109,14 @@ You can get more details on `west build` with
 
 ### Flashing without debugging
 
-`west` can be used to flash a target, as an example for `rd_rw612_bga` board:
+`west` can be used to flash a target:
 
 ```shell
 west flash -i <J-Link serial number>
 ```
 
 You can get more details on `west flash` with
-[Zephyr's flashing guide](https://docs.zephyrproject.org/latest/develop/west/build-flash-debug.html#flashing-west-flash)
+[Zephyr's flashing guide](https://docs.zephyrproject.org/3.7.0/develop/west/build-flash-debug.html#flashing-west-flash)
 
 > **Note**: `west flash` will not start a debug session, it will only flash and
 > reset the device
@@ -113,7 +127,7 @@ To debug a Matter with Zephyr application, you could use several methods:
 
 -   [MCUXpresso IDE (version >= 11.6.0)](https://www.nxp.com/design/software/development-software/mcuxpresso-software-and-tools-/mcuxpresso-integrated-development-environment-ide:MCUXpresso-IDE)
 -   `west debug`
-    [Zephyr's debugging guide](https://docs.zephyrproject.org/latest/develop/west/build-flash-debug.html#id29)
+    [Zephyr's debugging guide](https://docs.zephyrproject.org/3.7.0/develop/west/build-flash-debug.html#id29)
 
 > **Note**: As the build provides an elf file, any compatible debugging tool can
 > be used.
@@ -125,30 +139,30 @@ To debug a Matter with Zephyr application, you could use several methods:
 NXP Zephyr examples are not using factory data support by default. Please refer
 the the section below to build with factory data.
 
-You may refer to `src/platform/nxp/zephyr/boards/<board>/<board>.overlay` file
-to obtain the memory region used by this partition.
+You may refer to `<board>.overlay` file in each examples boards folder to obtain
+the memory region used by this partition.
 
-For example, the factory data partition on `rd_rw612_bga` is reserved in the
-last sector of the `flexspi` flash of `RD BGA` board, at `0x1BFFF000`.
+For example, the factory data partition on `frdm_rw612` is reserved in the last
+sector of the `flexspi` flash, at `0x1BFFF000`.
 
 ```
-&flexspi {
-  status = "okay";
+w25q512jvfiq: w25q512jvfiq@0 {
+    status = "okay";
 
-  mx25u51245g: mx25u51245g@0 {
-      ...
-      factory_partition: partition@3FFF000 {
-        label = "factory-data";
-        reg = <0x03FFF000 DT_SIZE_K(4)>;
-      };
-  };
+    partitions {
+        ...
+        factory_partition: partition@3FFF000 {
+            label = "factory-data";
+            reg = <0x03FFF000 DT_SIZE_K(4)>;
+        };
+
+    };
 };
 ```
 
-> **Note**: You may also refer to
-> `src/platform/nxp/zephyr/boards/<board>/<board>.overlay` file to check other
-> memory partitions used by the platform, such as the file system partition
-> mentioned with the `storage` label.
+> **Note**: You may also refer to `<board>.overlay` file in each NXP Zephyr
+> examples folder to check other memory partitions used by the platform, such as
+> the file system partition mentioned with the `storage` label.
 
 ### Build with factory data support
 
@@ -158,7 +172,7 @@ To build the example with factory data support, you can add
 Example:
 
 ```bash
-west build -b rd_rw612_bga -p  <path to example folder> -- -DFILE_SUFFIX=fdata
+west build -b <board> -p  <path to example folder> -- -DFILE_SUFFIX=fdata
 ```
 
 `prj_fdata.conf` configuration file will enable `CONFIG_CHIP_FACTORY_DATA`
@@ -194,14 +208,14 @@ the partition address: please refer to `factory_partition` defined in
 #### Manually
 
 See
-[Guide for writing manufacturing data on NXP devices](../../../../docs/guides/nxp/nxp_manufacturing_flow.md)
+[Guide for writing manufacturing data on NXP devices](../../../../docs/platforms/nxp/nxp_manufacturing_flow.md)
 
 <a name="ota-software-update"></a>
 
 ## OTA Software Update
 
 See
-[Guide for OTA Software Update on NXP devices using Zephyr SDK](../../../../docs/guides/nxp/nxp_zephyr_ota_software_update.md)
+[Guide for OTA Software Update on NXP devices using Zephyr SDK](../../../../docs/platforms/nxp/nxp_zephyr_ota_software_update.md)
 
 <a name="testing-the-example"></a>
 
@@ -226,13 +240,14 @@ configured for the example. The binding `zephyr,console` is used to print the
 logs, while the binding `zephyr,shell-uart` is used for the CLI. If the logs and
 the CLI are split among two serial interfaces, you will have to open both ports.
 
-As an example, the Matter CLI on `rd_rw612_bga` is configured to be output on
+As an example, the Matter CLI on `frdm_rw612` is configured to be output on
 `flexcomm3` with a baudrate of `115200`. The logs are configured to be output on
 `flexcomm0` with a baudrate of `115200`.
 
-> **Note**: `flexcomm3` is wired to the USB `FTDI` port of the `RD BGA` board by
-> default. `flexcomm0` is wired to `GPIO2` (RX) and `GPIO3` (TX). Those pins are
-> accessible on `HD2` pin header.
+> **Note**: `frdm_rw612` and ` frdm_rw612``flexcomm3 ` is wired to the USB
+> `MCULINK` port of the board by default. `rd_rw612_bga` `flexcomm0` is wired to
+> `GPIO2` (RX) and `GPIO3` (TX). Those pins are accessible on `HD2` pin header.
+> `frdm_rw612` `flexcomm0` is wired to RX and TX pins located at `J5 mikroBUS`.
 
 To access the CLI console, use a serial terminal emulator of your choice, like
 Minicom or GNU Screen. Use the baud rate set to `115200`.

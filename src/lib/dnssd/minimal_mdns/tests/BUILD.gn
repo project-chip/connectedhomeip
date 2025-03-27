@@ -53,3 +53,13 @@ if (enable_fuzz_test_targets) {
     ]
   }
 }
+
+if (pw_enable_fuzz_test_targets) {
+  chip_pw_fuzz_target("fuzz-minmdns-packet-parsing-pw") {
+    test_source = [ "FuzzPacketParsingPW.cpp" ]
+    public_deps = [
+      "${chip_root}/src/lib/dnssd/minimal_mdns",
+      "${chip_root}/src/platform/logging:default",
+    ]
+  }
+}

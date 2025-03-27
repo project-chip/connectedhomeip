@@ -21,8 +21,9 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/CommandHandler.h>
 #include <app/clusters/identify-server/identify-server.h>
+#include <app/clusters/thermostat-server/thermostat-server.h>
 
-#include "thermostat-manager.h"
+#include "thermostat-delegate-impl.h"
 
 using namespace chip;
 using namespace chip::app;
@@ -76,19 +77,16 @@ void ApplicationShutdown() {}
 
 int main(int argc, char * argv[])
 {
-    if (ChipLinuxAppInit(argc, argv) != 0)
-    {
-        return -1;
-    }
-    ChipLogProgress(Zcl, "Starting Thermostat Manager");
-    CHIP_ERROR err = ThermostatManager().Init();
-
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Failed to initialize thermostat manager: %" CHIP_ERROR_FORMAT, err.Format());
-        chip::DeviceLayer::PlatformMgr().Shutdown();
-        return -1;
-    }
+    VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
     ChipLinuxAppMainLoop();
     return 0;
+}
+
+using namespace chip::app::Clusters::Thermostat;
+void emberAfThermostatClusterInitCallback(EndpointId endpoint)
+{
+    // Register the delegate for the Thermostat
+    auto & delegate = ThermostatDelegate::GetInstance();
+
+    SetDefaultDelegate(endpoint, &delegate);
 }

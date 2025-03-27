@@ -21,10 +21,10 @@
 #include <app/CommandHandler.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/server/Server.h>
-#include <app/util/att-storage.h>
 #include <lib/support/CHIPMem.h>
 #include <new>
 #include <platform/PlatformManager.h>
+#include <static-supported-modes-manager.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/SessionManager.h>
 #include <transport/raw/PeerAddress.h>
@@ -37,6 +37,7 @@ using namespace chip::DeviceLayer;
 
 namespace {
 static LowPowerManager lowPowerManager;
+Clusters::ModeSelect::StaticSupportedModesManager sStaticSupportedModesManager;
 } // namespace
 
 void OnIdentifyStart(::Identify *)
@@ -81,7 +82,10 @@ static Identify gIdentify1 = {
     OnTriggerEffect,
 };
 
-void ApplicationInit() {}
+void ApplicationInit()
+{
+    Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
+}
 
 void ApplicationShutdown() {}
 

@@ -15,8 +15,46 @@
 #    limitations under the License.
 #
 
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
+# for details about the block below.
+#
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs:
+#   run1:
+#     app: examples/fabric-admin/scripts/fabric-sync-app.py
+#     app-args: --app-admin=${FABRIC_ADMIN_APP} --app-bridge=${FABRIC_BRIDGE_APP} --discriminator=1234
+#     app-ready-pattern: "Successfully opened pairing window on the device"
+#     app-stdin-pipe: dut-fsa-stdin
+#     script-args: >
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --endpoint 1
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+#   run2:
+#     app: ${FABRIC_SYNC_APP}
+#     app-args: --discriminator=1234
+#     app-stdin-pipe: dut-fsa-stdin
+#     script-args: >
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --endpoint 1
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+# === END CI TEST ARGUMENTS ===
+
 import chip.clusters as Clusters
-from matter_testing_support import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, per_endpoint_test
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 from mobly import asserts
 
 
@@ -27,7 +65,7 @@ class TC_CCTRL_2_1(MatterBaseTest):
                  TestStep(2, "Validate SupportedDeviceCategories is set accordingly based on MCORE.FS")]
         return steps
 
-    @per_endpoint_test(has_cluster(Clusters.CommissionerControl))
+    @run_if_endpoint_matches(has_cluster(Clusters.CommissionerControl))
     async def test_TC_CCTRL_2_1(self):
         self.step(1)
         is_fabric_sync_pics_enabled = self.check_pics("MCORE.FS")
