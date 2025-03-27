@@ -137,6 +137,7 @@ silabs_executable("lighting_app") {
   sources = [
     "${examples_common_plat_dir}/main.cpp",
     "src/AppTask.cpp",
+    "src/ColorFormat.cpp",
     "src/LightingManager.cpp",
     "src/ZclCallbacks.cpp",
   ]
