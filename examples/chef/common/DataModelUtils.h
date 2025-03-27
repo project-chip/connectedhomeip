@@ -17,6 +17,7 @@
  */
 
 #include <app/data-model-provider/MetadataList.h>
+#include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 
 namespace chef {
