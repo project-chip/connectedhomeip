@@ -99,8 +99,9 @@ public:
                                    EndpointId aOriginalEndpoint, std::vector<Structs::DeviceTypeStruct::Type> && aDeviceTypes,
                                    std::vector<std::string> && aUniqueLocationIds, uint64_t aUniqueLocationIdsLastEditEpochUs,
                                    FabricIndex aFabricIndex, PrivateToken _) :
-        mDeviceName(std::move(aDeviceName)), mDeviceNameLastEditEpochUs(aDeviceNameLastEditEpochUs),
-        mBridgedEndpoint(aBridgedEndpoint), mOriginalEndpoint(aOriginalEndpoint), mDeviceTypes(std::move(aDeviceTypes)),
+        mDeviceName(std::move(aDeviceName)),
+        mDeviceNameLastEditEpochUs(aDeviceNameLastEditEpochUs), mBridgedEndpoint(aBridgedEndpoint),
+        mOriginalEndpoint(aOriginalEndpoint), mDeviceTypes(std::move(aDeviceTypes)),
         mUniqueLocationIds(std::move(aUniqueLocationIds)), mUniqueLocationIdsLastEditEpochUs(aUniqueLocationIdsLastEditEpochUs),
         mFabricIndex(aFabricIndex)
 
@@ -164,7 +165,8 @@ public:
 
     explicit EcosystemLocationStruct(LocationDescriptorStruct && aLocationDescriptor, uint64_t aLocationDescriptorLastEditEpochUs,
                                      PrivateToken _) :
-        mLocationDescriptor(aLocationDescriptor), mLocationDescriptorLastEditEpochUs(aLocationDescriptorLastEditEpochUs)
+        mLocationDescriptor(aLocationDescriptor),
+        mLocationDescriptorLastEditEpochUs(aLocationDescriptorLastEditEpochUs)
     {}
 
     CHIP_ERROR Encode(const AttributeValueEncoder::ListEncodeHelper & aEncoder, const std::string & aUniqueLocationId,
