@@ -148,3 +148,12 @@ void emberAfActionsClusterInitCallback(EndpointId endpoint)
 
     sActionsServer->Init();
 }
+
+void emberAfActionsClusterShutdownCallback(EndpointId endpoint)
+{
+    VerifyOrReturn(sActionsDelegateImpl && sActionsServer);
+
+    sActionsServer->Shutdown();
+    sActionsDelegateImpl = nullptr;
+    sActionsServer       = nullptr;
+}
