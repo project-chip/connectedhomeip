@@ -33,7 +33,7 @@ from enum import Flag, auto
 from pathlib import Path
 from typing import List
 
-from zap.generate import getClangFormatBinary
+from zap.clang_format import getClangFormatBinary
 
 CHIP_ROOT_DIR = os.path.realpath(
     os.path.join(os.path.dirname(__file__), '../..'))
