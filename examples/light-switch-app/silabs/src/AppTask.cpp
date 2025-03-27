@@ -235,10 +235,10 @@ void AppTask::AppEventHandler(AppEvent * aEvent)
         {
             sAppTask.sIsButtonEventTriggered = true;
             // Post button press event to BaseApplication
-            AppEvent button_event            = {};
-            button_event.Type                = AppEvent::kEventType_Button;
-            button_event.ButtonEvent.Action  = static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonPressed);
-            button_event.Handler             = BaseApplication::ButtonHandler;
+            AppEvent button_event           = {};
+            button_event.Type               = AppEvent::kEventType_Button;
+            button_event.ButtonEvent.Action = static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonPressed);
+            button_event.Handler            = BaseApplication::ButtonHandler;
             AppTask::GetAppTask().PostEvent(&button_event);
         }
         break;
@@ -248,10 +248,10 @@ void AppTask::AppEventHandler(AppEvent * aEvent)
         {
             sAppTask.sIsButtonEventTriggered = false;
             // Post button release event to BaseApplication
-            AppEvent button_event            = {};
-            button_event.Type                = AppEvent::kEventType_Button;
-            button_event.ButtonEvent.Action  = static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonReleased);
-            button_event.Handler             = BaseApplication::ButtonHandler;
+            AppEvent button_event           = {};
+            button_event.Type               = AppEvent::kEventType_Button;
+            button_event.ButtonEvent.Action = static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonReleased);
+            button_event.Handler            = BaseApplication::ButtonHandler;
             AppTask::GetAppTask().PostEvent(&button_event);
         }
         break;
