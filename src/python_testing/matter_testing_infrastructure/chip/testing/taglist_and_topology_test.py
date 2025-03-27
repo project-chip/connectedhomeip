@@ -56,7 +56,7 @@ def get_all_children(endpoint_id, endpoint_dict: dict[int, Any]) -> set[int]:
     """Returns all the children (include subchildren) of the given endpoint
        This assumes we've already checked that there are no cycles, so we can do the dumb things and just trace the tree
     """
-    children = set()
+    children: set[int] = set()
 
     def add_children(endpoint_id, children):
         immediate_children = endpoint_dict[endpoint_id][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]
@@ -92,7 +92,7 @@ def find_tree_roots(tree_endpoints: list[int], endpoint_dict: dict[int, Any]) ->
 
 def parts_list_cycles(tree_endpoints: list[int], endpoint_dict: dict[int, Any]) -> list[int]:
     """Returns a list of all the endpoints in the tree_endpoints list that contain cycles"""
-    def parts_list_cycle_detect(visited: set, current_id: int) -> bool:
+    def parts_list_cycle_detect(visited: set[int], current_id: int) -> bool:
         if current_id in visited:
             return True
         visited.add(current_id)
@@ -105,7 +105,7 @@ def parts_list_cycles(tree_endpoints: list[int], endpoint_dict: dict[int, Any]) 
     cycles = []
     # This is quick enough that we can do all the endpoints without searching for the roots
     for endpoint_id in tree_endpoints:
-        visited = set()
+        visited: set[int] = set()
         if parts_list_cycle_detect(visited, endpoint_id):
             cycles.append(endpoint_id)
     return cycles
@@ -113,15 +113,15 @@ def parts_list_cycles(tree_endpoints: list[int], endpoint_dict: dict[int, Any]) 
 
 def create_device_type_lists(roots: list[int], endpoint_dict: dict[int, Any]) -> dict[int, dict[int, set[int]]]:
     """Returns a list of endpoints per device type for each root in the list"""
-    device_types = {}
+    device_types: dict[int, dict[int, set[int]]] = {}
     for root in roots:
-        tree_device_types = defaultdict(set)
+        tree_device_types: dict[int, set[int]] = defaultdict(set)
         eps = get_all_children(root, endpoint_dict)
         eps.add(root)
         for ep in eps:
             for d in endpoint_dict[ep][Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]:
                 tree_device_types[d.deviceType].add(ep)
-        device_types[root] = tree_device_types
+        device_types[root] = dict(tree_device_types)  # Convert defaultdict to dict before storing
 
     return device_types
 
