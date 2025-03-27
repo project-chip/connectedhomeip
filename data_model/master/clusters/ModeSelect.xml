@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2023). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -54,6 +54,8 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0050" name="Mode Select Cluster" revision="2">
   <revisionHistory>
@@ -72,24 +74,35 @@ Davis, CA 95616, USA
   <dataTypes>
     <struct name="ModeOptionStruct">
       <field id="0" name="Label" type="string" default="MS">
+        <quality persistence="fixed"/>
         <mandatoryConform/>
-        <constraint type="maxLength" value="64"/>
+        <constraint>
+          <maxLength value="64"/>
+        </constraint>
       </field>
       <field id="1" name="Mode" type="uint8" default="MS">
+        <quality persistence="fixed"/>
         <mandatoryConform/>
       </field>
       <field id="2" name="SemanticTags" type="list" default="MS">
         <entry type="SemanticTagStruct"/>
+        <quality persistence="fixed"/>
         <mandatoryConform/>
-        <constraint type="maxCount" value="64"/>
+        <constraint>
+          <maxCount value="64"/>
+        </constraint>
       </field>
     </struct>
     <struct name="SemanticTagStruct">
       <field id="0" name="MfgCode" type="vendor-id">
+        <quality persistence="fixed"/>
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="1" name="Value" type="enum16">
+        <quality persistence="fixed"/>
         <mandatoryConform/>
       </field>
     </struct>
@@ -97,42 +110,54 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="Description" type="string" default="MS">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
-      <constraint type="maxLength" value="64"/>
+      <constraint>
+        <maxLength value="64"/>
+      </constraint>
     </attribute>
     <attribute id="0x0001" name="StandardNamespace" type="enum16" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="fixed"/>
       <mandatoryConform/>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0002" name="SupportedModes" type="list" default="MS">
       <entry type="ModeOptionStruct"/>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
-      <constraint type="maxCount" value="255"/>
+      <constraint>
+        <maxCount value="255"/>
+      </constraint>
     </attribute>
     <attribute id="0x0003" name="CurrentMode" type="uint8" default="MS">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform/>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0004" name="StartUpMode" type="uint8" default="MS">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="nonVolatile"/>
       <optionalConform/>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0005" name="OnMode" type="uint8" default="null">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true" persistence="nonVolatile"/>
       <mandatoryConform>
         <feature name="DEPONOFF"/>
       </mandatoryConform>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
   </attributes>
   <commands>
@@ -141,7 +166,9 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <field id="0" name="NewMode" type="uint8">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </command>
   </commands>

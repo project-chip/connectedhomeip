@@ -60,6 +60,7 @@ executable("${sample_name}") {
     "${project_dir}/common/clusters/low-power/LowPowerManager.cpp",
     "${project_dir}/common/clusters/media-input/MediaInputManager.cpp",
     "${project_dir}/common/clusters/media-playback/MediaPlaybackManager.cpp",
+    "${project_dir}/common/clusters/oven-mode/chef-oven-mode.cpp",
     "${project_dir}/common/clusters/refrigerator-and-temperature-controlled-cabinet-mode/tcc-mode.cpp",
     "${project_dir}/common/clusters/resource-monitoring/chef-resource-monitoring-delegates.cpp",
     "${project_dir}/common/clusters/switch/SwitchEventHandler.cpp",
@@ -67,6 +68,7 @@ executable("${sample_name}") {
     "${project_dir}/common/clusters/target-navigator/TargetNavigatorManager.cpp",
     "${project_dir}/common/clusters/temperature-control/static-supported-temperature-levels.cpp",
     "${project_dir}/common/clusters/wake-on-lan/WakeOnLanManager.cpp",
+    "${project_dir}/common/clusters/window-covering/chef-window-covering.cpp",
     "${project_dir}/common/stubs.cpp",
     "${project_dir}/linux/main.cpp",
   ]

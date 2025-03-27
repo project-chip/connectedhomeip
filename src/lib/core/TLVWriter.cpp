@@ -332,7 +332,7 @@ CHIP_ERROR TLVWriter::PutString(Tag tag, const char * buf, uint32_t len)
     {
         return CHIP_ERROR_INVALID_TLV_CHAR_STRING;
     }
-#endif // CHIP_CONFIG_TLV_VALIDATE_CHAR_STRING_ON_READ
+#endif // CHIP_CONFIG_TLV_VALIDATE_CHAR_STRING_ON_WRITE
 
     return WriteElementWithData(kTLVType_UTF8String, tag, reinterpret_cast<const uint8_t *>(buf), len);
 }

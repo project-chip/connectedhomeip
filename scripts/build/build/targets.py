@@ -31,6 +31,7 @@ from builders.nuttx import NuttXApp, NuttXBoard, NuttXBuilder
 from builders.nxp import NxpApp, NxpBoard, NxpBoardVariant, NxpBuilder, NxpBuildSystem, NxpLogLevel, NxpOsUsed
 from builders.openiotsdk import OpenIotSdkApp, OpenIotSdkBuilder, OpenIotSdkCryptoBackend
 from builders.qpg import QpgApp, QpgBoard, QpgBuilder
+from builders.realtek import RealtekApp, RealtekBoard, RealtekBuilder
 from builders.stm32 import stm32App, stm32Board, stm32Builder
 from builders.telink import TelinkApp, TelinkBoard, TelinkBuilder
 from builders.ti import TIApp, TIBoard, TIBuilder
@@ -79,8 +80,7 @@ def BuildHostFakeTarget():
         "-clang").ExceptIfRe('-libfuzzer')
     target.AppendModifier("pw-fuzztest", fuzzing_type=HostFuzzingType.PW_FUZZTEST).OnlyIfRe(
         "-clang").ExceptIfRe('-(libfuzzer|ossfuzz|asan)')
-    target.AppendModifier('coverage', use_coverage=True).OnlyIfRe(
-        '-(chip-tool|all-clusters)')
+    target.AppendModifier('coverage', use_coverage=True)
     target.AppendModifier('dmalloc', use_dmalloc=True)
     target.AppendModifier('clang', use_clang=True)
 
@@ -149,6 +149,8 @@ def BuildHostTarget():
         TargetPart('energy-management', app=HostApp.ENERGY_MANAGEMENT),
         TargetPart('water-leak-detector', app=HostApp.WATER_LEAK_DETECTOR),
         TargetPart('terms-and-conditions', app=HostApp.TERMS_AND_CONDITIONS),
+        TargetPart('camera', app=HostApp.CAMERA),
+        TargetPart('camera-controller', app=HostApp.CAMERA_CONTROLLER),
     ]
 
     if (HostBoard.NATIVE.PlatformName() == 'darwin'):
@@ -186,8 +188,7 @@ def BuildHostTarget():
         "-clang").ExceptIfRe('-libfuzzer')
     target.AppendModifier("pw-fuzztest", fuzzing_type=HostFuzzingType.PW_FUZZTEST).OnlyIfRe(
         "-clang").ExceptIfRe('-(libfuzzer|ossfuzz|asan)')
-    target.AppendModifier('coverage', use_coverage=True).OnlyIfRe(
-        '-(chip-tool|all-clusters|tests)')
+    target.AppendModifier('coverage', use_coverage=True)
     target.AppendModifier('dmalloc', use_dmalloc=True)
     target.AppendModifier('clang', use_clang=True)
     target.AppendModifier('test', extra_tests=True)
@@ -305,8 +306,8 @@ def BuildNrfNativeTarget():
     target = BuildTarget('nrf', NrfConnectBuilder)
 
     target.AppendFixedTargets([
-        TargetPart('native-posix-64-tests',
-                   board=NrfBoard.NATIVE_POSIX_64, app=NrfApp.UNIT_TESTS),
+        TargetPart('native-sim-tests',
+                   board=NrfBoard.NATIVE_SIM, app=NrfApp.UNIT_TESTS),
     ])
 
     return target
@@ -778,10 +779,10 @@ def BuildTelinkTarget():
         TargetPart('tlsr9518adk80d', board=TelinkBoard.TLSR9518ADK80D),
         TargetPart('tlsr9528a', board=TelinkBoard.TLSR9528A),
         TargetPart('tlsr9528a_retention', board=TelinkBoard.TLSR9528A_RETENTION),
-        TargetPart('tlsr9258a', board=TelinkBoard.TLSR9258A),
-        TargetPart('tlsr9258a_retention', board=TelinkBoard.TLSR9258A_RETENTION),
         TargetPart('tl3218x', board=TelinkBoard.TL3218X),
+        TargetPart('tl3218x_retention', board=TelinkBoard.TL3218X_RETENTION),
         TargetPart('tl7218x', board=TelinkBoard.TL7218X),
+        TargetPart('tl7218x_retention', board=TelinkBoard.TL7218X_RETENTION),
     ])
 
     target.AppendFixedTargets([
@@ -814,6 +815,25 @@ def BuildTelinkTarget():
     target.AppendModifier('usb', usb_board_config=True)
     target.AppendModifier('compress-lzma', compress_lzma_config=True)
     target.AppendModifier('thread-analyzer', thread_analyzer_config=True)
+
+    return target
+
+
+def BuildRealtekTarget():
+    target = BuildTarget('realtek', RealtekBuilder)
+
+    # board
+    target.AppendFixedTargets([
+        TargetPart('rtl8777g', board=RealtekBoard.RTL8777G),
+    ])
+
+    # apps
+    target.AppendFixedTargets([
+        TargetPart('lighting', app=RealtekApp.LIGHT),
+        TargetPart('light-switch', app=RealtekApp.LIGHT_SWITCH),
+        TargetPart('lock', app=RealtekApp.LOCK),
+        TargetPart('window', app=RealtekApp.WINDOW),
+    ])
 
     return target
 
@@ -856,6 +876,7 @@ BUILD_TARGETS = [
     BuildNrfNativeTarget(),
     BuildNuttXTarget(),
     BuildQorvoTarget(),
+    BuildRealtekTarget(),
     BuildStm32Target(),
     BuildTizenTarget(),
     BuildTelinkTarget(),

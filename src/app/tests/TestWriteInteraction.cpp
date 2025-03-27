@@ -23,6 +23,7 @@
 #include <app/reporting/tests/MockReportScheduler.h>
 #include <app/tests/AppTestContext.h>
 #include <app/tests/test-interaction-model-api.h>
+#include <app/util/mock/MockNodeConfig.h>
 #include <credentials/GroupDataProviderImpl.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <crypto/DefaultSessionKeystore.h>
@@ -53,6 +54,74 @@ chip::Credentials::GroupDataProviderImpl gGroupsProvider(kMaxGroupsPerFabric, kM
 
 namespace chip {
 namespace app {
+
+using namespace chip::Test;
+
+const MockNodeConfig & TestMockNodeConfig()
+{
+    using namespace Clusters::Globals::Attributes;
+
+    // clang-format off
+    static const MockNodeConfig config({
+        MockEndpointConfig(kRootEndpointId, {
+            MockClusterConfig(Clusters::IcdManagement::Id, {
+                ClusterRevision::Id, FeatureMap::Id,
+                Clusters::IcdManagement::Attributes::OperatingMode::Id,
+            }),
+        }),
+        MockEndpointConfig(kTestEndpointId, {
+            MockClusterConfig(Clusters::UnitTesting::Id, {
+                ClusterRevision::Id, FeatureMap::Id,
+                Clusters::UnitTesting::Attributes::Boolean::Id,
+                Clusters::UnitTesting::Attributes::Int16u::Id,
+                Clusters::UnitTesting::Attributes::ListFabricScoped::Id,
+                Clusters::UnitTesting::Attributes::ListStructOctetString::Id,
+            }),
+        }),
+        MockEndpointConfig(kMockEndpoint1, {
+            MockClusterConfig(MockClusterId(1), {
+                ClusterRevision::Id, FeatureMap::Id,
+            }, {
+                MockEventId(1), MockEventId(2),
+            }),
+            MockClusterConfig(MockClusterId(2), {
+                ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1),
+            }),
+        }),
+        MockEndpointConfig(kMockEndpoint2, {
+            MockClusterConfig(MockClusterId(1), {
+                ClusterRevision::Id, FeatureMap::Id,
+            }),
+            MockClusterConfig(MockClusterId(2), {
+                ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1), MockAttributeId(2),
+            }),
+            MockClusterConfig(MockClusterId(3), {
+                ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1), MockAttributeId(2), MockAttributeId(3),
+            }),
+        }),
+        MockEndpointConfig(kMockEndpoint3, {
+            MockClusterConfig(MockClusterId(1), {
+                ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1),
+            }),
+            MockClusterConfig(MockClusterId(2), {
+                ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1), MockAttributeId(2), MockAttributeId(3), MockAttributeId(4),
+            }),
+            MockClusterConfig(MockClusterId(3), {
+                ClusterRevision::Id, FeatureMap::Id,
+            }),
+            MockClusterConfig(MockClusterId(4), {
+                ClusterRevision::Id, FeatureMap::Id,
+            }),
+        }),
+        /// For `TestWriteRoundtripWithClusterObjects` where path 2/3/4 is used
+        MockEndpointConfig(2, {
+            MockClusterConfig(3, {4}),
+        })
+    });
+    // clang-format on
+    return config;
+}
+
 class TestWriteInteraction : public chip::Test::AppContext
 {
 public:
@@ -72,9 +141,11 @@ public:
         ASSERT_EQ(chip::GroupTesting::InitData(&gGroupsProvider, GetBobFabricIndex(), span), CHIP_NO_ERROR);
 
         mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&TestImCustomDataModel::Instance());
+        chip::Test::SetMockNodeConfig(TestMockNodeConfig());
     }
     void TearDown() override
     {
+        chip::Test::ResetMockNodeConfig();
         InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
         chip::Credentials::GroupDataProvider * provider = chip::Credentials::GetGroupDataProvider();
         if (provider != nullptr)

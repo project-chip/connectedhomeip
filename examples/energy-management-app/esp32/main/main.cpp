@@ -38,11 +38,11 @@
 #include "shell_extension/openthread_cli_register.h"
 #include <EnergyManagementAppCmdLineOptions.h>
 #include <app/server/Dnssd.h>
-#include <app/server/OnboardingCodesUtil.h>
 #include <app/util/endpoint-config-api.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <platform/ESP32/ESP32Utils.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 
 #if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 #include <platform/ESP32/ESP32FactoryDataProvider.h>

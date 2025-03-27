@@ -1,0 +1,277 @@
+<?xml version="1.0"?>
+<!--
+Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+The information within this document is the property of the Connectivity
+Standards Alliance and its use and disclosure are restricted, except as
+expressly set forth herein.
+
+Connectivity Standards Alliance hereby grants you a fully-paid, non-exclusive,
+nontransferable, worldwide, limited and revocable license (without the right to
+sublicense), under Connectivity Standards Alliance's applicable copyright
+rights, to view, download, save, reproduce and use the document solely for your
+own internal purposes and in accordance with the terms of the license set forth
+herein. This license does not authorize you to, and you expressly warrant that
+you shall not: (a) permit others (outside your organization) to use this
+document; (b) post or publish this document; (c) modify, adapt, translate, or
+otherwise change this document in any manner or create any derivative work
+based on this document; (d) remove or modify any notice or label on this
+document, including this Copyright Notice, License and Disclaimer. The
+Connectivity Standards Alliance does not grant you any license hereunder other
+than as expressly stated herein.
+
+Elements of this document may be subject to third party intellectual property
+rights, including without limitation, patent, copyright or trademark rights,
+and any such third party may or may not be a member of the Connectivity
+Standards Alliance. Connectivity Standards Alliance members grant other
+Connectivity Standards Alliance members certain intellectual property rights as
+set forth in the Connectivity Standards Alliance IPR Policy. Connectivity
+Standards Alliance members do not grant you any rights under this license. The
+Connectivity Standards Alliance is not responsible for, and shall not be held
+responsible in any manner for, identifying or failing to identify any or all
+such third party intellectual property rights. Please visit www.csa-iot.org for
+more information on how to become a member of the Connectivity Standards
+Alliance.
+
+This document and the information contained herein are provided on an “AS IS”
+basis and the Connectivity Standards Alliance DISCLAIMS ALL WARRANTIES EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO (A) ANY WARRANTY THAT THE USE OF THE
+INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OF THIRD PARTIES (INCLUDING
+WITHOUT LIMITATION ANY INTELLECTUAL PROPERTY RIGHTS INCLUDING PATENT, COPYRIGHT
+OR TRADEMARK RIGHTS); OR (B) ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, TITLE OR NONINFRINGEMENT. IN NO EVENT WILL THE
+CONNECTIVITY STANDARDS ALLIANCE BE LIABLE FOR ANY LOSS OF PROFITS, LOSS OF
+BUSINESS, LOSS OF USE OF DATA, INTERRUPTION OF BUSINESS, OR FOR ANY OTHER
+DIRECT, INDIRECT, SPECIAL OR EXEMPLARY, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL
+DAMAGES OF ANY KIND, IN CONTRACT OR IN TORT, IN CONNECTION WITH THIS DOCUMENT
+OR THE INFORMATION CONTAINED HEREIN, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+LOSS OR DAMAGE.
+
+All company, brand and product names in this document may be trademarks that
+are the sole property of their respective owners.
+
+This notice and disclaimer must be included on all copies of this document.
+
+Connectivity Standards Alliance
+508 Second Street, Suite 206
+Davis, CA 95616, USA
+
+:xrefstyle: basic
+-->
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0030" name="General Commissioning Cluster" revision="2">
+  <revisionHistory>
+    <revision revision="1" summary="Initial revision"/>
+    <revision revision="2" summary="Add Enhanced Setup Flow"/>
+  </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0030" name="General Commissioning"/>
+  </clusterIds>
+  <classification hierarchy="base" role="utility" picsCode="CGEN" scope="Node"/>
+  <features>
+    <feature bit="0" code="TC" name="TermsAndConditions" summary="Supports Terms &amp; Conditions acknowledgement">
+      <optionalConform/>
+    </feature>
+  </features>
+  <dataTypes>
+    <enum name="CommissioningErrorEnum">
+      <item value="0" name="OK" summary="No error">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="ValueOutsideRange" summary="Attempting to set regulatory configuration to a region or indoor/outdoor mode for which the server does not have proper configuration.">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="InvalidAuthentication" summary="Executed CommissioningComplete outside CASE session.">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="NoFailSafe" summary="Executed CommissioningComplete when there was no active Fail-Safe context.">
+        <mandatoryConform/>
+      </item>
+      <item value="4" name="BusyWithOtherAdmin" summary="Attempting to arm fail-safe or execute CommissioningComplete from a fabric different than the one associated with the current fail-safe context.">
+        <mandatoryConform/>
+      </item>
+      <item value="5" name="RequiredTCNotAccepted" summary="One or more required TC features from the Enhanced Setup Flow were not accepted.">
+        <mandatoryConform>
+          <feature name="TC"/>
+        </mandatoryConform>
+      </item>
+      <item value="6" name="TCAcknowledgementsNotReceived" summary="TCAcknowledgementsNotReceived No acknowledgements from the user for the TC features were received.">
+        <mandatoryConform>
+          <feature name="TC"/>
+        </mandatoryConform>
+      </item>
+      <item value="7" name="TCMinVersionNotMet" summary="TCMinVersionNotMet The version of the TC features acknowledged by the user did not meet the minimum required version.">
+        <mandatoryConform>
+          <feature name="TC"/>
+        </mandatoryConform>
+      </item>
+    </enum>
+    <enum name="RegulatoryLocationTypeEnum">
+      <item value="0" name="Indoor" summary="Indoor only">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Outdoor" summary="Outdoor only">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="IndoorOutdoor" summary="Indoor/Outdoor">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <struct name="BasicCommissioningInfo">
+      <field id="0" name="FailSafeExpiryLengthSeconds" type="uint16">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="MaxCumulativeFailsafeSeconds" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </struct>
+  </dataTypes>
+  <attributes>
+    <attribute id="0x0000" name="Breadcrumb" type="uint64" default="0">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="admin"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0001" name="BasicCommissioningInfo" type="BasicCommissioningInfo">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform/>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0002" name="RegulatoryConfig" type="RegulatoryLocationTypeEnum">
+      <attribute name="LocationCapability"/>
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0003" name="LocationCapability" type="RegulatoryLocationTypeEnum">
+      <enum default="IndoorOutdoor"/>
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0004" name="SupportsConcurrentConnection" type="bool" default="true">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0005" name="TCAcceptedVersion" type="uint16">
+      <access read="true" readPrivilege="admin"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform>
+        <feature name="TC"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0006" name="TCMinRequiredVersion" type="uint16">
+      <access read="true" readPrivilege="admin"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform>
+        <feature name="TC"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0007" name="TCAcknowledgements" type="map16">
+      <access read="true" readPrivilege="admin"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform>
+        <feature name="TC"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0008" name="TCAcknowledgementsRequired" type="bool" default="true">
+      <access read="true" readPrivilege="admin"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform>
+        <feature name="TC"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0009" name="TCUpdateDeadline" type="uint32">
+      <access read="true" readPrivilege="admin"/>
+      <quality nullable="true" persistence="nonVolatile"/>
+      <mandatoryConform>
+        <feature name="TC"/>
+      </mandatoryConform>
+    </attribute>
+  </attributes>
+  <commands>
+    <command id="0x00" name="ArmFailSafe" direction="commandToServer" response="ArmFailSafeResponse">
+      <access invokePrivilege="admin"/>
+      <mandatoryConform/>
+      <field id="0" name="ExpiryLengthSeconds" type="uint16" default="900">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="Breadcrumb" type="uint64">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x01" name="ArmFailSafeResponse" direction="responseFromServer">
+      <mandatoryConform/>
+      <field id="0" name="ErrorCode" type="CommissioningErrorEnum" default="SUCCESS">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="DebugText" type="string" default="&quot;&quot;">
+        <mandatoryConform/>
+        <constraint>
+          <maxLength value="128"/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x02" name="SetRegulatoryConfig" direction="commandToServer" response="SetRegulatoryConfigResponse">
+      <access invokePrivilege="admin"/>
+      <mandatoryConform/>
+      <field id="0" name="NewRegulatoryConfig" type="RegulatoryLocationTypeEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="CountryCode" type="string">
+        <mandatoryConform/>
+        <constraint>
+          <allowed value="2"/>
+        </constraint>
+      </field>
+      <field id="2" name="Breadcrumb" type="uint64">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x03" name="SetRegulatoryConfigResponse" direction="responseFromServer">
+      <mandatoryConform/>
+      <field id="0" name="ErrorCode" type="CommissioningErrorEnum" default="SUCCESS">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="DebugText" type="string" default="&quot;&quot;">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x04" name="CommissioningComplete" direction="commandToServer" response="CommissioningCompleteResponse">
+      <access invokePrivilege="admin" fabricScoped="true"/>
+      <mandatoryConform/>
+    </command>
+    <command id="0x05" name="CommissioningCompleteResponse" direction="responseFromServer">
+      <mandatoryConform/>
+      <field id="0" name="ErrorCode" type="CommissioningErrorEnum" default="SUCCESS">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="DebugText" type="string" default="&quot;&quot;">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x06" name="SetTCAcknowledgements" direction="commandToServer" response="SetTCAcknowledgementsResponse">
+      <access invokePrivilege="admin"/>
+      <mandatoryConform>
+        <feature name="TC"/>
+      </mandatoryConform>
+      <field id="0" name="TCVersion" type="uint16">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="TCUserResponse" type="map16">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x07" name="SetTCAcknowledgementsResponse" direction="responseFromServer">
+      <mandatoryConform>
+        <feature name="TC"/>
+      </mandatoryConform>
+      <field id="0" name="ErrorCode" type="CommissioningErrorEnum" default="SUCCESS">
+        <mandatoryConform/>
+      </field>
+    </command>
+  </commands>
+</cluster>

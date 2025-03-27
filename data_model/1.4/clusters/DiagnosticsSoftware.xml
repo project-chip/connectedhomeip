@@ -54,6 +54,8 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0034" name="Software Diagnostics Cluster" revision="1">
   <revisionHistory>

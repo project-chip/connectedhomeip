@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -54,13 +54,13 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x003B" name="Switch Cluster" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
-    <revision revision="2" summary="Behavior clarifications for ambiguous combinations of events;
-             Introduction of TotalNumberOfPressesCounted == 0 when MultiPressMax is exceeded;
-             Introduction of ActionSwitch feature flag."/>
+    <revision revision="2" summary="Behavior clarifications for ambiguous combinations of events; Introduction of TotalNumberOfPressesCounted == 0 when MultiPressMax is exceeded; Introduction of ActionSwitch feature flag."/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x003B" name="Switch"/>
@@ -116,23 +116,29 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="NumberOfPositions" type="uint8" default="2">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
-      <constraint type="min" value="2"/>
+      <constraint>
+        <min value="2"/>
+      </constraint>
     </attribute>
     <attribute id="0x0001" name="CurrentPosition" type="uint8" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform/>
-      <constraint type="max" value="NumberOfPositions-1"/>
+      <constraint>
+        <max value="NumberOfPositions - 1"/>
+      </constraint>
     </attribute>
     <attribute id="0x0002" name="MultiPressMax" type="uint8" default="2">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="MSM"/>
       </mandatoryConform>
-      <constraint type="min" value="2"/>
+      <constraint>
+        <min value="2"/>
+      </constraint>
     </attribute>
   </attributes>
   <events>
@@ -143,7 +149,12 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="NewPosition" type="uint8">
         <mandatoryConform/>
-        <constraint type="between" from="0" to="NumberOfPositions-1"/>
+        <constraint>
+          <between>
+            <from value="0"/>
+            <to value="NumberOfPositions - 1"/>
+          </between>
+        </constraint>
       </field>
     </event>
     <event id="0x01" name="InitialPress" priority="info">
@@ -153,7 +164,12 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="NewPosition" type="uint8">
         <mandatoryConform/>
-        <constraint type="between" from="0" to="NumberOfPositions-1"/>
+        <constraint>
+          <between>
+            <from value="0"/>
+            <to value="NumberOfPositions - 1"/>
+          </between>
+        </constraint>
       </field>
     </event>
     <event id="0x02" name="LongPress" priority="info">
@@ -163,7 +179,12 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="NewPosition" type="uint8">
         <mandatoryConform/>
-        <constraint type="between" from="0" to="NumberOfPositions-1"/>
+        <constraint>
+          <between>
+            <from value="0"/>
+            <to value="NumberOfPositions - 1"/>
+          </between>
+        </constraint>
       </field>
     </event>
     <event id="0x03" name="ShortRelease" priority="info">
@@ -173,7 +194,12 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="PreviousPosition" type="uint8">
         <mandatoryConform/>
-        <constraint type="between" from="0" to="NumberOfPositions-1"/>
+        <constraint>
+          <between>
+            <from value="0"/>
+            <to value="NumberOfPositions - 1"/>
+          </between>
+        </constraint>
       </field>
     </event>
     <event id="0x04" name="LongRelease" priority="info">
@@ -183,7 +209,12 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="PreviousPosition" type="uint8">
         <mandatoryConform/>
-        <constraint type="between" from="0" to="NumberOfPositions-1"/>
+        <constraint>
+          <between>
+            <from value="0"/>
+            <to value="NumberOfPositions - 1"/>
+          </between>
+        </constraint>
       </field>
     </event>
     <event id="0x05" name="MultiPressOngoing" priority="info">
@@ -198,11 +229,20 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="NewPosition" type="uint8">
         <mandatoryConform/>
-        <constraint type="between" from="0" to="NumberOfPositions-1"/>
+        <constraint>
+          <between>
+            <from value="0"/>
+            <to value="NumberOfPositions - 1"/>
+          </between>
+        </constraint>
       </field>
       <field id="1" name="CurrentNumberOfPressesCounted" type="uint8">
         <mandatoryConform/>
-        <constraint type="between" from="2" to="MultiPressMax"/>
+        <constraint>
+          <between value="2">
+            <attribute name="MultiPressMax"/>
+          </between>
+        </constraint>
       </field>
     </event>
     <event id="0x06" name="MultiPressComplete" priority="info">
@@ -212,11 +252,20 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="PreviousPosition" type="uint8">
         <mandatoryConform/>
-        <constraint type="between" from="0" to="NumberOfPositions-1"/>
+        <constraint>
+          <between>
+            <from value="0"/>
+            <to value="NumberOfPositions - 1"/>
+          </between>
+        </constraint>
       </field>
       <field id="1" name="TotalNumberOfPressesCounted" type="uint8">
         <mandatoryConform/>
-        <constraint type="max" value="MultiPressMax"/>
+        <constraint>
+          <max>
+            <attribute name="MultiPressMax"/>
+          </max>
+        </constraint>
       </field>
     </event>
   </events>

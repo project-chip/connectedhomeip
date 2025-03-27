@@ -55,7 +55,7 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 
-// Update Name
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0046" name="ICD Management Cluster" revision="3">
   <revisionHistory>
@@ -64,7 +64,7 @@ Davis, CA 95616, USA
     <revision revision="3" summary="Addition of the ClientType attribute; addition of the ICD Check-In Backoff support; addition of the DynamicSitLitSupport feature"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x0046" name="ICDManagement"/>
+    <clusterId id="0x0046" name="ICD Management"/>
   </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="ICDM" scope="Node"/>
   <features>
@@ -94,7 +94,14 @@ Davis, CA 95616, USA
     </feature>
   </features>
   <dataTypes>
-    <number name="ClientType Field" type=""/>
+    <enum name="ClientTypeEnum">
+      <item value="0" name="Permanent" summary="The client is typically resident, always-on, fixed infrastructure in the home.">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Ephemeral" summary="The client is mobile or non-resident or not always-on and may not always be available in the home.">
+        <mandatoryConform/>
+      </item>
+    </enum>
     <enum name="OperatingModeEnum">
       <item value="0" name="SIT" summary="ICD is operating as a Short Idle Time ICD.">
         <mandatoryConform/>
@@ -159,10 +166,12 @@ Davis, CA 95616, USA
     <struct name="MonitoringRegistrationStruct">
       <field id="1" name="CheckInNodeID" type="node-id">
         <access fabricSensitive="true"/>
+        <quality persistence="nonVolatile"/>
         <mandatoryConform/>
       </field>
       <field id="2" name="MonitoredSubject" type="subject-id">
         <access fabricSensitive="true"/>
+        <quality persistence="nonVolatile"/>
         <mandatoryConform/>
       </field>
       <field id="3" name="Key">
@@ -170,6 +179,7 @@ Davis, CA 95616, USA
       </field>
       <field id="4" name="ClientType" type="ClientTypeEnum" default="0">
         <access fabricSensitive="true"/>
+        <quality persistence="nonVolatile"/>
         <mandatoryConform/>
       </field>
       <access fabricScoped="true"/>
@@ -178,24 +188,24 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="IdleModeDuration" type="uint32" default="1">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
       <constraint type="between" from="1" to="64800"/>
     </attribute>
     <attribute id="0x0001" name="ActiveModeDuration" type="uint32" default="300">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0002" name="ActiveModeThreshold" type="uint16" default="300">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0003" name="RegisteredClients" type="list" default="[]">
+    <attribute id="0x0003" name="RegisteredClients" type="list" default="empty">
       <entry type="MonitoringRegistrationStruct"/>
       <access read="true" readPrivilege="admin" fabricScoped="true"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform>
         <feature name="CIP"/>
       </mandatoryConform>
@@ -203,14 +213,14 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0004" name="ICDCounter" type="uint32" default="0">
       <access read="true" readPrivilege="admin"/>
-      <quality changeOmitted="true" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true" persistence="nonVolatile"/>
       <mandatoryConform>
         <feature name="CIP"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0005" name="ClientsSupportedPerFabric" type="uint16" default="1">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="CIP"/>
       </mandatoryConform>
@@ -218,15 +228,15 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0006" name="UserActiveModeTriggerHint" type="UserActiveModeTriggerBitmap" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="UAT"/>
       </mandatoryConform>
       <constraint type="desc"/>
     </attribute>
-    <attribute id="0x0007" name="UserActiveModeTriggerInstruction" type="string" default="&quot;">
+    <attribute id="0x0007" name="UserActiveModeTriggerInstruction" type="string" default="&quot;&quot;">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <constraint type="maxLength" value="128"/>
     </attribute>
     <attribute id="0x0008" name="OperatingMode" type="OperatingModeEnum">
@@ -237,11 +247,14 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0009" name="MaximumCheckInBackoff" type="uint32" default="1">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="CIP"/>
       </mandatoryConform>
-      <constraint type="between" from="IdleModeDuration" to="64800"/>
+      <constraint type="between">
+        <from attribute="IdleModeDuration"/>
+        <to value="64800"/>
+      </constraint>
     </attribute>
   </attributes>
   <commands>
@@ -258,11 +271,11 @@ Davis, CA 95616, USA
       </field>
       <field id="2" name="Key" type="octstr">
         <mandatoryConform/>
-        <constraint type="maxLength" value="16"/>
+        <constraint type="allowed" value="16"/>
       </field>
       <field id="3" name="VerificationKey" type="octstr">
         <optionalConform/>
-        <constraint type="maxLength" value="16"/>
+        <constraint type="allowed" value="16"/>
       </field>
       <field id="4" name="ClientType" type="ClientTypeEnum">
         <mandatoryConform/>
@@ -286,7 +299,7 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="VerificationKey" type="octstr">
         <optionalConform/>
-        <constraint type="maxLength" value="16"/>
+        <constraint type="allowed" value="16"/>
       </field>
     </command>
     <command id="0x03" name="StayActiveRequest" direction="commandToServer" response="StayActiveResponse">

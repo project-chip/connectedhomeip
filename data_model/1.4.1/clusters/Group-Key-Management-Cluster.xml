@@ -1,0 +1,261 @@
+<?xml version="1.0"?>
+<!--
+Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+The information within this document is the property of the Connectivity
+Standards Alliance and its use and disclosure are restricted, except as
+expressly set forth herein.
+
+Connectivity Standards Alliance hereby grants you a fully-paid, non-exclusive,
+nontransferable, worldwide, limited and revocable license (without the right to
+sublicense), under Connectivity Standards Alliance's applicable copyright
+rights, to view, download, save, reproduce and use the document solely for your
+own internal purposes and in accordance with the terms of the license set forth
+herein. This license does not authorize you to, and you expressly warrant that
+you shall not: (a) permit others (outside your organization) to use this
+document; (b) post or publish this document; (c) modify, adapt, translate, or
+otherwise change this document in any manner or create any derivative work
+based on this document; (d) remove or modify any notice or label on this
+document, including this Copyright Notice, License and Disclaimer. The
+Connectivity Standards Alliance does not grant you any license hereunder other
+than as expressly stated herein.
+
+Elements of this document may be subject to third party intellectual property
+rights, including without limitation, patent, copyright or trademark rights,
+and any such third party may or may not be a member of the Connectivity
+Standards Alliance. Connectivity Standards Alliance members grant other
+Connectivity Standards Alliance members certain intellectual property rights as
+set forth in the Connectivity Standards Alliance IPR Policy. Connectivity
+Standards Alliance members do not grant you any rights under this license. The
+Connectivity Standards Alliance is not responsible for, and shall not be held
+responsible in any manner for, identifying or failing to identify any or all
+such third party intellectual property rights. Please visit www.csa-iot.org for
+more information on how to become a member of the Connectivity Standards
+Alliance.
+
+This document and the information contained herein are provided on an “AS IS”
+basis and the Connectivity Standards Alliance DISCLAIMS ALL WARRANTIES EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO (A) ANY WARRANTY THAT THE USE OF THE
+INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OF THIRD PARTIES (INCLUDING
+WITHOUT LIMITATION ANY INTELLECTUAL PROPERTY RIGHTS INCLUDING PATENT, COPYRIGHT
+OR TRADEMARK RIGHTS); OR (B) ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, TITLE OR NONINFRINGEMENT. IN NO EVENT WILL THE
+CONNECTIVITY STANDARDS ALLIANCE BE LIABLE FOR ANY LOSS OF PROFITS, LOSS OF
+BUSINESS, LOSS OF USE OF DATA, INTERRUPTION OF BUSINESS, OR FOR ANY OTHER
+DIRECT, INDIRECT, SPECIAL OR EXEMPLARY, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL
+DAMAGES OF ANY KIND, IN CONTRACT OR IN TORT, IN CONNECTION WITH THIS DOCUMENT
+OR THE INFORMATION CONTAINED HEREIN, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+LOSS OR DAMAGE.
+
+All company, brand and product names in this document may be trademarks that
+are the sole property of their respective owners.
+
+This notice and disclaimer must be included on all copies of this document.
+
+Connectivity Standards Alliance
+508 Second Street, Suite 206
+Davis, CA 95616, USA
+
+:xrefstyle: basic
+-->
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x003F" name="Group Key Management Cluster" revision="2">
+  <revisionHistory>
+    <revision revision="1" summary="Initial revision"/>
+    <revision revision="2" summary="Clarify KeySetWrite validation and behavior on invalid epoch key lengths"/>
+  </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x003F" name="Group Key Management"/>
+  </clusterIds>
+  <classification hierarchy="base" role="utility" picsCode="GRPKEY" scope="Node"/>
+  <features>
+    <feature bit="0" code="CS" name="CacheAndSync" summary="The ability to support CacheAndSync security policy and MCSP.">
+      <provisionalConform/>
+    </feature>
+  </features>
+  <dataTypes>
+    <enum name="GroupKeyMulticastPolicyEnum">
+      <item value="0" name="PerGroupID" summary="Indicates filtering of multicast messages for a specific Group ID">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="AllNodes" summary="Indicates not filtering of multicast messages">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="GroupKeySecurityPolicyEnum">
+      <item value="0" name="TrustFirst" summary="Message counter synchronization using trust-first">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="CacheAndSync" summary="Message counter synchronization using cache-and-sync">
+        <mandatoryConform>
+          <feature name="CS"/>
+        </mandatoryConform>
+      </item>
+    </enum>
+    <struct name="GroupInfoMapStruct">
+      <field id="1" name="GroupId" type="group-id">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="Endpoints" type="list">
+        <entry type="endpoint-no"/>
+        <mandatoryConform/>
+        <constraint>
+          <minCount value="1"/>
+        </constraint>
+      </field>
+      <field id="3" name="GroupName" type="string">
+        <optionalConform/>
+        <constraint>
+          <maxLength value="16"/>
+        </constraint>
+      </field>
+      <access fabricScoped="true"/>
+    </struct>
+    <struct name="GroupKeyMapStruct">
+      <field id="1" name="GroupId" type="group-id">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="GroupKeySetID" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <between>
+            <from value="1"/>
+            <to value="65535"/>
+          </between>
+        </constraint>
+      </field>
+      <access fabricScoped="true"/>
+    </struct>
+    <struct name="GroupKeySetStruct">
+      <field id="0" name="GroupKeySetID" type="uint16">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="GroupKeySecurityPolicy" type="GroupKeySecurityPolicyEnum">
+        <access fabricSensitive="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="EpochKey0" type="octstr">
+        <access fabricSensitive="true"/>
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint>
+          <allowed value="16"/>
+        </constraint>
+      </field>
+      <field id="3" name="EpochStartTime0" type="epoch-us">
+        <access fabricSensitive="true"/>
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="4" name="EpochKey1" type="octstr">
+        <access fabricSensitive="true"/>
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint>
+          <allowed value="16"/>
+        </constraint>
+      </field>
+      <field id="5" name="EpochStartTime1" type="epoch-us">
+        <access fabricSensitive="true"/>
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="6" name="EpochKey2" type="octstr">
+        <access fabricSensitive="true"/>
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint>
+          <allowed value="16"/>
+        </constraint>
+      </field>
+      <field id="7" name="EpochStartTime2" type="epoch-us">
+        <access fabricSensitive="true"/>
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="8" name="GroupKeyMulticastPolicy" type="GroupKeyMulticastPolicyEnum">
+        <access fabricSensitive="true"/>
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform/>
+        </otherwiseConform>
+      </field>
+    </struct>
+  </dataTypes>
+  <attributes>
+    <attribute id="0x0000" name="GroupKeyMap" type="list" default="empty">
+      <entry type="GroupKeyMapStruct"/>
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage" fabricScoped="true"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform/>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0001" name="GroupTable" type="list" default="empty">
+      <entry type="GroupInfoMapStruct"/>
+      <access read="true" readPrivilege="view" fabricScoped="true"/>
+      <mandatoryConform/>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0002" name="MaxGroupsPerFabric" type="uint16" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0003" name="MaxGroupKeysPerFabric" type="uint16" default="1">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform/>
+      <constraint>
+        <between>
+          <from value="1"/>
+          <to value="65535"/>
+        </between>
+      </constraint>
+    </attribute>
+  </attributes>
+  <commands>
+    <command id="0x00" name="KeySetWrite" direction="commandToServer" response="Y">
+      <access invokePrivilege="admin" fabricScoped="true"/>
+      <mandatoryConform/>
+      <field id="0" name="GroupKeySet" type="GroupKeySetStruct">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x01" name="KeySetRead" direction="commandToServer" response="KeySetReadResponse">
+      <access invokePrivilege="admin" fabricScoped="true"/>
+      <mandatoryConform/>
+      <field id="0" name="GroupKeySetID" type="uint16">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x02" name="KeySetReadResponse" direction="responseFromServer">
+      <mandatoryConform/>
+      <field id="0" name="GroupKeySet" type="GroupKeySetStruct">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x03" name="KeySetRemove" direction="commandToServer" response="Y">
+      <access invokePrivilege="admin" fabricScoped="true"/>
+      <mandatoryConform/>
+      <field id="0" name="GroupKeySetID" type="uint16">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x04" name="KeySetReadAllIndices" direction="commandToServer" response="KeySetReadAllIndicesResponse">
+      <access invokePrivilege="admin" fabricScoped="true"/>
+      <mandatoryConform/>
+      <field id="0" name="DoNotUse">
+        <disallowConform/>
+      </field>
+    </command>
+    <command id="0x05" name="KeySetReadAllIndicesResponse" direction="responseFromServer">
+      <mandatoryConform/>
+      <field id="0" name="GroupKeySetIDs" type="list">
+        <entry type="uint16"/>
+        <mandatoryConform/>
+      </field>
+    </command>
+  </commands>
+</cluster>

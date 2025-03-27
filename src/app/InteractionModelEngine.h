@@ -25,9 +25,6 @@
 
 #pragma once
 
-// TODO(#32628): Remove the CHIPCore.h header when the esp32 build is correctly fixed
-#include <lib/core/CHIPCore.h>
-
 #include <access/AccessControl.h>
 #include <app/AppConfig.h>
 #include <app/AttributePathParams.h>
@@ -172,7 +169,13 @@ public:
      * Tears down all active subscriptions.
      */
     void ShutdownAllSubscriptions();
+
 #endif // CHIP_CONFIG_ENABLE_READ_CLIENT
+
+    /**
+     * Tears down all subscription handlers.
+     */
+    void ShutdownAllSubscriptionHandlers();
 
     uint32_t GetNumActiveReadHandlers() const;
     uint32_t GetNumActiveReadHandlers(ReadHandler::InteractionType type) const;
@@ -327,6 +330,14 @@ public:
      *        was successful or not.
      */
     void DecrementNumSubscriptionsToResume();
+#if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
+    /**
+     * @brief Function resets the number of retries of subscriptions resumption - mNumSubscriptionResumptionRetries.
+     *        This should be called after we have completed a re-subscribe attempt successfully on a persisted subscription,
+     *        or when the subscription resumption gets terminated.
+     */
+    void ResetNumSubscriptionsRetries();
+#endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST

@@ -519,7 +519,10 @@ inline void chipDie(void)
  *  @sa #chipDie
  *
  */
-#if CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
+#if CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE && CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE_NO_COND
+#define VerifyOrDie(aCondition)                                                                                                    \
+    nlABORT_ACTION(aCondition, ChipLogError(Support, "VerifyOrDie failure at %s:%d", __FILE__, __LINE__))
+#elif CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
 #define VerifyOrDie(aCondition)                                                                                                    \
     nlABORT_ACTION(aCondition, ChipLogError(Support, "VerifyOrDie failure at %s:%d: %s", __FILE__, __LINE__, #aCondition))
 #else // CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
@@ -675,7 +678,7 @@ inline void chipDie(void)
 #endif
 
 /**
- * @def ArraySize(aArray)
+ * @def MATTER_ARRAY_SIZE(aArray)
  *
  * @brief
  *   Returns the size of an array in number of elements.
@@ -684,16 +687,18 @@ inline void chipDie(void)
  *
  * @code
  * int numbers[10];
- * SortNumbers(numbers, ArraySize(numbers));
+ * SortNumbers(numbers, MATTER_ARRAY_SIZE(numbers));
  * @endcode
  *
  * @return      The size of an array in number of elements.
  *
- * @note Clever template-based solutions seem to fail when ArraySize is used
+ * @note Clever template-based solutions seem to fail when MATTER_ARRAY_SIZE is used
  *       with a variable-length array argument, so we just do the C-compatible
  *       thing in C++ as well.
  */
-#define ArraySize(a) (sizeof(a) / sizeof((a)[0]))
+#ifndef MATTER_ARRAY_SIZE
+#define MATTER_ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
+#endif
 
 /**
  * @brief Ensures that if `str` is NULL, a non-null `default_str_value` is provided

@@ -191,6 +191,27 @@ menu "CHIP Core"
                 Enable dynamic server to handle a different interaction model dispatch.
                 Can be implied when users do not want to use the same server clusters.
 
+        choice CHIP_MEM_ALLOC_MODE
+            prompt "Memory allocation strategy"
+            default CHIP_MEM_ALLOC_MODE_DEFAULT
+            help
+                Strategy for Matter memory management
+                - Internal DRAM memory only
+                - External SPIRAM memory only
+                - Either internal or external memory based on default malloc() behavior in ESP-IDF
+
+            config CHIP_MEM_ALLOC_MODE_INTERNAL
+                bool "Internal memory"
+
+            config CHIP_MEM_ALLOC_MODE_EXTERNAL
+                bool "External SPIRAM"
+                depends on SPIRAM_USE_CAPS_ALLOC || SPIRAM_USE_MALLOC
+
+            config CHIP_MEM_ALLOC_MODE_DEFAULT
+                bool "Default alloc mode"
+
+        endchoice # CHIP_MEM_ALLOC_MODE
+
     endmenu # "General Options"
 
     menu "Networking Options"
@@ -228,14 +249,15 @@ menu "CHIP Core"
             help
                 Enable this option to start a UDP Endpoint queue filter for mDNS Broadcast packets
 
-        config ENABLE_LWIP_THREAD_SAFETY
-            bool "Enable LwIP Thread safety options"
+        config USE_TCPIP_CORE_LOCK_FOR_THREAD_SAFETY
+            bool "Use TCPIP core locking for LwIP thread safety"
             default y
             select LWIP_TCPIP_CORE_LOCKING
             select LWIP_CHECK_THREAD_SAFETY
             help
                 CHIP SDK performs LwIP core locking before calling an LwIP API.
                 To make the calls thread safe we have to enable LWIP_TCPIP_CORE_LOCKING.
+                Otherwise CHIP SDK will post LwIP APIs to TCPIP task to ensure thread safety.
                 Here, we are also enabling LWIP_CHECK_THREAD_SAFETY which will assert when
                 LwIP code gets called from any other context or without holding the LwIP lock.
 

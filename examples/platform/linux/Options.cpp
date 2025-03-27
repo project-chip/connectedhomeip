@@ -23,10 +23,11 @@
 
 #include "Options.h"
 
-#include <app/server/OnboardingCodesUtil.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 
 #include <crypto/CHIPCryptoPAL.h>
 #include <json/json.h>
+#include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/Base64.h>
 #include <lib/support/BytesToHex.h>
@@ -128,6 +129,14 @@ enum
     kDeviceOption_WiFi_PAF,
 #endif
     kDeviceOption_DacProvider,
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+    kDeviceOption_TermsAndConditions_Version,
+    kDeviceOption_TermsAndConditions_Required,
+#endif
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    kDeviceOption_icdActiveModeDurationMs,
+    kDeviceOption_icdIdleModeDuration,
+#endif // CHIP_ENABLE_ICD_SERVER
 };
 
 constexpr unsigned kAppUsageLength = 64;
@@ -204,6 +213,14 @@ OptionDef sDeviceOptionDefs[] = {
     { "faults", kArgumentRequired, kDeviceOption_FaultInjection },
 #endif
     { "dac_provider", kArgumentRequired, kDeviceOption_DacProvider },
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+    { "tc-version", kArgumentRequired, kDeviceOption_TermsAndConditions_Version },
+    { "tc-required", kArgumentRequired, kDeviceOption_TermsAndConditions_Required },
+#endif
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    { "icdActiveModeDurationMs", kArgumentRequired, kDeviceOption_icdActiveModeDurationMs },
+    { "icdIdleModeDuration", kArgumentRequired, kDeviceOption_icdIdleModeDuration },
+#endif // CHIP_ENABLE_ICD_SERVER
     {}
 };
 
@@ -362,12 +379,30 @@ const char * sDeviceOptionHelp =
     "      Specifies the time after which the device transitions from active to idle.\n"
     "\n"
 #endif
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+    "  --tc-version\n"
+    "       Sets the minimum required version of the Terms and Conditions\n"
+    "\n"
+    "  --tc-required\n"
+    "       Sets the required acknowledgements for the Terms and Conditions as a 16-bit enumeration.\n"
+    "       Each bit represents an ordinal corresponding to a specific acknowledgment requirement.\n"
+    "\n"
+#endif
 #if CHIP_WITH_NLFAULTINJECTION
     "  --faults <fault-string,...>\n"
     "       Inject specified fault(s) at runtime.\n"
 #endif
-    "   --dac_provider <filepath>\n"
+    "  --dac_provider <filepath>\n"
     "       A json file with data used by the example dac provider to validate device attestation procedure.\n"
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    "  --icdActiveModeDurationMs <icdActiveModeDurationMs>\n"
+    "       Sets the ICD active mode duration (in milliseconds). (Default: 300) \n"
+    "       This defines the how long the the server typically will stay in active mode after \n"
+    "       initial transition out of idle mode.\n"
+    "  --icdIdleModeDuration <icdIdleModeDuration>\n"
+    "       Sets the ICD idle mode durations (in seconds). (Default: 300)\n"
+    "       This defines the how long the ICD server can stay in idle mode.\n"
+#endif
     "\n";
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
@@ -724,7 +759,7 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
                                                                          Inet::FaultInjection::GetManager,
                                                                          System::FaultInjection::GetManager };
         Platform::ScopedMemoryString mutableArg(aValue, strlen(aValue)); // ParseFaultInjectionStr may mutate
-        if (!nl::FaultInjection::ParseFaultInjectionStr(mutableArg.Get(), faultManagerFns, ArraySize(faultManagerFns)))
+        if (!nl::FaultInjection::ParseFaultInjectionStr(mutableArg.Get(), faultManagerFns, MATTER_ARRAY_SIZE(faultManagerFns)))
         {
             PrintArgError("%s: Invalid fault injection specification\n", aProgram);
             retval = false;
@@ -747,6 +782,46 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         LinuxDeviceOptions::GetInstance().dacProvider = &testDacProvider;
         break;
     }
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+    case kDeviceOption_TermsAndConditions_Version: {
+        LinuxDeviceOptions::GetInstance().tcVersion.SetValue(static_cast<uint16_t>(atoi(aValue)));
+        break;
+    }
+
+    case kDeviceOption_TermsAndConditions_Required: {
+        LinuxDeviceOptions::GetInstance().tcRequired.SetValue(static_cast<uint16_t>(atoi(aValue)));
+        break;
+    }
+#endif
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    case kDeviceOption_icdActiveModeDurationMs: {
+        uint32_t value = static_cast<uint32_t>(strtoul(aValue, nullptr, 0));
+        if (value < 1)
+        {
+            PrintArgError("%s: invalid value specified for icdActiveModeDurationMs: %s\n", aProgram, aValue);
+            retval = false;
+        }
+        else
+        {
+            LinuxDeviceOptions::GetInstance().icdActiveModeDurationMs.SetValue(chip::System::Clock::Milliseconds32(value));
+        }
+        break;
+    }
+    case kDeviceOption_icdIdleModeDuration: {
+        uint32_t value = static_cast<uint32_t>(strtoul(aValue, nullptr, 0));
+        if ((value < 1) || (value > 86400))
+        {
+            PrintArgError("%s: invalid value specified for icdIdleModeDuration: %s\n", aProgram, aValue);
+            retval = false;
+        }
+        else
+        {
+            // Covert from seconds to mini seconds
+            LinuxDeviceOptions::GetInstance().icdIdleModeDurationMs.SetValue(chip::System::Clock::Milliseconds32(value * 1000));
+        }
+        break;
+    }
+#endif
     default:
         PrintArgError("%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
         retval = false;

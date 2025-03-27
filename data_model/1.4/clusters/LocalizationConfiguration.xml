@@ -54,6 +54,8 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x002B" name="Localization Configuration Cluster" revision="1">
   <revisionHistory>
@@ -66,7 +68,7 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="ActiveLocale" type="string" default="MS">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform/>
       <constraint type="maxLength" value="35"/>
     </attribute>
@@ -75,7 +77,7 @@ Davis, CA 95616, USA
         <constraint type="maxLength" value="35"/>
       </entry>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
       <constraint type="maxCount" value="32"/>
     </attribute>

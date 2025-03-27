@@ -105,6 +105,7 @@ RUN set -x \
     unzip \
     wget \
     zlib1g-dev \
+    zstd \
     && rm -rf /var/lib/apt/lists/ \
     && git lfs install \
     && : # last line

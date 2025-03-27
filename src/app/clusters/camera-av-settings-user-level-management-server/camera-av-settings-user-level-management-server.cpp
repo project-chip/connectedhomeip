@@ -765,6 +765,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRemovePreset(HandlerContext 
 void CameraAvSettingsUserLevelMgmtServer::HandleDPTZSetViewport(HandlerContext & ctx,
                                                             const Commands::DPTZSetViewport::DecodableType & commandData)
 {
+    
     // Call the delegate
     Status status = mDelegate->DPTZSetViewport();
 

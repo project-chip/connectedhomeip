@@ -60,8 +60,8 @@ template("siwx917_sdk") {
       "${efr32_sdk_root}/platform/emdrv/nvm3/inc",
       "${efr32_sdk_root}/platform/emdrv/common/inc",
       "${efr32_sdk_root}/platform/service/device_init/inc",
-      "${sdk_support_root}/matter/si91x/siwx917/${silabs_board}/autogen",
-      "${sdk_support_root}/matter/si91x/siwx917/${silabs_board}/config",
+      "${matter_support_root}/board-support/si91x/siwx917/${silabs_board}/autogen",
+      "${matter_support_root}/board-support/si91x/siwx917/${silabs_board}/config",
 
       "${chip_root}/src/platform/silabs/rs911x",
       "${chip_root}/src/platform/silabs/wifi",
@@ -132,7 +132,7 @@ template("siwx917_sdk") {
       "${efr32_sdk_root}/platform/service/sleeptimer/inc",
       "${efr32_sdk_root}/platform/service/sleeptimer/config",
       "${efr32_sdk_root}/platform/service/sleeptimer/src",
-      "${sdk_support_root}/matter/si91x/support/inc",
+      "${matter_support_root}/board-support/si91x/support/inc",
 
       "${efr32_sdk_root}/platform/service/iostream/inc",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/button/inc",
@@ -560,7 +560,7 @@ template("siwx917_sdk") {
           "${efr32_sdk_root}/platform/security/sl_component/sli_psec_osal/inc",
 
           # tinycrypt specific headers
-          "${sdk_support_root}/matter/mbedtls/tinycrypt/inc",
+          "${matter_support_root}/tinycrypt/inc",
         ]
       }
 
@@ -613,10 +613,10 @@ template("siwx917_sdk") {
           "${_mbedtls_root}/library/x509write_csr.c",
 
           # tinycrypt
-          "${sdk_support_root}/matter/mbedtls/tinycrypt/src/ecc.c",
-          "${sdk_support_root}/matter/mbedtls/tinycrypt/src/ecc_dh.c",
-          "${sdk_support_root}/matter/mbedtls/tinycrypt/src/ecc_dsa.c",
-          "${sdk_support_root}/matter/mbedtls/tinycrypt/src/tinycrypt_util.c",
+          "${matter_support_root}/tinycrypt/src/ecc.c",
+          "${matter_support_root}/tinycrypt/src/ecc_dh.c",
+          "${matter_support_root}/tinycrypt/src/ecc_dsa.c",
+          "${matter_support_root}/tinycrypt/src/tinycrypt_util.c",
 
           # GECKO SDK
           "${efr32_sdk_root}/platform/security/sl_component/sli_psec_osal/src/sli_psec_osal_cmsis_rtos2.c",
@@ -744,11 +744,11 @@ template("siwx917_sdk") {
       "${efr32_sdk_root}/util/third_party/freertos/kernel/stream_buffer.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/tasks.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/timers.c",
-      "${sdk_support_root}/matter/si91x/siwx917/${silabs_board}/autogen/sl_event_handler.c",
-      "${sdk_support_root}/matter/si91x/siwx917/${silabs_board}/autogen/sl_iostream_handles.c",
-      "${sdk_support_root}/matter/si91x/siwx917/${silabs_board}/autogen/sl_si91x_button_instances.c",
-      "${sdk_support_root}/matter/si91x/siwx917/${silabs_board}/autogen/sl_ulp_timer_init.c",
-      "${sdk_support_root}/matter/si91x/support/hal/rsi_hal_mcu_m4.c",
+      "${matter_support_root}/board-support/si91x/siwx917/${silabs_board}/autogen/sl_event_handler.c",
+      "${matter_support_root}/board-support/si91x/siwx917/${silabs_board}/autogen/sl_iostream_handles.c",
+      "${matter_support_root}/board-support/si91x/siwx917/${silabs_board}/autogen/sl_si91x_button_instances.c",
+      "${matter_support_root}/board-support/si91x/siwx917/${silabs_board}/autogen/sl_ulp_timer_init.c",
+      "${matter_support_root}/board-support/si91x/support/hal/rsi_hal_mcu_m4.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/button/src/sl_si91x_button.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/clock_manager/src/sl_si91x_clock_manager.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/clock_manager/src/sli_si91x_clock_manager.c",
@@ -768,7 +768,7 @@ template("siwx917_sdk") {
       # STARTUP FILES
       "${efr32_sdk_root}/platform/service/iostream/src/sl_iostream.c",
       "${efr32_sdk_root}/platform/service/iostream/src/sl_iostream_rtt.c",
-      "${sdk_support_root}/matter/si91x/support/src/startup_common_RS1xxxx.c",
+      "${matter_support_root}/board-support/si91x/support/src/startup_common_RS1xxxx.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/nvm3/src/sl_si91x_common_flash_intf.c",
 
       # OTA
@@ -779,12 +779,12 @@ template("siwx917_sdk") {
 
     if (sl_enable_rgb_led) {
       sources += [
-        "${sdk_support_root}/matter/si91x/siwx917/${silabs_board}/autogen/sl_si91x_rgb_led_instances.c",
+        "${matter_support_root}/board-support/si91x/siwx917/${silabs_board}/autogen/sl_si91x_rgb_led_instances.c",
         "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/rgb_led/src/sl_si91x_rgb_led.c",
       ]
     } else {
       sources += [
-        "${sdk_support_root}/matter/si91x/siwx917/${silabs_board}/autogen/sl_si91x_led_instances.c",
+        "${matter_support_root}/board-support/si91x/siwx917/${silabs_board}/autogen/sl_si91x_led_instances.c",
         "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/led/src/sl_si91x_led.c",
       ]
     }
@@ -832,8 +832,8 @@ template("siwx917_sdk") {
 
     if (chip_enable_icd_server) {
       sources += [
-        "${sdk_support_root}/matter/si91x/siwx917/${silabs_board}/autogen/sl_si91x_power_manager_handler.c",
-        "${sdk_support_root}/matter/si91x/siwx917/${silabs_board}/autogen/sl_si91x_power_manager_wakeup_handler.c",
+        "${matter_support_root}/board-support/si91x/siwx917/${silabs_board}/autogen/sl_si91x_power_manager_handler.c",
+        "${matter_support_root}/board-support/si91x/siwx917/${silabs_board}/autogen/sl_si91x_power_manager_wakeup_handler.c",
         "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/sl_si91x_m4_ps.c",
         "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/power_manager/src/sl_si91x_power_manager.c",
         "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/power_manager/src/sli_si91x_power_manager.c",

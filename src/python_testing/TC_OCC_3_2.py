@@ -44,8 +44,8 @@ import logging
 import time
 
 import chip.clusters as Clusters
-from chip.testing.matter_testing import (AttributeValue, ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep,
-                                         async_test_body, await_sequence_of_reports, default_matter_test_main)
+from chip.testing.matter_testing import (ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, async_test_body,
+                                         await_sequence_of_reports, default_matter_test_main)
 from mobly import asserts
 
 
@@ -177,30 +177,10 @@ class TC_OCC_3_2(MatterBaseTest):
 
         self.step("4c")
         await self.write_single_attribute(attributes.HoldTime(hold_time_max))
-        hold_time_dut = await self.read_occ_attribute_expect_success(attribute=attributes.HoldTime)
-        asserts.assert_equal(hold_time_dut, hold_time_max, "HoldTime did not match written HoldTimeMax")
 
         self.step("4d")
-        has_no_legacy_features = ((not has_feature_pir) and (not has_feature_ultrasonic) and (not has_feature_contact))
-
-        expect_legacy_pir_timing = has_pir_timing_attrib and (has_feature_pir or has_no_legacy_features)
-        expect_legacy_us_timing = has_ultrasonic_timing_attrib and has_feature_ultrasonic
-        expect_legacy_phy_timing = has_contact_timing_attrib and has_feature_contact
-
-        # Build list of expectations based on attributes present.
-        all_expected_final_values = [AttributeValue(endpoint_id, attribute=cluster.Attributes.HoldTime, value=hold_time_max)]
-        if expect_legacy_pir_timing:
-            all_expected_final_values.append(AttributeValue(
-                endpoint_id, attribute=cluster.Attributes.PIROccupiedToUnoccupiedDelay, value=hold_time_max))
-        if expect_legacy_us_timing:
-            all_expected_final_values.append(AttributeValue(
-                endpoint_id, attribute=cluster.Attributes.UltrasonicOccupiedToUnoccupiedDelay, value=hold_time_max))
-        if expect_legacy_phy_timing:
-            all_expected_final_values.append(AttributeValue(
-                endpoint_id, attribute=cluster.Attributes.PhysicalContactOccupiedToUnoccupiedDelay, value=hold_time_max))
-
-        # Wait for the reports to come.
-        attrib_listener.await_all_final_values_reported(all_expected_final_values, timeout_sec=post_prompt_settle_delay_seconds)
+        await_sequence_of_reports(report_queue=attrib_listener.attribute_queue, endpoint_id=endpoint_id,
+                                  attribute=cluster.Attributes.HoldTime, sequence=[hold_time_max], timeout_sec=post_prompt_settle_delay_seconds)
 
 
 if __name__ == "__main__":

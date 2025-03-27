@@ -54,6 +54,8 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0753" name="Joint Fabric PKI Cluster" revision="1">
   <revisionHistory>
@@ -66,74 +68,74 @@ Davis, CA 95616, USA
   </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="JFPKI" scope="Node"/>
   <dataTypes>
-    <enum name="ICAC Signing Request Status Enum">
-      <item value="0" name="ref_IcacsrRequestStatusOK" summary="No error">
+    <enum name="ICACSigningRequestStatusEnum">
+      <item value="0" name="OK" summary="No error">
         <mandatoryConform/>
       </item>
-      <item value="1" name="ref_InvalidIcaCsrFormat" summary="The ICACSR in the request is not compliant to &lt;&lt;ref_Rfc2986, PKCS #10&gt;&gt; rules">
+      <item value="1" name="InvalidIcaCsrFormat" summary="The ICACSR in the request is not compliant to PKCS #10 rules">
         <mandatoryConform/>
       </item>
-      <item value="2" name="ref_InvalidIcaCsrSignature" summary="The ICACSR in the request has an incorrect signature">
+      <item value="2" name="InvalidIcaCsrSignature" summary="The ICACSR in the request has an incorrect signature">
         <mandatoryConform/>
       </item>
-      <item value="3" name="ref_FailedDCLVendorIdValidation" summary="DCL Vendor ID validation failed">
+      <item value="3" name="FailedDCLVendorIdValidation" summary="DCL Vendor ID validation failed">
         <mandatoryConform/>
       </item>
-      <item value="4" name="ref_NotAnIcac" summary="DCL returned certificate is not an ICAC">
+      <item value="4" name="NotAnIcac" summary="DCL returned certificate is not an ICAC">
         <mandatoryConform/>
       </item>
-      <item value="5" name="ref_BusyAnchorTransfer" summary="Error due to an in progress Anchor Transfer">
+      <item value="5" name="BusyAnchorTransfer" summary="Error due to an in progress Anchor Transfer">
         <mandatoryConform/>
       </item>
-      <item value="6" name="ref_IcaSigningFailed" summary="Signing the ICA CSR failed">
+      <item value="6" name="IcaCsrSigningFailed" summary="Signing the ICA CSR failed">
         <mandatoryConform/>
       </item>
-      <item value="7" name="ref_IcacsrRequestNoUserConsent" summary="No user consent">
+      <item value="7" name="IcaCsrRequestNoUserConsent" summary="No user consent">
         <mandatoryConform/>
       </item>
     </enum>
-    <enum name="Transfer Anchor Response Status Enum">
-      <item value="0" name="ref_TransferAnchorStatusOK" summary="No error">
+    <enum name="TransferAnchorResponseStatusEnum">
+      <item value="0" name="OK" summary="No error">
         <mandatoryConform/>
       </item>
-      <item value="1" name="ref_TransferAnchorStatusDatastoreBusy" summary="Anchor Transfer was not started due to on-going Datastore operations">
+      <item value="1" name="TransferAnchorStatusDatastoreBusy" summary="Anchor Transfer was not started due to on-going Datastore operations">
         <mandatoryConform/>
       </item>
-      <item value="2" name="ref_TransferAnchorStatusNoUserConsent" summary="User has not consented for Anchor Transfer">
+      <item value="2" name="TransferAnchorStatusNoUserConsent" summary="User has not consented for Anchor Transfer">
         <mandatoryConform/>
       </item>
     </enum>
   </dataTypes>
   <commands>
-    <command id="0x00" name="ICACSRRequest Command" direction="commandToServer" response="ICACSRResponse Command">
+    <command id="0x00" name="ICACSRRequest" direction="commandToServer" response="ICACSRResponse">
       <access invokePrivilege="admin"/>
       <mandatoryConform/>
-      <field id="0" name="ref_Icacsr" type="octstr">
+      <field id="0" name="ICACSR" type="octstr">
         <mandatoryConform/>
         <constraint type="maxLength" value="400"/>
       </field>
     </command>
-    <command id="0x01" name="ICACSRResponse Command" direction="responseFromServer">
+    <command id="0x01" name="ICACSRResponse" direction="responseFromServer">
       <mandatoryConform/>
-      <field id="0" name="ref_IcaCsrResponseStatusCode" type="ICAC Signing Request Status Enum">
+      <field id="0" name="StatusCode" type="ICACSigningRequestStatusEnum">
         <mandatoryConform/>
       </field>
-      <field id="1" name="ref_IcaCsrResponseICAC" type="octstr">
+      <field id="1" name="ICAC" type="octstr">
         <optionalConform/>
         <constraint type="maxLength" value="400"/>
       </field>
     </command>
-    <command id="0x02" name="Transfer Anchor Request Command" direction="commandToServer" response="Transfer Anchor Response Command">
+    <command id="0x02" name="TransferAnchorRequest" direction="commandToServer" response="TransferAnchorResponse">
       <access invokePrivilege="admin"/>
       <mandatoryConform/>
     </command>
-    <command id="0x03" name="Transfer Anchor Response Command" direction="responseFromServer">
+    <command id="0x03" name="TransferAnchorResponse" direction="responseFromServer">
       <mandatoryConform/>
-      <field id="0" name="ref_TransferAnchorResponseStatusCode" type="Transfer Anchor Response Status Enum">
+      <field id="0" name="StatusCode" type="TransferAnchorResponseStatusEnum">
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x04" name="Transfer Anchor Complete Command" direction="commandToServer" response="Y">
+    <command id="0x04" name="TransferAnchorComplete" direction="commandToServer" response="Y">
       <access invokePrivilege="admin"/>
       <mandatoryConform/>
     </command>
