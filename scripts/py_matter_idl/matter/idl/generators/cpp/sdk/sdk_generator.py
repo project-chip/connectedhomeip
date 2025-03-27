@@ -13,7 +13,6 @@
 # limitations under the License.
 #
 import os
-from typing import Optional
 
 from matter.idl.generators import CodeGenerator, GeneratorStorage
 from matter.idl.matter_idl_types import AccessPrivilege, Attribute, AttributeQuality, Command, CommandQuality, FieldQuality, Idl

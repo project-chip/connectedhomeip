@@ -18,6 +18,7 @@ import json
 import os
 import shutil
 import subprocess
+import traceback
 
 CHIP_ROOT_DIR = os.path.realpath(
     os.path.join(os.path.dirname(__file__), '../../..'))
