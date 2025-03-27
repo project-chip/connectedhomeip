@@ -33,13 +33,13 @@ from enum import Flag, auto
 from pathlib import Path
 from typing import List
 
+from zap.generate import getClangFormatBinary
+
 CHIP_ROOT_DIR = os.path.realpath(
     os.path.join(os.path.dirname(__file__), '../..'))
 
 # TODO: Can we share this constant definition with generate.py?
 DEFAULT_DATA_MODEL_DESCRIPTION_FILE = 'src/app/zap-templates/zcl/zcl.json'
-
-from zap.generate import getClangFormatBinary
 
 
 class TargetType(Flag):

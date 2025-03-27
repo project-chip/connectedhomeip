@@ -16,8 +16,8 @@ import enum
 import importlib
 
 from matter.idl.generators.cpp.application import CppApplicationGenerator
-from matter.idl.generators.cpp.tlvmeta import TLVMetaDataGenerator
 from matter.idl.generators.cpp.sdk import SdkGenerator
+from matter.idl.generators.cpp.tlvmeta import TLVMetaDataGenerator
 from matter.idl.generators.idl import IdlGenerator
 from matter.idl.generators.java import JavaClassGenerator, JavaJNIGenerator
 from matter.idl.generators.kotlin import KotlinClassGenerator

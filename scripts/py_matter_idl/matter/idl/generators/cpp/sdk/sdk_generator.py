@@ -48,6 +48,7 @@ def extract_attribute_quality_flags(attribute: Attribute) -> list[str]:
 
     return result
 
+
 def extract_command_quality_flags(command: Command) -> list[str]:
     result = []
 
@@ -61,9 +62,10 @@ def extract_command_quality_flags(command: Command) -> list[str]:
 
     return result
 
+
 def global_attribute(attribute: Attribute) -> bool:
     return 0xFFF8 <= attribute.definition.code <= 0xFFFF
- 
+
 
 class SdkGenerator(CodeGenerator):
     """
@@ -92,7 +94,7 @@ class SdkGenerator(CodeGenerator):
                 output_file_name=f"{cluster.name}.h",
                 vars={
                     "cluster": cluster,
-                    "input_name" : self.idl.parse_file_name,
+                    "input_name": self.idl.parse_file_name,
                 },
             )
 
@@ -101,9 +103,6 @@ class SdkGenerator(CodeGenerator):
             output_file_name="BUILD.gn",
             vars={
                 "cluster_names": [x.name for x in self.idl.clusters],
-                "input_name" : self.idl.parse_file_name,
+                "input_name": self.idl.parse_file_name,
             },
         )
-
-
-
