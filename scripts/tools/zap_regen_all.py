@@ -417,6 +417,11 @@ def getCodegenTemplates():
         idl_path="src/controller/data_model/controller-clusters.matter",
         output_directory="docs/ids_and_codes"))
 
+    targets.append(JinjaCodegenTarget(
+        generator="cpp-sdk",
+        idl_path="src/controller/data_model/controller-clusters.matter",
+        output_directory="src/clusters/metadata"))
+
     return targets
 
 
