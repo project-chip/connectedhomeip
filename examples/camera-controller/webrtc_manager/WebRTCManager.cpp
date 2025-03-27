@@ -70,6 +70,23 @@ void WebRTCManager::Init()
     // TODO:: mWebRTCRequestorServer.Init();
 }
 
+CHIP_ERROR WebRTCManager::SetRemoteDescription(uint16_t webRTCSessionID, const std::string & sdp)
+{
+    if (!mPeerConnection)
+    {
+        ChipLogError(NotSpecified, "Cannot set remote description: mPeerConnection is null");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    ChipLogProgress(NotSpecified, "WebRTCManager::SetRemoteDescription");
+    mPeerConnection->setRemoteDescription(sdp);
+
+    // Schedule the ProvideICECandidates() call to run asynchronously.
+    DeviceLayer::SystemLayer().ScheduleLambda([this, webRTCSessionID]() { ProvideICECandidates(webRTCSessionID); });
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner, NodeId nodeId, EndpointId endpointId)
 {
     ChipLogProgress(NotSpecified, "Attempting to establish WebRTC connection to node 0x" ChipLogFormatX64 " on endpoint 0x%x",
@@ -132,8 +149,8 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WebRTCManager::SendProvideOffer(DataModel::Nullable<uint16_t> webRTCSessionID,
-                                           Clusters::WebRTCTransportProvider::StreamUsageEnum streamUsage)
+CHIP_ERROR WebRTCManager::ProvideOffer(DataModel::Nullable<uint16_t> webRTCSessionID,
+                                       Clusters::WebRTCTransportProvider::StreamUsageEnum streamUsage)
 {
     ChipLogProgress(NotSpecified, "Sending ProvideOffer command to the peer device");
 
@@ -147,6 +164,36 @@ CHIP_ERROR WebRTCManager::SendProvideOffer(DataModel::Nullable<uint16_t> webRTCS
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "Failed to send ProvideOffer: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+
+    return err;
+}
+
+CHIP_ERROR WebRTCManager::ProvideICECandidates(uint16_t webRTCSessionID)
+{
+    ChipLogProgress(NotSpecified, "Sending ProvideICECandidates command to the peer device");
+
+    if (mLocalCandidates.empty())
+    {
+        ChipLogError(NotSpecified, "No local ICE candidates to send");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    // Convert mLocalCandidates (std::vector<std::string>) into a list of CharSpans.
+    std::vector<chip::CharSpan> candidateSpans;
+    candidateSpans.reserve(mLocalCandidates.size());
+    for (const auto & candidate : mLocalCandidates)
+    {
+        candidateSpans.push_back(chip::CharSpan(candidate.c_str(), static_cast<uint16_t>(candidate.size())));
+    }
+
+    auto ICECandidates = chip::app::DataModel::List<const chip::CharSpan>(candidateSpans.data(), candidateSpans.size());
+
+    CHIP_ERROR err = mWebRTCProviderClient.ProvideICECandidates(webRTCSessionID, ICECandidates);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to send ProvideICECandidates: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     return err;

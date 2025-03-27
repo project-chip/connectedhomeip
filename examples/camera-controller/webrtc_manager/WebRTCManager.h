@@ -34,10 +34,14 @@ public:
 
     void Init();
 
+    CHIP_ERROR SetRemoteDescription(uint16_t webRTCSessionID, const std::string & sdp);
+
     CHIP_ERROR Connnect(chip::Controller::DeviceCommissioner & commissioner, chip::NodeId nodeId, chip::EndpointId endpointId);
 
-    CHIP_ERROR SendProvideOffer(chip::app::DataModel::Nullable<uint16_t> webRTCSessionID,
-                                chip::app::Clusters::WebRTCTransportProvider::StreamUsageEnum streamUsage);
+    CHIP_ERROR ProvideOffer(chip::app::DataModel::Nullable<uint16_t> webRTCSessionID,
+                            chip::app::Clusters::WebRTCTransportProvider::StreamUsageEnum streamUsage);
+
+    CHIP_ERROR ProvideICECandidates(uint16_t webRTCSessionID);
 
     void HandleCommandResponse(const chip::app::ConcreteCommandPath & path, chip::TLV::TLVReader & data);
 

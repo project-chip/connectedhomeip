@@ -60,6 +60,7 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
     outSession.id          = args.sessionId;
     outSession.peerNodeID  = args.peerNodeId;
     outSession.streamUsage = args.streamUsage;
+    outSession.fabricIndex = args.fabricIndex;
 
     // By spec, MetadataOptions SHALL be set to 0 and reserved for future use
     outSession.metadataOptions.ClearAll();
@@ -160,7 +161,34 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideAnswer(uint16_t sessionId, const 
 
 CHIP_ERROR WebRTCProviderManager::HandleProvideICECandidates(uint16_t sessionId, const std::vector<std::string> & candidates)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    ChipLogProgress(NotSpecified, "HandleProvideICECandidates called with sessionId: %u", sessionId);
+
+    // Check if the provided sessionId matches your current session
+    if (sessionId != mCurrentSessionId)
+    {
+        ChipLogError(NotSpecified, "Session ID %u does not match the current session ID %u", sessionId, mCurrentSessionId);
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    if (!mPeerConnection)
+    {
+        ChipLogError(NotSpecified, "Cannot process ICE candidates: mPeerConnection is null");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    if (candidates.empty())
+    {
+        ChipLogError(NotSpecified, "Candidate list is empty. At least one candidate is expected.");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    for (const auto & candidate : candidates)
+    {
+        ChipLogProgress(NotSpecified, "Applying candidate: %s", candidate.c_str());
+        mPeerConnection->addRemoteCandidate(candidate);
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR WebRTCProviderManager::HandleEndSession(uint16_t sessionId, WebRTCEndReasonEnum reasonCode,
@@ -169,6 +197,7 @@ CHIP_ERROR WebRTCProviderManager::HandleEndSession(uint16_t sessionId, WebRTCEnd
 {
     if (mCurrentSessionId == sessionId)
     {
+        mCurrentSessionId      = 0;
         mOriginatingEndpointId = 0;
         mOriginatingEndpointId = 0;
         mPeerId                = ScopedNodeId();

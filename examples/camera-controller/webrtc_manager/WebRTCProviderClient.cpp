@@ -64,6 +64,27 @@ CHIP_ERROR WebRTCProviderClient::ProvideOffer(
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR WebRTCProviderClient::ProvideICECandidates(uint16_t webRTCSessionID, DataModel::List<const chip::CharSpan> ICECandidates)
+{
+    ChipLogProgress(NotSpecified, "Sending ProvideICECandidates to node " ChipLogFormatX64, ChipLogValueX64(mPeerId.GetNodeId()));
+
+    // Store the command type
+    mCommandType = CommandType::kProvideICECandidates;
+
+    // Stash data in class members so the CommandSender can safely reference them async
+    mProvideICECandidatesData.webRTCSessionID = webRTCSessionID;
+    mProvideICECandidatesData.ICECandidates   = ICECandidates;
+
+    // Attempt to find or establish a CASE session to the target PeerId.
+    InteractionModelEngine * engine     = InteractionModelEngine::GetInstance();
+    CASESessionManager * caseSessionMgr = engine->GetCASESessionManager();
+    VerifyOrReturnError(caseSessionMgr != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    caseSessionMgr->FindOrEstablishSession(mPeerId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+
+    return CHIP_NO_ERROR;
+}
+
 void WebRTCProviderClient::OnResponse(CommandSender * client, const ConcreteCommandPath & path, const StatusIB & status,
                                       TLV::TLVReader * data)
 {
@@ -106,8 +127,13 @@ CHIP_ERROR WebRTCProviderClient::SendCommandForType(Messaging::ExchangeManager &
     switch (commandType)
     {
     case CommandType::kProvideOffer:
-        return SendCommand(exchangeMgr, sessionHandle, Clusters::WebRTCTransportProvider::Id,
-                           Clusters::WebRTCTransportProvider::Commands::ProvideOffer::Id, mProvideOfferData);
+        return SendCommand(exchangeMgr, sessionHandle, Clusters::WebRTCTransportProvider::Commands::ProvideOffer::Id,
+                           mProvideOfferData);
+
+    case CommandType::kProvideICECandidates:
+        return SendCommand(exchangeMgr, sessionHandle, Clusters::WebRTCTransportProvider::Commands::ProvideICECandidates::Id,
+                           mProvideICECandidatesData);
+
     default:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -119,7 +145,7 @@ void WebRTCProviderClient::OnDeviceConnectedFn(void * context, Messaging::Exchan
     WebRTCProviderClient * self = reinterpret_cast<WebRTCProviderClient *>(context);
     VerifyOrReturn(self != nullptr, ChipLogError(NotSpecified, "OnDeviceConnectedFn: context is null"));
 
-    ChipLogProgress(NotSpecified, "CASE session established, sending ProvideOffer command...");
+    ChipLogProgress(NotSpecified, "CASE session established, sending WebRTCTransportProvider command...");
     CHIP_ERROR sendErr = self->SendCommandForType(exchangeMgr, sessionHandle, self->mCommandType);
     if (sendErr != CHIP_NO_ERROR)
     {

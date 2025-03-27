@@ -49,7 +49,7 @@ public:
     void Init(const chip::ScopedNodeId & peerId, chip::EndpointId endpointId);
 
     /**
-     * @brief Sends a ProvideOffer command to the remote device (WebRTCTransportProvider cluster).
+     * @brief Sends a ProvideOffer command to the remote device.
      *
      * This method populates the ProvideOffer command parameters, buffers the SDP locally to ensure
      * the data remains valid for the asynchronous command flow, and then requests a device connection
@@ -76,6 +76,23 @@ public:
                      ICEServers,
                  chip::Optional<chip::CharSpan> ICETransportPolicy);
 
+    /**
+     * @brief Sends a ProvideICECandidates command to the remote device.
+     *
+     * This method populates the ProvideICECandidates command parameters, packages the provided ICE
+     * candidate strings, and queues them for sending to the target device. This is typically used
+     * to inform the remote side about potential network endpoints it can use to establish or
+     * enhance a WebRTC session.
+     *
+     * @param webRTCSessionID   The unique identifier for the WebRTC session to which these
+     *                          ICE candidates apply.
+     * @param ICECandidates     A list of ICE candidate strings. Each string typically follows
+     *                          the "candidate:" syntax defined in the ICE specification.
+     *
+     * @return CHIP_NO_ERROR on success, or an appropriate CHIP_ERROR on failure.
+     */
+    CHIP_ERROR ProvideICECandidates(uint16_t webRTCSessionID, chip::app::DataModel::List<const chip::CharSpan> ICECandidates);
+
     /////////// CommandSender Callback Interface /////////
     virtual void OnResponse(chip::app::CommandSender * client, const chip::app::ConcreteCommandPath & path,
                             const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override;
@@ -99,7 +116,7 @@ private:
 
     template <class T>
     CHIP_ERROR SendCommand(chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle,
-                           chip::ClusterId clusterId, chip::CommandId commandId, const T & requestData)
+                           chip::CommandId commandId, const T & requestData)
     {
         mCommandSender =
             std::make_unique<chip::app::CommandSender>(this, &exchangeMgr,
@@ -107,7 +124,7 @@ private:
                                                        /* suppressResponse   = */ false, sessionHandle->AllowsLargePayload());
         VerifyOrReturnError(mCommandSender != nullptr, CHIP_ERROR_NO_MEMORY);
 
-        chip::app::CommandPathParams commandPath = { mEndpointId, clusterId, commandId,
+        chip::app::CommandPathParams commandPath = { mEndpointId, chip::app::Clusters::WebRTCTransportProvider::Id, commandId,
                                                      chip::app::CommandPathFlags::kEndpointIdValid };
 
         chip::app::CommandSender::AddRequestDataParameters addRequestDataParams(chip::NullOptional);
@@ -129,8 +146,9 @@ private:
     CommandType mCommandType     = CommandType::kUndefined;
     std::unique_ptr<chip::app::CommandSender> mCommandSender;
 
-    // Data needed to send the ProvideOffer command
+    // Data needed to send the WebRTCTransportProvider commands
     chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideOffer::Type mProvideOfferData;
+    chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideICECandidates::Type mProvideICECandidatesData;
 
     // We store the SDP here so that mProvideOfferData.sdp points to a stable buffer.
     std::string mSdpString;
