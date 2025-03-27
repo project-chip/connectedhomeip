@@ -183,17 +183,12 @@ public:
                                       attributePath.mClusterId, attributePath.mAttributeId, aDataVersion);
 
         ListIndex nextItemToAppendIndex = kInvalidListIndex;
-        // TODO CHANGE NAME OF numEncodedItems and maybe not make it listindex?
-        uint16_t numSuccessfullyEncodedItems = kInvalidListIndex;
-        bool chunkingNeeded                  = false;
-
-        // TODO Should we be able to send an empty List? In TestUserLabelCluster.yaml we send an empty list to CLEAR User Label
-        // List, This means this should be supported?
-        // VerifyOrReturnError(!listValue.empty(), CHIP_ERROR_INVALID_LIST_LENGTH);
+        uint16_t encodedItemCount       = 0;
+        bool chunkingNeeded             = false;
 
         // BACKWARD COMPATIBILITY: Legacy OTA Requestor Servers( Pre-Matter 1.4) only support having an empty list for ReplaceAll
-        // when writing to the DefaultOTAProviders attribute and they will only Decode List Items that are  of the AppendItem List
-        // operation. So we must allow this for backward compatiblity.
+        // when writing to the DefaultOTAProviders attribute and they will only Decode List Items that are received as part of the
+        // AppendItem List operation. So we must allow this for backward compatiblity.
         // TODO remove this special case when Matter 1.3 is Sunsetted
         bool encodeEmptyListAsReplaceAll =
             (path.mClusterId == Clusters::OtaSoftwareUpdateRequestor::Id &&
@@ -213,16 +208,14 @@ public:
             // same chunk)
             ReturnErrorOnFailure(StartNewMessage());
 
-            // TODO CHANGE NAME OF numEncodedItems
-            ReturnErrorOnFailure(
-                TryEncodeListIntoSingleAttributeDataIB(path, listValue, chunkingNeeded, numSuccessfullyEncodedItems));
+            ReturnErrorOnFailure(TryEncodeListIntoSingleAttributeDataIB(path, listValue, chunkingNeeded, encodedItemCount));
             if (!chunkingNeeded)
             {
                 return CHIP_NO_ERROR;
             }
             // Start a new WriteRequest chunk.
             ReturnErrorOnFailure(StartNewMessage());
-            nextItemToAppendIndex = numSuccessfullyEncodedItems;
+            nextItemToAppendIndex = encodedItemCount;
         }
 
         path.mListOp = ConcreteDataAttributePath::ListOperation::AppendItem;
@@ -366,7 +359,7 @@ private:
     template <class T>
     CHIP_ERROR TryEncodeListIntoSingleAttributeDataIB(const ConcreteDataAttributePath & attributePath,
                                                       const DataModel::List<T> & list, bool & chunkingNeeded,
-                                                      ListIndex & outNumSuccessfullyEncodedItems)
+                                                      uint16_t & outEncodedItemCount)
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
         TLV::TLVWriter backupWriter;
@@ -376,7 +369,7 @@ private:
         chip::TLV::TLVWriter * writer = nullptr;
         VerifyOrReturnError((writer = GetAttributeDataIBTLVWriter()) != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-        outNumSuccessfullyEncodedItems = 0;
+        outEncodedItemCount = 0;
 
         for (auto & item : list)
         {
@@ -397,7 +390,7 @@ private:
                 break;
             }
             ReturnErrorOnFailure(err);
-            outNumSuccessfullyEncodedItems++;
+            outEncodedItemCount++;
         }
 
         ReturnErrorOnFailure(EnsureListEnded());
@@ -447,7 +440,7 @@ private:
 
     CHIP_ERROR TryPutPreencodedListIntoSingleAttributeWritePayload(const chip::app::ConcreteDataAttributePath & attributePath,
                                                                    TLV::TLVReader & valueReader, bool & chunkingNeeded,
-                                                                   ListIndex & outNumSuccessfullyEncodedItems);
+                                                                   uint16_t & outEncodedItemCount);
     CHIP_ERROR EnsureMessage();
 
     /**
@@ -551,8 +544,7 @@ private:
     bool mHasDataVersion = false;
 
     // This was not added to kReservedSizeForTLVEncodingOverhead since it will be "Unreserved" before the others.
-    static constexpr uint32_t kReservedSizeForEndOfListContainer = 1;
-    // TODO should this be 2 ?
+    static constexpr uint32_t kReservedSizeForEndOfListContainer   = 1;
     static constexpr uint32_t kReservedSizeForEndOfAttributeDataIB = 1;
 
     static constexpr TLV::TLVType kAttributeDataIBType = TLV::kTLVType_Structure;

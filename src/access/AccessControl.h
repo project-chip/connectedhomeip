@@ -662,7 +662,11 @@ public:
      */
     CHIP_ERROR Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath, Privilege requestPrivilege);
 
-    // TODO: Is this ok? if yes, add doxygen comment
+    /**
+     * Validate whether a decoded AccessControlEntry is valid and complies with all defined constraints.
+     *
+     * @retval true if all the fields within the AccessControlEntryStruct are valid and compliant.
+     */
     bool IsValid(const Entry & entry);
 
 #if CHIP_ACCESS_CONTROL_DUMP_ENABLED
