@@ -29,6 +29,7 @@ from ..interaction_model import InteractionModelError, PyInvokeRequestData
 from ..interaction_model import Status as InteractionModelStatus
 from ..interaction_model import TestOnlyPyBatchCommandsOverrides, TestOnlyPyOnDoneInfo
 from ..native import GetLibraryHandle, NativeLibraryHandleMethodArguments, PyChipError
+from . import Objects as GeneratedObjects  # noqa: F401
 from .ClusterObjects import ClusterCommand
 
 logger = logging.getLogger('chip.cluster.Command')
@@ -79,7 +80,7 @@ def FindCommandClusterObject(isClientSideCommand: bool, path: CommandPath):
                                 if ('__dataclass_fields__' in name):
                                     if (field['cluster_id'].default == path.ClusterId) and (field['command_id'].default ==
                                                                                             path.CommandId) and (field['is_client'].default == isClientSideCommand):
-                                        return eval('chip.clusters.Objects.' + clusterName + '.Commands.' + commandName)
+                                        return eval('GeneratedObjects.' + clusterName + '.Commands.' + commandName)
     return None
 
 
