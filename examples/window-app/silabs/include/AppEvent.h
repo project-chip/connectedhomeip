@@ -27,7 +27,7 @@ struct AppEvent : public BaseAppEvent
 {
     enum AppEventTypes
     {
-        kEventType_ResetWarning = BaseAppEvent::kEventType_Timer + 1,
+        kEventType_ResetWarning = BaseAppEvent::kEventType_Max + 1,
         kEventType_ResetCanceled,
         // Button events
         kEventType_UpPressed,

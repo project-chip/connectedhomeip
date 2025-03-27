@@ -24,7 +24,7 @@ struct AppEvent : public BaseAppEvent
 {
     enum AppEventTypes
     {
-        kEventType_Refrigerator = BaseAppEvent::kEventType_Timer + 1,
+        kEventType_Refrigerator = BaseAppEvent::kEventType_Max + 1,
         kEventType_Install,
     };
 

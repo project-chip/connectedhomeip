@@ -31,6 +31,7 @@ struct BaseAppEvent
         kEventType_Button = 0,
         kEventType_LCD,
         kEventType_Timer,
+        kEventType_Max,
     };
 
     uint16_t Type;

@@ -25,7 +25,7 @@ struct AppEvent : public BaseAppEvent
 {
     enum AppEventTypes
     {
-        kEventType_PumpTimer = BaseAppEvent::kEventType_Timer + 1,
+        kEventType_PumpTimer = BaseAppEvent::kEventType_Max + 1,
         kEventType_Install,
         kEventType_None,
     };
