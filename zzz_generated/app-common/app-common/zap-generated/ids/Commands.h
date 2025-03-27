@@ -550,17 +550,17 @@ namespace AddTrustedRootCertificate {
 static constexpr CommandId Id = 0x0000000B;
 } // namespace AddTrustedRootCertificate
 
-namespace SetVidVerificationStatement {
+namespace SetVIDVerificationStatement {
 static constexpr CommandId Id = 0x0000000C;
-} // namespace SetVidVerificationStatement
+} // namespace SetVIDVerificationStatement
 
-namespace SignVidVerificationRequest {
+namespace SignVIDVerificationRequest {
 static constexpr CommandId Id = 0x0000000D;
-} // namespace SignVidVerificationRequest
+} // namespace SignVIDVerificationRequest
 
-namespace SignVidVerificationResponse {
+namespace SignVIDVerificationResponse {
 static constexpr CommandId Id = 0x0000000E;
-} // namespace SignVidVerificationResponse
+} // namespace SignVIDVerificationResponse
 
 } // namespace Commands
 } // namespace OperationalCredentials
