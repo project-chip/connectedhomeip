@@ -24,9 +24,9 @@
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandler.h>
 #include <app/EventLogging.h>
+#include <app/InteractionModelEngine.h>
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <app/clusters/ota-requestor/ota-requestor-server.h>
-#include <app/util/attribute-storage.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 using namespace chip;
@@ -158,7 +158,11 @@ Status OtaRequestorServerSetUpdateState(OTAUpdateStateEnum value)
     Status status = Status::Success;
 
     // Find all endpoints that have OtaSoftwareUpdateRequestor implemented
-    for (auto endpoint : EnabledEndpointsWithServerCluster(OtaSoftwareUpdateRequestor::Id))
+    DataModel::ListBuilder<EndpointId> endpointsList;
+    InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(OtaSoftwareUpdateRequestor::Id,
+                                                                                              endpointsList);
+
+    for (auto endpoint : endpointsList.TakeBuffer())
     {
         OTAUpdateStateEnum currentValue;
         status = Attributes::UpdateState::Get(endpoint, &currentValue);
@@ -184,7 +188,11 @@ Status OtaRequestorServerSetUpdateStateProgress(app::DataModel::Nullable<uint8_t
     Status status = Status::Success;
 
     // Find all endpoints that have OtaSoftwareUpdateRequestor implemented
-    for (auto endpoint : EnabledEndpointsWithServerCluster(OtaSoftwareUpdateRequestor::Id))
+    DataModel::ListBuilder<EndpointId> endpointsList;
+    InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(OtaSoftwareUpdateRequestor::Id,
+                                                                                              endpointsList);
+
+    for (auto endpoint : endpointsList.TakeBuffer())
     {
         app::DataModel::Nullable<uint8_t> currentValue;
         status = Attributes::UpdateStateProgress::Get(endpoint, currentValue);
@@ -215,7 +223,11 @@ void OtaRequestorServerOnStateTransition(OTAUpdateStateEnum previousState, OTAUp
     }
 
     // Find all endpoints that have OtaSoftwareUpdateRequestor implemented
-    for (auto endpoint : EnabledEndpointsWithServerCluster(OtaSoftwareUpdateRequestor::Id))
+    DataModel::ListBuilder<EndpointId> endpointsList;
+    InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(OtaSoftwareUpdateRequestor::Id,
+                                                                                              endpointsList);
+
+    for (auto endpoint : endpointsList.TakeBuffer())
     {
         Events::StateTransition::Type event{ previousState, newState, reason, targetSoftwareVersion };
         EventNumber eventNumber;
@@ -231,7 +243,11 @@ void OtaRequestorServerOnStateTransition(OTAUpdateStateEnum previousState, OTAUp
 void OtaRequestorServerOnVersionApplied(uint32_t softwareVersion, uint16_t productId)
 {
     // Find all endpoints that have OtaSoftwareUpdateRequestor implemented
-    for (auto endpoint : EnabledEndpointsWithServerCluster(OtaSoftwareUpdateRequestor::Id))
+    DataModel::ListBuilder<EndpointId> endpointsList;
+    InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(OtaSoftwareUpdateRequestor::Id,
+                                                                                              endpointsList);
+
+    for (auto endpoint : endpointsList.TakeBuffer())
     {
         Events::VersionApplied::Type event{ softwareVersion, productId };
         EventNumber eventNumber;
@@ -248,7 +264,11 @@ void OtaRequestorServerOnDownloadError(uint32_t softwareVersion, uint64_t bytesD
                                        DataModel::Nullable<uint8_t> progressPercent, DataModel::Nullable<int64_t> platformCode)
 {
     // Find all endpoints that have OtaSoftwareUpdateRequestor implemented
-    for (auto endpoint : EnabledEndpointsWithServerCluster(OtaSoftwareUpdateRequestor::Id))
+    DataModel::ListBuilder<EndpointId> endpointsList;
+    InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(OtaSoftwareUpdateRequestor::Id,
+                                                                                              endpointsList);
+
+    for (auto endpoint : endpointsList.TakeBuffer())
     {
         Events::DownloadError::Type event{ softwareVersion, bytesDownloaded, progressPercent, platformCode };
         EventNumber eventNumber;

@@ -15,9 +15,15 @@
  *    limitations under the License.
  */
 
+#include <app/InteractionModelEngine.h>
 #include <app/clusters/scenes-server/SceneTableImpl.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <stdlib.h>
+
+using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::ScenesManagement;
 
 namespace chip {
 namespace scenes {
@@ -802,7 +808,14 @@ CHIP_ERROR DefaultSceneTableImpl::RemoveFabric(FabricIndex fabric_index)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
-    for (auto endpoint : app::EnabledEndpointsWithServerCluster(chip::app::Clusters::ScenesManagement::Id))
+    // Find all endpoints that have ScenesManagement implemented
+    DataModel::ListBuilder<EndpointId> endpointsList;
+    if (InteractionModelEngine::GetInstance()->GetDataModelProvider() == nullptr)
+        return CHIP_NO_ERROR;
+
+    InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(ScenesManagement::Id, endpointsList);
+
+    for (auto endpoint : endpointsList.TakeBuffer())
     {
         FabricSceneData fabric(endpoint, fabric_index);
         SceneIndex idx = 0;

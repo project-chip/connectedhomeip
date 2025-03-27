@@ -27,7 +27,7 @@
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/EventLogging.h>
-#include <app/util/attribute-storage.h>
+#include <app/InteractionModelEngine.h>
 #include <lib/core/Optional.h>
 #include <platform/DiagnosticDataProvider.h>
 
@@ -204,7 +204,12 @@ void SoftwareDiagnosticsServer::OnSoftwareFaultDetect(const SoftwareDiagnostics:
 {
     ChipLogDetail(Zcl, "SoftwareDiagnosticsDelegate: OnSoftwareFaultDetected");
 
-    for (auto endpoint : EnabledEndpointsWithServerCluster(SoftwareDiagnostics::Id))
+    // Find all endpoints that have SoftwareDiagnostics implemented
+    DataModel::ListBuilder<EndpointId> endpointsList;
+    InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(SoftwareDiagnostics::Id,
+                                                                                              endpointsList);
+
+    for (auto endpoint : endpointsList.TakeBuffer())
     {
         // If Software Diagnostics cluster is implemented on this endpoint
         EventNumber eventNumber;

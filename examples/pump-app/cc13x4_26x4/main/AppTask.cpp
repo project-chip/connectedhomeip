@@ -31,8 +31,8 @@
 #include <examples/platform/cc13x4_26x4/CC13X4_26X4DeviceAttestationCreds.h>
 
 #include <app/EventLogging.h>
+#include <app/InteractionModelEngine.h>
 #include <app/util/af-types.h>
-#include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/Instance.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
@@ -714,8 +714,12 @@ void AppTask::UpdateCluster(intptr_t context)
 
 void AppTask::PostEvents(intptr_t context)
 {
+    DataModel::ListBuilder<EndpointId> endpointsList;
+    InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(PumpConfigurationAndControl::Id,
+                                                                                              endpointsList);
+
     // Example on posting events - here we post the general fault event on endpoints with PCC Server enabled
-    for (auto endpoint : EnabledEndpointsWithServerCluster(PumpConfigurationAndControl::Id))
+    for (auto endpoint : endpointsList.TakeBuffer())
     {
         PumpConfigurationAndControl::Events::GeneralFault::Type event;
         EventNumber eventNumber;

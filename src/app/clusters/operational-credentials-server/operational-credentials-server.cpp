@@ -328,8 +328,12 @@ public:
     // Gets called when a fabric is about to be deleted
     void FabricWillBeRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override
     {
+        DataModel::ListBuilder<EndpointId> endpointsList;
+        InteractionModelEngine::GetInstance()->GetDataModelProvider()->EndpointsWithServerCluster(BasicInformation::Id,
+                                                                                                  endpointsList);
+
         // The Leave event SHOULD be emitted by a Node prior to permanently leaving the Fabric.
-        for (auto endpoint : EnabledEndpointsWithServerCluster(BasicInformation::Id))
+        for (auto endpoint : endpointsList.TakeBuffer())
         {
             // If Basic cluster is implemented on this endpoint
             BasicInformation::Events::Leave::Type event;
