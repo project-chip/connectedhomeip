@@ -20,6 +20,7 @@
 
 #include <app/clusters/window-covering-server/window-covering-server.h>
 #include <lib/core/CHIPError.h>
+#include "BaseAppEvent.h"
 
 using namespace chip::app::Clusters::WindowCovering;
 
