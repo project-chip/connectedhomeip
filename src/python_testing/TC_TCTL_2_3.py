@@ -32,9 +32,10 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import chip.clusters as Clusters
 from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 from mobly import asserts
+
+import matter.clusters as Clusters
 
 
 class TC_TCTL_2_3(MatterBaseTest):

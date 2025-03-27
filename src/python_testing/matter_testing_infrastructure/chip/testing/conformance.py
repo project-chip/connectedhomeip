@@ -20,7 +20,7 @@ from dataclasses import dataclass
 from enum import Enum, auto
 from typing import Callable, Optional
 
-from chip.tlv import uint
+from matter.tlv import uint
 
 OTHERWISE_CONFORM = 'otherwiseConform'
 OPTIONAL_CONFORM = 'optionalConform'

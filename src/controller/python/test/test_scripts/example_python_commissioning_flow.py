@@ -19,9 +19,9 @@ import logging
 import os
 import random
 
-from chip import ChipDeviceCtrl
-from chip import clusters as Clusters
-from chip import commissioning
+from matter import ChipDeviceCtrl
+from matter import clusters as Clusters
+from matter import commissioning
 from matter.commissioning import commissioning_flow_blocks, pase
 
 

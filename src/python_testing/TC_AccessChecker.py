@@ -22,14 +22,15 @@ from copy import deepcopy
 from enum import Enum, auto
 from typing import Optional
 
-import chip.clusters as Clusters
-from chip.interaction_model import Status
 from chip.testing.basic_composition import BasicCompositionTests
 from chip.testing.global_attribute_ids import GlobalAttributeIds
 from chip.testing.matter_testing import (AttributePathLocation, ClusterPathLocation, MatterBaseTest, TestStep, async_test_body,
                                          default_matter_test_main)
 from chip.testing.spec_parsing import XmlCluster
-from chip.tlv import uint
+
+import matter.clusters as Clusters
+from matter.interaction_model import Status
+from matter.tlv import uint
 
 
 class AccessTestType(Enum):

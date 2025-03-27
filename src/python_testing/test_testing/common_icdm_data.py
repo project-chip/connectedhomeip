@@ -20,9 +20,10 @@ import string
 from dataclasses import dataclass
 from pathlib import Path
 
-import chip.clusters as Clusters
-from chip.clusters import Attribute
 from chip.testing.runner import MockTestRunner
+
+import matter.clusters as Clusters
+from matter.clusters import Attribute
 
 c = Clusters.IcdManagement
 attr = c.Attributes

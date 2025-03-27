@@ -108,7 +108,7 @@ the tests. Please see [Running tests in CI](#running-tests-in-ci).
 -   [ClusterObjects.py](https://github.com/project-chip/connectedhomeip/blob/master/src/controller/python/chip/clusters/ClusterObjects.py)
     for classes
 
-Common import used in test files: `import chip.clusters as Clusters`
+Common import used in test files: `import matter.clusters as Clusters`
 
 Each cluster is defined in the `Clusters.<ClusterName>` namespace and contains
 always:

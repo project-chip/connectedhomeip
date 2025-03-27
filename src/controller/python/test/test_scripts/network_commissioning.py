@@ -20,6 +20,7 @@ import logging
 import random
 
 import base
+
 import matter.clusters as Clusters
 import matter.interaction_model
 from matter.clusters.Types import NullValue

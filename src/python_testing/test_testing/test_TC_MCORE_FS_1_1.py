@@ -23,12 +23,13 @@ import sys
 import typing
 from pathlib import Path
 
-import chip.clusters as Clusters
 import click
-from chip import ChipDeviceCtrl
-from chip.clusters import Attribute
-from chip.interaction_model import InteractionModelError, Status
 from chip.testing.runner import AsyncMock, MockTestRunner
+
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.clusters import Attribute
+from matter.interaction_model import InteractionModelError, Status
 
 try:
     from chip.testing.matter_testing import MatterTestConfig, get_default_paa_trust_store, run_tests_no_exit

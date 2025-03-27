@@ -27,13 +27,14 @@ from dataclasses import dataclass
 from pprint import pformat, pprint
 from typing import Any, Optional
 
-import chip.clusters as Clusters
-import chip.clusters.ClusterObjects
-import chip.tlv
-from chip.clusters.Attribute import ValueDecodeFailure
 from chip.testing.conformance import ConformanceException
 from chip.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, build_xml_device_types, dm_from_spec_version
 from mobly import asserts
+
+import matter.clusters as Clusters
+import matter.clusters.ClusterObjects
+import matter.tlv
+from matter.clusters.Attribute import ValueDecodeFailure
 
 
 @dataclass

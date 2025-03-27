@@ -23,7 +23,7 @@ representations commonly used in Matter testing.
 
 from binascii import hexlify, unhexlify
 
-import chip.clusters as Clusters
+import matter.clusters as Clusters
 
 
 def bytes_from_hex(hex: str) -> bytes:

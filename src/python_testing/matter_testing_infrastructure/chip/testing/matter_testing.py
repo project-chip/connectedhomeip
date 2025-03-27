@@ -47,32 +47,33 @@ import chip.testing.timeoperations as timeoperations
 
 # isort: off
 
-from chip import ChipDeviceCtrl  # Needed before chip.FabricAdmin
-import chip.FabricAdmin  # Needed before chip.CertificateAuthority
-import chip.CertificateAuthority
+from matter import ChipDeviceCtrl  # Needed before chip.FabricAdmin
+import matter.FabricAdmin  # Needed before chip.CertificateAuthority
+import matter.CertificateAuthority
 
 # isort: on
 from time import sleep
 
-import chip.clusters as Clusters
-import chip.logging
-import chip.native
-from chip import discovery
-from chip.ChipStack import ChipStack
-from chip.clusters import Attribute
-from chip.clusters import ClusterObjects as ClusterObjects
-from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction, TypedAttributePath
-from chip.exceptions import ChipStackError
-from chip.interaction_model import InteractionModelError, Status
-from chip.setup_payload import SetupPayload
-from chip.storage import PersistentStorage
 from chip.testing.commissioning import CommissioningInfo, CustomCommissioningParameters, SetupPayloadInfo, commission_devices
 from chip.testing.global_attribute_ids import GlobalAttributeIds
 from chip.testing.pics import read_pics_from_file
-from chip.tracing import TracingContext
 from mobly import asserts, base_test, signals, utils
 from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
 from mobly.test_runner import TestRunner
+
+import matter.clusters as Clusters
+import matter.logging
+import matter.native
+from matter import discovery
+from matter.ChipStack import ChipStack
+from matter.clusters import Attribute
+from matter.clusters import ClusterObjects as ClusterObjects
+from matter.clusters.Attribute import EventReadResult, SubscriptionTransaction, TypedAttributePath
+from matter.exceptions import ChipStackError
+from matter.interaction_model import InteractionModelError, Status
+from matter.setup_payload import SetupPayload
+from matter.storage import PersistentStorage
+from matter.tracing import TracingContext
 
 try:
     from matter_yamltests.hooks import TestRunnerHooks

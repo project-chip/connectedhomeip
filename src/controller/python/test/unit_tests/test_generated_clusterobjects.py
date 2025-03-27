@@ -1,8 +1,9 @@
 import unittest
 
+from rich.pretty import pprint
+
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
-from rich.pretty import pprint
 
 '''
 This file contains tests for validating the generated cluster objects by running encoding and decoding

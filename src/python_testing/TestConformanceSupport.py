@@ -22,8 +22,9 @@ from chip.testing.conformance import (Choice, Conformance, ConformanceDecision, 
                                       deprecated, disallowed, mandatory, optional, parse_basic_callable_from_xml,
                                       parse_callable_from_xml, parse_device_type_callable_from_xml, provisional, zigbee)
 from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
-from chip.tlv import uint
 from mobly import asserts
+
+from matter.tlv import uint
 
 
 def basic_test(xml: str, cls: Callable) -> None:

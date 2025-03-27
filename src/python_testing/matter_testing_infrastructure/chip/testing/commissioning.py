@@ -23,10 +23,10 @@ import logging
 from dataclasses import dataclass
 from typing import List, Optional
 
-from chip import ChipDeviceCtrl, discovery
-from chip.ChipDeviceCtrl import CommissioningParameters
-from chip.clusters import ClusterObjects as ClusterObjects
-from chip.exceptions import ChipStackError
+from matter import ChipDeviceCtrl, discovery
+from matter.ChipDeviceCtrl import CommissioningParameters
+from matter.clusters import ClusterObjects as ClusterObjects
+from matter.exceptions import ChipStackError
 
 logger = logging.getLogger("matter.python_testing")
 logger.setLevel(logging.INFO)

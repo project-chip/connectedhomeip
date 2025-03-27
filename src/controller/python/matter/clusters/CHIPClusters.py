@@ -21,7 +21,7 @@
 
 import ctypes
 
-from chip import exceptions
+from matter import exceptions
 
 __all__ = ["ChipClusters"]
 

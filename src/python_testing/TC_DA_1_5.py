@@ -37,12 +37,8 @@
 
 import random
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.interaction_model import InteractionModelError, Status
 from chip.testing.conversions import hex_from_bytes
 from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
-from chip.tlv import TLVReader
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import ec, utils
@@ -51,6 +47,11 @@ from mobly import asserts
 from pyasn1.codec.der.decoder import decode as der_decoder
 from pyasn1.error import PyAsn1Error
 from pyasn1_modules import rfc2986, rfc3279, rfc5480
+
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.interaction_model import InteractionModelError, Status
+from matter.tlv import TLVReader
 
 
 class TC_DA_1_5(MatterBaseTest):

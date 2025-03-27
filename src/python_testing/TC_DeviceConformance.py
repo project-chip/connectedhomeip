@@ -38,7 +38,6 @@
 # TODO: Enable 10.5 in CI once the door lock OTA requestor problem is sorted.
 from typing import Callable
 
-import chip.clusters as Clusters
 from chip.testing.basic_composition import BasicCompositionTests
 from chip.testing.choice_conformance import (evaluate_attribute_choice_conformance, evaluate_command_choice_conformance,
                                              evaluate_feature_choice_conformance)
@@ -48,7 +47,9 @@ from chip.testing.global_attribute_ids import (ClusterIdType, DeviceTypeIdType, 
 from chip.testing.matter_testing import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
                                          MatterBaseTest, ProblemNotice, ProblemSeverity, async_test_body, default_matter_test_main)
 from chip.testing.spec_parsing import CommandType
-from chip.tlv import uint
+
+import matter.clusters as Clusters
+from matter.tlv import uint
 
 
 class DeviceConformanceTests(BasicCompositionTests):

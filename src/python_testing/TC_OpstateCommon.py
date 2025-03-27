@@ -21,14 +21,15 @@ import time
 from dataclasses import dataclass
 from typing import Any
 
-import chip.clusters as Clusters
 import psutil
-from chip.clusters import ClusterObjects as ClusterObjects
-from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction
-from chip.clusters.Types import NullValue
-from chip.interaction_model import InteractionModelError, Status
 from chip.testing.matter_testing import ClusterAttributeChangeAccumulator, EventChangeCallback, TestStep
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.clusters import ClusterObjects as ClusterObjects
+from matter.clusters.Attribute import EventReadResult, SubscriptionTransaction
+from matter.clusters.Types import NullValue
+from matter.interaction_model import InteractionModelError, Status
 
 
 def get_pid(name):

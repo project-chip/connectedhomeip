@@ -19,12 +19,13 @@ import matter.FabricAdmin  # Needed before matter.CertificateAuthority
 
 # isort: on
 
+from matter_yamltests.runner import TestRunner
+
 import matter.CertificateAuthority
 import matter.logging
 import matter.native
 from matter.ChipStack import ChipStack
 from matter.yaml.runner import ReplTestRunner
-from matter_yamltests.runner import TestRunner
 
 
 class Runner(TestRunner):

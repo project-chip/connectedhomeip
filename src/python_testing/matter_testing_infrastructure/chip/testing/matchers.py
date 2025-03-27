@@ -23,7 +23,7 @@ received values and expected type specifications.
 
 import typing
 
-from chip.tlv import float32, uint
+from matter.tlv import float32, uint
 
 
 def is_type(received_value, desired_type):

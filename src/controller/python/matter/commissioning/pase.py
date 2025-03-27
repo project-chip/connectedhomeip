@@ -18,7 +18,7 @@
 import dataclasses
 import ipaddress
 
-from chip import ChipDeviceCtrl, commissioning, discovery
+from matter import ChipDeviceCtrl, commissioning, discovery
 
 
 @dataclasses.dataclass

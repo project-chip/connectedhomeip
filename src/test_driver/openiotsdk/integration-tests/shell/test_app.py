@@ -18,12 +18,13 @@
 import logging
 import os
 
-import chip.native
 import pytest
-from chip import exceptions
-from chip.setup_payload import SetupPayload
 from common.utils import get_shell_commands_from_help_response
 from packaging import version
+
+import matter.native
+from matter import exceptions
+from matter.setup_payload import SetupPayload
 
 log = logging.getLogger(__name__)
 

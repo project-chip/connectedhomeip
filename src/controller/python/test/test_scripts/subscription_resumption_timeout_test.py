@@ -25,7 +25,8 @@ import sys
 from optparse import OptionParser
 
 from base import BaseTestHelper, FailIfNot, TestFail, TestTimeout, logger
-from chip import clusters as Clusters
+
+from matter import clusters as Clusters
 
 TEST_DISCRIMINATOR = 3840
 TEST_SETUPPIN = 20202021

@@ -20,8 +20,6 @@ import time
 import typing
 from datetime import datetime, timedelta, timezone
 
-import chip.clusters as Clusters
-from chip.clusters.Types import Nullable, NullValue
 from chip.testing.matter_testing import (MatterBaseTest, async_test_body, default_matter_test_main, parse_matter_test_args,
                                          type_matches)
 from chip.testing.pics import parse_pics, parse_pics_xml
@@ -29,8 +27,11 @@ from chip.testing.taglist_and_topology_test import (TagProblem, create_device_ty
                                                     find_tag_list_problems, find_tree_roots, flat_list_ok, get_all_children,
                                                     get_direct_children_of_root, parts_list_problems, separate_endpoint_types)
 from chip.testing.timeoperations import compare_time, get_wait_seconds_from_set_time, utc_time_in_matter_epoch
-from chip.tlv import uint
 from mobly import asserts, signals
+
+import matter.clusters as Clusters
+from matter.clusters.Types import Nullable, NullValue
+from matter.tlv import uint
 
 
 def get_raw_type_list():

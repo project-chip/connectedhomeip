@@ -27,11 +27,12 @@ from enum import IntFlag
 from functools import partial
 from typing import TYPE_CHECKING, Callable
 
-import chip.clusters as Clusters
-from chip.clusters import Attribute
-from chip.clusters import ClusterObjects as ClusterObjects
 from chip.testing.global_attribute_ids import GlobalAttributeIds
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.clusters import Attribute
+from matter.clusters import ClusterObjects as ClusterObjects
 
 # conditional import to avoid circular dependency but still allow type checking
 if TYPE_CHECKING:

@@ -21,8 +21,9 @@ import sys
 from pathlib import Path
 from unittest.mock import MagicMock
 
-from chip.clusters import Attribute
 from chip.testing.matter_testing import MatterStackState, MatterTestConfig, run_tests_no_exit
+
+from matter.clusters import Attribute
 
 
 class AsyncMock(MagicMock):

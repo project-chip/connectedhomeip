@@ -20,10 +20,11 @@ import os
 import pathlib
 import shutil
 
-import chip.CertificateAuthority
-import chip.native
 import pytest
-from chip import exceptions
+
+import matter.CertificateAuthority
+import matter.native
+from matter import exceptions
 
 from .fvp_device import FvpDevice
 from .telnet_connection import TelnetConnection
