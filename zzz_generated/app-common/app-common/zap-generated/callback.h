@@ -39,9 +39,19 @@
 void emberAfIdentifyClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfIdentifyClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfGroupsClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfGroupsClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -49,9 +59,19 @@ void emberAfGroupsClusterInitCallback(chip::EndpointId endpoint);
 void emberAfOnOffClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfOnOffClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfLevelControlClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfLevelControlClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -59,9 +79,19 @@ void emberAfLevelControlClusterInitCallback(chip::EndpointId endpoint);
 void emberAfPulseWidthModulationClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfPulseWidthModulationClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfDescriptorClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfDescriptorClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -69,9 +99,19 @@ void emberAfDescriptorClusterInitCallback(chip::EndpointId endpoint);
 void emberAfBindingClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfBindingClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfAccessControlClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfAccessControlClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -79,9 +119,19 @@ void emberAfAccessControlClusterInitCallback(chip::EndpointId endpoint);
 void emberAfActionsClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfActionsClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfBasicInformationClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfBasicInformationClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -89,9 +139,19 @@ void emberAfBasicInformationClusterInitCallback(chip::EndpointId endpoint);
 void emberAfOtaSoftwareUpdateProviderClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfOtaSoftwareUpdateProviderClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfOtaSoftwareUpdateRequestorClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfOtaSoftwareUpdateRequestorClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -99,9 +159,19 @@ void emberAfOtaSoftwareUpdateRequestorClusterInitCallback(chip::EndpointId endpo
 void emberAfLocalizationConfigurationClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfLocalizationConfigurationClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfTimeFormatLocalizationClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfTimeFormatLocalizationClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -109,9 +179,19 @@ void emberAfTimeFormatLocalizationClusterInitCallback(chip::EndpointId endpoint)
 void emberAfUnitLocalizationClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfUnitLocalizationClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfPowerSourceConfigurationClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfPowerSourceConfigurationClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -119,9 +199,19 @@ void emberAfPowerSourceConfigurationClusterInitCallback(chip::EndpointId endpoin
 void emberAfPowerSourceClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfPowerSourceClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfGeneralCommissioningClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfGeneralCommissioningClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -129,9 +219,19 @@ void emberAfGeneralCommissioningClusterInitCallback(chip::EndpointId endpoint);
 void emberAfNetworkCommissioningClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfNetworkCommissioningClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfDiagnosticLogsClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfDiagnosticLogsClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -139,9 +239,19 @@ void emberAfDiagnosticLogsClusterInitCallback(chip::EndpointId endpoint);
 void emberAfGeneralDiagnosticsClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfGeneralDiagnosticsClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfSoftwareDiagnosticsClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfSoftwareDiagnosticsClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -149,9 +259,19 @@ void emberAfSoftwareDiagnosticsClusterInitCallback(chip::EndpointId endpoint);
 void emberAfThreadNetworkDiagnosticsClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfThreadNetworkDiagnosticsClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfWiFiNetworkDiagnosticsClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfWiFiNetworkDiagnosticsClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -159,9 +279,19 @@ void emberAfWiFiNetworkDiagnosticsClusterInitCallback(chip::EndpointId endpoint)
 void emberAfEthernetNetworkDiagnosticsClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfEthernetNetworkDiagnosticsClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfTimeSynchronizationClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfTimeSynchronizationClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -169,9 +299,19 @@ void emberAfTimeSynchronizationClusterInitCallback(chip::EndpointId endpoint);
 void emberAfBridgedDeviceBasicInformationClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfBridgedDeviceBasicInformationClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfSwitchClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfSwitchClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -179,9 +319,19 @@ void emberAfSwitchClusterInitCallback(chip::EndpointId endpoint);
 void emberAfAdministratorCommissioningClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfAdministratorCommissioningClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfOperationalCredentialsClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfOperationalCredentialsClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -189,9 +339,19 @@ void emberAfOperationalCredentialsClusterInitCallback(chip::EndpointId endpoint)
 void emberAfGroupKeyManagementClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfGroupKeyManagementClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfFixedLabelClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfFixedLabelClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -199,9 +359,19 @@ void emberAfFixedLabelClusterInitCallback(chip::EndpointId endpoint);
 void emberAfUserLabelClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfUserLabelClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfProxyConfigurationClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfProxyConfigurationClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -209,9 +379,19 @@ void emberAfProxyConfigurationClusterInitCallback(chip::EndpointId endpoint);
 void emberAfProxyDiscoveryClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfProxyDiscoveryClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfProxyValidClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfProxyValidClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -219,9 +399,19 @@ void emberAfProxyValidClusterInitCallback(chip::EndpointId endpoint);
 void emberAfBooleanStateClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfBooleanStateClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfIcdManagementClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfIcdManagementClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -229,9 +419,19 @@ void emberAfIcdManagementClusterInitCallback(chip::EndpointId endpoint);
 void emberAfTimerClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfTimerClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfOvenCavityOperationalStateClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfOvenCavityOperationalStateClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -239,9 +439,19 @@ void emberAfOvenCavityOperationalStateClusterInitCallback(chip::EndpointId endpo
 void emberAfOvenModeClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfOvenModeClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfLaundryDryerControlsClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfLaundryDryerControlsClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -249,9 +459,19 @@ void emberAfLaundryDryerControlsClusterInitCallback(chip::EndpointId endpoint);
 void emberAfModeSelectClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfModeSelectClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfLaundryWasherModeClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfLaundryWasherModeClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -259,9 +479,19 @@ void emberAfLaundryWasherModeClusterInitCallback(chip::EndpointId endpoint);
 void emberAfRefrigeratorAndTemperatureControlledCabinetModeClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfRefrigeratorAndTemperatureControlledCabinetModeClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfLaundryWasherControlsClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfLaundryWasherControlsClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -269,9 +499,19 @@ void emberAfLaundryWasherControlsClusterInitCallback(chip::EndpointId endpoint);
 void emberAfRvcRunModeClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfRvcRunModeClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfRvcCleanModeClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfRvcCleanModeClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -279,9 +519,19 @@ void emberAfRvcCleanModeClusterInitCallback(chip::EndpointId endpoint);
 void emberAfTemperatureControlClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfTemperatureControlClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfRefrigeratorAlarmClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfRefrigeratorAlarmClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -289,9 +539,19 @@ void emberAfRefrigeratorAlarmClusterInitCallback(chip::EndpointId endpoint);
 void emberAfDishwasherModeClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfDishwasherModeClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfAirQualityClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfAirQualityClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -299,9 +559,19 @@ void emberAfAirQualityClusterInitCallback(chip::EndpointId endpoint);
 void emberAfSmokeCoAlarmClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfSmokeCoAlarmClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfDishwasherAlarmClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfDishwasherAlarmClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -309,9 +579,19 @@ void emberAfDishwasherAlarmClusterInitCallback(chip::EndpointId endpoint);
 void emberAfMicrowaveOvenModeClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfMicrowaveOvenModeClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfMicrowaveOvenControlClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfMicrowaveOvenControlClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -319,9 +599,19 @@ void emberAfMicrowaveOvenControlClusterInitCallback(chip::EndpointId endpoint);
 void emberAfOperationalStateClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfOperationalStateClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfRvcOperationalStateClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfRvcOperationalStateClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -329,9 +619,19 @@ void emberAfRvcOperationalStateClusterInitCallback(chip::EndpointId endpoint);
 void emberAfScenesManagementClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfScenesManagementClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfHepaFilterMonitoringClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfHepaFilterMonitoringClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -339,9 +639,19 @@ void emberAfHepaFilterMonitoringClusterInitCallback(chip::EndpointId endpoint);
 void emberAfActivatedCarbonFilterMonitoringClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfActivatedCarbonFilterMonitoringClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfBooleanStateConfigurationClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfBooleanStateConfigurationClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -349,9 +659,19 @@ void emberAfBooleanStateConfigurationClusterInitCallback(chip::EndpointId endpoi
 void emberAfValveConfigurationAndControlClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfValveConfigurationAndControlClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfElectricalPowerMeasurementClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfElectricalPowerMeasurementClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -359,9 +679,19 @@ void emberAfElectricalPowerMeasurementClusterInitCallback(chip::EndpointId endpo
 void emberAfElectricalEnergyMeasurementClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfElectricalEnergyMeasurementClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfWaterHeaterManagementClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfWaterHeaterManagementClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -369,9 +699,19 @@ void emberAfWaterHeaterManagementClusterInitCallback(chip::EndpointId endpoint);
 void emberAfDemandResponseLoadControlClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfDemandResponseLoadControlClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfMessagesClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfMessagesClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -379,9 +719,19 @@ void emberAfMessagesClusterInitCallback(chip::EndpointId endpoint);
 void emberAfDeviceEnergyManagementClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfDeviceEnergyManagementClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfEnergyEvseClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfEnergyEvseClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -389,9 +739,19 @@ void emberAfEnergyEvseClusterInitCallback(chip::EndpointId endpoint);
 void emberAfEnergyPreferenceClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfEnergyPreferenceClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfPowerTopologyClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfPowerTopologyClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -399,9 +759,19 @@ void emberAfPowerTopologyClusterInitCallback(chip::EndpointId endpoint);
 void emberAfEnergyEvseModeClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfEnergyEvseModeClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfWaterHeaterModeClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfWaterHeaterModeClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -409,9 +779,19 @@ void emberAfWaterHeaterModeClusterInitCallback(chip::EndpointId endpoint);
 void emberAfDeviceEnergyManagementModeClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfDeviceEnergyManagementModeClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfDoorLockClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfDoorLockClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -419,9 +799,19 @@ void emberAfDoorLockClusterInitCallback(chip::EndpointId endpoint);
 void emberAfWindowCoveringClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfWindowCoveringClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfClosureControlClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfClosureControlClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -429,9 +819,19 @@ void emberAfClosureControlClusterInitCallback(chip::EndpointId endpoint);
 void emberAfServiceAreaClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfServiceAreaClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfPumpConfigurationAndControlClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfPumpConfigurationAndControlClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -439,9 +839,19 @@ void emberAfPumpConfigurationAndControlClusterInitCallback(chip::EndpointId endp
 void emberAfThermostatClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfThermostatClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfFanControlClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfFanControlClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -449,9 +859,19 @@ void emberAfFanControlClusterInitCallback(chip::EndpointId endpoint);
 void emberAfThermostatUserInterfaceConfigurationClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfThermostatUserInterfaceConfigurationClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfColorControlClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfColorControlClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -459,9 +879,19 @@ void emberAfColorControlClusterInitCallback(chip::EndpointId endpoint);
 void emberAfBallastConfigurationClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfBallastConfigurationClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfIlluminanceMeasurementClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfIlluminanceMeasurementClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -469,9 +899,19 @@ void emberAfIlluminanceMeasurementClusterInitCallback(chip::EndpointId endpoint)
 void emberAfTemperatureMeasurementClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfTemperatureMeasurementClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfPressureMeasurementClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfPressureMeasurementClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -479,9 +919,19 @@ void emberAfPressureMeasurementClusterInitCallback(chip::EndpointId endpoint);
 void emberAfFlowMeasurementClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfFlowMeasurementClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfRelativeHumidityMeasurementClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfRelativeHumidityMeasurementClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -489,9 +939,19 @@ void emberAfRelativeHumidityMeasurementClusterInitCallback(chip::EndpointId endp
 void emberAfOccupancySensingClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfOccupancySensingClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfCarbonMonoxideConcentrationMeasurementClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfCarbonMonoxideConcentrationMeasurementClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -499,9 +959,19 @@ void emberAfCarbonMonoxideConcentrationMeasurementClusterInitCallback(chip::Endp
 void emberAfCarbonDioxideConcentrationMeasurementClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfCarbonDioxideConcentrationMeasurementClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfNitrogenDioxideConcentrationMeasurementClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfNitrogenDioxideConcentrationMeasurementClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -509,9 +979,19 @@ void emberAfNitrogenDioxideConcentrationMeasurementClusterInitCallback(chip::End
 void emberAfOzoneConcentrationMeasurementClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfOzoneConcentrationMeasurementClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfPm25ConcentrationMeasurementClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfPm25ConcentrationMeasurementClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -519,9 +999,19 @@ void emberAfPm25ConcentrationMeasurementClusterInitCallback(chip::EndpointId end
 void emberAfFormaldehydeConcentrationMeasurementClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfFormaldehydeConcentrationMeasurementClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfPm1ConcentrationMeasurementClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfPm1ConcentrationMeasurementClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -529,9 +1019,19 @@ void emberAfPm1ConcentrationMeasurementClusterInitCallback(chip::EndpointId endp
 void emberAfPm10ConcentrationMeasurementClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfPm10ConcentrationMeasurementClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfTotalVolatileOrganicCompoundsConcentrationMeasurementClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfTotalVolatileOrganicCompoundsConcentrationMeasurementClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -539,9 +1039,19 @@ void emberAfTotalVolatileOrganicCompoundsConcentrationMeasurementClusterInitCall
 void emberAfRadonConcentrationMeasurementClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfRadonConcentrationMeasurementClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfWiFiNetworkManagementClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfWiFiNetworkManagementClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -549,9 +1059,19 @@ void emberAfWiFiNetworkManagementClusterInitCallback(chip::EndpointId endpoint);
 void emberAfThreadBorderRouterManagementClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfThreadBorderRouterManagementClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfThreadNetworkDirectoryClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfThreadNetworkDirectoryClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -559,9 +1079,19 @@ void emberAfThreadNetworkDirectoryClusterInitCallback(chip::EndpointId endpoint)
 void emberAfWakeOnLanClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfWakeOnLanClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfChannelClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfChannelClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -569,9 +1099,19 @@ void emberAfChannelClusterInitCallback(chip::EndpointId endpoint);
 void emberAfTargetNavigatorClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfTargetNavigatorClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfMediaPlaybackClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfMediaPlaybackClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -579,9 +1119,19 @@ void emberAfMediaPlaybackClusterInitCallback(chip::EndpointId endpoint);
 void emberAfMediaInputClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfMediaInputClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfLowPowerClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfLowPowerClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -589,9 +1139,19 @@ void emberAfLowPowerClusterInitCallback(chip::EndpointId endpoint);
 void emberAfKeypadInputClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfKeypadInputClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfContentLauncherClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfContentLauncherClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -599,9 +1159,19 @@ void emberAfContentLauncherClusterInitCallback(chip::EndpointId endpoint);
 void emberAfAudioOutputClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfAudioOutputClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfApplicationLauncherClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfApplicationLauncherClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -609,9 +1179,19 @@ void emberAfApplicationLauncherClusterInitCallback(chip::EndpointId endpoint);
 void emberAfApplicationBasicClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfApplicationBasicClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfAccountLoginClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfAccountLoginClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -619,9 +1199,19 @@ void emberAfAccountLoginClusterInitCallback(chip::EndpointId endpoint);
 void emberAfContentControlClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfContentControlClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfContentAppObserverClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfContentAppObserverClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -629,9 +1219,19 @@ void emberAfContentAppObserverClusterInitCallback(chip::EndpointId endpoint);
 void emberAfZoneManagementClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfZoneManagementClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfCameraAvStreamManagementClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfCameraAvStreamManagementClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -639,9 +1239,19 @@ void emberAfCameraAvStreamManagementClusterInitCallback(chip::EndpointId endpoin
 void emberAfCameraAvSettingsUserLevelManagementClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfCameraAvSettingsUserLevelManagementClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfWebRTCTransportProviderClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfWebRTCTransportProviderClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -649,9 +1259,19 @@ void emberAfWebRTCTransportProviderClusterInitCallback(chip::EndpointId endpoint
 void emberAfWebRTCTransportRequestorClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfWebRTCTransportRequestorClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfPushAvStreamTransportClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfPushAvStreamTransportClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -659,9 +1279,19 @@ void emberAfPushAvStreamTransportClusterInitCallback(chip::EndpointId endpoint);
 void emberAfChimeClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfChimeClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfEcosystemInformationClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfEcosystemInformationClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -669,9 +1299,19 @@ void emberAfEcosystemInformationClusterInitCallback(chip::EndpointId endpoint);
 void emberAfCommissionerControlClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfCommissionerControlClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfTlsCertificateManagementClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfTlsCertificateManagementClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -679,9 +1319,19 @@ void emberAfTlsCertificateManagementClusterInitCallback(chip::EndpointId endpoin
 void emberAfTlsClientManagementClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfTlsClientManagementClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfUnitTestingClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfUnitTestingClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -689,9 +1339,19 @@ void emberAfUnitTestingClusterInitCallback(chip::EndpointId endpoint);
 void emberAfFaultInjectionClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfFaultInjectionClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfSampleMeiClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfSampleMeiClusterShutdownCallback(chip::EndpointId endpoint);
 
 // Cluster Server/Client Init Functions
 
@@ -6070,17 +6730,17 @@ bool emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::OperationalCredentials::Commands::AddTrustedRootCertificate::DecodableType & commandData);
 /**
- * @brief Operational Credentials Cluster SetVidVerificationStatement Command callback (from client)
+ * @brief Operational Credentials Cluster SetVIDVerificationStatement Command callback (from client)
  */
-bool emberAfOperationalCredentialsClusterSetVidVerificationStatementCallback(
+bool emberAfOperationalCredentialsClusterSetVIDVerificationStatementCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::OperationalCredentials::Commands::SetVidVerificationStatement::DecodableType & commandData);
+    const chip::app::Clusters::OperationalCredentials::Commands::SetVIDVerificationStatement::DecodableType & commandData);
 /**
- * @brief Operational Credentials Cluster SignVidVerificationRequest Command callback (from client)
+ * @brief Operational Credentials Cluster SignVIDVerificationRequest Command callback (from client)
  */
-bool emberAfOperationalCredentialsClusterSignVidVerificationRequestCallback(
+bool emberAfOperationalCredentialsClusterSignVIDVerificationRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::OperationalCredentials::Commands::SignVidVerificationRequest::DecodableType & commandData);
+    const chip::app::Clusters::OperationalCredentials::Commands::SignVIDVerificationRequest::DecodableType & commandData);
 /**
  * @brief Group Key Management Cluster KeySetWrite Command callback (from client)
  */
