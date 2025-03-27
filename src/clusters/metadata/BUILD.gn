@@ -3,661 +3,661 @@
 # Cluster metadata information based on src/controller/data_model/controller-clusters.matter
 
 source_set("Identify") {
-  sources = [ "Identify.h" ],
+  sources = [ "Identify.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("Groups") {
-  sources = [ "Groups.h" ],
+  sources = [ "Groups.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("OnOff") {
-  sources = [ "OnOff.h" ],
+  sources = [ "OnOff.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("LevelControl") {
-  sources = [ "LevelControl.h" ],
+  sources = [ "LevelControl.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("PulseWidthModulation") {
-  sources = [ "PulseWidthModulation.h" ],
+  sources = [ "PulseWidthModulation.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("Descriptor") {
-  sources = [ "Descriptor.h" ],
+  sources = [ "Descriptor.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("Binding") {
-  sources = [ "Binding.h" ],
+  sources = [ "Binding.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("AccessControl") {
-  sources = [ "AccessControl.h" ],
+  sources = [ "AccessControl.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("Actions") {
-  sources = [ "Actions.h" ],
+  sources = [ "Actions.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("BasicInformation") {
-  sources = [ "BasicInformation.h" ],
+  sources = [ "BasicInformation.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("OtaSoftwareUpdateProvider") {
-  sources = [ "OtaSoftwareUpdateProvider.h" ],
+  sources = [ "OtaSoftwareUpdateProvider.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("OtaSoftwareUpdateRequestor") {
-  sources = [ "OtaSoftwareUpdateRequestor.h" ],
+  sources = [ "OtaSoftwareUpdateRequestor.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("LocalizationConfiguration") {
-  sources = [ "LocalizationConfiguration.h" ],
+  sources = [ "LocalizationConfiguration.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("TimeFormatLocalization") {
-  sources = [ "TimeFormatLocalization.h" ],
+  sources = [ "TimeFormatLocalization.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("UnitLocalization") {
-  sources = [ "UnitLocalization.h" ],
+  sources = [ "UnitLocalization.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("PowerSourceConfiguration") {
-  sources = [ "PowerSourceConfiguration.h" ],
+  sources = [ "PowerSourceConfiguration.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("PowerSource") {
-  sources = [ "PowerSource.h" ],
+  sources = [ "PowerSource.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("GeneralCommissioning") {
-  sources = [ "GeneralCommissioning.h" ],
+  sources = [ "GeneralCommissioning.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("NetworkCommissioning") {
-  sources = [ "NetworkCommissioning.h" ],
+  sources = [ "NetworkCommissioning.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("DiagnosticLogs") {
-  sources = [ "DiagnosticLogs.h" ],
+  sources = [ "DiagnosticLogs.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("GeneralDiagnostics") {
-  sources = [ "GeneralDiagnostics.h" ],
+  sources = [ "GeneralDiagnostics.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("SoftwareDiagnostics") {
-  sources = [ "SoftwareDiagnostics.h" ],
+  sources = [ "SoftwareDiagnostics.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("ThreadNetworkDiagnostics") {
-  sources = [ "ThreadNetworkDiagnostics.h" ],
+  sources = [ "ThreadNetworkDiagnostics.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("WiFiNetworkDiagnostics") {
-  sources = [ "WiFiNetworkDiagnostics.h" ],
+  sources = [ "WiFiNetworkDiagnostics.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("EthernetNetworkDiagnostics") {
-  sources = [ "EthernetNetworkDiagnostics.h" ],
+  sources = [ "EthernetNetworkDiagnostics.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("TimeSynchronization") {
-  sources = [ "TimeSynchronization.h" ],
+  sources = [ "TimeSynchronization.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("BridgedDeviceBasicInformation") {
-  sources = [ "BridgedDeviceBasicInformation.h" ],
+  sources = [ "BridgedDeviceBasicInformation.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("Switch") {
-  sources = [ "Switch.h" ],
+  sources = [ "Switch.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("AdministratorCommissioning") {
-  sources = [ "AdministratorCommissioning.h" ],
+  sources = [ "AdministratorCommissioning.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("OperationalCredentials") {
-  sources = [ "OperationalCredentials.h" ],
+  sources = [ "OperationalCredentials.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("GroupKeyManagement") {
-  sources = [ "GroupKeyManagement.h" ],
+  sources = [ "GroupKeyManagement.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("FixedLabel") {
-  sources = [ "FixedLabel.h" ],
+  sources = [ "FixedLabel.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("UserLabel") {
-  sources = [ "UserLabel.h" ],
+  sources = [ "UserLabel.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("ProxyConfiguration") {
-  sources = [ "ProxyConfiguration.h" ],
+  sources = [ "ProxyConfiguration.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("ProxyDiscovery") {
-  sources = [ "ProxyDiscovery.h" ],
+  sources = [ "ProxyDiscovery.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("ProxyValid") {
-  sources = [ "ProxyValid.h" ],
+  sources = [ "ProxyValid.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("BooleanState") {
-  sources = [ "BooleanState.h" ],
+  sources = [ "BooleanState.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("IcdManagement") {
-  sources = [ "IcdManagement.h" ],
+  sources = [ "IcdManagement.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("Timer") {
-  sources = [ "Timer.h" ],
+  sources = [ "Timer.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("OvenCavityOperationalState") {
-  sources = [ "OvenCavityOperationalState.h" ],
+  sources = [ "OvenCavityOperationalState.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("OvenMode") {
-  sources = [ "OvenMode.h" ],
+  sources = [ "OvenMode.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("LaundryDryerControls") {
-  sources = [ "LaundryDryerControls.h" ],
+  sources = [ "LaundryDryerControls.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("ModeSelect") {
-  sources = [ "ModeSelect.h" ],
+  sources = [ "ModeSelect.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("LaundryWasherMode") {
-  sources = [ "LaundryWasherMode.h" ],
+  sources = [ "LaundryWasherMode.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("RefrigeratorAndTemperatureControlledCabinetMode") {
-  sources = [ "RefrigeratorAndTemperatureControlledCabinetMode.h" ],
+  sources = [ "RefrigeratorAndTemperatureControlledCabinetMode.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("LaundryWasherControls") {
-  sources = [ "LaundryWasherControls.h" ],
+  sources = [ "LaundryWasherControls.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("RvcRunMode") {
-  sources = [ "RvcRunMode.h" ],
+  sources = [ "RvcRunMode.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("RvcCleanMode") {
-  sources = [ "RvcCleanMode.h" ],
+  sources = [ "RvcCleanMode.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("TemperatureControl") {
-  sources = [ "TemperatureControl.h" ],
+  sources = [ "TemperatureControl.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("RefrigeratorAlarm") {
-  sources = [ "RefrigeratorAlarm.h" ],
+  sources = [ "RefrigeratorAlarm.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("DishwasherMode") {
-  sources = [ "DishwasherMode.h" ],
+  sources = [ "DishwasherMode.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("AirQuality") {
-  sources = [ "AirQuality.h" ],
+  sources = [ "AirQuality.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("SmokeCoAlarm") {
-  sources = [ "SmokeCoAlarm.h" ],
+  sources = [ "SmokeCoAlarm.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("DishwasherAlarm") {
-  sources = [ "DishwasherAlarm.h" ],
+  sources = [ "DishwasherAlarm.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("MicrowaveOvenMode") {
-  sources = [ "MicrowaveOvenMode.h" ],
+  sources = [ "MicrowaveOvenMode.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("MicrowaveOvenControl") {
-  sources = [ "MicrowaveOvenControl.h" ],
+  sources = [ "MicrowaveOvenControl.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("OperationalState") {
-  sources = [ "OperationalState.h" ],
+  sources = [ "OperationalState.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("RvcOperationalState") {
-  sources = [ "RvcOperationalState.h" ],
+  sources = [ "RvcOperationalState.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("ScenesManagement") {
-  sources = [ "ScenesManagement.h" ],
+  sources = [ "ScenesManagement.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("HepaFilterMonitoring") {
-  sources = [ "HepaFilterMonitoring.h" ],
+  sources = [ "HepaFilterMonitoring.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("ActivatedCarbonFilterMonitoring") {
-  sources = [ "ActivatedCarbonFilterMonitoring.h" ],
+  sources = [ "ActivatedCarbonFilterMonitoring.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("BooleanStateConfiguration") {
-  sources = [ "BooleanStateConfiguration.h" ],
+  sources = [ "BooleanStateConfiguration.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("ValveConfigurationAndControl") {
-  sources = [ "ValveConfigurationAndControl.h" ],
+  sources = [ "ValveConfigurationAndControl.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("ElectricalPowerMeasurement") {
-  sources = [ "ElectricalPowerMeasurement.h" ],
+  sources = [ "ElectricalPowerMeasurement.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("ElectricalEnergyMeasurement") {
-  sources = [ "ElectricalEnergyMeasurement.h" ],
+  sources = [ "ElectricalEnergyMeasurement.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("WaterHeaterManagement") {
-  sources = [ "WaterHeaterManagement.h" ],
+  sources = [ "WaterHeaterManagement.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("DemandResponseLoadControl") {
-  sources = [ "DemandResponseLoadControl.h" ],
+  sources = [ "DemandResponseLoadControl.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("Messages") {
-  sources = [ "Messages.h" ],
+  sources = [ "Messages.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("DeviceEnergyManagement") {
-  sources = [ "DeviceEnergyManagement.h" ],
+  sources = [ "DeviceEnergyManagement.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("EnergyEvse") {
-  sources = [ "EnergyEvse.h" ],
+  sources = [ "EnergyEvse.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("EnergyPreference") {
-  sources = [ "EnergyPreference.h" ],
+  sources = [ "EnergyPreference.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("PowerTopology") {
-  sources = [ "PowerTopology.h" ],
+  sources = [ "PowerTopology.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("EnergyEvseMode") {
-  sources = [ "EnergyEvseMode.h" ],
+  sources = [ "EnergyEvseMode.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("WaterHeaterMode") {
-  sources = [ "WaterHeaterMode.h" ],
+  sources = [ "WaterHeaterMode.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("DeviceEnergyManagementMode") {
-  sources = [ "DeviceEnergyManagementMode.h" ],
+  sources = [ "DeviceEnergyManagementMode.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("DoorLock") {
-  sources = [ "DoorLock.h" ],
+  sources = [ "DoorLock.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("WindowCovering") {
-  sources = [ "WindowCovering.h" ],
+  sources = [ "WindowCovering.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("ClosureControl") {
-  sources = [ "ClosureControl.h" ],
+  sources = [ "ClosureControl.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("ServiceArea") {
-  sources = [ "ServiceArea.h" ],
+  sources = [ "ServiceArea.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("PumpConfigurationAndControl") {
-  sources = [ "PumpConfigurationAndControl.h" ],
+  sources = [ "PumpConfigurationAndControl.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("Thermostat") {
-  sources = [ "Thermostat.h" ],
+  sources = [ "Thermostat.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("FanControl") {
-  sources = [ "FanControl.h" ],
+  sources = [ "FanControl.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("ThermostatUserInterfaceConfiguration") {
-  sources = [ "ThermostatUserInterfaceConfiguration.h" ],
+  sources = [ "ThermostatUserInterfaceConfiguration.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("ColorControl") {
-  sources = [ "ColorControl.h" ],
+  sources = [ "ColorControl.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("BallastConfiguration") {
-  sources = [ "BallastConfiguration.h" ],
+  sources = [ "BallastConfiguration.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("IlluminanceMeasurement") {
-  sources = [ "IlluminanceMeasurement.h" ],
+  sources = [ "IlluminanceMeasurement.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("TemperatureMeasurement") {
-  sources = [ "TemperatureMeasurement.h" ],
+  sources = [ "TemperatureMeasurement.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("PressureMeasurement") {
-  sources = [ "PressureMeasurement.h" ],
+  sources = [ "PressureMeasurement.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("FlowMeasurement") {
-  sources = [ "FlowMeasurement.h" ],
+  sources = [ "FlowMeasurement.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("RelativeHumidityMeasurement") {
-  sources = [ "RelativeHumidityMeasurement.h" ],
+  sources = [ "RelativeHumidityMeasurement.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("OccupancySensing") {
-  sources = [ "OccupancySensing.h" ],
+  sources = [ "OccupancySensing.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("CarbonMonoxideConcentrationMeasurement") {
-  sources = [ "CarbonMonoxideConcentrationMeasurement.h" ],
+  sources = [ "CarbonMonoxideConcentrationMeasurement.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("CarbonDioxideConcentrationMeasurement") {
-  sources = [ "CarbonDioxideConcentrationMeasurement.h" ],
+  sources = [ "CarbonDioxideConcentrationMeasurement.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("NitrogenDioxideConcentrationMeasurement") {
-  sources = [ "NitrogenDioxideConcentrationMeasurement.h" ],
+  sources = [ "NitrogenDioxideConcentrationMeasurement.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("OzoneConcentrationMeasurement") {
-  sources = [ "OzoneConcentrationMeasurement.h" ],
+  sources = [ "OzoneConcentrationMeasurement.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("Pm25ConcentrationMeasurement") {
-  sources = [ "Pm25ConcentrationMeasurement.h" ],
+  sources = [ "Pm25ConcentrationMeasurement.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("FormaldehydeConcentrationMeasurement") {
-  sources = [ "FormaldehydeConcentrationMeasurement.h" ],
+  sources = [ "FormaldehydeConcentrationMeasurement.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("Pm1ConcentrationMeasurement") {
-  sources = [ "Pm1ConcentrationMeasurement.h" ],
+  sources = [ "Pm1ConcentrationMeasurement.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("Pm10ConcentrationMeasurement") {
-  sources = [ "Pm10ConcentrationMeasurement.h" ],
+  sources = [ "Pm10ConcentrationMeasurement.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("TotalVolatileOrganicCompoundsConcentrationMeasurement") {
-  sources = [ "TotalVolatileOrganicCompoundsConcentrationMeasurement.h" ],
+  sources = [ "TotalVolatileOrganicCompoundsConcentrationMeasurement.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("RadonConcentrationMeasurement") {
-  sources = [ "RadonConcentrationMeasurement.h" ],
+  sources = [ "RadonConcentrationMeasurement.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("WiFiNetworkManagement") {
-  sources = [ "WiFiNetworkManagement.h" ],
+  sources = [ "WiFiNetworkManagement.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("ThreadBorderRouterManagement") {
-  sources = [ "ThreadBorderRouterManagement.h" ],
+  sources = [ "ThreadBorderRouterManagement.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("ThreadNetworkDirectory") {
-  sources = [ "ThreadNetworkDirectory.h" ],
+  sources = [ "ThreadNetworkDirectory.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("WakeOnLan") {
-  sources = [ "WakeOnLan.h" ],
+  sources = [ "WakeOnLan.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("Channel") {
-  sources = [ "Channel.h" ],
+  sources = [ "Channel.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("TargetNavigator") {
-  sources = [ "TargetNavigator.h" ],
+  sources = [ "TargetNavigator.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("MediaPlayback") {
-  sources = [ "MediaPlayback.h" ],
+  sources = [ "MediaPlayback.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("MediaInput") {
-  sources = [ "MediaInput.h" ],
+  sources = [ "MediaInput.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("LowPower") {
-  sources = [ "LowPower.h" ],
+  sources = [ "LowPower.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("KeypadInput") {
-  sources = [ "KeypadInput.h" ],
+  sources = [ "KeypadInput.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("ContentLauncher") {
-  sources = [ "ContentLauncher.h" ],
+  sources = [ "ContentLauncher.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("AudioOutput") {
-  sources = [ "AudioOutput.h" ],
+  sources = [ "AudioOutput.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("ApplicationLauncher") {
-  sources = [ "ApplicationLauncher.h" ],
+  sources = [ "ApplicationLauncher.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("ApplicationBasic") {
-  sources = [ "ApplicationBasic.h" ],
+  sources = [ "ApplicationBasic.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("AccountLogin") {
-  sources = [ "AccountLogin.h" ],
+  sources = [ "AccountLogin.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("ContentControl") {
-  sources = [ "ContentControl.h" ],
+  sources = [ "ContentControl.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("ContentAppObserver") {
-  sources = [ "ContentAppObserver.h" ],
+  sources = [ "ContentAppObserver.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("ZoneManagement") {
-  sources = [ "ZoneManagement.h" ],
+  sources = [ "ZoneManagement.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("CameraAvStreamManagement") {
-  sources = [ "CameraAvStreamManagement.h" ],
+  sources = [ "CameraAvStreamManagement.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("CameraAvSettingsUserLevelManagement") {
-  sources = [ "CameraAvSettingsUserLevelManagement.h" ],
+  sources = [ "CameraAvSettingsUserLevelManagement.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("WebRTCTransportProvider") {
-  sources = [ "WebRTCTransportProvider.h" ],
+  sources = [ "WebRTCTransportProvider.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("WebRTCTransportRequestor") {
-  sources = [ "WebRTCTransportRequestor.h" ],
+  sources = [ "WebRTCTransportRequestor.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("PushAvStreamTransport") {
-  sources = [ "PushAvStreamTransport.h" ],
+  sources = [ "PushAvStreamTransport.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("Chime") {
-  sources = [ "Chime.h" ],
+  sources = [ "Chime.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("EcosystemInformation") {
-  sources = [ "EcosystemInformation.h" ],
+  sources = [ "EcosystemInformation.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("CommissionerControl") {
-  sources = [ "CommissionerControl.h" ],
+  sources = [ "CommissionerControl.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("TlsCertificateManagement") {
-  sources = [ "TlsCertificateManagement.h" ],
+  sources = [ "TlsCertificateManagement.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("TlsClientManagement") {
-  sources = [ "TlsClientManagement.h" ],
+  sources = [ "TlsClientManagement.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("UnitTesting") {
-  sources = [ "UnitTesting.h" ],
+  sources = [ "UnitTesting.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("FaultInjection") {
-  sources = [ "FaultInjection.h" ],
+  sources = [ "FaultInjection.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
 
 source_set("SampleMei") {
-  sources = [ "SampleMei.h" ],
+  sources = [ "SampleMei.h" ]
   deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
 }
