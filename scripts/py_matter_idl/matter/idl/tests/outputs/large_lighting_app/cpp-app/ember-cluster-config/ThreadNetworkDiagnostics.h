@@ -26,7 +26,6 @@ inline constexpr std::array<EmberApplicationConfig::ClusteConfiguration<FeatureB
             FeatureBitmapType::kMLECounts, // feature bit 0x4
             FeatureBitmapType::kMACCounts// feature bit 0x8
         },
-        .clusterRevision = 1,
     },
 } };
 

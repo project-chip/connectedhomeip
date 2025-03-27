@@ -39,7 +39,6 @@ struct ClusterConfiguration
 {
     EndpointId endpointNumber;
     BitFlags<FeatureEnumType> featureMap;
-    uint32_t clusterRevision; // this is what ZAP reports, even though this may not match "latest" as required
 };
 
 } // namespace EmberApplicationConfig

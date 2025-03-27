@@ -34,7 +34,6 @@ inline constexpr std::array<EmberApplicationConfig::ClusteConfiguration<FeatureB
             // feature bit {{ "0x%0X" | format(feature.value) }}
           {%- endfor %}
         },
-        .clusterRevision = {{ endpoint_config.cluster_revision }},
     },
 {%- endfor %}
 } };

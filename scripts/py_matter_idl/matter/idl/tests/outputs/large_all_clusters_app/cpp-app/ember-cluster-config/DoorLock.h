@@ -28,7 +28,6 @@ inline constexpr std::array<EmberApplicationConfig::ClusteConfiguration<FeatureB
             FeatureBitmapType::kYearDaySchedules, // feature bit 0x400
             FeatureBitmapType::kHolidaySchedules// feature bit 0x800
         },
-        .clusterRevision = 6,
     },
 } };
 

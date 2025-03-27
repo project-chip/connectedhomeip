@@ -22,25 +22,21 @@ inline constexpr std::array<EmberApplicationConfig::ClusteConfiguration<FeatureB
         .endpointNumber = 0,
         .featureMap = BitFlags<FeatureBitmapType> {
         },
-        .clusterRevision = 1,
     },
     {
         .endpointNumber = 1,
         .featureMap = BitFlags<FeatureBitmapType> {
         },
-        .clusterRevision = 1,
     },
     {
         .endpointNumber = 2,
         .featureMap = BitFlags<FeatureBitmapType> {
         },
-        .clusterRevision = 1,
     },
     {
         .endpointNumber = 65534,
         .featureMap = BitFlags<FeatureBitmapType> {
         },
-        .clusterRevision = 1,
     },
 } };
 

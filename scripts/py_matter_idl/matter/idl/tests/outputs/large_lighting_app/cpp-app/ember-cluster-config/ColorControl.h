@@ -27,7 +27,6 @@ inline constexpr std::array<EmberApplicationConfig::ClusteConfiguration<FeatureB
             FeatureBitmapType::kXy, // feature bit 0x8
             FeatureBitmapType::kColorTemperature// feature bit 0x10
         },
-        .clusterRevision = 5,
     },
 } };
 

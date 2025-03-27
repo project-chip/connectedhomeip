@@ -23,21 +23,18 @@ inline constexpr std::array<EmberApplicationConfig::ClusteConfiguration<FeatureB
         .featureMap = BitFlags<FeatureBitmapType> {
             FeatureBitmapType::kBattery// feature bit 0x2
         },
-        .clusterRevision = 1,
     },
     {
         .endpointNumber = 1,
         .featureMap = BitFlags<FeatureBitmapType> {
             FeatureBitmapType::kBattery// feature bit 0x2
         },
-        .clusterRevision = 1,
     },
     {
         .endpointNumber = 2,
         .featureMap = BitFlags<FeatureBitmapType> {
             FeatureBitmapType::kBattery// feature bit 0x2
         },
-        .clusterRevision = 1,
     },
 } };
 

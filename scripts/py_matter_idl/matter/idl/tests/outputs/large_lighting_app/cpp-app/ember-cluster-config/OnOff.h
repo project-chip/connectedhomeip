@@ -23,7 +23,6 @@ inline constexpr std::array<EmberApplicationConfig::ClusteConfiguration<FeatureB
         .featureMap = BitFlags<FeatureBitmapType> {
             FeatureBitmapType::kLighting// feature bit 0x1
         },
-        .clusterRevision = 4,
     },
 } };
 

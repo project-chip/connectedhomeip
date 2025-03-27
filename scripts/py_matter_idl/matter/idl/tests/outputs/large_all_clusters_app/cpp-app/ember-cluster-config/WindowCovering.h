@@ -26,7 +26,6 @@ inline constexpr std::array<EmberApplicationConfig::ClusteConfiguration<FeatureB
             FeatureBitmapType::kPositionAwareLift, // feature bit 0x4
             FeatureBitmapType::kPositionAwareTilt// feature bit 0x10
         },
-        .clusterRevision = 5,
     },
 } };
 

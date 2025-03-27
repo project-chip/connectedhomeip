@@ -24,7 +24,6 @@ inline constexpr std::array<EmberApplicationConfig::ClusteConfiguration<FeatureB
             FeatureBitmapType::kOnOff, // feature bit 0x1
             FeatureBitmapType::kLighting// feature bit 0x2
         },
-        .clusterRevision = 5,
     },
 } };
 

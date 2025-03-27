@@ -26,7 +26,6 @@ inline constexpr std::array<EmberApplicationConfig::ClusteConfiguration<FeatureB
             FeatureBitmapType::kRocking, // feature bit 0x4
             FeatureBitmapType::kWind// feature bit 0x8
         },
-        .clusterRevision = 2,
     },
 } };
 

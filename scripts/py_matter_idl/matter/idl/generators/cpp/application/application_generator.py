@@ -33,7 +33,6 @@ class ServerClusterConfig:
     endpoint_number: int
     cluster_name: str
     feature_map: int
-    cluster_revision: int
     instance: ServerClusterInstantiation
 
     # Set if a `Feature` enumeration is available in the underlying
@@ -106,7 +105,6 @@ def cluster_instances(idl: Idl) -> Mapping[str, ClusterConfiguration]:
             # Defaults as per spec, however ZAP should generally
             # contain valid values here as they are required
             feature_map = 0
-            cluster_revision = 1
 
             for attribute in server_cluster.attributes:
                 if attribute.default is None:
@@ -116,9 +114,6 @@ def cluster_instances(idl: Idl) -> Mapping[str, ClusterConfiguration]:
                     case "featureMap":
                         assert isinstance(attribute.default, int)
                         feature_map = attribute.default
-                    case "clusterRevision":
-                        assert isinstance(attribute.default, int)
-                        cluster_revision = attribute.default
                     case _:
                         # no other attributes are interesting at this point
                         # although we may want to pull in some defaults
@@ -137,7 +132,6 @@ def cluster_instances(idl: Idl) -> Mapping[str, ClusterConfiguration]:
                     endpoint_number=endpoint.number,
                     cluster_name=name,
                     feature_map=feature_map,
-                    cluster_revision=cluster_revision,
                     instance=server_cluster,
                     feature_bitmap_type=feature_bitmap_type
                 )
