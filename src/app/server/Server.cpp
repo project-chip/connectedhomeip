@@ -710,7 +710,7 @@ CHIP_ERROR Server::SendUserDirectedCommissioningRequest(Transport::PeerAddress c
     CHIP_ERROR err;
 
     // only populate fields left blank by the client
-    if (strlen(id.GetInstanceName()) == 0)
+    if (strnlen(id.GetInstanceName(), Dnssd::Commission::kInstanceNameMaxLength + 1) == 0)
     {
         ChipLogDetail(AppServer, "Server::SendUserDirectedCommissioningRequest() Instance Name not known");
         char nameBuffer[Dnssd::Commission::kInstanceNameMaxLength + 1];
@@ -753,7 +753,7 @@ CHIP_ERROR Server::SendUserDirectedCommissioningRequest(Transport::PeerAddress c
         }
     }
 
-    if (strlen(id.GetDeviceName()) == 0)
+    if (strnlen(id.GetDeviceName(), Dnssd::kKeyDeviceNameMaxLength + 1) == 0)
     {
         char deviceName[Dnssd::kKeyDeviceNameMaxLength + 1] = {};
         if (!DeviceLayer::ConfigurationMgr().IsCommissionableDeviceNameEnabled() ||
