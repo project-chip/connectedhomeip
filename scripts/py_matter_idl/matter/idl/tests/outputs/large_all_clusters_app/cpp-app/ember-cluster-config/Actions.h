@@ -29,5 +29,5 @@ inline constexpr std::array<EmberApplicationConfig::ClusterConfiguration<Feature
 } // namespace Actions
 } // namespace Clusters
 } // namespace app
-} // namespace namespace chip
+} // namespace chip
 

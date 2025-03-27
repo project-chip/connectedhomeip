@@ -34,5 +34,5 @@ inline constexpr std::array<EmberApplicationConfig::ClusterConfiguration<Feature
 } // namespace Descriptor
 } // namespace Clusters
 } // namespace app
-} // namespace namespace chip
+} // namespace chip
 

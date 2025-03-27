@@ -35,5 +35,5 @@ inline constexpr std::array<EmberApplicationConfig::ClusterConfiguration<Feature
 } // namespace DoorLock
 } // namespace Clusters
 } // namespace app
-} // namespace namespace chip
+} // namespace chip
 
