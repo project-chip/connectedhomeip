@@ -39,7 +39,7 @@ __LOG_LEVELS__ = {
 @click.command()
 @click.option(
     '--log-level',
-    default='fatal',
+    default='warn',
     type=click.Choice(__LOG_LEVELS__.keys(), case_sensitive=False),
     help='Determines the verbosity of script output')
 @click.option(
