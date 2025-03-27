@@ -43,7 +43,7 @@ bool DataModelUtils::EndpointHasDeviceType(EndpointId endpoint, DeviceTypeId dev
 DataModel::ListBuilder<EndpointId> DataModelUtils::GetAllEndpointsHavingDeviceType(DeviceTypeId devieType)
 {
     DataModel::ListBuilder<DataModel::EndpointEntry> endpointsList;
-    ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->GetDataModelProvider()->Endpoints(endpointsList));
+    InteractionModelEngine::GetInstance()->GetDataModelProvider()->Endpoints(endpointsList);
     auto allEndpoints = endpointsList.TakeBuffer();
 
     DataModel::ListBuilder<EndpointId> endpoints;
