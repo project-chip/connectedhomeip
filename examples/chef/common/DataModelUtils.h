@@ -24,15 +24,15 @@ namespace chef {
 namespace DataModelUtils {
 
 // Common location to store all device type IDs
-constexpr DeviceTypeId kCookSurfaceDeviceId                  = 0x0077;
-constexpr DeviceTypeId kCooktopDeviceId                      = 0x0078;
-constexpr DeviceTypeId kOvenDeviceId                         = 0x007B;
-constexpr DeviceTypeId kRefrigeratorDeviceId                 = 0x0070;
-constexpr DeviceTypeId kTemperatureControlledCabinetDeviceId = 0x0071;
+constexpr chip::DeviceTypeId kCookSurfaceDeviceId                  = 0x0077;
+constexpr chip::DeviceTypeId kCooktopDeviceId                      = 0x0078;
+constexpr chip::DeviceTypeId kOvenDeviceId                         = 0x007B;
+constexpr chip::DeviceTypeId kRefrigeratorDeviceId                 = 0x0070;
+constexpr chip::DeviceTypeId kTemperatureControlledCabinetDeviceId = 0x0071;
 
 // Datamodel Util APIs
-bool EndpointHasDeviceType(EndpointId endpoint, DeviceTypeId deviceTypeId);
-DataModel::ListBuilder<EndpointId> GetAllEndpointsHavingDeviceType(DeviceTypeId devieType);
+bool EndpointHasDeviceType(chip::EndpointId endpoint, chip::DeviceTypeId deviceTypeId);
+chip::app::DataModel::ListBuilder<chip::EndpointId> GetAllEndpointsHavingDeviceType(chip::DeviceTypeId devieType);
 
 } // namespace DataModelUtils
 } // namespace chef

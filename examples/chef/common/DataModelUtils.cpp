@@ -22,6 +22,7 @@
 #include <lib/support/CodeUtils.h>
 
 using namespace chef;
+using namespace chip;
 using namespace chip::app;
 
 bool DataModelUtils::EndpointHasDeviceType(EndpointId endpoint, DeviceTypeId deviceTypeId)
