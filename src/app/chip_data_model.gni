@@ -46,7 +46,7 @@ _app_root = get_path_info(".", "abspath")
 #        - PluginApplicationCallbacks.h
 #   - ${name}-callbacks
 #     contains the callback implementation for cluster init:
-#        - cluster-init-callback.cpp
+#        - cluster-callbacks.cpp
 #        - callback-stub.cpp (contains __weak__ implementations. TODO: we should not be using
 #          weak linkage over time at all)
 #   - ${name}-command-dispatch:
@@ -96,7 +96,7 @@ template("chip_data_model") {
     outputs = [
       "app/PluginApplicationCallbacks.h",
       "app/callback-stub.cpp",
-      "app/cluster-init-callback.cpp",
+      "app/cluster-callbacks.cpp",
       "app/ember-cluster-config/{{server_cluster_name}}.h",
     ]
 
@@ -136,7 +136,7 @@ template("chip_data_model") {
             get_target_outputs(":${_data_model_name}_codegen_generate"),
             [
               "*/callback-stup.cpp",
-              "*/cluster-init-callback.cpp",
+              "*/cluster-callbacks.cpp",
             ])
 
     deps = [
