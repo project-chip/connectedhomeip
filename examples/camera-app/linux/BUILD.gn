@@ -17,6 +17,8 @@ import("//build_overrides/chip.gni")
 
 import("${chip_root}/build/chip/tools.gni")
 
+import("${build_root}/config/linux/pkg_config.gni")
+
 assert(chip_build_tools)
 
 config("config") {
@@ -34,8 +36,17 @@ config("config") {
   ]
 }
 
+pkg_config("gstreamer") {
+  packages = [
+    "gstreamer-1.0",
+    "gobject-2.0",
+  ]
+}
+
 executable("chip-camera-app") {
   configs += [ ":config" ]
+
+  configs += [ ":gstreamer" ]
 
   sources = [
     "${chip_root}/examples/camera-app/linux/src/camera-device.cpp",
@@ -63,20 +74,11 @@ executable("chip-camera-app") {
     "include/clusters/chime",
     "include/clusters/camera-avstream-mgmt",
     "${chip_root}/examples/camera-app/camera-common/include",
-
-    "/usr/include/gstreamer-1.0",
-    "/usr/include/gobject-2.0",
   ]
 
   cflags = [ "-Wconversion" ]
 
   output_dir = root_out_dir
-
-  # Manually specify GStreamer libraries
-  libs += [
-    "gstreamer-1.0",
-    "gobject-2.0",
-  ]
 }
 
 group("linux") {
