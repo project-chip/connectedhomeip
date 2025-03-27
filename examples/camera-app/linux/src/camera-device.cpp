@@ -27,9 +27,9 @@
 #include <linux/videodev2.h> // For V4L2 definitions
 #include <sys/ioctl.h>
 
+// File used to store snapshot from stream and return for CaptureSnapshot
+// command.
 #define SNAPSHOT_FILE_PATH "./capture_snapshot.jpg"
-#define SNAPSHOT_FILE_RES_WIDTH (168)
-#define SNAPSHOT_FILE_RES_HEIGHT (112)
 
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Chime;
@@ -526,6 +526,7 @@ void CameraDevice::SetHDRMode(bool hdrMode) {}
 
 void CameraDevice::InitializeVideoStreams()
 {
+    // Allocate single video stream with typical supported parameters
     VideoStream videoStream = { 1, false, VideoCodecEnum::kH264, { 640, 480 }, 30, nullptr };
 
     videoStreams.push_back(videoStream);
@@ -533,6 +534,7 @@ void CameraDevice::InitializeVideoStreams()
 
 void CameraDevice::InitializeAudioStreams()
 {
+    // Allocate single audio stream with typical supported parameters
     AudioStream audioStream = { 1, false, AudioCodecEnum::kOpus, 2, nullptr };
 
     audioStreams.push_back(audioStream);
@@ -540,6 +542,7 @@ void CameraDevice::InitializeAudioStreams()
 
 void CameraDevice::InitializeSnapshotStreams()
 {
+    // Allocate single snapshot stream with typical supported parameters
     snapshotStreams.push_back({ 1, false, ImageCodecEnum::kJpeg, { 320, 240 }, 90, nullptr });
 }
 
