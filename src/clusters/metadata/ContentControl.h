@@ -1,9 +1,10 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for ContentControl
+// Cluster metadata information for cluster ContentControl (cluster code: 1295/0x50F)
 // based on src/controller/data_model/controller-clusters.matter
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
 
@@ -13,7 +14,8 @@ namespace clusters {
 namespace ContentControl {
 namespace Metadata {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr ClusterId kClusterId = 0x050F;
+inline constexpr uint32_t kRevision   = 1;
 
 namespace Attributes {
 

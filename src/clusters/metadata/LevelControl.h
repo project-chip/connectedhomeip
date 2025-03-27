@@ -1,9 +1,10 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for LevelControl
+// Cluster metadata information for cluster LevelControl (cluster code: 8/0x8)
 // based on src/controller/data_model/controller-clusters.matter
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
 
@@ -13,7 +14,8 @@ namespace clusters {
 namespace LevelControl {
 namespace Metadata {
 
-inline constexpr uint32_t kRevision = 6;
+inline constexpr ClusterId kClusterId = 0x0008;
+inline constexpr uint32_t kRevision   = 6;
 
 namespace Attributes {
 

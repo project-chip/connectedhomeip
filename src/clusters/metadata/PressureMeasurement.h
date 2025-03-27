@@ -1,9 +1,10 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for PressureMeasurement
+// Cluster metadata information for cluster PressureMeasurement (cluster code: 1027/0x403)
 // based on src/controller/data_model/controller-clusters.matter
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
 
@@ -13,7 +14,8 @@ namespace clusters {
 namespace PressureMeasurement {
 namespace Metadata {
 
-inline constexpr uint32_t kRevision = 3;
+inline constexpr ClusterId kClusterId = 0x0403;
+inline constexpr uint32_t kRevision   = 3;
 
 namespace Attributes {
 

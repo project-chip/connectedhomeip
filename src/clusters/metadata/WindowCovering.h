@@ -1,9 +1,10 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for WindowCovering
+// Cluster metadata information for cluster WindowCovering (cluster code: 258/0x102)
 // based on src/controller/data_model/controller-clusters.matter
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
 
@@ -13,7 +14,8 @@ namespace clusters {
 namespace WindowCovering {
 namespace Metadata {
 
-inline constexpr uint32_t kRevision = 5;
+inline constexpr ClusterId kClusterId = 0x0102;
+inline constexpr uint32_t kRevision   = 5;
 
 namespace Attributes {
 

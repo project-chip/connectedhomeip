@@ -4,660 +4,1056 @@
 
 source_set("Identify") {
   sources = [ "Identify.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("Groups") {
   sources = [ "Groups.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("OnOff") {
   sources = [ "OnOff.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("LevelControl") {
   sources = [ "LevelControl.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("PulseWidthModulation") {
   sources = [ "PulseWidthModulation.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("Descriptor") {
   sources = [ "Descriptor.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("Binding") {
   sources = [ "Binding.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("AccessControl") {
   sources = [ "AccessControl.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("Actions") {
   sources = [ "Actions.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("BasicInformation") {
   sources = [ "BasicInformation.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("OtaSoftwareUpdateProvider") {
   sources = [ "OtaSoftwareUpdateProvider.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("OtaSoftwareUpdateRequestor") {
   sources = [ "OtaSoftwareUpdateRequestor.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("LocalizationConfiguration") {
   sources = [ "LocalizationConfiguration.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("TimeFormatLocalization") {
   sources = [ "TimeFormatLocalization.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("UnitLocalization") {
   sources = [ "UnitLocalization.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("PowerSourceConfiguration") {
   sources = [ "PowerSourceConfiguration.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("PowerSource") {
   sources = [ "PowerSource.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("GeneralCommissioning") {
   sources = [ "GeneralCommissioning.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("NetworkCommissioning") {
   sources = [ "NetworkCommissioning.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("DiagnosticLogs") {
   sources = [ "DiagnosticLogs.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("GeneralDiagnostics") {
   sources = [ "GeneralDiagnostics.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("SoftwareDiagnostics") {
   sources = [ "SoftwareDiagnostics.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("ThreadNetworkDiagnostics") {
   sources = [ "ThreadNetworkDiagnostics.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("WiFiNetworkDiagnostics") {
   sources = [ "WiFiNetworkDiagnostics.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("EthernetNetworkDiagnostics") {
   sources = [ "EthernetNetworkDiagnostics.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("TimeSynchronization") {
   sources = [ "TimeSynchronization.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("BridgedDeviceBasicInformation") {
   sources = [ "BridgedDeviceBasicInformation.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("Switch") {
   sources = [ "Switch.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("AdministratorCommissioning") {
   sources = [ "AdministratorCommissioning.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("OperationalCredentials") {
   sources = [ "OperationalCredentials.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("GroupKeyManagement") {
   sources = [ "GroupKeyManagement.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("FixedLabel") {
   sources = [ "FixedLabel.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("UserLabel") {
   sources = [ "UserLabel.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("ProxyConfiguration") {
   sources = [ "ProxyConfiguration.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("ProxyDiscovery") {
   sources = [ "ProxyDiscovery.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("ProxyValid") {
   sources = [ "ProxyValid.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("BooleanState") {
   sources = [ "BooleanState.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("IcdManagement") {
   sources = [ "IcdManagement.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("Timer") {
   sources = [ "Timer.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("OvenCavityOperationalState") {
   sources = [ "OvenCavityOperationalState.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("OvenMode") {
   sources = [ "OvenMode.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("LaundryDryerControls") {
   sources = [ "LaundryDryerControls.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("ModeSelect") {
   sources = [ "ModeSelect.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("LaundryWasherMode") {
   sources = [ "LaundryWasherMode.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("RefrigeratorAndTemperatureControlledCabinetMode") {
   sources = [ "RefrigeratorAndTemperatureControlledCabinetMode.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("LaundryWasherControls") {
   sources = [ "LaundryWasherControls.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("RvcRunMode") {
   sources = [ "RvcRunMode.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("RvcCleanMode") {
   sources = [ "RvcCleanMode.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("TemperatureControl") {
   sources = [ "TemperatureControl.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("RefrigeratorAlarm") {
   sources = [ "RefrigeratorAlarm.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("DishwasherMode") {
   sources = [ "DishwasherMode.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("AirQuality") {
   sources = [ "AirQuality.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("SmokeCoAlarm") {
   sources = [ "SmokeCoAlarm.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("DishwasherAlarm") {
   sources = [ "DishwasherAlarm.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("MicrowaveOvenMode") {
   sources = [ "MicrowaveOvenMode.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("MicrowaveOvenControl") {
   sources = [ "MicrowaveOvenControl.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("OperationalState") {
   sources = [ "OperationalState.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("RvcOperationalState") {
   sources = [ "RvcOperationalState.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("ScenesManagement") {
   sources = [ "ScenesManagement.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("HepaFilterMonitoring") {
   sources = [ "HepaFilterMonitoring.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("ActivatedCarbonFilterMonitoring") {
   sources = [ "ActivatedCarbonFilterMonitoring.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("BooleanStateConfiguration") {
   sources = [ "BooleanStateConfiguration.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("ValveConfigurationAndControl") {
   sources = [ "ValveConfigurationAndControl.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("ElectricalPowerMeasurement") {
   sources = [ "ElectricalPowerMeasurement.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("ElectricalEnergyMeasurement") {
   sources = [ "ElectricalEnergyMeasurement.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("WaterHeaterManagement") {
   sources = [ "WaterHeaterManagement.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("DemandResponseLoadControl") {
   sources = [ "DemandResponseLoadControl.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("Messages") {
   sources = [ "Messages.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("DeviceEnergyManagement") {
   sources = [ "DeviceEnergyManagement.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("EnergyEvse") {
   sources = [ "EnergyEvse.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("EnergyPreference") {
   sources = [ "EnergyPreference.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("PowerTopology") {
   sources = [ "PowerTopology.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("EnergyEvseMode") {
   sources = [ "EnergyEvseMode.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("WaterHeaterMode") {
   sources = [ "WaterHeaterMode.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("DeviceEnergyManagementMode") {
   sources = [ "DeviceEnergyManagementMode.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("DoorLock") {
   sources = [ "DoorLock.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("WindowCovering") {
   sources = [ "WindowCovering.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("ClosureControl") {
   sources = [ "ClosureControl.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("ServiceArea") {
   sources = [ "ServiceArea.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("PumpConfigurationAndControl") {
   sources = [ "PumpConfigurationAndControl.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("Thermostat") {
   sources = [ "Thermostat.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("FanControl") {
   sources = [ "FanControl.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("ThermostatUserInterfaceConfiguration") {
   sources = [ "ThermostatUserInterfaceConfiguration.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("ColorControl") {
   sources = [ "ColorControl.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("BallastConfiguration") {
   sources = [ "BallastConfiguration.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("IlluminanceMeasurement") {
   sources = [ "IlluminanceMeasurement.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("TemperatureMeasurement") {
   sources = [ "TemperatureMeasurement.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("PressureMeasurement") {
   sources = [ "PressureMeasurement.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("FlowMeasurement") {
   sources = [ "FlowMeasurement.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("RelativeHumidityMeasurement") {
   sources = [ "RelativeHumidityMeasurement.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("OccupancySensing") {
   sources = [ "OccupancySensing.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("CarbonMonoxideConcentrationMeasurement") {
   sources = [ "CarbonMonoxideConcentrationMeasurement.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("CarbonDioxideConcentrationMeasurement") {
   sources = [ "CarbonDioxideConcentrationMeasurement.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("NitrogenDioxideConcentrationMeasurement") {
   sources = [ "NitrogenDioxideConcentrationMeasurement.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("OzoneConcentrationMeasurement") {
   sources = [ "OzoneConcentrationMeasurement.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("Pm25ConcentrationMeasurement") {
   sources = [ "Pm25ConcentrationMeasurement.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("FormaldehydeConcentrationMeasurement") {
   sources = [ "FormaldehydeConcentrationMeasurement.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("Pm1ConcentrationMeasurement") {
   sources = [ "Pm1ConcentrationMeasurement.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("Pm10ConcentrationMeasurement") {
   sources = [ "Pm10ConcentrationMeasurement.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("TotalVolatileOrganicCompoundsConcentrationMeasurement") {
   sources = [ "TotalVolatileOrganicCompoundsConcentrationMeasurement.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("RadonConcentrationMeasurement") {
   sources = [ "RadonConcentrationMeasurement.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("WiFiNetworkManagement") {
   sources = [ "WiFiNetworkManagement.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("ThreadBorderRouterManagement") {
   sources = [ "ThreadBorderRouterManagement.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("ThreadNetworkDirectory") {
   sources = [ "ThreadNetworkDirectory.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("WakeOnLan") {
   sources = [ "WakeOnLan.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("Channel") {
   sources = [ "Channel.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("TargetNavigator") {
   sources = [ "TargetNavigator.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("MediaPlayback") {
   sources = [ "MediaPlayback.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("MediaInput") {
   sources = [ "MediaInput.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("LowPower") {
   sources = [ "LowPower.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("KeypadInput") {
   sources = [ "KeypadInput.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("ContentLauncher") {
   sources = [ "ContentLauncher.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("AudioOutput") {
   sources = [ "AudioOutput.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("ApplicationLauncher") {
   sources = [ "ApplicationLauncher.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("ApplicationBasic") {
   sources = [ "ApplicationBasic.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("AccountLogin") {
   sources = [ "AccountLogin.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("ContentControl") {
   sources = [ "ContentControl.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("ContentAppObserver") {
   sources = [ "ContentAppObserver.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("ZoneManagement") {
   sources = [ "ZoneManagement.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("CameraAvStreamManagement") {
   sources = [ "CameraAvStreamManagement.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("CameraAvSettingsUserLevelManagement") {
   sources = [ "CameraAvSettingsUserLevelManagement.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("WebRTCTransportProvider") {
   sources = [ "WebRTCTransportProvider.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("WebRTCTransportRequestor") {
   sources = [ "WebRTCTransportRequestor.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("PushAvStreamTransport") {
   sources = [ "PushAvStreamTransport.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("Chime") {
   sources = [ "Chime.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("EcosystemInformation") {
   sources = [ "EcosystemInformation.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("CommissionerControl") {
   sources = [ "CommissionerControl.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("TlsCertificateManagement") {
   sources = [ "TlsCertificateManagement.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("TlsClientManagement") {
   sources = [ "TlsClientManagement.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("UnitTesting") {
   sources = [ "UnitTesting.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("FaultInjection") {
   sources = [ "FaultInjection.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 
 source_set("SampleMei") {
   sources = [ "SampleMei.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }

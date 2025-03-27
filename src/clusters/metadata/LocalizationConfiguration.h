@@ -1,9 +1,10 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for LocalizationConfiguration
+// Cluster metadata information for cluster LocalizationConfiguration (cluster code: 43/0x2B)
 // based on src/controller/data_model/controller-clusters.matter
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
 
@@ -13,7 +14,8 @@ namespace clusters {
 namespace LocalizationConfiguration {
 namespace Metadata {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr ClusterId kClusterId = 0x002B;
+inline constexpr uint32_t kRevision   = 1;
 
 namespace Attributes {
 

@@ -1,9 +1,10 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for EnergyPreference
+// Cluster metadata information for cluster EnergyPreference (cluster code: 155/0x9B)
 // based on src/controller/data_model/controller-clusters.matter
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
 
@@ -13,7 +14,8 @@ namespace clusters {
 namespace EnergyPreference {
 namespace Metadata {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr ClusterId kClusterId = 0x009B;
+inline constexpr uint32_t kRevision   = 1;
 
 namespace Attributes {
 

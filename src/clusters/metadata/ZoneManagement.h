@@ -1,9 +1,10 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for ZoneManagement
+// Cluster metadata information for cluster ZoneManagement (cluster code: 1360/0x550)
 // based on src/controller/data_model/controller-clusters.matter
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
 
@@ -13,7 +14,8 @@ namespace clusters {
 namespace ZoneManagement {
 namespace Metadata {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr ClusterId kClusterId = 0x0550;
+inline constexpr uint32_t kRevision   = 1;
 
 namespace Attributes {
 

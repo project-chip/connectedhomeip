@@ -1,9 +1,10 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for DoorLock
+// Cluster metadata information for cluster DoorLock (cluster code: 257/0x101)
 // based on src/controller/data_model/controller-clusters.matter
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
 
@@ -13,7 +14,8 @@ namespace clusters {
 namespace DoorLock {
 namespace Metadata {
 
-inline constexpr uint32_t kRevision = 7;
+inline constexpr ClusterId kClusterId = 0x0101;
+inline constexpr uint32_t kRevision   = 7;
 
 namespace Attributes {
 

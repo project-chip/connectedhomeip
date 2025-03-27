@@ -1,9 +1,10 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for IcdManagement
+// Cluster metadata information for cluster IcdManagement (cluster code: 70/0x46)
 // based on src/controller/data_model/controller-clusters.matter
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
 
@@ -13,7 +14,8 @@ namespace clusters {
 namespace IcdManagement {
 namespace Metadata {
 
-inline constexpr uint32_t kRevision = 3;
+inline constexpr ClusterId kClusterId = 0x0046;
+inline constexpr uint32_t kRevision   = 3;
 
 namespace Attributes {
 

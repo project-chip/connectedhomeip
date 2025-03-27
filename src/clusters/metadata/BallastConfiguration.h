@@ -1,9 +1,10 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for BallastConfiguration
+// Cluster metadata information for cluster BallastConfiguration (cluster code: 769/0x301)
 // based on src/controller/data_model/controller-clusters.matter
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
 
@@ -13,7 +14,8 @@ namespace clusters {
 namespace BallastConfiguration {
 namespace Metadata {
 
-inline constexpr uint32_t kRevision = 4;
+inline constexpr ClusterId kClusterId = 0x0301;
+inline constexpr uint32_t kRevision   = 4;
 
 namespace Attributes {
 

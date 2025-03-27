@@ -1,9 +1,10 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for Switch
+// Cluster metadata information for cluster Switch (cluster code: 59/0x3B)
 // based on src/controller/data_model/controller-clusters.matter
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
 
@@ -13,7 +14,8 @@ namespace clusters {
 namespace Switch {
 namespace Metadata {
 
-inline constexpr uint32_t kRevision = 2;
+inline constexpr ClusterId kClusterId = 0x003B;
+inline constexpr uint32_t kRevision   = 2;
 
 namespace Attributes {
 

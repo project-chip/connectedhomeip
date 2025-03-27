@@ -1,9 +1,10 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for OccupancySensing
+// Cluster metadata information for cluster OccupancySensing (cluster code: 1030/0x406)
 // based on src/controller/data_model/controller-clusters.matter
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
 
@@ -13,7 +14,8 @@ namespace clusters {
 namespace OccupancySensing {
 namespace Metadata {
 
-inline constexpr uint32_t kRevision = 5;
+inline constexpr ClusterId kClusterId = 0x0406;
+inline constexpr uint32_t kRevision   = 5;
 
 namespace Attributes {
 

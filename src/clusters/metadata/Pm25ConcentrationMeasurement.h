@@ -1,9 +1,10 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for Pm25ConcentrationMeasurement
+// Cluster metadata information for cluster Pm25ConcentrationMeasurement (cluster code: 1066/0x42A)
 // based on src/controller/data_model/controller-clusters.matter
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
 
@@ -13,7 +14,8 @@ namespace clusters {
 namespace Pm25ConcentrationMeasurement {
 namespace Metadata {
 
-inline constexpr uint32_t kRevision = 3;
+inline constexpr ClusterId kClusterId = 0x042A;
+inline constexpr uint32_t kRevision   = 3;
 
 namespace Attributes {
 

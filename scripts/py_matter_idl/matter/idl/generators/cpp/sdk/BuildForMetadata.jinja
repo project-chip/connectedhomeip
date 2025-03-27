@@ -5,6 +5,9 @@
 
 source_set("{{cluster_name}}") {
   sources = [ "{{cluster_name}}.h" ]
-  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
 }
 {%- endfor %}

@@ -1,9 +1,10 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for TargetNavigator
+// Cluster metadata information for cluster TargetNavigator (cluster code: 1285/0x505)
 // based on src/controller/data_model/controller-clusters.matter
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
 
@@ -13,7 +14,8 @@ namespace clusters {
 namespace TargetNavigator {
 namespace Metadata {
 
-inline constexpr uint32_t kRevision = 2;
+inline constexpr ClusterId kClusterId = 0x0505;
+inline constexpr uint32_t kRevision   = 2;
 
 namespace Attributes {
 

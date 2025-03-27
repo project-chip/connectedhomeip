@@ -1,9 +1,10 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for {{cluster.name}}
+// Cluster metadata information for cluster {{cluster.name}} (cluster code: {{"%d/0x%X" | format(cluster.code, cluster.code)}})
 // based on {{input_name}}
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
 
@@ -13,6 +14,7 @@ namespace clusters {
 namespace {{cluster.name}} {
 namespace Metadata {
 
+inline constexpr ClusterId kClusterId = {{"0x%04X" | format(cluster.code)}};
 inline constexpr uint32_t kRevision = {{cluster.revision}};
 
 namespace Attributes {

@@ -1,9 +1,10 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for MicrowaveOvenControl
+// Cluster metadata information for cluster MicrowaveOvenControl (cluster code: 95/0x5F)
 // based on src/controller/data_model/controller-clusters.matter
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
 
@@ -13,7 +14,8 @@ namespace clusters {
 namespace MicrowaveOvenControl {
 namespace Metadata {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr ClusterId kClusterId = 0x005F;
+inline constexpr uint32_t kRevision   = 1;
 
 namespace Attributes {
 

@@ -1,9 +1,10 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for ElectricalPowerMeasurement
+// Cluster metadata information for cluster ElectricalPowerMeasurement (cluster code: 144/0x90)
 // based on src/controller/data_model/controller-clusters.matter
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
 
@@ -13,7 +14,8 @@ namespace clusters {
 namespace ElectricalPowerMeasurement {
 namespace Metadata {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr ClusterId kClusterId = 0x0090;
+inline constexpr uint32_t kRevision   = 1;
 
 namespace Attributes {
 
