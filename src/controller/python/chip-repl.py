@@ -26,6 +26,8 @@ from traitlets.config import Config
 def main():
     c = Config()
     c.InteractiveShellApp.exec_lines = [
+        "import chip",                         # Load chip package
+        "from chip.ChipReplStartup import *",  # Load REPL add-ons
         "from chip import ChipReplStartup",
         f"ChipReplStartup.main({repr(sys.argv[1:])})",
     ]

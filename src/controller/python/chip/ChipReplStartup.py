@@ -33,8 +33,6 @@ from .ChipStack import ChipStack
 from .logging import RedirectToPythonLogging
 from .native import Init as NativeInit
 
-_fabricAdmins = None
-
 
 def ReplInit(debug):
     #
