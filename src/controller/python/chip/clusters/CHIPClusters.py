@@ -1059,6 +1059,12 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
             },
+            0x00000018: {
+                "attributeName": "ConfigurationVersion",
+                "attributeId": 0x00000018,
+                "type": "int",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,
@@ -3097,6 +3103,12 @@ class ChipClusters:
                 "attributeName": "ProductAppearance",
                 "attributeId": 0x00000014,
                 "type": "",
+                "reportable": True,
+            },
+            0x00000018: {
+                "attributeName": "ConfigurationVersion",
+                "attributeId": 0x00000018,
+                "type": "int",
                 "reportable": True,
             },
             0x0000FFF8: {

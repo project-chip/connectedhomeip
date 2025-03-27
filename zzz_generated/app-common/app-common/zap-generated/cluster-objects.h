@@ -219,6 +219,29 @@ public:
 using DecodableType = Type;
 
 } // namespace ApplicationStruct
+namespace CapabilityMinimaStruct {
+enum class Fields : uint8_t
+{
+    kCaseSessionsPerFabric  = 0,
+    kSubscriptionsPerFabric = 1,
+};
+
+struct Type
+{
+public:
+    uint16_t caseSessionsPerFabric  = static_cast<uint16_t>(0);
+    uint16_t subscriptionsPerFabric = static_cast<uint16_t>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace CapabilityMinimaStruct
 namespace ErrorStateStruct {
 enum class Fields : uint8_t
 {
@@ -326,6 +349,29 @@ public:
 using DecodableType = Type;
 
 } // namespace OperationalStateStruct
+namespace ProductAppearanceStruct {
+enum class Fields : uint8_t
+{
+    kFinish       = 0,
+    kPrimaryColor = 1,
+};
+
+struct Type
+{
+public:
+    ProductFinishEnum finish = static_cast<ProductFinishEnum>(0);
+    DataModel::Nullable<ColorEnum> primaryColor;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace ProductAppearanceStruct
 namespace ViewportStruct {
 enum class Fields : uint8_t
 {
@@ -3800,52 +3846,8 @@ public:
 } // namespace Actions
 namespace BasicInformation {
 namespace Structs {
-namespace CapabilityMinimaStruct {
-enum class Fields : uint8_t
-{
-    kCaseSessionsPerFabric  = 0,
-    kSubscriptionsPerFabric = 1,
-};
-
-struct Type
-{
-public:
-    uint16_t caseSessionsPerFabric  = static_cast<uint16_t>(0);
-    uint16_t subscriptionsPerFabric = static_cast<uint16_t>(0);
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-using DecodableType = Type;
-
-} // namespace CapabilityMinimaStruct
-namespace ProductAppearanceStruct {
-enum class Fields : uint8_t
-{
-    kFinish       = 0,
-    kPrimaryColor = 1,
-};
-
-struct Type
-{
-public:
-    ProductFinishEnum finish = static_cast<ProductFinishEnum>(0);
-    DataModel::Nullable<ColorEnum> primaryColor;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-using DecodableType = Type;
-
-} // namespace ProductAppearanceStruct
+namespace CapabilityMinimaStruct  = Clusters::detail::Structs::CapabilityMinimaStruct;
+namespace ProductAppearanceStruct = Clusters::detail::Structs::ProductAppearanceStruct;
 } // namespace Structs
 
 namespace Commands {
@@ -4179,6 +4181,18 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxPathsPerInvoke
+namespace ConfigurationVersion {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BasicInformation::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ConfigurationVersion::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ConfigurationVersion
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -4241,6 +4255,7 @@ struct TypeInfo
         Attributes::ProductAppearance::TypeInfo::DecodableType productAppearance;
         Attributes::SpecificationVersion::TypeInfo::DecodableType specificationVersion = static_cast<uint32_t>(0);
         Attributes::MaxPathsPerInvoke::TypeInfo::DecodableType maxPathsPerInvoke       = static_cast<uint16_t>(0);
+        Attributes::ConfigurationVersion::TypeInfo::DecodableType configurationVersion = static_cast<uint32_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
@@ -10675,29 +10690,8 @@ public:
 } // namespace TimeSynchronization
 namespace BridgedDeviceBasicInformation {
 namespace Structs {
-namespace ProductAppearanceStruct {
-enum class Fields : uint8_t
-{
-    kFinish       = 0,
-    kPrimaryColor = 1,
-};
-
-struct Type
-{
-public:
-    ProductFinishEnum finish = static_cast<ProductFinishEnum>(0);
-    DataModel::Nullable<ColorEnum> primaryColor;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-using DecodableType = Type;
-
-} // namespace ProductAppearanceStruct
+namespace CapabilityMinimaStruct  = Clusters::detail::Structs::CapabilityMinimaStruct;
+namespace ProductAppearanceStruct = Clusters::detail::Structs::ProductAppearanceStruct;
 } // namespace Structs
 
 namespace Commands {
@@ -10966,6 +10960,18 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ProductAppearance
+namespace ConfigurationVersion {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasicInformation::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ConfigurationVersion::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ConfigurationVersion
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -11022,6 +11028,7 @@ struct TypeInfo
         Attributes::Reachable::TypeInfo::DecodableType reachable = static_cast<bool>(0);
         Attributes::UniqueID::TypeInfo::DecodableType uniqueID;
         Attributes::ProductAppearance::TypeInfo::DecodableType productAppearance;
+        Attributes::ConfigurationVersion::TypeInfo::DecodableType configurationVersion = static_cast<uint32_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
