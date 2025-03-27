@@ -413,12 +413,15 @@ void OvenTemperatureControlledCabinetCooktopCookSurfaceInit()
                                                     isTemperatureControlledCabinet) == CHIP_NO_ERROR) &&
             isTemperatureControlledCabinet)
         {
+            ChipLogProgress(NotSpecified, "Temperature controlled cabinet device type on EP: %d",
+                            kTemperatureControlledCabinetEpId);
             SetParentEndpointForEndpoint(kTemperatureControlledCabinetEpId, kOvenEpId);
         }
 
         if ((DataModelUtils::isEndpointOfDeviceType(kCooktopEpId, DataModelUtils::COOKTOP_DEVICE_ID, isCooktop) == CHIP_NO_ERROR) &&
             isCooktop)
         {
+            ChipLogProgress(NotSpecified, "Cooktop device type on EP: %d", kCooktopEpId);
             SetParentEndpointForEndpoint(kCooktopEpId, kOvenEpId);
         }
 
@@ -426,7 +429,8 @@ void OvenTemperatureControlledCabinetCooktopCookSurfaceInit()
              CHIP_NO_ERROR) &&
             isCookSurface)
         {
-            SetParentEndpointForEndpoint(kCookSurfaceEpId, kOvenEpId);
+            ChipLogProgress(NotSpecified, "Cook Surface device type on EP: %d", kCookSurfaceEpId);
+            SetParentEndpointForEndpoint(kCookSurfaceEpId, kCooktopEpId);
         }
     }
 }
@@ -436,6 +440,7 @@ void ApplicationInit()
     ChipLogProgress(NotSpecified, "Chef Application Init !!!");
 
     RefrigeratorTemperatureControlledCabinetInit();
+    OvenTemperatureControlledCabinetCooktopCookSurfaceInit();
 
 #ifdef MATTER_DM_PLUGIN_WINDOW_COVERING_SERVER
     ChipLogProgress(NotSpecified, "Initializing WindowCovering cluster delegate.");
