@@ -3555,7 +3555,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTROperationalCredentialsClusterSetVidVerificationStatementParams : NSObject <NSCopying>
+@interface MTROperationalCredentialsClusterSetVIDVerificationStatementParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nullable vendorID MTR_PROVISIONALLY_AVAILABLE;
 
@@ -3589,7 +3589,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTROperationalCredentialsClusterSignVidVerificationRequestParams : NSObject <NSCopying>
+@interface MTROperationalCredentialsClusterSignVIDVerificationRequestParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_PROVISIONALLY_AVAILABLE;
 
@@ -3621,7 +3621,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTROperationalCredentialsClusterSignVidVerificationResponseParams : NSObject <NSCopying>
+@interface MTROperationalCredentialsClusterSignVIDVerificationResponseParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_PROVISIONALLY_AVAILABLE;
 
@@ -3630,7 +3630,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @property (nonatomic, copy) NSData * _Nonnull signature MTR_PROVISIONALLY_AVAILABLE;
 
 /**
- * Initialize an MTROperationalCredentialsClusterSignVidVerificationResponseParams with a response-value dictionary
+ * Initialize an MTROperationalCredentialsClusterSignVIDVerificationResponseParams with a response-value dictionary
  * of the sort that MTRDeviceResponseHandler would receive.
  *
  * Will return nil and hand out an error if the response-value dictionary is not
@@ -4929,7 +4929,7 @@ MTR_PROVISIONALLY_AVAILABLE
 
 @property (nonatomic, copy) NSString * _Nonnull sceneName MTR_PROVISIONALLY_AVAILABLE;
 
-@property (nonatomic, copy) NSArray * _Nonnull extensionFieldSets MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nonnull extensionFieldSetStructs MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -5024,7 +5024,7 @@ MTR_PROVISIONALLY_AVAILABLE
 
 @property (nonatomic, copy) NSString * _Nullable sceneName MTR_PROVISIONALLY_AVAILABLE;
 
-@property (nonatomic, copy) NSArray * _Nullable extensionFieldSets MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nullable extensionFieldSetStructs MTR_PROVISIONALLY_AVAILABLE;
 
 /**
  * Initialize an MTRScenesManagementClusterViewSceneResponseParams with a response-value dictionary
