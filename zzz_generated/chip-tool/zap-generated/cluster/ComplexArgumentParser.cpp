@@ -7033,8 +7033,6 @@ ComplexArgumentParser::Setup(const char * label,
                                                                   value.isMember("connectionID")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("TransportConfigurationStruct.transportStatus", "transportStatus",
                                                                   value.isMember("transportStatus")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("TransportConfigurationStruct.transportOptions",
-                                                                  "transportOptions", value.isMember("transportOptions")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "connectionID");
@@ -7045,9 +7043,19 @@ ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.transportStatus, value["transportStatus"]));
     valueCopy.removeMember("transportStatus");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "transportOptions");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.transportOptions, value["transportOptions"]));
+    if (value.isMember("transportOptions"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "transportOptions");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.transportOptions, value["transportOptions"]));
+    }
     valueCopy.removeMember("transportOptions");
+
+    if (value.isMember("fabricIndex"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricIndex, value["fabricIndex"]));
+    }
+    valueCopy.removeMember("fabricIndex");
 
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
@@ -7058,6 +7066,7 @@ void ComplexArgumentParser::Finalize(
     ComplexArgumentParser::Finalize(request.connectionID);
     ComplexArgumentParser::Finalize(request.transportStatus);
     ComplexArgumentParser::Finalize(request.transportOptions);
+    ComplexArgumentParser::Finalize(request.fabricIndex);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters::Chime::Structs::ChimeSoundStruct::Type & request,
