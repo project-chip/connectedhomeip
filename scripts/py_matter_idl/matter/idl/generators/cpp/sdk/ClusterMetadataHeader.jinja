@@ -1,16 +1,62 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information based on {{input_name}}
+// Cluster metadata information for {{cluster.name}}
+// based on {{input_name}}
+
+#include <app/data-model-provider/MetadataTypes.h>
+
+#include <cstdint>
+
+namespace chip {
+namespace app {
+namespace clusters {
+namespace {{cluster.name}} {
+namespace Metadata {
+
+inline constexpr uint32_t kRevision = {{cluster.revision}};
+
+namespace Attributes {
+
+{% for attribute in cluster.attributes | reject("global_attribute") -%}
+inline constexpr DataModel::AttributeEntry k{{attribute.definition.name | upfirst}}Entry = {
+    .attributeId    = {{attribute.definition.code}},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ {{ attribute | extract_attribute_quality_flags | join(", ") }} },
+    .readPrivilege  = {% if attribute.is_readable -%}
+        {{attribute.readacl | as_privilege}}
+      {%- else -%}
+        std::nullopt
+      {%- endif -%}
+    ,
+    .writePrivilege = {% if attribute.is_writable -%}
+        {{attribute.writeacl | as_privilege}}
+      {%- else -%}
+        std::nullopt
+      {%- endif -%}
+    ,
+};
+{% endfor %}
+
+} // namespace Attributes
+
+namespace Commands {
+
+{% for command in cluster.commands -%}
+inline constexpr DataModel::AcceptedCommandEntry k{{command.name | upfirst}}Entry = {
+    .commandId = {{ command.code }},
+    .flags = BitFlags<DataModel::CommandQualityFlags>{ {{ command | extract_command_quality_flags | join(", ") }} },
+    .invokePrivilege = {{ command.invokeacl | as_privilege}},
+};
+{% endfor %}
+
+} // namespace Attributes
+
+} // namespace Metadata
+} // namespace {{cluster.name}}
+} // namespace app
+} // namespace clusters
+} // namespace chip
 
 // TODO:
-//    - revision: {{ cluster.revision }}
-//    - attributes: {{ cluster.attributes }}
-//    - commands: {{ cluster.commands }}
-//
-// TODO:
-//   - figure out the right namespace for this
-//   - define metadata namespace
-//   - split out attribute and command metadata
 //   - help out with mandatory attributes (maybe that array is useful)
 //
 //   - would probably also want the BUILD.gn file generated to contain all data

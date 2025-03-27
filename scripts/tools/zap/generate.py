@@ -27,7 +27,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
-from zap_execution import ZapTool
+from .zap_execution import ZapTool
 
 # TODO: Can we share this constant definition with zap_regen_all.py?
 DEFAULT_DATA_MODEL_DESCRIPTION_FILE = 'src/app/zap-templates/zcl/zcl.json'

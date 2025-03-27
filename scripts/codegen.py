@@ -122,7 +122,7 @@ def main(log_level, generator, option, output_dir, dry_run, name_only, expected_
         storage = FileSystemGeneratorStorage(output_dir)
 
     logging.info("Parsing idl from %s" % idl_path)
-    idl_tree = CreateParser().parse(open(idl_path, "rt").read())
+    idl_tree = CreateParser().parse(open(idl_path, "rt").read(), file_name=idl_path)
 
     plugin_module = None
     if generator.startswith('custom:'):

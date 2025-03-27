@@ -1,5 +1,10 @@
 # DO NOT EDIT MANUALLY - Generated file
 #
 # Cluster metadata information based on {{input_name}}
+{%- for cluster_name in cluster_names %}
 
-# TODO: implement for {{cluster_names}}
+source_set("{{cluster_name}}") {
+  sources = [ "{{cluster_name}}.h" ],
+  deps = [ "${chip_root}/src/app/data-model-provider:metadata" ]
+}
+{%- endfor %}

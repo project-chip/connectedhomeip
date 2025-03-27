@@ -13,10 +13,57 @@
 # limitations under the License.
 #
 import os
+from typing import Optional
 
 from matter.idl.generators import CodeGenerator, GeneratorStorage
-from matter.idl.matter_idl_types import Idl
+from matter.idl.matter_idl_types import AccessPrivilege, Attribute, AttributeQuality, Command, CommandQuality, FieldQuality, Idl
 
+
+def as_privilege(privilege: AccessPrivilege) -> str:
+    match privilege:
+        case AccessPrivilege.VIEW:
+            return "Access::Privilege::kView"
+        case AccessPrivilege.OPERATE:
+            return "Access::Privilege::kOperate"
+        case AccessPrivilege.MANAGE:
+            return "Access::Privilege::kManage"
+        case AccessPrivilege.ADMINISTER:
+            return "Access::Privilege::kAdminister"
+
+
+def extract_attribute_quality_flags(attribute: Attribute) -> list[str]:
+    result = []
+
+    if attribute.qualities & AttributeQuality.TIMED_WRITE:
+        result.append('DataModel::AttributeQualityFlags::kTimed')
+
+    if attribute.definition.is_list:
+        result.append('DataModel::AttributeQualityFlags::kListAttribute')
+
+    if attribute.definition.qualities & FieldQuality.FABRIC_SENSITIVE:
+        result.append('DataModel::AttributeQualityFlags::kFabricSensitive')
+
+    # TODO: kChangesOmitted is not available
+    # TODO: kFabricScoped is not available here (it is a struct/field quality...)
+
+    return result
+
+def extract_command_quality_flags(command: Command) -> list[str]:
+    result = []
+
+    if command.qualities & CommandQuality.FABRIC_SCOPED:
+        result.append('DataModel::CommandQualityFlags::kFabricScoped')
+
+    if command.qualities & CommandQuality.TIMED_INVOKE:
+        result.append('DataModel::CommandQualityFlags::kTimed')
+
+    # TODO: kLargeMessage is not available
+
+    return result
+
+def global_attribute(attribute: Attribute) -> bool:
+    return 0xFFF8 <= attribute.definition.code <= 0xFFFF
+ 
 
 class SdkGenerator(CodeGenerator):
     """
@@ -29,6 +76,10 @@ class SdkGenerator(CodeGenerator):
         filters as required by the java .jinja templates to function.
         """
         super().__init__(storage, idl, fs_loader_searchpath=os.path.dirname(__file__))
+        self.jinja_env.filters['as_privilege'] = as_privilege
+        self.jinja_env.filters['extract_attribute_quality_flags'] = extract_attribute_quality_flags
+        self.jinja_env.filters['extract_command_quality_flags'] = extract_command_quality_flags
+        self.jinja_env.tests['global_attribute'] = global_attribute
 
     def internal_render_all(self):
         """
