@@ -78,8 +78,12 @@ public:
         static void TimerCallback(void * timerCbArg);
     };
 
-    Timer * longPressTimer = nullptr;
-
+    Timer * longPressTimer       = nullptr;
+    bool sFunctionButtonPressed  = false; // True when button0 is pressed, used to trigger factory reset
+    bool sActionButtonPressed    = false; // True when button1 is pressed, used to initiate toggle or level-up/down
+    bool sActionButtonSuppressed = false; // True when both button0 and button1 are pressed, used to switch step direction
+    bool sIsButtonEventTriggered = false; // True when button0 press event is posted to BaseApplication
+    
     /**
      * @brief AppTask task main loop function
      *

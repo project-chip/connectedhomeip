@@ -193,9 +193,9 @@ void LightSwitchMgr::GenericSwitchWorkerFunction(intptr_t context)
     Platform::Delete(data);
 }
 
-void LightSwitchMgr::SwitchActionEventHandler(AppEvent * aEvent)
+void LightSwitchMgr::SwitchActionEventHandler(uint16_t eventType)
 {
-    switch (aEvent->Type)
+    switch (eventType)
     {
     case AppEvent::kEventType_ActionButtonPressed:
         LightSwitchMgr::GetInstance().GenericSwitchOnInitialPress();

@@ -71,7 +71,7 @@ public:
      *
      * @param aEvent button event being processed
      */
-    static void SwitchActionEventHandler(AppEvent * aEvent);
+    static void SwitchActionEventHandler(uint16_t eventType);
 
 private:
     static LightSwitchMgr sSwitch;

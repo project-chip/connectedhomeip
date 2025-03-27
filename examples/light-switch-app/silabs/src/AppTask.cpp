@@ -67,10 +67,6 @@ using namespace ::chip::DeviceLayer;
  *********************************************************/
 
 AppTask AppTask::sAppTask;
-bool sFunctionButtonPressed  = false; // True when button0 is pressed, used to trigger factory reset
-bool sActionButtonPressed    = false; // True when button1 is pressed, used to initiate toggle or level-up/down
-bool sActionButtonSuppressed = false; // True when both button0 and button1 are pressed, used to switch step direction
-bool sIsButtonEventTriggered = false; // True when button0 press event is posted to BaseApplication
 
 CHIP_ERROR AppTask::AppInit()
 {
@@ -115,9 +111,9 @@ void AppTask::HandleLongPress()
     AppEvent event;
     event.Handler = AppTask::AppEventHandler;
 
-    if (sActionButtonPressed)
+    if (sAppTask.sActionButtonPressed)
     {
-        sActionButtonSuppressed = true;
+        sAppTask.sActionButtonSuppressed = true;
         // Long press button up : Trigger Level Control Action
         event.Type = AppEvent::kEventType_TriggerLevelControlAction;
         AppTask::GetAppTask().PostEvent(&event);
@@ -229,43 +225,43 @@ void AppTask::AppEventHandler(AppEvent * aEvent)
     switch (aEvent->Type)
     {
     case AppEvent::kEventType_FunctionButtonPressed:
-        sFunctionButtonPressed = true;
-        if (sActionButtonPressed)
+        sAppTask.sFunctionButtonPressed = true;
+        if (sAppTask.sActionButtonPressed)
         {
-            sActionButtonSuppressed = true;
+            sAppTask.sActionButtonSuppressed = true;
             LightSwitchMgr::GetInstance().changeStepMode();
         }
         else
         {
-            sIsButtonEventTriggered = true;
+            sAppTask.sIsButtonEventTriggered = true;
             // Post button press event to BaseApplication
-            AppEvent button_event           = {};
-            button_event.Type               = AppEvent::kEventType_Button;
-            button_event.ButtonEvent.Action = static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonPressed);
-            button_event.Handler            = BaseApplication::ButtonHandler;
+            AppEvent button_event            = {};
+            button_event.Type                = AppEvent::kEventType_Button;
+            button_event.ButtonEvent.Action  = static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonPressed);
+            button_event.Handler             = BaseApplication::ButtonHandler;
             AppTask::GetAppTask().PostEvent(&button_event);
         }
         break;
     case AppEvent::kEventType_FunctionButtonReleased: {
-        sFunctionButtonPressed = false;
-        if (sIsButtonEventTriggered)
+        sAppTask.sFunctionButtonPressed = false;
+        if (sAppTask.sIsButtonEventTriggered)
         {
-            sIsButtonEventTriggered = false;
+            sAppTask.sIsButtonEventTriggered = false;
             // Post button release event to BaseApplication
-            AppEvent button_event           = {};
-            button_event.Type               = AppEvent::kEventType_Button;
-            button_event.ButtonEvent.Action = static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonReleased);
-            button_event.Handler            = BaseApplication::ButtonHandler;
+            AppEvent button_event            = {};
+            button_event.Type                = AppEvent::kEventType_Button;
+            button_event.ButtonEvent.Action  = static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonReleased);
+            button_event.Handler             = BaseApplication::ButtonHandler;
             AppTask::GetAppTask().PostEvent(&button_event);
         }
         break;
     }
     case AppEvent::kEventType_ActionButtonPressed:
-        sActionButtonPressed = true;
-        LightSwitchMgr::GetInstance().SwitchActionEventHandler(aEvent);
-        if (sFunctionButtonPressed)
+        sAppTask.sActionButtonPressed = true;
+        LightSwitchMgr::GetInstance().SwitchActionEventHandler(aEvent->Type);
+        if (sAppTask.sFunctionButtonPressed)
         {
-            sActionButtonSuppressed = true;
+            sAppTask.sActionButtonSuppressed = true;
             LightSwitchMgr::GetInstance().changeStepMode();
         }
         else if (sAppTask.longPressTimer)
@@ -274,25 +270,25 @@ void AppTask::AppEventHandler(AppEvent * aEvent)
         }
         break;
     case AppEvent::kEventType_ActionButtonReleased:
-        sActionButtonPressed = false;
+        sAppTask.sActionButtonPressed = false;
         if (sAppTask.longPressTimer)
         {
             sAppTask.longPressTimer->Stop();
         }
-        if (sActionButtonSuppressed)
+        if (sAppTask.sActionButtonSuppressed)
         {
-            sActionButtonSuppressed = false;
+            sAppTask.sActionButtonSuppressed = false;
         }
         else
         {
             aEvent->Type = AppEvent::kEventType_TriggerToggle;
-            LightSwitchMgr::GetInstance().SwitchActionEventHandler(aEvent);
+            LightSwitchMgr::GetInstance().SwitchActionEventHandler(aEvent->Type);
         }
         aEvent->Type = AppEvent::kEventType_ActionButtonReleased;
-        LightSwitchMgr::GetInstance().SwitchActionEventHandler(aEvent);
+        LightSwitchMgr::GetInstance().SwitchActionEventHandler(aEvent->Type);
         break;
     case AppEvent::kEventType_TriggerLevelControlAction:
-        LightSwitchMgr::GetInstance().SwitchActionEventHandler(aEvent);
+        LightSwitchMgr::GetInstance().SwitchActionEventHandler(aEvent->Type);
     default:
         break;
     }
