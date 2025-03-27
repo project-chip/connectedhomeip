@@ -50,4 +50,4 @@ tests:
           constraints:
               type: bitmap8
               minValue: 0
-              maxValue: 4
+              maxValue: 7
