@@ -8,6 +8,7 @@
 
 using chip::app::DataModel::Nullable;
 
+using namespace chef;
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -52,6 +53,17 @@ const Clusters::Descriptor::Structs::SemanticTagStruct::Type gRefrigeratorTagLis
 const Clusters::Descriptor::Structs::SemanticTagStruct::Type gFreezerTagList[]      = { { .namespaceID = kNamespaceRefrigerator,
                                                                                           .tag         = kTagFreezer } };
 } // namespace
+
+namespace PostionSemanticTag {
+
+constexpr const uint8_t kNamespace                                   = 0x08; // Common Position Namespace
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kLeft   = { .namespaceID = kNamespace, .tag = 0x00 };
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kRight  = { .namespaceID = kNamespace, .tag = 0x01 };
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kTop    = { .namespaceID = kNamespace, .tag = 0x02 };
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kBottom = { .namespaceID = kNamespace, .tag = 0x03 };
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kMiddle = { .namespaceID = kNamespace, .tag = 0x04 };
+
+} // namespace PostionSemanticTag
 
 #ifdef MATTER_DM_PLUGIN_RVC_OPERATIONAL_STATE_SERVER
 #include "chef-rvc-operational-state-delegate.h"
@@ -355,33 +367,24 @@ void RefrigeratorTemperatureControlledCabinetInit()
     EndpointId kRefEndpointId           = 1;
     EndpointId kColdCabinetEndpointId   = 2;
     EndpointId kFreezeCabinetEndpointId = 3;
-    bool isRefrigerator;
-    bool isColdCabinet;
-    bool isFreezeCabinet;
-    if ((DataModelUtils::isEndpointOfDeviceType(kRefEndpointId, DataModelUtils::REFRIGERATOR_DEVICE_ID, isRefrigerator) ==
-         CHIP_NO_ERROR) &&
-        isRefrigerator)
+    if (DataModelUtils::EndpointHasDeviceType(kRefEndpointId, DataModelUtils::kRefrigeratorDeviceId))
     {
-        ChipLogProgress(NotSpecified, "Refrigerator device type on EP: %d", kRefEndpointId);
+        ChipLogDetail(NotSpecified, "Refrigerator device type on EP: %d", kRefEndpointId);
         SetTreeCompositionForEndpoint(kRefEndpointId);
 
         // Cold Cabinet
-        if ((DataModelUtils::isEndpointOfDeviceType(kColdCabinetEndpointId,
-                                                    DataModelUtils::TEMPERATURE_CONTROLLED_CABINET_DEVICE_ID,
-                                                    isColdCabinet) == CHIP_NO_ERROR) &&
-            isColdCabinet)
+        if (DataModelUtils::EndpointHasDeviceType(kColdCabinetEndpointId, DataModelUtils::kTemperatureControlledCabinetDeviceId))
         {
+            ChipLogDetail(NotSpecified, "Temperature controlled cabinet device type on EP: %d", kColdCabinetEndpointId);
             SetParentEndpointForEndpoint(kColdCabinetEndpointId, kRefEndpointId);
             SetTagList(kColdCabinetEndpointId,
                        Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gRefrigeratorTagList));
         }
 
         // Freeze Cabinet
-        if ((DataModelUtils::isEndpointOfDeviceType(kFreezeCabinetEndpointId,
-                                                    DataModelUtils::TEMPERATURE_CONTROLLED_CABINET_DEVICE_ID,
-                                                    isFreezeCabinet) == CHIP_NO_ERROR) &&
-            isFreezeCabinet)
+        if (DataModelUtils::EndpointHasDeviceType(kFreezeCabinetEndpointId, DataModelUtils::kTemperatureControlledCabinetDeviceId))
         {
+            ChipLogDetail(NotSpecified, "Temperature controlled cabinet device type on EP: %d", kFreezeCabinetEndpointId);
             SetParentEndpointForEndpoint(kFreezeCabinetEndpointId, kRefEndpointId);
             SetTagList(kFreezeCabinetEndpointId,
                        Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gFreezerTagList));
@@ -398,39 +401,63 @@ void OvenTemperatureControlledCabinetCooktopCookSurfaceInit()
     EndpointId kOvenEpId                         = 1;
     EndpointId kTemperatureControlledCabinetEpId = 2;
     EndpointId kCooktopEpId                      = 3;
-    EndpointId kCookSurfaceEpId                  = 4;
-    bool isOven;
-    bool isTemperatureControlledCabinet;
-    bool isCooktop;
-    bool isCookSurface;
-    if ((DataModelUtils::isEndpointOfDeviceType(kOvenEpId, DataModelUtils::OVEN_DEVICE_ID, isOven) == CHIP_NO_ERROR) && isOven)
+    if (DataModelUtils::EndpointHasDeviceType(kOvenEpId, DataModelUtils::kOvenDeviceId))
     {
-        ChipLogProgress(NotSpecified, "Oven device type on EP: %d", kOvenEpId);
+        ChipLogDetail(NotSpecified, "Oven device type on EP: %d", kOvenEpId);
         SetTreeCompositionForEndpoint(kOvenEpId);
 
-        if ((DataModelUtils::isEndpointOfDeviceType(kTemperatureControlledCabinetEpId,
-                                                    DataModelUtils::TEMPERATURE_CONTROLLED_CABINET_DEVICE_ID,
-                                                    isTemperatureControlledCabinet) == CHIP_NO_ERROR) &&
-            isTemperatureControlledCabinet)
+        if (DataModelUtils::EndpointHasDeviceType(kTemperatureControlledCabinetEpId,
+                                                  DataModelUtils::kTemperatureControlledCabinetDeviceId))
         {
-            ChipLogProgress(NotSpecified, "Temperature controlled cabinet device type on EP: %d",
-                            kTemperatureControlledCabinetEpId);
+            ChipLogDetail(NotSpecified, "Temperature controlled cabinet device type on EP: %d", kTemperatureControlledCabinetEpId);
             SetParentEndpointForEndpoint(kTemperatureControlledCabinetEpId, kOvenEpId);
+            SetTagList(kTemperatureControlledCabinetEpId,
+                       Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>({ PostionSemanticTag::kTop }));
         }
+        CooktopCookSurfaceInit(kCooktopEpId);
+    }
+}
 
-        if ((DataModelUtils::isEndpointOfDeviceType(kCooktopEpId, DataModelUtils::COOKTOP_DEVICE_ID, isCooktop) == CHIP_NO_ERROR) &&
-            isCooktop)
+/**
+ * This initializer is for the application having cooktop. The cooktop can be a part of an oven
+ * or standalone cooktop.
+ *     Standalone Cooktop: Cooktop on EP1 and optional CookSurface on EP2.
+ *     Cooktop part of Oven: Oven on EP1, Cooktop on EP3 and optional CookSurface on EP4.
+ */
+void CooktopCookSurfaceInit(EndpointId kCooktopEpId)
+{
+    SetTreeCompositionForEndpoint(kCooktopEpId);
+    switch (kCooktopEpId)
+    {
+    case 1: // Standalone cooktop.
+        if (DataModelUtils::EndpointHasDeviceType(kCooktopEpId, DataModelUtils::kCooktopDeviceId))
         {
-            ChipLogProgress(NotSpecified, "Cooktop device type on EP: %d", kCooktopEpId);
+            ChipLogDetail(NotSpecified, "Cooktop device type on EP: %d", kCooktopEpId);
+            EndpointId kCookSurfaceEpId = 2;
+            if (DataModelUtils::EndpointHasDeviceType(kCookSurfaceEpId, DataModelUtils::kCookSurfaceDeviceId))
+            {
+                ChipLogDetail(NotSpecified, "Cook Surface device type on EP: %d", kCookSurfaceEpId);
+                SetParentEndpointForEndpoint(kCookSurfaceEpId, kCooktopEpId);
+                SetTagList(kCookSurfaceEpId,
+                           Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>({ PostionSemanticTag::kLeft }));
+            }
+        }
+        break;
+    case 3: // Cooktop part of oven.
+        EndpointId kOvenEpId = 1;
+        if (DataModelUtils::EndpointHasDeviceType(kCooktopEpId, DataModelUtils::kCooktopDeviceId) &&
+            DataModelUtils::EndpointHasDeviceType(kOvenEpId, DataModelUtils::kOvenDeviceId))
+        {
+            ChipLogDetail(NotSpecified, "Cooktop device type on EP: %d", kCooktopEpId);
             SetParentEndpointForEndpoint(kCooktopEpId, kOvenEpId);
-        }
-
-        if ((DataModelUtils::isEndpointOfDeviceType(kCookSurfaceEpId, DataModelUtils::COOK_SURFACE_DEVICE_ID, isCookSurface) ==
-             CHIP_NO_ERROR) &&
-            isCookSurface)
-        {
-            ChipLogProgress(NotSpecified, "Cook Surface device type on EP: %d", kCookSurfaceEpId);
-            SetParentEndpointForEndpoint(kCookSurfaceEpId, kCooktopEpId);
+            EndpointId kCookSurfaceEpId = 4;
+            if (DataModelUtils::EndpointHasDeviceType(kCookSurfaceEpId, DataModelUtils::kCookSurfaceDeviceId))
+            {
+                ChipLogDetail(NotSpecified, "Cook Surface device type on EP: %d", kCookSurfaceEpId);
+                SetParentEndpointForEndpoint(kCookSurfaceEpId, kCooktopEpId);
+                SetTagList(kCookSurfaceEpId,
+                           Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>({ PostionSemanticTag::kLeft }));
+            }
         }
     }
 }

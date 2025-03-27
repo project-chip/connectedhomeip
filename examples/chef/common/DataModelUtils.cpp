@@ -21,40 +21,38 @@
 #include <app/data-model-provider/MetadataTypes.h>
 #include <lib/support/CodeUtils.h>
 
+using namespace chef;
 using namespace chip::app;
 
-CHIP_ERROR DataModelUtils::isEndpointOfDeviceType(EndpointId endpoint, DeviceTypeId deviceTypeId, bool & isOfDeviceType)
+bool DataModelUtils::EndpointHasDeviceType(EndpointId endpoint, DeviceTypeId deviceTypeId)
 {
-    isOfDeviceType = false;
     DataModel::ListBuilder<DataModel::DeviceTypeEntry> deviceTypesList;
-    ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->GetDataModelProvider()->DeviceTypes(endpoint, deviceTypesList));
+    InteractionModelEngine::GetInstance()->GetDataModelProvider()->DeviceTypes(endpoint, deviceTypesList);
     auto deviceTypes = deviceTypesList.TakeBuffer();
     for (const auto & type : deviceTypes)
     {
         if (type.deviceTypeId == deviceTypeId)
         {
-            isOfDeviceType = true;
-            return CHIP_NO_ERROR;
+            return true;
         }
     }
-    return CHIP_NO_ERROR;
+    return false;
 }
 
-CHIP_ERROR DataModelUtils::getAllEndpointsHavingDeviceType(DeviceTypeId devieType, DataModel::ListBuilder<EndpointId> & builder)
+DataModel::ListBuilder<EndpointId> DataModelUtils::GetAllEndpointsHavingDeviceType(DeviceTypeId devieType)
 {
-
     DataModel::ListBuilder<DataModel::EndpointEntry> endpointsList;
     ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->GetDataModelProvider()->Endpoints(endpointsList));
     auto allEndpoints = endpointsList.TakeBuffer();
 
+    DataModel::ListBuilder<EndpointId> endpoints;
+
     for (const auto & ep : allEndpoints)
     {
-        bool isOfDeviceType;
-        ReturnErrorOnFailure(isEndpointOfDeviceType(ep.id, devieType, isOfDeviceType));
-        if (isOfDeviceType)
+        if (EndpointHasDeviceType(ep.id, devieType))
         {
-            ReturnErrorOnFailure(builder.Append(ep.id));
+            endpoints.Append(ep.id);
         }
     }
-    return CHIP_NO_ERROR;
+    return endpoints;
 }

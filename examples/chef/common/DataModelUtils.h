@@ -17,24 +17,21 @@
  */
 
 #include <app/data-model-provider/MetadataList.h>
-#include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 
-namespace chip {
-namespace app {
+namespace chef {
 namespace DataModelUtils {
 
 // Common location to store all device type IDs
-constexpr DeviceTypeId COOK_SURFACE_DEVICE_ID                   = 0x0077;
-constexpr DeviceTypeId COOKTOP_DEVICE_ID                        = 0x0078;
-constexpr DeviceTypeId OVEN_DEVICE_ID                           = 0x007B;
-constexpr DeviceTypeId REFRIGERATOR_DEVICE_ID                   = 0x0070;
-constexpr DeviceTypeId TEMPERATURE_CONTROLLED_CABINET_DEVICE_ID = 0x0071;
+constexpr DeviceTypeId kCookSurfaceDeviceId                  = 0x0077;
+constexpr DeviceTypeId kCooktopDeviceId                      = 0x0078;
+constexpr DeviceTypeId kOvenDeviceId                         = 0x007B;
+constexpr DeviceTypeId kRefrigeratorDeviceId                 = 0x0070;
+constexpr DeviceTypeId kTemperatureControlledCabinetDeviceId = 0x0071;
 
 // Datamodel Util APIs
-CHIP_ERROR isEndpointOfDeviceType(EndpointId endpoint, DeviceTypeId deviceTypeId, bool & isOfDeviceType);
-CHIP_ERROR getAllEndpointsHavingDeviceType(DeviceTypeId devieType, DataModel::ListBuilder<EndpointId> & builder);
+bool EndpointHasDeviceType(EndpointId endpoint, DeviceTypeId deviceTypeId);
+DataModel::ListBuilder<EndpointId> GetAllEndpointsHavingDeviceType(DeviceTypeId devieType);
 
 } // namespace DataModelUtils
-} // namespace app
-} // namespace chip
+} // namespace chef
