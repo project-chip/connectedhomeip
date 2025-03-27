@@ -33,7 +33,6 @@ cpp-app:
         app/PluginApplicationCallbacks.h: outputs/large_all_clusters_app/cpp-app/PluginApplicationCallbacks.h
         app/callback-stub.cpp: outputs/large_all_clusters_app/cpp-app/callback-stub.cpp
         app/cluster-callbacks.cpp: outputs/large_all_clusters_app/cpp-app/cluster-callbacks.cpp
-        app/cluster-init-callback.cpp: outputs/large_all_clusters_app/cpp-app/cluster-init-callback.cpp
         app/ember-cluster-config/AccessControl.h: outputs/large_all_clusters_app/cpp-app/ember-cluster-config/AccessControl.h
         app/ember-cluster-config/AccountLogin.h: outputs/large_all_clusters_app/cpp-app/ember-cluster-config/AccountLogin.h
         app/ember-cluster-config/Actions.h: outputs/large_all_clusters_app/cpp-app/ember-cluster-config/Actions.h
@@ -99,7 +98,6 @@ cpp-app:
         app/PluginApplicationCallbacks.h: outputs/large_lighting_app/cpp-app/PluginApplicationCallbacks.h
         app/callback-stub.cpp: outputs/large_lighting_app/cpp-app/callback-stub.cpp
         app/cluster-callbacks.cpp: outputs/large_lighting_app/cpp-app/cluster-callbacks.cpp
-        app/cluster-init-callback.cpp: outputs/large_lighting_app/cpp-app/cluster-init-callback.cpp
         app/ember-cluster-config/AccessControl.h: outputs/large_lighting_app/cpp-app/ember-cluster-config/AccessControl.h
         app/ember-cluster-config/AdministratorCommissioning.h: outputs/large_lighting_app/cpp-app/ember-cluster-config/AdministratorCommissioning.h
         app/ember-cluster-config/BasicInformation.h: outputs/large_lighting_app/cpp-app/ember-cluster-config/BasicInformation.h
