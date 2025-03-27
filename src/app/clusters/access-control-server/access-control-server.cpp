@@ -298,6 +298,8 @@ CHIP_ERROR AccessControlAttribute::WriteAcl(const ConcreteDataAttributePath & aP
 
         // Validating all ACL entries in the ReplaceAll list, before Updating or Deleting any entries, if any of the entries has an
         // invalid field, the whole "ReplaceAll" list will be rejected.
+        // TODO Discuss: if this fail, should we make it invalidate ALL received list Entries (i.e. even those that will be part of
+        // ListOperation::AppendItem? in case of chunking?)
         ReturnErrorOnFailure(IsValidAclEntryList(list));
 
         auto iterator = list.begin();
