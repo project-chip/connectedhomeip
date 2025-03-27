@@ -189,7 +189,8 @@ CHIP_ERROR WriteClient::StartNewMessage()
 
     // ... and the overhead for end of AttributeDataIBs (end of container), more chunks flag, end of WriteRequestMessage (another
     // end of container), the End of the List (EndOfContainer as well) and End of AttributeDataIB (EndOfContainer)
-    reservedSize = static_cast<uint16_t>(reservedSize + kReservedSizeForTLVEncodingOverhead);
+    reservedSize = static_cast<uint16_t>(reservedSize + kReservedSizeForTLVEncodingOverhead + kReservedSizeForEndOfListContainer +
+                                         kReservedSizeForEndOfAttributeDataIB);
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     // ... and for unit tests.
@@ -251,7 +252,7 @@ CHIP_ERROR WriteClient::PutSinglePreencodedAttributeWritePayload(const chip::app
 CHIP_ERROR
 WriteClient::TryPutPreencodedListIntoSingleAttributeWritePayload(const chip::app::ConcreteDataAttributePath & attributePath,
                                                                  TLV::TLVReader & valueReader, bool & chunkingNeeded,
-                                                                 ListIndex & outNumSuccessfullyEncodedItems)
+                                                                 ListIndex & outEncodedItemCount)
 {
     TLV::TLVWriter backupWriter;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -263,7 +264,7 @@ WriteClient::TryPutPreencodedListIntoSingleAttributeWritePayload(const chip::app
     chip::TLV::TLVWriter * writer = nullptr;
     VerifyOrReturnError((writer = GetAttributeDataIBTLVWriter()) != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    outNumSuccessfullyEncodedItems = 0;
+    outEncodedItemCount = 0;
 
     while ((err = valueReader.Next()) == CHIP_NO_ERROR)
     {
@@ -278,7 +279,7 @@ WriteClient::TryPutPreencodedListIntoSingleAttributeWritePayload(const chip::app
             break;
         }
         ReturnErrorOnFailure(err);
-        outNumSuccessfullyEncodedItems++;
+        outEncodedItemCount++;
     }
     VerifyOrReturnError(err == CHIP_END_OF_TLV || err == CHIP_NO_ERROR, err);
 
@@ -296,35 +297,33 @@ CHIP_ERROR WriteClient::PutPreencodedAttribute(const ConcreteDataAttributePath &
 
         TLV::TLVReader dataReader;
         TLV::TLVReader valueReader;
-        CHIP_ERROR err                       = CHIP_NO_ERROR;
-        uint16_t numSuccessfullyEncodedItems = kInvalidListIndex;
-        ConcreteDataAttributePath path       = attributePath;
+        uint16_t encodedItemCount      = 0;
+        ConcreteDataAttributePath path = attributePath;
 
-        //    ListIndex nextItemToAppendIndex      = kInvalidListIndex;
-        bool chunkingNeeded = false;
-
-        //  dataReader.Init(data);
-        //   dataReader.OpenContainer(valueReader);
-
-        // Encode an empty list for the chunking protocol.
+        // BACKWARD COMPATIBILITY: Legacy OTA Requestor Servers( Pre-Matter 1.4) only support having an empty list for ReplaceAll
+        // when writing to the DefaultOTAProviders attribute and they will only Decode List Items that are received as part of the
+        // AppendItem List operation. So we must allow this for backward compatiblity.
+        // TODO remove this special case when Matter 1.3 is Sunsetted
         bool encodeEmptyListAsReplaceAll =
             (path.mClusterId == Clusters::OtaSoftwareUpdateRequestor::Id &&
              path.mAttributeId == Clusters::OtaSoftwareUpdateRequestor::Attributes::DefaultOTAProviders::Id);
+
         if (encodeEmptyListAsReplaceAll)
         {
             ReturnErrorOnFailure(EnsureMessage());
             ReturnErrorOnFailure(EncodeSingleAttributeDataIB(path, DataModel::List<uint8_t>()));
-            numSuccessfullyEncodedItems = 0;
+            encodedItemCount = 0;
         }
         else
         {
             dataReader.Init(data);
             dataReader.OpenContainer(valueReader);
+            bool chunkingNeeded = false;
 
             ReturnErrorOnFailure(StartNewMessage());
 
-            ReturnErrorOnFailure(TryPutPreencodedListIntoSingleAttributeWritePayload(path, valueReader, chunkingNeeded,
-                                                                                     numSuccessfullyEncodedItems));
+            ReturnErrorOnFailure(
+                TryPutPreencodedListIntoSingleAttributeWritePayload(path, valueReader, chunkingNeeded, encodedItemCount));
 
             if (!chunkingNeeded)
             {
@@ -333,28 +332,24 @@ CHIP_ERROR WriteClient::PutPreencodedAttribute(const ConcreteDataAttributePath &
 
             // Start a new WriteRequest chunk.
             ReturnErrorOnFailure(StartNewMessage());
-            //   nextItemToAppendIndex = numSuccessfullyEncodedItems;
         }
         path.mListOp = ConcreteDataAttributePath::ListOperation::AppendItem;
-        // TODO HOW WOULD I KNOW WHERE TO CONTINUE? if chunking is needed, where to put the index?
-        // This ?
 
-        //    TLV::TLVReader dataReader2;
-        //  dataReader2.Init(valueReader.GetReadPoint(), valueReader.GetRemainingLength());
-        //   TLV::TLVUpdater UpdateReader2;
-        // UpdateReader2.Init(dataReader, )
-
+        // We will restart iterating again on ValueReader, Only Appending the Items we need to Append
         dataReader.Init(data);
         dataReader.OpenContainer(valueReader);
-        ListIndex nextItemToAppendIndex = 0;
+
+        CHIP_ERROR err            = CHIP_NO_ERROR;
+        uint16_t currentItemCount = 0;
 
         while ((err = valueReader.Next()) == CHIP_NO_ERROR)
         {
-            if (nextItemToAppendIndex >= numSuccessfullyEncodedItems)
+            currentItemCount++;
+
+            if (currentItemCount > encodedItemCount)
             {
                 ReturnErrorOnFailure(PutSinglePreencodedAttributeWritePayload(path, valueReader));
             }
-            nextItemToAppendIndex++;
         }
 
         if (err == CHIP_END_OF_TLV)
@@ -363,7 +358,6 @@ CHIP_ERROR WriteClient::PutPreencodedAttribute(const ConcreteDataAttributePath &
         }
         return err;
     }
-    ReturnErrorOnFailure(EnsureMessage());
 
     // We are writing a non-list attribute, or we are writing a single element of a list.
     ReturnErrorOnFailure(EnsureMessage());

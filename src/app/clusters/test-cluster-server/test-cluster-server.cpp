@@ -559,7 +559,7 @@ CHIP_ERROR TestAttrAccess::WriteListNullablesAndOptionalsStructAttribute(const C
             return CHIP_NO_ERROR;
         }
         // If count is greater than 0, this means we have a non-empty ReplaceAll List; We should process this list.
-        else if (count > 0)
+        if (count > 0)
         {
             auto iterator = list.begin();
             while (iterator.Next())

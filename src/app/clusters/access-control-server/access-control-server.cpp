@@ -270,8 +270,6 @@ CHIP_ERROR AccessControlAttribute::IsValidAclEntryList(const DataModel::Decodabl
     auto validationIterator = list.begin();
     while (validationIterator.Next())
     {
-        // validationIterator.Next() will implicity call Decode and check that each field of an Access Control Entry
-        // (AccessControlEntryStruct) is valid
         VerifyOrReturnError(GetAccessControl().IsValid(validationIterator.GetValue().GetEntry()), CHIP_ERROR_INVALID_ARGUMENT);
     }
     ReturnErrorOnFailure(validationIterator.GetStatus());
@@ -298,8 +296,8 @@ CHIP_ERROR AccessControlAttribute::WriteAcl(const ConcreteDataAttributePath & aP
 
         VerifyOrReturnError(newCount <= maxCount, CHIP_IM_GLOBAL_STATUS(ResourceExhausted));
 
-        // Validating all ACL entries in the ReplaceAll list, if any of the entries has an invalid field, we will reject the whole
-        // list.
+        // Validating all ACL entries in the ReplaceAll list, before Updating or Deleting any entries, if any of the entries has an
+        // invalid field, the whole "ReplaceAll" list will be rejected.
         ReturnErrorOnFailure(IsValidAclEntryList(list));
 
         auto iterator = list.begin();
