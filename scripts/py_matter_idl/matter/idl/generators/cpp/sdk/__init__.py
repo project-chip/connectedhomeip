@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-from .sdk_generator import CppApplicationGenerator
+from .sdk_generator import SdkGenerator
 
 __all__ = ['SdkGenerator']
 
