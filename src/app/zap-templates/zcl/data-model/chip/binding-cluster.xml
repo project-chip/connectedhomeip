@@ -18,6 +18,7 @@ limitations under the License.
   <domain name="CHIP" />
 
   <struct name="TargetStruct" isFabricScoped="true">
+    <cluster code="0x0752"/> <!-- Joint Fabric Datastore -->
     <cluster code="0x001e"/>
     <item fieldId="1" name="Node" type="node_id" optional="true"/>
     <item fieldId="2" name="Group" type="group_id" optional="true"/>
