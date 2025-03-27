@@ -285,6 +285,10 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "EcosystemInformation";
     case chip::app::Clusters::CommissionerControl::Id:
         return "CommissionerControl";
+    case chip::app::Clusters::JointFabricDatastore::Id:
+        return "JointFabricDatastore";
+    case chip::app::Clusters::JointFabricAdministrator::Id:
+        return "JointFabricAdministrator";
     case chip::app::Clusters::TlsCertificateManagement::Id:
         return "TlsCertificateManagement";
     case chip::app::Clusters::TlsClientManagement::Id:
@@ -4598,6 +4602,70 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Unknown";
         }
     }
+    case chip::app::Clusters::JointFabricDatastore::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::JointFabricDatastore::Attributes::AnchorRootCa::Id:
+            return "AnchorRootCa";
+        case chip::app::Clusters::JointFabricDatastore::Attributes::AnchorNodeId::Id:
+            return "AnchorNodeId";
+        case chip::app::Clusters::JointFabricDatastore::Attributes::AnchorVendorId::Id:
+            return "AnchorVendorId";
+        case chip::app::Clusters::JointFabricDatastore::Attributes::FriendlyName::Id:
+            return "FriendlyName";
+        case chip::app::Clusters::JointFabricDatastore::Attributes::GroupKeyList::Id:
+            return "GroupKeyList";
+        case chip::app::Clusters::JointFabricDatastore::Attributes::GroupList::Id:
+            return "GroupList";
+        case chip::app::Clusters::JointFabricDatastore::Attributes::NodeList::Id:
+            return "NodeList";
+        case chip::app::Clusters::JointFabricDatastore::Attributes::AdminList::Id:
+            return "AdminList";
+        case chip::app::Clusters::JointFabricDatastore::Attributes::StatusEntry::Id:
+            return "StatusEntry";
+        case chip::app::Clusters::JointFabricDatastore::Attributes::EndpointGroupIdList::Id:
+            return "EndpointGroupIdList";
+        case chip::app::Clusters::JointFabricDatastore::Attributes::EndpointBindingList::Id:
+            return "EndpointBindingList";
+        case chip::app::Clusters::JointFabricDatastore::Attributes::NodeKeySetList::Id:
+            return "NodeKeySetList";
+        case chip::app::Clusters::JointFabricDatastore::Attributes::NodeAclList::Id:
+            return "NodeAclList";
+        case chip::app::Clusters::JointFabricDatastore::Attributes::NodeEndpointList::Id:
+            return "NodeEndpointList";
+        case chip::app::Clusters::JointFabricDatastore::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::JointFabricDatastore::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::JointFabricDatastore::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::JointFabricDatastore::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::JointFabricDatastore::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::JointFabricAdministrator::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::JointFabricAdministrator::Attributes::AdministratorFabricIndex::Id:
+            return "AdministratorFabricIndex";
+        case chip::app::Clusters::JointFabricAdministrator::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::JointFabricAdministrator::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::JointFabricAdministrator::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::JointFabricAdministrator::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::JointFabricAdministrator::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::TlsCertificateManagement::Id: {
         switch (id)
         {
@@ -6158,6 +6226,66 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "Unknown";
         }
     }
+    case chip::app::Clusters::JointFabricDatastore::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::JointFabricDatastore::Commands::AddKeySet::Id:
+            return "AddKeySet";
+        case chip::app::Clusters::JointFabricDatastore::Commands::UpdateKeySet::Id:
+            return "UpdateKeySet";
+        case chip::app::Clusters::JointFabricDatastore::Commands::RemoveKeySet::Id:
+            return "RemoveKeySet";
+        case chip::app::Clusters::JointFabricDatastore::Commands::AddGroup::Id:
+            return "AddGroup";
+        case chip::app::Clusters::JointFabricDatastore::Commands::UpdateGroup::Id:
+            return "UpdateGroup";
+        case chip::app::Clusters::JointFabricDatastore::Commands::RemoveGroup::Id:
+            return "RemoveGroup";
+        case chip::app::Clusters::JointFabricDatastore::Commands::AddAdmin::Id:
+            return "AddAdmin";
+        case chip::app::Clusters::JointFabricDatastore::Commands::UpdateAdmin::Id:
+            return "UpdateAdmin";
+        case chip::app::Clusters::JointFabricDatastore::Commands::RemoveAdmin::Id:
+            return "RemoveAdmin";
+        case chip::app::Clusters::JointFabricDatastore::Commands::AddPendingNode::Id:
+            return "AddPendingNode";
+        case chip::app::Clusters::JointFabricDatastore::Commands::RefreshNode::Id:
+            return "RefreshNode";
+        case chip::app::Clusters::JointFabricDatastore::Commands::UpdateNode::Id:
+            return "UpdateNode";
+        case chip::app::Clusters::JointFabricDatastore::Commands::RemoveNode::Id:
+            return "RemoveNode";
+        case chip::app::Clusters::JointFabricDatastore::Commands::UpdateEndpointForNode::Id:
+            return "UpdateEndpointForNode";
+        case chip::app::Clusters::JointFabricDatastore::Commands::AddGroupIDToEndpointForNode::Id:
+            return "AddGroupIDToEndpointForNode";
+        case chip::app::Clusters::JointFabricDatastore::Commands::RemoveGroupIDFromEndpointForNode::Id:
+            return "RemoveGroupIDFromEndpointForNode";
+        case chip::app::Clusters::JointFabricDatastore::Commands::AddBindingToEndpointForNode::Id:
+            return "AddBindingToEndpointForNode";
+        case chip::app::Clusters::JointFabricDatastore::Commands::RemoveBindingFromEndpointForNode::Id:
+            return "RemoveBindingFromEndpointForNode";
+        case chip::app::Clusters::JointFabricDatastore::Commands::AddACLToNode::Id:
+            return "AddACLToNode";
+        case chip::app::Clusters::JointFabricDatastore::Commands::RemoveACLFromNode::Id:
+            return "RemoveACLFromNode";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::JointFabricAdministrator::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::JointFabricAdministrator::Commands::ICACCSRRequest::Id:
+            return "ICACCSRRequest";
+        case chip::app::Clusters::JointFabricAdministrator::Commands::AddICAC::Id:
+            return "AddICAC";
+        case chip::app::Clusters::JointFabricAdministrator::Commands::OpenJointCommissioningWindow::Id:
+            return "OpenJointCommissioningWindow";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::TlsCertificateManagement::Id: {
         switch (id)
         {
@@ -6785,6 +6913,17 @@ char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId i
         {
         case chip::app::Clusters::CommissionerControl::Commands::ReverseOpenCommissioningWindow::Id:
             return "ReverseOpenCommissioningWindow";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::JointFabricAdministrator::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::JointFabricAdministrator::Commands::ICACCSRResponse::Id:
+            return "ICACCSRResponse";
+        case chip::app::Clusters::JointFabricAdministrator::Commands::ICACResponse::Id:
+            return "ICACResponse";
         default:
             return "Unknown";
         }

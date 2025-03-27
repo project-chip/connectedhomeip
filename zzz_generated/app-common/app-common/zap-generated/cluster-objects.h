@@ -47141,6 +47141,1754 @@ public:
 } // namespace CommissioningRequestResult
 } // namespace Events
 } // namespace CommissionerControl
+namespace JointFabricDatastore {
+namespace Structs {
+namespace DatastoreStatusEntry {
+enum class Fields : uint8_t
+{
+    kState           = 0,
+    kUpdateTimestamp = 1,
+    kFailureCode     = 2,
+};
+
+struct Type
+{
+public:
+    DatastoreStateEnum state = static_cast<DatastoreStateEnum>(0);
+    DataModel::Nullable<uint64_t> updateTimestamp;
+    FailureCodeEnum failureCode = static_cast<FailureCodeEnum>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace DatastoreStatusEntry
+namespace DatastoreNodeKeyEntry {
+enum class Fields : uint8_t
+{
+    kNodeID        = 0,
+    kGroupKeySetId = 1,
+    kStatusEntry   = 2,
+};
+
+struct Type
+{
+public:
+    chip::NodeId nodeID    = static_cast<chip::NodeId>(0);
+    uint16_t groupKeySetId = static_cast<uint16_t>(0);
+    Structs::DatastoreStatusEntry::Type statusEntry;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace DatastoreNodeKeyEntry
+namespace DatastoreNodeInformationEntry {
+enum class Fields : uint8_t
+{
+    kNodeID                   = 1,
+    kFriendlyName             = 2,
+    kCommissioningStatusEntry = 3,
+    kFabricIndex              = 254,
+};
+
+struct Type
+{
+public:
+    chip::NodeId nodeID = static_cast<chip::NodeId>(0);
+    chip::CharSpan friendlyName;
+    Structs::DatastoreStatusEntry::Type commissioningStatusEntry;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = true;
+
+    auto GetFabricIndex() const { return fabricIndex; }
+
+    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
+
+    CHIP_ERROR EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
+
+private:
+    CHIP_ERROR DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const;
+};
+
+using DecodableType = Type;
+
+} // namespace DatastoreNodeInformationEntry
+namespace DatastoreEndpointGroupIDEntry {
+enum class Fields : uint8_t
+{
+    kNodeID      = 0,
+    kEndpointID  = 1,
+    kGroupID     = 2,
+    kStatusEntry = 3,
+};
+
+struct Type
+{
+public:
+    chip::NodeId nodeID         = static_cast<chip::NodeId>(0);
+    chip::EndpointId endpointID = static_cast<chip::EndpointId>(0);
+    chip::GroupId groupID       = static_cast<chip::GroupId>(0);
+    Structs::DatastoreStatusEntry::Type statusEntry;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace DatastoreEndpointGroupIDEntry
+namespace DatastoreEndpointEntry {
+enum class Fields : uint8_t
+{
+    kEndpointID   = 0,
+    kNodeID       = 1,
+    kFriendlyName = 2,
+    kStatusEntry  = 3,
+};
+
+struct Type
+{
+public:
+    chip::EndpointId endpointID = static_cast<chip::EndpointId>(0);
+    chip::NodeId nodeID         = static_cast<chip::NodeId>(0);
+    chip::CharSpan friendlyName;
+    Structs::DatastoreStatusEntry::Type statusEntry;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace DatastoreEndpointEntry
+namespace TargetStruct {
+enum class Fields : uint8_t
+{
+    kNode     = 1,
+    kGroup    = 2,
+    kEndpoint = 3,
+    kCluster  = 4,
+};
+
+struct Type
+{
+public:
+    Optional<chip::NodeId> node;
+    Optional<chip::GroupId> group;
+    Optional<chip::EndpointId> endpoint;
+    Optional<chip::ClusterId> cluster;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace TargetStruct
+namespace DatastoreEndpointBindingEntry {
+enum class Fields : uint8_t
+{
+    kNodeID      = 0,
+    kEndpointID  = 1,
+    kListID      = 2,
+    kBinding     = 3,
+    kStatusEntry = 4,
+};
+
+struct Type
+{
+public:
+    chip::NodeId nodeID         = static_cast<chip::NodeId>(0);
+    chip::EndpointId endpointID = static_cast<chip::EndpointId>(0);
+    uint16_t listID             = static_cast<uint16_t>(0);
+    Structs::TargetStruct::Type binding;
+    Structs::DatastoreStatusEntry::Type statusEntry;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace DatastoreEndpointBindingEntry
+namespace AccessControlTargetStruct {
+enum class Fields : uint8_t
+{
+    kCluster    = 0,
+    kEndpoint   = 1,
+    kDeviceType = 2,
+};
+
+struct Type
+{
+public:
+    DataModel::Nullable<chip::ClusterId> cluster;
+    DataModel::Nullable<chip::EndpointId> endpoint;
+    DataModel::Nullable<chip::DeviceTypeId> deviceType;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace AccessControlTargetStruct
+namespace AccessControlEntryStruct {
+enum class Fields : uint8_t
+{
+    kPrivilege = 1,
+    kAuthMode  = 2,
+    kSubjects  = 3,
+    kTargets   = 4,
+};
+
+struct Type
+{
+public:
+    AccessControlEntryPrivilegeEnum privilege = static_cast<AccessControlEntryPrivilegeEnum>(0);
+    AccessControlEntryAuthModeEnum authMode   = static_cast<AccessControlEntryAuthModeEnum>(0);
+    DataModel::Nullable<DataModel::List<const uint64_t>> subjects;
+    DataModel::Nullable<DataModel::List<const Structs::AccessControlTargetStruct::Type>> targets;
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    AccessControlEntryPrivilegeEnum privilege = static_cast<AccessControlEntryPrivilegeEnum>(0);
+    AccessControlEntryAuthModeEnum authMode   = static_cast<AccessControlEntryAuthModeEnum>(0);
+    DataModel::Nullable<DataModel::DecodableList<uint64_t>> subjects;
+    DataModel::Nullable<DataModel::DecodableList<Structs::AccessControlTargetStruct::DecodableType>> targets;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+};
+
+} // namespace AccessControlEntryStruct
+namespace DatastoreACLEntry {
+enum class Fields : uint8_t
+{
+    kNodeID      = 0,
+    kListID      = 1,
+    kACLEntry    = 2,
+    kStatusEntry = 3,
+};
+
+struct Type
+{
+public:
+    chip::NodeId nodeID = static_cast<chip::NodeId>(0);
+    uint16_t listID     = static_cast<uint16_t>(0);
+    Structs::AccessControlEntryStruct::Type ACLEntry;
+    Structs::DatastoreStatusEntry::Type statusEntry;
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    chip::NodeId nodeID = static_cast<chip::NodeId>(0);
+    uint16_t listID     = static_cast<uint16_t>(0);
+    Structs::AccessControlEntryStruct::DecodableType ACLEntry;
+    Structs::DatastoreStatusEntry::DecodableType statusEntry;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+};
+
+} // namespace DatastoreACLEntry
+namespace DatastoreAdministratorInformationEntry {
+enum class Fields : uint8_t
+{
+    kNodeID       = 1,
+    kFriendlyName = 2,
+    kVendorID     = 3,
+    kIcac         = 4,
+};
+
+struct Type
+{
+public:
+    chip::NodeId nodeID = static_cast<chip::NodeId>(0);
+    chip::CharSpan friendlyName;
+    chip::VendorId vendorID = static_cast<chip::VendorId>(0);
+    chip::ByteSpan icac;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace DatastoreAdministratorInformationEntry
+namespace DatastoreGroupInformationEntry {
+enum class Fields : uint8_t
+{
+    kGroupID         = 0,
+    kFriendlyName    = 1,
+    kGroupKeySetID   = 2,
+    kGroupCAT        = 3,
+    kGroupCATVersion = 4,
+    kGroupPermission = 5,
+    kFabricIndex     = 254,
+};
+
+struct Type
+{
+public:
+    uint64_t groupID = static_cast<uint64_t>(0);
+    chip::CharSpan friendlyName;
+    uint16_t groupKeySetID                          = static_cast<uint16_t>(0);
+    uint16_t groupCAT                               = static_cast<uint16_t>(0);
+    uint16_t groupCATVersion                        = static_cast<uint16_t>(0);
+    AccessControlEntryPrivilegeEnum groupPermission = static_cast<AccessControlEntryPrivilegeEnum>(0);
+    chip::FabricIndex fabricIndex                   = static_cast<chip::FabricIndex>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = true;
+
+    auto GetFabricIndex() const { return fabricIndex; }
+
+    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
+
+    CHIP_ERROR EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
+
+private:
+    CHIP_ERROR DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const;
+};
+
+using DecodableType = Type;
+
+} // namespace DatastoreGroupInformationEntry
+namespace GroupKeySetStruct {
+enum class Fields : uint8_t
+{
+    kGroupKeySetID          = 0,
+    kGroupKeySecurityPolicy = 1,
+    kEpochKey0              = 2,
+    kEpochStartTime0        = 3,
+    kEpochKey1              = 4,
+    kEpochStartTime1        = 5,
+    kEpochKey2              = 6,
+    kEpochStartTime2        = 7,
+};
+
+struct Type
+{
+public:
+    uint16_t groupKeySetID                            = static_cast<uint16_t>(0);
+    GroupKeySecurityPolicyEnum groupKeySecurityPolicy = static_cast<GroupKeySecurityPolicyEnum>(0);
+    DataModel::Nullable<chip::ByteSpan> epochKey0;
+    DataModel::Nullable<uint64_t> epochStartTime0;
+    DataModel::Nullable<chip::ByteSpan> epochKey1;
+    DataModel::Nullable<uint64_t> epochStartTime1;
+    DataModel::Nullable<chip::ByteSpan> epochKey2;
+    DataModel::Nullable<uint64_t> epochStartTime2;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace GroupKeySetStruct
+} // namespace Structs
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace AddKeySet {
+struct Type;
+struct DecodableType;
+} // namespace AddKeySet
+
+namespace UpdateKeySet {
+struct Type;
+struct DecodableType;
+} // namespace UpdateKeySet
+
+namespace RemoveKeySet {
+struct Type;
+struct DecodableType;
+} // namespace RemoveKeySet
+
+namespace AddGroup {
+struct Type;
+struct DecodableType;
+} // namespace AddGroup
+
+namespace UpdateGroup {
+struct Type;
+struct DecodableType;
+} // namespace UpdateGroup
+
+namespace RemoveGroup {
+struct Type;
+struct DecodableType;
+} // namespace RemoveGroup
+
+namespace AddAdmin {
+struct Type;
+struct DecodableType;
+} // namespace AddAdmin
+
+namespace UpdateAdmin {
+struct Type;
+struct DecodableType;
+} // namespace UpdateAdmin
+
+namespace RemoveAdmin {
+struct Type;
+struct DecodableType;
+} // namespace RemoveAdmin
+
+namespace AddPendingNode {
+struct Type;
+struct DecodableType;
+} // namespace AddPendingNode
+
+namespace RefreshNode {
+struct Type;
+struct DecodableType;
+} // namespace RefreshNode
+
+namespace UpdateNode {
+struct Type;
+struct DecodableType;
+} // namespace UpdateNode
+
+namespace RemoveNode {
+struct Type;
+struct DecodableType;
+} // namespace RemoveNode
+
+namespace UpdateEndpointForNode {
+struct Type;
+struct DecodableType;
+} // namespace UpdateEndpointForNode
+
+namespace AddGroupIDToEndpointForNode {
+struct Type;
+struct DecodableType;
+} // namespace AddGroupIDToEndpointForNode
+
+namespace RemoveGroupIDFromEndpointForNode {
+struct Type;
+struct DecodableType;
+} // namespace RemoveGroupIDFromEndpointForNode
+
+namespace AddBindingToEndpointForNode {
+struct Type;
+struct DecodableType;
+} // namespace AddBindingToEndpointForNode
+
+namespace RemoveBindingFromEndpointForNode {
+struct Type;
+struct DecodableType;
+} // namespace RemoveBindingFromEndpointForNode
+
+namespace AddACLToNode {
+struct Type;
+struct DecodableType;
+} // namespace AddACLToNode
+
+namespace RemoveACLFromNode {
+struct Type;
+struct DecodableType;
+} // namespace RemoveACLFromNode
+
+} // namespace Commands
+
+namespace Commands {
+namespace AddKeySet {
+enum class Fields : uint8_t
+{
+    kGroupKeySet = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::AddKeySet::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+
+    Structs::GroupKeySetStruct::Type groupKeySet;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::AddKeySet::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+
+    Structs::GroupKeySetStruct::DecodableType groupKeySet;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace AddKeySet
+namespace UpdateKeySet {
+enum class Fields : uint8_t
+{
+    kGroupKeySet = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::UpdateKeySet::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+
+    Structs::GroupKeySetStruct::Type groupKeySet;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::UpdateKeySet::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+
+    Structs::GroupKeySetStruct::DecodableType groupKeySet;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace UpdateKeySet
+namespace RemoveKeySet {
+enum class Fields : uint8_t
+{
+    kGroupKeySetId = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::RemoveKeySet::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+
+    uint16_t groupKeySetId = static_cast<uint16_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::RemoveKeySet::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+
+    uint16_t groupKeySetId = static_cast<uint16_t>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace RemoveKeySet
+namespace AddGroup {
+enum class Fields : uint8_t
+{
+    kGroupID         = 0,
+    kFriendlyName    = 1,
+    kGroupKeySetID   = 2,
+    kGroupCAT        = 3,
+    kGroupCATVersion = 4,
+    kGroupPermission = 5,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::AddGroup::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+
+    chip::GroupId groupID = static_cast<chip::GroupId>(0);
+    chip::CharSpan friendlyName;
+    uint16_t groupKeySetID                          = static_cast<uint16_t>(0);
+    uint16_t groupCAT                               = static_cast<uint16_t>(0);
+    uint16_t groupCATVersion                        = static_cast<uint16_t>(0);
+    AccessControlEntryPrivilegeEnum groupPermission = static_cast<AccessControlEntryPrivilegeEnum>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::AddGroup::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+
+    chip::GroupId groupID = static_cast<chip::GroupId>(0);
+    chip::CharSpan friendlyName;
+    uint16_t groupKeySetID                          = static_cast<uint16_t>(0);
+    uint16_t groupCAT                               = static_cast<uint16_t>(0);
+    uint16_t groupCATVersion                        = static_cast<uint16_t>(0);
+    AccessControlEntryPrivilegeEnum groupPermission = static_cast<AccessControlEntryPrivilegeEnum>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace AddGroup
+namespace UpdateGroup {
+enum class Fields : uint8_t
+{
+    kGroupID         = 0,
+    kFriendlyName    = 1,
+    kGroupKeySetID   = 2,
+    kGroupCAT        = 3,
+    kGroupCATVersion = 4,
+    kGroupPermission = 5,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::UpdateGroup::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+
+    chip::GroupId groupID = static_cast<chip::GroupId>(0);
+    chip::CharSpan friendlyName;
+    uint16_t groupKeySetID                          = static_cast<uint16_t>(0);
+    uint16_t groupCAT                               = static_cast<uint16_t>(0);
+    uint16_t groupCATVersion                        = static_cast<uint16_t>(0);
+    AccessControlEntryPrivilegeEnum groupPermission = static_cast<AccessControlEntryPrivilegeEnum>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::UpdateGroup::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+
+    chip::GroupId groupID = static_cast<chip::GroupId>(0);
+    chip::CharSpan friendlyName;
+    uint16_t groupKeySetID                          = static_cast<uint16_t>(0);
+    uint16_t groupCAT                               = static_cast<uint16_t>(0);
+    uint16_t groupCATVersion                        = static_cast<uint16_t>(0);
+    AccessControlEntryPrivilegeEnum groupPermission = static_cast<AccessControlEntryPrivilegeEnum>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace UpdateGroup
+namespace RemoveGroup {
+enum class Fields : uint8_t
+{
+    kGroupID = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::RemoveGroup::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+
+    chip::GroupId groupID = static_cast<chip::GroupId>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::RemoveGroup::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+
+    chip::GroupId groupID = static_cast<chip::GroupId>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace RemoveGroup
+namespace AddAdmin {
+enum class Fields : uint8_t
+{
+    kAdminInformationEntry = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::AddAdmin::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+
+    DataModel::Nullable<Structs::DatastoreAdministratorInformationEntry::Type> adminInformationEntry;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::AddAdmin::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+
+    DataModel::Nullable<Structs::DatastoreAdministratorInformationEntry::DecodableType> adminInformationEntry;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace AddAdmin
+namespace UpdateAdmin {
+enum class Fields : uint8_t
+{
+    kNodeID       = 0,
+    kFriendlyName = 1,
+    kIcac         = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::UpdateAdmin::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+
+    chip::NodeId nodeID = static_cast<chip::NodeId>(0);
+    chip::CharSpan friendlyName;
+    chip::ByteSpan icac;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::UpdateAdmin::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+
+    chip::NodeId nodeID = static_cast<chip::NodeId>(0);
+    chip::CharSpan friendlyName;
+    chip::ByteSpan icac;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace UpdateAdmin
+namespace RemoveAdmin {
+enum class Fields : uint8_t
+{
+    kNodeID = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::RemoveAdmin::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+
+    chip::NodeId nodeID = static_cast<chip::NodeId>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::RemoveAdmin::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+
+    chip::NodeId nodeID = static_cast<chip::NodeId>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace RemoveAdmin
+namespace AddPendingNode {
+enum class Fields : uint8_t
+{
+    kNodeID       = 0,
+    kFriendlyName = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::AddPendingNode::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+
+    chip::NodeId nodeID = static_cast<chip::NodeId>(0);
+    chip::CharSpan friendlyName;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::AddPendingNode::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+
+    chip::NodeId nodeID = static_cast<chip::NodeId>(0);
+    chip::CharSpan friendlyName;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace AddPendingNode
+namespace RefreshNode {
+enum class Fields : uint8_t
+{
+    kNodeID = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::RefreshNode::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+
+    chip::NodeId nodeID = static_cast<chip::NodeId>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::RefreshNode::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+
+    chip::NodeId nodeID = static_cast<chip::NodeId>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace RefreshNode
+namespace UpdateNode {
+enum class Fields : uint8_t
+{
+    kNodeID       = 0,
+    kFriendlyName = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::UpdateNode::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+
+    chip::NodeId nodeID = static_cast<chip::NodeId>(0);
+    chip::CharSpan friendlyName;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::UpdateNode::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+
+    chip::NodeId nodeID = static_cast<chip::NodeId>(0);
+    chip::CharSpan friendlyName;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace UpdateNode
+namespace RemoveNode {
+enum class Fields : uint8_t
+{
+    kNodeID = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::RemoveNode::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+
+    chip::NodeId nodeID = static_cast<chip::NodeId>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::RemoveNode::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+
+    chip::NodeId nodeID = static_cast<chip::NodeId>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace RemoveNode
+namespace UpdateEndpointForNode {
+enum class Fields : uint8_t
+{
+    kEndpointID   = 0,
+    kNodeID       = 1,
+    kFriendlyName = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::UpdateEndpointForNode::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+
+    chip::EndpointId endpointID = static_cast<chip::EndpointId>(0);
+    chip::NodeId nodeID         = static_cast<chip::NodeId>(0);
+    chip::CharSpan friendlyName;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::UpdateEndpointForNode::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+
+    chip::EndpointId endpointID = static_cast<chip::EndpointId>(0);
+    chip::NodeId nodeID         = static_cast<chip::NodeId>(0);
+    chip::CharSpan friendlyName;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace UpdateEndpointForNode
+namespace AddGroupIDToEndpointForNode {
+enum class Fields : uint8_t
+{
+    kNodeID     = 0,
+    kEndpointID = 1,
+    kGroupID    = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::AddGroupIDToEndpointForNode::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+
+    chip::NodeId nodeID         = static_cast<chip::NodeId>(0);
+    chip::EndpointId endpointID = static_cast<chip::EndpointId>(0);
+    chip::GroupId groupID       = static_cast<chip::GroupId>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::AddGroupIDToEndpointForNode::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+
+    chip::NodeId nodeID         = static_cast<chip::NodeId>(0);
+    chip::EndpointId endpointID = static_cast<chip::EndpointId>(0);
+    chip::GroupId groupID       = static_cast<chip::GroupId>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace AddGroupIDToEndpointForNode
+namespace RemoveGroupIDFromEndpointForNode {
+enum class Fields : uint8_t
+{
+    kNodeID     = 0,
+    kEndpointID = 1,
+    kGroupID    = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::RemoveGroupIDFromEndpointForNode::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+
+    chip::NodeId nodeID         = static_cast<chip::NodeId>(0);
+    chip::EndpointId endpointID = static_cast<chip::EndpointId>(0);
+    chip::GroupId groupID       = static_cast<chip::GroupId>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::RemoveGroupIDFromEndpointForNode::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+
+    chip::NodeId nodeID         = static_cast<chip::NodeId>(0);
+    chip::EndpointId endpointID = static_cast<chip::EndpointId>(0);
+    chip::GroupId groupID       = static_cast<chip::GroupId>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace RemoveGroupIDFromEndpointForNode
+namespace AddBindingToEndpointForNode {
+enum class Fields : uint8_t
+{
+    kNodeID     = 0,
+    kEndpointID = 1,
+    kBinding    = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::AddBindingToEndpointForNode::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+
+    chip::NodeId nodeID         = static_cast<chip::NodeId>(0);
+    chip::EndpointId endpointID = static_cast<chip::EndpointId>(0);
+    Structs::TargetStruct::Type binding;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::AddBindingToEndpointForNode::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+
+    chip::NodeId nodeID         = static_cast<chip::NodeId>(0);
+    chip::EndpointId endpointID = static_cast<chip::EndpointId>(0);
+    Structs::TargetStruct::DecodableType binding;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace AddBindingToEndpointForNode
+namespace RemoveBindingFromEndpointForNode {
+enum class Fields : uint8_t
+{
+    kListID     = 0,
+    kEndpointID = 1,
+    kNodeID     = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::RemoveBindingFromEndpointForNode::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+
+    uint16_t listID             = static_cast<uint16_t>(0);
+    chip::EndpointId endpointID = static_cast<chip::EndpointId>(0);
+    chip::NodeId nodeID         = static_cast<chip::NodeId>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::RemoveBindingFromEndpointForNode::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+
+    uint16_t listID             = static_cast<uint16_t>(0);
+    chip::EndpointId endpointID = static_cast<chip::EndpointId>(0);
+    chip::NodeId nodeID         = static_cast<chip::NodeId>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace RemoveBindingFromEndpointForNode
+namespace AddACLToNode {
+enum class Fields : uint8_t
+{
+    kNodeID   = 0,
+    kACLEntry = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::AddACLToNode::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+
+    chip::NodeId nodeID = static_cast<chip::NodeId>(0);
+    Structs::AccessControlEntryStruct::Type ACLEntry;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::AddACLToNode::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+
+    chip::NodeId nodeID = static_cast<chip::NodeId>(0);
+    Structs::AccessControlEntryStruct::DecodableType ACLEntry;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace AddACLToNode
+namespace RemoveACLFromNode {
+enum class Fields : uint8_t
+{
+    kListID = 0,
+    kNodeID = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::RemoveACLFromNode::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+
+    uint16_t listID     = static_cast<uint16_t>(0);
+    chip::NodeId nodeID = static_cast<chip::NodeId>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::RemoveACLFromNode::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+
+    uint16_t listID     = static_cast<uint16_t>(0);
+    chip::NodeId nodeID = static_cast<chip::NodeId>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace RemoveACLFromNode
+} // namespace Commands
+
+namespace Attributes {
+
+namespace AnchorRootCa {
+struct TypeInfo
+{
+    using Type             = chip::ByteSpan;
+    using DecodableType    = chip::ByteSpan;
+    using DecodableArgType = chip::ByteSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AnchorRootCa::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+    static constexpr size_t MaxLength() { return 254; }
+};
+} // namespace AnchorRootCa
+namespace AnchorNodeId {
+struct TypeInfo
+{
+    using Type             = chip::NodeId;
+    using DecodableType    = chip::NodeId;
+    using DecodableArgType = chip::NodeId;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AnchorNodeId::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AnchorNodeId
+namespace AnchorVendorId {
+struct TypeInfo
+{
+    using Type             = chip::VendorId;
+    using DecodableType    = chip::VendorId;
+    using DecodableArgType = chip::VendorId;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AnchorVendorId::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AnchorVendorId
+namespace FriendlyName {
+struct TypeInfo
+{
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FriendlyName::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+    static constexpr size_t MaxLength() { return 32; }
+};
+} // namespace FriendlyName
+namespace GroupKeyList {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::JointFabricDatastore::Structs::GroupKeySetStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::JointFabricDatastore::Structs::GroupKeySetStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::JointFabricDatastore::Structs::GroupKeySetStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::GroupKeyList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace GroupKeyList
+namespace GroupList {
+struct TypeInfo
+{
+    using Type =
+        chip::app::DataModel::List<const chip::app::Clusters::JointFabricDatastore::Structs::DatastoreGroupInformationEntry::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<
+        chip::app::Clusters::JointFabricDatastore::Structs::DatastoreGroupInformationEntry::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::JointFabricDatastore::Structs::DatastoreGroupInformationEntry::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::GroupList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace GroupList
+namespace NodeList {
+struct TypeInfo
+{
+    using Type =
+        chip::app::DataModel::List<const chip::app::Clusters::JointFabricDatastore::Structs::DatastoreNodeInformationEntry::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<
+        chip::app::Clusters::JointFabricDatastore::Structs::DatastoreNodeInformationEntry::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::JointFabricDatastore::Structs::DatastoreNodeInformationEntry::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NodeList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace NodeList
+namespace AdminList {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::List<
+        const chip::app::Clusters::JointFabricDatastore::Structs::DatastoreAdministratorInformationEntry::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<
+        chip::app::Clusters::JointFabricDatastore::Structs::DatastoreAdministratorInformationEntry::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::JointFabricDatastore::Structs::DatastoreAdministratorInformationEntry::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AdminList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AdminList
+namespace StatusEntry {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::JointFabricDatastore::Structs::DatastoreStatusEntry::Type;
+    using DecodableType    = chip::app::Clusters::JointFabricDatastore::Structs::DatastoreStatusEntry::DecodableType;
+    using DecodableArgType = const chip::app::Clusters::JointFabricDatastore::Structs::DatastoreStatusEntry::DecodableType &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::StatusEntry::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace StatusEntry
+namespace EndpointGroupIdList {
+struct TypeInfo
+{
+    using Type =
+        chip::app::DataModel::List<const chip::app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointGroupIDEntry::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<
+        chip::app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointGroupIDEntry::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointGroupIDEntry::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::EndpointGroupIdList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace EndpointGroupIdList
+namespace EndpointBindingList {
+struct TypeInfo
+{
+    using Type =
+        chip::app::DataModel::List<const chip::app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntry::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<
+        chip::app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntry::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntry::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::EndpointBindingList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace EndpointBindingList
+namespace NodeKeySetList {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::JointFabricDatastore::Structs::DatastoreNodeKeyEntry::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<
+        chip::app::Clusters::JointFabricDatastore::Structs::DatastoreNodeKeyEntry::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::JointFabricDatastore::Structs::DatastoreNodeKeyEntry::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NodeKeySetList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace NodeKeySetList
+namespace NodeAclList {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::JointFabricDatastore::Structs::DatastoreACLEntry::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::JointFabricDatastore::Structs::DatastoreACLEntry::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::JointFabricDatastore::Structs::DatastoreACLEntry::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NodeAclList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace NodeAclList
+namespace NodeEndpointList {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointEntry::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<
+        chip::app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointEntry::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointEntry::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NodeEndpointList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace NodeEndpointList
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+};
+} // namespace AcceptedCommandList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::JointFabricDatastore::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::AnchorRootCa::TypeInfo::DecodableType anchorRootCa;
+        Attributes::AnchorNodeId::TypeInfo::DecodableType anchorNodeId     = static_cast<chip::NodeId>(0);
+        Attributes::AnchorVendorId::TypeInfo::DecodableType anchorVendorId = static_cast<chip::VendorId>(0);
+        Attributes::FriendlyName::TypeInfo::DecodableType friendlyName;
+        Attributes::GroupKeyList::TypeInfo::DecodableType groupKeyList;
+        Attributes::GroupList::TypeInfo::DecodableType groupList;
+        Attributes::NodeList::TypeInfo::DecodableType nodeList;
+        Attributes::AdminList::TypeInfo::DecodableType adminList;
+        Attributes::StatusEntry::TypeInfo::DecodableType statusEntry;
+        Attributes::EndpointGroupIdList::TypeInfo::DecodableType endpointGroupIdList;
+        Attributes::EndpointBindingList::TypeInfo::DecodableType endpointBindingList;
+        Attributes::NodeKeySetList::TypeInfo::DecodableType nodeKeySetList;
+        Attributes::NodeAclList::TypeInfo::DecodableType nodeAclList;
+        Attributes::NodeEndpointList::TypeInfo::DecodableType nodeEndpointList;
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace JointFabricDatastore
+namespace JointFabricAdministrator {
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace ICACCSRRequest {
+struct Type;
+struct DecodableType;
+} // namespace ICACCSRRequest
+
+namespace ICACCSRResponse {
+struct Type;
+struct DecodableType;
+} // namespace ICACCSRResponse
+
+namespace AddICAC {
+struct Type;
+struct DecodableType;
+} // namespace AddICAC
+
+namespace ICACResponse {
+struct Type;
+struct DecodableType;
+} // namespace ICACResponse
+
+namespace OpenJointCommissioningWindow {
+struct Type;
+struct DecodableType;
+} // namespace OpenJointCommissioningWindow
+
+} // namespace Commands
+
+namespace Commands {
+namespace ICACCSRRequest {
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ICACCSRRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricAdministrator::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = Clusters::JointFabricAdministrator::Commands::ICACCSRResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ICACCSRRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricAdministrator::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ICACCSRRequest
+namespace ICACCSRResponse {
+enum class Fields : uint8_t
+{
+    kIcaccsr = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ICACCSRResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricAdministrator::Id; }
+
+    chip::ByteSpan icaccsr;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ICACCSRResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricAdministrator::Id; }
+
+    chip::ByteSpan icaccsr;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ICACCSRResponse
+namespace AddICAC {
+enum class Fields : uint8_t
+{
+    kICACValue = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::AddICAC::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricAdministrator::Id; }
+
+    chip::ByteSpan ICACValue;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = Clusters::JointFabricAdministrator::Commands::ICACResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::AddICAC::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricAdministrator::Id; }
+
+    chip::ByteSpan ICACValue;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace AddICAC
+namespace ICACResponse {
+enum class Fields : uint8_t
+{
+    kStatusCode = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ICACResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricAdministrator::Id; }
+
+    ICACResponseStatusEnum statusCode = static_cast<ICACResponseStatusEnum>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ICACResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricAdministrator::Id; }
+
+    ICACResponseStatusEnum statusCode = static_cast<ICACResponseStatusEnum>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ICACResponse
+namespace OpenJointCommissioningWindow {
+enum class Fields : uint8_t
+{
+    kCommissioningTimeout = 0,
+    kPAKEPasscodeVerifier = 1,
+    kDiscriminator        = 2,
+    kIterations           = 3,
+    kSalt                 = 4,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::OpenJointCommissioningWindow::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricAdministrator::Id; }
+
+    uint16_t commissioningTimeout = static_cast<uint16_t>(0);
+    chip::ByteSpan PAKEPasscodeVerifier;
+    uint16_t discriminator = static_cast<uint16_t>(0);
+    uint32_t iterations    = static_cast<uint32_t>(0);
+    chip::ByteSpan salt;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::OpenJointCommissioningWindow::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricAdministrator::Id; }
+
+    uint16_t commissioningTimeout = static_cast<uint16_t>(0);
+    chip::ByteSpan PAKEPasscodeVerifier;
+    uint16_t discriminator = static_cast<uint16_t>(0);
+    uint32_t iterations    = static_cast<uint32_t>(0);
+    chip::ByteSpan salt;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace OpenJointCommissioningWindow
+} // namespace Commands
+
+namespace Attributes {
+
+namespace AdministratorFabricIndex {
+struct TypeInfo
+{
+    using Type             = chip::FabricIndex;
+    using DecodableType    = chip::FabricIndex;
+    using DecodableArgType = chip::FabricIndex;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricAdministrator::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AdministratorFabricIndex::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AdministratorFabricIndex
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricAdministrator::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricAdministrator::Id; }
+};
+} // namespace AcceptedCommandList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricAdministrator::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricAdministrator::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::JointFabricAdministrator::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::JointFabricAdministrator::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::AdministratorFabricIndex::TypeInfo::DecodableType administratorFabricIndex = static_cast<chip::FabricIndex>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace JointFabricAdministrator
 namespace TlsCertificateManagement {
 namespace Structs {
 namespace TLSCertStruct {
