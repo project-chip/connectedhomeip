@@ -93,3 +93,92 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
         break;
     }
 }
+
+// Cluster Shutdown Functions
+void emberAfClusterShutdownCallback(EndpointId endpoint, ClusterId clusterId)
+{
+    switch (clusterId)
+    {
+    case app::Clusters::AccessControl::Id:
+        emberAfAccessControlClusterShutdownCallback(endpoint);
+        break;
+    case app::Clusters::AdministratorCommissioning::Id:
+        emberAfAdministratorCommissioningClusterShutdownCallback(endpoint);
+        break;
+    case app::Clusters::BasicInformation::Id:
+        emberAfBasicInformationClusterShutdownCallback(endpoint);
+        break;
+    case app::Clusters::ColorControl::Id:
+        emberAfColorControlClusterShutdownCallback(endpoint);
+        break;
+    case app::Clusters::Descriptor::Id:
+        emberAfDescriptorClusterShutdownCallback(endpoint);
+        break;
+    case app::Clusters::DiagnosticLogs::Id:
+        emberAfDiagnosticLogsClusterShutdownCallback(endpoint);
+        break;
+    case app::Clusters::EthernetNetworkDiagnostics::Id:
+        emberAfEthernetNetworkDiagnosticsClusterShutdownCallback(endpoint);
+        break;
+    case app::Clusters::FixedLabel::Id:
+        emberAfFixedLabelClusterShutdownCallback(endpoint);
+        break;
+    case app::Clusters::GeneralCommissioning::Id:
+        emberAfGeneralCommissioningClusterShutdownCallback(endpoint);
+        break;
+    case app::Clusters::GeneralDiagnostics::Id:
+        emberAfGeneralDiagnosticsClusterShutdownCallback(endpoint);
+        break;
+    case app::Clusters::GroupKeyManagement::Id:
+        emberAfGroupKeyManagementClusterShutdownCallback(endpoint);
+        break;
+    case app::Clusters::Groups::Id:
+        emberAfGroupsClusterShutdownCallback(endpoint);
+        break;
+    case app::Clusters::Identify::Id:
+        emberAfIdentifyClusterShutdownCallback(endpoint);
+        break;
+    case app::Clusters::LevelControl::Id:
+        emberAfLevelControlClusterShutdownCallback(endpoint);
+        break;
+    case app::Clusters::LocalizationConfiguration::Id:
+        emberAfLocalizationConfigurationClusterShutdownCallback(endpoint);
+        break;
+    case app::Clusters::NetworkCommissioning::Id:
+        emberAfNetworkCommissioningClusterShutdownCallback(endpoint);
+        break;
+    case app::Clusters::OccupancySensing::Id:
+        emberAfOccupancySensingClusterShutdownCallback(endpoint);
+        break;
+    case app::Clusters::OnOff::Id:
+        emberAfOnOffClusterShutdownCallback(endpoint);
+        break;
+    case app::Clusters::OperationalCredentials::Id:
+        emberAfOperationalCredentialsClusterShutdownCallback(endpoint);
+        break;
+    case app::Clusters::OtaSoftwareUpdateRequestor::Id:
+        emberAfOtaSoftwareUpdateRequestorClusterShutdownCallback(endpoint);
+        break;
+    case app::Clusters::SoftwareDiagnostics::Id:
+        emberAfSoftwareDiagnosticsClusterShutdownCallback(endpoint);
+        break;
+    case app::Clusters::Switch::Id:
+        emberAfSwitchClusterShutdownCallback(endpoint);
+        break;
+    case app::Clusters::ThreadNetworkDiagnostics::Id:
+        emberAfThreadNetworkDiagnosticsClusterShutdownCallback(endpoint);
+        break;
+    case app::Clusters::TimeFormatLocalization::Id:
+        emberAfTimeFormatLocalizationClusterShutdownCallback(endpoint);
+        break;
+    case app::Clusters::UserLabel::Id:
+        emberAfUserLabelClusterShutdownCallback(endpoint);
+        break;
+    case app::Clusters::WiFiNetworkDiagnostics::Id:
+        emberAfWiFiNetworkDiagnosticsClusterShutdownCallback(endpoint);
+        break;
+    default:
+        // Unrecognized cluster ID
+        break;
+    }
+}
