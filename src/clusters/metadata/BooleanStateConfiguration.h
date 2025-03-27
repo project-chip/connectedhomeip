@@ -90,9 +90,3 @@ inline constexpr DataModel::AcceptedCommandEntry kEnableDisableAlarmEntry = {
 } // namespace clusters
 } // namespace app
 } // namespace chip
-
-// TODO:
-//   - help out with mandatory attributes (maybe that array is useful)
-//
-//   - would probably also want the BUILD.gn file generated to contain all data
-//
