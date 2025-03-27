@@ -100,7 +100,7 @@ def mattersetdebug(enableDebugMode: bool = True):
     builtins.enableDebugMode = enableDebugMode
 
 
-def main():
+def main(args=None):
     console = Console()
 
     parser = argparse.ArgumentParser()
@@ -117,7 +117,7 @@ def main():
         "-b", "--ble-adapter", help="Set the Bluetooth adapter index.", type=int, default=None)
     parser.add_argument(
         "-s", "--server-interactions", help="Enable server interactions.", action="store_true")
-    args = parser.parse_args()
+    args = parser.parse_args(args)
 
     if not os.path.exists(args.trust_store):
         # there is a chance that the script is being run from a sub-path of a checkout.

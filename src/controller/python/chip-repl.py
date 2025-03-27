@@ -27,7 +27,7 @@ def main():
     c = Config()
     c.InteractiveShellApp.exec_lines = [
         "from chip import ChipReplStartup",
-        "ChipReplStartup.main()",
+        f"ChipReplStartup.main({repr(sys.argv[1:])})",
     ]
 
     sys.argv = [sys.argv[0]]
