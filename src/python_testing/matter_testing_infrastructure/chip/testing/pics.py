@@ -64,11 +64,22 @@ def parse_pics(lines: typing.List[str]) -> dict[str, bool]:
 
 
 def parse_pics_xml(contents: str) -> dict[str, bool]:
-    pics = {}
+    pics: dict[str, bool] = {}
     mytree = ET.fromstring(contents)
     for pi in mytree.iter('picsItem'):
-        name = pi.find('itemNumber').text
-        support = pi.find('support').text
+        name_elem = pi.find('itemNumber')
+        support_elem = pi.find('support')
+
+        # Skip if either element is None
+        if name_elem is None or support_elem is None:
+            continue
+
+        # Skip if either text is None
+        name = name_elem.text
+        support = support_elem.text
+        if name is None or support is None:
+            continue
+
         pics[name] = int(json.loads(support.lower())) == 1
     return pics
 
