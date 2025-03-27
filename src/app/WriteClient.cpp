@@ -253,16 +253,14 @@ WriteClient::TryPutPreencodedListIntoSingleAttributeWritePayload(const chip::app
                                                                  TLV::TLVReader & valueReader, bool & chunkingNeeded,
                                                                  ListIndex & outEncodedItemCount)
 {
-    TLV::TLVWriter backupWriter;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    // mWriteRequestBuilder.GetWriteRequests().Checkpoint(backupWriter);
 
     ReturnErrorOnFailure(EnsureListStarted(attributePath));
 
     chip::TLV::TLVWriter * writer = nullptr;
     VerifyOrReturnError((writer = GetAttributeDataIBTLVWriter()) != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
+    TLV::TLVWriter backupWriter;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
     outEncodedItemCount = 0;
 
     while ((err = valueReader.Next()) == CHIP_NO_ERROR)
@@ -315,11 +313,12 @@ CHIP_ERROR WriteClient::PutPreencodedAttribute(const ConcreteDataAttributePath &
         }
         else
         {
+            // We will always start a New Chunk before Encoding a ReplaceAll List
+            ReturnErrorOnFailure(StartNewMessage());
+
             dataReader.Init(data);
             dataReader.OpenContainer(valueReader);
             bool chunkingNeeded = false;
-
-            ReturnErrorOnFailure(StartNewMessage());
 
             ReturnErrorOnFailure(
                 TryPutPreencodedListIntoSingleAttributeWritePayload(path, valueReader, chunkingNeeded, encodedItemCount));
@@ -334,7 +333,7 @@ CHIP_ERROR WriteClient::PutPreencodedAttribute(const ConcreteDataAttributePath &
         }
         path.mListOp = ConcreteDataAttributePath::ListOperation::AppendItem;
 
-        // We will restart iterating again on ValueReader, Only Appending the Items we need to Append
+        // We will restart iterating on ValueReader, only appending the items we need to append.
         dataReader.Init(data);
         dataReader.OpenContainer(valueReader);
 

@@ -57,10 +57,6 @@ uint32_t gIterationCount = 0;
 constexpr EndpointId kTestEndpointId      = 0;
 constexpr AttributeId kTestListAttribute  = 6;
 constexpr AttributeId kTestListAttribute2 = 7;
-constexpr uint32_t kTestListLength        = 1;
-// constexpr uint32_t kTestListLengthTRANSACTION = 25;
-
-// constexpr uint32_t kTestListLengthv2 = 5;
 
 // We don't really care about the content, we just need a buffer.
 uint8_t sByteSpanData[app::kMaxSecureSduLengthBytes];
@@ -203,7 +199,7 @@ CHIP_ERROR TestAttrAccess::Write(const app::ConcreteDataAttributePath & aPath, a
     {
         app::DataModel::Nullable<app::DataModel::DecodableList<ByteSpan>> list;
         CHIP_ERROR err = aDecoder.Decode(list);
-        ChipLogError(Zcl, "NotList/Replace All: Decode result: %s", err.AsString());
+        ChipLogError(Zcl, "NotList/ReplaceAll: Decode result: %s", err.AsString());
         return err;
     }
     if (aPath.mListOp == app::ConcreteDataAttributePath::ListOperation::AppendItem)
@@ -242,23 +238,6 @@ TEST_F(TestWriteChunking, TestListChunking)
     AttributeAccessInterfaceRegistry::Instance().Register(&testServer);
 
     app::AttributePathParams attributePath(kTestEndpointId, app::Clusters::UnitTesting::Id, kTestListAttribute);
-    //
-    // We've empirically determined that by reserving all but 75 bytes in the packet buffer, we can fit 2
-    // AttributeDataIBs into the packet. ~30-40 bytes covers a single write chunk, but let's 2-3x that
-    // to ensure we'll sweep from fitting 2 chunks to 3-4 chunks.
-    //
-
-    // uint8_t list_binary[] = {
-    //     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-
-    // };
-
-    //  ByteSpan list(list_binary);
-
-    // CHIP_ERROR err = CHIP_NO_ERROR;
-
-    //  err = writeClient1.EncodeAttribute(attributePath, app::DataModel::List<uint8_t>(list_binary));
-    //  EXPECT_EQ(err, CHIP_NO_ERROR);
 
     // We've empirically determined that by reserving all but 60 bytes in the packet buffer, we can fit 1
     // AttributeDataIB into the packet with a List of ByteSpans with 5 empty items.
@@ -280,7 +259,6 @@ TEST_F(TestWriteChunking, TestListChunking)
 
         err = writeClient.EncodeAttribute(attributePath, app::DataModel::List<ByteSpan>(list, 20));
 
-        //  err = writeClient.EncodeAttribute(attributePath, app::DataModel::List<ByteSpan>(list, sizeof(list_binary)));
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
         err = writeClient.SendWriteRequest(sessionHandle);
@@ -297,8 +275,7 @@ TEST_F(TestWriteChunking, TestListChunking)
         }
 
         // IN THE WAY THE WRITE CHUNKING WORKS NOW, THE NUMBER OF SUCCESSes depende on how many chunks we get, and that is not
-        // predictable EXPECT_EQ(writeCallback.mSuccessCount, kTestListLength /* an extra item for the empty list at the beginning
-        // */);
+        // predictable
         EXPECT_EQ(writeCallback.mErrorCount, 0u);
         EXPECT_EQ(writeCallback.mOnDoneCount, 1u);
 
@@ -577,6 +554,8 @@ TEST_F(TestWriteChunking, TestBadChunking_NonEmptyReplaceAllList)
  */
 TEST_F(TestWriteChunking, TestConflictWrite)
 {
+    // constexpr uint32_t kTestListLengthv2 = 5;
+
     auto sessionHandle = GetSessionBobToAlice();
 
     // Initialize the ember side server logic
@@ -778,6 +757,8 @@ TEST_F(TestWriteChunking, TestNonConflictWrite)
     TestWriteCallback writeCallback2;
     app::WriteClient writeClient2(&GetExchangeManager(), &writeCallback2, Optional<uint16_t>::Missing(),
                                   static_cast<uint16_t>(kReserveSize));
+
+    constexpr uint32_t kTestListLength = 1;
 
     ByteSpan list[kTestListLength];
 
