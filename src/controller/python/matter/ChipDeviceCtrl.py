@@ -1747,7 +1747,7 @@ class ChipDeviceControllerBase():
                 ReadAttribute(1, [ Clusters.BasicInformation ] ) -- case 5 above.
                 ReadAttribute(1, [ (1, Clusters.BasicInformation.Attributes.Location ] ) -- case 1 above.
 
-            An AttributePath can also be specified directly by [chip.cluster.Attribute.AttributePath(...)]
+            An AttributePath can also be specified directly by [matter.cluster.Attribute.AttributePath(...)]
 
         dataVersionFilters: A list of tuples of (endpoint, cluster, data version).
 
@@ -1781,7 +1781,7 @@ class ChipDeviceControllerBase():
             - AsyncReadTransaction.ReadResponse. Please see ReadAttribute and ReadEvent for examples of how to access data.
 
         Raises:
-            - InteractionModelError (chip.interaction_model) on error
+            - InteractionModelError (matter.interaction_model) on error
 
         '''
         self.CheckIsActive()
@@ -1852,7 +1852,7 @@ class ChipDeviceControllerBase():
                 ReadAttribute(1, [ Clusters.BasicInformation ] ) -- case 5 above.
                 ReadAttribute(1, [ (1, Clusters.BasicInformation.Attributes.Location ] ) -- case 1 above.
 
-            An AttributePath can also be specified directly by [chip.cluster.Attribute.AttributePath(...)]
+            An AttributePath can also be specified directly by [matter.cluster.Attribute.AttributePath(...)]
 
         returnClusterObject: This returns the data as consolidated cluster objects, with all attributes for a cluster inside
                              a single cluster-wide cluster object.
@@ -1885,7 +1885,7 @@ class ChipDeviceControllerBase():
                             returned_object[1][Clusters.OnOff][Clusters.OnOff.Attributes.OnTime]
 
         Raises:
-            - InteractionModelError (chip.interaction_model) on error
+            - InteractionModelError (matter.interaction_model) on error
         '''
         res = await self.Read(nodeid,
                               attributes=attributes,
@@ -1965,7 +1965,7 @@ class ChipDeviceControllerBase():
                             This is a List[ClusterEvent].
 
         Raises:
-            - InteractionModelError (chip.interaction_model) on error
+            - InteractionModelError (matter.interaction_model) on error
         '''
         res = await self.Read(nodeid=nodeid, events=events, eventNumberFilter=eventNumberFilter,
                               fabricFiltered=fabricFiltered, reportInterval=reportInterval, keepSubscriptions=keepSubscriptions,

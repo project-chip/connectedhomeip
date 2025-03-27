@@ -66,7 +66,7 @@ class FabricAdmin:
     def NewController(self, nodeId: Optional[int] = None, paaTrustStorePath: str = "",
                       useTestCommissioner: bool = False, catTags: List[int] = [], keypair: p256keypair.P256Keypair = None,
                       dacRevocationSetPath: str = ""):
-        ''' Create a new chip.ChipDeviceCtrl.ChipDeviceController instance on this fabric.
+        ''' Create a new matter.ChipDeviceCtrl.ChipDeviceController instance on this fabric.
 
             When vending ChipDeviceController instances on a given fabric, each controller instance
             is associated with a unique fabric index local to the running process. In the underlying FabricTable, each FabricInfo

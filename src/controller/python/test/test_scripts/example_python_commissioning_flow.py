@@ -22,7 +22,7 @@ import random
 from chip import ChipDeviceCtrl
 from chip import clusters as Clusters
 from chip import commissioning
-from chip.commissioning import commissioning_flow_blocks, pase
+from matter.commissioning import commissioning_flow_blocks, pase
 
 
 class ExampleCustomMatterCommissioningFlow(commissioning_flow_blocks.CommissioningFlowBlocks):

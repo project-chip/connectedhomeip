@@ -20,9 +20,9 @@ import logging
 import random
 
 import base
-import chip.clusters as Clusters
-import chip.interaction_model
-from chip.clusters.Types import NullValue
+import matter.clusters as Clusters
+import matter.interaction_model
+from matter.clusters.Types import NullValue
 
 logger = logging.getLogger('NetworkCommissioning')
 logger.setLevel(logging.INFO)
@@ -105,7 +105,7 @@ class NetworkCommissioningTests:
                 networkID=b'0' * 254, breadcrumb=0)
             res = await self._devCtrl.SendCommand(nodeid=self._nodeid, endpoint=endpointId, payload=req)
             raise AssertionError(f"Failure expected but got response {res}")
-        except chip.interaction_model.InteractionModelError as ex:
+        except matter.interaction_model.InteractionModelError as ex:
             logger.info(f"Received {ex} from server.")
 
         logger.info("Finished negative test cases.")

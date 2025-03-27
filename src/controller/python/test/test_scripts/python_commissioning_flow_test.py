@@ -29,7 +29,7 @@ from base import BaseTestHelper, TestFail, TestTimeout, logger
 from chip import ChipDeviceCtrl
 from chip import clusters as Clusters
 from chip import commissioning
-from chip.crypto import p256keypair
+from matter.crypto import p256keypair
 
 # The thread network dataset tlv for testing, splited into T-L-V.
 

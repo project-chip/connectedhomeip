@@ -63,7 +63,7 @@ class CertificateAuthority:
              as well.
 
              Arguments:
-                chipStack:          A reference to a chip.ChipStack object.
+                chipStack:          A reference to a matter.ChipStack object.
                 caIndex:            An index used to look-up details about stored credential material and fabrics
                                     from persistent storage.
                 persistentStorage:  An optional reference to a PersistentStorage object. If one is provided, it will pick that over
@@ -237,7 +237,7 @@ class CertificateAuthorityManager:
     def __init__(self, chipStack: ChipStack.ChipStack, persistentStorage: PersistentStorage = None):
         ''' Initializes the manager.
 
-            chipStack:          Reference to a chip.ChipStack object that is used to initialize
+            chipStack:          Reference to a matter.ChipStack object that is used to initialize
                                 CertificateAuthority instances.
 
             persistentStorage:  If provided, over-rides the default instance in the provided chipStack

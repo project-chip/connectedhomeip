@@ -32,7 +32,7 @@ from ..native import GetLibraryHandle, NativeLibraryHandleMethodArguments, PyChi
 from . import Objects as GeneratedObjects  # noqa: F401
 from .ClusterObjects import ClusterCommand
 
-logger = logging.getLogger('chip.cluster.Command')
+logger = logging.getLogger('matter.cluster.Command')
 logger.setLevel(logging.ERROR)
 
 
@@ -70,8 +70,8 @@ def FindCommandClusterObject(isClientSideCommand: bool, path: CommandPath):
 
         Returns the type of the cluster object if one is found. Otherwise, returns None.
     '''
-    for clusterName, obj in inspect.getmembers(sys.modules['chip.clusters.Objects']):
-        if ('chip.clusters.Objects' in str(obj)) and inspect.isclass(obj):
+    for clusterName, obj in inspect.getmembers(sys.modules['matter.clusters.Objects']):
+        if ('matter.clusters.Objects' in str(obj)) and inspect.isclass(obj):
             for objName, subclass in inspect.getmembers(obj):
                 if inspect.isclass(subclass) and (('Commands') in str(subclass)):
                     for commandName, command in inspect.getmembers(subclass):

@@ -33,7 +33,7 @@ def _RedirectToPythonLogging(category, module, message):
     module = module.decode('utf-8')
     message = message.decode('utf-8')
 
-    logger = logging.getLogger('chip.native.%s' % module)
+    logger = logging.getLogger('matter.native.%s' % module)
 
     if category == LOG_CATEGORY_ERROR:
         logger.error("%s", message)
@@ -43,12 +43,12 @@ def _RedirectToPythonLogging(category, module, message):
         logger.debug("%s", message)
     else:
         # All logs are expected to have some reasonable category. This treats
-        # unknonw/None as critical.
+        # unknown/None as critical.
         logging.critical("%s", message)
 
 
 def RedirectToPythonLogging():
-    """Redireects CHIP logging to python logging module."""
+    """Redirects CHIP logging to python logging module."""
 
     handle = _GetLoggingLibraryHandle()
     handle.pychip_logging_set_callback(_RedirectToPythonLogging)
