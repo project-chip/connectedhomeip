@@ -17,7 +17,7 @@ namespace EmberApplicationConfig {
 
 using FeatureBitmapType = uint32_t;
 
-inline constexpr std::array<EmberApplicationConfig::ClusteConfiguration<FeatureBitmapType>, 4> kEmberClusterConfig = { {
+inline constexpr std::array<EmberApplicationConfig::ClusterConfiguration<FeatureBitmapType>, 4> kEmberClusterConfig = { {
     {
         .endpointNumber = 0,
         .featureMap = BitFlags<FeatureBitmapType> {
