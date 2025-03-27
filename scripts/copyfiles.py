@@ -88,7 +88,7 @@ def main(log_level, source_dir: str, target_dir: str, filenames: list[str]):
         filename = os.path.abspath(filename)
         relative_path = os.path.relpath(filename, source_dir)
         if not filename.endswith(relative_path):
-            logging.error("%s does not seem relative to %s: relative path is %s", filename, source_dir, relative_path)
+            logging.error("%s does not seem to be a child of %s: relative path is %s", filename, source_dir, relative_path)
             sys.exit(1)
 
         # Prepend the destination directory to relative path. So that if we have:
