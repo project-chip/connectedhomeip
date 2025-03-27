@@ -90,18 +90,18 @@ class SdkGenerator(CodeGenerator):
         for cluster in self.idl.clusters:
             self.internal_render_one_output(
                 template_path="ClusterMetadataHeader.jinja",
-                output_file_name=f"{cluster.name}.h",
+                output_file_name=f"{cluster.name}/{cluster.name}Metadata.h",
                 vars={
                     "cluster": cluster,
                     "input_name": self.idl.parse_file_name,
                 },
             )
 
-        self.internal_render_one_output(
-            template_path="BuildForMetadata.jinja",
-            output_file_name="BUILD.gn",
-            vars={
-                "cluster_names": [x.name for x in self.idl.clusters],
-                "input_name": self.idl.parse_file_name,
-            },
-        )
+            self.internal_render_one_output(
+                template_path="BuildForMetadata.jinja",
+                output_file_name=f"{cluster.name}/BUILD.gn",
+                vars={
+                    "cluster": cluster,
+                    "input_name": self.idl.parse_file_name,
+                },
+            )
