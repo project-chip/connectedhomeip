@@ -663,9 +663,9 @@ public:
     CHIP_ERROR Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath, Privilege requestPrivilege);
 
     /**
-     * Validate whether a decoded AccessControlEntry is valid and complies with all defined constraints.
+     * Validate whether an AccessControlEntryStruct is valid and complies with all defined constraints.
      *
-     * @retval true if all the fields within the AccessControlEntryStruct are valid and compliant.
+     * @retval true if all the fields within the AccessControlEntry are valid and compliant.
      */
     bool IsValid(const Entry & entry);
 
