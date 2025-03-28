@@ -50,6 +50,13 @@ jobs:
           platform: nuttx
           extra-submodule-parameters: " --recursive"
       - name: Build example simulator NuttX Lighting App
+        # DISABLED due to external build system failing builds
+        # See https://github.com/project-chip/connectedhomeip/issues/38169
+        #
+        # TLDR: NuttX build system resides externall to CHIP, making it impossible
+        #       for CHIP SDK to control its contents (in particular it cannot control
+        #       main include paths nor cpp files for the application builds)
+        if: false
         run: |
           ./scripts/run_in_build_env.sh \
             "./scripts/build/build_examples.py \
