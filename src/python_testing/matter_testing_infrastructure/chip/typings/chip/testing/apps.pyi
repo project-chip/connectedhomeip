@@ -2,7 +2,6 @@ from typing import Any
 
 from chip.testing.tasks import Subprocess
 
-
 class AppServerSubprocess(Subprocess):
     PREFIX: bytes
 

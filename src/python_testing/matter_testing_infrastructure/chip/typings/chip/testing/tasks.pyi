@@ -1,7 +1,6 @@
 import threading
 from typing import Any, BinaryIO, Callable, Optional, Pattern, Union
 
-
 def forward_f(f_in: BinaryIO, f_out: BinaryIO,
               cb: Optional[Callable[[bytes, bool], bytes]] = ...,
               is_stderr: bool = ...) -> None: ...
