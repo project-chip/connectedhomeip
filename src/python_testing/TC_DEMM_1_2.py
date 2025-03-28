@@ -18,7 +18,7 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
+#     app: ${ENERGY_MANAGEMENT_APP}
 #     app-args: >
 #       --discriminator 1234
 #       --KVS kvs1
@@ -81,8 +81,7 @@ class TC_DEMM_1_2(MatterBaseTest, ModeBaseClusterChecks):
         # According to the spec, there should be at least on like
         # No Optimization, Device Optimization, Local Optimization, or Grid Optimization
         # tag in the ones supported.
-        additional_tags = [cluster_demm_mode.Enums.ModeTag.kNoOptimization,
-                           cluster_demm_mode.Enums.ModeTag.kDeviceOptimization]
+        additional_tags = [cluster_demm_mode.Enums.ModeTag.kNoOptimization]
         self.check_tags_in_lists(supported_modes=supported_modes, required_tags=additional_tags)
 
         self.step(3)
