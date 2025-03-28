@@ -192,7 +192,8 @@
             "CapabilityMinima",
             "ProductAppearance",
             "SpecificationVersion",
-            "MaxPathsPerInvoke"
+            "MaxPathsPerInvoke",
+            "DeviceLocation"
         ],
         "Bridged Device Basic Information": ["ProductAppearance"],
         "Chime": ["SelectedChime", "Enabled"],
