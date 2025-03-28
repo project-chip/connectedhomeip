@@ -32,6 +32,7 @@ class Efr32App(Enum):
     PUMP = auto()
     UNIT_TEST = auto()
     AIR_QUALITY_SENSOR = auto()
+    CLOSURE = auto()
 
     def ExampleName(self):
         if self == Efr32App.LIGHT:
@@ -48,6 +49,8 @@ class Efr32App(Enum):
             return 'pump-app'
         elif self == Efr32App.AIR_QUALITY_SENSOR:
             return 'air-quality-sensor-app'
+        elif self == Efr32App.CLOSURE:
+            return 'closure-app'
         else:
             raise Exception('Unknown app type: %r' % self)
 
