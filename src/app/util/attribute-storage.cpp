@@ -176,11 +176,6 @@ uint16_t emberAfIndexFromEndpointIncludingDisabledEndpoints(EndpointId endpoint)
 constexpr const DeviceTypeId kRootnodeId   = 0x0016;
 constexpr const DeviceTypeId kAggregatorId = 0x000E;
 
-bool IsFullFamilyComposition(const EmberAfDeviceType & deviceType)
-{
-    return (deviceType.deviceTypeId == kRootnodeId) || (deviceType.deviceTypeId == kAggregatorId);
-}
-
 } // anonymous namespace
 
 // Initial configuration
@@ -227,7 +222,7 @@ void emberAfEndpointConfigure()
         emAfEndpoints[ep].bitmask.Set(EmberAfEndpointOptions::isEnabled);
         for (const auto & deviceType : emAfEndpoints[ep].deviceTypeList)
         {
-            if (IsFullFamilyComposition(deviceType))
+            if ((deviceType.deviceTypeId == kRootnodeId) || (deviceType.deviceTypeId == kAggregatorId))
             {
                 emAfEndpoints[ep].bitmask.Set(EmberAfEndpointOptions::isFlatComposition);
                 break;
