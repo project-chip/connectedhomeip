@@ -4,23 +4,23 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG24.
 
 <hr>
 
--   [Matter EFR32 Lighting Example](#matter-efr32-lighting-example)
-    -   [Introduction](#introduction)
-    -   [Building](#building)
-    -   [Flashing the Application](#flashing-the-application)
-    -   [Viewing Logging Output](#viewing-logging-output)
-    -   [Running the Complete Example](#running-the-complete-example)
-        -   [Notes](#notes)
-    -   [Running RPC console](#running-rpc-console)
-    -   [Device Tracing](#device-tracing)
-    -   [Memory settings](#memory-settings)
-    -   [OTA Software Update](#ota-software-update)
-    -   [Group Communication (Multicast)](#group-communication-multicast)
-    -   [Building options](#building-options)
-        -   [Disabling logging](#disabling-logging)
-        -   [Debug build / release build](#debug-build--release-build)
-        -   [Disabling LCD](#disabling-lcd)
-        -   [KVS maximum entry count](#kvs-maximum-entry-count)
+- [Matter EFR32 Lighting Example](#matter-efr32-lighting-example)
+  - [Introduction](#introduction)
+  - [Building](#building)
+  - [Flashing the Application](#flashing-the-application)
+  - [Viewing Logging Output](#viewing-logging-output)
+  - [Running the Complete Example](#running-the-complete-example)
+    - [Notes](#notes)
+  - [Running RPC console](#running-rpc-console)
+  - [Device Tracing](#device-tracing)
+  - [Memory settings](#memory-settings)
+  - [OTA Software Update](#ota-software-update)
+  - [Group Communication (Multicast)](#group-communication-multicast)
+  - [Building options](#building-options)
+    - [Disabling logging](#disabling-logging)
+    - [Debug build / release build](#debug-build--release-build)
+    - [Disabling LCD](#disabling-lcd)
+    - [KVS maximum entry count](#kvs-maximum-entry-count)
 
 <hr>
 
@@ -83,6 +83,13 @@ Silicon Labs platform.
     -   BRD4187C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
     -   BRD2703A / MG24 Explorer Kit
     -   BRD2704A / SparkFun Thing Plus MGM240P board
+
+*   Region code Setting (917 WiFi projects)
+
+    -   In Wifi configurations, the region code can be set in this
+        [file](https://github.com/project-chip/connectedhomeip/blob/85e9d5fd42071d52fa3940238739544fd2a3f717/src/platform/silabs/wifi/SiWx/WifiInterfaceImpl.cpp#L104).
+        The available region codes can be found
+        [here](https://github.com/SiliconLabs/wiseconnect/blob/f675628eefa1ac4990e94146abb75dd08b522571/components/device/silabs/si91x/wireless/inc/sl_si91x_types.h#L71)
 
 *   Build the example application:
 

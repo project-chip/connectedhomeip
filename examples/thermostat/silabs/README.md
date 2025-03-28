@@ -4,25 +4,25 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG24.
 
 <hr>
 
--   [Matter EFR32 Thermostat Example](#matter-efr32-thermostat-example)
-    -   [Introduction](#introduction)
-    -   [Building](#building)
-        -   [Linux](#linux)
-        -   [Mac OS X](#mac-os-x)
-    -   [Flashing the Application](#flashing-the-application)
-    -   [Viewing Logging Output](#viewing-logging-output)
-    -   [Running the Complete Example](#running-the-complete-example)
-        -   [Notes](#notes)
-            -   [On Border Router:](#on-border-router)
-            -   [On PC(Linux):](#on-pclinux)
-    -   [Running RPC console](#running-rpc-console)
-    -   [Memory settings](#memory-settings)
-    -   [OTA Software Update](#ota-software-update)
-    -   [Building options](#building-options)
-        -   [Disabling logging](#disabling-logging)
-        -   [Debug build / release build](#debug-build--release-build)
-        -   [Disabling LCD](#disabling-lcd)
-        -   [KVS maximum entry count](#kvs-maximum-entry-count)
+- [Matter EFR32 Thermostat Example](#matter-efr32-thermostat-example)
+  - [Introduction](#introduction)
+  - [Building](#building)
+      - [Linux](#linux)
+      - [Mac OS X](#mac-os-x)
+  - [Flashing the Application](#flashing-the-application)
+  - [Viewing Logging Output](#viewing-logging-output)
+  - [Running the Complete Example](#running-the-complete-example)
+    - [Notes](#notes)
+      - [On Border Router:](#on-border-router)
+      - [On PC(Linux):](#on-pclinux)
+  - [Running RPC console](#running-rpc-console)
+  - [Memory settings](#memory-settings)
+  - [OTA Software Update](#ota-software-update)
+  - [Building options](#building-options)
+    - [Disabling logging](#disabling-logging)
+    - [Debug build / release build](#debug-build--release-build)
+    - [Disabling LCD](#disabling-lcd)
+    - [KVS maximum entry count](#kvs-maximum-entry-count)
 
 <hr>
 
@@ -87,6 +87,13 @@ Silicon Labs platform.
     -   BRD4186C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
     -   BRD4187A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
     -   BRD4187C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
+
+*   Region code Setting (917 WiFi projects)
+
+    -   In Wifi configurations, the region code can be set in this
+        [file](https://github.com/project-chip/connectedhomeip/blob/85e9d5fd42071d52fa3940238739544fd2a3f717/src/platform/silabs/wifi/SiWx/WifiInterfaceImpl.cpp#L104).
+        The available region codes can be found
+        [here](https://github.com/SiliconLabs/wiseconnect/blob/f675628eefa1ac4990e94146abb75dd08b522571/components/device/silabs/si91x/wireless/inc/sl_si91x_types.h#L71)
 
 *   Build the example application:
 
