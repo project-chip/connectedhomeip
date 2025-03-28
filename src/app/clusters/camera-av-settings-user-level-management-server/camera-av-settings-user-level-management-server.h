@@ -23,6 +23,7 @@
 #include <app/CommandHandlerInterface.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <protocols/interaction_model/StatusCode.h>
+#include <vector>
 
 namespace chip {
 namespace app {
