@@ -1,0 +1,58 @@
+// DO NOT EDIT MANUALLY - Generated file
+//
+// Identifier constant values for cluster ThreadBorderRouterManagement (cluster code: 1106/0x452)
+// based on src/controller/data_model/controller-clusters.matter
+
+#include <lib/core/DataModelTypes.h>
+
+namespace chip {
+namespace app {
+namespace clusters {
+namespace ThreadBorderRouterManagement {
+
+inline constexpr ClusterId kClusterId = 0x00000452;
+
+namespace Attributes {
+namespace BorderRouterName {
+inline constexpr AttributeId Id = 0x00000000;
+} // namespace BorderRouterName
+namespace BorderAgentID {
+inline constexpr AttributeId Id = 0x00000001;
+} // namespace BorderAgentID
+namespace ThreadVersion {
+inline constexpr AttributeId Id = 0x00000002;
+} // namespace ThreadVersion
+namespace InterfaceEnabled {
+inline constexpr AttributeId Id = 0x00000003;
+} // namespace InterfaceEnabled
+namespace ActiveDatasetTimestamp {
+inline constexpr AttributeId Id = 0x00000004;
+} // namespace ActiveDatasetTimestamp
+namespace PendingDatasetTimestamp {
+inline constexpr AttributeId Id = 0x00000005;
+} // namespace PendingDatasetTimestamp
+
+// TODO: globals & reference globals?
+
+} // namespace Attributes
+
+namespace Commands {
+namespace GetActiveDatasetRequest {
+inline constexpr CommandId Id = 0x00000000;
+} // namespace GetActiveDatasetRequest
+namespace GetPendingDatasetRequest {
+inline constexpr CommandId Id = 0x00000001;
+} // namespace GetPendingDatasetRequest
+namespace SetActiveDatasetRequest {
+inline constexpr CommandId Id = 0x00000003;
+} // namespace SetActiveDatasetRequest
+namespace SetPendingDatasetRequest {
+inline constexpr CommandId Id = 0x00000004;
+} // namespace SetPendingDatasetRequest
+} // namespace Commands
+
+namespace Events {} // namespace Events
+} // namespace ThreadBorderRouterManagement
+} // namespace clusters
+} // namespace app
+} // namespace chip

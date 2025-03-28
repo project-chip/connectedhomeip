@@ -1,0 +1,37 @@
+// DO NOT EDIT MANUALLY - Generated file
+//
+// Identifier constant values for cluster OtaSoftwareUpdateProvider (cluster code: 41/0x29)
+// based on src/controller/data_model/controller-clusters.matter
+
+#include <lib/core/DataModelTypes.h>
+
+namespace chip {
+namespace app {
+namespace clusters {
+namespace OtaSoftwareUpdateProvider {
+
+inline constexpr ClusterId kClusterId = 0x00000029;
+
+namespace Attributes {
+
+// TODO: globals & reference globals?
+
+} // namespace Attributes
+
+namespace Commands {
+namespace QueryImage {
+inline constexpr CommandId Id = 0x00000000;
+} // namespace QueryImage
+namespace ApplyUpdateRequest {
+inline constexpr CommandId Id = 0x00000002;
+} // namespace ApplyUpdateRequest
+namespace NotifyUpdateApplied {
+inline constexpr CommandId Id = 0x00000004;
+} // namespace NotifyUpdateApplied
+} // namespace Commands
+
+namespace Events {} // namespace Events
+} // namespace OtaSoftwareUpdateProvider
+} // namespace clusters
+} // namespace app
+} // namespace chip
