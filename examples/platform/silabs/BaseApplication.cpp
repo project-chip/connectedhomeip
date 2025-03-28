@@ -69,7 +69,8 @@
 #include <platform/silabs/wifi/WifiInterface.h>
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-#include <platform/silabs/wifi/icd/WifiSleepManager.h>
+#include <platform/silabs/wifi/icd/WifiSleepManager.h> // nogncheck
+
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 #endif // SL_WIFI
 
@@ -265,14 +266,39 @@ CHIP_ERROR BaseApplication::StartAppTask(osThreadFunc_t taskFunction)
 
 CHIP_ERROR BaseApplication::Init()
 {
+    CHIP_ERROR err = BaseInit();
+    if (err != CHIP_NO_ERROR)
+    {
+        SILABS_LOG("BaseInit() failed");
+        appError(err);
+        return err;
+    }
+
+    err = AppInit();
+    if (err != CHIP_NO_ERROR)
+    {
+        SILABS_LOG("AppInit() failed");
+        appError(err);
+        return err;
+    }
+
+    return err;
+}
+
+CHIP_ERROR BaseApplication::BaseInit()
+{
     CHIP_ERROR err = CHIP_NO_ERROR;
+
+#ifdef DISPLAY_ENABLED
+    GetLCD().Init((uint8_t *) APP_TASK_NAME);
+#endif
 
 #ifdef SL_WIFI
     /*
      * Wait for the WiFi to be initialized
      */
     ChipLogProgress(AppServer, "APP: Wait WiFi Init");
-    while (!IsStationReady())
+    while (!WifiInterface::GetInstance().IsStationReady())
     {
         osDelay(pdMS_TO_TICKS(10));
     }
