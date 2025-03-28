@@ -31,7 +31,17 @@ constexpr chip::DeviceTypeId kRefrigeratorDeviceId                 = 0x0070;
 constexpr chip::DeviceTypeId kTemperatureControlledCabinetDeviceId = 0x0071;
 
 // Devicetype APIs
+
+/**
+ * Returns true if the endpoint has the specified device type in its device types list.
+ * Device types list for the given endpoint is fetched using DataModelProvider.
+ */
 bool EndpointHasDeviceType(chip::EndpointId endpoint, chip::DeviceTypeId deviceTypeId);
+
+/**
+ * Returns a list of all endpoints that have the specified device type in their respective device types list.
+ * Endpoints list is fetched using DataModelProvider. Device type match is checked using EndpointHasDeviceType.
+ */
 chip::app::DataModel::ListBuilder<chip::EndpointId> GetAllEndpointsHavingDeviceType(chip::DeviceTypeId deviceTypeId);
 
 } // namespace DeviceTypes
