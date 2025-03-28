@@ -264,8 +264,15 @@ uint16_t emberAfGetDynamicIndexFromEndpoint(EndpointId id)
 }
 
 CHIP_ERROR emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, const EmberAfEndpointType * ep,
+    const Span<DataVersion> & dataVersionStorage, Span<const EmberAfDeviceType> deviceTypeList, EndpointId parentEndpointId)
+{
+    return emberAfSetDynamicEndpointWithEpUniqueId(index, id, ep, dataVersionStorage, deviceTypeList, CharSpan{}, parentEndpointId);
+}
+
+
+CHIP_ERROR emberAfSetDynamicEndpointWithEpUniqueId(uint16_t index, EndpointId id, const EmberAfEndpointType * ep,
                                      const Span<DataVersion> & dataVersionStorage, Span<const EmberAfDeviceType> deviceTypeList,
-                                     chip::CharSpan endpointUniqueId, EndpointId parentEndpointId)
+                                     CharSpan endpointUniqueId, EndpointId parentEndpointId)
 {
     auto realIndex = index + FIXED_ENDPOINT_COUNT;
 
@@ -321,10 +328,10 @@ CHIP_ERROR emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, const EmberA
     emAfEndpoints[index].deviceTypeList = deviceTypeList;
     emAfEndpoints[index].endpointType   = ep;
     emAfEndpoints[index].dataVersions   = dataVersionStorage.data();
-    memcpy((void *) (emAfEndpoints[index].endpointUniqueId), endpointUniqueId.data(),
-           endpointUniqueId.size() > Clusters::Descriptor::Attributes::EndpointUniqueId::TypeInfo::MaxLength()
-               ? Clusters::Descriptor::Attributes::EndpointUniqueId::TypeInfo::MaxLength()
-               : endpointUniqueId.size());
+
+    MutableCharSpan targetSpan(emAfEndpoints[index].endpointUniqueId);
+    CopyCharSpanToMutableCharSpanWithTruncation(endpointUniqueId, targetSpan);
+    emAfEndpoints[index].endpointUniqueIdSize = endpointUniqueId.size();
 
     // Start the endpoint off as disabled.
     emAfEndpoints[index].bitmask.Clear(EmberAfEndpointOptions::isEnabled);
@@ -1085,7 +1092,7 @@ CHIP_ERROR GetSemanticTagForEndpointAtIndex(EndpointId endpoint, size_t index,
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR GetEndpointUniqueIdForEndPoint(EndpointId endpoint, chip::MutableCharSpan & epUniqueIdMutSpan)
+CHIP_ERROR GetEndpointUniqueIdForEndPoint(EndpointId endpoint, MutableCharSpan & epUniqueIdMutSpan)
 {
     uint16_t endpointIndex = emberAfIndexFromEndpoint(endpoint);
 
@@ -1093,11 +1100,11 @@ CHIP_ERROR GetEndpointUniqueIdForEndPoint(EndpointId endpoint, chip::MutableChar
     {
         return CHIP_ERROR_NOT_FOUND;
     }
-    chip::CharSpan epUniqueIdSpan(emAfEndpoints[endpointIndex].endpointUniqueId,
-                                  strnlen(emAfEndpoints[endpointIndex].endpointUniqueId,
-                                          Clusters::Descriptor::Attributes::EndpointUniqueId::TypeInfo::MaxLength()));
-    chip::CopyCharSpanToMutableCharSpan(epUniqueIdSpan, epUniqueIdMutSpan);
-
+    
+    CharSpan epUniqueIdSpan(emAfEndpoints[endpointIndex].endpointUniqueId,
+                                  emAfEndpoints[endpointIndex].endpointUniqueIdSize);
+    CopyCharSpanToMutableCharSpan(epUniqueIdSpan, epUniqueIdMutSpan);
+    
     return CHIP_NO_ERROR;
 }
 

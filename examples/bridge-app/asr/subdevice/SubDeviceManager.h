@@ -66,7 +66,7 @@ extern "C" {
 #define ZCL_ON_OFF_CLUSTER_REVISION (4u)
 
 int AddDeviceEndpoint(SubDevice * dev, EmberAfEndpointType * ep, const Span<const EmberAfDeviceType> & deviceTypeList,
-                      const Span<DataVersion> & dataVersionStorage, chip::CharSpan epUniqueId, chip::EndpointId parentEndpointId);
+                      const Span<DataVersion> & dataVersionStorage, chip::EndpointId parentEndpointId);
 CHIP_ERROR RemoveDeviceEndpoint(SubDevice * dev);
 Protocols::InteractionModel::Status HandleReadBridgedDeviceBasicAttribute(SubDevice * dev, chip::AttributeId attributeId,
                                                                           uint8_t * buffer, uint16_t maxReadLength);

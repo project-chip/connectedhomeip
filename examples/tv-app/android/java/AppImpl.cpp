@@ -466,7 +466,7 @@ EndpointId ContentAppFactoryImpl::AddContentApp(const char * szVendorName, uint1
                                               std::move(supportedClusters), mAttributeDelegate, mCommandDelegate);
     EndpointId epId      = ContentAppPlatform::GetInstance().AddContentApp(
         app, &contentAppEndpoint, Span<DataVersion>(dataVersionBuf, MATTER_ARRAY_SIZE(contentAppClusters)),
-        Span<const EmberAfDeviceType>(gContentAppDeviceType), chip::CharSpan(), desiredEndpointId);
+        Span<const EmberAfDeviceType>(gContentAppDeviceType), desiredEndpointId);
     ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl AddContentApp endpoint returned %d. Endpoint set %d", epId,
                     app->GetEndpointId());
     mContentApps.push_back(app);

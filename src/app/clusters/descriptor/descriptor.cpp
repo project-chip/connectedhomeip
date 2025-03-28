@@ -214,8 +214,8 @@ CHIP_ERROR DescriptorAttrAccess::ReadDeviceAttribute(EndpointId endpoint, Attrib
 
 CHIP_ERROR DescriptorAttrAccess::ReadEndpointUniqueId(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
-    char epUniqueId[Attributes::EndpointUniqueId::TypeInfo::MaxLength() + 1] = { 0 };
-    chip::MutableCharSpan epUniqueIdSpan(epUniqueId);
+    char epUniqueId[Attributes::EndpointUniqueId::TypeInfo::MaxLength()] = { 0 };
+    MutableCharSpan epUniqueIdSpan(epUniqueId);   
     GetEndpointUniqueIdForEndPoint(endpoint, epUniqueIdSpan);
 
     return aEncoder.Encode(epUniqueIdSpan);

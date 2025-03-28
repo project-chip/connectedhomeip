@@ -132,13 +132,13 @@ void Sync_SubDevice_test()
 
     // Add lights 1..4 --> will be mapped to ZCL endpoints 3..6
     AddDeviceEndpoint(&gLight1, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                      Span<DataVersion>(gLight1DataVersions), chip::CharSpan(), 1);
+                      Span<DataVersion>(gLight1DataVersions), 1);
     AddDeviceEndpoint(&gLight2, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                      Span<DataVersion>(gLight2DataVersions), chip::CharSpan(), 1);
+                      Span<DataVersion>(gLight2DataVersions), 1);
     AddDeviceEndpoint(&gLight3, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                      Span<DataVersion>(gLight3DataVersions), chip::CharSpan(), 1);
+                      Span<DataVersion>(gLight3DataVersions), 1);
     AddDeviceEndpoint(&gLight4, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                      Span<DataVersion>(gLight4DataVersions), chip::CharSpan(), 1);
+                      Span<DataVersion>(gLight4DataVersions), 1);
 }
 
 void Add_SubDevice_test()
@@ -147,7 +147,7 @@ void Add_SubDevice_test()
     gLight2.SetChangeCallback(&HandleDeviceStatusChanged);
     // Re-add Light 2 -- > will be mapped to ZCL endpoint 7
     AddDeviceEndpoint(&gLight2, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
-                      Span<DataVersion>(gLight2DataVersions), chip::CharSpan(), 1);
+                      Span<DataVersion>(gLight2DataVersions), 1);
 }
 
 void Remove_SubDevice_test()

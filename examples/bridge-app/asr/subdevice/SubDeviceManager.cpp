@@ -49,7 +49,7 @@ static EndpointId gFirstDynamicEndpointId;
 static SubDevice * gSubDevices[CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT]; // number of dynamic endpoints count
 
 int AddDeviceEndpoint(SubDevice * dev, EmberAfEndpointType * ep, const Span<const EmberAfDeviceType> & deviceTypeList,
-                      const Span<DataVersion> & dataVersionStorage, chip::CharSpan epUniqueId, chip::EndpointId parentEndpointId)
+                      const Span<DataVersion> & dataVersionStorage, chip::EndpointId parentEndpointId)
 {
     uint8_t index = 0;
     while (index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
@@ -61,8 +61,8 @@ int AddDeviceEndpoint(SubDevice * dev, EmberAfEndpointType * ep, const Span<cons
             while (1)
             {
                 dev->SetEndpointId(gCurrentEndpointId);
-                err = emberAfSetDynamicEndpoint(index, gCurrentEndpointId, ep, dataVersionStorage, deviceTypeList, epUniqueId,
-                                                parentEndpointId);
+                err =
+                    emberAfSetDynamicEndpoint(index, gCurrentEndpointId, ep, dataVersionStorage, deviceTypeList, parentEndpointId);
                 if (err == CHIP_NO_ERROR)
                 {
                     ChipLogProgress(DeviceLayer, "Added device %s to dynamic endpoint %d (index=%d)", dev->GetName(),

@@ -62,7 +62,7 @@ public:
      * @param parentEndpointId The parent endpoint ID. Defaults to an invalid endpoint ID.
      * @return int The index of the dynamic endpoint if successful, nullopt otherwise
      */
-    std::optional<unsigned> AddDeviceEndpoint(std::unique_ptr<BridgedDevice> dev, chip::CharSpan epUniqueId = {},
+    std::optional<unsigned> AddDeviceEndpoint(std::unique_ptr<BridgedDevice> dev,
                                               chip::EndpointId parentEndpointId = chip::kInvalidEndpointId);
 
     /**
