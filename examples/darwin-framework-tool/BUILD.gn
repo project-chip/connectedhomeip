@@ -260,6 +260,7 @@ executable("darwin-framework-tool") {
 
   deps = [
     ":build-darwin-framework",
+    "${chip_root}/src/app/common:ids",
     "${chip_root}/third_party/libwebsockets",
     jsoncpp_root,
   ]
