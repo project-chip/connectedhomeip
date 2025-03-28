@@ -36,6 +36,7 @@ inline constexpr AttributeId Id = 0x00000004;
 namespace Commands {} // namespace Commands
 
 namespace Events {} // namespace Events
+
 } // namespace EnergyPreference
 } // namespace clusters
 } // namespace app

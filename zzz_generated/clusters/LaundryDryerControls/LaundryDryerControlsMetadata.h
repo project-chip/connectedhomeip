@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/LaundryDryerControls/LaundryDryerControlsIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,13 +21,13 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kSupportedDrynessLevelsEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::SupportedDrynessLevels::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kSelectedDrynessLevelEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::SelectedDrynessLevel::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,

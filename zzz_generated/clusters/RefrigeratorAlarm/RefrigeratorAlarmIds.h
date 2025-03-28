@@ -34,6 +34,7 @@ namespace Notify {
 inline constexpr EventId Id = 0x00000000;
 } // namespace Notify
 } // namespace Events
+
 } // namespace RefrigeratorAlarm
 } // namespace clusters
 } // namespace app

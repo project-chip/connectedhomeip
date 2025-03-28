@@ -98,6 +98,7 @@ namespace AllClear {
 inline constexpr EventId Id = 0x0000000A;
 } // namespace AllClear
 } // namespace Events
+
 } // namespace SmokeCoAlarm
 } // namespace clusters
 } // namespace app

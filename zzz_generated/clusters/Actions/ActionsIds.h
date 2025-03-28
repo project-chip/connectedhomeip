@@ -74,6 +74,7 @@ namespace ActionFailed {
 inline constexpr EventId Id = 0x00000001;
 } // namespace ActionFailed
 } // namespace Events
+
 } // namespace Actions
 } // namespace clusters
 } // namespace app

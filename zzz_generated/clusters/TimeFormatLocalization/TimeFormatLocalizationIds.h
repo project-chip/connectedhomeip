@@ -30,6 +30,7 @@ inline constexpr AttributeId Id = 0x00000002;
 namespace Commands {} // namespace Commands
 
 namespace Events {} // namespace Events
+
 } // namespace TimeFormatLocalization
 } // namespace clusters
 } // namespace app

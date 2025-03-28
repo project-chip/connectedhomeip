@@ -37,6 +37,7 @@ inline constexpr CommandId Id = 0x00000000;
 } // namespace Commands
 
 namespace Events {} // namespace Events
+
 } // namespace LaundryWasherMode
 } // namespace clusters
 } // namespace app

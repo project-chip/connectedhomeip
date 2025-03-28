@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/OnOff/OnOffIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,31 +21,31 @@ inline constexpr uint32_t kRevision = 6;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kOnOffEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::OnOff::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kGlobalSceneControlEntry = {
-    .attributeId    = 16384,
+    .attributeId    = Attributes::GlobalSceneControl::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kOnTimeEntry = {
-    .attributeId    = 16385,
+    .attributeId    = Attributes::OnTime::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AttributeEntry kOffWaitTimeEntry = {
-    .attributeId    = 16386,
+    .attributeId    = Attributes::OffWaitTime::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AttributeEntry kStartUpOnOffEntry = {
-    .attributeId    = 16387,
+    .attributeId    = Attributes::StartUpOnOff::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
@@ -54,32 +56,32 @@ inline constexpr DataModel::AttributeEntry kStartUpOnOffEntry = {
 namespace Commands {
 
 inline constexpr DataModel::AcceptedCommandEntry kOffEntry = {
-    .commandId       = 0,
+    .commandId       = Commands::Off::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kOnEntry = {
-    .commandId       = 1,
+    .commandId       = Commands::On::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kToggleEntry = {
-    .commandId       = 2,
+    .commandId       = Commands::Toggle::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kOffWithEffectEntry = {
-    .commandId       = 64,
+    .commandId       = Commands::OffWithEffect::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kOnWithRecallGlobalSceneEntry = {
-    .commandId       = 65,
+    .commandId       = Commands::OnWithRecallGlobalScene::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kOnWithTimedOffEntry = {
-    .commandId       = 66,
+    .commandId       = Commands::OnWithTimedOff::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

@@ -107,6 +107,7 @@ namespace ReachableChanged {
 inline constexpr EventId Id = 0x00000003;
 } // namespace ReachableChanged
 } // namespace Events
+
 } // namespace BasicInformation
 } // namespace clusters
 } // namespace app

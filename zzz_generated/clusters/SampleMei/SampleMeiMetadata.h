@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/SampleMei/SampleMeiIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,7 +21,7 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kFlipFlopEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::FlipFlop::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
@@ -30,12 +32,12 @@ inline constexpr DataModel::AttributeEntry kFlipFlopEntry = {
 namespace Commands {
 
 inline constexpr DataModel::AcceptedCommandEntry kPingEntry = {
-    .commandId       = 0,
+    .commandId       = Commands::Ping::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kAddArgumentsEntry = {
-    .commandId       = 2,
+    .commandId       = Commands::AddArguments::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

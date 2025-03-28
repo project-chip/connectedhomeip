@@ -80,6 +80,7 @@ namespace RemainingScreenTimeExpired {
 inline constexpr EventId Id = 0x00000000;
 } // namespace RemainingScreenTimeExpired
 } // namespace Events
+
 } // namespace ContentControl
 } // namespace clusters
 } // namespace app

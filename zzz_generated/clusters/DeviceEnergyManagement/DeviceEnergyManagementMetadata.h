@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/DeviceEnergyManagement/DeviceEnergyManagementIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,49 +21,49 @@ inline constexpr uint32_t kRevision = 4;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kESATypeEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::ESAType::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kESACanGenerateEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::ESACanGenerate::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kESAStateEntry = {
-    .attributeId    = 2,
+    .attributeId    = Attributes::ESAState::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kAbsMinPowerEntry = {
-    .attributeId    = 3,
+    .attributeId    = Attributes::AbsMinPower::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kAbsMaxPowerEntry = {
-    .attributeId    = 4,
+    .attributeId    = Attributes::AbsMaxPower::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kPowerAdjustmentCapabilityEntry = {
-    .attributeId    = 5,
+    .attributeId    = Attributes::PowerAdjustmentCapability::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kForecastEntry = {
-    .attributeId    = 6,
+    .attributeId    = Attributes::Forecast::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kOptOutStateEntry = {
-    .attributeId    = 7,
+    .attributeId    = Attributes::OptOutState::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -72,42 +74,42 @@ inline constexpr DataModel::AttributeEntry kOptOutStateEntry = {
 namespace Commands {
 
 inline constexpr DataModel::AcceptedCommandEntry kPowerAdjustRequestEntry = {
-    .commandId       = 0,
+    .commandId       = Commands::PowerAdjustRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kCancelPowerAdjustRequestEntry = {
-    .commandId       = 1,
+    .commandId       = Commands::CancelPowerAdjustRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kStartTimeAdjustRequestEntry = {
-    .commandId       = 2,
+    .commandId       = Commands::StartTimeAdjustRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kPauseRequestEntry = {
-    .commandId       = 3,
+    .commandId       = Commands::PauseRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kResumeRequestEntry = {
-    .commandId       = 4,
+    .commandId       = Commands::ResumeRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kModifyForecastRequestEntry = {
-    .commandId       = 5,
+    .commandId       = Commands::ModifyForecastRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kRequestConstraintBasedForecastEntry = {
-    .commandId       = 6,
+    .commandId       = Commands::RequestConstraintBasedForecast::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kCancelRequestEntry = {
-    .commandId       = 7,
+    .commandId       = Commands::CancelRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

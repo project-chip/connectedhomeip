@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/ContentControl/ContentControlIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,49 +21,49 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kEnabledEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::Enabled::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kOnDemandRatingsEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::OnDemandRatings::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kOnDemandRatingThresholdEntry = {
-    .attributeId    = 2,
+    .attributeId    = Attributes::OnDemandRatingThreshold::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kScheduledContentRatingsEntry = {
-    .attributeId    = 3,
+    .attributeId    = Attributes::ScheduledContentRatings::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kScheduledContentRatingThresholdEntry = {
-    .attributeId    = 4,
+    .attributeId    = Attributes::ScheduledContentRatingThreshold::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kScreenDailyTimeEntry = {
-    .attributeId    = 5,
+    .attributeId    = Attributes::ScreenDailyTime::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kRemainingScreenTimeEntry = {
-    .attributeId    = 6,
+    .attributeId    = Attributes::RemainingScreenTime::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kBlockUnratedEntry = {
-    .attributeId    = 7,
+    .attributeId    = Attributes::BlockUnrated::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -72,52 +74,52 @@ inline constexpr DataModel::AttributeEntry kBlockUnratedEntry = {
 namespace Commands {
 
 inline constexpr DataModel::AcceptedCommandEntry kUpdatePINEntry = {
-    .commandId       = 0,
+    .commandId       = Commands::UpdatePIN::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kResetPINEntry = {
-    .commandId       = 1,
+    .commandId       = Commands::ResetPIN::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kEnableEntry = {
-    .commandId       = 3,
+    .commandId       = Commands::Enable::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kDisableEntry = {
-    .commandId       = 4,
+    .commandId       = Commands::Disable::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kAddBonusTimeEntry = {
-    .commandId       = 5,
+    .commandId       = Commands::AddBonusTime::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kSetScreenDailyTimeEntry = {
-    .commandId       = 6,
+    .commandId       = Commands::SetScreenDailyTime::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kBlockUnratedContentEntry = {
-    .commandId       = 7,
+    .commandId       = Commands::BlockUnratedContent::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kUnblockUnratedContentEntry = {
-    .commandId       = 8,
+    .commandId       = Commands::UnblockUnratedContent::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kSetOnDemandRatingThresholdEntry = {
-    .commandId       = 9,
+    .commandId       = Commands::SetOnDemandRatingThreshold::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kSetScheduledContentRatingThresholdEntry = {
-    .commandId       = 10,
+    .commandId       = Commands::SetScheduledContentRatingThreshold::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

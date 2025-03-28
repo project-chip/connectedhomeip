@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/LowPower/LowPowerIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -21,7 +23,7 @@ namespace Attributes {} // namespace Attributes
 namespace Commands {
 
 inline constexpr DataModel::AcceptedCommandEntry kSleepEntry = {
-    .commandId       = 0,
+    .commandId       = Commands::Sleep::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

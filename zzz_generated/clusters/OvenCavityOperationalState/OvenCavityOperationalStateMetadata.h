@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/OvenCavityOperationalState/OvenCavityOperationalStateIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,37 +21,37 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kPhaseListEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::PhaseList::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kCurrentPhaseEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::CurrentPhase::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kCountdownTimeEntry = {
-    .attributeId    = 2,
+    .attributeId    = Attributes::CountdownTime::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kOperationalStateListEntry = {
-    .attributeId    = 3,
+    .attributeId    = Attributes::OperationalStateList::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kOperationalStateEntry = {
-    .attributeId    = 4,
+    .attributeId    = Attributes::OperationalState::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kOperationalErrorEntry = {
-    .attributeId    = 5,
+    .attributeId    = Attributes::OperationalError::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -60,22 +62,22 @@ inline constexpr DataModel::AttributeEntry kOperationalErrorEntry = {
 namespace Commands {
 
 inline constexpr DataModel::AcceptedCommandEntry kPauseEntry = {
-    .commandId       = 0,
+    .commandId       = Commands::Pause::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kStopEntry = {
-    .commandId       = 1,
+    .commandId       = Commands::Stop::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kStartEntry = {
-    .commandId       = 2,
+    .commandId       = Commands::Start::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kResumeEntry = {
-    .commandId       = 3,
+    .commandId       = Commands::Resume::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

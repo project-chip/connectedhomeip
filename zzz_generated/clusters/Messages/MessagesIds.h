@@ -44,6 +44,7 @@ namespace MessageComplete {
 inline constexpr EventId Id = 0x00000002;
 } // namespace MessageComplete
 } // namespace Events
+
 } // namespace Messages
 } // namespace clusters
 } // namespace app

@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/RefrigeratorAlarm/RefrigeratorAlarmIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,19 +21,19 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kMaskEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::Mask::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kStateEntry = {
-    .attributeId    = 2,
+    .attributeId    = Attributes::State::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kSupportedEntry = {
-    .attributeId    = 3,
+    .attributeId    = Attributes::Supported::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,

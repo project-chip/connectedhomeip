@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/TlsCertificateManagement/TlsCertificateManagementIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,25 +21,25 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kMaxRootCertificatesEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::MaxRootCertificates::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kProvisionedRootCertificatesEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::ProvisionedRootCertificates::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kMaxClientCertificatesEntry = {
-    .attributeId    = 2,
+    .attributeId    = Attributes::MaxClientCertificates::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kProvisionedClientCertificatesEntry = {
-    .attributeId    = 3,
+    .attributeId    = Attributes::ProvisionedClientCertificates::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -48,47 +50,47 @@ inline constexpr DataModel::AttributeEntry kProvisionedClientCertificatesEntry =
 namespace Commands {
 
 inline constexpr DataModel::AcceptedCommandEntry kProvisionRootCertificateEntry = {
-    .commandId       = 0,
+    .commandId       = Commands::ProvisionRootCertificate::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 inline constexpr DataModel::AcceptedCommandEntry kFindRootCertificateEntry = {
-    .commandId       = 2,
+    .commandId       = Commands::FindRootCertificate::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kLookupRootCertificateEntry = {
-    .commandId       = 4,
+    .commandId       = Commands::LookupRootCertificate::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kRemoveRootCertificateEntry = {
-    .commandId       = 6,
+    .commandId       = Commands::RemoveRootCertificate::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 inline constexpr DataModel::AcceptedCommandEntry kTLSClientCSREntry = {
-    .commandId       = 7,
+    .commandId       = Commands::TLSClientCSR::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 inline constexpr DataModel::AcceptedCommandEntry kProvisionClientCertificateEntry = {
-    .commandId       = 9,
+    .commandId       = Commands::ProvisionClientCertificate::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 inline constexpr DataModel::AcceptedCommandEntry kFindClientCertificateEntry = {
-    .commandId       = 10,
+    .commandId       = Commands::FindClientCertificate::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kLookupClientCertificateEntry = {
-    .commandId       = 12,
+    .commandId       = Commands::LookupClientCertificate::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kRemoveClientCertificateEntry = {
-    .commandId       = 14,
+    .commandId       = Commands::RemoveClientCertificate::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kAdminister,
 };

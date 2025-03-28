@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/LaundryWasherControls/LaundryWasherControlsIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,25 +21,25 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kSpinSpeedsEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::SpinSpeeds::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kSpinSpeedCurrentEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::SpinSpeedCurrent::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AttributeEntry kNumberOfRinsesEntry = {
-    .attributeId    = 2,
+    .attributeId    = Attributes::NumberOfRinses::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AttributeEntry kSupportedRinsesEntry = {
-    .attributeId    = 3,
+    .attributeId    = Attributes::SupportedRinses::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,

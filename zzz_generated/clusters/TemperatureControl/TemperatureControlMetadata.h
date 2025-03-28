@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/TemperatureControl/TemperatureControlIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,37 +21,37 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kTemperatureSetpointEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::TemperatureSetpoint::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kMinTemperatureEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::MinTemperature::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kMaxTemperatureEntry = {
-    .attributeId    = 2,
+    .attributeId    = Attributes::MaxTemperature::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kStepEntry = {
-    .attributeId    = 3,
+    .attributeId    = Attributes::Step::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kSelectedTemperatureLevelEntry = {
-    .attributeId    = 4,
+    .attributeId    = Attributes::SelectedTemperatureLevel::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kSupportedTemperatureLevelsEntry = {
-    .attributeId    = 5,
+    .attributeId    = Attributes::SupportedTemperatureLevels::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -60,7 +62,7 @@ inline constexpr DataModel::AttributeEntry kSupportedTemperatureLevelsEntry = {
 namespace Commands {
 
 inline constexpr DataModel::AcceptedCommandEntry kSetTemperatureEntry = {
-    .commandId       = 0,
+    .commandId       = Commands::SetTemperature::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

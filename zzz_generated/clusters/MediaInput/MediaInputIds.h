@@ -40,6 +40,7 @@ inline constexpr CommandId Id = 0x00000003;
 } // namespace Commands
 
 namespace Events {} // namespace Events
+
 } // namespace MediaInput
 } // namespace clusters
 } // namespace app

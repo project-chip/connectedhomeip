@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/ColorControl/ColorControlIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,313 +21,313 @@ inline constexpr uint32_t kRevision = 7;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kCurrentHueEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::CurrentHue::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kCurrentSaturationEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::CurrentSaturation::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kRemainingTimeEntry = {
-    .attributeId    = 2,
+    .attributeId    = Attributes::RemainingTime::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kCurrentXEntry = {
-    .attributeId    = 3,
+    .attributeId    = Attributes::CurrentX::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kCurrentYEntry = {
-    .attributeId    = 4,
+    .attributeId    = Attributes::CurrentY::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kDriftCompensationEntry = {
-    .attributeId    = 5,
+    .attributeId    = Attributes::DriftCompensation::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kCompensationTextEntry = {
-    .attributeId    = 6,
+    .attributeId    = Attributes::CompensationText::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kColorTemperatureMiredsEntry = {
-    .attributeId    = 7,
+    .attributeId    = Attributes::ColorTemperatureMireds::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kColorModeEntry = {
-    .attributeId    = 8,
+    .attributeId    = Attributes::ColorMode::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kOptionsEntry = {
-    .attributeId    = 15,
+    .attributeId    = Attributes::Options::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AttributeEntry kNumberOfPrimariesEntry = {
-    .attributeId    = 16,
+    .attributeId    = Attributes::NumberOfPrimaries::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kPrimary1XEntry = {
-    .attributeId    = 17,
+    .attributeId    = Attributes::Primary1X::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kPrimary1YEntry = {
-    .attributeId    = 18,
+    .attributeId    = Attributes::Primary1Y::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kPrimary1IntensityEntry = {
-    .attributeId    = 19,
+    .attributeId    = Attributes::Primary1Intensity::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kPrimary2XEntry = {
-    .attributeId    = 21,
+    .attributeId    = Attributes::Primary2X::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kPrimary2YEntry = {
-    .attributeId    = 22,
+    .attributeId    = Attributes::Primary2Y::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kPrimary2IntensityEntry = {
-    .attributeId    = 23,
+    .attributeId    = Attributes::Primary2Intensity::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kPrimary3XEntry = {
-    .attributeId    = 25,
+    .attributeId    = Attributes::Primary3X::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kPrimary3YEntry = {
-    .attributeId    = 26,
+    .attributeId    = Attributes::Primary3Y::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kPrimary3IntensityEntry = {
-    .attributeId    = 27,
+    .attributeId    = Attributes::Primary3Intensity::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kPrimary4XEntry = {
-    .attributeId    = 32,
+    .attributeId    = Attributes::Primary4X::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kPrimary4YEntry = {
-    .attributeId    = 33,
+    .attributeId    = Attributes::Primary4Y::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kPrimary4IntensityEntry = {
-    .attributeId    = 34,
+    .attributeId    = Attributes::Primary4Intensity::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kPrimary5XEntry = {
-    .attributeId    = 36,
+    .attributeId    = Attributes::Primary5X::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kPrimary5YEntry = {
-    .attributeId    = 37,
+    .attributeId    = Attributes::Primary5Y::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kPrimary5IntensityEntry = {
-    .attributeId    = 38,
+    .attributeId    = Attributes::Primary5Intensity::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kPrimary6XEntry = {
-    .attributeId    = 40,
+    .attributeId    = Attributes::Primary6X::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kPrimary6YEntry = {
-    .attributeId    = 41,
+    .attributeId    = Attributes::Primary6Y::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kPrimary6IntensityEntry = {
-    .attributeId    = 42,
+    .attributeId    = Attributes::Primary6Intensity::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kWhitePointXEntry = {
-    .attributeId    = 48,
+    .attributeId    = Attributes::WhitePointX::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AttributeEntry kWhitePointYEntry = {
-    .attributeId    = 49,
+    .attributeId    = Attributes::WhitePointY::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AttributeEntry kColorPointRXEntry = {
-    .attributeId    = 50,
+    .attributeId    = Attributes::ColorPointRX::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AttributeEntry kColorPointRYEntry = {
-    .attributeId    = 51,
+    .attributeId    = Attributes::ColorPointRY::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AttributeEntry kColorPointRIntensityEntry = {
-    .attributeId    = 52,
+    .attributeId    = Attributes::ColorPointRIntensity::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AttributeEntry kColorPointGXEntry = {
-    .attributeId    = 54,
+    .attributeId    = Attributes::ColorPointGX::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AttributeEntry kColorPointGYEntry = {
-    .attributeId    = 55,
+    .attributeId    = Attributes::ColorPointGY::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AttributeEntry kColorPointGIntensityEntry = {
-    .attributeId    = 56,
+    .attributeId    = Attributes::ColorPointGIntensity::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AttributeEntry kColorPointBXEntry = {
-    .attributeId    = 58,
+    .attributeId    = Attributes::ColorPointBX::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AttributeEntry kColorPointBYEntry = {
-    .attributeId    = 59,
+    .attributeId    = Attributes::ColorPointBY::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AttributeEntry kColorPointBIntensityEntry = {
-    .attributeId    = 60,
+    .attributeId    = Attributes::ColorPointBIntensity::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AttributeEntry kEnhancedCurrentHueEntry = {
-    .attributeId    = 16384,
+    .attributeId    = Attributes::EnhancedCurrentHue::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kEnhancedColorModeEntry = {
-    .attributeId    = 16385,
+    .attributeId    = Attributes::EnhancedColorMode::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kColorLoopActiveEntry = {
-    .attributeId    = 16386,
+    .attributeId    = Attributes::ColorLoopActive::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kColorLoopDirectionEntry = {
-    .attributeId    = 16387,
+    .attributeId    = Attributes::ColorLoopDirection::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kColorLoopTimeEntry = {
-    .attributeId    = 16388,
+    .attributeId    = Attributes::ColorLoopTime::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kColorLoopStartEnhancedHueEntry = {
-    .attributeId    = 16389,
+    .attributeId    = Attributes::ColorLoopStartEnhancedHue::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kColorLoopStoredEnhancedHueEntry = {
-    .attributeId    = 16390,
+    .attributeId    = Attributes::ColorLoopStoredEnhancedHue::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kColorCapabilitiesEntry = {
-    .attributeId    = 16394,
+    .attributeId    = Attributes::ColorCapabilities::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kColorTempPhysicalMinMiredsEntry = {
-    .attributeId    = 16395,
+    .attributeId    = Attributes::ColorTempPhysicalMinMireds::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kColorTempPhysicalMaxMiredsEntry = {
-    .attributeId    = 16396,
+    .attributeId    = Attributes::ColorTempPhysicalMaxMireds::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kCoupleColorTempToLevelMinMiredsEntry = {
-    .attributeId    = 16397,
+    .attributeId    = Attributes::CoupleColorTempToLevelMinMireds::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kStartUpColorTemperatureMiredsEntry = {
-    .attributeId    = 16400,
+    .attributeId    = Attributes::StartUpColorTemperatureMireds::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
@@ -336,97 +338,97 @@ inline constexpr DataModel::AttributeEntry kStartUpColorTemperatureMiredsEntry =
 namespace Commands {
 
 inline constexpr DataModel::AcceptedCommandEntry kMoveToHueEntry = {
-    .commandId       = 0,
+    .commandId       = Commands::MoveToHue::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kMoveHueEntry = {
-    .commandId       = 1,
+    .commandId       = Commands::MoveHue::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kStepHueEntry = {
-    .commandId       = 2,
+    .commandId       = Commands::StepHue::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kMoveToSaturationEntry = {
-    .commandId       = 3,
+    .commandId       = Commands::MoveToSaturation::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kMoveSaturationEntry = {
-    .commandId       = 4,
+    .commandId       = Commands::MoveSaturation::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kStepSaturationEntry = {
-    .commandId       = 5,
+    .commandId       = Commands::StepSaturation::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kMoveToHueAndSaturationEntry = {
-    .commandId       = 6,
+    .commandId       = Commands::MoveToHueAndSaturation::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kMoveToColorEntry = {
-    .commandId       = 7,
+    .commandId       = Commands::MoveToColor::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kMoveColorEntry = {
-    .commandId       = 8,
+    .commandId       = Commands::MoveColor::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kStepColorEntry = {
-    .commandId       = 9,
+    .commandId       = Commands::StepColor::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kMoveToColorTemperatureEntry = {
-    .commandId       = 10,
+    .commandId       = Commands::MoveToColorTemperature::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kEnhancedMoveToHueEntry = {
-    .commandId       = 64,
+    .commandId       = Commands::EnhancedMoveToHue::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kEnhancedMoveHueEntry = {
-    .commandId       = 65,
+    .commandId       = Commands::EnhancedMoveHue::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kEnhancedStepHueEntry = {
-    .commandId       = 66,
+    .commandId       = Commands::EnhancedStepHue::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kEnhancedMoveToHueAndSaturationEntry = {
-    .commandId       = 67,
+    .commandId       = Commands::EnhancedMoveToHueAndSaturation::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kColorLoopSetEntry = {
-    .commandId       = 68,
+    .commandId       = Commands::ColorLoopSet::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kStopMoveStepEntry = {
-    .commandId       = 71,
+    .commandId       = Commands::StopMoveStep::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kMoveColorTemperatureEntry = {
-    .commandId       = 75,
+    .commandId       = Commands::MoveColorTemperature::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kStepColorTemperatureEntry = {
-    .commandId       = 76,
+    .commandId       = Commands::StepColorTemperature::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

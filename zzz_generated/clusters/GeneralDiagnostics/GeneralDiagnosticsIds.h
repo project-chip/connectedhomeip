@@ -71,6 +71,7 @@ namespace BootReason {
 inline constexpr EventId Id = 0x00000003;
 } // namespace BootReason
 } // namespace Events
+
 } // namespace GeneralDiagnostics
 } // namespace clusters
 } // namespace app

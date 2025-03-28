@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/WindowCovering/WindowCoveringIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,133 +21,133 @@ inline constexpr uint32_t kRevision = 5;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kTypeEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::Type::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kPhysicalClosedLimitLiftEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::PhysicalClosedLimitLift::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kPhysicalClosedLimitTiltEntry = {
-    .attributeId    = 2,
+    .attributeId    = Attributes::PhysicalClosedLimitTilt::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kCurrentPositionLiftEntry = {
-    .attributeId    = 3,
+    .attributeId    = Attributes::CurrentPositionLift::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kCurrentPositionTiltEntry = {
-    .attributeId    = 4,
+    .attributeId    = Attributes::CurrentPositionTilt::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kNumberOfActuationsLiftEntry = {
-    .attributeId    = 5,
+    .attributeId    = Attributes::NumberOfActuationsLift::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kNumberOfActuationsTiltEntry = {
-    .attributeId    = 6,
+    .attributeId    = Attributes::NumberOfActuationsTilt::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kConfigStatusEntry = {
-    .attributeId    = 7,
+    .attributeId    = Attributes::ConfigStatus::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kCurrentPositionLiftPercentageEntry = {
-    .attributeId    = 8,
+    .attributeId    = Attributes::CurrentPositionLiftPercentage::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kCurrentPositionTiltPercentageEntry = {
-    .attributeId    = 9,
+    .attributeId    = Attributes::CurrentPositionTiltPercentage::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kOperationalStatusEntry = {
-    .attributeId    = 10,
+    .attributeId    = Attributes::OperationalStatus::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kTargetPositionLiftPercent100thsEntry = {
-    .attributeId    = 11,
+    .attributeId    = Attributes::TargetPositionLiftPercent100ths::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kTargetPositionTiltPercent100thsEntry = {
-    .attributeId    = 12,
+    .attributeId    = Attributes::TargetPositionTiltPercent100ths::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kEndProductTypeEntry = {
-    .attributeId    = 13,
+    .attributeId    = Attributes::EndProductType::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kCurrentPositionLiftPercent100thsEntry = {
-    .attributeId    = 14,
+    .attributeId    = Attributes::CurrentPositionLiftPercent100ths::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kCurrentPositionTiltPercent100thsEntry = {
-    .attributeId    = 15,
+    .attributeId    = Attributes::CurrentPositionTiltPercent100ths::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kInstalledOpenLimitLiftEntry = {
-    .attributeId    = 16,
+    .attributeId    = Attributes::InstalledOpenLimitLift::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kInstalledClosedLimitLiftEntry = {
-    .attributeId    = 17,
+    .attributeId    = Attributes::InstalledClosedLimitLift::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kInstalledOpenLimitTiltEntry = {
-    .attributeId    = 18,
+    .attributeId    = Attributes::InstalledOpenLimitTilt::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kInstalledClosedLimitTiltEntry = {
-    .attributeId    = 19,
+    .attributeId    = Attributes::InstalledClosedLimitTilt::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kModeEntry = {
-    .attributeId    = 23,
+    .attributeId    = Attributes::Mode::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AttributeEntry kSafetyStatusEntry = {
-    .attributeId    = 26,
+    .attributeId    = Attributes::SafetyStatus::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -156,37 +158,37 @@ inline constexpr DataModel::AttributeEntry kSafetyStatusEntry = {
 namespace Commands {
 
 inline constexpr DataModel::AcceptedCommandEntry kUpOrOpenEntry = {
-    .commandId       = 0,
+    .commandId       = Commands::UpOrOpen::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kDownOrCloseEntry = {
-    .commandId       = 1,
+    .commandId       = Commands::DownOrClose::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kStopMotionEntry = {
-    .commandId       = 2,
+    .commandId       = Commands::StopMotion::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kGoToLiftValueEntry = {
-    .commandId       = 4,
+    .commandId       = Commands::GoToLiftValue::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kGoToLiftPercentageEntry = {
-    .commandId       = 5,
+    .commandId       = Commands::GoToLiftPercentage::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kGoToTiltValueEntry = {
-    .commandId       = 7,
+    .commandId       = Commands::GoToTiltValue::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kGoToTiltPercentageEntry = {
-    .commandId       = 8,
+    .commandId       = Commands::GoToTiltPercentage::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

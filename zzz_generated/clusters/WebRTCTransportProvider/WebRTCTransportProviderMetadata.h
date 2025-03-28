@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/WebRTCTransportProvider/WebRTCTransportProviderIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,7 +21,7 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kCurrentSessionsEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::CurrentSessions::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kManage,
     .writePrivilege = std::nullopt,
@@ -30,27 +32,27 @@ inline constexpr DataModel::AttributeEntry kCurrentSessionsEntry = {
 namespace Commands {
 
 inline constexpr DataModel::AcceptedCommandEntry kSolicitOfferEntry = {
-    .commandId       = 1,
+    .commandId       = Commands::SolicitOffer::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kProvideOfferEntry = {
-    .commandId       = 3,
+    .commandId       = Commands::ProvideOffer::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kProvideAnswerEntry = {
-    .commandId       = 5,
+    .commandId       = Commands::ProvideAnswer::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kProvideICECandidatesEntry = {
-    .commandId       = 6,
+    .commandId       = Commands::ProvideICECandidates::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kEndSessionEntry = {
-    .commandId       = 7,
+    .commandId       = Commands::EndSession::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kOperate,
 };

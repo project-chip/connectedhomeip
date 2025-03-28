@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/LocalizationConfiguration/LocalizationConfigurationIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,13 +21,13 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kActiveLocaleEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::ActiveLocale::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AttributeEntry kSupportedLocalesEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::SupportedLocales::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,

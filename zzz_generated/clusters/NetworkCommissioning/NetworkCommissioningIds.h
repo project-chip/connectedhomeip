@@ -76,6 +76,7 @@ inline constexpr CommandId Id = 0x00000009;
 } // namespace Commands
 
 namespace Events {} // namespace Events
+
 } // namespace NetworkCommissioning
 } // namespace clusters
 } // namespace app

@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/GroupKeyManagement/GroupKeyManagementIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,25 +21,25 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kGroupKeyMapEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::GroupKeyMap::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AttributeEntry kGroupTableEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::GroupTable::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kMaxGroupsPerFabricEntry = {
-    .attributeId    = 2,
+    .attributeId    = Attributes::MaxGroupsPerFabric::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kMaxGroupKeysPerFabricEntry = {
-    .attributeId    = 3,
+    .attributeId    = Attributes::MaxGroupKeysPerFabric::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -48,22 +50,22 @@ inline constexpr DataModel::AttributeEntry kMaxGroupKeysPerFabricEntry = {
 namespace Commands {
 
 inline constexpr DataModel::AcceptedCommandEntry kKeySetWriteEntry = {
-    .commandId       = 0,
+    .commandId       = Commands::KeySetWrite::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 inline constexpr DataModel::AcceptedCommandEntry kKeySetReadEntry = {
-    .commandId       = 1,
+    .commandId       = Commands::KeySetRead::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 inline constexpr DataModel::AcceptedCommandEntry kKeySetRemoveEntry = {
-    .commandId       = 3,
+    .commandId       = Commands::KeySetRemove::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 inline constexpr DataModel::AcceptedCommandEntry kKeySetReadAllIndicesEntry = {
-    .commandId       = 4,
+    .commandId       = Commands::KeySetReadAllIndices::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kAdminister,
 };

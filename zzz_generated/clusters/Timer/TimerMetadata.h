@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/Timer/TimerIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,19 +21,19 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kSetTimeEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::SetTime::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kTimeRemainingEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::TimeRemaining::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kTimerStateEntry = {
-    .attributeId    = 2,
+    .attributeId    = Attributes::TimerState::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -42,22 +44,22 @@ inline constexpr DataModel::AttributeEntry kTimerStateEntry = {
 namespace Commands {
 
 inline constexpr DataModel::AcceptedCommandEntry kSetTimerEntry = {
-    .commandId       = 0,
+    .commandId       = Commands::SetTimer::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kResetTimerEntry = {
-    .commandId       = 1,
+    .commandId       = Commands::ResetTimer::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kAddTimeEntry = {
-    .commandId       = 2,
+    .commandId       = Commands::AddTime::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kReduceTimeEntry = {
-    .commandId       = 3,
+    .commandId       = Commands::ReduceTime::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

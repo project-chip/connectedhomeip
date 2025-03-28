@@ -67,6 +67,7 @@ namespace OccupancyChanged {
 inline constexpr EventId Id = 0x00000000;
 } // namespace OccupancyChanged
 } // namespace Events
+
 } // namespace OccupancySensing
 } // namespace clusters
 } // namespace app

@@ -41,6 +41,7 @@ namespace SoftwareFault {
 inline constexpr EventId Id = 0x00000000;
 } // namespace SoftwareFault
 } // namespace Events
+
 } // namespace SoftwareDiagnostics
 } // namespace clusters
 } // namespace app

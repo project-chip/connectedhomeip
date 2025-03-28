@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/BallastConfiguration/BallastConfigurationIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,85 +21,85 @@ inline constexpr uint32_t kRevision = 4;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kPhysicalMinLevelEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::PhysicalMinLevel::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kPhysicalMaxLevelEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::PhysicalMaxLevel::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kBallastStatusEntry = {
-    .attributeId    = 2,
+    .attributeId    = Attributes::BallastStatus::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kMinLevelEntry = {
-    .attributeId    = 16,
+    .attributeId    = Attributes::MinLevel::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AttributeEntry kMaxLevelEntry = {
-    .attributeId    = 17,
+    .attributeId    = Attributes::MaxLevel::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AttributeEntry kIntrinsicBallastFactorEntry = {
-    .attributeId    = 20,
+    .attributeId    = Attributes::IntrinsicBallastFactor::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AttributeEntry kBallastFactorAdjustmentEntry = {
-    .attributeId    = 21,
+    .attributeId    = Attributes::BallastFactorAdjustment::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AttributeEntry kLampQuantityEntry = {
-    .attributeId    = 32,
+    .attributeId    = Attributes::LampQuantity::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kLampTypeEntry = {
-    .attributeId    = 48,
+    .attributeId    = Attributes::LampType::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AttributeEntry kLampManufacturerEntry = {
-    .attributeId    = 49,
+    .attributeId    = Attributes::LampManufacturer::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AttributeEntry kLampRatedHoursEntry = {
-    .attributeId    = 50,
+    .attributeId    = Attributes::LampRatedHours::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AttributeEntry kLampBurnHoursEntry = {
-    .attributeId    = 51,
+    .attributeId    = Attributes::LampBurnHours::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AttributeEntry kLampAlarmModeEntry = {
-    .attributeId    = 52,
+    .attributeId    = Attributes::LampAlarmMode::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AttributeEntry kLampBurnHoursTripPointEntry = {
-    .attributeId    = 53,
+    .attributeId    = Attributes::LampBurnHoursTripPoint::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,

@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/BooleanStateConfiguration/BooleanStateConfigurationIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,49 +21,49 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kCurrentSensitivityLevelEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::CurrentSensitivityLevel::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AttributeEntry kSupportedSensitivityLevelsEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::SupportedSensitivityLevels::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kDefaultSensitivityLevelEntry = {
-    .attributeId    = 2,
+    .attributeId    = Attributes::DefaultSensitivityLevel::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kAlarmsActiveEntry = {
-    .attributeId    = 3,
+    .attributeId    = Attributes::AlarmsActive::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kAlarmsSuppressedEntry = {
-    .attributeId    = 4,
+    .attributeId    = Attributes::AlarmsSuppressed::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kAlarmsEnabledEntry = {
-    .attributeId    = 5,
+    .attributeId    = Attributes::AlarmsEnabled::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kAlarmsSupportedEntry = {
-    .attributeId    = 6,
+    .attributeId    = Attributes::AlarmsSupported::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kSensorFaultEntry = {
-    .attributeId    = 7,
+    .attributeId    = Attributes::SensorFault::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -72,12 +74,12 @@ inline constexpr DataModel::AttributeEntry kSensorFaultEntry = {
 namespace Commands {
 
 inline constexpr DataModel::AcceptedCommandEntry kSuppressAlarmEntry = {
-    .commandId       = 0,
+    .commandId       = Commands::SuppressAlarm::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kEnableDisableAlarmEntry = {
-    .commandId       = 1,
+    .commandId       = Commands::EnableDisableAlarm::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

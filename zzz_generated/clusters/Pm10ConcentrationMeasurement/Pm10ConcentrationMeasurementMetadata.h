@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/Pm10ConcentrationMeasurement/Pm10ConcentrationMeasurementIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,67 +21,67 @@ inline constexpr uint32_t kRevision = 3;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kMeasuredValueEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::MeasuredValue::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kMinMeasuredValueEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::MinMeasuredValue::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kMaxMeasuredValueEntry = {
-    .attributeId    = 2,
+    .attributeId    = Attributes::MaxMeasuredValue::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kPeakMeasuredValueEntry = {
-    .attributeId    = 3,
+    .attributeId    = Attributes::PeakMeasuredValue::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kPeakMeasuredValueWindowEntry = {
-    .attributeId    = 4,
+    .attributeId    = Attributes::PeakMeasuredValueWindow::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kAverageMeasuredValueEntry = {
-    .attributeId    = 5,
+    .attributeId    = Attributes::AverageMeasuredValue::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kAverageMeasuredValueWindowEntry = {
-    .attributeId    = 6,
+    .attributeId    = Attributes::AverageMeasuredValueWindow::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kUncertaintyEntry = {
-    .attributeId    = 7,
+    .attributeId    = Attributes::Uncertainty::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kMeasurementUnitEntry = {
-    .attributeId    = 8,
+    .attributeId    = Attributes::MeasurementUnit::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kMeasurementMediumEntry = {
-    .attributeId    = 9,
+    .attributeId    = Attributes::MeasurementMedium::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kLevelValueEntry = {
-    .attributeId    = 10,
+    .attributeId    = Attributes::LevelValue::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,

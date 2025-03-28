@@ -48,6 +48,7 @@ inline constexpr AttributeId Id = 0x00000014;
 namespace Commands {} // namespace Commands
 
 namespace Events {} // namespace Events
+
 } // namespace PressureMeasurement
 } // namespace clusters
 } // namespace app

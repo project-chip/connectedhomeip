@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/GeneralCommissioning/GeneralCommissioningIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,61 +21,61 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kBreadcrumbEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::Breadcrumb::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kAdminister,
 };
 inline constexpr DataModel::AttributeEntry kBasicCommissioningInfoEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::BasicCommissioningInfo::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kRegulatoryConfigEntry = {
-    .attributeId    = 2,
+    .attributeId    = Attributes::RegulatoryConfig::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kLocationCapabilityEntry = {
-    .attributeId    = 3,
+    .attributeId    = Attributes::LocationCapability::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kSupportsConcurrentConnectionEntry = {
-    .attributeId    = 4,
+    .attributeId    = Attributes::SupportsConcurrentConnection::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kTCAcceptedVersionEntry = {
-    .attributeId    = 5,
+    .attributeId    = Attributes::TCAcceptedVersion::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kAdminister,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kTCMinRequiredVersionEntry = {
-    .attributeId    = 6,
+    .attributeId    = Attributes::TCMinRequiredVersion::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kAdminister,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kTCAcknowledgementsEntry = {
-    .attributeId    = 7,
+    .attributeId    = Attributes::TCAcknowledgements::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kAdminister,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kTCAcknowledgementsRequiredEntry = {
-    .attributeId    = 8,
+    .attributeId    = Attributes::TCAcknowledgementsRequired::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kAdminister,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kTCUpdateDeadlineEntry = {
-    .attributeId    = 9,
+    .attributeId    = Attributes::TCUpdateDeadline::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kAdminister,
     .writePrivilege = std::nullopt,
@@ -84,22 +86,22 @@ inline constexpr DataModel::AttributeEntry kTCUpdateDeadlineEntry = {
 namespace Commands {
 
 inline constexpr DataModel::AcceptedCommandEntry kArmFailSafeEntry = {
-    .commandId       = 0,
+    .commandId       = Commands::ArmFailSafe::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 inline constexpr DataModel::AcceptedCommandEntry kSetRegulatoryConfigEntry = {
-    .commandId       = 2,
+    .commandId       = Commands::SetRegulatoryConfig::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 inline constexpr DataModel::AcceptedCommandEntry kCommissioningCompleteEntry = {
-    .commandId       = 4,
+    .commandId       = Commands::CommissioningComplete::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 inline constexpr DataModel::AcceptedCommandEntry kSetTCAcknowledgementsEntry = {
-    .commandId       = 6,
+    .commandId       = Commands::SetTCAcknowledgements::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };

@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/OtaSoftwareUpdateRequestor/OtaSoftwareUpdateRequestorIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,25 +21,25 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kDefaultOTAProvidersEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::DefaultOTAProviders::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kAdminister,
 };
 inline constexpr DataModel::AttributeEntry kUpdatePossibleEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::UpdatePossible::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kUpdateStateEntry = {
-    .attributeId    = 2,
+    .attributeId    = Attributes::UpdateState::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kUpdateStateProgressEntry = {
-    .attributeId    = 3,
+    .attributeId    = Attributes::UpdateStateProgress::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -48,7 +50,7 @@ inline constexpr DataModel::AttributeEntry kUpdateStateProgressEntry = {
 namespace Commands {
 
 inline constexpr DataModel::AcceptedCommandEntry kAnnounceOTAProviderEntry = {
-    .commandId       = 0,
+    .commandId       = Commands::AnnounceOTAProvider::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/ZoneManagement/ZoneManagementIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,25 +21,25 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kSupportedZoneSourcesEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::SupportedZoneSources::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kZonesEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::Zones::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kTriggersEntry = {
-    .attributeId    = 2,
+    .attributeId    = Attributes::Triggers::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AttributeEntry kSensitivityEntry = {
-    .attributeId    = 3,
+    .attributeId    = Attributes::Sensitivity::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
@@ -48,22 +50,22 @@ inline constexpr DataModel::AttributeEntry kSensitivityEntry = {
 namespace Commands {
 
 inline constexpr DataModel::AcceptedCommandEntry kCreateTwoDCartesianZoneEntry = {
-    .commandId       = 0,
+    .commandId       = Commands::CreateTwoDCartesianZone::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AcceptedCommandEntry kUpdateTwoDCartesianZoneEntry = {
-    .commandId       = 2,
+    .commandId       = Commands::UpdateTwoDCartesianZone::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AcceptedCommandEntry kGetTwoDCartesianZoneEntry = {
-    .commandId       = 3,
+    .commandId       = Commands::GetTwoDCartesianZone::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AcceptedCommandEntry kRemoveZoneEntry = {
-    .commandId       = 5,
+    .commandId       = Commands::RemoveZone::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };

@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/ContentAppObserver/ContentAppObserverIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -21,7 +23,7 @@ namespace Attributes {} // namespace Attributes
 namespace Commands {
 
 inline constexpr DataModel::AcceptedCommandEntry kContentAppMessageEntry = {
-    .commandId       = 0,
+    .commandId       = Commands::ContentAppMessage::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

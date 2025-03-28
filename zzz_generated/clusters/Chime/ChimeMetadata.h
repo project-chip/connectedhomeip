@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/Chime/ChimeIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,19 +21,19 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kInstalledChimeSoundsEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::InstalledChimeSounds::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kSelectedChimeEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::SelectedChime::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AttributeEntry kEnabledEntry = {
-    .attributeId    = 2,
+    .attributeId    = Attributes::Enabled::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
@@ -42,7 +44,7 @@ inline constexpr DataModel::AttributeEntry kEnabledEntry = {
 namespace Commands {
 
 inline constexpr DataModel::AcceptedCommandEntry kPlayChimeSoundEntry = {
-    .commandId       = 0,
+    .commandId       = Commands::PlayChimeSound::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

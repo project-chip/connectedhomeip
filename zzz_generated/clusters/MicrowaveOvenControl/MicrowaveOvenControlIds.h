@@ -55,6 +55,7 @@ inline constexpr CommandId Id = 0x00000001;
 } // namespace Commands
 
 namespace Events {} // namespace Events
+
 } // namespace MicrowaveOvenControl
 } // namespace clusters
 } // namespace app

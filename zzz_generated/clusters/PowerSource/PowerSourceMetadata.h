@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/PowerSource/PowerSourceIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,193 +21,193 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kStatusEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::Status::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kOrderEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::Order::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kDescriptionEntry = {
-    .attributeId    = 2,
+    .attributeId    = Attributes::Description::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kWiredAssessedInputVoltageEntry = {
-    .attributeId    = 3,
+    .attributeId    = Attributes::WiredAssessedInputVoltage::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kWiredAssessedInputFrequencyEntry = {
-    .attributeId    = 4,
+    .attributeId    = Attributes::WiredAssessedInputFrequency::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kWiredCurrentTypeEntry = {
-    .attributeId    = 5,
+    .attributeId    = Attributes::WiredCurrentType::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kWiredAssessedCurrentEntry = {
-    .attributeId    = 6,
+    .attributeId    = Attributes::WiredAssessedCurrent::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kWiredNominalVoltageEntry = {
-    .attributeId    = 7,
+    .attributeId    = Attributes::WiredNominalVoltage::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kWiredMaximumCurrentEntry = {
-    .attributeId    = 8,
+    .attributeId    = Attributes::WiredMaximumCurrent::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kWiredPresentEntry = {
-    .attributeId    = 9,
+    .attributeId    = Attributes::WiredPresent::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kActiveWiredFaultsEntry = {
-    .attributeId    = 10,
+    .attributeId    = Attributes::ActiveWiredFaults::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kBatVoltageEntry = {
-    .attributeId    = 11,
+    .attributeId    = Attributes::BatVoltage::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kBatPercentRemainingEntry = {
-    .attributeId    = 12,
+    .attributeId    = Attributes::BatPercentRemaining::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kBatTimeRemainingEntry = {
-    .attributeId    = 13,
+    .attributeId    = Attributes::BatTimeRemaining::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kBatChargeLevelEntry = {
-    .attributeId    = 14,
+    .attributeId    = Attributes::BatChargeLevel::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kBatReplacementNeededEntry = {
-    .attributeId    = 15,
+    .attributeId    = Attributes::BatReplacementNeeded::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kBatReplaceabilityEntry = {
-    .attributeId    = 16,
+    .attributeId    = Attributes::BatReplaceability::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kBatPresentEntry = {
-    .attributeId    = 17,
+    .attributeId    = Attributes::BatPresent::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kActiveBatFaultsEntry = {
-    .attributeId    = 18,
+    .attributeId    = Attributes::ActiveBatFaults::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kBatReplacementDescriptionEntry = {
-    .attributeId    = 19,
+    .attributeId    = Attributes::BatReplacementDescription::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kBatCommonDesignationEntry = {
-    .attributeId    = 20,
+    .attributeId    = Attributes::BatCommonDesignation::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kBatANSIDesignationEntry = {
-    .attributeId    = 21,
+    .attributeId    = Attributes::BatANSIDesignation::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kBatIECDesignationEntry = {
-    .attributeId    = 22,
+    .attributeId    = Attributes::BatIECDesignation::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kBatApprovedChemistryEntry = {
-    .attributeId    = 23,
+    .attributeId    = Attributes::BatApprovedChemistry::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kBatCapacityEntry = {
-    .attributeId    = 24,
+    .attributeId    = Attributes::BatCapacity::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kBatQuantityEntry = {
-    .attributeId    = 25,
+    .attributeId    = Attributes::BatQuantity::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kBatChargeStateEntry = {
-    .attributeId    = 26,
+    .attributeId    = Attributes::BatChargeState::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kBatTimeToFullChargeEntry = {
-    .attributeId    = 27,
+    .attributeId    = Attributes::BatTimeToFullCharge::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kBatFunctionalWhileChargingEntry = {
-    .attributeId    = 28,
+    .attributeId    = Attributes::BatFunctionalWhileCharging::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kBatChargingCurrentEntry = {
-    .attributeId    = 29,
+    .attributeId    = Attributes::BatChargingCurrent::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kActiveBatChargeFaultsEntry = {
-    .attributeId    = 30,
+    .attributeId    = Attributes::ActiveBatChargeFaults::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kEndpointListEntry = {
-    .attributeId    = 31,
+    .attributeId    = Attributes::EndpointList::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,

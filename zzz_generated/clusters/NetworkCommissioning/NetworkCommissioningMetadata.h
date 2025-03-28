@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/NetworkCommissioning/NetworkCommissioningIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,67 +21,67 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kMaxNetworksEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::MaxNetworks::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kAdminister,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kNetworksEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::Networks::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kAdminister,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kScanMaxTimeSecondsEntry = {
-    .attributeId    = 2,
+    .attributeId    = Attributes::ScanMaxTimeSeconds::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kConnectMaxTimeSecondsEntry = {
-    .attributeId    = 3,
+    .attributeId    = Attributes::ConnectMaxTimeSeconds::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kInterfaceEnabledEntry = {
-    .attributeId    = 4,
+    .attributeId    = Attributes::InterfaceEnabled::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kAdminister,
 };
 inline constexpr DataModel::AttributeEntry kLastNetworkingStatusEntry = {
-    .attributeId    = 5,
+    .attributeId    = Attributes::LastNetworkingStatus::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kAdminister,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kLastNetworkIDEntry = {
-    .attributeId    = 6,
+    .attributeId    = Attributes::LastNetworkID::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kAdminister,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kLastConnectErrorValueEntry = {
-    .attributeId    = 7,
+    .attributeId    = Attributes::LastConnectErrorValue::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kAdminister,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kSupportedWiFiBandsEntry = {
-    .attributeId    = 8,
+    .attributeId    = Attributes::SupportedWiFiBands::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kSupportedThreadFeaturesEntry = {
-    .attributeId    = 9,
+    .attributeId    = Attributes::SupportedThreadFeatures::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kThreadVersionEntry = {
-    .attributeId    = 10,
+    .attributeId    = Attributes::ThreadVersion::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -90,37 +92,37 @@ inline constexpr DataModel::AttributeEntry kThreadVersionEntry = {
 namespace Commands {
 
 inline constexpr DataModel::AcceptedCommandEntry kScanNetworksEntry = {
-    .commandId       = 0,
+    .commandId       = Commands::ScanNetworks::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 inline constexpr DataModel::AcceptedCommandEntry kAddOrUpdateWiFiNetworkEntry = {
-    .commandId       = 2,
+    .commandId       = Commands::AddOrUpdateWiFiNetwork::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 inline constexpr DataModel::AcceptedCommandEntry kAddOrUpdateThreadNetworkEntry = {
-    .commandId       = 3,
+    .commandId       = Commands::AddOrUpdateThreadNetwork::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 inline constexpr DataModel::AcceptedCommandEntry kRemoveNetworkEntry = {
-    .commandId       = 4,
+    .commandId       = Commands::RemoveNetwork::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 inline constexpr DataModel::AcceptedCommandEntry kConnectNetworkEntry = {
-    .commandId       = 6,
+    .commandId       = Commands::ConnectNetwork::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 inline constexpr DataModel::AcceptedCommandEntry kReorderNetworkEntry = {
-    .commandId       = 8,
+    .commandId       = Commands::ReorderNetwork::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 inline constexpr DataModel::AcceptedCommandEntry kQueryIdentityEntry = {
-    .commandId       = 9,
+    .commandId       = Commands::QueryIdentity::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };

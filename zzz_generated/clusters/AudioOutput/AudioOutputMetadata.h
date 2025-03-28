@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/AudioOutput/AudioOutputIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,13 +21,13 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kOutputListEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::OutputList::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kCurrentOutputEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::CurrentOutput::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -36,12 +38,12 @@ inline constexpr DataModel::AttributeEntry kCurrentOutputEntry = {
 namespace Commands {
 
 inline constexpr DataModel::AcceptedCommandEntry kSelectOutputEntry = {
-    .commandId       = 0,
+    .commandId       = Commands::SelectOutput::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kRenameOutputEntry = {
-    .commandId       = 1,
+    .commandId       = Commands::RenameOutput::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };

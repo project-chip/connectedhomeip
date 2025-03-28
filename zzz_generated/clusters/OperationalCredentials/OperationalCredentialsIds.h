@@ -70,6 +70,7 @@ inline constexpr CommandId Id = 0x0000000D;
 } // namespace Commands
 
 namespace Events {} // namespace Events
+
 } // namespace OperationalCredentials
 } // namespace clusters
 } // namespace app

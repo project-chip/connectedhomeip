@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/ElectricalPowerMeasurement/ElectricalPowerMeasurementIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,115 +21,115 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kPowerModeEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::PowerMode::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kNumberOfMeasurementTypesEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::NumberOfMeasurementTypes::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kAccuracyEntry = {
-    .attributeId    = 2,
+    .attributeId    = Attributes::Accuracy::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kRangesEntry = {
-    .attributeId    = 3,
+    .attributeId    = Attributes::Ranges::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kVoltageEntry = {
-    .attributeId    = 4,
+    .attributeId    = Attributes::Voltage::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kActiveCurrentEntry = {
-    .attributeId    = 5,
+    .attributeId    = Attributes::ActiveCurrent::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kReactiveCurrentEntry = {
-    .attributeId    = 6,
+    .attributeId    = Attributes::ReactiveCurrent::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kApparentCurrentEntry = {
-    .attributeId    = 7,
+    .attributeId    = Attributes::ApparentCurrent::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kActivePowerEntry = {
-    .attributeId    = 8,
+    .attributeId    = Attributes::ActivePower::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kReactivePowerEntry = {
-    .attributeId    = 9,
+    .attributeId    = Attributes::ReactivePower::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kApparentPowerEntry = {
-    .attributeId    = 10,
+    .attributeId    = Attributes::ApparentPower::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kRMSVoltageEntry = {
-    .attributeId    = 11,
+    .attributeId    = Attributes::RMSVoltage::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kRMSCurrentEntry = {
-    .attributeId    = 12,
+    .attributeId    = Attributes::RMSCurrent::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kRMSPowerEntry = {
-    .attributeId    = 13,
+    .attributeId    = Attributes::RMSPower::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kFrequencyEntry = {
-    .attributeId    = 14,
+    .attributeId    = Attributes::Frequency::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kHarmonicCurrentsEntry = {
-    .attributeId    = 15,
+    .attributeId    = Attributes::HarmonicCurrents::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kHarmonicPhasesEntry = {
-    .attributeId    = 16,
+    .attributeId    = Attributes::HarmonicPhases::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kPowerFactorEntry = {
-    .attributeId    = 17,
+    .attributeId    = Attributes::PowerFactor::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kNeutralCurrentEntry = {
-    .attributeId    = 18,
+    .attributeId    = Attributes::NeutralCurrent::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,

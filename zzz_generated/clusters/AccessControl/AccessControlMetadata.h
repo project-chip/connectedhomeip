@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/AccessControl/AccessControlIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,43 +21,43 @@ inline constexpr uint32_t kRevision = 2;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kAclEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::Acl::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kAdminister,
     .writePrivilege = Access::Privilege::kAdminister,
 };
 inline constexpr DataModel::AttributeEntry kExtensionEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::Extension::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kAdminister,
     .writePrivilege = Access::Privilege::kAdminister,
 };
 inline constexpr DataModel::AttributeEntry kSubjectsPerAccessControlEntryEntry = {
-    .attributeId    = 2,
+    .attributeId    = Attributes::SubjectsPerAccessControlEntry::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kTargetsPerAccessControlEntryEntry = {
-    .attributeId    = 3,
+    .attributeId    = Attributes::TargetsPerAccessControlEntry::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kAccessControlEntriesPerFabricEntry = {
-    .attributeId    = 4,
+    .attributeId    = Attributes::AccessControlEntriesPerFabric::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kCommissioningARLEntry = {
-    .attributeId    = 5,
+    .attributeId    = Attributes::CommissioningARL::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kArlEntry = {
-    .attributeId    = 6,
+    .attributeId    = Attributes::Arl::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -66,7 +68,7 @@ inline constexpr DataModel::AttributeEntry kArlEntry = {
 namespace Commands {
 
 inline constexpr DataModel::AcceptedCommandEntry kReviewFabricRestrictionsEntry = {
-    .commandId       = 0,
+    .commandId       = Commands::ReviewFabricRestrictions::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kAdminister,
 };

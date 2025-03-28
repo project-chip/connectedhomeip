@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/IcdManagement/IcdManagementIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,61 +21,61 @@ inline constexpr uint32_t kRevision = 3;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kIdleModeDurationEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::IdleModeDuration::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kActiveModeDurationEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::ActiveModeDuration::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kActiveModeThresholdEntry = {
-    .attributeId    = 2,
+    .attributeId    = Attributes::ActiveModeThreshold::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kRegisteredClientsEntry = {
-    .attributeId    = 3,
+    .attributeId    = Attributes::RegisteredClients::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kAdminister,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kICDCounterEntry = {
-    .attributeId    = 4,
+    .attributeId    = Attributes::ICDCounter::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kAdminister,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kClientsSupportedPerFabricEntry = {
-    .attributeId    = 5,
+    .attributeId    = Attributes::ClientsSupportedPerFabric::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kUserActiveModeTriggerHintEntry = {
-    .attributeId    = 6,
+    .attributeId    = Attributes::UserActiveModeTriggerHint::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kUserActiveModeTriggerInstructionEntry = {
-    .attributeId    = 7,
+    .attributeId    = Attributes::UserActiveModeTriggerInstruction::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kOperatingModeEntry = {
-    .attributeId    = 8,
+    .attributeId    = Attributes::OperatingMode::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kMaximumCheckInBackOffEntry = {
-    .attributeId    = 9,
+    .attributeId    = Attributes::MaximumCheckInBackOff::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -84,17 +86,17 @@ inline constexpr DataModel::AttributeEntry kMaximumCheckInBackOffEntry = {
 namespace Commands {
 
 inline constexpr DataModel::AcceptedCommandEntry kRegisterClientEntry = {
-    .commandId       = 0,
+    .commandId       = Commands::RegisterClient::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AcceptedCommandEntry kUnregisterClientEntry = {
-    .commandId       = 2,
+    .commandId       = Commands::UnregisterClient::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AcceptedCommandEntry kStayActiveRequestEntry = {
-    .commandId       = 3,
+    .commandId       = Commands::StayActiveRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };

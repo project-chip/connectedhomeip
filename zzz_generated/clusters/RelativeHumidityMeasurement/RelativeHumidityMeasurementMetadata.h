@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/RelativeHumidityMeasurement/RelativeHumidityMeasurementIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,25 +21,25 @@ inline constexpr uint32_t kRevision = 3;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kMeasuredValueEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::MeasuredValue::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kMinMeasuredValueEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::MinMeasuredValue::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kMaxMeasuredValueEntry = {
-    .attributeId    = 2,
+    .attributeId    = Attributes::MaxMeasuredValue::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kToleranceEntry = {
-    .attributeId    = 3,
+    .attributeId    = Attributes::Tolerance::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,

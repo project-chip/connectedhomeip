@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/ThermostatUserInterfaceConfiguration/ThermostatUserInterfaceConfigurationIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,19 +21,19 @@ inline constexpr uint32_t kRevision = 2;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kTemperatureDisplayModeEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::TemperatureDisplayMode::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AttributeEntry kKeypadLockoutEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::KeypadLockout::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AttributeEntry kScheduleProgrammingVisibilityEntry = {
-    .attributeId    = 2,
+    .attributeId    = Attributes::ScheduleProgrammingVisibility::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,

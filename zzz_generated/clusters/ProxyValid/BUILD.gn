@@ -2,20 +2,23 @@
 #
 # Cluster generated code for constants and metadata based on src/controller/data_model/controller-clusters.matter
 
-source_set("metadata") {
-  sources = [ "ProxyValidMetadata.h" ]
-  deps = [
-    "${chip_root}/src/app/data-model-provider:metadata",
-    "${chip_root}/src/lib/core:types",
-  ]
-}
-
 source_set("ids") {
   sources = [ "ProxyValidIds.h" ]
   deps = [
     "${chip_root}/src/app/data-model-provider:metadata",
     "${chip_root}/src/lib/core:types",
   ]
+  configs = [ "${chip_root}/zzz_generated/clusters:includes" ]
+}
+
+source_set("metadata") {
+  sources = [ "ProxyValidMetadata.h" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
+  public_deps = [ ":ids" ]
+  configs = [ "${chip_root}/zzz_generated/clusters:includes" ]
 }
 
 source_set("ProxyValid") {

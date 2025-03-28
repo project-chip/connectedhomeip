@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/Groups/GroupsIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,7 +21,7 @@ inline constexpr uint32_t kRevision = 4;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kNameSupportEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::NameSupport::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -30,32 +32,32 @@ inline constexpr DataModel::AttributeEntry kNameSupportEntry = {
 namespace Commands {
 
 inline constexpr DataModel::AcceptedCommandEntry kAddGroupEntry = {
-    .commandId       = 0,
+    .commandId       = Commands::AddGroup::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AcceptedCommandEntry kViewGroupEntry = {
-    .commandId       = 1,
+    .commandId       = Commands::ViewGroup::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kGetGroupMembershipEntry = {
-    .commandId       = 2,
+    .commandId       = Commands::GetGroupMembership::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kRemoveGroupEntry = {
-    .commandId       = 3,
+    .commandId       = Commands::RemoveGroup::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AcceptedCommandEntry kRemoveAllGroupsEntry = {
-    .commandId       = 4,
+    .commandId       = Commands::RemoveAllGroups::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AcceptedCommandEntry kAddGroupIfIdentifyingEntry = {
-    .commandId       = 5,
+    .commandId       = Commands::AddGroupIfIdentifying::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kManage,
 };

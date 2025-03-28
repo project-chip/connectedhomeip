@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/PulseWidthModulation/PulseWidthModulationIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {

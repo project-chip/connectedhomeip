@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/MediaPlayback/MediaPlaybackIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,67 +21,67 @@ inline constexpr uint32_t kRevision = 2;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kCurrentStateEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::CurrentState::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kStartTimeEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::StartTime::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kDurationEntry = {
-    .attributeId    = 2,
+    .attributeId    = Attributes::Duration::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kSampledPositionEntry = {
-    .attributeId    = 3,
+    .attributeId    = Attributes::SampledPosition::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kPlaybackSpeedEntry = {
-    .attributeId    = 4,
+    .attributeId    = Attributes::PlaybackSpeed::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kSeekRangeEndEntry = {
-    .attributeId    = 5,
+    .attributeId    = Attributes::SeekRangeEnd::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kSeekRangeStartEntry = {
-    .attributeId    = 6,
+    .attributeId    = Attributes::SeekRangeStart::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kActiveAudioTrackEntry = {
-    .attributeId    = 7,
+    .attributeId    = Attributes::ActiveAudioTrack::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kAvailableAudioTracksEntry = {
-    .attributeId    = 8,
+    .attributeId    = Attributes::AvailableAudioTracks::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kActiveTextTrackEntry = {
-    .attributeId    = 9,
+    .attributeId    = Attributes::ActiveTextTrack::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kAvailableTextTracksEntry = {
-    .attributeId    = 10,
+    .attributeId    = Attributes::AvailableTextTracks::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -90,72 +92,72 @@ inline constexpr DataModel::AttributeEntry kAvailableTextTracksEntry = {
 namespace Commands {
 
 inline constexpr DataModel::AcceptedCommandEntry kPlayEntry = {
-    .commandId       = 0,
+    .commandId       = Commands::Play::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kPauseEntry = {
-    .commandId       = 1,
+    .commandId       = Commands::Pause::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kStopEntry = {
-    .commandId       = 2,
+    .commandId       = Commands::Stop::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kStartOverEntry = {
-    .commandId       = 3,
+    .commandId       = Commands::StartOver::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kPreviousEntry = {
-    .commandId       = 4,
+    .commandId       = Commands::Previous::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kNextEntry = {
-    .commandId       = 5,
+    .commandId       = Commands::Next::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kRewindEntry = {
-    .commandId       = 6,
+    .commandId       = Commands::Rewind::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kFastForwardEntry = {
-    .commandId       = 7,
+    .commandId       = Commands::FastForward::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kSkipForwardEntry = {
-    .commandId       = 8,
+    .commandId       = Commands::SkipForward::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kSkipBackwardEntry = {
-    .commandId       = 9,
+    .commandId       = Commands::SkipBackward::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kSeekEntry = {
-    .commandId       = 11,
+    .commandId       = Commands::Seek::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kActivateAudioTrackEntry = {
-    .commandId       = 12,
+    .commandId       = Commands::ActivateAudioTrack::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kActivateTextTrackEntry = {
-    .commandId       = 13,
+    .commandId       = Commands::ActivateTextTrack::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kDeactivateTextTrackEntry = {
-    .commandId       = 14,
+    .commandId       = Commands::DeactivateTextTrack::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

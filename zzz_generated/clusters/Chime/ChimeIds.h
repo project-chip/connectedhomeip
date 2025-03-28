@@ -34,6 +34,7 @@ inline constexpr CommandId Id = 0x00000000;
 } // namespace Commands
 
 namespace Events {} // namespace Events
+
 } // namespace Chime
 } // namespace clusters
 } // namespace app

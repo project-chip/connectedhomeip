@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/OtaSoftwareUpdateProvider/OtaSoftwareUpdateProviderIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -21,17 +23,17 @@ namespace Attributes {} // namespace Attributes
 namespace Commands {
 
 inline constexpr DataModel::AcceptedCommandEntry kQueryImageEntry = {
-    .commandId       = 0,
+    .commandId       = Commands::QueryImage::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kApplyUpdateRequestEntry = {
-    .commandId       = 2,
+    .commandId       = Commands::ApplyUpdateRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kNotifyUpdateAppliedEntry = {
-    .commandId       = 4,
+    .commandId       = Commands::NotifyUpdateApplied::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

@@ -380,6 +380,7 @@ namespace TestDifferentVendorMeiEvent {
 inline constexpr EventId Id = 0xFFF200EE;
 } // namespace TestDifferentVendorMeiEvent
 } // namespace Events
+
 } // namespace UnitTesting
 } // namespace clusters
 } // namespace app

@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/FanControl/FanControlIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,73 +21,73 @@ inline constexpr uint32_t kRevision = 5;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kFanModeEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::FanMode::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AttributeEntry kFanModeSequenceEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::FanModeSequence::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kPercentSettingEntry = {
-    .attributeId    = 2,
+    .attributeId    = Attributes::PercentSetting::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AttributeEntry kPercentCurrentEntry = {
-    .attributeId    = 3,
+    .attributeId    = Attributes::PercentCurrent::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kSpeedMaxEntry = {
-    .attributeId    = 4,
+    .attributeId    = Attributes::SpeedMax::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kSpeedSettingEntry = {
-    .attributeId    = 5,
+    .attributeId    = Attributes::SpeedSetting::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AttributeEntry kSpeedCurrentEntry = {
-    .attributeId    = 6,
+    .attributeId    = Attributes::SpeedCurrent::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kRockSupportEntry = {
-    .attributeId    = 7,
+    .attributeId    = Attributes::RockSupport::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kRockSettingEntry = {
-    .attributeId    = 8,
+    .attributeId    = Attributes::RockSetting::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AttributeEntry kWindSupportEntry = {
-    .attributeId    = 9,
+    .attributeId    = Attributes::WindSupport::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kWindSettingEntry = {
-    .attributeId    = 10,
+    .attributeId    = Attributes::WindSetting::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AttributeEntry kAirflowDirectionEntry = {
-    .attributeId    = 11,
+    .attributeId    = Attributes::AirflowDirection::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
@@ -96,7 +98,7 @@ inline constexpr DataModel::AttributeEntry kAirflowDirectionEntry = {
 namespace Commands {
 
 inline constexpr DataModel::AcceptedCommandEntry kStepEntry = {
-    .commandId       = 0,
+    .commandId       = Commands::Step::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

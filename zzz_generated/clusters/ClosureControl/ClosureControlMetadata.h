@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/ClosureControl/ClosureControlIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,61 +21,61 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kCountdownTimeEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::CountdownTime::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kMainStateEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::MainState::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kCurrentErrorListEntry = {
-    .attributeId    = 2,
+    .attributeId    = Attributes::CurrentErrorList::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kOverallStateEntry = {
-    .attributeId    = 3,
+    .attributeId    = Attributes::OverallState::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kOverallTargetEntry = {
-    .attributeId    = 4,
+    .attributeId    = Attributes::OverallTarget::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kRestingProcedureEntry = {
-    .attributeId    = 5,
+    .attributeId    = Attributes::RestingProcedure::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kTriggerConditionEntry = {
-    .attributeId    = 6,
+    .attributeId    = Attributes::TriggerCondition::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kTriggerPositionEntry = {
-    .attributeId    = 7,
+    .attributeId    = Attributes::TriggerPosition::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kWaitingDelayEntry = {
-    .attributeId    = 8,
+    .attributeId    = Attributes::WaitingDelay::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kKickoffTimerEntry = {
-    .attributeId    = 9,
+    .attributeId    = Attributes::KickoffTimer::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -84,27 +86,27 @@ inline constexpr DataModel::AttributeEntry kKickoffTimerEntry = {
 namespace Commands {
 
 inline constexpr DataModel::AcceptedCommandEntry kStopEntry = {
-    .commandId       = 0,
+    .commandId       = Commands::Stop::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kMoveToEntry = {
-    .commandId       = 1,
+    .commandId       = Commands::MoveTo::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kCalibrateEntry = {
-    .commandId       = 2,
+    .commandId       = Commands::Calibrate::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AcceptedCommandEntry kConfigureFallbackEntry = {
-    .commandId       = 3,
+    .commandId       = Commands::ConfigureFallback::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kCancelFallbackEntry = {
-    .commandId       = 4,
+    .commandId       = Commands::CancelFallback::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

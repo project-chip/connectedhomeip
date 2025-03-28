@@ -54,6 +54,7 @@ inline constexpr AttributeId Id = 0x0000000A;
 namespace Commands {} // namespace Commands
 
 namespace Events {} // namespace Events
+
 } // namespace Pm1ConcentrationMeasurement
 } // namespace clusters
 } // namespace app

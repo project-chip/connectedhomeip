@@ -54,6 +54,7 @@ inline constexpr AttributeId Id = 0x0000000A;
 namespace Commands {} // namespace Commands
 
 namespace Events {} // namespace Events
+
 } // namespace RadonConcentrationMeasurement
 } // namespace clusters
 } // namespace app

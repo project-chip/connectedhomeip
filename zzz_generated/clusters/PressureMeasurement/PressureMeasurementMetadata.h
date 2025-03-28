@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/PressureMeasurement/PressureMeasurementIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,55 +21,55 @@ inline constexpr uint32_t kRevision = 3;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kMeasuredValueEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::MeasuredValue::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kMinMeasuredValueEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::MinMeasuredValue::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kMaxMeasuredValueEntry = {
-    .attributeId    = 2,
+    .attributeId    = Attributes::MaxMeasuredValue::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kToleranceEntry = {
-    .attributeId    = 3,
+    .attributeId    = Attributes::Tolerance::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kScaledValueEntry = {
-    .attributeId    = 16,
+    .attributeId    = Attributes::ScaledValue::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kMinScaledValueEntry = {
-    .attributeId    = 17,
+    .attributeId    = Attributes::MinScaledValue::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kMaxScaledValueEntry = {
-    .attributeId    = 18,
+    .attributeId    = Attributes::MaxScaledValue::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kScaledToleranceEntry = {
-    .attributeId    = 19,
+    .attributeId    = Attributes::ScaledTolerance::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kScaleEntry = {
-    .attributeId    = 20,
+    .attributeId    = Attributes::Scale::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,

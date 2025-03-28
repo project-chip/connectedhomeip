@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/AdministratorCommissioning/AdministratorCommissioningIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,19 +21,19 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kWindowStatusEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::WindowStatus::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kAdminFabricIndexEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::AdminFabricIndex::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kAdminVendorIdEntry = {
-    .attributeId    = 2,
+    .attributeId    = Attributes::AdminVendorId::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -42,17 +44,17 @@ inline constexpr DataModel::AttributeEntry kAdminVendorIdEntry = {
 namespace Commands {
 
 inline constexpr DataModel::AcceptedCommandEntry kOpenCommissioningWindowEntry = {
-    .commandId       = 0,
+    .commandId       = Commands::OpenCommissioningWindow::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 inline constexpr DataModel::AcceptedCommandEntry kOpenBasicCommissioningWindowEntry = {
-    .commandId       = 1,
+    .commandId       = Commands::OpenBasicCommissioningWindow::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 inline constexpr DataModel::AcceptedCommandEntry kRevokeCommissioningEntry = {
-    .commandId       = 2,
+    .commandId       = Commands::RevokeCommissioning::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
     .invokePrivilege = Access::Privilege::kAdminister,
 };

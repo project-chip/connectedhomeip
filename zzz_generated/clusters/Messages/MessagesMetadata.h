@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/Messages/MessagesIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,13 +21,13 @@ inline constexpr uint32_t kRevision = 3;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kMessagesEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::Messages::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kActiveMessageIDsEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::ActiveMessageIDs::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -36,12 +38,12 @@ inline constexpr DataModel::AttributeEntry kActiveMessageIDsEntry = {
 namespace Commands {
 
 inline constexpr DataModel::AcceptedCommandEntry kPresentMessagesRequestEntry = {
-    .commandId       = 0,
+    .commandId       = Commands::PresentMessagesRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kCancelMessagesRequestEntry = {
-    .commandId       = 1,
+    .commandId       = Commands::CancelMessagesRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kOperate,
 };

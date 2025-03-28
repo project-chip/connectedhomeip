@@ -61,6 +61,7 @@ inline constexpr CommandId Id = 0x0000000E;
 } // namespace Commands
 
 namespace Events {} // namespace Events
+
 } // namespace TlsCertificateManagement
 } // namespace clusters
 } // namespace app

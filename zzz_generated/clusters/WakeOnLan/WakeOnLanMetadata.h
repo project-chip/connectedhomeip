@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/WakeOnLan/WakeOnLanIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,13 +21,13 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kMACAddressEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::MACAddress::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kLinkLocalAddressEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::LinkLocalAddress::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,

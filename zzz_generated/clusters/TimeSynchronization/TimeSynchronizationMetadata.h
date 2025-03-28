@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/TimeSynchronization/TimeSynchronizationIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,79 +21,79 @@ inline constexpr uint32_t kRevision = 2;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kUTCTimeEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::UTCTime::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kGranularityEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::Granularity::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kTimeSourceEntry = {
-    .attributeId    = 2,
+    .attributeId    = Attributes::TimeSource::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kTrustedTimeSourceEntry = {
-    .attributeId    = 3,
+    .attributeId    = Attributes::TrustedTimeSource::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kDefaultNTPEntry = {
-    .attributeId    = 4,
+    .attributeId    = Attributes::DefaultNTP::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kTimeZoneEntry = {
-    .attributeId    = 5,
+    .attributeId    = Attributes::TimeZone::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kDSTOffsetEntry = {
-    .attributeId    = 6,
+    .attributeId    = Attributes::DSTOffset::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kLocalTimeEntry = {
-    .attributeId    = 7,
+    .attributeId    = Attributes::LocalTime::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kTimeZoneDatabaseEntry = {
-    .attributeId    = 8,
+    .attributeId    = Attributes::TimeZoneDatabase::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kNTPServerAvailableEntry = {
-    .attributeId    = 9,
+    .attributeId    = Attributes::NTPServerAvailable::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kTimeZoneListMaxSizeEntry = {
-    .attributeId    = 10,
+    .attributeId    = Attributes::TimeZoneListMaxSize::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kDSTOffsetListMaxSizeEntry = {
-    .attributeId    = 11,
+    .attributeId    = Attributes::DSTOffsetListMaxSize::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kSupportsDNSResolveEntry = {
-    .attributeId    = 12,
+    .attributeId    = Attributes::SupportsDNSResolve::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -102,27 +104,27 @@ inline constexpr DataModel::AttributeEntry kSupportsDNSResolveEntry = {
 namespace Commands {
 
 inline constexpr DataModel::AcceptedCommandEntry kSetUTCTimeEntry = {
-    .commandId       = 0,
+    .commandId       = Commands::SetUTCTime::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 inline constexpr DataModel::AcceptedCommandEntry kSetTrustedTimeSourceEntry = {
-    .commandId       = 1,
+    .commandId       = Commands::SetTrustedTimeSource::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 inline constexpr DataModel::AcceptedCommandEntry kSetTimeZoneEntry = {
-    .commandId       = 2,
+    .commandId       = Commands::SetTimeZone::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AcceptedCommandEntry kSetDSTOffsetEntry = {
-    .commandId       = 4,
+    .commandId       = Commands::SetDSTOffset::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AcceptedCommandEntry kSetDefaultNTPEntry = {
-    .commandId       = 5,
+    .commandId       = Commands::SetDefaultNTP::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };

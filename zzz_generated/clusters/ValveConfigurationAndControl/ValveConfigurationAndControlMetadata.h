@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/ValveConfigurationAndControl/ValveConfigurationAndControlIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,67 +21,67 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kOpenDurationEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::OpenDuration::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kDefaultOpenDurationEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::DefaultOpenDuration::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AttributeEntry kAutoCloseTimeEntry = {
-    .attributeId    = 2,
+    .attributeId    = Attributes::AutoCloseTime::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kRemainingDurationEntry = {
-    .attributeId    = 3,
+    .attributeId    = Attributes::RemainingDuration::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kCurrentStateEntry = {
-    .attributeId    = 4,
+    .attributeId    = Attributes::CurrentState::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kTargetStateEntry = {
-    .attributeId    = 5,
+    .attributeId    = Attributes::TargetState::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kCurrentLevelEntry = {
-    .attributeId    = 6,
+    .attributeId    = Attributes::CurrentLevel::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kTargetLevelEntry = {
-    .attributeId    = 7,
+    .attributeId    = Attributes::TargetLevel::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kDefaultOpenLevelEntry = {
-    .attributeId    = 8,
+    .attributeId    = Attributes::DefaultOpenLevel::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AttributeEntry kValveFaultEntry = {
-    .attributeId    = 9,
+    .attributeId    = Attributes::ValveFault::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kLevelStepEntry = {
-    .attributeId    = 10,
+    .attributeId    = Attributes::LevelStep::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -90,12 +92,12 @@ inline constexpr DataModel::AttributeEntry kLevelStepEntry = {
 namespace Commands {
 
 inline constexpr DataModel::AcceptedCommandEntry kOpenEntry = {
-    .commandId       = 0,
+    .commandId       = Commands::Open::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kCloseEntry = {
-    .commandId       = 1,
+    .commandId       = Commands::Close::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

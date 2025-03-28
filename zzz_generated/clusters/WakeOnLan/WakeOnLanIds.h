@@ -27,6 +27,7 @@ inline constexpr AttributeId Id = 0x00000001;
 namespace Commands {} // namespace Commands
 
 namespace Events {} // namespace Events
+
 } // namespace WakeOnLan
 } // namespace clusters
 } // namespace app

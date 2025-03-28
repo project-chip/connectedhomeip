@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/ThreadBorderRouterManagement/ThreadBorderRouterManagementIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,37 +21,37 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kBorderRouterNameEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::BorderRouterName::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kBorderAgentIDEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::BorderAgentID::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kThreadVersionEntry = {
-    .attributeId    = 2,
+    .attributeId    = Attributes::ThreadVersion::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kInterfaceEnabledEntry = {
-    .attributeId    = 3,
+    .attributeId    = Attributes::InterfaceEnabled::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kActiveDatasetTimestampEntry = {
-    .attributeId    = 4,
+    .attributeId    = Attributes::ActiveDatasetTimestamp::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kPendingDatasetTimestampEntry = {
-    .attributeId    = 5,
+    .attributeId    = Attributes::PendingDatasetTimestamp::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -60,22 +62,22 @@ inline constexpr DataModel::AttributeEntry kPendingDatasetTimestampEntry = {
 namespace Commands {
 
 inline constexpr DataModel::AcceptedCommandEntry kGetActiveDatasetRequestEntry = {
-    .commandId       = 0,
+    .commandId       = Commands::GetActiveDatasetRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AcceptedCommandEntry kGetPendingDatasetRequestEntry = {
-    .commandId       = 1,
+    .commandId       = Commands::GetPendingDatasetRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AcceptedCommandEntry kSetActiveDatasetRequestEntry = {
-    .commandId       = 3,
+    .commandId       = Commands::SetActiveDatasetRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AcceptedCommandEntry kSetPendingDatasetRequestEntry = {
-    .commandId       = 4,
+    .commandId       = Commands::SetPendingDatasetRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };

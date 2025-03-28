@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/ServiceArea/ServiceAreaIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,37 +21,37 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kSupportedAreasEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::SupportedAreas::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kSupportedMapsEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::SupportedMaps::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kSelectedAreasEntry = {
-    .attributeId    = 2,
+    .attributeId    = Attributes::SelectedAreas::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kCurrentAreaEntry = {
-    .attributeId    = 3,
+    .attributeId    = Attributes::CurrentArea::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kEstimatedEndTimeEntry = {
-    .attributeId    = 4,
+    .attributeId    = Attributes::EstimatedEndTime::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kProgressEntry = {
-    .attributeId    = 5,
+    .attributeId    = Attributes::Progress::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -60,12 +62,12 @@ inline constexpr DataModel::AttributeEntry kProgressEntry = {
 namespace Commands {
 
 inline constexpr DataModel::AcceptedCommandEntry kSelectAreasEntry = {
-    .commandId       = 0,
+    .commandId       = Commands::SelectAreas::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kSkipAreaEntry = {
-    .commandId       = 2,
+    .commandId       = Commands::SkipArea::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

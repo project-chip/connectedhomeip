@@ -33,6 +33,7 @@ inline constexpr AttributeId Id = 0x00000003;
 namespace Commands {} // namespace Commands
 
 namespace Events {} // namespace Events
+
 } // namespace RelativeHumidityMeasurement
 } // namespace clusters
 } // namespace app

@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/WiFiNetworkDiagnostics/WiFiNetworkDiagnosticsIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,79 +21,79 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kBssidEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::Bssid::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kSecurityTypeEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::SecurityType::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kWiFiVersionEntry = {
-    .attributeId    = 2,
+    .attributeId    = Attributes::WiFiVersion::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kChannelNumberEntry = {
-    .attributeId    = 3,
+    .attributeId    = Attributes::ChannelNumber::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kRssiEntry = {
-    .attributeId    = 4,
+    .attributeId    = Attributes::Rssi::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kBeaconLostCountEntry = {
-    .attributeId    = 5,
+    .attributeId    = Attributes::BeaconLostCount::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kBeaconRxCountEntry = {
-    .attributeId    = 6,
+    .attributeId    = Attributes::BeaconRxCount::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kPacketMulticastRxCountEntry = {
-    .attributeId    = 7,
+    .attributeId    = Attributes::PacketMulticastRxCount::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kPacketMulticastTxCountEntry = {
-    .attributeId    = 8,
+    .attributeId    = Attributes::PacketMulticastTxCount::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kPacketUnicastRxCountEntry = {
-    .attributeId    = 9,
+    .attributeId    = Attributes::PacketUnicastRxCount::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kPacketUnicastTxCountEntry = {
-    .attributeId    = 10,
+    .attributeId    = Attributes::PacketUnicastTxCount::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kCurrentMaxRateEntry = {
-    .attributeId    = 11,
+    .attributeId    = Attributes::CurrentMaxRate::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kOverrunCountEntry = {
-    .attributeId    = 12,
+    .attributeId    = Attributes::OverrunCount::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -102,7 +104,7 @@ inline constexpr DataModel::AttributeEntry kOverrunCountEntry = {
 namespace Commands {
 
 inline constexpr DataModel::AcceptedCommandEntry kResetCountsEntry = {
-    .commandId       = 0,
+    .commandId       = Commands::ResetCounts::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

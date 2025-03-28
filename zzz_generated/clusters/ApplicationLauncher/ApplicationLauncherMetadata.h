@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/ApplicationLauncher/ApplicationLauncherIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,13 +21,13 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kCatalogListEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::CatalogList::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kCurrentAppEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::CurrentApp::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -36,17 +38,17 @@ inline constexpr DataModel::AttributeEntry kCurrentAppEntry = {
 namespace Commands {
 
 inline constexpr DataModel::AcceptedCommandEntry kLaunchAppEntry = {
-    .commandId       = 0,
+    .commandId       = Commands::LaunchApp::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kStopAppEntry = {
-    .commandId       = 1,
+    .commandId       = Commands::StopApp::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kHideAppEntry = {
-    .commandId       = 2,
+    .commandId       = Commands::HideApp::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

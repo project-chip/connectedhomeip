@@ -28,6 +28,7 @@ namespace StateChange {
 inline constexpr EventId Id = 0x00000000;
 } // namespace StateChange
 } // namespace Events
+
 } // namespace BooleanState
 } // namespace clusters
 } // namespace app

@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/WiFiNetworkManagement/WiFiNetworkManagementIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,13 +21,13 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kSsidEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::Ssid::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kPassphraseSurrogateEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::PassphraseSurrogate::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kManage,
     .writePrivilege = std::nullopt,
@@ -36,7 +38,7 @@ inline constexpr DataModel::AttributeEntry kPassphraseSurrogateEntry = {
 namespace Commands {
 
 inline constexpr DataModel::AcceptedCommandEntry kNetworkPassphraseRequestEntry = {
-    .commandId       = 0,
+    .commandId       = Commands::NetworkPassphraseRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };

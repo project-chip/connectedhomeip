@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/{{cluster.name | upfirst}}/{{cluster.name | upfirst}}Ids.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -20,7 +22,7 @@ namespace Attributes {
 
 {% for attribute in cluster.attributes | reject("global_attribute") -%}
 inline constexpr DataModel::AttributeEntry k{{attribute.definition.name | upfirst}}Entry = {
-    .attributeId    = {{attribute.definition.code}},
+    .attributeId    = Attributes::{{attribute.definition.name | upfirst}}::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ {{ attribute | extract_attribute_quality_flags | join(", ") }} },
     .readPrivilege  = {% if attribute.is_readable -%}
         {{attribute.readacl | as_privilege}}
@@ -43,8 +45,8 @@ namespace Commands {
 
 {% for command in cluster.commands -%}
 inline constexpr DataModel::AcceptedCommandEntry k{{command.name | upfirst}}Entry = {
-    .commandId = {{ command.code }},
-    .flags = BitFlags<DataModel::CommandQualityFlags>{ {{ command | extract_command_quality_flags | join(", ") }} },
+    .commandId       = Commands::{{command.name | upfirst}}::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{ {{ command | extract_command_quality_flags | join(", ") }} },
     .invokePrivilege = {{ command.invokeacl | as_privilege}},
 };
 {% endfor %}

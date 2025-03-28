@@ -21,6 +21,7 @@ namespace Attributes {
 namespace Commands {} // namespace Commands
 
 namespace Events {} // namespace Events
+
 } // namespace PulseWidthModulation
 } // namespace clusters
 } // namespace app

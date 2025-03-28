@@ -35,6 +35,7 @@ namespace LoggedOut {
 inline constexpr EventId Id = 0x00000000;
 } // namespace LoggedOut
 } // namespace Events
+
 } // namespace AccountLogin
 } // namespace clusters
 } // namespace app

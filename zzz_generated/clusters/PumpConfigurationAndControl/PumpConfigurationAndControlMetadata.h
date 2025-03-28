@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/PumpConfigurationAndControl/PumpConfigurationAndControlIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,139 +21,139 @@ inline constexpr uint32_t kRevision = 4;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kMaxPressureEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::MaxPressure::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kMaxSpeedEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::MaxSpeed::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kMaxFlowEntry = {
-    .attributeId    = 2,
+    .attributeId    = Attributes::MaxFlow::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kMinConstPressureEntry = {
-    .attributeId    = 3,
+    .attributeId    = Attributes::MinConstPressure::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kMaxConstPressureEntry = {
-    .attributeId    = 4,
+    .attributeId    = Attributes::MaxConstPressure::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kMinCompPressureEntry = {
-    .attributeId    = 5,
+    .attributeId    = Attributes::MinCompPressure::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kMaxCompPressureEntry = {
-    .attributeId    = 6,
+    .attributeId    = Attributes::MaxCompPressure::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kMinConstSpeedEntry = {
-    .attributeId    = 7,
+    .attributeId    = Attributes::MinConstSpeed::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kMaxConstSpeedEntry = {
-    .attributeId    = 8,
+    .attributeId    = Attributes::MaxConstSpeed::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kMinConstFlowEntry = {
-    .attributeId    = 9,
+    .attributeId    = Attributes::MinConstFlow::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kMaxConstFlowEntry = {
-    .attributeId    = 10,
+    .attributeId    = Attributes::MaxConstFlow::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kMinConstTempEntry = {
-    .attributeId    = 11,
+    .attributeId    = Attributes::MinConstTemp::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kMaxConstTempEntry = {
-    .attributeId    = 12,
+    .attributeId    = Attributes::MaxConstTemp::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kPumpStatusEntry = {
-    .attributeId    = 16,
+    .attributeId    = Attributes::PumpStatus::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kEffectiveOperationModeEntry = {
-    .attributeId    = 17,
+    .attributeId    = Attributes::EffectiveOperationMode::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kEffectiveControlModeEntry = {
-    .attributeId    = 18,
+    .attributeId    = Attributes::EffectiveControlMode::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kCapacityEntry = {
-    .attributeId    = 19,
+    .attributeId    = Attributes::Capacity::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kSpeedEntry = {
-    .attributeId    = 20,
+    .attributeId    = Attributes::Speed::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kLifetimeRunningHoursEntry = {
-    .attributeId    = 21,
+    .attributeId    = Attributes::LifetimeRunningHours::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AttributeEntry kPowerEntry = {
-    .attributeId    = 22,
+    .attributeId    = Attributes::Power::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kLifetimeEnergyConsumedEntry = {
-    .attributeId    = 23,
+    .attributeId    = Attributes::LifetimeEnergyConsumed::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AttributeEntry kOperationModeEntry = {
-    .attributeId    = 32,
+    .attributeId    = Attributes::OperationMode::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AttributeEntry kControlModeEntry = {
-    .attributeId    = 33,
+    .attributeId    = Attributes::ControlMode::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,

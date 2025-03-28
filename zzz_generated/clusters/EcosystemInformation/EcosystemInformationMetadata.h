@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/EcosystemInformation/EcosystemInformationIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,13 +21,13 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kDeviceDirectoryEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::DeviceDirectory::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kManage,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kLocationDirectoryEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::LocationDirectory::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kManage,
     .writePrivilege = std::nullopt,

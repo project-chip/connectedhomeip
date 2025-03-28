@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/MediaInput/MediaInputIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,13 +21,13 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kInputListEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::InputList::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kCurrentInputEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::CurrentInput::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -36,22 +38,22 @@ inline constexpr DataModel::AttributeEntry kCurrentInputEntry = {
 namespace Commands {
 
 inline constexpr DataModel::AcceptedCommandEntry kSelectInputEntry = {
-    .commandId       = 0,
+    .commandId       = Commands::SelectInput::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kShowInputStatusEntry = {
-    .commandId       = 1,
+    .commandId       = Commands::ShowInputStatus::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kHideInputStatusEntry = {
-    .commandId       = 2,
+    .commandId       = Commands::HideInputStatus::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kRenameInputEntry = {
-    .commandId       = 3,
+    .commandId       = Commands::RenameInput::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };

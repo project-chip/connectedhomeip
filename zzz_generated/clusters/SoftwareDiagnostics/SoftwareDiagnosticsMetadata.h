@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/SoftwareDiagnostics/SoftwareDiagnosticsIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,25 +21,25 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kThreadMetricsEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::ThreadMetrics::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kCurrentHeapFreeEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::CurrentHeapFree::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kCurrentHeapUsedEntry = {
-    .attributeId    = 2,
+    .attributeId    = Attributes::CurrentHeapUsed::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kCurrentHeapHighWatermarkEntry = {
-    .attributeId    = 3,
+    .attributeId    = Attributes::CurrentHeapHighWatermark::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -48,7 +50,7 @@ inline constexpr DataModel::AttributeEntry kCurrentHeapHighWatermarkEntry = {
 namespace Commands {
 
 inline constexpr DataModel::AcceptedCommandEntry kResetWatermarksEntry = {
-    .commandId       = 0,
+    .commandId       = Commands::ResetWatermarks::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };

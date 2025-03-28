@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/TlsClientManagement/TlsClientManagementIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,13 +21,13 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kMaxProvisionedEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::MaxProvisioned::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kProvisionedEndpointsEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::ProvisionedEndpoints::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -36,17 +38,17 @@ inline constexpr DataModel::AttributeEntry kProvisionedEndpointsEntry = {
 namespace Commands {
 
 inline constexpr DataModel::AcceptedCommandEntry kProvisionEndpointEntry = {
-    .commandId       = 0,
+    .commandId       = Commands::ProvisionEndpoint::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 inline constexpr DataModel::AcceptedCommandEntry kFindEndpointEntry = {
-    .commandId       = 2,
+    .commandId       = Commands::FindEndpoint::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kRemoveEndpointEntry = {
-    .commandId       = 4,
+    .commandId       = Commands::RemoveEndpoint::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kAdminister,
 };

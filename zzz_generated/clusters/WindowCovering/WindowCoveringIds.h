@@ -109,6 +109,7 @@ inline constexpr CommandId Id = 0x00000008;
 } // namespace Commands
 
 namespace Events {} // namespace Events
+
 } // namespace WindowCovering
 } // namespace clusters
 } // namespace app

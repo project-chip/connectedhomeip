@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/ModeSelect/ModeSelectIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,37 +21,37 @@ inline constexpr uint32_t kRevision = 2;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kDescriptionEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::Description::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kStandardNamespaceEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::StandardNamespace::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kSupportedModesEntry = {
-    .attributeId    = 2,
+    .attributeId    = Attributes::SupportedModes::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kCurrentModeEntry = {
-    .attributeId    = 3,
+    .attributeId    = Attributes::CurrentMode::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kStartUpModeEntry = {
-    .attributeId    = 4,
+    .attributeId    = Attributes::StartUpMode::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AttributeEntry kOnModeEntry = {
-    .attributeId    = 5,
+    .attributeId    = Attributes::OnMode::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
@@ -60,7 +62,7 @@ inline constexpr DataModel::AttributeEntry kOnModeEntry = {
 namespace Commands {
 
 inline constexpr DataModel::AcceptedCommandEntry kChangeToModeEntry = {
-    .commandId       = 0,
+    .commandId       = Commands::ChangeToMode::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

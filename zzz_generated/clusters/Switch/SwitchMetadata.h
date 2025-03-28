@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/Switch/SwitchIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,19 +21,19 @@ inline constexpr uint32_t kRevision = 2;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kNumberOfPositionsEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::NumberOfPositions::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kCurrentPositionEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::CurrentPosition::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kMultiPressMaxEntry = {
-    .attributeId    = 2,
+    .attributeId    = Attributes::MultiPressMax::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,

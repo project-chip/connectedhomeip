@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/WebRTCTransportRequestor/WebRTCTransportRequestorIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,7 +21,7 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kCurrentSessionsEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::CurrentSessions::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kAdminister,
     .writePrivilege = std::nullopt,
@@ -30,22 +32,22 @@ inline constexpr DataModel::AttributeEntry kCurrentSessionsEntry = {
 namespace Commands {
 
 inline constexpr DataModel::AcceptedCommandEntry kOfferEntry = {
-    .commandId       = 1,
+    .commandId       = Commands::Offer::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kAnswerEntry = {
-    .commandId       = 2,
+    .commandId       = Commands::Answer::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kICECandidatesEntry = {
-    .commandId       = 3,
+    .commandId       = Commands::ICECandidates::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kEndEntry = {
-    .commandId       = 4,
+    .commandId       = Commands::End::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

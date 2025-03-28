@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/Descriptor/DescriptorIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,31 +21,31 @@ inline constexpr uint32_t kRevision = 2;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kDeviceTypeListEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::DeviceTypeList::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kServerListEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::ServerList::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kClientListEntry = {
-    .attributeId    = 2,
+    .attributeId    = Attributes::ClientList::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kPartsListEntry = {
-    .attributeId    = 3,
+    .attributeId    = Attributes::PartsList::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kTagListEntry = {
-    .attributeId    = 4,
+    .attributeId    = Attributes::TagList::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,

@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/UnitLocalization/UnitLocalizationIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,7 +21,7 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kTemperatureUnitEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::TemperatureUnit::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,

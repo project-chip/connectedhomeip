@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/ApplicationBasic/ApplicationBasicIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,49 +21,49 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kVendorNameEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::VendorName::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kVendorIDEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::VendorID::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kApplicationNameEntry = {
-    .attributeId    = 2,
+    .attributeId    = Attributes::ApplicationName::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kProductIDEntry = {
-    .attributeId    = 3,
+    .attributeId    = Attributes::ProductID::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kApplicationEntry = {
-    .attributeId    = 4,
+    .attributeId    = Attributes::Application::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kStatusEntry = {
-    .attributeId    = 5,
+    .attributeId    = Attributes::Status::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kApplicationVersionEntry = {
-    .attributeId    = 6,
+    .attributeId    = Attributes::ApplicationVersion::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kAllowedVendorListEntry = {
-    .attributeId    = 7,
+    .attributeId    = Attributes::AllowedVendorList::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kAdminister,
     .writePrivilege = std::nullopt,

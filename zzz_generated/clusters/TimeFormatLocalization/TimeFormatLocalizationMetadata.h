@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/TimeFormatLocalization/TimeFormatLocalizationIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,19 +21,19 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kHourFormatEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::HourFormat::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AttributeEntry kActiveCalendarTypeEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::ActiveCalendarType::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AttributeEntry kSupportedCalendarTypesEntry = {
-    .attributeId    = 2,
+    .attributeId    = Attributes::SupportedCalendarTypes::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,

@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/CommissionerControl/CommissionerControlIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,7 +21,7 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kSupportedDeviceCategoriesEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::SupportedDeviceCategories::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kManage,
     .writePrivilege = std::nullopt,
@@ -30,12 +32,12 @@ inline constexpr DataModel::AttributeEntry kSupportedDeviceCategoriesEntry = {
 namespace Commands {
 
 inline constexpr DataModel::AcceptedCommandEntry kRequestCommissioningApprovalEntry = {
-    .commandId       = 0,
+    .commandId       = Commands::RequestCommissioningApproval::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AcceptedCommandEntry kCommissionNodeEntry = {
-    .commandId       = 1,
+    .commandId       = Commands::CommissionNode::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };

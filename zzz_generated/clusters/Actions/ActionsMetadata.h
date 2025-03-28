@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/Actions/ActionsIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,19 +21,19 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kActionListEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::ActionList::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kEndpointListsEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::EndpointLists::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kSetupURLEntry = {
-    .attributeId    = 2,
+    .attributeId    = Attributes::SetupURL::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -42,62 +44,62 @@ inline constexpr DataModel::AttributeEntry kSetupURLEntry = {
 namespace Commands {
 
 inline constexpr DataModel::AcceptedCommandEntry kInstantActionEntry = {
-    .commandId       = 0,
+    .commandId       = Commands::InstantAction::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kInstantActionWithTransitionEntry = {
-    .commandId       = 1,
+    .commandId       = Commands::InstantActionWithTransition::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kStartActionEntry = {
-    .commandId       = 2,
+    .commandId       = Commands::StartAction::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kStartActionWithDurationEntry = {
-    .commandId       = 3,
+    .commandId       = Commands::StartActionWithDuration::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kStopActionEntry = {
-    .commandId       = 4,
+    .commandId       = Commands::StopAction::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kPauseActionEntry = {
-    .commandId       = 5,
+    .commandId       = Commands::PauseAction::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kPauseActionWithDurationEntry = {
-    .commandId       = 6,
+    .commandId       = Commands::PauseActionWithDuration::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kResumeActionEntry = {
-    .commandId       = 7,
+    .commandId       = Commands::ResumeAction::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kEnableActionEntry = {
-    .commandId       = 8,
+    .commandId       = Commands::EnableAction::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kEnableActionWithDurationEntry = {
-    .commandId       = 9,
+    .commandId       = Commands::EnableActionWithDuration::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kDisableActionEntry = {
-    .commandId       = 10,
+    .commandId       = Commands::DisableAction::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kDisableActionWithDurationEntry = {
-    .commandId       = 11,
+    .commandId       = Commands::DisableActionWithDuration::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

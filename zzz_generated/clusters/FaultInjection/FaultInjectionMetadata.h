@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/FaultInjection/FaultInjectionIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -21,12 +23,12 @@ namespace Attributes {} // namespace Attributes
 namespace Commands {
 
 inline constexpr DataModel::AcceptedCommandEntry kFailAtFaultEntry = {
-    .commandId       = 0,
+    .commandId       = Commands::FailAtFault::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AcceptedCommandEntry kFailRandomlyAtFaultEntry = {
-    .commandId       = 1,
+    .commandId       = Commands::FailRandomlyAtFault::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };

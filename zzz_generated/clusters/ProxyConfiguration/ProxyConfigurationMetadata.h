@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/ProxyConfiguration/ProxyConfigurationIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {

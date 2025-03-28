@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/Channel/ChannelIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,19 +21,19 @@ inline constexpr uint32_t kRevision = 2;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kChannelListEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::ChannelList::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kLineupEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::Lineup::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kCurrentChannelEntry = {
-    .attributeId    = 2,
+    .attributeId    = Attributes::CurrentChannel::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -42,32 +44,32 @@ inline constexpr DataModel::AttributeEntry kCurrentChannelEntry = {
 namespace Commands {
 
 inline constexpr DataModel::AcceptedCommandEntry kChangeChannelEntry = {
-    .commandId       = 0,
+    .commandId       = Commands::ChangeChannel::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kChangeChannelByNumberEntry = {
-    .commandId       = 2,
+    .commandId       = Commands::ChangeChannelByNumber::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kSkipChannelEntry = {
-    .commandId       = 3,
+    .commandId       = Commands::SkipChannel::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kGetProgramGuideEntry = {
-    .commandId       = 4,
+    .commandId       = Commands::GetProgramGuide::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kRecordProgramEntry = {
-    .commandId       = 6,
+    .commandId       = Commands::RecordProgram::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kCancelRecordProgramEntry = {
-    .commandId       = 7,
+    .commandId       = Commands::CancelRecordProgram::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

@@ -37,6 +37,7 @@ inline constexpr CommandId Id = 0x00000004;
 } // namespace Commands
 
 namespace Events {} // namespace Events
+
 } // namespace WebRTCTransportRequestor
 } // namespace clusters
 } // namespace app

@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/GeneralDiagnostics/GeneralDiagnosticsIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,55 +21,55 @@ inline constexpr uint32_t kRevision = 2;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kNetworkInterfacesEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::NetworkInterfaces::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kRebootCountEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::RebootCount::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kUpTimeEntry = {
-    .attributeId    = 2,
+    .attributeId    = Attributes::UpTime::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kTotalOperationalHoursEntry = {
-    .attributeId    = 3,
+    .attributeId    = Attributes::TotalOperationalHours::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kBootReasonEntry = {
-    .attributeId    = 4,
+    .attributeId    = Attributes::BootReason::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kActiveHardwareFaultsEntry = {
-    .attributeId    = 5,
+    .attributeId    = Attributes::ActiveHardwareFaults::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kActiveRadioFaultsEntry = {
-    .attributeId    = 6,
+    .attributeId    = Attributes::ActiveRadioFaults::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kActiveNetworkFaultsEntry = {
-    .attributeId    = 7,
+    .attributeId    = Attributes::ActiveNetworkFaults::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kTestEventTriggersEnabledEntry = {
-    .attributeId    = 8,
+    .attributeId    = Attributes::TestEventTriggersEnabled::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -78,17 +80,17 @@ inline constexpr DataModel::AttributeEntry kTestEventTriggersEnabledEntry = {
 namespace Commands {
 
 inline constexpr DataModel::AcceptedCommandEntry kTestEventTriggerEntry = {
-    .commandId       = 0,
+    .commandId       = Commands::TestEventTrigger::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AcceptedCommandEntry kTimeSnapshotEntry = {
-    .commandId       = 1,
+    .commandId       = Commands::TimeSnapshot::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kPayloadTestRequestEntry = {
-    .commandId       = 3,
+    .commandId       = Commands::PayloadTestRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };

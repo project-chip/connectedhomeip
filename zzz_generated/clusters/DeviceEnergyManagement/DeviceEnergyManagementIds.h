@@ -83,6 +83,7 @@ namespace Resumed {
 inline constexpr EventId Id = 0x00000003;
 } // namespace Resumed
 } // namespace Events
+
 } // namespace DeviceEnergyManagement
 } // namespace clusters
 } // namespace app

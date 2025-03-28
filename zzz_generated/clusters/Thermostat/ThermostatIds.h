@@ -223,6 +223,7 @@ inline constexpr CommandId Id = 0x000000FE;
 } // namespace Commands
 
 namespace Events {} // namespace Events
+
 } // namespace Thermostat
 } // namespace clusters
 } // namespace app

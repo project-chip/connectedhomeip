@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/Thermostat/ThermostatIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,361 +21,361 @@ inline constexpr uint32_t kRevision = 7;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kLocalTemperatureEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::LocalTemperature::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kOutdoorTemperatureEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::OutdoorTemperature::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kOccupancyEntry = {
-    .attributeId    = 2,
+    .attributeId    = Attributes::Occupancy::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kAbsMinHeatSetpointLimitEntry = {
-    .attributeId    = 3,
+    .attributeId    = Attributes::AbsMinHeatSetpointLimit::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kAbsMaxHeatSetpointLimitEntry = {
-    .attributeId    = 4,
+    .attributeId    = Attributes::AbsMaxHeatSetpointLimit::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kAbsMinCoolSetpointLimitEntry = {
-    .attributeId    = 5,
+    .attributeId    = Attributes::AbsMinCoolSetpointLimit::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kAbsMaxCoolSetpointLimitEntry = {
-    .attributeId    = 6,
+    .attributeId    = Attributes::AbsMaxCoolSetpointLimit::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kPICoolingDemandEntry = {
-    .attributeId    = 7,
+    .attributeId    = Attributes::PICoolingDemand::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kPIHeatingDemandEntry = {
-    .attributeId    = 8,
+    .attributeId    = Attributes::PIHeatingDemand::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kHVACSystemTypeConfigurationEntry = {
-    .attributeId    = 9,
+    .attributeId    = Attributes::HVACSystemTypeConfiguration::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AttributeEntry kLocalTemperatureCalibrationEntry = {
-    .attributeId    = 16,
+    .attributeId    = Attributes::LocalTemperatureCalibration::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AttributeEntry kOccupiedCoolingSetpointEntry = {
-    .attributeId    = 17,
+    .attributeId    = Attributes::OccupiedCoolingSetpoint::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AttributeEntry kOccupiedHeatingSetpointEntry = {
-    .attributeId    = 18,
+    .attributeId    = Attributes::OccupiedHeatingSetpoint::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AttributeEntry kUnoccupiedCoolingSetpointEntry = {
-    .attributeId    = 19,
+    .attributeId    = Attributes::UnoccupiedCoolingSetpoint::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AttributeEntry kUnoccupiedHeatingSetpointEntry = {
-    .attributeId    = 20,
+    .attributeId    = Attributes::UnoccupiedHeatingSetpoint::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AttributeEntry kMinHeatSetpointLimitEntry = {
-    .attributeId    = 21,
+    .attributeId    = Attributes::MinHeatSetpointLimit::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AttributeEntry kMaxHeatSetpointLimitEntry = {
-    .attributeId    = 22,
+    .attributeId    = Attributes::MaxHeatSetpointLimit::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AttributeEntry kMinCoolSetpointLimitEntry = {
-    .attributeId    = 23,
+    .attributeId    = Attributes::MinCoolSetpointLimit::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AttributeEntry kMaxCoolSetpointLimitEntry = {
-    .attributeId    = 24,
+    .attributeId    = Attributes::MaxCoolSetpointLimit::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AttributeEntry kMinSetpointDeadBandEntry = {
-    .attributeId    = 25,
+    .attributeId    = Attributes::MinSetpointDeadBand::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AttributeEntry kRemoteSensingEntry = {
-    .attributeId    = 26,
+    .attributeId    = Attributes::RemoteSensing::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AttributeEntry kControlSequenceOfOperationEntry = {
-    .attributeId    = 27,
+    .attributeId    = Attributes::ControlSequenceOfOperation::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AttributeEntry kSystemModeEntry = {
-    .attributeId    = 28,
+    .attributeId    = Attributes::SystemMode::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AttributeEntry kThermostatRunningModeEntry = {
-    .attributeId    = 30,
+    .attributeId    = Attributes::ThermostatRunningMode::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kStartOfWeekEntry = {
-    .attributeId    = 32,
+    .attributeId    = Attributes::StartOfWeek::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kNumberOfWeeklyTransitionsEntry = {
-    .attributeId    = 33,
+    .attributeId    = Attributes::NumberOfWeeklyTransitions::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kNumberOfDailyTransitionsEntry = {
-    .attributeId    = 34,
+    .attributeId    = Attributes::NumberOfDailyTransitions::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kTemperatureSetpointHoldEntry = {
-    .attributeId    = 35,
+    .attributeId    = Attributes::TemperatureSetpointHold::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AttributeEntry kTemperatureSetpointHoldDurationEntry = {
-    .attributeId    = 36,
+    .attributeId    = Attributes::TemperatureSetpointHoldDuration::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AttributeEntry kThermostatProgrammingOperationModeEntry = {
-    .attributeId    = 37,
+    .attributeId    = Attributes::ThermostatProgrammingOperationMode::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AttributeEntry kThermostatRunningStateEntry = {
-    .attributeId    = 41,
+    .attributeId    = Attributes::ThermostatRunningState::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kSetpointChangeSourceEntry = {
-    .attributeId    = 48,
+    .attributeId    = Attributes::SetpointChangeSource::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kSetpointChangeAmountEntry = {
-    .attributeId    = 49,
+    .attributeId    = Attributes::SetpointChangeAmount::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kSetpointChangeSourceTimestampEntry = {
-    .attributeId    = 50,
+    .attributeId    = Attributes::SetpointChangeSourceTimestamp::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kOccupiedSetbackEntry = {
-    .attributeId    = 52,
+    .attributeId    = Attributes::OccupiedSetback::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AttributeEntry kOccupiedSetbackMinEntry = {
-    .attributeId    = 53,
+    .attributeId    = Attributes::OccupiedSetbackMin::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kOccupiedSetbackMaxEntry = {
-    .attributeId    = 54,
+    .attributeId    = Attributes::OccupiedSetbackMax::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kUnoccupiedSetbackEntry = {
-    .attributeId    = 55,
+    .attributeId    = Attributes::UnoccupiedSetback::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AttributeEntry kUnoccupiedSetbackMinEntry = {
-    .attributeId    = 56,
+    .attributeId    = Attributes::UnoccupiedSetbackMin::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kUnoccupiedSetbackMaxEntry = {
-    .attributeId    = 57,
+    .attributeId    = Attributes::UnoccupiedSetbackMax::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kEmergencyHeatDeltaEntry = {
-    .attributeId    = 58,
+    .attributeId    = Attributes::EmergencyHeatDelta::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AttributeEntry kACTypeEntry = {
-    .attributeId    = 64,
+    .attributeId    = Attributes::ACType::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AttributeEntry kACCapacityEntry = {
-    .attributeId    = 65,
+    .attributeId    = Attributes::ACCapacity::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AttributeEntry kACRefrigerantTypeEntry = {
-    .attributeId    = 66,
+    .attributeId    = Attributes::ACRefrigerantType::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AttributeEntry kACCompressorTypeEntry = {
-    .attributeId    = 67,
+    .attributeId    = Attributes::ACCompressorType::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AttributeEntry kACErrorCodeEntry = {
-    .attributeId    = 68,
+    .attributeId    = Attributes::ACErrorCode::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AttributeEntry kACLouverPositionEntry = {
-    .attributeId    = 69,
+    .attributeId    = Attributes::ACLouverPosition::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AttributeEntry kACCoilTemperatureEntry = {
-    .attributeId    = 70,
+    .attributeId    = Attributes::ACCoilTemperature::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kACCapacityformatEntry = {
-    .attributeId    = 71,
+    .attributeId    = Attributes::ACCapacityformat::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AttributeEntry kPresetTypesEntry = {
-    .attributeId    = 72,
+    .attributeId    = Attributes::PresetTypes::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kScheduleTypesEntry = {
-    .attributeId    = 73,
+    .attributeId    = Attributes::ScheduleTypes::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kNumberOfPresetsEntry = {
-    .attributeId    = 74,
+    .attributeId    = Attributes::NumberOfPresets::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kNumberOfSchedulesEntry = {
-    .attributeId    = 75,
+    .attributeId    = Attributes::NumberOfSchedules::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kNumberOfScheduleTransitionsEntry = {
-    .attributeId    = 76,
+    .attributeId    = Attributes::NumberOfScheduleTransitions::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kNumberOfScheduleTransitionPerDayEntry = {
-    .attributeId    = 77,
+    .attributeId    = Attributes::NumberOfScheduleTransitionPerDay::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kActivePresetHandleEntry = {
-    .attributeId    = 78,
+    .attributeId    = Attributes::ActivePresetHandle::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kActiveScheduleHandleEntry = {
-    .attributeId    = 79,
+    .attributeId    = Attributes::ActiveScheduleHandle::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kPresetsEntry = {
-    .attributeId    = 80,
+    .attributeId    = Attributes::Presets::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AttributeEntry kSchedulesEntry = {
-    .attributeId    = 81,
+    .attributeId    = Attributes::Schedules::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AttributeEntry kSetpointHoldExpiryTimestampEntry = {
-    .attributeId    = 82,
+    .attributeId    = Attributes::SetpointHoldExpiryTimestamp::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -384,37 +386,37 @@ inline constexpr DataModel::AttributeEntry kSetpointHoldExpiryTimestampEntry = {
 namespace Commands {
 
 inline constexpr DataModel::AcceptedCommandEntry kSetpointRaiseLowerEntry = {
-    .commandId       = 0,
+    .commandId       = Commands::SetpointRaiseLower::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kSetWeeklyScheduleEntry = {
-    .commandId       = 1,
+    .commandId       = Commands::SetWeeklySchedule::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AcceptedCommandEntry kGetWeeklyScheduleEntry = {
-    .commandId       = 2,
+    .commandId       = Commands::GetWeeklySchedule::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kClearWeeklyScheduleEntry = {
-    .commandId       = 3,
+    .commandId       = Commands::ClearWeeklySchedule::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AcceptedCommandEntry kSetActiveScheduleRequestEntry = {
-    .commandId       = 5,
+    .commandId       = Commands::SetActiveScheduleRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kSetActivePresetRequestEntry = {
-    .commandId       = 6,
+    .commandId       = Commands::SetActivePresetRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kAtomicRequestEntry = {
-    .commandId       = 254,
+    .commandId       = Commands::AtomicRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };

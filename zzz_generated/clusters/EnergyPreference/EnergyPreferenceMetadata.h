@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/EnergyPreference/EnergyPreferenceIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,31 +21,31 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kEnergyBalancesEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::EnergyBalances::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kCurrentEnergyBalanceEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::CurrentEnergyBalance::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AttributeEntry kEnergyPrioritiesEntry = {
-    .attributeId    = 2,
+    .attributeId    = Attributes::EnergyPriorities::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kLowPowerModeSensitivitiesEntry = {
-    .attributeId    = 3,
+    .attributeId    = Attributes::LowPowerModeSensitivities::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kCurrentLowPowerModeSensitivityEntry = {
-    .attributeId    = 4,
+    .attributeId    = Attributes::CurrentLowPowerModeSensitivity::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,

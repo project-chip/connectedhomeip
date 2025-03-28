@@ -131,6 +131,7 @@ namespace RFID {
 inline constexpr EventId Id = 0x00000005;
 } // namespace RFID
 } // namespace Events
+
 } // namespace EnergyEvse
 } // namespace clusters
 } // namespace app

@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/ActivatedCarbonFilterMonitoring/ActivatedCarbonFilterMonitoringIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,37 +21,37 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kConditionEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::Condition::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kDegradationDirectionEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::DegradationDirection::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kChangeIndicationEntry = {
-    .attributeId    = 2,
+    .attributeId    = Attributes::ChangeIndication::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kInPlaceIndicatorEntry = {
-    .attributeId    = 3,
+    .attributeId    = Attributes::InPlaceIndicator::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kLastChangedTimeEntry = {
-    .attributeId    = 4,
+    .attributeId    = Attributes::LastChangedTime::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AttributeEntry kReplacementProductListEntry = {
-    .attributeId    = 5,
+    .attributeId    = Attributes::ReplacementProductList::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -60,7 +62,7 @@ inline constexpr DataModel::AttributeEntry kReplacementProductListEntry = {
 namespace Commands {
 
 inline constexpr DataModel::AcceptedCommandEntry kResetConditionEntry = {
-    .commandId       = 0,
+    .commandId       = Commands::ResetCondition::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

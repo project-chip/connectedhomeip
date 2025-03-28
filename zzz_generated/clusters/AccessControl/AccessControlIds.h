@@ -56,6 +56,7 @@ namespace FabricRestrictionReviewUpdate {
 inline constexpr EventId Id = 0x00000002;
 } // namespace FabricRestrictionReviewUpdate
 } // namespace Events
+
 } // namespace AccessControl
 } // namespace clusters
 } // namespace app

@@ -56,6 +56,7 @@ namespace PushTransportEnd {
 inline constexpr EventId Id = 0x00000001;
 } // namespace PushTransportEnd
 } // namespace Events
+
 } // namespace PushAvStreamTransport
 } // namespace clusters
 } // namespace app

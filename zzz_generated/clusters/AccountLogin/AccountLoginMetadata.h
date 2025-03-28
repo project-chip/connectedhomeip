@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/AccountLogin/AccountLoginIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -21,19 +23,19 @@ namespace Attributes {} // namespace Attributes
 namespace Commands {
 
 inline constexpr DataModel::AcceptedCommandEntry kGetSetupPINEntry = {
-    .commandId       = 0,
+    .commandId       = Commands::GetSetupPIN::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped,
                                                                  DataModel::CommandQualityFlags::kTimed },
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 inline constexpr DataModel::AcceptedCommandEntry kLoginEntry = {
-    .commandId       = 2,
+    .commandId       = Commands::Login::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped,
                                                                  DataModel::CommandQualityFlags::kTimed },
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 inline constexpr DataModel::AcceptedCommandEntry kLogoutEntry = {
-    .commandId       = 3,
+    .commandId       = Commands::Logout::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped,
                                                                  DataModel::CommandQualityFlags::kTimed },
     .invokePrivilege = Access::Privilege::kOperate,

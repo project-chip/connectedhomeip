@@ -175,6 +175,7 @@ inline constexpr CommandId Id = 0x0000000C;
 } // namespace Commands
 
 namespace Events {} // namespace Events
+
 } // namespace CameraAvStreamManagement
 } // namespace clusters
 } // namespace app

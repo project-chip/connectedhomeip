@@ -74,6 +74,7 @@ namespace ConnectionStatus {
 inline constexpr EventId Id = 0x00000002;
 } // namespace ConnectionStatus
 } // namespace Events
+
 } // namespace WiFiNetworkDiagnostics
 } // namespace clusters
 } // namespace app

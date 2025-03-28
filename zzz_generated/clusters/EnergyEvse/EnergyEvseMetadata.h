@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/EnergyEvse/EnergyEvseIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,139 +21,139 @@ inline constexpr uint32_t kRevision = 3;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kStateEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::State::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kSupplyStateEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::SupplyState::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kFaultStateEntry = {
-    .attributeId    = 2,
+    .attributeId    = Attributes::FaultState::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kChargingEnabledUntilEntry = {
-    .attributeId    = 3,
+    .attributeId    = Attributes::ChargingEnabledUntil::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kDischargingEnabledUntilEntry = {
-    .attributeId    = 4,
+    .attributeId    = Attributes::DischargingEnabledUntil::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kCircuitCapacityEntry = {
-    .attributeId    = 5,
+    .attributeId    = Attributes::CircuitCapacity::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kMinimumChargeCurrentEntry = {
-    .attributeId    = 6,
+    .attributeId    = Attributes::MinimumChargeCurrent::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kMaximumChargeCurrentEntry = {
-    .attributeId    = 7,
+    .attributeId    = Attributes::MaximumChargeCurrent::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kMaximumDischargeCurrentEntry = {
-    .attributeId    = 8,
+    .attributeId    = Attributes::MaximumDischargeCurrent::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kUserMaximumChargeCurrentEntry = {
-    .attributeId    = 9,
+    .attributeId    = Attributes::UserMaximumChargeCurrent::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AttributeEntry kRandomizationDelayWindowEntry = {
-    .attributeId    = 10,
+    .attributeId    = Attributes::RandomizationDelayWindow::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AttributeEntry kNextChargeStartTimeEntry = {
-    .attributeId    = 35,
+    .attributeId    = Attributes::NextChargeStartTime::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kNextChargeTargetTimeEntry = {
-    .attributeId    = 36,
+    .attributeId    = Attributes::NextChargeTargetTime::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kNextChargeRequiredEnergyEntry = {
-    .attributeId    = 37,
+    .attributeId    = Attributes::NextChargeRequiredEnergy::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kNextChargeTargetSoCEntry = {
-    .attributeId    = 38,
+    .attributeId    = Attributes::NextChargeTargetSoC::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kApproximateEVEfficiencyEntry = {
-    .attributeId    = 39,
+    .attributeId    = Attributes::ApproximateEVEfficiency::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AttributeEntry kStateOfChargeEntry = {
-    .attributeId    = 48,
+    .attributeId    = Attributes::StateOfCharge::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kBatteryCapacityEntry = {
-    .attributeId    = 49,
+    .attributeId    = Attributes::BatteryCapacity::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kVehicleIDEntry = {
-    .attributeId    = 50,
+    .attributeId    = Attributes::VehicleID::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kSessionIDEntry = {
-    .attributeId    = 64,
+    .attributeId    = Attributes::SessionID::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kSessionDurationEntry = {
-    .attributeId    = 65,
+    .attributeId    = Attributes::SessionDuration::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kSessionEnergyChargedEntry = {
-    .attributeId    = 66,
+    .attributeId    = Attributes::SessionEnergyCharged::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kSessionEnergyDischargedEntry = {
-    .attributeId    = 67,
+    .attributeId    = Attributes::SessionEnergyDischarged::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -162,37 +164,37 @@ inline constexpr DataModel::AttributeEntry kSessionEnergyDischargedEntry = {
 namespace Commands {
 
 inline constexpr DataModel::AcceptedCommandEntry kDisableEntry = {
-    .commandId       = 1,
+    .commandId       = Commands::Disable::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kEnableChargingEntry = {
-    .commandId       = 2,
+    .commandId       = Commands::EnableCharging::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kEnableDischargingEntry = {
-    .commandId       = 3,
+    .commandId       = Commands::EnableDischarging::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kStartDiagnosticsEntry = {
-    .commandId       = 4,
+    .commandId       = Commands::StartDiagnostics::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kSetTargetsEntry = {
-    .commandId       = 5,
+    .commandId       = Commands::SetTargets::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kGetTargetsEntry = {
-    .commandId       = 6,
+    .commandId       = Commands::GetTargets::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kClearTargetsEntry = {
-    .commandId       = 7,
+    .commandId       = Commands::ClearTargets::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
     .invokePrivilege = Access::Privilege::kOperate,
 };

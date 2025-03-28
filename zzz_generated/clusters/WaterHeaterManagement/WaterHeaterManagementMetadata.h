@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/WaterHeaterManagement/WaterHeaterManagementIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,37 +21,37 @@ inline constexpr uint32_t kRevision = 2;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kHeaterTypesEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::HeaterTypes::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kHeatDemandEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::HeatDemand::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kTankVolumeEntry = {
-    .attributeId    = 2,
+    .attributeId    = Attributes::TankVolume::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kEstimatedHeatRequiredEntry = {
-    .attributeId    = 3,
+    .attributeId    = Attributes::EstimatedHeatRequired::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kTankPercentageEntry = {
-    .attributeId    = 4,
+    .attributeId    = Attributes::TankPercentage::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kBoostStateEntry = {
-    .attributeId    = 5,
+    .attributeId    = Attributes::BoostState::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -60,12 +62,12 @@ inline constexpr DataModel::AttributeEntry kBoostStateEntry = {
 namespace Commands {
 
 inline constexpr DataModel::AcceptedCommandEntry kBoostEntry = {
-    .commandId       = 0,
+    .commandId       = Commands::Boost::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AcceptedCommandEntry kCancelBoostEntry = {
-    .commandId       = 1,
+    .commandId       = Commands::CancelBoost::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };

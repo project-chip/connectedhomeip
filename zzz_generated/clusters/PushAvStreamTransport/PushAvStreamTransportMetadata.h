@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/PushAvStreamTransport/PushAvStreamTransportIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,19 +21,19 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kSupportedContainerFormatsEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::SupportedContainerFormats::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kSupportedIngestMethodsEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::SupportedIngestMethods::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kCurrentConnectionsEntry = {
-    .attributeId    = 2,
+    .attributeId    = Attributes::CurrentConnections::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -42,32 +44,32 @@ inline constexpr DataModel::AttributeEntry kCurrentConnectionsEntry = {
 namespace Commands {
 
 inline constexpr DataModel::AcceptedCommandEntry kAllocatePushTransportEntry = {
-    .commandId       = 0,
+    .commandId       = Commands::AllocatePushTransport::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AcceptedCommandEntry kDeallocatePushTransportEntry = {
-    .commandId       = 2,
+    .commandId       = Commands::DeallocatePushTransport::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AcceptedCommandEntry kModifyPushTransportEntry = {
-    .commandId       = 3,
+    .commandId       = Commands::ModifyPushTransport::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AcceptedCommandEntry kSetTransportStatusEntry = {
-    .commandId       = 4,
+    .commandId       = Commands::SetTransportStatus::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AcceptedCommandEntry kManuallyTriggerTransportEntry = {
-    .commandId       = 5,
+    .commandId       = Commands::ManuallyTriggerTransport::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kFindTransportEntry = {
-    .commandId       = 6,
+    .commandId       = Commands::FindTransport::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

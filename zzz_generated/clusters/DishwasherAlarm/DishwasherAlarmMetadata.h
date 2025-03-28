@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/DishwasherAlarm/DishwasherAlarmIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,25 +21,25 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kMaskEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::Mask::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kLatchEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::Latch::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kStateEntry = {
-    .attributeId    = 2,
+    .attributeId    = Attributes::State::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kSupportedEntry = {
-    .attributeId    = 3,
+    .attributeId    = Attributes::Supported::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -48,12 +50,12 @@ inline constexpr DataModel::AttributeEntry kSupportedEntry = {
 namespace Commands {
 
 inline constexpr DataModel::AcceptedCommandEntry kResetEntry = {
-    .commandId       = 0,
+    .commandId       = Commands::Reset::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kModifyEnabledAlarmsEntry = {
-    .commandId       = 1,
+    .commandId       = Commands::ModifyEnabledAlarms::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

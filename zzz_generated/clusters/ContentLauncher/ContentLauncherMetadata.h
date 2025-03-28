@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/ContentLauncher/ContentLauncherIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,13 +21,13 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kAcceptHeaderEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::AcceptHeader::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kSupportedStreamingProtocolsEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::SupportedStreamingProtocols::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -36,12 +38,12 @@ inline constexpr DataModel::AttributeEntry kSupportedStreamingProtocolsEntry = {
 namespace Commands {
 
 inline constexpr DataModel::AcceptedCommandEntry kLaunchContentEntry = {
-    .commandId       = 0,
+    .commandId       = Commands::LaunchContent::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AcceptedCommandEntry kLaunchURLEntry = {
-    .commandId       = 1,
+    .commandId       = Commands::LaunchURL::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

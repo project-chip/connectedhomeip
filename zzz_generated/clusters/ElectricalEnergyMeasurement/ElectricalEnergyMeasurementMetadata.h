@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/ElectricalEnergyMeasurement/ElectricalEnergyMeasurementIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,37 +21,37 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kAccuracyEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::Accuracy::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kCumulativeEnergyImportedEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::CumulativeEnergyImported::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kCumulativeEnergyExportedEntry = {
-    .attributeId    = 2,
+    .attributeId    = Attributes::CumulativeEnergyExported::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kPeriodicEnergyImportedEntry = {
-    .attributeId    = 3,
+    .attributeId    = Attributes::PeriodicEnergyImported::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kPeriodicEnergyExportedEntry = {
-    .attributeId    = 4,
+    .attributeId    = Attributes::PeriodicEnergyExported::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 inline constexpr DataModel::AttributeEntry kCumulativeEnergyResetEntry = {
-    .attributeId    = 5,
+    .attributeId    = Attributes::CumulativeEnergyReset::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,

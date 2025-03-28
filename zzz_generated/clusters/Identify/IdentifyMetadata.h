@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/Identify/IdentifyIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -19,13 +21,13 @@ inline constexpr uint32_t kRevision = 4;
 namespace Attributes {
 
 inline constexpr DataModel::AttributeEntry kIdentifyTimeEntry = {
-    .attributeId    = 0,
+    .attributeId    = Attributes::IdentifyTime::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
 inline constexpr DataModel::AttributeEntry kIdentifyTypeEntry = {
-    .attributeId    = 1,
+    .attributeId    = Attributes::IdentifyType::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
@@ -36,12 +38,12 @@ inline constexpr DataModel::AttributeEntry kIdentifyTypeEntry = {
 namespace Commands {
 
 inline constexpr DataModel::AcceptedCommandEntry kIdentifyEntry = {
-    .commandId       = 0,
+    .commandId       = Commands::Identify::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
 inline constexpr DataModel::AcceptedCommandEntry kTriggerEffectEntry = {
-    .commandId       = 64,
+    .commandId       = Commands::TriggerEffect::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };

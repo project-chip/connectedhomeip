@@ -59,6 +59,7 @@ namespace OperationCompletion {
 inline constexpr EventId Id = 0x00000001;
 } // namespace OperationCompletion
 } // namespace Events
+
 } // namespace OvenCavityOperationalState
 } // namespace clusters
 } // namespace app

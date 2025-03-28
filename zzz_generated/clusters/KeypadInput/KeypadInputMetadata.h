@@ -8,6 +8,8 @@
 
 #include <cstdint>
 
+#include <clusters/KeypadInput/KeypadInputIds.h>
+
 namespace chip {
 namespace app {
 namespace clusters {
@@ -21,7 +23,7 @@ namespace Attributes {} // namespace Attributes
 namespace Commands {
 
 inline constexpr DataModel::AcceptedCommandEntry kSendKeyEntry = {
-    .commandId       = 0,
+    .commandId       = Commands::SendKey::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };

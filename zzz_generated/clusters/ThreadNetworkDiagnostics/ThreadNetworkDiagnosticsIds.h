@@ -221,6 +221,7 @@ namespace NetworkFaultChange {
 inline constexpr EventId Id = 0x00000001;
 } // namespace NetworkFaultChange
 } // namespace Events
+
 } // namespace ThreadNetworkDiagnostics
 } // namespace clusters
 } // namespace app
