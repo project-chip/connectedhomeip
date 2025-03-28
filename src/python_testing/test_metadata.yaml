@@ -81,6 +81,8 @@ not_automated:
       reason: Code/Test not being used or not shared code for any other tests
     - name: modebase_cluster_check.py
       reason: Shared code for Modebase derived clusters, not a standalone test.
+    - name: TC_DA_1_9.py
+      reason: This tests the controller and can not be run on the through execute_python_tests.py
 
 # This is a list of slow tests (just arbitrarily picked around 20 seconds)
 # used in some script reporting for "be patient" messages as well as potentially
