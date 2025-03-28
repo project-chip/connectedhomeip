@@ -76,11 +76,7 @@ void emberAfDeviceEnergyManagementClusterShutdownCallback(chip::EndpointId endpo
     if (gInstance)
     {
         gInstance->Shutdown();
-        gInstance = nullptr;
     }
-
-    if (gDelegate)
-    {
-        gDelegate = nullptr;
-    }
+    gInstance = nullptr;
+    gDelegate = nullptr;
 }

@@ -151,9 +151,10 @@ void emberAfActionsClusterInitCallback(EndpointId endpoint)
 
 void emberAfActionsClusterShutdownCallback(EndpointId endpoint)
 {
-    VerifyOrReturn(sActionsDelegateImpl && sActionsServer);
-
-    sActionsServer->Shutdown();
+    if (sActionsServer)
+    {
+        sActionsServer->Shutdown();
+    }
     sActionsDelegateImpl = nullptr;
     sActionsServer       = nullptr;
 }

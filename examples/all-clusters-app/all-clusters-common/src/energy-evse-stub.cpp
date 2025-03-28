@@ -65,14 +65,8 @@ void emberAfEnergyEvseClusterShutdownCallback(chip::EndpointId endpointId)
     if (gInstance)
     {
         gInstance->Shutdown();
-        gInstance = nullptr;
     }
-    if (gDelegate)
-    {
-        gInstance = nullptr;
-    }
-    if (gEvseTargetsDelegate)
-    {
-        gEvseTargetsDelegate = nullptr;
-    }
+    gInstance            = nullptr;
+    gDelegate            = nullptr;
+    gEvseTargetsDelegate = nullptr;
 }

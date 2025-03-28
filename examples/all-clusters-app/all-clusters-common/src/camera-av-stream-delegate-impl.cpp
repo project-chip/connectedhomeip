@@ -360,11 +360,6 @@ void emberAfCameraAvStreamManagementClusterInitCallback(EndpointId endpoint)
 
 void emberAfCameraAvStreamManagementClusterShutdownCallback(EndpointId endpoint)
 {
-    VerifyOrReturn(sCameraAVStreamMgrInstance && sCameraAVStreamMgmtClusterServerInstance);
-
-    // TODO: CameraAVStreamMgmtServer class should have Shutdown correponding to Init.
     sCameraAVStreamMgmtClusterServerInstance = nullptr;
-
-    // TODO: CameraAVStreamManager class should have Shutdown correponding to Init.
-    sCameraAVStreamMgrInstance = nullptr;
+    sCameraAVStreamMgrInstance               = nullptr;
 }

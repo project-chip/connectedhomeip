@@ -85,7 +85,7 @@ void emberAfOccupancySensingClusterShutdownCallback(EndpointId endpointId)
         if (gOccupancySensingClusterInstances[epIndex])
         {
             gOccupancySensingClusterInstances[epIndex]->Shutdown();
-            gOccupancySensingClusterInstances[epIndex] = nullptr;
         }
+        gOccupancySensingClusterInstances[epIndex] = nullptr;
     }
 }

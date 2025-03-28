@@ -76,10 +76,7 @@ void emberAfPowerTopologyClusterShutdownCallback(chip::EndpointId endpointId)
     if (gInstance)
     {
         gInstance->Shutdown();
-        gInstance = nullptr;
     }
-    if (gDelegate)
-    {
-        gDelegate = nullptr;
-    }
+    gInstance = nullptr;
+    gDelegate = nullptr;
 }

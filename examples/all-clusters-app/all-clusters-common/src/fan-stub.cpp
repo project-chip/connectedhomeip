@@ -184,6 +184,6 @@ void emberAfFanControlClusterShutdownCallback(EndpointId endpoint)
     if (mFanControlManager)
     {
         delete mFanControlManager;
-        mFanControlManager = nullptr;
     }
+    mFanControlManager = nullptr;
 }

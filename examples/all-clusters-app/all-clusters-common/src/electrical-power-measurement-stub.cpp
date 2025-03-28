@@ -57,11 +57,7 @@ void emberAfElectricalPowerMeasurementClusterShutdownCallback(chip::EndpointId e
     if (gEPMInstance)
     {
         gEPMInstance->Shutdown();
-        gEPMInstance = nullptr;
     }
-
-    if (gEPMDelegate)
-    {
-        gEPMDelegate = nullptr;
-    }
+    gEPMInstance = nullptr;
+    gEPMDelegate = nullptr;
 }
