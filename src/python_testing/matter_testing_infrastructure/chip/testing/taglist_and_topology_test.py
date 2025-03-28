@@ -148,7 +148,9 @@ def cmp_tag_list(a: Clusters.Descriptor.Structs.SemanticTagStruct, b: Clusters.D
     if type(a.mfgCode) != type(b.mfgCode):
         return -1 if type(a.mfgCode) is Nullable else 1
     if a.mfgCode != b.mfgCode:
-        return -1 if a.mfgCode < b.mfgCode else 1
+        # Adding type ignore for the comparison between potentially incompatible types
+        result = -1 if a.mfgCode < b.mfgCode else 1  # type: ignore
+        return result
     if a.namespaceID != b.namespaceID:
         return -1 if a.namespaceID < b.namespaceID else 1
     if a.tag != b.tag:
@@ -156,7 +158,9 @@ def cmp_tag_list(a: Clusters.Descriptor.Structs.SemanticTagStruct, b: Clusters.D
     if type(a.label) != type(b.label):
         return -1 if type(a.label) is Nullable or a.label is None else 1
     if a.label != b.label:
-        return -1 if a.label < b.label else 1
+        # Adding type ignore for the comparison between potentially incompatible types
+        result = -1 if a.label < b.label else 1  # type: ignore
+        return result
     return 0
 
 
