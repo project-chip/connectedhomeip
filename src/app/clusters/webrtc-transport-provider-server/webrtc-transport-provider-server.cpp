@@ -220,7 +220,7 @@ WebRTCSessionStruct * WebRTCTransportProviderServer::CheckForMatchingSession(Han
 
 uint16_t WebRTCTransportProviderServer::GenerateSessionId()
 {
-    static uint16_t lastSessionId = 0;
+    static uint16_t lastSessionId = 1;
 
     do
     {
@@ -229,7 +229,7 @@ uint16_t WebRTCTransportProviderServer::GenerateSessionId()
         // Handle wrap-around per spec
         if (lastSessionId > kMaxSessionId)
         {
-            lastSessionId = 0;
+            lastSessionId = 1;
         }
 
         if (FindSession(candidateId) == nullptr)
@@ -277,6 +277,7 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
     args.audioStreamId   = req.audioStreamID;
     args.metadataOptions = req.metadataOptions;
     args.peerNodeId      = GetNodeIdFromCtx(ctx.mCommandHandler);
+    args.fabricIndex     = ctx.mCommandHandler.GetAccessingFabricIndex();
 
     if (req.ICEServers.HasValue())
     {
@@ -391,6 +392,8 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
             return;
         }
 
+        FabricIndex peerFabricIndex = ctx.mCommandHandler.GetAccessingFabricIndex();
+
         // Prepare delegate arguments.
         Delegate::ProvideOfferRequestArgs args;
         args.sessionId       = GenerateSessionId();
@@ -399,6 +402,7 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
         args.audioStreamId   = audioStreamID;
         args.metadataOptions = req.metadataOptions;
         args.peerNodeId      = peerNodeId;
+        args.fabricIndex     = peerFabricIndex;
         args.sdp             = std::string(req.sdp.data(), req.sdp.size());
 
         // Convert ICE servers list from DecodableList to vector.
@@ -432,8 +436,12 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
                 std::string(req.ICETransportPolicy.Value().data(), req.ICETransportPolicy.Value().size()));
         }
 
+        // Build a ScopedNodeId using the secure session’s fabric & node ID.
+        ScopedNodeId peerId(peerNodeId, peerFabricIndex);
+
         // Delegate processing: process the SDP offer, gather ICE candidates, create SDP answer, etc.
-        auto delegateStatus = Protocols::InteractionModel::ClusterStatusCode(mDelegate.HandleProvideOffer(args, outSession));
+        auto delegateStatus = Protocols::InteractionModel::ClusterStatusCode(
+            mDelegate.HandleProvideOffer(args, outSession, peerId, req.originatingEndpointID));
         if (!delegateStatus.IsSuccess())
         {
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, delegateStatus);
