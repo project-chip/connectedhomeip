@@ -47,15 +47,17 @@ jobs:
       
       - name: Run mypy validation
         run: |
+          # List the directory to debug the file structure
+          ls -la src/python_testing/matter_testing_infrastructure/chip/testing/
+          
           # TODO: Expand this list to include more files once they are mypy-compatible
           # Eventually we should just check all files in the chip/testing directory
           
-          ./scripts/run_in_python_env.sh out/venv "cd src/python_testing/matter_testing_infrastructure && \
-          mypy --config-file=mypy.ini \
-            chip/testing/apps.py \
-            chip/testing/tasks.py \
-            chip/testing/taglist_and_topology.py \
-            chip/testing/pics.py"
+          ./scripts/run_in_python_env.sh out/venv "mypy --config-file=src/python_testing/matter_testing_infrastructure/mypy.ini \
+            src/python_testing/matter_testing_infrastructure/chip/testing/apps.py \
+            src/python_testing/matter_testing_infrastructure/chip/testing/tasks.py \
+            src/python_testing/matter_testing_infrastructure/chip/testing/taglist_and_topology.py \
+            src/python_testing/matter_testing_infrastructure/chip/testing/pics.py"
           
           # Print a reminder about expanding coverage
           echo "⚠️ NOTE: Currently only checking a subset of files. Remember to expand coverage!" 
