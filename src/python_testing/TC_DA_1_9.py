@@ -49,7 +49,7 @@ test_cases = [
         'name': 'tc_pai_revoked',
         'dac_provider': 'revoked-pai.json',
         'revocation_set_path': 'revocation-set.json',
-        'expects_commissioning_success': False, 
+        'expects_commissioning_success': False,
         'expects_att_err': 202
     },
     {
@@ -92,6 +92,8 @@ test_cases = [
 # Check if the attestation error is present in the commissioner log
 # Returns True if the attestation error is present and matches the expected error
 # Returns False otherwise
+
+
 def get_attestation_error_from_log(log_file: str, expected_att_err: Optional[int]) -> bool:
     att_err_matches = True
     if expected_att_err:
@@ -120,8 +122,10 @@ def get_attestation_error_from_log(log_file: str, expected_att_err: Optional[int
 @click.option('--manual', is_flag=True, show_default=True, default=False,
               help="Run the tests manually with a different DUT(commissioner) and enter the results by hand")
 def main(app: str, chip_tool: str, out_dir: str, manual: bool):
-    dac_provider_base_path = os.path.abspath(os.path.join(CHIP_ROOT, 'credentials/test/revoked-attestation-certificates/dac-provider-test-vectors'))
-    revocation_set_base_path = os.path.abspath(os.path.join(CHIP_ROOT, 'credentials/test/revoked-attestation-certificates/revocation-sets'))
+    dac_provider_base_path = os.path.abspath(os.path.join(
+        CHIP_ROOT, 'credentials/test/revoked-attestation-certificates/dac-provider-test-vectors'))
+    revocation_set_base_path = os.path.abspath(os.path.join(
+        CHIP_ROOT, 'credentials/test/revoked-attestation-certificates/revocation-sets'))
     subprocess.call(f'mkdir -p {out_dir}', shell=True)
     results = {}
 
@@ -129,7 +133,8 @@ def main(app: str, chip_tool: str, out_dir: str, manual: bool):
         if test_case['dac_provider'] is None:
             dac_provider_path = None
         else:
-            dac_provider_path = str(os.path.join(dac_provider_base_path, test_case['dac_provider'])) if test_case['dac_provider'] else None
+            dac_provider_path = str(os.path.join(dac_provider_base_path,
+                                    test_case['dac_provider'])) if test_case['dac_provider'] else None
 
         # remove any existing KVS files (if any), equivalent to Factory Resetting the TH(all-clusters-app)
         subprocess.call("rm -f /tmp/tmpkvs*", shell=True)
@@ -163,7 +168,7 @@ def main(app: str, chip_tool: str, out_dir: str, manual: bool):
                         input_done = True
                     else:
                         print('Unknown key entered, please try again')
-                    
+
                     # We can not get the attestation error in the manual mode, setting it to True
                     att_err_matches = True
             else:
@@ -196,6 +201,7 @@ def main(app: str, chip_tool: str, out_dir: str, manual: bool):
         for k, v in results.items():
             passed = "PASSED" if v is True else "FAILED"
             summary_file.write(f'{k}:{passed}')
+
 
 if __name__ == '__main__':
     main()
