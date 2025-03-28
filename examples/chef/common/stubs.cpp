@@ -63,6 +63,8 @@ const Clusters::Descriptor::Structs::SemanticTagStruct::Type kTop    = { .namesp
 const Clusters::Descriptor::Structs::SemanticTagStruct::Type kBottom = { .namespaceID = kNamespace, .tag = 0x03 };
 const Clusters::Descriptor::Structs::SemanticTagStruct::Type kMiddle = { .namespaceID = kNamespace, .tag = 0x04 };
 
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kTopTagList[]  = { PostionSemanticTag::kTop };
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kLeftTagList[] = { PostionSemanticTag::kLeft };
 } // namespace PostionSemanticTag
 
 #ifdef MATTER_DM_PLUGIN_RVC_OPERATIONAL_STATE_SERVER
@@ -412,9 +414,7 @@ void CooktopCookSurfaceInit(EndpointId kCooktopEpId)
             {
                 ChipLogDetail(NotSpecified, "Cook Surface device type on EP: %d", kCookSurfaceEpId);
                 SetParentEndpointForEndpoint(kCookSurfaceEpId, kCooktopEpId);
-                const Clusters::Descriptor::Structs::SemanticTagStruct::Type cookSurfacePosition[] = { PostionSemanticTag::kLeft };
-                SetTagList(kCookSurfaceEpId,
-                           Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(cookSurfacePosition));
+                SetTagList(kCookSurfaceEpId, PostionSemanticTag::kLeftTagList);
             }
         }
         break;
@@ -430,9 +430,7 @@ void CooktopCookSurfaceInit(EndpointId kCooktopEpId)
             {
                 ChipLogDetail(NotSpecified, "Cook Surface device type on EP: %d", kCookSurfaceEpId);
                 SetParentEndpointForEndpoint(kCookSurfaceEpId, kCooktopEpId);
-                const Clusters::Descriptor::Structs::SemanticTagStruct::Type cookSurfacePosition[] = { PostionSemanticTag::kLeft };
-                SetTagList(kCookSurfaceEpId,
-                           Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(cookSurfacePosition));
+                SetTagList(kCookSurfaceEpId, PostionSemanticTag::kLeftTagList);
             }
         }
     }
@@ -457,9 +455,7 @@ void OvenTemperatureControlledCabinetCooktopCookSurfaceInit()
         {
             ChipLogDetail(NotSpecified, "Temperature controlled cabinet device type on EP: %d", kTemperatureControlledCabinetEpId);
             SetParentEndpointForEndpoint(kTemperatureControlledCabinetEpId, kOvenEpId);
-            const Clusters::Descriptor::Structs::SemanticTagStruct::Type cabinetPosition[] = { PostionSemanticTag::kTop };
-            SetTagList(kTemperatureControlledCabinetEpId,
-                       Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(cabinetPosition));
+            SetTagList(kTemperatureControlledCabinetEpId, PostionSemanticTag::kTopTagList);
         }
         CooktopCookSurfaceInit(kCooktopEpId);
     }
