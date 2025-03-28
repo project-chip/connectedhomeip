@@ -64,7 +64,7 @@ namespace TemperatureControl {
 
 class AppSupportedTemperatureLevelsDelegate : public SupportedTemperatureLevelsIteratorDelegate
 {
-    static ChefTemperatureControl::EndpointPair
+    static chef::Configuration::TemperatureControl::EndpointPair
         supportedOptionsByEndpoints[MATTER_DM_TEMPERATURE_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
 
 public:
@@ -72,7 +72,7 @@ public:
 
     CHIP_ERROR Next(MutableCharSpan & item) override;
 
-    static void SetSupportedEndpointPair(uint16_t index, ChefTemperatureControl::EndpointPair endpointPair)
+    static void SetSupportedEndpointPair(uint16_t index, chef::Configuration::TemperatureControl::EndpointPair endpointPair)
     {
         supportedOptionsByEndpoints[index] = endpointPair;
     }
