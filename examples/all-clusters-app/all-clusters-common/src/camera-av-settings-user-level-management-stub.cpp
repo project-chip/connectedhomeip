@@ -18,7 +18,6 @@
 
 #include <camera-av-settings-user-level-management-instance.h>
 
-
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -26,15 +25,14 @@ using namespace chip::app::Clusters::CameraAvSettingsUserLevelManagement;
 
 using chip::Protocols::InteractionModel::Status;
 
-static AVSettingsUserLevelManagementDelegate * gDelegate = nullptr;
+static AVSettingsUserLevelManagementDelegate * gDelegate                           = nullptr;
 static CameraAvSettingsUserLevelMgmtServer * gAVSettingsUserLevelManagementCluster = nullptr;
-static constexpr EndpointId kEndpointId = 1;
+static constexpr EndpointId kEndpointId                                            = 1;
 
 CameraAvSettingsUserLevelMgmtServer * GetInstance()
 {
     return gAVSettingsUserLevelManagementCluster;
 }
-
 
 void Shutdown()
 {
@@ -45,8 +43,10 @@ void Shutdown()
     }
 }
 
-
-bool AVSettingsUserLevelManagementDelegate::CanChangeMPTZ() { return true; }
+bool AVSettingsUserLevelManagementDelegate::CanChangeMPTZ()
+{
+    return true;
+}
 
 Status AVSettingsUserLevelManagementDelegate::PersistentAttributesLoadedCallback()
 {
@@ -55,45 +55,47 @@ Status AVSettingsUserLevelManagementDelegate::PersistentAttributesLoadedCallback
 
 Status AVSettingsUserLevelManagementDelegate::MPTZSetPosition(Optional<int16_t> pan, Optional<int16_t> tilt, Optional<uint8_t> zoom)
 {
-  // The Cluster implementation has validated that the Feature Flags are set and the values themselves are in range. Do any needed
-  // hardware interactions to actually set the camera to the new values of PTZ.  Then return a Status response. The server itself will
-  // persist the new values.
-  //
-  return Status::Success;
+    // The Cluster implementation has validated that the Feature Flags are set and the values themselves are in range. Do any needed
+    // hardware interactions to actually set the camera to the new values of PTZ.  Then return a Status response. The server itself
+    // will persist the new values.
+    //
+    return Status::Success;
 }
 
-Status AVSettingsUserLevelManagementDelegate::MPTZRelativeMove(Optional<int16_t> pan, Optional<int16_t> tilt, Optional<uint8_t> zoom)
+Status AVSettingsUserLevelManagementDelegate::MPTZRelativeMove(Optional<int16_t> pan, Optional<int16_t> tilt,
+                                                               Optional<uint8_t> zoom)
 {
-  // The Cluster implementation has validated that the Feature Flags are set and the values themselves are in range. Do any needed
-  // hardware interactions to actually set the camera to the new values of PTZ.  Then return a Status response. The server itself will
-  // persist the new values.
-  //
-  return Status::Success;
+    // The Cluster implementation has validated that the Feature Flags are set and the values themselves are in range. Do any needed
+    // hardware interactions to actually set the camera to the new values of PTZ.  Then return a Status response. The server itself
+    // will persist the new values.
+    //
+    return Status::Success;
 }
 
-Status AVSettingsUserLevelManagementDelegate::MPTZMoveToPreset(uint8_t preset, Optional<int16_t> pan, Optional<int16_t> tilt, Optional<uint8_t> zoom)
+Status AVSettingsUserLevelManagementDelegate::MPTZMoveToPreset(uint8_t preset, Optional<int16_t> pan, Optional<int16_t> tilt,
+                                                               Optional<uint8_t> zoom)
 {
-  return Status::Success;
+    return Status::Success;
 }
 
 Status AVSettingsUserLevelManagementDelegate::MPTZSavePreset()
 {
-  return Status::Success;
+    return Status::Success;
 }
 
 Status AVSettingsUserLevelManagementDelegate::MPTZRemovePreset()
 {
-  return Status::Success;
+    return Status::Success;
 }
 
 Status AVSettingsUserLevelManagementDelegate::DPTZSetViewport()
 {
-  return Status::Success;
+    return Status::Success;
 }
 
 Status AVSettingsUserLevelManagementDelegate::DPTZRelativeMove()
 {
-  return Status::Success;
+    return Status::Success;
 }
 
 void emberAfCameraAvSettingsUserLevelManagementClusterInitCallback(chip::EndpointId endpointId)
@@ -101,23 +103,30 @@ void emberAfCameraAvSettingsUserLevelManagementClusterInitCallback(chip::Endpoin
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
     VerifyOrDie(gDelegate == nullptr && gAVSettingsUserLevelManagementCluster == nullptr);
     const uint8_t appMaxPresets = 5;
-    const uint16_t appPanMin = -90;
-    const uint16_t appPanMax = 90;
-    const uint16_t appTiltMin = -45;
-    const uint16_t appTiltMax = 45;
-    const uint8_t appZoomMax = 75;
+    const uint16_t appPanMin    = -90;
+    const uint16_t appPanMax    = 90;
+    const uint16_t appTiltMin   = -45;
+    const uint16_t appTiltMax   = 45;
+    const uint8_t appZoomMax    = 75;
 
     gDelegate = new AVSettingsUserLevelManagementDelegate;
-    BitMask<CameraAvSettingsUserLevelManagement::Feature, uint32_t> avsumFeatures(CameraAvSettingsUserLevelManagement::Feature::kDigitalPTZ,
-       CameraAvSettingsUserLevelManagement::Feature::kMechanicalPan, CameraAvSettingsUserLevelManagement::Feature::kMechanicalTilt,
-       CameraAvSettingsUserLevelManagement::Feature::kMechanicalZoom, CameraAvSettingsUserLevelManagement::Feature::kMechanicalPresets);
-    BitMask<CameraAvSettingsUserLevelManagement::OptionalAttributes, uint32_t> avsumAttrs(CameraAvSettingsUserLevelManagement::OptionalAttributes::kMptzPosition,
-       CameraAvSettingsUserLevelManagement::OptionalAttributes::kMaxPresets, CameraAvSettingsUserLevelManagement::OptionalAttributes::kMptzPresets,
-       CameraAvSettingsUserLevelManagement::OptionalAttributes::kDptzRelativeMove, CameraAvSettingsUserLevelManagement::OptionalAttributes::kZoomMax,
-       CameraAvSettingsUserLevelManagement::OptionalAttributes::kZoomMax, CameraAvSettingsUserLevelManagement::OptionalAttributes::kTiltMin,
-       CameraAvSettingsUserLevelManagement::OptionalAttributes::kPanMin, CameraAvSettingsUserLevelManagement::OptionalAttributes::kPanMax);
+    BitMask<CameraAvSettingsUserLevelManagement::Feature, uint32_t> avsumFeatures(
+        CameraAvSettingsUserLevelManagement::Feature::kDigitalPTZ, CameraAvSettingsUserLevelManagement::Feature::kMechanicalPan,
+        CameraAvSettingsUserLevelManagement::Feature::kMechanicalTilt,
+        CameraAvSettingsUserLevelManagement::Feature::kMechanicalZoom,
+        CameraAvSettingsUserLevelManagement::Feature::kMechanicalPresets);
+    BitMask<CameraAvSettingsUserLevelManagement::OptionalAttributes, uint32_t> avsumAttrs(
+        CameraAvSettingsUserLevelManagement::OptionalAttributes::kMptzPosition,
+        CameraAvSettingsUserLevelManagement::OptionalAttributes::kMaxPresets,
+        CameraAvSettingsUserLevelManagement::OptionalAttributes::kMptzPresets,
+        CameraAvSettingsUserLevelManagement::OptionalAttributes::kDptzRelativeMove,
+        CameraAvSettingsUserLevelManagement::OptionalAttributes::kZoomMax,
+        CameraAvSettingsUserLevelManagement::OptionalAttributes::kZoomMax,
+        CameraAvSettingsUserLevelManagement::OptionalAttributes::kTiltMin,
+        CameraAvSettingsUserLevelManagement::OptionalAttributes::kPanMin,
+        CameraAvSettingsUserLevelManagement::OptionalAttributes::kPanMax);
 
-gAVSettingsUserLevelManagementCluster = new CameraAvSettingsUserLevelMgmtServer(kEndpointId, gDelegate, avsumFeatures, avsumAttrs, appMaxPresets,
-      appPanMin, appPanMax, appTiltMin , appTiltMax, appZoomMax);
+    gAVSettingsUserLevelManagementCluster = new CameraAvSettingsUserLevelMgmtServer(
+        kEndpointId, gDelegate, avsumFeatures, avsumAttrs, appMaxPresets, appPanMin, appPanMax, appTiltMin, appTiltMax, appZoomMax);
     gAVSettingsUserLevelManagementCluster->Init();
 }

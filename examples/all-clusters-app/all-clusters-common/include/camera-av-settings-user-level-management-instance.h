@@ -11,7 +11,7 @@ namespace CameraAvSettingsUserLevelManagement {
 class AVSettingsUserLevelManagementDelegate : public Delegate
 {
 public:
-    AVSettingsUserLevelManagementDelegate() {};
+    AVSettingsUserLevelManagementDelegate(){};
 
     /**
      *  @brief Callback into the delegate once persistent attributes managed by
@@ -24,9 +24,12 @@ public:
     /**
      * delegate command handlers
      */
-    Protocols::InteractionModel::Status MPTZSetPosition(Optional<int16_t> pan, Optional<int16_t> tilt, Optional<uint8_t> zoom) override;
-    Protocols::InteractionModel::Status MPTZRelativeMove(Optional<int16_t> pan, Optional<int16_t> tilt, Optional<uint8_t> zoom) override;
-    Protocols::InteractionModel::Status MPTZMoveToPreset(uint8_t preset, Optional<int16_t> pan, Optional<int16_t> tilt, Optional<uint8_t> zoom) override;
+    Protocols::InteractionModel::Status MPTZSetPosition(Optional<int16_t> pan, Optional<int16_t> tilt,
+                                                        Optional<uint8_t> zoom) override;
+    Protocols::InteractionModel::Status MPTZRelativeMove(Optional<int16_t> pan, Optional<int16_t> tilt,
+                                                         Optional<uint8_t> zoom) override;
+    Protocols::InteractionModel::Status MPTZMoveToPreset(uint8_t preset, Optional<int16_t> pan, Optional<int16_t> tilt,
+                                                         Optional<uint8_t> zoom) override;
     Protocols::InteractionModel::Status MPTZSavePreset() override;
     Protocols::InteractionModel::Status MPTZRemovePreset() override;
     Protocols::InteractionModel::Status DPTZSetViewport() override;
@@ -37,7 +40,7 @@ CameraAvSettingsUserLevelMgmtServer * GetInstance();
 
 void Shutdown();
 
-} // namespace AVSettingsUserLevelManagementDelegate
+} // namespace CameraAvSettingsUserLevelManagement
 } // namespace Clusters
 } // namespace app
 } // namespace chip

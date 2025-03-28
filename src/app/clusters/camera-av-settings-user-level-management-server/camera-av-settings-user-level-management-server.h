@@ -30,22 +30,22 @@ namespace Clusters {
 namespace CameraAvSettingsUserLevelManagement {
 
 using chip::Protocols::InteractionModel::Status;
-using MPTZStructType        = Structs::MPTZStruct::Type;
-using MPTZPresetStructType  = Structs::MPTZPresetStruct::Type;
+using MPTZStructType       = Structs::MPTZStruct::Type;
+using MPTZPresetStructType = Structs::MPTZPresetStruct::Type;
 
 class Delegate;
 
 enum class OptionalAttributes : uint32_t
 {
-    kMptzPosition      = 0x0001,
-    kMaxPresets        = 0x0002,
-    kMptzPresets       = 0x0004,
-    kDptzRelativeMove  = 0x0008,
-    kZoomMax           = 0x0010,
-    kTiltMin           = 0x0020,
-    kTiltMax           = 0x0040,
-    kPanMin            = 0x0080,
-    kPanMax            = 0x0100,
+    kMptzPosition     = 0x0001,
+    kMaxPresets       = 0x0002,
+    kMptzPresets      = 0x0004,
+    kDptzRelativeMove = 0x0008,
+    kZoomMax          = 0x0010,
+    kTiltMin          = 0x0020,
+    kTiltMax          = 0x0040,
+    kPanMin           = 0x0080,
+    kPanMax           = 0x0100,
 };
 
 struct MPTZPresetHelper
@@ -54,12 +54,11 @@ private:
     uint8_t presetID;
     std::string name;
     MPTZStructType mptzPosition;
+
 public:
-    virtual ~MPTZPresetHelper()   = default;
+    virtual ~MPTZPresetHelper() = default;
     MPTZPresetHelper() {}
-    MPTZPresetHelper(uint8_t aPreset,
-                     chip::CharSpan aName,
-                     MPTZStructType aPosition)
+    MPTZPresetHelper(uint8_t aPreset, chip::CharSpan aName, MPTZStructType aPosition)
     {
         SetPresetID(aPreset);
         SetName(aName);
@@ -69,25 +68,14 @@ public:
     // Accessors and Mutators
     //
     std::string GetName() const { return name; }
-    void SetName(chip::CharSpan aName)
-    {
-        name = std::string(aName.begin(),aName.end());
-    }
+    void SetName(chip::CharSpan aName) { name = std::string(aName.begin(), aName.end()); }
 
     uint8_t GetPresetID() const { return presetID; }
-    void SetPresetID(uint8_t aPreset)
-    {
-        presetID = aPreset;
-    }
+    void SetPresetID(uint8_t aPreset) { presetID = aPreset; }
 
     MPTZStructType GetMptzPosition() const { return mptzPosition; }
-    void SetMptzPosition(MPTZStructType aPosition)
-    {
-        mptzPosition = aPosition;
-    }
-
+    void SetMptzPosition(MPTZStructType aPosition) { mptzPosition = aPosition; }
 };
-
 
 class CameraAvSettingsUserLevelMgmtServer : public AttributeAccessInterface, public CommandHandlerInterface
 {
@@ -100,8 +88,8 @@ public:
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
     CameraAvSettingsUserLevelMgmtServer(EndpointId endpointId, Delegate * delegate, BitMask<Feature> aFeature,
-        const BitFlags<OptionalAttributes> aOptionalAttrs, uint8_t aMaxPresets, uint16_t aPanMin, uint16_t aPanMax,
-        uint16_t aTiltMin, uint16_t aTiltMax, uint8_t aZoomMax);
+                                        const BitFlags<OptionalAttributes> aOptionalAttrs, uint8_t aMaxPresets, uint16_t aPanMin,
+                                        uint16_t aPanMax, uint16_t aTiltMin, uint16_t aTiltMax, uint8_t aZoomMax);
     ~CameraAvSettingsUserLevelMgmtServer() override;
 
     CHIP_ERROR Init();
@@ -121,17 +109,16 @@ public:
     void setPan(Optional<int16_t>);
 
     /**
-     * Allows for a delegate or application to set the tilt value given physical changes on the device itself, possibly due to direct
-     * user changes
+     * Allows for a delegate or application to set the tilt value given physical changes on the device itself, possibly due to
+     * direct user changes
      */
     void setTilt(Optional<int16_t>);
 
     /**
-     * Allows for a delegate or application to set the zoom value given physical changes on the device itself, possibly due to direct
-     * user changes
+     * Allows for a delegate or application to set the zoom value given physical changes on the device itself, possibly due to
+     * direct user changes
      */
     void setZoom(Optional<uint8_t>);
-
 
     uint8_t GetMaxPresets() const { return mMaxPresets; }
 
@@ -165,16 +152,15 @@ private:
     MPTZStructType mMptzPosition;
 
     // Note, spec defaults, overwritten on construction
-    uint8_t mMaxPresets   = 5;
-    int16_t mPanMin       = -180;
-    int16_t mPanMax       = 180;
-    int16_t mTiltMin      = -90;
-    int16_t mTiltMax      = 90;
-    uint8_t mZoomMax      = 100;
+    uint8_t mMaxPresets = 5;
+    int16_t mPanMin     = -180;
+    int16_t mPanMax     = 180;
+    int16_t mTiltMin    = -90;
+    int16_t mTiltMax    = 90;
+    uint8_t mZoomMax    = 100;
 
     std::vector<MPTZPresetHelper> mMptzPresetHelper;
     std::vector<uint16_t> mDptzRelativeMove;
-
 
     // Attribute handler interface
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
@@ -202,17 +188,16 @@ private:
      * Helper function that manages preset IDs
      */
     void UpdatePresetID();
-
 };
 
 /** @brief
- *  Defines interfaces for implementing application-specific logic for various aspects of the CameraAvUserSettingsManagement Cluster.
- *  Specifically, it defines interfaces for the interaction with manual and digital pan, tilt, and zoom functions.
+ *  Defines interfaces for implementing application-specific logic for various aspects of the CameraAvUserSettingsManagement
+ * Cluster. Specifically, it defines interfaces for the interaction with manual and digital pan, tilt, and zoom functions.
  */
 class Delegate
 {
 public:
-    Delegate() = default;
+    Delegate()          = default;
     virtual ~Delegate() = default;
 
     /**
@@ -231,33 +216,34 @@ public:
      */
 
     /**
-     * Allows any needed app handling given provided and already validated pan, tilt, and zoom values that are to be set based on receoption
-     * of an MPTZSetPosition command.
-     * Returns a failure status if the physical device cannot realize these values. On a success response the server
-     * will update the server held attribute values for PTZ.
+     * Allows any needed app handling given provided and already validated pan, tilt, and zoom values that are to be set based on
+     * receoption of an MPTZSetPosition command. Returns a failure status if the physical device cannot realize these values. On a
+     * success response the server will update the server held attribute values for PTZ.
      * @param pan The validated value of the pan that is to be set
      * @param tilt The validated value of the tilt that is to be set
      * @param zoom The validated value of the zoom that is to be set
      */
-    virtual Protocols::InteractionModel::Status MPTZSetPosition(Optional<int16_t> pan, Optional<int16_t> tilt, Optional<uint8_t> zoom) = 0;
+    virtual Protocols::InteractionModel::Status MPTZSetPosition(Optional<int16_t> pan, Optional<int16_t> tilt,
+                                                                Optional<uint8_t> zoom) = 0;
 
     /**
-     * Allows any needed app handling given provided and already validated pan, tilt, and zoom values that are to be set based on receoption
-     * of an MPTZRelativeMove command.  The server has already validated the received relative values, and provides the app with the new,
-     * requested settings for PTZ.
-     * Returns a failure status if the physical device cannot realize these values. On a success response the server
-     * will update the server held attribute values for PTZ.
+     * Allows any needed app handling given provided and already validated pan, tilt, and zoom values that are to be set based on
+     * receoption of an MPTZRelativeMove command.  The server has already validated the received relative values, and provides the
+     * app with the new, requested settings for PTZ. Returns a failure status if the physical device cannot realize these values. On
+     * a success response the server will update the server held attribute values for PTZ.
      * @param pan The validated value of the pan that is to be set
      * @param tilt The validated value of the tilt that is to be set
      * @param zoom The validated value of the zoom that is to be set
      */
-    virtual Protocols::InteractionModel::Status MPTZRelativeMove(Optional<int16_t> pan, Optional<int16_t> tilt, Optional<uint8_t> zoom) = 0;
+    virtual Protocols::InteractionModel::Status MPTZRelativeMove(Optional<int16_t> pan, Optional<int16_t> tilt,
+                                                                 Optional<uint8_t> zoom) = 0;
 
-    virtual Protocols::InteractionModel::Status MPTZMoveToPreset(uint8_t preset, Optional<int16_t> pan, Optional<int16_t> tilt, Optional<uint8_t> zoom) = 0;
-    virtual Protocols::InteractionModel::Status MPTZSavePreset() = 0;
-    virtual Protocols::InteractionModel::Status MPTZRemovePreset() = 0;
-    virtual Protocols::InteractionModel::Status DPTZSetViewport() = 0;
-    virtual Protocols::InteractionModel::Status DPTZRelativeMove() = 0;
+    virtual Protocols::InteractionModel::Status MPTZMoveToPreset(uint8_t preset, Optional<int16_t> pan, Optional<int16_t> tilt,
+                                                                 Optional<uint8_t> zoom) = 0;
+    virtual Protocols::InteractionModel::Status MPTZSavePreset()                         = 0;
+    virtual Protocols::InteractionModel::Status MPTZRemovePreset()                       = 0;
+    virtual Protocols::InteractionModel::Status DPTZSetViewport()                        = 0;
+    virtual Protocols::InteractionModel::Status DPTZRelativeMove()                       = 0;
 
 private:
     friend class CameraAvSettingsUserLevelMgmtServer;
@@ -270,7 +256,6 @@ private:
 protected:
     CameraAvSettingsUserLevelMgmtServer * GetServer() const { return mServer; }
 };
-
 
 } // namespace CameraAvSettingsUserLevelManagement
 } // namespace Clusters
