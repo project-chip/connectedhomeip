@@ -62,6 +62,19 @@ def extract_command_quality_flags(command: Command) -> list[str]:
     return result
 
 
+def name_for_id_usage(name: str) -> str:
+    """
+    Generally the same as `upfirst` EXCEPT that it has additional handling for special
+    casing where `.matter` naming (which is already convereted by zap) does not match
+    what zap used to generate. Since original "names with spaces" is lost in matter
+    as names are already converted, this is a special case-based implementation.
+    """
+    if name == "RFID":
+        return "Rfid"
+
+    return name[0].upper() + name[1:]
+
+
 def global_attribute(attribute: Attribute) -> bool:
     return 0xFFF8 <= attribute.definition.code <= 0xFFFF
 
@@ -84,6 +97,7 @@ class SdkGenerator(CodeGenerator):
         self.jinja_env.filters['as_privilege'] = as_privilege
         self.jinja_env.filters['extract_attribute_quality_flags'] = extract_attribute_quality_flags
         self.jinja_env.filters['extract_command_quality_flags'] = extract_command_quality_flags
+        self.jinja_env.filters['name_for_id_usage'] = name_for_id_usage
         self.jinja_env.tests['global_attribute'] = global_attribute
         self.jinja_env.tests['response_struct'] = response_struct
 

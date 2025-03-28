@@ -148,9 +148,9 @@ inline constexpr EventId Id = 0x00000003;
 namespace Fault {
 inline constexpr EventId Id = 0x00000004;
 } // namespace Fault
-namespace RFID {
+namespace Rfid {
 inline constexpr EventId Id = 0x00000005;
-} // namespace RFID
+} // namespace Rfid
 } // namespace Events
 
 } // namespace EnergyEvse
