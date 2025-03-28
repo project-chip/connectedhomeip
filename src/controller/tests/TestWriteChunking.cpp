@@ -57,6 +57,7 @@ uint32_t gIterationCount = 0;
 constexpr EndpointId kTestEndpointId      = 0;
 constexpr AttributeId kTestListAttribute  = 6;
 constexpr AttributeId kTestListAttribute2 = 7;
+constexpr uint8_t kTestListLength         = 10;
 
 // We don't really care about the content, we just need a buffer.
 uint8_t sByteSpanData[app::kMaxSecureSduLengthBytes];
@@ -243,7 +244,6 @@ TEST_F(TestWriteChunking, TestListChunking)
     // AttributeDataIB into the packet with a List of 5/6 ByteSpans with empty items. So if we have a ByteSpan List of 10 items, our
     // initial ReplaceAll list will contain 5/6 items, and the remaining items are chunked.
     constexpr size_t minReservationSize = kMaxSecureSduLengthBytes - 60 - 100;
-    constexpr uint8_t kTestListLength   = 10;
 
     for (uint32_t i = 100; i > 0; i--)
     {
@@ -276,8 +276,10 @@ TEST_F(TestWriteChunking, TestListChunking)
             DrainAndServiceIO();
         }
 
-        // Due to the way Write Chunking is done, it is difficult to predict mSuccessCount. It all depends on how much was
-        // packed into the initial ReplaceAll List.
+        // Due to Write Chunking being done dynamically (fitting as many items as possible into an initial ReplaceAll List, before
+        // starting to chunk), it is fragile to try to predict mSuccessCount. It all depends on how much was packed into the initial
+        // ReplaceAll List.
+        // However, we know for sure that writeCallback should NEVER fail.
         EXPECT_EQ(writeCallback.mErrorCount, 0u);
         EXPECT_EQ(writeCallback.mOnDoneCount, 1u);
 
@@ -402,7 +404,7 @@ TEST_F(TestWriteChunking, TestBadChunking)
 
     app::AttributePathParams attributePath(kTestEndpointId, app::Clusters::UnitTesting::Id, kTestListAttribute);
 
-    constexpr uint8_t kTestListLength = 5;
+    constexpr uint8_t kTestListLengthBadChunking = 5;
 
     for (int i = 850; i < static_cast<int>(chip::app::kMaxSecureSduLengthBytes); i++)
     {
@@ -415,13 +417,13 @@ TEST_F(TestWriteChunking, TestBadChunking)
 
         app::WriteClient writeClient(&GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing());
 
-        ByteSpan list[kTestListLength];
+        ByteSpan list[kTestListLengthBadChunking];
         for (auto & item : list)
         {
             item = ByteSpan(sByteSpanData, static_cast<uint32_t>(i));
         }
 
-        err = writeClient.EncodeAttribute(attributePath, app::DataModel::List<ByteSpan>(list, kTestListLength));
+        err = writeClient.EncodeAttribute(attributePath, app::DataModel::List<ByteSpan>(list, kTestListLengthBadChunking));
         if (err == CHIP_ERROR_NO_MEMORY || err == CHIP_ERROR_BUFFER_TOO_SMALL)
         {
             // This kind of error is expected.
@@ -559,8 +561,6 @@ TEST_F(TestWriteChunking, TestBadChunking_NonEmptyReplaceAllList)
  */
 TEST_F(TestWriteChunking, TestConflictWrite)
 {
-    // constexpr uint32_t kTestListLengthv2 = 5;
-
     auto sessionHandle = GetSessionBobToAlice();
 
     // Initialize the ember side server logic
@@ -578,8 +578,7 @@ TEST_F(TestWriteChunking, TestConflictWrite)
     // To ensure that chunking is triggered: We've empirically determined that by reserving all but 60 bytes in the packet buffer,
     // we can fit 1 AttributeDataIB into the packet with a List of 5/6 ByteSpans with empty items. So if we have a ByteSpan List of
     // 10 items, our initial ReplaceAll list will contain 5/6 items, and the remaining items are chunked.
-    constexpr size_t kReserveSize     = kMaxSecureSduLengthBytes - 60;
-    constexpr uint8_t kTestListLength = 10;
+    constexpr size_t kReserveSize = kMaxSecureSduLengthBytes - 60;
     ByteSpan list[kTestListLength];
 
     TestWriteCallback writeCallback1;
@@ -617,20 +616,12 @@ TEST_F(TestWriteChunking, TestConflictWrite)
             writeCallbackRef1 = &writeCallback2;
         }
 
-        // TODO resolve this:
-        // chunking is done automatically, it is difficult to predict how many success or Errors we get,
-
-        //        For Sure WriteCallbackRef2 will not succeed
-        // but we will get many errors in others, (is it because we get as many Busy Errors as we have WriteRequest messages? so it
-        // becomes unpredictable)
-
-        //    EXPECT_EQ(writeCallbackRef1->mSuccessCount,
-        //     kTestListLengthv2 /* an extra item for the empty list at the beginning */); // TODO remove the comments on extra
-        // list item
-        //   EXPECT_EQ(writeCallbackRef1->mErrorCount, 0u);
-
+        // Due to Write Chunking being done dynamically (fitting as many items as possible into an initial ReplaceAll List, before
+        // starting to chunk), it is fragile to try to predict mSuccessCount. It all depends on how much was packed into the initial
+        // ReplaceAll List. However, we know for sure that writeCallbackRef1 should NEVER fail, and that writeCallbackRef2 should
+        // NEVER Succeed.
+        EXPECT_EQ(writeCallbackRef1->mErrorCount, 0u);
         EXPECT_EQ(writeCallbackRef2->mSuccessCount, 0u);
-        //     EXPECT_EQ(writeCallbackRef2->mErrorCount, kTestListLengthv2);
 
         EXPECT_EQ(writeCallbackRef2->mLastErrorReason.mStatus, Protocols::InteractionModel::Status::Busy);
 
@@ -748,8 +739,10 @@ TEST_F(TestWriteChunking, TestNonConflictWrite)
     app::AttributePathParams attributePath1(kTestEndpointId, app::Clusters::UnitTesting::Id, kTestListAttribute);
     app::AttributePathParams attributePath2(kTestEndpointId, app::Clusters::UnitTesting::Id, kTestListAttribute2);
 
-    /* use a smaller chunk (128 bytes) so we only need a few attributes in the write request. */
-    constexpr size_t kReserveSize = kMaxSecureSduLengthBytes - 128;
+    // To ensure that chunking is triggered: We've empirically determined that by reserving all but 60 bytes in the packet buffer,
+    // we can fit 1 AttributeDataIB into the packet with a List of 5/6 ByteSpans with empty items. So if we have a ByteSpan List of
+    // 10 items, our initial ReplaceAll list will contain 5/6 items, and the remaining items are chunked.
+    constexpr size_t kReserveSize = kMaxSecureSduLengthBytes - 60;
 
     TestWriteCallback writeCallback1;
     app::WriteClient writeClient1(&GetExchangeManager(), &writeCallback1, Optional<uint16_t>::Missing(),
@@ -758,8 +751,6 @@ TEST_F(TestWriteChunking, TestNonConflictWrite)
     TestWriteCallback writeCallback2;
     app::WriteClient writeClient2(&GetExchangeManager(), &writeCallback2, Optional<uint16_t>::Missing(),
                                   static_cast<uint16_t>(kReserveSize));
-
-    constexpr uint32_t kTestListLength = 1;
 
     ByteSpan list[kTestListLength];
 
@@ -779,10 +770,11 @@ TEST_F(TestWriteChunking, TestNonConflictWrite)
     DrainAndServiceIO();
 
     {
+        // Due to Write Chunking being done dynamically, it is fragile to try to predict mSuccessCount. It all depends on how much
+        // was packed into the initial ReplaceAll List.
+        // However, we know for sure that writeCallback1 and writeCallback2 should NEVER fail.
         EXPECT_EQ(writeCallback1.mErrorCount, 0u);
-        EXPECT_EQ(writeCallback1.mSuccessCount, kTestListLength);
         EXPECT_EQ(writeCallback2.mErrorCount, 0u);
-        EXPECT_EQ(writeCallback2.mSuccessCount, kTestListLength);
 
         EXPECT_EQ(writeCallback1.mOnDoneCount, 1u);
         EXPECT_EQ(writeCallback2.mOnDoneCount, 1u);
@@ -875,7 +867,7 @@ void TestWriteChunking::RunTest(Instructions instructions)
     std::unique_ptr<WriteClient> writeClient = std::make_unique<WriteClient>(
         &GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing(),
         static_cast<uint16_t>(kMaxSecureSduLengthBytes -
-                              100) /* use a smaller chunk so we only need a few attributes in the write request. */);
+                              64) /* use a smaller chunk so we only need a few attributes in the write request. */);
 
     ConcreteAttributePath onGoingPath = ConcreteAttributePath();
     std::vector<PathStatus> status;
@@ -905,15 +897,8 @@ void TestWriteChunking::RunTest(Instructions instructions)
                         aPath.mEndpointId, ChipLogValueMEI(aPath.mClusterId), ChipLogValueMEI(aPath.mAttributeId));
     };
 
-    // uint8_t list_binary[] = { 0x01, 0x23, 0x45, 0x67, 0x89, 0x01, 0x23, 0x45, 0x67, 0x89, 0x01, 0x23, 0x45, 0x67, 0x89,
-    //                           0x01, 0x23, 0x45, 0x67, 0x89, 0x01, 0x23, 0x45, 0x67, 0x89, 0x01, 0x23, 0x45, 0x67, 0x89
-
-    // };
-
-    // ByteSpan list(list_binary);
-
-    ByteSpan list[30];
-    uint8_t badList[30];
+    ByteSpan list[kTestListLength];
+    uint8_t badList[kTestListLength];
 
     if (instructions.data.size() == 0)
     {
@@ -933,12 +918,12 @@ void TestWriteChunking::RunTest(Instructions instructions)
         }
         case ListData::kList: {
             err = writeClient->EncodeAttribute(AttributePathParams(p.mEndpointId, p.mClusterId, p.mAttributeId),
-                                               app::DataModel::List<ByteSpan>(list));
+                                               DataModel::List<ByteSpan>(list, kTestListLength));
             break;
         }
         case ListData::kBadValue: {
             err = writeClient->EncodeAttribute(AttributePathParams(p.mEndpointId, p.mClusterId, p.mAttributeId),
-                                               app::DataModel::List<uint8_t>(badList, 30));
+                                               DataModel::List<uint8_t>(badList, kTestListLength));
             break;
         }
         }
@@ -978,28 +963,27 @@ TEST_F(TestWriteChunking, TestTransactionalList)
     AttributeAccessInterfaceRegistry::Instance().Register(&testServer);
 
     // Test 1: we should receive transaction notifications
-    ChipLogProgress(Zcl, "AAAAAAA Test 1: we should receive transaction notifications");
+    ChipLogProgress(Zcl, "Test 1: we should receive transaction notifications");
     RunTest(Instructions{
         .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
         .expectedStatus = { true },
     });
-    // TODO test 2 fails
-    ChipLogProgress(Zcl, "AAAAAAA Test 2: we should receive transaction notifications for incomplete list operations");
+
+    ChipLogProgress(Zcl, "Test 2: we should receive transaction notifications for incomplete list operations");
     RunTest(Instructions{
         .paths                   = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
         .onListWriteBeginActions = [&](const app::ConcreteAttributePath & aPath) { return Operations::kShutdownWriteClient; },
         .expectedStatus          = { false },
     });
 
-    ChipLogProgress(Zcl, "AAAAAAA Test 3: we should receive transaction notifications for every list in the transaction");
+    ChipLogProgress(Zcl, "Test 3: we should receive transaction notifications for every list in the transaction");
     RunTest(Instructions{
         .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
                             ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute2) },
         .expectedStatus = { true, true },
     });
 
-    // TODO test 4 fails
-    ChipLogProgress(Zcl, "AAAAAAA Test 4: we should receive transaction notifications with the status of each list");
+    ChipLogProgress(Zcl, "Test 4: we should receive transaction notifications with the status of each list");
     RunTest(Instructions{
         .paths = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
                    ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute2) },
@@ -1014,10 +998,9 @@ TEST_F(TestWriteChunking, TestTransactionalList)
         .expectedStatus = { true, false },
     });
 
-    ChipLogProgress(
-        Zcl,
-        "AAAAAAA Test 5: transactional list callbacks will be called for nullable lists, test if it is handled correctly for "
-        "null value before non null values");
+    ChipLogProgress(Zcl,
+                    "Test 5: transactional list callbacks will be called for nullable lists, test if it is handled correctly for "
+                    "null value before non null values");
     RunTest(Instructions{
         .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
                             ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
@@ -1025,10 +1008,9 @@ TEST_F(TestWriteChunking, TestTransactionalList)
         .expectedStatus = { true },
     });
 
-    ChipLogProgress(
-        Zcl,
-        "AAAAAAA Test 6: transactional list callbacks will be called for nullable lists, test if it is handled correctly for "
-        "null value after non null values");
+    ChipLogProgress(Zcl,
+                    "Test 6: transactional list callbacks will be called for nullable lists, test if it is handled correctly for "
+                    "null value after non null values");
     RunTest(Instructions{
         .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
                             ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
@@ -1036,10 +1018,9 @@ TEST_F(TestWriteChunking, TestTransactionalList)
         .expectedStatus = { true },
     });
 
-    ChipLogProgress(
-        Zcl,
-        "AAAAAAA Test 7: transactional list callbacks will be called for nullable lists, test if it is handled correctly for "
-        "null value between non null values");
+    ChipLogProgress(Zcl,
+                    "Test 7: transactional list callbacks will be called for nullable lists, test if it is handled correctly for "
+                    "null value between non null values");
     RunTest(Instructions{
         .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
                             ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
@@ -1048,19 +1029,16 @@ TEST_F(TestWriteChunking, TestTransactionalList)
         .expectedStatus = { true },
     });
 
-    ChipLogProgress(Zcl, "AAAAAAA Test 8: transactional list callbacks will be called for nullable lists");
+    ChipLogProgress(Zcl, "Test 8: transactional list callbacks will be called for nullable lists");
     RunTest(Instructions{
         .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
         .data           = { ListData::kNull },
         .expectedStatus = { true },
     });
 
-    // TODO test 9 fails
-
-    ChipLogProgress(
-        Zcl,
-        "AAAAAAA Test 9: for nullable lists, we should receive notifications for unsuccessful writes when non-fatal occurred "
-        "during processing the requests");
+    ChipLogProgress(Zcl,
+                    "Test 9: for nullable lists, we should receive notifications for unsuccessful writes when non-fatal occurred "
+                    "during processing the requests");
     RunTest(Instructions{
         .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
         .data           = { ListData::kBadValue },

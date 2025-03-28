@@ -366,6 +366,9 @@ private:
 
         TLV::TLVType outerType;
 
+        ReturnErrorOnFailure(
+            mMessageWriter.ReserveBuffer(kReservedSizeForEndOfListContainer + kReservedSizeForEndOfAttributeDataIB));
+
         ReturnErrorOnFailure(PrepareAttributeIB(attributePath));
         VerifyOrReturnError((writer = GetAttributeDataIBTLVWriter()) != nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorOnFailure(
@@ -578,7 +581,8 @@ private:
         kReservedSizeForEndOfContainer + kReservedSizeForEndOfContainer;
     bool mHasDataVersion = false;
 
-    // This was not added to kReservedSizeForTLVEncodingOverhead since it will be "Unreserved" before the others.
+    // These were not added to kReservedSizeForTLVEncodingOverhead since they will only be Reserved and Unreserved when Encoding
+    // Attributes that use a list Data Type
     static constexpr uint32_t kReservedSizeForEndOfListContainer   = 1;
     static constexpr uint32_t kReservedSizeForEndOfAttributeDataIB = 1;
 
