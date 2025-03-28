@@ -28,7 +28,7 @@ struct EndpointPair
     const chip::CharSpan * mTemperatureLevels;
     uint8_t mSize;
 
-    EndpointPair(chip::EndpointId aEndpointId, chip::CharSpan * TemperatureLevels, uint8_t size) :
+    EndpointPair(chip::EndpointId aEndpointId, const chip::CharSpan * TemperatureLevels, uint8_t size) :
         mEndpointId(aEndpointId), mTemperatureLevels(TemperatureLevels), mSize(size)
     {}
 };
