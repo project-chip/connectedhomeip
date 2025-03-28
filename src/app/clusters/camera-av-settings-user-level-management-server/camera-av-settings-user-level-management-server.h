@@ -69,7 +69,7 @@ public:
     // Accessors and Mutators
     //
     std::string GetName() const { return name; }
-    void SetName(chip::CharSpan aName) 
+    void SetName(chip::CharSpan aName)
     {
         name = std::string(aName.begin(),aName.end());
     }
@@ -99,8 +99,8 @@ public:
      * @param aDelegate A reference to the delegate to be used by this server.
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
-    CameraAvSettingsUserLevelMgmtServer(EndpointId endpointId, Delegate * delegate, BitMask<Feature> aFeature, 
-        const BitFlags<OptionalAttributes> aOptionalAttrs, uint8_t aMaxPresets, uint16_t aPanMin, uint16_t aPanMax, 
+    CameraAvSettingsUserLevelMgmtServer(EndpointId endpointId, Delegate * delegate, BitMask<Feature> aFeature,
+        const BitFlags<OptionalAttributes> aOptionalAttrs, uint8_t aMaxPresets, uint16_t aPanMin, uint16_t aPanMax,
         uint16_t aTiltMin, uint16_t aTiltMax, uint8_t aZoomMax);
     ~CameraAvSettingsUserLevelMgmtServer() override;
 
@@ -164,8 +164,8 @@ private:
     // Attributes local storage
     MPTZStructType mMptzPosition;
 
-    // Note, spec defaults, overwritten on construction 
-    uint8_t mMaxPresets   = 5; 
+    // Note, spec defaults, overwritten on construction
+    uint8_t mMaxPresets   = 5;
     int16_t mPanMin       = -180;
     int16_t mPanMax       = 180;
     int16_t mTiltMin      = -90;
@@ -174,8 +174,8 @@ private:
 
     std::vector<MPTZPresetHelper> mMptzPresetHelper;
     std::vector<uint16_t> mDptzRelativeMove;
- 
- 
+
+
     // Attribute handler interface
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
@@ -232,9 +232,9 @@ public:
 
     /**
      * Allows any needed app handling given provided and already validated pan, tilt, and zoom values that are to be set based on receoption
-     * of an MPTZSetPosition command.  
-     * Returns a failure status if the physical device cannot realize these values. On a success response the server 
-     * will update the server held attribute values for PTZ. 
+     * of an MPTZSetPosition command.
+     * Returns a failure status if the physical device cannot realize these values. On a success response the server
+     * will update the server held attribute values for PTZ.
      * @param pan The validated value of the pan that is to be set
      * @param tilt The validated value of the tilt that is to be set
      * @param zoom The validated value of the zoom that is to be set
@@ -243,10 +243,10 @@ public:
 
     /**
      * Allows any needed app handling given provided and already validated pan, tilt, and zoom values that are to be set based on receoption
-     * of an MPTZRelativeMove command.  The server has already validated the received relative values, and provides the app with the new, 
-     * requested settings for PTZ. 
-     * Returns a failure status if the physical device cannot realize these values. On a success response the server 
-     * will update the server held attribute values for PTZ. 
+     * of an MPTZRelativeMove command.  The server has already validated the received relative values, and provides the app with the new,
+     * requested settings for PTZ.
+     * Returns a failure status if the physical device cannot realize these values. On a success response the server
+     * will update the server held attribute values for PTZ.
      * @param pan The validated value of the pan that is to be set
      * @param tilt The validated value of the tilt that is to be set
      * @param zoom The validated value of the zoom that is to be set

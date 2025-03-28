@@ -53,11 +53,11 @@ Status AVSettingsUserLevelManagementDelegate::PersistentAttributesLoadedCallback
     return Status::Success;
 }
 
-Status AVSettingsUserLevelManagementDelegate::MPTZSetPosition(Optional<int16_t> pan, Optional<int16_t> tilt, Optional<uint8_t> zoom) 
+Status AVSettingsUserLevelManagementDelegate::MPTZSetPosition(Optional<int16_t> pan, Optional<int16_t> tilt, Optional<uint8_t> zoom)
 {
   // The Cluster implementation has validated that the Feature Flags are set and the values themselves are in range. Do any needed
   // hardware interactions to actually set the camera to the new values of PTZ.  Then return a Status response. The server itself will
-  // persist the new values. 
+  // persist the new values.
   //
   return Status::Success;
 }
@@ -66,12 +66,12 @@ Status AVSettingsUserLevelManagementDelegate::MPTZRelativeMove(Optional<int16_t>
 {
   // The Cluster implementation has validated that the Feature Flags are set and the values themselves are in range. Do any needed
   // hardware interactions to actually set the camera to the new values of PTZ.  Then return a Status response. The server itself will
-  // persist the new values. 
+  // persist the new values.
   //
   return Status::Success;
 }
 
-Status AVSettingsUserLevelManagementDelegate::MPTZMoveToPreset(uint8_t preset, Optional<int16_t> pan, Optional<int16_t> tilt, Optional<uint8_t> zoom) 
+Status AVSettingsUserLevelManagementDelegate::MPTZMoveToPreset(uint8_t preset, Optional<int16_t> pan, Optional<int16_t> tilt, Optional<uint8_t> zoom)
 {
   return Status::Success;
 }
@@ -108,7 +108,7 @@ void emberAfCameraAvSettingsUserLevelManagementClusterInitCallback(chip::Endpoin
     const uint8_t appZoomMax = 75;
 
     gDelegate = new AVSettingsUserLevelManagementDelegate;
-    BitMask<CameraAvSettingsUserLevelManagement::Feature, uint32_t> avsumFeatures(CameraAvSettingsUserLevelManagement::Feature::kDigitalPTZ, 
+    BitMask<CameraAvSettingsUserLevelManagement::Feature, uint32_t> avsumFeatures(CameraAvSettingsUserLevelManagement::Feature::kDigitalPTZ,
        CameraAvSettingsUserLevelManagement::Feature::kMechanicalPan, CameraAvSettingsUserLevelManagement::Feature::kMechanicalTilt,
        CameraAvSettingsUserLevelManagement::Feature::kMechanicalZoom, CameraAvSettingsUserLevelManagement::Feature::kMechanicalPresets);
     BitMask<CameraAvSettingsUserLevelManagement::OptionalAttributes, uint32_t> avsumAttrs(CameraAvSettingsUserLevelManagement::OptionalAttributes::kMptzPosition,
