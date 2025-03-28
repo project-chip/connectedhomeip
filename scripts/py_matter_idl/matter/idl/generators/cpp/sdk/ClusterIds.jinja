@@ -1,0 +1,54 @@
+// DO NOT EDIT MANUALLY - Generated file
+//
+// Identifier constant values for cluster {{cluster.name}} (cluster code: {{"%d/0x%X" | format(cluster.code, cluster.code)}})
+// based on {{input_name}}
+#pragma once
+
+#include <lib/core/DataModelTypes.h>
+#include <app/common/GlobalIds.h>
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace {{cluster.name}} {
+
+inline constexpr ClusterId Id = {{"0x%08X" | format(cluster.code)}};
+
+namespace Attributes {
+{% for attribute in cluster.attributes -%}
+namespace {{attribute.definition.name | name_for_id_usage}} {
+   {%- if attribute is global_attribute %}
+inline constexpr AttributeId Id = Globals::Attributes::{{attribute.definition.name | name_for_id_usage}}::Id;
+   {%- else %}
+inline constexpr AttributeId Id = {{ "0x%08X" | format(attribute.definition.code)}};
+   {%- endif %}
+} // namespace {{attribute.definition.name | name_for_id_usage}}
+{% endfor %}
+
+} // namespace Attributes
+
+namespace Commands {
+{% for command in cluster.commands -%}
+namespace {{command.name | name_for_id_usage}} {
+inline constexpr CommandId Id = {{ "0x%08X" | format(command.code)}};
+} // namespace {{command.name | name_for_id_usage}}
+{% endfor -%}
+{% for struct in cluster.structs | select("response_struct") -%}
+namespace {{struct.name | name_for_id_usage}} {
+inline constexpr CommandId Id = {{ "0x%08X" | format(struct.code)}};
+} // namespace {{struct.name | name_for_id_usage}}
+{% endfor -%}
+} // namespace Commands
+
+namespace Events {
+{% for event in cluster.events -%}
+namespace {{event.name | name_for_id_usage}} {
+inline constexpr EventId Id = {{ "0x%08X" | format(event.code)}};
+} // namespace {{event.name | name_for_id_usage}}
+{% endfor -%}
+} // namespace Events
+
+} // namespace {{cluster.name}}
+} // namespace app
+} // namespace Clusters
+} // namespace chip

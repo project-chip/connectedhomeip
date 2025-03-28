@@ -2692,6 +2692,7 @@
 					"$(CHIP_ROOT)/src",
 					"$(CHIP_ROOT)/third_party/nlassert/repo/include",
 					"$(CHIP_ROOT)/zzz_generated/app-common",
+					"$(CHIP_ROOT)/zzz_generated/data_model",
 					"$(CHIP_ROOT)/third_party/nlio/repo/include",
 					"$(CHIP_ROOT)/third_party/jsoncpp/repo/include",
 					"$(CHIP_ROOT)/zzz_generated/darwin-framework-tool",
@@ -2775,6 +2776,7 @@
 					"$(CHIP_ROOT)/third_party/nlassert/repo/include",
 					"$(CHIP_ROOT)/zzz_generated/darwin-framework-tool",
 					"$(CHIP_ROOT)/zzz_generated/app-common",
+					"$(CHIP_ROOT)/zzz_generated/data_model",
 					"$(CHIP_ROOT)/third_party/nlio/repo/include",
 					"$(CHIP_ROOT)/third_party/jsoncpp/repo/include",
 					"$(CHIP_ROOT)/third_party/editline/repo/include",
@@ -2974,6 +2976,7 @@
 					"$(CHIP_ROOT)/src/include",
 					"$(CHIP_ROOT)/zzz_generated/",
 					"$(CHIP_ROOT)/zzz_generated/app-common",
+					"$(CHIP_ROOT)/zzz_generated/data_model",
 					"$(CHIP_ROOT)/third_party/nlassert/repo/include",
 					"$(CHIP_ROOT)/third_party/nlio/repo/include",
 				);
@@ -3146,6 +3149,7 @@
 					"$(CHIP_ROOT)/src/include",
 					"$(CHIP_ROOT)/zzz_generated/",
 					"$(CHIP_ROOT)/zzz_generated/app-common",
+					"$(CHIP_ROOT)/zzz_generated/data_model",
 					"$(CHIP_ROOT)/third_party/nlassert/repo/include",
 					"$(CHIP_ROOT)/third_party/nlio/repo/include",
 				);

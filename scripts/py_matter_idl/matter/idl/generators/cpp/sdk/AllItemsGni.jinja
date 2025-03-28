@@ -1,0 +1,10 @@
+# DO NOT EDIT MANUALLY - Generated file
+#
+# List of cluster usages based on {{input_name}}
+import("//build_overrides/chip.gni")
+
+chip_all_cluster_id_targets = [
+{%- for cluster in clusters %}
+  "${chip_root}/zzz_generated/data_model/clusters/{{cluster.name | upfirst}}:ids",
+{%- endfor%}
+]

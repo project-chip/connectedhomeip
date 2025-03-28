@@ -1,0 +1,60 @@
+// DO NOT EDIT MANUALLY - Generated file
+//
+// Cluster metadata information for cluster {{cluster.name}} (cluster code: {{"%d/0x%X" | format(cluster.code, cluster.code)}})
+// based on {{input_name}}
+#pragma once
+
+#include <app/data-model-provider/MetadataTypes.h>
+#include <lib/core/DataModelTypes.h>
+
+#include <cstdint>
+
+#include <clusters/{{cluster.name | upfirst}}/{{cluster.name | upfirst}}Ids.h>
+
+namespace chip {
+namespace app {
+namespace clusters {
+namespace {{cluster.name}} {
+namespace Metadata {
+
+inline constexpr uint32_t kRevision = {{cluster.revision}};
+
+namespace Attributes {
+
+{% for attribute in cluster.attributes | reject("global_attribute") -%}
+inline constexpr DataModel::AttributeEntry k{{attribute.definition.name | upfirst}}Entry = {
+    .attributeId    = {{cluster.name | upfirst}}::Attributes::{{attribute.definition.name | upfirst}}::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ {{ attribute | extract_attribute_quality_flags | join(", ") }} },
+    .readPrivilege  = {% if attribute.is_readable -%}
+        {{attribute.readacl | as_privilege}}
+      {%- else -%}
+        std::nullopt
+      {%- endif -%}
+    ,
+    .writePrivilege = {% if attribute.is_writable -%}
+        {{attribute.writeacl | as_privilege}}
+      {%- else -%}
+        std::nullopt
+      {%- endif -%}
+    ,
+};
+{% endfor %}
+
+} // namespace Attributes
+
+namespace Commands {
+
+{% for command in cluster.commands -%}
+inline constexpr DataModel::AcceptedCommandEntry k{{command.name | upfirst}}Entry = {
+    .commandId       = {{cluster.name | upfirst}}::Commands::{{command.name | upfirst}}::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{ {{ command | extract_command_quality_flags | join(", ") }} },
+    .invokePrivilege = {{ command.invokeacl | as_privilege}},
+};
+{% endfor %}
+
+} // namespace Attributes
+} // namespace Metadata
+} // namespace {{cluster.name}}
+} // namespace app
+} // namespace Clusters
+} // namespace chip

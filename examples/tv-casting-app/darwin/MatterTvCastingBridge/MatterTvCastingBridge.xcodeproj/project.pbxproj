@@ -683,6 +683,7 @@
 					"$(CHIP_ROOT)/third_party/nlio/repo/include",
 					"$(TEMP_DIR)/out/gen/include",
 					"$(CHIP_ROOT)/zzz_generated/app-common",
+					"$(CHIP_ROOT)/zzz_generated/data_model",
 				);
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -763,6 +764,7 @@
 					"$(CHIP_ROOT)/third_party/nlio/repo/include",
 					"$(TEMP_DIR)/out/gen/include",
 					"$(CHIP_ROOT)/zzz_generated/app-common",
+					"$(CHIP_ROOT)/zzz_generated/data_model",
 				);
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";

@@ -1,19 +1,7 @@
 {{> header}}
-
 #pragma once
 
-#include <app/util/basic-types.h>
-
-namespace chip {
-namespace app {
-namespace Clusters {
-
 {{#zcl_clusters}}
-namespace {{asUpperCamelCase label}} {
-static constexpr ClusterId Id = {{asMEI manufacturerCode code}};
-} // namespace {{asUpperCamelCase label}} {
+#include <clusters/{{asUpperCamelCase label}}/{{asUpperCamelCase label}}Ids.h>
 {{/zcl_clusters}}
 
-} // namespace Clusters
-} // namespace app
-} // namespace chip

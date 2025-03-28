@@ -198,6 +198,7 @@ target_include_directories(
     ${chip_dir}/zzz_generated/lock-app
     ${chip_dir}/zzz_generated/lock-app/zap-generated
     ${chip_dir}/zzz_generated/app-common
+    ${chip_dir}/zzz_generated/data_model
     ${chip_dir}/examples/lock-app/lock-common
     ${chip_dir}/examples/lock-app/lock-common/include
     ${chip_dir}/examples/lock-app/realtek_bee/main/include

@@ -105,7 +105,10 @@ static_library("nxp_platform") {
     "PlatformManagerImpl.h",
     "SystemTimeSupport.cpp",
   ]
-  deps = [ "${chip_root}/src/app:app_config" ]
+  deps = [
+    "${chip_root}/src/app:app_config",
+    "${chip_root}/src/app/common:ids",
+  ]
 
   if (nxp_nvm_component == "fwk_nvm") {
     defines += [ "CHIP_PLAT_NVM_SUPPORT=1" ]
@@ -178,7 +181,6 @@ static_library("nxp_platform") {
       "ThreadStackManagerImpl.cpp",
       "ThreadStackManagerImpl.h",
     ]
-    deps += [ "${chip_root}/src/app:app_config" ]
 
     deps += [ "${chip_root}/third_party/openthread:openthread" ]
     public_deps += [ "${chip_root}/third_party/openthread:openthread-platform" ]

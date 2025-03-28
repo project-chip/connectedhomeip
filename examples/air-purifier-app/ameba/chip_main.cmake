@@ -193,6 +193,7 @@ target_include_directories(
     ${chip_dir}/zzz_generated/air-purifier-app
     ${chip_dir}/zzz_generated/air-purifier-app/zap-generated
     ${chip_dir}/zzz_generated/app-common
+    ${chip_dir}/zzz_generated/data_model
     ${chip_dir}/examples/air-purifier-app/air-purifier-common
     ${chip_dir}/examples/air-purifier-app/air-purifier-common/include
     ${chip_dir}/examples/air-purifier-app/ameba/main/include
