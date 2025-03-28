@@ -47,10 +47,7 @@ public:
 
     CHIP_ERROR Next(MutableCharSpan & item) override;
 
-    void SetSupportedEndpointPair(uint16_t index, const EndpointPair & endpointPair)
-    {
-        supportedOptionsByEndpoints[index] = endpointPair;
-    }
+    void SetSupportedEndpointPair(uint16_t index, EndpointPair endpointPair) { supportedOptionsByEndpoints[index] = endpointPair; }
 
     ~AppSupportedTemperatureLevelsDelegate() {}
 };
