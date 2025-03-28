@@ -256,7 +256,7 @@ tests:
           "Step 9b: TH reads GroupTable attribute from GroupKeyManagement
           cluster on DUT using a fabric-filtered read"
       cluster: "Group Key Management"
-      PICS: " !G.S.F00 && GRPKEY.S.A0001 "
+      PICS: " G.S && !G.S.F00 && GRPKEY.S.A0001 "
       command: "readAttribute"
       attribute: "GroupTable"
       response:
