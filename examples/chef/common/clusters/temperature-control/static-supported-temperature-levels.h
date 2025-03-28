@@ -21,6 +21,42 @@
 #include <app/clusters/temperature-control-server/supported-temperature-levels-manager.h>
 #include <app/util/config.h>
 
+namespace chef {
+namespace Configuration {
+namespace TemperatureControl {
+
+/**
+ * @brief Endpoint to temperature levels mapping. The endpoint must have a temperature control cluster.
+ * Represents a pair of endpoints and temperature levels supported by that endpoint.
+ */
+struct EndpointPair
+{
+    /**
+     * @brief An endpoint having temperature control cluster.
+     */
+    chip::EndpointId mEndpointId;
+
+    /**
+     * @brief Temperature levels supported by the temperature control cluster at this endpoint.
+     * This should point to a const char span array initialized statically.
+     */
+    const chip::CharSpan * mTemperatureLevels;
+
+    /**
+     * @brief Size of the temperature levels array.
+     */
+    uint8_t mSize;
+
+    EndpointPair() : mEndpointId(chip::kInvalidEndpointId), mTemperatureLevels(NULL), mSize(0) {}
+
+    EndpointPair(chip::EndpointId aEndpointId, const chip::CharSpan * TemperatureLevels, uint8_t size) :
+        mEndpointId(aEndpointId), mTemperatureLevels(TemperatureLevels), mSize(size)
+    {}
+};
+} // namespace TemperatureControl
+} // namespace Configuration
+} // namespace chef
+
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -28,24 +64,18 @@ namespace TemperatureControl {
 
 class AppSupportedTemperatureLevelsDelegate : public SupportedTemperatureLevelsIteratorDelegate
 {
-    struct EndpointPair
-    {
-        EndpointId mEndpointId;
-        CharSpan * mTemperatureLevels;
-        uint8_t mSize;
-
-        EndpointPair(EndpointId aEndpointId, CharSpan * TemperatureLevels, uint8_t size) :
-            mEndpointId(aEndpointId), mTemperatureLevels(TemperatureLevels), mSize(size)
-        {}
-    };
-
-    static CharSpan temperatureLevelOptions[3];
-    static const EndpointPair supportedOptionsByEndpoints[MATTER_DM_TEMPERATURE_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
+    static chef::Configuration::TemperatureControl::EndpointPair
+        supportedOptionsByEndpoints[MATTER_DM_TEMPERATURE_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
 
 public:
     uint8_t Size() override;
 
     CHIP_ERROR Next(MutableCharSpan & item) override;
+
+    static void SetSupportedEndpointPair(uint16_t index, chef::Configuration::TemperatureControl::EndpointPair endpointPair)
+    {
+        supportedOptionsByEndpoints[index] = endpointPair;
+    }
 
     ~AppSupportedTemperatureLevelsDelegate() {}
 };

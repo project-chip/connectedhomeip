@@ -21,6 +21,7 @@
 #ifdef MATTER_DM_PLUGIN_TEMPERATURE_CONTROL_SERVER
 #include "static-supported-temperature-levels.h"
 #include <app/clusters/temperature-control-server/supported-temperature-levels-manager.h>
+#include <app/util/attribute-storage.h>
 #include <lib/support/CodeUtils.h>
 
 using namespace chip;
@@ -30,12 +31,17 @@ using chip::Protocols::InteractionModel::Status;
 
 app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
 
-CharSpan AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions[] = { "Low"_span, "Medium"_span, "High"_span };
+namespace chef {
+namespace Configuration {
+namespace TemperatureControl {
 
-const AppSupportedTemperatureLevelsDelegate::EndpointPair AppSupportedTemperatureLevelsDelegate::supportedOptionsByEndpoints
-    [MATTER_DM_TEMPERATURE_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT] = { EndpointPair(
-        1 /* endpointId */, AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions,
-        MATTER_ARRAY_SIZE(AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions)) };
+static const CharSpan temperatureLevelOptions[3] = { "Low"_span, "Medium"_span, "High"_span };
+} // namespace TemperatureControl
+} // namespace Configuration
+} // namespace chef
+
+chef::Configuration::TemperatureControl::EndpointPair
+    AppSupportedTemperatureLevelsDelegate::supportedOptionsByEndpoints[MATTER_DM_TEMPERATURE_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
 
 uint8_t AppSupportedTemperatureLevelsDelegate::Size()
 {
@@ -72,7 +78,14 @@ CHIP_ERROR AppSupportedTemperatureLevelsDelegate::Next(MutableCharSpan & item)
 }
 void emberAfTemperatureControlClusterInitCallback(EndpointId endpoint)
 {
-    static_assert(MATTER_DM_TEMPERATURE_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT == 1, "This cluster is only enabled for endpoint 1");
+    ChipLogDetail(DeviceLayer, "Initializing TemperatureControl cluster for Endpoint: %d", endpoint);
+    uint16_t epIndex = emberAfGetClusterServerEndpointIndex(endpoint, TemperatureControl::Id,
+                                                            MATTER_DM_TEMPERATURE_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
+    sAppSupportedTemperatureLevelsDelegate.SetSupportedEndpointPair(
+        epIndex,
+        chef::Configuration::TemperatureControl::EndpointPair(
+            endpoint /* endpointId */, chef::Configuration::TemperatureControl::temperatureLevelOptions,
+            MATTER_ARRAY_SIZE(chef::Configuration::TemperatureControl::temperatureLevelOptions)));
 
     chip::app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
 }

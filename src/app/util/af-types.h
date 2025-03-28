@@ -195,7 +195,7 @@ enum class EmberAfEndpointOptions : uint8_t
 {
     isEnabled         = 0x1,
     isFlatComposition = 0x2,
-    isTreeComposition = 0x3,
+    isTreeComposition = 0x4,
 };
 
 /**
