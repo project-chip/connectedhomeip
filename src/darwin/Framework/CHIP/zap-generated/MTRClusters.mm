@@ -21298,6 +21298,60 @@ using chip::System::Clock::Timeout;
 
 @end
 
+@implementation MTRClusterMeterIdentification
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeMeterTypeWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeMeterIdentificationID) attributeID:@(MTRAttributeIDTypeClusterMeterIdentificationAttributeMeterTypeID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributePointOfDeliveryWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeMeterIdentificationID) attributeID:@(MTRAttributeIDTypeClusterMeterIdentificationAttributePointOfDeliveryID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeMeterSerialNumberWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeMeterIdentificationID) attributeID:@(MTRAttributeIDTypeClusterMeterIdentificationAttributeMeterSerialNumberID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeProtocolVersionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeMeterIdentificationID) attributeID:@(MTRAttributeIDTypeClusterMeterIdentificationAttributeProtocolVersionID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributePowerThresholdWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeMeterIdentificationID) attributeID:@(MTRAttributeIDTypeClusterMeterIdentificationAttributePowerThresholdID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeMeterIdentificationID) attributeID:@(MTRAttributeIDTypeClusterMeterIdentificationAttributeGeneratedCommandListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeMeterIdentificationID) attributeID:@(MTRAttributeIDTypeClusterMeterIdentificationAttributeAcceptedCommandListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeMeterIdentificationID) attributeID:@(MTRAttributeIDTypeClusterMeterIdentificationAttributeAttributeListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeMeterIdentificationID) attributeID:@(MTRAttributeIDTypeClusterMeterIdentificationAttributeFeatureMapID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeMeterIdentificationID) attributeID:@(MTRAttributeIDTypeClusterMeterIdentificationAttributeClusterRevisionID) params:params];
+}
+
+@end
+
 @implementation MTRClusterUnitTesting
 
 - (void)testWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion

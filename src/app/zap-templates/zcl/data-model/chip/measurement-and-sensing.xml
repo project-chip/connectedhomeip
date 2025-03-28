@@ -34,7 +34,10 @@ limitations under the License.
     <item name="PowerFactor" value="0x000C"/>
     <item name="NeutralCurrent" value="0x000D"/>
     <item name="ElectricalEnergy" value="0x000E"/>
+    <item name="ReactiveEnergy" value="0x000F"/>
+    <item name="ApparentEnergy" value="0x0010"/>
   </enum>
+  
   <struct name="MeasurementAccuracyRangeStruct" apiMaturity="provisional">
     <cluster code="0x0090"/>
     <cluster code="0x0091"/>
@@ -47,6 +50,7 @@ limitations under the License.
     <item fieldId="6" name="FixedMin" type="int64u" optional="true" max="4611686018427387903"/>
     <item fieldId="7" name="FixedTypical" type="int64u" optional="true" max="4611686018427387903"/>
   </struct>
+
   <struct name="MeasurementAccuracyStruct" apiMaturity="provisional">
     <cluster code="0x0090"/>
     <cluster code="0x0091"/>
