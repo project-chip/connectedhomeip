@@ -127,6 +127,9 @@ inline constexpr CommandId Id = 0x00000006;
 namespace ClearTargets {
 inline constexpr CommandId Id = 0x00000007;
 } // namespace ClearTargets
+namespace GetTargetsResponse {
+inline constexpr CommandId Id = 0x00000000;
+} // namespace GetTargetsResponse
 } // namespace Commands
 
 namespace Events {

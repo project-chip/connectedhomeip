@@ -58,6 +58,18 @@ inline constexpr CommandId Id = 0x00000004;
 namespace AddGroupIfIdentifying {
 inline constexpr CommandId Id = 0x00000005;
 } // namespace AddGroupIfIdentifying
+namespace AddGroupResponse {
+inline constexpr CommandId Id = 0x00000000;
+} // namespace AddGroupResponse
+namespace ViewGroupResponse {
+inline constexpr CommandId Id = 0x00000001;
+} // namespace ViewGroupResponse
+namespace GetGroupMembershipResponse {
+inline constexpr CommandId Id = 0x00000002;
+} // namespace GetGroupMembershipResponse
+namespace RemoveGroupResponse {
+inline constexpr CommandId Id = 0x00000003;
+} // namespace RemoveGroupResponse
 } // namespace Commands
 
 namespace Events {} // namespace Events

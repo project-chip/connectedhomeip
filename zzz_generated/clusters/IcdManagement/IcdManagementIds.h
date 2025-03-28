@@ -76,6 +76,12 @@ inline constexpr CommandId Id = 0x00000002;
 namespace StayActiveRequest {
 inline constexpr CommandId Id = 0x00000003;
 } // namespace StayActiveRequest
+namespace RegisterClientResponse {
+inline constexpr CommandId Id = 0x00000001;
+} // namespace RegisterClientResponse
+namespace StayActiveResponse {
+inline constexpr CommandId Id = 0x00000004;
+} // namespace StayActiveResponse
 } // namespace Commands
 
 namespace Events {} // namespace Events

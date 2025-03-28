@@ -238,6 +238,12 @@ inline constexpr CommandId Id = 0x00000006;
 namespace AtomicRequest {
 inline constexpr CommandId Id = 0x000000FE;
 } // namespace AtomicRequest
+namespace GetWeeklyScheduleResponse {
+inline constexpr CommandId Id = 0x00000000;
+} // namespace GetWeeklyScheduleResponse
+namespace AtomicResponse {
+inline constexpr CommandId Id = 0x000000FD;
+} // namespace AtomicResponse
 } // namespace Commands
 
 namespace Events {} // namespace Events

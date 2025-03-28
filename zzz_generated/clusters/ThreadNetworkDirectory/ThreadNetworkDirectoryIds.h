@@ -55,6 +55,9 @@ inline constexpr CommandId Id = 0x00000001;
 namespace GetOperationalDataset {
 inline constexpr CommandId Id = 0x00000002;
 } // namespace GetOperationalDataset
+namespace OperationalDatasetResponse {
+inline constexpr CommandId Id = 0x00000003;
+} // namespace OperationalDatasetResponse
 } // namespace Commands
 
 namespace Events {} // namespace Events

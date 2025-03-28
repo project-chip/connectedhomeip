@@ -61,6 +61,12 @@ inline constexpr CommandId Id = 0x00000003;
 namespace RemoveZone {
 inline constexpr CommandId Id = 0x00000005;
 } // namespace RemoveZone
+namespace CreateTwoDCartesianZoneResponse {
+inline constexpr CommandId Id = 0x00000001;
+} // namespace CreateTwoDCartesianZoneResponse
+namespace GetTwoDCartesianZoneResponse {
+inline constexpr CommandId Id = 0x00000004;
+} // namespace GetTwoDCartesianZoneResponse
 } // namespace Commands
 
 namespace Events {

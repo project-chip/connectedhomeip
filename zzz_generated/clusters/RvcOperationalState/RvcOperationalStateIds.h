@@ -64,6 +64,9 @@ inline constexpr CommandId Id = 0x00000003;
 namespace GoHome {
 inline constexpr CommandId Id = 0x00000080;
 } // namespace GoHome
+namespace OperationalCommandResponse {
+inline constexpr CommandId Id = 0x00000004;
+} // namespace OperationalCommandResponse
 } // namespace Commands
 
 namespace Events {

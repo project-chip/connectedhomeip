@@ -235,6 +235,24 @@ inline constexpr CommandId Id = 0x00000028;
 namespace ClearAliroReaderConfig {
 inline constexpr CommandId Id = 0x00000029;
 } // namespace ClearAliroReaderConfig
+namespace GetWeekDayScheduleResponse {
+inline constexpr CommandId Id = 0x0000000C;
+} // namespace GetWeekDayScheduleResponse
+namespace GetYearDayScheduleResponse {
+inline constexpr CommandId Id = 0x0000000F;
+} // namespace GetYearDayScheduleResponse
+namespace GetHolidayScheduleResponse {
+inline constexpr CommandId Id = 0x00000012;
+} // namespace GetHolidayScheduleResponse
+namespace GetUserResponse {
+inline constexpr CommandId Id = 0x0000001C;
+} // namespace GetUserResponse
+namespace SetCredentialResponse {
+inline constexpr CommandId Id = 0x00000023;
+} // namespace SetCredentialResponse
+namespace GetCredentialStatusResponse {
+inline constexpr CommandId Id = 0x00000025;
+} // namespace GetCredentialStatusResponse
 } // namespace Commands
 
 namespace Events {

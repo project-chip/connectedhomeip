@@ -61,6 +61,12 @@ inline constexpr CommandId Id = 0x00000003;
 namespace KeySetReadAllIndices {
 inline constexpr CommandId Id = 0x00000004;
 } // namespace KeySetReadAllIndices
+namespace KeySetReadResponse {
+inline constexpr CommandId Id = 0x00000002;
+} // namespace KeySetReadResponse
+namespace KeySetReadAllIndicesResponse {
+inline constexpr CommandId Id = 0x00000005;
+} // namespace KeySetReadAllIndicesResponse
 } // namespace Commands
 
 namespace Events {} // namespace Events

@@ -40,6 +40,9 @@ namespace Commands {
 namespace RetrieveLogsRequest {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace RetrieveLogsRequest
+namespace RetrieveLogsResponse {
+inline constexpr CommandId Id = 0x00000001;
+} // namespace RetrieveLogsResponse
 } // namespace Commands
 
 namespace Events {} // namespace Events

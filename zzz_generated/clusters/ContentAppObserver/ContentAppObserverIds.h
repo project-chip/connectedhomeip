@@ -40,6 +40,9 @@ namespace Commands {
 namespace ContentAppMessage {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace ContentAppMessage
+namespace ContentAppMessageResponse {
+inline constexpr CommandId Id = 0x00000001;
+} // namespace ContentAppMessageResponse
 } // namespace Commands
 
 namespace Events {} // namespace Events

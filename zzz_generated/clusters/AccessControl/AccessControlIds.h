@@ -61,6 +61,9 @@ namespace Commands {
 namespace ReviewFabricRestrictions {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace ReviewFabricRestrictions
+namespace ReviewFabricRestrictionsResponse {
+inline constexpr CommandId Id = 0x00000001;
+} // namespace ReviewFabricRestrictionsResponse
 } // namespace Commands
 
 namespace Events {

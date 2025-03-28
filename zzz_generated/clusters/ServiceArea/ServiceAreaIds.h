@@ -61,6 +61,12 @@ inline constexpr CommandId Id = 0x00000000;
 namespace SkipArea {
 inline constexpr CommandId Id = 0x00000002;
 } // namespace SkipArea
+namespace SelectAreasResponse {
+inline constexpr CommandId Id = 0x00000001;
+} // namespace SelectAreasResponse
+namespace SkipAreaResponse {
+inline constexpr CommandId Id = 0x00000003;
+} // namespace SkipAreaResponse
 } // namespace Commands
 
 namespace Events {} // namespace Events

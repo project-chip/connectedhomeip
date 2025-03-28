@@ -67,6 +67,27 @@ inline constexpr CommandId Id = 0x00000006;
 namespace CopyScene {
 inline constexpr CommandId Id = 0x00000040;
 } // namespace CopyScene
+namespace AddSceneResponse {
+inline constexpr CommandId Id = 0x00000000;
+} // namespace AddSceneResponse
+namespace ViewSceneResponse {
+inline constexpr CommandId Id = 0x00000001;
+} // namespace ViewSceneResponse
+namespace RemoveSceneResponse {
+inline constexpr CommandId Id = 0x00000002;
+} // namespace RemoveSceneResponse
+namespace RemoveAllScenesResponse {
+inline constexpr CommandId Id = 0x00000003;
+} // namespace RemoveAllScenesResponse
+namespace StoreSceneResponse {
+inline constexpr CommandId Id = 0x00000004;
+} // namespace StoreSceneResponse
+namespace GetSceneMembershipResponse {
+inline constexpr CommandId Id = 0x00000006;
+} // namespace GetSceneMembershipResponse
+namespace CopySceneResponse {
+inline constexpr CommandId Id = 0x00000040;
+} // namespace CopySceneResponse
 } // namespace Commands
 
 namespace Events {} // namespace Events

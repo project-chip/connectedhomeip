@@ -46,6 +46,9 @@ inline constexpr CommandId Id = 0x00000000;
 namespace CommissionNode {
 inline constexpr CommandId Id = 0x00000001;
 } // namespace CommissionNode
+namespace ReverseOpenCommissioningWindow {
+inline constexpr CommandId Id = 0x00000002;
+} // namespace ReverseOpenCommissioningWindow
 } // namespace Commands
 
 namespace Events {

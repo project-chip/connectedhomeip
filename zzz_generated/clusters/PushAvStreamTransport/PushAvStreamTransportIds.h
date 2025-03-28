@@ -64,6 +64,12 @@ inline constexpr CommandId Id = 0x00000005;
 namespace FindTransport {
 inline constexpr CommandId Id = 0x00000006;
 } // namespace FindTransport
+namespace AllocatePushTransportResponse {
+inline constexpr CommandId Id = 0x00000001;
+} // namespace AllocatePushTransportResponse
+namespace FindTransportResponse {
+inline constexpr CommandId Id = 0x00000007;
+} // namespace FindTransportResponse
 } // namespace Commands
 
 namespace Events {

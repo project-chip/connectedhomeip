@@ -46,6 +46,9 @@ namespace Commands {
 namespace ChangeToMode {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace ChangeToMode
+namespace ChangeToModeResponse {
+inline constexpr CommandId Id = 0x00000001;
+} // namespace ChangeToModeResponse
 } // namespace Commands
 
 namespace Events {} // namespace Events

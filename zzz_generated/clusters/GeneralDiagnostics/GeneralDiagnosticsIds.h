@@ -73,6 +73,12 @@ inline constexpr CommandId Id = 0x00000001;
 namespace PayloadTestRequest {
 inline constexpr CommandId Id = 0x00000003;
 } // namespace PayloadTestRequest
+namespace TimeSnapshotResponse {
+inline constexpr CommandId Id = 0x00000002;
+} // namespace TimeSnapshotResponse
+namespace PayloadTestResponse {
+inline constexpr CommandId Id = 0x00000004;
+} // namespace PayloadTestResponse
 } // namespace Commands
 
 namespace Events {

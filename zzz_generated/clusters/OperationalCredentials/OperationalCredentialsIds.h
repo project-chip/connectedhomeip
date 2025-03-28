@@ -85,6 +85,21 @@ inline constexpr CommandId Id = 0x0000000C;
 namespace SignVIDVerificationRequest {
 inline constexpr CommandId Id = 0x0000000D;
 } // namespace SignVIDVerificationRequest
+namespace AttestationResponse {
+inline constexpr CommandId Id = 0x00000001;
+} // namespace AttestationResponse
+namespace CertificateChainResponse {
+inline constexpr CommandId Id = 0x00000003;
+} // namespace CertificateChainResponse
+namespace CSRResponse {
+inline constexpr CommandId Id = 0x00000005;
+} // namespace CSRResponse
+namespace NOCResponse {
+inline constexpr CommandId Id = 0x00000008;
+} // namespace NOCResponse
+namespace SignVIDVerificationResponse {
+inline constexpr CommandId Id = 0x0000000E;
+} // namespace SignVIDVerificationResponse
 } // namespace Commands
 
 namespace Events {} // namespace Events

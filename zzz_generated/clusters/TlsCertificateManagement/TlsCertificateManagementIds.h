@@ -76,6 +76,24 @@ inline constexpr CommandId Id = 0x0000000C;
 namespace RemoveClientCertificate {
 inline constexpr CommandId Id = 0x0000000E;
 } // namespace RemoveClientCertificate
+namespace ProvisionRootCertificateResponse {
+inline constexpr CommandId Id = 0x00000001;
+} // namespace ProvisionRootCertificateResponse
+namespace FindRootCertificateResponse {
+inline constexpr CommandId Id = 0x00000003;
+} // namespace FindRootCertificateResponse
+namespace LookupRootCertificateResponse {
+inline constexpr CommandId Id = 0x00000005;
+} // namespace LookupRootCertificateResponse
+namespace TLSClientCSRResponse {
+inline constexpr CommandId Id = 0x00000008;
+} // namespace TLSClientCSRResponse
+namespace FindClientCertificateResponse {
+inline constexpr CommandId Id = 0x0000000B;
+} // namespace FindClientCertificateResponse
+namespace LookupClientCertificateResponse {
+inline constexpr CommandId Id = 0x0000000D;
+} // namespace LookupClientCertificateResponse
 } // namespace Commands
 
 namespace Events {} // namespace Events

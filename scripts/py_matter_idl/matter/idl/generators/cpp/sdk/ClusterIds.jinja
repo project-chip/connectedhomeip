@@ -33,6 +33,11 @@ namespace {{command.name | upfirst}} {
 inline constexpr CommandId Id = {{ "0x%08X" | format(command.code)}};
 } // namespace {{command.name | upfirst}}
 {% endfor -%}
+{% for struct in cluster.structs | select("response_struct") -%}
+namespace {{struct.name | upfirst}} {
+inline constexpr CommandId Id = {{ "0x%08X" | format(struct.code)}};
+} // namespace {{struct.name | upfirst}}
+{% endfor -%}
 } // namespace Commands
 
 namespace Events {

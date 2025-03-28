@@ -46,6 +46,12 @@ inline constexpr CommandId Id = 0x00000002;
 namespace NotifyUpdateApplied {
 inline constexpr CommandId Id = 0x00000004;
 } // namespace NotifyUpdateApplied
+namespace QueryImageResponse {
+inline constexpr CommandId Id = 0x00000001;
+} // namespace QueryImageResponse
+namespace ApplyUpdateResponse {
+inline constexpr CommandId Id = 0x00000003;
+} // namespace ApplyUpdateResponse
 } // namespace Commands
 
 namespace Events {} // namespace Events

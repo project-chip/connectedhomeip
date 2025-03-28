@@ -15,7 +15,7 @@
 import os
 
 from matter.idl.generators import CodeGenerator, GeneratorStorage
-from matter.idl.matter_idl_types import AccessPrivilege, Attribute, AttributeQuality, Command, CommandQuality, FieldQuality, Idl
+from matter.idl.matter_idl_types import AccessPrivilege, Attribute, AttributeQuality, Command, CommandQuality, FieldQuality, Idl, Struct
 
 
 def as_privilege(privilege: AccessPrivilege) -> str:
@@ -66,6 +66,10 @@ def global_attribute(attribute: Attribute) -> bool:
     return 0xFFF8 <= attribute.definition.code <= 0xFFFF
 
 
+def response_struct(s: Struct) -> bool:
+    return s.code is not None
+
+
 class SdkGenerator(CodeGenerator):
     """
     Generation of cpp code for application implementation for matter.
@@ -81,6 +85,7 @@ class SdkGenerator(CodeGenerator):
         self.jinja_env.filters['extract_attribute_quality_flags'] = extract_attribute_quality_flags
         self.jinja_env.filters['extract_command_quality_flags'] = extract_command_quality_flags
         self.jinja_env.tests['global_attribute'] = global_attribute
+        self.jinja_env.tests['response_struct'] = response_struct
 
     def internal_render_all(self):
         """

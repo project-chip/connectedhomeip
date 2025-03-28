@@ -112,6 +112,9 @@ inline constexpr CommandId Id = 0x0000000D;
 namespace DeactivateTextTrack {
 inline constexpr CommandId Id = 0x0000000E;
 } // namespace DeactivateTextTrack
+namespace PlaybackResponse {
+inline constexpr CommandId Id = 0x0000000A;
+} // namespace PlaybackResponse
 } // namespace Commands
 
 namespace Events {

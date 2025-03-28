@@ -67,6 +67,9 @@ inline constexpr CommandId Id = 0x00000003;
 namespace SetPendingDatasetRequest {
 inline constexpr CommandId Id = 0x00000004;
 } // namespace SetPendingDatasetRequest
+namespace DatasetResponse {
+inline constexpr CommandId Id = 0x00000002;
+} // namespace DatasetResponse
 } // namespace Commands
 
 namespace Events {} // namespace Events

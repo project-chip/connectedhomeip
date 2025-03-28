@@ -91,6 +91,18 @@ inline constexpr CommandId Id = 0x00000008;
 namespace QueryIdentity {
 inline constexpr CommandId Id = 0x00000009;
 } // namespace QueryIdentity
+namespace ScanNetworksResponse {
+inline constexpr CommandId Id = 0x00000001;
+} // namespace ScanNetworksResponse
+namespace NetworkConfigResponse {
+inline constexpr CommandId Id = 0x00000005;
+} // namespace NetworkConfigResponse
+namespace ConnectNetworkResponse {
+inline constexpr CommandId Id = 0x00000007;
+} // namespace ConnectNetworkResponse
+namespace QueryIdentityResponse {
+inline constexpr CommandId Id = 0x0000000A;
+} // namespace QueryIdentityResponse
 } // namespace Commands
 
 namespace Events {} // namespace Events

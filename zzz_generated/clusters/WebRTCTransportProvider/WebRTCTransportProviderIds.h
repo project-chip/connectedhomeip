@@ -55,6 +55,12 @@ inline constexpr CommandId Id = 0x00000006;
 namespace EndSession {
 inline constexpr CommandId Id = 0x00000007;
 } // namespace EndSession
+namespace SolicitOfferResponse {
+inline constexpr CommandId Id = 0x00000002;
+} // namespace SolicitOfferResponse
+namespace ProvideOfferResponse {
+inline constexpr CommandId Id = 0x00000004;
+} // namespace ProvideOfferResponse
 } // namespace Commands
 
 namespace Events {} // namespace Events

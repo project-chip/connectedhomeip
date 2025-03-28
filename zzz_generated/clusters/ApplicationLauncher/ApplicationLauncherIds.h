@@ -52,6 +52,9 @@ inline constexpr CommandId Id = 0x00000001;
 namespace HideApp {
 inline constexpr CommandId Id = 0x00000002;
 } // namespace HideApp
+namespace LauncherResponse {
+inline constexpr CommandId Id = 0x00000003;
+} // namespace LauncherResponse
 } // namespace Commands
 
 namespace Events {} // namespace Events

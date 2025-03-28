@@ -91,6 +91,9 @@ inline constexpr CommandId Id = 0x00000004;
 namespace SetDefaultNTP {
 inline constexpr CommandId Id = 0x00000005;
 } // namespace SetDefaultNTP
+namespace SetTimeZoneResponse {
+inline constexpr CommandId Id = 0x00000003;
+} // namespace SetTimeZoneResponse
 } // namespace Commands
 
 namespace Events {

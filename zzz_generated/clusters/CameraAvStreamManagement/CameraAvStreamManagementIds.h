@@ -190,6 +190,18 @@ inline constexpr CommandId Id = 0x0000000B;
 namespace CaptureSnapshot {
 inline constexpr CommandId Id = 0x0000000C;
 } // namespace CaptureSnapshot
+namespace AudioStreamAllocateResponse {
+inline constexpr CommandId Id = 0x00000001;
+} // namespace AudioStreamAllocateResponse
+namespace VideoStreamAllocateResponse {
+inline constexpr CommandId Id = 0x00000004;
+} // namespace VideoStreamAllocateResponse
+namespace SnapshotStreamAllocateResponse {
+inline constexpr CommandId Id = 0x00000008;
+} // namespace SnapshotStreamAllocateResponse
+namespace CaptureSnapshotResponse {
+inline constexpr CommandId Id = 0x0000000D;
+} // namespace CaptureSnapshotResponse
 } // namespace Commands
 
 namespace Events {} // namespace Events

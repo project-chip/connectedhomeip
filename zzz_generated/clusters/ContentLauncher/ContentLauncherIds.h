@@ -49,6 +49,9 @@ inline constexpr CommandId Id = 0x00000000;
 namespace LaunchURL {
 inline constexpr CommandId Id = 0x00000001;
 } // namespace LaunchURL
+namespace LauncherResponse {
+inline constexpr CommandId Id = 0x00000002;
+} // namespace LauncherResponse
 } // namespace Commands
 
 namespace Events {} // namespace Events

@@ -67,6 +67,9 @@ inline constexpr CommandId Id = 0x00000002;
 namespace Resume {
 inline constexpr CommandId Id = 0x00000003;
 } // namespace Resume
+namespace OperationalCommandResponse {
+inline constexpr CommandId Id = 0x00000004;
+} // namespace OperationalCommandResponse
 } // namespace Commands
 
 namespace Events {

@@ -385,6 +385,54 @@ inline constexpr CommandId Id = 0x00000019;
 namespace TestDifferentVendorMeiRequest {
 inline constexpr CommandId Id = 0xFFF200AA;
 } // namespace TestDifferentVendorMeiRequest
+namespace TestSpecificResponse {
+inline constexpr CommandId Id = 0x00000000;
+} // namespace TestSpecificResponse
+namespace TestAddArgumentsResponse {
+inline constexpr CommandId Id = 0x00000001;
+} // namespace TestAddArgumentsResponse
+namespace TestSimpleArgumentResponse {
+inline constexpr CommandId Id = 0x00000002;
+} // namespace TestSimpleArgumentResponse
+namespace TestStructArrayArgumentResponse {
+inline constexpr CommandId Id = 0x00000003;
+} // namespace TestStructArrayArgumentResponse
+namespace TestListInt8UReverseResponse {
+inline constexpr CommandId Id = 0x00000004;
+} // namespace TestListInt8UReverseResponse
+namespace TestEnumsResponse {
+inline constexpr CommandId Id = 0x00000005;
+} // namespace TestEnumsResponse
+namespace TestNullableOptionalResponse {
+inline constexpr CommandId Id = 0x00000006;
+} // namespace TestNullableOptionalResponse
+namespace TestComplexNullableOptionalResponse {
+inline constexpr CommandId Id = 0x00000007;
+} // namespace TestComplexNullableOptionalResponse
+namespace BooleanResponse {
+inline constexpr CommandId Id = 0x00000008;
+} // namespace BooleanResponse
+namespace SimpleStructResponse {
+inline constexpr CommandId Id = 0x00000009;
+} // namespace SimpleStructResponse
+namespace TestEmitTestEventResponse {
+inline constexpr CommandId Id = 0x0000000A;
+} // namespace TestEmitTestEventResponse
+namespace TestEmitTestFabricScopedEventResponse {
+inline constexpr CommandId Id = 0x0000000B;
+} // namespace TestEmitTestFabricScopedEventResponse
+namespace TestBatchHelperResponse {
+inline constexpr CommandId Id = 0x0000000C;
+} // namespace TestBatchHelperResponse
+namespace StringEchoResponse {
+inline constexpr CommandId Id = 0x0000000D;
+} // namespace StringEchoResponse
+namespace GlobalEchoResponse {
+inline constexpr CommandId Id = 0x0000000E;
+} // namespace GlobalEchoResponse
+namespace TestDifferentVendorMeiResponse {
+inline constexpr CommandId Id = 0xFFF200BB;
+} // namespace TestDifferentVendorMeiResponse
 } // namespace Commands
 
 namespace Events {

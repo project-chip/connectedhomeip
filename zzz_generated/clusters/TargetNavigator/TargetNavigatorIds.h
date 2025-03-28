@@ -46,6 +46,9 @@ namespace Commands {
 namespace NavigateTarget {
 inline constexpr CommandId Id = 0x00000000;
 } // namespace NavigateTarget
+namespace NavigateTargetResponse {
+inline constexpr CommandId Id = 0x00000001;
+} // namespace NavigateTargetResponse
 } // namespace Commands
 
 namespace Events {

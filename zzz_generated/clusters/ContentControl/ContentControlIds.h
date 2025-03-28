@@ -91,6 +91,9 @@ inline constexpr CommandId Id = 0x00000009;
 namespace SetScheduledContentRatingThreshold {
 inline constexpr CommandId Id = 0x0000000A;
 } // namespace SetScheduledContentRatingThreshold
+namespace ResetPINResponse {
+inline constexpr CommandId Id = 0x00000002;
+} // namespace ResetPINResponse
 } // namespace Commands
 
 namespace Events {
