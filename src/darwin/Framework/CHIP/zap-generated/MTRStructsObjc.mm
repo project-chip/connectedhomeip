@@ -6752,9 +6752,9 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _tagPosition = nil;
+        _position = nil;
 
-        _tagLatch = nil;
+        _latch = nil;
 
         _speed = nil;
     }
@@ -6765,8 +6765,8 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRClosureControlClusterOverallTargetStruct alloc] init];
 
-    other.tagPosition = self.tagPosition;
-    other.tagLatch = self.tagLatch;
+    other.position = self.position;
+    other.latch = self.latch;
     other.speed = self.speed;
 
     return other;
@@ -6774,7 +6774,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: tagPosition:%@; tagLatch:%@; speed:%@; >", NSStringFromClass([self class]), _tagPosition, _tagLatch, _speed];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: position:%@; latch:%@; speed:%@; >", NSStringFromClass([self class]), _position, _latch, _speed];
     return descriptionString;
 }
 
