@@ -21,11 +21,30 @@
 #include <app/clusters/temperature-control-server/supported-temperature-levels-manager.h>
 #include <app/util/config.h>
 
-namespace ChefTemperatureControl {
+namespace chef {
+namespace Configuration {
+namespace TemperatureControl {
+
+/**
+ * @brief Endpoint to temperature levels mapping. The endpoint must have a temperature control cluster.
+ * Represents a pair of endpoints and temperature levels supported by that endpoint.
+ */
 struct EndpointPair
 {
+    /**
+     * @brief An endpoint having temperature control cluster.
+     */
     chip::EndpointId mEndpointId;
+
+    /**
+     * @brief Temperature levels supported by the temperature control cluster at this endpoint.
+     * This should point to a const char span array initialized statically.
+     */
     const chip::CharSpan * mTemperatureLevels;
+
+    /**
+     * @brief Size of the temperature levels array.
+     */
     uint8_t mSize;
 
     EndpointPair() : mEndpointId(chip::kInvalidEndpointId), mTemperatureLevels(NULL), mSize(0) {}
@@ -34,7 +53,9 @@ struct EndpointPair
         mEndpointId(aEndpointId), mTemperatureLevels(TemperatureLevels), mSize(size)
     {}
 };
-} // namespace ChefTemperatureControl
+} // namespace TemperatureControl
+} // namespace Configuration
+} // namespace chef
 
 namespace chip {
 namespace app {

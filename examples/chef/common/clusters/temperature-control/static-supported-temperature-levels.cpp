@@ -31,9 +31,14 @@ using chip::Protocols::InteractionModel::Status;
 
 app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
 
-namespace ChefTemperatureControl {
+namespace chef {
+namespace Configuration {
+namespace TemperatureControl {
+
 static const CharSpan temperatureLevelOptions[3] = { "Low"_span, "Medium"_span, "High"_span };
-} // namespace ChefTemperatureControl
+} // namespace TemperatureControl
+} // namespace Configuration
+} // namespace chef
 
 ChefTemperatureControl::EndpointPair
     AppSupportedTemperatureLevelsDelegate::supportedOptionsByEndpoints[MATTER_DM_TEMPERATURE_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
@@ -78,8 +83,9 @@ void emberAfTemperatureControlClusterInitCallback(EndpointId endpoint)
                                                             MATTER_DM_TEMPERATURE_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
     sAppSupportedTemperatureLevelsDelegate.SetSupportedEndpointPair(
         epIndex,
-        ChefTemperatureControl::EndpointPair(endpoint /* endpointId */, ChefTemperatureControl::temperatureLevelOptions,
-                                             MATTER_ARRAY_SIZE(ChefTemperatureControl::temperatureLevelOptions)));
+        ChefTemperatureControl::EndpointPair(endpoint /* endpointId */,
+                                             chef::Configuration::TemperatureControl::temperatureLevelOptions,
+                                             MATTER_ARRAY_SIZE(chef::Configuration::TemperatureControl::temperatureLevelOptions)));
 
     chip::app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
 }
