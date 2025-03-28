@@ -81,8 +81,7 @@ class TC_EEVSEM_1_2(MatterBaseTest, ModeBaseClusterChecks):
 
         # According to the spec, there should be at least one Manual or Time of Use
         # tag in the ones supported.
-        additional_tags = [cluster_eevsem_mode.Enums.ModeTag.kManual,
-                           cluster_eevsem_mode.Enums.ModeTag.kTimeOfUse]
+        additional_tags = [cluster_eevsem_mode.Enums.ModeTag.kManual]
         self.check_tags_in_lists(supported_modes=supported_modes, required_tags=additional_tags)
 
         self.step(3)
