@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (c) 2024 Project CHIP Authors
+Copyright (c) 2025 Project CHIP Authors
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -23,10 +23,31 @@ limitations under the License.
     <item fieldId="1" name="StatusCode" type="status"/>
   </struct>
 
+  <struct name="CurrencyStruct" apiMaturity="provisional">
+    <cluster code="0x0095"/>
+    <cluster code="0x0700"/>
+    <item fieldId="0" name="Currency" type="int16u" min="0" max="999"/>
+    <item fieldId="1" name="DecimalPoints" type="int8u"  min="0" max="255"/>
+  </struct>
+
   <struct name="LocationDescriptorStruct">
     <item fieldId="0" name="LocationName"    type="char_string" length="128" isNullable="false" optional="false"/>
     <item fieldId="1" name="FloorNumber"     type="int16s"                   isNullable="true"  optional="false"/>
     <item fieldId="2" name="AreaType"        type="AreaTypeTag"              isNullable="true"  optional="false"/>
+  </struct>
+
+  <struct name="PowerThresholdStruct" apiMaturity="provisional">
+    <cluster code="0x0700"/>
+    <cluster code="0x0B06"/>
+    <item fieldId="0" name="PowerThreshold" type="power_mw" optional="true"/>
+    <item fieldId="1" name="ApparentPowerThreshold" type="power_mva" optional="true"/>
+    <item fieldId="2" name="PowerThresholdSource" type="PowerThresholdSourceEnum" isNullable="true" min="0x00" max="0x02"/>
+  </struct>
+
+  <struct name="PriceStruct" apiMaturity="provisional">
+    <cluster code="0x0095"/>
+    <item fieldId="0" name="Amount" type="money"/>
+    <item fieldId="1" name="Currency" type="CurrencyStruct"/>
   </struct>
 
   <!--

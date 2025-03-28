@@ -55,6 +55,7 @@ limitations under the License.
     <type id="0x42" description="Character String"         name="char_string"                 composite="true"/>
     <type id="0x44" description="Long Character String"    name="long_char_string"            composite="true"/>
 
+    <type id="0xD6" description="Power millivolt-amps"     name="power_mva"         size="8"  analog="true"     signed="true"/>
     <type id="0xD9" description="Power milliwatts"         name="power_mw"          size="8"  analog="true"     signed="true"/>
     <type id="0xDA" description="Amperage milliamps"       name="amperage_ma"       size="8"  analog="true"     signed="true"/>
     <type id="0xDB" description="Voltage millivolts"       name="voltage_mv"        size="8"  analog="true"     signed="true"/>
@@ -73,7 +74,8 @@ limitations under the License.
     <type id="0xD1" description="System Time Milliseconds" name="systime_ms"        size="8"  analog="true"   />
     <type id="0xD2" description="Elapsed Time Seconds"     name="elapsed_s"         size="4"  analog="true"   />
 
-    <type id="0xD8" description="Temperature"              name="temperature"       size="2"  analog="true"     signed="true" />
+    <type id="0xD8" description="Temperature"              name="temperature"       size="2"  analog="true" signed="true"/>
+    <type id="0xF7" description="Amount of Money"          name="money"             size="8"  analog="true" signed="true"/>
 
     <type id="0x30" description="8-bit enumeration"        name="enum8"             size="1"  discrete="true" />
     <type id="0x31" description="16-bit enumeration"       name="enum16"            size="2"  discrete="true" />
