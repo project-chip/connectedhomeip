@@ -1,55 +1,40 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster AudioOutput (cluster code: 1291/0x50B)
+// Identifier constant values for cluster AudioOutput (cluster code: 1291/0x50B)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/AudioOutput/AudioOutputIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace AudioOutput {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr ClusterId kClusterId = 0x0000050B;
 
 namespace Attributes {
+namespace OutputList {
+inline constexpr AttributeId Id = 0x00000000;
+} // namespace OutputList
+namespace CurrentOutput {
+inline constexpr AttributeId Id = 0x00000001;
+} // namespace CurrentOutput
 
-inline constexpr DataModel::AttributeEntry kOutputListEntry = {
-    .attributeId    = Attributes::OutputList::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kCurrentOutputEntry = {
-    .attributeId    = Attributes::CurrentOutput::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+// TODO: globals & reference globals?
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kSelectOutputEntry = {
-    .commandId       = Commands::SelectOutput::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AcceptedCommandEntry kRenameOutputEntry = {
-    .commandId       = Commands::RenameOutput::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kManage,
-};
-
+namespace SelectOutput {
+inline constexpr CommandId Id = 0x00000000;
+} // namespace SelectOutput
+namespace RenameOutput {
+inline constexpr CommandId Id = 0x00000001;
+} // namespace RenameOutput
 } // namespace Commands
-} // namespace Metadata
+
+namespace Events {} // namespace Events
+
 } // namespace AudioOutput
 } // namespace clusters
 } // namespace app

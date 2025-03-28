@@ -1,62 +1,43 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster OvenMode (cluster code: 73/0x49)
+// Identifier constant values for cluster OvenMode (cluster code: 73/0x49)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/OvenMode/OvenModeIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace OvenMode {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr ClusterId kClusterId = 0x00000049;
 
 namespace Attributes {
+namespace SupportedModes {
+inline constexpr AttributeId Id = 0x00000000;
+} // namespace SupportedModes
+namespace CurrentMode {
+inline constexpr AttributeId Id = 0x00000001;
+} // namespace CurrentMode
+namespace StartUpMode {
+inline constexpr AttributeId Id = 0x00000002;
+} // namespace StartUpMode
+namespace OnMode {
+inline constexpr AttributeId Id = 0x00000003;
+} // namespace OnMode
 
-inline constexpr DataModel::AttributeEntry kSupportedModesEntry = {
-    .attributeId    = Attributes::SupportedModes::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kCurrentModeEntry = {
-    .attributeId    = Attributes::CurrentMode::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kStartUpModeEntry = {
-    .attributeId    = Attributes::StartUpMode::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kOnModeEntry = {
-    .attributeId    = Attributes::OnMode::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
+// TODO: globals & reference globals?
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kChangeToModeEntry = {
-    .commandId       = Commands::ChangeToMode::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-
+namespace ChangeToMode {
+inline constexpr CommandId Id = 0x00000000;
+} // namespace ChangeToMode
 } // namespace Commands
-} // namespace Metadata
+
+namespace Events {} // namespace Events
+
 } // namespace OvenMode
 } // namespace clusters
 } // namespace app

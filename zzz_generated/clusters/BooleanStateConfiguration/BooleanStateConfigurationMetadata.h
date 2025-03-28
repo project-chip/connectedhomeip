@@ -1,91 +1,65 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster BooleanStateConfiguration (cluster code: 128/0x80)
+// Identifier constant values for cluster BooleanStateConfiguration (cluster code: 128/0x80)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/BooleanStateConfiguration/BooleanStateConfigurationIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace BooleanStateConfiguration {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr ClusterId kClusterId = 0x00000080;
 
 namespace Attributes {
+namespace CurrentSensitivityLevel {
+inline constexpr AttributeId Id = 0x00000000;
+} // namespace CurrentSensitivityLevel
+namespace SupportedSensitivityLevels {
+inline constexpr AttributeId Id = 0x00000001;
+} // namespace SupportedSensitivityLevels
+namespace DefaultSensitivityLevel {
+inline constexpr AttributeId Id = 0x00000002;
+} // namespace DefaultSensitivityLevel
+namespace AlarmsActive {
+inline constexpr AttributeId Id = 0x00000003;
+} // namespace AlarmsActive
+namespace AlarmsSuppressed {
+inline constexpr AttributeId Id = 0x00000004;
+} // namespace AlarmsSuppressed
+namespace AlarmsEnabled {
+inline constexpr AttributeId Id = 0x00000005;
+} // namespace AlarmsEnabled
+namespace AlarmsSupported {
+inline constexpr AttributeId Id = 0x00000006;
+} // namespace AlarmsSupported
+namespace SensorFault {
+inline constexpr AttributeId Id = 0x00000007;
+} // namespace SensorFault
 
-inline constexpr DataModel::AttributeEntry kCurrentSensitivityLevelEntry = {
-    .attributeId    = Attributes::CurrentSensitivityLevel::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kSupportedSensitivityLevelsEntry = {
-    .attributeId    = Attributes::SupportedSensitivityLevels::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kDefaultSensitivityLevelEntry = {
-    .attributeId    = Attributes::DefaultSensitivityLevel::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kAlarmsActiveEntry = {
-    .attributeId    = Attributes::AlarmsActive::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kAlarmsSuppressedEntry = {
-    .attributeId    = Attributes::AlarmsSuppressed::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kAlarmsEnabledEntry = {
-    .attributeId    = Attributes::AlarmsEnabled::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kAlarmsSupportedEntry = {
-    .attributeId    = Attributes::AlarmsSupported::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kSensorFaultEntry = {
-    .attributeId    = Attributes::SensorFault::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+// TODO: globals & reference globals?
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kSuppressAlarmEntry = {
-    .commandId       = Commands::SuppressAlarm::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AcceptedCommandEntry kEnableDisableAlarmEntry = {
-    .commandId       = Commands::EnableDisableAlarm::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-
+namespace SuppressAlarm {
+inline constexpr CommandId Id = 0x00000000;
+} // namespace SuppressAlarm
+namespace EnableDisableAlarm {
+inline constexpr CommandId Id = 0x00000001;
+} // namespace EnableDisableAlarm
 } // namespace Commands
-} // namespace Metadata
+
+namespace Events {
+namespace AlarmsStateChanged {
+inline constexpr EventId Id = 0x00000000;
+} // namespace AlarmsStateChanged
+namespace SensorFault {
+inline constexpr EventId Id = 0x00000001;
+} // namespace SensorFault
+} // namespace Events
+
 } // namespace BooleanStateConfiguration
 } // namespace clusters
 } // namespace app

@@ -1,67 +1,50 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster DishwasherAlarm (cluster code: 93/0x5D)
+// Identifier constant values for cluster DishwasherAlarm (cluster code: 93/0x5D)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/DishwasherAlarm/DishwasherAlarmIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace DishwasherAlarm {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr ClusterId kClusterId = 0x0000005D;
 
 namespace Attributes {
+namespace Mask {
+inline constexpr AttributeId Id = 0x00000000;
+} // namespace Mask
+namespace Latch {
+inline constexpr AttributeId Id = 0x00000001;
+} // namespace Latch
+namespace State {
+inline constexpr AttributeId Id = 0x00000002;
+} // namespace State
+namespace Supported {
+inline constexpr AttributeId Id = 0x00000003;
+} // namespace Supported
 
-inline constexpr DataModel::AttributeEntry kMaskEntry = {
-    .attributeId    = Attributes::Mask::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kLatchEntry = {
-    .attributeId    = Attributes::Latch::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kStateEntry = {
-    .attributeId    = Attributes::State::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kSupportedEntry = {
-    .attributeId    = Attributes::Supported::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+// TODO: globals & reference globals?
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kResetEntry = {
-    .commandId       = Commands::Reset::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AcceptedCommandEntry kModifyEnabledAlarmsEntry = {
-    .commandId       = Commands::ModifyEnabledAlarms::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-
+namespace Reset {
+inline constexpr CommandId Id = 0x00000000;
+} // namespace Reset
+namespace ModifyEnabledAlarms {
+inline constexpr CommandId Id = 0x00000001;
+} // namespace ModifyEnabledAlarms
 } // namespace Commands
-} // namespace Metadata
+
+namespace Events {
+namespace Notify {
+inline constexpr EventId Id = 0x00000000;
+} // namespace Notify
+} // namespace Events
+
 } // namespace DishwasherAlarm
 } // namespace clusters
 } // namespace app

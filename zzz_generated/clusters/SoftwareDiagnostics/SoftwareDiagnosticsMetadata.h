@@ -1,62 +1,47 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster SoftwareDiagnostics (cluster code: 52/0x34)
+// Identifier constant values for cluster SoftwareDiagnostics (cluster code: 52/0x34)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/SoftwareDiagnostics/SoftwareDiagnosticsIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace SoftwareDiagnostics {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr ClusterId kClusterId = 0x00000034;
 
 namespace Attributes {
+namespace ThreadMetrics {
+inline constexpr AttributeId Id = 0x00000000;
+} // namespace ThreadMetrics
+namespace CurrentHeapFree {
+inline constexpr AttributeId Id = 0x00000001;
+} // namespace CurrentHeapFree
+namespace CurrentHeapUsed {
+inline constexpr AttributeId Id = 0x00000002;
+} // namespace CurrentHeapUsed
+namespace CurrentHeapHighWatermark {
+inline constexpr AttributeId Id = 0x00000003;
+} // namespace CurrentHeapHighWatermark
 
-inline constexpr DataModel::AttributeEntry kThreadMetricsEntry = {
-    .attributeId    = Attributes::ThreadMetrics::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kCurrentHeapFreeEntry = {
-    .attributeId    = Attributes::CurrentHeapFree::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kCurrentHeapUsedEntry = {
-    .attributeId    = Attributes::CurrentHeapUsed::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kCurrentHeapHighWatermarkEntry = {
-    .attributeId    = Attributes::CurrentHeapHighWatermark::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+// TODO: globals & reference globals?
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kResetWatermarksEntry = {
-    .commandId       = Commands::ResetWatermarks::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kManage,
-};
-
+namespace ResetWatermarks {
+inline constexpr CommandId Id = 0x00000000;
+} // namespace ResetWatermarks
 } // namespace Commands
-} // namespace Metadata
+
+namespace Events {
+namespace SoftwareFault {
+inline constexpr EventId Id = 0x00000000;
+} // namespace SoftwareFault
+} // namespace Events
+
 } // namespace SoftwareDiagnostics
 } // namespace clusters
 } // namespace app

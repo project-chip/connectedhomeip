@@ -1,122 +1,76 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster CameraAvSettingsUserLevelManagement (cluster code: 1362/0x552)
+// Identifier constant values for cluster CameraAvSettingsUserLevelManagement (cluster code: 1362/0x552)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/CameraAvSettingsUserLevelManagement/CameraAvSettingsUserLevelManagementIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace CameraAvSettingsUserLevelManagement {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr ClusterId kClusterId = 0x00000552;
 
 namespace Attributes {
+namespace MPTZPosition {
+inline constexpr AttributeId Id = 0x00000000;
+} // namespace MPTZPosition
+namespace MaxPresets {
+inline constexpr AttributeId Id = 0x00000001;
+} // namespace MaxPresets
+namespace MPTZPresets {
+inline constexpr AttributeId Id = 0x00000002;
+} // namespace MPTZPresets
+namespace DPTZRelativeMove {
+inline constexpr AttributeId Id = 0x00000003;
+} // namespace DPTZRelativeMove
+namespace ZoomMax {
+inline constexpr AttributeId Id = 0x00000004;
+} // namespace ZoomMax
+namespace TiltMin {
+inline constexpr AttributeId Id = 0x00000005;
+} // namespace TiltMin
+namespace TiltMax {
+inline constexpr AttributeId Id = 0x00000006;
+} // namespace TiltMax
+namespace PanMin {
+inline constexpr AttributeId Id = 0x00000007;
+} // namespace PanMin
+namespace PanMax {
+inline constexpr AttributeId Id = 0x00000008;
+} // namespace PanMax
 
-inline constexpr DataModel::AttributeEntry kMPTZPositionEntry = {
-    .attributeId    = Attributes::MPTZPosition::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kMaxPresetsEntry = {
-    .attributeId    = Attributes::MaxPresets::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kMPTZPresetsEntry = {
-    .attributeId    = Attributes::MPTZPresets::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kDPTZRelativeMoveEntry = {
-    .attributeId    = Attributes::DPTZRelativeMove::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kZoomMaxEntry = {
-    .attributeId    = Attributes::ZoomMax::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kTiltMinEntry = {
-    .attributeId    = Attributes::TiltMin::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kTiltMaxEntry = {
-    .attributeId    = Attributes::TiltMax::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kPanMinEntry = {
-    .attributeId    = Attributes::PanMin::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kPanMaxEntry = {
-    .attributeId    = Attributes::PanMax::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+// TODO: globals & reference globals?
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kMPTZSetPositionEntry = {
-    .commandId       = Commands::MPTZSetPosition::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AcceptedCommandEntry kMPTZRelativeMoveEntry = {
-    .commandId       = Commands::MPTZRelativeMove::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AcceptedCommandEntry kMPTZMoveToPresetEntry = {
-    .commandId       = Commands::MPTZMoveToPreset::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AcceptedCommandEntry kMPTZSavePresetEntry = {
-    .commandId       = Commands::MPTZSavePreset::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AcceptedCommandEntry kMPTZRemovePresetEntry = {
-    .commandId       = Commands::MPTZRemovePreset::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AcceptedCommandEntry kDPTZSetViewportEntry = {
-    .commandId       = Commands::DPTZSetViewport::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AcceptedCommandEntry kDPTZRelativeMoveEntry = {
-    .commandId       = Commands::DPTZRelativeMove::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-
+namespace MPTZSetPosition {
+inline constexpr CommandId Id = 0x00000000;
+} // namespace MPTZSetPosition
+namespace MPTZRelativeMove {
+inline constexpr CommandId Id = 0x00000001;
+} // namespace MPTZRelativeMove
+namespace MPTZMoveToPreset {
+inline constexpr CommandId Id = 0x00000002;
+} // namespace MPTZMoveToPreset
+namespace MPTZSavePreset {
+inline constexpr CommandId Id = 0x00000003;
+} // namespace MPTZSavePreset
+namespace MPTZRemovePreset {
+inline constexpr CommandId Id = 0x00000004;
+} // namespace MPTZRemovePreset
+namespace DPTZSetViewport {
+inline constexpr CommandId Id = 0x00000005;
+} // namespace DPTZSetViewport
+namespace DPTZRelativeMove {
+inline constexpr CommandId Id = 0x00000006;
+} // namespace DPTZRelativeMove
 } // namespace Commands
-} // namespace Metadata
+
+namespace Events {} // namespace Events
+
 } // namespace CameraAvSettingsUserLevelManagement
 } // namespace clusters
 } // namespace app

@@ -1,66 +1,46 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster AdministratorCommissioning (cluster code: 60/0x3C)
+// Identifier constant values for cluster AdministratorCommissioning (cluster code: 60/0x3C)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/AdministratorCommissioning/AdministratorCommissioningIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace AdministratorCommissioning {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr ClusterId kClusterId = 0x0000003C;
 
 namespace Attributes {
+namespace WindowStatus {
+inline constexpr AttributeId Id = 0x00000000;
+} // namespace WindowStatus
+namespace AdminFabricIndex {
+inline constexpr AttributeId Id = 0x00000001;
+} // namespace AdminFabricIndex
+namespace AdminVendorId {
+inline constexpr AttributeId Id = 0x00000002;
+} // namespace AdminVendorId
 
-inline constexpr DataModel::AttributeEntry kWindowStatusEntry = {
-    .attributeId    = Attributes::WindowStatus::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kAdminFabricIndexEntry = {
-    .attributeId    = Attributes::AdminFabricIndex::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kAdminVendorIdEntry = {
-    .attributeId    = Attributes::AdminVendorId::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+// TODO: globals & reference globals?
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kOpenCommissioningWindowEntry = {
-    .commandId       = Commands::OpenCommissioningWindow::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
-    .invokePrivilege = Access::Privilege::kAdminister,
-};
-inline constexpr DataModel::AcceptedCommandEntry kOpenBasicCommissioningWindowEntry = {
-    .commandId       = Commands::OpenBasicCommissioningWindow::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
-    .invokePrivilege = Access::Privilege::kAdminister,
-};
-inline constexpr DataModel::AcceptedCommandEntry kRevokeCommissioningEntry = {
-    .commandId       = Commands::RevokeCommissioning::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
-    .invokePrivilege = Access::Privilege::kAdminister,
-};
-
+namespace OpenCommissioningWindow {
+inline constexpr CommandId Id = 0x00000000;
+} // namespace OpenCommissioningWindow
+namespace OpenBasicCommissioningWindow {
+inline constexpr CommandId Id = 0x00000001;
+} // namespace OpenBasicCommissioningWindow
+namespace RevokeCommissioning {
+inline constexpr CommandId Id = 0x00000002;
+} // namespace RevokeCommissioning
 } // namespace Commands
-} // namespace Metadata
+
+namespace Events {} // namespace Events
+
 } // namespace AdministratorCommissioning
 } // namespace clusters
 } // namespace app

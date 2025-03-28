@@ -1,27 +1,27 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster ProxyDiscovery (cluster code: 67/0x43)
+// Identifier constant values for cluster ProxyDiscovery (cluster code: 67/0x43)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/ProxyDiscovery/ProxyDiscoveryIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace ProxyDiscovery {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr ClusterId kClusterId = 0x00000043;
 
-namespace Attributes {} // namespace Attributes
+namespace Attributes {
+
+// TODO: globals & reference globals?
+
+} // namespace Attributes
 
 namespace Commands {} // namespace Commands
-} // namespace Metadata
+
+namespace Events {} // namespace Events
+
 } // namespace ProxyDiscovery
 } // namespace clusters
 } // namespace app

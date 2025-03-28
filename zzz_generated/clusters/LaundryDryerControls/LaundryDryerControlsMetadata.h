@@ -1,42 +1,33 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster LaundryDryerControls (cluster code: 74/0x4A)
+// Identifier constant values for cluster LaundryDryerControls (cluster code: 74/0x4A)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/LaundryDryerControls/LaundryDryerControlsIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace LaundryDryerControls {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr ClusterId kClusterId = 0x0000004A;
 
 namespace Attributes {
+namespace SupportedDrynessLevels {
+inline constexpr AttributeId Id = 0x00000000;
+} // namespace SupportedDrynessLevels
+namespace SelectedDrynessLevel {
+inline constexpr AttributeId Id = 0x00000001;
+} // namespace SelectedDrynessLevel
 
-inline constexpr DataModel::AttributeEntry kSupportedDrynessLevelsEntry = {
-    .attributeId    = Attributes::SupportedDrynessLevels::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kSelectedDrynessLevelEntry = {
-    .attributeId    = Attributes::SelectedDrynessLevel::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
+// TODO: globals & reference globals?
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-} // namespace Metadata
+
+namespace Events {} // namespace Events
+
 } // namespace LaundryDryerControls
 } // namespace clusters
 } // namespace app

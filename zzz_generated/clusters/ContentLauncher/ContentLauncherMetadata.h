@@ -1,55 +1,40 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster ContentLauncher (cluster code: 1290/0x50A)
+// Identifier constant values for cluster ContentLauncher (cluster code: 1290/0x50A)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/ContentLauncher/ContentLauncherIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace ContentLauncher {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr ClusterId kClusterId = 0x0000050A;
 
 namespace Attributes {
+namespace AcceptHeader {
+inline constexpr AttributeId Id = 0x00000000;
+} // namespace AcceptHeader
+namespace SupportedStreamingProtocols {
+inline constexpr AttributeId Id = 0x00000001;
+} // namespace SupportedStreamingProtocols
 
-inline constexpr DataModel::AttributeEntry kAcceptHeaderEntry = {
-    .attributeId    = Attributes::AcceptHeader::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kSupportedStreamingProtocolsEntry = {
-    .attributeId    = Attributes::SupportedStreamingProtocols::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+// TODO: globals & reference globals?
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kLaunchContentEntry = {
-    .commandId       = Commands::LaunchContent::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AcceptedCommandEntry kLaunchURLEntry = {
-    .commandId       = Commands::LaunchURL::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-
+namespace LaunchContent {
+inline constexpr CommandId Id = 0x00000000;
+} // namespace LaunchContent
+namespace LaunchURL {
+inline constexpr CommandId Id = 0x00000001;
+} // namespace LaunchURL
 } // namespace Commands
-} // namespace Metadata
+
+namespace Events {} // namespace Events
+
 } // namespace ContentLauncher
 } // namespace clusters
 } // namespace app

@@ -1,36 +1,30 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster UserLabel (cluster code: 65/0x41)
+// Identifier constant values for cluster UserLabel (cluster code: 65/0x41)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/UserLabel/UserLabelIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace UserLabel {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr ClusterId kClusterId = 0x00000041;
 
 namespace Attributes {
+namespace LabelList {
+inline constexpr AttributeId Id = 0x00000000;
+} // namespace LabelList
 
-inline constexpr DataModel::AttributeEntry kLabelListEntry = {
-    .attributeId    = Attributes::LabelList::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kManage,
-};
+// TODO: globals & reference globals?
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-} // namespace Metadata
+
+namespace Events {} // namespace Events
+
 } // namespace UserLabel
 } // namespace clusters
 } // namespace app

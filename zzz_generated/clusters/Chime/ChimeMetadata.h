@@ -1,56 +1,40 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster Chime (cluster code: 1366/0x556)
+// Identifier constant values for cluster Chime (cluster code: 1366/0x556)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/Chime/ChimeIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace Chime {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr ClusterId kClusterId = 0x00000556;
 
 namespace Attributes {
+namespace InstalledChimeSounds {
+inline constexpr AttributeId Id = 0x00000000;
+} // namespace InstalledChimeSounds
+namespace SelectedChime {
+inline constexpr AttributeId Id = 0x00000001;
+} // namespace SelectedChime
+namespace Enabled {
+inline constexpr AttributeId Id = 0x00000002;
+} // namespace Enabled
 
-inline constexpr DataModel::AttributeEntry kInstalledChimeSoundsEntry = {
-    .attributeId    = Attributes::InstalledChimeSounds::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kSelectedChimeEntry = {
-    .attributeId    = Attributes::SelectedChime::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kEnabledEntry = {
-    .attributeId    = Attributes::Enabled::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
+// TODO: globals & reference globals?
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kPlayChimeSoundEntry = {
-    .commandId       = Commands::PlayChimeSound::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-
+namespace PlayChimeSound {
+inline constexpr CommandId Id = 0x00000000;
+} // namespace PlayChimeSound
 } // namespace Commands
-} // namespace Metadata
+
+namespace Events {} // namespace Events
+
 } // namespace Chime
 } // namespace clusters
 } // namespace app

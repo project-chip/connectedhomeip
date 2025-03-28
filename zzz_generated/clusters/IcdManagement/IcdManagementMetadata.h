@@ -1,108 +1,67 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster IcdManagement (cluster code: 70/0x46)
+// Identifier constant values for cluster IcdManagement (cluster code: 70/0x46)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/IcdManagement/IcdManagementIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace IcdManagement {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 3;
+inline constexpr ClusterId kClusterId = 0x00000046;
 
 namespace Attributes {
+namespace IdleModeDuration {
+inline constexpr AttributeId Id = 0x00000000;
+} // namespace IdleModeDuration
+namespace ActiveModeDuration {
+inline constexpr AttributeId Id = 0x00000001;
+} // namespace ActiveModeDuration
+namespace ActiveModeThreshold {
+inline constexpr AttributeId Id = 0x00000002;
+} // namespace ActiveModeThreshold
+namespace RegisteredClients {
+inline constexpr AttributeId Id = 0x00000003;
+} // namespace RegisteredClients
+namespace ICDCounter {
+inline constexpr AttributeId Id = 0x00000004;
+} // namespace ICDCounter
+namespace ClientsSupportedPerFabric {
+inline constexpr AttributeId Id = 0x00000005;
+} // namespace ClientsSupportedPerFabric
+namespace UserActiveModeTriggerHint {
+inline constexpr AttributeId Id = 0x00000006;
+} // namespace UserActiveModeTriggerHint
+namespace UserActiveModeTriggerInstruction {
+inline constexpr AttributeId Id = 0x00000007;
+} // namespace UserActiveModeTriggerInstruction
+namespace OperatingMode {
+inline constexpr AttributeId Id = 0x00000008;
+} // namespace OperatingMode
+namespace MaximumCheckInBackOff {
+inline constexpr AttributeId Id = 0x00000009;
+} // namespace MaximumCheckInBackOff
 
-inline constexpr DataModel::AttributeEntry kIdleModeDurationEntry = {
-    .attributeId    = Attributes::IdleModeDuration::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kActiveModeDurationEntry = {
-    .attributeId    = Attributes::ActiveModeDuration::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kActiveModeThresholdEntry = {
-    .attributeId    = Attributes::ActiveModeThreshold::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kRegisteredClientsEntry = {
-    .attributeId    = Attributes::RegisteredClients::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kAdminister,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kICDCounterEntry = {
-    .attributeId    = Attributes::ICDCounter::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kAdminister,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kClientsSupportedPerFabricEntry = {
-    .attributeId    = Attributes::ClientsSupportedPerFabric::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kUserActiveModeTriggerHintEntry = {
-    .attributeId    = Attributes::UserActiveModeTriggerHint::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kUserActiveModeTriggerInstructionEntry = {
-    .attributeId    = Attributes::UserActiveModeTriggerInstruction::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kOperatingModeEntry = {
-    .attributeId    = Attributes::OperatingMode::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kMaximumCheckInBackOffEntry = {
-    .attributeId    = Attributes::MaximumCheckInBackOff::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+// TODO: globals & reference globals?
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kRegisterClientEntry = {
-    .commandId       = Commands::RegisterClient::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
-    .invokePrivilege = Access::Privilege::kManage,
-};
-inline constexpr DataModel::AcceptedCommandEntry kUnregisterClientEntry = {
-    .commandId       = Commands::UnregisterClient::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
-    .invokePrivilege = Access::Privilege::kManage,
-};
-inline constexpr DataModel::AcceptedCommandEntry kStayActiveRequestEntry = {
-    .commandId       = Commands::StayActiveRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kManage,
-};
-
+namespace RegisterClient {
+inline constexpr CommandId Id = 0x00000000;
+} // namespace RegisterClient
+namespace UnregisterClient {
+inline constexpr CommandId Id = 0x00000002;
+} // namespace UnregisterClient
+namespace StayActiveRequest {
+inline constexpr CommandId Id = 0x00000003;
+} // namespace StayActiveRequest
 } // namespace Commands
-} // namespace Metadata
+
+namespace Events {} // namespace Events
+
 } // namespace IcdManagement
 } // namespace clusters
 } // namespace app

@@ -1,92 +1,58 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster EthernetNetworkDiagnostics (cluster code: 55/0x37)
+// Identifier constant values for cluster EthernetNetworkDiagnostics (cluster code: 55/0x37)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/EthernetNetworkDiagnostics/EthernetNetworkDiagnosticsIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace EthernetNetworkDiagnostics {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr ClusterId kClusterId = 0x00000037;
 
 namespace Attributes {
+namespace PHYRate {
+inline constexpr AttributeId Id = 0x00000000;
+} // namespace PHYRate
+namespace FullDuplex {
+inline constexpr AttributeId Id = 0x00000001;
+} // namespace FullDuplex
+namespace PacketRxCount {
+inline constexpr AttributeId Id = 0x00000002;
+} // namespace PacketRxCount
+namespace PacketTxCount {
+inline constexpr AttributeId Id = 0x00000003;
+} // namespace PacketTxCount
+namespace TxErrCount {
+inline constexpr AttributeId Id = 0x00000004;
+} // namespace TxErrCount
+namespace CollisionCount {
+inline constexpr AttributeId Id = 0x00000005;
+} // namespace CollisionCount
+namespace OverrunCount {
+inline constexpr AttributeId Id = 0x00000006;
+} // namespace OverrunCount
+namespace CarrierDetect {
+inline constexpr AttributeId Id = 0x00000007;
+} // namespace CarrierDetect
+namespace TimeSinceReset {
+inline constexpr AttributeId Id = 0x00000008;
+} // namespace TimeSinceReset
 
-inline constexpr DataModel::AttributeEntry kPHYRateEntry = {
-    .attributeId    = Attributes::PHYRate::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kFullDuplexEntry = {
-    .attributeId    = Attributes::FullDuplex::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kPacketRxCountEntry = {
-    .attributeId    = Attributes::PacketRxCount::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kPacketTxCountEntry = {
-    .attributeId    = Attributes::PacketTxCount::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kTxErrCountEntry = {
-    .attributeId    = Attributes::TxErrCount::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kCollisionCountEntry = {
-    .attributeId    = Attributes::CollisionCount::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kOverrunCountEntry = {
-    .attributeId    = Attributes::OverrunCount::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kCarrierDetectEntry = {
-    .attributeId    = Attributes::CarrierDetect::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kTimeSinceResetEntry = {
-    .attributeId    = Attributes::TimeSinceReset::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+// TODO: globals & reference globals?
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kResetCountsEntry = {
-    .commandId       = Commands::ResetCounts::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kManage,
-};
-
+namespace ResetCounts {
+inline constexpr CommandId Id = 0x00000000;
+} // namespace ResetCounts
 } // namespace Commands
-} // namespace Metadata
+
+namespace Events {} // namespace Events
+
 } // namespace EthernetNetworkDiagnostics
 } // namespace clusters
 } // namespace app

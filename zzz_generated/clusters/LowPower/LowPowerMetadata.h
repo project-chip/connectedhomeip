@@ -1,35 +1,31 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster LowPower (cluster code: 1288/0x508)
+// Identifier constant values for cluster LowPower (cluster code: 1288/0x508)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/LowPower/LowPowerIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace LowPower {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr ClusterId kClusterId = 0x00000508;
 
-namespace Attributes {} // namespace Attributes
+namespace Attributes {
+
+// TODO: globals & reference globals?
+
+} // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kSleepEntry = {
-    .commandId       = Commands::Sleep::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-
+namespace Sleep {
+inline constexpr CommandId Id = 0x00000000;
+} // namespace Sleep
 } // namespace Commands
-} // namespace Metadata
+
+namespace Events {} // namespace Events
+
 } // namespace LowPower
 } // namespace clusters
 } // namespace app

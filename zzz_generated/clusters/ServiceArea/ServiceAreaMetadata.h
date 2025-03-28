@@ -1,79 +1,52 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster ServiceArea (cluster code: 336/0x150)
+// Identifier constant values for cluster ServiceArea (cluster code: 336/0x150)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/ServiceArea/ServiceAreaIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace ServiceArea {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr ClusterId kClusterId = 0x00000150;
 
 namespace Attributes {
+namespace SupportedAreas {
+inline constexpr AttributeId Id = 0x00000000;
+} // namespace SupportedAreas
+namespace SupportedMaps {
+inline constexpr AttributeId Id = 0x00000001;
+} // namespace SupportedMaps
+namespace SelectedAreas {
+inline constexpr AttributeId Id = 0x00000002;
+} // namespace SelectedAreas
+namespace CurrentArea {
+inline constexpr AttributeId Id = 0x00000003;
+} // namespace CurrentArea
+namespace EstimatedEndTime {
+inline constexpr AttributeId Id = 0x00000004;
+} // namespace EstimatedEndTime
+namespace Progress {
+inline constexpr AttributeId Id = 0x00000005;
+} // namespace Progress
 
-inline constexpr DataModel::AttributeEntry kSupportedAreasEntry = {
-    .attributeId    = Attributes::SupportedAreas::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kSupportedMapsEntry = {
-    .attributeId    = Attributes::SupportedMaps::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kSelectedAreasEntry = {
-    .attributeId    = Attributes::SelectedAreas::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kCurrentAreaEntry = {
-    .attributeId    = Attributes::CurrentArea::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kEstimatedEndTimeEntry = {
-    .attributeId    = Attributes::EstimatedEndTime::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kProgressEntry = {
-    .attributeId    = Attributes::Progress::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+// TODO: globals & reference globals?
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kSelectAreasEntry = {
-    .commandId       = Commands::SelectAreas::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AcceptedCommandEntry kSkipAreaEntry = {
-    .commandId       = Commands::SkipArea::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-
+namespace SelectAreas {
+inline constexpr CommandId Id = 0x00000000;
+} // namespace SelectAreas
+namespace SkipArea {
+inline constexpr CommandId Id = 0x00000002;
+} // namespace SkipArea
 } // namespace Commands
-} // namespace Metadata
+
+namespace Events {} // namespace Events
+
 } // namespace ServiceArea
 } // namespace clusters
 } // namespace app

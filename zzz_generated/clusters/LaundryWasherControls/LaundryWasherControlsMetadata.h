@@ -1,54 +1,39 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster LaundryWasherControls (cluster code: 83/0x53)
+// Identifier constant values for cluster LaundryWasherControls (cluster code: 83/0x53)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/LaundryWasherControls/LaundryWasherControlsIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace LaundryWasherControls {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr ClusterId kClusterId = 0x00000053;
 
 namespace Attributes {
+namespace SpinSpeeds {
+inline constexpr AttributeId Id = 0x00000000;
+} // namespace SpinSpeeds
+namespace SpinSpeedCurrent {
+inline constexpr AttributeId Id = 0x00000001;
+} // namespace SpinSpeedCurrent
+namespace NumberOfRinses {
+inline constexpr AttributeId Id = 0x00000002;
+} // namespace NumberOfRinses
+namespace SupportedRinses {
+inline constexpr AttributeId Id = 0x00000003;
+} // namespace SupportedRinses
 
-inline constexpr DataModel::AttributeEntry kSpinSpeedsEntry = {
-    .attributeId    = Attributes::SpinSpeeds::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kSpinSpeedCurrentEntry = {
-    .attributeId    = Attributes::SpinSpeedCurrent::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kNumberOfRinsesEntry = {
-    .attributeId    = Attributes::NumberOfRinses::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kSupportedRinsesEntry = {
-    .attributeId    = Attributes::SupportedRinses::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+// TODO: globals & reference globals?
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-} // namespace Metadata
+
+namespace Events {} // namespace Events
+
 } // namespace LaundryWasherControls
 } // namespace clusters
 } // namespace app

@@ -1,48 +1,36 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster ThermostatUserInterfaceConfiguration (cluster code: 516/0x204)
+// Identifier constant values for cluster ThermostatUserInterfaceConfiguration (cluster code: 516/0x204)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/ThermostatUserInterfaceConfiguration/ThermostatUserInterfaceConfigurationIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace ThermostatUserInterfaceConfiguration {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 2;
+inline constexpr ClusterId kClusterId = 0x00000204;
 
 namespace Attributes {
+namespace TemperatureDisplayMode {
+inline constexpr AttributeId Id = 0x00000000;
+} // namespace TemperatureDisplayMode
+namespace KeypadLockout {
+inline constexpr AttributeId Id = 0x00000001;
+} // namespace KeypadLockout
+namespace ScheduleProgrammingVisibility {
+inline constexpr AttributeId Id = 0x00000002;
+} // namespace ScheduleProgrammingVisibility
 
-inline constexpr DataModel::AttributeEntry kTemperatureDisplayModeEntry = {
-    .attributeId    = Attributes::TemperatureDisplayMode::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kKeypadLockoutEntry = {
-    .attributeId    = Attributes::KeypadLockout::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kManage,
-};
-inline constexpr DataModel::AttributeEntry kScheduleProgrammingVisibilityEntry = {
-    .attributeId    = Attributes::ScheduleProgrammingVisibility::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kManage,
-};
+// TODO: globals & reference globals?
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-} // namespace Metadata
+
+namespace Events {} // namespace Events
+
 } // namespace ThermostatUserInterfaceConfiguration
 } // namespace clusters
 } // namespace app

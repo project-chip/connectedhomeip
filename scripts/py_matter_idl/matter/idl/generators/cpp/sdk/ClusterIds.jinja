@@ -1,0 +1,45 @@
+// DO NOT EDIT MANUALLY - Generated file
+//
+// Identifier constant values for cluster {{cluster.name}} (cluster code: {{"%d/0x%X" | format(cluster.code, cluster.code)}})
+// based on {{input_name}}
+
+#include <lib/core/DataModelTypes.h>
+
+namespace chip {
+namespace app {
+namespace clusters {
+namespace {{cluster.name}} {
+
+inline constexpr ClusterId kClusterId = {{"0x%08X" | format(cluster.code)}};
+
+namespace Attributes {
+{% for attribute in cluster.attributes | reject("global_attribute") -%}
+namespace {{attribute.definition.name | upfirst}} {
+inline constexpr AttributeId Id = {{ "0x%08X" | format(attribute.definition.code)}};
+} // namespace {{attribute.definition.name | upfirst}}
+{% endfor %}
+
+// TODO: globals & reference globals?
+
+} // namespace Attributes
+
+namespace Commands {
+{% for command in cluster.commands -%}
+namespace {{command.name | upfirst}} {
+inline constexpr CommandId Id = {{ "0x%08X" | format(command.code)}};
+} // namespace {{command.name | upfirst}}
+{% endfor -%}
+} // namespace Commands
+
+namespace Events {
+{% for event in cluster.events -%}
+namespace {{event.name | upfirst}} {
+inline constexpr EventId Id = {{ "0x%08X" | format(event.code)}};
+} // namespace {{event.name | upfirst}}
+{% endfor -%}
+} // namespace Events
+
+} // namespace {{cluster.name}}
+} // namespace app
+} // namespace Clusters
+} // namespace chip

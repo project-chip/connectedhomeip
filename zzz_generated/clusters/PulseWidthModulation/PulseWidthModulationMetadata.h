@@ -1,27 +1,27 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster PulseWidthModulation (cluster code: 28/0x1C)
+// Identifier constant values for cluster PulseWidthModulation (cluster code: 28/0x1C)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/PulseWidthModulation/PulseWidthModulationIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace PulseWidthModulation {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr ClusterId kClusterId = 0x0000001C;
 
-namespace Attributes {} // namespace Attributes
+namespace Attributes {
+
+// TODO: globals & reference globals?
+
+} // namespace Attributes
 
 namespace Commands {} // namespace Commands
-} // namespace Metadata
+
+namespace Events {} // namespace Events
+
 } // namespace PulseWidthModulation
 } // namespace clusters
 } // namespace app

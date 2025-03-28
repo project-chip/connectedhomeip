@@ -1,36 +1,30 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster PowerSourceConfiguration (cluster code: 46/0x2E)
+// Identifier constant values for cluster PowerSourceConfiguration (cluster code: 46/0x2E)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/PowerSourceConfiguration/PowerSourceConfigurationIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace PowerSourceConfiguration {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr ClusterId kClusterId = 0x0000002E;
 
 namespace Attributes {
+namespace Sources {
+inline constexpr AttributeId Id = 0x00000000;
+} // namespace Sources
 
-inline constexpr DataModel::AttributeEntry kSourcesEntry = {
-    .attributeId    = Attributes::Sources::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+// TODO: globals & reference globals?
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-} // namespace Metadata
+
+namespace Events {} // namespace Events
+
 } // namespace PowerSourceConfiguration
 } // namespace clusters
 } // namespace app

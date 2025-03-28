@@ -1,48 +1,41 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster AccountLogin (cluster code: 1294/0x50E)
+// Identifier constant values for cluster AccountLogin (cluster code: 1294/0x50E)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/AccountLogin/AccountLoginIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace AccountLogin {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 2;
+inline constexpr ClusterId kClusterId = 0x0000050E;
 
-namespace Attributes {} // namespace Attributes
+namespace Attributes {
+
+// TODO: globals & reference globals?
+
+} // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kGetSetupPINEntry = {
-    .commandId       = Commands::GetSetupPIN::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped,
-                                                                 DataModel::CommandQualityFlags::kTimed },
-    .invokePrivilege = Access::Privilege::kAdminister,
-};
-inline constexpr DataModel::AcceptedCommandEntry kLoginEntry = {
-    .commandId       = Commands::Login::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped,
-                                                                 DataModel::CommandQualityFlags::kTimed },
-    .invokePrivilege = Access::Privilege::kAdminister,
-};
-inline constexpr DataModel::AcceptedCommandEntry kLogoutEntry = {
-    .commandId       = Commands::Logout::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped,
-                                                                 DataModel::CommandQualityFlags::kTimed },
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-
+namespace GetSetupPIN {
+inline constexpr CommandId Id = 0x00000000;
+} // namespace GetSetupPIN
+namespace Login {
+inline constexpr CommandId Id = 0x00000002;
+} // namespace Login
+namespace Logout {
+inline constexpr CommandId Id = 0x00000003;
+} // namespace Logout
 } // namespace Commands
-} // namespace Metadata
+
+namespace Events {
+namespace LoggedOut {
+inline constexpr EventId Id = 0x00000000;
+} // namespace LoggedOut
+} // namespace Events
+
 } // namespace AccountLogin
 } // namespace clusters
 } // namespace app

@@ -1,49 +1,41 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster SampleMei (cluster code: 4294048800/0xFFF1FC20)
+// Identifier constant values for cluster SampleMei (cluster code: 4294048800/0xFFF1FC20)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/SampleMei/SampleMeiIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace SampleMei {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr ClusterId kClusterId = 0xFFF1FC20;
 
 namespace Attributes {
+namespace FlipFlop {
+inline constexpr AttributeId Id = 0x00000000;
+} // namespace FlipFlop
 
-inline constexpr DataModel::AttributeEntry kFlipFlopEntry = {
-    .attributeId    = Attributes::FlipFlop::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
+// TODO: globals & reference globals?
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kPingEntry = {
-    .commandId       = Commands::Ping::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AcceptedCommandEntry kAddArgumentsEntry = {
-    .commandId       = Commands::AddArguments::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-
+namespace Ping {
+inline constexpr CommandId Id = 0x00000000;
+} // namespace Ping
+namespace AddArguments {
+inline constexpr CommandId Id = 0x00000002;
+} // namespace AddArguments
 } // namespace Commands
-} // namespace Metadata
+
+namespace Events {
+namespace PingCountEvent {
+inline constexpr EventId Id = 0x00000000;
+} // namespace PingCountEvent
+} // namespace Events
+
 } // namespace SampleMei
 } // namespace clusters
 } // namespace app

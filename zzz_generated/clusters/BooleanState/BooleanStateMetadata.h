@@ -1,36 +1,34 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster BooleanState (cluster code: 69/0x45)
+// Identifier constant values for cluster BooleanState (cluster code: 69/0x45)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/BooleanState/BooleanStateIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace BooleanState {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr ClusterId kClusterId = 0x00000045;
 
 namespace Attributes {
+namespace StateValue {
+inline constexpr AttributeId Id = 0x00000000;
+} // namespace StateValue
 
-inline constexpr DataModel::AttributeEntry kStateValueEntry = {
-    .attributeId    = Attributes::StateValue::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+// TODO: globals & reference globals?
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-} // namespace Metadata
+
+namespace Events {
+namespace StateChange {
+inline constexpr EventId Id = 0x00000000;
+} // namespace StateChange
+} // namespace Events
+
 } // namespace BooleanState
 } // namespace clusters
 } // namespace app

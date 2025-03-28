@@ -1,79 +1,59 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster WaterHeaterManagement (cluster code: 148/0x94)
+// Identifier constant values for cluster WaterHeaterManagement (cluster code: 148/0x94)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/WaterHeaterManagement/WaterHeaterManagementIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace WaterHeaterManagement {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 2;
+inline constexpr ClusterId kClusterId = 0x00000094;
 
 namespace Attributes {
+namespace HeaterTypes {
+inline constexpr AttributeId Id = 0x00000000;
+} // namespace HeaterTypes
+namespace HeatDemand {
+inline constexpr AttributeId Id = 0x00000001;
+} // namespace HeatDemand
+namespace TankVolume {
+inline constexpr AttributeId Id = 0x00000002;
+} // namespace TankVolume
+namespace EstimatedHeatRequired {
+inline constexpr AttributeId Id = 0x00000003;
+} // namespace EstimatedHeatRequired
+namespace TankPercentage {
+inline constexpr AttributeId Id = 0x00000004;
+} // namespace TankPercentage
+namespace BoostState {
+inline constexpr AttributeId Id = 0x00000005;
+} // namespace BoostState
 
-inline constexpr DataModel::AttributeEntry kHeaterTypesEntry = {
-    .attributeId    = Attributes::HeaterTypes::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kHeatDemandEntry = {
-    .attributeId    = Attributes::HeatDemand::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kTankVolumeEntry = {
-    .attributeId    = Attributes::TankVolume::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kEstimatedHeatRequiredEntry = {
-    .attributeId    = Attributes::EstimatedHeatRequired::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kTankPercentageEntry = {
-    .attributeId    = Attributes::TankPercentage::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kBoostStateEntry = {
-    .attributeId    = Attributes::BoostState::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+// TODO: globals & reference globals?
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kBoostEntry = {
-    .commandId       = Commands::Boost::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kManage,
-};
-inline constexpr DataModel::AcceptedCommandEntry kCancelBoostEntry = {
-    .commandId       = Commands::CancelBoost::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kManage,
-};
-
+namespace Boost {
+inline constexpr CommandId Id = 0x00000000;
+} // namespace Boost
+namespace CancelBoost {
+inline constexpr CommandId Id = 0x00000001;
+} // namespace CancelBoost
 } // namespace Commands
-} // namespace Metadata
+
+namespace Events {
+namespace BoostStarted {
+inline constexpr EventId Id = 0x00000000;
+} // namespace BoostStarted
+namespace BoostEnded {
+inline constexpr EventId Id = 0x00000001;
+} // namespace BoostEnded
+} // namespace Events
+
 } // namespace WaterHeaterManagement
 } // namespace clusters
 } // namespace app

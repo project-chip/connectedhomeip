@@ -1,62 +1,53 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster OtaSoftwareUpdateRequestor (cluster code: 42/0x2A)
+// Identifier constant values for cluster OtaSoftwareUpdateRequestor (cluster code: 42/0x2A)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/OtaSoftwareUpdateRequestor/OtaSoftwareUpdateRequestorIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace OtaSoftwareUpdateRequestor {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr ClusterId kClusterId = 0x0000002A;
 
 namespace Attributes {
+namespace DefaultOTAProviders {
+inline constexpr AttributeId Id = 0x00000000;
+} // namespace DefaultOTAProviders
+namespace UpdatePossible {
+inline constexpr AttributeId Id = 0x00000001;
+} // namespace UpdatePossible
+namespace UpdateState {
+inline constexpr AttributeId Id = 0x00000002;
+} // namespace UpdateState
+namespace UpdateStateProgress {
+inline constexpr AttributeId Id = 0x00000003;
+} // namespace UpdateStateProgress
 
-inline constexpr DataModel::AttributeEntry kDefaultOTAProvidersEntry = {
-    .attributeId    = Attributes::DefaultOTAProviders::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kAdminister,
-};
-inline constexpr DataModel::AttributeEntry kUpdatePossibleEntry = {
-    .attributeId    = Attributes::UpdatePossible::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kUpdateStateEntry = {
-    .attributeId    = Attributes::UpdateState::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kUpdateStateProgressEntry = {
-    .attributeId    = Attributes::UpdateStateProgress::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+// TODO: globals & reference globals?
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kAnnounceOTAProviderEntry = {
-    .commandId       = Commands::AnnounceOTAProvider::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-
+namespace AnnounceOTAProvider {
+inline constexpr CommandId Id = 0x00000000;
+} // namespace AnnounceOTAProvider
 } // namespace Commands
-} // namespace Metadata
+
+namespace Events {
+namespace StateTransition {
+inline constexpr EventId Id = 0x00000000;
+} // namespace StateTransition
+namespace VersionApplied {
+inline constexpr EventId Id = 0x00000001;
+} // namespace VersionApplied
+namespace DownloadError {
+inline constexpr EventId Id = 0x00000002;
+} // namespace DownloadError
+} // namespace Events
+
 } // namespace OtaSoftwareUpdateRequestor
 } // namespace clusters
 } // namespace app

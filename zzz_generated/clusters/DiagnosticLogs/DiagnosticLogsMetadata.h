@@ -1,35 +1,31 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster DiagnosticLogs (cluster code: 50/0x32)
+// Identifier constant values for cluster DiagnosticLogs (cluster code: 50/0x32)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/DiagnosticLogs/DiagnosticLogsIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace DiagnosticLogs {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr ClusterId kClusterId = 0x00000032;
 
-namespace Attributes {} // namespace Attributes
+namespace Attributes {
+
+// TODO: globals & reference globals?
+
+} // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kRetrieveLogsRequestEntry = {
-    .commandId       = Commands::RetrieveLogsRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-
+namespace RetrieveLogsRequest {
+inline constexpr CommandId Id = 0x00000000;
+} // namespace RetrieveLogsRequest
 } // namespace Commands
-} // namespace Metadata
+
+namespace Events {} // namespace Events
+
 } // namespace DiagnosticLogs
 } // namespace clusters
 } // namespace app

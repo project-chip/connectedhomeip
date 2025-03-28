@@ -1,109 +1,74 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster ValveConfigurationAndControl (cluster code: 129/0x81)
+// Identifier constant values for cluster ValveConfigurationAndControl (cluster code: 129/0x81)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/ValveConfigurationAndControl/ValveConfigurationAndControlIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace ValveConfigurationAndControl {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr ClusterId kClusterId = 0x00000081;
 
 namespace Attributes {
+namespace OpenDuration {
+inline constexpr AttributeId Id = 0x00000000;
+} // namespace OpenDuration
+namespace DefaultOpenDuration {
+inline constexpr AttributeId Id = 0x00000001;
+} // namespace DefaultOpenDuration
+namespace AutoCloseTime {
+inline constexpr AttributeId Id = 0x00000002;
+} // namespace AutoCloseTime
+namespace RemainingDuration {
+inline constexpr AttributeId Id = 0x00000003;
+} // namespace RemainingDuration
+namespace CurrentState {
+inline constexpr AttributeId Id = 0x00000004;
+} // namespace CurrentState
+namespace TargetState {
+inline constexpr AttributeId Id = 0x00000005;
+} // namespace TargetState
+namespace CurrentLevel {
+inline constexpr AttributeId Id = 0x00000006;
+} // namespace CurrentLevel
+namespace TargetLevel {
+inline constexpr AttributeId Id = 0x00000007;
+} // namespace TargetLevel
+namespace DefaultOpenLevel {
+inline constexpr AttributeId Id = 0x00000008;
+} // namespace DefaultOpenLevel
+namespace ValveFault {
+inline constexpr AttributeId Id = 0x00000009;
+} // namespace ValveFault
+namespace LevelStep {
+inline constexpr AttributeId Id = 0x0000000A;
+} // namespace LevelStep
 
-inline constexpr DataModel::AttributeEntry kOpenDurationEntry = {
-    .attributeId    = Attributes::OpenDuration::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kDefaultOpenDurationEntry = {
-    .attributeId    = Attributes::DefaultOpenDuration::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kAutoCloseTimeEntry = {
-    .attributeId    = Attributes::AutoCloseTime::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kRemainingDurationEntry = {
-    .attributeId    = Attributes::RemainingDuration::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kCurrentStateEntry = {
-    .attributeId    = Attributes::CurrentState::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kTargetStateEntry = {
-    .attributeId    = Attributes::TargetState::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kCurrentLevelEntry = {
-    .attributeId    = Attributes::CurrentLevel::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kTargetLevelEntry = {
-    .attributeId    = Attributes::TargetLevel::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kDefaultOpenLevelEntry = {
-    .attributeId    = Attributes::DefaultOpenLevel::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kValveFaultEntry = {
-    .attributeId    = Attributes::ValveFault::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kLevelStepEntry = {
-    .attributeId    = Attributes::LevelStep::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+// TODO: globals & reference globals?
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kOpenEntry = {
-    .commandId       = Commands::Open::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AcceptedCommandEntry kCloseEntry = {
-    .commandId       = Commands::Close::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-
+namespace Open {
+inline constexpr CommandId Id = 0x00000000;
+} // namespace Open
+namespace Close {
+inline constexpr CommandId Id = 0x00000001;
+} // namespace Close
 } // namespace Commands
-} // namespace Metadata
+
+namespace Events {
+namespace ValveStateChanged {
+inline constexpr EventId Id = 0x00000000;
+} // namespace ValveStateChanged
+namespace ValveFault {
+inline constexpr EventId Id = 0x00000001;
+} // namespace ValveFault
+} // namespace Events
+
 } // namespace ValveConfigurationAndControl
 } // namespace clusters
 } // namespace app

@@ -1,36 +1,30 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster AirQuality (cluster code: 91/0x5B)
+// Identifier constant values for cluster AirQuality (cluster code: 91/0x5B)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/AirQuality/AirQualityIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace AirQuality {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr ClusterId kClusterId = 0x0000005B;
 
 namespace Attributes {
+namespace AirQuality {
+inline constexpr AttributeId Id = 0x00000000;
+} // namespace AirQuality
 
-inline constexpr DataModel::AttributeEntry kAirQualityEntry = {
-    .attributeId    = Attributes::AirQuality::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+// TODO: globals & reference globals?
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-} // namespace Metadata
+
+namespace Events {} // namespace Events
+
 } // namespace AirQuality
 } // namespace clusters
 } // namespace app

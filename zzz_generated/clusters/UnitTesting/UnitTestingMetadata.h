@@ -1,702 +1,386 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster UnitTesting (cluster code: 4294048773/0xFFF1FC05)
+// Identifier constant values for cluster UnitTesting (cluster code: 4294048773/0xFFF1FC05)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/UnitTesting/UnitTestingIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace UnitTesting {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr ClusterId kClusterId = 0xFFF1FC05;
 
 namespace Attributes {
+namespace Boolean {
+inline constexpr AttributeId Id = 0x00000000;
+} // namespace Boolean
+namespace Bitmap8 {
+inline constexpr AttributeId Id = 0x00000001;
+} // namespace Bitmap8
+namespace Bitmap16 {
+inline constexpr AttributeId Id = 0x00000002;
+} // namespace Bitmap16
+namespace Bitmap32 {
+inline constexpr AttributeId Id = 0x00000003;
+} // namespace Bitmap32
+namespace Bitmap64 {
+inline constexpr AttributeId Id = 0x00000004;
+} // namespace Bitmap64
+namespace Int8u {
+inline constexpr AttributeId Id = 0x00000005;
+} // namespace Int8u
+namespace Int16u {
+inline constexpr AttributeId Id = 0x00000006;
+} // namespace Int16u
+namespace Int24u {
+inline constexpr AttributeId Id = 0x00000007;
+} // namespace Int24u
+namespace Int32u {
+inline constexpr AttributeId Id = 0x00000008;
+} // namespace Int32u
+namespace Int40u {
+inline constexpr AttributeId Id = 0x00000009;
+} // namespace Int40u
+namespace Int48u {
+inline constexpr AttributeId Id = 0x0000000A;
+} // namespace Int48u
+namespace Int56u {
+inline constexpr AttributeId Id = 0x0000000B;
+} // namespace Int56u
+namespace Int64u {
+inline constexpr AttributeId Id = 0x0000000C;
+} // namespace Int64u
+namespace Int8s {
+inline constexpr AttributeId Id = 0x0000000D;
+} // namespace Int8s
+namespace Int16s {
+inline constexpr AttributeId Id = 0x0000000E;
+} // namespace Int16s
+namespace Int24s {
+inline constexpr AttributeId Id = 0x0000000F;
+} // namespace Int24s
+namespace Int32s {
+inline constexpr AttributeId Id = 0x00000010;
+} // namespace Int32s
+namespace Int40s {
+inline constexpr AttributeId Id = 0x00000011;
+} // namespace Int40s
+namespace Int48s {
+inline constexpr AttributeId Id = 0x00000012;
+} // namespace Int48s
+namespace Int56s {
+inline constexpr AttributeId Id = 0x00000013;
+} // namespace Int56s
+namespace Int64s {
+inline constexpr AttributeId Id = 0x00000014;
+} // namespace Int64s
+namespace Enum8 {
+inline constexpr AttributeId Id = 0x00000015;
+} // namespace Enum8
+namespace Enum16 {
+inline constexpr AttributeId Id = 0x00000016;
+} // namespace Enum16
+namespace FloatSingle {
+inline constexpr AttributeId Id = 0x00000017;
+} // namespace FloatSingle
+namespace FloatDouble {
+inline constexpr AttributeId Id = 0x00000018;
+} // namespace FloatDouble
+namespace OctetString {
+inline constexpr AttributeId Id = 0x00000019;
+} // namespace OctetString
+namespace ListInt8u {
+inline constexpr AttributeId Id = 0x0000001A;
+} // namespace ListInt8u
+namespace ListOctetString {
+inline constexpr AttributeId Id = 0x0000001B;
+} // namespace ListOctetString
+namespace ListStructOctetString {
+inline constexpr AttributeId Id = 0x0000001C;
+} // namespace ListStructOctetString
+namespace LongOctetString {
+inline constexpr AttributeId Id = 0x0000001D;
+} // namespace LongOctetString
+namespace CharString {
+inline constexpr AttributeId Id = 0x0000001E;
+} // namespace CharString
+namespace LongCharString {
+inline constexpr AttributeId Id = 0x0000001F;
+} // namespace LongCharString
+namespace EpochUs {
+inline constexpr AttributeId Id = 0x00000020;
+} // namespace EpochUs
+namespace EpochS {
+inline constexpr AttributeId Id = 0x00000021;
+} // namespace EpochS
+namespace VendorId {
+inline constexpr AttributeId Id = 0x00000022;
+} // namespace VendorId
+namespace ListNullablesAndOptionalsStruct {
+inline constexpr AttributeId Id = 0x00000023;
+} // namespace ListNullablesAndOptionalsStruct
+namespace EnumAttr {
+inline constexpr AttributeId Id = 0x00000024;
+} // namespace EnumAttr
+namespace StructAttr {
+inline constexpr AttributeId Id = 0x00000025;
+} // namespace StructAttr
+namespace RangeRestrictedInt8u {
+inline constexpr AttributeId Id = 0x00000026;
+} // namespace RangeRestrictedInt8u
+namespace RangeRestrictedInt8s {
+inline constexpr AttributeId Id = 0x00000027;
+} // namespace RangeRestrictedInt8s
+namespace RangeRestrictedInt16u {
+inline constexpr AttributeId Id = 0x00000028;
+} // namespace RangeRestrictedInt16u
+namespace RangeRestrictedInt16s {
+inline constexpr AttributeId Id = 0x00000029;
+} // namespace RangeRestrictedInt16s
+namespace ListLongOctetString {
+inline constexpr AttributeId Id = 0x0000002A;
+} // namespace ListLongOctetString
+namespace ListFabricScoped {
+inline constexpr AttributeId Id = 0x0000002B;
+} // namespace ListFabricScoped
+namespace TimedWriteBoolean {
+inline constexpr AttributeId Id = 0x00000030;
+} // namespace TimedWriteBoolean
+namespace GeneralErrorBoolean {
+inline constexpr AttributeId Id = 0x00000031;
+} // namespace GeneralErrorBoolean
+namespace ClusterErrorBoolean {
+inline constexpr AttributeId Id = 0x00000032;
+} // namespace ClusterErrorBoolean
+namespace GlobalEnum {
+inline constexpr AttributeId Id = 0x00000033;
+} // namespace GlobalEnum
+namespace GlobalStruct {
+inline constexpr AttributeId Id = 0x00000034;
+} // namespace GlobalStruct
+namespace Unsupported {
+inline constexpr AttributeId Id = 0x000000FF;
+} // namespace Unsupported
+namespace ReadFailureCode {
+inline constexpr AttributeId Id = 0x00003000;
+} // namespace ReadFailureCode
+namespace FailureInt32U {
+inline constexpr AttributeId Id = 0x00003001;
+} // namespace FailureInt32U
+namespace NullableBoolean {
+inline constexpr AttributeId Id = 0x00004000;
+} // namespace NullableBoolean
+namespace NullableBitmap8 {
+inline constexpr AttributeId Id = 0x00004001;
+} // namespace NullableBitmap8
+namespace NullableBitmap16 {
+inline constexpr AttributeId Id = 0x00004002;
+} // namespace NullableBitmap16
+namespace NullableBitmap32 {
+inline constexpr AttributeId Id = 0x00004003;
+} // namespace NullableBitmap32
+namespace NullableBitmap64 {
+inline constexpr AttributeId Id = 0x00004004;
+} // namespace NullableBitmap64
+namespace NullableInt8u {
+inline constexpr AttributeId Id = 0x00004005;
+} // namespace NullableInt8u
+namespace NullableInt16u {
+inline constexpr AttributeId Id = 0x00004006;
+} // namespace NullableInt16u
+namespace NullableInt24u {
+inline constexpr AttributeId Id = 0x00004007;
+} // namespace NullableInt24u
+namespace NullableInt32u {
+inline constexpr AttributeId Id = 0x00004008;
+} // namespace NullableInt32u
+namespace NullableInt40u {
+inline constexpr AttributeId Id = 0x00004009;
+} // namespace NullableInt40u
+namespace NullableInt48u {
+inline constexpr AttributeId Id = 0x0000400A;
+} // namespace NullableInt48u
+namespace NullableInt56u {
+inline constexpr AttributeId Id = 0x0000400B;
+} // namespace NullableInt56u
+namespace NullableInt64u {
+inline constexpr AttributeId Id = 0x0000400C;
+} // namespace NullableInt64u
+namespace NullableInt8s {
+inline constexpr AttributeId Id = 0x0000400D;
+} // namespace NullableInt8s
+namespace NullableInt16s {
+inline constexpr AttributeId Id = 0x0000400E;
+} // namespace NullableInt16s
+namespace NullableInt24s {
+inline constexpr AttributeId Id = 0x0000400F;
+} // namespace NullableInt24s
+namespace NullableInt32s {
+inline constexpr AttributeId Id = 0x00004010;
+} // namespace NullableInt32s
+namespace NullableInt40s {
+inline constexpr AttributeId Id = 0x00004011;
+} // namespace NullableInt40s
+namespace NullableInt48s {
+inline constexpr AttributeId Id = 0x00004012;
+} // namespace NullableInt48s
+namespace NullableInt56s {
+inline constexpr AttributeId Id = 0x00004013;
+} // namespace NullableInt56s
+namespace NullableInt64s {
+inline constexpr AttributeId Id = 0x00004014;
+} // namespace NullableInt64s
+namespace NullableEnum8 {
+inline constexpr AttributeId Id = 0x00004015;
+} // namespace NullableEnum8
+namespace NullableEnum16 {
+inline constexpr AttributeId Id = 0x00004016;
+} // namespace NullableEnum16
+namespace NullableFloatSingle {
+inline constexpr AttributeId Id = 0x00004017;
+} // namespace NullableFloatSingle
+namespace NullableFloatDouble {
+inline constexpr AttributeId Id = 0x00004018;
+} // namespace NullableFloatDouble
+namespace NullableOctetString {
+inline constexpr AttributeId Id = 0x00004019;
+} // namespace NullableOctetString
+namespace NullableCharString {
+inline constexpr AttributeId Id = 0x0000401E;
+} // namespace NullableCharString
+namespace NullableEnumAttr {
+inline constexpr AttributeId Id = 0x00004024;
+} // namespace NullableEnumAttr
+namespace NullableStruct {
+inline constexpr AttributeId Id = 0x00004025;
+} // namespace NullableStruct
+namespace NullableRangeRestrictedInt8u {
+inline constexpr AttributeId Id = 0x00004026;
+} // namespace NullableRangeRestrictedInt8u
+namespace NullableRangeRestrictedInt8s {
+inline constexpr AttributeId Id = 0x00004027;
+} // namespace NullableRangeRestrictedInt8s
+namespace NullableRangeRestrictedInt16u {
+inline constexpr AttributeId Id = 0x00004028;
+} // namespace NullableRangeRestrictedInt16u
+namespace NullableRangeRestrictedInt16s {
+inline constexpr AttributeId Id = 0x00004029;
+} // namespace NullableRangeRestrictedInt16s
+namespace WriteOnlyInt8u {
+inline constexpr AttributeId Id = 0x0000402A;
+} // namespace WriteOnlyInt8u
+namespace NullableGlobalEnum {
+inline constexpr AttributeId Id = 0x00004033;
+} // namespace NullableGlobalEnum
+namespace NullableGlobalStruct {
+inline constexpr AttributeId Id = 0x00004034;
+} // namespace NullableGlobalStruct
+namespace MeiInt8u {
+inline constexpr AttributeId Id = 0xFFF24F01;
+} // namespace MeiInt8u
 
-inline constexpr DataModel::AttributeEntry kBooleanEntry = {
-    .attributeId    = Attributes::Boolean::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kBitmap8Entry = {
-    .attributeId    = Attributes::Bitmap8::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kBitmap16Entry = {
-    .attributeId    = Attributes::Bitmap16::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kBitmap32Entry = {
-    .attributeId    = Attributes::Bitmap32::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kBitmap64Entry = {
-    .attributeId    = Attributes::Bitmap64::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kInt8uEntry = {
-    .attributeId    = Attributes::Int8u::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kInt16uEntry = {
-    .attributeId    = Attributes::Int16u::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kInt24uEntry = {
-    .attributeId    = Attributes::Int24u::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kInt32uEntry = {
-    .attributeId    = Attributes::Int32u::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kInt40uEntry = {
-    .attributeId    = Attributes::Int40u::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kInt48uEntry = {
-    .attributeId    = Attributes::Int48u::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kInt56uEntry = {
-    .attributeId    = Attributes::Int56u::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kInt64uEntry = {
-    .attributeId    = Attributes::Int64u::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kInt8sEntry = {
-    .attributeId    = Attributes::Int8s::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kInt16sEntry = {
-    .attributeId    = Attributes::Int16s::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kInt24sEntry = {
-    .attributeId    = Attributes::Int24s::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kInt32sEntry = {
-    .attributeId    = Attributes::Int32s::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kInt40sEntry = {
-    .attributeId    = Attributes::Int40s::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kInt48sEntry = {
-    .attributeId    = Attributes::Int48s::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kInt56sEntry = {
-    .attributeId    = Attributes::Int56s::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kInt64sEntry = {
-    .attributeId    = Attributes::Int64s::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kEnum8Entry = {
-    .attributeId    = Attributes::Enum8::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kEnum16Entry = {
-    .attributeId    = Attributes::Enum16::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kFloatSingleEntry = {
-    .attributeId    = Attributes::FloatSingle::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kFloatDoubleEntry = {
-    .attributeId    = Attributes::FloatDouble::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kOctetStringEntry = {
-    .attributeId    = Attributes::OctetString::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kListInt8uEntry = {
-    .attributeId    = Attributes::ListInt8u::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kListOctetStringEntry = {
-    .attributeId    = Attributes::ListOctetString::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kListStructOctetStringEntry = {
-    .attributeId    = Attributes::ListStructOctetString::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kLongOctetStringEntry = {
-    .attributeId    = Attributes::LongOctetString::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kCharStringEntry = {
-    .attributeId    = Attributes::CharString::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kLongCharStringEntry = {
-    .attributeId    = Attributes::LongCharString::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kEpochUsEntry = {
-    .attributeId    = Attributes::EpochUs::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kEpochSEntry = {
-    .attributeId    = Attributes::EpochS::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kVendorIdEntry = {
-    .attributeId    = Attributes::VendorId::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kListNullablesAndOptionalsStructEntry = {
-    .attributeId    = Attributes::ListNullablesAndOptionalsStruct::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kEnumAttrEntry = {
-    .attributeId    = Attributes::EnumAttr::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kStructAttrEntry = {
-    .attributeId    = Attributes::StructAttr::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kRangeRestrictedInt8uEntry = {
-    .attributeId    = Attributes::RangeRestrictedInt8u::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kRangeRestrictedInt8sEntry = {
-    .attributeId    = Attributes::RangeRestrictedInt8s::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kRangeRestrictedInt16uEntry = {
-    .attributeId    = Attributes::RangeRestrictedInt16u::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kRangeRestrictedInt16sEntry = {
-    .attributeId    = Attributes::RangeRestrictedInt16s::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kListLongOctetStringEntry = {
-    .attributeId    = Attributes::ListLongOctetString::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kListFabricScopedEntry = {
-    .attributeId    = Attributes::ListFabricScoped::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kTimedWriteBooleanEntry = {
-    .attributeId    = Attributes::TimedWriteBoolean::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kTimed },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kGeneralErrorBooleanEntry = {
-    .attributeId    = Attributes::GeneralErrorBoolean::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kClusterErrorBooleanEntry = {
-    .attributeId    = Attributes::ClusterErrorBoolean::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kGlobalEnumEntry = {
-    .attributeId    = Attributes::GlobalEnum::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kGlobalStructEntry = {
-    .attributeId    = Attributes::GlobalStruct::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kUnsupportedEntry = {
-    .attributeId    = Attributes::Unsupported::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kReadFailureCodeEntry = {
-    .attributeId    = Attributes::ReadFailureCode::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kFailureInt32UEntry = {
-    .attributeId    = Attributes::FailureInt32U::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kNullableBooleanEntry = {
-    .attributeId    = Attributes::NullableBoolean::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kNullableBitmap8Entry = {
-    .attributeId    = Attributes::NullableBitmap8::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kNullableBitmap16Entry = {
-    .attributeId    = Attributes::NullableBitmap16::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kNullableBitmap32Entry = {
-    .attributeId    = Attributes::NullableBitmap32::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kNullableBitmap64Entry = {
-    .attributeId    = Attributes::NullableBitmap64::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kNullableInt8uEntry = {
-    .attributeId    = Attributes::NullableInt8u::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kNullableInt16uEntry = {
-    .attributeId    = Attributes::NullableInt16u::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kNullableInt24uEntry = {
-    .attributeId    = Attributes::NullableInt24u::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kNullableInt32uEntry = {
-    .attributeId    = Attributes::NullableInt32u::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kNullableInt40uEntry = {
-    .attributeId    = Attributes::NullableInt40u::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kNullableInt48uEntry = {
-    .attributeId    = Attributes::NullableInt48u::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kNullableInt56uEntry = {
-    .attributeId    = Attributes::NullableInt56u::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kNullableInt64uEntry = {
-    .attributeId    = Attributes::NullableInt64u::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kNullableInt8sEntry = {
-    .attributeId    = Attributes::NullableInt8s::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kNullableInt16sEntry = {
-    .attributeId    = Attributes::NullableInt16s::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kNullableInt24sEntry = {
-    .attributeId    = Attributes::NullableInt24s::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kNullableInt32sEntry = {
-    .attributeId    = Attributes::NullableInt32s::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kNullableInt40sEntry = {
-    .attributeId    = Attributes::NullableInt40s::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kNullableInt48sEntry = {
-    .attributeId    = Attributes::NullableInt48s::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kNullableInt56sEntry = {
-    .attributeId    = Attributes::NullableInt56s::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kNullableInt64sEntry = {
-    .attributeId    = Attributes::NullableInt64s::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kNullableEnum8Entry = {
-    .attributeId    = Attributes::NullableEnum8::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kNullableEnum16Entry = {
-    .attributeId    = Attributes::NullableEnum16::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kNullableFloatSingleEntry = {
-    .attributeId    = Attributes::NullableFloatSingle::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kNullableFloatDoubleEntry = {
-    .attributeId    = Attributes::NullableFloatDouble::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kNullableOctetStringEntry = {
-    .attributeId    = Attributes::NullableOctetString::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kNullableCharStringEntry = {
-    .attributeId    = Attributes::NullableCharString::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kNullableEnumAttrEntry = {
-    .attributeId    = Attributes::NullableEnumAttr::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kNullableStructEntry = {
-    .attributeId    = Attributes::NullableStruct::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kNullableRangeRestrictedInt8uEntry = {
-    .attributeId    = Attributes::NullableRangeRestrictedInt8u::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kNullableRangeRestrictedInt8sEntry = {
-    .attributeId    = Attributes::NullableRangeRestrictedInt8s::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kNullableRangeRestrictedInt16uEntry = {
-    .attributeId    = Attributes::NullableRangeRestrictedInt16u::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kNullableRangeRestrictedInt16sEntry = {
-    .attributeId    = Attributes::NullableRangeRestrictedInt16s::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kWriteOnlyInt8uEntry = {
-    .attributeId    = Attributes::WriteOnlyInt8u::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kNullableGlobalEnumEntry = {
-    .attributeId    = Attributes::NullableGlobalEnum::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kNullableGlobalStructEntry = {
-    .attributeId    = Attributes::NullableGlobalStruct::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kMeiInt8uEntry = {
-    .attributeId    = Attributes::MeiInt8u::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
+// TODO: globals & reference globals?
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kTestEntry = {
-    .commandId       = Commands::Test::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AcceptedCommandEntry kTestNotHandledEntry = {
-    .commandId       = Commands::TestNotHandled::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AcceptedCommandEntry kTestSpecificEntry = {
-    .commandId       = Commands::TestSpecific::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AcceptedCommandEntry kTestUnknownCommandEntry = {
-    .commandId       = Commands::TestUnknownCommand::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AcceptedCommandEntry kTestAddArgumentsEntry = {
-    .commandId       = Commands::TestAddArguments::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AcceptedCommandEntry kTestSimpleArgumentRequestEntry = {
-    .commandId       = Commands::TestSimpleArgumentRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AcceptedCommandEntry kTestStructArrayArgumentRequestEntry = {
-    .commandId       = Commands::TestStructArrayArgumentRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AcceptedCommandEntry kTestStructArgumentRequestEntry = {
-    .commandId       = Commands::TestStructArgumentRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AcceptedCommandEntry kTestNestedStructArgumentRequestEntry = {
-    .commandId       = Commands::TestNestedStructArgumentRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AcceptedCommandEntry kTestListStructArgumentRequestEntry = {
-    .commandId       = Commands::TestListStructArgumentRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AcceptedCommandEntry kTestListInt8UArgumentRequestEntry = {
-    .commandId       = Commands::TestListInt8UArgumentRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AcceptedCommandEntry kTestNestedStructListArgumentRequestEntry = {
-    .commandId       = Commands::TestNestedStructListArgumentRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AcceptedCommandEntry kTestListNestedStructListArgumentRequestEntry = {
-    .commandId       = Commands::TestListNestedStructListArgumentRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AcceptedCommandEntry kTestListInt8UReverseRequestEntry = {
-    .commandId       = Commands::TestListInt8UReverseRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AcceptedCommandEntry kTestEnumsRequestEntry = {
-    .commandId       = Commands::TestEnumsRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AcceptedCommandEntry kTestNullableOptionalRequestEntry = {
-    .commandId       = Commands::TestNullableOptionalRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AcceptedCommandEntry kTestComplexNullableOptionalRequestEntry = {
-    .commandId       = Commands::TestComplexNullableOptionalRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AcceptedCommandEntry kSimpleStructEchoRequestEntry = {
-    .commandId       = Commands::SimpleStructEchoRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AcceptedCommandEntry kTimedInvokeRequestEntry = {
-    .commandId       = Commands::TimedInvokeRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AcceptedCommandEntry kTestSimpleOptionalArgumentRequestEntry = {
-    .commandId       = Commands::TestSimpleOptionalArgumentRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AcceptedCommandEntry kTestEmitTestEventRequestEntry = {
-    .commandId       = Commands::TestEmitTestEventRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AcceptedCommandEntry kTestEmitTestFabricScopedEventRequestEntry = {
-    .commandId       = Commands::TestEmitTestFabricScopedEventRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AcceptedCommandEntry kTestBatchHelperRequestEntry = {
-    .commandId       = Commands::TestBatchHelperRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AcceptedCommandEntry kTestSecondBatchHelperRequestEntry = {
-    .commandId       = Commands::TestSecondBatchHelperRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AcceptedCommandEntry kStringEchoRequestEntry = {
-    .commandId       = Commands::StringEchoRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AcceptedCommandEntry kGlobalEchoRequestEntry = {
-    .commandId       = Commands::GlobalEchoRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AcceptedCommandEntry kTestDifferentVendorMeiRequestEntry = {
-    .commandId       = Commands::TestDifferentVendorMeiRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-
+namespace Test {
+inline constexpr CommandId Id = 0x00000000;
+} // namespace Test
+namespace TestNotHandled {
+inline constexpr CommandId Id = 0x00000001;
+} // namespace TestNotHandled
+namespace TestSpecific {
+inline constexpr CommandId Id = 0x00000002;
+} // namespace TestSpecific
+namespace TestUnknownCommand {
+inline constexpr CommandId Id = 0x00000003;
+} // namespace TestUnknownCommand
+namespace TestAddArguments {
+inline constexpr CommandId Id = 0x00000004;
+} // namespace TestAddArguments
+namespace TestSimpleArgumentRequest {
+inline constexpr CommandId Id = 0x00000005;
+} // namespace TestSimpleArgumentRequest
+namespace TestStructArrayArgumentRequest {
+inline constexpr CommandId Id = 0x00000006;
+} // namespace TestStructArrayArgumentRequest
+namespace TestStructArgumentRequest {
+inline constexpr CommandId Id = 0x00000007;
+} // namespace TestStructArgumentRequest
+namespace TestNestedStructArgumentRequest {
+inline constexpr CommandId Id = 0x00000008;
+} // namespace TestNestedStructArgumentRequest
+namespace TestListStructArgumentRequest {
+inline constexpr CommandId Id = 0x00000009;
+} // namespace TestListStructArgumentRequest
+namespace TestListInt8UArgumentRequest {
+inline constexpr CommandId Id = 0x0000000A;
+} // namespace TestListInt8UArgumentRequest
+namespace TestNestedStructListArgumentRequest {
+inline constexpr CommandId Id = 0x0000000B;
+} // namespace TestNestedStructListArgumentRequest
+namespace TestListNestedStructListArgumentRequest {
+inline constexpr CommandId Id = 0x0000000C;
+} // namespace TestListNestedStructListArgumentRequest
+namespace TestListInt8UReverseRequest {
+inline constexpr CommandId Id = 0x0000000D;
+} // namespace TestListInt8UReverseRequest
+namespace TestEnumsRequest {
+inline constexpr CommandId Id = 0x0000000E;
+} // namespace TestEnumsRequest
+namespace TestNullableOptionalRequest {
+inline constexpr CommandId Id = 0x0000000F;
+} // namespace TestNullableOptionalRequest
+namespace TestComplexNullableOptionalRequest {
+inline constexpr CommandId Id = 0x00000010;
+} // namespace TestComplexNullableOptionalRequest
+namespace SimpleStructEchoRequest {
+inline constexpr CommandId Id = 0x00000011;
+} // namespace SimpleStructEchoRequest
+namespace TimedInvokeRequest {
+inline constexpr CommandId Id = 0x00000012;
+} // namespace TimedInvokeRequest
+namespace TestSimpleOptionalArgumentRequest {
+inline constexpr CommandId Id = 0x00000013;
+} // namespace TestSimpleOptionalArgumentRequest
+namespace TestEmitTestEventRequest {
+inline constexpr CommandId Id = 0x00000014;
+} // namespace TestEmitTestEventRequest
+namespace TestEmitTestFabricScopedEventRequest {
+inline constexpr CommandId Id = 0x00000015;
+} // namespace TestEmitTestFabricScopedEventRequest
+namespace TestBatchHelperRequest {
+inline constexpr CommandId Id = 0x00000016;
+} // namespace TestBatchHelperRequest
+namespace TestSecondBatchHelperRequest {
+inline constexpr CommandId Id = 0x00000017;
+} // namespace TestSecondBatchHelperRequest
+namespace StringEchoRequest {
+inline constexpr CommandId Id = 0x00000018;
+} // namespace StringEchoRequest
+namespace GlobalEchoRequest {
+inline constexpr CommandId Id = 0x00000019;
+} // namespace GlobalEchoRequest
+namespace TestDifferentVendorMeiRequest {
+inline constexpr CommandId Id = 0xFFF200AA;
+} // namespace TestDifferentVendorMeiRequest
 } // namespace Commands
-} // namespace Metadata
+
+namespace Events {
+namespace TestEvent {
+inline constexpr EventId Id = 0x00000001;
+} // namespace TestEvent
+namespace TestFabricScopedEvent {
+inline constexpr EventId Id = 0x00000002;
+} // namespace TestFabricScopedEvent
+namespace TestDifferentVendorMeiEvent {
+inline constexpr EventId Id = 0xFFF200EE;
+} // namespace TestDifferentVendorMeiEvent
+} // namespace Events
+
 } // namespace UnitTesting
 } // namespace clusters
 } // namespace app

@@ -1,35 +1,31 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster KeypadInput (cluster code: 1289/0x509)
+// Identifier constant values for cluster KeypadInput (cluster code: 1289/0x509)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/KeypadInput/KeypadInputIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace KeypadInput {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr ClusterId kClusterId = 0x00000509;
 
-namespace Attributes {} // namespace Attributes
+namespace Attributes {
+
+// TODO: globals & reference globals?
+
+} // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kSendKeyEntry = {
-    .commandId       = Commands::SendKey::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-
+namespace SendKey {
+inline constexpr CommandId Id = 0x00000000;
+} // namespace SendKey
 } // namespace Commands
-} // namespace Metadata
+
+namespace Events {} // namespace Events
+
 } // namespace KeypadInput
 } // namespace clusters
 } // namespace app

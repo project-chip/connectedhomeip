@@ -87,6 +87,15 @@ class SdkGenerator(CodeGenerator):
         Renders the cpp and header files required for sdk cluster definitions
         """
 
+        self.internal_render_one_output(
+            template_path="AllItemsGni.jinja",
+            output_file_name="all_items.gni",
+            vars={
+                "clusters": self.idl.clusters,
+                "input_name": self.idl.parse_file_name,
+            },
+        )
+
         for cluster in self.idl.clusters:
             self.internal_render_one_output(
                 template_path="ClusterMetadataHeader.jinja",
@@ -99,7 +108,7 @@ class SdkGenerator(CodeGenerator):
 
             self.internal_render_one_output(
                 template_path="ClusterIds.jinja",
-                output_file_name=f"{cluster.name}/{cluster.name}Ids.h",
+                output_file_name=f"{cluster.name}/{cluster.name}Metadata.h",
                 vars={
                     "cluster": cluster,
                     "input_name": self.idl.parse_file_name,

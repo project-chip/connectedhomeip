@@ -1,116 +1,104 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster SmokeCoAlarm (cluster code: 92/0x5C)
+// Identifier constant values for cluster SmokeCoAlarm (cluster code: 92/0x5C)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/SmokeCoAlarm/SmokeCoAlarmIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace SmokeCoAlarm {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr ClusterId kClusterId = 0x0000005C;
 
 namespace Attributes {
+namespace ExpressedState {
+inline constexpr AttributeId Id = 0x00000000;
+} // namespace ExpressedState
+namespace SmokeState {
+inline constexpr AttributeId Id = 0x00000001;
+} // namespace SmokeState
+namespace COState {
+inline constexpr AttributeId Id = 0x00000002;
+} // namespace COState
+namespace BatteryAlert {
+inline constexpr AttributeId Id = 0x00000003;
+} // namespace BatteryAlert
+namespace DeviceMuted {
+inline constexpr AttributeId Id = 0x00000004;
+} // namespace DeviceMuted
+namespace TestInProgress {
+inline constexpr AttributeId Id = 0x00000005;
+} // namespace TestInProgress
+namespace HardwareFaultAlert {
+inline constexpr AttributeId Id = 0x00000006;
+} // namespace HardwareFaultAlert
+namespace EndOfServiceAlert {
+inline constexpr AttributeId Id = 0x00000007;
+} // namespace EndOfServiceAlert
+namespace InterconnectSmokeAlarm {
+inline constexpr AttributeId Id = 0x00000008;
+} // namespace InterconnectSmokeAlarm
+namespace InterconnectCOAlarm {
+inline constexpr AttributeId Id = 0x00000009;
+} // namespace InterconnectCOAlarm
+namespace ContaminationState {
+inline constexpr AttributeId Id = 0x0000000A;
+} // namespace ContaminationState
+namespace SmokeSensitivityLevel {
+inline constexpr AttributeId Id = 0x0000000B;
+} // namespace SmokeSensitivityLevel
+namespace ExpiryDate {
+inline constexpr AttributeId Id = 0x0000000C;
+} // namespace ExpiryDate
 
-inline constexpr DataModel::AttributeEntry kExpressedStateEntry = {
-    .attributeId    = Attributes::ExpressedState::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kSmokeStateEntry = {
-    .attributeId    = Attributes::SmokeState::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kCOStateEntry = {
-    .attributeId    = Attributes::COState::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kBatteryAlertEntry = {
-    .attributeId    = Attributes::BatteryAlert::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kDeviceMutedEntry = {
-    .attributeId    = Attributes::DeviceMuted::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kTestInProgressEntry = {
-    .attributeId    = Attributes::TestInProgress::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kHardwareFaultAlertEntry = {
-    .attributeId    = Attributes::HardwareFaultAlert::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kEndOfServiceAlertEntry = {
-    .attributeId    = Attributes::EndOfServiceAlert::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kInterconnectSmokeAlarmEntry = {
-    .attributeId    = Attributes::InterconnectSmokeAlarm::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kInterconnectCOAlarmEntry = {
-    .attributeId    = Attributes::InterconnectCOAlarm::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kContaminationStateEntry = {
-    .attributeId    = Attributes::ContaminationState::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kSmokeSensitivityLevelEntry = {
-    .attributeId    = Attributes::SmokeSensitivityLevel::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kManage,
-};
-inline constexpr DataModel::AttributeEntry kExpiryDateEntry = {
-    .attributeId    = Attributes::ExpiryDate::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+// TODO: globals & reference globals?
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kSelfTestRequestEntry = {
-    .commandId       = Commands::SelfTestRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-
+namespace SelfTestRequest {
+inline constexpr CommandId Id = 0x00000000;
+} // namespace SelfTestRequest
 } // namespace Commands
-} // namespace Metadata
+
+namespace Events {
+namespace SmokeAlarm {
+inline constexpr EventId Id = 0x00000000;
+} // namespace SmokeAlarm
+namespace COAlarm {
+inline constexpr EventId Id = 0x00000001;
+} // namespace COAlarm
+namespace LowBattery {
+inline constexpr EventId Id = 0x00000002;
+} // namespace LowBattery
+namespace HardwareFault {
+inline constexpr EventId Id = 0x00000003;
+} // namespace HardwareFault
+namespace EndOfService {
+inline constexpr EventId Id = 0x00000004;
+} // namespace EndOfService
+namespace SelfTestComplete {
+inline constexpr EventId Id = 0x00000005;
+} // namespace SelfTestComplete
+namespace AlarmMuted {
+inline constexpr EventId Id = 0x00000006;
+} // namespace AlarmMuted
+namespace MuteEnded {
+inline constexpr EventId Id = 0x00000007;
+} // namespace MuteEnded
+namespace InterconnectSmokeAlarm {
+inline constexpr EventId Id = 0x00000008;
+} // namespace InterconnectSmokeAlarm
+namespace InterconnectCOAlarm {
+inline constexpr EventId Id = 0x00000009;
+} // namespace InterconnectCOAlarm
+namespace AllClear {
+inline constexpr EventId Id = 0x0000000A;
+} // namespace AllClear
+} // namespace Events
+
 } // namespace SmokeCoAlarm
 } // namespace clusters
 } // namespace app

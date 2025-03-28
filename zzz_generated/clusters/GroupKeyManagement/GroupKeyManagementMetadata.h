@@ -1,77 +1,52 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster GroupKeyManagement (cluster code: 63/0x3F)
+// Identifier constant values for cluster GroupKeyManagement (cluster code: 63/0x3F)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/GroupKeyManagement/GroupKeyManagementIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace GroupKeyManagement {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr ClusterId kClusterId = 0x0000003F;
 
 namespace Attributes {
+namespace GroupKeyMap {
+inline constexpr AttributeId Id = 0x00000000;
+} // namespace GroupKeyMap
+namespace GroupTable {
+inline constexpr AttributeId Id = 0x00000001;
+} // namespace GroupTable
+namespace MaxGroupsPerFabric {
+inline constexpr AttributeId Id = 0x00000002;
+} // namespace MaxGroupsPerFabric
+namespace MaxGroupKeysPerFabric {
+inline constexpr AttributeId Id = 0x00000003;
+} // namespace MaxGroupKeysPerFabric
 
-inline constexpr DataModel::AttributeEntry kGroupKeyMapEntry = {
-    .attributeId    = Attributes::GroupKeyMap::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kManage,
-};
-inline constexpr DataModel::AttributeEntry kGroupTableEntry = {
-    .attributeId    = Attributes::GroupTable::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kMaxGroupsPerFabricEntry = {
-    .attributeId    = Attributes::MaxGroupsPerFabric::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kMaxGroupKeysPerFabricEntry = {
-    .attributeId    = Attributes::MaxGroupKeysPerFabric::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+// TODO: globals & reference globals?
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kKeySetWriteEntry = {
-    .commandId       = Commands::KeySetWrite::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
-    .invokePrivilege = Access::Privilege::kAdminister,
-};
-inline constexpr DataModel::AcceptedCommandEntry kKeySetReadEntry = {
-    .commandId       = Commands::KeySetRead::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
-    .invokePrivilege = Access::Privilege::kAdminister,
-};
-inline constexpr DataModel::AcceptedCommandEntry kKeySetRemoveEntry = {
-    .commandId       = Commands::KeySetRemove::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
-    .invokePrivilege = Access::Privilege::kAdminister,
-};
-inline constexpr DataModel::AcceptedCommandEntry kKeySetReadAllIndicesEntry = {
-    .commandId       = Commands::KeySetReadAllIndices::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
-    .invokePrivilege = Access::Privilege::kAdminister,
-};
-
+namespace KeySetWrite {
+inline constexpr CommandId Id = 0x00000000;
+} // namespace KeySetWrite
+namespace KeySetRead {
+inline constexpr CommandId Id = 0x00000001;
+} // namespace KeySetRead
+namespace KeySetRemove {
+inline constexpr CommandId Id = 0x00000003;
+} // namespace KeySetRemove
+namespace KeySetReadAllIndices {
+inline constexpr CommandId Id = 0x00000004;
+} // namespace KeySetReadAllIndices
 } // namespace Commands
-} // namespace Metadata
+
+namespace Events {} // namespace Events
+
 } // namespace GroupKeyManagement
 } // namespace clusters
 } // namespace app

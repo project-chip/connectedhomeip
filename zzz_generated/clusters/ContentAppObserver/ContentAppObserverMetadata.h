@@ -1,35 +1,31 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster ContentAppObserver (cluster code: 1296/0x510)
+// Identifier constant values for cluster ContentAppObserver (cluster code: 1296/0x510)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/ContentAppObserver/ContentAppObserverIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace ContentAppObserver {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr ClusterId kClusterId = 0x00000510;
 
-namespace Attributes {} // namespace Attributes
+namespace Attributes {
+
+// TODO: globals & reference globals?
+
+} // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kContentAppMessageEntry = {
-    .commandId       = Commands::ContentAppMessage::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-
+namespace ContentAppMessage {
+inline constexpr CommandId Id = 0x00000000;
+} // namespace ContentAppMessage
 } // namespace Commands
-} // namespace Metadata
+
+namespace Events {} // namespace Events
+
 } // namespace ContentAppObserver
 } // namespace clusters
 } // namespace app

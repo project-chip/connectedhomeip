@@ -1,50 +1,37 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster RvcCleanMode (cluster code: 85/0x55)
+// Identifier constant values for cluster RvcCleanMode (cluster code: 85/0x55)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/RvcCleanMode/RvcCleanModeIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace RvcCleanMode {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 3;
+inline constexpr ClusterId kClusterId = 0x00000055;
 
 namespace Attributes {
+namespace SupportedModes {
+inline constexpr AttributeId Id = 0x00000000;
+} // namespace SupportedModes
+namespace CurrentMode {
+inline constexpr AttributeId Id = 0x00000001;
+} // namespace CurrentMode
 
-inline constexpr DataModel::AttributeEntry kSupportedModesEntry = {
-    .attributeId    = Attributes::SupportedModes::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kCurrentModeEntry = {
-    .attributeId    = Attributes::CurrentMode::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+// TODO: globals & reference globals?
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kChangeToModeEntry = {
-    .commandId       = Commands::ChangeToMode::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-
+namespace ChangeToMode {
+inline constexpr CommandId Id = 0x00000000;
+} // namespace ChangeToMode
 } // namespace Commands
-} // namespace Metadata
+
+namespace Events {} // namespace Events
+
 } // namespace RvcCleanMode
 } // namespace clusters
 } // namespace app

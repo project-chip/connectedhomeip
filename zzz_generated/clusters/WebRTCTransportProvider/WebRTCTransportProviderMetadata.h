@@ -1,64 +1,46 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster WebRTCTransportProvider (cluster code: 1363/0x553)
+// Identifier constant values for cluster WebRTCTransportProvider (cluster code: 1363/0x553)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/WebRTCTransportProvider/WebRTCTransportProviderIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace WebRTCTransportProvider {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr ClusterId kClusterId = 0x00000553;
 
 namespace Attributes {
+namespace CurrentSessions {
+inline constexpr AttributeId Id = 0x00000000;
+} // namespace CurrentSessions
 
-inline constexpr DataModel::AttributeEntry kCurrentSessionsEntry = {
-    .attributeId    = Attributes::CurrentSessions::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kManage,
-    .writePrivilege = std::nullopt,
-};
+// TODO: globals & reference globals?
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kSolicitOfferEntry = {
-    .commandId       = Commands::SolicitOffer::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AcceptedCommandEntry kProvideOfferEntry = {
-    .commandId       = Commands::ProvideOffer::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AcceptedCommandEntry kProvideAnswerEntry = {
-    .commandId       = Commands::ProvideAnswer::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AcceptedCommandEntry kProvideICECandidatesEntry = {
-    .commandId       = Commands::ProvideICECandidates::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AcceptedCommandEntry kEndSessionEntry = {
-    .commandId       = Commands::EndSession::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-
+namespace SolicitOffer {
+inline constexpr CommandId Id = 0x00000001;
+} // namespace SolicitOffer
+namespace ProvideOffer {
+inline constexpr CommandId Id = 0x00000003;
+} // namespace ProvideOffer
+namespace ProvideAnswer {
+inline constexpr CommandId Id = 0x00000005;
+} // namespace ProvideAnswer
+namespace ProvideICECandidates {
+inline constexpr CommandId Id = 0x00000006;
+} // namespace ProvideICECandidates
+namespace EndSession {
+inline constexpr CommandId Id = 0x00000007;
+} // namespace EndSession
 } // namespace Commands
-} // namespace Metadata
+
+namespace Events {} // namespace Events
+
 } // namespace WebRTCTransportProvider
 } // namespace clusters
 } // namespace app

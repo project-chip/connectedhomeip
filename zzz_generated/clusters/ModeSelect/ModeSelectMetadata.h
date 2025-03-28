@@ -1,74 +1,49 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster ModeSelect (cluster code: 80/0x50)
+// Identifier constant values for cluster ModeSelect (cluster code: 80/0x50)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/ModeSelect/ModeSelectIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace ModeSelect {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 2;
+inline constexpr ClusterId kClusterId = 0x00000050;
 
 namespace Attributes {
+namespace Description {
+inline constexpr AttributeId Id = 0x00000000;
+} // namespace Description
+namespace StandardNamespace {
+inline constexpr AttributeId Id = 0x00000001;
+} // namespace StandardNamespace
+namespace SupportedModes {
+inline constexpr AttributeId Id = 0x00000002;
+} // namespace SupportedModes
+namespace CurrentMode {
+inline constexpr AttributeId Id = 0x00000003;
+} // namespace CurrentMode
+namespace StartUpMode {
+inline constexpr AttributeId Id = 0x00000004;
+} // namespace StartUpMode
+namespace OnMode {
+inline constexpr AttributeId Id = 0x00000005;
+} // namespace OnMode
 
-inline constexpr DataModel::AttributeEntry kDescriptionEntry = {
-    .attributeId    = Attributes::Description::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kStandardNamespaceEntry = {
-    .attributeId    = Attributes::StandardNamespace::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kSupportedModesEntry = {
-    .attributeId    = Attributes::SupportedModes::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kCurrentModeEntry = {
-    .attributeId    = Attributes::CurrentMode::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kStartUpModeEntry = {
-    .attributeId    = Attributes::StartUpMode::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kOnModeEntry = {
-    .attributeId    = Attributes::OnMode::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
+// TODO: globals & reference globals?
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kChangeToModeEntry = {
-    .commandId       = Commands::ChangeToMode::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-
+namespace ChangeToMode {
+inline constexpr CommandId Id = 0x00000000;
+} // namespace ChangeToMode
 } // namespace Commands
-} // namespace Metadata
+
+namespace Events {} // namespace Events
+
 } // namespace ModeSelect
 } // namespace clusters
 } // namespace app

@@ -1,55 +1,50 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster Messages (cluster code: 151/0x97)
+// Identifier constant values for cluster Messages (cluster code: 151/0x97)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/Messages/MessagesIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace Messages {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 3;
+inline constexpr ClusterId kClusterId = 0x00000097;
 
 namespace Attributes {
+namespace Messages {
+inline constexpr AttributeId Id = 0x00000000;
+} // namespace Messages
+namespace ActiveMessageIDs {
+inline constexpr AttributeId Id = 0x00000001;
+} // namespace ActiveMessageIDs
 
-inline constexpr DataModel::AttributeEntry kMessagesEntry = {
-    .attributeId    = Attributes::Messages::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kActiveMessageIDsEntry = {
-    .attributeId    = Attributes::ActiveMessageIDs::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+// TODO: globals & reference globals?
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kPresentMessagesRequestEntry = {
-    .commandId       = Commands::PresentMessagesRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AcceptedCommandEntry kCancelMessagesRequestEntry = {
-    .commandId       = Commands::CancelMessagesRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-
+namespace PresentMessagesRequest {
+inline constexpr CommandId Id = 0x00000000;
+} // namespace PresentMessagesRequest
+namespace CancelMessagesRequest {
+inline constexpr CommandId Id = 0x00000001;
+} // namespace CancelMessagesRequest
 } // namespace Commands
-} // namespace Metadata
+
+namespace Events {
+namespace MessageQueued {
+inline constexpr EventId Id = 0x00000000;
+} // namespace MessageQueued
+namespace MessagePresented {
+inline constexpr EventId Id = 0x00000001;
+} // namespace MessagePresented
+namespace MessageComplete {
+inline constexpr EventId Id = 0x00000002;
+} // namespace MessageComplete
+} // namespace Events
+
 } // namespace Messages
 } // namespace clusters
 } // namespace app

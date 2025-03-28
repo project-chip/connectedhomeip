@@ -1,42 +1,33 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster LocalizationConfiguration (cluster code: 43/0x2B)
+// Identifier constant values for cluster LocalizationConfiguration (cluster code: 43/0x2B)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/LocalizationConfiguration/LocalizationConfigurationIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace LocalizationConfiguration {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr ClusterId kClusterId = 0x0000002B;
 
 namespace Attributes {
+namespace ActiveLocale {
+inline constexpr AttributeId Id = 0x00000000;
+} // namespace ActiveLocale
+namespace SupportedLocales {
+inline constexpr AttributeId Id = 0x00000001;
+} // namespace SupportedLocales
 
-inline constexpr DataModel::AttributeEntry kActiveLocaleEntry = {
-    .attributeId    = Attributes::ActiveLocale::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kManage,
-};
-inline constexpr DataModel::AttributeEntry kSupportedLocalesEntry = {
-    .attributeId    = Attributes::SupportedLocales::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+// TODO: globals & reference globals?
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-} // namespace Metadata
+
+namespace Events {} // namespace Events
+
 } // namespace LocalizationConfiguration
 } // namespace clusters
 } // namespace app

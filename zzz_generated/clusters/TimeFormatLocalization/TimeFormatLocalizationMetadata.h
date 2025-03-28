@@ -1,48 +1,36 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster TimeFormatLocalization (cluster code: 44/0x2C)
+// Identifier constant values for cluster TimeFormatLocalization (cluster code: 44/0x2C)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/TimeFormatLocalization/TimeFormatLocalizationIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace TimeFormatLocalization {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr ClusterId kClusterId = 0x0000002C;
 
 namespace Attributes {
+namespace HourFormat {
+inline constexpr AttributeId Id = 0x00000000;
+} // namespace HourFormat
+namespace ActiveCalendarType {
+inline constexpr AttributeId Id = 0x00000001;
+} // namespace ActiveCalendarType
+namespace SupportedCalendarTypes {
+inline constexpr AttributeId Id = 0x00000002;
+} // namespace SupportedCalendarTypes
 
-inline constexpr DataModel::AttributeEntry kHourFormatEntry = {
-    .attributeId    = Attributes::HourFormat::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kManage,
-};
-inline constexpr DataModel::AttributeEntry kActiveCalendarTypeEntry = {
-    .attributeId    = Attributes::ActiveCalendarType::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kManage,
-};
-inline constexpr DataModel::AttributeEntry kSupportedCalendarTypesEntry = {
-    .attributeId    = Attributes::SupportedCalendarTypes::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+// TODO: globals & reference globals?
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-} // namespace Metadata
+
+namespace Events {} // namespace Events
+
 } // namespace TimeFormatLocalization
 } // namespace clusters
 } // namespace app

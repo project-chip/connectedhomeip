@@ -1,176 +1,113 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster BasicInformation (cluster code: 40/0x28)
+// Identifier constant values for cluster BasicInformation (cluster code: 40/0x28)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/BasicInformation/BasicInformationIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace BasicInformation {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 3;
+inline constexpr ClusterId kClusterId = 0x00000028;
 
 namespace Attributes {
+namespace DataModelRevision {
+inline constexpr AttributeId Id = 0x00000000;
+} // namespace DataModelRevision
+namespace VendorName {
+inline constexpr AttributeId Id = 0x00000001;
+} // namespace VendorName
+namespace VendorID {
+inline constexpr AttributeId Id = 0x00000002;
+} // namespace VendorID
+namespace ProductName {
+inline constexpr AttributeId Id = 0x00000003;
+} // namespace ProductName
+namespace ProductID {
+inline constexpr AttributeId Id = 0x00000004;
+} // namespace ProductID
+namespace NodeLabel {
+inline constexpr AttributeId Id = 0x00000005;
+} // namespace NodeLabel
+namespace Location {
+inline constexpr AttributeId Id = 0x00000006;
+} // namespace Location
+namespace HardwareVersion {
+inline constexpr AttributeId Id = 0x00000007;
+} // namespace HardwareVersion
+namespace HardwareVersionString {
+inline constexpr AttributeId Id = 0x00000008;
+} // namespace HardwareVersionString
+namespace SoftwareVersion {
+inline constexpr AttributeId Id = 0x00000009;
+} // namespace SoftwareVersion
+namespace SoftwareVersionString {
+inline constexpr AttributeId Id = 0x0000000A;
+} // namespace SoftwareVersionString
+namespace ManufacturingDate {
+inline constexpr AttributeId Id = 0x0000000B;
+} // namespace ManufacturingDate
+namespace PartNumber {
+inline constexpr AttributeId Id = 0x0000000C;
+} // namespace PartNumber
+namespace ProductURL {
+inline constexpr AttributeId Id = 0x0000000D;
+} // namespace ProductURL
+namespace ProductLabel {
+inline constexpr AttributeId Id = 0x0000000E;
+} // namespace ProductLabel
+namespace SerialNumber {
+inline constexpr AttributeId Id = 0x0000000F;
+} // namespace SerialNumber
+namespace LocalConfigDisabled {
+inline constexpr AttributeId Id = 0x00000010;
+} // namespace LocalConfigDisabled
+namespace Reachable {
+inline constexpr AttributeId Id = 0x00000011;
+} // namespace Reachable
+namespace UniqueID {
+inline constexpr AttributeId Id = 0x00000012;
+} // namespace UniqueID
+namespace CapabilityMinima {
+inline constexpr AttributeId Id = 0x00000013;
+} // namespace CapabilityMinima
+namespace ProductAppearance {
+inline constexpr AttributeId Id = 0x00000014;
+} // namespace ProductAppearance
+namespace SpecificationVersion {
+inline constexpr AttributeId Id = 0x00000015;
+} // namespace SpecificationVersion
+namespace MaxPathsPerInvoke {
+inline constexpr AttributeId Id = 0x00000016;
+} // namespace MaxPathsPerInvoke
 
-inline constexpr DataModel::AttributeEntry kDataModelRevisionEntry = {
-    .attributeId    = Attributes::DataModelRevision::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kVendorNameEntry = {
-    .attributeId    = Attributes::VendorName::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kVendorIDEntry = {
-    .attributeId    = Attributes::VendorID::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kProductNameEntry = {
-    .attributeId    = Attributes::ProductName::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kProductIDEntry = {
-    .attributeId    = Attributes::ProductID::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kNodeLabelEntry = {
-    .attributeId    = Attributes::NodeLabel::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kManage,
-};
-inline constexpr DataModel::AttributeEntry kLocationEntry = {
-    .attributeId    = Attributes::Location::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kAdminister,
-};
-inline constexpr DataModel::AttributeEntry kHardwareVersionEntry = {
-    .attributeId    = Attributes::HardwareVersion::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kHardwareVersionStringEntry = {
-    .attributeId    = Attributes::HardwareVersionString::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kSoftwareVersionEntry = {
-    .attributeId    = Attributes::SoftwareVersion::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kSoftwareVersionStringEntry = {
-    .attributeId    = Attributes::SoftwareVersionString::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kManufacturingDateEntry = {
-    .attributeId    = Attributes::ManufacturingDate::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kPartNumberEntry = {
-    .attributeId    = Attributes::PartNumber::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kProductURLEntry = {
-    .attributeId    = Attributes::ProductURL::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kProductLabelEntry = {
-    .attributeId    = Attributes::ProductLabel::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kSerialNumberEntry = {
-    .attributeId    = Attributes::SerialNumber::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kLocalConfigDisabledEntry = {
-    .attributeId    = Attributes::LocalConfigDisabled::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kManage,
-};
-inline constexpr DataModel::AttributeEntry kReachableEntry = {
-    .attributeId    = Attributes::Reachable::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kUniqueIDEntry = {
-    .attributeId    = Attributes::UniqueID::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kCapabilityMinimaEntry = {
-    .attributeId    = Attributes::CapabilityMinima::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kProductAppearanceEntry = {
-    .attributeId    = Attributes::ProductAppearance::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kSpecificationVersionEntry = {
-    .attributeId    = Attributes::SpecificationVersion::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kMaxPathsPerInvokeEntry = {
-    .attributeId    = Attributes::MaxPathsPerInvoke::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+// TODO: globals & reference globals?
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kMfgSpecificPingEntry = {
-    .commandId       = Commands::MfgSpecificPing::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-
+namespace MfgSpecificPing {
+inline constexpr CommandId Id = 0x00000000;
+} // namespace MfgSpecificPing
 } // namespace Commands
-} // namespace Metadata
+
+namespace Events {
+namespace StartUp {
+inline constexpr EventId Id = 0x00000000;
+} // namespace StartUp
+namespace ShutDown {
+inline constexpr EventId Id = 0x00000001;
+} // namespace ShutDown
+namespace Leave {
+inline constexpr EventId Id = 0x00000002;
+} // namespace Leave
+namespace ReachableChanged {
+inline constexpr EventId Id = 0x00000003;
+} // namespace ReachableChanged
+} // namespace Events
+
 } // namespace BasicInformation
 } // namespace clusters
 } // namespace app

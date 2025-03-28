@@ -1,55 +1,40 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster Identify (cluster code: 3/0x3)
+// Identifier constant values for cluster Identify (cluster code: 3/0x3)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/Identify/IdentifyIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace Identify {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 4;
+inline constexpr ClusterId kClusterId = 0x00000003;
 
 namespace Attributes {
+namespace IdentifyTime {
+inline constexpr AttributeId Id = 0x00000000;
+} // namespace IdentifyTime
+namespace IdentifyType {
+inline constexpr AttributeId Id = 0x00000001;
+} // namespace IdentifyType
 
-inline constexpr DataModel::AttributeEntry kIdentifyTimeEntry = {
-    .attributeId    = Attributes::IdentifyTime::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kIdentifyTypeEntry = {
-    .attributeId    = Attributes::IdentifyType::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+// TODO: globals & reference globals?
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kIdentifyEntry = {
-    .commandId       = Commands::Identify::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kManage,
-};
-inline constexpr DataModel::AcceptedCommandEntry kTriggerEffectEntry = {
-    .commandId       = Commands::TriggerEffect::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kManage,
-};
-
+namespace Identify {
+inline constexpr CommandId Id = 0x00000000;
+} // namespace Identify
+namespace TriggerEffect {
+inline constexpr CommandId Id = 0x00000040;
+} // namespace TriggerEffect
 } // namespace Commands
-} // namespace Metadata
+
+namespace Events {} // namespace Events
+
 } // namespace Identify
 } // namespace clusters
 } // namespace app

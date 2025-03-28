@@ -1,36 +1,30 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster UnitLocalization (cluster code: 45/0x2D)
+// Identifier constant values for cluster UnitLocalization (cluster code: 45/0x2D)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/UnitLocalization/UnitLocalizationIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace UnitLocalization {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr ClusterId kClusterId = 0x0000002D;
 
 namespace Attributes {
+namespace TemperatureUnit {
+inline constexpr AttributeId Id = 0x00000000;
+} // namespace TemperatureUnit
 
-inline constexpr DataModel::AttributeEntry kTemperatureUnitEntry = {
-    .attributeId    = Attributes::TemperatureUnit::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kManage,
-};
+// TODO: globals & reference globals?
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-} // namespace Metadata
+
+namespace Events {} // namespace Events
+
 } // namespace UnitLocalization
 } // namespace clusters
 } // namespace app

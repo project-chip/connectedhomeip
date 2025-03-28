@@ -1,60 +1,42 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster EnergyPreference (cluster code: 155/0x9B)
+// Identifier constant values for cluster EnergyPreference (cluster code: 155/0x9B)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/EnergyPreference/EnergyPreferenceIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace EnergyPreference {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr ClusterId kClusterId = 0x0000009B;
 
 namespace Attributes {
+namespace EnergyBalances {
+inline constexpr AttributeId Id = 0x00000000;
+} // namespace EnergyBalances
+namespace CurrentEnergyBalance {
+inline constexpr AttributeId Id = 0x00000001;
+} // namespace CurrentEnergyBalance
+namespace EnergyPriorities {
+inline constexpr AttributeId Id = 0x00000002;
+} // namespace EnergyPriorities
+namespace LowPowerModeSensitivities {
+inline constexpr AttributeId Id = 0x00000003;
+} // namespace LowPowerModeSensitivities
+namespace CurrentLowPowerModeSensitivity {
+inline constexpr AttributeId Id = 0x00000004;
+} // namespace CurrentLowPowerModeSensitivity
 
-inline constexpr DataModel::AttributeEntry kEnergyBalancesEntry = {
-    .attributeId    = Attributes::EnergyBalances::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kCurrentEnergyBalanceEntry = {
-    .attributeId    = Attributes::CurrentEnergyBalance::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kEnergyPrioritiesEntry = {
-    .attributeId    = Attributes::EnergyPriorities::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kLowPowerModeSensitivitiesEntry = {
-    .attributeId    = Attributes::LowPowerModeSensitivities::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kCurrentLowPowerModeSensitivityEntry = {
-    .attributeId    = Attributes::CurrentLowPowerModeSensitivity::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
+// TODO: globals & reference globals?
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-} // namespace Metadata
+
+namespace Events {} // namespace Events
+
 } // namespace EnergyPreference
 } // namespace clusters
 } // namespace app

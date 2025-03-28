@@ -1,6 +1,7 @@
 # DO NOT EDIT MANUALLY - Generated file
 #
 # Cluster generated code for constants and metadata based on src/controller/data_model/controller-clusters.matter
+import("//build_overrides/chip.gni")
 
 source_set("ids") {
   sources = [ "ApplicationLauncherIds.h" ]
@@ -8,7 +9,7 @@ source_set("ids") {
     "${chip_root}/src/app/data-model-provider:metadata",
     "${chip_root}/src/lib/core:types",
   ]
-  configs = [ "${chip_root}/zzz_generated/clusters:includes" ]
+  public_configs = [ "${chip_root}/zzz_generated/clusters:includes" ]
 }
 
 source_set("metadata") {
@@ -18,7 +19,7 @@ source_set("metadata") {
     "${chip_root}/src/lib/core:types",
   ]
   public_deps = [ ":ids" ]
-  configs = [ "${chip_root}/zzz_generated/clusters:includes" ]
+  public_configs = [ "${chip_root}/zzz_generated/clusters:includes" ]
 }
 
 source_set("ApplicationLauncher") {

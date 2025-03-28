@@ -1,416 +1,227 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster ThreadNetworkDiagnostics (cluster code: 53/0x35)
+// Identifier constant values for cluster ThreadNetworkDiagnostics (cluster code: 53/0x35)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/ThreadNetworkDiagnostics/ThreadNetworkDiagnosticsIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace ThreadNetworkDiagnostics {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 2;
+inline constexpr ClusterId kClusterId = 0x00000035;
 
 namespace Attributes {
+namespace Channel {
+inline constexpr AttributeId Id = 0x00000000;
+} // namespace Channel
+namespace RoutingRole {
+inline constexpr AttributeId Id = 0x00000001;
+} // namespace RoutingRole
+namespace NetworkName {
+inline constexpr AttributeId Id = 0x00000002;
+} // namespace NetworkName
+namespace PanId {
+inline constexpr AttributeId Id = 0x00000003;
+} // namespace PanId
+namespace ExtendedPanId {
+inline constexpr AttributeId Id = 0x00000004;
+} // namespace ExtendedPanId
+namespace MeshLocalPrefix {
+inline constexpr AttributeId Id = 0x00000005;
+} // namespace MeshLocalPrefix
+namespace OverrunCount {
+inline constexpr AttributeId Id = 0x00000006;
+} // namespace OverrunCount
+namespace NeighborTable {
+inline constexpr AttributeId Id = 0x00000007;
+} // namespace NeighborTable
+namespace RouteTable {
+inline constexpr AttributeId Id = 0x00000008;
+} // namespace RouteTable
+namespace PartitionId {
+inline constexpr AttributeId Id = 0x00000009;
+} // namespace PartitionId
+namespace Weighting {
+inline constexpr AttributeId Id = 0x0000000A;
+} // namespace Weighting
+namespace DataVersion {
+inline constexpr AttributeId Id = 0x0000000B;
+} // namespace DataVersion
+namespace StableDataVersion {
+inline constexpr AttributeId Id = 0x0000000C;
+} // namespace StableDataVersion
+namespace LeaderRouterId {
+inline constexpr AttributeId Id = 0x0000000D;
+} // namespace LeaderRouterId
+namespace DetachedRoleCount {
+inline constexpr AttributeId Id = 0x0000000E;
+} // namespace DetachedRoleCount
+namespace ChildRoleCount {
+inline constexpr AttributeId Id = 0x0000000F;
+} // namespace ChildRoleCount
+namespace RouterRoleCount {
+inline constexpr AttributeId Id = 0x00000010;
+} // namespace RouterRoleCount
+namespace LeaderRoleCount {
+inline constexpr AttributeId Id = 0x00000011;
+} // namespace LeaderRoleCount
+namespace AttachAttemptCount {
+inline constexpr AttributeId Id = 0x00000012;
+} // namespace AttachAttemptCount
+namespace PartitionIdChangeCount {
+inline constexpr AttributeId Id = 0x00000013;
+} // namespace PartitionIdChangeCount
+namespace BetterPartitionAttachAttemptCount {
+inline constexpr AttributeId Id = 0x00000014;
+} // namespace BetterPartitionAttachAttemptCount
+namespace ParentChangeCount {
+inline constexpr AttributeId Id = 0x00000015;
+} // namespace ParentChangeCount
+namespace TxTotalCount {
+inline constexpr AttributeId Id = 0x00000016;
+} // namespace TxTotalCount
+namespace TxUnicastCount {
+inline constexpr AttributeId Id = 0x00000017;
+} // namespace TxUnicastCount
+namespace TxBroadcastCount {
+inline constexpr AttributeId Id = 0x00000018;
+} // namespace TxBroadcastCount
+namespace TxAckRequestedCount {
+inline constexpr AttributeId Id = 0x00000019;
+} // namespace TxAckRequestedCount
+namespace TxAckedCount {
+inline constexpr AttributeId Id = 0x0000001A;
+} // namespace TxAckedCount
+namespace TxNoAckRequestedCount {
+inline constexpr AttributeId Id = 0x0000001B;
+} // namespace TxNoAckRequestedCount
+namespace TxDataCount {
+inline constexpr AttributeId Id = 0x0000001C;
+} // namespace TxDataCount
+namespace TxDataPollCount {
+inline constexpr AttributeId Id = 0x0000001D;
+} // namespace TxDataPollCount
+namespace TxBeaconCount {
+inline constexpr AttributeId Id = 0x0000001E;
+} // namespace TxBeaconCount
+namespace TxBeaconRequestCount {
+inline constexpr AttributeId Id = 0x0000001F;
+} // namespace TxBeaconRequestCount
+namespace TxOtherCount {
+inline constexpr AttributeId Id = 0x00000020;
+} // namespace TxOtherCount
+namespace TxRetryCount {
+inline constexpr AttributeId Id = 0x00000021;
+} // namespace TxRetryCount
+namespace TxDirectMaxRetryExpiryCount {
+inline constexpr AttributeId Id = 0x00000022;
+} // namespace TxDirectMaxRetryExpiryCount
+namespace TxIndirectMaxRetryExpiryCount {
+inline constexpr AttributeId Id = 0x00000023;
+} // namespace TxIndirectMaxRetryExpiryCount
+namespace TxErrCcaCount {
+inline constexpr AttributeId Id = 0x00000024;
+} // namespace TxErrCcaCount
+namespace TxErrAbortCount {
+inline constexpr AttributeId Id = 0x00000025;
+} // namespace TxErrAbortCount
+namespace TxErrBusyChannelCount {
+inline constexpr AttributeId Id = 0x00000026;
+} // namespace TxErrBusyChannelCount
+namespace RxTotalCount {
+inline constexpr AttributeId Id = 0x00000027;
+} // namespace RxTotalCount
+namespace RxUnicastCount {
+inline constexpr AttributeId Id = 0x00000028;
+} // namespace RxUnicastCount
+namespace RxBroadcastCount {
+inline constexpr AttributeId Id = 0x00000029;
+} // namespace RxBroadcastCount
+namespace RxDataCount {
+inline constexpr AttributeId Id = 0x0000002A;
+} // namespace RxDataCount
+namespace RxDataPollCount {
+inline constexpr AttributeId Id = 0x0000002B;
+} // namespace RxDataPollCount
+namespace RxBeaconCount {
+inline constexpr AttributeId Id = 0x0000002C;
+} // namespace RxBeaconCount
+namespace RxBeaconRequestCount {
+inline constexpr AttributeId Id = 0x0000002D;
+} // namespace RxBeaconRequestCount
+namespace RxOtherCount {
+inline constexpr AttributeId Id = 0x0000002E;
+} // namespace RxOtherCount
+namespace RxAddressFilteredCount {
+inline constexpr AttributeId Id = 0x0000002F;
+} // namespace RxAddressFilteredCount
+namespace RxDestAddrFilteredCount {
+inline constexpr AttributeId Id = 0x00000030;
+} // namespace RxDestAddrFilteredCount
+namespace RxDuplicatedCount {
+inline constexpr AttributeId Id = 0x00000031;
+} // namespace RxDuplicatedCount
+namespace RxErrNoFrameCount {
+inline constexpr AttributeId Id = 0x00000032;
+} // namespace RxErrNoFrameCount
+namespace RxErrUnknownNeighborCount {
+inline constexpr AttributeId Id = 0x00000033;
+} // namespace RxErrUnknownNeighborCount
+namespace RxErrInvalidSrcAddrCount {
+inline constexpr AttributeId Id = 0x00000034;
+} // namespace RxErrInvalidSrcAddrCount
+namespace RxErrSecCount {
+inline constexpr AttributeId Id = 0x00000035;
+} // namespace RxErrSecCount
+namespace RxErrFcsCount {
+inline constexpr AttributeId Id = 0x00000036;
+} // namespace RxErrFcsCount
+namespace RxErrOtherCount {
+inline constexpr AttributeId Id = 0x00000037;
+} // namespace RxErrOtherCount
+namespace ActiveTimestamp {
+inline constexpr AttributeId Id = 0x00000038;
+} // namespace ActiveTimestamp
+namespace PendingTimestamp {
+inline constexpr AttributeId Id = 0x00000039;
+} // namespace PendingTimestamp
+namespace Delay {
+inline constexpr AttributeId Id = 0x0000003A;
+} // namespace Delay
+namespace SecurityPolicy {
+inline constexpr AttributeId Id = 0x0000003B;
+} // namespace SecurityPolicy
+namespace ChannelPage0Mask {
+inline constexpr AttributeId Id = 0x0000003C;
+} // namespace ChannelPage0Mask
+namespace OperationalDatasetComponents {
+inline constexpr AttributeId Id = 0x0000003D;
+} // namespace OperationalDatasetComponents
+namespace ActiveNetworkFaultsList {
+inline constexpr AttributeId Id = 0x0000003E;
+} // namespace ActiveNetworkFaultsList
 
-inline constexpr DataModel::AttributeEntry kChannelEntry = {
-    .attributeId    = Attributes::Channel::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kRoutingRoleEntry = {
-    .attributeId    = Attributes::RoutingRole::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kNetworkNameEntry = {
-    .attributeId    = Attributes::NetworkName::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kPanIdEntry = {
-    .attributeId    = Attributes::PanId::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kExtendedPanIdEntry = {
-    .attributeId    = Attributes::ExtendedPanId::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kMeshLocalPrefixEntry = {
-    .attributeId    = Attributes::MeshLocalPrefix::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kOverrunCountEntry = {
-    .attributeId    = Attributes::OverrunCount::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kNeighborTableEntry = {
-    .attributeId    = Attributes::NeighborTable::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kRouteTableEntry = {
-    .attributeId    = Attributes::RouteTable::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kPartitionIdEntry = {
-    .attributeId    = Attributes::PartitionId::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kWeightingEntry = {
-    .attributeId    = Attributes::Weighting::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kDataVersionEntry = {
-    .attributeId    = Attributes::DataVersion::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kStableDataVersionEntry = {
-    .attributeId    = Attributes::StableDataVersion::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kLeaderRouterIdEntry = {
-    .attributeId    = Attributes::LeaderRouterId::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kDetachedRoleCountEntry = {
-    .attributeId    = Attributes::DetachedRoleCount::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kChildRoleCountEntry = {
-    .attributeId    = Attributes::ChildRoleCount::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kRouterRoleCountEntry = {
-    .attributeId    = Attributes::RouterRoleCount::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kLeaderRoleCountEntry = {
-    .attributeId    = Attributes::LeaderRoleCount::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kAttachAttemptCountEntry = {
-    .attributeId    = Attributes::AttachAttemptCount::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kPartitionIdChangeCountEntry = {
-    .attributeId    = Attributes::PartitionIdChangeCount::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kBetterPartitionAttachAttemptCountEntry = {
-    .attributeId    = Attributes::BetterPartitionAttachAttemptCount::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kParentChangeCountEntry = {
-    .attributeId    = Attributes::ParentChangeCount::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kTxTotalCountEntry = {
-    .attributeId    = Attributes::TxTotalCount::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kTxUnicastCountEntry = {
-    .attributeId    = Attributes::TxUnicastCount::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kTxBroadcastCountEntry = {
-    .attributeId    = Attributes::TxBroadcastCount::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kTxAckRequestedCountEntry = {
-    .attributeId    = Attributes::TxAckRequestedCount::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kTxAckedCountEntry = {
-    .attributeId    = Attributes::TxAckedCount::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kTxNoAckRequestedCountEntry = {
-    .attributeId    = Attributes::TxNoAckRequestedCount::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kTxDataCountEntry = {
-    .attributeId    = Attributes::TxDataCount::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kTxDataPollCountEntry = {
-    .attributeId    = Attributes::TxDataPollCount::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kTxBeaconCountEntry = {
-    .attributeId    = Attributes::TxBeaconCount::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kTxBeaconRequestCountEntry = {
-    .attributeId    = Attributes::TxBeaconRequestCount::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kTxOtherCountEntry = {
-    .attributeId    = Attributes::TxOtherCount::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kTxRetryCountEntry = {
-    .attributeId    = Attributes::TxRetryCount::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kTxDirectMaxRetryExpiryCountEntry = {
-    .attributeId    = Attributes::TxDirectMaxRetryExpiryCount::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kTxIndirectMaxRetryExpiryCountEntry = {
-    .attributeId    = Attributes::TxIndirectMaxRetryExpiryCount::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kTxErrCcaCountEntry = {
-    .attributeId    = Attributes::TxErrCcaCount::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kTxErrAbortCountEntry = {
-    .attributeId    = Attributes::TxErrAbortCount::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kTxErrBusyChannelCountEntry = {
-    .attributeId    = Attributes::TxErrBusyChannelCount::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kRxTotalCountEntry = {
-    .attributeId    = Attributes::RxTotalCount::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kRxUnicastCountEntry = {
-    .attributeId    = Attributes::RxUnicastCount::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kRxBroadcastCountEntry = {
-    .attributeId    = Attributes::RxBroadcastCount::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kRxDataCountEntry = {
-    .attributeId    = Attributes::RxDataCount::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kRxDataPollCountEntry = {
-    .attributeId    = Attributes::RxDataPollCount::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kRxBeaconCountEntry = {
-    .attributeId    = Attributes::RxBeaconCount::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kRxBeaconRequestCountEntry = {
-    .attributeId    = Attributes::RxBeaconRequestCount::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kRxOtherCountEntry = {
-    .attributeId    = Attributes::RxOtherCount::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kRxAddressFilteredCountEntry = {
-    .attributeId    = Attributes::RxAddressFilteredCount::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kRxDestAddrFilteredCountEntry = {
-    .attributeId    = Attributes::RxDestAddrFilteredCount::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kRxDuplicatedCountEntry = {
-    .attributeId    = Attributes::RxDuplicatedCount::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kRxErrNoFrameCountEntry = {
-    .attributeId    = Attributes::RxErrNoFrameCount::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kRxErrUnknownNeighborCountEntry = {
-    .attributeId    = Attributes::RxErrUnknownNeighborCount::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kRxErrInvalidSrcAddrCountEntry = {
-    .attributeId    = Attributes::RxErrInvalidSrcAddrCount::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kRxErrSecCountEntry = {
-    .attributeId    = Attributes::RxErrSecCount::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kRxErrFcsCountEntry = {
-    .attributeId    = Attributes::RxErrFcsCount::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kRxErrOtherCountEntry = {
-    .attributeId    = Attributes::RxErrOtherCount::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kActiveTimestampEntry = {
-    .attributeId    = Attributes::ActiveTimestamp::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kPendingTimestampEntry = {
-    .attributeId    = Attributes::PendingTimestamp::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kDelayEntry = {
-    .attributeId    = Attributes::Delay::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kSecurityPolicyEntry = {
-    .attributeId    = Attributes::SecurityPolicy::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kChannelPage0MaskEntry = {
-    .attributeId    = Attributes::ChannelPage0Mask::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kOperationalDatasetComponentsEntry = {
-    .attributeId    = Attributes::OperationalDatasetComponents::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kActiveNetworkFaultsListEntry = {
-    .attributeId    = Attributes::ActiveNetworkFaultsList::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+// TODO: globals & reference globals?
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kResetCountsEntry = {
-    .commandId       = Commands::ResetCounts::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kManage,
-};
-
+namespace ResetCounts {
+inline constexpr CommandId Id = 0x00000000;
+} // namespace ResetCounts
 } // namespace Commands
-} // namespace Metadata
+
+namespace Events {
+namespace ConnectionStatus {
+inline constexpr EventId Id = 0x00000000;
+} // namespace ConnectionStatus
+namespace NetworkFaultChange {
+inline constexpr EventId Id = 0x00000001;
+} // namespace NetworkFaultChange
+} // namespace Events
+
 } // namespace ThreadNetworkDiagnostics
 } // namespace clusters
 } // namespace app

@@ -1,50 +1,37 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster WiFiNetworkManagement (cluster code: 1105/0x451)
+// Identifier constant values for cluster WiFiNetworkManagement (cluster code: 1105/0x451)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/WiFiNetworkManagement/WiFiNetworkManagementIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace WiFiNetworkManagement {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr ClusterId kClusterId = 0x00000451;
 
 namespace Attributes {
+namespace Ssid {
+inline constexpr AttributeId Id = 0x00000000;
+} // namespace Ssid
+namespace PassphraseSurrogate {
+inline constexpr AttributeId Id = 0x00000001;
+} // namespace PassphraseSurrogate
 
-inline constexpr DataModel::AttributeEntry kSsidEntry = {
-    .attributeId    = Attributes::Ssid::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kPassphraseSurrogateEntry = {
-    .attributeId    = Attributes::PassphraseSurrogate::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kManage,
-    .writePrivilege = std::nullopt,
-};
+// TODO: globals & reference globals?
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kNetworkPassphraseRequestEntry = {
-    .commandId       = Commands::NetworkPassphraseRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kManage,
-};
-
+namespace NetworkPassphraseRequest {
+inline constexpr CommandId Id = 0x00000000;
+} // namespace NetworkPassphraseRequest
 } // namespace Commands
-} // namespace Metadata
+
+namespace Events {} // namespace Events
+
 } // namespace WiFiNetworkManagement
 } // namespace clusters
 } // namespace app

@@ -1,48 +1,58 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster Switch (cluster code: 59/0x3B)
+// Identifier constant values for cluster Switch (cluster code: 59/0x3B)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/Switch/SwitchIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace Switch {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 2;
+inline constexpr ClusterId kClusterId = 0x0000003B;
 
 namespace Attributes {
+namespace NumberOfPositions {
+inline constexpr AttributeId Id = 0x00000000;
+} // namespace NumberOfPositions
+namespace CurrentPosition {
+inline constexpr AttributeId Id = 0x00000001;
+} // namespace CurrentPosition
+namespace MultiPressMax {
+inline constexpr AttributeId Id = 0x00000002;
+} // namespace MultiPressMax
 
-inline constexpr DataModel::AttributeEntry kNumberOfPositionsEntry = {
-    .attributeId    = Attributes::NumberOfPositions::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kCurrentPositionEntry = {
-    .attributeId    = Attributes::CurrentPosition::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kMultiPressMaxEntry = {
-    .attributeId    = Attributes::MultiPressMax::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+// TODO: globals & reference globals?
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-} // namespace Metadata
+
+namespace Events {
+namespace SwitchLatched {
+inline constexpr EventId Id = 0x00000000;
+} // namespace SwitchLatched
+namespace InitialPress {
+inline constexpr EventId Id = 0x00000001;
+} // namespace InitialPress
+namespace LongPress {
+inline constexpr EventId Id = 0x00000002;
+} // namespace LongPress
+namespace ShortRelease {
+inline constexpr EventId Id = 0x00000003;
+} // namespace ShortRelease
+namespace LongRelease {
+inline constexpr EventId Id = 0x00000004;
+} // namespace LongRelease
+namespace MultiPressOngoing {
+inline constexpr EventId Id = 0x00000005;
+} // namespace MultiPressOngoing
+namespace MultiPressComplete {
+inline constexpr EventId Id = 0x00000006;
+} // namespace MultiPressComplete
+} // namespace Events
+
 } // namespace Switch
 } // namespace clusters
 } // namespace app

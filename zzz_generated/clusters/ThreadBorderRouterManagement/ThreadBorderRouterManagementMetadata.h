@@ -1,89 +1,58 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster ThreadBorderRouterManagement (cluster code: 1106/0x452)
+// Identifier constant values for cluster ThreadBorderRouterManagement (cluster code: 1106/0x452)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/ThreadBorderRouterManagement/ThreadBorderRouterManagementIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace ThreadBorderRouterManagement {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr ClusterId kClusterId = 0x00000452;
 
 namespace Attributes {
+namespace BorderRouterName {
+inline constexpr AttributeId Id = 0x00000000;
+} // namespace BorderRouterName
+namespace BorderAgentID {
+inline constexpr AttributeId Id = 0x00000001;
+} // namespace BorderAgentID
+namespace ThreadVersion {
+inline constexpr AttributeId Id = 0x00000002;
+} // namespace ThreadVersion
+namespace InterfaceEnabled {
+inline constexpr AttributeId Id = 0x00000003;
+} // namespace InterfaceEnabled
+namespace ActiveDatasetTimestamp {
+inline constexpr AttributeId Id = 0x00000004;
+} // namespace ActiveDatasetTimestamp
+namespace PendingDatasetTimestamp {
+inline constexpr AttributeId Id = 0x00000005;
+} // namespace PendingDatasetTimestamp
 
-inline constexpr DataModel::AttributeEntry kBorderRouterNameEntry = {
-    .attributeId    = Attributes::BorderRouterName::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kBorderAgentIDEntry = {
-    .attributeId    = Attributes::BorderAgentID::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kThreadVersionEntry = {
-    .attributeId    = Attributes::ThreadVersion::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kInterfaceEnabledEntry = {
-    .attributeId    = Attributes::InterfaceEnabled::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kActiveDatasetTimestampEntry = {
-    .attributeId    = Attributes::ActiveDatasetTimestamp::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kPendingDatasetTimestampEntry = {
-    .attributeId    = Attributes::PendingDatasetTimestamp::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+// TODO: globals & reference globals?
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kGetActiveDatasetRequestEntry = {
-    .commandId       = Commands::GetActiveDatasetRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kManage,
-};
-inline constexpr DataModel::AcceptedCommandEntry kGetPendingDatasetRequestEntry = {
-    .commandId       = Commands::GetPendingDatasetRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kManage,
-};
-inline constexpr DataModel::AcceptedCommandEntry kSetActiveDatasetRequestEntry = {
-    .commandId       = Commands::SetActiveDatasetRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kManage,
-};
-inline constexpr DataModel::AcceptedCommandEntry kSetPendingDatasetRequestEntry = {
-    .commandId       = Commands::SetPendingDatasetRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kManage,
-};
-
+namespace GetActiveDatasetRequest {
+inline constexpr CommandId Id = 0x00000000;
+} // namespace GetActiveDatasetRequest
+namespace GetPendingDatasetRequest {
+inline constexpr CommandId Id = 0x00000001;
+} // namespace GetPendingDatasetRequest
+namespace SetActiveDatasetRequest {
+inline constexpr CommandId Id = 0x00000003;
+} // namespace SetActiveDatasetRequest
+namespace SetPendingDatasetRequest {
+inline constexpr CommandId Id = 0x00000004;
+} // namespace SetPendingDatasetRequest
 } // namespace Commands
-} // namespace Metadata
+
+namespace Events {} // namespace Events
+
 } // namespace ThreadBorderRouterManagement
 } // namespace clusters
 } // namespace app

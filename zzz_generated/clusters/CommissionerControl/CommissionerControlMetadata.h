@@ -1,49 +1,41 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster CommissionerControl (cluster code: 1873/0x751)
+// Identifier constant values for cluster CommissionerControl (cluster code: 1873/0x751)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/CommissionerControl/CommissionerControlIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace CommissionerControl {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr ClusterId kClusterId = 0x00000751;
 
 namespace Attributes {
+namespace SupportedDeviceCategories {
+inline constexpr AttributeId Id = 0x00000000;
+} // namespace SupportedDeviceCategories
 
-inline constexpr DataModel::AttributeEntry kSupportedDeviceCategoriesEntry = {
-    .attributeId    = Attributes::SupportedDeviceCategories::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kManage,
-    .writePrivilege = std::nullopt,
-};
+// TODO: globals & reference globals?
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kRequestCommissioningApprovalEntry = {
-    .commandId       = Commands::RequestCommissioningApproval::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kManage,
-};
-inline constexpr DataModel::AcceptedCommandEntry kCommissionNodeEntry = {
-    .commandId       = Commands::CommissionNode::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kManage,
-};
-
+namespace RequestCommissioningApproval {
+inline constexpr CommandId Id = 0x00000000;
+} // namespace RequestCommissioningApproval
+namespace CommissionNode {
+inline constexpr CommandId Id = 0x00000001;
+} // namespace CommissionNode
 } // namespace Commands
-} // namespace Metadata
+
+namespace Events {
+namespace CommissioningRequestResult {
+inline constexpr EventId Id = 0x00000000;
+} // namespace CommissioningRequestResult
+} // namespace Events
+
 } // namespace CommissionerControl
 } // namespace clusters
 } // namespace app

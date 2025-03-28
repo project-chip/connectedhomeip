@@ -1,74 +1,49 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster TemperatureControl (cluster code: 86/0x56)
+// Identifier constant values for cluster TemperatureControl (cluster code: 86/0x56)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/TemperatureControl/TemperatureControlIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace TemperatureControl {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr ClusterId kClusterId = 0x00000056;
 
 namespace Attributes {
+namespace TemperatureSetpoint {
+inline constexpr AttributeId Id = 0x00000000;
+} // namespace TemperatureSetpoint
+namespace MinTemperature {
+inline constexpr AttributeId Id = 0x00000001;
+} // namespace MinTemperature
+namespace MaxTemperature {
+inline constexpr AttributeId Id = 0x00000002;
+} // namespace MaxTemperature
+namespace Step {
+inline constexpr AttributeId Id = 0x00000003;
+} // namespace Step
+namespace SelectedTemperatureLevel {
+inline constexpr AttributeId Id = 0x00000004;
+} // namespace SelectedTemperatureLevel
+namespace SupportedTemperatureLevels {
+inline constexpr AttributeId Id = 0x00000005;
+} // namespace SupportedTemperatureLevels
 
-inline constexpr DataModel::AttributeEntry kTemperatureSetpointEntry = {
-    .attributeId    = Attributes::TemperatureSetpoint::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kMinTemperatureEntry = {
-    .attributeId    = Attributes::MinTemperature::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kMaxTemperatureEntry = {
-    .attributeId    = Attributes::MaxTemperature::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kStepEntry = {
-    .attributeId    = Attributes::Step::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kSelectedTemperatureLevelEntry = {
-    .attributeId    = Attributes::SelectedTemperatureLevel::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kSupportedTemperatureLevelsEntry = {
-    .attributeId    = Attributes::SupportedTemperatureLevels::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+// TODO: globals & reference globals?
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kSetTemperatureEntry = {
-    .commandId       = Commands::SetTemperature::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-
+namespace SetTemperature {
+inline constexpr CommandId Id = 0x00000000;
+} // namespace SetTemperature
 } // namespace Commands
-} // namespace Metadata
+
+namespace Events {} // namespace Events
+
 } // namespace TemperatureControl
 } // namespace clusters
 } // namespace app

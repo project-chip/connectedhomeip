@@ -1,50 +1,41 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster TargetNavigator (cluster code: 1285/0x505)
+// Identifier constant values for cluster TargetNavigator (cluster code: 1285/0x505)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/TargetNavigator/TargetNavigatorIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace TargetNavigator {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 2;
+inline constexpr ClusterId kClusterId = 0x00000505;
 
 namespace Attributes {
+namespace TargetList {
+inline constexpr AttributeId Id = 0x00000000;
+} // namespace TargetList
+namespace CurrentTarget {
+inline constexpr AttributeId Id = 0x00000001;
+} // namespace CurrentTarget
 
-inline constexpr DataModel::AttributeEntry kTargetListEntry = {
-    .attributeId    = Attributes::TargetList::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kCurrentTargetEntry = {
-    .attributeId    = Attributes::CurrentTarget::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+// TODO: globals & reference globals?
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kNavigateTargetEntry = {
-    .commandId       = Commands::NavigateTarget::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-
+namespace NavigateTarget {
+inline constexpr CommandId Id = 0x00000000;
+} // namespace NavigateTarget
 } // namespace Commands
-} // namespace Metadata
+
+namespace Events {
+namespace TargetUpdated {
+inline constexpr EventId Id = 0x00000000;
+} // namespace TargetUpdated
+} // namespace Events
+
 } // namespace TargetNavigator
 } // namespace clusters
 } // namespace app

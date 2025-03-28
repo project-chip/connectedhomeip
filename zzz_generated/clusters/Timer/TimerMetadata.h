@@ -1,71 +1,49 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster Timer (cluster code: 71/0x47)
+// Identifier constant values for cluster Timer (cluster code: 71/0x47)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/Timer/TimerIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace Timer {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr ClusterId kClusterId = 0x00000047;
 
 namespace Attributes {
+namespace SetTime {
+inline constexpr AttributeId Id = 0x00000000;
+} // namespace SetTime
+namespace TimeRemaining {
+inline constexpr AttributeId Id = 0x00000001;
+} // namespace TimeRemaining
+namespace TimerState {
+inline constexpr AttributeId Id = 0x00000002;
+} // namespace TimerState
 
-inline constexpr DataModel::AttributeEntry kSetTimeEntry = {
-    .attributeId    = Attributes::SetTime::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kTimeRemainingEntry = {
-    .attributeId    = Attributes::TimeRemaining::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kTimerStateEntry = {
-    .attributeId    = Attributes::TimerState::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+// TODO: globals & reference globals?
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kSetTimerEntry = {
-    .commandId       = Commands::SetTimer::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AcceptedCommandEntry kResetTimerEntry = {
-    .commandId       = Commands::ResetTimer::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AcceptedCommandEntry kAddTimeEntry = {
-    .commandId       = Commands::AddTime::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AcceptedCommandEntry kReduceTimeEntry = {
-    .commandId       = Commands::ReduceTime::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-
+namespace SetTimer {
+inline constexpr CommandId Id = 0x00000000;
+} // namespace SetTimer
+namespace ResetTimer {
+inline constexpr CommandId Id = 0x00000001;
+} // namespace ResetTimer
+namespace AddTime {
+inline constexpr CommandId Id = 0x00000002;
+} // namespace AddTime
+namespace ReduceTime {
+inline constexpr CommandId Id = 0x00000003;
+} // namespace ReduceTime
 } // namespace Commands
-} // namespace Metadata
+
+namespace Events {} // namespace Events
+
 } // namespace Timer
 } // namespace clusters
 } // namespace app

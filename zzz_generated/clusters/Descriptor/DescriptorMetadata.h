@@ -1,60 +1,42 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster Descriptor (cluster code: 29/0x1D)
+// Identifier constant values for cluster Descriptor (cluster code: 29/0x1D)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/Descriptor/DescriptorIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace Descriptor {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 2;
+inline constexpr ClusterId kClusterId = 0x0000001D;
 
 namespace Attributes {
+namespace DeviceTypeList {
+inline constexpr AttributeId Id = 0x00000000;
+} // namespace DeviceTypeList
+namespace ServerList {
+inline constexpr AttributeId Id = 0x00000001;
+} // namespace ServerList
+namespace ClientList {
+inline constexpr AttributeId Id = 0x00000002;
+} // namespace ClientList
+namespace PartsList {
+inline constexpr AttributeId Id = 0x00000003;
+} // namespace PartsList
+namespace TagList {
+inline constexpr AttributeId Id = 0x00000004;
+} // namespace TagList
 
-inline constexpr DataModel::AttributeEntry kDeviceTypeListEntry = {
-    .attributeId    = Attributes::DeviceTypeList::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kServerListEntry = {
-    .attributeId    = Attributes::ServerList::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kClientListEntry = {
-    .attributeId    = Attributes::ClientList::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kPartsListEntry = {
-    .attributeId    = Attributes::PartsList::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kTagListEntry = {
-    .attributeId    = Attributes::TagList::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+// TODO: globals & reference globals?
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-} // namespace Metadata
+
+namespace Events {} // namespace Events
+
 } // namespace Descriptor
 } // namespace clusters
 } // namespace app

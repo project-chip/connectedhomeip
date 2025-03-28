@@ -1,78 +1,51 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster ApplicationBasic (cluster code: 1293/0x50D)
+// Identifier constant values for cluster ApplicationBasic (cluster code: 1293/0x50D)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/ApplicationBasic/ApplicationBasicIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace ApplicationBasic {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr ClusterId kClusterId = 0x0000050D;
 
 namespace Attributes {
+namespace VendorName {
+inline constexpr AttributeId Id = 0x00000000;
+} // namespace VendorName
+namespace VendorID {
+inline constexpr AttributeId Id = 0x00000001;
+} // namespace VendorID
+namespace ApplicationName {
+inline constexpr AttributeId Id = 0x00000002;
+} // namespace ApplicationName
+namespace ProductID {
+inline constexpr AttributeId Id = 0x00000003;
+} // namespace ProductID
+namespace Application {
+inline constexpr AttributeId Id = 0x00000004;
+} // namespace Application
+namespace Status {
+inline constexpr AttributeId Id = 0x00000005;
+} // namespace Status
+namespace ApplicationVersion {
+inline constexpr AttributeId Id = 0x00000006;
+} // namespace ApplicationVersion
+namespace AllowedVendorList {
+inline constexpr AttributeId Id = 0x00000007;
+} // namespace AllowedVendorList
 
-inline constexpr DataModel::AttributeEntry kVendorNameEntry = {
-    .attributeId    = Attributes::VendorName::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kVendorIDEntry = {
-    .attributeId    = Attributes::VendorID::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kApplicationNameEntry = {
-    .attributeId    = Attributes::ApplicationName::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kProductIDEntry = {
-    .attributeId    = Attributes::ProductID::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kApplicationEntry = {
-    .attributeId    = Attributes::Application::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kStatusEntry = {
-    .attributeId    = Attributes::Status::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kApplicationVersionEntry = {
-    .attributeId    = Attributes::ApplicationVersion::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kAllowedVendorListEntry = {
-    .attributeId    = Attributes::AllowedVendorList::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kAdminister,
-    .writePrivilege = std::nullopt,
-};
+// TODO: globals & reference globals?
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-} // namespace Metadata
+
+namespace Events {} // namespace Events
+
 } // namespace ApplicationBasic
 } // namespace clusters
 } // namespace app

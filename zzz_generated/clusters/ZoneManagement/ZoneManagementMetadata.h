@@ -1,77 +1,59 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster ZoneManagement (cluster code: 1360/0x550)
+// Identifier constant values for cluster ZoneManagement (cluster code: 1360/0x550)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/ZoneManagement/ZoneManagementIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace ZoneManagement {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr ClusterId kClusterId = 0x00000550;
 
 namespace Attributes {
+namespace SupportedZoneSources {
+inline constexpr AttributeId Id = 0x00000000;
+} // namespace SupportedZoneSources
+namespace Zones {
+inline constexpr AttributeId Id = 0x00000001;
+} // namespace Zones
+namespace Triggers {
+inline constexpr AttributeId Id = 0x00000002;
+} // namespace Triggers
+namespace Sensitivity {
+inline constexpr AttributeId Id = 0x00000003;
+} // namespace Sensitivity
 
-inline constexpr DataModel::AttributeEntry kSupportedZoneSourcesEntry = {
-    .attributeId    = Attributes::SupportedZoneSources::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kZonesEntry = {
-    .attributeId    = Attributes::Zones::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kTriggersEntry = {
-    .attributeId    = Attributes::Triggers::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AttributeEntry kSensitivityEntry = {
-    .attributeId    = Attributes::Sensitivity::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
+// TODO: globals & reference globals?
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kCreateTwoDCartesianZoneEntry = {
-    .commandId       = Commands::CreateTwoDCartesianZone::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kManage,
-};
-inline constexpr DataModel::AcceptedCommandEntry kUpdateTwoDCartesianZoneEntry = {
-    .commandId       = Commands::UpdateTwoDCartesianZone::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kManage,
-};
-inline constexpr DataModel::AcceptedCommandEntry kGetTwoDCartesianZoneEntry = {
-    .commandId       = Commands::GetTwoDCartesianZone::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kManage,
-};
-inline constexpr DataModel::AcceptedCommandEntry kRemoveZoneEntry = {
-    .commandId       = Commands::RemoveZone::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kManage,
-};
-
+namespace CreateTwoDCartesianZone {
+inline constexpr CommandId Id = 0x00000000;
+} // namespace CreateTwoDCartesianZone
+namespace UpdateTwoDCartesianZone {
+inline constexpr CommandId Id = 0x00000002;
+} // namespace UpdateTwoDCartesianZone
+namespace GetTwoDCartesianZone {
+inline constexpr CommandId Id = 0x00000003;
+} // namespace GetTwoDCartesianZone
+namespace RemoveZone {
+inline constexpr CommandId Id = 0x00000005;
+} // namespace RemoveZone
 } // namespace Commands
-} // namespace Metadata
+
+namespace Events {
+namespace ZoneTriggered {
+inline constexpr EventId Id = 0x00000000;
+} // namespace ZoneTriggered
+namespace ZoneStopped {
+inline constexpr EventId Id = 0x00000001;
+} // namespace ZoneStopped
+} // namespace Events
+
 } // namespace ZoneManagement
 } // namespace clusters
 } // namespace app

@@ -1,121 +1,89 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster DeviceEnergyManagement (cluster code: 152/0x98)
+// Identifier constant values for cluster DeviceEnergyManagement (cluster code: 152/0x98)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/DeviceEnergyManagement/DeviceEnergyManagementIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace DeviceEnergyManagement {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 4;
+inline constexpr ClusterId kClusterId = 0x00000098;
 
 namespace Attributes {
+namespace ESAType {
+inline constexpr AttributeId Id = 0x00000000;
+} // namespace ESAType
+namespace ESACanGenerate {
+inline constexpr AttributeId Id = 0x00000001;
+} // namespace ESACanGenerate
+namespace ESAState {
+inline constexpr AttributeId Id = 0x00000002;
+} // namespace ESAState
+namespace AbsMinPower {
+inline constexpr AttributeId Id = 0x00000003;
+} // namespace AbsMinPower
+namespace AbsMaxPower {
+inline constexpr AttributeId Id = 0x00000004;
+} // namespace AbsMaxPower
+namespace PowerAdjustmentCapability {
+inline constexpr AttributeId Id = 0x00000005;
+} // namespace PowerAdjustmentCapability
+namespace Forecast {
+inline constexpr AttributeId Id = 0x00000006;
+} // namespace Forecast
+namespace OptOutState {
+inline constexpr AttributeId Id = 0x00000007;
+} // namespace OptOutState
 
-inline constexpr DataModel::AttributeEntry kESATypeEntry = {
-    .attributeId    = Attributes::ESAType::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kESACanGenerateEntry = {
-    .attributeId    = Attributes::ESACanGenerate::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kESAStateEntry = {
-    .attributeId    = Attributes::ESAState::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kAbsMinPowerEntry = {
-    .attributeId    = Attributes::AbsMinPower::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kAbsMaxPowerEntry = {
-    .attributeId    = Attributes::AbsMaxPower::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kPowerAdjustmentCapabilityEntry = {
-    .attributeId    = Attributes::PowerAdjustmentCapability::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kForecastEntry = {
-    .attributeId    = Attributes::Forecast::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kOptOutStateEntry = {
-    .attributeId    = Attributes::OptOutState::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+// TODO: globals & reference globals?
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kPowerAdjustRequestEntry = {
-    .commandId       = Commands::PowerAdjustRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AcceptedCommandEntry kCancelPowerAdjustRequestEntry = {
-    .commandId       = Commands::CancelPowerAdjustRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AcceptedCommandEntry kStartTimeAdjustRequestEntry = {
-    .commandId       = Commands::StartTimeAdjustRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AcceptedCommandEntry kPauseRequestEntry = {
-    .commandId       = Commands::PauseRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AcceptedCommandEntry kResumeRequestEntry = {
-    .commandId       = Commands::ResumeRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AcceptedCommandEntry kModifyForecastRequestEntry = {
-    .commandId       = Commands::ModifyForecastRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AcceptedCommandEntry kRequestConstraintBasedForecastEntry = {
-    .commandId       = Commands::RequestConstraintBasedForecast::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AcceptedCommandEntry kCancelRequestEntry = {
-    .commandId       = Commands::CancelRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-
+namespace PowerAdjustRequest {
+inline constexpr CommandId Id = 0x00000000;
+} // namespace PowerAdjustRequest
+namespace CancelPowerAdjustRequest {
+inline constexpr CommandId Id = 0x00000001;
+} // namespace CancelPowerAdjustRequest
+namespace StartTimeAdjustRequest {
+inline constexpr CommandId Id = 0x00000002;
+} // namespace StartTimeAdjustRequest
+namespace PauseRequest {
+inline constexpr CommandId Id = 0x00000003;
+} // namespace PauseRequest
+namespace ResumeRequest {
+inline constexpr CommandId Id = 0x00000004;
+} // namespace ResumeRequest
+namespace ModifyForecastRequest {
+inline constexpr CommandId Id = 0x00000005;
+} // namespace ModifyForecastRequest
+namespace RequestConstraintBasedForecast {
+inline constexpr CommandId Id = 0x00000006;
+} // namespace RequestConstraintBasedForecast
+namespace CancelRequest {
+inline constexpr CommandId Id = 0x00000007;
+} // namespace CancelRequest
 } // namespace Commands
-} // namespace Metadata
+
+namespace Events {
+namespace PowerAdjustStart {
+inline constexpr EventId Id = 0x00000000;
+} // namespace PowerAdjustStart
+namespace PowerAdjustEnd {
+inline constexpr EventId Id = 0x00000001;
+} // namespace PowerAdjustEnd
+namespace Paused {
+inline constexpr EventId Id = 0x00000002;
+} // namespace Paused
+namespace Resumed {
+inline constexpr EventId Id = 0x00000003;
+} // namespace Resumed
+} // namespace Events
+
 } // namespace DeviceEnergyManagement
 } // namespace clusters
 } // namespace app

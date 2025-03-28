@@ -1,42 +1,33 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster WakeOnLan (cluster code: 1283/0x503)
+// Identifier constant values for cluster WakeOnLan (cluster code: 1283/0x503)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/WakeOnLan/WakeOnLanIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace WakeOnLan {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr ClusterId kClusterId = 0x00000503;
 
 namespace Attributes {
+namespace MACAddress {
+inline constexpr AttributeId Id = 0x00000000;
+} // namespace MACAddress
+namespace LinkLocalAddress {
+inline constexpr AttributeId Id = 0x00000001;
+} // namespace LinkLocalAddress
 
-inline constexpr DataModel::AttributeEntry kMACAddressEntry = {
-    .attributeId    = Attributes::MACAddress::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kLinkLocalAddressEntry = {
-    .attributeId    = Attributes::LinkLocalAddress::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+// TODO: globals & reference globals?
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-} // namespace Metadata
+
+namespace Events {} // namespace Events
+
 } // namespace WakeOnLan
 } // namespace clusters
 } // namespace app

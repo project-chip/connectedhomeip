@@ -1,36 +1,30 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster FixedLabel (cluster code: 64/0x40)
+// Identifier constant values for cluster FixedLabel (cluster code: 64/0x40)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/FixedLabel/FixedLabelIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace FixedLabel {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr ClusterId kClusterId = 0x00000040;
 
 namespace Attributes {
+namespace LabelList {
+inline constexpr AttributeId Id = 0x00000000;
+} // namespace LabelList
 
-inline constexpr DataModel::AttributeEntry kLabelListEntry = {
-    .attributeId    = Attributes::LabelList::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+// TODO: globals & reference globals?
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-} // namespace Metadata
+
+namespace Events {} // namespace Events
+
 } // namespace FixedLabel
 } // namespace clusters
 } // namespace app

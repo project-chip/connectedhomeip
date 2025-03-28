@@ -1,136 +1,98 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster TimeSynchronization (cluster code: 56/0x38)
+// Identifier constant values for cluster TimeSynchronization (cluster code: 56/0x38)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/TimeSynchronization/TimeSynchronizationIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace TimeSynchronization {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 2;
+inline constexpr ClusterId kClusterId = 0x00000038;
 
 namespace Attributes {
+namespace UTCTime {
+inline constexpr AttributeId Id = 0x00000000;
+} // namespace UTCTime
+namespace Granularity {
+inline constexpr AttributeId Id = 0x00000001;
+} // namespace Granularity
+namespace TimeSource {
+inline constexpr AttributeId Id = 0x00000002;
+} // namespace TimeSource
+namespace TrustedTimeSource {
+inline constexpr AttributeId Id = 0x00000003;
+} // namespace TrustedTimeSource
+namespace DefaultNTP {
+inline constexpr AttributeId Id = 0x00000004;
+} // namespace DefaultNTP
+namespace TimeZone {
+inline constexpr AttributeId Id = 0x00000005;
+} // namespace TimeZone
+namespace DSTOffset {
+inline constexpr AttributeId Id = 0x00000006;
+} // namespace DSTOffset
+namespace LocalTime {
+inline constexpr AttributeId Id = 0x00000007;
+} // namespace LocalTime
+namespace TimeZoneDatabase {
+inline constexpr AttributeId Id = 0x00000008;
+} // namespace TimeZoneDatabase
+namespace NTPServerAvailable {
+inline constexpr AttributeId Id = 0x00000009;
+} // namespace NTPServerAvailable
+namespace TimeZoneListMaxSize {
+inline constexpr AttributeId Id = 0x0000000A;
+} // namespace TimeZoneListMaxSize
+namespace DSTOffsetListMaxSize {
+inline constexpr AttributeId Id = 0x0000000B;
+} // namespace DSTOffsetListMaxSize
+namespace SupportsDNSResolve {
+inline constexpr AttributeId Id = 0x0000000C;
+} // namespace SupportsDNSResolve
 
-inline constexpr DataModel::AttributeEntry kUTCTimeEntry = {
-    .attributeId    = Attributes::UTCTime::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kGranularityEntry = {
-    .attributeId    = Attributes::Granularity::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kTimeSourceEntry = {
-    .attributeId    = Attributes::TimeSource::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kTrustedTimeSourceEntry = {
-    .attributeId    = Attributes::TrustedTimeSource::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kDefaultNTPEntry = {
-    .attributeId    = Attributes::DefaultNTP::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kTimeZoneEntry = {
-    .attributeId    = Attributes::TimeZone::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kDSTOffsetEntry = {
-    .attributeId    = Attributes::DSTOffset::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kLocalTimeEntry = {
-    .attributeId    = Attributes::LocalTime::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kTimeZoneDatabaseEntry = {
-    .attributeId    = Attributes::TimeZoneDatabase::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kNTPServerAvailableEntry = {
-    .attributeId    = Attributes::NTPServerAvailable::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kTimeZoneListMaxSizeEntry = {
-    .attributeId    = Attributes::TimeZoneListMaxSize::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kDSTOffsetListMaxSizeEntry = {
-    .attributeId    = Attributes::DSTOffsetListMaxSize::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kSupportsDNSResolveEntry = {
-    .attributeId    = Attributes::SupportsDNSResolve::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+// TODO: globals & reference globals?
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kSetUTCTimeEntry = {
-    .commandId       = Commands::SetUTCTime::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kAdminister,
-};
-inline constexpr DataModel::AcceptedCommandEntry kSetTrustedTimeSourceEntry = {
-    .commandId       = Commands::SetTrustedTimeSource::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
-    .invokePrivilege = Access::Privilege::kAdminister,
-};
-inline constexpr DataModel::AcceptedCommandEntry kSetTimeZoneEntry = {
-    .commandId       = Commands::SetTimeZone::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kManage,
-};
-inline constexpr DataModel::AcceptedCommandEntry kSetDSTOffsetEntry = {
-    .commandId       = Commands::SetDSTOffset::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kManage,
-};
-inline constexpr DataModel::AcceptedCommandEntry kSetDefaultNTPEntry = {
-    .commandId       = Commands::SetDefaultNTP::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kAdminister,
-};
-
+namespace SetUTCTime {
+inline constexpr CommandId Id = 0x00000000;
+} // namespace SetUTCTime
+namespace SetTrustedTimeSource {
+inline constexpr CommandId Id = 0x00000001;
+} // namespace SetTrustedTimeSource
+namespace SetTimeZone {
+inline constexpr CommandId Id = 0x00000002;
+} // namespace SetTimeZone
+namespace SetDSTOffset {
+inline constexpr CommandId Id = 0x00000004;
+} // namespace SetDSTOffset
+namespace SetDefaultNTP {
+inline constexpr CommandId Id = 0x00000005;
+} // namespace SetDefaultNTP
 } // namespace Commands
-} // namespace Metadata
+
+namespace Events {
+namespace DSTTableEmpty {
+inline constexpr EventId Id = 0x00000000;
+} // namespace DSTTableEmpty
+namespace DSTStatus {
+inline constexpr EventId Id = 0x00000001;
+} // namespace DSTStatus
+namespace TimeZoneStatus {
+inline constexpr EventId Id = 0x00000002;
+} // namespace TimeZoneStatus
+namespace TimeFailure {
+inline constexpr EventId Id = 0x00000003;
+} // namespace TimeFailure
+namespace MissingTrustedTimeSource {
+inline constexpr EventId Id = 0x00000004;
+} // namespace MissingTrustedTimeSource
+} // namespace Events
+
 } // namespace TimeSynchronization
 } // namespace clusters
 } // namespace app

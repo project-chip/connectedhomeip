@@ -1,102 +1,77 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Cluster metadata information for cluster GeneralDiagnostics (cluster code: 51/0x33)
+// Identifier constant values for cluster GeneralDiagnostics (cluster code: 51/0x33)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
-
-#include <cstdint>
-
-#include <clusters/GeneralDiagnostics/GeneralDiagnosticsIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace GeneralDiagnostics {
-namespace Metadata {
 
-inline constexpr uint32_t kRevision = 2;
+inline constexpr ClusterId kClusterId = 0x00000033;
 
 namespace Attributes {
+namespace NetworkInterfaces {
+inline constexpr AttributeId Id = 0x00000000;
+} // namespace NetworkInterfaces
+namespace RebootCount {
+inline constexpr AttributeId Id = 0x00000001;
+} // namespace RebootCount
+namespace UpTime {
+inline constexpr AttributeId Id = 0x00000002;
+} // namespace UpTime
+namespace TotalOperationalHours {
+inline constexpr AttributeId Id = 0x00000003;
+} // namespace TotalOperationalHours
+namespace BootReason {
+inline constexpr AttributeId Id = 0x00000004;
+} // namespace BootReason
+namespace ActiveHardwareFaults {
+inline constexpr AttributeId Id = 0x00000005;
+} // namespace ActiveHardwareFaults
+namespace ActiveRadioFaults {
+inline constexpr AttributeId Id = 0x00000006;
+} // namespace ActiveRadioFaults
+namespace ActiveNetworkFaults {
+inline constexpr AttributeId Id = 0x00000007;
+} // namespace ActiveNetworkFaults
+namespace TestEventTriggersEnabled {
+inline constexpr AttributeId Id = 0x00000008;
+} // namespace TestEventTriggersEnabled
 
-inline constexpr DataModel::AttributeEntry kNetworkInterfacesEntry = {
-    .attributeId    = Attributes::NetworkInterfaces::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kRebootCountEntry = {
-    .attributeId    = Attributes::RebootCount::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kUpTimeEntry = {
-    .attributeId    = Attributes::UpTime::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kTotalOperationalHoursEntry = {
-    .attributeId    = Attributes::TotalOperationalHours::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kBootReasonEntry = {
-    .attributeId    = Attributes::BootReason::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kActiveHardwareFaultsEntry = {
-    .attributeId    = Attributes::ActiveHardwareFaults::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kActiveRadioFaultsEntry = {
-    .attributeId    = Attributes::ActiveRadioFaults::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kActiveNetworkFaultsEntry = {
-    .attributeId    = Attributes::ActiveNetworkFaults::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-inline constexpr DataModel::AttributeEntry kTestEventTriggersEnabledEntry = {
-    .attributeId    = Attributes::TestEventTriggersEnabled::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+// TODO: globals & reference globals?
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kTestEventTriggerEntry = {
-    .commandId       = Commands::TestEventTrigger::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kManage,
-};
-inline constexpr DataModel::AcceptedCommandEntry kTimeSnapshotEntry = {
-    .commandId       = Commands::TimeSnapshot::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-inline constexpr DataModel::AcceptedCommandEntry kPayloadTestRequestEntry = {
-    .commandId       = Commands::PayloadTestRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kManage,
-};
-
+namespace TestEventTrigger {
+inline constexpr CommandId Id = 0x00000000;
+} // namespace TestEventTrigger
+namespace TimeSnapshot {
+inline constexpr CommandId Id = 0x00000001;
+} // namespace TimeSnapshot
+namespace PayloadTestRequest {
+inline constexpr CommandId Id = 0x00000003;
+} // namespace PayloadTestRequest
 } // namespace Commands
-} // namespace Metadata
+
+namespace Events {
+namespace HardwareFaultChange {
+inline constexpr EventId Id = 0x00000000;
+} // namespace HardwareFaultChange
+namespace RadioFaultChange {
+inline constexpr EventId Id = 0x00000001;
+} // namespace RadioFaultChange
+namespace NetworkFaultChange {
+inline constexpr EventId Id = 0x00000002;
+} // namespace NetworkFaultChange
+namespace BootReason {
+inline constexpr EventId Id = 0x00000003;
+} // namespace BootReason
+} // namespace Events
+
 } // namespace GeneralDiagnostics
 } // namespace clusters
 } // namespace app
