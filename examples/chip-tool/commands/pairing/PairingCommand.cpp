@@ -124,6 +124,10 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
         params.SetThreadOperationalDataset(mOperationalDataset);
         break;
     case PairingNetworkType::None:
+        if (mThreadDataset.HasValue())
+        {
+            params.SetThreadOperationalDataset(mThreadDataset.Value());
+        }
         break;
     }
 
