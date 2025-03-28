@@ -1195,3 +1195,21 @@ exit:
     commandObj->AddStatus(commandPath, finalStatus);
     return true;
 }
+
+bool emberAfOperationalCredentialsClusterSetVIDVerificationStatementCallback(
+    app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+    const Commands::SetVIDVerificationStatement::DecodableType & commandData)
+{
+    (void) commandData;
+    commandObj->AddStatus(commandPath, Status::UnsupportedCommand);
+    return true;
+}
+
+bool emberAfOperationalCredentialsClusterSignVIDVerificationRequestCallback(
+    app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+    const Commands::SignVIDVerificationRequest::DecodableType & commandData)
+{
+    (void) commandData;
+    commandObj->AddStatus(commandPath, Status::UnsupportedCommand);
+    return true;
+}
