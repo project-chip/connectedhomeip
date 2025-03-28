@@ -75,9 +75,8 @@ void emberAfTemperatureControlClusterInitCallback(EndpointId endpoint)
                                                             MATTER_DM_TEMPERATURE_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
     sAppSupportedTemperatureLevelsDelegate->SetSupportedEndpointPair(
         epIndex,
-        AppSupportedTemperatureLevelsDelegate::EndpointPair(endpoint /* endpointId */,
-                                                            ChefTemperatureControl::temperatureLevelOptions,
-                                                            MATTER_ARRAY_SIZE(ChefTemperatureControl::temperatureLevelOptions)));
+        ChefTemperatureControl::EndpointPair(endpoint /* endpointId */, ChefTemperatureControl::temperatureLevelOptions,
+                                             MATTER_ARRAY_SIZE(ChefTemperatureControl::temperatureLevelOptions)));
 
     chip::app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
 }
