@@ -49,7 +49,7 @@ public:
 
     CHIP_ERROR Next(MutableCharSpan & item) override;
 
-    void SetSupportedEndpointPair(uint16_t index, ChefTemperatureControl::EndpointPair endpointPair)
+    static void SetSupportedEndpointPair(uint16_t index, ChefTemperatureControl::EndpointPair endpointPair)
     {
         supportedOptionsByEndpoints[index] = endpointPair;
     }
