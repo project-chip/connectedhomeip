@@ -99,8 +99,9 @@ public:
      * @param aDelegate A reference to the delegate to be used by this server.
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
-    CameraAvSettingsUserLevelMgmtServer(EndpointId endpointId, Delegate * delegate, BitMask<Feature> aFeature, uint8_t aMaxPresets,
-       uint16_t aPanMin, uint16_t aPanMax, uint16_t aTiltMin, uint16_t aTiltMax, uint8_t aZoomMax);
+    CameraAvSettingsUserLevelMgmtServer(EndpointId endpointId, Delegate * delegate, BitMask<Feature> aFeature, 
+        const BitFlags<OptionalAttributes> aOptionalAttrs, uint8_t aMaxPresets, uint16_t aPanMin, uint16_t aPanMax, 
+        uint16_t aTiltMin, uint16_t aTiltMax, uint8_t aZoomMax);
     ~CameraAvSettingsUserLevelMgmtServer() override;
 
     CHIP_ERROR Init();

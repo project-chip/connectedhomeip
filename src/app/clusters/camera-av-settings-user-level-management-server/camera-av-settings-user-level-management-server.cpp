@@ -42,9 +42,10 @@ namespace Clusters {
 namespace CameraAvSettingsUserLevelManagement {
 
 CameraAvSettingsUserLevelMgmtServer::CameraAvSettingsUserLevelMgmtServer(EndpointId endpointId, Delegate * delegate, BitMask<Feature> aFeature,
-    const uint8_t aMaxPresets, uint16_t aPanMin, uint16_t aPanMax, uint16_t aTiltMin, uint16_t aTiltMax, uint8_t aZoomMax) :
+    const BitFlags<OptionalAttributes> aOptionalAttrs, const uint8_t aMaxPresets, uint16_t aPanMin, uint16_t aPanMax, uint16_t aTiltMin, 
+    uint16_t aTiltMax, uint8_t aZoomMax) :
     AttributeAccessInterface(MakeOptional(endpointId), CameraAvSettingsUserLevelManagement::Id), CommandHandlerInterface(MakeOptional(endpointId), CameraAvSettingsUserLevelManagement::Id),
-    mDelegate(delegate),mEndpointId(endpointId),mFeature(aFeature),mMaxPresets(aMaxPresets),mPanMin(aPanMin),mPanMax(aPanMax), 
+    mDelegate(delegate),mEndpointId(endpointId),mFeature(aFeature),mOptionalAttrs(aOptionalAttrs),mMaxPresets(aMaxPresets),mPanMin(aPanMin),mPanMax(aPanMax), 
     mTiltMin(aTiltMin),mTiltMax(aTiltMax),mZoomMax(aZoomMax)
 {
     mDelegate->SetServer(this);
@@ -765,7 +766,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRemovePreset(HandlerContext 
 void CameraAvSettingsUserLevelMgmtServer::HandleDPTZSetViewport(HandlerContext & ctx,
                                                             const Commands::DPTZSetViewport::DecodableType & commandData)
 {
-    
+
     // Call the delegate
     Status status = mDelegate->DPTZSetViewport();
 

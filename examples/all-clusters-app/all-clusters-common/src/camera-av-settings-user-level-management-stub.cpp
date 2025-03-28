@@ -111,7 +111,13 @@ void emberAfCameraAvSettingsUserLevelManagementClusterInitCallback(chip::Endpoin
     BitMask<CameraAvSettingsUserLevelManagement::Feature, uint32_t> avsumFeatures(CameraAvSettingsUserLevelManagement::Feature::kDigitalPTZ, 
        CameraAvSettingsUserLevelManagement::Feature::kMechanicalPan, CameraAvSettingsUserLevelManagement::Feature::kMechanicalTilt,
        CameraAvSettingsUserLevelManagement::Feature::kMechanicalZoom, CameraAvSettingsUserLevelManagement::Feature::kMechanicalPresets);
-    gAVSettingsUserLevelManagementCluster = new CameraAvSettingsUserLevelMgmtServer(kEndpointId, gDelegate, avsumFeatures, appMaxPresets,
+    BitMask<CameraAvSettingsUserLevelManagement::OptionalAttributes, uint32_t> avsumAttrs(CameraAvSettingsUserLevelManagement::OptionalAttributes::kMptzPosition,
+       CameraAvSettingsUserLevelManagement::OptionalAttributes::kMaxPresets, CameraAvSettingsUserLevelManagement::OptionalAttributes::kMptzPresets,
+       CameraAvSettingsUserLevelManagement::OptionalAttributes::kDptzRelativeMove, CameraAvSettingsUserLevelManagement::OptionalAttributes::kZoomMax,
+       CameraAvSettingsUserLevelManagement::OptionalAttributes::kZoomMax, CameraAvSettingsUserLevelManagement::OptionalAttributes::kTiltMin,
+       CameraAvSettingsUserLevelManagement::OptionalAttributes::kPanMin, CameraAvSettingsUserLevelManagement::OptionalAttributes::kPanMax);
+
+gAVSettingsUserLevelManagementCluster = new CameraAvSettingsUserLevelMgmtServer(kEndpointId, gDelegate, avsumFeatures, avsumAttrs, appMaxPresets,
       appPanMin, appPanMax, appTiltMin , appTiltMax, appZoomMax);
     gAVSettingsUserLevelManagementCluster->Init();
 }
