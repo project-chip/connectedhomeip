@@ -162,3 +162,7 @@ executable("chip-tool") {
 group("default") {
   deps = [ ":chip-tool" ]
 }
+
+if (target_os == "linux") {
+  chip_enable_nfc_commissioning = true
+}
