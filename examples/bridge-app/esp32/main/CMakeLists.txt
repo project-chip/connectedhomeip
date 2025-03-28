@@ -20,12 +20,14 @@ get_filename_component(APP_COMMON_GEN_DIR ${CHIP_ROOT}/zzz_generated/app-common/
 idf_component_register(PRIV_INCLUDE_DIRS
                       "${CMAKE_CURRENT_LIST_DIR}/include"
                       "${CHIP_ROOT}/examples/providers"
+                      "${CHIP_ROOT}/examples/bridge-app/bridge-common/include"
                       SRC_DIRS
                       "${CMAKE_CURRENT_LIST_DIR}"
                       "${APP_COMMON_GEN_DIR}/attributes"
                       "${APP_COMMON_GEN_DIR}"
                       "${CHIP_ROOT}/examples/platform/esp32/common"
-                      "${CHIP_ROOT}/examples/providers")
+                      "${CHIP_ROOT}/examples/providers"
+                      "${CHIP_ROOT}/examples/bridge-app/bridge-common/src")
 
 include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
 chip_configure_data_model(${COMPONENT_LIB}
