@@ -1,94 +1,102 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster GeneralDiagnostics (cluster code: 51/0x33)
+// Cluster metadata information for cluster GeneralDiagnostics (cluster code: 51/0x33)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/common/GlobalIds.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
+
+#include <cstdint>
+
+#include <clusters/GeneralDiagnostics/GeneralDiagnosticsIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace GeneralDiagnostics {
+namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x00000033;
+inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
-namespace NetworkInterfaces {
-inline constexpr AttributeId Id = 0x00000000;
-} // namespace NetworkInterfaces
-namespace RebootCount {
-inline constexpr AttributeId Id = 0x00000001;
-} // namespace RebootCount
-namespace UpTime {
-inline constexpr AttributeId Id = 0x00000002;
-} // namespace UpTime
-namespace TotalOperationalHours {
-inline constexpr AttributeId Id = 0x00000003;
-} // namespace TotalOperationalHours
-namespace BootReason {
-inline constexpr AttributeId Id = 0x00000004;
-} // namespace BootReason
-namespace ActiveHardwareFaults {
-inline constexpr AttributeId Id = 0x00000005;
-} // namespace ActiveHardwareFaults
-namespace ActiveRadioFaults {
-inline constexpr AttributeId Id = 0x00000006;
-} // namespace ActiveRadioFaults
-namespace ActiveNetworkFaults {
-inline constexpr AttributeId Id = 0x00000007;
-} // namespace ActiveNetworkFaults
-namespace TestEventTriggersEnabled {
-inline constexpr AttributeId Id = 0x00000008;
-} // namespace TestEventTriggersEnabled
-namespace GeneratedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
-} // namespace GeneratedCommandList
-namespace AcceptedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
-} // namespace AcceptedCommandList
-namespace EventList {
-inline constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-} // namespace EventList
-namespace AttributeList {
-inline constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
-} // namespace AttributeList
-namespace FeatureMap {
-inline constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-namespace ClusterRevision {
-inline constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
+
+inline constexpr DataModel::AttributeEntry kNetworkInterfacesEntry = {
+    .attributeId    = GeneralDiagnostics::Attributes::NetworkInterfaces::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kRebootCountEntry = {
+    .attributeId    = GeneralDiagnostics::Attributes::RebootCount::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kUpTimeEntry = {
+    .attributeId    = GeneralDiagnostics::Attributes::UpTime::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kTotalOperationalHoursEntry = {
+    .attributeId    = GeneralDiagnostics::Attributes::TotalOperationalHours::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kBootReasonEntry = {
+    .attributeId    = GeneralDiagnostics::Attributes::BootReason::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kActiveHardwareFaultsEntry = {
+    .attributeId    = GeneralDiagnostics::Attributes::ActiveHardwareFaults::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kActiveRadioFaultsEntry = {
+    .attributeId    = GeneralDiagnostics::Attributes::ActiveRadioFaults::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kActiveNetworkFaultsEntry = {
+    .attributeId    = GeneralDiagnostics::Attributes::ActiveNetworkFaults::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kTestEventTriggersEnabledEntry = {
+    .attributeId    = GeneralDiagnostics::Attributes::TestEventTriggersEnabled::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
 
 } // namespace Attributes
 
 namespace Commands {
-namespace TestEventTrigger {
-inline constexpr CommandId Id = 0x00000000;
-} // namespace TestEventTrigger
-namespace TimeSnapshot {
-inline constexpr CommandId Id = 0x00000001;
-} // namespace TimeSnapshot
-namespace PayloadTestRequest {
-inline constexpr CommandId Id = 0x00000003;
-} // namespace PayloadTestRequest
+
+inline constexpr DataModel::AcceptedCommandEntry kTestEventTriggerEntry = {
+    .commandId       = GeneralDiagnostics::Commands::TestEventTrigger::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kManage,
+};
+inline constexpr DataModel::AcceptedCommandEntry kTimeSnapshotEntry = {
+    .commandId       = GeneralDiagnostics::Commands::TimeSnapshot::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+inline constexpr DataModel::AcceptedCommandEntry kPayloadTestRequestEntry = {
+    .commandId       = GeneralDiagnostics::Commands::PayloadTestRequest::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kManage,
+};
+
 } // namespace Commands
-
-namespace Events {
-namespace HardwareFaultChange {
-inline constexpr EventId Id = 0x00000000;
-} // namespace HardwareFaultChange
-namespace RadioFaultChange {
-inline constexpr EventId Id = 0x00000001;
-} // namespace RadioFaultChange
-namespace NetworkFaultChange {
-inline constexpr EventId Id = 0x00000002;
-} // namespace NetworkFaultChange
-namespace BootReason {
-inline constexpr EventId Id = 0x00000003;
-} // namespace BootReason
-} // namespace Events
-
+} // namespace Metadata
 } // namespace GeneralDiagnostics
 } // namespace clusters
 } // namespace app

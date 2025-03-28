@@ -1,82 +1,91 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster BooleanStateConfiguration (cluster code: 128/0x80)
+// Cluster metadata information for cluster BooleanStateConfiguration (cluster code: 128/0x80)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/common/GlobalIds.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
+
+#include <cstdint>
+
+#include <clusters/BooleanStateConfiguration/BooleanStateConfigurationIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace BooleanStateConfiguration {
+namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x00000080;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-namespace CurrentSensitivityLevel {
-inline constexpr AttributeId Id = 0x00000000;
-} // namespace CurrentSensitivityLevel
-namespace SupportedSensitivityLevels {
-inline constexpr AttributeId Id = 0x00000001;
-} // namespace SupportedSensitivityLevels
-namespace DefaultSensitivityLevel {
-inline constexpr AttributeId Id = 0x00000002;
-} // namespace DefaultSensitivityLevel
-namespace AlarmsActive {
-inline constexpr AttributeId Id = 0x00000003;
-} // namespace AlarmsActive
-namespace AlarmsSuppressed {
-inline constexpr AttributeId Id = 0x00000004;
-} // namespace AlarmsSuppressed
-namespace AlarmsEnabled {
-inline constexpr AttributeId Id = 0x00000005;
-} // namespace AlarmsEnabled
-namespace AlarmsSupported {
-inline constexpr AttributeId Id = 0x00000006;
-} // namespace AlarmsSupported
-namespace SensorFault {
-inline constexpr AttributeId Id = 0x00000007;
-} // namespace SensorFault
-namespace GeneratedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
-} // namespace GeneratedCommandList
-namespace AcceptedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
-} // namespace AcceptedCommandList
-namespace EventList {
-inline constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-} // namespace EventList
-namespace AttributeList {
-inline constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
-} // namespace AttributeList
-namespace FeatureMap {
-inline constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-namespace ClusterRevision {
-inline constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
+
+inline constexpr DataModel::AttributeEntry kCurrentSensitivityLevelEntry = {
+    .attributeId    = BooleanStateConfiguration::Attributes::CurrentSensitivityLevel::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = Access::Privilege::kOperate,
+};
+inline constexpr DataModel::AttributeEntry kSupportedSensitivityLevelsEntry = {
+    .attributeId    = BooleanStateConfiguration::Attributes::SupportedSensitivityLevels::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kDefaultSensitivityLevelEntry = {
+    .attributeId    = BooleanStateConfiguration::Attributes::DefaultSensitivityLevel::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kAlarmsActiveEntry = {
+    .attributeId    = BooleanStateConfiguration::Attributes::AlarmsActive::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kAlarmsSuppressedEntry = {
+    .attributeId    = BooleanStateConfiguration::Attributes::AlarmsSuppressed::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kAlarmsEnabledEntry = {
+    .attributeId    = BooleanStateConfiguration::Attributes::AlarmsEnabled::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kAlarmsSupportedEntry = {
+    .attributeId    = BooleanStateConfiguration::Attributes::AlarmsSupported::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kSensorFaultEntry = {
+    .attributeId    = BooleanStateConfiguration::Attributes::SensorFault::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
 
 } // namespace Attributes
 
 namespace Commands {
-namespace SuppressAlarm {
-inline constexpr CommandId Id = 0x00000000;
-} // namespace SuppressAlarm
-namespace EnableDisableAlarm {
-inline constexpr CommandId Id = 0x00000001;
-} // namespace EnableDisableAlarm
+
+inline constexpr DataModel::AcceptedCommandEntry kSuppressAlarmEntry = {
+    .commandId       = BooleanStateConfiguration::Commands::SuppressAlarm::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+inline constexpr DataModel::AcceptedCommandEntry kEnableDisableAlarmEntry = {
+    .commandId       = BooleanStateConfiguration::Commands::EnableDisableAlarm::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+
 } // namespace Commands
-
-namespace Events {
-namespace AlarmsStateChanged {
-inline constexpr EventId Id = 0x00000000;
-} // namespace AlarmsStateChanged
-namespace SensorFault {
-inline constexpr EventId Id = 0x00000001;
-} // namespace SensorFault
-} // namespace Events
-
+} // namespace Metadata
 } // namespace BooleanStateConfiguration
 } // namespace clusters
 } // namespace app

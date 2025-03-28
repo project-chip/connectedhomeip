@@ -1,77 +1,96 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster OzoneConcentrationMeasurement (cluster code: 1045/0x415)
+// Cluster metadata information for cluster OzoneConcentrationMeasurement (cluster code: 1045/0x415)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/common/GlobalIds.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
+
+#include <cstdint>
+
+#include <clusters/OzoneConcentrationMeasurement/OzoneConcentrationMeasurementIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace OzoneConcentrationMeasurement {
+namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x00000415;
+inline constexpr uint32_t kRevision = 3;
 
 namespace Attributes {
-namespace MeasuredValue {
-inline constexpr AttributeId Id = 0x00000000;
-} // namespace MeasuredValue
-namespace MinMeasuredValue {
-inline constexpr AttributeId Id = 0x00000001;
-} // namespace MinMeasuredValue
-namespace MaxMeasuredValue {
-inline constexpr AttributeId Id = 0x00000002;
-} // namespace MaxMeasuredValue
-namespace PeakMeasuredValue {
-inline constexpr AttributeId Id = 0x00000003;
-} // namespace PeakMeasuredValue
-namespace PeakMeasuredValueWindow {
-inline constexpr AttributeId Id = 0x00000004;
-} // namespace PeakMeasuredValueWindow
-namespace AverageMeasuredValue {
-inline constexpr AttributeId Id = 0x00000005;
-} // namespace AverageMeasuredValue
-namespace AverageMeasuredValueWindow {
-inline constexpr AttributeId Id = 0x00000006;
-} // namespace AverageMeasuredValueWindow
-namespace Uncertainty {
-inline constexpr AttributeId Id = 0x00000007;
-} // namespace Uncertainty
-namespace MeasurementUnit {
-inline constexpr AttributeId Id = 0x00000008;
-} // namespace MeasurementUnit
-namespace MeasurementMedium {
-inline constexpr AttributeId Id = 0x00000009;
-} // namespace MeasurementMedium
-namespace LevelValue {
-inline constexpr AttributeId Id = 0x0000000A;
-} // namespace LevelValue
-namespace GeneratedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
-} // namespace GeneratedCommandList
-namespace AcceptedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
-} // namespace AcceptedCommandList
-namespace EventList {
-inline constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-} // namespace EventList
-namespace AttributeList {
-inline constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
-} // namespace AttributeList
-namespace FeatureMap {
-inline constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-namespace ClusterRevision {
-inline constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
+
+inline constexpr DataModel::AttributeEntry kMeasuredValueEntry = {
+    .attributeId    = OzoneConcentrationMeasurement::Attributes::MeasuredValue::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kMinMeasuredValueEntry = {
+    .attributeId    = OzoneConcentrationMeasurement::Attributes::MinMeasuredValue::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kMaxMeasuredValueEntry = {
+    .attributeId    = OzoneConcentrationMeasurement::Attributes::MaxMeasuredValue::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kPeakMeasuredValueEntry = {
+    .attributeId    = OzoneConcentrationMeasurement::Attributes::PeakMeasuredValue::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kPeakMeasuredValueWindowEntry = {
+    .attributeId    = OzoneConcentrationMeasurement::Attributes::PeakMeasuredValueWindow::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kAverageMeasuredValueEntry = {
+    .attributeId    = OzoneConcentrationMeasurement::Attributes::AverageMeasuredValue::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kAverageMeasuredValueWindowEntry = {
+    .attributeId    = OzoneConcentrationMeasurement::Attributes::AverageMeasuredValueWindow::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kUncertaintyEntry = {
+    .attributeId    = OzoneConcentrationMeasurement::Attributes::Uncertainty::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kMeasurementUnitEntry = {
+    .attributeId    = OzoneConcentrationMeasurement::Attributes::MeasurementUnit::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kMeasurementMediumEntry = {
+    .attributeId    = OzoneConcentrationMeasurement::Attributes::MeasurementMedium::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kLevelValueEntry = {
+    .attributeId    = OzoneConcentrationMeasurement::Attributes::LevelValue::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-
-namespace Events {} // namespace Events
-
+} // namespace Metadata
 } // namespace OzoneConcentrationMeasurement
 } // namespace clusters
 } // namespace app

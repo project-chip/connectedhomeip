@@ -1,198 +1,329 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster CameraAvStreamManagement (cluster code: 1361/0x551)
+// Cluster metadata information for cluster CameraAvStreamManagement (cluster code: 1361/0x551)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/common/GlobalIds.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
+
+#include <cstdint>
+
+#include <clusters/CameraAvStreamManagement/CameraAvStreamManagementIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace CameraAvStreamManagement {
+namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x00000551;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-namespace MaxConcurrentVideoEncoders {
-inline constexpr AttributeId Id = 0x00000000;
-} // namespace MaxConcurrentVideoEncoders
-namespace MaxEncodedPixelRate {
-inline constexpr AttributeId Id = 0x00000001;
-} // namespace MaxEncodedPixelRate
-namespace VideoSensorParams {
-inline constexpr AttributeId Id = 0x00000002;
-} // namespace VideoSensorParams
-namespace NightVisionCapable {
-inline constexpr AttributeId Id = 0x00000003;
-} // namespace NightVisionCapable
-namespace MinViewport {
-inline constexpr AttributeId Id = 0x00000004;
-} // namespace MinViewport
-namespace RateDistortionTradeOffPoints {
-inline constexpr AttributeId Id = 0x00000005;
-} // namespace RateDistortionTradeOffPoints
-namespace MaxContentBufferSize {
-inline constexpr AttributeId Id = 0x00000006;
-} // namespace MaxContentBufferSize
-namespace MicrophoneCapabilities {
-inline constexpr AttributeId Id = 0x00000007;
-} // namespace MicrophoneCapabilities
-namespace SpeakerCapabilities {
-inline constexpr AttributeId Id = 0x00000008;
-} // namespace SpeakerCapabilities
-namespace TwoWayTalkSupport {
-inline constexpr AttributeId Id = 0x00000009;
-} // namespace TwoWayTalkSupport
-namespace SupportedSnapshotParams {
-inline constexpr AttributeId Id = 0x0000000A;
-} // namespace SupportedSnapshotParams
-namespace MaxNetworkBandwidth {
-inline constexpr AttributeId Id = 0x0000000B;
-} // namespace MaxNetworkBandwidth
-namespace CurrentFrameRate {
-inline constexpr AttributeId Id = 0x0000000C;
-} // namespace CurrentFrameRate
-namespace HDRModeEnabled {
-inline constexpr AttributeId Id = 0x0000000D;
-} // namespace HDRModeEnabled
-namespace SupportedStreamUsages {
-inline constexpr AttributeId Id = 0x0000000E;
-} // namespace SupportedStreamUsages
-namespace AllocatedVideoStreams {
-inline constexpr AttributeId Id = 0x0000000F;
-} // namespace AllocatedVideoStreams
-namespace AllocatedAudioStreams {
-inline constexpr AttributeId Id = 0x00000010;
-} // namespace AllocatedAudioStreams
-namespace AllocatedSnapshotStreams {
-inline constexpr AttributeId Id = 0x00000011;
-} // namespace AllocatedSnapshotStreams
-namespace RankedVideoStreamPrioritiesList {
-inline constexpr AttributeId Id = 0x00000012;
-} // namespace RankedVideoStreamPrioritiesList
-namespace SoftRecordingPrivacyModeEnabled {
-inline constexpr AttributeId Id = 0x00000013;
-} // namespace SoftRecordingPrivacyModeEnabled
-namespace SoftLivestreamPrivacyModeEnabled {
-inline constexpr AttributeId Id = 0x00000014;
-} // namespace SoftLivestreamPrivacyModeEnabled
-namespace HardPrivacyModeOn {
-inline constexpr AttributeId Id = 0x00000015;
-} // namespace HardPrivacyModeOn
-namespace NightVision {
-inline constexpr AttributeId Id = 0x00000016;
-} // namespace NightVision
-namespace NightVisionIllum {
-inline constexpr AttributeId Id = 0x00000017;
-} // namespace NightVisionIllum
-namespace Viewport {
-inline constexpr AttributeId Id = 0x00000018;
-} // namespace Viewport
-namespace SpeakerMuted {
-inline constexpr AttributeId Id = 0x00000019;
-} // namespace SpeakerMuted
-namespace SpeakerVolumeLevel {
-inline constexpr AttributeId Id = 0x0000001A;
-} // namespace SpeakerVolumeLevel
-namespace SpeakerMaxLevel {
-inline constexpr AttributeId Id = 0x0000001B;
-} // namespace SpeakerMaxLevel
-namespace SpeakerMinLevel {
-inline constexpr AttributeId Id = 0x0000001C;
-} // namespace SpeakerMinLevel
-namespace MicrophoneMuted {
-inline constexpr AttributeId Id = 0x0000001D;
-} // namespace MicrophoneMuted
-namespace MicrophoneVolumeLevel {
-inline constexpr AttributeId Id = 0x0000001E;
-} // namespace MicrophoneVolumeLevel
-namespace MicrophoneMaxLevel {
-inline constexpr AttributeId Id = 0x0000001F;
-} // namespace MicrophoneMaxLevel
-namespace MicrophoneMinLevel {
-inline constexpr AttributeId Id = 0x00000020;
-} // namespace MicrophoneMinLevel
-namespace MicrophoneAGCEnabled {
-inline constexpr AttributeId Id = 0x00000021;
-} // namespace MicrophoneAGCEnabled
-namespace ImageRotation {
-inline constexpr AttributeId Id = 0x00000022;
-} // namespace ImageRotation
-namespace ImageFlipHorizontal {
-inline constexpr AttributeId Id = 0x00000023;
-} // namespace ImageFlipHorizontal
-namespace ImageFlipVertical {
-inline constexpr AttributeId Id = 0x00000024;
-} // namespace ImageFlipVertical
-namespace LocalVideoRecordingEnabled {
-inline constexpr AttributeId Id = 0x00000025;
-} // namespace LocalVideoRecordingEnabled
-namespace LocalSnapshotRecordingEnabled {
-inline constexpr AttributeId Id = 0x00000026;
-} // namespace LocalSnapshotRecordingEnabled
-namespace StatusLightEnabled {
-inline constexpr AttributeId Id = 0x00000027;
-} // namespace StatusLightEnabled
-namespace StatusLightBrightness {
-inline constexpr AttributeId Id = 0x00000028;
-} // namespace StatusLightBrightness
-namespace GeneratedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
-} // namespace GeneratedCommandList
-namespace AcceptedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
-} // namespace AcceptedCommandList
-namespace EventList {
-inline constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-} // namespace EventList
-namespace AttributeList {
-inline constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
-} // namespace AttributeList
-namespace FeatureMap {
-inline constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-namespace ClusterRevision {
-inline constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
+
+inline constexpr DataModel::AttributeEntry kMaxConcurrentVideoEncodersEntry = {
+    .attributeId    = CameraAvStreamManagement::Attributes::MaxConcurrentVideoEncoders::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kMaxEncodedPixelRateEntry = {
+    .attributeId    = CameraAvStreamManagement::Attributes::MaxEncodedPixelRate::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kVideoSensorParamsEntry = {
+    .attributeId    = CameraAvStreamManagement::Attributes::VideoSensorParams::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kNightVisionCapableEntry = {
+    .attributeId    = CameraAvStreamManagement::Attributes::NightVisionCapable::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kMinViewportEntry = {
+    .attributeId    = CameraAvStreamManagement::Attributes::MinViewport::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kRateDistortionTradeOffPointsEntry = {
+    .attributeId    = CameraAvStreamManagement::Attributes::RateDistortionTradeOffPoints::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kMaxContentBufferSizeEntry = {
+    .attributeId    = CameraAvStreamManagement::Attributes::MaxContentBufferSize::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kMicrophoneCapabilitiesEntry = {
+    .attributeId    = CameraAvStreamManagement::Attributes::MicrophoneCapabilities::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kSpeakerCapabilitiesEntry = {
+    .attributeId    = CameraAvStreamManagement::Attributes::SpeakerCapabilities::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kTwoWayTalkSupportEntry = {
+    .attributeId    = CameraAvStreamManagement::Attributes::TwoWayTalkSupport::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kSupportedSnapshotParamsEntry = {
+    .attributeId    = CameraAvStreamManagement::Attributes::SupportedSnapshotParams::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kMaxNetworkBandwidthEntry = {
+    .attributeId    = CameraAvStreamManagement::Attributes::MaxNetworkBandwidth::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kCurrentFrameRateEntry = {
+    .attributeId    = CameraAvStreamManagement::Attributes::CurrentFrameRate::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kHDRModeEnabledEntry = {
+    .attributeId    = CameraAvStreamManagement::Attributes::HDRModeEnabled::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kManage,
+    .writePrivilege = Access::Privilege::kManage,
+};
+inline constexpr DataModel::AttributeEntry kSupportedStreamUsagesEntry = {
+    .attributeId    = CameraAvStreamManagement::Attributes::SupportedStreamUsages::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kAllocatedVideoStreamsEntry = {
+    .attributeId    = CameraAvStreamManagement::Attributes::AllocatedVideoStreams::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kAllocatedAudioStreamsEntry = {
+    .attributeId    = CameraAvStreamManagement::Attributes::AllocatedAudioStreams::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kAllocatedSnapshotStreamsEntry = {
+    .attributeId    = CameraAvStreamManagement::Attributes::AllocatedSnapshotStreams::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kRankedVideoStreamPrioritiesListEntry = {
+    .attributeId    = CameraAvStreamManagement::Attributes::RankedVideoStreamPrioritiesList::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kSoftRecordingPrivacyModeEnabledEntry = {
+    .attributeId    = CameraAvStreamManagement::Attributes::SoftRecordingPrivacyModeEnabled::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = Access::Privilege::kOperate,
+};
+inline constexpr DataModel::AttributeEntry kSoftLivestreamPrivacyModeEnabledEntry = {
+    .attributeId    = CameraAvStreamManagement::Attributes::SoftLivestreamPrivacyModeEnabled::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = Access::Privilege::kOperate,
+};
+inline constexpr DataModel::AttributeEntry kHardPrivacyModeOnEntry = {
+    .attributeId    = CameraAvStreamManagement::Attributes::HardPrivacyModeOn::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kNightVisionEntry = {
+    .attributeId    = CameraAvStreamManagement::Attributes::NightVision::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kManage,
+    .writePrivilege = Access::Privilege::kManage,
+};
+inline constexpr DataModel::AttributeEntry kNightVisionIllumEntry = {
+    .attributeId    = CameraAvStreamManagement::Attributes::NightVisionIllum::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kManage,
+    .writePrivilege = Access::Privilege::kManage,
+};
+inline constexpr DataModel::AttributeEntry kViewportEntry = {
+    .attributeId    = CameraAvStreamManagement::Attributes::Viewport::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kManage,
+    .writePrivilege = Access::Privilege::kManage,
+};
+inline constexpr DataModel::AttributeEntry kSpeakerMutedEntry = {
+    .attributeId    = CameraAvStreamManagement::Attributes::SpeakerMuted::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kManage,
+    .writePrivilege = Access::Privilege::kManage,
+};
+inline constexpr DataModel::AttributeEntry kSpeakerVolumeLevelEntry = {
+    .attributeId    = CameraAvStreamManagement::Attributes::SpeakerVolumeLevel::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kManage,
+    .writePrivilege = Access::Privilege::kManage,
+};
+inline constexpr DataModel::AttributeEntry kSpeakerMaxLevelEntry = {
+    .attributeId    = CameraAvStreamManagement::Attributes::SpeakerMaxLevel::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kManage,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kSpeakerMinLevelEntry = {
+    .attributeId    = CameraAvStreamManagement::Attributes::SpeakerMinLevel::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kManage,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kMicrophoneMutedEntry = {
+    .attributeId    = CameraAvStreamManagement::Attributes::MicrophoneMuted::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kManage,
+    .writePrivilege = Access::Privilege::kManage,
+};
+inline constexpr DataModel::AttributeEntry kMicrophoneVolumeLevelEntry = {
+    .attributeId    = CameraAvStreamManagement::Attributes::MicrophoneVolumeLevel::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kManage,
+    .writePrivilege = Access::Privilege::kManage,
+};
+inline constexpr DataModel::AttributeEntry kMicrophoneMaxLevelEntry = {
+    .attributeId    = CameraAvStreamManagement::Attributes::MicrophoneMaxLevel::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kManage,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kMicrophoneMinLevelEntry = {
+    .attributeId    = CameraAvStreamManagement::Attributes::MicrophoneMinLevel::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kManage,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kMicrophoneAGCEnabledEntry = {
+    .attributeId    = CameraAvStreamManagement::Attributes::MicrophoneAGCEnabled::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kManage,
+    .writePrivilege = Access::Privilege::kManage,
+};
+inline constexpr DataModel::AttributeEntry kImageRotationEntry = {
+    .attributeId    = CameraAvStreamManagement::Attributes::ImageRotation::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kManage,
+    .writePrivilege = Access::Privilege::kManage,
+};
+inline constexpr DataModel::AttributeEntry kImageFlipHorizontalEntry = {
+    .attributeId    = CameraAvStreamManagement::Attributes::ImageFlipHorizontal::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kManage,
+    .writePrivilege = Access::Privilege::kManage,
+};
+inline constexpr DataModel::AttributeEntry kImageFlipVerticalEntry = {
+    .attributeId    = CameraAvStreamManagement::Attributes::ImageFlipVertical::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kManage,
+    .writePrivilege = Access::Privilege::kManage,
+};
+inline constexpr DataModel::AttributeEntry kLocalVideoRecordingEnabledEntry = {
+    .attributeId    = CameraAvStreamManagement::Attributes::LocalVideoRecordingEnabled::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kManage,
+    .writePrivilege = Access::Privilege::kManage,
+};
+inline constexpr DataModel::AttributeEntry kLocalSnapshotRecordingEnabledEntry = {
+    .attributeId    = CameraAvStreamManagement::Attributes::LocalSnapshotRecordingEnabled::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kManage,
+    .writePrivilege = Access::Privilege::kManage,
+};
+inline constexpr DataModel::AttributeEntry kStatusLightEnabledEntry = {
+    .attributeId    = CameraAvStreamManagement::Attributes::StatusLightEnabled::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kManage,
+    .writePrivilege = Access::Privilege::kManage,
+};
+inline constexpr DataModel::AttributeEntry kStatusLightBrightnessEntry = {
+    .attributeId    = CameraAvStreamManagement::Attributes::StatusLightBrightness::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kManage,
+    .writePrivilege = Access::Privilege::kManage,
+};
 
 } // namespace Attributes
 
 namespace Commands {
-namespace AudioStreamAllocate {
-inline constexpr CommandId Id = 0x00000000;
-} // namespace AudioStreamAllocate
-namespace AudioStreamDeallocate {
-inline constexpr CommandId Id = 0x00000002;
-} // namespace AudioStreamDeallocate
-namespace VideoStreamAllocate {
-inline constexpr CommandId Id = 0x00000003;
-} // namespace VideoStreamAllocate
-namespace VideoStreamModify {
-inline constexpr CommandId Id = 0x00000005;
-} // namespace VideoStreamModify
-namespace VideoStreamDeallocate {
-inline constexpr CommandId Id = 0x00000006;
-} // namespace VideoStreamDeallocate
-namespace SnapshotStreamAllocate {
-inline constexpr CommandId Id = 0x00000007;
-} // namespace SnapshotStreamAllocate
-namespace SnapshotStreamModify {
-inline constexpr CommandId Id = 0x00000009;
-} // namespace SnapshotStreamModify
-namespace SnapshotStreamDeallocate {
-inline constexpr CommandId Id = 0x0000000A;
-} // namespace SnapshotStreamDeallocate
-namespace SetStreamPriorities {
-inline constexpr CommandId Id = 0x0000000B;
-} // namespace SetStreamPriorities
-namespace CaptureSnapshot {
-inline constexpr CommandId Id = 0x0000000C;
-} // namespace CaptureSnapshot
+
+inline constexpr DataModel::AcceptedCommandEntry kAudioStreamAllocateEntry = {
+    .commandId       = CameraAvStreamManagement::Commands::AudioStreamAllocate::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kManage,
+};
+inline constexpr DataModel::AcceptedCommandEntry kAudioStreamDeallocateEntry = {
+    .commandId       = CameraAvStreamManagement::Commands::AudioStreamDeallocate::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kManage,
+};
+inline constexpr DataModel::AcceptedCommandEntry kVideoStreamAllocateEntry = {
+    .commandId       = CameraAvStreamManagement::Commands::VideoStreamAllocate::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kManage,
+};
+inline constexpr DataModel::AcceptedCommandEntry kVideoStreamModifyEntry = {
+    .commandId       = CameraAvStreamManagement::Commands::VideoStreamModify::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kManage,
+};
+inline constexpr DataModel::AcceptedCommandEntry kVideoStreamDeallocateEntry = {
+    .commandId       = CameraAvStreamManagement::Commands::VideoStreamDeallocate::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kManage,
+};
+inline constexpr DataModel::AcceptedCommandEntry kSnapshotStreamAllocateEntry = {
+    .commandId       = CameraAvStreamManagement::Commands::SnapshotStreamAllocate::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kManage,
+};
+inline constexpr DataModel::AcceptedCommandEntry kSnapshotStreamModifyEntry = {
+    .commandId       = CameraAvStreamManagement::Commands::SnapshotStreamModify::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kManage,
+};
+inline constexpr DataModel::AcceptedCommandEntry kSnapshotStreamDeallocateEntry = {
+    .commandId       = CameraAvStreamManagement::Commands::SnapshotStreamDeallocate::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kManage,
+};
+inline constexpr DataModel::AcceptedCommandEntry kSetStreamPrioritiesEntry = {
+    .commandId       = CameraAvStreamManagement::Commands::SetStreamPriorities::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kAdminister,
+};
+inline constexpr DataModel::AcceptedCommandEntry kCaptureSnapshotEntry = {
+    .commandId       = CameraAvStreamManagement::Commands::CaptureSnapshot::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+
 } // namespace Commands
-
-namespace Events {} // namespace Events
-
+} // namespace Metadata
 } // namespace CameraAvStreamManagement
 } // namespace clusters
 } // namespace app

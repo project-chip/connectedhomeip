@@ -1,58 +1,49 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster CommissionerControl (cluster code: 1873/0x751)
+// Cluster metadata information for cluster CommissionerControl (cluster code: 1873/0x751)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/common/GlobalIds.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
+
+#include <cstdint>
+
+#include <clusters/CommissionerControl/CommissionerControlIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace CommissionerControl {
+namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x00000751;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-namespace SupportedDeviceCategories {
-inline constexpr AttributeId Id = 0x00000000;
-} // namespace SupportedDeviceCategories
-namespace GeneratedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
-} // namespace GeneratedCommandList
-namespace AcceptedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
-} // namespace AcceptedCommandList
-namespace EventList {
-inline constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-} // namespace EventList
-namespace AttributeList {
-inline constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
-} // namespace AttributeList
-namespace FeatureMap {
-inline constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-namespace ClusterRevision {
-inline constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
+
+inline constexpr DataModel::AttributeEntry kSupportedDeviceCategoriesEntry = {
+    .attributeId    = CommissionerControl::Attributes::SupportedDeviceCategories::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kManage,
+    .writePrivilege = std::nullopt,
+};
 
 } // namespace Attributes
 
 namespace Commands {
-namespace RequestCommissioningApproval {
-inline constexpr CommandId Id = 0x00000000;
-} // namespace RequestCommissioningApproval
-namespace CommissionNode {
-inline constexpr CommandId Id = 0x00000001;
-} // namespace CommissionNode
+
+inline constexpr DataModel::AcceptedCommandEntry kRequestCommissioningApprovalEntry = {
+    .commandId       = CommissionerControl::Commands::RequestCommissioningApproval::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kManage,
+};
+inline constexpr DataModel::AcceptedCommandEntry kCommissionNodeEntry = {
+    .commandId       = CommissionerControl::Commands::CommissionNode::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kManage,
+};
+
 } // namespace Commands
-
-namespace Events {
-namespace CommissioningRequestResult {
-inline constexpr EventId Id = 0x00000000;
-} // namespace CommissioningRequestResult
-} // namespace Events
-
+} // namespace Metadata
 } // namespace CommissionerControl
 } // namespace clusters
 } // namespace app

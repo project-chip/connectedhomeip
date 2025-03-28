@@ -32,6 +32,11 @@ namespace AcceptedCommandList {
 static constexpr AttributeId Id = 0x0000FFF9;
 } // namespace AcceptedCommandList
 
+// NOTE: EventList has been deprecated and should not be exposed in new clusters
+namespace EventList {
+static constexpr AttributeId Id = 0x0000FFFA;
+} // namespace EventList
+
 namespace AttributeList {
 static constexpr AttributeId Id = 0x0000FFFB;
 } // namespace AttributeList

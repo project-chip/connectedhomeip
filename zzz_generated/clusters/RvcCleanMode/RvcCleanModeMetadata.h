@@ -1,54 +1,50 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster RvcCleanMode (cluster code: 85/0x55)
+// Cluster metadata information for cluster RvcCleanMode (cluster code: 85/0x55)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/common/GlobalIds.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
+
+#include <cstdint>
+
+#include <clusters/RvcCleanMode/RvcCleanModeIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace RvcCleanMode {
+namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x00000055;
+inline constexpr uint32_t kRevision = 3;
 
 namespace Attributes {
-namespace SupportedModes {
-inline constexpr AttributeId Id = 0x00000000;
-} // namespace SupportedModes
-namespace CurrentMode {
-inline constexpr AttributeId Id = 0x00000001;
-} // namespace CurrentMode
-namespace GeneratedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
-} // namespace GeneratedCommandList
-namespace AcceptedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
-} // namespace AcceptedCommandList
-namespace EventList {
-inline constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-} // namespace EventList
-namespace AttributeList {
-inline constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
-} // namespace AttributeList
-namespace FeatureMap {
-inline constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-namespace ClusterRevision {
-inline constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
+
+inline constexpr DataModel::AttributeEntry kSupportedModesEntry = {
+    .attributeId    = RvcCleanMode::Attributes::SupportedModes::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kCurrentModeEntry = {
+    .attributeId    = RvcCleanMode::Attributes::CurrentMode::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
 
 } // namespace Attributes
 
 namespace Commands {
-namespace ChangeToMode {
-inline constexpr CommandId Id = 0x00000000;
-} // namespace ChangeToMode
+
+inline constexpr DataModel::AcceptedCommandEntry kChangeToModeEntry = {
+    .commandId       = RvcCleanMode::Commands::ChangeToMode::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+
 } // namespace Commands
-
-namespace Events {} // namespace Events
-
+} // namespace Metadata
 } // namespace RvcCleanMode
 } // namespace clusters
 } // namespace app

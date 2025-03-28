@@ -1,76 +1,79 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster WaterHeaterManagement (cluster code: 148/0x94)
+// Cluster metadata information for cluster WaterHeaterManagement (cluster code: 148/0x94)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/common/GlobalIds.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
+
+#include <cstdint>
+
+#include <clusters/WaterHeaterManagement/WaterHeaterManagementIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace WaterHeaterManagement {
+namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x00000094;
+inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
-namespace HeaterTypes {
-inline constexpr AttributeId Id = 0x00000000;
-} // namespace HeaterTypes
-namespace HeatDemand {
-inline constexpr AttributeId Id = 0x00000001;
-} // namespace HeatDemand
-namespace TankVolume {
-inline constexpr AttributeId Id = 0x00000002;
-} // namespace TankVolume
-namespace EstimatedHeatRequired {
-inline constexpr AttributeId Id = 0x00000003;
-} // namespace EstimatedHeatRequired
-namespace TankPercentage {
-inline constexpr AttributeId Id = 0x00000004;
-} // namespace TankPercentage
-namespace BoostState {
-inline constexpr AttributeId Id = 0x00000005;
-} // namespace BoostState
-namespace GeneratedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
-} // namespace GeneratedCommandList
-namespace AcceptedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
-} // namespace AcceptedCommandList
-namespace EventList {
-inline constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-} // namespace EventList
-namespace AttributeList {
-inline constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
-} // namespace AttributeList
-namespace FeatureMap {
-inline constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-namespace ClusterRevision {
-inline constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
+
+inline constexpr DataModel::AttributeEntry kHeaterTypesEntry = {
+    .attributeId    = WaterHeaterManagement::Attributes::HeaterTypes::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kHeatDemandEntry = {
+    .attributeId    = WaterHeaterManagement::Attributes::HeatDemand::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kTankVolumeEntry = {
+    .attributeId    = WaterHeaterManagement::Attributes::TankVolume::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kEstimatedHeatRequiredEntry = {
+    .attributeId    = WaterHeaterManagement::Attributes::EstimatedHeatRequired::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kTankPercentageEntry = {
+    .attributeId    = WaterHeaterManagement::Attributes::TankPercentage::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kBoostStateEntry = {
+    .attributeId    = WaterHeaterManagement::Attributes::BoostState::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
 
 } // namespace Attributes
 
 namespace Commands {
-namespace Boost {
-inline constexpr CommandId Id = 0x00000000;
-} // namespace Boost
-namespace CancelBoost {
-inline constexpr CommandId Id = 0x00000001;
-} // namespace CancelBoost
+
+inline constexpr DataModel::AcceptedCommandEntry kBoostEntry = {
+    .commandId       = WaterHeaterManagement::Commands::Boost::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kManage,
+};
+inline constexpr DataModel::AcceptedCommandEntry kCancelBoostEntry = {
+    .commandId       = WaterHeaterManagement::Commands::CancelBoost::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kManage,
+};
+
 } // namespace Commands
-
-namespace Events {
-namespace BoostStarted {
-inline constexpr EventId Id = 0x00000000;
-} // namespace BoostStarted
-namespace BoostEnded {
-inline constexpr EventId Id = 0x00000001;
-} // namespace BoostEnded
-} // namespace Events
-
+} // namespace Metadata
 } // namespace WaterHeaterManagement
 } // namespace clusters
 } // namespace app

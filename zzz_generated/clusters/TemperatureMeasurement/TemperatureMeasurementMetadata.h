@@ -1,56 +1,54 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster TemperatureMeasurement (cluster code: 1026/0x402)
+// Cluster metadata information for cluster TemperatureMeasurement (cluster code: 1026/0x402)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/common/GlobalIds.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
+
+#include <cstdint>
+
+#include <clusters/TemperatureMeasurement/TemperatureMeasurementIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace TemperatureMeasurement {
+namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x00000402;
+inline constexpr uint32_t kRevision = 4;
 
 namespace Attributes {
-namespace MeasuredValue {
-inline constexpr AttributeId Id = 0x00000000;
-} // namespace MeasuredValue
-namespace MinMeasuredValue {
-inline constexpr AttributeId Id = 0x00000001;
-} // namespace MinMeasuredValue
-namespace MaxMeasuredValue {
-inline constexpr AttributeId Id = 0x00000002;
-} // namespace MaxMeasuredValue
-namespace Tolerance {
-inline constexpr AttributeId Id = 0x00000003;
-} // namespace Tolerance
-namespace GeneratedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
-} // namespace GeneratedCommandList
-namespace AcceptedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
-} // namespace AcceptedCommandList
-namespace EventList {
-inline constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-} // namespace EventList
-namespace AttributeList {
-inline constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
-} // namespace AttributeList
-namespace FeatureMap {
-inline constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-namespace ClusterRevision {
-inline constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
+
+inline constexpr DataModel::AttributeEntry kMeasuredValueEntry = {
+    .attributeId    = TemperatureMeasurement::Attributes::MeasuredValue::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kMinMeasuredValueEntry = {
+    .attributeId    = TemperatureMeasurement::Attributes::MinMeasuredValue::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kMaxMeasuredValueEntry = {
+    .attributeId    = TemperatureMeasurement::Attributes::MaxMeasuredValue::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kToleranceEntry = {
+    .attributeId    = TemperatureMeasurement::Attributes::Tolerance::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-
-namespace Events {} // namespace Events
-
+} // namespace Metadata
 } // namespace TemperatureMeasurement
 } // namespace clusters
 } // namespace app

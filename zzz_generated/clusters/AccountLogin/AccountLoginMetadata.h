@@ -1,58 +1,48 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster AccountLogin (cluster code: 1294/0x50E)
+// Cluster metadata information for cluster AccountLogin (cluster code: 1294/0x50E)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/common/GlobalIds.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
+
+#include <cstdint>
+
+#include <clusters/AccountLogin/AccountLoginIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace AccountLogin {
+namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0000050E;
+inline constexpr uint32_t kRevision = 2;
 
-namespace Attributes {
-namespace GeneratedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
-} // namespace GeneratedCommandList
-namespace AcceptedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
-} // namespace AcceptedCommandList
-namespace EventList {
-inline constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-} // namespace EventList
-namespace AttributeList {
-inline constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
-} // namespace AttributeList
-namespace FeatureMap {
-inline constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-namespace ClusterRevision {
-inline constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
-
-} // namespace Attributes
+namespace Attributes {} // namespace Attributes
 
 namespace Commands {
-namespace GetSetupPIN {
-inline constexpr CommandId Id = 0x00000000;
-} // namespace GetSetupPIN
-namespace Login {
-inline constexpr CommandId Id = 0x00000002;
-} // namespace Login
-namespace Logout {
-inline constexpr CommandId Id = 0x00000003;
-} // namespace Logout
+
+inline constexpr DataModel::AcceptedCommandEntry kGetSetupPINEntry = {
+    .commandId       = AccountLogin::Commands::GetSetupPIN::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped,
+                                                                 DataModel::CommandQualityFlags::kTimed },
+    .invokePrivilege = Access::Privilege::kAdminister,
+};
+inline constexpr DataModel::AcceptedCommandEntry kLoginEntry = {
+    .commandId       = AccountLogin::Commands::Login::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped,
+                                                                 DataModel::CommandQualityFlags::kTimed },
+    .invokePrivilege = Access::Privilege::kAdminister,
+};
+inline constexpr DataModel::AcceptedCommandEntry kLogoutEntry = {
+    .commandId       = AccountLogin::Commands::Logout::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped,
+                                                                 DataModel::CommandQualityFlags::kTimed },
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+
 } // namespace Commands
-
-namespace Events {
-namespace LoggedOut {
-inline constexpr EventId Id = 0x00000000;
-} // namespace LoggedOut
-} // namespace Events
-
+} // namespace Metadata
 } // namespace AccountLogin
 } // namespace clusters
 } // namespace app

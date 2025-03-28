@@ -3,11 +3,12 @@
 // Identifier constant values for cluster LevelControl (cluster code: 8/0x8)
 // based on src/controller/data_model/controller-clusters.matter
 
+#include <app/common/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
 
 namespace chip {
 namespace app {
-namespace clusters {
+namespace Clusters {
 namespace LevelControl {
 
 inline constexpr ClusterId kClusterId = 0x00000008;
@@ -55,8 +56,24 @@ inline constexpr AttributeId Id = 0x00000014;
 namespace StartUpCurrentLevel {
 inline constexpr AttributeId Id = 0x00004000;
 } // namespace StartUpCurrentLevel
-
-// TODO: globals & reference globals?
+namespace GeneratedCommandList {
+inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+inline constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+namespace EventList {
+inline constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+namespace AttributeList {
+inline constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+namespace FeatureMap {
+inline constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+namespace ClusterRevision {
+inline constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
 
 } // namespace Attributes
 
@@ -93,6 +110,6 @@ inline constexpr CommandId Id = 0x00000008;
 namespace Events {} // namespace Events
 
 } // namespace LevelControl
-} // namespace clusters
+} // namespace Clusters
 } // namespace app
 } // namespace chip

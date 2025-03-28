@@ -1,64 +1,62 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster SoftwareDiagnostics (cluster code: 52/0x34)
+// Cluster metadata information for cluster SoftwareDiagnostics (cluster code: 52/0x34)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/common/GlobalIds.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
+
+#include <cstdint>
+
+#include <clusters/SoftwareDiagnostics/SoftwareDiagnosticsIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace SoftwareDiagnostics {
+namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x00000034;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-namespace ThreadMetrics {
-inline constexpr AttributeId Id = 0x00000000;
-} // namespace ThreadMetrics
-namespace CurrentHeapFree {
-inline constexpr AttributeId Id = 0x00000001;
-} // namespace CurrentHeapFree
-namespace CurrentHeapUsed {
-inline constexpr AttributeId Id = 0x00000002;
-} // namespace CurrentHeapUsed
-namespace CurrentHeapHighWatermark {
-inline constexpr AttributeId Id = 0x00000003;
-} // namespace CurrentHeapHighWatermark
-namespace GeneratedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
-} // namespace GeneratedCommandList
-namespace AcceptedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
-} // namespace AcceptedCommandList
-namespace EventList {
-inline constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-} // namespace EventList
-namespace AttributeList {
-inline constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
-} // namespace AttributeList
-namespace FeatureMap {
-inline constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-namespace ClusterRevision {
-inline constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
+
+inline constexpr DataModel::AttributeEntry kThreadMetricsEntry = {
+    .attributeId    = SoftwareDiagnostics::Attributes::ThreadMetrics::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kCurrentHeapFreeEntry = {
+    .attributeId    = SoftwareDiagnostics::Attributes::CurrentHeapFree::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kCurrentHeapUsedEntry = {
+    .attributeId    = SoftwareDiagnostics::Attributes::CurrentHeapUsed::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kCurrentHeapHighWatermarkEntry = {
+    .attributeId    = SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
 
 } // namespace Attributes
 
 namespace Commands {
-namespace ResetWatermarks {
-inline constexpr CommandId Id = 0x00000000;
-} // namespace ResetWatermarks
+
+inline constexpr DataModel::AcceptedCommandEntry kResetWatermarksEntry = {
+    .commandId       = SoftwareDiagnostics::Commands::ResetWatermarks::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kManage,
+};
+
 } // namespace Commands
-
-namespace Events {
-namespace SoftwareFault {
-inline constexpr EventId Id = 0x00000000;
-} // namespace SoftwareFault
-} // namespace Events
-
+} // namespace Metadata
 } // namespace SoftwareDiagnostics
 } // namespace clusters
 } // namespace app

@@ -1,58 +1,50 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster TargetNavigator (cluster code: 1285/0x505)
+// Cluster metadata information for cluster TargetNavigator (cluster code: 1285/0x505)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/common/GlobalIds.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
+
+#include <cstdint>
+
+#include <clusters/TargetNavigator/TargetNavigatorIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace TargetNavigator {
+namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x00000505;
+inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
-namespace TargetList {
-inline constexpr AttributeId Id = 0x00000000;
-} // namespace TargetList
-namespace CurrentTarget {
-inline constexpr AttributeId Id = 0x00000001;
-} // namespace CurrentTarget
-namespace GeneratedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
-} // namespace GeneratedCommandList
-namespace AcceptedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
-} // namespace AcceptedCommandList
-namespace EventList {
-inline constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-} // namespace EventList
-namespace AttributeList {
-inline constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
-} // namespace AttributeList
-namespace FeatureMap {
-inline constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-namespace ClusterRevision {
-inline constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
+
+inline constexpr DataModel::AttributeEntry kTargetListEntry = {
+    .attributeId    = TargetNavigator::Attributes::TargetList::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kCurrentTargetEntry = {
+    .attributeId    = TargetNavigator::Attributes::CurrentTarget::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
 
 } // namespace Attributes
 
 namespace Commands {
-namespace NavigateTarget {
-inline constexpr CommandId Id = 0x00000000;
-} // namespace NavigateTarget
+
+inline constexpr DataModel::AcceptedCommandEntry kNavigateTargetEntry = {
+    .commandId       = TargetNavigator::Commands::NavigateTarget::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+
 } // namespace Commands
-
-namespace Events {
-namespace TargetUpdated {
-inline constexpr EventId Id = 0x00000000;
-} // namespace TargetUpdated
-} // namespace Events
-
+} // namespace Metadata
 } // namespace TargetNavigator
 } // namespace clusters
 } // namespace app

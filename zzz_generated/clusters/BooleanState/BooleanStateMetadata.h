@@ -1,51 +1,36 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster BooleanState (cluster code: 69/0x45)
+// Cluster metadata information for cluster BooleanState (cluster code: 69/0x45)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/common/GlobalIds.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
+
+#include <cstdint>
+
+#include <clusters/BooleanState/BooleanStateIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace BooleanState {
+namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x00000045;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-namespace StateValue {
-inline constexpr AttributeId Id = 0x00000000;
-} // namespace StateValue
-namespace GeneratedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
-} // namespace GeneratedCommandList
-namespace AcceptedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
-} // namespace AcceptedCommandList
-namespace EventList {
-inline constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-} // namespace EventList
-namespace AttributeList {
-inline constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
-} // namespace AttributeList
-namespace FeatureMap {
-inline constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-namespace ClusterRevision {
-inline constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
+
+inline constexpr DataModel::AttributeEntry kStateValueEntry = {
+    .attributeId    = BooleanState::Attributes::StateValue::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-
-namespace Events {
-namespace StateChange {
-inline constexpr EventId Id = 0x00000000;
-} // namespace StateChange
-} // namespace Events
-
+} // namespace Metadata
 } // namespace BooleanState
 } // namespace clusters
 } // namespace app

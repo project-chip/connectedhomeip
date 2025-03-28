@@ -1,165 +1,168 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster PumpConfigurationAndControl (cluster code: 512/0x200)
+// Cluster metadata information for cluster PumpConfigurationAndControl (cluster code: 512/0x200)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/common/GlobalIds.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
+
+#include <cstdint>
+
+#include <clusters/PumpConfigurationAndControl/PumpConfigurationAndControlIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace PumpConfigurationAndControl {
+namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x00000200;
+inline constexpr uint32_t kRevision = 4;
 
 namespace Attributes {
-namespace MaxPressure {
-inline constexpr AttributeId Id = 0x00000000;
-} // namespace MaxPressure
-namespace MaxSpeed {
-inline constexpr AttributeId Id = 0x00000001;
-} // namespace MaxSpeed
-namespace MaxFlow {
-inline constexpr AttributeId Id = 0x00000002;
-} // namespace MaxFlow
-namespace MinConstPressure {
-inline constexpr AttributeId Id = 0x00000003;
-} // namespace MinConstPressure
-namespace MaxConstPressure {
-inline constexpr AttributeId Id = 0x00000004;
-} // namespace MaxConstPressure
-namespace MinCompPressure {
-inline constexpr AttributeId Id = 0x00000005;
-} // namespace MinCompPressure
-namespace MaxCompPressure {
-inline constexpr AttributeId Id = 0x00000006;
-} // namespace MaxCompPressure
-namespace MinConstSpeed {
-inline constexpr AttributeId Id = 0x00000007;
-} // namespace MinConstSpeed
-namespace MaxConstSpeed {
-inline constexpr AttributeId Id = 0x00000008;
-} // namespace MaxConstSpeed
-namespace MinConstFlow {
-inline constexpr AttributeId Id = 0x00000009;
-} // namespace MinConstFlow
-namespace MaxConstFlow {
-inline constexpr AttributeId Id = 0x0000000A;
-} // namespace MaxConstFlow
-namespace MinConstTemp {
-inline constexpr AttributeId Id = 0x0000000B;
-} // namespace MinConstTemp
-namespace MaxConstTemp {
-inline constexpr AttributeId Id = 0x0000000C;
-} // namespace MaxConstTemp
-namespace PumpStatus {
-inline constexpr AttributeId Id = 0x00000010;
-} // namespace PumpStatus
-namespace EffectiveOperationMode {
-inline constexpr AttributeId Id = 0x00000011;
-} // namespace EffectiveOperationMode
-namespace EffectiveControlMode {
-inline constexpr AttributeId Id = 0x00000012;
-} // namespace EffectiveControlMode
-namespace Capacity {
-inline constexpr AttributeId Id = 0x00000013;
-} // namespace Capacity
-namespace Speed {
-inline constexpr AttributeId Id = 0x00000014;
-} // namespace Speed
-namespace LifetimeRunningHours {
-inline constexpr AttributeId Id = 0x00000015;
-} // namespace LifetimeRunningHours
-namespace Power {
-inline constexpr AttributeId Id = 0x00000016;
-} // namespace Power
-namespace LifetimeEnergyConsumed {
-inline constexpr AttributeId Id = 0x00000017;
-} // namespace LifetimeEnergyConsumed
-namespace OperationMode {
-inline constexpr AttributeId Id = 0x00000020;
-} // namespace OperationMode
-namespace ControlMode {
-inline constexpr AttributeId Id = 0x00000021;
-} // namespace ControlMode
-namespace GeneratedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
-} // namespace GeneratedCommandList
-namespace AcceptedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
-} // namespace AcceptedCommandList
-namespace EventList {
-inline constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-} // namespace EventList
-namespace AttributeList {
-inline constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
-} // namespace AttributeList
-namespace FeatureMap {
-inline constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-namespace ClusterRevision {
-inline constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
+
+inline constexpr DataModel::AttributeEntry kMaxPressureEntry = {
+    .attributeId    = PumpConfigurationAndControl::Attributes::MaxPressure::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kMaxSpeedEntry = {
+    .attributeId    = PumpConfigurationAndControl::Attributes::MaxSpeed::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kMaxFlowEntry = {
+    .attributeId    = PumpConfigurationAndControl::Attributes::MaxFlow::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kMinConstPressureEntry = {
+    .attributeId    = PumpConfigurationAndControl::Attributes::MinConstPressure::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kMaxConstPressureEntry = {
+    .attributeId    = PumpConfigurationAndControl::Attributes::MaxConstPressure::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kMinCompPressureEntry = {
+    .attributeId    = PumpConfigurationAndControl::Attributes::MinCompPressure::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kMaxCompPressureEntry = {
+    .attributeId    = PumpConfigurationAndControl::Attributes::MaxCompPressure::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kMinConstSpeedEntry = {
+    .attributeId    = PumpConfigurationAndControl::Attributes::MinConstSpeed::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kMaxConstSpeedEntry = {
+    .attributeId    = PumpConfigurationAndControl::Attributes::MaxConstSpeed::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kMinConstFlowEntry = {
+    .attributeId    = PumpConfigurationAndControl::Attributes::MinConstFlow::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kMaxConstFlowEntry = {
+    .attributeId    = PumpConfigurationAndControl::Attributes::MaxConstFlow::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kMinConstTempEntry = {
+    .attributeId    = PumpConfigurationAndControl::Attributes::MinConstTemp::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kMaxConstTempEntry = {
+    .attributeId    = PumpConfigurationAndControl::Attributes::MaxConstTemp::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kPumpStatusEntry = {
+    .attributeId    = PumpConfigurationAndControl::Attributes::PumpStatus::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kEffectiveOperationModeEntry = {
+    .attributeId    = PumpConfigurationAndControl::Attributes::EffectiveOperationMode::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kEffectiveControlModeEntry = {
+    .attributeId    = PumpConfigurationAndControl::Attributes::EffectiveControlMode::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kCapacityEntry = {
+    .attributeId    = PumpConfigurationAndControl::Attributes::Capacity::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kSpeedEntry = {
+    .attributeId    = PumpConfigurationAndControl::Attributes::Speed::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kLifetimeRunningHoursEntry = {
+    .attributeId    = PumpConfigurationAndControl::Attributes::LifetimeRunningHours::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = Access::Privilege::kManage,
+};
+inline constexpr DataModel::AttributeEntry kPowerEntry = {
+    .attributeId    = PumpConfigurationAndControl::Attributes::Power::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kLifetimeEnergyConsumedEntry = {
+    .attributeId    = PumpConfigurationAndControl::Attributes::LifetimeEnergyConsumed::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = Access::Privilege::kManage,
+};
+inline constexpr DataModel::AttributeEntry kOperationModeEntry = {
+    .attributeId    = PumpConfigurationAndControl::Attributes::OperationMode::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = Access::Privilege::kManage,
+};
+inline constexpr DataModel::AttributeEntry kControlModeEntry = {
+    .attributeId    = PumpConfigurationAndControl::Attributes::ControlMode::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = Access::Privilege::kManage,
+};
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-
-namespace Events {
-namespace SupplyVoltageLow {
-inline constexpr EventId Id = 0x00000000;
-} // namespace SupplyVoltageLow
-namespace SupplyVoltageHigh {
-inline constexpr EventId Id = 0x00000001;
-} // namespace SupplyVoltageHigh
-namespace PowerMissingPhase {
-inline constexpr EventId Id = 0x00000002;
-} // namespace PowerMissingPhase
-namespace SystemPressureLow {
-inline constexpr EventId Id = 0x00000003;
-} // namespace SystemPressureLow
-namespace SystemPressureHigh {
-inline constexpr EventId Id = 0x00000004;
-} // namespace SystemPressureHigh
-namespace DryRunning {
-inline constexpr EventId Id = 0x00000005;
-} // namespace DryRunning
-namespace MotorTemperatureHigh {
-inline constexpr EventId Id = 0x00000006;
-} // namespace MotorTemperatureHigh
-namespace PumpMotorFatalFailure {
-inline constexpr EventId Id = 0x00000007;
-} // namespace PumpMotorFatalFailure
-namespace ElectronicTemperatureHigh {
-inline constexpr EventId Id = 0x00000008;
-} // namespace ElectronicTemperatureHigh
-namespace PumpBlocked {
-inline constexpr EventId Id = 0x00000009;
-} // namespace PumpBlocked
-namespace SensorFailure {
-inline constexpr EventId Id = 0x0000000A;
-} // namespace SensorFailure
-namespace ElectronicNonFatalFailure {
-inline constexpr EventId Id = 0x0000000B;
-} // namespace ElectronicNonFatalFailure
-namespace ElectronicFatalFailure {
-inline constexpr EventId Id = 0x0000000C;
-} // namespace ElectronicFatalFailure
-namespace GeneralFault {
-inline constexpr EventId Id = 0x0000000D;
-} // namespace GeneralFault
-namespace Leakage {
-inline constexpr EventId Id = 0x0000000E;
-} // namespace Leakage
-namespace AirDetection {
-inline constexpr EventId Id = 0x0000000F;
-} // namespace AirDetection
-namespace TurbineOperation {
-inline constexpr EventId Id = 0x00000010;
-} // namespace TurbineOperation
-} // namespace Events
-
+} // namespace Metadata
 } // namespace PumpConfigurationAndControl
 } // namespace clusters
 } // namespace app

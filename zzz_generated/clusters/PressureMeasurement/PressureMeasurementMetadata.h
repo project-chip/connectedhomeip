@@ -1,71 +1,84 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster PressureMeasurement (cluster code: 1027/0x403)
+// Cluster metadata information for cluster PressureMeasurement (cluster code: 1027/0x403)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/common/GlobalIds.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
+
+#include <cstdint>
+
+#include <clusters/PressureMeasurement/PressureMeasurementIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace PressureMeasurement {
+namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x00000403;
+inline constexpr uint32_t kRevision = 3;
 
 namespace Attributes {
-namespace MeasuredValue {
-inline constexpr AttributeId Id = 0x00000000;
-} // namespace MeasuredValue
-namespace MinMeasuredValue {
-inline constexpr AttributeId Id = 0x00000001;
-} // namespace MinMeasuredValue
-namespace MaxMeasuredValue {
-inline constexpr AttributeId Id = 0x00000002;
-} // namespace MaxMeasuredValue
-namespace Tolerance {
-inline constexpr AttributeId Id = 0x00000003;
-} // namespace Tolerance
-namespace ScaledValue {
-inline constexpr AttributeId Id = 0x00000010;
-} // namespace ScaledValue
-namespace MinScaledValue {
-inline constexpr AttributeId Id = 0x00000011;
-} // namespace MinScaledValue
-namespace MaxScaledValue {
-inline constexpr AttributeId Id = 0x00000012;
-} // namespace MaxScaledValue
-namespace ScaledTolerance {
-inline constexpr AttributeId Id = 0x00000013;
-} // namespace ScaledTolerance
-namespace Scale {
-inline constexpr AttributeId Id = 0x00000014;
-} // namespace Scale
-namespace GeneratedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
-} // namespace GeneratedCommandList
-namespace AcceptedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
-} // namespace AcceptedCommandList
-namespace EventList {
-inline constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-} // namespace EventList
-namespace AttributeList {
-inline constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
-} // namespace AttributeList
-namespace FeatureMap {
-inline constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-namespace ClusterRevision {
-inline constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
+
+inline constexpr DataModel::AttributeEntry kMeasuredValueEntry = {
+    .attributeId    = PressureMeasurement::Attributes::MeasuredValue::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kMinMeasuredValueEntry = {
+    .attributeId    = PressureMeasurement::Attributes::MinMeasuredValue::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kMaxMeasuredValueEntry = {
+    .attributeId    = PressureMeasurement::Attributes::MaxMeasuredValue::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kToleranceEntry = {
+    .attributeId    = PressureMeasurement::Attributes::Tolerance::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kScaledValueEntry = {
+    .attributeId    = PressureMeasurement::Attributes::ScaledValue::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kMinScaledValueEntry = {
+    .attributeId    = PressureMeasurement::Attributes::MinScaledValue::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kMaxScaledValueEntry = {
+    .attributeId    = PressureMeasurement::Attributes::MaxScaledValue::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kScaledToleranceEntry = {
+    .attributeId    = PressureMeasurement::Attributes::ScaledTolerance::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kScaleEntry = {
+    .attributeId    = PressureMeasurement::Attributes::Scale::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-
-namespace Events {} // namespace Events
-
+} // namespace Metadata
 } // namespace PressureMeasurement
 } // namespace clusters
 } // namespace app

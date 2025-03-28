@@ -1,59 +1,60 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster Descriptor (cluster code: 29/0x1D)
+// Cluster metadata information for cluster Descriptor (cluster code: 29/0x1D)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/common/GlobalIds.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
+
+#include <cstdint>
+
+#include <clusters/Descriptor/DescriptorIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace Descriptor {
+namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0000001D;
+inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
-namespace DeviceTypeList {
-inline constexpr AttributeId Id = 0x00000000;
-} // namespace DeviceTypeList
-namespace ServerList {
-inline constexpr AttributeId Id = 0x00000001;
-} // namespace ServerList
-namespace ClientList {
-inline constexpr AttributeId Id = 0x00000002;
-} // namespace ClientList
-namespace PartsList {
-inline constexpr AttributeId Id = 0x00000003;
-} // namespace PartsList
-namespace TagList {
-inline constexpr AttributeId Id = 0x00000004;
-} // namespace TagList
-namespace GeneratedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
-} // namespace GeneratedCommandList
-namespace AcceptedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
-} // namespace AcceptedCommandList
-namespace EventList {
-inline constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-} // namespace EventList
-namespace AttributeList {
-inline constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
-} // namespace AttributeList
-namespace FeatureMap {
-inline constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-namespace ClusterRevision {
-inline constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
+
+inline constexpr DataModel::AttributeEntry kDeviceTypeListEntry = {
+    .attributeId    = Descriptor::Attributes::DeviceTypeList::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kServerListEntry = {
+    .attributeId    = Descriptor::Attributes::ServerList::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kClientListEntry = {
+    .attributeId    = Descriptor::Attributes::ClientList::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kPartsListEntry = {
+    .attributeId    = Descriptor::Attributes::PartsList::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kTagListEntry = {
+    .attributeId    = Descriptor::Attributes::TagList::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-
-namespace Events {} // namespace Events
-
+} // namespace Metadata
 } // namespace Descriptor
 } // namespace clusters
 } // namespace app

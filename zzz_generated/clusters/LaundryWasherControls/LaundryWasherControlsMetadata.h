@@ -1,56 +1,54 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster LaundryWasherControls (cluster code: 83/0x53)
+// Cluster metadata information for cluster LaundryWasherControls (cluster code: 83/0x53)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/common/GlobalIds.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
+
+#include <cstdint>
+
+#include <clusters/LaundryWasherControls/LaundryWasherControlsIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace LaundryWasherControls {
+namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x00000053;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-namespace SpinSpeeds {
-inline constexpr AttributeId Id = 0x00000000;
-} // namespace SpinSpeeds
-namespace SpinSpeedCurrent {
-inline constexpr AttributeId Id = 0x00000001;
-} // namespace SpinSpeedCurrent
-namespace NumberOfRinses {
-inline constexpr AttributeId Id = 0x00000002;
-} // namespace NumberOfRinses
-namespace SupportedRinses {
-inline constexpr AttributeId Id = 0x00000003;
-} // namespace SupportedRinses
-namespace GeneratedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
-} // namespace GeneratedCommandList
-namespace AcceptedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
-} // namespace AcceptedCommandList
-namespace EventList {
-inline constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-} // namespace EventList
-namespace AttributeList {
-inline constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
-} // namespace AttributeList
-namespace FeatureMap {
-inline constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-namespace ClusterRevision {
-inline constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
+
+inline constexpr DataModel::AttributeEntry kSpinSpeedsEntry = {
+    .attributeId    = LaundryWasherControls::Attributes::SpinSpeeds::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kSpinSpeedCurrentEntry = {
+    .attributeId    = LaundryWasherControls::Attributes::SpinSpeedCurrent::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = Access::Privilege::kOperate,
+};
+inline constexpr DataModel::AttributeEntry kNumberOfRinsesEntry = {
+    .attributeId    = LaundryWasherControls::Attributes::NumberOfRinses::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = Access::Privilege::kOperate,
+};
+inline constexpr DataModel::AttributeEntry kSupportedRinsesEntry = {
+    .attributeId    = LaundryWasherControls::Attributes::SupportedRinses::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-
-namespace Events {} // namespace Events
-
+} // namespace Metadata
 } // namespace LaundryWasherControls
 } // namespace clusters
 } // namespace app

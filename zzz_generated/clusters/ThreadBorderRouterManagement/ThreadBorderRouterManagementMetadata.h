@@ -1,75 +1,89 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster ThreadBorderRouterManagement (cluster code: 1106/0x452)
+// Cluster metadata information for cluster ThreadBorderRouterManagement (cluster code: 1106/0x452)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/common/GlobalIds.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
+
+#include <cstdint>
+
+#include <clusters/ThreadBorderRouterManagement/ThreadBorderRouterManagementIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace ThreadBorderRouterManagement {
+namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x00000452;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-namespace BorderRouterName {
-inline constexpr AttributeId Id = 0x00000000;
-} // namespace BorderRouterName
-namespace BorderAgentID {
-inline constexpr AttributeId Id = 0x00000001;
-} // namespace BorderAgentID
-namespace ThreadVersion {
-inline constexpr AttributeId Id = 0x00000002;
-} // namespace ThreadVersion
-namespace InterfaceEnabled {
-inline constexpr AttributeId Id = 0x00000003;
-} // namespace InterfaceEnabled
-namespace ActiveDatasetTimestamp {
-inline constexpr AttributeId Id = 0x00000004;
-} // namespace ActiveDatasetTimestamp
-namespace PendingDatasetTimestamp {
-inline constexpr AttributeId Id = 0x00000005;
-} // namespace PendingDatasetTimestamp
-namespace GeneratedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
-} // namespace GeneratedCommandList
-namespace AcceptedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
-} // namespace AcceptedCommandList
-namespace EventList {
-inline constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-} // namespace EventList
-namespace AttributeList {
-inline constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
-} // namespace AttributeList
-namespace FeatureMap {
-inline constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-namespace ClusterRevision {
-inline constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
+
+inline constexpr DataModel::AttributeEntry kBorderRouterNameEntry = {
+    .attributeId    = ThreadBorderRouterManagement::Attributes::BorderRouterName::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kBorderAgentIDEntry = {
+    .attributeId    = ThreadBorderRouterManagement::Attributes::BorderAgentID::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kThreadVersionEntry = {
+    .attributeId    = ThreadBorderRouterManagement::Attributes::ThreadVersion::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kInterfaceEnabledEntry = {
+    .attributeId    = ThreadBorderRouterManagement::Attributes::InterfaceEnabled::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kActiveDatasetTimestampEntry = {
+    .attributeId    = ThreadBorderRouterManagement::Attributes::ActiveDatasetTimestamp::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kPendingDatasetTimestampEntry = {
+    .attributeId    = ThreadBorderRouterManagement::Attributes::PendingDatasetTimestamp::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
 
 } // namespace Attributes
 
 namespace Commands {
-namespace GetActiveDatasetRequest {
-inline constexpr CommandId Id = 0x00000000;
-} // namespace GetActiveDatasetRequest
-namespace GetPendingDatasetRequest {
-inline constexpr CommandId Id = 0x00000001;
-} // namespace GetPendingDatasetRequest
-namespace SetActiveDatasetRequest {
-inline constexpr CommandId Id = 0x00000003;
-} // namespace SetActiveDatasetRequest
-namespace SetPendingDatasetRequest {
-inline constexpr CommandId Id = 0x00000004;
-} // namespace SetPendingDatasetRequest
+
+inline constexpr DataModel::AcceptedCommandEntry kGetActiveDatasetRequestEntry = {
+    .commandId       = ThreadBorderRouterManagement::Commands::GetActiveDatasetRequest::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kManage,
+};
+inline constexpr DataModel::AcceptedCommandEntry kGetPendingDatasetRequestEntry = {
+    .commandId       = ThreadBorderRouterManagement::Commands::GetPendingDatasetRequest::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kManage,
+};
+inline constexpr DataModel::AcceptedCommandEntry kSetActiveDatasetRequestEntry = {
+    .commandId       = ThreadBorderRouterManagement::Commands::SetActiveDatasetRequest::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kManage,
+};
+inline constexpr DataModel::AcceptedCommandEntry kSetPendingDatasetRequestEntry = {
+    .commandId       = ThreadBorderRouterManagement::Commands::SetPendingDatasetRequest::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kManage,
+};
+
 } // namespace Commands
-
-namespace Events {} // namespace Events
-
+} // namespace Metadata
 } // namespace ThreadBorderRouterManagement
 } // namespace clusters
 } // namespace app

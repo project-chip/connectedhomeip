@@ -108,7 +108,7 @@ class SdkGenerator(CodeGenerator):
 
             self.internal_render_one_output(
                 template_path="ClusterIds.jinja",
-                output_file_name=f"{cluster.name}/{cluster.name}Metadata.h",
+                output_file_name=f"{cluster.name}/{cluster.name}Ids.h",
                 vars={
                     "cluster": cluster,
                     "input_name": self.idl.parse_file_name,

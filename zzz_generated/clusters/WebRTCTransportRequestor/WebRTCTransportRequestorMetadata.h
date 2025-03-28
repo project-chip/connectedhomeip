@@ -1,60 +1,59 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster WebRTCTransportRequestor (cluster code: 1364/0x554)
+// Cluster metadata information for cluster WebRTCTransportRequestor (cluster code: 1364/0x554)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/common/GlobalIds.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
+
+#include <cstdint>
+
+#include <clusters/WebRTCTransportRequestor/WebRTCTransportRequestorIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace WebRTCTransportRequestor {
+namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x00000554;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-namespace CurrentSessions {
-inline constexpr AttributeId Id = 0x00000000;
-} // namespace CurrentSessions
-namespace GeneratedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
-} // namespace GeneratedCommandList
-namespace AcceptedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
-} // namespace AcceptedCommandList
-namespace EventList {
-inline constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-} // namespace EventList
-namespace AttributeList {
-inline constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
-} // namespace AttributeList
-namespace FeatureMap {
-inline constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-namespace ClusterRevision {
-inline constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
+
+inline constexpr DataModel::AttributeEntry kCurrentSessionsEntry = {
+    .attributeId    = WebRTCTransportRequestor::Attributes::CurrentSessions::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    .readPrivilege  = Access::Privilege::kAdminister,
+    .writePrivilege = std::nullopt,
+};
 
 } // namespace Attributes
 
 namespace Commands {
-namespace Offer {
-inline constexpr CommandId Id = 0x00000001;
-} // namespace Offer
-namespace Answer {
-inline constexpr CommandId Id = 0x00000002;
-} // namespace Answer
-namespace ICECandidates {
-inline constexpr CommandId Id = 0x00000003;
-} // namespace ICECandidates
-namespace End {
-inline constexpr CommandId Id = 0x00000004;
-} // namespace End
+
+inline constexpr DataModel::AcceptedCommandEntry kOfferEntry = {
+    .commandId       = WebRTCTransportRequestor::Commands::Offer::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+inline constexpr DataModel::AcceptedCommandEntry kAnswerEntry = {
+    .commandId       = WebRTCTransportRequestor::Commands::Answer::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+inline constexpr DataModel::AcceptedCommandEntry kICECandidatesEntry = {
+    .commandId       = WebRTCTransportRequestor::Commands::ICECandidates::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+inline constexpr DataModel::AcceptedCommandEntry kEndEntry = {
+    .commandId       = WebRTCTransportRequestor::Commands::End::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+
 } // namespace Commands
-
-namespace Events {} // namespace Events
-
+} // namespace Metadata
 } // namespace WebRTCTransportRequestor
 } // namespace clusters
 } // namespace app

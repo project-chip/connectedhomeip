@@ -1,79 +1,80 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster AccessControl (cluster code: 31/0x1F)
+// Cluster metadata information for cluster AccessControl (cluster code: 31/0x1F)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/common/GlobalIds.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
+
+#include <cstdint>
+
+#include <clusters/AccessControl/AccessControlIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace AccessControl {
+namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0000001F;
+inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
-namespace Acl {
-inline constexpr AttributeId Id = 0x00000000;
-} // namespace Acl
-namespace Extension {
-inline constexpr AttributeId Id = 0x00000001;
-} // namespace Extension
-namespace SubjectsPerAccessControlEntry {
-inline constexpr AttributeId Id = 0x00000002;
-} // namespace SubjectsPerAccessControlEntry
-namespace TargetsPerAccessControlEntry {
-inline constexpr AttributeId Id = 0x00000003;
-} // namespace TargetsPerAccessControlEntry
-namespace AccessControlEntriesPerFabric {
-inline constexpr AttributeId Id = 0x00000004;
-} // namespace AccessControlEntriesPerFabric
-namespace CommissioningARL {
-inline constexpr AttributeId Id = 0x00000005;
-} // namespace CommissioningARL
-namespace Arl {
-inline constexpr AttributeId Id = 0x00000006;
-} // namespace Arl
-namespace GeneratedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
-} // namespace GeneratedCommandList
-namespace AcceptedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
-} // namespace AcceptedCommandList
-namespace EventList {
-inline constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-} // namespace EventList
-namespace AttributeList {
-inline constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
-} // namespace AttributeList
-namespace FeatureMap {
-inline constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-namespace ClusterRevision {
-inline constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
+
+inline constexpr DataModel::AttributeEntry kAclEntry = {
+    .attributeId    = AccessControl::Attributes::Acl::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    .readPrivilege  = Access::Privilege::kAdminister,
+    .writePrivilege = Access::Privilege::kAdminister,
+};
+inline constexpr DataModel::AttributeEntry kExtensionEntry = {
+    .attributeId    = AccessControl::Attributes::Extension::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    .readPrivilege  = Access::Privilege::kAdminister,
+    .writePrivilege = Access::Privilege::kAdminister,
+};
+inline constexpr DataModel::AttributeEntry kSubjectsPerAccessControlEntryEntry = {
+    .attributeId    = AccessControl::Attributes::SubjectsPerAccessControlEntry::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kTargetsPerAccessControlEntryEntry = {
+    .attributeId    = AccessControl::Attributes::TargetsPerAccessControlEntry::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kAccessControlEntriesPerFabricEntry = {
+    .attributeId    = AccessControl::Attributes::AccessControlEntriesPerFabric::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kCommissioningARLEntry = {
+    .attributeId    = AccessControl::Attributes::CommissioningARL::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kArlEntry = {
+    .attributeId    = AccessControl::Attributes::Arl::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
 
 } // namespace Attributes
 
 namespace Commands {
-namespace ReviewFabricRestrictions {
-inline constexpr CommandId Id = 0x00000000;
-} // namespace ReviewFabricRestrictions
+
+inline constexpr DataModel::AcceptedCommandEntry kReviewFabricRestrictionsEntry = {
+    .commandId       = AccessControl::Commands::ReviewFabricRestrictions::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
+    .invokePrivilege = Access::Privilege::kAdminister,
+};
+
 } // namespace Commands
-
-namespace Events {
-namespace AccessControlEntryChanged {
-inline constexpr EventId Id = 0x00000000;
-} // namespace AccessControlEntryChanged
-namespace AccessControlExtensionChanged {
-inline constexpr EventId Id = 0x00000001;
-} // namespace AccessControlExtensionChanged
-namespace FabricRestrictionReviewUpdate {
-inline constexpr EventId Id = 0x00000002;
-} // namespace FabricRestrictionReviewUpdate
-} // namespace Events
-
+} // namespace Metadata
 } // namespace AccessControl
 } // namespace clusters
 } // namespace app

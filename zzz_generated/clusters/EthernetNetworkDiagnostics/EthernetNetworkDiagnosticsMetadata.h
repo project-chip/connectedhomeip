@@ -1,75 +1,92 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster EthernetNetworkDiagnostics (cluster code: 55/0x37)
+// Cluster metadata information for cluster EthernetNetworkDiagnostics (cluster code: 55/0x37)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/common/GlobalIds.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
+
+#include <cstdint>
+
+#include <clusters/EthernetNetworkDiagnostics/EthernetNetworkDiagnosticsIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace EthernetNetworkDiagnostics {
+namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x00000037;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-namespace PHYRate {
-inline constexpr AttributeId Id = 0x00000000;
-} // namespace PHYRate
-namespace FullDuplex {
-inline constexpr AttributeId Id = 0x00000001;
-} // namespace FullDuplex
-namespace PacketRxCount {
-inline constexpr AttributeId Id = 0x00000002;
-} // namespace PacketRxCount
-namespace PacketTxCount {
-inline constexpr AttributeId Id = 0x00000003;
-} // namespace PacketTxCount
-namespace TxErrCount {
-inline constexpr AttributeId Id = 0x00000004;
-} // namespace TxErrCount
-namespace CollisionCount {
-inline constexpr AttributeId Id = 0x00000005;
-} // namespace CollisionCount
-namespace OverrunCount {
-inline constexpr AttributeId Id = 0x00000006;
-} // namespace OverrunCount
-namespace CarrierDetect {
-inline constexpr AttributeId Id = 0x00000007;
-} // namespace CarrierDetect
-namespace TimeSinceReset {
-inline constexpr AttributeId Id = 0x00000008;
-} // namespace TimeSinceReset
-namespace GeneratedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
-} // namespace GeneratedCommandList
-namespace AcceptedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
-} // namespace AcceptedCommandList
-namespace EventList {
-inline constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-} // namespace EventList
-namespace AttributeList {
-inline constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
-} // namespace AttributeList
-namespace FeatureMap {
-inline constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-namespace ClusterRevision {
-inline constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
+
+inline constexpr DataModel::AttributeEntry kPHYRateEntry = {
+    .attributeId    = EthernetNetworkDiagnostics::Attributes::PHYRate::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kFullDuplexEntry = {
+    .attributeId    = EthernetNetworkDiagnostics::Attributes::FullDuplex::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kPacketRxCountEntry = {
+    .attributeId    = EthernetNetworkDiagnostics::Attributes::PacketRxCount::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kPacketTxCountEntry = {
+    .attributeId    = EthernetNetworkDiagnostics::Attributes::PacketTxCount::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kTxErrCountEntry = {
+    .attributeId    = EthernetNetworkDiagnostics::Attributes::TxErrCount::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kCollisionCountEntry = {
+    .attributeId    = EthernetNetworkDiagnostics::Attributes::CollisionCount::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kOverrunCountEntry = {
+    .attributeId    = EthernetNetworkDiagnostics::Attributes::OverrunCount::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kCarrierDetectEntry = {
+    .attributeId    = EthernetNetworkDiagnostics::Attributes::CarrierDetect::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kTimeSinceResetEntry = {
+    .attributeId    = EthernetNetworkDiagnostics::Attributes::TimeSinceReset::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
 
 } // namespace Attributes
 
 namespace Commands {
-namespace ResetCounts {
-inline constexpr CommandId Id = 0x00000000;
-} // namespace ResetCounts
+
+inline constexpr DataModel::AcceptedCommandEntry kResetCountsEntry = {
+    .commandId       = EthernetNetworkDiagnostics::Commands::ResetCounts::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kManage,
+};
+
 } // namespace Commands
-
-namespace Events {} // namespace Events
-
+} // namespace Metadata
 } // namespace EthernetNetworkDiagnostics
 } // namespace clusters
 } // namespace app

@@ -1,79 +1,81 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster PushAvStreamTransport (cluster code: 1365/0x555)
+// Cluster metadata information for cluster PushAvStreamTransport (cluster code: 1365/0x555)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/common/GlobalIds.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
+
+#include <cstdint>
+
+#include <clusters/PushAvStreamTransport/PushAvStreamTransportIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace PushAvStreamTransport {
+namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x00000555;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-namespace SupportedContainerFormats {
-inline constexpr AttributeId Id = 0x00000000;
-} // namespace SupportedContainerFormats
-namespace SupportedIngestMethods {
-inline constexpr AttributeId Id = 0x00000001;
-} // namespace SupportedIngestMethods
-namespace CurrentConnections {
-inline constexpr AttributeId Id = 0x00000002;
-} // namespace CurrentConnections
-namespace GeneratedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
-} // namespace GeneratedCommandList
-namespace AcceptedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
-} // namespace AcceptedCommandList
-namespace EventList {
-inline constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-} // namespace EventList
-namespace AttributeList {
-inline constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
-} // namespace AttributeList
-namespace FeatureMap {
-inline constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-namespace ClusterRevision {
-inline constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
+
+inline constexpr DataModel::AttributeEntry kSupportedContainerFormatsEntry = {
+    .attributeId    = PushAvStreamTransport::Attributes::SupportedContainerFormats::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kSupportedIngestMethodsEntry = {
+    .attributeId    = PushAvStreamTransport::Attributes::SupportedIngestMethods::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kCurrentConnectionsEntry = {
+    .attributeId    = PushAvStreamTransport::Attributes::CurrentConnections::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
 
 } // namespace Attributes
 
 namespace Commands {
-namespace AllocatePushTransport {
-inline constexpr CommandId Id = 0x00000000;
-} // namespace AllocatePushTransport
-namespace DeallocatePushTransport {
-inline constexpr CommandId Id = 0x00000002;
-} // namespace DeallocatePushTransport
-namespace ModifyPushTransport {
-inline constexpr CommandId Id = 0x00000003;
-} // namespace ModifyPushTransport
-namespace SetTransportStatus {
-inline constexpr CommandId Id = 0x00000004;
-} // namespace SetTransportStatus
-namespace ManuallyTriggerTransport {
-inline constexpr CommandId Id = 0x00000005;
-} // namespace ManuallyTriggerTransport
-namespace FindTransport {
-inline constexpr CommandId Id = 0x00000006;
-} // namespace FindTransport
+
+inline constexpr DataModel::AcceptedCommandEntry kAllocatePushTransportEntry = {
+    .commandId       = PushAvStreamTransport::Commands::AllocatePushTransport::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kManage,
+};
+inline constexpr DataModel::AcceptedCommandEntry kDeallocatePushTransportEntry = {
+    .commandId       = PushAvStreamTransport::Commands::DeallocatePushTransport::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kManage,
+};
+inline constexpr DataModel::AcceptedCommandEntry kModifyPushTransportEntry = {
+    .commandId       = PushAvStreamTransport::Commands::ModifyPushTransport::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kManage,
+};
+inline constexpr DataModel::AcceptedCommandEntry kSetTransportStatusEntry = {
+    .commandId       = PushAvStreamTransport::Commands::SetTransportStatus::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kManage,
+};
+inline constexpr DataModel::AcceptedCommandEntry kManuallyTriggerTransportEntry = {
+    .commandId       = PushAvStreamTransport::Commands::ManuallyTriggerTransport::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+inline constexpr DataModel::AcceptedCommandEntry kFindTransportEntry = {
+    .commandId       = PushAvStreamTransport::Commands::FindTransport::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+
 } // namespace Commands
-
-namespace Events {
-namespace PushTransportBegin {
-inline constexpr EventId Id = 0x00000000;
-} // namespace PushTransportBegin
-namespace PushTransportEnd {
-inline constexpr EventId Id = 0x00000001;
-} // namespace PushTransportEnd
-} // namespace Events
-
+} // namespace Metadata
 } // namespace PushAvStreamTransport
 } // namespace clusters
 } // namespace app

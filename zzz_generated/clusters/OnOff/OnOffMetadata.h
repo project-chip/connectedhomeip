@@ -1,78 +1,93 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster OnOff (cluster code: 6/0x6)
+// Cluster metadata information for cluster OnOff (cluster code: 6/0x6)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/common/GlobalIds.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
+
+#include <cstdint>
+
+#include <clusters/OnOff/OnOffIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace OnOff {
+namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x00000006;
+inline constexpr uint32_t kRevision = 6;
 
 namespace Attributes {
-namespace OnOff {
-inline constexpr AttributeId Id = 0x00000000;
-} // namespace OnOff
-namespace GlobalSceneControl {
-inline constexpr AttributeId Id = 0x00004000;
-} // namespace GlobalSceneControl
-namespace OnTime {
-inline constexpr AttributeId Id = 0x00004001;
-} // namespace OnTime
-namespace OffWaitTime {
-inline constexpr AttributeId Id = 0x00004002;
-} // namespace OffWaitTime
-namespace StartUpOnOff {
-inline constexpr AttributeId Id = 0x00004003;
-} // namespace StartUpOnOff
-namespace GeneratedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
-} // namespace GeneratedCommandList
-namespace AcceptedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
-} // namespace AcceptedCommandList
-namespace EventList {
-inline constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-} // namespace EventList
-namespace AttributeList {
-inline constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
-} // namespace AttributeList
-namespace FeatureMap {
-inline constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-namespace ClusterRevision {
-inline constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
+
+inline constexpr DataModel::AttributeEntry kOnOffEntry = {
+    .attributeId    = OnOff::Attributes::OnOff::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kGlobalSceneControlEntry = {
+    .attributeId    = OnOff::Attributes::GlobalSceneControl::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kOnTimeEntry = {
+    .attributeId    = OnOff::Attributes::OnTime::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = Access::Privilege::kOperate,
+};
+inline constexpr DataModel::AttributeEntry kOffWaitTimeEntry = {
+    .attributeId    = OnOff::Attributes::OffWaitTime::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = Access::Privilege::kOperate,
+};
+inline constexpr DataModel::AttributeEntry kStartUpOnOffEntry = {
+    .attributeId    = OnOff::Attributes::StartUpOnOff::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = Access::Privilege::kManage,
+};
 
 } // namespace Attributes
 
 namespace Commands {
-namespace Off {
-inline constexpr CommandId Id = 0x00000000;
-} // namespace Off
-namespace On {
-inline constexpr CommandId Id = 0x00000001;
-} // namespace On
-namespace Toggle {
-inline constexpr CommandId Id = 0x00000002;
-} // namespace Toggle
-namespace OffWithEffect {
-inline constexpr CommandId Id = 0x00000040;
-} // namespace OffWithEffect
-namespace OnWithRecallGlobalScene {
-inline constexpr CommandId Id = 0x00000041;
-} // namespace OnWithRecallGlobalScene
-namespace OnWithTimedOff {
-inline constexpr CommandId Id = 0x00000042;
-} // namespace OnWithTimedOff
+
+inline constexpr DataModel::AcceptedCommandEntry kOffEntry = {
+    .commandId       = OnOff::Commands::Off::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+inline constexpr DataModel::AcceptedCommandEntry kOnEntry = {
+    .commandId       = OnOff::Commands::On::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+inline constexpr DataModel::AcceptedCommandEntry kToggleEntry = {
+    .commandId       = OnOff::Commands::Toggle::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+inline constexpr DataModel::AcceptedCommandEntry kOffWithEffectEntry = {
+    .commandId       = OnOff::Commands::OffWithEffect::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+inline constexpr DataModel::AcceptedCommandEntry kOnWithRecallGlobalSceneEntry = {
+    .commandId       = OnOff::Commands::OnWithRecallGlobalScene::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+inline constexpr DataModel::AcceptedCommandEntry kOnWithTimedOffEntry = {
+    .commandId       = OnOff::Commands::OnWithTimedOff::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+
 } // namespace Commands
-
-namespace Events {} // namespace Events
-
+} // namespace Metadata
 } // namespace OnOff
 } // namespace clusters
 } // namespace app

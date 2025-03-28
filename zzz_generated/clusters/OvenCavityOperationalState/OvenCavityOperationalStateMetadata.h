@@ -1,82 +1,89 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster OvenCavityOperationalState (cluster code: 72/0x48)
+// Cluster metadata information for cluster OvenCavityOperationalState (cluster code: 72/0x48)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/common/GlobalIds.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
+
+#include <cstdint>
+
+#include <clusters/OvenCavityOperationalState/OvenCavityOperationalStateIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace OvenCavityOperationalState {
+namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x00000048;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-namespace PhaseList {
-inline constexpr AttributeId Id = 0x00000000;
-} // namespace PhaseList
-namespace CurrentPhase {
-inline constexpr AttributeId Id = 0x00000001;
-} // namespace CurrentPhase
-namespace CountdownTime {
-inline constexpr AttributeId Id = 0x00000002;
-} // namespace CountdownTime
-namespace OperationalStateList {
-inline constexpr AttributeId Id = 0x00000003;
-} // namespace OperationalStateList
-namespace OperationalState {
-inline constexpr AttributeId Id = 0x00000004;
-} // namespace OperationalState
-namespace OperationalError {
-inline constexpr AttributeId Id = 0x00000005;
-} // namespace OperationalError
-namespace GeneratedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
-} // namespace GeneratedCommandList
-namespace AcceptedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
-} // namespace AcceptedCommandList
-namespace EventList {
-inline constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-} // namespace EventList
-namespace AttributeList {
-inline constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
-} // namespace AttributeList
-namespace FeatureMap {
-inline constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-namespace ClusterRevision {
-inline constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
+
+inline constexpr DataModel::AttributeEntry kPhaseListEntry = {
+    .attributeId    = OvenCavityOperationalState::Attributes::PhaseList::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kCurrentPhaseEntry = {
+    .attributeId    = OvenCavityOperationalState::Attributes::CurrentPhase::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kCountdownTimeEntry = {
+    .attributeId    = OvenCavityOperationalState::Attributes::CountdownTime::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kOperationalStateListEntry = {
+    .attributeId    = OvenCavityOperationalState::Attributes::OperationalStateList::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kOperationalStateEntry = {
+    .attributeId    = OvenCavityOperationalState::Attributes::OperationalState::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kOperationalErrorEntry = {
+    .attributeId    = OvenCavityOperationalState::Attributes::OperationalError::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
 
 } // namespace Attributes
 
 namespace Commands {
-namespace Pause {
-inline constexpr CommandId Id = 0x00000000;
-} // namespace Pause
-namespace Stop {
-inline constexpr CommandId Id = 0x00000001;
-} // namespace Stop
-namespace Start {
-inline constexpr CommandId Id = 0x00000002;
-} // namespace Start
-namespace Resume {
-inline constexpr CommandId Id = 0x00000003;
-} // namespace Resume
+
+inline constexpr DataModel::AcceptedCommandEntry kPauseEntry = {
+    .commandId       = OvenCavityOperationalState::Commands::Pause::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+inline constexpr DataModel::AcceptedCommandEntry kStopEntry = {
+    .commandId       = OvenCavityOperationalState::Commands::Stop::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+inline constexpr DataModel::AcceptedCommandEntry kStartEntry = {
+    .commandId       = OvenCavityOperationalState::Commands::Start::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+inline constexpr DataModel::AcceptedCommandEntry kResumeEntry = {
+    .commandId       = OvenCavityOperationalState::Commands::Resume::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+
 } // namespace Commands
-
-namespace Events {
-namespace OperationalError {
-inline constexpr EventId Id = 0x00000000;
-} // namespace OperationalError
-namespace OperationCompletion {
-inline constexpr EventId Id = 0x00000001;
-} // namespace OperationCompletion
-} // namespace Events
-
+} // namespace Metadata
 } // namespace OvenCavityOperationalState
 } // namespace clusters
 } // namespace app

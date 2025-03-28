@@ -1,50 +1,42 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster EcosystemInformation (cluster code: 1872/0x750)
+// Cluster metadata information for cluster EcosystemInformation (cluster code: 1872/0x750)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/common/GlobalIds.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
+
+#include <cstdint>
+
+#include <clusters/EcosystemInformation/EcosystemInformationIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace EcosystemInformation {
+namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x00000750;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-namespace DeviceDirectory {
-inline constexpr AttributeId Id = 0x00000000;
-} // namespace DeviceDirectory
-namespace LocationDirectory {
-inline constexpr AttributeId Id = 0x00000001;
-} // namespace LocationDirectory
-namespace GeneratedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
-} // namespace GeneratedCommandList
-namespace AcceptedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
-} // namespace AcceptedCommandList
-namespace EventList {
-inline constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-} // namespace EventList
-namespace AttributeList {
-inline constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
-} // namespace AttributeList
-namespace FeatureMap {
-inline constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-namespace ClusterRevision {
-inline constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
+
+inline constexpr DataModel::AttributeEntry kDeviceDirectoryEntry = {
+    .attributeId    = EcosystemInformation::Attributes::DeviceDirectory::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    .readPrivilege  = Access::Privilege::kManage,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kLocationDirectoryEntry = {
+    .attributeId    = EcosystemInformation::Attributes::LocationDirectory::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    .readPrivilege  = Access::Privilege::kManage,
+    .writePrivilege = std::nullopt,
+};
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-
-namespace Events {} // namespace Events
-
+} // namespace Metadata
 } // namespace EcosystemInformation
 } // namespace clusters
 } // namespace app

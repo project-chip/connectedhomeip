@@ -3,11 +3,12 @@
 // Identifier constant values for cluster UnitTesting (cluster code: 4294048773/0xFFF1FC05)
 // based on src/controller/data_model/controller-clusters.matter
 
+#include <app/common/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
 
 namespace chip {
 namespace app {
-namespace clusters {
+namespace Clusters {
 namespace UnitTesting {
 
 inline constexpr ClusterId kClusterId = 0xFFF1FC05;
@@ -280,8 +281,24 @@ inline constexpr AttributeId Id = 0x00004034;
 namespace MeiInt8u {
 inline constexpr AttributeId Id = 0xFFF24F01;
 } // namespace MeiInt8u
-
-// TODO: globals & reference globals?
+namespace GeneratedCommandList {
+inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+inline constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+namespace EventList {
+inline constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+namespace AttributeList {
+inline constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+namespace FeatureMap {
+inline constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+namespace ClusterRevision {
+inline constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
 
 } // namespace Attributes
 
@@ -382,6 +399,6 @@ inline constexpr EventId Id = 0xFFF200EE;
 } // namespace Events
 
 } // namespace UnitTesting
-} // namespace clusters
+} // namespace Clusters
 } // namespace app
 } // namespace chip

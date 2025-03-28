@@ -1,54 +1,45 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster OtaSoftwareUpdateProvider (cluster code: 41/0x29)
+// Cluster metadata information for cluster OtaSoftwareUpdateProvider (cluster code: 41/0x29)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/common/GlobalIds.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
+
+#include <cstdint>
+
+#include <clusters/OtaSoftwareUpdateProvider/OtaSoftwareUpdateProviderIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace OtaSoftwareUpdateProvider {
+namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x00000029;
+inline constexpr uint32_t kRevision = 1;
 
-namespace Attributes {
-namespace GeneratedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
-} // namespace GeneratedCommandList
-namespace AcceptedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
-} // namespace AcceptedCommandList
-namespace EventList {
-inline constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-} // namespace EventList
-namespace AttributeList {
-inline constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
-} // namespace AttributeList
-namespace FeatureMap {
-inline constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-namespace ClusterRevision {
-inline constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
-
-} // namespace Attributes
+namespace Attributes {} // namespace Attributes
 
 namespace Commands {
-namespace QueryImage {
-inline constexpr CommandId Id = 0x00000000;
-} // namespace QueryImage
-namespace ApplyUpdateRequest {
-inline constexpr CommandId Id = 0x00000002;
-} // namespace ApplyUpdateRequest
-namespace NotifyUpdateApplied {
-inline constexpr CommandId Id = 0x00000004;
-} // namespace NotifyUpdateApplied
+
+inline constexpr DataModel::AcceptedCommandEntry kQueryImageEntry = {
+    .commandId       = OtaSoftwareUpdateProvider::Commands::QueryImage::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+inline constexpr DataModel::AcceptedCommandEntry kApplyUpdateRequestEntry = {
+    .commandId       = OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+inline constexpr DataModel::AcceptedCommandEntry kNotifyUpdateAppliedEntry = {
+    .commandId       = OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+
 } // namespace Commands
-
-namespace Events {} // namespace Events
-
+} // namespace Metadata
 } // namespace OtaSoftwareUpdateProvider
 } // namespace clusters
 } // namespace app

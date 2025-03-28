@@ -1,54 +1,50 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster WiFiNetworkManagement (cluster code: 1105/0x451)
+// Cluster metadata information for cluster WiFiNetworkManagement (cluster code: 1105/0x451)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/common/GlobalIds.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
+
+#include <cstdint>
+
+#include <clusters/WiFiNetworkManagement/WiFiNetworkManagementIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace WiFiNetworkManagement {
+namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x00000451;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-namespace Ssid {
-inline constexpr AttributeId Id = 0x00000000;
-} // namespace Ssid
-namespace PassphraseSurrogate {
-inline constexpr AttributeId Id = 0x00000001;
-} // namespace PassphraseSurrogate
-namespace GeneratedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
-} // namespace GeneratedCommandList
-namespace AcceptedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
-} // namespace AcceptedCommandList
-namespace EventList {
-inline constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-} // namespace EventList
-namespace AttributeList {
-inline constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
-} // namespace AttributeList
-namespace FeatureMap {
-inline constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-namespace ClusterRevision {
-inline constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
+
+inline constexpr DataModel::AttributeEntry kSsidEntry = {
+    .attributeId    = WiFiNetworkManagement::Attributes::Ssid::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kPassphraseSurrogateEntry = {
+    .attributeId    = WiFiNetworkManagement::Attributes::PassphraseSurrogate::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kManage,
+    .writePrivilege = std::nullopt,
+};
 
 } // namespace Attributes
 
 namespace Commands {
-namespace NetworkPassphraseRequest {
-inline constexpr CommandId Id = 0x00000000;
-} // namespace NetworkPassphraseRequest
+
+inline constexpr DataModel::AcceptedCommandEntry kNetworkPassphraseRequestEntry = {
+    .commandId       = WiFiNetworkManagement::Commands::NetworkPassphraseRequest::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kManage,
+};
+
 } // namespace Commands
-
-namespace Events {} // namespace Events
-
+} // namespace Metadata
 } // namespace WiFiNetworkManagement
 } // namespace clusters
 } // namespace app

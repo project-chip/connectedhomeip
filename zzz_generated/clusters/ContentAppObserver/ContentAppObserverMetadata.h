@@ -1,48 +1,35 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster ContentAppObserver (cluster code: 1296/0x510)
+// Cluster metadata information for cluster ContentAppObserver (cluster code: 1296/0x510)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/common/GlobalIds.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
+
+#include <cstdint>
+
+#include <clusters/ContentAppObserver/ContentAppObserverIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace ContentAppObserver {
+namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x00000510;
+inline constexpr uint32_t kRevision = 1;
 
-namespace Attributes {
-namespace GeneratedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
-} // namespace GeneratedCommandList
-namespace AcceptedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
-} // namespace AcceptedCommandList
-namespace EventList {
-inline constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-} // namespace EventList
-namespace AttributeList {
-inline constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
-} // namespace AttributeList
-namespace FeatureMap {
-inline constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-namespace ClusterRevision {
-inline constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
-
-} // namespace Attributes
+namespace Attributes {} // namespace Attributes
 
 namespace Commands {
-namespace ContentAppMessage {
-inline constexpr CommandId Id = 0x00000000;
-} // namespace ContentAppMessage
+
+inline constexpr DataModel::AcceptedCommandEntry kContentAppMessageEntry = {
+    .commandId       = ContentAppObserver::Commands::ContentAppMessage::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+
 } // namespace Commands
-
-namespace Events {} // namespace Events
-
+} // namespace Metadata
 } // namespace ContentAppObserver
 } // namespace clusters
 } // namespace app

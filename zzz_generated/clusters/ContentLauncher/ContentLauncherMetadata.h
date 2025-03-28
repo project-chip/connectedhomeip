@@ -1,57 +1,55 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster ContentLauncher (cluster code: 1290/0x50A)
+// Cluster metadata information for cluster ContentLauncher (cluster code: 1290/0x50A)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/common/GlobalIds.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
+
+#include <cstdint>
+
+#include <clusters/ContentLauncher/ContentLauncherIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace ContentLauncher {
+namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0000050A;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-namespace AcceptHeader {
-inline constexpr AttributeId Id = 0x00000000;
-} // namespace AcceptHeader
-namespace SupportedStreamingProtocols {
-inline constexpr AttributeId Id = 0x00000001;
-} // namespace SupportedStreamingProtocols
-namespace GeneratedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
-} // namespace GeneratedCommandList
-namespace AcceptedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
-} // namespace AcceptedCommandList
-namespace EventList {
-inline constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-} // namespace EventList
-namespace AttributeList {
-inline constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
-} // namespace AttributeList
-namespace FeatureMap {
-inline constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-namespace ClusterRevision {
-inline constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
+
+inline constexpr DataModel::AttributeEntry kAcceptHeaderEntry = {
+    .attributeId    = ContentLauncher::Attributes::AcceptHeader::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kSupportedStreamingProtocolsEntry = {
+    .attributeId    = ContentLauncher::Attributes::SupportedStreamingProtocols::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
 
 } // namespace Attributes
 
 namespace Commands {
-namespace LaunchContent {
-inline constexpr CommandId Id = 0x00000000;
-} // namespace LaunchContent
-namespace LaunchURL {
-inline constexpr CommandId Id = 0x00000001;
-} // namespace LaunchURL
+
+inline constexpr DataModel::AcceptedCommandEntry kLaunchContentEntry = {
+    .commandId       = ContentLauncher::Commands::LaunchContent::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+inline constexpr DataModel::AcceptedCommandEntry kLaunchURLEntry = {
+    .commandId       = ContentLauncher::Commands::LaunchURL::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+
 } // namespace Commands
-
-namespace Events {} // namespace Events
-
+} // namespace Metadata
 } // namespace ContentLauncher
 } // namespace clusters
 } // namespace app

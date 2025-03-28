@@ -1,57 +1,48 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster RefrigeratorAlarm (cluster code: 87/0x57)
+// Cluster metadata information for cluster RefrigeratorAlarm (cluster code: 87/0x57)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/common/GlobalIds.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
+
+#include <cstdint>
+
+#include <clusters/RefrigeratorAlarm/RefrigeratorAlarmIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace RefrigeratorAlarm {
+namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x00000057;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-namespace Mask {
-inline constexpr AttributeId Id = 0x00000000;
-} // namespace Mask
-namespace State {
-inline constexpr AttributeId Id = 0x00000002;
-} // namespace State
-namespace Supported {
-inline constexpr AttributeId Id = 0x00000003;
-} // namespace Supported
-namespace GeneratedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
-} // namespace GeneratedCommandList
-namespace AcceptedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
-} // namespace AcceptedCommandList
-namespace EventList {
-inline constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-} // namespace EventList
-namespace AttributeList {
-inline constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
-} // namespace AttributeList
-namespace FeatureMap {
-inline constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-namespace ClusterRevision {
-inline constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
+
+inline constexpr DataModel::AttributeEntry kMaskEntry = {
+    .attributeId    = RefrigeratorAlarm::Attributes::Mask::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kStateEntry = {
+    .attributeId    = RefrigeratorAlarm::Attributes::State::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kSupportedEntry = {
+    .attributeId    = RefrigeratorAlarm::Attributes::Supported::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-
-namespace Events {
-namespace Notify {
-inline constexpr EventId Id = 0x00000000;
-} // namespace Notify
-} // namespace Events
-
+} // namespace Metadata
 } // namespace RefrigeratorAlarm
 } // namespace clusters
 } // namespace app

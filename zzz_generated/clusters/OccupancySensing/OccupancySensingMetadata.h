@@ -1,90 +1,114 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster OccupancySensing (cluster code: 1030/0x406)
+// Cluster metadata information for cluster OccupancySensing (cluster code: 1030/0x406)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/common/GlobalIds.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
+
+#include <cstdint>
+
+#include <clusters/OccupancySensing/OccupancySensingIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace OccupancySensing {
+namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x00000406;
+inline constexpr uint32_t kRevision = 5;
 
 namespace Attributes {
-namespace Occupancy {
-inline constexpr AttributeId Id = 0x00000000;
-} // namespace Occupancy
-namespace OccupancySensorType {
-inline constexpr AttributeId Id = 0x00000001;
-} // namespace OccupancySensorType
-namespace OccupancySensorTypeBitmap {
-inline constexpr AttributeId Id = 0x00000002;
-} // namespace OccupancySensorTypeBitmap
-namespace HoldTime {
-inline constexpr AttributeId Id = 0x00000003;
-} // namespace HoldTime
-namespace HoldTimeLimits {
-inline constexpr AttributeId Id = 0x00000004;
-} // namespace HoldTimeLimits
-namespace PIROccupiedToUnoccupiedDelay {
-inline constexpr AttributeId Id = 0x00000010;
-} // namespace PIROccupiedToUnoccupiedDelay
-namespace PIRUnoccupiedToOccupiedDelay {
-inline constexpr AttributeId Id = 0x00000011;
-} // namespace PIRUnoccupiedToOccupiedDelay
-namespace PIRUnoccupiedToOccupiedThreshold {
-inline constexpr AttributeId Id = 0x00000012;
-} // namespace PIRUnoccupiedToOccupiedThreshold
-namespace UltrasonicOccupiedToUnoccupiedDelay {
-inline constexpr AttributeId Id = 0x00000020;
-} // namespace UltrasonicOccupiedToUnoccupiedDelay
-namespace UltrasonicUnoccupiedToOccupiedDelay {
-inline constexpr AttributeId Id = 0x00000021;
-} // namespace UltrasonicUnoccupiedToOccupiedDelay
-namespace UltrasonicUnoccupiedToOccupiedThreshold {
-inline constexpr AttributeId Id = 0x00000022;
-} // namespace UltrasonicUnoccupiedToOccupiedThreshold
-namespace PhysicalContactOccupiedToUnoccupiedDelay {
-inline constexpr AttributeId Id = 0x00000030;
-} // namespace PhysicalContactOccupiedToUnoccupiedDelay
-namespace PhysicalContactUnoccupiedToOccupiedDelay {
-inline constexpr AttributeId Id = 0x00000031;
-} // namespace PhysicalContactUnoccupiedToOccupiedDelay
-namespace PhysicalContactUnoccupiedToOccupiedThreshold {
-inline constexpr AttributeId Id = 0x00000032;
-} // namespace PhysicalContactUnoccupiedToOccupiedThreshold
-namespace GeneratedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
-} // namespace GeneratedCommandList
-namespace AcceptedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
-} // namespace AcceptedCommandList
-namespace EventList {
-inline constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-} // namespace EventList
-namespace AttributeList {
-inline constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
-} // namespace AttributeList
-namespace FeatureMap {
-inline constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-namespace ClusterRevision {
-inline constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
+
+inline constexpr DataModel::AttributeEntry kOccupancyEntry = {
+    .attributeId    = OccupancySensing::Attributes::Occupancy::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kOccupancySensorTypeEntry = {
+    .attributeId    = OccupancySensing::Attributes::OccupancySensorType::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kOccupancySensorTypeBitmapEntry = {
+    .attributeId    = OccupancySensing::Attributes::OccupancySensorTypeBitmap::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kHoldTimeEntry = {
+    .attributeId    = OccupancySensing::Attributes::HoldTime::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = Access::Privilege::kManage,
+};
+inline constexpr DataModel::AttributeEntry kHoldTimeLimitsEntry = {
+    .attributeId    = OccupancySensing::Attributes::HoldTimeLimits::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kPIROccupiedToUnoccupiedDelayEntry = {
+    .attributeId    = OccupancySensing::Attributes::PIROccupiedToUnoccupiedDelay::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = Access::Privilege::kManage,
+};
+inline constexpr DataModel::AttributeEntry kPIRUnoccupiedToOccupiedDelayEntry = {
+    .attributeId    = OccupancySensing::Attributes::PIRUnoccupiedToOccupiedDelay::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = Access::Privilege::kManage,
+};
+inline constexpr DataModel::AttributeEntry kPIRUnoccupiedToOccupiedThresholdEntry = {
+    .attributeId    = OccupancySensing::Attributes::PIRUnoccupiedToOccupiedThreshold::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = Access::Privilege::kManage,
+};
+inline constexpr DataModel::AttributeEntry kUltrasonicOccupiedToUnoccupiedDelayEntry = {
+    .attributeId    = OccupancySensing::Attributes::UltrasonicOccupiedToUnoccupiedDelay::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = Access::Privilege::kManage,
+};
+inline constexpr DataModel::AttributeEntry kUltrasonicUnoccupiedToOccupiedDelayEntry = {
+    .attributeId    = OccupancySensing::Attributes::UltrasonicUnoccupiedToOccupiedDelay::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = Access::Privilege::kManage,
+};
+inline constexpr DataModel::AttributeEntry kUltrasonicUnoccupiedToOccupiedThresholdEntry = {
+    .attributeId    = OccupancySensing::Attributes::UltrasonicUnoccupiedToOccupiedThreshold::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = Access::Privilege::kManage,
+};
+inline constexpr DataModel::AttributeEntry kPhysicalContactOccupiedToUnoccupiedDelayEntry = {
+    .attributeId    = OccupancySensing::Attributes::PhysicalContactOccupiedToUnoccupiedDelay::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = Access::Privilege::kManage,
+};
+inline constexpr DataModel::AttributeEntry kPhysicalContactUnoccupiedToOccupiedDelayEntry = {
+    .attributeId    = OccupancySensing::Attributes::PhysicalContactUnoccupiedToOccupiedDelay::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = Access::Privilege::kManage,
+};
+inline constexpr DataModel::AttributeEntry kPhysicalContactUnoccupiedToOccupiedThresholdEntry = {
+    .attributeId    = OccupancySensing::Attributes::PhysicalContactUnoccupiedToOccupiedThreshold::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = Access::Privilege::kManage,
+};
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-
-namespace Events {
-namespace OccupancyChanged {
-inline constexpr EventId Id = 0x00000000;
-} // namespace OccupancyChanged
-} // namespace Events
-
+} // namespace Metadata
 } // namespace OccupancySensing
 } // namespace clusters
 } // namespace app

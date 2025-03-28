@@ -1,69 +1,66 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster ElectricalEnergyMeasurement (cluster code: 145/0x91)
+// Cluster metadata information for cluster ElectricalEnergyMeasurement (cluster code: 145/0x91)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/common/GlobalIds.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
+
+#include <cstdint>
+
+#include <clusters/ElectricalEnergyMeasurement/ElectricalEnergyMeasurementIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace ElectricalEnergyMeasurement {
+namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x00000091;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-namespace Accuracy {
-inline constexpr AttributeId Id = 0x00000000;
-} // namespace Accuracy
-namespace CumulativeEnergyImported {
-inline constexpr AttributeId Id = 0x00000001;
-} // namespace CumulativeEnergyImported
-namespace CumulativeEnergyExported {
-inline constexpr AttributeId Id = 0x00000002;
-} // namespace CumulativeEnergyExported
-namespace PeriodicEnergyImported {
-inline constexpr AttributeId Id = 0x00000003;
-} // namespace PeriodicEnergyImported
-namespace PeriodicEnergyExported {
-inline constexpr AttributeId Id = 0x00000004;
-} // namespace PeriodicEnergyExported
-namespace CumulativeEnergyReset {
-inline constexpr AttributeId Id = 0x00000005;
-} // namespace CumulativeEnergyReset
-namespace GeneratedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
-} // namespace GeneratedCommandList
-namespace AcceptedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
-} // namespace AcceptedCommandList
-namespace EventList {
-inline constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-} // namespace EventList
-namespace AttributeList {
-inline constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
-} // namespace AttributeList
-namespace FeatureMap {
-inline constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-namespace ClusterRevision {
-inline constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
+
+inline constexpr DataModel::AttributeEntry kAccuracyEntry = {
+    .attributeId    = ElectricalEnergyMeasurement::Attributes::Accuracy::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kCumulativeEnergyImportedEntry = {
+    .attributeId    = ElectricalEnergyMeasurement::Attributes::CumulativeEnergyImported::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kCumulativeEnergyExportedEntry = {
+    .attributeId    = ElectricalEnergyMeasurement::Attributes::CumulativeEnergyExported::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kPeriodicEnergyImportedEntry = {
+    .attributeId    = ElectricalEnergyMeasurement::Attributes::PeriodicEnergyImported::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kPeriodicEnergyExportedEntry = {
+    .attributeId    = ElectricalEnergyMeasurement::Attributes::PeriodicEnergyExported::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kCumulativeEnergyResetEntry = {
+    .attributeId    = ElectricalEnergyMeasurement::Attributes::CumulativeEnergyReset::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-
-namespace Events {
-namespace CumulativeEnergyMeasured {
-inline constexpr EventId Id = 0x00000000;
-} // namespace CumulativeEnergyMeasured
-namespace PeriodicEnergyMeasured {
-inline constexpr EventId Id = 0x00000001;
-} // namespace PeriodicEnergyMeasured
-} // namespace Events
-
+} // namespace Metadata
 } // namespace ElectricalEnergyMeasurement
 } // namespace clusters
 } // namespace app

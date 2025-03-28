@@ -3,11 +3,12 @@
 // Identifier constant values for cluster TimeSynchronization (cluster code: 56/0x38)
 // based on src/controller/data_model/controller-clusters.matter
 
+#include <app/common/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
 
 namespace chip {
 namespace app {
-namespace clusters {
+namespace Clusters {
 namespace TimeSynchronization {
 
 inline constexpr ClusterId kClusterId = 0x00000038;
@@ -52,8 +53,24 @@ inline constexpr AttributeId Id = 0x0000000B;
 namespace SupportsDNSResolve {
 inline constexpr AttributeId Id = 0x0000000C;
 } // namespace SupportsDNSResolve
-
-// TODO: globals & reference globals?
+namespace GeneratedCommandList {
+inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+inline constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+namespace EventList {
+inline constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+namespace AttributeList {
+inline constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+namespace FeatureMap {
+inline constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+namespace ClusterRevision {
+inline constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
 
 } // namespace Attributes
 
@@ -94,6 +111,6 @@ inline constexpr EventId Id = 0x00000004;
 } // namespace Events
 
 } // namespace TimeSynchronization
-} // namespace clusters
+} // namespace Clusters
 } // namespace app
 } // namespace chip

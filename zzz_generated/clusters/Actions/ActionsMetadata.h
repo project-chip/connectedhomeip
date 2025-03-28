@@ -1,97 +1,111 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster Actions (cluster code: 37/0x25)
+// Cluster metadata information for cluster Actions (cluster code: 37/0x25)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/common/GlobalIds.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
+
+#include <cstdint>
+
+#include <clusters/Actions/ActionsIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace Actions {
+namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x00000025;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-namespace ActionList {
-inline constexpr AttributeId Id = 0x00000000;
-} // namespace ActionList
-namespace EndpointLists {
-inline constexpr AttributeId Id = 0x00000001;
-} // namespace EndpointLists
-namespace SetupURL {
-inline constexpr AttributeId Id = 0x00000002;
-} // namespace SetupURL
-namespace GeneratedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
-} // namespace GeneratedCommandList
-namespace AcceptedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
-} // namespace AcceptedCommandList
-namespace EventList {
-inline constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-} // namespace EventList
-namespace AttributeList {
-inline constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
-} // namespace AttributeList
-namespace FeatureMap {
-inline constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-namespace ClusterRevision {
-inline constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
+
+inline constexpr DataModel::AttributeEntry kActionListEntry = {
+    .attributeId    = Actions::Attributes::ActionList::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kEndpointListsEntry = {
+    .attributeId    = Actions::Attributes::EndpointLists::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kSetupURLEntry = {
+    .attributeId    = Actions::Attributes::SetupURL::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
 
 } // namespace Attributes
 
 namespace Commands {
-namespace InstantAction {
-inline constexpr CommandId Id = 0x00000000;
-} // namespace InstantAction
-namespace InstantActionWithTransition {
-inline constexpr CommandId Id = 0x00000001;
-} // namespace InstantActionWithTransition
-namespace StartAction {
-inline constexpr CommandId Id = 0x00000002;
-} // namespace StartAction
-namespace StartActionWithDuration {
-inline constexpr CommandId Id = 0x00000003;
-} // namespace StartActionWithDuration
-namespace StopAction {
-inline constexpr CommandId Id = 0x00000004;
-} // namespace StopAction
-namespace PauseAction {
-inline constexpr CommandId Id = 0x00000005;
-} // namespace PauseAction
-namespace PauseActionWithDuration {
-inline constexpr CommandId Id = 0x00000006;
-} // namespace PauseActionWithDuration
-namespace ResumeAction {
-inline constexpr CommandId Id = 0x00000007;
-} // namespace ResumeAction
-namespace EnableAction {
-inline constexpr CommandId Id = 0x00000008;
-} // namespace EnableAction
-namespace EnableActionWithDuration {
-inline constexpr CommandId Id = 0x00000009;
-} // namespace EnableActionWithDuration
-namespace DisableAction {
-inline constexpr CommandId Id = 0x0000000A;
-} // namespace DisableAction
-namespace DisableActionWithDuration {
-inline constexpr CommandId Id = 0x0000000B;
-} // namespace DisableActionWithDuration
+
+inline constexpr DataModel::AcceptedCommandEntry kInstantActionEntry = {
+    .commandId       = Actions::Commands::InstantAction::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+inline constexpr DataModel::AcceptedCommandEntry kInstantActionWithTransitionEntry = {
+    .commandId       = Actions::Commands::InstantActionWithTransition::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+inline constexpr DataModel::AcceptedCommandEntry kStartActionEntry = {
+    .commandId       = Actions::Commands::StartAction::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+inline constexpr DataModel::AcceptedCommandEntry kStartActionWithDurationEntry = {
+    .commandId       = Actions::Commands::StartActionWithDuration::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+inline constexpr DataModel::AcceptedCommandEntry kStopActionEntry = {
+    .commandId       = Actions::Commands::StopAction::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+inline constexpr DataModel::AcceptedCommandEntry kPauseActionEntry = {
+    .commandId       = Actions::Commands::PauseAction::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+inline constexpr DataModel::AcceptedCommandEntry kPauseActionWithDurationEntry = {
+    .commandId       = Actions::Commands::PauseActionWithDuration::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+inline constexpr DataModel::AcceptedCommandEntry kResumeActionEntry = {
+    .commandId       = Actions::Commands::ResumeAction::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+inline constexpr DataModel::AcceptedCommandEntry kEnableActionEntry = {
+    .commandId       = Actions::Commands::EnableAction::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+inline constexpr DataModel::AcceptedCommandEntry kEnableActionWithDurationEntry = {
+    .commandId       = Actions::Commands::EnableActionWithDuration::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+inline constexpr DataModel::AcceptedCommandEntry kDisableActionEntry = {
+    .commandId       = Actions::Commands::DisableAction::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+inline constexpr DataModel::AcceptedCommandEntry kDisableActionWithDurationEntry = {
+    .commandId       = Actions::Commands::DisableActionWithDuration::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+
 } // namespace Commands
-
-namespace Events {
-namespace StateChanged {
-inline constexpr EventId Id = 0x00000000;
-} // namespace StateChanged
-namespace ActionFailed {
-inline constexpr EventId Id = 0x00000001;
-} // namespace ActionFailed
-} // namespace Events
-
+} // namespace Metadata
 } // namespace Actions
 } // namespace clusters
 } // namespace app

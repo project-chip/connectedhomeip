@@ -1,66 +1,74 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster ActivatedCarbonFilterMonitoring (cluster code: 114/0x72)
+// Cluster metadata information for cluster ActivatedCarbonFilterMonitoring (cluster code: 114/0x72)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/common/GlobalIds.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
+
+#include <cstdint>
+
+#include <clusters/ActivatedCarbonFilterMonitoring/ActivatedCarbonFilterMonitoringIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace ActivatedCarbonFilterMonitoring {
+namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x00000072;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-namespace Condition {
-inline constexpr AttributeId Id = 0x00000000;
-} // namespace Condition
-namespace DegradationDirection {
-inline constexpr AttributeId Id = 0x00000001;
-} // namespace DegradationDirection
-namespace ChangeIndication {
-inline constexpr AttributeId Id = 0x00000002;
-} // namespace ChangeIndication
-namespace InPlaceIndicator {
-inline constexpr AttributeId Id = 0x00000003;
-} // namespace InPlaceIndicator
-namespace LastChangedTime {
-inline constexpr AttributeId Id = 0x00000004;
-} // namespace LastChangedTime
-namespace ReplacementProductList {
-inline constexpr AttributeId Id = 0x00000005;
-} // namespace ReplacementProductList
-namespace GeneratedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
-} // namespace GeneratedCommandList
-namespace AcceptedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
-} // namespace AcceptedCommandList
-namespace EventList {
-inline constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-} // namespace EventList
-namespace AttributeList {
-inline constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
-} // namespace AttributeList
-namespace FeatureMap {
-inline constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-namespace ClusterRevision {
-inline constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
+
+inline constexpr DataModel::AttributeEntry kConditionEntry = {
+    .attributeId    = ActivatedCarbonFilterMonitoring::Attributes::Condition::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kDegradationDirectionEntry = {
+    .attributeId    = ActivatedCarbonFilterMonitoring::Attributes::DegradationDirection::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kChangeIndicationEntry = {
+    .attributeId    = ActivatedCarbonFilterMonitoring::Attributes::ChangeIndication::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kInPlaceIndicatorEntry = {
+    .attributeId    = ActivatedCarbonFilterMonitoring::Attributes::InPlaceIndicator::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kLastChangedTimeEntry = {
+    .attributeId    = ActivatedCarbonFilterMonitoring::Attributes::LastChangedTime::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = Access::Privilege::kOperate,
+};
+inline constexpr DataModel::AttributeEntry kReplacementProductListEntry = {
+    .attributeId    = ActivatedCarbonFilterMonitoring::Attributes::ReplacementProductList::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
 
 } // namespace Attributes
 
 namespace Commands {
-namespace ResetCondition {
-inline constexpr CommandId Id = 0x00000000;
-} // namespace ResetCondition
+
+inline constexpr DataModel::AcceptedCommandEntry kResetConditionEntry = {
+    .commandId       = ActivatedCarbonFilterMonitoring::Commands::ResetCondition::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+
 } // namespace Commands
-
-namespace Events {} // namespace Events
-
+} // namespace Metadata
 } // namespace ActivatedCarbonFilterMonitoring
 } // namespace clusters
 } // namespace app

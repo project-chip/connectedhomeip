@@ -3,11 +3,12 @@
 // Identifier constant values for cluster ThermostatUserInterfaceConfiguration (cluster code: 516/0x204)
 // based on src/controller/data_model/controller-clusters.matter
 
+#include <app/common/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
 
 namespace chip {
 namespace app {
-namespace clusters {
+namespace Clusters {
 namespace ThermostatUserInterfaceConfiguration {
 
 inline constexpr ClusterId kClusterId = 0x00000204;
@@ -22,8 +23,24 @@ inline constexpr AttributeId Id = 0x00000001;
 namespace ScheduleProgrammingVisibility {
 inline constexpr AttributeId Id = 0x00000002;
 } // namespace ScheduleProgrammingVisibility
-
-// TODO: globals & reference globals?
+namespace GeneratedCommandList {
+inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+inline constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+namespace EventList {
+inline constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+namespace AttributeList {
+inline constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+namespace FeatureMap {
+inline constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+namespace ClusterRevision {
+inline constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
 
 } // namespace Attributes
 
@@ -32,6 +49,6 @@ namespace Commands {} // namespace Commands
 namespace Events {} // namespace Events
 
 } // namespace ThermostatUserInterfaceConfiguration
-} // namespace clusters
+} // namespace Clusters
 } // namespace app
 } // namespace chip

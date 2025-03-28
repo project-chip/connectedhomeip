@@ -1,66 +1,69 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster Groups (cluster code: 4/0x4)
+// Cluster metadata information for cluster Groups (cluster code: 4/0x4)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/common/GlobalIds.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
+
+#include <cstdint>
+
+#include <clusters/Groups/GroupsIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace Groups {
+namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x00000004;
+inline constexpr uint32_t kRevision = 4;
 
 namespace Attributes {
-namespace NameSupport {
-inline constexpr AttributeId Id = 0x00000000;
-} // namespace NameSupport
-namespace GeneratedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
-} // namespace GeneratedCommandList
-namespace AcceptedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
-} // namespace AcceptedCommandList
-namespace EventList {
-inline constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-} // namespace EventList
-namespace AttributeList {
-inline constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
-} // namespace AttributeList
-namespace FeatureMap {
-inline constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-namespace ClusterRevision {
-inline constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
+
+inline constexpr DataModel::AttributeEntry kNameSupportEntry = {
+    .attributeId    = Groups::Attributes::NameSupport::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
 
 } // namespace Attributes
 
 namespace Commands {
-namespace AddGroup {
-inline constexpr CommandId Id = 0x00000000;
-} // namespace AddGroup
-namespace ViewGroup {
-inline constexpr CommandId Id = 0x00000001;
-} // namespace ViewGroup
-namespace GetGroupMembership {
-inline constexpr CommandId Id = 0x00000002;
-} // namespace GetGroupMembership
-namespace RemoveGroup {
-inline constexpr CommandId Id = 0x00000003;
-} // namespace RemoveGroup
-namespace RemoveAllGroups {
-inline constexpr CommandId Id = 0x00000004;
-} // namespace RemoveAllGroups
-namespace AddGroupIfIdentifying {
-inline constexpr CommandId Id = 0x00000005;
-} // namespace AddGroupIfIdentifying
+
+inline constexpr DataModel::AcceptedCommandEntry kAddGroupEntry = {
+    .commandId       = Groups::Commands::AddGroup::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
+    .invokePrivilege = Access::Privilege::kManage,
+};
+inline constexpr DataModel::AcceptedCommandEntry kViewGroupEntry = {
+    .commandId       = Groups::Commands::ViewGroup::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+inline constexpr DataModel::AcceptedCommandEntry kGetGroupMembershipEntry = {
+    .commandId       = Groups::Commands::GetGroupMembership::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+inline constexpr DataModel::AcceptedCommandEntry kRemoveGroupEntry = {
+    .commandId       = Groups::Commands::RemoveGroup::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
+    .invokePrivilege = Access::Privilege::kManage,
+};
+inline constexpr DataModel::AcceptedCommandEntry kRemoveAllGroupsEntry = {
+    .commandId       = Groups::Commands::RemoveAllGroups::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
+    .invokePrivilege = Access::Privilege::kManage,
+};
+inline constexpr DataModel::AcceptedCommandEntry kAddGroupIfIdentifyingEntry = {
+    .commandId       = Groups::Commands::AddGroupIfIdentifying::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
+    .invokePrivilege = Access::Privilege::kManage,
+};
+
 } // namespace Commands
-
-namespace Events {} // namespace Events
-
+} // namespace Metadata
 } // namespace Groups
 } // namespace clusters
 } // namespace app

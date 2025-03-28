@@ -1,106 +1,121 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster DeviceEnergyManagement (cluster code: 152/0x98)
+// Cluster metadata information for cluster DeviceEnergyManagement (cluster code: 152/0x98)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/common/GlobalIds.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
+
+#include <cstdint>
+
+#include <clusters/DeviceEnergyManagement/DeviceEnergyManagementIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace DeviceEnergyManagement {
+namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x00000098;
+inline constexpr uint32_t kRevision = 4;
 
 namespace Attributes {
-namespace ESAType {
-inline constexpr AttributeId Id = 0x00000000;
-} // namespace ESAType
-namespace ESACanGenerate {
-inline constexpr AttributeId Id = 0x00000001;
-} // namespace ESACanGenerate
-namespace ESAState {
-inline constexpr AttributeId Id = 0x00000002;
-} // namespace ESAState
-namespace AbsMinPower {
-inline constexpr AttributeId Id = 0x00000003;
-} // namespace AbsMinPower
-namespace AbsMaxPower {
-inline constexpr AttributeId Id = 0x00000004;
-} // namespace AbsMaxPower
-namespace PowerAdjustmentCapability {
-inline constexpr AttributeId Id = 0x00000005;
-} // namespace PowerAdjustmentCapability
-namespace Forecast {
-inline constexpr AttributeId Id = 0x00000006;
-} // namespace Forecast
-namespace OptOutState {
-inline constexpr AttributeId Id = 0x00000007;
-} // namespace OptOutState
-namespace GeneratedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
-} // namespace GeneratedCommandList
-namespace AcceptedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
-} // namespace AcceptedCommandList
-namespace EventList {
-inline constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-} // namespace EventList
-namespace AttributeList {
-inline constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
-} // namespace AttributeList
-namespace FeatureMap {
-inline constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-namespace ClusterRevision {
-inline constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
+
+inline constexpr DataModel::AttributeEntry kESATypeEntry = {
+    .attributeId    = DeviceEnergyManagement::Attributes::ESAType::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kESACanGenerateEntry = {
+    .attributeId    = DeviceEnergyManagement::Attributes::ESACanGenerate::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kESAStateEntry = {
+    .attributeId    = DeviceEnergyManagement::Attributes::ESAState::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kAbsMinPowerEntry = {
+    .attributeId    = DeviceEnergyManagement::Attributes::AbsMinPower::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kAbsMaxPowerEntry = {
+    .attributeId    = DeviceEnergyManagement::Attributes::AbsMaxPower::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kPowerAdjustmentCapabilityEntry = {
+    .attributeId    = DeviceEnergyManagement::Attributes::PowerAdjustmentCapability::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kForecastEntry = {
+    .attributeId    = DeviceEnergyManagement::Attributes::Forecast::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kOptOutStateEntry = {
+    .attributeId    = DeviceEnergyManagement::Attributes::OptOutState::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
 
 } // namespace Attributes
 
 namespace Commands {
-namespace PowerAdjustRequest {
-inline constexpr CommandId Id = 0x00000000;
-} // namespace PowerAdjustRequest
-namespace CancelPowerAdjustRequest {
-inline constexpr CommandId Id = 0x00000001;
-} // namespace CancelPowerAdjustRequest
-namespace StartTimeAdjustRequest {
-inline constexpr CommandId Id = 0x00000002;
-} // namespace StartTimeAdjustRequest
-namespace PauseRequest {
-inline constexpr CommandId Id = 0x00000003;
-} // namespace PauseRequest
-namespace ResumeRequest {
-inline constexpr CommandId Id = 0x00000004;
-} // namespace ResumeRequest
-namespace ModifyForecastRequest {
-inline constexpr CommandId Id = 0x00000005;
-} // namespace ModifyForecastRequest
-namespace RequestConstraintBasedForecast {
-inline constexpr CommandId Id = 0x00000006;
-} // namespace RequestConstraintBasedForecast
-namespace CancelRequest {
-inline constexpr CommandId Id = 0x00000007;
-} // namespace CancelRequest
+
+inline constexpr DataModel::AcceptedCommandEntry kPowerAdjustRequestEntry = {
+    .commandId       = DeviceEnergyManagement::Commands::PowerAdjustRequest::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+inline constexpr DataModel::AcceptedCommandEntry kCancelPowerAdjustRequestEntry = {
+    .commandId       = DeviceEnergyManagement::Commands::CancelPowerAdjustRequest::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+inline constexpr DataModel::AcceptedCommandEntry kStartTimeAdjustRequestEntry = {
+    .commandId       = DeviceEnergyManagement::Commands::StartTimeAdjustRequest::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+inline constexpr DataModel::AcceptedCommandEntry kPauseRequestEntry = {
+    .commandId       = DeviceEnergyManagement::Commands::PauseRequest::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+inline constexpr DataModel::AcceptedCommandEntry kResumeRequestEntry = {
+    .commandId       = DeviceEnergyManagement::Commands::ResumeRequest::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+inline constexpr DataModel::AcceptedCommandEntry kModifyForecastRequestEntry = {
+    .commandId       = DeviceEnergyManagement::Commands::ModifyForecastRequest::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+inline constexpr DataModel::AcceptedCommandEntry kRequestConstraintBasedForecastEntry = {
+    .commandId       = DeviceEnergyManagement::Commands::RequestConstraintBasedForecast::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+inline constexpr DataModel::AcceptedCommandEntry kCancelRequestEntry = {
+    .commandId       = DeviceEnergyManagement::Commands::CancelRequest::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+
 } // namespace Commands
-
-namespace Events {
-namespace PowerAdjustStart {
-inline constexpr EventId Id = 0x00000000;
-} // namespace PowerAdjustStart
-namespace PowerAdjustEnd {
-inline constexpr EventId Id = 0x00000001;
-} // namespace PowerAdjustEnd
-namespace Paused {
-inline constexpr EventId Id = 0x00000002;
-} // namespace Paused
-namespace Resumed {
-inline constexpr EventId Id = 0x00000003;
-} // namespace Resumed
-} // namespace Events
-
+} // namespace Metadata
 } // namespace DeviceEnergyManagement
 } // namespace clusters
 } // namespace app

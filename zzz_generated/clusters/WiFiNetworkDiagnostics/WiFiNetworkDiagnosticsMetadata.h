@@ -1,97 +1,116 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster WiFiNetworkDiagnostics (cluster code: 54/0x36)
+// Cluster metadata information for cluster WiFiNetworkDiagnostics (cluster code: 54/0x36)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/common/GlobalIds.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
+
+#include <cstdint>
+
+#include <clusters/WiFiNetworkDiagnostics/WiFiNetworkDiagnosticsIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace WiFiNetworkDiagnostics {
+namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x00000036;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-namespace Bssid {
-inline constexpr AttributeId Id = 0x00000000;
-} // namespace Bssid
-namespace SecurityType {
-inline constexpr AttributeId Id = 0x00000001;
-} // namespace SecurityType
-namespace WiFiVersion {
-inline constexpr AttributeId Id = 0x00000002;
-} // namespace WiFiVersion
-namespace ChannelNumber {
-inline constexpr AttributeId Id = 0x00000003;
-} // namespace ChannelNumber
-namespace Rssi {
-inline constexpr AttributeId Id = 0x00000004;
-} // namespace Rssi
-namespace BeaconLostCount {
-inline constexpr AttributeId Id = 0x00000005;
-} // namespace BeaconLostCount
-namespace BeaconRxCount {
-inline constexpr AttributeId Id = 0x00000006;
-} // namespace BeaconRxCount
-namespace PacketMulticastRxCount {
-inline constexpr AttributeId Id = 0x00000007;
-} // namespace PacketMulticastRxCount
-namespace PacketMulticastTxCount {
-inline constexpr AttributeId Id = 0x00000008;
-} // namespace PacketMulticastTxCount
-namespace PacketUnicastRxCount {
-inline constexpr AttributeId Id = 0x00000009;
-} // namespace PacketUnicastRxCount
-namespace PacketUnicastTxCount {
-inline constexpr AttributeId Id = 0x0000000A;
-} // namespace PacketUnicastTxCount
-namespace CurrentMaxRate {
-inline constexpr AttributeId Id = 0x0000000B;
-} // namespace CurrentMaxRate
-namespace OverrunCount {
-inline constexpr AttributeId Id = 0x0000000C;
-} // namespace OverrunCount
-namespace GeneratedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
-} // namespace GeneratedCommandList
-namespace AcceptedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
-} // namespace AcceptedCommandList
-namespace EventList {
-inline constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-} // namespace EventList
-namespace AttributeList {
-inline constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
-} // namespace AttributeList
-namespace FeatureMap {
-inline constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-namespace ClusterRevision {
-inline constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
+
+inline constexpr DataModel::AttributeEntry kBssidEntry = {
+    .attributeId    = WiFiNetworkDiagnostics::Attributes::Bssid::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kSecurityTypeEntry = {
+    .attributeId    = WiFiNetworkDiagnostics::Attributes::SecurityType::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kWiFiVersionEntry = {
+    .attributeId    = WiFiNetworkDiagnostics::Attributes::WiFiVersion::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kChannelNumberEntry = {
+    .attributeId    = WiFiNetworkDiagnostics::Attributes::ChannelNumber::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kRssiEntry = {
+    .attributeId    = WiFiNetworkDiagnostics::Attributes::Rssi::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kBeaconLostCountEntry = {
+    .attributeId    = WiFiNetworkDiagnostics::Attributes::BeaconLostCount::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kBeaconRxCountEntry = {
+    .attributeId    = WiFiNetworkDiagnostics::Attributes::BeaconRxCount::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kPacketMulticastRxCountEntry = {
+    .attributeId    = WiFiNetworkDiagnostics::Attributes::PacketMulticastRxCount::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kPacketMulticastTxCountEntry = {
+    .attributeId    = WiFiNetworkDiagnostics::Attributes::PacketMulticastTxCount::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kPacketUnicastRxCountEntry = {
+    .attributeId    = WiFiNetworkDiagnostics::Attributes::PacketUnicastRxCount::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kPacketUnicastTxCountEntry = {
+    .attributeId    = WiFiNetworkDiagnostics::Attributes::PacketUnicastTxCount::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kCurrentMaxRateEntry = {
+    .attributeId    = WiFiNetworkDiagnostics::Attributes::CurrentMaxRate::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kOverrunCountEntry = {
+    .attributeId    = WiFiNetworkDiagnostics::Attributes::OverrunCount::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
 
 } // namespace Attributes
 
 namespace Commands {
-namespace ResetCounts {
-inline constexpr CommandId Id = 0x00000000;
-} // namespace ResetCounts
+
+inline constexpr DataModel::AcceptedCommandEntry kResetCountsEntry = {
+    .commandId       = WiFiNetworkDiagnostics::Commands::ResetCounts::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+
 } // namespace Commands
-
-namespace Events {
-namespace Disconnection {
-inline constexpr EventId Id = 0x00000000;
-} // namespace Disconnection
-namespace AssociationFailure {
-inline constexpr EventId Id = 0x00000001;
-} // namespace AssociationFailure
-namespace ConnectionStatus {
-inline constexpr EventId Id = 0x00000002;
-} // namespace ConnectionStatus
-} // namespace Events
-
+} // namespace Metadata
 } // namespace WiFiNetworkDiagnostics
 } // namespace clusters
 } // namespace app

@@ -3,11 +3,12 @@
 // Identifier constant values for cluster WaterHeaterMode (cluster code: 158/0x9E)
 // based on src/controller/data_model/controller-clusters.matter
 
+#include <app/common/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
 
 namespace chip {
 namespace app {
-namespace clusters {
+namespace Clusters {
 namespace WaterHeaterMode {
 
 inline constexpr ClusterId kClusterId = 0x0000009E;
@@ -19,8 +20,24 @@ inline constexpr AttributeId Id = 0x00000000;
 namespace CurrentMode {
 inline constexpr AttributeId Id = 0x00000001;
 } // namespace CurrentMode
-
-// TODO: globals & reference globals?
+namespace GeneratedCommandList {
+inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+inline constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+namespace EventList {
+inline constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+namespace AttributeList {
+inline constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+namespace FeatureMap {
+inline constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+namespace ClusterRevision {
+inline constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
 
 } // namespace Attributes
 
@@ -33,6 +50,6 @@ inline constexpr CommandId Id = 0x00000000;
 namespace Events {} // namespace Events
 
 } // namespace WaterHeaterMode
-} // namespace clusters
+} // namespace Clusters
 } // namespace app
 } // namespace chip

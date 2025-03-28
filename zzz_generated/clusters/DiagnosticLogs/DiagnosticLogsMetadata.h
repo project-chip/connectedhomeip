@@ -1,48 +1,35 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster DiagnosticLogs (cluster code: 50/0x32)
+// Cluster metadata information for cluster DiagnosticLogs (cluster code: 50/0x32)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/common/GlobalIds.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
+
+#include <cstdint>
+
+#include <clusters/DiagnosticLogs/DiagnosticLogsIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace DiagnosticLogs {
+namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x00000032;
+inline constexpr uint32_t kRevision = 1;
 
-namespace Attributes {
-namespace GeneratedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
-} // namespace GeneratedCommandList
-namespace AcceptedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
-} // namespace AcceptedCommandList
-namespace EventList {
-inline constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-} // namespace EventList
-namespace AttributeList {
-inline constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
-} // namespace AttributeList
-namespace FeatureMap {
-inline constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-namespace ClusterRevision {
-inline constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
-
-} // namespace Attributes
+namespace Attributes {} // namespace Attributes
 
 namespace Commands {
-namespace RetrieveLogsRequest {
-inline constexpr CommandId Id = 0x00000000;
-} // namespace RetrieveLogsRequest
+
+inline constexpr DataModel::AcceptedCommandEntry kRetrieveLogsRequestEntry = {
+    .commandId       = DiagnosticLogs::Commands::RetrieveLogsRequest::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+
 } // namespace Commands
-
-namespace Events {} // namespace Events
-
+} // namespace Metadata
 } // namespace DiagnosticLogs
 } // namespace clusters
 } // namespace app

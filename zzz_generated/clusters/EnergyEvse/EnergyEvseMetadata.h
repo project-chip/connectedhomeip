@@ -1,154 +1,206 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster EnergyEvse (cluster code: 153/0x99)
+// Cluster metadata information for cluster EnergyEvse (cluster code: 153/0x99)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/common/GlobalIds.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
+
+#include <cstdint>
+
+#include <clusters/EnergyEvse/EnergyEvseIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace EnergyEvse {
+namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x00000099;
+inline constexpr uint32_t kRevision = 3;
 
 namespace Attributes {
-namespace State {
-inline constexpr AttributeId Id = 0x00000000;
-} // namespace State
-namespace SupplyState {
-inline constexpr AttributeId Id = 0x00000001;
-} // namespace SupplyState
-namespace FaultState {
-inline constexpr AttributeId Id = 0x00000002;
-} // namespace FaultState
-namespace ChargingEnabledUntil {
-inline constexpr AttributeId Id = 0x00000003;
-} // namespace ChargingEnabledUntil
-namespace DischargingEnabledUntil {
-inline constexpr AttributeId Id = 0x00000004;
-} // namespace DischargingEnabledUntil
-namespace CircuitCapacity {
-inline constexpr AttributeId Id = 0x00000005;
-} // namespace CircuitCapacity
-namespace MinimumChargeCurrent {
-inline constexpr AttributeId Id = 0x00000006;
-} // namespace MinimumChargeCurrent
-namespace MaximumChargeCurrent {
-inline constexpr AttributeId Id = 0x00000007;
-} // namespace MaximumChargeCurrent
-namespace MaximumDischargeCurrent {
-inline constexpr AttributeId Id = 0x00000008;
-} // namespace MaximumDischargeCurrent
-namespace UserMaximumChargeCurrent {
-inline constexpr AttributeId Id = 0x00000009;
-} // namespace UserMaximumChargeCurrent
-namespace RandomizationDelayWindow {
-inline constexpr AttributeId Id = 0x0000000A;
-} // namespace RandomizationDelayWindow
-namespace NextChargeStartTime {
-inline constexpr AttributeId Id = 0x00000023;
-} // namespace NextChargeStartTime
-namespace NextChargeTargetTime {
-inline constexpr AttributeId Id = 0x00000024;
-} // namespace NextChargeTargetTime
-namespace NextChargeRequiredEnergy {
-inline constexpr AttributeId Id = 0x00000025;
-} // namespace NextChargeRequiredEnergy
-namespace NextChargeTargetSoC {
-inline constexpr AttributeId Id = 0x00000026;
-} // namespace NextChargeTargetSoC
-namespace ApproximateEVEfficiency {
-inline constexpr AttributeId Id = 0x00000027;
-} // namespace ApproximateEVEfficiency
-namespace StateOfCharge {
-inline constexpr AttributeId Id = 0x00000030;
-} // namespace StateOfCharge
-namespace BatteryCapacity {
-inline constexpr AttributeId Id = 0x00000031;
-} // namespace BatteryCapacity
-namespace VehicleID {
-inline constexpr AttributeId Id = 0x00000032;
-} // namespace VehicleID
-namespace SessionID {
-inline constexpr AttributeId Id = 0x00000040;
-} // namespace SessionID
-namespace SessionDuration {
-inline constexpr AttributeId Id = 0x00000041;
-} // namespace SessionDuration
-namespace SessionEnergyCharged {
-inline constexpr AttributeId Id = 0x00000042;
-} // namespace SessionEnergyCharged
-namespace SessionEnergyDischarged {
-inline constexpr AttributeId Id = 0x00000043;
-} // namespace SessionEnergyDischarged
-namespace GeneratedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
-} // namespace GeneratedCommandList
-namespace AcceptedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
-} // namespace AcceptedCommandList
-namespace EventList {
-inline constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-} // namespace EventList
-namespace AttributeList {
-inline constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
-} // namespace AttributeList
-namespace FeatureMap {
-inline constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-namespace ClusterRevision {
-inline constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
+
+inline constexpr DataModel::AttributeEntry kStateEntry = {
+    .attributeId    = EnergyEvse::Attributes::State::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kSupplyStateEntry = {
+    .attributeId    = EnergyEvse::Attributes::SupplyState::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kFaultStateEntry = {
+    .attributeId    = EnergyEvse::Attributes::FaultState::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kChargingEnabledUntilEntry = {
+    .attributeId    = EnergyEvse::Attributes::ChargingEnabledUntil::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kDischargingEnabledUntilEntry = {
+    .attributeId    = EnergyEvse::Attributes::DischargingEnabledUntil::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kCircuitCapacityEntry = {
+    .attributeId    = EnergyEvse::Attributes::CircuitCapacity::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kMinimumChargeCurrentEntry = {
+    .attributeId    = EnergyEvse::Attributes::MinimumChargeCurrent::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kMaximumChargeCurrentEntry = {
+    .attributeId    = EnergyEvse::Attributes::MaximumChargeCurrent::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kMaximumDischargeCurrentEntry = {
+    .attributeId    = EnergyEvse::Attributes::MaximumDischargeCurrent::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kUserMaximumChargeCurrentEntry = {
+    .attributeId    = EnergyEvse::Attributes::UserMaximumChargeCurrent::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = Access::Privilege::kManage,
+};
+inline constexpr DataModel::AttributeEntry kRandomizationDelayWindowEntry = {
+    .attributeId    = EnergyEvse::Attributes::RandomizationDelayWindow::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = Access::Privilege::kManage,
+};
+inline constexpr DataModel::AttributeEntry kNextChargeStartTimeEntry = {
+    .attributeId    = EnergyEvse::Attributes::NextChargeStartTime::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kNextChargeTargetTimeEntry = {
+    .attributeId    = EnergyEvse::Attributes::NextChargeTargetTime::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kNextChargeRequiredEnergyEntry = {
+    .attributeId    = EnergyEvse::Attributes::NextChargeRequiredEnergy::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kNextChargeTargetSoCEntry = {
+    .attributeId    = EnergyEvse::Attributes::NextChargeTargetSoC::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kApproximateEVEfficiencyEntry = {
+    .attributeId    = EnergyEvse::Attributes::ApproximateEVEfficiency::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = Access::Privilege::kManage,
+};
+inline constexpr DataModel::AttributeEntry kStateOfChargeEntry = {
+    .attributeId    = EnergyEvse::Attributes::StateOfCharge::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kBatteryCapacityEntry = {
+    .attributeId    = EnergyEvse::Attributes::BatteryCapacity::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kVehicleIDEntry = {
+    .attributeId    = EnergyEvse::Attributes::VehicleID::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kSessionIDEntry = {
+    .attributeId    = EnergyEvse::Attributes::SessionID::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kSessionDurationEntry = {
+    .attributeId    = EnergyEvse::Attributes::SessionDuration::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kSessionEnergyChargedEntry = {
+    .attributeId    = EnergyEvse::Attributes::SessionEnergyCharged::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+inline constexpr DataModel::AttributeEntry kSessionEnergyDischargedEntry = {
+    .attributeId    = EnergyEvse::Attributes::SessionEnergyDischarged::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
 
 } // namespace Attributes
 
 namespace Commands {
-namespace Disable {
-inline constexpr CommandId Id = 0x00000001;
-} // namespace Disable
-namespace EnableCharging {
-inline constexpr CommandId Id = 0x00000002;
-} // namespace EnableCharging
-namespace EnableDischarging {
-inline constexpr CommandId Id = 0x00000003;
-} // namespace EnableDischarging
-namespace StartDiagnostics {
-inline constexpr CommandId Id = 0x00000004;
-} // namespace StartDiagnostics
-namespace SetTargets {
-inline constexpr CommandId Id = 0x00000005;
-} // namespace SetTargets
-namespace GetTargets {
-inline constexpr CommandId Id = 0x00000006;
-} // namespace GetTargets
-namespace ClearTargets {
-inline constexpr CommandId Id = 0x00000007;
-} // namespace ClearTargets
+
+inline constexpr DataModel::AcceptedCommandEntry kDisableEntry = {
+    .commandId       = EnergyEvse::Commands::Disable::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+inline constexpr DataModel::AcceptedCommandEntry kEnableChargingEntry = {
+    .commandId       = EnergyEvse::Commands::EnableCharging::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+inline constexpr DataModel::AcceptedCommandEntry kEnableDischargingEntry = {
+    .commandId       = EnergyEvse::Commands::EnableDischarging::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+inline constexpr DataModel::AcceptedCommandEntry kStartDiagnosticsEntry = {
+    .commandId       = EnergyEvse::Commands::StartDiagnostics::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+inline constexpr DataModel::AcceptedCommandEntry kSetTargetsEntry = {
+    .commandId       = EnergyEvse::Commands::SetTargets::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+inline constexpr DataModel::AcceptedCommandEntry kGetTargetsEntry = {
+    .commandId       = EnergyEvse::Commands::GetTargets::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+inline constexpr DataModel::AcceptedCommandEntry kClearTargetsEntry = {
+    .commandId       = EnergyEvse::Commands::ClearTargets::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+
 } // namespace Commands
-
-namespace Events {
-namespace EVConnected {
-inline constexpr EventId Id = 0x00000000;
-} // namespace EVConnected
-namespace EVNotDetected {
-inline constexpr EventId Id = 0x00000001;
-} // namespace EVNotDetected
-namespace EnergyTransferStarted {
-inline constexpr EventId Id = 0x00000002;
-} // namespace EnergyTransferStarted
-namespace EnergyTransferStopped {
-inline constexpr EventId Id = 0x00000003;
-} // namespace EnergyTransferStopped
-namespace Fault {
-inline constexpr EventId Id = 0x00000004;
-} // namespace Fault
-namespace RFID {
-inline constexpr EventId Id = 0x00000005;
-} // namespace RFID
-} // namespace Events
-
+} // namespace Metadata
 } // namespace EnergyEvse
 } // namespace clusters
 } // namespace app

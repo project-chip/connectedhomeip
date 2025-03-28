@@ -1,47 +1,36 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster UnitLocalization (cluster code: 45/0x2D)
+// Cluster metadata information for cluster UnitLocalization (cluster code: 45/0x2D)
 // based on src/controller/data_model/controller-clusters.matter
 
-#include <app/common/GlobalIds.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
+
+#include <cstdint>
+
+#include <clusters/UnitLocalization/UnitLocalizationIds.h>
 
 namespace chip {
 namespace app {
 namespace clusters {
 namespace UnitLocalization {
+namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0000002D;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-namespace TemperatureUnit {
-inline constexpr AttributeId Id = 0x00000000;
-} // namespace TemperatureUnit
-namespace GeneratedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
-} // namespace GeneratedCommandList
-namespace AcceptedCommandList {
-inline constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
-} // namespace AcceptedCommandList
-namespace EventList {
-inline constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-} // namespace EventList
-namespace AttributeList {
-inline constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
-} // namespace AttributeList
-namespace FeatureMap {
-inline constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-namespace ClusterRevision {
-inline constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
+
+inline constexpr DataModel::AttributeEntry kTemperatureUnitEntry = {
+    .attributeId    = UnitLocalization::Attributes::TemperatureUnit::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = Access::Privilege::kManage,
+};
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-
-namespace Events {} // namespace Events
-
+} // namespace Metadata
 } // namespace UnitLocalization
 } // namespace clusters
 } // namespace app
