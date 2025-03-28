@@ -68,7 +68,7 @@ static_library("stm32") {
       "SystemPlatformConfig.h",
     ]
 
-    deps += [ 
+    deps += [
       "${chip_root}/src/app/common:ids",
       "${chip_root}/src/platform/logging:stdio",
     ]
