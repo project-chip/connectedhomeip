@@ -2,6 +2,7 @@
 //
 // Identifier constant values for cluster ValveConfigurationAndControl (cluster code: 129/0x81)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/common/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
@@ -11,7 +12,7 @@ namespace app {
 namespace Clusters {
 namespace ValveConfigurationAndControl {
 
-inline constexpr ClusterId kClusterId = 0x00000081;
+inline constexpr ClusterId Id = 0x00000081;
 
 namespace Attributes {
 namespace OpenDuration {

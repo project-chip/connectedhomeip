@@ -2,6 +2,7 @@
 //
 // Identifier constant values for cluster FormaldehydeConcentrationMeasurement (cluster code: 1067/0x42B)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/common/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
@@ -11,7 +12,7 @@ namespace app {
 namespace Clusters {
 namespace FormaldehydeConcentrationMeasurement {
 
-inline constexpr ClusterId kClusterId = 0x0000042B;
+inline constexpr ClusterId Id = 0x0000042B;
 
 namespace Attributes {
 namespace MeasuredValue {

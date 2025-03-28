@@ -2,6 +2,7 @@
 //
 // Identifier constant values for cluster OnOff (cluster code: 6/0x6)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/common/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
@@ -11,7 +12,7 @@ namespace app {
 namespace Clusters {
 namespace OnOff {
 
-inline constexpr ClusterId kClusterId = 0x00000006;
+inline constexpr ClusterId Id = 0x00000006;
 
 namespace Attributes {
 namespace OnOff {

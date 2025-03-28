@@ -2,6 +2,7 @@
 //
 // Cluster metadata information for cluster PushAvStreamTransport (cluster code: 1365/0x555)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>

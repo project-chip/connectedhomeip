@@ -2,6 +2,7 @@
 //
 // Identifier constant values for cluster RvcRunMode (cluster code: 84/0x54)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/common/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
@@ -11,7 +12,7 @@ namespace app {
 namespace Clusters {
 namespace RvcRunMode {
 
-inline constexpr ClusterId kClusterId = 0x00000054;
+inline constexpr ClusterId Id = 0x00000054;
 
 namespace Attributes {
 namespace SupportedModes {

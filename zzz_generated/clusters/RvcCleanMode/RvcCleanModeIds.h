@@ -2,6 +2,7 @@
 //
 // Identifier constant values for cluster RvcCleanMode (cluster code: 85/0x55)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/common/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
@@ -11,7 +12,7 @@ namespace app {
 namespace Clusters {
 namespace RvcCleanMode {
 
-inline constexpr ClusterId kClusterId = 0x00000055;
+inline constexpr ClusterId Id = 0x00000055;
 
 namespace Attributes {
 namespace SupportedModes {

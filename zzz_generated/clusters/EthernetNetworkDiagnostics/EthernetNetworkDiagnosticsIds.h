@@ -2,6 +2,7 @@
 //
 // Identifier constant values for cluster EthernetNetworkDiagnostics (cluster code: 55/0x37)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/common/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
@@ -11,7 +12,7 @@ namespace app {
 namespace Clusters {
 namespace EthernetNetworkDiagnostics {
 
-inline constexpr ClusterId kClusterId = 0x00000037;
+inline constexpr ClusterId Id = 0x00000037;
 
 namespace Attributes {
 namespace PHYRate {

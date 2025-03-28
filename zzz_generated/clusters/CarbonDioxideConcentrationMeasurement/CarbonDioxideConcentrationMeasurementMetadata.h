@@ -2,6 +2,7 @@
 //
 // Cluster metadata information for cluster CarbonDioxideConcentrationMeasurement (cluster code: 1037/0x40D)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>

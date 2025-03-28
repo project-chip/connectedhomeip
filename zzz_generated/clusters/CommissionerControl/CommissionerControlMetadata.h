@@ -2,6 +2,7 @@
 //
 // Cluster metadata information for cluster CommissionerControl (cluster code: 1873/0x751)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>

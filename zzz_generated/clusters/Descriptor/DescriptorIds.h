@@ -2,6 +2,7 @@
 //
 // Identifier constant values for cluster Descriptor (cluster code: 29/0x1D)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/common/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
@@ -11,7 +12,7 @@ namespace app {
 namespace Clusters {
 namespace Descriptor {
 
-inline constexpr ClusterId kClusterId = 0x0000001D;
+inline constexpr ClusterId Id = 0x0000001D;
 
 namespace Attributes {
 namespace DeviceTypeList {

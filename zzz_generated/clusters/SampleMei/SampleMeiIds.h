@@ -2,6 +2,7 @@
 //
 // Identifier constant values for cluster SampleMei (cluster code: 4294048800/0xFFF1FC20)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/common/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
@@ -11,7 +12,7 @@ namespace app {
 namespace Clusters {
 namespace SampleMei {
 
-inline constexpr ClusterId kClusterId = 0xFFF1FC20;
+inline constexpr ClusterId Id = 0xFFF1FC20;
 
 namespace Attributes {
 namespace FlipFlop {

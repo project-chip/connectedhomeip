@@ -2,6 +2,7 @@
 //
 // Identifier constant values for cluster RelativeHumidityMeasurement (cluster code: 1029/0x405)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/common/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
@@ -11,7 +12,7 @@ namespace app {
 namespace Clusters {
 namespace RelativeHumidityMeasurement {
 
-inline constexpr ClusterId kClusterId = 0x00000405;
+inline constexpr ClusterId Id = 0x00000405;
 
 namespace Attributes {
 namespace MeasuredValue {

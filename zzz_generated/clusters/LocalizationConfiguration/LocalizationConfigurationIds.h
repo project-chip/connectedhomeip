@@ -2,6 +2,7 @@
 //
 // Identifier constant values for cluster LocalizationConfiguration (cluster code: 43/0x2B)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/common/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
@@ -11,7 +12,7 @@ namespace app {
 namespace Clusters {
 namespace LocalizationConfiguration {
 
-inline constexpr ClusterId kClusterId = 0x0000002B;
+inline constexpr ClusterId Id = 0x0000002B;
 
 namespace Attributes {
 namespace ActiveLocale {

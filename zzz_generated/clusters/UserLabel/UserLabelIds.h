@@ -2,6 +2,7 @@
 //
 // Identifier constant values for cluster UserLabel (cluster code: 65/0x41)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/common/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
@@ -11,7 +12,7 @@ namespace app {
 namespace Clusters {
 namespace UserLabel {
 
-inline constexpr ClusterId kClusterId = 0x00000041;
+inline constexpr ClusterId Id = 0x00000041;
 
 namespace Attributes {
 namespace LabelList {

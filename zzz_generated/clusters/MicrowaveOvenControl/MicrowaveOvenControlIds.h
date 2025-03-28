@@ -2,6 +2,7 @@
 //
 // Identifier constant values for cluster MicrowaveOvenControl (cluster code: 95/0x5F)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/common/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
@@ -11,7 +12,7 @@ namespace app {
 namespace Clusters {
 namespace MicrowaveOvenControl {
 
-inline constexpr ClusterId kClusterId = 0x0000005F;
+inline constexpr ClusterId Id = 0x0000005F;
 
 namespace Attributes {
 namespace CookTime {

@@ -2,6 +2,7 @@
 //
 // Identifier constant values for cluster BasicInformation (cluster code: 40/0x28)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/common/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
@@ -11,7 +12,7 @@ namespace app {
 namespace Clusters {
 namespace BasicInformation {
 
-inline constexpr ClusterId kClusterId = 0x00000028;
+inline constexpr ClusterId Id = 0x00000028;
 
 namespace Attributes {
 namespace DataModelRevision {

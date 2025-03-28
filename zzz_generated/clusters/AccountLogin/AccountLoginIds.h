@@ -2,6 +2,7 @@
 //
 // Identifier constant values for cluster AccountLogin (cluster code: 1294/0x50E)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/common/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
@@ -11,7 +12,7 @@ namespace app {
 namespace Clusters {
 namespace AccountLogin {
 
-inline constexpr ClusterId kClusterId = 0x0000050E;
+inline constexpr ClusterId Id = 0x0000050E;
 
 namespace Attributes {
 namespace GeneratedCommandList {

@@ -2,6 +2,7 @@
 //
 // Cluster metadata information for cluster WebRTCTransportProvider (cluster code: 1363/0x553)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>

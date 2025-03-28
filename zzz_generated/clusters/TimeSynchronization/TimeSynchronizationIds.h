@@ -2,6 +2,7 @@
 //
 // Identifier constant values for cluster TimeSynchronization (cluster code: 56/0x38)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/common/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
@@ -11,7 +12,7 @@ namespace app {
 namespace Clusters {
 namespace TimeSynchronization {
 
-inline constexpr ClusterId kClusterId = 0x00000038;
+inline constexpr ClusterId Id = 0x00000038;
 
 namespace Attributes {
 namespace UTCTime {

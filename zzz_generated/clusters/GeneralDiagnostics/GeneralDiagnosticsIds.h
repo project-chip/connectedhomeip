@@ -2,6 +2,7 @@
 //
 // Identifier constant values for cluster GeneralDiagnostics (cluster code: 51/0x33)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/common/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
@@ -11,7 +12,7 @@ namespace app {
 namespace Clusters {
 namespace GeneralDiagnostics {
 
-inline constexpr ClusterId kClusterId = 0x00000033;
+inline constexpr ClusterId Id = 0x00000033;
 
 namespace Attributes {
 namespace NetworkInterfaces {

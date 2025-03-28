@@ -2,6 +2,7 @@
 //
 // Identifier constant values for cluster OvenCavityOperationalState (cluster code: 72/0x48)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/common/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
@@ -11,7 +12,7 @@ namespace app {
 namespace Clusters {
 namespace OvenCavityOperationalState {
 
-inline constexpr ClusterId kClusterId = 0x00000048;
+inline constexpr ClusterId Id = 0x00000048;
 
 namespace Attributes {
 namespace PhaseList {

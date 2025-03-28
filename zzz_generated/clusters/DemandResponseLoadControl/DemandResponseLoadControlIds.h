@@ -2,6 +2,7 @@
 //
 // Identifier constant values for cluster DemandResponseLoadControl (cluster code: 150/0x96)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/common/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
@@ -11,7 +12,7 @@ namespace app {
 namespace Clusters {
 namespace DemandResponseLoadControl {
 
-inline constexpr ClusterId kClusterId = 0x00000096;
+inline constexpr ClusterId Id = 0x00000096;
 
 namespace Attributes {
 namespace LoadControlPrograms {

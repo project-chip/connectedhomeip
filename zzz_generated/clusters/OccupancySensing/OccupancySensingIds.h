@@ -2,6 +2,7 @@
 //
 // Identifier constant values for cluster OccupancySensing (cluster code: 1030/0x406)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/common/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
@@ -11,7 +12,7 @@ namespace app {
 namespace Clusters {
 namespace OccupancySensing {
 
-inline constexpr ClusterId kClusterId = 0x00000406;
+inline constexpr ClusterId Id = 0x00000406;
 
 namespace Attributes {
 namespace Occupancy {

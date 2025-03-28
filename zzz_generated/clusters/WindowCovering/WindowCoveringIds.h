@@ -2,6 +2,7 @@
 //
 // Identifier constant values for cluster WindowCovering (cluster code: 258/0x102)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/common/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
@@ -11,7 +12,7 @@ namespace app {
 namespace Clusters {
 namespace WindowCovering {
 
-inline constexpr ClusterId kClusterId = 0x00000102;
+inline constexpr ClusterId Id = 0x00000102;
 
 namespace Attributes {
 namespace Type {

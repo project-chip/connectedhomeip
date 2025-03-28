@@ -2,6 +2,7 @@
 //
 // Identifier constant values for cluster LowPower (cluster code: 1288/0x508)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/common/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
@@ -11,7 +12,7 @@ namespace app {
 namespace Clusters {
 namespace LowPower {
 
-inline constexpr ClusterId kClusterId = 0x00000508;
+inline constexpr ClusterId Id = 0x00000508;
 
 namespace Attributes {
 namespace GeneratedCommandList {

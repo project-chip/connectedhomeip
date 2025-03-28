@@ -2,6 +2,7 @@
 //
 // Identifier constant values for cluster WaterHeaterManagement (cluster code: 148/0x94)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/common/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
@@ -11,7 +12,7 @@ namespace app {
 namespace Clusters {
 namespace WaterHeaterManagement {
 
-inline constexpr ClusterId kClusterId = 0x00000094;
+inline constexpr ClusterId Id = 0x00000094;
 
 namespace Attributes {
 namespace HeaterTypes {

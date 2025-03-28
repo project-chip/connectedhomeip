@@ -2,6 +2,7 @@
 //
 // Cluster metadata information for cluster UserLabel (cluster code: 65/0x41)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>

@@ -2,6 +2,7 @@
 //
 // Identifier constant values for cluster NetworkCommissioning (cluster code: 49/0x31)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/common/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
@@ -11,7 +12,7 @@ namespace app {
 namespace Clusters {
 namespace NetworkCommissioning {
 
-inline constexpr ClusterId kClusterId = 0x00000031;
+inline constexpr ClusterId Id = 0x00000031;
 
 namespace Attributes {
 namespace MaxNetworks {

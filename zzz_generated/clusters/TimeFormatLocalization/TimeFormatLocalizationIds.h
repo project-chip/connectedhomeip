@@ -2,6 +2,7 @@
 //
 // Identifier constant values for cluster TimeFormatLocalization (cluster code: 44/0x2C)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/common/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
@@ -11,7 +12,7 @@ namespace app {
 namespace Clusters {
 namespace TimeFormatLocalization {
 
-inline constexpr ClusterId kClusterId = 0x0000002C;
+inline constexpr ClusterId Id = 0x0000002C;
 
 namespace Attributes {
 namespace HourFormat {

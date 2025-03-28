@@ -2,6 +2,7 @@
 //
 // Identifier constant values for cluster PressureMeasurement (cluster code: 1027/0x403)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/common/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
@@ -11,7 +12,7 @@ namespace app {
 namespace Clusters {
 namespace PressureMeasurement {
 
-inline constexpr ClusterId kClusterId = 0x00000403;
+inline constexpr ClusterId Id = 0x00000403;
 
 namespace Attributes {
 namespace MeasuredValue {

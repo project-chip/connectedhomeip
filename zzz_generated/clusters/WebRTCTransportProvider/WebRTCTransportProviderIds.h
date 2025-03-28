@@ -2,6 +2,7 @@
 //
 // Identifier constant values for cluster WebRTCTransportProvider (cluster code: 1363/0x553)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/common/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
@@ -11,7 +12,7 @@ namespace app {
 namespace Clusters {
 namespace WebRTCTransportProvider {
 
-inline constexpr ClusterId kClusterId = 0x00000553;
+inline constexpr ClusterId Id = 0x00000553;
 
 namespace Attributes {
 namespace CurrentSessions {

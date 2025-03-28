@@ -2,6 +2,7 @@
 //
 // Cluster metadata information for cluster AdministratorCommissioning (cluster code: 60/0x3C)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>

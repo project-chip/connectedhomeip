@@ -2,6 +2,7 @@
 //
 // Cluster metadata information for cluster MediaPlayback (cluster code: 1286/0x506)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>

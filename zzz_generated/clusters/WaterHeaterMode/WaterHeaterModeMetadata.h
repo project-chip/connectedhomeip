@@ -2,6 +2,7 @@
 //
 // Cluster metadata information for cluster WaterHeaterMode (cluster code: 158/0x9E)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>

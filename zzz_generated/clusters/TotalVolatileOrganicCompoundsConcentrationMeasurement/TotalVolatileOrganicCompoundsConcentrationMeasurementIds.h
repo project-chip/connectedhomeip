@@ -2,6 +2,7 @@
 //
 // Identifier constant values for cluster TotalVolatileOrganicCompoundsConcentrationMeasurement (cluster code: 1070/0x42E)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/common/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
@@ -11,7 +12,7 @@ namespace app {
 namespace Clusters {
 namespace TotalVolatileOrganicCompoundsConcentrationMeasurement {
 
-inline constexpr ClusterId kClusterId = 0x0000042E;
+inline constexpr ClusterId Id = 0x0000042E;
 
 namespace Attributes {
 namespace MeasuredValue {

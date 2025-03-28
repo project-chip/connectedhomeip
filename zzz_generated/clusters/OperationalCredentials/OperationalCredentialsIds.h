@@ -2,6 +2,7 @@
 //
 // Identifier constant values for cluster OperationalCredentials (cluster code: 62/0x3E)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/common/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
@@ -11,7 +12,7 @@ namespace app {
 namespace Clusters {
 namespace OperationalCredentials {
 
-inline constexpr ClusterId kClusterId = 0x0000003E;
+inline constexpr ClusterId Id = 0x0000003E;
 
 namespace Attributes {
 namespace NOCs {

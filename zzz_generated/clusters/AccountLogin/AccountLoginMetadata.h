@@ -2,6 +2,7 @@
 //
 // Cluster metadata information for cluster AccountLogin (cluster code: 1294/0x50E)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>

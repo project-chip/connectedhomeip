@@ -2,6 +2,7 @@
 //
 // Identifier constant values for cluster IcdManagement (cluster code: 70/0x46)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/common/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
@@ -11,7 +12,7 @@ namespace app {
 namespace Clusters {
 namespace IcdManagement {
 
-inline constexpr ClusterId kClusterId = 0x00000046;
+inline constexpr ClusterId Id = 0x00000046;
 
 namespace Attributes {
 namespace IdleModeDuration {

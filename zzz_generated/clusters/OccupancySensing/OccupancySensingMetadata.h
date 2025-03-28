@@ -2,6 +2,7 @@
 //
 // Cluster metadata information for cluster OccupancySensing (cluster code: 1030/0x406)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>

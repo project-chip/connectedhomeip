@@ -2,6 +2,7 @@
 //
 // Identifier constant values for cluster ThreadNetworkDiagnostics (cluster code: 53/0x35)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/common/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
@@ -11,7 +12,7 @@ namespace app {
 namespace Clusters {
 namespace ThreadNetworkDiagnostics {
 
-inline constexpr ClusterId kClusterId = 0x00000035;
+inline constexpr ClusterId Id = 0x00000035;
 
 namespace Attributes {
 namespace Channel {

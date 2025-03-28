@@ -2,6 +2,7 @@
 //
 // Identifier constant values for cluster ColorControl (cluster code: 768/0x300)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/common/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
@@ -11,7 +12,7 @@ namespace app {
 namespace Clusters {
 namespace ColorControl {
 
-inline constexpr ClusterId kClusterId = 0x00000300;
+inline constexpr ClusterId Id = 0x00000300;
 
 namespace Attributes {
 namespace CurrentHue {

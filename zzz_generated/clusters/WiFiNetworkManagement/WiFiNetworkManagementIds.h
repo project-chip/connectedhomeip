@@ -2,6 +2,7 @@
 //
 // Identifier constant values for cluster WiFiNetworkManagement (cluster code: 1105/0x451)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/common/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
@@ -11,7 +12,7 @@ namespace app {
 namespace Clusters {
 namespace WiFiNetworkManagement {
 
-inline constexpr ClusterId kClusterId = 0x00000451;
+inline constexpr ClusterId Id = 0x00000451;
 
 namespace Attributes {
 namespace Ssid {

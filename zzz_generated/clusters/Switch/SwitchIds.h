@@ -2,6 +2,7 @@
 //
 // Identifier constant values for cluster Switch (cluster code: 59/0x3B)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/common/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
@@ -11,7 +12,7 @@ namespace app {
 namespace Clusters {
 namespace Switch {
 
-inline constexpr ClusterId kClusterId = 0x0000003B;
+inline constexpr ClusterId Id = 0x0000003B;
 
 namespace Attributes {
 namespace NumberOfPositions {

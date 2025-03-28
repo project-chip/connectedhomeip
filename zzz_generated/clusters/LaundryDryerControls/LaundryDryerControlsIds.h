@@ -2,6 +2,7 @@
 //
 // Identifier constant values for cluster LaundryDryerControls (cluster code: 74/0x4A)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/common/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
@@ -11,7 +12,7 @@ namespace app {
 namespace Clusters {
 namespace LaundryDryerControls {
 
-inline constexpr ClusterId kClusterId = 0x0000004A;
+inline constexpr ClusterId Id = 0x0000004A;
 
 namespace Attributes {
 namespace SupportedDrynessLevels {

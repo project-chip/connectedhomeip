@@ -2,6 +2,7 @@
 //
 // Cluster metadata information for cluster FaultInjection (cluster code: 4294048774/0xFFF1FC06)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>

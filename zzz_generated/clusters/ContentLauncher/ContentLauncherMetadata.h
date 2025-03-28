@@ -2,6 +2,7 @@
 //
 // Cluster metadata information for cluster ContentLauncher (cluster code: 1290/0x50A)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>

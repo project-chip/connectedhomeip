@@ -2,6 +2,7 @@
 //
 // Identifier constant values for cluster DoorLock (cluster code: 257/0x101)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/common/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
@@ -11,7 +12,7 @@ namespace app {
 namespace Clusters {
 namespace DoorLock {
 
-inline constexpr ClusterId kClusterId = 0x00000101;
+inline constexpr ClusterId Id = 0x00000101;
 
 namespace Attributes {
 namespace LockState {

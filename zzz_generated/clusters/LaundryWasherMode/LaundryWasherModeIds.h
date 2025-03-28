@@ -2,6 +2,7 @@
 //
 // Identifier constant values for cluster LaundryWasherMode (cluster code: 81/0x51)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/common/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
@@ -11,7 +12,7 @@ namespace app {
 namespace Clusters {
 namespace LaundryWasherMode {
 
-inline constexpr ClusterId kClusterId = 0x00000051;
+inline constexpr ClusterId Id = 0x00000051;
 
 namespace Attributes {
 namespace SupportedModes {

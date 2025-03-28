@@ -2,6 +2,7 @@
 //
 // Identifier constant values for cluster FaultInjection (cluster code: 4294048774/0xFFF1FC06)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/common/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
@@ -11,7 +12,7 @@ namespace app {
 namespace Clusters {
 namespace FaultInjection {
 
-inline constexpr ClusterId kClusterId = 0xFFF1FC06;
+inline constexpr ClusterId Id = 0xFFF1FC06;
 
 namespace Attributes {
 namespace GeneratedCommandList {

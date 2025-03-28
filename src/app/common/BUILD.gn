@@ -28,7 +28,9 @@ source_set("attribute-type") {
 
 source_set("global-ids") {
   sources = [ "GlobalIds.h" ]
+
   deps = [ "${chip_root}/src/lib/core:types" ]
+
 }
 
 source_set("ids") {
@@ -40,7 +42,7 @@ source_set("ids") {
   ]
 
   public_deps = [ "${chip_root}/src/app/util:types" ]
-  deps = chip_all_cluster_id_targets
+  public_deps += chip_all_cluster_id_targets
 
   public_configs = [ ":includes" ]
 }

@@ -2,6 +2,7 @@
 //
 // Identifier constant values for cluster WaterHeaterMode (cluster code: 158/0x9E)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/common/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
@@ -11,7 +12,7 @@ namespace app {
 namespace Clusters {
 namespace WaterHeaterMode {
 
-inline constexpr ClusterId kClusterId = 0x0000009E;
+inline constexpr ClusterId Id = 0x0000009E;
 
 namespace Attributes {
 namespace SupportedModes {

@@ -2,6 +2,7 @@
 //
 // Identifier constant values for cluster NitrogenDioxideConcentrationMeasurement (cluster code: 1043/0x413)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/common/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
@@ -11,7 +12,7 @@ namespace app {
 namespace Clusters {
 namespace NitrogenDioxideConcentrationMeasurement {
 
-inline constexpr ClusterId kClusterId = 0x00000413;
+inline constexpr ClusterId Id = 0x00000413;
 
 namespace Attributes {
 namespace MeasuredValue {

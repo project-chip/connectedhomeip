@@ -2,6 +2,7 @@
 //
 // Identifier constant values for cluster BooleanStateConfiguration (cluster code: 128/0x80)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/common/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
@@ -11,7 +12,7 @@ namespace app {
 namespace Clusters {
 namespace BooleanStateConfiguration {
 
-inline constexpr ClusterId kClusterId = 0x00000080;
+inline constexpr ClusterId Id = 0x00000080;
 
 namespace Attributes {
 namespace CurrentSensitivityLevel {

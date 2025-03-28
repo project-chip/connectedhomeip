@@ -2,6 +2,7 @@
 //
 // Identifier constant values for cluster OvenMode (cluster code: 73/0x49)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/common/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
@@ -11,7 +12,7 @@ namespace app {
 namespace Clusters {
 namespace OvenMode {
 
-inline constexpr ClusterId kClusterId = 0x00000049;
+inline constexpr ClusterId Id = 0x00000049;
 
 namespace Attributes {
 namespace SupportedModes {

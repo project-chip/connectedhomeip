@@ -2,6 +2,7 @@
 //
 // Identifier constant values for cluster OtaSoftwareUpdateRequestor (cluster code: 42/0x2A)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/common/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
@@ -11,7 +12,7 @@ namespace app {
 namespace Clusters {
 namespace OtaSoftwareUpdateRequestor {
 
-inline constexpr ClusterId kClusterId = 0x0000002A;
+inline constexpr ClusterId Id = 0x0000002A;
 
 namespace Attributes {
 namespace DefaultOTAProviders {

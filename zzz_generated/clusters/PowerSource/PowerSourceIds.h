@@ -2,6 +2,7 @@
 //
 // Identifier constant values for cluster PowerSource (cluster code: 47/0x2F)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/common/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
@@ -11,7 +12,7 @@ namespace app {
 namespace Clusters {
 namespace PowerSource {
 
-inline constexpr ClusterId kClusterId = 0x0000002F;
+inline constexpr ClusterId Id = 0x0000002F;
 
 namespace Attributes {
 namespace Status {

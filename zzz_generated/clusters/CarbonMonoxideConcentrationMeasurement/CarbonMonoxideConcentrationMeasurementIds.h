@@ -2,6 +2,7 @@
 //
 // Identifier constant values for cluster CarbonMonoxideConcentrationMeasurement (cluster code: 1036/0x40C)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/common/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
@@ -11,7 +12,7 @@ namespace app {
 namespace Clusters {
 namespace CarbonMonoxideConcentrationMeasurement {
 
-inline constexpr ClusterId kClusterId = 0x0000040C;
+inline constexpr ClusterId Id = 0x0000040C;
 
 namespace Attributes {
 namespace MeasuredValue {

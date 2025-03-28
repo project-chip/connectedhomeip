@@ -2,6 +2,7 @@
 //
 // Identifier constant values for cluster LevelControl (cluster code: 8/0x8)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/common/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
@@ -11,7 +12,7 @@ namespace app {
 namespace Clusters {
 namespace LevelControl {
 
-inline constexpr ClusterId kClusterId = 0x00000008;
+inline constexpr ClusterId Id = 0x00000008;
 
 namespace Attributes {
 namespace CurrentLevel {

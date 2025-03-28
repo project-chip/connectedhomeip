@@ -2,6 +2,7 @@
 //
 // Identifier constant values for cluster HepaFilterMonitoring (cluster code: 113/0x71)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/common/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
@@ -11,7 +12,7 @@ namespace app {
 namespace Clusters {
 namespace HepaFilterMonitoring {
 
-inline constexpr ClusterId kClusterId = 0x00000071;
+inline constexpr ClusterId Id = 0x00000071;
 
 namespace Attributes {
 namespace Condition {

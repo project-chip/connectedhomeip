@@ -2,6 +2,7 @@
 //
 // Identifier constant values for cluster TlsCertificateManagement (cluster code: 2049/0x801)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/common/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
@@ -11,7 +12,7 @@ namespace app {
 namespace Clusters {
 namespace TlsCertificateManagement {
 
-inline constexpr ClusterId kClusterId = 0x00000801;
+inline constexpr ClusterId Id = 0x00000801;
 
 namespace Attributes {
 namespace MaxRootCertificates {

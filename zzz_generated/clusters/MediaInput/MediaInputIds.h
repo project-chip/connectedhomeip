@@ -2,6 +2,7 @@
 //
 // Identifier constant values for cluster MediaInput (cluster code: 1287/0x507)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/common/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
@@ -11,7 +12,7 @@ namespace app {
 namespace Clusters {
 namespace MediaInput {
 
-inline constexpr ClusterId kClusterId = 0x00000507;
+inline constexpr ClusterId Id = 0x00000507;
 
 namespace Attributes {
 namespace InputList {

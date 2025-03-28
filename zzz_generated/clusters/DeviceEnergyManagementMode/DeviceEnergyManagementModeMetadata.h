@@ -2,6 +2,7 @@
 //
 // Cluster metadata information for cluster DeviceEnergyManagementMode (cluster code: 159/0x9F)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>

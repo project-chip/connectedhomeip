@@ -2,6 +2,7 @@
 //
 // Cluster metadata information for cluster PressureMeasurement (cluster code: 1027/0x403)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>

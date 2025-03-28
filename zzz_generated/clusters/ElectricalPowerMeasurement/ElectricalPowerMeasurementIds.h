@@ -2,6 +2,7 @@
 //
 // Identifier constant values for cluster ElectricalPowerMeasurement (cluster code: 144/0x90)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/common/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
@@ -11,7 +12,7 @@ namespace app {
 namespace Clusters {
 namespace ElectricalPowerMeasurement {
 
-inline constexpr ClusterId kClusterId = 0x00000090;
+inline constexpr ClusterId Id = 0x00000090;
 
 namespace Attributes {
 namespace PowerMode {

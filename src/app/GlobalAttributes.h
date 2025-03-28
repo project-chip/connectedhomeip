@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <app-common/zap-generated/ids/Attributes.h>
+#include <app/common/GlobalIds.h>
 #include <app/AppConfig.h>
 #include <app/AttributeValueEncoder.h>
 #include <app/ConcreteAttributePath.h>

@@ -2,6 +2,7 @@
 //
 // Cluster metadata information for cluster AccessControl (cluster code: 31/0x1F)
 // based on src/controller/data_model/controller-clusters.matter
+#pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
 #include <lib/core/DataModelTypes.h>
