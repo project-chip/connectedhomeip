@@ -438,7 +438,7 @@ def getCodegenTemplates():
     targets.append(JinjaCodegenTarget(
         generator="cpp-sdk",
         idl_path="src/controller/data_model/controller-clusters.matter",
-        output_directory="zzz_generated/clusters"))
+        output_directory="zzz_generated/data_model/clusters"))
 
     return targets
 

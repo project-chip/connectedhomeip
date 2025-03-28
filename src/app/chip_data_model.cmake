@@ -145,6 +145,7 @@ function(chip_configure_data_model APP_TARGET)
         OUTPUT_FILES APP_TEMPLATES_GEN_FILES
     )
     target_include_directories(${APP_TARGET} ${SCOPE} "${APP_TEMPLATES_GEN_DIR}")
+    target_include_directories(${APP_TARGET} ${SCOPE} "${CHIP_APP_BASE_DIR}/zzz_generated")
     add_dependencies(${APP_TARGET} ${APP_TARGET}-zapgen)
 
     target_sources(${APP_TARGET} ${SCOPE}

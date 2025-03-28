@@ -15,7 +15,8 @@
 import os
 
 from matter.idl.generators import CodeGenerator, GeneratorStorage
-from matter.idl.matter_idl_types import AccessPrivilege, Attribute, AttributeQuality, Command, CommandQuality, FieldQuality, Idl, Struct
+from matter.idl.matter_idl_types import (AccessPrivilege, Attribute, AttributeQuality, Command, CommandQuality, FieldQuality, Idl,
+                                         Struct)
 
 
 def as_privilege(privilege: AccessPrivilege) -> str:

@@ -1,0 +1,31 @@
+# DO NOT EDIT MANUALLY - Generated file
+#
+# Cluster generated code for constants and metadata based on src/controller/data_model/controller-clusters.matter
+import("//build_overrides/chip.gni")
+
+source_set("ids") {
+  sources = [ "AccountLoginIds.h" ]
+  deps = [
+    "${chip_root}/src/app/common:global-ids",
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
+  public_configs = [ "${chip_root}/zzz_generated/data_model:includes" ]
+}
+
+source_set("metadata") {
+  sources = [ "AccountLoginMetadata.h" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
+  public_deps = [ ":ids" ]
+  public_configs = [ "${chip_root}/zzz_generated/data_model:includes" ]
+}
+
+source_set("AccountLogin") {
+  public_deps = [
+    ":ids",
+    ":metadata",
+  ]
+}

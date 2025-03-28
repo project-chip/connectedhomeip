@@ -10,7 +10,7 @@ source_set("ids") {
     "${chip_root}/src/app/data-model-provider:metadata",
     "${chip_root}/src/lib/core:types",
   ]
-  public_configs = [ "${chip_root}/zzz_generated/clusters:includes" ]
+  public_configs = [ "${chip_root}/zzz_generated/data_model:includes" ]
 }
 
 source_set("metadata") {
@@ -20,7 +20,7 @@ source_set("metadata") {
     "${chip_root}/src/lib/core:types",
   ]
   public_deps = [ ":ids" ]
-  public_configs = [ "${chip_root}/zzz_generated/clusters:includes" ]
+  public_configs = [ "${chip_root}/zzz_generated/data_model:includes" ]
 }
 
 source_set("{{cluster.name}}") {

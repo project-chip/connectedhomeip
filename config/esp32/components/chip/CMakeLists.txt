@@ -418,6 +418,7 @@ target_include_directories(${COMPONENT_LIB} INTERFACE
     "${CHIP_ROOT}/src/lib"
     "${CHIP_ROOT}/src"
     "${CHIP_ROOT}/zzz_generated/app-common"
+    "${CHIP_ROOT}/zzz_generated/data_model"
     "${CHIP_ROOT}/examples/platform/esp32"
     "${CHIP_ROOT}/third_party/nlassert/repo/include"
     "${CHIP_ROOT}/third_party/nlio/repo/include"
