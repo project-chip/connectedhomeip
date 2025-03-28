@@ -173,6 +173,18 @@ uint16_t emberAfIndexFromEndpointIncludingDisabledEndpoints(EndpointId endpoint)
     return findIndexFromEndpoint(endpoint, false /* ignoreDisabledEndpoints */);
 }
 
+constexpr const DeviceTypeId kRootnodeId   = 0x0016;
+constexpr const DeviceTypeId kAggregatorId = 0x000E;
+
+bool IsFullFamilyComposition(const EmberAfDeviceType & deviceType)
+{
+    if ((deviceType.deviceTypeId == kRootnodeId) || (deviceType.deviceTypeId == kAggregatorId))
+    {
+        return true;
+    }
+    return false;
+}
+
 } // anonymous namespace
 
 // Initial configuration
@@ -217,7 +229,16 @@ void emberAfEndpointConfigure()
         emAfEndpoints[ep].parentEndpointId = fixedParentEndpoints[ep];
 
         emAfEndpoints[ep].bitmask.Set(EmberAfEndpointOptions::isEnabled);
-        emAfEndpoints[ep].bitmask.Set(EmberAfEndpointOptions::isFlatComposition);
+        EmberAfEndpointOptions defaultComposition = EmberAfEndpointOptions::isTreeComposition;
+        for (const auto & deviceType : emAfEndpoints[ep].deviceTypeList)
+        {
+            if (IsFullFamilyComposition(deviceType))
+            {
+                defaultComposition = EmberAfEndpointOptions::isFlatComposition;
+                break;
+            }
+        }
+        emAfEndpoints[ep].bitmask.Set(defaultComposition);
 
         // Increment currentDataVersions by 1 (slot) for every server cluster
         // this endpoint has.
