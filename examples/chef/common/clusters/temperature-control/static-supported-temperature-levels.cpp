@@ -31,11 +31,6 @@ using chip::Protocols::InteractionModel::Status;
 
 app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
 
-namespace ChefTemperatureControl {
-// Define temperature level options used by chef app
-static CharSpan temperatureLevelOptions[] = { "Low"_span, "Medium"_span, "High"_span };
-} // namespace ChefTemperatureControl
-
 uint8_t AppSupportedTemperatureLevelsDelegate::Size()
 {
     for (auto & endpointPair : AppSupportedTemperatureLevelsDelegate::supportedOptionsByEndpoints)

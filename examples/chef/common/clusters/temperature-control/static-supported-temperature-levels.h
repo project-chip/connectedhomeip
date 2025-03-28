@@ -21,6 +21,20 @@
 #include <app/clusters/temperature-control-server/supported-temperature-levels-manager.h>
 #include <app/util/config.h>
 
+namespace ChefTemperatureControl {
+struct EndpointPair
+{
+    EndpointId mEndpointId;
+    CharSpan * mTemperatureLevels;
+    uint8_t mSize;
+
+    EndpointPair(EndpointId aEndpointId, CharSpan * TemperatureLevels, uint8_t size) :
+        mEndpointId(aEndpointId), mTemperatureLevels(TemperatureLevels), mSize(size)
+    {}
+};
+static const CharSpan temperatureLevelOptions[3] = { "Low"_span, "Medium"_span, "High"_span };
+} // namespace ChefTemperatureControl
+
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -28,25 +42,18 @@ namespace TemperatureControl {
 
 class AppSupportedTemperatureLevelsDelegate : public SupportedTemperatureLevelsIteratorDelegate
 {
-    struct EndpointPair
-    {
-        EndpointId mEndpointId;
-        CharSpan * mTemperatureLevels;
-        uint8_t mSize;
-
-        EndpointPair(EndpointId aEndpointId, CharSpan * TemperatureLevels, uint8_t size) :
-            mEndpointId(aEndpointId), mTemperatureLevels(TemperatureLevels), mSize(size)
-        {}
-    };
-
-    static EndpointPair supportedOptionsByEndpoints[MATTER_DM_TEMPERATURE_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
+    static ChefTemperatureControl::EndpointPair
+        supportedOptionsByEndpoints[MATTER_DM_TEMPERATURE_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
 
 public:
     uint8_t Size() override;
 
     CHIP_ERROR Next(MutableCharSpan & item) override;
 
-    void SetSupportedEndpointPair(uint16_t index, EndpointPair endpointPair) { supportedOptionsByEndpoints[index] = endpointPair; }
+    void SetSupportedEndpointPair(uint16_t index, ChefTemperatureControl::EndpointPair endpointPair)
+    {
+        supportedOptionsByEndpoints[index] = endpointPair;
+    }
 
     ~AppSupportedTemperatureLevelsDelegate() {}
 };
