@@ -72,6 +72,7 @@ target_sources(app PRIVATE
     ${TELINK_COMMON}/zephyr_ext/zephyr_pwm_pool.c
     ${TELINK_COMMON}/zephyr_ext/zephyr_ws2812.c
     ${CHEF}/common/stubs.cpp
+    ${CHEF}/common/DataModelUtils.cpp
 )
 
 message(STATUS ${CHEF}/devices/${SAMPLE_NAME}.zap)
