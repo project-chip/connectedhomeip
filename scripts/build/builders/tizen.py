@@ -187,7 +187,7 @@ class TizenBuilder(GnBuilder):
 
     def GnBuildArgs(self):
         # Make sure that required ENV variables are defined
-        for env in ('TIZEN_SDK_ROOT', 'TIZEN_SDK_SYSROOT'):
+        for env in ('TIZEN_SDK_ROOT'):
             if env not in os.environ:
                 raise Exception(
                     "Environment %s missing, cannot build Tizen target" % env)
@@ -209,6 +209,9 @@ class TizenBuilder(GnBuilder):
                     "Environment %s missing, cannot build Tizen target" % env)
 
             sysroot = os.environ[env]
+
+        else:
+            raise Exception("CPU architecture is not supported")
 
         return self.extra_gn_options + [
             'target_os="tizen"',
