@@ -6059,6 +6059,45 @@ static BOOL AttributeIsSpecifiedInTLSClientManagementCluster(AttributeId aAttrib
     }
     }
 }
+static BOOL AttributeIsSpecifiedInMeterIdentificationCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::MeterIdentification;
+    switch (aAttributeId) {
+    case Attributes::MeterType::Id: {
+        return YES;
+    }
+    case Attributes::PointOfDelivery::Id: {
+        return YES;
+    }
+    case Attributes::MeterSerialNumber::Id: {
+        return YES;
+    }
+    case Attributes::ProtocolVersion::Id: {
+        return YES;
+    }
+    case Attributes::PowerThreshold::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInUnitTestingCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::UnitTesting;
@@ -6758,6 +6797,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::TlsClientManagement::Id: {
         return AttributeIsSpecifiedInTLSClientManagementCluster(aAttributeId);
+    }
+    case Clusters::MeterIdentification::Id: {
+        return AttributeIsSpecifiedInMeterIdentificationCluster(aAttributeId);
     }
     case Clusters::UnitTesting::Id: {
         return AttributeIsSpecifiedInUnitTestingCluster(aAttributeId);
