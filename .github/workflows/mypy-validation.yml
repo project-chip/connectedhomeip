@@ -1,8 +1,22 @@
+# Copyright (c) 2025 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 name: Mypy Type Validation
 
 on:
   push:
-    branches: [ main ]
+    branches: [ master ]
     paths:
       - 'src/python_testing/matter_testing_infrastructure/**/*.py'
   pull_request:
@@ -12,12 +26,20 @@ on:
 jobs:
   mypy-check:
     runs-on: ubuntu-latest
+    if: github.actor != 'restyled-io[bot]'
+    
+    container:
+      image: ghcr.io/project-chip/chip-build:119
+      options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
+    
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v4
       
-      # TODO: This assumes the Pigweed environment is already set up in your workflow
-      # If not, you might need to add setup steps here
+      - name: Checkout submodules & Bootstrap
+        uses: ./.github/actions/checkout-submodules-and-bootstrap
+        with:
+          platform: linux
       
       - name: Run mypy validation
         working-directory: src/python_testing/matter_testing_infrastructure
