@@ -406,6 +406,12 @@ static constexpr ClusterId Id = 0x00000750;
 namespace CommissionerControl {
 static constexpr ClusterId Id = 0x00000751;
 } // namespace CommissionerControl
+namespace JointFabricDatastore {
+static constexpr ClusterId Id = 0x00000752;
+} // namespace JointFabricDatastore
+namespace JointFabricAdministrator {
+static constexpr ClusterId Id = 0x00000753;
+} // namespace JointFabricAdministrator
 namespace TlsCertificateManagement {
 static constexpr ClusterId Id = 0x00000801;
 } // namespace TlsCertificateManagement

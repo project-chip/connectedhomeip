@@ -18290,6 +18290,430 @@ static id _Nullable DecodeAttributeValueForCommissionerControlCluster(AttributeI
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeAttributeValueForJointFabricDatastoreCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::JointFabricDatastore;
+    switch (aAttributeId) {
+    case Attributes::AnchorRootCa::Id: {
+        using TypeInfo = Attributes::AnchorRootCa::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSData * _Nonnull value;
+        value = AsData(cppValue);
+        return value;
+    }
+    case Attributes::AnchorNodeId::Id: {
+        using TypeInfo = Attributes::AnchorNodeId::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedLongLong:cppValue];
+        return value;
+    }
+    case Attributes::AnchorVendorId::Id: {
+        using TypeInfo = Attributes::AnchorVendorId::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedShort:chip::to_underlying(cppValue)];
+        return value;
+    }
+    case Attributes::FriendlyName::Id: {
+        using TypeInfo = Attributes::FriendlyName::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSString * _Nonnull value;
+        value = AsString(cppValue);
+        if (value == nil) {
+            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+            *aError = err;
+            return nil;
+        }
+        return value;
+    }
+    case Attributes::GroupKeyList::Id: {
+        using TypeInfo = Attributes::GroupKeyList::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                MTRJointFabricDatastoreClusterGroupKeySetStruct * newElement_0;
+                newElement_0 = [MTRJointFabricDatastoreClusterGroupKeySetStruct new];
+                newElement_0.groupKeySetID = [NSNumber numberWithUnsignedShort:entry_0.groupKeySetID];
+                newElement_0.groupKeySecurityPolicy = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.groupKeySecurityPolicy)];
+                if (entry_0.epochKey0.IsNull()) {
+                    newElement_0.epochKey0 = nil;
+                } else {
+                    newElement_0.epochKey0 = AsData(entry_0.epochKey0.Value());
+                }
+                if (entry_0.epochStartTime0.IsNull()) {
+                    newElement_0.epochStartTime0 = nil;
+                } else {
+                    newElement_0.epochStartTime0 = [NSNumber numberWithUnsignedLongLong:entry_0.epochStartTime0.Value()];
+                }
+                if (entry_0.epochKey1.IsNull()) {
+                    newElement_0.epochKey1 = nil;
+                } else {
+                    newElement_0.epochKey1 = AsData(entry_0.epochKey1.Value());
+                }
+                if (entry_0.epochStartTime1.IsNull()) {
+                    newElement_0.epochStartTime1 = nil;
+                } else {
+                    newElement_0.epochStartTime1 = [NSNumber numberWithUnsignedLongLong:entry_0.epochStartTime1.Value()];
+                }
+                if (entry_0.epochKey2.IsNull()) {
+                    newElement_0.epochKey2 = nil;
+                } else {
+                    newElement_0.epochKey2 = AsData(entry_0.epochKey2.Value());
+                }
+                if (entry_0.epochStartTime2.IsNull()) {
+                    newElement_0.epochStartTime2 = nil;
+                } else {
+                    newElement_0.epochStartTime2 = [NSNumber numberWithUnsignedLongLong:entry_0.epochStartTime2.Value()];
+                }
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
+        return value;
+    }
+    case Attributes::GroupList::Id: {
+        using TypeInfo = Attributes::GroupList::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                MTRJointFabricDatastoreClusterDatastoreGroupInformationEntry * newElement_0;
+                newElement_0 = [MTRJointFabricDatastoreClusterDatastoreGroupInformationEntry new];
+                newElement_0.groupID = [NSNumber numberWithUnsignedLongLong:entry_0.groupID];
+                newElement_0.friendlyName = AsString(entry_0.friendlyName);
+                if (newElement_0.friendlyName == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    *aError = err;
+                    return nil;
+                }
+                newElement_0.groupKeySetID = [NSNumber numberWithUnsignedShort:entry_0.groupKeySetID];
+                newElement_0.groupCAT = [NSNumber numberWithUnsignedShort:entry_0.groupCAT];
+                newElement_0.groupCATVersion = [NSNumber numberWithUnsignedShort:entry_0.groupCATVersion];
+                newElement_0.groupPermission = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.groupPermission)];
+                newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
+        return value;
+    }
+    case Attributes::NodeList::Id: {
+        using TypeInfo = Attributes::NodeList::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                MTRJointFabricDatastoreClusterDatastoreNodeInformationEntry * newElement_0;
+                newElement_0 = [MTRJointFabricDatastoreClusterDatastoreNodeInformationEntry new];
+                newElement_0.nodeID = [NSNumber numberWithUnsignedLongLong:entry_0.nodeID];
+                newElement_0.friendlyName = AsString(entry_0.friendlyName);
+                if (newElement_0.friendlyName == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    *aError = err;
+                    return nil;
+                }
+                newElement_0.commissioningStatusEntry = [MTRJointFabricDatastoreClusterDatastoreStatusEntry new];
+                newElement_0.commissioningStatusEntry.state = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.commissioningStatusEntry.state)];
+                if (entry_0.commissioningStatusEntry.updateTimestamp.IsNull()) {
+                    newElement_0.commissioningStatusEntry.updateTimestamp = nil;
+                } else {
+                    newElement_0.commissioningStatusEntry.updateTimestamp = [NSNumber numberWithUnsignedLongLong:entry_0.commissioningStatusEntry.updateTimestamp.Value()];
+                }
+                newElement_0.commissioningStatusEntry.failureCode = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.commissioningStatusEntry.failureCode)];
+                { // Scope for our temporary variables
+                    auto * array_2 = [NSMutableArray new];
+                    auto iter_2 = entry_0.nodeKeySetList.begin();
+                    while (iter_2.Next()) {
+                        auto & entry_2 = iter_2.GetValue();
+                        MTRJointFabricDatastoreClusterDatastoreNodeKeyEntry * newElement_2;
+                        newElement_2 = [MTRJointFabricDatastoreClusterDatastoreNodeKeyEntry new];
+                        newElement_2.groupKeySetId = [NSNumber numberWithUnsignedShort:entry_2.groupKeySetId];
+                        newElement_2.statusEntry = [MTRJointFabricDatastoreClusterDatastoreStatusEntry new];
+                        newElement_2.statusEntry.state = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_2.statusEntry.state)];
+                        if (entry_2.statusEntry.updateTimestamp.IsNull()) {
+                            newElement_2.statusEntry.updateTimestamp = nil;
+                        } else {
+                            newElement_2.statusEntry.updateTimestamp = [NSNumber numberWithUnsignedLongLong:entry_2.statusEntry.updateTimestamp.Value()];
+                        }
+                        newElement_2.statusEntry.failureCode = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_2.statusEntry.failureCode)];
+                        [array_2 addObject:newElement_2];
+                    }
+                    CHIP_ERROR err = iter_2.GetStatus();
+                    if (err != CHIP_NO_ERROR) {
+                        *aError = err;
+                        return nil;
+                    }
+                    newElement_0.nodeKeySetList = array_2;
+                }
+                { // Scope for our temporary variables
+                    auto * array_2 = [NSMutableArray new];
+                    auto iter_2 = entry_0.ACLList.begin();
+                    while (iter_2.Next()) {
+                        auto & entry_2 = iter_2.GetValue();
+                        MTRJointFabricDatastoreClusterDatastoreACLEntry * newElement_2;
+                        newElement_2 = [MTRJointFabricDatastoreClusterDatastoreACLEntry new];
+                        newElement_2.listID = [NSNumber numberWithUnsignedShort:entry_2.listID];
+                        newElement_2.statusEntry = [MTRJointFabricDatastoreClusterDatastoreStatusEntry new];
+                        newElement_2.statusEntry.state = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_2.statusEntry.state)];
+                        if (entry_2.statusEntry.updateTimestamp.IsNull()) {
+                            newElement_2.statusEntry.updateTimestamp = nil;
+                        } else {
+                            newElement_2.statusEntry.updateTimestamp = [NSNumber numberWithUnsignedLongLong:entry_2.statusEntry.updateTimestamp.Value()];
+                        }
+                        newElement_2.statusEntry.failureCode = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_2.statusEntry.failureCode)];
+                        [array_2 addObject:newElement_2];
+                    }
+                    CHIP_ERROR err = iter_2.GetStatus();
+                    if (err != CHIP_NO_ERROR) {
+                        *aError = err;
+                        return nil;
+                    }
+                    newElement_0.aclList = array_2;
+                }
+                { // Scope for our temporary variables
+                    auto * array_2 = [NSMutableArray new];
+                    auto iter_2 = entry_0.endpointList.begin();
+                    while (iter_2.Next()) {
+                        auto & entry_2 = iter_2.GetValue();
+                        MTRJointFabricDatastoreClusterDatastoreEndpointEntry * newElement_2;
+                        newElement_2 = [MTRJointFabricDatastoreClusterDatastoreEndpointEntry new];
+                        newElement_2.endpointID = [NSNumber numberWithUnsignedShort:entry_2.endpointID];
+                        newElement_2.nodeID = [NSNumber numberWithUnsignedLongLong:entry_2.nodeID];
+                        newElement_2.friendlyName = AsString(entry_2.friendlyName);
+                        if (newElement_2.friendlyName == nil) {
+                            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                            *aError = err;
+                            return nil;
+                        }
+                        newElement_2.statusEntry = [MTRJointFabricDatastoreClusterDatastoreStatusEntry new];
+                        newElement_2.statusEntry.state = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_2.statusEntry.state)];
+                        if (entry_2.statusEntry.updateTimestamp.IsNull()) {
+                            newElement_2.statusEntry.updateTimestamp = nil;
+                        } else {
+                            newElement_2.statusEntry.updateTimestamp = [NSNumber numberWithUnsignedLongLong:entry_2.statusEntry.updateTimestamp.Value()];
+                        }
+                        newElement_2.statusEntry.failureCode = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_2.statusEntry.failureCode)];
+                        { // Scope for our temporary variables
+                            auto * array_4 = [NSMutableArray new];
+                            auto iter_4 = entry_2.groupIDList.begin();
+                            while (iter_4.Next()) {
+                                auto & entry_4 = iter_4.GetValue();
+                                MTRJointFabricDatastoreClusterDatastoreGroupIDEntry * newElement_4;
+                                newElement_4 = [MTRJointFabricDatastoreClusterDatastoreGroupIDEntry new];
+                                newElement_4.groupID = [NSNumber numberWithUnsignedShort:entry_4.groupID];
+                                newElement_4.statusEntry = [MTRJointFabricDatastoreClusterDatastoreStatusEntry new];
+                                newElement_4.statusEntry.state = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_4.statusEntry.state)];
+                                if (entry_4.statusEntry.updateTimestamp.IsNull()) {
+                                    newElement_4.statusEntry.updateTimestamp = nil;
+                                } else {
+                                    newElement_4.statusEntry.updateTimestamp = [NSNumber numberWithUnsignedLongLong:entry_4.statusEntry.updateTimestamp.Value()];
+                                }
+                                newElement_4.statusEntry.failureCode = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_4.statusEntry.failureCode)];
+                                [array_4 addObject:newElement_4];
+                            }
+                            CHIP_ERROR err = iter_4.GetStatus();
+                            if (err != CHIP_NO_ERROR) {
+                                *aError = err;
+                                return nil;
+                            }
+                            newElement_2.groupIDList = array_4;
+                        }
+                        { // Scope for our temporary variables
+                            auto * array_4 = [NSMutableArray new];
+                            auto iter_4 = entry_2.bindingList.begin();
+                            while (iter_4.Next()) {
+                                auto & entry_4 = iter_4.GetValue();
+                                MTRJointFabricDatastoreClusterDatastoreBindingEntry * newElement_4;
+                                newElement_4 = [MTRJointFabricDatastoreClusterDatastoreBindingEntry new];
+                                newElement_4.listID = [NSNumber numberWithUnsignedShort:entry_4.listID];
+                                newElement_4.statusEntry = [MTRJointFabricDatastoreClusterDatastoreStatusEntry new];
+                                newElement_4.statusEntry.state = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_4.statusEntry.state)];
+                                if (entry_4.statusEntry.updateTimestamp.IsNull()) {
+                                    newElement_4.statusEntry.updateTimestamp = nil;
+                                } else {
+                                    newElement_4.statusEntry.updateTimestamp = [NSNumber numberWithUnsignedLongLong:entry_4.statusEntry.updateTimestamp.Value()];
+                                }
+                                newElement_4.statusEntry.failureCode = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_4.statusEntry.failureCode)];
+                                [array_4 addObject:newElement_4];
+                            }
+                            CHIP_ERROR err = iter_4.GetStatus();
+                            if (err != CHIP_NO_ERROR) {
+                                *aError = err;
+                                return nil;
+                            }
+                            newElement_2.bindingList = array_4;
+                        }
+                        [array_2 addObject:newElement_2];
+                    }
+                    CHIP_ERROR err = iter_2.GetStatus();
+                    if (err != CHIP_NO_ERROR) {
+                        *aError = err;
+                        return nil;
+                    }
+                    newElement_0.endpointList = array_2;
+                }
+                newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
+        return value;
+    }
+    case Attributes::AdminList::Id: {
+        using TypeInfo = Attributes::AdminList::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                MTRJointFabricDatastoreClusterDatastoreAdministratorInformationEntry * newElement_0;
+                newElement_0 = [MTRJointFabricDatastoreClusterDatastoreAdministratorInformationEntry new];
+                newElement_0.nodeID = [NSNumber numberWithUnsignedLongLong:entry_0.nodeID];
+                newElement_0.friendlyName = AsString(entry_0.friendlyName);
+                if (newElement_0.friendlyName == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    *aError = err;
+                    return nil;
+                }
+                newElement_0.vendorID = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_0.vendorID)];
+                newElement_0.icac = AsData(entry_0.icac);
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
+        return value;
+    }
+    case Attributes::StatusEntry::Id: {
+        using TypeInfo = Attributes::StatusEntry::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                MTRJointFabricDatastoreClusterDatastoreAdministratorInformationEntry * newElement_0;
+                newElement_0 = [MTRJointFabricDatastoreClusterDatastoreAdministratorInformationEntry new];
+                newElement_0.nodeID = [NSNumber numberWithUnsignedLongLong:entry_0.nodeID];
+                newElement_0.friendlyName = AsString(entry_0.friendlyName);
+                if (newElement_0.friendlyName == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    *aError = err;
+                    return nil;
+                }
+                newElement_0.vendorID = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_0.vendorID)];
+                newElement_0.icac = AsData(entry_0.icac);
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
+        return value;
+    }
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeAttributeValueForJointFabricAdministratorCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::JointFabricAdministrator;
+    switch (aAttributeId) {
+    case Attributes::AdministratorFabricIndex::Id: {
+        using TypeInfo = Attributes::AdministratorFabricIndex::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedChar:cppValue];
+        return value;
+    }
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeAttributeValueForTLSCertificateManagementCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::TlsCertificateManagement;
@@ -20435,6 +20859,12 @@ id _Nullable MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::T
     }
     case Clusters::CommissionerControl::Id: {
         return DecodeAttributeValueForCommissionerControlCluster(aPath.mAttributeId, aReader, aError);
+    }
+    case Clusters::JointFabricDatastore::Id: {
+        return DecodeAttributeValueForJointFabricDatastoreCluster(aPath.mAttributeId, aReader, aError);
+    }
+    case Clusters::JointFabricAdministrator::Id: {
+        return DecodeAttributeValueForJointFabricAdministratorCluster(aPath.mAttributeId, aReader, aError);
     }
     case Clusters::TlsCertificateManagement::Id: {
         return DecodeAttributeValueForTLSCertificateManagementCluster(aPath.mAttributeId, aReader, aError);

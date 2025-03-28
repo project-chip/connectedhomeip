@@ -13532,6 +13532,331 @@ class ChipClusters:
             },
         },
     }
+    _JOINT_FABRIC_DATASTORE_CLUSTER_INFO = {
+        "clusterName": "JointFabricDatastore",
+        "clusterId": 0x00000752,
+        "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "AddKeySet",
+                "args": {
+                    "groupKeySet": "GroupKeySetStruct",
+                },
+            },
+            0x00000001: {
+                "commandId": 0x00000001,
+                "commandName": "UpdateKeySet",
+                "args": {
+                    "groupKeySet": "GroupKeySetStruct",
+                },
+            },
+            0x00000002: {
+                "commandId": 0x00000002,
+                "commandName": "RemoveKeySet",
+                "args": {
+                    "groupKeySetId": "int",
+                },
+            },
+            0x00000003: {
+                "commandId": 0x00000003,
+                "commandName": "AddGroup",
+                "args": {
+                    "groupID": "int",
+                    "friendlyName": "str",
+                    "groupKeySetID": "int",
+                    "groupCAT": "int",
+                    "groupCATVersion": "int",
+                    "groupPermission": "int",
+                },
+            },
+            0x00000004: {
+                "commandId": 0x00000004,
+                "commandName": "UpdateGroup",
+                "args": {
+                    "groupID": "int",
+                    "friendlyName": "str",
+                    "groupKeySetID": "int",
+                    "groupCAT": "int",
+                    "groupCATVersion": "int",
+                    "groupPermission": "int",
+                },
+            },
+            0x00000005: {
+                "commandId": 0x00000005,
+                "commandName": "RemoveGroup",
+                "args": {
+                    "groupID": "int",
+                },
+            },
+            0x00000006: {
+                "commandId": 0x00000006,
+                "commandName": "AddAdmin",
+                "args": {
+                    "adminInformationEntry": "DatastoreAdministratorInformationEntry",
+                },
+            },
+            0x00000007: {
+                "commandId": 0x00000007,
+                "commandName": "UpdateAdmin",
+                "args": {
+                    "nodeID": "int",
+                    "friendlyName": "str",
+                    "icac": "bytes",
+                },
+            },
+            0x00000008: {
+                "commandId": 0x00000008,
+                "commandName": "RemoveAdmin",
+                "args": {
+                    "nodeID": "int",
+                },
+            },
+            0x00000009: {
+                "commandId": 0x00000009,
+                "commandName": "AddPendingNode",
+                "args": {
+                    "nodeID": "int",
+                    "friendlyName": "str",
+                },
+            },
+            0x0000000A: {
+                "commandId": 0x0000000A,
+                "commandName": "RefreshNode",
+                "args": {
+                    "nodeID": "int",
+                },
+            },
+            0x0000000B: {
+                "commandId": 0x0000000B,
+                "commandName": "UpdateNode",
+                "args": {
+                    "nodeID": "int",
+                    "friendlyName": "str",
+                },
+            },
+            0x0000000C: {
+                "commandId": 0x0000000C,
+                "commandName": "RemoveNode",
+                "args": {
+                    "nodeID": "int",
+                },
+            },
+            0x0000000D: {
+                "commandId": 0x0000000D,
+                "commandName": "UpdateEndpointForNode",
+                "args": {
+                    "endpointID": "int",
+                    "nodeID": "int",
+                    "friendlyName": "str",
+                },
+            },
+            0x0000000E: {
+                "commandId": 0x0000000E,
+                "commandName": "AddGroupIDToEndpointForNode",
+                "args": {
+                    "nodeID": "int",
+                    "endpointID": "int",
+                    "groupID": "int",
+                },
+            },
+            0x0000000F: {
+                "commandId": 0x0000000F,
+                "commandName": "RemoveGroupIDFromEndpointForNode",
+                "args": {
+                    "nodeID": "int",
+                    "endpointID": "int",
+                    "groupID": "int",
+                },
+            },
+            0x00000010: {
+                "commandId": 0x00000010,
+                "commandName": "AddBindingToEndpointForNode",
+                "args": {
+                    "nodeID": "int",
+                    "endpointID": "int",
+                },
+            },
+            0x00000011: {
+                "commandId": 0x00000011,
+                "commandName": "RemoveBindingFromEndpointForNode",
+                "args": {
+                    "listID": "int",
+                    "endpointID": "int",
+                    "nodeID": "int",
+                },
+            },
+            0x00000012: {
+                "commandId": 0x00000012,
+                "commandName": "AddACLToNode",
+                "args": {
+                    "nodeID": "int",
+                },
+            },
+            0x00000013: {
+                "commandId": 0x00000013,
+                "commandName": "RemoveACLFromNode",
+                "args": {
+                    "listID": "int",
+                    "nodeID": "int",
+                },
+            },
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "AnchorRootCa",
+                "attributeId": 0x00000000,
+                "type": "bytes",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "AnchorNodeId",
+                "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "AnchorVendorId",
+                "attributeId": 0x00000002,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000003: {
+                "attributeName": "FriendlyName",
+                "attributeId": 0x00000003,
+                "type": "str",
+                "reportable": True,
+            },
+            0x00000004: {
+                "attributeName": "GroupKeyList",
+                "attributeId": 0x00000004,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000005: {
+                "attributeName": "GroupList",
+                "attributeId": 0x00000005,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000006: {
+                "attributeName": "NodeList",
+                "attributeId": 0x00000006,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000007: {
+                "attributeName": "AdminList",
+                "attributeId": 0x00000007,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000008: {
+                "attributeName": "StatusEntry",
+                "attributeId": 0x00000008,
+                "type": "",
+                "reportable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
+    _JOINT_FABRIC_ADMINISTRATOR_CLUSTER_INFO = {
+        "clusterName": "JointFabricAdministrator",
+        "clusterId": 0x00000753,
+        "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "ICACCSRRequest",
+                "args": {
+                },
+            },
+            0x00000002: {
+                "commandId": 0x00000002,
+                "commandName": "AddICAC",
+                "args": {
+                    "ICACValue": "bytes",
+                },
+            },
+            0x00000004: {
+                "commandId": 0x00000004,
+                "commandName": "OpenJointCommissioningWindow",
+                "args": {
+                    "commissioningTimeout": "int",
+                    "PAKEPasscodeVerifier": "bytes",
+                    "discriminator": "int",
+                    "iterations": "int",
+                    "salt": "bytes",
+                },
+            },
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "AdministratorFabricIndex",
+                "attributeId": 0x00000000,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
     _TLS_CERTIFICATE_MANAGEMENT_CLUSTER_INFO = {
         "clusterName": "TlsCertificateManagement",
         "clusterId": 0x00000801,
@@ -14850,6 +15175,8 @@ class ChipClusters:
         0x00000556: _CHIME_CLUSTER_INFO,
         0x00000750: _ECOSYSTEM_INFORMATION_CLUSTER_INFO,
         0x00000751: _COMMISSIONER_CONTROL_CLUSTER_INFO,
+        0x00000752: _JOINT_FABRIC_DATASTORE_CLUSTER_INFO,
+        0x00000753: _JOINT_FABRIC_ADMINISTRATOR_CLUSTER_INFO,
         0x00000801: _TLS_CERTIFICATE_MANAGEMENT_CLUSTER_INFO,
         0x00000802: _TLS_CLIENT_MANAGEMENT_CLUSTER_INFO,
         0xFFF1FC05: _UNIT_TESTING_CLUSTER_INFO,
@@ -14985,6 +15312,8 @@ class ChipClusters:
         "Chime": _CHIME_CLUSTER_INFO,
         "EcosystemInformation": _ECOSYSTEM_INFORMATION_CLUSTER_INFO,
         "CommissionerControl": _COMMISSIONER_CONTROL_CLUSTER_INFO,
+        "JointFabricDatastore": _JOINT_FABRIC_DATASTORE_CLUSTER_INFO,
+        "JointFabricAdministrator": _JOINT_FABRIC_ADMINISTRATOR_CLUSTER_INFO,
         "TlsCertificateManagement": _TLS_CERTIFICATE_MANAGEMENT_CLUSTER_INFO,
         "TlsClientManagement": _TLS_CLIENT_MANAGEMENT_CLUSTER_INFO,
         "UnitTesting": _UNIT_TESTING_CLUSTER_INFO,

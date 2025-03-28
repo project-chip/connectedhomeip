@@ -1,0 +1,298 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2024 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="CHIP"/>
+
+  <enum name="DatastoreStateEnum" type="enum8">
+    <cluster code="0x0752"/>
+    <item name="Pending" value="0x00"/>
+    <item name="Committed" value="0x01"/>
+    <item name="DeletePending" value="0x02"/>
+    <item name="CommitFailed" value="0x03"/>
+  </enum>
+
+  <enum name="FailureCodeEnum" type="enum8">
+    <cluster code="0x0752"/>
+    <item name="OK" value="0x00"/>
+  </enum>
+
+  <struct name="DatastoreStatusEntry">
+    <cluster code="0x0752"/>
+    <item fieldId="0" name="State" type="DatastoreStateEnum" default="Pending"/>
+    <item fieldId="1" name="UpdateTimestamp" type="epoch_us" isNullable="true"/>
+    <item fieldId="2" name="FailureCode" type="FailureCodeEnum" default="OK"/>
+  </struct>
+
+  <struct name="DatastoreNodeKeyEntry">
+    <cluster code="0x0752"/>
+    <item fieldId="0" name="GroupKeySetId" type="int16u"/>
+    <item fieldId="1" name="StatusEntry" type="DatastoreStatusEntry"/>
+  </struct>
+
+  <struct name="DatastoreGroupInformationEntry" isFabricScoped="true">
+    <cluster code="0x0752"/>
+    <item fieldId="0" name="GroupID" type="int64u"/>
+    <item fieldId="1" name="FriendlyName" type="char_string" length="32"/>
+    <item fieldId="2" name="GroupKeySetID" type="int16u"/>
+    <item fieldId="3" name="GroupCAT" type="int16u"/>
+    <item fieldId="4" name="GroupCATVersion" type="int16u"/>
+    <item fieldId="5" name="GroupPermission" type="AccessControlEntryPrivilegeEnum"/>
+  </struct>
+
+  <struct name="DatastoreBindingEntry">
+    <cluster code="0x0752"/>
+    <item fieldId="0" name="ListID" type="int16u"/>
+    <!-- TODO: Need to support WrappedStructs when dealing with FabricScoped items -->
+    <!-- <item fieldId="1" name="Binding" type="TargetStruct"/> -->
+    <item fieldId="2" name="StatusEntry" type="DatastoreStatusEntry"/>
+  </struct>
+
+  <struct name="DatastoreGroupIDEntry">
+    <cluster code="0x0752"/>
+    <item fieldId="0" name="GroupID" type="group_id"/>
+    <item fieldId="1" name="StatusEntry" type="DatastoreStatusEntry"/>
+  </struct>
+
+  <struct name="DatastoreEndpointEntry">
+    <cluster code="0x0752"/>
+    <item fieldId="0" name="EndpointID" type="endpoint_no"/>
+    <item fieldId="1" name="NodeID" type="node_id"/>
+    <item fieldId="2" name="FriendlyName" type="char_string" length="32"/>
+    <item fieldId="3" name="StatusEntry" type="DatastoreStatusEntry"/>
+    <item fieldId="4" name="GroupIDList" type="DatastoreGroupIDEntry" array="true"/>
+    <item fieldId="5" name="BindingList" type="DatastoreBindingEntry" array="true"/>
+  </struct>
+
+  <struct name="DatastoreACLEntry">
+    <cluster code="0x0752"/>
+    <item fieldId="0" name="ListID" type="int16u"/>
+    <!-- TODO: Need to support WrappedStructs when dealing with FabricScoped items -->
+    <!-- <item fieldId="1" name="ACLEntry" type="AccessControlEntryStruct"/> -->
+    <item fieldId="2" name="StatusEntry" type="DatastoreStatusEntry"/>
+  </struct>
+
+  <struct name="DatastoreNodeInformationEntry" isFabricScoped="true">
+    <cluster code="0x0752"/>
+    <item fieldId="1" name="NodeID" type="node_id"/>
+    <item fieldId="2" name="FriendlyName" type="char_string" length="32"/>
+    <item fieldId="3" name="CommissioningStatusEntry" type="DatastoreStatusEntry"/>
+    <item fieldId="4" name="NodeKeySetList" type="DatastoreNodeKeyEntry" array="true"/>
+    <item fieldId="5" name="ACLList" type="DatastoreACLEntry" array="true"/>
+    <item fieldId="6" name="EndpointList" type="DatastoreEndpointEntry" array="true"/>
+  </struct>
+
+  <struct name="DatastoreAdministratorInformationEntry">
+    <cluster code="0x0752"/>
+    <item fieldId="1" name="NodeID" type="node_id"/>
+    <item fieldId="2" name="FriendlyName" type="char_string" length="32"/>
+    <item fieldId="3" name="VendorID" type="vendor_id"/>
+    <item fieldId="4" name="ICAC" type="octet_string" length="400"/>
+  </struct>
+
+  <cluster>
+    <domain>General</domain>
+    <name>Joint Fabric Datastore</name>
+    <code>0x0752</code>
+    <define>JOINT_FABRIC_DATASTORE_CLUSTER</define>
+    <description>Joint Fabric Datastore Cluster.</description>
+
+    <attribute side="server" code="0x0000" define="ANCHOR_ROOT_CA" type="octet_string" writable="false" optional="false">
+      <description>AnchorRootCa</description>
+      <access op="read" privilege="administer"/>
+    </attribute>
+    <attribute side="server" code="0x0001" define="ANCHOR_NODE_ID" type="node_id" writable="false" optional="false">
+      <description>AnchorNodeId</description>
+      <access op="read" privilege="administer"/>
+    </attribute>
+    <attribute side="server" code="0x0002" define="ANCHOR_VENDOR_ID" type="vendor_id" writable="false" optional="false">
+      <description>AnchorVendorId</description>
+      <access op="read" privilege="administer"/>
+    </attribute>
+    <attribute side="server" code="0x0003" define="FRIENDLY_NAME" type="char_string" length="32" writable="false" optional="false">
+      <description>FriendlyName</description>
+      <access op="read" privilege="administer"/>
+    </attribute>
+    <attribute side="server" code="0x0004" define="GROUP_KEY_LIST" type="array" entryType="GroupKeySetStruct" writable="false" optional="false">
+      <description>GroupKeyList</description>
+      <access op="read" privilege="administer"/>
+    </attribute>
+    <attribute side="server" code="0x0005" define="GROUP_LIST" type="array" entryType="DatastoreGroupInformationEntry" writable="false" optional="false">
+      <description>GroupList</description>
+      <access op="read" privilege="administer"/>
+    </attribute>
+    <attribute side="server" code="0x0006" define="NODE_LIST" type="array" entryType="DatastoreNodeInformationEntry" writable="false" optional="false">
+      <description>NodeList</description>
+      <access op="read" privilege="administer"/>
+    </attribute>
+    <attribute side="server" code="0x0007" define="ADMIN_LIST" type="array" entryType="DatastoreAdministratorInformationEntry" writable="false" optional="false">
+      <description>AdminList</description>
+      <access op="read" privilege="administer"/>
+    </attribute>
+    <attribute side="server" code="0x0008" define="STATUS_ENTRY" type="array" entryType="DatastoreAdministratorInformationEntry" writable="false" optional="false">
+      <description>StatusEntry</description>
+      <access op="read" privilege="administer"/>
+    </attribute>
+
+    <command source="client" code="0x00" name="AddKeySet" isFabricScoped="true" optional="false">
+      <description>AddKeySet</description>
+      <arg name="GroupKeySet" type="GroupKeySetStruct"/>
+      <access op="invoke" privilege="administer"/>
+    </command>
+
+    <command source="client" code="0x01" name="UpdateKeySet" isFabricScoped="true" optional="false">
+      <description>UpdateKeySet</description>
+      <arg name="GroupKeySet" type="GroupKeySetStruct"/>
+      <access op="invoke" privilege="administer"/>
+    </command>
+
+    <command source="client" code="0x02" name="RemoveKeySet" isFabricScoped="true" optional="false">
+      <description>RemoveKeySet</description>
+      <arg name="GroupKeySetId" type="int16u"/>
+      <access op="invoke" privilege="administer"/>
+    </command>
+
+    <command source="client" code="0x03" name="AddGroup" isFabricScoped="true" optional="false">
+      <description>AddGroup</description>
+      <arg name="GroupID" type="group_id"/>
+      <arg name="FriendlyName" type="char_string" length="32"/>
+      <arg name="GroupKeySetID" type="int16u"/>
+      <arg name="GroupCAT" type="int16u"/>
+      <arg name="GroupCATVersion" type="int16u"/>
+      <arg name="GroupPermission" type="AccessControlEntryPrivilegeEnum"/>
+      <access op="invoke" privilege="administer"/>
+    </command>
+
+    <command source="client" code="0x04" name="UpdateGroup" isFabricScoped="true" optional="false">
+      <description>UpdateGroup</description>
+      <arg name="GroupID" type="group_id"/>
+      <arg name="FriendlyName" type="char_string" length="32"/>
+      <arg name="GroupKeySetID" type="int16u"/>
+      <arg name="GroupCAT" type="int16u"/>
+      <arg name="GroupCATVersion" type="int16u"/>
+      <arg name="GroupPermission" type="AccessControlEntryPrivilegeEnum"/>
+      <access op="invoke" privilege="administer"/>
+    </command>
+
+    <command source="client" code="0x05" name="RemoveGroup" isFabricScoped="true" optional="false">
+      <description>RemoveGroup</description>
+      <arg name="GroupID" type="group_id"/>
+      <access op="invoke" privilege="administer"/>
+    </command>
+
+    <command source="client" code="0x06" name="AddAdmin" isFabricScoped="true" optional="false">
+      <description>AddAdmin</description>
+      <arg name="AdminInformationEntry" type="DatastoreAdministratorInformationEntry" isNullable="true"/>
+      <access op="invoke" privilege="administer"/>
+    </command>
+
+    <command source="client" code="0x07" name="UpdateAdmin" isFabricScoped="true" optional="false">
+      <description>UpdateAdmin</description>
+      <arg name="NodeID" type="node_id"/>
+      <arg name="FriendlyName" type="char_string" length="32"/>
+      <arg name="ICAC" type="octet_string" length="400"/>
+      <access op="invoke" privilege="administer"/>
+    </command>
+
+    <command source="client" code="0x08" name="RemoveAdmin" isFabricScoped="true" optional="false">
+      <description>RemoveAdmin</description>
+      <arg name="NodeID" type="node_id"/>
+      <access op="invoke" privilege="administer"/>
+    </command>
+
+    <command source="client" code="0x09" name="AddPendingNode" isFabricScoped="true" optional="false">
+      <description>AddPendingNode</description>
+      <arg name="NodeID" type="node_id"/>
+      <arg name="FriendlyName" type="char_string" length="32"/>
+      <access op="invoke" privilege="administer"/>
+    </command>
+
+    <command source="client" code="0x0A" name="RefreshNode" isFabricScoped="true" optional="false">
+      <description>RefreshNode</description>
+      <arg name="NodeID" type="node_id"/>
+      <access op="invoke" privilege="administer"/>
+    </command>
+
+    <command source="client" code="0x0B" name="UpdateNode" isFabricScoped="true" optional="false">
+      <description>UpdateNode</description>
+      <arg name="NodeID" type="node_id"/>
+      <arg name="FriendlyName" type="char_string" length="32"/>
+      <access op="invoke" privilege="administer"/>
+    </command>
+
+    <command source="client" code="0x0C" name="RemoveNode" isFabricScoped="true" optional="false">
+      <description>RemoveNode</description>
+      <arg name="NodeID" type="node_id"/>
+      <access op="invoke" privilege="administer"/>
+    </command>
+
+    <command source="client" code="0x0D" name="UpdateEndpointForNode" isFabricScoped="true" optional="false">
+      <description>UpdateEndpointForNode</description>
+      <arg name="EndpointID" type="endpoint_no"/>
+      <arg name="NodeID" type="node_id"/>
+      <arg name="FriendlyName" type="char_string" length="32"/>
+      <access op="invoke" privilege="administer"/>
+    </command>
+
+    <command source="client" code="0x0E" name="AddGroupIDToEndpointForNode" isFabricScoped="true" optional="false">
+      <description>AddGroupIDToEndpointForNode</description>
+      <arg name="NodeID" type="node_id"/>
+      <arg name="EndpointID" type="endpoint_no"/>
+      <arg name="GroupID" type="group_id"/>
+      <access op="invoke" privilege="administer"/>
+    </command>
+
+    <command source="client" code="0x0F" name="RemoveGroupIDFromEndpointForNode" isFabricScoped="true" optional="false">
+      <description>RemoveGroupIDFromEndpointForNode</description>
+      <arg name="NodeID" type="node_id"/>
+      <arg name="EndpointID" type="endpoint_no"/>
+      <arg name="GroupID" type="group_id"/>
+      <access op="invoke" privilege="administer"/>
+    </command>
+
+    <command source="client" code="0x10" name="AddBindingToEndpointForNode" isFabricScoped="true" optional="false">
+      <description>AddBindingToEndpointForNode</description>
+      <arg name="NodeID" type="node_id"/>
+      <arg name="EndpointID" type="endpoint_no"/>
+      <!-- TODO: Need to support WrappedStructs when dealing with FabricScoped items -->
+      <!-- <arg name="Binding" type="TargetStruct"/> -->
+      <access op="invoke" privilege="administer"/>
+    </command>
+
+    <command source="client" code="0x11" name="RemoveBindingFromEndpointForNode" isFabricScoped="true" optional="false">
+      <description>RemoveBindingFromEndpointForNode</description>
+      <arg name="ListID" type="int16u"/>
+      <arg name="EndpointID" type="endpoint_no"/>
+      <arg name="NodeID" type="node_id"/>
+      <access op="invoke" privilege="administer"/>
+    </command>
+
+    <command source="client" code="0x12" name="AddACLToNode" isFabricScoped="true" optional="false">
+      <description>AddACLToNode</description>
+      <arg name="NodeID" type="node_id"/>
+      <!-- TODO: Need to support WrappedStructs when dealing with FabricScoped items -->
+      <!-- <arg name="ACLEntry" type="AccessControlEntryStruct"/> -->
+      <access op="invoke" privilege="administer"/>
+    </command>
+
+    <command source="client" code="0x13" name="RemoveACLFromNode" isFabricScoped="true" optional="false">
+      <description>RemoveACLFromNode</description>
+      <arg name="ListID" type="int16u"/>
+      <arg name="NodeID" type="node_id"/>
+      <access op="invoke" privilege="administer"/>
+    </command>
+  </cluster>
+</configurator>

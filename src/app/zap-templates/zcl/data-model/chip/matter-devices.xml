@@ -63,6 +63,8 @@ limitations under the License.
             <include cluster="General Commissioning" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireCommand>SetRegulatoryConfig</requireCommand>
             </include>
+            <include cluster="Joint Fabric Datastore" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Joint Fabric Administrator" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Power Source Configuration" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Time Synchronization" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Group Key Management" client="false" server="true" clientLocked="true" serverLocked="true"></include>
