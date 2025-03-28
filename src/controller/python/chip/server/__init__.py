@@ -16,8 +16,8 @@
 
 import ctypes
 
-from chip import native
-from chip.native import PostAttributeChangeCallback, c_PostAttributeChangeCallback
+from .. import native as MatterNative
+from ..native import PostAttributeChangeCallback
 
 __all__ = [
     "GetLibraryHandle",
@@ -25,14 +25,14 @@ __all__ = [
 ]
 
 
-def GetLibraryHandle(cb: c_PostAttributeChangeCallback) -> ctypes.CDLL:
+def GetLibraryHandle(cb: MatterNative.c_PostAttributeChangeCallback) -> ctypes.CDLL:
     """Get a memoized handle to the chip native code dll.
 
     Args:
       cb: A callback decorated by PostAttributeChangeCallback decorator.
     """
 
-    handle = native._GetLibraryHandle(native.Library.SERVER, False)
+    handle = MatterNative._GetLibraryHandle(MatterNative.Library.SERVER, False)
     if not handle.initialized:
         handle.dll.pychip_server_native_init().raise_on_error()
         handle.dll.pychip_server_set_callbacks(cb)
