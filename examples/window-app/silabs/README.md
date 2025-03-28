@@ -4,19 +4,19 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG24.
 
 <hr>
 
-- [Matter EFR32 Window Covering Example](#matter-efr32-window-covering-example)
-  - [Introduction](#introduction)
-  - [Building](#building)
-  - [Flashing the Application](#flashing-the-application)
-  - [Viewing Logging Output](#viewing-logging-output)
-  - [Running the Complete Example](#running-the-complete-example)
-    - [Notes](#notes)
-  - [OTA Software Update](#ota-software-update)
-  - [Building options](#building-options)
-    - [Disabling logging](#disabling-logging)
-    - [Debug build / release build](#debug-build--release-build)
-    - [Disabling LCD](#disabling-lcd)
-    - [KVS maximum entry count](#kvs-maximum-entry-count)
+-   [Matter EFR32 Window Covering Example](#matter-efr32-window-covering-example)
+    -   [Introduction](#introduction)
+    -   [Building](#building)
+    -   [Flashing the Application](#flashing-the-application)
+    -   [Viewing Logging Output](#viewing-logging-output)
+    -   [Running the Complete Example](#running-the-complete-example)
+        -   [Notes](#notes)
+    -   [OTA Software Update](#ota-software-update)
+    -   [Building options](#building-options)
+        -   [Disabling logging](#disabling-logging)
+        -   [Debug build / release build](#debug-build--release-build)
+        -   [Disabling LCD](#disabling-lcd)
+        -   [KVS maximum entry count](#kvs-maximum-entry-count)
 
 <hr>
 
