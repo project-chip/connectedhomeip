@@ -43,7 +43,7 @@ namespace CameraAvSettingsUserLevelManagement {
 
 CameraAvSettingsUserLevelMgmtServer::CameraAvSettingsUserLevelMgmtServer(
     EndpointId endpointId, Delegate * delegate, BitMask<Feature> aFeature, const BitFlags<OptionalAttributes> aOptionalAttrs,
-    const uint8_t aMaxPresets, uint16_t aPanMin, uint16_t aPanMax, uint16_t aTiltMin, uint16_t aTiltMax, uint8_t aZoomMax) :
+    const uint8_t aMaxPresets, int16_t aPanMin, int16_t aPanMax, int16_t aTiltMin, int16_t aTiltMax, uint8_t aZoomMax) :
     AttributeAccessInterface(MakeOptional(endpointId), CameraAvSettingsUserLevelManagement::Id),
     CommandHandlerInterface(MakeOptional(endpointId), CameraAvSettingsUserLevelManagement::Id), mDelegate(delegate),
     mEndpointId(endpointId), mFeature(aFeature), mOptionalAttrs(aOptionalAttrs), mMaxPresets(aMaxPresets), mPanMin(aPanMin),
@@ -218,7 +218,7 @@ void CameraAvSettingsUserLevelMgmtServer::UpdatePresetID()
         });
         if (it == mMptzPresetHelper.end())
         {
-            currentPresetID += increment;
+            currentPresetID += (uint8_t)increment;
             break;
         }
         increment++;
@@ -553,7 +553,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRelativeMove(HandlerContext 
 
     Optional<int16_t> panDelta  = commandData.panDelta;
     Optional<int16_t> tiltDelta = commandData.tiltDelta;
-    Optional<uint8_t> zoomDelta = commandData.zoomDelta;
+    Optional<int8_t> zoomDelta = commandData.zoomDelta;
     int16_t newPan              = mMptzPosition.pan.Value();
     int16_t newTilt             = mMptzPosition.tilt.Value();
     uint8_t newZoom             = mMptzPosition.zoom.Value();
@@ -577,7 +577,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRelativeMove(HandlerContext 
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
             return;
         }
-        newPan += panDelta.Value();
+        newPan += (int16_t)panDelta.Value();
         if (newPan > mPanMax)
         {
             newPan = mPanMax;
@@ -598,7 +598,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRelativeMove(HandlerContext 
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
             return;
         }
-        newTilt += tiltDelta.Value();
+        newTilt += (int16_t)tiltDelta.Value();
         if (newTilt > mTiltMax)
         {
             newTilt = mTiltMax;
@@ -619,7 +619,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRelativeMove(HandlerContext 
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
             return;
         }
-        newZoom += zoomDelta.Value();
+        newZoom += (uint8_t)zoomDelta.Value();
         if (newZoom > mZoomMax)
         {
             newZoom = mZoomMax;

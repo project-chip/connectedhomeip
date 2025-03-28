@@ -89,8 +89,8 @@ public:
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
     CameraAvSettingsUserLevelMgmtServer(EndpointId endpointId, Delegate * delegate, BitMask<Feature> aFeature,
-                                        const BitFlags<OptionalAttributes> aOptionalAttrs, uint8_t aMaxPresets, uint16_t aPanMin,
-                                        uint16_t aPanMax, uint16_t aTiltMin, uint16_t aTiltMax, uint8_t aZoomMax);
+                                        const BitFlags<OptionalAttributes> aOptionalAttrs, uint8_t aMaxPresets, int16_t aPanMin,
+                                        int16_t aPanMax, int16_t aTiltMin, int16_t aTiltMax, uint8_t aZoomMax);
     ~CameraAvSettingsUserLevelMgmtServer() override;
 
     CHIP_ERROR Init();

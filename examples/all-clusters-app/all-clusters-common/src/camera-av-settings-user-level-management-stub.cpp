@@ -103,10 +103,10 @@ void emberAfCameraAvSettingsUserLevelManagementClusterInitCallback(chip::Endpoin
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
     VerifyOrDie(gDelegate == nullptr && gAVSettingsUserLevelManagementCluster == nullptr);
     const uint8_t appMaxPresets = 5;
-    const uint16_t appPanMin    = -90;
-    const uint16_t appPanMax    = 90;
-    const uint16_t appTiltMin   = -45;
-    const uint16_t appTiltMax   = 45;
+    const int16_t appPanMin     = -90;
+    const int16_t appPanMax     = 90;
+    const int16_t appTiltMin    = -45;
+    const int16_t appTiltMax    = 45;
     const uint8_t appZoomMax    = 75;
 
     gDelegate = new AVSettingsUserLevelManagementDelegate;
