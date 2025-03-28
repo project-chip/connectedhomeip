@@ -74,7 +74,7 @@ void emberAfTemperatureControlClusterInitCallback(EndpointId endpoint)
     ChipLogDetail(DeviceLayer, "Initializing TemperatureControl cluster for Endpoint: %d", endpoint);
     uint16_t epIndex = emberAfGetClusterServerEndpointIndex(endpoint, TemperatureControl::Id,
                                                             MATTER_DM_TEMPERATURE_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
-    supportedOptionsByEndpoints[epIndex] =
+    AppSupportedTemperatureLevelsDelegate::supportedOptionsByEndpoints[epIndex] =
         EndpointPair(endpoint /* endpointId */, AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions,
                      MATTER_ARRAY_SIZE(AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions));
 
