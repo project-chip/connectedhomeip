@@ -233,7 +233,6 @@ void emberAfEndpointConfigure()
                 break;
             }
         }
-        emAfEndpoints[ep].bitmask.Set(defaultComposition);
 
         // Increment currentDataVersions by 1 (slot) for every server cluster
         // this endpoint has.
