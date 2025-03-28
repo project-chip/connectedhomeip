@@ -14,8 +14,7 @@ namespace clusters {
 namespace TimeFormatLocalization {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x002C;
-inline constexpr uint32_t kRevision   = 1;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 
@@ -41,7 +40,6 @@ inline constexpr DataModel::AttributeEntry kSupportedCalendarTypesEntry = {
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-
 } // namespace Metadata
 } // namespace TimeFormatLocalization
 } // namespace clusters

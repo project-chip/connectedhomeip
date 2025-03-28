@@ -14,8 +14,7 @@ namespace clusters {
 namespace WebRTCTransportRequestor {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0554;
-inline constexpr uint32_t kRevision   = 1;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 
@@ -52,7 +51,6 @@ inline constexpr DataModel::AcceptedCommandEntry kEndEntry = {
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace WebRTCTransportRequestor
 } // namespace clusters

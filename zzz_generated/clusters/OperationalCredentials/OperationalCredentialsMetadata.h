@@ -14,8 +14,7 @@ namespace clusters {
 namespace OperationalCredentials {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x003E;
-inline constexpr uint32_t kRevision   = 2;
+inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
 
@@ -112,7 +111,6 @@ inline constexpr DataModel::AcceptedCommandEntry kSignVIDVerificationRequestEntr
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace OperationalCredentials
 } // namespace clusters

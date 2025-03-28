@@ -14,8 +14,7 @@ namespace clusters {
 namespace FanControl {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0202;
-inline constexpr uint32_t kRevision   = 5;
+inline constexpr uint32_t kRevision = 5;
 
 namespace Attributes {
 
@@ -103,7 +102,6 @@ inline constexpr DataModel::AcceptedCommandEntry kStepEntry = {
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace FanControl
 } // namespace clusters

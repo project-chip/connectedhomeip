@@ -14,8 +14,7 @@ namespace clusters {
 namespace ActivatedCarbonFilterMonitoring {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0072;
-inline constexpr uint32_t kRevision   = 1;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 
@@ -67,7 +66,6 @@ inline constexpr DataModel::AcceptedCommandEntry kResetConditionEntry = {
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace ActivatedCarbonFilterMonitoring
 } // namespace clusters

@@ -14,8 +14,7 @@ namespace clusters {
 namespace OnOff {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0006;
-inline constexpr uint32_t kRevision   = 6;
+inline constexpr uint32_t kRevision = 6;
 
 namespace Attributes {
 
@@ -86,7 +85,6 @@ inline constexpr DataModel::AcceptedCommandEntry kOnWithTimedOffEntry = {
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace OnOff
 } // namespace clusters

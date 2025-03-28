@@ -14,8 +14,7 @@ namespace clusters {
 namespace Descriptor {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x001D;
-inline constexpr uint32_t kRevision   = 2;
+inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
 
@@ -53,7 +52,6 @@ inline constexpr DataModel::AttributeEntry kTagListEntry = {
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-
 } // namespace Metadata
 } // namespace Descriptor
 } // namespace clusters

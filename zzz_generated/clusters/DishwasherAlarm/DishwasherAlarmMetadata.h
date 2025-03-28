@@ -14,8 +14,7 @@ namespace clusters {
 namespace DishwasherAlarm {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x005D;
-inline constexpr uint32_t kRevision   = 1;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 
@@ -60,7 +59,6 @@ inline constexpr DataModel::AcceptedCommandEntry kModifyEnabledAlarmsEntry = {
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace DishwasherAlarm
 } // namespace clusters

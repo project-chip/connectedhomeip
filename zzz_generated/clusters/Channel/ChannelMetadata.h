@@ -14,8 +14,7 @@ namespace clusters {
 namespace Channel {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0504;
-inline constexpr uint32_t kRevision   = 2;
+inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
 
@@ -74,7 +73,6 @@ inline constexpr DataModel::AcceptedCommandEntry kCancelRecordProgramEntry = {
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace Channel
 } // namespace clusters

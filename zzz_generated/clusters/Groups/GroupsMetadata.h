@@ -14,8 +14,7 @@ namespace clusters {
 namespace Groups {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0004;
-inline constexpr uint32_t kRevision   = 4;
+inline constexpr uint32_t kRevision = 4;
 
 namespace Attributes {
 
@@ -62,7 +61,6 @@ inline constexpr DataModel::AcceptedCommandEntry kAddGroupIfIdentifyingEntry = {
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace Groups
 } // namespace clusters

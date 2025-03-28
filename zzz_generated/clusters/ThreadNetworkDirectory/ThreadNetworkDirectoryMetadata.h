@@ -14,8 +14,7 @@ namespace clusters {
 namespace ThreadNetworkDirectory {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0453;
-inline constexpr uint32_t kRevision   = 1;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 
@@ -59,7 +58,6 @@ inline constexpr DataModel::AcceptedCommandEntry kGetOperationalDatasetEntry = {
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace ThreadNetworkDirectory
 } // namespace clusters

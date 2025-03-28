@@ -14,8 +14,7 @@ namespace clusters {
 namespace Thermostat {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0201;
-inline constexpr uint32_t kRevision   = 7;
+inline constexpr uint32_t kRevision = 7;
 
 namespace Attributes {
 
@@ -421,7 +420,6 @@ inline constexpr DataModel::AcceptedCommandEntry kAtomicRequestEntry = {
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace Thermostat
 } // namespace clusters

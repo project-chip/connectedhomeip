@@ -14,8 +14,7 @@ namespace clusters {
 namespace DoorLock {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0101;
-inline constexpr uint32_t kRevision   = 7;
+inline constexpr uint32_t kRevision = 7;
 
 namespace Attributes {
 
@@ -401,7 +400,6 @@ inline constexpr DataModel::AcceptedCommandEntry kClearAliroReaderConfigEntry = 
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace DoorLock
 } // namespace clusters

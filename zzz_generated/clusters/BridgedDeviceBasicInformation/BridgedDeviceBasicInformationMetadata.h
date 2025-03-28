@@ -14,8 +14,7 @@ namespace clusters {
 namespace BridgedDeviceBasicInformation {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0039;
-inline constexpr uint32_t kRevision   = 3;
+inline constexpr uint32_t kRevision = 3;
 
 namespace Attributes {
 
@@ -133,7 +132,6 @@ inline constexpr DataModel::AcceptedCommandEntry kKeepActiveEntry = {
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace BridgedDeviceBasicInformation
 } // namespace clusters

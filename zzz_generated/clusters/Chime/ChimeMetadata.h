@@ -14,8 +14,7 @@ namespace clusters {
 namespace Chime {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0556;
-inline constexpr uint32_t kRevision   = 1;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 
@@ -49,7 +48,6 @@ inline constexpr DataModel::AcceptedCommandEntry kPlayChimeSoundEntry = {
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace Chime
 } // namespace clusters

@@ -14,8 +14,7 @@ namespace clusters {
 namespace UserLabel {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0041;
-inline constexpr uint32_t kRevision   = 1;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 
@@ -29,7 +28,6 @@ inline constexpr DataModel::AttributeEntry kLabelListEntry = {
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-
 } // namespace Metadata
 } // namespace UserLabel
 } // namespace clusters

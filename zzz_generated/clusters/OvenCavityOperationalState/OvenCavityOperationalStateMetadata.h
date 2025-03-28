@@ -14,8 +14,7 @@ namespace clusters {
 namespace OvenCavityOperationalState {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0048;
-inline constexpr uint32_t kRevision   = 1;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 
@@ -82,7 +81,6 @@ inline constexpr DataModel::AcceptedCommandEntry kResumeEntry = {
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace OvenCavityOperationalState
 } // namespace clusters

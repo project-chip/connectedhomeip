@@ -14,8 +14,7 @@ namespace clusters {
 namespace WaterHeaterMode {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x009E;
-inline constexpr uint32_t kRevision   = 1;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 
@@ -43,7 +42,6 @@ inline constexpr DataModel::AcceptedCommandEntry kChangeToModeEntry = {
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace WaterHeaterMode
 } // namespace clusters

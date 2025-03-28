@@ -14,8 +14,7 @@ namespace clusters {
 namespace TemperatureControl {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0056;
-inline constexpr uint32_t kRevision   = 1;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 
@@ -67,7 +66,6 @@ inline constexpr DataModel::AcceptedCommandEntry kSetTemperatureEntry = {
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace TemperatureControl
 } // namespace clusters

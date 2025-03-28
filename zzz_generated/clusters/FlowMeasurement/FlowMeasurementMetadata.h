@@ -14,8 +14,7 @@ namespace clusters {
 namespace FlowMeasurement {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0404;
-inline constexpr uint32_t kRevision   = 1;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 
@@ -47,7 +46,6 @@ inline constexpr DataModel::AttributeEntry kToleranceEntry = {
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-
 } // namespace Metadata
 } // namespace FlowMeasurement
 } // namespace clusters

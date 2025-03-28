@@ -14,8 +14,7 @@ namespace clusters {
 namespace ColorControl {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0300;
-inline constexpr uint32_t kRevision   = 7;
+inline constexpr uint32_t kRevision = 7;
 
 namespace Attributes {
 
@@ -433,7 +432,6 @@ inline constexpr DataModel::AcceptedCommandEntry kStepColorTemperatureEntry = {
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace ColorControl
 } // namespace clusters

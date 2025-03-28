@@ -14,8 +14,7 @@ namespace clusters {
 namespace CommissionerControl {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0751;
-inline constexpr uint32_t kRevision   = 1;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 
@@ -42,7 +41,6 @@ inline constexpr DataModel::AcceptedCommandEntry kCommissionNodeEntry = {
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace CommissionerControl
 } // namespace clusters

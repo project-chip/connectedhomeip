@@ -14,8 +14,7 @@ namespace clusters {
 namespace IcdManagement {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0046;
-inline constexpr uint32_t kRevision   = 3;
+inline constexpr uint32_t kRevision = 3;
 
 namespace Attributes {
 
@@ -101,7 +100,6 @@ inline constexpr DataModel::AcceptedCommandEntry kStayActiveRequestEntry = {
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace IcdManagement
 } // namespace clusters

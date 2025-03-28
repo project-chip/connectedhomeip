@@ -14,8 +14,7 @@ namespace clusters {
 namespace ContentLauncher {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x050A;
-inline constexpr uint32_t kRevision   = 1;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 
@@ -48,7 +47,6 @@ inline constexpr DataModel::AcceptedCommandEntry kLaunchURLEntry = {
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace ContentLauncher
 } // namespace clusters

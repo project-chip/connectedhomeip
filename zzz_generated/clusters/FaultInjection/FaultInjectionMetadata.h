@@ -14,8 +14,7 @@ namespace clusters {
 namespace FaultInjection {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0xFFF1FC06;
-inline constexpr uint32_t kRevision   = 1;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {} // namespace Attributes
 
@@ -33,7 +32,6 @@ inline constexpr DataModel::AcceptedCommandEntry kFailRandomlyAtFaultEntry = {
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace FaultInjection
 } // namespace clusters

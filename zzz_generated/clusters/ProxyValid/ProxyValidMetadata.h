@@ -14,13 +14,11 @@ namespace clusters {
 namespace ProxyValid {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0044;
-inline constexpr uint32_t kRevision   = 1;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {} // namespace Attributes
 
 namespace Commands {} // namespace Commands
-
 } // namespace Metadata
 } // namespace ProxyValid
 } // namespace clusters

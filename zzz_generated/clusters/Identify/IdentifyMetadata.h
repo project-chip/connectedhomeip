@@ -14,8 +14,7 @@ namespace clusters {
 namespace Identify {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0003;
-inline constexpr uint32_t kRevision   = 4;
+inline constexpr uint32_t kRevision = 4;
 
 namespace Attributes {
 
@@ -48,7 +47,6 @@ inline constexpr DataModel::AcceptedCommandEntry kTriggerEffectEntry = {
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace Identify
 } // namespace clusters

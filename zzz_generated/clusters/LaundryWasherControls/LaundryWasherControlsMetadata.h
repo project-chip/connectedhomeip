@@ -14,8 +14,7 @@ namespace clusters {
 namespace LaundryWasherControls {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0053;
-inline constexpr uint32_t kRevision   = 1;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 
@@ -47,7 +46,6 @@ inline constexpr DataModel::AttributeEntry kSupportedRinsesEntry = {
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-
 } // namespace Metadata
 } // namespace LaundryWasherControls
 } // namespace clusters

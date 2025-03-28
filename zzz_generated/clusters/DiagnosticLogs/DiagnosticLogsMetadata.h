@@ -14,8 +14,7 @@ namespace clusters {
 namespace DiagnosticLogs {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0032;
-inline constexpr uint32_t kRevision   = 1;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {} // namespace Attributes
 
@@ -28,7 +27,6 @@ inline constexpr DataModel::AcceptedCommandEntry kRetrieveLogsRequestEntry = {
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace DiagnosticLogs
 } // namespace clusters

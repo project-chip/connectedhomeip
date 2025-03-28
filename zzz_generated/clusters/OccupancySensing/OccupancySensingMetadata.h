@@ -14,8 +14,7 @@ namespace clusters {
 namespace OccupancySensing {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0406;
-inline constexpr uint32_t kRevision   = 5;
+inline constexpr uint32_t kRevision = 5;
 
 namespace Attributes {
 
@@ -107,7 +106,6 @@ inline constexpr DataModel::AttributeEntry kPhysicalContactUnoccupiedToOccupiedT
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-
 } // namespace Metadata
 } // namespace OccupancySensing
 } // namespace clusters

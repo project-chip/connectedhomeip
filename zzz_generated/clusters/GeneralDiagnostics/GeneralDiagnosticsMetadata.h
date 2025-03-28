@@ -14,8 +14,7 @@ namespace clusters {
 namespace GeneralDiagnostics {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0033;
-inline constexpr uint32_t kRevision   = 2;
+inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
 
@@ -95,7 +94,6 @@ inline constexpr DataModel::AcceptedCommandEntry kPayloadTestRequestEntry = {
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace GeneralDiagnostics
 } // namespace clusters

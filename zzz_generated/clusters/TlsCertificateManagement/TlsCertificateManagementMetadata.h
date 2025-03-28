@@ -14,8 +14,7 @@ namespace clusters {
 namespace TlsCertificateManagement {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0801;
-inline constexpr uint32_t kRevision   = 1;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 
@@ -95,7 +94,6 @@ inline constexpr DataModel::AcceptedCommandEntry kRemoveClientCertificateEntry =
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace TlsCertificateManagement
 } // namespace clusters

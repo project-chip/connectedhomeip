@@ -14,8 +14,7 @@ namespace clusters {
 namespace AccountLogin {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x050E;
-inline constexpr uint32_t kRevision   = 2;
+inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {} // namespace Attributes
 
@@ -41,7 +40,6 @@ inline constexpr DataModel::AcceptedCommandEntry kLogoutEntry = {
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace AccountLogin
 } // namespace clusters

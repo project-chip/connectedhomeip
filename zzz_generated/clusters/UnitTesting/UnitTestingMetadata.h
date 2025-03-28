@@ -14,8 +14,7 @@ namespace clusters {
 namespace UnitTesting {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0xFFF1FC05;
-inline constexpr uint32_t kRevision   = 1;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 
@@ -695,7 +694,6 @@ inline constexpr DataModel::AcceptedCommandEntry kTestDifferentVendorMeiRequestE
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace UnitTesting
 } // namespace clusters

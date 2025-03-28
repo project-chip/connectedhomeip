@@ -14,8 +14,7 @@ namespace clusters {
 namespace GeneralCommissioning {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0030;
-inline constexpr uint32_t kRevision   = 1;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 
@@ -106,7 +105,6 @@ inline constexpr DataModel::AcceptedCommandEntry kSetTCAcknowledgementsEntry = {
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace GeneralCommissioning
 } // namespace clusters

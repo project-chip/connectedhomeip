@@ -14,8 +14,7 @@ namespace clusters {
 namespace IlluminanceMeasurement {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0400;
-inline constexpr uint32_t kRevision   = 3;
+inline constexpr uint32_t kRevision = 3;
 
 namespace Attributes {
 
@@ -53,7 +52,6 @@ inline constexpr DataModel::AttributeEntry kLightSensorTypeEntry = {
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-
 } // namespace Metadata
 } // namespace IlluminanceMeasurement
 } // namespace clusters

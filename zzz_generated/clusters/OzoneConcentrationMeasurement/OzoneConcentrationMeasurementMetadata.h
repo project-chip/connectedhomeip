@@ -14,8 +14,7 @@ namespace clusters {
 namespace OzoneConcentrationMeasurement {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0415;
-inline constexpr uint32_t kRevision   = 3;
+inline constexpr uint32_t kRevision = 3;
 
 namespace Attributes {
 
@@ -89,7 +88,6 @@ inline constexpr DataModel::AttributeEntry kLevelValueEntry = {
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-
 } // namespace Metadata
 } // namespace OzoneConcentrationMeasurement
 } // namespace clusters

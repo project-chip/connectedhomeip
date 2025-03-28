@@ -14,8 +14,7 @@ namespace clusters {
 namespace UnitLocalization {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x002D;
-inline constexpr uint32_t kRevision   = 1;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 
@@ -29,7 +28,6 @@ inline constexpr DataModel::AttributeEntry kTemperatureUnitEntry = {
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-
 } // namespace Metadata
 } // namespace UnitLocalization
 } // namespace clusters

@@ -14,8 +14,7 @@ namespace clusters {
 namespace PowerSourceConfiguration {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x002E;
-inline constexpr uint32_t kRevision   = 1;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 
@@ -29,7 +28,6 @@ inline constexpr DataModel::AttributeEntry kSourcesEntry = {
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-
 } // namespace Metadata
 } // namespace PowerSourceConfiguration
 } // namespace clusters

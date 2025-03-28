@@ -1,11 +1,26 @@
 # DO NOT EDIT MANUALLY - Generated file
 #
-# Cluster metadata information based on src/controller/data_model/controller-clusters.matter
+# Cluster generated code for constants and metadata based on src/controller/data_model/controller-clusters.matter
 
 source_set("metadata") {
   sources = [ "LaundryWasherModeMetadata.h" ]
   deps = [
     "${chip_root}/src/app/data-model-provider:metadata",
     "${chip_root}/src/lib/core:types",
+  ]
+}
+
+source_set("ids") {
+  sources = [ "LaundryWasherModeIds.h" ]
+  deps = [
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/lib/core:types",
+  ]
+}
+
+source_set("LaundryWasherMode") {
+  public_deps = [
+    ":ids",
+    ":metadata",
   ]
 }

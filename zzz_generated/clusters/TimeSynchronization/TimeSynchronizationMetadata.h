@@ -14,8 +14,7 @@ namespace clusters {
 namespace TimeSynchronization {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0038;
-inline constexpr uint32_t kRevision   = 2;
+inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
 
@@ -129,7 +128,6 @@ inline constexpr DataModel::AcceptedCommandEntry kSetDefaultNTPEntry = {
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace TimeSynchronization
 } // namespace clusters

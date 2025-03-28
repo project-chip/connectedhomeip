@@ -14,8 +14,7 @@ namespace clusters {
 namespace PushAvStreamTransport {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0555;
-inline constexpr uint32_t kRevision   = 1;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 
@@ -74,7 +73,6 @@ inline constexpr DataModel::AcceptedCommandEntry kFindTransportEntry = {
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace PushAvStreamTransport
 } // namespace clusters

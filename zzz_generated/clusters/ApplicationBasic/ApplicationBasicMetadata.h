@@ -14,8 +14,7 @@ namespace clusters {
 namespace ApplicationBasic {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x050D;
-inline constexpr uint32_t kRevision   = 1;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 
@@ -71,7 +70,6 @@ inline constexpr DataModel::AttributeEntry kAllowedVendorListEntry = {
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-
 } // namespace Metadata
 } // namespace ApplicationBasic
 } // namespace clusters

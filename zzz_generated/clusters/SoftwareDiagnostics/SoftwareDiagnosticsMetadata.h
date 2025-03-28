@@ -14,8 +14,7 @@ namespace clusters {
 namespace SoftwareDiagnostics {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0034;
-inline constexpr uint32_t kRevision   = 1;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 
@@ -55,7 +54,6 @@ inline constexpr DataModel::AcceptedCommandEntry kResetWatermarksEntry = {
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace SoftwareDiagnostics
 } // namespace clusters

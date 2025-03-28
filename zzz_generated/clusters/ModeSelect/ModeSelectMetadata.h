@@ -14,8 +14,7 @@ namespace clusters {
 namespace ModeSelect {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0050;
-inline constexpr uint32_t kRevision   = 2;
+inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
 
@@ -67,7 +66,6 @@ inline constexpr DataModel::AcceptedCommandEntry kChangeToModeEntry = {
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace ModeSelect
 } // namespace clusters

@@ -14,8 +14,7 @@ namespace clusters {
 namespace MicrowaveOvenControl {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x005F;
-inline constexpr uint32_t kRevision   = 1;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 
@@ -90,7 +89,6 @@ inline constexpr DataModel::AcceptedCommandEntry kAddMoreTimeEntry = {
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace MicrowaveOvenControl
 } // namespace clusters

@@ -14,8 +14,7 @@ namespace clusters {
 namespace RvcRunMode {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0054;
-inline constexpr uint32_t kRevision   = 3;
+inline constexpr uint32_t kRevision = 3;
 
 namespace Attributes {
 
@@ -43,7 +42,6 @@ inline constexpr DataModel::AcceptedCommandEntry kChangeToModeEntry = {
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace RvcRunMode
 } // namespace clusters

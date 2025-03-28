@@ -14,8 +14,7 @@ namespace clusters {
 namespace CameraAvSettingsUserLevelManagement {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0552;
-inline constexpr uint32_t kRevision   = 1;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 
@@ -115,7 +114,6 @@ inline constexpr DataModel::AcceptedCommandEntry kDPTZRelativeMoveEntry = {
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace CameraAvSettingsUserLevelManagement
 } // namespace clusters

@@ -14,8 +14,7 @@ namespace clusters {
 namespace TargetNavigator {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0505;
-inline constexpr uint32_t kRevision   = 2;
+inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
 
@@ -43,7 +42,6 @@ inline constexpr DataModel::AcceptedCommandEntry kNavigateTargetEntry = {
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace TargetNavigator
 } // namespace clusters

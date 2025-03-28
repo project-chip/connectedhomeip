@@ -14,8 +14,7 @@ namespace clusters {
 namespace EnergyEvse {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0099;
-inline constexpr uint32_t kRevision   = 3;
+inline constexpr uint32_t kRevision = 3;
 
 namespace Attributes {
 
@@ -199,7 +198,6 @@ inline constexpr DataModel::AcceptedCommandEntry kClearTargetsEntry = {
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace EnergyEvse
 } // namespace clusters

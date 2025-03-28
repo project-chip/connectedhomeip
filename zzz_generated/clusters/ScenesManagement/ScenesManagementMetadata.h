@@ -14,8 +14,7 @@ namespace clusters {
 namespace ScenesManagement {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0062;
-inline constexpr uint32_t kRevision   = 1;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 
@@ -78,7 +77,6 @@ inline constexpr DataModel::AcceptedCommandEntry kCopySceneEntry = {
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace ScenesManagement
 } // namespace clusters

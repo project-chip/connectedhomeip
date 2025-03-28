@@ -14,8 +14,7 @@ namespace clusters {
 namespace ThermostatUserInterfaceConfiguration {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0204;
-inline constexpr uint32_t kRevision   = 2;
+inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
 
@@ -41,7 +40,6 @@ inline constexpr DataModel::AttributeEntry kScheduleProgrammingVisibilityEntry =
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-
 } // namespace Metadata
 } // namespace ThermostatUserInterfaceConfiguration
 } // namespace clusters

@@ -14,8 +14,7 @@ namespace clusters {
 namespace DishwasherMode {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0059;
-inline constexpr uint32_t kRevision   = 2;
+inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
 
@@ -55,7 +54,6 @@ inline constexpr DataModel::AcceptedCommandEntry kChangeToModeEntry = {
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace DishwasherMode
 } // namespace clusters

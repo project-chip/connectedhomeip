@@ -14,8 +14,7 @@ namespace clusters {
 namespace BallastConfiguration {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0301;
-inline constexpr uint32_t kRevision   = 4;
+inline constexpr uint32_t kRevision = 4;
 
 namespace Attributes {
 
@@ -107,7 +106,6 @@ inline constexpr DataModel::AttributeEntry kLampBurnHoursTripPointEntry = {
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-
 } // namespace Metadata
 } // namespace BallastConfiguration
 } // namespace clusters

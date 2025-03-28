@@ -14,8 +14,7 @@ namespace clusters {
 namespace EcosystemInformation {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0750;
-inline constexpr uint32_t kRevision   = 1;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 
@@ -35,7 +34,6 @@ inline constexpr DataModel::AttributeEntry kLocationDirectoryEntry = {
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-
 } // namespace Metadata
 } // namespace EcosystemInformation
 } // namespace clusters

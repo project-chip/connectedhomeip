@@ -14,7 +14,6 @@ namespace clusters {
 namespace {{cluster.name}} {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = {{"0x%04X" | format(cluster.code)}};
 inline constexpr uint32_t kRevision = {{cluster.revision}};
 
 namespace Attributes {
@@ -51,7 +50,6 @@ inline constexpr DataModel::AcceptedCommandEntry k{{command.name | upfirst}}Entr
 {% endfor %}
 
 } // namespace Attributes
-
 } // namespace Metadata
 } // namespace {{cluster.name}}
 } // namespace app

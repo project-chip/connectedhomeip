@@ -14,8 +14,7 @@ namespace clusters {
 namespace TemperatureMeasurement {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0402;
-inline constexpr uint32_t kRevision   = 4;
+inline constexpr uint32_t kRevision = 4;
 
 namespace Attributes {
 
@@ -47,7 +46,6 @@ inline constexpr DataModel::AttributeEntry kToleranceEntry = {
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-
 } // namespace Metadata
 } // namespace TemperatureMeasurement
 } // namespace clusters

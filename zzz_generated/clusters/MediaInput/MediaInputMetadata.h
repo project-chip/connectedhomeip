@@ -14,8 +14,7 @@ namespace clusters {
 namespace MediaInput {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0507;
-inline constexpr uint32_t kRevision   = 1;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 
@@ -58,7 +57,6 @@ inline constexpr DataModel::AcceptedCommandEntry kRenameInputEntry = {
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace MediaInput
 } // namespace clusters

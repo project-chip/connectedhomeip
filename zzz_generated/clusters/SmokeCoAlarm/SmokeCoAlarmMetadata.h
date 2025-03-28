@@ -14,8 +14,7 @@ namespace clusters {
 namespace SmokeCoAlarm {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x005C;
-inline constexpr uint32_t kRevision   = 1;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 
@@ -109,7 +108,6 @@ inline constexpr DataModel::AcceptedCommandEntry kSelfTestRequestEntry = {
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace SmokeCoAlarm
 } // namespace clusters

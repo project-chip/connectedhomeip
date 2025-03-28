@@ -14,8 +14,7 @@ namespace clusters {
 namespace PowerTopology {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x009C;
-inline constexpr uint32_t kRevision   = 1;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 
@@ -35,7 +34,6 @@ inline constexpr DataModel::AttributeEntry kActiveEndpointsEntry = {
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-
 } // namespace Metadata
 } // namespace PowerTopology
 } // namespace clusters

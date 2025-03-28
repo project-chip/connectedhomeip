@@ -14,8 +14,7 @@ namespace clusters {
 namespace PressureMeasurement {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0403;
-inline constexpr uint32_t kRevision   = 3;
+inline constexpr uint32_t kRevision = 3;
 
 namespace Attributes {
 
@@ -77,7 +76,6 @@ inline constexpr DataModel::AttributeEntry kScaleEntry = {
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-
 } // namespace Metadata
 } // namespace PressureMeasurement
 } // namespace clusters

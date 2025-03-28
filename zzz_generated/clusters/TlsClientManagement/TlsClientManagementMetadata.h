@@ -14,8 +14,7 @@ namespace clusters {
 namespace TlsClientManagement {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0802;
-inline constexpr uint32_t kRevision   = 1;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 
@@ -53,7 +52,6 @@ inline constexpr DataModel::AcceptedCommandEntry kRemoveEndpointEntry = {
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace TlsClientManagement
 } // namespace clusters

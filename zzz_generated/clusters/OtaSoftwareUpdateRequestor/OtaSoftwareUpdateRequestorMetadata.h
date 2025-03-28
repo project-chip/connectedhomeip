@@ -14,8 +14,7 @@ namespace clusters {
 namespace OtaSoftwareUpdateRequestor {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x002A;
-inline constexpr uint32_t kRevision   = 1;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 
@@ -55,7 +54,6 @@ inline constexpr DataModel::AcceptedCommandEntry kAnnounceOTAProviderEntry = {
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace OtaSoftwareUpdateRequestor
 } // namespace clusters

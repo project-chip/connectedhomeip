@@ -14,8 +14,7 @@ namespace clusters {
 namespace PumpConfigurationAndControl {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0200;
-inline constexpr uint32_t kRevision   = 4;
+inline constexpr uint32_t kRevision = 4;
 
 namespace Attributes {
 
@@ -161,7 +160,6 @@ inline constexpr DataModel::AttributeEntry kControlModeEntry = {
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-
 } // namespace Metadata
 } // namespace PumpConfigurationAndControl
 } // namespace clusters

@@ -14,8 +14,7 @@ namespace clusters {
 namespace ClosureControl {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0104;
-inline constexpr uint32_t kRevision   = 1;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 
@@ -111,7 +110,6 @@ inline constexpr DataModel::AcceptedCommandEntry kCancelFallbackEntry = {
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace ClosureControl
 } // namespace clusters

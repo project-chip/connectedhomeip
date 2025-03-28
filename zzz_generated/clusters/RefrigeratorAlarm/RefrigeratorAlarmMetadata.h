@@ -14,8 +14,7 @@ namespace clusters {
 namespace RefrigeratorAlarm {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0057;
-inline constexpr uint32_t kRevision   = 1;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 
@@ -41,7 +40,6 @@ inline constexpr DataModel::AttributeEntry kSupportedEntry = {
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-
 } // namespace Metadata
 } // namespace RefrigeratorAlarm
 } // namespace clusters

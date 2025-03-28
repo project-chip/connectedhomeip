@@ -14,8 +14,7 @@ namespace clusters {
 namespace ZoneManagement {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0550;
-inline constexpr uint32_t kRevision   = 1;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 
@@ -70,7 +69,6 @@ inline constexpr DataModel::AcceptedCommandEntry kRemoveZoneEntry = {
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace ZoneManagement
 } // namespace clusters

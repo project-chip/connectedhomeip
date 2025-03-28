@@ -14,8 +14,7 @@ namespace clusters {
 namespace DeviceEnergyManagement {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0098;
-inline constexpr uint32_t kRevision   = 4;
+inline constexpr uint32_t kRevision = 4;
 
 namespace Attributes {
 
@@ -114,7 +113,6 @@ inline constexpr DataModel::AcceptedCommandEntry kCancelRequestEntry = {
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace DeviceEnergyManagement
 } // namespace clusters

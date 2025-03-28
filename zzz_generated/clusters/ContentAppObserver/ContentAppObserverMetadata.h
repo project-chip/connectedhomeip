@@ -14,8 +14,7 @@ namespace clusters {
 namespace ContentAppObserver {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0510;
-inline constexpr uint32_t kRevision   = 1;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {} // namespace Attributes
 
@@ -28,7 +27,6 @@ inline constexpr DataModel::AcceptedCommandEntry kContentAppMessageEntry = {
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace ContentAppObserver
 } // namespace clusters

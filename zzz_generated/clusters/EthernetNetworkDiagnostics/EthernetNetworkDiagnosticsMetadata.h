@@ -14,8 +14,7 @@ namespace clusters {
 namespace EthernetNetworkDiagnostics {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0037;
-inline constexpr uint32_t kRevision   = 1;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 
@@ -85,7 +84,6 @@ inline constexpr DataModel::AcceptedCommandEntry kResetCountsEntry = {
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace EthernetNetworkDiagnostics
 } // namespace clusters

@@ -14,8 +14,7 @@ namespace clusters {
 namespace WakeOnLan {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0503;
-inline constexpr uint32_t kRevision   = 1;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 
@@ -35,7 +34,6 @@ inline constexpr DataModel::AttributeEntry kLinkLocalAddressEntry = {
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-
 } // namespace Metadata
 } // namespace WakeOnLan
 } // namespace clusters

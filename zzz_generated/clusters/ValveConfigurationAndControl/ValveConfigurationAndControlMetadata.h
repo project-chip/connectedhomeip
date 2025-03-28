@@ -14,8 +14,7 @@ namespace clusters {
 namespace ValveConfigurationAndControl {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0081;
-inline constexpr uint32_t kRevision   = 1;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 
@@ -102,7 +101,6 @@ inline constexpr DataModel::AcceptedCommandEntry kCloseEntry = {
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace ValveConfigurationAndControl
 } // namespace clusters

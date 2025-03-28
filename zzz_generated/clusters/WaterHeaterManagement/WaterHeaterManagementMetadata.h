@@ -14,8 +14,7 @@ namespace clusters {
 namespace WaterHeaterManagement {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0094;
-inline constexpr uint32_t kRevision   = 2;
+inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
 
@@ -72,7 +71,6 @@ inline constexpr DataModel::AcceptedCommandEntry kCancelBoostEntry = {
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace WaterHeaterManagement
 } // namespace clusters

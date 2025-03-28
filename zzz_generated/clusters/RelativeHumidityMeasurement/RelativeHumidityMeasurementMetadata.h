@@ -14,8 +14,7 @@ namespace clusters {
 namespace RelativeHumidityMeasurement {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0405;
-inline constexpr uint32_t kRevision   = 3;
+inline constexpr uint32_t kRevision = 3;
 
 namespace Attributes {
 
@@ -47,7 +46,6 @@ inline constexpr DataModel::AttributeEntry kToleranceEntry = {
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-
 } // namespace Metadata
 } // namespace RelativeHumidityMeasurement
 } // namespace clusters

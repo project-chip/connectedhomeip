@@ -14,8 +14,7 @@ namespace clusters {
 namespace CameraAvStreamManagement {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0551;
-inline constexpr uint32_t kRevision   = 1;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 
@@ -322,7 +321,6 @@ inline constexpr DataModel::AcceptedCommandEntry kCaptureSnapshotEntry = {
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace CameraAvStreamManagement
 } // namespace clusters

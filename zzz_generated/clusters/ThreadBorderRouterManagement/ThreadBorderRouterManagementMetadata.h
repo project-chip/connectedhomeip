@@ -14,8 +14,7 @@ namespace clusters {
 namespace ThreadBorderRouterManagement {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0452;
-inline constexpr uint32_t kRevision   = 1;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 
@@ -82,7 +81,6 @@ inline constexpr DataModel::AcceptedCommandEntry kSetPendingDatasetRequestEntry 
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace ThreadBorderRouterManagement
 } // namespace clusters

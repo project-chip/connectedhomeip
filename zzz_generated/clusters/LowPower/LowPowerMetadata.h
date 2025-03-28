@@ -14,8 +14,7 @@ namespace clusters {
 namespace LowPower {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0508;
-inline constexpr uint32_t kRevision   = 1;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {} // namespace Attributes
 
@@ -28,7 +27,6 @@ inline constexpr DataModel::AcceptedCommandEntry kSleepEntry = {
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace LowPower
 } // namespace clusters

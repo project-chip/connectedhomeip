@@ -14,8 +14,7 @@ namespace clusters {
 namespace MediaPlayback {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0506;
-inline constexpr uint32_t kRevision   = 2;
+inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
 
@@ -162,7 +161,6 @@ inline constexpr DataModel::AcceptedCommandEntry kDeactivateTextTrackEntry = {
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace MediaPlayback
 } // namespace clusters

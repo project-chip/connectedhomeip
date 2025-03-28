@@ -14,8 +14,7 @@ namespace clusters {
 namespace WiFiNetworkManagement {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0451;
-inline constexpr uint32_t kRevision   = 1;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 
@@ -43,7 +42,6 @@ inline constexpr DataModel::AcceptedCommandEntry kNetworkPassphraseRequestEntry 
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace WiFiNetworkManagement
 } // namespace clusters

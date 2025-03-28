@@ -14,8 +14,7 @@ namespace clusters {
 namespace WindowCovering {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0102;
-inline constexpr uint32_t kRevision   = 5;
+inline constexpr uint32_t kRevision = 5;
 
 namespace Attributes {
 
@@ -193,7 +192,6 @@ inline constexpr DataModel::AcceptedCommandEntry kGoToTiltPercentageEntry = {
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace WindowCovering
 } // namespace clusters

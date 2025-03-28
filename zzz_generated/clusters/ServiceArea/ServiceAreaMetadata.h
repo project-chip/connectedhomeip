@@ -14,8 +14,7 @@ namespace clusters {
 namespace ServiceArea {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0150;
-inline constexpr uint32_t kRevision   = 1;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 
@@ -72,7 +71,6 @@ inline constexpr DataModel::AcceptedCommandEntry kSkipAreaEntry = {
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace ServiceArea
 } // namespace clusters

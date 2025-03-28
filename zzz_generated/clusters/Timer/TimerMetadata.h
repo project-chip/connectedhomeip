@@ -14,8 +14,7 @@ namespace clusters {
 namespace Timer {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0047;
-inline constexpr uint32_t kRevision   = 1;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 
@@ -64,7 +63,6 @@ inline constexpr DataModel::AcceptedCommandEntry kReduceTimeEntry = {
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace Timer
 } // namespace clusters

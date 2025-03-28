@@ -14,8 +14,7 @@ namespace clusters {
 namespace BasicInformation {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0028;
-inline constexpr uint32_t kRevision   = 3;
+inline constexpr uint32_t kRevision = 3;
 
 namespace Attributes {
 
@@ -169,7 +168,6 @@ inline constexpr DataModel::AcceptedCommandEntry kMfgSpecificPingEntry = {
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace BasicInformation
 } // namespace clusters

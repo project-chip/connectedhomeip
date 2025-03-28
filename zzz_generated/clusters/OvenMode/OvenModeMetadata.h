@@ -14,8 +14,7 @@ namespace clusters {
 namespace OvenMode {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0049;
-inline constexpr uint32_t kRevision   = 1;
+inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 
@@ -55,7 +54,6 @@ inline constexpr DataModel::AcceptedCommandEntry kChangeToModeEntry = {
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace OvenMode
 } // namespace clusters

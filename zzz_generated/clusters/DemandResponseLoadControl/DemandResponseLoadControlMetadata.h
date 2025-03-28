@@ -14,8 +14,7 @@ namespace clusters {
 namespace DemandResponseLoadControl {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0096;
-inline constexpr uint32_t kRevision   = 4;
+inline constexpr uint32_t kRevision = 4;
 
 namespace Attributes {
 
@@ -99,7 +98,6 @@ inline constexpr DataModel::AcceptedCommandEntry kClearLoadControlEventsRequestE
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace DemandResponseLoadControl
 } // namespace clusters

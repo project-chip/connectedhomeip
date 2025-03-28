@@ -14,8 +14,7 @@ namespace clusters {
 namespace LevelControl {
 namespace Metadata {
 
-inline constexpr ClusterId kClusterId = 0x0008;
-inline constexpr uint32_t kRevision   = 6;
+inline constexpr uint32_t kRevision = 6;
 
 namespace Attributes {
 
@@ -155,7 +154,6 @@ inline constexpr DataModel::AcceptedCommandEntry kMoveToClosestFrequencyEntry = 
 };
 
 } // namespace Commands
-
 } // namespace Metadata
 } // namespace LevelControl
 } // namespace clusters
