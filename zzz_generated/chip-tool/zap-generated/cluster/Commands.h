@@ -6800,7 +6800,6 @@ private:
 | * UnregisterLoadControlProgramRequest                               |   0x01 |
 | * AddLoadControlEventRequest                                        |   0x02 |
 | * RemoveLoadControlEventRequest                                     |   0x03 |
-| * ClearLoadControlEventsRequest                                     |   0x04 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * LoadControlPrograms                                               | 0x0000 |
@@ -6984,45 +6983,6 @@ public:
 
 private:
     chip::app::Clusters::DemandResponseLoadControl::Commands::RemoveLoadControlEventRequest::Type mRequest;
-};
-
-/*
- * Command ClearLoadControlEventsRequest
- */
-class DemandResponseLoadControlClearLoadControlEventsRequest : public ClusterCommand
-{
-public:
-    DemandResponseLoadControlClearLoadControlEventsRequest(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("clear-load-control-events-request", credsIssuerConfig)
-    {
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::DemandResponseLoadControl::Id;
-        constexpr chip::CommandId commandId =
-            chip::app::Clusters::DemandResponseLoadControl::Commands::ClearLoadControlEventsRequest::Id;
-
-        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
-                        commandId, endpointIds.at(0));
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::DemandResponseLoadControl::Id;
-        constexpr chip::CommandId commandId =
-            chip::app::Clusters::DemandResponseLoadControl::Commands::ClearLoadControlEventsRequest::Id;
-
-        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
-                        groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
-    }
-
-private:
-    chip::app::Clusters::DemandResponseLoadControl::Commands::ClearLoadControlEventsRequest::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -22995,7 +22955,6 @@ void registerClusterDemandResponseLoadControl(Commands & commands, CredentialIss
         make_unique<DemandResponseLoadControlUnregisterLoadControlProgramRequest>(credsIssuerConfig), //
         make_unique<DemandResponseLoadControlAddLoadControlEventRequest>(credsIssuerConfig),          //
         make_unique<DemandResponseLoadControlRemoveLoadControlEventRequest>(credsIssuerConfig),       //
-        make_unique<DemandResponseLoadControlClearLoadControlEventsRequest>(credsIssuerConfig),       //
         //
         // Attributes
         //
@@ -23025,8 +22984,7 @@ void registerClusterDemandResponseLoadControl(Commands & commands, CredentialIss
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<
             const chip::app::Clusters::DemandResponseLoadControl::Structs::LoadControlEventStruct::Type>>>(
             Id, "events", Attributes::Events::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<
-            const chip::app::Clusters::DemandResponseLoadControl::Structs::LoadControlEventStruct::Type>>>(
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::ByteSpan>>>(
             Id, "active-events", Attributes::ActiveEvents::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "number-of-events-per-program", 0, UINT8_MAX,
                                              Attributes::NumberOfEventsPerProgram::Id, WriteCommandType::kForceWrite,

@@ -30370,22 +30370,6 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void clearLoadControlEventsRequest(DefaultClusterCallback callback) {
-      clearLoadControlEventsRequest(callback, 0);
-    }
-
-    public void clearLoadControlEventsRequest(DefaultClusterCallback callback, int timedInvokeTimeoutMs) {
-      final long commandId = 4L;
-
-      ArrayList<StructElement> elements = new ArrayList<>();
-      StructType commandArgs = new StructType(elements);
-      invoke(new InvokeCallbackImpl(callback) {
-          @Override
-          public void onResponse(StructType invokeStructValue) {
-          callback.onSuccess();
-        }}, commandId, commandArgs, timedInvokeTimeoutMs);
-    }
-
     public interface LoadControlProgramsAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<ChipStructs.DemandResponseLoadControlClusterLoadControlProgramStruct> value);
     }
@@ -30395,7 +30379,7 @@ public class ChipClusters {
     }
 
     public interface ActiveEventsAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(List<ChipStructs.DemandResponseLoadControlClusterLoadControlEventStruct> value);
+      void onSuccess(List<byte[]> value);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -30499,7 +30483,7 @@ public class ChipClusters {
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            List<ChipStructs.DemandResponseLoadControlClusterLoadControlEventStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<byte[]> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, ACTIVE_EVENTS_ATTRIBUTE_ID, true);
@@ -30512,7 +30496,7 @@ public class ChipClusters {
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            List<ChipStructs.DemandResponseLoadControlClusterLoadControlEventStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<byte[]> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, ACTIVE_EVENTS_ATTRIBUTE_ID, minInterval, maxInterval);

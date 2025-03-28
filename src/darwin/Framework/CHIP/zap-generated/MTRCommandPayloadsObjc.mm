@@ -15818,12 +15818,6 @@ NS_ASSUME_NONNULL_BEGIN
     {
         encodableStruct.loadControlProgram.programID = AsByteSpan(self.loadControlProgram.programID);
         encodableStruct.loadControlProgram.name = AsCharSpan(self.loadControlProgram.name);
-        if (self.loadControlProgram.enrollmentGroup == nil) {
-            encodableStruct.loadControlProgram.enrollmentGroup.SetNull();
-        } else {
-            auto & nonNullValue_1 = encodableStruct.loadControlProgram.enrollmentGroup.SetNonNull();
-            nonNullValue_1 = self.loadControlProgram.enrollmentGroup.unsignedCharValue;
-        }
         if (self.loadControlProgram.randomStartMinutes == nil) {
             encodableStruct.loadControlProgram.randomStartMinutes.SetNull();
         } else {
@@ -16000,12 +15994,11 @@ NS_ASSUME_NONNULL_BEGIN
             auto & nonNullValue_1 = encodableStruct.event.programID.SetNonNull();
             nonNullValue_1 = AsByteSpan(self.event.programID);
         }
-        encodableStruct.event.control = static_cast<std::remove_reference_t<decltype(encodableStruct.event.control)>>(self.event.control.unsignedShortValue);
-        encodableStruct.event.deviceClass = static_cast<std::remove_reference_t<decltype(encodableStruct.event.deviceClass)>>(self.event.deviceClass.unsignedIntValue);
-        if (self.event.enrollmentGroup != nil) {
-            auto & definedValue_1 = encodableStruct.event.enrollmentGroup.Emplace();
-            definedValue_1 = self.event.enrollmentGroup.unsignedCharValue;
+        if (self.event.status != nil) {
+            auto & definedValue_1 = encodableStruct.event.status.Emplace();
+            definedValue_1 = static_cast<std::remove_reference_t<decltype(definedValue_1)>>(self.event.status.unsignedCharValue);
         }
+        encodableStruct.event.control = static_cast<std::remove_reference_t<decltype(encodableStruct.event.control)>>(self.event.control.unsignedShortValue);
         encodableStruct.event.criticality = static_cast<std::remove_reference_t<decltype(encodableStruct.event.criticality)>>(self.event.criticality.unsignedCharValue);
         if (self.event.startTime == nil) {
             encodableStruct.event.startTime.SetNull();
@@ -16039,16 +16032,16 @@ NS_ASSUME_NONNULL_BEGIN
                                 definedValue_5.SetNull();
                             } else {
                                 auto & nonNullValue_6 = definedValue_5.SetNonNull();
-                                nonNullValue_6 = element_1.temperatureControl.coolingTempOffset.unsignedShortValue;
+                                nonNullValue_6 = element_1.temperatureControl.coolingTempOffset.shortValue;
                             }
                         }
-                        if (element_1.temperatureControl.heatingtTempOffset != nil) {
-                            auto & definedValue_5 = definedValue_3.heatingtTempOffset.Emplace();
-                            if (element_1.temperatureControl.heatingtTempOffset == nil) {
+                        if (element_1.temperatureControl.heatingTempOffset != nil) {
+                            auto & definedValue_5 = definedValue_3.heatingTempOffset.Emplace();
+                            if (element_1.temperatureControl.heatingTempOffset == nil) {
                                 definedValue_5.SetNull();
                             } else {
                                 auto & nonNullValue_6 = definedValue_5.SetNonNull();
-                                nonNullValue_6 = element_1.temperatureControl.heatingtTempOffset.unsignedShortValue;
+                                nonNullValue_6 = element_1.temperatureControl.heatingTempOffset.shortValue;
                             }
                         }
                         if (element_1.temperatureControl.coolingTempSetpoint != nil) {
@@ -16178,79 +16171,6 @@ NS_ASSUME_NONNULL_BEGIN
     {
         encodableStruct.cancelControl = static_cast<std::remove_reference_t<decltype(encodableStruct.cancelControl)>>(self.cancelControl.unsignedShortValue);
     }
-
-    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
-    if (buffer.IsNull()) {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    chip::System::PacketBufferTLVWriter writer;
-    // Commands never need chained buffers, since they cannot be chunked.
-    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
-
-    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
-
-    ReturnErrorOnFailure(writer.Finalize(&buffer));
-
-    reader.Init(std::move(buffer));
-    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
-{
-    chip::System::PacketBufferTLVReader reader;
-    CHIP_ERROR err = [self _encodeToTLVReader:reader];
-    if (err != CHIP_NO_ERROR) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:err];
-        }
-        return nil;
-    }
-
-    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
-    if (decodedObj == nil) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
-        }
-    }
-    return decodedObj;
-}
-@end
-
-@implementation MTRDemandResponseLoadControlClusterClearLoadControlEventsRequestParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRDemandResponseLoadControlClusterClearLoadControlEventsRequestParams alloc] init];
-
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTRDemandResponseLoadControlClusterClearLoadControlEventsRequestParams (InternalMethods)
-
-- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
-{
-    chip::app::Clusters::DemandResponseLoadControl::Commands::ClearLoadControlEventsRequest::Type encodableStruct;
-    ListFreer listFreer;
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
     if (buffer.IsNull()) {

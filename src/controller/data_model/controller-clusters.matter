@@ -4788,20 +4788,12 @@ provisional cluster DemandResponseLoadControl = 150 {
     kLevel3 = 4;
     kLevel4 = 5;
     kLevel5 = 6;
-    kEmergency = 7;
-    kPlannedOutage = 8;
-    kServiceDisconnect = 9;
   }
 
   enum HeatingSourceEnum : enum8 {
     kAny = 0;
     kElectric = 1;
     kNonElectric = 2;
-  }
-
-  enum LoadControlEventChangeSourceEnum : enum8 {
-    kAutomatic = 0;
-    kUserAction = 1;
   }
 
   enum LoadControlEventStatusEnum : enum8 {
@@ -4824,26 +4816,6 @@ provisional cluster DemandResponseLoadControl = 150 {
     kRandomEnd = 0x1;
   }
 
-  bitmap DeviceClassBitmap : bitmap32 {
-    kHVAC = 0x1;
-    kStripHeater = 0x2;
-    kWaterHeater = 0x4;
-    kPoolPump = 0x8;
-    kSmartAppliance = 0x10;
-    kIrrigationPump = 0x20;
-    kCommercialLoad = 0x40;
-    kResidentialLoad = 0x80;
-    kExteriorLighting = 0x100;
-    kInteriorLighting = 0x200;
-    kEV = 0x400;
-    kGenerationSystem = 0x800;
-    kSmartInverter = 0x1000;
-    kEVSE = 0x2000;
-    kRESU = 0x4000;
-    kEMS = 0x8000;
-    kSEM = 0x10000;
-  }
-
   bitmap EventControlBitmap : bitmap16 {
     kRandomStart = 0x1;
   }
@@ -4854,13 +4826,12 @@ provisional cluster DemandResponseLoadControl = 150 {
   }
 
   bitmap Feature : bitmap32 {
-    kEnrollmentGroups = 0x1;
-    kTemperatureOffset = 0x2;
-    kTemperatureSetpoint = 0x4;
-    kLoadAdjustment = 0x8;
-    kDutyCycle = 0x10;
-    kPowerSavings = 0x20;
-    kHeatingSource = 0x40;
+    kTemperatureOffset = 0x1;
+    kTemperatureSetpoint = 0x2;
+    kLoadAdjustment = 0x4;
+    kDutyCycle = 0x8;
+    kPowerSavings = 0x10;
+    kHeatingSource = 0x20;
   }
 
   struct HeatingSourceControlStruct {
@@ -4880,8 +4851,8 @@ provisional cluster DemandResponseLoadControl = 150 {
   }
 
   struct TemperatureControlStruct {
-    optional nullable int16u coolingTempOffset = 0;
-    optional nullable int16u heatingtTempOffset = 1;
+    optional nullable int16s coolingTempOffset = 0;
+    optional nullable int16s heatingTempOffset = 1;
     optional nullable temperature coolingTempSetpoint = 2;
     optional nullable temperature heatingTempSetpoint = 3;
   }
@@ -4899,25 +4870,23 @@ provisional cluster DemandResponseLoadControl = 150 {
   struct LoadControlEventStruct {
     octet_string<16> eventID = 0;
     nullable octet_string<16> programID = 1;
-    EventControlBitmap control = 2;
-    DeviceClassBitmap deviceClass = 3;
-    optional int8u enrollmentGroup = 4;
-    CriticalityLevelEnum criticality = 5;
-    nullable epoch_s startTime = 6;
-    LoadControlEventTransitionStruct transitions[] = 7;
+    optional LoadControlEventStatusEnum status = 2;
+    EventControlBitmap control = 3;
+    CriticalityLevelEnum criticality = 4;
+    nullable epoch_s startTime = 5;
+    LoadControlEventTransitionStruct transitions[] = 6;
   }
 
   struct LoadControlProgramStruct {
     octet_string<16> programID = 0;
-    long_char_string<32> name = 1;
-    nullable int8u enrollmentGroup = 2;
-    nullable int8u randomStartMinutes = 3;
-    nullable int8u randomDurationMinutes = 4;
+    char_string<32> name = 1;
+    nullable int8u randomStartMinutes = 2;
+    nullable int8u randomDurationMinutes = 3;
   }
 
   info event LoadControlEventStatusChange = 0 {
     octet_string eventID = 0;
-    nullable int8u transitionIndex = 1;
+    int8u transitionIndex = 1;
     LoadControlEventStatusEnum status = 2;
     CriticalityLevelEnum criticality = 3;
     EventControlBitmap control = 4;
@@ -4931,7 +4900,7 @@ provisional cluster DemandResponseLoadControl = 150 {
   readonly attribute LoadControlProgramStruct loadControlPrograms[] = 0;
   readonly attribute int8u numberOfLoadControlPrograms = 1;
   readonly attribute LoadControlEventStruct events[] = 2;
-  readonly attribute LoadControlEventStruct activeEvents[] = 3;
+  readonly attribute octet_string activeEvents[] = 3;
   readonly attribute int8u numberOfEventsPerProgram = 4;
   readonly attribute int8u numberOfTransitions = 5;
   attribute access(write: manage) int8u defaultRandomStart = 6;
@@ -4960,16 +4929,14 @@ provisional cluster DemandResponseLoadControl = 150 {
     CancelControlBitmap cancelControl = 1;
   }
 
-  /** Upon receipt, this SHALL insert a new LoadControlProgramStruct into LoadControlPrograms, or if the ProgramID matches an existing LoadControlProgramStruct, then the provider SHALL be updated with the provided values. */
+  /** Upon receipt, this SHALL insert a new LoadControlProgramStruct into LoadControlPrograms, or if the ProgramID matches an existing LoadControlProgramStruct, then the existing LoadControlProgramStruct SHALL be overwritten with the provided values. */
   command RegisterLoadControlProgramRequest(RegisterLoadControlProgramRequestRequest): DefaultSuccess = 0;
-  /** Upon receipt, this SHALL remove a the LoadControlProgramStruct from LoadControlPrograms with the matching ProgramID. */
+  /** Upon receipt, this SHALL remove the LoadControlProgramStruct with the matching ProgramID, if it exists, from LoadControlPrograms. */
   command UnregisterLoadControlProgramRequest(UnregisterLoadControlProgramRequestRequest): DefaultSuccess = 1;
-  /** On receipt of the AddLoadControlEventsRequest command, the server SHALL add a load control event. */
+  /** On receipt of this command, the server SHALL perform the following procedure: */
   command AddLoadControlEventRequest(AddLoadControlEventRequestRequest): DefaultSuccess = 2;
-  /** Upon receipt, this SHALL remove the LoadControlEventStruct with the matching EventID from LoadEventPrograms. */
+  /** On receipt of this command, the server SHALL remove any load control events in Events whose EventID matches EventID, either immediately if the RandomEnd Bit bit is not set on the CancelControl field, or after a random duration. */
   command RemoveLoadControlEventRequest(RemoveLoadControlEventRequestRequest): DefaultSuccess = 3;
-  /** Upon receipt, this SHALL clear all the load control events. */
-  command ClearLoadControlEventsRequest(): DefaultSuccess = 4;
 }
 
 /** This cluster provides an interface for passing messages to be presented by a device. */

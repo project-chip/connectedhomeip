@@ -9411,8 +9411,7 @@ public class ClusterIDMapping {
             RegisterLoadControlProgramRequest(0L),
             UnregisterLoadControlProgramRequest(1L),
             AddLoadControlEventRequest(2L),
-            RemoveLoadControlEventRequest(3L),
-            ClearLoadControlEventsRequest(4L),;
+            RemoveLoadControlEventRequest(3L),;
             private final long id;
             Command(long id) {
                 this.id = id;
