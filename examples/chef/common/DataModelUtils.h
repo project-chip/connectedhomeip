@@ -32,7 +32,7 @@ constexpr chip::DeviceTypeId kTemperatureControlledCabinetDeviceId = 0x0071;
 
 // Datamodel Util APIs
 bool EndpointHasDeviceType(chip::EndpointId endpoint, chip::DeviceTypeId deviceTypeId);
-chip::app::DataModel::ListBuilder<chip::EndpointId> GetAllEndpointsHavingDeviceType(chip::DeviceTypeId devieType);
+chip::app::DataModel::ListBuilder<chip::EndpointId> GetAllEndpointsHavingDeviceType(chip::DeviceTypeId deviceTypeId);
 
 } // namespace DataModelUtils
 } // namespace chef

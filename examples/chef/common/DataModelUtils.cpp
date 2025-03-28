@@ -40,7 +40,7 @@ bool DataModelUtils::EndpointHasDeviceType(EndpointId endpoint, DeviceTypeId dev
     return false;
 }
 
-DataModel::ListBuilder<EndpointId> DataModelUtils::GetAllEndpointsHavingDeviceType(DeviceTypeId devieType)
+DataModel::ListBuilder<EndpointId> DataModelUtils::GetAllEndpointsHavingDeviceType(DeviceTypeId deviceTypeId)
 {
     DataModel::ListBuilder<DataModel::EndpointEntry> endpointsList;
     InteractionModelEngine::GetInstance()->GetDataModelProvider()->Endpoints(endpointsList);
@@ -50,7 +50,7 @@ DataModel::ListBuilder<EndpointId> DataModelUtils::GetAllEndpointsHavingDeviceTy
 
     for (const auto & ep : allEndpoints)
     {
-        if (EndpointHasDeviceType(ep.id, devieType))
+        if (EndpointHasDeviceType(ep.id, deviceTypeId))
         {
             endpoints.Append(ep.id);
         }
