@@ -134,8 +134,7 @@ def main(app: str, chip_tool: str, out_dir: str, manual: bool):
         if test_case['dac_provider'] is None:
             dac_provider_path = None
         else:
-            dac_provider_path = str(os.path.join(dac_provider_base_path,
-                                    test_case['dac_provider'])) if test_case['dac_provider'] else None
+            dac_provider_path = str(os.path.join(dac_provider_base_path, test_case['dac_provider']))
 
         # remove any existing KVS files (if any), equivalent to Factory Resetting the TH(all-clusters-app)
         subprocess.call("rm -f /tmp/tmpkvs*", shell=True)
