@@ -24,11 +24,11 @@
 namespace ChefTemperatureControl {
 struct EndpointPair
 {
-    EndpointId mEndpointId;
-    CharSpan * mTemperatureLevels;
+    chip::EndpointId mEndpointId;
+    chip::CharSpan * mTemperatureLevels;
     uint8_t mSize;
 
-    EndpointPair(EndpointId aEndpointId, CharSpan * TemperatureLevels, uint8_t size) :
+    EndpointPair(chip::EndpointId aEndpointId, chip::CharSpan * TemperatureLevels, uint8_t size) :
         mEndpointId(aEndpointId), mTemperatureLevels(TemperatureLevels), mSize(size)
     {}
 };
