@@ -1,5 +1,3 @@
-import re
-import sys
 import threading
 from typing import Any, BinaryIO, Callable, Optional, Pattern, Union
 

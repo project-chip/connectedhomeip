@@ -1,8 +1,5 @@
-from typing import Any, Callable, Optional
+from typing import Any
 
-import os
-import signal
-import tempfile
 from chip.testing.tasks import Subprocess
 
 

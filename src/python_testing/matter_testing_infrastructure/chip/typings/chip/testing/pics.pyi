@@ -1,5 +1,4 @@
 import typing
-import xml.etree.ElementTree as ET
 
 
 def attribute_pics_str(pics_base: str, id: int) -> str: ...

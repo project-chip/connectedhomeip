@@ -18,7 +18,7 @@
 import functools
 from collections import defaultdict
 from dataclasses import dataclass, field
-from typing import Any, Optional, Set, Dict, List, Tuple, cast
+from typing import Any, Set, Dict, List, Tuple
 
 import chip.clusters as Clusters
 from chip.clusters.Types import Nullable
