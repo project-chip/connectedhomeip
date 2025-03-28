@@ -376,7 +376,7 @@ static const auto * optionalInternalStateKeys = @{
     if ( ![self delegateExists] ) {
         return MTRDeviceStateReachable;
     }
-    
+
     NSNumber * stateNumber = MTR_SAFE_CAST(self._internalState[kMTRDeviceInternalPropertyDeviceState], NSNumber);
     switch (static_cast<MTRDeviceState>(stateNumber.unsignedIntegerValue)) {
         default:
