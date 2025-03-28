@@ -139,11 +139,6 @@ brew install kotlin
 
 ## Running the app
 
-This example Matter TV Casting Android app can be tested with the following
-video players:
-
-1. With the
-   [example Matter tv-app](https://github.com/project-chip/connectedhomeip/tree/master/examples/tv-app)
-   running on a Raspberry Pi - works out of the box.
-2. With a FireTV device - requires your Amazon Customer ID to be allow-listed
-   first.
+This example Matter TV Casting Android app can be tested with the
+[example Matter tv-app](https://github.com/project-chip/connectedhomeip/tree/master/examples/tv-app)
+running on a Raspberry Pi.
