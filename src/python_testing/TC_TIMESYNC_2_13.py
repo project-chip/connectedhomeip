@@ -41,8 +41,10 @@ import time
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.clusters.Types import NullValue
-from chip.testing.matter_testing import MatterBaseTest, SimpleEventCallback, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
+
+from matter.testing.matter_testing import (MatterBaseTest, SimpleEventCallback, async_test_body, default_matter_test_main,
+                                           type_matches)
 
 
 class TC_TIMESYNC_2_13(MatterBaseTest):

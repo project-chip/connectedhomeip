@@ -15,6 +15,7 @@
 
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass
 from typing import Any, Tuple, Union
 
@@ -28,8 +29,6 @@ try:
     from yaml import CSafeLoader as SafeLoader
 except ImportError:
     from yaml import SafeLoader
-
-import os
 
 import yaml
 

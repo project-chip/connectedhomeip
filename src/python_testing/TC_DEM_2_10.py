@@ -50,10 +50,11 @@ import time
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
-from chip.testing.matter_testing import (ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, async_test_body,
-                                         default_matter_test_main)
 from mobly import asserts
 from TC_DEMTestBase import DEMTestBase
+
+from matter.testing.matter_testing import (ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, async_test_body,
+                                           default_matter_test_main)
 
 logger = logging.getLogger(__name__)
 
@@ -129,7 +130,7 @@ class TC_DEM_2_10(MatterBaseTest, DEMTestBase):
 
         return steps
 
-    @ async_test_body
+    @async_test_body
     async def test_TC_DEM_2_10(self):
         # pylint: disable=too-many-locals, too-many-statements
         """Run the test steps."""

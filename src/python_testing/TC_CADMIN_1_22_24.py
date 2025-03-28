@@ -39,8 +39,9 @@ from time import sleep
 import chip.clusters as Clusters
 from chip.ChipDeviceCtrl import CommissioningParameters
 from chip.exceptions import ChipStackError
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
 class TC_CADMIN_1_22_24(MatterBaseTest):

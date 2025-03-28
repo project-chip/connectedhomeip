@@ -26,8 +26,8 @@ pw_python_package("matter_placeholder_adapter") {
   ]
 
   sources = [
-    "matter_placeholder_adapter/__init__.py",
-    "matter_placeholder_adapter/adapter.py",
+    "matter/placeholder_adapter/__init__.py",
+    "matter/placeholder_adapter/adapter.py",
   ]
 
   # TODO: at a future time consider enabling all (* or missing) here to get

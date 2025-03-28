@@ -13,7 +13,7 @@
 # limitations under the License.
 
 
-"""The matter_idl package."""
+"""The matter-idl package."""
 
 import setuptools  # type: ignore
 

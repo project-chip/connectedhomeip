@@ -38,8 +38,9 @@ import logging
 
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
+
+from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 
 """ Integration test for error path returns via the UnitTesting cluster.
 """

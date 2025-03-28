@@ -24,16 +24,17 @@ import traceback
 from dataclasses import dataclass
 
 import click
-from matter_yamltests.definitions import SpecDefinitionsFromPaths
-from matter_yamltests.parser import TestParserConfig
-from matter_yamltests.parser_builder import TestParserBuilderConfig
-from matter_yamltests.parser_config import TestConfigParser
-from matter_yamltests.pseudo_clusters.pseudo_clusters import PseudoClusters, get_default_pseudo_clusters
-from matter_yamltests.runner import TestRunner, TestRunnerConfig, TestRunnerOptions
-from matter_yamltests.websocket_runner import WebSocketRunner, WebSocketRunnerConfig
 from paths_finder import PathsFinder
 from tests_finder import TestsFinder
 from tests_logger import TestParserLogger, TestRunnerLogger, WebSocketRunnerLogger
+
+from matter.testing.yamltests.definitions import SpecDefinitionsFromPaths
+from matter.testing.yamltests.parser import TestParserConfig
+from matter.testing.yamltests.parser_builder import TestParserBuilderConfig
+from matter.testing.yamltests.parser_config import TestConfigParser
+from matter.testing.yamltests.pseudo_clusters.pseudo_clusters import PseudoClusters, get_default_pseudo_clusters
+from matter.testing.yamltests.runner import TestRunner, TestRunnerConfig, TestRunnerOptions
+from matter.testing.yamltests.websocket_runner import WebSocketRunner, WebSocketRunnerConfig
 
 #
 # Options
@@ -220,24 +221,24 @@ class YamlTestParserGroup(click.Group):
 CONTEXT_SETTINGS = dict(
     default_map={
         'chiptool': {
-            'adapter': 'matter_chip_tool_adapter.adapter',
+            'adapter': 'matter.chip_tool_adapter.adapter',
             'server_name': 'chip-tool',
             'server_arguments': 'interactive server',
         },
         'darwinframeworktool': {
-            'adapter': 'matter_chip_tool_adapter.adapter',
+            'adapter': 'matter.chip_tool_adapter.adapter',
             'server_name': 'darwin-framework-tool',
             'server_arguments': 'interactive server',
         },
         'app1': {
             'configuration_directory': 'examples/placeholder/linux/apps/app1',
-            'adapter': 'matter_placeholder_adapter.adapter',
+            'adapter': 'matter.placeholder_adapter.adapter',
             'server_name': 'chip-app1',
             'server_arguments': '--interactive',
         },
         'app2': {
             'configuration_directory': 'examples/placeholder/linux/apps/app2',
-            'adapter': 'matter_placeholder_adapter.adapter',
+            'adapter': 'matter.placeholder_adapter.adapter',
             'server_name': 'chip-app2',
             'server_arguments': '--interactive',
         },

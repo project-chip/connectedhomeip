@@ -14,7 +14,7 @@
 
 import unittest
 
-# TODO: Allow to use relative imports or imports from chip.testing package. Then,
+# TODO: Allow to use relative imports or imports from matter.testing package. Then,
 #       rename "tasks" module to "subprocess", because it would be more descriptive.
 #       Unfortunately, current way of importing clashes with the subprocess module
 #       from the Python standard library.

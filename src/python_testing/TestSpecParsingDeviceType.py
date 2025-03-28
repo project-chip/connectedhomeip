@@ -18,14 +18,15 @@ import xml.etree.ElementTree as ElementTree
 
 import chip.clusters as Clusters
 from chip.clusters import Attribute
-from chip.testing.conformance import conformance_allowed
-from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
-from chip.testing.spec_parsing import (PrebuiltDataModelDirectory, build_xml_clusters, build_xml_device_types,
-                                       parse_single_device_type)
 from chip.tlv import uint
 from jinja2 import Template
 from mobly import asserts
 from TC_DeviceConformance import DeviceConformanceTests
+
+from matter.testing.conformance import conformance_allowed
+from matter.testing.matter_testing import MatterBaseTest, default_matter_test_main
+from matter.testing.spec_parsing import (PrebuiltDataModelDirectory, build_xml_clusters, build_xml_device_types,
+                                         parse_single_device_type)
 
 
 class TestSpecParsingDeviceType(MatterBaseTest):

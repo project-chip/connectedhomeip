@@ -321,5 +321,5 @@ RUN set -x && DEBIAN_FRONTEND=noninteractive apt-get update; apt-get install -fy
 RUN apt-get remove -y python3-gi
 
 RUN pip install --break-system-packages --no-cache-dir \
-    python_lib/obj/src/python_testing/matter_testing_infrastructure/chip-testing._build_wheel/chip_testing-*.whl \
+    python_lib/obj/src/python_testing/matter_testing_infrastructure/matter-testing._build_wheel/matter*.whl \
     python_lib/controller/python/chip*.whl

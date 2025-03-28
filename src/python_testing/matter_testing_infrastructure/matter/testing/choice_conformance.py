@@ -1,8 +1,9 @@
-from chip.testing.conformance import Choice, ConformanceDecisionWithChoice
-from chip.testing.global_attribute_ids import GlobalAttributeIds
-from chip.testing.matter_testing import AttributePathLocation, ProblemNotice, ProblemSeverity
-from chip.testing.spec_parsing import XmlCluster
 from chip.tlv import uint
+
+from matter.testing.conformance import Choice, ConformanceDecisionWithChoice
+from matter.testing.global_attribute_ids import GlobalAttributeIds
+from matter.testing.matter_testing import AttributePathLocation, ProblemNotice, ProblemSeverity
+from matter.testing.spec_parsing import XmlCluster
 
 
 class ChoiceConformanceProblemNotice(ProblemNotice):

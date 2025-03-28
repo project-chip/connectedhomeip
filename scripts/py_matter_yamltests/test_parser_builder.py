@@ -17,9 +17,9 @@
 import unittest
 from unittest.mock import mock_open, patch
 
-from matter_yamltests.hooks import TestParserHooks
-from matter_yamltests.parser import TestParser
-from matter_yamltests.parser_builder import TestParserBuilder, TestParserBuilderConfig
+from matter.testing.yamltests.hooks import TestParserHooks
+from matter.testing.yamltests.parser import TestParser
+from matter.testing.yamltests.parser_builder import TestParserBuilder, TestParserBuilderConfig
 
 simple_yaml = '''
 name: Hello World
