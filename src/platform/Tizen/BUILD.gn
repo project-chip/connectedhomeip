@@ -65,7 +65,10 @@ static_library("Tizen") {
     "SystemTimeSupport.cpp",
   ]
 
-  deps = [ "${chip_root}/src/setup_payload" ]
+  deps = [
+    "${chip_root}/src/setup_payload",
+    "${chip_root}/src/app/common:ids",
+  ]
 
   public_deps = [
     "${chip_root}/src/app:app_config",
