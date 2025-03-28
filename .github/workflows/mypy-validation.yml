@@ -1,4 +1,4 @@
-# Copyright (c) 2025 Project CHIP Authors
+# Copyright (c) 2024 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -41,17 +41,21 @@ jobs:
         with:
           platform: linux
       
+      - name: Build Python environment
+        run: |
+          scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/venv'
+      
       - name: Run mypy validation
-        working-directory: src/python_testing/matter_testing_infrastructure
         run: |
           # TODO: Expand this list to include more files once they are mypy-compatible
           # Eventually we should just check all files in the chip/testing directory
           
+          ./scripts/run_in_python_env.sh out/venv "cd src/python_testing/matter_testing_infrastructure && \
           mypy --config-file=mypy.ini \
             chip/testing/apps.py \
             chip/testing/tasks.py \
             chip/testing/taglist_and_topology.py \
-            chip/testing/pics.py
+            chip/testing/pics.py"
           
           # Print a reminder about expanding coverage
           echo "⚠️ NOTE: Currently only checking a subset of files. Remember to expand coverage!" 
