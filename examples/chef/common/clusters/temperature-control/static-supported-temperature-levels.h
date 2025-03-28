@@ -34,6 +34,8 @@ class AppSupportedTemperatureLevelsDelegate : public SupportedTemperatureLevelsI
         CharSpan * mTemperatureLevels;
         uint8_t mSize;
 
+        EndpointPair() : mEndpointId(kInvalidEndpointId), mTemperatureLevels(NULL), mSize(0) {}
+
         EndpointPair(EndpointId aEndpointId, CharSpan * TemperatureLevels, uint8_t size) :
             mEndpointId(aEndpointId), mTemperatureLevels(TemperatureLevels), mSize(size)
         {}
