@@ -66,8 +66,8 @@ static_library("Tizen") {
   ]
 
   deps = [
-    "${chip_root}/src/setup_payload",
     "${chip_root}/src/app/common:ids",
+    "${chip_root}/src/setup_payload",
   ]
 
   public_deps = [
