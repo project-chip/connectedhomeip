@@ -1,4 +1,4 @@
-#include "DataModelUtils.h"
+#include "DeviceTypes.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
 #include <app/data-model/Nullable.h>
@@ -367,13 +367,13 @@ void RefrigeratorTemperatureControlledCabinetInit()
     EndpointId kRefEndpointId           = 1;
     EndpointId kColdCabinetEndpointId   = 2;
     EndpointId kFreezeCabinetEndpointId = 3;
-    if (DataModelUtils::EndpointHasDeviceType(kRefEndpointId, DataModelUtils::kRefrigeratorDeviceId))
+    if (DeviceTypes::EndpointHasDeviceType(kRefEndpointId, DeviceTypes::kRefrigeratorDeviceId))
     {
         ChipLogDetail(NotSpecified, "Refrigerator device type on EP: %d", kRefEndpointId);
         SetTreeCompositionForEndpoint(kRefEndpointId);
 
         // Cold Cabinet
-        if (DataModelUtils::EndpointHasDeviceType(kColdCabinetEndpointId, DataModelUtils::kTemperatureControlledCabinetDeviceId))
+        if (DeviceTypes::EndpointHasDeviceType(kColdCabinetEndpointId, DeviceTypes::kTemperatureControlledCabinetDeviceId))
         {
             ChipLogDetail(NotSpecified, "Temperature controlled cabinet device type on EP: %d", kColdCabinetEndpointId);
             SetParentEndpointForEndpoint(kColdCabinetEndpointId, kRefEndpointId);
@@ -382,7 +382,7 @@ void RefrigeratorTemperatureControlledCabinetInit()
         }
 
         // Freeze Cabinet
-        if (DataModelUtils::EndpointHasDeviceType(kFreezeCabinetEndpointId, DataModelUtils::kTemperatureControlledCabinetDeviceId))
+        if (DeviceTypes::EndpointHasDeviceType(kFreezeCabinetEndpointId, DeviceTypes::kTemperatureControlledCabinetDeviceId))
         {
             ChipLogDetail(NotSpecified, "Temperature controlled cabinet device type on EP: %d", kFreezeCabinetEndpointId);
             SetParentEndpointForEndpoint(kFreezeCabinetEndpointId, kRefEndpointId);
@@ -404,11 +404,11 @@ void CooktopCookSurfaceInit(EndpointId kCooktopEpId)
     switch (kCooktopEpId)
     {
     case 1: // Standalone cooktop.
-        if (DataModelUtils::EndpointHasDeviceType(kCooktopEpId, DataModelUtils::kCooktopDeviceId))
+        if (DeviceTypes::EndpointHasDeviceType(kCooktopEpId, DeviceTypes::kCooktopDeviceId))
         {
             ChipLogDetail(NotSpecified, "Cooktop device type on EP: %d", kCooktopEpId);
             EndpointId kCookSurfaceEpId = 2;
-            if (DataModelUtils::EndpointHasDeviceType(kCookSurfaceEpId, DataModelUtils::kCookSurfaceDeviceId))
+            if (DeviceTypes::EndpointHasDeviceType(kCookSurfaceEpId, DeviceTypes::kCookSurfaceDeviceId))
             {
                 ChipLogDetail(NotSpecified, "Cook Surface device type on EP: %d", kCookSurfaceEpId);
                 SetParentEndpointForEndpoint(kCookSurfaceEpId, kCooktopEpId);
@@ -420,13 +420,13 @@ void CooktopCookSurfaceInit(EndpointId kCooktopEpId)
         break;
     case 3: // Cooktop part of oven.
         EndpointId kOvenEpId = 1;
-        if (DataModelUtils::EndpointHasDeviceType(kCooktopEpId, DataModelUtils::kCooktopDeviceId) &&
-            DataModelUtils::EndpointHasDeviceType(kOvenEpId, DataModelUtils::kOvenDeviceId))
+        if (DeviceTypes::EndpointHasDeviceType(kCooktopEpId, DeviceTypes::kCooktopDeviceId) &&
+            DeviceTypes::EndpointHasDeviceType(kOvenEpId, DeviceTypes::kOvenDeviceId))
         {
             ChipLogDetail(NotSpecified, "Cooktop device type on EP: %d", kCooktopEpId);
             SetParentEndpointForEndpoint(kCooktopEpId, kOvenEpId);
             EndpointId kCookSurfaceEpId = 4;
-            if (DataModelUtils::EndpointHasDeviceType(kCookSurfaceEpId, DataModelUtils::kCookSurfaceDeviceId))
+            if (DeviceTypes::EndpointHasDeviceType(kCookSurfaceEpId, DeviceTypes::kCookSurfaceDeviceId))
             {
                 ChipLogDetail(NotSpecified, "Cook Surface device type on EP: %d", kCookSurfaceEpId);
                 SetParentEndpointForEndpoint(kCookSurfaceEpId, kCooktopEpId);
@@ -447,13 +447,13 @@ void OvenTemperatureControlledCabinetCooktopCookSurfaceInit()
     EndpointId kOvenEpId                         = 1;
     EndpointId kTemperatureControlledCabinetEpId = 2;
     EndpointId kCooktopEpId                      = 3;
-    if (DataModelUtils::EndpointHasDeviceType(kOvenEpId, DataModelUtils::kOvenDeviceId))
+    if (DeviceTypes::EndpointHasDeviceType(kOvenEpId, DeviceTypes::kOvenDeviceId))
     {
         ChipLogDetail(NotSpecified, "Oven device type on EP: %d", kOvenEpId);
         SetTreeCompositionForEndpoint(kOvenEpId);
 
-        if (DataModelUtils::EndpointHasDeviceType(kTemperatureControlledCabinetEpId,
-                                                  DataModelUtils::kTemperatureControlledCabinetDeviceId))
+        if (DeviceTypes::EndpointHasDeviceType(kTemperatureControlledCabinetEpId,
+                                               DeviceTypes::kTemperatureControlledCabinetDeviceId))
         {
             ChipLogDetail(NotSpecified, "Temperature controlled cabinet device type on EP: %d", kTemperatureControlledCabinetEpId);
             SetParentEndpointForEndpoint(kTemperatureControlledCabinetEpId, kOvenEpId);

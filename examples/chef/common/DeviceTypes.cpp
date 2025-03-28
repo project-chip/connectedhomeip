@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include <DataModelUtils.h>
+#include "DeviceTypes.h"
 #include <app/InteractionModelEngine.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <lib/support/CodeUtils.h>
@@ -25,7 +25,7 @@ using namespace chef;
 using namespace chip;
 using namespace chip::app;
 
-bool DataModelUtils::EndpointHasDeviceType(EndpointId endpoint, DeviceTypeId deviceTypeId)
+bool DeviceTypes::EndpointHasDeviceType(EndpointId endpoint, DeviceTypeId deviceTypeId)
 {
     DataModel::ListBuilder<DataModel::DeviceTypeEntry> deviceTypesList;
     InteractionModelEngine::GetInstance()->GetDataModelProvider()->DeviceTypes(endpoint, deviceTypesList);
@@ -40,7 +40,7 @@ bool DataModelUtils::EndpointHasDeviceType(EndpointId endpoint, DeviceTypeId dev
     return false;
 }
 
-DataModel::ListBuilder<EndpointId> DataModelUtils::GetAllEndpointsHavingDeviceType(DeviceTypeId deviceTypeId)
+DataModel::ListBuilder<EndpointId> DeviceTypes::GetAllEndpointsHavingDeviceType(DeviceTypeId deviceTypeId)
 {
     DataModel::ListBuilder<DataModel::EndpointEntry> endpointsList;
     InteractionModelEngine::GetInstance()->GetDataModelProvider()->Endpoints(endpointsList);

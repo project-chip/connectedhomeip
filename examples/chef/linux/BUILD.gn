@@ -40,7 +40,7 @@ chip_data_model("chef-data-model") {
 
 executable("${sample_name}") {
   sources = [
-    "${project_dir}/common/DataModelUtils.cpp",
+    "${project_dir}/common/DeviceTypes.cpp",
     "${project_dir}/common/chef-air-quality.cpp",
     "${project_dir}/common/chef-concentration-measurement.cpp",
     "${project_dir}/common/chef-dishwasher-alarm-delegate-impl.cpp",

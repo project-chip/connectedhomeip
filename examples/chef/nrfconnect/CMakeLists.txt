@@ -78,7 +78,7 @@ if (CONFIG_CHIP_LIB_SHELL)
 endif()
 
 target_sources(app PRIVATE
-    ${CHEF}/common/DataModelUtils.cpp
+    ${CHEF}/common/DeviceTypes.cpp
     ${CHEF}/common/chef-air-quality.cpp
     ${CHEF}/common/chef-concentration-measurement.cpp
     ${CHEF}/common/chef-fan-control-manager.cpp
