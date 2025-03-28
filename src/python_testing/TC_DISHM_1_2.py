@@ -81,8 +81,7 @@ class TC_DISHM_1_2(MatterBaseTest, ModeBaseClusterChecks):
         # According to the spec, there should be at least one like
         # Normal, Heavy, or Light
         # tag in the ones supported.
-        additional_tags = [cluster_dishm_mode.Enums.ModeTag.kNormal,
-                           cluster_dishm_mode.Enums.ModeTag.kHeavy]
+        additional_tags = [cluster_dishm_mode.Enums.ModeTag.kNormal]
         self.check_tags_in_lists(supported_modes=supported_modes, required_tags=additional_tags)
 
         self.step(3)
