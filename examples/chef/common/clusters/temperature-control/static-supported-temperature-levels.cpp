@@ -35,6 +35,9 @@ namespace ChefTemperatureControl {
 static const CharSpan temperatureLevelOptions[3] = { "Low"_span, "Medium"_span, "High"_span };
 } // namespace ChefTemperatureControl
 
+ChefTemperatureControl::EndpointPair
+    AppSupportedTemperatureLevelsDelegate::supportedOptionsByEndpoints[MATTER_DM_TEMPERATURE_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
+
 uint8_t AppSupportedTemperatureLevelsDelegate::Size()
 {
     for (auto & endpointPair : AppSupportedTemperatureLevelsDelegate::supportedOptionsByEndpoints)
