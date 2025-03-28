@@ -6,6 +6,7 @@ import("//build_overrides/chip.gni")
 source_set("ids") {
   sources = [ "ThreadNetworkDirectoryIds.h" ]
   deps = [
+    "${chip_root}/src/app/common:global-ids",
     "${chip_root}/src/app/data-model-provider:metadata",
     "${chip_root}/src/lib/core:types",
   ]
