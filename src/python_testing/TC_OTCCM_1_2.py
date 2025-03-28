@@ -81,8 +81,7 @@ class TC_OTCCM_1_2(MatterBaseTest, ModeBaseClusterChecks):
         # According to the spec, there should be at least one like
         # Bake, Convection, Grill, Roast, Clean, Convection Bake, Convection Roast, Warming, Proofing
         # tag in the ones supported.
-        additional_tags = [cluster_otccm_mode.Enums.ModeTag.kBake,
-                           cluster_otccm_mode.Enums.ModeTag.kConvection]
+        additional_tags = [cluster_otccm_mode.Enums.ModeTag.kBake]
         self.check_tags_in_lists(supported_modes=supported_modes, required_tags=additional_tags)
 
         self.step(3)
