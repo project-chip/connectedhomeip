@@ -247,29 +247,103 @@ CHIP_ERROR WriteClient::PutSinglePreencodedAttributeWritePayload(const chip::app
     return err;
 }
 
+CHIP_ERROR
+WriteClient::TryPutPreencodedListIntoSingleAttributeWritePayload(const chip::app::ConcreteDataAttributePath & attributePath,
+                                                                 TLV::TLVReader & valueReader, bool & chunkingNeeded,
+                                                                 ListIndex & outEncodedItemCount)
+{
+
+    ReturnErrorOnFailure(EnsureListStarted(attributePath));
+
+    chip::TLV::TLVWriter * writer = nullptr;
+    VerifyOrReturnError((writer = GetAttributeDataIBTLVWriter()) != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    TLV::TLVWriter backupWriter;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    outEncodedItemCount = 0;
+
+    while ((err = valueReader.Next()) == CHIP_NO_ERROR)
+    {
+        mWriteRequestBuilder.GetWriteRequests().Checkpoint(backupWriter);
+        err = writer->CopyElement(TLV::AnonymousTag(), valueReader);
+
+        if (err == CHIP_ERROR_NO_MEMORY || err == CHIP_ERROR_BUFFER_TOO_SMALL)
+        {
+            mWriteRequestBuilder.GetWriteRequests().Rollback(backupWriter);
+            chunkingNeeded = true;
+            err            = CHIP_NO_ERROR;
+            break;
+        }
+        ReturnErrorOnFailure(err);
+        outEncodedItemCount++;
+    }
+    VerifyOrReturnError(err == CHIP_END_OF_TLV || err == CHIP_NO_ERROR, err);
+
+    ReturnErrorOnFailure(EnsureListEnded());
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR WriteClient::PutPreencodedAttribute(const ConcreteDataAttributePath & attributePath, const TLV::TLVReader & data)
 {
-    ReturnErrorOnFailure(EnsureMessage());
 
     // ListIndex is missing and the data is an array -- we are writing a whole list.
     if (!attributePath.IsListOperation() && data.GetType() == TLV::TLVType::kTLVType_Array)
     {
+
         TLV::TLVReader dataReader;
         TLV::TLVReader valueReader;
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
+        uint16_t encodedItemCount      = 0;
         ConcreteDataAttributePath path = attributePath;
 
+        // BACKWARD COMPATIBILITY: Legacy OTA Requestor Servers( Pre-Matter 1.4) only support having an empty list for ReplaceAll
+        // when writing to the DefaultOTAProviders attribute and they will only Decode List Items that are received as part of the
+        // AppendItem List operation. So we must allow this for backward compatiblity.
+        // TODO remove this special case when Matter 1.3 is Sunsetted
+        bool encodeEmptyListAsReplaceAll =
+            (path.mClusterId == Clusters::OtaSoftwareUpdateRequestor::Id &&
+             path.mAttributeId == Clusters::OtaSoftwareUpdateRequestor::Attributes::DefaultOTAProviders::Id);
+
+        if (encodeEmptyListAsReplaceAll)
+        {
+            ReturnErrorOnFailure(EnsureMessage());
+            ReturnErrorOnFailure(EncodeSingleAttributeDataIB(path, DataModel::List<uint8_t>()));
+            encodedItemCount = 0;
+        }
+        else
+        {
+            // We will always start a New Chunk before Encoding a ReplaceAll List
+            ReturnErrorOnFailure(StartNewMessage());
+
+            dataReader.Init(data);
+            dataReader.OpenContainer(valueReader);
+            bool chunkingNeeded = false;
+
+            ReturnErrorOnFailure(
+                TryPutPreencodedListIntoSingleAttributeWritePayload(path, valueReader, chunkingNeeded, encodedItemCount));
+
+            if (!chunkingNeeded)
+            {
+                return CHIP_NO_ERROR;
+            }
+
+            // Start a new WriteRequest chunk.
+            ReturnErrorOnFailure(StartNewMessage());
+        }
+        path.mListOp = ConcreteDataAttributePath::ListOperation::AppendItem;
+
+        // We will restart iterating on ValueReader, only appending the items we need to append.
         dataReader.Init(data);
         dataReader.OpenContainer(valueReader);
 
-        // Encode an empty list for the chunking protocol.
-        ReturnErrorOnFailure(EncodeSingleAttributeDataIB(path, DataModel::List<uint8_t>()));
+        CHIP_ERROR err            = CHIP_NO_ERROR;
+        uint16_t currentItemCount = 0;
 
-        if (err == CHIP_NO_ERROR)
+        while ((err = valueReader.Next()) == CHIP_NO_ERROR)
         {
-            path.mListOp = ConcreteDataAttributePath::ListOperation::AppendItem;
-            while ((err = valueReader.Next()) == CHIP_NO_ERROR)
+            currentItemCount++;
+
+            if (currentItemCount > encodedItemCount)
             {
                 ReturnErrorOnFailure(PutSinglePreencodedAttributeWritePayload(path, valueReader));
             }
@@ -281,7 +355,9 @@ CHIP_ERROR WriteClient::PutPreencodedAttribute(const ConcreteDataAttributePath &
         }
         return err;
     }
+
     // We are writing a non-list attribute, or we are writing a single element of a list.
+    ReturnErrorOnFailure(EnsureMessage());
     return PutSinglePreencodedAttributeWritePayload(attributePath, data);
 }
 
