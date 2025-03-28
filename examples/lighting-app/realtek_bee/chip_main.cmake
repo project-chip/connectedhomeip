@@ -197,6 +197,7 @@ target_include_directories(
       ${chip_dir}/zzz_generated/lighting-app
       ${chip_dir}/zzz_generated/lighting-app/zap-generated
       ${chip_dir}/zzz_generated/app-common
+      ${chip_dir}/zzz_generated/data_model
       ${chip_dir}/examples/lighting-app/realtek_bee/main/include
       ${chip_dir}/examples/lighting-app/lighting-common
       ${chip_dir}/examples/lighting-app/lighting-common/include

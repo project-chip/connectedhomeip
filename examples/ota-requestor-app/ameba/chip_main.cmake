@@ -48,6 +48,7 @@ target_include_directories(
 	${inc_path}
     ${chip_dir}/zzz_generated/ota-requestor-app
     ${chip_dir}/zzz_generated/app-common
+    ${chip_dir}/zzz_generated/data_model
     ${chip_dir}/zzz_generated
     ${chip_dir_output}/gen/include
     ${chip_dir}/src/include/

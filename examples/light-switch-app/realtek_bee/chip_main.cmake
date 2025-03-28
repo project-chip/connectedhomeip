@@ -49,6 +49,7 @@ target_include_directories(
     ${chip_dir}/zzz_generated/light-switch-app
     ${chip_dir}/zzz_generated/light-switch-app/zap-generated
     ${chip_dir}/zzz_generated/app-common
+    ${chip_dir}/zzz_generated/data_model
     ${chip_dir}/examples/light-switch-app/light-switch-common
     ${chip_dir}/examples/light-switch-app/realtek_bee/main/include
     ${chip_dir}/examples/platform/realtek_bee
