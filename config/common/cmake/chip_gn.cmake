@@ -170,6 +170,7 @@ macro(matter_build target)
         ${CHIP_ROOT}/third_party/nlio/repo/include
         ${CHIP_ROOT}/third_party/nlfaultinjection/include
         ${CHIP_APP_ZAP_DIR}
+        ${CHIP_ROOT}/zzz_generated/data_model
         ${CMAKE_CURRENT_BINARY_DIR}/gen/include
     )
 
