@@ -32,7 +32,6 @@ struct EndpointPair
         mEndpointId(aEndpointId), mTemperatureLevels(TemperatureLevels), mSize(size)
     {}
 };
-static const CharSpan temperatureLevelOptions[3] = { "Low"_span, "Medium"_span, "High"_span };
 } // namespace ChefTemperatureControl
 
 namespace chip {
