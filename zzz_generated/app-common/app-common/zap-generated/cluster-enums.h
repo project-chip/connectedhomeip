@@ -2807,6 +2807,22 @@ enum class WaterHeaterHeatSourceBitmap : uint8_t
 };
 } // namespace WaterHeaterManagement
 
+namespace CommodityPrice {
+
+// Bitmap for CommodityPriceDetailBitmap
+enum class CommodityPriceDetailBitmap : uint16_t
+{
+    kDescription = 0x1,
+    kComponents  = 0x2,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kForecasting = 0x1,
+};
+} // namespace CommodityPrice
+
 namespace DemandResponseLoadControl {
 
 // Enum for CriticalityLevelEnum
@@ -6095,6 +6111,8 @@ enum class Feature : uint32_t
     kPowerThreshold = 0x1,
 };
 } // namespace MeterIdentification
+
+namespace CommodityMetering {} // namespace CommodityMetering
 
 namespace UnitTesting {
 

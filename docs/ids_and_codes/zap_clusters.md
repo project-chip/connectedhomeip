@@ -78,6 +78,7 @@ Generally regenerate using one of:
 |        144 |       0x90 | ElectricalPowerMeasurement                              |
 |        145 |       0x91 | ElectricalEnergyMeasurement                             |
 |        148 |       0x94 | WaterHeaterManagement                                   |
+|        149 |       0x95 | CommodityPrice                                          |
 |        150 |       0x96 | DemandResponseLoadControl                               |
 |        151 |       0x97 | Messages                                                |
 |        152 |       0x98 | DeviceEnergyManagement                                  |
@@ -143,6 +144,7 @@ Generally regenerate using one of:
 |       2049 |      0x801 | TlsCertificateManagement                                |
 |       2050 |      0x802 | TlsClientManagement                                     |
 |       2822 |      0xB06 | MeterIdentification                                     |
+|       2823 |      0xB07 | CommodityMetering                                       |
 | 4294048773 | 0xFFF1FC05 | UnitTesting                                             |
 | 4294048774 | 0xFFF1FC06 | FaultInjection                                          |
 | 4294048800 | 0xFFF1FC20 | SampleMei                                               |

@@ -230,12 +230,6 @@ bitmap TestGlobalBitmap : bitmap32 {
   kSecondBit = 0x2;
 }
 
-struct PowerThresholdStruct {
-  optional int64s powerThreshold = 0;
-  optional int64s apparentPowerThreshold = 1;
-  nullable PowerThresholdSourceEnum powerThresholdSource = 2;
-}
-
 struct TestGlobalStruct {
   char_string<128> name = 0;
   nullable TestGlobalBitmap myBitmap = 1;
@@ -4790,6 +4784,85 @@ provisional cluster WaterHeaterManagement = 148 {
   command access(invoke: manage) Boost(BoostRequest): DefaultSuccess = 0;
   /** Allows a client to cancel an ongoing Boost operation. */
   command access(invoke: manage) CancelBoost(): DefaultSuccess = 1;
+}
+
+/** The CommodityTariffCluster provides the mechanism for communicating Commodity Tariff information within the premises. */
+provisional cluster CommodityPrice = 149 {
+  revision 4;
+
+  bitmap CommodityPriceDetailBitmap : bitmap16 {
+    kDescription = 0x1;
+    kComponents = 0x2;
+  }
+
+  bitmap Feature : bitmap32 {
+    kForecasting = 0x1;
+  }
+
+  struct CurrencyStruct {
+    int16u currency = 0;
+    int8u decimalPoints = 1;
+  }
+
+  struct CommodityPriceComponentStruct {
+    money price = 0;
+    TariffPriceTypeEnum source = 1;
+    optional char_string<32> description = 2;
+    optional int32u tariffComponentID = 3;
+  }
+
+  struct PriceStruct {
+    money amount = 0;
+    CurrencyStruct currency = 1;
+  }
+
+  struct CommodityPriceStruct {
+    epoch_s periodStart = 0;
+    nullable epoch_s periodEnd = 1;
+    PriceStruct price = 2;
+    optional char_string<32> description = 3;
+    optional CommodityPriceComponentStruct components[] = 4;
+  }
+
+  info event PriceChange = 0 {
+    CommodityPriceStruct currentPrice = 0;
+  }
+
+  info event ForecastChange = 1 {
+    CommodityPriceStruct priceForecast[] = 0;
+  }
+
+  readonly attribute TariffUnitEnum tariffUnit = 0;
+  readonly attribute nullable CurrencyStruct currency = 1;
+  readonly attribute nullable CommodityPriceStruct currentPrice = 2;
+  readonly attribute optional CommodityPriceStruct priceForecast[] = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct GetDetailedPriceRequestRequest {
+    CommodityPriceDetailBitmap details = 0;
+  }
+
+  response struct GetDetailedPriceResponse = 1 {
+    nullable CommodityPriceStruct currentPrice = 0;
+  }
+
+  request struct GetDetailedForecastRequestRequest {
+    CommodityPriceDetailBitmap details = 0;
+  }
+
+  response struct GetDetailedForecastResponse = 3 {
+    CommodityPriceStruct priceForecast[] = 0;
+  }
+
+  /** Upon receipt, this SHALL generate a GetDetailedPrice Response command. */
+  command GetDetailedPriceRequest(GetDetailedPriceRequestRequest): GetDetailedPriceResponse = 0;
+  /** Upon receipt, this SHALL generate a GetDetailedForecast Response command. */
+  command GetDetailedForecastRequest(GetDetailedForecastRequestRequest): GetDetailedForecastResponse = 2;
 }
 
 /** This cluster provides an interface to the functionality of Smart Energy Demand Response and Load Control. */
@@ -10596,6 +10669,12 @@ provisional cluster CommodityTariff = 1792 {
     nullable BlockModeEnum blockMode = 3;
   }
 
+  struct PowerThresholdStruct {
+    optional power_mw powerThreshold = 0;
+    optional power_mva apparentPowerThreshold = 1;
+    nullable PowerThresholdSourceEnum powerThresholdSource = 2;
+  }
+
   struct PeakPeriodStruct {
     PeakPeriodSeverityEnum severity = 0;
     int16u peakPeriod = 1;
@@ -10975,11 +11054,37 @@ provisional cluster MeterIdentification = 2822 {
     kPowerThreshold = 0x1;
   }
 
+  struct PowerThresholdStruct {
+    optional power_mw powerThreshold = 0;
+    optional power_mva apparentPowerThreshold = 1;
+    nullable PowerThresholdSourceEnum powerThresholdSource = 2;
+  }
+
   readonly attribute nullable MeterTypeEnum meterType = 0;
   readonly attribute nullable char_string<64> pointOfDelivery = 1;
   readonly attribute nullable char_string<64> meterSerialNumber = 2;
   readonly attribute optional nullable char_string<64> protocolVersion = 3;
   readonly attribute optional nullable PowerThresholdStruct powerThreshold = 4;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
+/** The CommodityTariffCluster provides the mechanism for communicating Commodity Tariff information within the premises. */
+cluster CommodityMetering = 2823 {
+  revision 1;
+
+  struct MeteredQuantityStruct {
+    int32u tariffComponentIDs[] = 0;
+    int64s quantity = 1;
+  }
+
+  readonly attribute nullable MeteredQuantityStruct meteredQuantity[] = 0;
+  readonly attribute nullable epoch_s meteredQuantityTimestamp = 1;
+  readonly attribute nullable MeasurementTypeEnum measurementType = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;

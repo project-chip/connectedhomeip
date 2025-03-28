@@ -2822,6 +2822,42 @@ static BOOL AttributeIsSpecifiedInWaterHeaterManagementCluster(AttributeId aAttr
     }
     }
 }
+static BOOL AttributeIsSpecifiedInCommodityPriceCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::CommodityPrice;
+    switch (aAttributeId) {
+    case Attributes::TariffUnit::Id: {
+        return YES;
+    }
+    case Attributes::Currency::Id: {
+        return YES;
+    }
+    case Attributes::CurrentPrice::Id: {
+        return YES;
+    }
+    case Attributes::PriceForecast::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInDemandResponseLoadControlCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::DemandResponseLoadControl;
@@ -6179,6 +6215,39 @@ static BOOL AttributeIsSpecifiedInMeterIdentificationCluster(AttributeId aAttrib
     }
     }
 }
+static BOOL AttributeIsSpecifiedInCommodityMeteringCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::CommodityMetering;
+    switch (aAttributeId) {
+    case Attributes::MeteredQuantity::Id: {
+        return YES;
+    }
+    case Attributes::MeteredQuantityTimestamp::Id: {
+        return YES;
+    }
+    case Attributes::MeasurementType::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInUnitTestingCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::UnitTesting;
@@ -6690,6 +6759,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     case Clusters::WaterHeaterManagement::Id: {
         return AttributeIsSpecifiedInWaterHeaterManagementCluster(aAttributeId);
     }
+    case Clusters::CommodityPrice::Id: {
+        return AttributeIsSpecifiedInCommodityPriceCluster(aAttributeId);
+    }
     case Clusters::DemandResponseLoadControl::Id: {
         return AttributeIsSpecifiedInDemandResponseLoadControlCluster(aAttributeId);
     }
@@ -6884,6 +6956,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::MeterIdentification::Id: {
         return AttributeIsSpecifiedInMeterIdentificationCluster(aAttributeId);
+    }
+    case Clusters::CommodityMetering::Id: {
+        return AttributeIsSpecifiedInCommodityMeteringCluster(aAttributeId);
     }
     case Clusters::UnitTesting::Id: {
         return AttributeIsSpecifiedInUnitTestingCluster(aAttributeId);

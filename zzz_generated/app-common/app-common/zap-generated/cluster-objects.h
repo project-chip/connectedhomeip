@@ -43,6 +43,54 @@ namespace detail {
 // Structs shared across multiple clusters.
 namespace Structs {
 
+namespace CurrencyStruct {
+enum class Fields : uint8_t
+{
+    kCurrency      = 0,
+    kDecimalPoints = 1,
+};
+
+struct Type
+{
+public:
+    uint16_t currency     = static_cast<uint16_t>(0);
+    uint8_t decimalPoints = static_cast<uint8_t>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace CurrencyStruct
+namespace PowerThresholdStruct {
+enum class Fields : uint8_t
+{
+    kPowerThreshold         = 0,
+    kApparentPowerThreshold = 1,
+    kPowerThresholdSource   = 2,
+};
+
+struct Type
+{
+public:
+    Optional<int64_t> powerThreshold;
+    Optional<int64_t> apparentPowerThreshold;
+    DataModel::Nullable<Globals::PowerThresholdSourceEnum> powerThresholdSource;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace PowerThresholdStruct
 namespace ModeTagStruct {
 enum class Fields : uint8_t
 {
@@ -403,32 +451,6 @@ namespace Globals {
 
 // Global structs.
 namespace Structs {
-
-namespace PowerThresholdStruct {
-enum class Fields : uint8_t
-{
-    kPowerThreshold         = 0,
-    kApparentPowerThreshold = 1,
-    kPowerThresholdSource   = 2,
-};
-
-struct Type
-{
-public:
-    Optional<int64_t> powerThreshold;
-    Optional<int64_t> apparentPowerThreshold;
-    DataModel::Nullable<Globals::PowerThresholdSourceEnum> powerThresholdSource;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-using DecodableType = Type;
-
-} // namespace PowerThresholdStruct
 
 namespace TestGlobalStruct {
 enum class Fields : uint8_t
@@ -21254,6 +21276,433 @@ public:
 } // namespace BoostEnded
 } // namespace Events
 } // namespace WaterHeaterManagement
+namespace CommodityPrice {
+namespace Structs {
+namespace CurrencyStruct = Clusters::detail::Structs::CurrencyStruct;
+namespace CommodityPriceComponentStruct {
+enum class Fields : uint8_t
+{
+    kPrice             = 0,
+    kSource            = 1,
+    kDescription       = 2,
+    kTariffComponentID = 3,
+};
+
+struct Type
+{
+public:
+    int64_t price              = static_cast<int64_t>(0);
+    TariffPriceTypeEnum source = static_cast<TariffPriceTypeEnum>(0);
+    Optional<chip::CharSpan> description;
+    Optional<uint32_t> tariffComponentID;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace CommodityPriceComponentStruct
+namespace PriceStruct {
+enum class Fields : uint8_t
+{
+    kAmount   = 0,
+    kCurrency = 1,
+};
+
+struct Type
+{
+public:
+    int64_t amount = static_cast<int64_t>(0);
+    Structs::CurrencyStruct::Type currency;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace PriceStruct
+namespace CommodityPriceStruct {
+enum class Fields : uint8_t
+{
+    kPeriodStart = 0,
+    kPeriodEnd   = 1,
+    kPrice       = 2,
+    kDescription = 3,
+    kComponents  = 4,
+};
+
+struct Type
+{
+public:
+    uint32_t periodStart = static_cast<uint32_t>(0);
+    DataModel::Nullable<uint32_t> periodEnd;
+    Structs::PriceStruct::Type price;
+    Optional<chip::CharSpan> description;
+    Optional<DataModel::List<const Structs::CommodityPriceComponentStruct::Type>> components;
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    uint32_t periodStart = static_cast<uint32_t>(0);
+    DataModel::Nullable<uint32_t> periodEnd;
+    Structs::PriceStruct::DecodableType price;
+    Optional<chip::CharSpan> description;
+    Optional<DataModel::DecodableList<Structs::CommodityPriceComponentStruct::DecodableType>> components;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+};
+
+} // namespace CommodityPriceStruct
+} // namespace Structs
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace GetDetailedPriceRequest {
+struct Type;
+struct DecodableType;
+} // namespace GetDetailedPriceRequest
+
+namespace GetDetailedPriceResponse {
+struct Type;
+struct DecodableType;
+} // namespace GetDetailedPriceResponse
+
+namespace GetDetailedForecastRequest {
+struct Type;
+struct DecodableType;
+} // namespace GetDetailedForecastRequest
+
+namespace GetDetailedForecastResponse {
+struct Type;
+struct DecodableType;
+} // namespace GetDetailedForecastResponse
+
+} // namespace Commands
+
+namespace Commands {
+namespace GetDetailedPriceRequest {
+enum class Fields : uint8_t
+{
+    kDetails = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::GetDetailedPriceRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
+
+    chip::BitMask<CommodityPriceDetailBitmap> details = static_cast<chip::BitMask<CommodityPriceDetailBitmap>>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = Clusters::CommodityPrice::Commands::GetDetailedPriceResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::GetDetailedPriceRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
+
+    chip::BitMask<CommodityPriceDetailBitmap> details = static_cast<chip::BitMask<CommodityPriceDetailBitmap>>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetDetailedPriceRequest
+namespace GetDetailedPriceResponse {
+enum class Fields : uint8_t
+{
+    kCurrentPrice = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::GetDetailedPriceResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
+
+    DataModel::Nullable<Structs::CommodityPriceStruct::Type> currentPrice;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::GetDetailedPriceResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
+
+    DataModel::Nullable<Structs::CommodityPriceStruct::DecodableType> currentPrice;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetDetailedPriceResponse
+namespace GetDetailedForecastRequest {
+enum class Fields : uint8_t
+{
+    kDetails = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::GetDetailedForecastRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
+
+    chip::BitMask<CommodityPriceDetailBitmap> details = static_cast<chip::BitMask<CommodityPriceDetailBitmap>>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = Clusters::CommodityPrice::Commands::GetDetailedForecastResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::GetDetailedForecastRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
+
+    chip::BitMask<CommodityPriceDetailBitmap> details = static_cast<chip::BitMask<CommodityPriceDetailBitmap>>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetDetailedForecastRequest
+namespace GetDetailedForecastResponse {
+enum class Fields : uint8_t
+{
+    kPriceForecast = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::GetDetailedForecastResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
+
+    DataModel::List<const Structs::CommodityPriceStruct::Type> priceForecast;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::GetDetailedForecastResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
+
+    DataModel::DecodableList<Structs::CommodityPriceStruct::DecodableType> priceForecast;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetDetailedForecastResponse
+} // namespace Commands
+
+namespace Attributes {
+
+namespace TariffUnit {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::CommodityPrice::TariffUnitEnum;
+    using DecodableType    = chip::app::Clusters::CommodityPrice::TariffUnitEnum;
+    using DecodableArgType = chip::app::Clusters::CommodityPrice::TariffUnitEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TariffUnit::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace TariffUnit
+namespace Currency {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::Nullable<chip::app::Clusters::CommodityPrice::Structs::CurrencyStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::Nullable<chip::app::Clusters::CommodityPrice::Structs::CurrencyStruct::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::Nullable<chip::app::Clusters::CommodityPrice::Structs::CurrencyStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Currency::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Currency
+namespace CurrentPrice {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::Nullable<chip::app::Clusters::CommodityPrice::Structs::CommodityPriceStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::Nullable<chip::app::Clusters::CommodityPrice::Structs::CommodityPriceStruct::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::Nullable<chip::app::Clusters::CommodityPrice::Structs::CommodityPriceStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentPrice::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace CurrentPrice
+namespace PriceForecast {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::CommodityPrice::Structs::CommodityPriceStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::CommodityPrice::Structs::CommodityPriceStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::CommodityPrice::Structs::CommodityPriceStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PriceForecast::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PriceForecast
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
+};
+} // namespace AcceptedCommandList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::TariffUnit::TypeInfo::DecodableType tariffUnit =
+            static_cast<chip::app::Clusters::CommodityPrice::TariffUnitEnum>(0);
+        Attributes::Currency::TypeInfo::DecodableType currency;
+        Attributes::CurrentPrice::TypeInfo::DecodableType currentPrice;
+        Attributes::PriceForecast::TypeInfo::DecodableType priceForecast;
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+namespace Events {
+namespace PriceChange {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+    kCurrentPrice = 0,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::PriceChange::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    Structs::CommodityPriceStruct::Type currentPrice;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::PriceChange::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
+
+    Structs::CommodityPriceStruct::DecodableType currentPrice;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace PriceChange
+namespace ForecastChange {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+    kPriceForecast = 0,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::ForecastChange::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    DataModel::List<const Structs::CommodityPriceStruct::Type> priceForecast;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::ForecastChange::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityPrice::Id; }
+
+    DataModel::DecodableList<Structs::CommodityPriceStruct::DecodableType> priceForecast;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace ForecastChange
+} // namespace Events
+} // namespace CommodityPrice
 namespace DemandResponseLoadControl {
 namespace Structs {
 namespace HeatingSourceControlStruct {
@@ -45072,29 +45521,7 @@ struct TypeInfo
 } // namespace Chime
 namespace CommodityTariff {
 namespace Structs {
-namespace CurrencyStruct {
-enum class Fields : uint8_t
-{
-    kCurrency      = 0,
-    kDecimalPoints = 1,
-};
-
-struct Type
-{
-public:
-    uint16_t currency     = static_cast<uint16_t>(0);
-    uint8_t decimalPoints = static_cast<uint8_t>(0);
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-using DecodableType = Type;
-
-} // namespace CurrencyStruct
+namespace CurrencyStruct = Clusters::detail::Structs::CurrencyStruct;
 namespace TariffInformationStruct {
 enum class Fields : uint8_t
 {
@@ -45122,6 +45549,7 @@ public:
 using DecodableType = Type;
 
 } // namespace TariffInformationStruct
+namespace PowerThresholdStruct = Clusters::detail::Structs::PowerThresholdStruct;
 namespace PeakPeriodStruct {
 enum class Fields : uint8_t
 {
@@ -45215,7 +45643,7 @@ public:
     Optional<bool> friendlyCredit;
     Optional<Structs::AuxiliaryLoadSwitchSettingsStruct::Type> auxiliaryLoad;
     Optional<Structs::PeakPeriodStruct::Type> peakPeriod;
-    Optional<Globals::Structs::PowerThresholdStruct::Type> powerThreshold;
+    Optional<Structs::PowerThresholdStruct::Type> powerThreshold;
     DataModel::Nullable<uint32_t> threshold;
     Optional<DataModel::Nullable<chip::CharSpan>> label;
     Optional<bool> predicted;
@@ -47379,6 +47807,9 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace TlsClientManagement
 namespace MeterIdentification {
+namespace Structs {
+namespace PowerThresholdStruct = Clusters::detail::Structs::PowerThresholdStruct;
+} // namespace Structs
 
 namespace Attributes {
 
@@ -47436,11 +47867,11 @@ struct TypeInfo
 namespace PowerThreshold {
 struct TypeInfo
 {
-    using Type = chip::app::DataModel::Nullable<chip::app::Clusters::Globals::Structs::PowerThresholdStruct::Type>;
+    using Type = chip::app::DataModel::Nullable<chip::app::Clusters::MeterIdentification::Structs::PowerThresholdStruct::Type>;
     using DecodableType =
-        chip::app::DataModel::Nullable<chip::app::Clusters::Globals::Structs::PowerThresholdStruct::DecodableType>;
-    using DecodableArgType =
-        const chip::app::DataModel::Nullable<chip::app::Clusters::Globals::Structs::PowerThresholdStruct::DecodableType> &;
+        chip::app::DataModel::Nullable<chip::app::Clusters::MeterIdentification::Structs::PowerThresholdStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<
+        chip::app::Clusters::MeterIdentification::Structs::PowerThresholdStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PowerThreshold::Id; }
@@ -47500,6 +47931,132 @@ struct TypeInfo
 };
 } // namespace Attributes
 } // namespace MeterIdentification
+namespace CommodityMetering {
+namespace Structs {
+namespace MeteredQuantityStruct {
+enum class Fields : uint8_t
+{
+    kTariffComponentIDs = 0,
+    kQuantity           = 1,
+};
+
+struct Type
+{
+public:
+    DataModel::List<const uint32_t> tariffComponentIDs;
+    int64_t quantity = static_cast<int64_t>(0);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    DataModel::DecodableList<uint32_t> tariffComponentIDs;
+    int64_t quantity = static_cast<int64_t>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+};
+
+} // namespace MeteredQuantityStruct
+} // namespace Structs
+
+namespace Attributes {
+
+namespace MeteredQuantity {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::Nullable<
+        chip::app::DataModel::List<const chip::app::Clusters::CommodityMetering::Structs::MeteredQuantityStruct::Type>>;
+    using DecodableType = chip::app::DataModel::Nullable<
+        chip::app::DataModel::DecodableList<chip::app::Clusters::CommodityMetering::Structs::MeteredQuantityStruct::DecodableType>>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+        chip::app::Clusters::CommodityMetering::Structs::MeteredQuantityStruct::DecodableType>> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityMetering::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeteredQuantity::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeteredQuantity
+namespace MeteredQuantityTimestamp {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint32_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityMetering::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeteredQuantityTimestamp::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeteredQuantityTimestamp
+namespace MeasurementType {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<chip::app::Clusters::CommodityMetering::MeasurementTypeEnum>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::app::Clusters::CommodityMetering::MeasurementTypeEnum>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::Clusters::CommodityMetering::MeasurementTypeEnum> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityMetering::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementType::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeasurementType
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityMetering::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityMetering::Id; }
+};
+} // namespace AcceptedCommandList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityMetering::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityMetering::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::CommodityMetering::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::CommodityMetering::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::MeteredQuantity::TypeInfo::DecodableType meteredQuantity;
+        Attributes::MeteredQuantityTimestamp::TypeInfo::DecodableType meteredQuantityTimestamp;
+        Attributes::MeasurementType::TypeInfo::DecodableType measurementType;
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace CommodityMetering
 namespace UnitTesting {
 namespace Structs {
 namespace SimpleStruct {

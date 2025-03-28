@@ -22,10 +22,15 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <lib/core/CHIPError.h>
 
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Globals::Structs::PowerThresholdStruct::Type & request,
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::detail::Structs::CurrencyStruct::Type & request,
                         Json::Value & value);
 
-static void Finalize(chip::app::Clusters::Globals::Structs::PowerThresholdStruct::Type & request);
+static void Finalize(chip::app::Clusters::detail::Structs::CurrencyStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::detail::Structs::PowerThresholdStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::detail::Structs::PowerThresholdStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Globals::Structs::TestGlobalStruct::Type & request,
                         Json::Value & value);
@@ -368,6 +373,22 @@ static CHIP_ERROR Setup(const char * label,
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::WaterHeaterManagement::Structs::WaterHeaterBoostInfoStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::CommodityPrice::Structs::CommodityPriceComponentStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::CommodityPrice::Structs::CommodityPriceComponentStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::CommodityPrice::Structs::PriceStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::CommodityPrice::Structs::PriceStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::CommodityPrice::Structs::CommodityPriceStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::CommodityPrice::Structs::CommodityPriceStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::DemandResponseLoadControl::Structs::HeatingSourceControlStruct::Type & request,
@@ -822,11 +843,6 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Chime::Structs:
 
 static void Finalize(chip::app::Clusters::Chime::Structs::ChimeSoundStruct::Type & request);
 
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::CommodityTariff::Structs::CurrencyStruct::Type & request,
-                        Json::Value & value);
-
-static void Finalize(chip::app::Clusters::CommodityTariff::Structs::CurrencyStruct::Type & request);
-
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::CommodityTariff::Structs::TariffInformationStruct::Type & request,
                         Json::Value & value);
 
@@ -905,6 +921,11 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::TlsClientManage
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::TlsClientManagement::Structs::TLSEndpointStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::CommodityMetering::Structs::MeteredQuantityStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::CommodityMetering::Structs::MeteredQuantityStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::UnitTesting::Structs::SimpleStruct::Type & request,
                         Json::Value & value);

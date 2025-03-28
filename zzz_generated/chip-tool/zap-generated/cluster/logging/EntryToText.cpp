@@ -157,6 +157,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "ElectricalEnergyMeasurement";
     case chip::app::Clusters::WaterHeaterManagement::Id:
         return "WaterHeaterManagement";
+    case chip::app::Clusters::CommodityPrice::Id:
+        return "CommodityPrice";
     case chip::app::Clusters::DemandResponseLoadControl::Id:
         return "DemandResponseLoadControl";
     case chip::app::Clusters::Messages::Id:
@@ -287,6 +289,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "TlsClientManagement";
     case chip::app::Clusters::MeterIdentification::Id:
         return "MeterIdentification";
+    case chip::app::Clusters::CommodityMetering::Id:
+        return "CommodityMetering";
     case chip::app::Clusters::UnitTesting::Id:
         return "UnitTesting";
     case chip::app::Clusters::FaultInjection::Id:
@@ -2293,6 +2297,31 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         case chip::app::Clusters::WaterHeaterManagement::Attributes::FeatureMap::Id:
             return "FeatureMap";
         case chip::app::Clusters::WaterHeaterManagement::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::CommodityPrice::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::CommodityPrice::Attributes::TariffUnit::Id:
+            return "TariffUnit";
+        case chip::app::Clusters::CommodityPrice::Attributes::Currency::Id:
+            return "Currency";
+        case chip::app::Clusters::CommodityPrice::Attributes::CurrentPrice::Id:
+            return "CurrentPrice";
+        case chip::app::Clusters::CommodityPrice::Attributes::PriceForecast::Id:
+            return "PriceForecast";
+        case chip::app::Clusters::CommodityPrice::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::CommodityPrice::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::CommodityPrice::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::CommodityPrice::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::CommodityPrice::Attributes::ClusterRevision::Id:
             return "ClusterRevision";
         default:
             return "Unknown";
@@ -4601,6 +4630,29 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Unknown";
         }
     }
+    case chip::app::Clusters::CommodityMetering::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::CommodityMetering::Attributes::MeteredQuantity::Id:
+            return "MeteredQuantity";
+        case chip::app::Clusters::CommodityMetering::Attributes::MeteredQuantityTimestamp::Id:
+            return "MeteredQuantityTimestamp";
+        case chip::app::Clusters::CommodityMetering::Attributes::MeasurementType::Id:
+            return "MeasurementType";
+        case chip::app::Clusters::CommodityMetering::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::CommodityMetering::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::CommodityMetering::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::CommodityMetering::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::CommodityMetering::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::UnitTesting::Id: {
         switch (id)
         {
@@ -5405,6 +5457,17 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "Boost";
         case chip::app::Clusters::WaterHeaterManagement::Commands::CancelBoost::Id:
             return "CancelBoost";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::CommodityPrice::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::CommodityPrice::Commands::GetDetailedPriceRequest::Id:
+            return "GetDetailedPriceRequest";
+        case chip::app::Clusters::CommodityPrice::Commands::GetDetailedForecastRequest::Id:
+            return "GetDetailedForecastRequest";
         default:
             return "Unknown";
         }
@@ -6404,6 +6467,17 @@ char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId i
             return "GetSceneMembershipResponse";
         case chip::app::Clusters::ScenesManagement::Commands::CopySceneResponse::Id:
             return "CopySceneResponse";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::CommodityPrice::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::CommodityPrice::Commands::GetDetailedPriceResponse::Id:
+            return "GetDetailedPriceResponse";
+        case chip::app::Clusters::CommodityPrice::Commands::GetDetailedForecastResponse::Id:
+            return "GetDetailedForecastResponse";
         default:
             return "Unknown";
         }

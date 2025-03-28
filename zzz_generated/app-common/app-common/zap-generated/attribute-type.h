@@ -74,6 +74,7 @@ enum
     ZCL_SYSTIME_US_ATTRIBUTE_TYPE        = 0xD0, // System Time Microseconds
     ZCL_SYSTIME_MS_ATTRIBUTE_TYPE        = 0xD1, // System Time Milliseconds
     ZCL_ELAPSED_S_ATTRIBUTE_TYPE         = 0xD2, // Elapsed Time Seconds
+    ZCL_POWER_MVA_ATTRIBUTE_TYPE         = 0xD6, // Power millivolt-amps
     ZCL_TEMPERATURE_ATTRIBUTE_TYPE       = 0xD8, // Temperature
     ZCL_POWER_MW_ATTRIBUTE_TYPE          = 0xD9, // Power milliwatts
     ZCL_AMPERAGE_MA_ATTRIBUTE_TYPE       = 0xDA, // Amperage milliamps
@@ -124,6 +125,8 @@ inline bool IsSignedAttributeType(uint8_t attributeType)
     case ZCL_INT56S_ATTRIBUTE_TYPE:
         return true;
     case ZCL_INT64S_ATTRIBUTE_TYPE:
+        return true;
+    case ZCL_POWER_MVA_ATTRIBUTE_TYPE:
         return true;
     case ZCL_TEMPERATURE_ATTRIBUTE_TYPE:
         return true;

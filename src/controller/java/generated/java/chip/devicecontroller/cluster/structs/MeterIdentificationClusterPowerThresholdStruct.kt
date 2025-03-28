@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 
 class MeterIdentificationClusterPowerThresholdStruct(
   val powerThreshold: Optional<Long>,
-  val apparentPowerThreshold: Optional<Long>,
+  val apparentPowerThreshold: Optional<Any>,
   val powerThresholdSource: UInt?,
 ) {
   override fun toString(): String = buildString {
@@ -71,7 +71,7 @@ class MeterIdentificationClusterPowerThresholdStruct(
         }
       val apparentPowerThreshold =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_APPARENT_POWER_THRESHOLD))) {
-          Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_APPARENT_POWER_THRESHOLD)))
+          Optional.of(tlvReader.getAny(ContextSpecificTag(TAG_APPARENT_POWER_THRESHOLD)))
         } else {
           Optional.empty()
         }

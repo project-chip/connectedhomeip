@@ -216,6 +216,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeWaterHeaterManagementID:
         result = @"WaterHeaterManagement";
         break;
+    case MTRClusterIDTypeCommodityPriceID:
+        result = @"CommodityPrice";
+        break;
     case MTRClusterIDTypeDemandResponseLoadControlID:
         result = @"DemandResponseLoadControl";
         break;
@@ -410,6 +413,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
         break;
     case MTRClusterIDTypeMeterIdentificationID:
         result = @"MeterIdentification";
+        break;
+    case MTRClusterIDTypeCommodityMeteringID:
+        result = @"CommodityMetering";
         break;
     case MTRClusterIDTypeUnitTestingID:
         result = @"UnitTesting";
@@ -4094,6 +4100,53 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             break;
 
         case MTRAttributeIDTypeClusterWaterHeaterManagementAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeCommodityPriceID:
+
+        switch (attributeID) {
+
+            // Cluster CommodityPrice attributes
+        case MTRAttributeIDTypeClusterCommodityPriceAttributeTariffUnitID:
+            result = @"TariffUnit";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityPriceAttributeCurrencyID:
+            result = @"Currency";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityPriceAttributeCurrentPriceID:
+            result = @"CurrentPrice";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityPriceAttributePriceForecastID:
+            result = @"PriceForecast";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityPriceAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityPriceAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityPriceAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityPriceAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityPriceAttributeClusterRevisionID:
             result = @"ClusterRevision";
             break;
 
@@ -8514,6 +8567,49 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
         }
         break;
 
+    case MTRClusterIDTypeCommodityMeteringID:
+
+        switch (attributeID) {
+
+            // Cluster CommodityMetering attributes
+        case MTRAttributeIDTypeClusterCommodityMeteringAttributeMeteredQuantityID:
+            result = @"MeteredQuantity";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityMeteringAttributeMeteredQuantityTimestampID:
+            result = @"MeteredQuantityTimestamp";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityMeteringAttributeMeasurementTypeID:
+            result = @"MeasurementType";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityMeteringAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityMeteringAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityMeteringAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityMeteringAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityMeteringAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeUnitTestingID:
 
         switch (attributeID) {
@@ -10090,6 +10186,24 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
         }
         break;
 
+    case MTRClusterIDTypeCommodityPriceID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterCommodityPriceCommandGetDetailedPriceRequestID:
+            result = @"GetDetailedPriceRequest";
+            break;
+
+        case MTRCommandIDTypeClusterCommodityPriceCommandGetDetailedForecastRequestID:
+            result = @"GetDetailedForecastRequest";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeDemandResponseLoadControlID:
 
         switch (commandID) {
@@ -11524,6 +11638,16 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
         }
         break;
 
+    case MTRClusterIDTypeCommodityMeteringID:
+
+        switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeUnitTestingID:
 
         switch (commandID) {
@@ -12480,6 +12604,24 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
         }
         break;
 
+    case MTRClusterIDTypeCommodityPriceID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterCommodityPriceCommandGetDetailedPriceResponseID:
+            result = @"GetDetailedPriceResponse";
+            break;
+
+        case MTRCommandIDTypeClusterCommodityPriceCommandGetDetailedForecastResponseID:
+            result = @"GetDetailedForecastResponse";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeDemandResponseLoadControlID:
 
         switch (commandID) {
@@ -13313,6 +13455,16 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
         break;
 
     case MTRClusterIDTypeMeterIdentificationID:
+
+        switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeCommodityMeteringID:
 
         switch (commandID) {
 
@@ -14364,6 +14516,25 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
         }
         break;
 
+    case MTRClusterIDTypeCommodityPriceID:
+
+        switch (eventID) {
+
+            // Cluster CommodityPrice events
+        case MTREventIDTypeClusterCommodityPriceEventPriceChangeID:
+            result = @"PriceChange";
+            break;
+
+        case MTREventIDTypeClusterCommodityPriceEventForecastChangeID:
+            result = @"ForecastChange";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeDemandResponseLoadControlID:
 
         switch (eventID) {
@@ -15203,6 +15374,16 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
         break;
 
     case MTRClusterIDTypeMeterIdentificationID:
+
+        switch (eventID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeCommodityMeteringID:
 
         switch (eventID) {
 

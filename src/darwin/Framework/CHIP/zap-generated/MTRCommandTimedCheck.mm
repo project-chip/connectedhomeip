@@ -599,6 +599,15 @@ static BOOL CommandNeedsTimedInvokeInWaterHeaterManagementCluster(AttributeId aA
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInCommodityPriceCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::CommodityPrice;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInDemandResponseLoadControlCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::DemandResponseLoadControl;
@@ -1250,6 +1259,15 @@ static BOOL CommandNeedsTimedInvokeInMeterIdentificationCluster(AttributeId aAtt
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInCommodityMeteringCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::CommodityMetering;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInUnitTestingCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::UnitTesting;
@@ -1467,6 +1485,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     case Clusters::WaterHeaterManagement::Id: {
         return CommandNeedsTimedInvokeInWaterHeaterManagementCluster(commandID);
     }
+    case Clusters::CommodityPrice::Id: {
+        return CommandNeedsTimedInvokeInCommodityPriceCluster(commandID);
+    }
     case Clusters::DemandResponseLoadControl::Id: {
         return CommandNeedsTimedInvokeInDemandResponseLoadControlCluster(commandID);
     }
@@ -1661,6 +1682,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::MeterIdentification::Id: {
         return CommandNeedsTimedInvokeInMeterIdentificationCluster(commandID);
+    }
+    case Clusters::CommodityMetering::Id: {
+        return CommandNeedsTimedInvokeInCommodityMeteringCluster(commandID);
     }
     case Clusters::UnitTesting::Id: {
         return CommandNeedsTimedInvokeInUnitTestingCluster(commandID);

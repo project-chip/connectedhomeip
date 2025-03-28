@@ -19,8 +19,39 @@
 
 #include <commands/clusters/ComplexArgument.h>
 
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters::detail::Structs::CurrencyStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("CurrencyStruct.currency", "currency", value.isMember("currency")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("CurrencyStruct.decimalPoints", "decimalPoints", value.isMember("decimalPoints")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "currency");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.currency, value["currency"]));
+    valueCopy.removeMember("currency");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "decimalPoints");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.decimalPoints, value["decimalPoints"]));
+    valueCopy.removeMember("decimalPoints");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::detail::Structs::CurrencyStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.currency);
+    ComplexArgumentParser::Finalize(request.decimalPoints);
+}
+
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::Globals::Structs::PowerThresholdStruct::Type & request,
+                                        chip::app::Clusters::detail::Structs::PowerThresholdStruct::Type & request,
                                         Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -55,7 +86,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::Globals::Structs::PowerThresholdStruct::Type & request)
+void ComplexArgumentParser::Finalize(chip::app::Clusters::detail::Structs::PowerThresholdStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.powerThreshold);
     ComplexArgumentParser::Finalize(request.apparentPowerThreshold);
@@ -3184,6 +3215,138 @@ void ComplexArgumentParser::Finalize(
     ComplexArgumentParser::Finalize(request.temporarySetpoint);
     ComplexArgumentParser::Finalize(request.targetPercentage);
     ComplexArgumentParser::Finalize(request.targetReheat);
+}
+
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::CommodityPrice::Structs::CommodityPriceComponentStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("CommodityPriceComponentStruct.price", "price", value.isMember("price")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("CommodityPriceComponentStruct.source", "source", value.isMember("source")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "price");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.price, value["price"]));
+    valueCopy.removeMember("price");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "source");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.source, value["source"]));
+    valueCopy.removeMember("source");
+
+    if (value.isMember("description"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "description");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.description, value["description"]));
+    }
+    valueCopy.removeMember("description");
+
+    if (value.isMember("tariffComponentID"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "tariffComponentID");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.tariffComponentID, value["tariffComponentID"]));
+    }
+    valueCopy.removeMember("tariffComponentID");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::CommodityPrice::Structs::CommodityPriceComponentStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.price);
+    ComplexArgumentParser::Finalize(request.source);
+    ComplexArgumentParser::Finalize(request.description);
+    ComplexArgumentParser::Finalize(request.tariffComponentID);
+}
+
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::CommodityPrice::Structs::PriceStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("PriceStruct.amount", "amount", value.isMember("amount")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("PriceStruct.currency", "currency", value.isMember("currency")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "amount");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.amount, value["amount"]));
+    valueCopy.removeMember("amount");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "currency");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.currency, value["currency"]));
+    valueCopy.removeMember("currency");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::CommodityPrice::Structs::PriceStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.amount);
+    ComplexArgumentParser::Finalize(request.currency);
+}
+
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::CommodityPrice::Structs::CommodityPriceStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("CommodityPriceStruct.periodStart", "periodStart", value.isMember("periodStart")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("CommodityPriceStruct.periodEnd", "periodEnd", value.isMember("periodEnd")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("CommodityPriceStruct.price", "price", value.isMember("price")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "periodStart");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.periodStart, value["periodStart"]));
+    valueCopy.removeMember("periodStart");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "periodEnd");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.periodEnd, value["periodEnd"]));
+    valueCopy.removeMember("periodEnd");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "price");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.price, value["price"]));
+    valueCopy.removeMember("price");
+
+    if (value.isMember("description"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "description");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.description, value["description"]));
+    }
+    valueCopy.removeMember("description");
+
+    if (value.isMember("components"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "components");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.components, value["components"]));
+    }
+    valueCopy.removeMember("components");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::CommodityPrice::Structs::CommodityPriceStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.periodStart);
+    ComplexArgumentParser::Finalize(request.periodEnd);
+    ComplexArgumentParser::Finalize(request.price);
+    ComplexArgumentParser::Finalize(request.description);
+    ComplexArgumentParser::Finalize(request.components);
 }
 
 CHIP_ERROR
@@ -7134,38 +7297,6 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::Chime::Structs::ChimeS
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::CommodityTariff::Structs::CurrencyStruct::Type & request,
-                                        Json::Value & value)
-{
-    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
-
-    // Copy to track which members we already processed.
-    Json::Value valueCopy(value);
-
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("CurrencyStruct.currency", "currency", value.isMember("currency")));
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("CurrencyStruct.decimalPoints", "decimalPoints", value.isMember("decimalPoints")));
-
-    char labelWithMember[kMaxLabelLength];
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "currency");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.currency, value["currency"]));
-    valueCopy.removeMember("currency");
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "decimalPoints");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.decimalPoints, value["decimalPoints"]));
-    valueCopy.removeMember("decimalPoints");
-
-    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
-}
-
-void ComplexArgumentParser::Finalize(chip::app::Clusters::CommodityTariff::Structs::CurrencyStruct::Type & request)
-{
-    ComplexArgumentParser::Finalize(request.currency);
-    ComplexArgumentParser::Finalize(request.decimalPoints);
-}
-
-CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                         chip::app::Clusters::CommodityTariff::Structs::TariffInformationStruct::Type & request,
                                         Json::Value & value)
 {
@@ -7868,6 +7999,38 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::TlsClientManagement::S
     ComplexArgumentParser::Finalize(request.caid);
     ComplexArgumentParser::Finalize(request.ccdid);
     ComplexArgumentParser::Finalize(request.status);
+}
+
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::CommodityMetering::Structs::MeteredQuantityStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("MeteredQuantityStruct.tariffComponentIDs", "tariffComponentIDs",
+                                                                  value.isMember("tariffComponentIDs")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("MeteredQuantityStruct.quantity", "quantity", value.isMember("quantity")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "tariffComponentIDs");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.tariffComponentIDs, value["tariffComponentIDs"]));
+    valueCopy.removeMember("tariffComponentIDs");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "quantity");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.quantity, value["quantity"]));
+    valueCopy.removeMember("quantity");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::CommodityMetering::Structs::MeteredQuantityStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.tariffComponentIDs);
+    ComplexArgumentParser::Finalize(request.quantity);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters::UnitTesting::Structs::SimpleStruct::Type & request,

@@ -75,6 +75,7 @@ function atomicType(arg)
   case 'percent100ths':
     return 'chip::Percent100ths';
   case 'power_mw':
+  case 'power_mva':
   case 'amperage_ma':
   case 'voltage_mv':
   case 'energy_mwh':

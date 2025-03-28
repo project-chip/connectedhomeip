@@ -94,6 +94,8 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/global-attributes.xml \
                       src/app/zap-templates/zcl/data-model/chip/chime-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/closure-control-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/commodity-metering-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/commodity-price-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/commodity-tariff-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/global-bitmaps.xml \
                       src/app/zap-templates/zcl/data-model/chip/global-enums.xml \

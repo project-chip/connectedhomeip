@@ -247,12 +247,6 @@ struct AtomicAttributeStatusStruct {
   status statusCode = 1;
 }
 
-struct PowerThresholdStruct {
-  optional int64s powerThreshold = 0;
-  optional int64s apparentPowerThreshold = 1;
-  nullable PowerThresholdSourceEnum powerThresholdSource = 2;
-}
-
 /** The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters. */
 cluster Descriptor = 29 {
   revision 2;

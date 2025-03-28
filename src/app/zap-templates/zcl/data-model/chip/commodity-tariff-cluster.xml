@@ -72,21 +72,6 @@ Git:
     <item name="High" value="0x03"/>
   </enum>
 
-  <enum name="TariffPriceTypeEnum" type="enum8">
-    <cluster code="0x0700"/>
-    <item name="Standard" value="0x00"/>
-    <item name="Critical" value="0x01"/>
-    <item name="Virtual" value="0x02"/>
-    <item name="Incentive" value="0x03"/>
-    <item name="IncentiveSignal" value="0x04"/>
-  </enum>
-
-  <enum name="TariffUnitEnum" type="enum8">
-    <cluster code="0x0700"/>
-    <item name="kWh" value="0x00"/>
-    <item name="kVAh" value="0x01"/>
-  </enum>
-
   <struct name="AuxiliaryLoadSwitchSettingsStruct" apiMaturity="provisional">
     <cluster code="0x0700"/>
     <item fieldId="0" name="Number" type="int8u"/>
@@ -97,12 +82,6 @@ Git:
     <cluster code="0x0700"/>
     <item fieldId="0" name="StartDate" type="epoch_s" isNullable="true" max="0xFFFFFFFE"/>
     <item fieldId="1" name="DayPatternIDs" array="true" type="int32u" length="7" minLength="1"/>
-  </struct>
-
-  <struct name="CurrencyStruct">
-    <cluster code="0x0700"/>
-    <item fieldId="0" name="Currency" type="int16u" min="0" max="999"/>
-    <item fieldId="1" name="DecimalPoints" type="int8u"  min="0" max="255"/>
   </struct>
 
   <struct name="DayEntryStruct" apiMaturity="provisional">
