@@ -14,6 +14,10 @@ matter_idl_generator_templates = [
   "${chip_root}/scripts/py_matter_idl/matter/idl/generators/java/ClusterIDMapping.jinja",
   "${chip_root}/scripts/py_matter_idl/matter/idl/generators/java/ClusterReadMapping.jinja",
   "${chip_root}/scripts/py_matter_idl/matter/idl/generators/java/ClusterWriteMapping.jinja",
+  "${chip_root}/scripts/py_matter_idl/matter/idl/generators/sdk/AllItemsGni.jinja",
+  "${chip_root}/scripts/py_matter_idl/matter/idl/generators/sdk/BuildForMetadata.jinja",
+  "${chip_root}/scripts/py_matter_idl/matter/idl/generators/sdk/ClusterIds.jinja",
+  "${chip_root}/scripts/py_matter_idl/matter/idl/generators/sdk/ClusterMetadataHeader.jinja",
 ]
 
 matter_idl_generator_sources = [
@@ -35,6 +39,8 @@ matter_idl_generator_sources = [
   "${chip_root}/scripts/py_matter_idl/matter/idl/generators/idl/__init__.py",
   "${chip_root}/scripts/py_matter_idl/matter/idl/generators/java/__init__.py",
   "${chip_root}/scripts/py_matter_idl/matter/idl/generators/registry.py",
+  "${chip_root}/scripts/py_matter_idl/matter/idl/generators/sdk/__init__.py",
+  "${chip_root}/scripts/py_matter_idl/matter/idl/generators/sdk/sdk_generator.py",
   "${chip_root}/scripts/py_matter_idl/matter/idl/generators/type_definitions.py",
   "${chip_root}/scripts/py_matter_idl/matter/idl/lint/__init__.py",
   "${chip_root}/scripts/py_matter_idl/matter/idl/lint/lint_rules_parser.py",
