@@ -1,5 +1,4 @@
 {{> header}}
-
 #pragma once
 
 {{#zcl_clusters}}
