@@ -1,0 +1,35 @@
+name: Mypy Type Validation
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'src/python_testing/matter_testing_infrastructure/**/*.py'
+  pull_request:
+    paths:
+      - 'src/python_testing/matter_testing_infrastructure/**/*.py'
+
+jobs:
+  mypy-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      # TODO: This assumes the Pigweed environment is already set up in your workflow
+      # If not, you might need to add setup steps here
+      
+      - name: Run mypy validation
+        working-directory: src/python_testing/matter_testing_infrastructure
+        run: |
+          # TODO: Expand this list to include more files once they are mypy-compatible
+          # Eventually we should just check all files in the chip/testing directory
+          
+          mypy --config-file=mypy.ini \
+            chip/testing/apps.py \
+            chip/testing/tasks.py \
+            chip/testing/taglist_and_topology.py \
+            chip/testing/pics.py
+          
+          # Print a reminder about expanding coverage
+          echo "⚠️ NOTE: Currently only checking a subset of files. Remember to expand coverage!" 
