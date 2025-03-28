@@ -411,7 +411,7 @@ void OvenTemperatureControlledCabinetCooktopCookSurfaceInit()
         {
             ChipLogDetail(NotSpecified, "Temperature controlled cabinet device type on EP: %d", kTemperatureControlledCabinetEpId);
             SetParentEndpointForEndpoint(kTemperatureControlledCabinetEpId, kOvenEpId);
-            Clusters::Descriptor::Structs::SemanticTagStruct::Type cabinetPosition[] = { PostionSemanticTag::kTop };
+            const Clusters::Descriptor::Structs::SemanticTagStruct::Type cabinetPosition[] = { PostionSemanticTag::kTop };
             SetTagList(kTemperatureControlledCabinetEpId,
                        Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(cabinetPosition));
         }
@@ -439,7 +439,7 @@ void CooktopCookSurfaceInit(EndpointId kCooktopEpId)
             {
                 ChipLogDetail(NotSpecified, "Cook Surface device type on EP: %d", kCookSurfaceEpId);
                 SetParentEndpointForEndpoint(kCookSurfaceEpId, kCooktopEpId);
-                Clusters::Descriptor::Structs::SemanticTagStruct::Type cookSurfacePosition[] = { PostionSemanticTag::kLeft };
+                const Clusters::Descriptor::Structs::SemanticTagStruct::Type cookSurfacePosition[] = { PostionSemanticTag::kLeft };
                 SetTagList(kCookSurfaceEpId,
                            Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(cookSurfacePosition));
             }
@@ -457,7 +457,7 @@ void CooktopCookSurfaceInit(EndpointId kCooktopEpId)
             {
                 ChipLogDetail(NotSpecified, "Cook Surface device type on EP: %d", kCookSurfaceEpId);
                 SetParentEndpointForEndpoint(kCookSurfaceEpId, kCooktopEpId);
-                Clusters::Descriptor::Structs::SemanticTagStruct::Type cookSurfacePosition[] = { PostionSemanticTag::kLeft };
+                const Clusters::Descriptor::Structs::SemanticTagStruct::Type cookSurfacePosition[] = { PostionSemanticTag::kLeft };
                 SetTagList(kCookSurfaceEpId,
                            Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(cookSurfacePosition));
             }
