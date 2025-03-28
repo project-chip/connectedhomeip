@@ -39,7 +39,6 @@ class AppSupportedTemperatureLevelsDelegate : public SupportedTemperatureLevelsI
         {}
     };
 
-    static CharSpan temperatureLevelOptions[3];
     static EndpointPair supportedOptionsByEndpoints[MATTER_DM_TEMPERATURE_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
 
 public:
