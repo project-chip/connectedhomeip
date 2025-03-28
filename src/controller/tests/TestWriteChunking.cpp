@@ -240,8 +240,10 @@ TEST_F(TestWriteChunking, TestListChunking)
     app::AttributePathParams attributePath(kTestEndpointId, app::Clusters::UnitTesting::Id, kTestListAttribute);
 
     // We've empirically determined that by reserving all but 60 bytes in the packet buffer, we can fit 1
-    // AttributeDataIB into the packet with a List of ByteSpans with 5 empty items.
+    // AttributeDataIB into the packet with a List of 5/6 ByteSpans with empty items. So if we have a ByteSpan List of 10 items, our
+    // initial ReplaceAll list will contain 5/6 items, and the remaining items are chunked.
     constexpr size_t minReservationSize = kMaxSecureSduLengthBytes - 60 - 100;
+    constexpr uint8_t kTestListLength   = 10;
 
     for (uint32_t i = 100; i > 0; i--)
     {
@@ -255,9 +257,9 @@ TEST_F(TestWriteChunking, TestListChunking)
         app::WriteClient writeClient(&GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing(),
                                      static_cast<uint16_t>(minReservationSize + i) /* reserved buffer size */);
 
-        ByteSpan list[20];
+        ByteSpan list[kTestListLength];
 
-        err = writeClient.EncodeAttribute(attributePath, app::DataModel::List<ByteSpan>(list, 20));
+        err = writeClient.EncodeAttribute(attributePath, app::DataModel::List<ByteSpan>(list, kTestListLength));
 
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
@@ -274,8 +276,8 @@ TEST_F(TestWriteChunking, TestListChunking)
             DrainAndServiceIO();
         }
 
-        // IN THE WAY THE WRITE CHUNKING WORKS NOW, THE NUMBER OF SUCCESSes depende on how many chunks we get, and that is not
-        // predictable
+        // Due to the way Write Chunking is done, it is difficult to predict mSuccessCount. It all depends on how much was
+        // packed into the initial ReplaceAll List.
         EXPECT_EQ(writeCallback.mErrorCount, 0u);
         EXPECT_EQ(writeCallback.mOnDoneCount, 1u);
 
@@ -400,6 +402,8 @@ TEST_F(TestWriteChunking, TestBadChunking)
 
     app::AttributePathParams attributePath(kTestEndpointId, app::Clusters::UnitTesting::Id, kTestListAttribute);
 
+    constexpr uint8_t kTestListLength = 5;
+
     for (int i = 850; i < static_cast<int>(chip::app::kMaxSecureSduLengthBytes); i++)
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -411,13 +415,13 @@ TEST_F(TestWriteChunking, TestBadChunking)
 
         app::WriteClient writeClient(&GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing());
 
-        ByteSpan list[5];
+        ByteSpan list[kTestListLength];
         for (auto & item : list)
         {
             item = ByteSpan(sByteSpanData, static_cast<uint32_t>(i));
         }
 
-        err = writeClient.EncodeAttribute(attributePath, app::DataModel::List<ByteSpan>(list, 5));
+        err = writeClient.EncodeAttribute(attributePath, app::DataModel::List<ByteSpan>(list, kTestListLength));
         if (err == CHIP_ERROR_NO_MEMORY || err == CHIP_ERROR_BUFFER_TOO_SMALL)
         {
             // This kind of error is expected.
@@ -441,7 +445,8 @@ TEST_F(TestWriteChunking, TestBadChunking)
             DrainAndServiceIO();
         }
 
-        //   EXPECT_EQ(writeCallback.mSuccessCount, kTestListLength /* an extra item for the empty list at the beginning */);
+        // Due to the way Write Chunking is done, it is difficult to predict mSuccessCount. It all depends on how much was
+        // packed into the initial ReplaceAll List.
         EXPECT_EQ(writeCallback.mErrorCount, 0u);
         EXPECT_EQ(writeCallback.mOnDoneCount, 1u);
 
@@ -570,8 +575,12 @@ TEST_F(TestWriteChunking, TestConflictWrite)
 
     app::AttributePathParams attributePath(kTestEndpointId, app::Clusters::UnitTesting::Id, kTestListAttribute);
 
-    /* use a smaller chunk (128 bytes) so we only need a few attributes in the write request. */
-    constexpr size_t kReserveSize = kMaxSecureSduLengthBytes - 128;
+    // To ensure that chunking is triggered: We've empirically determined that by reserving all but 60 bytes in the packet buffer,
+    // we can fit 1 AttributeDataIB into the packet with a List of 5/6 ByteSpans with empty items. So if we have a ByteSpan List of
+    // 10 items, our initial ReplaceAll list will contain 5/6 items, and the remaining items are chunked.
+    constexpr size_t kReserveSize     = kMaxSecureSduLengthBytes - 60;
+    constexpr uint8_t kTestListLength = 10;
+    ByteSpan list[kTestListLength];
 
     TestWriteCallback writeCallback1;
     app::WriteClient writeClient1(&GetExchangeManager(), &writeCallback1, Optional<uint16_t>::Missing(),
@@ -581,19 +590,11 @@ TEST_F(TestWriteChunking, TestConflictWrite)
     app::WriteClient writeClient2(&GetExchangeManager(), &writeCallback2, Optional<uint16_t>::Missing(),
                                   static_cast<uint16_t>(kReserveSize));
 
-    uint8_t list_binary[] = { 0x01, 0x23, 0x45, 0x67, 0x89, 0x01, 0x23, 0x45, 0x67, 0x89, 0x01, 0x23, 0x45, 0x67, 0x89,
-                              0x01, 0x23, 0x45, 0x67, 0x89, 0x01, 0x23, 0x45, 0x67, 0x89, 0x01, 0x23, 0x45, 0x67, 0x89,
-                              0x01, 0x23, 0x45, 0x67, 0x89, 0x01, 0x23, 0x45, 0x67, 0x89, 0x01, 0x23, 0x45, 0x67, 0x89
-
-    };
-
-    ByteSpan list(list_binary);
-
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    err = writeClient1.EncodeAttribute(attributePath, app::DataModel::List<uint8_t>(list_binary));
+    err = writeClient1.EncodeAttribute(attributePath, app::DataModel::List<ByteSpan>(list, kTestListLength));
     EXPECT_EQ(err, CHIP_NO_ERROR);
-    err = writeClient2.EncodeAttribute(attributePath, app::DataModel::List<uint8_t>(list_binary));
+    err = writeClient2.EncodeAttribute(attributePath, app::DataModel::List<ByteSpan>(list, kTestListLength));
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
     err = writeClient1.SendWriteRequest(sessionHandle);
