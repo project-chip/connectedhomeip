@@ -34,20 +34,23 @@ class AppSupportedTemperatureLevelsDelegate : public SupportedTemperatureLevelsI
         CharSpan * mTemperatureLevels;
         uint8_t mSize;
 
-        EndpointPair() : mEndpointId(kInvalidEndpointId), mTemperatureLevels(NULL), mSize(0) {}
-
         EndpointPair(EndpointId aEndpointId, CharSpan * TemperatureLevels, uint8_t size) :
             mEndpointId(aEndpointId), mTemperatureLevels(TemperatureLevels), mSize(size)
         {}
     };
 
     static CharSpan temperatureLevelOptions[3];
-    static const EndpointPair supportedOptionsByEndpoints[MATTER_DM_TEMPERATURE_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
+    static EndpointPair supportedOptionsByEndpoints[MATTER_DM_TEMPERATURE_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
 
 public:
     uint8_t Size() override;
 
     CHIP_ERROR Next(MutableCharSpan & item) override;
+
+    void SetSupportedEndpointPair(uint16_t index, const EndpointPair & endpointPair)
+    {
+        supportedOptionsByEndpoints[index] = endpointPair;
+    }
 
     ~AppSupportedTemperatureLevelsDelegate() {}
 };

@@ -33,9 +33,6 @@ app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSup
 
 CharSpan AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions[] = { "Low"_span, "Medium"_span, "High"_span };
 
-const AppSupportedTemperatureLevelsDelegate::EndpointPair
-    AppSupportedTemperatureLevelsDelegate::supportedOptionsByEndpoints[MATTER_DM_TEMPERATURE_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
-
 uint8_t AppSupportedTemperatureLevelsDelegate::Size()
 {
     for (auto & endpointPair : AppSupportedTemperatureLevelsDelegate::supportedOptionsByEndpoints)
@@ -74,9 +71,10 @@ void emberAfTemperatureControlClusterInitCallback(EndpointId endpoint)
     ChipLogDetail(DeviceLayer, "Initializing TemperatureControl cluster for Endpoint: %d", endpoint);
     uint16_t epIndex = emberAfGetClusterServerEndpointIndex(endpoint, TemperatureControl::Id,
                                                             MATTER_DM_TEMPERATURE_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
-    AppSupportedTemperatureLevelsDelegate::supportedOptionsByEndpoints[epIndex] =
+    sAppSupportedTemperatureLevelsDelegate->SetSupportedEndpointPair(
+        epIndex,
         EndpointPair(endpoint /* endpointId */, AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions,
-                     MATTER_ARRAY_SIZE(AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions));
+                     MATTER_ARRAY_SIZE(AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions)));
 
     chip::app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
 }
