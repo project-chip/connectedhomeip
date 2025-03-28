@@ -408,7 +408,7 @@ struct ChipDeviceEvent final
 
     union
     {
-        ChipDevicePlatformEvent Platform;
+        ChipDevicePlatformEvent Platform = {};
         LambdaBridge LambdaEvent;
         struct
         {
