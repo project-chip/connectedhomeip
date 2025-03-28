@@ -31,7 +31,7 @@ namespace Commands {} // namespace Commands
 
 namespace Events {
 namespace Notify {
-inline constexpr CommandId Id = 0x00000000;
+inline constexpr EventId Id = 0x00000000;
 } // namespace Notify
 } // namespace Events
 } // namespace RefrigeratorAlarm

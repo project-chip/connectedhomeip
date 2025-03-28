@@ -65,37 +65,37 @@ inline constexpr CommandId Id = 0x00000000;
 
 namespace Events {
 namespace SmokeAlarm {
-inline constexpr CommandId Id = 0x00000000;
+inline constexpr EventId Id = 0x00000000;
 } // namespace SmokeAlarm
 namespace COAlarm {
-inline constexpr CommandId Id = 0x00000001;
+inline constexpr EventId Id = 0x00000001;
 } // namespace COAlarm
 namespace LowBattery {
-inline constexpr CommandId Id = 0x00000002;
+inline constexpr EventId Id = 0x00000002;
 } // namespace LowBattery
 namespace HardwareFault {
-inline constexpr CommandId Id = 0x00000003;
+inline constexpr EventId Id = 0x00000003;
 } // namespace HardwareFault
 namespace EndOfService {
-inline constexpr CommandId Id = 0x00000004;
+inline constexpr EventId Id = 0x00000004;
 } // namespace EndOfService
 namespace SelfTestComplete {
-inline constexpr CommandId Id = 0x00000005;
+inline constexpr EventId Id = 0x00000005;
 } // namespace SelfTestComplete
 namespace AlarmMuted {
-inline constexpr CommandId Id = 0x00000006;
+inline constexpr EventId Id = 0x00000006;
 } // namespace AlarmMuted
 namespace MuteEnded {
-inline constexpr CommandId Id = 0x00000007;
+inline constexpr EventId Id = 0x00000007;
 } // namespace MuteEnded
 namespace InterconnectSmokeAlarm {
-inline constexpr CommandId Id = 0x00000008;
+inline constexpr EventId Id = 0x00000008;
 } // namespace InterconnectSmokeAlarm
 namespace InterconnectCOAlarm {
-inline constexpr CommandId Id = 0x00000009;
+inline constexpr EventId Id = 0x00000009;
 } // namespace InterconnectCOAlarm
 namespace AllClear {
-inline constexpr CommandId Id = 0x0000000A;
+inline constexpr EventId Id = 0x0000000A;
 } // namespace AllClear
 } // namespace Events
 } // namespace SmokeCoAlarm

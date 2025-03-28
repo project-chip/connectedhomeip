@@ -25,7 +25,7 @@ namespace Commands {} // namespace Commands
 
 namespace Events {
 namespace StateChange {
-inline constexpr CommandId Id = 0x00000000;
+inline constexpr EventId Id = 0x00000000;
 } // namespace StateChange
 } // namespace Events
 } // namespace BooleanState

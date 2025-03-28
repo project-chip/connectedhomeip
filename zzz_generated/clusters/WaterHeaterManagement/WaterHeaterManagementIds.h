@@ -47,10 +47,10 @@ inline constexpr CommandId Id = 0x00000001;
 
 namespace Events {
 namespace BoostStarted {
-inline constexpr CommandId Id = 0x00000000;
+inline constexpr EventId Id = 0x00000000;
 } // namespace BoostStarted
 namespace BoostEnded {
-inline constexpr CommandId Id = 0x00000001;
+inline constexpr EventId Id = 0x00000001;
 } // namespace BoostEnded
 } // namespace Events
 } // namespace WaterHeaterManagement

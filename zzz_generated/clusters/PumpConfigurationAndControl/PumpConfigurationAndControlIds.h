@@ -91,55 +91,55 @@ namespace Commands {} // namespace Commands
 
 namespace Events {
 namespace SupplyVoltageLow {
-inline constexpr CommandId Id = 0x00000000;
+inline constexpr EventId Id = 0x00000000;
 } // namespace SupplyVoltageLow
 namespace SupplyVoltageHigh {
-inline constexpr CommandId Id = 0x00000001;
+inline constexpr EventId Id = 0x00000001;
 } // namespace SupplyVoltageHigh
 namespace PowerMissingPhase {
-inline constexpr CommandId Id = 0x00000002;
+inline constexpr EventId Id = 0x00000002;
 } // namespace PowerMissingPhase
 namespace SystemPressureLow {
-inline constexpr CommandId Id = 0x00000003;
+inline constexpr EventId Id = 0x00000003;
 } // namespace SystemPressureLow
 namespace SystemPressureHigh {
-inline constexpr CommandId Id = 0x00000004;
+inline constexpr EventId Id = 0x00000004;
 } // namespace SystemPressureHigh
 namespace DryRunning {
-inline constexpr CommandId Id = 0x00000005;
+inline constexpr EventId Id = 0x00000005;
 } // namespace DryRunning
 namespace MotorTemperatureHigh {
-inline constexpr CommandId Id = 0x00000006;
+inline constexpr EventId Id = 0x00000006;
 } // namespace MotorTemperatureHigh
 namespace PumpMotorFatalFailure {
-inline constexpr CommandId Id = 0x00000007;
+inline constexpr EventId Id = 0x00000007;
 } // namespace PumpMotorFatalFailure
 namespace ElectronicTemperatureHigh {
-inline constexpr CommandId Id = 0x00000008;
+inline constexpr EventId Id = 0x00000008;
 } // namespace ElectronicTemperatureHigh
 namespace PumpBlocked {
-inline constexpr CommandId Id = 0x00000009;
+inline constexpr EventId Id = 0x00000009;
 } // namespace PumpBlocked
 namespace SensorFailure {
-inline constexpr CommandId Id = 0x0000000A;
+inline constexpr EventId Id = 0x0000000A;
 } // namespace SensorFailure
 namespace ElectronicNonFatalFailure {
-inline constexpr CommandId Id = 0x0000000B;
+inline constexpr EventId Id = 0x0000000B;
 } // namespace ElectronicNonFatalFailure
 namespace ElectronicFatalFailure {
-inline constexpr CommandId Id = 0x0000000C;
+inline constexpr EventId Id = 0x0000000C;
 } // namespace ElectronicFatalFailure
 namespace GeneralFault {
-inline constexpr CommandId Id = 0x0000000D;
+inline constexpr EventId Id = 0x0000000D;
 } // namespace GeneralFault
 namespace Leakage {
-inline constexpr CommandId Id = 0x0000000E;
+inline constexpr EventId Id = 0x0000000E;
 } // namespace Leakage
 namespace AirDetection {
-inline constexpr CommandId Id = 0x0000000F;
+inline constexpr EventId Id = 0x0000000F;
 } // namespace AirDetection
 namespace TurbineOperation {
-inline constexpr CommandId Id = 0x00000010;
+inline constexpr EventId Id = 0x00000010;
 } // namespace TurbineOperation
 } // namespace Events
 } // namespace PumpConfigurationAndControl

@@ -77,19 +77,19 @@ inline constexpr CommandId Id = 0x00000080;
 
 namespace Events {
 namespace StartUp {
-inline constexpr CommandId Id = 0x00000000;
+inline constexpr EventId Id = 0x00000000;
 } // namespace StartUp
 namespace ShutDown {
-inline constexpr CommandId Id = 0x00000001;
+inline constexpr EventId Id = 0x00000001;
 } // namespace ShutDown
 namespace Leave {
-inline constexpr CommandId Id = 0x00000002;
+inline constexpr EventId Id = 0x00000002;
 } // namespace Leave
 namespace ReachableChanged {
-inline constexpr CommandId Id = 0x00000003;
+inline constexpr EventId Id = 0x00000003;
 } // namespace ReachableChanged
 namespace ActiveChanged {
-inline constexpr CommandId Id = 0x00000080;
+inline constexpr EventId Id = 0x00000080;
 } // namespace ActiveChanged
 } // namespace Events
 } // namespace BridgedDeviceBasicInformation

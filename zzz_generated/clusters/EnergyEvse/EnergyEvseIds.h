@@ -113,22 +113,22 @@ inline constexpr CommandId Id = 0x00000007;
 
 namespace Events {
 namespace EVConnected {
-inline constexpr CommandId Id = 0x00000000;
+inline constexpr EventId Id = 0x00000000;
 } // namespace EVConnected
 namespace EVNotDetected {
-inline constexpr CommandId Id = 0x00000001;
+inline constexpr EventId Id = 0x00000001;
 } // namespace EVNotDetected
 namespace EnergyTransferStarted {
-inline constexpr CommandId Id = 0x00000002;
+inline constexpr EventId Id = 0x00000002;
 } // namespace EnergyTransferStarted
 namespace EnergyTransferStopped {
-inline constexpr CommandId Id = 0x00000003;
+inline constexpr EventId Id = 0x00000003;
 } // namespace EnergyTransferStopped
 namespace Fault {
-inline constexpr CommandId Id = 0x00000004;
+inline constexpr EventId Id = 0x00000004;
 } // namespace Fault
 namespace RFID {
-inline constexpr CommandId Id = 0x00000005;
+inline constexpr EventId Id = 0x00000005;
 } // namespace RFID
 } // namespace Events
 } // namespace EnergyEvse

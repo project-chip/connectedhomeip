@@ -221,19 +221,19 @@ inline constexpr CommandId Id = 0x00000029;
 
 namespace Events {
 namespace DoorLockAlarm {
-inline constexpr CommandId Id = 0x00000000;
+inline constexpr EventId Id = 0x00000000;
 } // namespace DoorLockAlarm
 namespace DoorStateChange {
-inline constexpr CommandId Id = 0x00000001;
+inline constexpr EventId Id = 0x00000001;
 } // namespace DoorStateChange
 namespace LockOperation {
-inline constexpr CommandId Id = 0x00000002;
+inline constexpr EventId Id = 0x00000002;
 } // namespace LockOperation
 namespace LockOperationError {
-inline constexpr CommandId Id = 0x00000003;
+inline constexpr EventId Id = 0x00000003;
 } // namespace LockOperationError
 namespace LockUserChange {
-inline constexpr CommandId Id = 0x00000004;
+inline constexpr EventId Id = 0x00000004;
 } // namespace LockUserChange
 } // namespace Events
 } // namespace DoorLock

@@ -64,7 +64,7 @@ namespace Commands {} // namespace Commands
 
 namespace Events {
 namespace OccupancyChanged {
-inline constexpr CommandId Id = 0x00000000;
+inline constexpr EventId Id = 0x00000000;
 } // namespace OccupancyChanged
 } // namespace Events
 } // namespace OccupancySensing

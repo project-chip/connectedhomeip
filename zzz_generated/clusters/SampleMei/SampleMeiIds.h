@@ -32,7 +32,7 @@ inline constexpr CommandId Id = 0x00000002;
 
 namespace Events {
 namespace PingCountEvent {
-inline constexpr CommandId Id = 0x00000000;
+inline constexpr EventId Id = 0x00000000;
 } // namespace PingCountEvent
 } // namespace Events
 } // namespace SampleMei

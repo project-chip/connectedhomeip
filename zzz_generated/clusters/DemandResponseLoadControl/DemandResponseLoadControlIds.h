@@ -62,7 +62,7 @@ inline constexpr CommandId Id = 0x00000004;
 
 namespace Events {
 namespace LoadControlEventStatusChange {
-inline constexpr CommandId Id = 0x00000000;
+inline constexpr EventId Id = 0x00000000;
 } // namespace LoadControlEventStatusChange
 } // namespace Events
 } // namespace DemandResponseLoadControl

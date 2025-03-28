@@ -118,13 +118,13 @@ namespace Commands {} // namespace Commands
 
 namespace Events {
 namespace WiredFaultChange {
-inline constexpr CommandId Id = 0x00000000;
+inline constexpr EventId Id = 0x00000000;
 } // namespace WiredFaultChange
 namespace BatFaultChange {
-inline constexpr CommandId Id = 0x00000001;
+inline constexpr EventId Id = 0x00000001;
 } // namespace BatFaultChange
 namespace BatChargeFaultChange {
-inline constexpr CommandId Id = 0x00000002;
+inline constexpr EventId Id = 0x00000002;
 } // namespace BatChargeFaultChange
 } // namespace Events
 } // namespace PowerSource

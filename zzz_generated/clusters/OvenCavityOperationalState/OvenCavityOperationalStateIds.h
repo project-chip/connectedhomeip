@@ -53,10 +53,10 @@ inline constexpr CommandId Id = 0x00000003;
 
 namespace Events {
 namespace OperationalError {
-inline constexpr CommandId Id = 0x00000000;
+inline constexpr EventId Id = 0x00000000;
 } // namespace OperationalError
 namespace OperationCompletion {
-inline constexpr CommandId Id = 0x00000001;
+inline constexpr EventId Id = 0x00000001;
 } // namespace OperationCompletion
 } // namespace Events
 } // namespace OvenCavityOperationalState

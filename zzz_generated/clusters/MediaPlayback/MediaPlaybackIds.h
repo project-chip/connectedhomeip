@@ -98,7 +98,7 @@ inline constexpr CommandId Id = 0x0000000E;
 
 namespace Events {
 namespace StateChanged {
-inline constexpr CommandId Id = 0x00000000;
+inline constexpr EventId Id = 0x00000000;
 } // namespace StateChanged
 } // namespace Events
 } // namespace MediaPlayback

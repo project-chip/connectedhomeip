@@ -371,13 +371,13 @@ inline constexpr CommandId Id = 0xFFF200AA;
 
 namespace Events {
 namespace TestEvent {
-inline constexpr CommandId Id = 0x00000001;
+inline constexpr EventId Id = 0x00000001;
 } // namespace TestEvent
 namespace TestFabricScopedEvent {
-inline constexpr CommandId Id = 0x00000002;
+inline constexpr EventId Id = 0x00000002;
 } // namespace TestFabricScopedEvent
 namespace TestDifferentVendorMeiEvent {
-inline constexpr CommandId Id = 0xFFF200EE;
+inline constexpr EventId Id = 0xFFF200EE;
 } // namespace TestDifferentVendorMeiEvent
 } // namespace Events
 } // namespace UnitTesting

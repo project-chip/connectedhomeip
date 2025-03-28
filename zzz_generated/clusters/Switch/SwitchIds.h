@@ -31,25 +31,25 @@ namespace Commands {} // namespace Commands
 
 namespace Events {
 namespace SwitchLatched {
-inline constexpr CommandId Id = 0x00000000;
+inline constexpr EventId Id = 0x00000000;
 } // namespace SwitchLatched
 namespace InitialPress {
-inline constexpr CommandId Id = 0x00000001;
+inline constexpr EventId Id = 0x00000001;
 } // namespace InitialPress
 namespace LongPress {
-inline constexpr CommandId Id = 0x00000002;
+inline constexpr EventId Id = 0x00000002;
 } // namespace LongPress
 namespace ShortRelease {
-inline constexpr CommandId Id = 0x00000003;
+inline constexpr EventId Id = 0x00000003;
 } // namespace ShortRelease
 namespace LongRelease {
-inline constexpr CommandId Id = 0x00000004;
+inline constexpr EventId Id = 0x00000004;
 } // namespace LongRelease
 namespace MultiPressOngoing {
-inline constexpr CommandId Id = 0x00000005;
+inline constexpr EventId Id = 0x00000005;
 } // namespace MultiPressOngoing
 namespace MultiPressComplete {
-inline constexpr CommandId Id = 0x00000006;
+inline constexpr EventId Id = 0x00000006;
 } // namespace MultiPressComplete
 } // namespace Events
 } // namespace Switch

@@ -77,19 +77,19 @@ inline constexpr CommandId Id = 0x00000005;
 
 namespace Events {
 namespace DSTTableEmpty {
-inline constexpr CommandId Id = 0x00000000;
+inline constexpr EventId Id = 0x00000000;
 } // namespace DSTTableEmpty
 namespace DSTStatus {
-inline constexpr CommandId Id = 0x00000001;
+inline constexpr EventId Id = 0x00000001;
 } // namespace DSTStatus
 namespace TimeZoneStatus {
-inline constexpr CommandId Id = 0x00000002;
+inline constexpr EventId Id = 0x00000002;
 } // namespace TimeZoneStatus
 namespace TimeFailure {
-inline constexpr CommandId Id = 0x00000003;
+inline constexpr EventId Id = 0x00000003;
 } // namespace TimeFailure
 namespace MissingTrustedTimeSource {
-inline constexpr CommandId Id = 0x00000004;
+inline constexpr EventId Id = 0x00000004;
 } // namespace MissingTrustedTimeSource
 } // namespace Events
 } // namespace TimeSynchronization

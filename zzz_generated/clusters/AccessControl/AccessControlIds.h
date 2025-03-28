@@ -47,13 +47,13 @@ inline constexpr CommandId Id = 0x00000000;
 
 namespace Events {
 namespace AccessControlEntryChanged {
-inline constexpr CommandId Id = 0x00000000;
+inline constexpr EventId Id = 0x00000000;
 } // namespace AccessControlEntryChanged
 namespace AccessControlExtensionChanged {
-inline constexpr CommandId Id = 0x00000001;
+inline constexpr EventId Id = 0x00000001;
 } // namespace AccessControlExtensionChanged
 namespace FabricRestrictionReviewUpdate {
-inline constexpr CommandId Id = 0x00000002;
+inline constexpr EventId Id = 0x00000002;
 } // namespace FabricRestrictionReviewUpdate
 } // namespace Events
 } // namespace AccessControl

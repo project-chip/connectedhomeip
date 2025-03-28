@@ -35,13 +35,13 @@ inline constexpr CommandId Id = 0x00000001;
 
 namespace Events {
 namespace MessageQueued {
-inline constexpr CommandId Id = 0x00000000;
+inline constexpr EventId Id = 0x00000000;
 } // namespace MessageQueued
 namespace MessagePresented {
-inline constexpr CommandId Id = 0x00000001;
+inline constexpr EventId Id = 0x00000001;
 } // namespace MessagePresented
 namespace MessageComplete {
-inline constexpr CommandId Id = 0x00000002;
+inline constexpr EventId Id = 0x00000002;
 } // namespace MessageComplete
 } // namespace Events
 } // namespace Messages

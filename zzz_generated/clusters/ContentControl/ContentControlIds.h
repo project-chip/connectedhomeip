@@ -77,7 +77,7 @@ inline constexpr CommandId Id = 0x0000000A;
 
 namespace Events {
 namespace RemainingScreenTimeExpired {
-inline constexpr CommandId Id = 0x00000000;
+inline constexpr EventId Id = 0x00000000;
 } // namespace RemainingScreenTimeExpired
 } // namespace Events
 } // namespace ContentControl

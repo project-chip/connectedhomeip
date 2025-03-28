@@ -32,7 +32,7 @@ inline constexpr CommandId Id = 0x00000003;
 
 namespace Events {
 namespace LoggedOut {
-inline constexpr CommandId Id = 0x00000000;
+inline constexpr EventId Id = 0x00000000;
 } // namespace LoggedOut
 } // namespace Events
 } // namespace AccountLogin

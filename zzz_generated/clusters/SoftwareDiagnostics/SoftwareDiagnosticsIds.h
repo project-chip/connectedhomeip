@@ -38,7 +38,7 @@ inline constexpr CommandId Id = 0x00000000;
 
 namespace Events {
 namespace SoftwareFault {
-inline constexpr CommandId Id = 0x00000000;
+inline constexpr EventId Id = 0x00000000;
 } // namespace SoftwareFault
 } // namespace Events
 } // namespace SoftwareDiagnostics

@@ -71,16 +71,16 @@ inline constexpr CommandId Id = 0x00000007;
 
 namespace Events {
 namespace PowerAdjustStart {
-inline constexpr CommandId Id = 0x00000000;
+inline constexpr EventId Id = 0x00000000;
 } // namespace PowerAdjustStart
 namespace PowerAdjustEnd {
-inline constexpr CommandId Id = 0x00000001;
+inline constexpr EventId Id = 0x00000001;
 } // namespace PowerAdjustEnd
 namespace Paused {
-inline constexpr CommandId Id = 0x00000002;
+inline constexpr EventId Id = 0x00000002;
 } // namespace Paused
 namespace Resumed {
-inline constexpr CommandId Id = 0x00000003;
+inline constexpr EventId Id = 0x00000003;
 } // namespace Resumed
 } // namespace Events
 } // namespace DeviceEnergyManagement

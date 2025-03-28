@@ -215,10 +215,10 @@ inline constexpr CommandId Id = 0x00000000;
 
 namespace Events {
 namespace ConnectionStatus {
-inline constexpr CommandId Id = 0x00000000;
+inline constexpr EventId Id = 0x00000000;
 } // namespace ConnectionStatus
 namespace NetworkFaultChange {
-inline constexpr CommandId Id = 0x00000001;
+inline constexpr EventId Id = 0x00000001;
 } // namespace NetworkFaultChange
 } // namespace Events
 } // namespace ThreadNetworkDiagnostics

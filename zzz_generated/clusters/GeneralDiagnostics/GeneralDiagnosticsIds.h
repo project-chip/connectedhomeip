@@ -59,16 +59,16 @@ inline constexpr CommandId Id = 0x00000003;
 
 namespace Events {
 namespace HardwareFaultChange {
-inline constexpr CommandId Id = 0x00000000;
+inline constexpr EventId Id = 0x00000000;
 } // namespace HardwareFaultChange
 namespace RadioFaultChange {
-inline constexpr CommandId Id = 0x00000001;
+inline constexpr EventId Id = 0x00000001;
 } // namespace RadioFaultChange
 namespace NetworkFaultChange {
-inline constexpr CommandId Id = 0x00000002;
+inline constexpr EventId Id = 0x00000002;
 } // namespace NetworkFaultChange
 namespace BootReason {
-inline constexpr CommandId Id = 0x00000003;
+inline constexpr EventId Id = 0x00000003;
 } // namespace BootReason
 } // namespace Events
 } // namespace GeneralDiagnostics

@@ -38,13 +38,13 @@ inline constexpr CommandId Id = 0x00000000;
 
 namespace Events {
 namespace StateTransition {
-inline constexpr CommandId Id = 0x00000000;
+inline constexpr EventId Id = 0x00000000;
 } // namespace StateTransition
 namespace VersionApplied {
-inline constexpr CommandId Id = 0x00000001;
+inline constexpr EventId Id = 0x00000001;
 } // namespace VersionApplied
 namespace DownloadError {
-inline constexpr CommandId Id = 0x00000002;
+inline constexpr EventId Id = 0x00000002;
 } // namespace DownloadError
 } // namespace Events
 } // namespace OtaSoftwareUpdateRequestor

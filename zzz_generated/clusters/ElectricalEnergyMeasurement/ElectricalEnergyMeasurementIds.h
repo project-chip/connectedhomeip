@@ -40,10 +40,10 @@ namespace Commands {} // namespace Commands
 
 namespace Events {
 namespace CumulativeEnergyMeasured {
-inline constexpr CommandId Id = 0x00000000;
+inline constexpr EventId Id = 0x00000000;
 } // namespace CumulativeEnergyMeasured
 namespace PeriodicEnergyMeasured {
-inline constexpr CommandId Id = 0x00000001;
+inline constexpr EventId Id = 0x00000001;
 } // namespace PeriodicEnergyMeasured
 } // namespace Events
 } // namespace ElectricalEnergyMeasurement

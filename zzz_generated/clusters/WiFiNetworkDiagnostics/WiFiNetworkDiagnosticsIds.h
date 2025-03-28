@@ -65,13 +65,13 @@ inline constexpr CommandId Id = 0x00000000;
 
 namespace Events {
 namespace Disconnection {
-inline constexpr CommandId Id = 0x00000000;
+inline constexpr EventId Id = 0x00000000;
 } // namespace Disconnection
 namespace AssociationFailure {
-inline constexpr CommandId Id = 0x00000001;
+inline constexpr EventId Id = 0x00000001;
 } // namespace AssociationFailure
 namespace ConnectionStatus {
-inline constexpr CommandId Id = 0x00000002;
+inline constexpr EventId Id = 0x00000002;
 } // namespace ConnectionStatus
 } // namespace Events
 } // namespace WiFiNetworkDiagnostics

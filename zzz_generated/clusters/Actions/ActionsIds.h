@@ -68,10 +68,10 @@ inline constexpr CommandId Id = 0x0000000B;
 
 namespace Events {
 namespace StateChanged {
-inline constexpr CommandId Id = 0x00000000;
+inline constexpr EventId Id = 0x00000000;
 } // namespace StateChanged
 namespace ActionFailed {
-inline constexpr CommandId Id = 0x00000001;
+inline constexpr EventId Id = 0x00000001;
 } // namespace ActionFailed
 } // namespace Events
 } // namespace Actions

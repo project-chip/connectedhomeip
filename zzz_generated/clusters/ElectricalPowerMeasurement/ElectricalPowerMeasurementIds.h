@@ -79,7 +79,7 @@ namespace Commands {} // namespace Commands
 
 namespace Events {
 namespace MeasurementPeriodRanges {
-inline constexpr CommandId Id = 0x00000000;
+inline constexpr EventId Id = 0x00000000;
 } // namespace MeasurementPeriodRanges
 } // namespace Events
 } // namespace ElectricalPowerMeasurement
