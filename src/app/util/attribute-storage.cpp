@@ -1100,11 +1100,11 @@ CHIP_ERROR GetEndpointUniqueIdForEndPoint(EndpointId endpoint, MutableCharSpan &
     {
         return CHIP_ERROR_NOT_FOUND;
     }
-    
+
     CharSpan epUniqueIdSpan(emAfEndpoints[endpointIndex].endpointUniqueId,
                                   emAfEndpoints[endpointIndex].endpointUniqueIdSize);
     CopyCharSpanToMutableCharSpan(epUniqueIdSpan, epUniqueIdMutSpan);
-    
+
     return CHIP_NO_ERROR;
 }
 
