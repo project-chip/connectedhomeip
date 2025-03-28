@@ -393,33 +393,6 @@ void RefrigeratorTemperatureControlledCabinetInit()
 }
 
 /**
- * This initializer is for the application having oven on EP1 and child endpoints -
- * temperatureControlledCabinet on EP2, cooktop on EP3 and cooksurface on EP4.
- */
-void OvenTemperatureControlledCabinetCooktopCookSurfaceInit()
-{
-    EndpointId kOvenEpId                         = 1;
-    EndpointId kTemperatureControlledCabinetEpId = 2;
-    EndpointId kCooktopEpId                      = 3;
-    if (DataModelUtils::EndpointHasDeviceType(kOvenEpId, DataModelUtils::kOvenDeviceId))
-    {
-        ChipLogDetail(NotSpecified, "Oven device type on EP: %d", kOvenEpId);
-        SetTreeCompositionForEndpoint(kOvenEpId);
-
-        if (DataModelUtils::EndpointHasDeviceType(kTemperatureControlledCabinetEpId,
-                                                  DataModelUtils::kTemperatureControlledCabinetDeviceId))
-        {
-            ChipLogDetail(NotSpecified, "Temperature controlled cabinet device type on EP: %d", kTemperatureControlledCabinetEpId);
-            SetParentEndpointForEndpoint(kTemperatureControlledCabinetEpId, kOvenEpId);
-            const Clusters::Descriptor::Structs::SemanticTagStruct::Type cabinetPosition[] = { PostionSemanticTag::kTop };
-            SetTagList(kTemperatureControlledCabinetEpId,
-                       Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(cabinetPosition));
-        }
-        CooktopCookSurfaceInit(kCooktopEpId);
-    }
-}
-
-/**
  * This initializer is for the application having cooktop. The cooktop can be a part of an oven
  * or standalone cooktop.
  *     Standalone Cooktop: Cooktop on EP1 and optional CookSurface on EP2.
@@ -462,6 +435,33 @@ void CooktopCookSurfaceInit(EndpointId kCooktopEpId)
                            Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(cookSurfacePosition));
             }
         }
+    }
+}
+
+/**
+ * This initializer is for the application having oven on EP1 and child endpoints -
+ * temperatureControlledCabinet on EP2, cooktop on EP3 and cooksurface on EP4.
+ */
+void OvenTemperatureControlledCabinetCooktopCookSurfaceInit()
+{
+    EndpointId kOvenEpId                         = 1;
+    EndpointId kTemperatureControlledCabinetEpId = 2;
+    EndpointId kCooktopEpId                      = 3;
+    if (DataModelUtils::EndpointHasDeviceType(kOvenEpId, DataModelUtils::kOvenDeviceId))
+    {
+        ChipLogDetail(NotSpecified, "Oven device type on EP: %d", kOvenEpId);
+        SetTreeCompositionForEndpoint(kOvenEpId);
+
+        if (DataModelUtils::EndpointHasDeviceType(kTemperatureControlledCabinetEpId,
+                                                  DataModelUtils::kTemperatureControlledCabinetDeviceId))
+        {
+            ChipLogDetail(NotSpecified, "Temperature controlled cabinet device type on EP: %d", kTemperatureControlledCabinetEpId);
+            SetParentEndpointForEndpoint(kTemperatureControlledCabinetEpId, kOvenEpId);
+            const Clusters::Descriptor::Structs::SemanticTagStruct::Type cabinetPosition[] = { PostionSemanticTag::kTop };
+            SetTagList(kTemperatureControlledCabinetEpId,
+                       Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(cabinetPosition));
+        }
+        CooktopCookSurfaceInit(kCooktopEpId);
     }
 }
 
