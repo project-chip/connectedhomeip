@@ -130,7 +130,7 @@
                      wifi,
                      thread,
                      _deviceController.uniqueIdentifier,
-                     (unsigned long) self.state];
+                    (unsigned long) [MTR_SAFE_CAST(self._internalState[kMTRDeviceInternalPropertyDeviceState], NSNumber) unsignedLongValue]];
 }
 
 - (nullable NSNumber *)vendorID
@@ -372,16 +372,22 @@ static const auto * optionalInternalStateKeys = @{
 
 - (MTRDeviceState)state
 {
+    // TEMPORARY WORKAROUND for UNTIL WE HAVE the addDelegate flow fixed
+    if ( ![self delegateExists] ) {
+        return MTRDeviceStateReachable;
+    }
+    
     NSNumber * stateNumber = MTR_SAFE_CAST(self._internalState[kMTRDeviceInternalPropertyDeviceState], NSNumber);
     switch (static_cast<MTRDeviceState>(stateNumber.unsignedIntegerValue)) {
-    case MTRDeviceStateUnknown:
-        return MTRDeviceStateUnknown;
+        default:
+        case MTRDeviceStateUnknown:
+            return MTRDeviceStateUnknown;
 
-    case MTRDeviceStateUnreachable:
-        return MTRDeviceStateUnreachable;
+        case MTRDeviceStateUnreachable:
+            return MTRDeviceStateUnreachable;
 
-    case MTRDeviceStateReachable:
-        return MTRDeviceStateReachable;
+        case MTRDeviceStateReachable:
+            return MTRDeviceStateReachable;
     }
 
     MTR_LOG_ERROR("stateNumber from internal state is an invalid value: %@", stateNumber);
