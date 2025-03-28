@@ -196,6 +196,12 @@ enum PositionTag : enum8 {
   kColumn = 6;
 }
 
+enum PowerThresholdSourceEnum : enum8 {
+  kContract = 0;
+  kRegulator = 1;
+  kEquipment = 2;
+}
+
 enum RelativePositionTag : enum8 {
   kUnder = 0;
   kNextTo = 1;
@@ -204,6 +210,19 @@ enum RelativePositionTag : enum8 {
   kAbove = 4;
   kFrontOf = 5;
   kBehind = 6;
+}
+
+enum TariffPriceTypeEnum : enum8 {
+  kStandard = 0;
+  kCritical = 1;
+  kVirtual = 2;
+  kIncentive = 3;
+  kIncentiveSignal = 4;
+}
+
+enum TariffUnitEnum : enum8 {
+  kKWh = 0;
+  kKVAh = 1;
 }
 
 enum TestGlobalEnum : enum8 {
@@ -224,6 +243,17 @@ bitmap TestGlobalBitmap : bitmap32 {
   kSecondBit = 0x2;
 }
 
+struct CurrencyStruct {
+  int16u currency = 0;
+  int8u decimalPoints = 1;
+}
+
+struct PowerThresholdStruct {
+  optional power_mw powerThreshold = 0;
+  optional power_mva apparentPowerThreshold = 1;
+  nullable PowerThresholdSourceEnum powerThresholdSource = 2;
+}
+
 struct TestGlobalStruct {
   char_string<128> name = 0;
   nullable TestGlobalBitmap myBitmap = 1;
@@ -236,9 +266,20 @@ struct LocationDescriptorStruct {
   nullable AreaTypeTag areaType = 2;
 }
 
+struct PriceStruct {
+  money amount = 0;
+  CurrencyStruct currency = 1;
+}
+
 struct AtomicAttributeStatusStruct {
   attrib_id attributeID = 0;
   status statusCode = 1;
+}
+
+fabric_scoped struct SuppliedAttributionData {
+  enum8 contextInformation = 0;
+  optional int32u sourceContext = 1;
+  fabric_idx fabricIndex = 254;
 }
 
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
@@ -1551,7 +1592,7 @@ cluster GroupKeyManagement = 63 {
 
 /** This cluster provides a mechanism for querying data about electrical power as measured by the server. */
 cluster ElectricalPowerMeasurement = 144 {
-  revision 1;
+  revision 3;
 
   enum MeasurementTypeEnum : enum16 {
     kUnspecified = 0;
@@ -1569,6 +1610,8 @@ cluster ElectricalPowerMeasurement = 144 {
     kPowerFactor = 12;
     kNeutralCurrent = 13;
     kElectricalEnergy = 14;
+    kReactiveEnergy = 15;
+    kApparentEnergy = 16;
   }
 
   enum PowerModeEnum : enum8 {
@@ -1636,8 +1679,8 @@ cluster ElectricalPowerMeasurement = 144 {
   readonly attribute optional nullable amperage_ma reactiveCurrent = 6;
   readonly attribute optional nullable amperage_ma apparentCurrent = 7;
   readonly attribute nullable power_mw activePower = 8;
-  readonly attribute optional nullable power_mw reactivePower = 9;
-  readonly attribute optional nullable power_mw apparentPower = 10;
+  readonly attribute optional nullable power_mvar reactivePower = 9;
+  readonly attribute optional nullable power_mva apparentPower = 10;
   readonly attribute optional nullable voltage_mv RMSVoltage = 11;
   readonly attribute optional nullable amperage_ma RMSCurrent = 12;
   readonly attribute optional nullable power_mw RMSPower = 13;
@@ -1656,7 +1699,7 @@ cluster ElectricalPowerMeasurement = 144 {
 
 /** This cluster provides a mechanism for querying data about the electrical energy imported or provided by the server. */
 cluster ElectricalEnergyMeasurement = 145 {
-  revision 1;
+  revision 2;
 
   enum MeasurementTypeEnum : enum16 {
     kUnspecified = 0;
@@ -1674,6 +1717,8 @@ cluster ElectricalEnergyMeasurement = 145 {
     kPowerFactor = 12;
     kNeutralCurrent = 13;
     kElectricalEnergy = 14;
+    kReactiveEnergy = 15;
+    kApparentEnergy = 16;
   }
 
   bitmap Feature : bitmap32 {
@@ -1681,6 +1726,8 @@ cluster ElectricalEnergyMeasurement = 145 {
     kExportedEnergy = 0x2;
     kCumulativeEnergy = 0x4;
     kPeriodicEnergy = 0x8;
+    kApparentEnergy = 0x10;
+    kReactiveEnergy = 0x20;
   }
 
   struct MeasurementAccuracyRangeStruct {
@@ -1715,6 +1762,8 @@ cluster ElectricalEnergyMeasurement = 145 {
     optional epoch_s endTimestamp = 2;
     optional systime_ms startSystime = 3;
     optional systime_ms endSystime = 4;
+    optional energy_mvah apparentEnergy = 5;
+    optional energy_mvarh reactiveEnergy = 6;
   }
 
   info event CumulativeEnergyMeasured = 0 {
