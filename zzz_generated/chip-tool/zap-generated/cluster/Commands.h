@@ -14544,7 +14544,7 @@ public:
     {
         AddArgument("Pan", INT16_MIN, INT16_MAX, &mRequest.pan);
         AddArgument("Tilt", INT16_MIN, INT16_MAX, &mRequest.tilt);
-        AddArgument("Zoom", 0, UINT8_MAX, &mRequest.zoom);
+        AddArgument("Zoom", INT8_MIN, INT8_MAX, &mRequest.zoom);
         ClusterCommand::AddArguments();
     }
 
@@ -28579,8 +28579,8 @@ void registerClusterCameraAvSettingsUserLevelManagement(Commands & commands, Cre
             Id, "mptzpresets", Attributes::MPTZPresets::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const uint16_t>>>(
             Id, "dptzrelative-move", Attributes::DPTZRelativeMove::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<uint8_t>>(Id, "zoom-max", 0, UINT8_MAX, Attributes::ZoomMax::Id, WriteCommandType::kForceWrite,
-                                             credsIssuerConfig), //
+        make_unique<WriteAttribute<int8_t>>(Id, "zoom-max", INT8_MIN, INT8_MAX, Attributes::ZoomMax::Id,
+                                            WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<int16_t>>(Id, "tilt-min", INT16_MIN, INT16_MAX, Attributes::TiltMin::Id,
                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<int16_t>>(Id, "tilt-max", INT16_MIN, INT16_MAX, Attributes::TiltMax::Id,

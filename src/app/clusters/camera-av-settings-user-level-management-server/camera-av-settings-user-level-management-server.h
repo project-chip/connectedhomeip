@@ -89,8 +89,8 @@ public:
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
     CameraAvSettingsUserLevelMgmtServer(EndpointId endpointId, Delegate * delegate, BitMask<Feature> aFeature,
-                                        const BitFlags<OptionalAttributes> aOptionalAttrs, uint8_t aMaxPresets, int16_t aPanMin,
-                                        int16_t aPanMax, int16_t aTiltMin, int16_t aTiltMax, uint8_t aZoomMax);
+                                        const BitMask<OptionalAttributes> aOptionalAttrs, uint8_t aMaxPresets, int16_t aPanMin,
+                                        int16_t aPanMax, int16_t aTiltMin, int16_t aTiltMax, int8_t aZoomMax);
     ~CameraAvSettingsUserLevelMgmtServer() override;
 
     CHIP_ERROR Init();
@@ -119,13 +119,13 @@ public:
      * Allows for a delegate or application to set the zoom value given physical changes on the device itself, possibly due to
      * direct user changes
      */
-    void setZoom(Optional<uint8_t>);
+    void setZoom(Optional<int8_t>);
 
     uint8_t GetMaxPresets() const { return mMaxPresets; }
 
     const std::vector<uint16_t> GetDptzRelativeMove() const { return mDptzRelativeMove; }
 
-    uint8_t GetZoomMax() const { return mZoomMax; }
+    int8_t GetZoomMax() const { return mZoomMax; }
 
     int16_t GetTiltMin() const { return mTiltMin; }
 
@@ -145,7 +145,7 @@ private:
 
     const Optional<int16_t> defaultPan  = Optional(static_cast<int16_t>(0));
     const Optional<int16_t> defaultTilt = Optional(static_cast<int16_t>(0));
-    const Optional<uint8_t> defaultZoom = Optional(static_cast<uint8_t>(1));
+    const Optional<int8_t> defaultZoom = Optional(static_cast<int8_t>(1));
 
     uint8_t currentPresetID = 0;
 
@@ -158,7 +158,7 @@ private:
     int16_t mPanMax     = 180;
     int16_t mTiltMin    = -90;
     int16_t mTiltMax    = 90;
-    uint8_t mZoomMax    = 100;
+    int8_t mZoomMax     = 100;
 
     std::vector<MPTZPresetHelper> mMptzPresetHelper;
     std::vector<uint16_t> mDptzRelativeMove;
@@ -225,7 +225,7 @@ public:
      * @param zoom The validated value of the zoom that is to be set
      */
     virtual Protocols::InteractionModel::Status MPTZSetPosition(Optional<int16_t> pan, Optional<int16_t> tilt,
-                                                                Optional<uint8_t> zoom) = 0;
+                                                                Optional<int8_t> zoom) = 0;
 
     /**
      * Allows any needed app handling given provided and already validated pan, tilt, and zoom values that are to be set based on
@@ -237,14 +237,14 @@ public:
      * @param zoom The validated value of the zoom that is to be set
      */
     virtual Protocols::InteractionModel::Status MPTZRelativeMove(Optional<int16_t> pan, Optional<int16_t> tilt,
-                                                                 Optional<uint8_t> zoom) = 0;
+                                                                 Optional<int8_t> zoom) = 0;
 
     virtual Protocols::InteractionModel::Status MPTZMoveToPreset(uint8_t preset, Optional<int16_t> pan, Optional<int16_t> tilt,
-                                                                 Optional<uint8_t> zoom) = 0;
-    virtual Protocols::InteractionModel::Status MPTZSavePreset()                         = 0;
-    virtual Protocols::InteractionModel::Status MPTZRemovePreset()                       = 0;
-    virtual Protocols::InteractionModel::Status DPTZSetViewport()                        = 0;
-    virtual Protocols::InteractionModel::Status DPTZRelativeMove()                       = 0;
+                                                                 Optional<int8_t> zoom) = 0;
+    virtual Protocols::InteractionModel::Status MPTZSavePreset()                        = 0;
+    virtual Protocols::InteractionModel::Status MPTZRemovePreset()                      = 0;
+    virtual Protocols::InteractionModel::Status DPTZSetViewport()                       = 0;
+    virtual Protocols::InteractionModel::Status DPTZRelativeMove()                      = 0;
 
 private:
     friend class CameraAvSettingsUserLevelMgmtServer;

@@ -53,7 +53,7 @@ Status AVSettingsUserLevelManagementDelegate::PersistentAttributesLoadedCallback
     return Status::Success;
 }
 
-Status AVSettingsUserLevelManagementDelegate::MPTZSetPosition(Optional<int16_t> pan, Optional<int16_t> tilt, Optional<uint8_t> zoom)
+Status AVSettingsUserLevelManagementDelegate::MPTZSetPosition(Optional<int16_t> pan, Optional<int16_t> tilt, Optional<int8_t> zoom)
 {
     // The Cluster implementation has validated that the Feature Flags are set and the values themselves are in range. Do any needed
     // hardware interactions to actually set the camera to the new values of PTZ.  Then return a Status response. The server itself
@@ -63,7 +63,7 @@ Status AVSettingsUserLevelManagementDelegate::MPTZSetPosition(Optional<int16_t> 
 }
 
 Status AVSettingsUserLevelManagementDelegate::MPTZRelativeMove(Optional<int16_t> pan, Optional<int16_t> tilt,
-                                                               Optional<uint8_t> zoom)
+                                                               Optional<int8_t> zoom)
 {
     // The Cluster implementation has validated that the Feature Flags are set and the values themselves are in range. Do any needed
     // hardware interactions to actually set the camera to the new values of PTZ.  Then return a Status response. The server itself
@@ -73,7 +73,7 @@ Status AVSettingsUserLevelManagementDelegate::MPTZRelativeMove(Optional<int16_t>
 }
 
 Status AVSettingsUserLevelManagementDelegate::MPTZMoveToPreset(uint8_t preset, Optional<int16_t> pan, Optional<int16_t> tilt,
-                                                               Optional<uint8_t> zoom)
+                                                               Optional<int8_t> zoom)
 {
     return Status::Success;
 }
@@ -107,7 +107,7 @@ void emberAfCameraAvSettingsUserLevelManagementClusterInitCallback(chip::Endpoin
     const int16_t appPanMax     = 90;
     const int16_t appTiltMin    = -45;
     const int16_t appTiltMax    = 45;
-    const uint8_t appZoomMax    = 75;
+    const int8_t appZoomMax     = 75;
 
     gDelegate = new AVSettingsUserLevelManagementDelegate;
     BitMask<CameraAvSettingsUserLevelManagement::Feature, uint32_t> avsumFeatures(

@@ -46727,7 +46727,7 @@ class CameraAvSettingsUserLevelManagement(Cluster):
                 ClusterObjectFieldDescriptor(Label="maxPresets", Tag=0x00000001, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="MPTZPresets", Tag=0x00000002, Type=typing.Optional[typing.List[CameraAvSettingsUserLevelManagement.Structs.MPTZPresetStruct]]),
                 ClusterObjectFieldDescriptor(Label="DPTZRelativeMove", Tag=0x00000003, Type=typing.Optional[typing.List[uint]]),
-                ClusterObjectFieldDescriptor(Label="zoomMax", Tag=0x00000004, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="zoomMax", Tag=0x00000004, Type=typing.Optional[int]),
                 ClusterObjectFieldDescriptor(Label="tiltMin", Tag=0x00000005, Type=typing.Optional[int]),
                 ClusterObjectFieldDescriptor(Label="tiltMax", Tag=0x00000006, Type=typing.Optional[int]),
                 ClusterObjectFieldDescriptor(Label="panMin", Tag=0x00000007, Type=typing.Optional[int]),
@@ -46743,7 +46743,7 @@ class CameraAvSettingsUserLevelManagement(Cluster):
     maxPresets: typing.Optional[uint] = None
     MPTZPresets: typing.Optional[typing.List[CameraAvSettingsUserLevelManagement.Structs.MPTZPresetStruct]] = None
     DPTZRelativeMove: typing.Optional[typing.List[uint]] = None
-    zoomMax: typing.Optional[uint] = None
+    zoomMax: typing.Optional[int] = None
     tiltMin: typing.Optional[int] = None
     tiltMax: typing.Optional[int] = None
     panMin: typing.Optional[int] = None
@@ -46771,12 +46771,12 @@ class CameraAvSettingsUserLevelManagement(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="pan", Tag=0, Type=typing.Optional[int]),
                         ClusterObjectFieldDescriptor(Label="tilt", Tag=1, Type=typing.Optional[int]),
-                        ClusterObjectFieldDescriptor(Label="zoom", Tag=2, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="zoom", Tag=2, Type=typing.Optional[int]),
                     ])
 
             pan: 'typing.Optional[int]' = None
             tilt: 'typing.Optional[int]' = None
-            zoom: 'typing.Optional[uint]' = None
+            zoom: 'typing.Optional[int]' = None
 
         @dataclass
         class MPTZPresetStruct(ClusterObject):
@@ -46824,12 +46824,12 @@ class CameraAvSettingsUserLevelManagement(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="pan", Tag=0, Type=typing.Optional[int]),
                         ClusterObjectFieldDescriptor(Label="tilt", Tag=1, Type=typing.Optional[int]),
-                        ClusterObjectFieldDescriptor(Label="zoom", Tag=2, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="zoom", Tag=2, Type=typing.Optional[int]),
                     ])
 
             pan: typing.Optional[int] = None
             tilt: typing.Optional[int] = None
-            zoom: typing.Optional[uint] = None
+            zoom: typing.Optional[int] = None
 
         @dataclass
         class MPTZRelativeMove(ClusterCommand):
@@ -47018,9 +47018,9 @@ class CameraAvSettingsUserLevelManagement(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[int])
 
-            value: typing.Optional[uint] = None
+            value: typing.Optional[int] = None
 
         @dataclass
         class TiltMin(ClusterAttributeDescriptor):

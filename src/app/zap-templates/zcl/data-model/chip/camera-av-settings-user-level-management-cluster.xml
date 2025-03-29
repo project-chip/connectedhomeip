@@ -33,7 +33,7 @@ Git: 0.7-summer-2025-1-ge4654a5ef
     <cluster code="0x0552"/>
     <item fieldId="0" name="Pan" type="int16s" optional="true" default="0"/>
     <item fieldId="1" name="Tilt" type="int16s" optional="true" default="0"/>
-    <item fieldId="2" name="Zoom" type="int8u" optional="true" default="1" min="1"/>
+    <item fieldId="2" name="Zoom" type="int8s" optional="true" default="1" min="1"/>
   </struct>
 
   <cluster>
@@ -67,13 +67,13 @@ Git: 0.7-summer-2025-1-ge4654a5ef
         <feature name="MPRESETS"/>
       </mandatoryConform>
     </attribute>
-    <attribute code="0x0003" side="server" define="MPTZ_RELATIVE_MOVE" type="array" optional="true" entryType="int16u">
+    <attribute code="0x0003" side="server" define="DPTZ_RELATIVE_MOVE" type="array" optional="true" entryType="int16u">
       <description>DPTZRelativeMove</description>
       <mandatoryConform>
         <feature name="DPTZ"/>
       </mandatoryConform>
     </attribute>
-    <attribute code="0x0004" side="server" define="DPTZ_RELATIVE_MOVE" type="int8u" optional="true" min="2" max="100" default="100">
+    <attribute code="0x0004" side="server" define="ZOOM_MAX" type="int8s" optional="true" min="2" max="100" default="100">
       <description>ZoomMax</description>
       <mandatoryConform>
         <feature name="MZOOM"/>
@@ -107,7 +107,7 @@ Git: 0.7-summer-2025-1-ge4654a5ef
       <description>This command SHALL set the values for the pan, tilt, and zoom in the mechanical PTZ.</description>
       <arg id="0" name="Pan" type="int16s" optional="true" min="-180" max="180"/>
       <arg id="1" name="Tilt" type="int16s" optional="true" min="-180" max="180"/>
-      <arg id="2" name="Zoom" type="int8u" optional="true" min="1" max="100"/>
+      <arg id="2" name="Zoom" type="int8s" optional="true" min="1" max="100"/>
       <mandatoryConform>
         <orTerm>
           <feature name="MPAN"/>
