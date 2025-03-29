@@ -622,7 +622,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRelativeMove(HandlerContext 
             return;
         }
         int8_t zoomDeltaValue = zoomDelta.Value();
-        newZoom = newZoom + zoomDeltaValue; 
+        newZoom = newZoom + zoomDeltaValue;
         if (newZoom > mZoomMax)
         {
             newZoom = mZoomMax;
