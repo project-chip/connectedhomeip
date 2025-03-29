@@ -11624,8 +11624,37 @@
       clusters:
           # In-progress for maybe Matter 1.5
           - ClosureControl
+          - TLSClientManagement
+      commands:
+          OperationalCredentials:
+              # In-progress for Matter 1.5: VID Verification feature
+              - SetVIDVerificationStatement
+              - SignVIDVerificationRequest
+              - SignVIDVerificationResponse
+      struct fields:
+          OperationalCredentials:
+              # In-progress for Matter 1.5: VID Verification feature
+              FabricDescriptorStruct:
+                  - vidVerificationStatement
+              NOCStruct:
+                  - vvsc
       device types:
           # In-progress for maybe Matter 1.5
+          - Awning
+          - Barrier
+          - Cabinet
           - Camera
+          - Door
+          - Blind
+          - ClosureBase
+          - Curtain
+          - GarageDoor
+          - Gate
+          - MountedDimmableLoadControl
           - MountedOnOffControl
+          - Pergola
+          - Screen
+          - Shade
+          - Shutter
           - ThermostatController
+          - Window
