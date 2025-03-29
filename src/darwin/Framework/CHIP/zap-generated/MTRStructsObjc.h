@@ -656,6 +656,12 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
 @interface MTRTimeSynchronizationClusterMissingTrustedTimeSourceEvent : NSObject <NSCopying>
 @end
 
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRBridgedDeviceBasicInformationClusterCapabilityMinimaStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull caseSessionsPerFabric MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull subscriptionsPerFabric MTR_PROVISIONALLY_AVAILABLE;
+@end
+
 MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
 @interface MTRBridgedDeviceBasicInformationClusterProductAppearanceStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull finish MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
