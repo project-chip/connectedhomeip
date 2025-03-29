@@ -857,6 +857,7 @@ limitations under the License.
         <deviceId editable="false">0x010F</deviceId>
         <class>Simple</class>
         <scope>Endpoint</scope>
+        <superset>On/Off Plug-in Unit</superset>
         <clusters>
             <include cluster="Groups" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
@@ -887,6 +888,7 @@ limitations under the License.
         <deviceId editable="false">0x0110</deviceId>
         <class>Simple</class>
         <scope>Endpoint</scope>
+        <superset>Dimmable Plug-in Unit</superset>
         <clusters>
             <include cluster="Groups" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
@@ -2536,6 +2538,15 @@ limitations under the License.
         <deviceId editable="false">0x007B</deviceId>
         <class>Simple</class>
         <scope>Endpoint</scope>
+        <endpointComposition>
+            <compositionType>tree</compositionType>
+            <endpoint conformance="M" constraint="min 1">
+                    <deviceType>0x0071</deviceType>
+            </endpoint>
+             <endpoint conformance="O" constraint="max 1">
+                    <deviceType>0x0078</deviceType>
+            </endpoint>
+        </endpointComposition>
         <clusters lockOthers="true">
             <include cluster="Identify" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
