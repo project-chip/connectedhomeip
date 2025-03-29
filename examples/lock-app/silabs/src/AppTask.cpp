@@ -195,7 +195,8 @@ CHIP_ERROR AppTask::AppInit()
                              .SetNumberOfWeekdaySchedulesPerUser(numberOfWeekdaySchedulesPerUser)
                              .SetNumberOfYeardaySchedulesPerUser(numberOfYeardaySchedulesPerUser)
                              .SetNumberOfHolidaySchedules(numberOfHolidaySchedules)
-                             .GetLockParam());
+                             .GetLockParam(),
+                         &Server::GetInstance().GetPersistentStorage());
 
     if (err != CHIP_NO_ERROR)
     {
@@ -254,9 +255,6 @@ void AppTask::AppTaskMain(void * pvParameter)
 #endif
 
     SILABS_LOG("App Task started");
-
-    // Users and credentials should be checked once from nvm flash on boot
-    LockMgr().ReadConfigValues();
 
     while (true)
     {
