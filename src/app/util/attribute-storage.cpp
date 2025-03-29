@@ -264,8 +264,15 @@ uint16_t emberAfGetDynamicIndexFromEndpoint(EndpointId id)
 }
 
 CHIP_ERROR emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, const EmberAfEndpointType * ep,
+    const Span<DataVersion> & dataVersionStorage, Span<const EmberAfDeviceType> deviceTypeList, EndpointId parentEndpointId)
+{
+    return emberAfSetDynamicEndpointWithEpUniqueId(index, id, ep, dataVersionStorage, deviceTypeList, CharSpan{}, parentEndpointId);
+}
+
+
+CHIP_ERROR emberAfSetDynamicEndpointWithEpUniqueId(uint16_t index, EndpointId id, const EmberAfEndpointType * ep,
                                      const Span<DataVersion> & dataVersionStorage, Span<const EmberAfDeviceType> deviceTypeList,
-                                     EndpointId parentEndpointId)
+                                     CharSpan endpointUniqueId, EndpointId parentEndpointId)
 {
     auto realIndex = index + FIXED_ENDPOINT_COUNT;
 
@@ -321,6 +328,11 @@ CHIP_ERROR emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, const EmberA
     emAfEndpoints[index].deviceTypeList = deviceTypeList;
     emAfEndpoints[index].endpointType   = ep;
     emAfEndpoints[index].dataVersions   = dataVersionStorage.data();
+
+    MutableCharSpan targetSpan(emAfEndpoints[index].endpointUniqueId);
+    CopyCharSpanToMutableCharSpanWithTruncation(endpointUniqueId, targetSpan);
+    emAfEndpoints[index].endpointUniqueIdSize = endpointUniqueId.size();
+
     // Start the endpoint off as disabled.
     emAfEndpoints[index].bitmask.Clear(EmberAfEndpointOptions::isEnabled);
     emAfEndpoints[index].parentEndpointId = parentEndpointId;
@@ -1077,6 +1089,22 @@ CHIP_ERROR GetSemanticTagForEndpointAtIndex(EndpointId endpoint, size_t index,
         return CHIP_ERROR_NOT_FOUND;
     }
     tag = emAfEndpoints[endpointIndex].tagList[index];
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR GetEndpointUniqueIdForEndPoint(EndpointId endpoint, MutableCharSpan & epUniqueIdMutSpan)
+{
+    uint16_t endpointIndex = emberAfIndexFromEndpoint(endpoint);
+
+    if (endpointIndex == 0xFFFF)
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    CharSpan epUniqueIdSpan(emAfEndpoints[endpointIndex].endpointUniqueId,
+                                  emAfEndpoints[endpointIndex].endpointUniqueIdSize);
+    CopyCharSpanToMutableCharSpan(epUniqueIdSpan, epUniqueIdMutSpan);
+
     return CHIP_NO_ERROR;
 }
 

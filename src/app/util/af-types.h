@@ -236,6 +236,13 @@ struct EmberAfDefinedEndpoint
      * Span pointing to a list of tags. Lifetime has to outlive usage, and data is owned by callers.
      */
     chip::Span<const chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> tagList;
+
+    /**
+     * Unique Id for this end point.
+     */
+    char endpointUniqueId[chip::app::Clusters::Descriptor::Attributes::EndpointUniqueID::TypeInfo::MaxLength()] = { 0 };
+
+    size_t endpointUniqueIdSize = 0;
 };
 
 /**
