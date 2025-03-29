@@ -5649,9 +5649,9 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, Mark
 } // namespace MaxPresets
 
 namespace ZoomMax {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value); // int8u
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status Get(EndpointId endpoint, int8_t * value); // int8s
+Protocols::InteractionModel::Status Set(EndpointId endpoint, int8_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, int8_t value, MarkAttributeDirty markDirty);
 } // namespace ZoomMax
 
 namespace TiltMin {

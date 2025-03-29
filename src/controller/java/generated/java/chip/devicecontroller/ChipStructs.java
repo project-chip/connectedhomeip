@@ -14306,7 +14306,7 @@ public static class CameraAvSettingsUserLevelManagementClusterMPTZStruct {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(PAN_ID, pan.<BaseTLVType>map((nonOptionalpan) -> new IntType(nonOptionalpan)).orElse(new EmptyType())));
     values.add(new StructElement(TILT_ID, tilt.<BaseTLVType>map((nonOptionaltilt) -> new IntType(nonOptionaltilt)).orElse(new EmptyType())));
-    values.add(new StructElement(ZOOM_ID, zoom.<BaseTLVType>map((nonOptionalzoom) -> new UIntType(nonOptionalzoom)).orElse(new EmptyType())));
+    values.add(new StructElement(ZOOM_ID, zoom.<BaseTLVType>map((nonOptionalzoom) -> new IntType(nonOptionalzoom)).orElse(new EmptyType())));
 
     return new StructType(values);
   }
@@ -14330,8 +14330,8 @@ public static class CameraAvSettingsUserLevelManagementClusterMPTZStruct {
           tilt = Optional.of(castingValue.value(Integer.class));
         }
       } else if (element.contextTagNum() == ZOOM_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
           zoom = Optional.of(castingValue.value(Integer.class));
         }
       }

@@ -42985,7 +42985,7 @@ struct Type
 public:
     Optional<int16_t> pan;
     Optional<int16_t> tilt;
-    Optional<uint8_t> zoom;
+    Optional<int8_t> zoom;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -43083,7 +43083,7 @@ public:
 
     Optional<int16_t> pan;
     Optional<int16_t> tilt;
-    Optional<uint8_t> zoom;
+    Optional<int8_t> zoom;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -43100,7 +43100,7 @@ public:
 
     Optional<int16_t> pan;
     Optional<int16_t> tilt;
-    Optional<uint8_t> zoom;
+    Optional<int8_t> zoom;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace MPTZSetPosition
@@ -43375,9 +43375,9 @@ struct TypeInfo
 namespace ZoomMax {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = int8_t;
+    using DecodableType    = int8_t;
+    using DecodableArgType = int8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvSettingsUserLevelManagement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ZoomMax::Id; }
@@ -43475,7 +43475,7 @@ struct TypeInfo
         Attributes::MaxPresets::TypeInfo::DecodableType maxPresets = static_cast<uint8_t>(0);
         Attributes::MPTZPresets::TypeInfo::DecodableType MPTZPresets;
         Attributes::DPTZRelativeMove::TypeInfo::DecodableType DPTZRelativeMove;
-        Attributes::ZoomMax::TypeInfo::DecodableType zoomMax = static_cast<uint8_t>(0);
+        Attributes::ZoomMax::TypeInfo::DecodableType zoomMax = static_cast<int8_t>(0);
         Attributes::TiltMin::TypeInfo::DecodableType tiltMin = static_cast<int16_t>(0);
         Attributes::TiltMax::TypeInfo::DecodableType tiltMax = static_cast<int16_t>(0);
         Attributes::PanMin::TypeInfo::DecodableType panMin   = static_cast<int16_t>(0);

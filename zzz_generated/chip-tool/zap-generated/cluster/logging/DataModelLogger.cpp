@@ -19383,7 +19383,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("DPTZRelativeMove", 1, value);
         }
         case CameraAvSettingsUserLevelManagement::Attributes::ZoomMax::Id: {
-            uint8_t value;
+            int8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ZoomMax", 1, value);
         }
