@@ -315,7 +315,13 @@ CHIP_ERROR EncodeTlvElement(const Json::Value & val, TLV::TLVWriter & writer, co
 
         Platform::ScopedMemoryBuffer<uint8_t> byteString;
         byteString.Alloc(BASE64_MAX_DECODED_LEN(static_cast<uint16_t>(encodedLen)));
-        VerifyOrReturnError(byteString.Get() != nullptr, CHIP_ERROR_NO_MEMORY);
+
+        // On a platform where malloc(0) is null (which could be misinterpreted as "out of memory")
+        // we should skip this check if it's a zero-length string.
+#ifdef CONFIG_MALLOC_0_IS_NULL
+        if (encodedLen > 0)
+#endif
+            VerifyOrReturnError(byteString.Get() != nullptr, CHIP_ERROR_NO_MEMORY);
 
         auto decodedLen = Base64Decode(valAsString.c_str(), static_cast<uint16_t>(encodedLen), byteString.Get());
         VerifyOrReturnError(decodedLen < UINT16_MAX, CHIP_ERROR_INVALID_ARGUMENT);
