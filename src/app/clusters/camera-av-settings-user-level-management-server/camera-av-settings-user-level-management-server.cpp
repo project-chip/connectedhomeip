@@ -656,7 +656,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRelativeMove(HandlerContext 
     // Set the local values of pan, tilt, and zoom
     setPan(Optional(static_cast<int16_t>(newPan)));
     setTilt(Optional(static_cast<int16_t>(newTilt)));
-    setZoom(Optional(static_cast<uint8_t>(newZoom)));
+    setZoom(Optional(static_cast<int8_t>(newZoom)));
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
