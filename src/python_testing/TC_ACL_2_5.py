@@ -43,7 +43,7 @@ import time
 
 class TC_ACL_2_5(MatterBaseTest):
     def desc_TC_ACL_2_5(self) -> str:
-        return "[TC-ACL-S]"
+        return "[TC-ACL-2.5] Cluster endpoint"
 
     async def read_access_control_extension(self):
         """Read the AccessControl cluster's Extension attribute"""
