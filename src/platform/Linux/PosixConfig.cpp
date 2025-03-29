@@ -39,6 +39,8 @@ namespace Internal {
 static ChipLinuxStorage gChipLinuxFactoryStorage;
 static ChipLinuxStorage gChipLinuxConfigStorage;
 static ChipLinuxStorage gChipLinuxCountersStorage;
+static std::string mStorageFolderPath;
+
 
 // *** CAUTION ***: Changing the names or namespaces of these values will *break* existing devices.
 
@@ -94,6 +96,21 @@ ChipLinuxStorage * PosixConfig::GetStorageForNamespace(Key key)
 
     return nullptr;
 }
+
+CHIP_ERROR PosixConfig::SetStorageSpace(const char * path)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    if (!mStorageFolderPath.empty()) {
+        ChipLogError(DeviceLayer, "Storage space path has already been set: %s", path);
+        return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
+    }
+    ChipLogDetail(DeviceLayer, "Set storage space path %s for factory data, config, counters.", path);
+    mStorageFolderPath.assign(path);
+
+    return err;
+}
+
 
 CHIP_ERROR PosixConfig::Init()
 {
@@ -458,20 +475,39 @@ CHIP_ERROR PosixConfig::EnsureNamespace(const char * ns)
     CHIP_ERROR err             = CHIP_NO_ERROR;
     ChipLinuxStorage * storage = nullptr;
 
+    ChipLogDetail(DeviceLayer, "%s, %d, storage folder path: %s", __func__, __LINE__, mStorageFolderPath.c_str());
     if (strcmp(ns, kConfigNamespace_ChipFactory) == 0)
     {
         storage = &gChipLinuxFactoryStorage;
-        err     = storage->Init(CHIP_DEFAULT_FACTORY_PATH);
+        if (mStorageFolderPath.empty()) {
+            err     = storage->Init(CHIP_DEFAULT_FACTORY_PATH);
+        } else {
+            std::string tmp = mStorageFolderPath;
+            tmp += FATCONFFILE;
+            err     = storage->Init(tmp.c_str());
+        }
     }
     else if (strcmp(ns, kConfigNamespace_ChipConfig) == 0)
     {
         storage = &gChipLinuxConfigStorage;
-        err     = storage->Init(CHIP_DEFAULT_CONFIG_PATH);
+        if (mStorageFolderPath.empty()) {
+            err     = storage->Init(CHIP_DEFAULT_CONFIG_PATH);
+        } else {
+            std::string tmp = mStorageFolderPath;
+            tmp += SYSCONFFILE;
+            err     = storage->Init(tmp.c_str());
+        }
     }
     else if (strcmp(ns, kConfigNamespace_ChipCounters) == 0)
     {
         storage = &gChipLinuxCountersStorage;
-        err     = storage->Init(CHIP_DEFAULT_DATA_PATH);
+        if (mStorageFolderPath.empty()) {
+            err     = storage->Init(CHIP_DEFAULT_DATA_PATH);
+        } else {
+            std::string tmp = mStorageFolderPath;
+            tmp += LOCALSTATEFILE;
+            err     = storage->Init(tmp.c_str());
+        }
     }
 
     SuccessOrExit(err);
