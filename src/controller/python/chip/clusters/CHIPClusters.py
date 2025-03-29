@@ -584,7 +584,7 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000005: {
-                "attributeName": "EndpointUniqueId",
+                "attributeName": "EndpointUniqueID",
                 "attributeId": 0x00000005,
                 "type": "str",
                 "reportable": True,

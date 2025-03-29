@@ -2815,7 +2815,7 @@ public class ChipClusters {
         }, TAG_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readEndpointUniqueIdAttribute(
+    public void readEndpointUniqueIDAttribute(
         CharStringAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ENDPOINT_UNIQUE_ID_ATTRIBUTE_ID);
 
@@ -2828,7 +2828,7 @@ public class ChipClusters {
         }, ENDPOINT_UNIQUE_ID_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeEndpointUniqueIdAttribute(
+    public void subscribeEndpointUniqueIDAttribute(
         CharStringAttributeCallback callback, int minInterval, int maxInterval) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ENDPOINT_UNIQUE_ID_ATTRIBUTE_ID);
 

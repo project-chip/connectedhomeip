@@ -673,17 +673,17 @@ public class ClusterReadMapping {
           readDescriptorTagListCommandParams
         );
         result.put("readTagListAttribute", readDescriptorTagListAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readDescriptorEndpointUniqueIdCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readDescriptorEndpointUniqueIdAttributeInteractionInfo = new InteractionInfo(
+     Map<String, CommandParameterInfo> readDescriptorEndpointUniqueIDCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readDescriptorEndpointUniqueIDAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.DescriptorCluster) cluster).readEndpointUniqueIdAttribute(
+            ((ChipClusters.DescriptorCluster) cluster).readEndpointUniqueIDAttribute(
               (ChipClusters.CharStringAttributeCallback) callback
             );
           },
           () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
-          readDescriptorEndpointUniqueIdCommandParams
+          readDescriptorEndpointUniqueIDCommandParams
         );
-        result.put("readEndpointUniqueIdAttribute", readDescriptorEndpointUniqueIdAttributeInteractionInfo);
+        result.put("readEndpointUniqueIDAttribute", readDescriptorEndpointUniqueIDAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readDescriptorGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readDescriptorGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
