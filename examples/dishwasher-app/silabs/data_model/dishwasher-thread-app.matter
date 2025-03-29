@@ -2759,18 +2759,6 @@ endpoint 3 {
   device type device_energy_management = 1293, version 1;
 
 
-  server cluster Descriptor {
-    callback attribute deviceTypeList;
-    callback attribute serverList;
-    callback attribute clientList;
-    callback attribute partsList;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    callback attribute featureMap;
-    callback attribute clusterRevision;
-  }
-
   server cluster DeviceEnergyManagement {
     emits event PowerAdjustStart;
     emits event PowerAdjustEnd;
