@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (c) 2024 Project CHIP Authors
+Copyright (c) 2024-2025 Project CHIP Authors
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,26 +14,24 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
-
-<configurator>
+<configurator xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../zcl.xsd">
   <domain name="CHIP"/>
-
   <struct name="AtomicAttributeStatusStruct">
-    <item fieldId="0" name="AttributeID" type="attrib_id" />
+    <item fieldId="0" name="AttributeID" type="attrib_id"/>
     <item fieldId="1" name="StatusCode" type="status"/>
   </struct>
 
   <struct name="LocationDescriptorStruct">
-    <item fieldId="0" name="LocationName"    type="char_string" length="128" isNullable="false" optional="false"/>
-    <item fieldId="1" name="FloorNumber"     type="int16s"                   isNullable="true"  optional="false"/>
-    <item fieldId="2" name="AreaType"        type="AreaTypeTag"              isNullable="true"  optional="false"/>
+    <item fieldId="0" name="LocationName" type="char_string" length="128"/>
+    <item fieldId="1" name="FloorNumber" type="int16s" isNullable="true"/>
+    <item fieldId="2" name="AreaType" type="AreaTypeTag" isNullable="true"/>
   </struct>
 
   <!--
     These are test global items (no cluster attached) for testing only.
     Their usage is defined for UnitTestCluster only.
   -->
-  
+
   <struct name="TestGlobalStruct">
     <item fieldId="0" name="Name" type="char_string" length="128" isNullable="false" optional="false"/>
     <item fieldId="1" name="MyBitmap" type="TestGlobalBitmap" isNullable="true" optional="false"/>

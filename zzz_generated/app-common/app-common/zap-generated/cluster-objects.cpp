@@ -20870,7 +20870,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kAreaID), areaID);
     encoder.Encode(to_underlying(Fields::kStatus), status);
     encoder.Encode(to_underlying(Fields::kTotalOperationalTime), totalOperationalTime);
-    encoder.Encode(to_underlying(Fields::kEstimatedTime), estimatedTime);
+    encoder.Encode(to_underlying(Fields::kInitialTimeEstimate), initialTimeEstimate);
     return encoder.Finalize();
 }
 
@@ -20900,9 +20900,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, totalOperationalTime);
         }
-        else if (__context_tag == to_underlying(Fields::kEstimatedTime))
+        else if (__context_tag == to_underlying(Fields::kInitialTimeEstimate))
         {
-            err = DataModel::Decode(reader, estimatedTime);
+            err = DataModel::Decode(reader, initialTimeEstimate);
         }
         else
         {
