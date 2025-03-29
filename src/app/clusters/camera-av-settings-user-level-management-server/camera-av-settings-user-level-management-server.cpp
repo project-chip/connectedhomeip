@@ -578,7 +578,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRelativeMove(HandlerContext 
             return;
         }
         int16_t panDeltaValue = panDelta.Value();
-        newPan = newPan + panDeltaValue;
+        newPan                = newPan + panDeltaValue;
         if (newPan > mPanMax)
         {
             newPan = mPanMax;
@@ -600,7 +600,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRelativeMove(HandlerContext 
             return;
         }
         int16_t tiltDeltaValue = tiltDelta.Value();
-        newTilt = newTilt + tiltDeltaValue;
+        newTilt                = newTilt + tiltDeltaValue;
         if (newTilt > mTiltMax)
         {
             newTilt = mTiltMax;
@@ -622,7 +622,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRelativeMove(HandlerContext 
             return;
         }
         int8_t zoomDeltaValue = zoomDelta.Value();
-        newZoom = newZoom + zoomDeltaValue;
+        newZoom               = newZoom + zoomDeltaValue;
         if (newZoom > mZoomMax)
         {
             newZoom = mZoomMax;

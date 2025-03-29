@@ -145,7 +145,7 @@ private:
 
     const Optional<int16_t> defaultPan  = Optional(static_cast<int16_t>(0));
     const Optional<int16_t> defaultTilt = Optional(static_cast<int16_t>(0));
-    const Optional<int8_t> defaultZoom = Optional(static_cast<int8_t>(1));
+    const Optional<int8_t> defaultZoom  = Optional(static_cast<int8_t>(1));
 
     uint8_t currentPresetID = 0;
 
