@@ -51,14 +51,14 @@ private:
     CHIP_ERROR SendMsgImpl(const IPPacketInfo * pktInfo, chip::System::PacketBufferHandle && msg) override;
     void CloseImpl() override;
 
-    nw_listener_t mListener;
-    dispatch_semaphore_t mListenerSemaphore;
-    dispatch_queue_t mListenerQueue;
-    nw_connection_t mConnection;
-    dispatch_semaphore_t mConnectionSemaphore;
-    dispatch_queue_t mConnectionQueue;
-    dispatch_semaphore_t mSendSemaphore;
-    dispatch_queue_t mSystemQueue;
+    nw_listener_t mListener                   = nullptr;
+    dispatch_semaphore_t mListenerSemaphore   = nullptr;
+    dispatch_queue_t mListenerQueue           = nullptr;
+    nw_connection_t mConnection               = nullptr;
+    dispatch_semaphore_t mConnectionSemaphore = nullptr;
+    dispatch_queue_t mConnectionQueue         = nullptr;
+    dispatch_semaphore_t mSendSemaphore       = nullptr;
+    dispatch_queue_t mSystemQueue             = nullptr;
 
     CHIP_ERROR ConfigureProtocol(IPAddressType aAddressType, const nw_parameters_t & aParameters);
     CHIP_ERROR StartListener();
