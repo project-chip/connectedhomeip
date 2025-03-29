@@ -378,3 +378,8 @@ void MatterEcosystemInformationPluginServerInitCallback()
 {
     chip::app::AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
 }
+
+void MatterEcosystemInformationPluginServerShutdownCallback()
+{
+    chip::app::AttributeAccessInterfaceRegistry::Instance().Unregister(&gAttrAccess);
+}
