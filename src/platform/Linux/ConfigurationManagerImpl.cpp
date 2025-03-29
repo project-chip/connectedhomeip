@@ -118,6 +118,13 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
         SuccessOrExit(err);
     }
 
+    if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_ConfigurationVersion))
+    {
+        // The first boot after factory reset of the Node.
+        err = StoreConfigurationVersion(10);
+        SuccessOrExit(err);
+    }
+
     err = CHIP_NO_ERROR;
 
 exit:
@@ -374,6 +381,16 @@ CHIP_ERROR ConfigurationManagerImpl::GetLocationCapability(uint8_t & location)
     }
 
     return err;
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetConfigurationVersion(uint32_t & configurationVersion)
+{
+    return ReadConfigValue(PosixConfig::kConfigKey_ConfigurationVersion, configurationVersion);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreConfigurationVersion(uint32_t configurationVersion)
+{
+    return WriteConfigValue(PosixConfig::kConfigKey_ConfigurationVersion, configurationVersion);
 }
 
 ConfigurationManager & ConfigurationMgrImpl()
