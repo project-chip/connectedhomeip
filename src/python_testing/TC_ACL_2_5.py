@@ -41,36 +41,9 @@ import logging
 import asyncio
 import time
 
-# Define our own EventChangeCallback class to match the test usage pattern
-class EventChangeCallback:
-    def __init__(self, expected_event: Clusters.ClusterObjects.ClusterEvent, output: queue.Queue):
-        self._output = output
-        self._expected_cluster_id = expected_event.cluster_id
-        self._expected_event_id = expected_event.event_id
-        print(f"Created EventChangeCallback for cluster {self._expected_cluster_id}, event {self._expected_event_id}")
-
-    def __call__(self, res, transaction):
-        """This callback is called when an event is received"""
-        self.print_step(f"=== EVENT CALLBACK CALLED ===","")
-        self.print_step(f"Status", {res.Status})
-        self.print_step(f"Header", "ClusterId={getattr(res.Header, 'ClusterId', 'unknown')}, EventId={getattr(res.Header, 'EventId', 'unknown')}")
-        
-        # Be more permissive - just log any events we receive
-        try:
-            self.print_step(f"Data received", {res.Data})
-            self._output.put(res)
-        except Exception as e:
-            self.print_step(f"ERROR in callback", {e})
-            # Still try to add the response to the queue even if there was an error
-            try:
-                self._output.put(res)
-            except:
-                pass
-
 class TC_ACL_2_5(MatterBaseTest):
-
     def desc_TC_ACL_2_5(self) -> str:
-        return "[TC-ACL-2.5] Cluster endpoint"
+        return "[TC-ACL-S]"
 
     async def read_access_control_extension(self):
         """Read the AccessControl cluster's Extension attribute"""
