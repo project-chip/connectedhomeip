@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <ClosureControlDelegate.h>
+#include <ClosureControlManager.h>
 #include <app/clusters/closure-control-server/closure-control-server.h>
 #include <app/util/af-types.h>
 #include <lib/core/CHIPError.h>
@@ -32,7 +32,7 @@ using namespace chip::app::Clusters::ClosureControl;
 class ClosureControlInstance : public Instance
 {
 public:
-    ClosureControlInstance(EndpointId aEndpointId, ClosureControlDelegate & aDelegate, Feature aFeatures,
+    ClosureControlInstance(EndpointId aEndpointId, ClosureControlManager & aDelegate, Feature aFeatures,
                            OptionalAttribute aOptionalAttribute) :
         ClosureControl::Instance(aEndpointId, aDelegate, aFeatures, aOptionalAttribute)
     {
@@ -47,10 +47,10 @@ public:
     CHIP_ERROR Init();
     void Shutdown();
 
-    ClosureControlDelegate * GetDelegate() { return mDelegate; };
+    ClosureControlManager * GetDelegate() { return mDelegate; };
 
 private:
-    ClosureControlDelegate * mDelegate;
+    ClosureControlManager * mDelegate;
 };
 
 } // namespace ClosureControl

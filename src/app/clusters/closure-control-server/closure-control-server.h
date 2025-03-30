@@ -67,9 +67,7 @@ public:
      * until the End<Type>Read() has been called (i.e. releasing a lock on the data)
      */
     virtual CHIP_ERROR StartCurrentErrorListRead() = 0;
-    // The delegate is expected to return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED to indicate end of list.
-    virtual CHIP_ERROR GetCurrentErrorListAtIndex(size_t, ClosureErrorEnum &) = 0;
-    virtual CHIP_ERROR EndCurrentErrorListRead()                              = 0;
+    virtual CHIP_ERROR EndCurrentErrorListRead() = 0;
 
 protected:
     EndpointId mEndpointId = chip::kInvalidEndpointId;
@@ -164,6 +162,12 @@ public:
      * @return true if State is supported, false if State is not supported
      */
     bool IsSupportedState(MainStateEnum aMainState);
+    
+    /**
+     * Reports that the contents of the current error list has changed.
+     * The device SHALL call this method whenever it changes the current error list.
+     */
+    void ReportCurrentErrorListChange();
 
 protected:
     /**
@@ -189,6 +193,13 @@ private:
     MainStateEnum mMainState;
     GenericOverallState mOverallState;
     GenericOverallTarget mOverallTarget;
+    
+    /**
+     * This is used by the SDK to populate the error list attribute. If the contents of this list changes, the
+     * device SHALL call the Instance's ReportCurrentErrorListChange method to report that this attribute has changed.
+     * @param ClosureErrorEnum  The MutableCharSpan is filled.
+     */
+    std::unordered_set<ClosureErrorEnum> currentErrorList;
 
     // AttributeAccessInterface
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;

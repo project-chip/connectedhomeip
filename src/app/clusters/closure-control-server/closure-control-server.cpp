@@ -78,6 +78,11 @@ bool Instance::IsSupportedState(MainStateEnum aMainState)
     return true;
 }
 
+void Instance::ReportCurrentErrorListChange()
+{
+    MatterReportingAttributeChangeCallback(ConcreteAttributePath(mDelegate.GetEndpointId(), ClosureControl::Id, Attributes::CurrentErrorList::Id));
+}
+
 CHIP_ERROR Instance::SetMainState(MainStateEnum aMainState)
 {
     if (!IsSupportedState(aMainState))
@@ -200,17 +205,10 @@ CHIP_ERROR Instance::EncodeCurrentErrorList(const AttributeValueEncoder::ListEnc
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     ReturnErrorOnFailure(mDelegate.StartCurrentErrorListRead());
-    for (size_t i = 0; true; i++)
+    SuccessOrExit(!(currentErrorList.empty()));
+    
+    for (const auto& error : currentErrorList) 
     {
-        ClosureErrorEnum error;
-
-        err = mDelegate.GetCurrentErrorListAtIndex(i, error);
-        // Convert end of list to CHIP_NO_ERROR
-        VerifyOrExit(err != CHIP_ERROR_PROVIDER_LIST_EXHAUSTED, err = CHIP_NO_ERROR);
-
-        // Check if another error occurred before trying to encode
-        SuccessOrExit(err);
-
         err = encoder.Encode(error);
         SuccessOrExit(err);
     }

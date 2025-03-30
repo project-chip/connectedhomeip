@@ -36,7 +36,7 @@ namespace app {
 namespace Clusters {
 namespace ClosureControl {
 
-static std::unique_ptr<ClosureControlDelegate> gClosureCtrlDelegate;
+static std::unique_ptr<ClosureControlManager> gClosureCtrlDelegate;
 static std::unique_ptr<ClosureControlInstance> gClosureCtrlInstance;
 
 /*
@@ -56,10 +56,10 @@ CHIP_ERROR ClosureControlInit(EndpointId endpointId)
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    gClosureCtrlDelegate = std::make_unique<ClosureControlDelegate>(endpointId);
+    gClosureCtrlDelegate = std::make_unique<ClosureControlManager>(endpointId);
     if (!gClosureCtrlDelegate)
     {
-        ChipLogError(AppServer, "Failed to allocate memory for ClosureControlDelegate");
+        ChipLogError(AppServer, "Failed to allocate memory for ClosureControlManager");
         return CHIP_ERROR_NO_MEMORY;
     }
 

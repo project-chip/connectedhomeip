@@ -17,10 +17,10 @@ import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/src/app/chip_data_model.gni")
 
 config("config") {
-  include_dirs = [ "common/include" ]
+  include_dirs = [ "common/closure-control/include" ]
 }
 
-chip_data_model("closure-common") {
+chip_data_model("common") {
   zap_file = "closure-app.zap"
   is_server = true
 }
