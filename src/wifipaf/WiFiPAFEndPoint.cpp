@@ -860,7 +860,7 @@ CHIP_ERROR WiFiPAFEndPoint::DebugPktAckSn(const PktDirect_t PktDirect, Encoding:
     }
     else
     {
-        snprintf(AckBuff, sizeof(AckBuff), "%02hu", *pAct);
+        snprintf(AckBuff, sizeof(AckBuff), "%02hhu", *pAct);
     }
     if (PktDirect == PktDirect_t::kTx)
     {
@@ -972,7 +972,6 @@ CHIP_ERROR WiFiPAFEndPoint::RxPacketProcess(PacketBufferHandle && data)
                 // Ensure end point's in the right state before continuing.
                 VerifyOrExit(mState == kState_Connecting, err = CHIP_ERROR_INCORRECT_STATE);
                 mConnStateFlags.Set(ConnectionStateFlag::kCapabilitiesMsgReceived);
-
                 err = HandleCapabilitiesResponseReceived(std::move(data));
                 SuccessOrExit(err);
             }

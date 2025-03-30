@@ -71,13 +71,15 @@ public:
     CHIP_ERROR WiFiPAFMessageReceived(WiFiPAFSession & RxInfo, System::PacketBufferHandle && msg) override { return CHIP_NO_ERROR; }
     CHIP_ERROR WiFiPAFMessageSend(WiFiPAFSession & TxInfo, System::PacketBufferHandle && msg) override { return CHIP_NO_ERROR; }
     CHIP_ERROR WiFiPAFCloseSession(WiFiPAFSession & SessionInfo) override { return CHIP_NO_ERROR; }
-    static constexpr size_t kTestPacketLength = 100;
+    static constexpr size_t kTestPacketLength     = 100;
+    static constexpr size_t kTestPacketLengthLong = 500;
 
     void SetEndPoint(WiFiPAFEndPoint * pEndPoint) { mEndPoint = pEndPoint; }
     void EpDoClose(uint8_t flags, CHIP_ERROR err) { return mEndPoint->DoClose(flags, err); }
     CHIP_ERROR EpDriveStandAloneAck() { return mEndPoint->DriveStandAloneAck(); }
     CHIP_ERROR EpDoSendStandAloneAck() { return mEndPoint->DoSendStandAloneAck(); }
-    void SetRxNextSeqNum(SequenceNumber_t seq) { mEndPoint->mPafTP.mRxNextSeqNum = seq; }
+    void EpSetRxNextSeqNum(SequenceNumber_t seq) { mEndPoint->mPafTP.mRxNextSeqNum = seq; }
+    WiFiPAFTP::State_t EpGetTxState() { return mEndPoint->mPafTP.mTxState; }
 
 private:
     WiFiPAFEndPoint * mEndPoint;
@@ -255,11 +257,7 @@ TEST_F(TestWiFiPAFLayer, CheckRunAsCommissionee)
     EXPECT_EQ(NewEndPoint(&newEndPoint, sessionInfo, sessionInfo.role), CHIP_NO_ERROR);
     EXPECT_NE(newEndPoint, nullptr);
     SetEndPoint(newEndPoint);
-    newEndPoint->mState = WiFiPAFEndPoint::kState_Ready;
-
-    EXPECT_EQ(newEndPoint->StartConnect(), CHIP_NO_ERROR);
     EXPECT_EQ(AddPafSession(PafInfoAccess::kAccSessionId, sessionInfo), CHIP_NO_ERROR);
-
     newEndPoint->mState = WiFiPAFEndPoint::kState_Ready;
 
     // Receive the Capability_Request packet
@@ -270,14 +268,26 @@ TEST_F(TestWiFiPAFLayer, CheckRunAsCommissionee)
     // Reply the Capability Response packet
     constexpr uint8_t bufCapResp[] = { 0x65, 0x6c, 0x04, 0x5b, 0x01, 0x06 };
     auto packetCapResp             = System::PacketBufferHandle::NewWithData(bufCapResp, sizeof(bufCapResp));
+    EXPECT_EQ(HandleWriteConfirmed(sessionInfo, true), CHIP_NO_ERROR);
     EXPECT_EQ(SendMessage(sessionInfo, std::move(packetCapResp)), CHIP_NO_ERROR);
     EXPECT_EQ(HandleWriteConfirmed(sessionInfo, true), CHIP_NO_ERROR);
 
-    // Send a packet
-    auto buf = System::PacketBufferHandle::New(kTestPacketLength);
+    // Send a long packet
+    auto buf = System::PacketBufferHandle::New(kTestPacketLengthLong);
+    buf->SetDataLength(kTestPacketLengthLong);
+    memset(buf->Start(), 0, buf->DataLength());
+    EXPECT_EQ(SendMessage(sessionInfo, std::move(buf)), CHIP_NO_ERROR);
+    EXPECT_EQ(EpGetTxState(), WiFiPAFTP::kState_InProgress);
+    EXPECT_EQ(HandleWriteConfirmed(sessionInfo, true), CHIP_NO_ERROR);
+    EXPECT_EQ(EpGetTxState(), WiFiPAFTP::kState_Complete);
+    EXPECT_EQ(HandleWriteConfirmed(sessionInfo, true), CHIP_NO_ERROR);
+
+    // Send a normal packet
+    buf = System::PacketBufferHandle::New(kTestPacketLength);
     buf->SetDataLength(kTestPacketLength);
     memset(buf->Start(), 0, buf->DataLength());
     EXPECT_EQ(SendMessage(sessionInfo, std::move(buf)), CHIP_NO_ERROR);
+    EXPECT_EQ(EpGetTxState(), WiFiPAFTP::kState_Complete);
     EXPECT_EQ(HandleWriteConfirmed(sessionInfo, true), CHIP_NO_ERROR);
 
     // Receive a packet, sn#1
@@ -291,7 +301,7 @@ TEST_F(TestWiFiPAFLayer, CheckRunAsCommissionee)
     };
     auto packet_rx = System::PacketBufferHandle::NewWithData(buf_rx, sizeof(buf_rx));
     EXPECT_EQ(packet_rx->DataLength(), static_cast<size_t>(5));
-    SetRxNextSeqNum(1);
+    EpSetRxNextSeqNum(1);
     EXPECT_EQ(newEndPoint->Receive(std::move(packet_rx)), CHIP_NO_ERROR);
 
     // Receive the duplicate packet
