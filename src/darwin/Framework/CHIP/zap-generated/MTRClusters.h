@@ -3358,7 +3358,7 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
 
 /**
  * Cluster Commodity Price
- *    The CommodityTariffCluster provides the mechanism for communicating Commodity Tariff information within the premises.
+ *    The Commodity Price Cluster provides the mechanism for communicating Gas, Energy, or Water pricing information within the premises.
  */
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRClusterCommodityPrice : MTRGenericCluster

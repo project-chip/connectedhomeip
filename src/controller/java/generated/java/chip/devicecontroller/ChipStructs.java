@@ -6958,7 +6958,7 @@ public static class CommodityPriceClusterCurrencyStruct {
 }
 public static class CommodityPriceClusterCommodityPriceComponentStruct {
   public Object price;
-  public Object source;
+  public Integer source;
   public Optional<String> description;
   public Optional<Long> tariffComponentID;
   private static final long PRICE_ID = 0L;
@@ -6968,7 +6968,7 @@ public static class CommodityPriceClusterCommodityPriceComponentStruct {
 
   public CommodityPriceClusterCommodityPriceComponentStruct(
     Object price,
-    Object source,
+    Integer source,
     Optional<String> description,
     Optional<Long> tariffComponentID
   ) {
@@ -6981,7 +6981,7 @@ public static class CommodityPriceClusterCommodityPriceComponentStruct {
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(PRICE_ID, new AnyType(price)));
-    values.add(new StructElement(SOURCE_ID, new AnyType(source)));
+    values.add(new StructElement(SOURCE_ID, new UIntType(source)));
     values.add(new StructElement(DESCRIPTION_ID, description.<BaseTLVType>map((nonOptionaldescription) -> new StringType(nonOptionaldescription)).orElse(new EmptyType())));
     values.add(new StructElement(TARIFF_COMPONENT_ID_ID, tariffComponentID.<BaseTLVType>map((nonOptionaltariffComponentID) -> new UIntType(nonOptionaltariffComponentID)).orElse(new EmptyType())));
 
@@ -6993,7 +6993,7 @@ public static class CommodityPriceClusterCommodityPriceComponentStruct {
       return null;
     }
     Object price = null;
-    Object source = null;
+    Integer source = null;
     Optional<String> description = Optional.empty();
     Optional<Long> tariffComponentID = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
@@ -7003,9 +7003,9 @@ public static class CommodityPriceClusterCommodityPriceComponentStruct {
           price = castingValue.value(Object.class);
         }
       } else if (element.contextTagNum() == SOURCE_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.Any) {
-          AnyType castingValue = element.value(AnyType.class);
-          source = castingValue.value(Object.class);
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          source = castingValue.value(Integer.class);
         }
       } else if (element.contextTagNum() == DESCRIPTION_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.String) {

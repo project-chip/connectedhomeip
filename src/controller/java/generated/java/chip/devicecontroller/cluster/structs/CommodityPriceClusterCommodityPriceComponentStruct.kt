@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 
 class CommodityPriceClusterCommodityPriceComponentStruct(
   val price: Any,
-  val source: Any,
+  val source: UInt,
   val description: Optional<String>,
   val tariffComponentID: Optional<ULong>,
 ) {
@@ -67,7 +67,7 @@ class CommodityPriceClusterCommodityPriceComponentStruct(
     ): CommodityPriceClusterCommodityPriceComponentStruct {
       tlvReader.enterStructure(tlvTag)
       val price = tlvReader.getAny(ContextSpecificTag(TAG_PRICE))
-      val source = tlvReader.getAny(ContextSpecificTag(TAG_SOURCE))
+      val source = tlvReader.getUInt(ContextSpecificTag(TAG_SOURCE))
       val description =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_DESCRIPTION))) {
           Optional.of(tlvReader.getString(ContextSpecificTag(TAG_DESCRIPTION)))

@@ -155,6 +155,33 @@ enum class StreamUsageEnum : uint8_t
     kUnknownEnumValue = 4,
 };
 
+// Enum for TariffPriceTypeEnum
+enum class TariffPriceTypeEnum : uint8_t
+{
+    kStandard        = 0x00,
+    kCritical        = 0x01,
+    kVirtual         = 0x02,
+    kIncentive       = 0x03,
+    kIncentiveSignal = 0x04,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 5,
+};
+
+// Enum for TariffUnitEnum
+enum class TariffUnitEnum : uint8_t
+{
+    kKWh  = 0x00,
+    kKVAh = 0x01,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 2,
+};
+
 // Enum for WebRTCEndReasonEnum
 enum class WebRTCEndReasonEnum : uint8_t
 {
@@ -2808,6 +2835,10 @@ enum class WaterHeaterHeatSourceBitmap : uint8_t
 } // namespace WaterHeaterManagement
 
 namespace CommodityPrice {
+
+using TariffPriceTypeEnum = Clusters::detail::TariffPriceTypeEnum;
+
+using TariffUnitEnum = Clusters::detail::TariffUnitEnum;
 
 // Bitmap for CommodityPriceDetailBitmap
 enum class CommodityPriceDetailBitmap : uint16_t
@@ -6011,32 +6042,9 @@ enum class PeakPeriodSeverityEnum : uint8_t
     kUnknownEnumValue = 4,
 };
 
-// Enum for TariffPriceTypeEnum
-enum class TariffPriceTypeEnum : uint8_t
-{
-    kStandard        = 0x00,
-    kCritical        = 0x01,
-    kVirtual         = 0x02,
-    kIncentive       = 0x03,
-    kIncentiveSignal = 0x04,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 5,
-};
+using TariffPriceTypeEnum = Clusters::detail::TariffPriceTypeEnum;
 
-// Enum for TariffUnitEnum
-enum class TariffUnitEnum : uint8_t
-{
-    kKWh  = 0x00,
-    kKVAh = 0x01,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 2,
-};
+using TariffUnitEnum = Clusters::detail::TariffUnitEnum;
 
 // Bitmap for DayPatternDayOfWeekBitmap
 enum class DayPatternDayOfWeekBitmap : uint8_t
@@ -6112,7 +6120,10 @@ enum class Feature : uint32_t
 };
 } // namespace MeterIdentification
 
-namespace CommodityMetering {} // namespace CommodityMetering
+namespace CommodityMetering {
+
+using MeasurementTypeEnum = Clusters::detail::MeasurementTypeEnum;
+} // namespace CommodityMetering
 
 namespace UnitTesting {
 

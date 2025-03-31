@@ -30350,10 +30350,6 @@ public class ChipClusters {
       void onSuccess(ArrayList<ChipStructs.CommodityPriceClusterCommodityPriceStruct> priceForecast);
     }
 
-    public interface TariffUnitAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(Object value);
-    }
-
     public interface CurrencyAttributeCallback extends BaseAttributeCallback {
       void onSuccess(@Nullable ChipStructs.CommodityPriceClusterCurrencyStruct value);
     }
@@ -30383,26 +30379,26 @@ public class ChipClusters {
     }
 
     public void readTariffUnitAttribute(
-        TariffUnitAttributeCallback callback) {
+        IntegerAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TARIFF_UNIT_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Object value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, TARIFF_UNIT_ATTRIBUTE_ID, true);
     }
 
     public void subscribeTariffUnitAttribute(
-        TariffUnitAttributeCallback callback, int minInterval, int maxInterval) {
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TARIFF_UNIT_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Object value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, TARIFF_UNIT_ATTRIBUTE_ID, minInterval, maxInterval);
@@ -67600,7 +67596,7 @@ public class ChipClusters {
     }
 
     public interface MeasurementTypeAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable Object value);
+      void onSuccess(@Nullable Integer value);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -67678,7 +67674,7 @@ public class ChipClusters {
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable Object value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, MEASUREMENT_TYPE_ATTRIBUTE_ID, true);
@@ -67691,7 +67687,7 @@ public class ChipClusters {
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable Object value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, MEASUREMENT_TYPE_ATTRIBUTE_ID, minInterval, maxInterval);

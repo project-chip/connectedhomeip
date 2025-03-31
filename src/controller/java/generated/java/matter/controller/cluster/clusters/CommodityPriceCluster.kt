@@ -29,6 +29,7 @@ import matter.controller.ReadData
 import matter.controller.ReadRequest
 import matter.controller.SubscribeRequest
 import matter.controller.SubscriptionState
+import matter.controller.UByteSubscriptionState
 import matter.controller.UIntSubscriptionState
 import matter.controller.UShortSubscriptionState
 import matter.controller.cluster.structs.*
@@ -48,16 +49,6 @@ class CommodityPriceCluster(
   class GetDetailedForecastResponse(
     val priceForecast: List<CommodityPriceClusterCommodityPriceStruct>
   )
-
-  class TariffUnitAttribute(val value: Any)
-
-  sealed class TariffUnitAttributeSubscriptionState {
-    data class Success(val value: Any) : TariffUnitAttributeSubscriptionState()
-
-    data class Error(val exception: Exception) : TariffUnitAttributeSubscriptionState()
-
-    object SubscriptionEstablished : TariffUnitAttributeSubscriptionState()
-  }
 
   class CurrencyAttribute(val value: CommodityPriceClusterCurrencyStruct?)
 
@@ -240,7 +231,7 @@ class CommodityPriceCluster(
     return GetDetailedForecastResponse(priceForecast_decoded)
   }
 
-  suspend fun readTariffUnitAttribute(): TariffUnitAttribute {
+  suspend fun readTariffUnitAttribute(): UByte {
     val ATTRIBUTE_ID: UInt = 0u
 
     val attributePath =
@@ -266,15 +257,15 @@ class CommodityPriceCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Any = tlvReader.getAny(AnonymousTag)
+    val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
 
-    return TariffUnitAttribute(decodedValue)
+    return decodedValue
   }
 
   suspend fun subscribeTariffUnitAttribute(
     minInterval: Int,
     maxInterval: Int,
-  ): Flow<TariffUnitAttributeSubscriptionState> {
+  ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 0u
     val attributePaths =
       listOf(
@@ -293,7 +284,7 @@ class CommodityPriceCluster(
       when (subscriptionState) {
         is SubscriptionState.SubscriptionErrorNotification -> {
           emit(
-            TariffUnitAttributeSubscriptionState.Error(
+            UByteSubscriptionState.Error(
               Exception(
                 "Subscription terminated with error code: ${subscriptionState.terminationCause}"
               )
@@ -310,12 +301,12 @@ class CommodityPriceCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: Any = tlvReader.getAny(AnonymousTag)
+          val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
 
-          emit(TariffUnitAttributeSubscriptionState.Success(decodedValue))
+          emit(UByteSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
-          emit(TariffUnitAttributeSubscriptionState.SubscriptionEstablished)
+          emit(UByteSubscriptionState.SubscriptionEstablished)
         }
       }
     }

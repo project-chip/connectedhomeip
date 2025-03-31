@@ -418,6 +418,33 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(detail::StreamUsageEnum
         return EnumType::kUnknownEnumValue;
     }
 }
+static auto __attribute__((unused)) EnsureKnownEnumValue(detail::TariffPriceTypeEnum val)
+{
+    using EnumType = detail::TariffPriceTypeEnum;
+    switch (val)
+    {
+    case EnumType::kStandard:
+    case EnumType::kCritical:
+    case EnumType::kVirtual:
+    case EnumType::kIncentive:
+    case EnumType::kIncentiveSignal:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(detail::TariffUnitEnum val)
+{
+    using EnumType = detail::TariffUnitEnum;
+    switch (val)
+    {
+    case EnumType::kKWh:
+    case EnumType::kKVAh:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
 static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::TestGlobalEnum val)
 {
     using EnumType = Globals::TestGlobalEnum;
@@ -4008,33 +4035,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(CommodityTariff::PeakPe
     case EnumType::kLow:
     case EnumType::kMedium:
     case EnumType::kHigh:
-        return val;
-    default:
-        return EnumType::kUnknownEnumValue;
-    }
-}
-static auto __attribute__((unused)) EnsureKnownEnumValue(CommodityTariff::TariffPriceTypeEnum val)
-{
-    using EnumType = CommodityTariff::TariffPriceTypeEnum;
-    switch (val)
-    {
-    case EnumType::kStandard:
-    case EnumType::kCritical:
-    case EnumType::kVirtual:
-    case EnumType::kIncentive:
-    case EnumType::kIncentiveSignal:
-        return val;
-    default:
-        return EnumType::kUnknownEnumValue;
-    }
-}
-static auto __attribute__((unused)) EnsureKnownEnumValue(CommodityTariff::TariffUnitEnum val)
-{
-    using EnumType = CommodityTariff::TariffUnitEnum;
-    switch (val)
-    {
-    case EnumType::kKWh:
-    case EnumType::kKVAh:
         return val;
     default:
         return EnumType::kUnknownEnumValue;

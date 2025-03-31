@@ -60,10 +60,10 @@ class CommodityMeteringCluster(
     object SubscriptionEstablished : MeteredQuantityTimestampAttributeSubscriptionState()
   }
 
-  class MeasurementTypeAttribute(val value: Any?)
+  class MeasurementTypeAttribute(val value: UShort?)
 
   sealed class MeasurementTypeAttributeSubscriptionState {
-    data class Success(val value: Any?) : MeasurementTypeAttributeSubscriptionState()
+    data class Success(val value: UShort?) : MeasurementTypeAttributeSubscriptionState()
 
     data class Error(val exception: Exception) : MeasurementTypeAttributeSubscriptionState()
 
@@ -340,9 +340,9 @@ class CommodityMeteringCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Any? =
+    val decodedValue: UShort? =
       if (!tlvReader.isNull()) {
-        tlvReader.getAny(AnonymousTag)
+        tlvReader.getUShort(AnonymousTag)
       } else {
         tlvReader.getNull(AnonymousTag)
         null
@@ -392,9 +392,9 @@ class CommodityMeteringCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: Any? =
+          val decodedValue: UShort? =
             if (!tlvReader.isNull()) {
-              tlvReader.getAny(AnonymousTag)
+              tlvReader.getUShort(AnonymousTag)
             } else {
               tlvReader.getNull(AnonymousTag)
               null
