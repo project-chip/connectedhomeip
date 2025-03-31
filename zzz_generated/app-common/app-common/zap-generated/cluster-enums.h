@@ -2799,8 +2799,6 @@ enum class Feature : uint32_t
     kExportedEnergy   = 0x2,
     kCumulativeEnergy = 0x4,
     kPeriodicEnergy   = 0x8,
-    kApparentEnergy   = 0x10,
-    kReactiveEnergy   = 0x20,
 };
 } // namespace ElectricalEnergyMeasurement
 

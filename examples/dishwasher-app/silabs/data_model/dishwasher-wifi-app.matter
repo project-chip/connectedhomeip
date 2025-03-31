@@ -276,12 +276,6 @@ struct AtomicAttributeStatusStruct {
   status statusCode = 1;
 }
 
-fabric_scoped struct SuppliedAttributionData {
-  enum8 contextInformation = 0;
-  optional int32u sourceContext = 1;
-  fabric_idx fabricIndex = 254;
-}
-
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
 cluster Identify = 3 {
   revision 4;
@@ -1795,7 +1789,7 @@ cluster OperationalState = 96 {
 
 /** This cluster provides a mechanism for querying data about electrical power as measured by the server. */
 cluster ElectricalPowerMeasurement = 144 {
-  revision 3;
+  revision 1;
 
   enum MeasurementTypeEnum : enum16 {
     kUnspecified = 0;
@@ -1882,8 +1876,8 @@ cluster ElectricalPowerMeasurement = 144 {
   readonly attribute optional nullable amperage_ma reactiveCurrent = 6;
   readonly attribute optional nullable amperage_ma apparentCurrent = 7;
   readonly attribute nullable power_mw activePower = 8;
-  readonly attribute optional nullable power_mvar reactivePower = 9;
-  readonly attribute optional nullable power_mva apparentPower = 10;
+  readonly attribute optional nullable power_mw reactivePower = 9;
+  readonly attribute optional nullable power_mw apparentPower = 10;
   readonly attribute optional nullable voltage_mv RMSVoltage = 11;
   readonly attribute optional nullable amperage_ma RMSCurrent = 12;
   readonly attribute optional nullable power_mw RMSPower = 13;
@@ -1902,7 +1896,7 @@ cluster ElectricalPowerMeasurement = 144 {
 
 /** This cluster provides a mechanism for querying data about the electrical energy imported or provided by the server. */
 cluster ElectricalEnergyMeasurement = 145 {
-  revision 2;
+  revision 1;
 
   enum MeasurementTypeEnum : enum16 {
     kUnspecified = 0;
@@ -1929,8 +1923,6 @@ cluster ElectricalEnergyMeasurement = 145 {
     kExportedEnergy = 0x2;
     kCumulativeEnergy = 0x4;
     kPeriodicEnergy = 0x8;
-    kApparentEnergy = 0x10;
-    kReactiveEnergy = 0x20;
   }
 
   struct MeasurementAccuracyRangeStruct {
@@ -1965,8 +1957,6 @@ cluster ElectricalEnergyMeasurement = 145 {
     optional epoch_s endTimestamp = 2;
     optional systime_ms startSystime = 3;
     optional systime_ms endSystime = 4;
-    optional energy_mvah apparentEnergy = 5;
-    optional energy_mvarh reactiveEnergy = 6;
   }
 
   info event CumulativeEnergyMeasured = 0 {
