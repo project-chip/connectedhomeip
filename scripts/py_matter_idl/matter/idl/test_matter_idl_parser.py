@@ -835,8 +835,10 @@ server cluster A = 1 { /* Test comment */ }
             }
         """)
 
-        global_enum = Enum(name="TestEnum", base_type="ENUM16", entries=[], is_global=True)
-        global_bitmap = Bitmap(name="TestBitmap", base_type="BITMAP32", entries=[], is_global=True)
+        global_enum = Enum(name="TestEnum", base_type="ENUM16",
+                           entries=[], is_global=True)
+        global_bitmap = Bitmap(
+            name="TestBitmap", base_type="BITMAP32", entries=[], is_global=True)
         global_struct = Struct(name="TestStruct", fields=[], is_global=True)
         expected = Idl(
             global_enums=[global_enum],
@@ -893,18 +895,22 @@ server cluster A = 1 { /* Test comment */ }
             }
         """)
 
-        global_enum = Enum(name="TestEnum", base_type="ENUM16", entries=[], is_global=True)
-        global_bitmap = Bitmap(name="TestBitmap", base_type="BITMAP32", entries=[], is_global=True)
+        global_enum = Enum(name="TestEnum", base_type="ENUM16",
+                           entries=[], is_global=True)
+        global_bitmap = Bitmap(
+            name="TestBitmap", base_type="BITMAP32", entries=[], is_global=True)
         global_struct1 = Struct(name="TestStruct1", fields=[
             Field(name="enumField", code=0, data_type=DataType(name="TestEnum")),
 
         ], is_global=True)
         global_struct2 = Struct(name="TestStruct2", fields=[
-            Field(name="substruct", code=0, data_type=DataType(name="TestStruct1")),
+            Field(name="substruct", code=0,
+                  data_type=DataType(name="TestStruct1")),
 
         ], is_global=True)
         global_struct3 = Struct(name="TestStruct3", fields=[
-            Field(name="substruct", code=0, data_type=DataType(name="TestStruct2")),
+            Field(name="substruct", code=0,
+                  data_type=DataType(name="TestStruct2")),
             Field(name="bmp", code=1, data_type=DataType(name="TestBitmap")),
         ], is_global=True)
         expected = Idl(
@@ -960,6 +966,25 @@ server cluster A = 1 { /* Test comment */ }
             ])
         ])
 
+        self.assertIdlEqual(actual, expected)
+
+    def test_does_not_merge_duplicate(self):
+        actual = parseText("""
+            enum FooEnum : ENUM16 { A = 1234; }
+            server cluster A = 1 {
+                enum FooEnum : ENUM32 { B = 234; }
+            }
+        """)
+
+        expected = Idl(
+            global_enums=[
+                Enum(name="FooEnum", base_type="ENUM16",
+                     entries=[ConstantEntry(name="A", code=1234)],
+                     is_global=True)],
+            clusters=[
+                Cluster(name="A", code=1, revision=1, enums=[
+                    Enum(name="FooEnum", base_type="ENUM32",
+                         entries=[ConstantEntry(name="B", code=234)])])])
         self.assertIdlEqual(actual, expected)
 
     def test_revision(self):

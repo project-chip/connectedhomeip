@@ -579,6 +579,11 @@ class GlobalMapping:
         """
         global_types_added = set()
 
+        # cluster types are already accessible, so no need to add them back
+        global_types_added = global_types_added.union([v.name for v in cluster.bitmaps])
+        global_types_added = global_types_added.union([v.name for v in cluster.structs])
+        global_types_added = global_types_added.union([v.name for v in cluster.enums])
+
         changed = True
         while changed:
             changed = False
@@ -612,6 +617,7 @@ def _merge_global_types_into_clusters(idl: Idl) -> Idl:
     clusters reference those type names
     """
     mapping = GlobalMapping(idl)
+
     return dataclasses.replace(idl, clusters=[mapping.merge_global_types_into_cluster(cluster) for cluster in idl.clusters])
 
 
