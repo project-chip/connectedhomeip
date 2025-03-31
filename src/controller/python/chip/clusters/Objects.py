@@ -17760,7 +17760,7 @@ class SmokeCoAlarm(Cluster):
     class Bitmaps:
         class Feature(IntFlag):
             kSmokeAlarm = 0x1
-            kCoAlarm = 0x2
+            kCOAlarm = 0x2
 
     class Commands:
         @dataclass
