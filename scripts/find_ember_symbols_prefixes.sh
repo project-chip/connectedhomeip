@@ -8,20 +8,20 @@ check_symbols() {
     local exclusions=()
     while [[ $# -gt 0 ]]; do
         case $1 in
-            --skip-dir)
-                exclusions+=(":(exclude)$2")
-                shift 2
-                ;;
-            --help)
-                echo "Usage: $0 [--skip-dir <dir>]"
-                echo "  --skip-dir <dir>  Skip the specified directory from the search (can be used multiple times for different directories)"
-                echo "  --help            Display this help message"
-                exit 0
-                ;;
-            *)
-                echo "Unknown option: $1"
-                exit 1
-                ;;
+        --skip-subtree)
+            exclusions+=(":(exclude)$2")
+            shift 2
+            ;;
+        --help)
+            echo "Usage: $0 [--skip-subtree <dir>]"
+            echo "  --skip-subtree <dir>  Skip the specified subtree or file from the search (can be used multiple times for different trees/files)"
+            echo "  --help            Display this help message"
+            exit 0
+            ;;
+        *)
+            echo "Unknown option: $1"
+            exit 1
+            ;;
         esac
     done
 
