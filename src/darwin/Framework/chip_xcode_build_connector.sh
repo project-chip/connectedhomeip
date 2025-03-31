@@ -107,6 +107,7 @@ declare -a args=(
     'default_configs_cosmetic=[]' # suppress colorization
     'chip_crypto="boringssl"'
     'chip_build_controller_dynamic_server=false'
+    'chip_system_config_use_network_framework=true'
     'chip_build_tools=false'
     'chip_build_tests=false'
     'chip_enable_wifi=false'
@@ -184,12 +185,6 @@ esac
 [[ $CHIP_ENABLE_ENCODING_SENTINEL_ENUM_VALUES == YES ]] && {
     args+=(
         'enable_encoding_sentinel_enum_values=true'
-    )
-}
-
-[[ $CHIP_USE_NETWORK_FRAMEWORK == YES ]] && {
-    args+=(
-        'chip_system_config_use_network_framework=true'
     )
 }
 
