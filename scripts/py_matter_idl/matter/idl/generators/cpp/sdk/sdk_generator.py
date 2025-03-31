@@ -126,9 +126,10 @@ class SdkGenerator(CodeGenerator):
 
                 # contains id definitions
                 "AttributeIds.jinja": "AttributeIds.h",
-                "ClusterIds.jinja": "ClusterIds.h",
+                "ClusterId.jinja": "ClusterId.h",
                 "CommandIds.jinja": "CommandIds.h",
                 "EventIds.jinja": "EventIds.h",
+                "Ids.jinja": "Ids.h",
             }
 
             for template_path, output_file in build_targets.items():
