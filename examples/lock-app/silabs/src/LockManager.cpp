@@ -345,13 +345,18 @@ bool LockManager::GetUser(chip::EndpointId endpointId, uint16_t userIndex, Ember
 
     ChipLogProgress(Zcl, "Door Lock App: LockManager::GetUser [endpoint=%d,userIndex=%hu]", endpointId, userIndex);
 
-    chip::StorageKeyName userKey = LockUserEndpoint(userIndex, endpointId);
+    // Get User struct from nvm3
+    chip::StorageKeyName userKey = LockUserEndpoint(endpointId, userIndex);
 
     uint16_t size = LockUserInfoSize;
 
     LockUserInfo userInStorage;
 
     error = mStorage->SyncGetKeyValue(userKey.KeyName(), &userInStorage, size);
+
+    // Check size out param matches what we expect to read
+    VerifyOrReturnValue(size == LockUserInfoSize, false);
+
     // If no data is found at user key
     if (error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
@@ -405,6 +410,9 @@ bool LockManager::GetUser(chip::EndpointId endpointId, uint16_t userIndex, Ember
     CredentialStruct credentials[kMaxCredentialsPerUser];
 
     error = mStorage->SyncGetKeyValue(credentialKey.KeyName(), credentials, credentialSize);
+
+    // Check size out param matches what we expect to read
+    VerifyOrReturnValue(credentialSize == static_cast<uint16_t>(CredentialStructSize * userInStorage.currentCredentialCount), false);
 
     // If KVS read was successful
     if (error == CHIP_NO_ERROR)
@@ -486,7 +494,7 @@ bool LockManager::SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip:
                         false);
 
     // Save user in nvm3
-    chip::StorageKeyName userKey = LockUserEndpoint(userIndex, endpointId);
+    chip::StorageKeyName userKey = LockUserEndpoint(endpointId, userIndex);
 
     VerifyOrReturnValue(mStorage->SyncSetKeyValue(userKey.KeyName(), &userInStorage, LockUserInfoSize) == CHIP_NO_ERROR, false);
 
@@ -509,13 +517,16 @@ bool LockManager::GetCredential(chip::EndpointId endpointId, uint16_t credential
     ChipLogProgress(Zcl, "Lock App: LockManager::GetCredential [credentialType=%u], credentialIndex=%d",
                     to_underlying(credentialType), credentialIndex);
 
-    chip::StorageKeyName key = LockCredentialEndpoint(credentialIndex, credentialType, endpointId);
+    chip::StorageKeyName key = LockCredentialEndpoint(endpointId, credentialType, credentialIndex);
 
     LockCredentialInfo credentialInStorage;
 
     uint16_t size = LockCredentialInfoSize;
 
     error = mStorage->SyncGetKeyValue(key.KeyName(), &credentialInStorage, size);
+
+    // Check size out param matches what we expect to read
+    VerifyOrReturnValue(size == LockCredentialInfoSize, false);
 
     // If no data is found at credential key
     if (error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
@@ -593,7 +604,7 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credential
     // Copy credential data to the storage struct
     memmove(credentialInStorage.credentialData, credentialData.data(), credentialInStorage.credentialDataSize);
 
-    chip::StorageKeyName key = LockCredentialEndpoint(credentialIndex, credentialType, endpointId);
+    chip::StorageKeyName key = LockCredentialEndpoint(endpointId, credentialType, credentialIndex);
 
     error = mStorage->SyncSetKeyValue(key.KeyName(), &credentialInStorage, LockCredentialInfoSize);
 
@@ -627,11 +638,14 @@ DlStatus LockManager::GetWeekdaySchedule(chip::EndpointId endpointId, uint8_t we
     VerifyOrReturnValue(IsValidUserIndex(userIndex), DlStatus::kFailure);
 
     // Get schedule data from nvm3
-    chip::StorageKeyName scheduleDataKey = LockUserWeekDayScheduleEndpoint(userIndex, weekdayIndex, endpointId);
+    chip::StorageKeyName scheduleDataKey = LockUserWeekDayScheduleEndpoint(endpointId, userIndex, weekdayIndex);
 
     uint16_t size = WeekDayScheduleInfoSize; // Create a non-const variable
 
     error = mStorage->SyncGetKeyValue(scheduleDataKey.KeyName(), &weekDayScheduleInStorage, size);
+
+    // Check size out param matches what we expect to read
+    VerifyOrReturnValue(size == WeekDayScheduleInfoSize, DlStatus::kFailure);    
 
     // If no data is found at scheduleDataKey
     if (error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
@@ -684,7 +698,7 @@ DlStatus LockManager::SetWeekdaySchedule(chip::EndpointId endpointId, uint8_t we
     weekDayScheduleInStorage.status               = status;
 
     // Save schedule data in nvm3
-    chip::StorageKeyName scheduleDataKey = LockUserWeekDayScheduleEndpoint(userIndex, weekdayIndex, endpointId);
+    chip::StorageKeyName scheduleDataKey = LockUserWeekDayScheduleEndpoint(endpointId, userIndex, weekdayIndex);
 
     VerifyOrReturnValue(mStorage->SyncSetKeyValue(scheduleDataKey.KeyName(), &weekDayScheduleInStorage, WeekDayScheduleInfoSize) ==
                             CHIP_NO_ERROR,
@@ -712,11 +726,14 @@ DlStatus LockManager::GetYeardaySchedule(chip::EndpointId endpointId, uint8_t ye
     VerifyOrReturnValue(IsValidUserIndex(userIndex), DlStatus::kFailure);
 
     // Get schedule data from nvm3
-    chip::StorageKeyName scheduleDataKey = LockUserYearDayScheduleEndpoint(userIndex, yearDayIndex, endpointId);
+    chip::StorageKeyName scheduleDataKey = LockUserYearDayScheduleEndpoint(endpointId, userIndex, yearDayIndex);
 
     uint16_t size = YearDayScheduleInfoSize;
 
     error = mStorage->SyncGetKeyValue(scheduleDataKey.KeyName(), &yearDayScheduleInStorage, size);
+
+    // Check size out param matches what we expect to read
+    VerifyOrReturnValue(size == YearDayScheduleInfoSize, DlStatus::kFailure); 
 
     // If no data is found at scheduleDataKey
     if (error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
@@ -766,7 +783,7 @@ DlStatus LockManager::SetYeardaySchedule(chip::EndpointId endpointId, uint8_t ye
     yearDayScheduleInStorage.status                  = status;
 
     // Save schedule data in nvm3
-    chip::StorageKeyName scheduleDataKey = LockUserYearDayScheduleEndpoint(userIndex, yearDayIndex, endpointId);
+    chip::StorageKeyName scheduleDataKey = LockUserYearDayScheduleEndpoint(endpointId, userIndex, yearDayIndex);
 
     VerifyOrReturnValue(mStorage->SyncSetKeyValue(scheduleDataKey.KeyName(), &yearDayScheduleInStorage, YearDayScheduleInfoSize) ==
                             CHIP_NO_ERROR,
@@ -791,11 +808,14 @@ DlStatus LockManager::GetHolidaySchedule(chip::EndpointId endpointId, uint8_t ho
     VerifyOrReturnValue(IsValidHolidayScheduleIndex(holidayIndex), DlStatus::kFailure);
 
     // Get schedule data from nvm3
-    chip::StorageKeyName scheduleDataKey = LockHolidayScheduleEndpoint(holidayIndex, endpointId);
+    chip::StorageKeyName scheduleDataKey = LockHolidayScheduleEndpoint(endpointId, holidayIndex);
 
     uint16_t size = HolidayScheduleInfoSize;
 
     error = mStorage->SyncGetKeyValue(scheduleDataKey.KeyName(), &holidayScheduleInStorage, size);
+
+    // Check size out param matches what we expect to read
+    VerifyOrReturnValue(size == HolidayScheduleInfoSize, DlStatus::kFailure); 
 
     // If no data is found at scheduleDataKey
     if (error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
@@ -843,7 +863,7 @@ DlStatus LockManager::SetHolidaySchedule(chip::EndpointId endpointId, uint8_t ho
     holidayScheduleInStorage.status                  = status;
 
     // Save schedule data in nvm3
-    chip::StorageKeyName scheduleDataKey = LockHolidayScheduleEndpoint(holidayIndex, endpointId);
+    chip::StorageKeyName scheduleDataKey = LockHolidayScheduleEndpoint(endpointId, holidayIndex);
 
     VerifyOrReturnValue(mStorage->SyncSetKeyValue(scheduleDataKey.KeyName(), &holidayScheduleInStorage, HolidayScheduleInfoSize) ==
                             CHIP_NO_ERROR,
@@ -910,7 +930,7 @@ bool LockManager::setLockState(chip::EndpointId endpointId, const Nullable<chip:
     for (int userIndex = 0; userIndex < kMaxUsers; userIndex++)
     {
         // Get user data to obtain currentCredentialCount
-        chip::StorageKeyName userKey = LockUserEndpoint(userIndex, endpointId);
+        chip::StorageKeyName userKey = LockUserEndpoint(endpointId, userIndex);
 
         uint16_t userSize = LockUserInfoSize;
 
@@ -938,8 +958,7 @@ bool LockManager::setLockState(chip::EndpointId endpointId, const Nullable<chip:
                     {
                         // Read the individual credential at userCredentialIndex
                         chip::StorageKeyName key =
-                            LockCredentialEndpoint(mCredentials[userCredentialIndex].credentialIndex,
-                                                   mCredentials[userCredentialIndex].credentialType, endpointId);
+                            LockCredentialEndpoint(endpointId, mCredentials[userCredentialIndex].credentialType, mCredentials[userCredentialIndex].credentialIndex);
 
                         uint16_t credentialSize = LockCredentialInfoSize;
 
