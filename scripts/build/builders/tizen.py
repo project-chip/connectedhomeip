@@ -187,10 +187,10 @@ class TizenBuilder(GnBuilder):
 
     def GnBuildArgs(self):
         # Make sure that required ENV variables are defined
-        for env in ('TIZEN_SDK_ROOT',):
-            if env not in os.environ:
-                raise Exception(
-                    "Environment %s missing, cannot build Tizen target" % env)
+        env = 'TIZEN_SDK_ROOT'
+        if env not in os.environ:
+            raise Exception(
+                "Environment %s missing, cannot build Tizen target" % env)
 
         sysroot = None
 
