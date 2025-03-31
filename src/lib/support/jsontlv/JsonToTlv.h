@@ -18,6 +18,10 @@
 #include <lib/core/TLV.h>
 #include <string>
 
+#ifndef CONFIG_MALLOC_0_IS_NULL
+#define CONFIG_MALLOC_0_IS_NULL 0
+#endif
+
 namespace chip {
 
 /*

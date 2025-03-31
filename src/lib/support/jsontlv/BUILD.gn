@@ -46,6 +46,6 @@ static_library("jsontlv") {
 
   if (chip_device_platform == "esp32") {
     # malloc(0) is null on this platform.
-    defines = [ "CONFIG_MALLOC_0_IS_NULL" ]
+    defines = [ "CONFIG_MALLOC_0_IS_NULL=1" ]
   }
 }

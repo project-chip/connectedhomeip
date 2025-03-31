@@ -318,7 +318,7 @@ CHIP_ERROR EncodeTlvElement(const Json::Value & val, TLV::TLVWriter & writer, co
 
         // On a platform where malloc(0) is null (which could be misinterpreted as "out of memory")
         // we should skip this check if it's a zero-length string.
-#ifdef CONFIG_MALLOC_0_IS_NULL
+#if CONFIG_MALLOC_0_IS_NULL
         if (encodedLen > 0)
 #endif
             VerifyOrReturnError(byteString.Get() != nullptr, CHIP_ERROR_NO_MEMORY);
