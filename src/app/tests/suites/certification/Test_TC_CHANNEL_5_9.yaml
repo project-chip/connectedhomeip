@@ -21,16 +21,11 @@ config:
     nodeId: 0x12344321
     cluster: "Channel"
     endpoint: 1
+    channelName:
+        type: string
+        defaultValue: "PBS"
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
-      cluster: "DelayCommands"
-      command: "WaitForCommissionee"
-      arguments:
-          values:
-              - name: "nodeId"
-                value: nodeId
-
     - label: "Step 1: TH reads the ChannelList attribute from the DUT"
       PICS: CHANNEL.S.A0000
       command: "readAttribute"
@@ -38,31 +33,82 @@ tests:
       response:
           constraints:
               type: list
+          verify:
+              description: "Verify that the response contains a list of the known TV channels."
 
-    - label: "Step 2: TH sends a ChangeChannel command to the DUT with a channel
-          name from the list in step 1"
+    - label: "Step 2: TH reads the CurrentChannel attribute from the DUT"
+      PICS: CHANNEL.S.A0002
+      command: "readAttribute"
+      attribute: "CurrentChannel"
+      response:
+          constraints:
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 19.7.2. [TC-CHANNEL-5.9] Change Channel Verification (DUT as Server)
+
+PICS:
+    - CHANNEL.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Channel"
+    endpoint: 1
+    channelName:
+        type: string
+        defaultValue: "PBS"
+
+tests:
+    - label: "Step 1: TH reads the ChannelList attribute from the DUT"
+      PICS: CHANNEL.S.A0000
+      command: "readAttribute"
+      attribute: "ChannelList"
+      response:
+          constraints:
+              type: list
+          verify:
+              description: "Verify that the response contains a list of the known TV channels."
+
+    - label: "Step 2: TH reads the CurrentChannel attribute from the DUT"
+      PICS: CHANNEL.S.A0002
+      command: "readAttribute"
+      attribute: "CurrentChannel"
+      response:
+          constraints:
+      type: struct
+             saveAs: "previousChannel"
+          verify:
+              description: "Record the channel name for usage in the next step."
+
+    - label: "Step 3: TH sends a ChangeChannel command to the DUT with a different channel name from the list in Step 1"
       PICS: CHANNEL.S.C00.Rsp
       command: "ChangeChannel"
       arguments:
           values:
               - name: "Match"
-                value: "PBS" # Example, choose from the available ChannelList
+                value: channelName
+      response:
+          constraints:
+              status: 0
+          verify:
+              description: "Verify that a successful (status 0) response is received."
 
-    - label: "Step 2a: Verify that the channel has changed on the device"
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && CHANNEL.S.C00.Rsp
-      arguments:
-          values:
-              - name: "message"
-                value:
-                    "Please enter 'y' if the channel has changed on the device"
-              - name: "expectedValue"
-                value: "y"
-
-    - label: "Step 3: TH reads the CurrentChannel attribute from the DUT"
+    - label: "Step 4: TH reads the CurrentChannel attribute from the DUT"
       PICS: CHANNEL.S.A0002 && CHANNEL.S.C00.Rsp
       command: "readAttribute"
       attribute: "CurrentChannel"
       response:
-          value: { Name: "PBS" } # Should match the name sent in Step 2
+          value: { Name: channelName }
+          verify:
+              description: "Verify that the channel name in the response matches the one selected in Step 3."
