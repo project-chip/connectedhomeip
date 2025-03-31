@@ -973,6 +973,7 @@ server cluster A = 1 { /* Test comment */ }
             enum FooEnum : ENUM16 { A = 1234; }
             server cluster A = 1 {
                 enum FooEnum : ENUM32 { B = 234; }
+                struct S { nullable FooEnum testEnum = 0; }
             }
         """)
 
@@ -984,7 +985,13 @@ server cluster A = 1 { /* Test comment */ }
             clusters=[
                 Cluster(name="A", code=1, revision=1, enums=[
                     Enum(name="FooEnum", base_type="ENUM32",
-                         entries=[ConstantEntry(name="B", code=234)])])])
+                         entries=[ConstantEntry(name="B", code=234)])],
+                    structs=[
+                        Struct(name="S", fields=[
+                            Field(name="testEnum", code=0, data_type=DataType(
+                                name="FooEnum"), qualities=FieldQuality.NULLABLE)
+                        ])]
+                        )])
         self.assertIdlEqual(actual, expected)
 
     def test_revision(self):
