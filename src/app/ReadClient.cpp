@@ -508,8 +508,8 @@ void ReadClient::OnActiveModeNotification()
         return;
     }
 
-    // If the server sends a check-in message and a subscription is already scheduled, it indicates a client-side subscription
-    // timeout or failure. Cancel the scheduled subscription and initiate a new one immediately.
+    // If we have already detected subscription loss and are waiting to try to re-subscribe,
+    // now is a really good time to do it, since the server is listening.
     TriggerResubscribeIfScheduled("check-in message");
 }
 
