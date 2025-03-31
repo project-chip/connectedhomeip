@@ -141,4 +141,3 @@ class SdkGenerator(CodeGenerator):
                         "input_name": self.idl.parse_file_name,
                     },
                 )
-
