@@ -78,21 +78,16 @@ public:
         static void TimerCallback(void * timerCbArg);
     };
 
-    Timer * longPressTimer       = nullptr;
-    bool sFunctionButtonPressed  = false; // True when button0 is pressed, used to trigger factory reset
-    bool sActionButtonPressed    = false; // True when button1 is pressed, used to initiate toggle or level-up/down
-    bool sActionButtonSuppressed = false; // True when both button0 and button1 are pressed, used to switch step direction
-    bool sIsButtonEventTriggered = false; // True when button0 press event is posted to BaseApplication
-
+    
     /**
      * @brief AppTask task main loop function
      *
      * @param pvParameter FreeRTOS task parameter
      */
     static void AppTaskMain(void * pvParameter);
-
+    
     CHIP_ERROR StartAppTask();
-
+    
     /**
      * @brief Event handler when a button is pressed
      * Function posts an event for button processing
@@ -102,11 +97,16 @@ public:
      *                  SL_SIMPLE_BUTTON_RELEASED or SL_SIMPLE_BUTTON_DISABLED
      */
     static void ButtonEventHandler(uint8_t button, uint8_t btnAction);
-
+    
     static void AppEventHandler(AppEvent * aEvent);
-
+    
 private:
     static AppTask sAppTask;
+    Timer * longPressTimer = nullptr;
+    static bool functionButtonPressed;    // True when button0 is pressed, used to trigger factory reset
+    static bool actionButtonPressed;      // True when button1 is pressed, used to initiate toggle or level-up/down
+    static bool actionButtonSuppressed;   // True when both button0 and button1 are pressed, used to switch step direction
+    static bool isButtonEventTriggered;   // True when button0 press event is posted to BaseApplication
 
     /**
      * @brief Override of BaseApplication::AppInit() virtual method, called by BaseApplication::Init()

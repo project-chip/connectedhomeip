@@ -68,6 +68,11 @@ using namespace ::chip::DeviceLayer;
 
 AppTask AppTask::sAppTask;
 
+bool AppTask::functionButtonPressed  = false;
+bool AppTask::actionButtonPressed    = false;
+bool AppTask::actionButtonSuppressed = false;
+bool AppTask::isButtonEventTriggered = false;
+
 CHIP_ERROR AppTask::AppInit()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -80,7 +85,7 @@ CHIP_ERROR AppTask::AppInit()
         appError(err);
     }
 
-    longPressTimer = new Timer(LONG_PRESS_TIMEOUT, OnLongPressTimeout, this);
+    longPressTimer = new Timer(LONG_PRESS_TIMEOUT_MS, OnLongPressTimeout, this);
 
     return err;
 }
@@ -88,7 +93,7 @@ CHIP_ERROR AppTask::AppInit()
 void AppTask::Timer::Start()
 {
     // Starts or restarts the function timer
-    if (osTimerStart(mHandler, pdMS_TO_TICKS(LONG_PRESS_TIMEOUT)) != osOK)
+    if (osTimerStart(mHandler, pdMS_TO_TICKS(LONG_PRESS_TIMEOUT_MS)) != osOK)
     {
         SILABS_LOG("Timer start() failed");
         appError(CHIP_ERROR_INTERNAL);
@@ -111,9 +116,9 @@ void AppTask::HandleLongPress()
     AppEvent event;
     event.Handler = AppTask::AppEventHandler;
 
-    if (sAppTask.sActionButtonPressed)
+    if (actionButtonPressed)
     {
-        sAppTask.sActionButtonSuppressed = true;
+        actionButtonSuppressed = true;
         // Long press button up : Trigger Level Control Action
         event.Type = AppEvent::kEventType_TriggerLevelControlAction;
         AppTask::GetAppTask().PostEvent(&event);
@@ -155,12 +160,12 @@ AppTask::Timer::~Timer()
 
 void AppTask::Timer::Stop()
 {
-    mIsActive = false;
     if (osTimerStop(mHandler) == osError)
     {
         SILABS_LOG("Timer stop() failed");
         appError(CHIP_ERROR_INTERNAL);
     }
+    mIsActive = false;
 }
 
 void AppTask::Timer::TimerCallback(void * timerCbArg)
@@ -225,15 +230,15 @@ void AppTask::AppEventHandler(AppEvent * aEvent)
     switch (aEvent->Type)
     {
     case AppEvent::kEventType_FunctionButtonPressed:
-        sAppTask.sFunctionButtonPressed = true;
-        if (sAppTask.sActionButtonPressed)
+        functionButtonPressed = true;
+        if (actionButtonPressed)
         {
-            sAppTask.sActionButtonSuppressed = true;
+            actionButtonSuppressed = true;
             LightSwitchMgr::GetInstance().changeStepMode();
         }
         else
         {
-            sAppTask.sIsButtonEventTriggered = true;
+            isButtonEventTriggered = true;
             // Post button press event to BaseApplication
             AppEvent button_event           = {};
             button_event.Type               = AppEvent::kEventType_Button;
@@ -243,10 +248,10 @@ void AppTask::AppEventHandler(AppEvent * aEvent)
         }
         break;
     case AppEvent::kEventType_FunctionButtonReleased: {
-        sAppTask.sFunctionButtonPressed = false;
-        if (sAppTask.sIsButtonEventTriggered)
+        functionButtonPressed = false;
+        if (isButtonEventTriggered)
         {
-            sAppTask.sIsButtonEventTriggered = false;
+            isButtonEventTriggered = false;
             // Post button release event to BaseApplication
             AppEvent button_event           = {};
             button_event.Type               = AppEvent::kEventType_Button;
@@ -257,11 +262,11 @@ void AppTask::AppEventHandler(AppEvent * aEvent)
         break;
     }
     case AppEvent::kEventType_ActionButtonPressed:
-        sAppTask.sActionButtonPressed = true;
+        actionButtonPressed = true;
         LightSwitchMgr::GetInstance().SwitchActionEventHandler(aEvent->Type);
-        if (sAppTask.sFunctionButtonPressed)
+        if (functionButtonPressed)
         {
-            sAppTask.sActionButtonSuppressed = true;
+            actionButtonSuppressed = true;
             LightSwitchMgr::GetInstance().changeStepMode();
         }
         else if (sAppTask.longPressTimer)
@@ -270,14 +275,14 @@ void AppTask::AppEventHandler(AppEvent * aEvent)
         }
         break;
     case AppEvent::kEventType_ActionButtonReleased:
-        sAppTask.sActionButtonPressed = false;
+        actionButtonPressed = false;
         if (sAppTask.longPressTimer)
         {
             sAppTask.longPressTimer->Stop();
         }
-        if (sAppTask.sActionButtonSuppressed)
+        if (actionButtonSuppressed)
         {
-            sAppTask.sActionButtonSuppressed = false;
+            actionButtonSuppressed = false;
         }
         else
         {
