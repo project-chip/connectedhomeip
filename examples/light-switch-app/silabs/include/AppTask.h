@@ -78,7 +78,6 @@ public:
         static void TimerCallback(void * timerCbArg);
     };
 
-
     /**
      * @brief AppTask task main loop function
      *
@@ -103,10 +102,10 @@ public:
 private:
     static AppTask sAppTask;
     Timer * longPressTimer = nullptr;
-    static bool functionButtonPressed;    // True when button0 is pressed, used to trigger factory reset
-    static bool actionButtonPressed;      // True when button1 is pressed, used to initiate toggle or level-up/down
-    static bool actionButtonSuppressed;   // True when both button0 and button1 are pressed, used to switch step direction
-    static bool isButtonEventTriggered;   // True when button0 press event is posted to BaseApplication
+    static bool functionButtonPressed;  // True when button0 is pressed, used to trigger factory reset
+    static bool actionButtonPressed;    // True when button1 is pressed, used to initiate toggle or level-up/down
+    static bool actionButtonSuppressed; // True when both button0 and button1 are pressed, used to switch step direction
+    static bool isButtonEventTriggered; // True when button0 press event is posted to BaseApplication
 
     /**
      * @brief Override of BaseApplication::AppInit() virtual method, called by BaseApplication::Init()
