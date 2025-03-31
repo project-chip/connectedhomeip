@@ -39,6 +39,7 @@ import random
 
 import chip.clusters as Clusters
 import langcodes
+import logging
 from chip.interaction_model import Status
 from chip.testing.matter_asserts import assert_non_empty_string
 from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
@@ -136,7 +137,9 @@ class Test_TC_LCFG_2_1(MatterBaseTest):
         if filtered_supported_locales:
             value_present_in_supported_locales = random.choice(filtered_supported_locales)
         else:
-            asserts.fail("SupportedLocales attribute has only one element and is the same value as ActiveLocale")
+            logging.info("SupportedLocales attribute has only one element and is the same value as ActiveLocale. Skipping remaining test steps.")
+            self.skip_all_remaining_steps(5)
+            return
 
         result = await self.write_single_attribute(attribute_value=Clusters.LocalizationConfiguration.Attributes.ActiveLocale(value_present_in_supported_locales), endpoint_id=endpoint, expect_success=True)
 
