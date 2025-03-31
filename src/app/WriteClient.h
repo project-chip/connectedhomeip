@@ -199,19 +199,22 @@ public:
         }
         else
         {
-            // StartNewMessage was called to make sure we always create a new chunk when we have a new Attribute to Encode, this
-            // might be more efficient
-            // TODO should we keep this or just use EnsureMessage; if we choose EnsureMessage, we will have to adapt
-            // EnsureListStarted to make sure we create a New Chunk if it fails (could happens when a new Attribute is added to the
-            // same chunk)
+            // We will always start a new chunk when we have a new Attribute to Encode. This might be more efficient since this
+            // first chunk contains the "ReplaceAll List" which will pack as many list items as possible into a single
+            // AttributeDataIB.
             ReturnErrorOnFailure(StartNewMessage());
 
+            // Encode as many list-items as possible into a single AttributeDataIB, which will be included in a single
+            // WriteRequestMessage chunk
             ReturnErrorOnFailure(TryEncodeListIntoSingleAttributeDataIB(path, listValue, chunkingNeeded, encodedItemCount));
-            if (!chunkingNeeded)
-            {
-                return CHIP_NO_ERROR;
-            }
-            // Start a new WriteRequest chunk.
+
+            // If all list items fit perfectly into a single AttributeDataIB, there is no need for any `append-item` or chunking,
+            // and we can exit early
+            VerifyOrReturnError(chunkingNeeded, CHIP_NO_ERROR);
+
+            // Start a new WriteRequest chunk, as there are still remaining list items to encode. These remaining items will be
+            // appended one by one, each into its own AttributeDataIB. Unlike the first chunk (which contains only one
+            // AttributeDataIB), subsequent chunks may contain multiple AttributeDataIBs if space allows it
             ReturnErrorOnFailure(StartNewMessage());
             nextItemToAppendIndex = encodedItemCount;
         }
