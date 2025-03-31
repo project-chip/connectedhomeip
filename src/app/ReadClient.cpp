@@ -498,8 +498,10 @@ void ReadClient::OnActiveModeNotification()
         return;
     }
 
-    // When receiving check-in message, it means all tracked subscriptions for this node has gone in server side, if there is a related active subscription
-    // and subscription has not yet rescheduled in client side, we should forcibly timeout the current subscription, and schedule a new one.
+    // If this API has been called, that means the subscription for this ReadClient is gone
+    // on the server side (because otherwise the server would not have checked in with us).
+    // Even if we think we have a live subscription, we are wrong, and should just forcibly time it
+    // out and schedule a new one.
     if (!mIsResubscriptionScheduled)
     {
         // Closing will ultimately trigger ScheduleResubscription with the aReestablishCASE argument set to true, effectively
