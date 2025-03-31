@@ -8,4 +8,9 @@ void __attribute__((weak)) emberAf{{name}}ClusterInitCallback(EndpointId endpoin
     // To prevent warning
     (void) endpoint;
 }
+void __attribute__((weak)) emberAf{{name}}ClusterShutdownCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
 {%- endfor %}
