@@ -40,8 +40,7 @@ source_set("ids") {
     "${chip_app_zap_dir}/app-common/zap-generated/ids/Events.h",
   ]
 
-  public_deps = [ "${chip_root}/src/app/util:types" ]
-  public_deps += chip_all_cluster_id_targets
+  public_deps = chip_all_cluster_id_targets
 
   public_configs = [ ":includes" ]
 }
