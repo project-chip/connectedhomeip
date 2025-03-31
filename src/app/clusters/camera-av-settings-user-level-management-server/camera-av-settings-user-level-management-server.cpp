@@ -86,7 +86,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::Init()
         VerifyOrReturnError(HasFeature(Feature::kMechanicalPresets), CHIP_ERROR_INVALID_ARGUMENT,
                             ChipLogError(Zcl,
                                          "CameraAVSettingsUserLevelManagement[ep=%d]: Feature configuration error. If MaxPresets "
-                                         "is enabled, then MaxPresets feature is required",
+                                         "is enabled, then MechanicalPresets feature is required",
                                          mEndpointId));
     }
 
@@ -95,7 +95,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::Init()
         VerifyOrReturnError(HasFeature(Feature::kMechanicalPresets), CHIP_ERROR_INVALID_ARGUMENT,
                             ChipLogError(Zcl,
                                          "CameraAVSettingsUserLevelManagement[ep=%d]: Feature configuration error. If MPTZPresets "
-                                         "is enabled, then MaxPresets feature is required",
+                                         "is enabled, then MechanicalPresets feature is required",
                                          mEndpointId));
     }
 
@@ -104,7 +104,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::Init()
         VerifyOrReturnError(HasFeature(Feature::kDigitalPTZ), CHIP_ERROR_INVALID_ARGUMENT,
                             ChipLogError(Zcl,
                                          "CameraAVSettingsUserLevelManagement[ep=%d]: Feature configuration error. If "
-                                         "DPTZRelativeMove is enabled, then DPTZ feature is required",
+                                         "DPTZRelativeMove is enabled, then DigitalPTZ feature is required",
                                          mEndpointId));
     }
 
@@ -113,7 +113,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::Init()
         VerifyOrReturnError(HasFeature(Feature::kMechanicalZoom), CHIP_ERROR_INVALID_ARGUMENT,
                             ChipLogError(Zcl,
                                          "CameraAVSettingsUserLevelManagement[ep=%d]: Feature configuration error. If ZoomMax is "
-                                         "enabled, then Mechanical Zoom feature is required",
+                                         "enabled, then MechanicalZoom feature is required",
                                          mEndpointId));
     }
 
@@ -122,7 +122,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::Init()
         VerifyOrReturnError(HasFeature(Feature::kMechanicalTilt), CHIP_ERROR_INVALID_ARGUMENT,
                             ChipLogError(Zcl,
                                          "CameraAVSettingsUserLevelManagement[ep=%d]: Feature configuration error. If TiltMin is "
-                                         "enabled, then Mechanical Tilt feature is required",
+                                         "enabled, then MechanicalTilt feature is required",
                                          mEndpointId));
     }
 
@@ -131,7 +131,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::Init()
         VerifyOrReturnError(HasFeature(Feature::kMechanicalTilt), CHIP_ERROR_INVALID_ARGUMENT,
                             ChipLogError(Zcl,
                                          "CameraAVSettingsUserLevelManagement[ep=%d]: Feature configuration error. If TiltMax is "
-                                         "enabled, then Mechanical Tilt feature is required",
+                                         "enabled, then MechanicalTilt feature is required",
                                          mEndpointId));
     }
 
@@ -140,7 +140,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::Init()
         VerifyOrReturnError(HasFeature(Feature::kMechanicalPan), CHIP_ERROR_INVALID_ARGUMENT,
                             ChipLogError(Zcl,
                                          "CameraAVSettingsUserLevelManagement[ep=%d]: Feature configuration error. If PanMin is "
-                                         "enabled, then Mechanical Pan feature is required",
+                                         "enabled, then MechanicalPan feature is required",
                                          mEndpointId));
     }
 
@@ -149,7 +149,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::Init()
         VerifyOrReturnError(HasFeature(Feature::kMechanicalPan), CHIP_ERROR_INVALID_ARGUMENT,
                             ChipLogError(Zcl,
                                          "CameraAVSettingsUserLevelManagement[ep=%d]: Feature configuration error. If PanMax is "
-                                         "enabled, then Mechanical Pan feature is required",
+                                         "enabled, then MechanicalPan feature is required",
                                          mEndpointId));
     }
 
@@ -836,6 +836,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZSavePreset(HandlerContext & 
     uint8_t presetToUse       = currentPresetID;
 
     // Make sure that the vector will not exceed the max size
+    // TO DO, handle the case where we're overwriting an existing preset id
     //
     if (mMptzPresetHelper.size() == mMaxPresets)
     {
@@ -885,6 +886,15 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRemovePreset(HandlerContext 
                                                                  const Commands::MPTZRemovePreset::DecodableType & commandData)
 {
     uint8_t presetToRemove = commandData.presetID;
+
+    // Verify the provided presetID is within spec limits
+    //
+    if (presetToRemove > mMaxPresets-1) 
+    {
+        ChipLogError(Zcl, "Preset to remove is out of range");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+        return;    
+    }
 
     // Is the provided ID known to us?
     //

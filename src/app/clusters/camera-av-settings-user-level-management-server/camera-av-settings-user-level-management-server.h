@@ -66,7 +66,7 @@ private:
 public:
     virtual ~MPTZPresetHelper() = default;
     MPTZPresetHelper() {}
-    MPTZPresetHelper(uint8_t aPreset, chip::CharSpan aName, MPTZStructType aPosition)
+    MPTZPresetHelper(uint8_t aPreset, CharSpan aName, MPTZStructType aPosition)
     {
         SetPresetID(aPreset);
         SetName(aName);
