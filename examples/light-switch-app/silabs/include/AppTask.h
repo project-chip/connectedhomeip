@@ -78,16 +78,16 @@ public:
         static void TimerCallback(void * timerCbArg);
     };
 
-    
+
     /**
      * @brief AppTask task main loop function
      *
      * @param pvParameter FreeRTOS task parameter
      */
     static void AppTaskMain(void * pvParameter);
-    
+
     CHIP_ERROR StartAppTask();
-    
+
     /**
      * @brief Event handler when a button is pressed
      * Function posts an event for button processing
@@ -97,9 +97,9 @@ public:
      *                  SL_SIMPLE_BUTTON_RELEASED or SL_SIMPLE_BUTTON_DISABLED
      */
     static void ButtonEventHandler(uint8_t button, uint8_t btnAction);
-    
+
     static void AppEventHandler(AppEvent * aEvent);
-    
+
 private:
     static AppTask sAppTask;
     Timer * longPressTimer = nullptr;
