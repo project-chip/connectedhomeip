@@ -36,6 +36,7 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
+import re
 from enum import Enum
 from typing import Optional
 
@@ -143,25 +144,20 @@ class TC_CC_2_1(MatterBaseTest):
 
         return steps
 
-    async def _get_totalnumberofprimaries(self):
+    async def _get_totalnumberofprimaries(self) -> int:
         """Read the attributes which area Primaries<n>X attributes and return the total found and avaiable in the current cluster.
 
         Returns:
-            numberofprimaries(int) : Number of primaries found.
+            numberofprimaries(int) : Number of Primary attributes found.
         """
         numberofprimaries = 0
-        # Read all the Attributes with Primaries then guard the attributes and sum those with return true
         instance_attribute_names = [attr for attr in self.attributes.__dict__.keys(
         ) if not attr.startswith("__") and attr.startswith('Primary')]
-        logger.info(instance_attribute_names)
         for primaryattr in instance_attribute_names:
-            logger.info(f"Attribute name string {str(primaryattr)}")
-            import re
-            # Use X as example
+           # Use X as reference
             primaryx_pattern = re.compile(r'^Primary\d{1,2}X$')
-            if primaryx_pattern.match(str(primaryattr)) and await self.attribute_guard(self.endpoint, getattr(self.attributes, str(primaryattr))):
+            if primaryx_pattern.match(str(primaryattr)) and await self.cluster_has_attribute(self.endpoint, getattr(self.attributes, str(primaryattr))):
                 numberofprimaries += 1
-
         return numberofprimaries
 
     async def _verify_attribute(self, attribute: Attribute, data_type: ValueTypesEnum, enum_range: Optional[list] = None, min_len: Optional[int] = None, max_len: Optional[int] = None):
@@ -332,18 +328,18 @@ class TC_CC_2_1(MatterBaseTest):
         # Issue: #9103 to address remove 0 in NumberofPrimaries.
         # After this is resolved, check not 0.
 
-        # Get the total of Primariesattributes
-
         self.step(24)
+        # Get the total number of primaries avaiable in the cluster
         primariesfound = await self._get_totalnumberofprimaries()
+        # Get the total of Primariesattributes
         numberofprimaries_value = await self._verify_attribute(self.attributes.NumberOfPrimaries, ValueTypesEnum.UINT8, max_len=6)
-        logger.info(f"Primaries found {primariesfound} with ")
+        logger.info(f"Fetched Primaries attributes {primariesfound}")
         asserts.assert_equal(numberofprimaries_value, primariesfound,
                              "NumberOfPrimaries does not match with the Primaries found in the cluster.")
         # Verify for numberofprimaries section
         # We are at step 24 before all the number of primaries checks
         current_step = 24
-        # Must start at 1 and max in the spec is 6.
+
         for primariesindex in range(1, 7):
             skip_steps_verifynp = self._verify_for_numberofprimaries_value(numberofprimaries_value, primariesindex)
             if skip_steps_verifynp:
