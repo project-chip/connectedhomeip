@@ -11821,7 +11821,7 @@ enum class Fields : uint8_t
     kFabricID                 = 3,
     kNodeID                   = 4,
     kLabel                    = 5,
-    kVidVerificationStatement = 6,
+    kVIDVerificationStatement = 6,
     kFabricIndex              = 254,
 };
 
@@ -11833,7 +11833,7 @@ public:
     chip::FabricId fabricID = static_cast<chip::FabricId>(0);
     chip::NodeId nodeID     = static_cast<chip::NodeId>(0);
     chip::CharSpan label;
-    Optional<chip::ByteSpan> vidVerificationStatement;
+    Optional<chip::ByteSpan> VIDVerificationStatement;
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -11954,20 +11954,20 @@ struct Type;
 struct DecodableType;
 } // namespace AddTrustedRootCertificate
 
-namespace SetVidVerificationStatement {
+namespace SetVIDVerificationStatement {
 struct Type;
 struct DecodableType;
-} // namespace SetVidVerificationStatement
+} // namespace SetVIDVerificationStatement
 
-namespace SignVidVerificationRequest {
+namespace SignVIDVerificationRequest {
 struct Type;
 struct DecodableType;
-} // namespace SignVidVerificationRequest
+} // namespace SignVIDVerificationRequest
 
-namespace SignVidVerificationResponse {
+namespace SignVIDVerificationResponse {
 struct Type;
 struct DecodableType;
-} // namespace SignVidVerificationResponse
+} // namespace SignVIDVerificationResponse
 
 } // namespace Commands
 
@@ -12386,11 +12386,11 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace AddTrustedRootCertificate
-namespace SetVidVerificationStatement {
+namespace SetVIDVerificationStatement {
 enum class Fields : uint8_t
 {
     kVendorID                 = 0,
-    kVidVerificationStatement = 1,
+    kVIDVerificationStatement = 1,
     kVvsc                     = 2,
 };
 
@@ -12398,11 +12398,11 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::SetVidVerificationStatement::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetVIDVerificationStatement::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     Optional<chip::VendorId> vendorID;
-    Optional<chip::ByteSpan> vidVerificationStatement;
+    Optional<chip::ByteSpan> VIDVerificationStatement;
     Optional<chip::ByteSpan> vvsc;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
@@ -12415,16 +12415,16 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::SetVidVerificationStatement::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetVIDVerificationStatement::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     Optional<chip::VendorId> vendorID;
-    Optional<chip::ByteSpan> vidVerificationStatement;
+    Optional<chip::ByteSpan> VIDVerificationStatement;
     Optional<chip::ByteSpan> vvsc;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace SetVidVerificationStatement
-namespace SignVidVerificationRequest {
+}; // namespace SetVIDVerificationStatement
+namespace SignVIDVerificationRequest {
 enum class Fields : uint8_t
 {
     kFabricIndex     = 0,
@@ -12435,7 +12435,7 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::SignVidVerificationRequest::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SignVIDVerificationRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
@@ -12443,7 +12443,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
-    using ResponseType = Clusters::OperationalCredentials::Commands::SignVidVerificationResponse::DecodableType;
+    using ResponseType = Clusters::OperationalCredentials::Commands::SignVIDVerificationResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -12451,15 +12451,15 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::SignVidVerificationRequest::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SignVIDVerificationRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
     chip::ByteSpan clientChallenge;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace SignVidVerificationRequest
-namespace SignVidVerificationResponse {
+}; // namespace SignVIDVerificationRequest
+namespace SignVIDVerificationResponse {
 enum class Fields : uint8_t
 {
     kFabricIndex          = 0,
@@ -12471,7 +12471,7 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::SignVidVerificationResponse::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SignVIDVerificationResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
@@ -12488,7 +12488,7 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::SignVidVerificationResponse::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SignVIDVerificationResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
 
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
@@ -12496,7 +12496,7 @@ public:
     chip::ByteSpan signature;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace SignVidVerificationResponse
+}; // namespace SignVIDVerificationResponse
 } // namespace Commands
 
 namespace Attributes {
