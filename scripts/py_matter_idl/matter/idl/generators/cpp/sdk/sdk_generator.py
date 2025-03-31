@@ -117,29 +117,27 @@ class SdkGenerator(CodeGenerator):
         )
 
         for cluster in self.idl.clusters:
-            self.internal_render_one_output(
-                template_path="ClusterMetadataHeader.jinja",
-                output_file_name=f"{cluster.name}/Metadata.h",
-                vars={
-                    "cluster": cluster,
-                    "input_name": self.idl.parse_file_name,
-                },
-            )
 
-            self.internal_render_one_output(
-                template_path="ClusterIds.jinja",
-                output_file_name=f"{cluster.name}/Ids.h",
-                vars={
-                    "cluster": cluster,
-                    "input_name": self.idl.parse_file_name,
-                },
-            )
+            build_targets = {
+                "Build.jinja": "BUILD.gn",
 
-            self.internal_render_one_output(
-                template_path="BuildForMetadata.jinja",
-                output_file_name=f"{cluster.name}/BUILD.gn",
-                vars={
-                    "cluster": cluster,
-                    "input_name": self.idl.parse_file_name,
-                },
-            )
+                # contains `*Entry` items for attributes and commands
+                "ClusterMetadataHeader.jinja": "Metadata.h",
+
+                # contains id definitions
+                "AttributeIds.jinja": "AttributeIds.h",
+                "ClusterIds.jinja": "ClusterIds.h",
+                "CommandIds.jinja": "CommandIds.h",
+                "EventIds.jinja": "EventIds.h",
+            }
+
+            for template_path, output_file in build_targets.items():
+                self.internal_render_one_output(
+                    template_path=template_path,
+                    output_file_name=f"{cluster.name}/{output_file}",
+                    vars={
+                        "cluster": cluster,
+                        "input_name": self.idl.parse_file_name,
+                    },
+                )
+

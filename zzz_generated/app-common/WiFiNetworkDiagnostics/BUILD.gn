@@ -4,7 +4,12 @@
 import("//build_overrides/chip.gni")
 
 source_set("ids") {
-  sources = [ "WiFiNetworkDiagnosticsIds.h" ]
+  sources = [
+    "AttributeIds.h",
+    "ClusterIds.h",
+    "CommandIds.h",
+    "EventIds.h",
+  ]
   deps = [
     "${chip_root}/src/app/common:global-ids",
     "${chip_root}/src/app/data-model-provider:metadata",
@@ -13,7 +18,7 @@ source_set("ids") {
 }
 
 source_set("metadata") {
-  sources = [ "WiFiNetworkDiagnosticsMetadata.h" ]
+  sources = [ "Metadata.h" ]
   deps = [
     "${chip_root}/src/app/data-model-provider:metadata",
     "${chip_root}/src/lib/core:types",
