@@ -292,9 +292,9 @@ namespace TagList {
 static constexpr AttributeId Id = 0x00000004;
 } // namespace TagList
 
-namespace EndpointUniqueId {
+namespace EndpointUniqueID {
 static constexpr AttributeId Id = 0x00000005;
-} // namespace EndpointUniqueId
+} // namespace EndpointUniqueID
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;

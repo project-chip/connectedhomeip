@@ -214,7 +214,7 @@ CHIP_ERROR DescriptorAttrAccess::ReadDeviceAttribute(EndpointId endpoint, Attrib
 
 CHIP_ERROR DescriptorAttrAccess::ReadEndpointUniqueId(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
-    char epUniqueId[Attributes::EndpointUniqueId::TypeInfo::MaxLength()] = { 0 };
+    char epUniqueId[Attributes::EndpointUniqueID::TypeInfo::MaxLength()] = { 0 };
     MutableCharSpan epUniqueIdSpan(epUniqueId);
     GetEndpointUniqueIdForEndPoint(endpoint, epUniqueIdSpan);
 
@@ -281,7 +281,7 @@ CHIP_ERROR DescriptorAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
     case FeatureMap::Id: {
         return ReadFeatureMap(aPath.mEndpointId, aEncoder);
     }
-    case EndpointUniqueId::Id: {
+    case EndpointUniqueID::Id: {
         return ReadEndpointUniqueId(aPath.mEndpointId, aEncoder);
     }
     default: {

@@ -440,8 +440,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "PartsList";
         case chip::app::Clusters::Descriptor::Attributes::TagList::Id:
             return "TagList";
-        case chip::app::Clusters::Descriptor::Attributes::EndpointUniqueId::Id:
-            return "EndpointUniqueId";
+        case chip::app::Clusters::Descriptor::Attributes::EndpointUniqueID::Id:
+            return "EndpointUniqueID";
         case chip::app::Clusters::Descriptor::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::Descriptor::Attributes::AcceptedCommandList::Id:

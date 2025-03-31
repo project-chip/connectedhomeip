@@ -696,8 +696,8 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"TagList";
             break;
 
-        case MTRAttributeIDTypeClusterDescriptorAttributeEndpointUniqueIdID:
-            result = @"EndpointUniqueId";
+        case MTRAttributeIDTypeClusterDescriptorAttributeEndpointUniqueIDID:
+            result = @"EndpointUniqueID";
             break;
 
         case MTRAttributeIDTypeClusterDescriptorAttributeGeneratedCommandListID:

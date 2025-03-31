@@ -613,7 +613,7 @@ class DescriptorCluster(private val controller: MatterController, private val en
     }
   }
 
-  suspend fun readEndpointUniqueIdAttribute(): String? {
+  suspend fun readEndpointUniqueIDAttribute(): String? {
     val ATTRIBUTE_ID: UInt = 5u
 
     val attributePath =
@@ -649,7 +649,7 @@ class DescriptorCluster(private val controller: MatterController, private val en
     return decodedValue
   }
 
-  suspend fun subscribeEndpointUniqueIdAttribute(
+  suspend fun subscribeEndpointUniqueIDAttribute(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<StringSubscriptionState> {
