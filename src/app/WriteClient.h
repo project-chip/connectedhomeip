@@ -169,11 +169,9 @@ public:
      *
      * This function will Attempt to to encode as many list items as possible into a SingleAttributeDataIB, which will be handled by
      cluster server as a ReplaceAll Item operation
-     * If the list is too large, WriteRequest will be chunked and remaining items will be encoded as AppendItem operations, chunking
-     them as needed
+     * If the list is too large, the WriteRequest will be chunked and remaining items will be encoded as AppendItem operations,
+     chunking them as needed
      *
-        // The items in this list will be decoded by servers as part of the ReplaceAll list.
-
      */
     template <class T>
     CHIP_ERROR EncodeAttribute(const AttributePathParams & attributePath, const DataModel::List<T> & listValue,
@@ -476,9 +474,13 @@ private:
     CHIP_ERROR PutSinglePreencodedAttributeWritePayload(const ConcreteDataAttributePath & attributePath,
                                                         const TLV::TLVReader & data);
 
-    CHIP_ERROR TryPutPreencodedListIntoSingleAttributeWritePayload(const chip::app::ConcreteDataAttributePath & attributePath,
-                                                                   TLV::TLVReader & valueReader, bool & chunkingNeeded,
-                                                                   uint16_t & outEncodedItemCount);
+    /**
+     * Encodes preencoded attribute data into a list, that will be decoded by Cluster Servers as a "ReplaceAll ListOperation".
+     * Returns outChunkingNeeded = true if it was not possible to fit all the data into a single list.
+     */
+    CHIP_ERROR TryPutPreencodedAttributeWritePayloadIntoList(const chip::app::ConcreteDataAttributePath & attributePath,
+                                                             TLV::TLVReader & valueReader, bool & outChunkingNeeded,
+                                                             uint16_t & outEncodedItemCount);
     CHIP_ERROR EnsureMessage();
 
     /**

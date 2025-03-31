@@ -1109,8 +1109,7 @@ tests:
                       Targets: null,
                       FabricIndex: CurrentFabricIndexValue,
                   },
-                  # TODO is this ok? since when running automatically, we are retaining the value from Step 21 and Step 22 (Steps 24, 25 27 and 28 are skipped)
-                  # TODO can we make this as a variable? depending on what was executed? if Step 27 was Executed, we would expect its ACL to be printed instead of Step 21's ACL
+                  # We are retaining the ACLs from Step 21 and Step 22
                   {
                       Privilege: 3,
                       AuthMode: 2,
