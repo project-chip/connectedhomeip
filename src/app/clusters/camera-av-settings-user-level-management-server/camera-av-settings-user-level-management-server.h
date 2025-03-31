@@ -34,6 +34,13 @@ using chip::Protocols::InteractionModel::Status;
 using MPTZStructType       = Structs::MPTZStruct::Type;
 using MPTZPresetStructType = Structs::MPTZPresetStruct::Type;
 
+constexpr int16_t kMinPanValue   = -180;
+constexpr int16_t kMaxPanValue   = 180;
+constexpr int16_t kMinTiltValue  = -180;
+constexpr int16_t kMaxTiltValue  = 180;
+constexpr int16_t kMinZoomValue  = 1;
+constexpr uint8_t kMaxZoomValue  = 100;
+
 class Delegate;
 
 enum class OptionalAttributes : uint32_t
@@ -85,12 +92,14 @@ public:
      * Creates a server instance. The Init() function needs to be called for this instance to be registered and
      * called by the interaction model at the appropriate times.
      * @param aEndpointId The endpoint on which this cluster exists. This must match the zap configuration.
-     * @param aDelegate A reference to the delegate to be used by this server.
+     * @param aDelegate   A reference to the delegate to be used by this server.
+     * @param aFeature                        The bitflags value that identifies which features are supported by this instance.
+     * @param aOptionalAttrs                    The bitflags value that identifies the optional attributes supported by this
+     *                                          instance.
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
-    CameraAvSettingsUserLevelMgmtServer(EndpointId endpointId, Delegate * delegate, BitMask<Feature> aFeature,
-                                        const BitMask<OptionalAttributes> aOptionalAttrs, uint8_t aMaxPresets, int16_t aPanMin,
-                                        int16_t aPanMax, int16_t aTiltMin, int16_t aTiltMax, int8_t aZoomMax);
+    CameraAvSettingsUserLevelMgmtServer(EndpointId endpointId, Delegate * delegate, BitFlags<Feature> aFeature,
+                                        const BitFlags<OptionalAttributes> aOptionalAttrs);
     ~CameraAvSettingsUserLevelMgmtServer() override;
 
     CHIP_ERROR Init();
@@ -101,8 +110,33 @@ public:
     bool SupportsOptAttr(OptionalAttributes aOptionalAttrs) const;
 
     // Attribute Accessors and Mutators
+    CHIP_ERROR setMaxPresets(uint8_t);
+
+    CHIP_ERROR setTiltMin(int16_t);
+
+    CHIP_ERROR setTiltMax(int16_t);
+    
+    CHIP_ERROR setPanMin(int16_t);
+
+    CHIP_ERROR setPanMax(int16_t);
+
+    CHIP_ERROR setZoomMax(int8_t);
+
     const MPTZStructType & GetMptzPosition() const { return mMptzPosition; }
 
+    uint8_t GetMaxPresets() const { return mMaxPresets; }
+
+    const std::vector<uint16_t> GetDptzRelativeMove() const { return mDptzRelativeMove; }
+
+    int8_t GetZoomMax() const { return mZoomMax; }
+
+    int16_t GetTiltMin() const { return mTiltMin; }
+
+    int16_t GetTiltMax() const { return mTiltMax; }
+
+    int16_t GetPanMin() const { return mPanMin; }
+
+    int16_t GetPanMax() const { return mPanMax; }
     /**
      * Allows for a delegate or application to set the pan value given physical changes on the device itself, possibly due to direct
      * user changes
@@ -121,19 +155,19 @@ public:
      */
     void setZoom(Optional<int8_t>);
 
-    uint8_t GetMaxPresets() const { return mMaxPresets; }
+    /**
+     * Allows for a delegate or application to provide the ID of an allocated video stream that is capable of digital movement. 
+     * It is expected that this would be done by a delegate on the conclusion of allocating a video stream via the AV Stream
+     * Management cluster. 
+     */
+    void addMoveCapableVideoStreamID(uint16_t videoStreamID);
 
-    const std::vector<uint16_t> GetDptzRelativeMove() const { return mDptzRelativeMove; }
-
-    int8_t GetZoomMax() const { return mZoomMax; }
-
-    int16_t GetTiltMin() const { return mTiltMin; }
-
-    int16_t GetTiltMax() const { return mTiltMax; }
-
-    int16_t GetPanMin() const { return mPanMin; }
-
-    int16_t GetPanMax() const { return mPanMax; }
+    /**
+     * Allows for a delegate or application to remove a video stream from the set that is capable of digital movement.  
+     * It is expected that this would be done by a delegate on the conclusion of deallocating a video stream via the AV Stream
+     * Management cluster. 
+     */
+    void removeMoveCapableVideoStreamID(uint16_t videoStreamID);
 
     EndpointId GetEndpointId() { return AttributeAccessInterface::GetEndpointId().Value(); }
 
@@ -143,16 +177,18 @@ private:
     BitMask<Feature> mFeature;
     BitMask<OptionalAttributes> mOptionalAttrs;
 
+    // Spec defined defaulta for Pan, Tilt, and Zoom
     const Optional<int16_t> defaultPan  = Optional(static_cast<int16_t>(0));
     const Optional<int16_t> defaultTilt = Optional(static_cast<int16_t>(0));
     const Optional<int8_t> defaultZoom  = Optional(static_cast<int8_t>(1));
 
+    // Next available preset ID
     uint8_t currentPresetID = 0;
 
-    // Attributes local storage
+    // My known values for MPTZ.  
     MPTZStructType mMptzPosition;
 
-    // Note, spec defaults, overwritten on construction
+    // Note, spec defaults, potentially overwritten by the delegate
     uint8_t mMaxPresets = 5;
     int16_t mPanMin     = -180;
     int16_t mPanMax     = 180;
@@ -189,6 +225,11 @@ private:
      * Helper function that manages preset IDs
      */
     void UpdatePresetID();
+
+    /**
+     * Helper function that validates whether a given video stream ID is already known
+     */
+    bool knownVideoStreamID(uint16_t videoStreamID);
 };
 
 /** @brief
@@ -211,6 +252,11 @@ public:
      * Allows the delegate to determine whether a change in MPTZ is possible given current device status
      */
     virtual bool CanChangeMPTZ() = 0;
+
+    /**
+     * Allows the delegate to verify that a received video stream ID is valid
+     */
+    virtual bool IsValidVideoStreamID(uint16_t videoStreamID) = 0;
 
     /**
      * Delegate command handlers
@@ -241,10 +287,11 @@ public:
 
     virtual Protocols::InteractionModel::Status MPTZMoveToPreset(uint8_t preset, Optional<int16_t> pan, Optional<int16_t> tilt,
                                                                  Optional<int8_t> zoom) = 0;
-    virtual Protocols::InteractionModel::Status MPTZSavePreset()                        = 0;
-    virtual Protocols::InteractionModel::Status MPTZRemovePreset()                      = 0;
-    virtual Protocols::InteractionModel::Status DPTZSetViewport()                       = 0;
-    virtual Protocols::InteractionModel::Status DPTZRelativeMove()                      = 0;
+    virtual Protocols::InteractionModel::Status MPTZSavePreset(uint8_t preset)          = 0;
+    virtual Protocols::InteractionModel::Status MPTZRemovePreset(uint8_t preset)        = 0;
+    virtual Protocols::InteractionModel::Status DPTZSetViewport(uint16_t videoStreamID, Structs::ViewportStruct::Type viewport) = 0;
+    virtual Protocols::InteractionModel::Status DPTZRelativeMove(uint16_t videoStreamID, Optional<int16_t> deltaX,
+                                                                 Optional<int16_t> deltaY, Optional<int8_t> zoomDelta) = 0;
 
 private:
     friend class CameraAvSettingsUserLevelMgmtServer;

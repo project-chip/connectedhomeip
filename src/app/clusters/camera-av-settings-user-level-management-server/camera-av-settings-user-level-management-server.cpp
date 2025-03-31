@@ -42,12 +42,10 @@ namespace Clusters {
 namespace CameraAvSettingsUserLevelManagement {
 
 CameraAvSettingsUserLevelMgmtServer::CameraAvSettingsUserLevelMgmtServer(
-    EndpointId endpointId, Delegate * delegate, BitMask<Feature> aFeature, const BitMask<OptionalAttributes> aOptionalAttrs,
-    const uint8_t aMaxPresets, int16_t aPanMin, int16_t aPanMax, int16_t aTiltMin, int16_t aTiltMax, int8_t aZoomMax) :
+    EndpointId endpointId, Delegate * delegate, BitFlags<Feature> aFeature, const BitFlags<OptionalAttributes> aOptionalAttrs) :
     AttributeAccessInterface(MakeOptional(endpointId), CameraAvSettingsUserLevelManagement::Id),
     CommandHandlerInterface(MakeOptional(endpointId), CameraAvSettingsUserLevelManagement::Id), mDelegate(delegate),
-    mEndpointId(endpointId), mFeature(aFeature), mOptionalAttrs(aOptionalAttrs), mMaxPresets(aMaxPresets), mPanMin(aPanMin),
-    mPanMax(aPanMax), mTiltMin(aTiltMin), mTiltMax(aTiltMax), mZoomMax(aZoomMax)
+    mEndpointId(endpointId), mFeature(aFeature), mOptionalAttrs(aOptionalAttrs)
 {
     mDelegate->SetServer(this);
 }
@@ -177,6 +175,79 @@ bool CameraAvSettingsUserLevelMgmtServer::SupportsOptAttr(OptionalAttributes aOp
     return mOptionalAttrs.Has(aOptionalAttrs);
 }
 
+// Attribute mutators
+//
+CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::setMaxPresets(uint8_t aMaxPresets)
+{
+    mMaxPresets = aMaxPresets;
+    return CHIP_NO_ERROR;
+}
+    
+CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::setTiltMin(int16_t aTiltMin)
+{
+    if ((aTiltMin < kMinTiltValue) || (aTiltMin > kMaxTiltValue-1) || (aTiltMin > mTiltMax))
+    {
+        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+    }
+
+    mTiltMin = aTiltMin;
+    // TO DO
+    // handle subscription notifications for the change
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::setTiltMax(int16_t aTiltMax)
+{
+    if ((aTiltMax > kMaxTiltValue) || (aTiltMax < kMinTiltValue+1) || (aTiltMax < mTiltMin))
+    {
+        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+    }
+
+    mTiltMax = aTiltMax;
+    // TO DO
+    // handle subscription notifications for the change
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::setPanMin(int16_t aPanMin)
+{
+    if ((aPanMin < kMinPanValue) || (aPanMin > kMaxPanValue-1) || (aPanMin > mPanMax))
+    {
+        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+    }
+
+    mPanMin = aPanMin;
+    // TO DO
+    // handle subscription notifications for the change
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::setPanMax(int16_t aPanMax)
+{
+    if ((aPanMax > kMaxPanValue) || (aPanMax < kMinPanValue+1) || (aPanMax < mPanMin))
+    {
+        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+    }
+
+    mPanMax = aPanMax;
+    // TO DO
+    // handle subscription notifications for the change
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::setZoomMax(int8_t aZoomMax)
+{
+    if ((aZoomMax > kMaxZoomValue) || (aZoomMax < kMinZoomValue+1))
+    {
+        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+    }
+
+    mZoomMax = aZoomMax;
+    // TO DO
+    // handle subscription notifications for the change
+    return CHIP_NO_ERROR;
+}
+
 // Mutators that may be invoked by a delegate in responding to command callbacks, or due to local on device changes
 //
 void CameraAvSettingsUserLevelMgmtServer::setPan(Optional<int16_t> pan)
@@ -202,6 +273,44 @@ void CameraAvSettingsUserLevelMgmtServer::setZoom(Optional<int8_t> zoom)
         mMptzPosition.zoom = zoom;
     }
 }
+
+void CameraAvSettingsUserLevelMgmtServer::addMoveCapableVideoStreamID(uint16_t videoStreamID)
+{
+    // Make sure this isn't a duplicate ID, if not, add to the list
+    //
+    if (!knownVideoStreamID(videoStreamID))
+    {
+        // Not found, this is a good add.
+        //
+        mDptzRelativeMove.push_back(videoStreamID); 
+    }   
+}
+
+void CameraAvSettingsUserLevelMgmtServer::removeMoveCapableVideoStreamID(uint16_t videoStreamID)
+{
+    // Verify that this is a known ID, if it is, remove from the list
+    //
+    auto it = std::find(mDptzRelativeMove.begin(), mDptzRelativeMove.end(), videoStreamID);
+
+    if (it == mDptzRelativeMove.end())
+    {
+        ChipLogError(Zcl, "No matching video stream ID, removal not possible");
+        return;
+    }
+
+    mDptzRelativeMove.erase(it);
+
+}
+
+bool CameraAvSettingsUserLevelMgmtServer::knownVideoStreamID(uint16_t videoStreamID) 
+{
+    // Verify that this is a known ID, if it is, remove from the list
+    //
+    auto it = std::find(mDptzRelativeMove.begin(), mDptzRelativeMove.end(), videoStreamID);
+
+    return (it == mDptzRelativeMove.end()? false: true);
+}
+
 
 // Helper function for setting the next preset ID to use
 //
@@ -328,6 +437,8 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::Read(const ConcreteReadAttribute
 
 void CameraAvSettingsUserLevelMgmtServer::LoadPersistentAttributes()
 {
+    // Currently there are no non-volatile attributes defined in the spec.  This however is under discussion and likely to change. 
+    // Hence this is here as a placeholder.
     // Signal delegate that all persistent configuration attributes have been loaded.
     mDelegate->PersistentAttributesLoadedCallback();
 }
@@ -510,7 +621,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZSetPosition(HandlerContext &
             return;
         }
         int8_t zoomValue = zoom.Value();
-        if ((zoomValue > mZoomMax) || (zoomValue < 1))
+        if ((zoomValue > mZoomMax) || (zoomValue < kMinZoomValue))
         {
             ChipLogError(Zcl, "Received Zoom value out of range");
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
@@ -740,6 +851,17 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZSavePreset(HandlerContext & 
         presetToUse = preset.Value();
     }
 
+    // Call the delegate, make sure that it is ok to save a new preset, given the current 
+    // delegate aware values for MPTZ
+    //
+    status = mDelegate->MPTZSavePreset(presetToUse);
+
+    if (status != Status::Success)
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+        return;
+    }
+
     // Capture the current MPTZ values in the preset
     //
     MPTZPresetHelper mptzPresetHelper;
@@ -752,15 +874,6 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZSavePreset(HandlerContext & 
 
     mptzPresetHelper.SetMptzPosition(mMptzPosition);
     mMptzPresetHelper.push_back(mptzPresetHelper);
-
-    // Call the delegate
-    status = mDelegate->MPTZSavePreset();
-
-    if (status != Status::Success)
-    {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
-        return;
-    }
 
     // Update the current preset ID to the next available
     UpdatePresetID();
@@ -785,12 +898,9 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRemovePreset(HandlerContext 
         return;
     }
 
-    // Remove the identified item from the known set of presets
+    // Call the delegate to ensure that it is ok to remove the preset indicated.
     //
-    mMptzPresetHelper.erase(it);
-
-    // Call the delegate
-    Status status = mDelegate->MPTZRemovePreset();
+    Status status = mDelegate->MPTZRemovePreset(presetToRemove);
 
     if (status != Status::Success)
     {
@@ -798,15 +908,36 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRemovePreset(HandlerContext 
         return;
     }
 
+    // Remove the identified item from the known set of presets
+    //
+    mMptzPresetHelper.erase(it);
+
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::Success);
 }
 
 void CameraAvSettingsUserLevelMgmtServer::HandleDPTZSetViewport(HandlerContext & ctx,
                                                                 const Commands::DPTZSetViewport::DecodableType & commandData)
 {
+    uint16_t videoStreamID = commandData.videoStreamID;
+    Structs::ViewportStruct::Type  viewport = commandData.viewport;
+
+    // Is this a video stream ID of which we have already been informed?
+    // If not, ask the delegate if it's ok.  If yes, add to our set and proceed, if not, fail.
+    //
+    if (!knownVideoStreamID(videoStreamID))
+    {
+        // Call the delegate to validate that the videoStreamID is known; if yes then add to our list and proceed
+        //
+        if (!mDelegate->IsValidVideoStreamID(videoStreamID))
+        {
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidAction);
+            return;
+        }
+        addMoveCapableVideoStreamID(videoStreamID);
+    }
 
     // Call the delegate
-    Status status = mDelegate->DPTZSetViewport();
+    Status status = mDelegate->DPTZSetViewport(videoStreamID, viewport);
 
     if (status != Status::Success)
     {
@@ -820,8 +951,28 @@ void CameraAvSettingsUserLevelMgmtServer::HandleDPTZSetViewport(HandlerContext &
 void CameraAvSettingsUserLevelMgmtServer::HandleDPTZRelativeMove(HandlerContext & ctx,
                                                                  const Commands::DPTZRelativeMove::DecodableType & commandData)
 {
+    uint16_t videoStreamID     = commandData.videoStreamID;
+    Optional<int16_t> deltaX   = commandData.deltaX;
+    Optional<int16_t> deltaY   = commandData.deltaY;
+    Optional<int8_t> zoomDelta = commandData.zoomDelta; 
+
+    // Is this a video stream ID of which we have already been informed?
+    // If not, ask the delegate if it's ok.  If yes, add to our set and proceed, if not, fail.
+    //
+    if (!knownVideoStreamID(videoStreamID))
+    {
+        // Call the delegate to validate that the videoStreamID is known; if yes then add to our list and proceed
+        //
+        if (!mDelegate->IsValidVideoStreamID(videoStreamID))
+        {
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidAction);
+            return;
+        }
+        addMoveCapableVideoStreamID(videoStreamID);
+    }
+
     // Call the delegate
-    Status status = mDelegate->DPTZRelativeMove();
+    Status status = mDelegate->DPTZRelativeMove(videoStreamID, deltaX, deltaY, zoomDelta);
 
     if (status != Status::Success)
     {

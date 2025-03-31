@@ -20,6 +20,7 @@ public:
     Protocols::InteractionModel::Status PersistentAttributesLoadedCallback() override;
 
     bool CanChangeMPTZ() override;
+    bool IsValidVideoStreamID(uint16_t videoStreamID) override;
 
     /**
      * delegate command handlers
@@ -30,10 +31,11 @@ public:
                                                          Optional<int8_t> zoom) override;
     Protocols::InteractionModel::Status MPTZMoveToPreset(uint8_t preset, Optional<int16_t> pan, Optional<int16_t> tilt,
                                                          Optional<int8_t> zoom) override;
-    Protocols::InteractionModel::Status MPTZSavePreset() override;
-    Protocols::InteractionModel::Status MPTZRemovePreset() override;
-    Protocols::InteractionModel::Status DPTZSetViewport() override;
-    Protocols::InteractionModel::Status DPTZRelativeMove() override;
+    Protocols::InteractionModel::Status MPTZSavePreset(uint8_t preset) override;
+    Protocols::InteractionModel::Status MPTZRemovePreset(uint8_t preset) override;
+    Protocols::InteractionModel::Status DPTZSetViewport(uint16_t videoStreamID, Structs::ViewportStruct::Type viewport) override;
+    Protocols::InteractionModel::Status DPTZRelativeMove(uint16_t videoStreamID, Optional<int16_t> deltaX, 
+                                                         Optional<int16_t> deltaY, Optional<int8_t> zoomDelta) override;
 };
 
 CameraAvSettingsUserLevelMgmtServer * GetInstance();
