@@ -23,7 +23,7 @@ from matter.idl import matter_idl_types
 from ..clusters.enum import MatterIntEnum
 from ..clusters.Types import Nullable, NullValue
 from ..tlv import float32, uint
-from ..yaml.errors import ValidationError
+from .errors import ValidationError
 
 
 @dataclass

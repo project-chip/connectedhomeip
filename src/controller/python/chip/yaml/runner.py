@@ -31,10 +31,9 @@ from ..ChipDeviceCtrl import ChipDeviceController, discovery
 from ..clusters import ClusterObjects
 from ..clusters.Attribute import AttributeStatus, EventReadResult, SubscriptionTransaction, TypedAttributePath, ValueDecodeFailure
 from ..exceptions import ChipStackError
-from ..yaml import format_converter as Converter
-from ..yaml.data_model_lookup import DataModelLookup
-from ..yaml.errors import ActionCreationError, UnexpectedActionCreationError
-from .data_model_lookup import PreDefinedDataModelLookup
+from . import format_converter as Converter
+from .data_model_lookup import DataModelLookup, PreDefinedDataModelLookup
+from .errors import ActionCreationError, UnexpectedActionCreationError
 
 _PSEUDO_CLUSTERS = get_default_pseudo_clusters()
 logger = logging.getLogger('YamlParser')
