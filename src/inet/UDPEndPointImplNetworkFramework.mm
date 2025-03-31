@@ -181,14 +181,15 @@ namespace Inet {
         VerifyOrReturnError(!intfId.IsPresent(), CHIP_ERROR_NOT_IMPLEMENTED);
 
         __auto_type configure_tls = NW_PARAMETERS_DISABLE_PROTOCOL;
-        __auto_type parameters = nw_parameters_create_secure_udp(configure_tls, NW_PARAMETERS_DEFAULT_CONFIGURATION);
-        VerifyOrReturnError(nullptr != parameters, CHIP_ERROR_INVALID_ARGUMENT);
+        mParameters = nw_parameters_create_secure_udp(configure_tls, NW_PARAMETERS_DEFAULT_CONFIGURATION);
+        VerifyOrReturnError(nullptr != mParameters, CHIP_ERROR_INVALID_ARGUMENT, ReleaseAll());
 
         // Note: The ConfigureProtocol function uses nw_ip_options_set_version to set the IP version for this endpoint.
         //
         // This works as expected when the IPAddress is specified. However, when using a wildcard address (chip::Inet::IPAddressType::kAny)
         //  for an IPv6 socket, the specified IP version (nw_ip_version_6) may be ignored, allowing both IPv4 and IPv6 connections.
-        ReturnErrorOnFailure(ConfigureProtocol(addressType, parameters));
+        CHIP_ERROR err = ConfigureProtocol(addressType, mParameters);
+        VerifyOrReturnError(CHIP_NO_ERROR == err, err, ReleaseAll());
 
         // Note: Network.framework does not provide an API to set the SO_REUSEPORT socket option.
         // This limitation is not an issue when the port is set to 0, as the platform will choose a random port.
@@ -208,22 +209,21 @@ namespace Inet {
         }
 
         __auto_type endpoint = GetEndPoint(addressType, address, port);
-        VerifyOrReturnError(nullptr != endpoint, CHIP_ERROR_INTERNAL);
-        nw_parameters_set_local_endpoint(parameters, endpoint);
+        VerifyOrReturnError(nullptr != endpoint, CHIP_ERROR_INTERNAL, ReleaseAll());
+        nw_parameters_set_local_endpoint(mParameters, endpoint);
 
         mConnectionQueue = dispatch_queue_create("inet_dispatch_global", DISPATCH_QUEUE_SERIAL);
-        VerifyOrReturnError(nullptr != mConnectionQueue, CHIP_ERROR_NO_MEMORY);
+        VerifyOrReturnError(nullptr != mConnectionQueue, CHIP_ERROR_NO_MEMORY, ReleaseAll());
 
         mConnectionSemaphore = dispatch_semaphore_create(0);
-        VerifyOrReturnError(nullptr != mConnectionSemaphore, CHIP_ERROR_NO_MEMORY);
+        VerifyOrReturnError(nullptr != mConnectionSemaphore, CHIP_ERROR_NO_MEMORY, ReleaseAll());
 
         mSendSemaphore = dispatch_semaphore_create(0);
-        VerifyOrReturnError(nullptr != mSendSemaphore, CHIP_ERROR_NO_MEMORY);
+        VerifyOrReturnError(nullptr != mSendSemaphore, CHIP_ERROR_NO_MEMORY, ReleaseAll());
 
         mSystemQueue = static_cast<System::LayerSocketsLoop &>(GetSystemLayer()).GetDispatchQueue();
         mAddrType = addressType;
         mConnection = nullptr;
-        mParameters = parameters;
 
         return CHIP_NO_ERROR;
     }
@@ -467,30 +467,30 @@ namespace Inet {
         VerifyOrReturnError(nullptr == mListenerSemaphore, CHIP_ERROR_INCORRECT_STATE);
         VerifyOrReturnError(nullptr == mListenerQueue, CHIP_ERROR_INCORRECT_STATE);
 
-        __auto_type listener = nw_listener_create(mParameters);
-        VerifyOrReturnError(nullptr != listener, CHIP_ERROR_INCORRECT_STATE);
+        mListener = nw_listener_create(mParameters);
+        VerifyOrReturnError(nullptr != mListener, CHIP_ERROR_INCORRECT_STATE, ReleaseAll());
 
         mListenerSemaphore = dispatch_semaphore_create(0);
-        VerifyOrReturnError(nullptr != mListenerSemaphore, CHIP_ERROR_NO_MEMORY);
+        VerifyOrReturnError(nullptr != mListenerSemaphore, CHIP_ERROR_NO_MEMORY, ReleaseAll());
 
         mListenerQueue = dispatch_queue_create("inet_dispatch_listener", DISPATCH_QUEUE_CONCURRENT);
-        VerifyOrReturnError(nullptr != mListenerQueue, CHIP_ERROR_NO_MEMORY);
+        VerifyOrReturnError(nullptr != mListenerQueue, CHIP_ERROR_NO_MEMORY, ReleaseAll());
 
-        nw_listener_set_queue(listener, mListenerQueue);
+        nw_listener_set_queue(mListener, mListenerQueue);
 
-        nw_listener_set_new_connection_handler(listener, ^(nw_connection_t connection) {
+        nw_listener_set_new_connection_handler(mListener, ^(nw_connection_t connection) {
             ReleaseConnection();
             StartConnection(connection);
         });
 
         __block CHIP_ERROR err = CHIP_NO_ERROR;
-        nw_listener_set_state_changed_handler(listener, ^(nw_listener_state_t state, nw_error_t error) {
+        nw_listener_set_state_changed_handler(mListener, ^(nw_listener_state_t state, nw_error_t error) {
             DebugPrintListenerState(state);
 
             switch (state) {
             case nw_listener_state_invalid:
                 err = CHIP_ERROR_INCORRECT_STATE;
-                nw_listener_cancel(listener);
+                nw_listener_cancel(mListener);
                 break;
 
             case nw_listener_state_waiting:
@@ -517,11 +517,11 @@ namespace Inet {
             }
         });
 
-        nw_listener_start(listener);
+        nw_listener_start(mListener);
         dispatch_semaphore_wait(mListenerSemaphore, DISPATCH_TIME_FOREVER);
 
-        if (CHIP_NO_ERROR == err) {
-            mListener = listener;
+        if (CHIP_NO_ERROR != err) {
+            mListener = nullptr;
         }
 
         return err;
