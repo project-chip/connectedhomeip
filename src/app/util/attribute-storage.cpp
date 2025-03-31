@@ -264,15 +264,16 @@ uint16_t emberAfGetDynamicIndexFromEndpoint(EndpointId id)
 }
 
 CHIP_ERROR emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, const EmberAfEndpointType * ep,
-    const Span<DataVersion> & dataVersionStorage, Span<const EmberAfDeviceType> deviceTypeList, EndpointId parentEndpointId)
+                                     const Span<DataVersion> & dataVersionStorage, Span<const EmberAfDeviceType> deviceTypeList,
+                                     EndpointId parentEndpointId)
 {
     return emberAfSetDynamicEndpointWithEpUniqueId(index, id, ep, dataVersionStorage, deviceTypeList, CharSpan{}, parentEndpointId);
 }
 
-
 CHIP_ERROR emberAfSetDynamicEndpointWithEpUniqueId(uint16_t index, EndpointId id, const EmberAfEndpointType * ep,
-                                     const Span<DataVersion> & dataVersionStorage, Span<const EmberAfDeviceType> deviceTypeList,
-                                     CharSpan endpointUniqueId, EndpointId parentEndpointId)
+                                                   const Span<DataVersion> & dataVersionStorage,
+                                                   Span<const EmberAfDeviceType> deviceTypeList, CharSpan endpointUniqueId,
+                                                   EndpointId parentEndpointId)
 {
     auto realIndex = index + FIXED_ENDPOINT_COUNT;
 
@@ -1101,8 +1102,7 @@ CHIP_ERROR GetEndpointUniqueIdForEndPoint(EndpointId endpoint, MutableCharSpan &
         return CHIP_ERROR_NOT_FOUND;
     }
 
-    CharSpan epUniqueIdSpan(emAfEndpoints[endpointIndex].endpointUniqueId,
-                                  emAfEndpoints[endpointIndex].endpointUniqueIdSize);
+    CharSpan epUniqueIdSpan(emAfEndpoints[endpointIndex].endpointUniqueId, emAfEndpoints[endpointIndex].endpointUniqueIdSize);
     CopyCharSpanToMutableCharSpan(epUniqueIdSpan, epUniqueIdMutSpan);
 
     return CHIP_NO_ERROR;

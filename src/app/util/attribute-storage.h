@@ -258,9 +258,9 @@ void emberAfEndpointConfigure();
 //          CHIP_ERROR_ENDPOINT_EXISTS      If the EndpointId value passed already exists
 //
 CHIP_ERROR emberAfSetDynamicEndpoint(uint16_t index, chip::EndpointId id, const EmberAfEndpointType * ep,
-    const chip::Span<chip::DataVersion> & dataVersionStorage,
-    chip::Span<const EmberAfDeviceType> deviceTypeList = {},
-    chip::EndpointId parentEndpointId = chip::kInvalidEndpointId);
+                                     const chip::Span<chip::DataVersion> & dataVersionStorage,
+                                     chip::Span<const EmberAfDeviceType> deviceTypeList = {},
+                                     chip::EndpointId parentEndpointId                  = chip::kInvalidEndpointId);
 
 // Register a dynamic endpoint. This involves registering descriptors that describe
 // the composition of the endpoint (encapsulated in the 'ep' argument) as well as providing
@@ -286,9 +286,10 @@ CHIP_ERROR emberAfSetDynamicEndpoint(uint16_t index, chip::EndpointId id, const 
 //          CHIP_ERROR_ENDPOINT_EXISTS      If the EndpointId value passed already exists
 //
 CHIP_ERROR emberAfSetDynamicEndpointWithEpUniqueId(uint16_t index, chip::EndpointId id, const EmberAfEndpointType * ep,
-                                     const chip::Span<chip::DataVersion> & dataVersionStorage,
-                                     chip::Span<const EmberAfDeviceType> deviceTypeList = {}, chip::CharSpan endpointUniqueId = {},
-                                     chip::EndpointId parentEndpointId = chip::kInvalidEndpointId);
+                                                   const chip::Span<chip::DataVersion> & dataVersionStorage,
+                                                   chip::Span<const EmberAfDeviceType> deviceTypeList = {},
+                                                   chip::CharSpan endpointUniqueId                    = {},
+                                                   chip::EndpointId parentEndpointId                  = chip::kInvalidEndpointId);
 chip::EndpointId emberAfClearDynamicEndpoint(uint16_t index);
 uint16_t emberAfGetDynamicIndexFromEndpoint(chip::EndpointId id);
 /**
