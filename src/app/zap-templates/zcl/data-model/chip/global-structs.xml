@@ -55,11 +55,6 @@ Git: 0.7-summer-2025-511-g2b8c413df
     <item fieldId="1" name="Currency" type="CurrencyStruct"/>
   </struct>
 
-  <struct name="SuppliedAttributionData" apiMaturity="provisional" isFabricScoped="true">
-    <item fieldId="0" name="ContextInformation" type="enum8"/>
-    <item fieldId="1" name="SourceContext" type="int32u" optional="true"/>
-  </struct>
-
   <struct name="TestGlobalStruct">
     <item fieldId="0" name="Name" type="char_string" length="128" isNullable="false" optional="false"/>
     <item fieldId="1" name="MyBitmap" type="TestGlobalBitmap" isNullable="true" optional="false"/>
