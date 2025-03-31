@@ -260,7 +260,7 @@ executable("darwin-framework-tool") {
   # TODO: this is WRONG however the darwin framework tool seems to manually
   #       include files instead of depending on them and does not include
   #       appropriate headers.
-  check_includes=false
+  check_includes = false
 
   deps = [
     ":build-darwin-framework",
