@@ -41,8 +41,9 @@ namespace app {
 namespace Clusters {
 namespace CameraAvSettingsUserLevelManagement {
 
-CameraAvSettingsUserLevelMgmtServer::CameraAvSettingsUserLevelMgmtServer(
-    EndpointId endpointId, Delegate * delegate, BitFlags<Feature> aFeature, const BitFlags<OptionalAttributes> aOptionalAttrs) :
+CameraAvSettingsUserLevelMgmtServer::CameraAvSettingsUserLevelMgmtServer(EndpointId endpointId, Delegate * delegate,
+                                                                         BitFlags<Feature> aFeature,
+                                                                         const BitFlags<OptionalAttributes> aOptionalAttrs) :
     AttributeAccessInterface(MakeOptional(endpointId), CameraAvSettingsUserLevelManagement::Id),
     CommandHandlerInterface(MakeOptional(endpointId), CameraAvSettingsUserLevelManagement::Id), mDelegate(delegate),
     mEndpointId(endpointId), mFeature(aFeature), mOptionalAttrs(aOptionalAttrs)
@@ -185,7 +186,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::setMaxPresets(uint8_t aMaxPreset
 
 CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::setTiltMin(int16_t aTiltMin)
 {
-    if ((aTiltMin < kMinTiltValue) || (aTiltMin > kMaxTiltValue-1) || (aTiltMin > mTiltMax))
+    if ((aTiltMin < kMinTiltValue) || (aTiltMin > kMaxTiltValue - 1) || (aTiltMin > mTiltMax))
     {
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
@@ -198,7 +199,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::setTiltMin(int16_t aTiltMin)
 
 CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::setTiltMax(int16_t aTiltMax)
 {
-    if ((aTiltMax > kMaxTiltValue) || (aTiltMax < kMinTiltValue+1) || (aTiltMax < mTiltMin))
+    if ((aTiltMax > kMaxTiltValue) || (aTiltMax < kMinTiltValue + 1) || (aTiltMax < mTiltMin))
     {
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
@@ -211,7 +212,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::setTiltMax(int16_t aTiltMax)
 
 CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::setPanMin(int16_t aPanMin)
 {
-    if ((aPanMin < kMinPanValue) || (aPanMin > kMaxPanValue-1) || (aPanMin > mPanMax))
+    if ((aPanMin < kMinPanValue) || (aPanMin > kMaxPanValue - 1) || (aPanMin > mPanMax))
     {
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
@@ -224,7 +225,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::setPanMin(int16_t aPanMin)
 
 CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::setPanMax(int16_t aPanMax)
 {
-    if ((aPanMax > kMaxPanValue) || (aPanMax < kMinPanValue+1) || (aPanMax < mPanMin))
+    if ((aPanMax > kMaxPanValue) || (aPanMax < kMinPanValue + 1) || (aPanMax < mPanMin))
     {
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
@@ -237,7 +238,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::setPanMax(int16_t aPanMax)
 
 CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::setZoomMax(int8_t aZoomMax)
 {
-    if ((aZoomMax > kMaxZoomValue) || (aZoomMax < kMinZoomValue+1))
+    if ((aZoomMax > kMaxZoomValue) || (aZoomMax < kMinZoomValue + 1))
     {
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
@@ -299,7 +300,6 @@ void CameraAvSettingsUserLevelMgmtServer::removeMoveCapableVideoStreamID(uint16_
     }
 
     mDptzRelativeMove.erase(it);
-
 }
 
 bool CameraAvSettingsUserLevelMgmtServer::knownVideoStreamID(uint16_t videoStreamID)
@@ -308,9 +308,8 @@ bool CameraAvSettingsUserLevelMgmtServer::knownVideoStreamID(uint16_t videoStrea
     //
     auto it = std::find(mDptzRelativeMove.begin(), mDptzRelativeMove.end(), videoStreamID);
 
-    return (it == mDptzRelativeMove.end()? false: true);
+    return (it == mDptzRelativeMove.end() ? false : true);
 }
-
 
 // Helper function for setting the next preset ID to use
 //
@@ -889,7 +888,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRemovePreset(HandlerContext 
 
     // Verify the provided presetID is within spec limits
     //
-    if (presetToRemove > mMaxPresets-1)
+    if (presetToRemove > mMaxPresets - 1)
     {
         ChipLogError(Zcl, "Preset to remove is out of range");
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
@@ -928,8 +927,8 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRemovePreset(HandlerContext 
 void CameraAvSettingsUserLevelMgmtServer::HandleDPTZSetViewport(HandlerContext & ctx,
                                                                 const Commands::DPTZSetViewport::DecodableType & commandData)
 {
-    uint16_t videoStreamID = commandData.videoStreamID;
-    Structs::ViewportStruct::Type  viewport = commandData.viewport;
+    uint16_t videoStreamID                 = commandData.videoStreamID;
+    Structs::ViewportStruct::Type viewport = commandData.viewport;
 
     // Is this a video stream ID of which we have already been informed?
     // If not, ask the delegate if it's ok.  If yes, add to our set and proceed, if not, fail.

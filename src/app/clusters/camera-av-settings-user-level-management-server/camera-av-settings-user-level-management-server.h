@@ -34,12 +34,12 @@ using chip::Protocols::InteractionModel::Status;
 using MPTZStructType       = Structs::MPTZStruct::Type;
 using MPTZPresetStructType = Structs::MPTZPresetStruct::Type;
 
-constexpr int16_t kMinPanValue   = -180;
-constexpr int16_t kMaxPanValue   = 180;
-constexpr int16_t kMinTiltValue  = -180;
-constexpr int16_t kMaxTiltValue  = 180;
-constexpr int16_t kMinZoomValue  = 1;
-constexpr uint8_t kMaxZoomValue  = 100;
+constexpr int16_t kMinPanValue  = -180;
+constexpr int16_t kMaxPanValue  = 180;
+constexpr int16_t kMinTiltValue = -180;
+constexpr int16_t kMaxTiltValue = 180;
+constexpr int16_t kMinZoomValue = 1;
+constexpr uint8_t kMaxZoomValue = 100;
 
 class Delegate;
 
@@ -286,12 +286,12 @@ public:
                                                                  Optional<int8_t> zoom) = 0;
 
     virtual Protocols::InteractionModel::Status MPTZMoveToPreset(uint8_t preset, Optional<int16_t> pan, Optional<int16_t> tilt,
-                                                                 Optional<int8_t> zoom) = 0;
-    virtual Protocols::InteractionModel::Status MPTZSavePreset(uint8_t preset)          = 0;
-    virtual Protocols::InteractionModel::Status MPTZRemovePreset(uint8_t preset)        = 0;
+                                                                 Optional<int8_t> zoom)                                         = 0;
+    virtual Protocols::InteractionModel::Status MPTZSavePreset(uint8_t preset)                                                  = 0;
+    virtual Protocols::InteractionModel::Status MPTZRemovePreset(uint8_t preset)                                                = 0;
     virtual Protocols::InteractionModel::Status DPTZSetViewport(uint16_t videoStreamID, Structs::ViewportStruct::Type viewport) = 0;
     virtual Protocols::InteractionModel::Status DPTZRelativeMove(uint16_t videoStreamID, Optional<int16_t> deltaX,
-                                                                 Optional<int16_t> deltaY, Optional<int8_t> zoomDelta) = 0;
+                                                                 Optional<int16_t> deltaY, Optional<int8_t> zoomDelta)          = 0;
 
 private:
     friend class CameraAvSettingsUserLevelMgmtServer;

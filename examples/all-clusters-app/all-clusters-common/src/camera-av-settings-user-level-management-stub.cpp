@@ -124,11 +124,11 @@ void emberAfCameraAvSettingsUserLevelManagementClusterInitCallback(chip::Endpoin
 {
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
     VerifyOrDie(gDelegate == nullptr && gAVSettingsUserLevelManagementCluster == nullptr);
-    const int16_t appPanMin     = -90;
-    const int16_t appPanMax     = 90;
-    const int16_t appTiltMin    = -45;
-    const int16_t appTiltMax    = 45;
-    const int8_t appZoomMax     = 75;
+    const int16_t appPanMin  = -90;
+    const int16_t appPanMax  = 90;
+    const int16_t appTiltMin = -45;
+    const int16_t appTiltMax = 45;
+    const int8_t appZoomMax  = 75;
 
     gDelegate = new AVSettingsUserLevelManagementDelegate;
     BitFlags<CameraAvSettingsUserLevelManagement::Feature, uint32_t> avsumFeatures(
@@ -147,8 +147,8 @@ void emberAfCameraAvSettingsUserLevelManagementClusterInitCallback(chip::Endpoin
         CameraAvSettingsUserLevelManagement::OptionalAttributes::kPanMin,
         CameraAvSettingsUserLevelManagement::OptionalAttributes::kPanMax);
 
-    gAVSettingsUserLevelManagementCluster = new CameraAvSettingsUserLevelMgmtServer(
-        kEndpointId, gDelegate, avsumFeatures, avsumAttrs);
+    gAVSettingsUserLevelManagementCluster =
+        new CameraAvSettingsUserLevelMgmtServer(kEndpointId, gDelegate, avsumFeatures, avsumAttrs);
     gAVSettingsUserLevelManagementCluster->Init();
 
     // Set app specific limits to pan, tilt, zoom

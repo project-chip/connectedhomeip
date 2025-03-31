@@ -52,8 +52,8 @@ public:
     Protocols::InteractionModel::Status MPTZSavePreset(uint8_t preset) override;
     Protocols::InteractionModel::Status MPTZRemovePreset(uint8_t preset) override;
     Protocols::InteractionModel::Status DPTZSetViewport(uint16_t videoStreamID, Structs::ViewportStruct::Type viewport) override;
-    Protocols::InteractionModel::Status DPTZRelativeMove(uint16_t videoStreamID, Optional<int16_t> deltaX,
-                                                         Optional<int16_t> deltaY, Optional<int8_t> zoomDelta) override;
+    Protocols::InteractionModel::Status DPTZRelativeMove(uint16_t videoStreamID, Optional<int16_t> deltaX, Optional<int16_t> deltaY,
+                                                         Optional<int8_t> zoomDelta) override;
 };
 
 CameraAvSettingsUserLevelMgmtServer * GetInstance();
