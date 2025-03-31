@@ -148,10 +148,10 @@ std::unique_ptr<EcosystemDeviceStruct> EcosystemDeviceStruct::Builder::Build()
         VerifyOrReturnValue(locationId.size() <= kUniqueLocationIdMaxSize, nullptr, ChipLogError(Zcl, "Location id too long"));
     }
 
-    // std::make_unique does not have access to private constructor we workaround with using new
-    std::unique_ptr<EcosystemDeviceStruct> ret{ new EcosystemDeviceStruct(
+    PrivateToken token;
+    std::unique_ptr<EcosystemDeviceStruct> ret = std::make_unique<EcosystemDeviceStruct>(
         std::move(mDeviceName), mDeviceNameLastEditEpochUs, mBridgedEndpoint, mOriginalEndpoint, std::move(mDeviceTypes),
-        std::move(mUniqueLocationIds), mUniqueLocationIdsLastEditEpochUs, mFabricIndex) };
+        std::move(mUniqueLocationIds), mUniqueLocationIdsLastEditEpochUs, mFabricIndex, token);
     mIsAlreadyBuilt = true;
     return ret;
 }
@@ -222,8 +222,9 @@ std::unique_ptr<EcosystemLocationStruct> EcosystemLocationStruct::Builder::Build
         ChipLogError(Zcl, "Location Name must be less than %u bytes", static_cast<uint16_t>(kLocationDescriptorNameMaxSize)));
 
     // std::make_unique does not have access to private constructor we workaround with using new
-    std::unique_ptr<EcosystemLocationStruct> ret{ new EcosystemLocationStruct(std::move(mLocationDescriptor),
-                                                                              mLocationDescriptorLastEditEpochUs) };
+    PrivateToken token;
+    std::unique_ptr<EcosystemLocationStruct> ret =
+        std::make_unique<EcosystemLocationStruct>(std::move(mLocationDescriptor), mLocationDescriptorLastEditEpochUs, token);
     mIsAlreadyBuilt = true;
     return ret;
 }
