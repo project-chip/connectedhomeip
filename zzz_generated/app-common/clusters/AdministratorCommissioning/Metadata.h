@@ -15,53 +15,61 @@ namespace chip {
 namespace app {
 namespace clusters {
 namespace AdministratorCommissioning {
-namespace Metadata {
 
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-
-inline constexpr DataModel::AttributeEntry kWindowStatusEntry = {
+namespace WindowStatus {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = AdministratorCommissioning::Attributes::WindowStatus::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kAdminFabricIndexEntry = {
+} // namespace WindowStatus
+namespace AdminFabricIndex {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = AdministratorCommissioning::Attributes::AdminFabricIndex::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kAdminVendorIdEntry = {
+} // namespace AdminFabricIndex
+namespace AdminVendorId {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = AdministratorCommissioning::Attributes::AdminVendorId::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
+} // namespace AdminVendorId
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kOpenCommissioningWindowEntry = {
+namespace OpenCommissioningWindow {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = AdministratorCommissioning::Commands::OpenCommissioningWindow::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
     .invokePrivilege = Access::Privilege::kAdminister,
 };
-inline constexpr DataModel::AcceptedCommandEntry kOpenBasicCommissioningWindowEntry = {
+} // namespace OpenCommissioningWindow
+namespace OpenBasicCommissioningWindow {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
     .invokePrivilege = Access::Privilege::kAdminister,
 };
-inline constexpr DataModel::AcceptedCommandEntry kRevokeCommissioningEntry = {
+} // namespace OpenBasicCommissioningWindow
+namespace RevokeCommissioning {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = AdministratorCommissioning::Commands::RevokeCommissioning::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
     .invokePrivilege = Access::Privilege::kAdminister,
 };
+} // namespace RevokeCommissioning
 
 } // namespace Commands
-} // namespace Metadata
 } // namespace AdministratorCommissioning
 } // namespace clusters
 } // namespace app

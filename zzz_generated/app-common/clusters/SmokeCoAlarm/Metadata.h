@@ -15,103 +15,127 @@ namespace chip {
 namespace app {
 namespace clusters {
 namespace SmokeCoAlarm {
-namespace Metadata {
 
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-
-inline constexpr DataModel::AttributeEntry kExpressedStateEntry = {
+namespace ExpressedState {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = SmokeCoAlarm::Attributes::ExpressedState::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kSmokeStateEntry = {
+} // namespace ExpressedState
+namespace SmokeState {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = SmokeCoAlarm::Attributes::SmokeState::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kCOStateEntry = {
+} // namespace SmokeState
+namespace COState {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = SmokeCoAlarm::Attributes::COState::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kBatteryAlertEntry = {
+} // namespace COState
+namespace BatteryAlert {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = SmokeCoAlarm::Attributes::BatteryAlert::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kDeviceMutedEntry = {
+} // namespace BatteryAlert
+namespace DeviceMuted {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = SmokeCoAlarm::Attributes::DeviceMuted::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kTestInProgressEntry = {
+} // namespace DeviceMuted
+namespace TestInProgress {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = SmokeCoAlarm::Attributes::TestInProgress::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kHardwareFaultAlertEntry = {
+} // namespace TestInProgress
+namespace HardwareFaultAlert {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = SmokeCoAlarm::Attributes::HardwareFaultAlert::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kEndOfServiceAlertEntry = {
+} // namespace HardwareFaultAlert
+namespace EndOfServiceAlert {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = SmokeCoAlarm::Attributes::EndOfServiceAlert::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kInterconnectSmokeAlarmEntry = {
+} // namespace EndOfServiceAlert
+namespace InterconnectSmokeAlarm {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = SmokeCoAlarm::Attributes::InterconnectSmokeAlarm::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kInterconnectCOAlarmEntry = {
+} // namespace InterconnectSmokeAlarm
+namespace InterconnectCOAlarm {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = SmokeCoAlarm::Attributes::InterconnectCOAlarm::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kContaminationStateEntry = {
+} // namespace InterconnectCOAlarm
+namespace ContaminationState {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = SmokeCoAlarm::Attributes::ContaminationState::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kSmokeSensitivityLevelEntry = {
+} // namespace ContaminationState
+namespace SmokeSensitivityLevel {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = SmokeCoAlarm::Attributes::SmokeSensitivityLevel::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
-inline constexpr DataModel::AttributeEntry kExpiryDateEntry = {
+} // namespace SmokeSensitivityLevel
+namespace ExpiryDate {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = SmokeCoAlarm::Attributes::ExpiryDate::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
+} // namespace ExpiryDate
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kSelfTestRequestEntry = {
+namespace SelfTestRequest {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = SmokeCoAlarm::Commands::SelfTestRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
+} // namespace SelfTestRequest
 
 } // namespace Commands
-} // namespace Metadata
 } // namespace SmokeCoAlarm
 } // namespace clusters
 } // namespace app

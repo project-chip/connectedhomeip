@@ -15,121 +15,153 @@ namespace chip {
 namespace app {
 namespace clusters {
 namespace NetworkCommissioning {
-namespace Metadata {
 
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-
-inline constexpr DataModel::AttributeEntry kMaxNetworksEntry = {
+namespace MaxNetworks {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = NetworkCommissioning::Attributes::MaxNetworks::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kAdminister,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kNetworksEntry = {
+} // namespace MaxNetworks
+namespace Networks {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = NetworkCommissioning::Attributes::Networks::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kAdminister,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kScanMaxTimeSecondsEntry = {
+} // namespace Networks
+namespace ScanMaxTimeSeconds {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = NetworkCommissioning::Attributes::ScanMaxTimeSeconds::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kConnectMaxTimeSecondsEntry = {
+} // namespace ScanMaxTimeSeconds
+namespace ConnectMaxTimeSeconds {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = NetworkCommissioning::Attributes::ConnectMaxTimeSeconds::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kInterfaceEnabledEntry = {
+} // namespace ConnectMaxTimeSeconds
+namespace InterfaceEnabled {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = NetworkCommissioning::Attributes::InterfaceEnabled::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kAdminister,
 };
-inline constexpr DataModel::AttributeEntry kLastNetworkingStatusEntry = {
+} // namespace InterfaceEnabled
+namespace LastNetworkingStatus {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = NetworkCommissioning::Attributes::LastNetworkingStatus::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kAdminister,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kLastNetworkIDEntry = {
+} // namespace LastNetworkingStatus
+namespace LastNetworkID {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = NetworkCommissioning::Attributes::LastNetworkID::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kAdminister,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kLastConnectErrorValueEntry = {
+} // namespace LastNetworkID
+namespace LastConnectErrorValue {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = NetworkCommissioning::Attributes::LastConnectErrorValue::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kAdminister,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kSupportedWiFiBandsEntry = {
+} // namespace LastConnectErrorValue
+namespace SupportedWiFiBands {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = NetworkCommissioning::Attributes::SupportedWiFiBands::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kSupportedThreadFeaturesEntry = {
+} // namespace SupportedWiFiBands
+namespace SupportedThreadFeatures {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = NetworkCommissioning::Attributes::SupportedThreadFeatures::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kThreadVersionEntry = {
+} // namespace SupportedThreadFeatures
+namespace ThreadVersion {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = NetworkCommissioning::Attributes::ThreadVersion::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
+} // namespace ThreadVersion
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kScanNetworksEntry = {
+namespace ScanNetworks {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = NetworkCommissioning::Commands::ScanNetworks::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };
-inline constexpr DataModel::AcceptedCommandEntry kAddOrUpdateWiFiNetworkEntry = {
+} // namespace ScanNetworks
+namespace AddOrUpdateWiFiNetwork {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = NetworkCommissioning::Commands::AddOrUpdateWiFiNetwork::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };
-inline constexpr DataModel::AcceptedCommandEntry kAddOrUpdateThreadNetworkEntry = {
+} // namespace AddOrUpdateWiFiNetwork
+namespace AddOrUpdateThreadNetwork {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = NetworkCommissioning::Commands::AddOrUpdateThreadNetwork::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };
-inline constexpr DataModel::AcceptedCommandEntry kRemoveNetworkEntry = {
+} // namespace AddOrUpdateThreadNetwork
+namespace RemoveNetwork {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = NetworkCommissioning::Commands::RemoveNetwork::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };
-inline constexpr DataModel::AcceptedCommandEntry kConnectNetworkEntry = {
+} // namespace RemoveNetwork
+namespace ConnectNetwork {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = NetworkCommissioning::Commands::ConnectNetwork::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };
-inline constexpr DataModel::AcceptedCommandEntry kReorderNetworkEntry = {
+} // namespace ConnectNetwork
+namespace ReorderNetwork {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = NetworkCommissioning::Commands::ReorderNetwork::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };
-inline constexpr DataModel::AcceptedCommandEntry kQueryIdentityEntry = {
+} // namespace ReorderNetwork
+namespace QueryIdentity {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = NetworkCommissioning::Commands::QueryIdentity::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };
+} // namespace QueryIdentity
 
 } // namespace Commands
-} // namespace Metadata
 } // namespace NetworkCommissioning
 } // namespace clusters
 } // namespace app

@@ -15,71 +15,86 @@ namespace chip {
 namespace app {
 namespace clusters {
 namespace PressureMeasurement {
-namespace Metadata {
 
 inline constexpr uint32_t kRevision = 3;
 
 namespace Attributes {
-
-inline constexpr DataModel::AttributeEntry kMeasuredValueEntry = {
+namespace MeasuredValue {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = PressureMeasurement::Attributes::MeasuredValue::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kMinMeasuredValueEntry = {
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = PressureMeasurement::Attributes::MinMeasuredValue::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kMaxMeasuredValueEntry = {
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = PressureMeasurement::Attributes::MaxMeasuredValue::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kToleranceEntry = {
+} // namespace MaxMeasuredValue
+namespace Tolerance {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = PressureMeasurement::Attributes::Tolerance::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kScaledValueEntry = {
+} // namespace Tolerance
+namespace ScaledValue {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = PressureMeasurement::Attributes::ScaledValue::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kMinScaledValueEntry = {
+} // namespace ScaledValue
+namespace MinScaledValue {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = PressureMeasurement::Attributes::MinScaledValue::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kMaxScaledValueEntry = {
+} // namespace MinScaledValue
+namespace MaxScaledValue {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = PressureMeasurement::Attributes::MaxScaledValue::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kScaledToleranceEntry = {
+} // namespace MaxScaledValue
+namespace ScaledTolerance {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = PressureMeasurement::Attributes::ScaledTolerance::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kScaleEntry = {
+} // namespace ScaledTolerance
+namespace Scale {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = PressureMeasurement::Attributes::Scale::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
+} // namespace Scale
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-} // namespace Metadata
 } // namespace PressureMeasurement
 } // namespace clusters
 } // namespace app

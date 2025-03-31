@@ -15,67 +15,79 @@ namespace chip {
 namespace app {
 namespace clusters {
 namespace AccessControl {
-namespace Metadata {
 
 inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
-
-inline constexpr DataModel::AttributeEntry kAclEntry = {
+namespace Acl {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = AccessControl::Attributes::Acl::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kAdminister,
     .writePrivilege = Access::Privilege::kAdminister,
 };
-inline constexpr DataModel::AttributeEntry kExtensionEntry = {
+} // namespace Acl
+namespace Extension {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = AccessControl::Attributes::Extension::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kAdminister,
     .writePrivilege = Access::Privilege::kAdminister,
 };
-inline constexpr DataModel::AttributeEntry kSubjectsPerAccessControlEntryEntry = {
+} // namespace Extension
+namespace SubjectsPerAccessControlEntry {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = AccessControl::Attributes::SubjectsPerAccessControlEntry::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kTargetsPerAccessControlEntryEntry = {
+} // namespace SubjectsPerAccessControlEntry
+namespace TargetsPerAccessControlEntry {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = AccessControl::Attributes::TargetsPerAccessControlEntry::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kAccessControlEntriesPerFabricEntry = {
+} // namespace TargetsPerAccessControlEntry
+namespace AccessControlEntriesPerFabric {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = AccessControl::Attributes::AccessControlEntriesPerFabric::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kCommissioningARLEntry = {
+} // namespace AccessControlEntriesPerFabric
+namespace CommissioningARL {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = AccessControl::Attributes::CommissioningARL::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kArlEntry = {
+} // namespace CommissioningARL
+namespace Arl {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = AccessControl::Attributes::Arl::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
+} // namespace Arl
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kReviewFabricRestrictionsEntry = {
+namespace ReviewFabricRestrictions {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = AccessControl::Commands::ReviewFabricRestrictions::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kAdminister,
 };
+} // namespace ReviewFabricRestrictions
 
 } // namespace Commands
-} // namespace Metadata
 } // namespace AccessControl
 } // namespace clusters
 } // namespace app

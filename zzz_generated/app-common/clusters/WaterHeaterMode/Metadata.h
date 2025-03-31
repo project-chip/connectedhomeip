@@ -15,37 +15,39 @@ namespace chip {
 namespace app {
 namespace clusters {
 namespace WaterHeaterMode {
-namespace Metadata {
 
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-
-inline constexpr DataModel::AttributeEntry kSupportedModesEntry = {
+namespace SupportedModes {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = WaterHeaterMode::Attributes::SupportedModes::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kCurrentModeEntry = {
+} // namespace SupportedModes
+namespace CurrentMode {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = WaterHeaterMode::Attributes::CurrentMode::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
+} // namespace CurrentMode
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kChangeToModeEntry = {
+namespace ChangeToMode {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = WaterHeaterMode::Commands::ChangeToMode::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
+} // namespace ChangeToMode
 
 } // namespace Commands
-} // namespace Metadata
 } // namespace WaterHeaterMode
 } // namespace clusters
 } // namespace app

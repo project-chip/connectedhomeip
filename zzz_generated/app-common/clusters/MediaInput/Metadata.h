@@ -15,52 +15,60 @@ namespace chip {
 namespace app {
 namespace clusters {
 namespace MediaInput {
-namespace Metadata {
 
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-
-inline constexpr DataModel::AttributeEntry kInputListEntry = {
+namespace InputList {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = MediaInput::Attributes::InputList::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kCurrentInputEntry = {
+} // namespace InputList
+namespace CurrentInput {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = MediaInput::Attributes::CurrentInput::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
+} // namespace CurrentInput
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kSelectInputEntry = {
+namespace SelectInput {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = MediaInput::Commands::SelectInput::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
-inline constexpr DataModel::AcceptedCommandEntry kShowInputStatusEntry = {
+} // namespace SelectInput
+namespace ShowInputStatus {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = MediaInput::Commands::ShowInputStatus::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
-inline constexpr DataModel::AcceptedCommandEntry kHideInputStatusEntry = {
+} // namespace ShowInputStatus
+namespace HideInputStatus {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = MediaInput::Commands::HideInputStatus::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
-inline constexpr DataModel::AcceptedCommandEntry kRenameInputEntry = {
+} // namespace HideInputStatus
+namespace RenameInput {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = MediaInput::Commands::RenameInput::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
+} // namespace RenameInput
 
 } // namespace Commands
-} // namespace Metadata
 } // namespace MediaInput
 } // namespace clusters
 } // namespace app

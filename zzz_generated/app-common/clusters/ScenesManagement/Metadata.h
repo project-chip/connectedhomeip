@@ -15,72 +15,88 @@ namespace chip {
 namespace app {
 namespace clusters {
 namespace ScenesManagement {
-namespace Metadata {
 
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-
-inline constexpr DataModel::AttributeEntry kSceneTableSizeEntry = {
+namespace SceneTableSize {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ScenesManagement::Attributes::SceneTableSize::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kFabricSceneInfoEntry = {
+} // namespace SceneTableSize
+namespace FabricSceneInfo {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ScenesManagement::Attributes::FabricSceneInfo::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
+} // namespace FabricSceneInfo
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kAddSceneEntry = {
+namespace AddScene {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = ScenesManagement::Commands::AddScene::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kManage,
 };
-inline constexpr DataModel::AcceptedCommandEntry kViewSceneEntry = {
+} // namespace AddScene
+namespace ViewScene {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = ScenesManagement::Commands::ViewScene::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kOperate,
 };
-inline constexpr DataModel::AcceptedCommandEntry kRemoveSceneEntry = {
+} // namespace ViewScene
+namespace RemoveScene {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = ScenesManagement::Commands::RemoveScene::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kManage,
 };
-inline constexpr DataModel::AcceptedCommandEntry kRemoveAllScenesEntry = {
+} // namespace RemoveScene
+namespace RemoveAllScenes {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = ScenesManagement::Commands::RemoveAllScenes::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kManage,
 };
-inline constexpr DataModel::AcceptedCommandEntry kStoreSceneEntry = {
+} // namespace RemoveAllScenes
+namespace StoreScene {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = ScenesManagement::Commands::StoreScene::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kManage,
 };
-inline constexpr DataModel::AcceptedCommandEntry kRecallSceneEntry = {
+} // namespace StoreScene
+namespace RecallScene {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = ScenesManagement::Commands::RecallScene::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kOperate,
 };
-inline constexpr DataModel::AcceptedCommandEntry kGetSceneMembershipEntry = {
+} // namespace RecallScene
+namespace GetSceneMembership {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = ScenesManagement::Commands::GetSceneMembership::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kOperate,
 };
-inline constexpr DataModel::AcceptedCommandEntry kCopySceneEntry = {
+} // namespace GetSceneMembership
+namespace CopyScene {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = ScenesManagement::Commands::CopyScene::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kManage,
 };
+} // namespace CopyScene
 
 } // namespace Commands
-} // namespace Metadata
 } // namespace ScenesManagement
 } // namespace clusters
 } // namespace app

@@ -15,41 +15,46 @@ namespace chip {
 namespace app {
 namespace clusters {
 namespace FlowMeasurement {
-namespace Metadata {
 
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-
-inline constexpr DataModel::AttributeEntry kMeasuredValueEntry = {
+namespace MeasuredValue {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = FlowMeasurement::Attributes::MeasuredValue::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kMinMeasuredValueEntry = {
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = FlowMeasurement::Attributes::MinMeasuredValue::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kMaxMeasuredValueEntry = {
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = FlowMeasurement::Attributes::MaxMeasuredValue::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kToleranceEntry = {
+} // namespace MaxMeasuredValue
+namespace Tolerance {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = FlowMeasurement::Attributes::Tolerance::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
+} // namespace Tolerance
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-} // namespace Metadata
 } // namespace FlowMeasurement
 } // namespace clusters
 } // namespace app

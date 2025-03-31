@@ -15,14 +15,12 @@ namespace chip {
 namespace app {
 namespace clusters {
 namespace ProxyValid {
-namespace Metadata {
 
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {} // namespace Attributes
 
 namespace Commands {} // namespace Commands
-} // namespace Metadata
 } // namespace ProxyValid
 } // namespace clusters
 } // namespace app

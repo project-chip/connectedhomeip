@@ -15,23 +15,22 @@ namespace chip {
 namespace app {
 namespace clusters {
 namespace PowerSourceConfiguration {
-namespace Metadata {
 
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-
-inline constexpr DataModel::AttributeEntry kSourcesEntry = {
+namespace Sources {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = PowerSourceConfiguration::Attributes::Sources::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
+} // namespace Sources
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-} // namespace Metadata
 } // namespace PowerSourceConfiguration
 } // namespace clusters
 } // namespace app

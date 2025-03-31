@@ -15,35 +15,38 @@ namespace chip {
 namespace app {
 namespace clusters {
 namespace Switch {
-namespace Metadata {
 
 inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
-
-inline constexpr DataModel::AttributeEntry kNumberOfPositionsEntry = {
+namespace NumberOfPositions {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = Switch::Attributes::NumberOfPositions::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kCurrentPositionEntry = {
+} // namespace NumberOfPositions
+namespace CurrentPosition {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = Switch::Attributes::CurrentPosition::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kMultiPressMaxEntry = {
+} // namespace CurrentPosition
+namespace MultiPressMax {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = Switch::Attributes::MultiPressMax::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
+} // namespace MultiPressMax
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-} // namespace Metadata
 } // namespace Switch
 } // namespace clusters
 } // namespace app

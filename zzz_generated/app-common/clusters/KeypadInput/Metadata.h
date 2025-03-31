@@ -15,22 +15,21 @@ namespace chip {
 namespace app {
 namespace clusters {
 namespace KeypadInput {
-namespace Metadata {
 
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {} // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kSendKeyEntry = {
+namespace SendKey {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = KeypadInput::Commands::SendKey::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
+} // namespace SendKey
 
 } // namespace Commands
-} // namespace Metadata
 } // namespace KeypadInput
 } // namespace clusters
 } // namespace app

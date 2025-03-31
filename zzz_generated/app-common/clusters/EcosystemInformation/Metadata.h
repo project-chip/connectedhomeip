@@ -15,29 +15,30 @@ namespace chip {
 namespace app {
 namespace clusters {
 namespace EcosystemInformation {
-namespace Metadata {
 
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-
-inline constexpr DataModel::AttributeEntry kDeviceDirectoryEntry = {
+namespace DeviceDirectory {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = EcosystemInformation::Attributes::DeviceDirectory::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kManage,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kLocationDirectoryEntry = {
+} // namespace DeviceDirectory
+namespace LocationDirectory {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = EcosystemInformation::Attributes::LocationDirectory::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kManage,
     .writePrivilege = std::nullopt,
 };
+} // namespace LocationDirectory
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-} // namespace Metadata
 } // namespace EcosystemInformation
 } // namespace clusters
 } // namespace app

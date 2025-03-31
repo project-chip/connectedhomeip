@@ -15,123 +15,155 @@ namespace chip {
 namespace app {
 namespace clusters {
 namespace TimeSynchronization {
-namespace Metadata {
 
 inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
-
-inline constexpr DataModel::AttributeEntry kUTCTimeEntry = {
+namespace UTCTime {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = TimeSynchronization::Attributes::UTCTime::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kGranularityEntry = {
+} // namespace UTCTime
+namespace Granularity {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = TimeSynchronization::Attributes::Granularity::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kTimeSourceEntry = {
+} // namespace Granularity
+namespace TimeSource {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = TimeSynchronization::Attributes::TimeSource::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kTrustedTimeSourceEntry = {
+} // namespace TimeSource
+namespace TrustedTimeSource {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = TimeSynchronization::Attributes::TrustedTimeSource::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kDefaultNTPEntry = {
+} // namespace TrustedTimeSource
+namespace DefaultNTP {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = TimeSynchronization::Attributes::DefaultNTP::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kTimeZoneEntry = {
+} // namespace DefaultNTP
+namespace TimeZone {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = TimeSynchronization::Attributes::TimeZone::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kDSTOffsetEntry = {
+} // namespace TimeZone
+namespace DSTOffset {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = TimeSynchronization::Attributes::DSTOffset::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kLocalTimeEntry = {
+} // namespace DSTOffset
+namespace LocalTime {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = TimeSynchronization::Attributes::LocalTime::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kTimeZoneDatabaseEntry = {
+} // namespace LocalTime
+namespace TimeZoneDatabase {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = TimeSynchronization::Attributes::TimeZoneDatabase::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kNTPServerAvailableEntry = {
+} // namespace TimeZoneDatabase
+namespace NTPServerAvailable {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = TimeSynchronization::Attributes::NTPServerAvailable::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kTimeZoneListMaxSizeEntry = {
+} // namespace NTPServerAvailable
+namespace TimeZoneListMaxSize {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = TimeSynchronization::Attributes::TimeZoneListMaxSize::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kDSTOffsetListMaxSizeEntry = {
+} // namespace TimeZoneListMaxSize
+namespace DSTOffsetListMaxSize {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = TimeSynchronization::Attributes::DSTOffsetListMaxSize::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kSupportsDNSResolveEntry = {
+} // namespace DSTOffsetListMaxSize
+namespace SupportsDNSResolve {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = TimeSynchronization::Attributes::SupportsDNSResolve::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
+} // namespace SupportsDNSResolve
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kSetUTCTimeEntry = {
+namespace SetUTCTime {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = TimeSynchronization::Commands::SetUTCTime::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };
-inline constexpr DataModel::AcceptedCommandEntry kSetTrustedTimeSourceEntry = {
+} // namespace SetUTCTime
+namespace SetTrustedTimeSource {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = TimeSynchronization::Commands::SetTrustedTimeSource::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kAdminister,
 };
-inline constexpr DataModel::AcceptedCommandEntry kSetTimeZoneEntry = {
+} // namespace SetTrustedTimeSource
+namespace SetTimeZone {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = TimeSynchronization::Commands::SetTimeZone::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
-inline constexpr DataModel::AcceptedCommandEntry kSetDSTOffsetEntry = {
+} // namespace SetTimeZone
+namespace SetDSTOffset {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = TimeSynchronization::Commands::SetDSTOffset::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
-inline constexpr DataModel::AcceptedCommandEntry kSetDefaultNTPEntry = {
+} // namespace SetDSTOffset
+namespace SetDefaultNTP {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = TimeSynchronization::Commands::SetDefaultNTP::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kAdminister,
 };
+} // namespace SetDefaultNTP
 
 } // namespace Commands
-} // namespace Metadata
 } // namespace TimeSynchronization
 } // namespace clusters
 } // namespace app

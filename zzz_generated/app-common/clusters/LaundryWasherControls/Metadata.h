@@ -15,41 +15,46 @@ namespace chip {
 namespace app {
 namespace clusters {
 namespace LaundryWasherControls {
-namespace Metadata {
 
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-
-inline constexpr DataModel::AttributeEntry kSpinSpeedsEntry = {
+namespace SpinSpeeds {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = LaundryWasherControls::Attributes::SpinSpeeds::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kSpinSpeedCurrentEntry = {
+} // namespace SpinSpeeds
+namespace SpinSpeedCurrent {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = LaundryWasherControls::Attributes::SpinSpeedCurrent::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
-inline constexpr DataModel::AttributeEntry kNumberOfRinsesEntry = {
+} // namespace SpinSpeedCurrent
+namespace NumberOfRinses {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = LaundryWasherControls::Attributes::NumberOfRinses::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
-inline constexpr DataModel::AttributeEntry kSupportedRinsesEntry = {
+} // namespace NumberOfRinses
+namespace SupportedRinses {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = LaundryWasherControls::Attributes::SupportedRinses::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
+} // namespace SupportedRinses
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-} // namespace Metadata
 } // namespace LaundryWasherControls
 } // namespace clusters
 } // namespace app

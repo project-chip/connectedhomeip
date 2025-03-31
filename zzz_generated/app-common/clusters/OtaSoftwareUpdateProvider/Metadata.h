@@ -15,32 +15,35 @@ namespace chip {
 namespace app {
 namespace clusters {
 namespace OtaSoftwareUpdateProvider {
-namespace Metadata {
 
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {} // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kQueryImageEntry = {
+namespace QueryImage {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = OtaSoftwareUpdateProvider::Commands::QueryImage::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
-inline constexpr DataModel::AcceptedCommandEntry kApplyUpdateRequestEntry = {
+} // namespace QueryImage
+namespace ApplyUpdateRequest {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
-inline constexpr DataModel::AcceptedCommandEntry kNotifyUpdateAppliedEntry = {
+} // namespace ApplyUpdateRequest
+namespace NotifyUpdateApplied {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
+} // namespace NotifyUpdateApplied
 
 } // namespace Commands
-} // namespace Metadata
 } // namespace OtaSoftwareUpdateProvider
 } // namespace clusters
 } // namespace app

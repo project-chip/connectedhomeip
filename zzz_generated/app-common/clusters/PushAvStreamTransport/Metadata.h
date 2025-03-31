@@ -15,68 +15,82 @@ namespace chip {
 namespace app {
 namespace clusters {
 namespace PushAvStreamTransport {
-namespace Metadata {
 
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-
-inline constexpr DataModel::AttributeEntry kSupportedContainerFormatsEntry = {
+namespace SupportedContainerFormats {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = PushAvStreamTransport::Attributes::SupportedContainerFormats::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kSupportedIngestMethodsEntry = {
+} // namespace SupportedContainerFormats
+namespace SupportedIngestMethods {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = PushAvStreamTransport::Attributes::SupportedIngestMethods::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kCurrentConnectionsEntry = {
+} // namespace SupportedIngestMethods
+namespace CurrentConnections {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = PushAvStreamTransport::Attributes::CurrentConnections::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
+} // namespace CurrentConnections
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kAllocatePushTransportEntry = {
+namespace AllocatePushTransport {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = PushAvStreamTransport::Commands::AllocatePushTransport::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
-inline constexpr DataModel::AcceptedCommandEntry kDeallocatePushTransportEntry = {
+} // namespace AllocatePushTransport
+namespace DeallocatePushTransport {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = PushAvStreamTransport::Commands::DeallocatePushTransport::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
-inline constexpr DataModel::AcceptedCommandEntry kModifyPushTransportEntry = {
+} // namespace DeallocatePushTransport
+namespace ModifyPushTransport {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = PushAvStreamTransport::Commands::ModifyPushTransport::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
-inline constexpr DataModel::AcceptedCommandEntry kSetTransportStatusEntry = {
+} // namespace ModifyPushTransport
+namespace SetTransportStatus {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = PushAvStreamTransport::Commands::SetTransportStatus::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
-inline constexpr DataModel::AcceptedCommandEntry kManuallyTriggerTransportEntry = {
+} // namespace SetTransportStatus
+namespace ManuallyTriggerTransport {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = PushAvStreamTransport::Commands::ManuallyTriggerTransport::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
-inline constexpr DataModel::AcceptedCommandEntry kFindTransportEntry = {
+} // namespace ManuallyTriggerTransport
+namespace FindTransport {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = PushAvStreamTransport::Commands::FindTransport::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
+} // namespace FindTransport
 
 } // namespace Commands
-} // namespace Metadata
 } // namespace PushAvStreamTransport
 } // namespace clusters
 } // namespace app

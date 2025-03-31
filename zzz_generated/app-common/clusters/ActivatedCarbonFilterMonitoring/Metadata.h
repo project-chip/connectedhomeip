@@ -15,61 +15,71 @@ namespace chip {
 namespace app {
 namespace clusters {
 namespace ActivatedCarbonFilterMonitoring {
-namespace Metadata {
 
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-
-inline constexpr DataModel::AttributeEntry kConditionEntry = {
+namespace Condition {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ActivatedCarbonFilterMonitoring::Attributes::Condition::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kDegradationDirectionEntry = {
+} // namespace Condition
+namespace DegradationDirection {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ActivatedCarbonFilterMonitoring::Attributes::DegradationDirection::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kChangeIndicationEntry = {
+} // namespace DegradationDirection
+namespace ChangeIndication {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ActivatedCarbonFilterMonitoring::Attributes::ChangeIndication::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kInPlaceIndicatorEntry = {
+} // namespace ChangeIndication
+namespace InPlaceIndicator {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ActivatedCarbonFilterMonitoring::Attributes::InPlaceIndicator::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kLastChangedTimeEntry = {
+} // namespace InPlaceIndicator
+namespace LastChangedTime {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ActivatedCarbonFilterMonitoring::Attributes::LastChangedTime::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
-inline constexpr DataModel::AttributeEntry kReplacementProductListEntry = {
+} // namespace LastChangedTime
+namespace ReplacementProductList {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ActivatedCarbonFilterMonitoring::Attributes::ReplacementProductList::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
+} // namespace ReplacementProductList
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kResetConditionEntry = {
+namespace ResetCondition {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = ActivatedCarbonFilterMonitoring::Commands::ResetCondition::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
+} // namespace ResetCondition
 
 } // namespace Commands
-} // namespace Metadata
 } // namespace ActivatedCarbonFilterMonitoring
 } // namespace clusters
 } // namespace app

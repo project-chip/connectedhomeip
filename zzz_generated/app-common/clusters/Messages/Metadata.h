@@ -15,42 +15,46 @@ namespace chip {
 namespace app {
 namespace clusters {
 namespace Messages {
-namespace Metadata {
 
 inline constexpr uint32_t kRevision = 3;
 
 namespace Attributes {
-
-inline constexpr DataModel::AttributeEntry kMessagesEntry = {
+namespace Messages {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = Messages::Attributes::Messages::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kActiveMessageIDsEntry = {
+} // namespace Messages
+namespace ActiveMessageIDs {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = Messages::Attributes::ActiveMessageIDs::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
+} // namespace ActiveMessageIDs
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kPresentMessagesRequestEntry = {
+namespace PresentMessagesRequest {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = Messages::Commands::PresentMessagesRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kOperate,
 };
-inline constexpr DataModel::AcceptedCommandEntry kCancelMessagesRequestEntry = {
+} // namespace PresentMessagesRequest
+namespace CancelMessagesRequest {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = Messages::Commands::CancelMessagesRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kOperate,
 };
+} // namespace CancelMessagesRequest
 
 } // namespace Commands
-} // namespace Metadata
 } // namespace Messages
 } // namespace clusters
 } // namespace app

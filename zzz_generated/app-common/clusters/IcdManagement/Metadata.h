@@ -15,95 +15,117 @@ namespace chip {
 namespace app {
 namespace clusters {
 namespace IcdManagement {
-namespace Metadata {
 
 inline constexpr uint32_t kRevision = 3;
 
 namespace Attributes {
-
-inline constexpr DataModel::AttributeEntry kIdleModeDurationEntry = {
+namespace IdleModeDuration {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = IcdManagement::Attributes::IdleModeDuration::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kActiveModeDurationEntry = {
+} // namespace IdleModeDuration
+namespace ActiveModeDuration {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = IcdManagement::Attributes::ActiveModeDuration::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kActiveModeThresholdEntry = {
+} // namespace ActiveModeDuration
+namespace ActiveModeThreshold {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = IcdManagement::Attributes::ActiveModeThreshold::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kRegisteredClientsEntry = {
+} // namespace ActiveModeThreshold
+namespace RegisteredClients {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = IcdManagement::Attributes::RegisteredClients::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kAdminister,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kICDCounterEntry = {
+} // namespace RegisteredClients
+namespace ICDCounter {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = IcdManagement::Attributes::ICDCounter::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kAdminister,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kClientsSupportedPerFabricEntry = {
+} // namespace ICDCounter
+namespace ClientsSupportedPerFabric {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = IcdManagement::Attributes::ClientsSupportedPerFabric::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kUserActiveModeTriggerHintEntry = {
+} // namespace ClientsSupportedPerFabric
+namespace UserActiveModeTriggerHint {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = IcdManagement::Attributes::UserActiveModeTriggerHint::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kUserActiveModeTriggerInstructionEntry = {
+} // namespace UserActiveModeTriggerHint
+namespace UserActiveModeTriggerInstruction {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = IcdManagement::Attributes::UserActiveModeTriggerInstruction::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kOperatingModeEntry = {
+} // namespace UserActiveModeTriggerInstruction
+namespace OperatingMode {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = IcdManagement::Attributes::OperatingMode::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kMaximumCheckInBackOffEntry = {
+} // namespace OperatingMode
+namespace MaximumCheckInBackOff {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = IcdManagement::Attributes::MaximumCheckInBackOff::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
+} // namespace MaximumCheckInBackOff
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kRegisterClientEntry = {
+namespace RegisterClient {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = IcdManagement::Commands::RegisterClient::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kManage,
 };
-inline constexpr DataModel::AcceptedCommandEntry kUnregisterClientEntry = {
+} // namespace RegisterClient
+namespace UnregisterClient {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = IcdManagement::Commands::UnregisterClient::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kManage,
 };
-inline constexpr DataModel::AcceptedCommandEntry kStayActiveRequestEntry = {
+} // namespace UnregisterClient
+namespace StayActiveRequest {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = IcdManagement::Commands::StayActiveRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
+} // namespace StayActiveRequest
 
 } // namespace Commands
-} // namespace Metadata
 } // namespace IcdManagement
 } // namespace clusters
 } // namespace app

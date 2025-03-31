@@ -15,47 +15,53 @@ namespace chip {
 namespace app {
 namespace clusters {
 namespace ApplicationLauncher {
-namespace Metadata {
 
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-
-inline constexpr DataModel::AttributeEntry kCatalogListEntry = {
+namespace CatalogList {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ApplicationLauncher::Attributes::CatalogList::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kCurrentAppEntry = {
+} // namespace CatalogList
+namespace CurrentApp {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ApplicationLauncher::Attributes::CurrentApp::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
+} // namespace CurrentApp
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kLaunchAppEntry = {
+namespace LaunchApp {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = ApplicationLauncher::Commands::LaunchApp::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
-inline constexpr DataModel::AcceptedCommandEntry kStopAppEntry = {
+} // namespace LaunchApp
+namespace StopApp {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = ApplicationLauncher::Commands::StopApp::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
-inline constexpr DataModel::AcceptedCommandEntry kHideAppEntry = {
+} // namespace StopApp
+namespace HideApp {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = ApplicationLauncher::Commands::HideApp::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
+} // namespace HideApp
 
 } // namespace Commands
-} // namespace Metadata
 } // namespace ApplicationLauncher
 } // namespace clusters
 } // namespace app

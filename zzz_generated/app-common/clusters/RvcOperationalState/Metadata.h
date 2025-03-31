@@ -15,71 +15,85 @@ namespace chip {
 namespace app {
 namespace clusters {
 namespace RvcOperationalState {
-namespace Metadata {
 
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-
-inline constexpr DataModel::AttributeEntry kPhaseListEntry = {
+namespace PhaseList {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = RvcOperationalState::Attributes::PhaseList::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kCurrentPhaseEntry = {
+} // namespace PhaseList
+namespace CurrentPhase {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = RvcOperationalState::Attributes::CurrentPhase::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kCountdownTimeEntry = {
+} // namespace CurrentPhase
+namespace CountdownTime {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = RvcOperationalState::Attributes::CountdownTime::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kOperationalStateListEntry = {
+} // namespace CountdownTime
+namespace OperationalStateList {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = RvcOperationalState::Attributes::OperationalStateList::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kOperationalStateEntry = {
+} // namespace OperationalStateList
+namespace OperationalState {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = RvcOperationalState::Attributes::OperationalState::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kOperationalErrorEntry = {
+} // namespace OperationalState
+namespace OperationalError {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = RvcOperationalState::Attributes::OperationalError::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
+} // namespace OperationalError
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kPauseEntry = {
+namespace Pause {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = RvcOperationalState::Commands::Pause::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
-inline constexpr DataModel::AcceptedCommandEntry kResumeEntry = {
+} // namespace Pause
+namespace Resume {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = RvcOperationalState::Commands::Resume::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
-inline constexpr DataModel::AcceptedCommandEntry kGoHomeEntry = {
+} // namespace Resume
+namespace GoHome {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = RvcOperationalState::Commands::GoHome::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
+} // namespace GoHome
 
 } // namespace Commands
-} // namespace Metadata
 } // namespace RvcOperationalState
 } // namespace clusters
 } // namespace app

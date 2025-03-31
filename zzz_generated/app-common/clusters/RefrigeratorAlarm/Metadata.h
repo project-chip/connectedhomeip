@@ -15,35 +15,38 @@ namespace chip {
 namespace app {
 namespace clusters {
 namespace RefrigeratorAlarm {
-namespace Metadata {
 
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-
-inline constexpr DataModel::AttributeEntry kMaskEntry = {
+namespace Mask {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = RefrigeratorAlarm::Attributes::Mask::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kStateEntry = {
+} // namespace Mask
+namespace State {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = RefrigeratorAlarm::Attributes::State::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kSupportedEntry = {
+} // namespace State
+namespace Supported {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = RefrigeratorAlarm::Attributes::Supported::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
+} // namespace Supported
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-} // namespace Metadata
 } // namespace RefrigeratorAlarm
 } // namespace clusters
 } // namespace app

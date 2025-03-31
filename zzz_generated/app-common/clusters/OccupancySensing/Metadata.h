@@ -15,101 +15,126 @@ namespace chip {
 namespace app {
 namespace clusters {
 namespace OccupancySensing {
-namespace Metadata {
 
 inline constexpr uint32_t kRevision = 5;
 
 namespace Attributes {
-
-inline constexpr DataModel::AttributeEntry kOccupancyEntry = {
+namespace Occupancy {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = OccupancySensing::Attributes::Occupancy::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kOccupancySensorTypeEntry = {
+} // namespace Occupancy
+namespace OccupancySensorType {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = OccupancySensing::Attributes::OccupancySensorType::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kOccupancySensorTypeBitmapEntry = {
+} // namespace OccupancySensorType
+namespace OccupancySensorTypeBitmap {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = OccupancySensing::Attributes::OccupancySensorTypeBitmap::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kHoldTimeEntry = {
+} // namespace OccupancySensorTypeBitmap
+namespace HoldTime {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = OccupancySensing::Attributes::HoldTime::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
-inline constexpr DataModel::AttributeEntry kHoldTimeLimitsEntry = {
+} // namespace HoldTime
+namespace HoldTimeLimits {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = OccupancySensing::Attributes::HoldTimeLimits::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kPIROccupiedToUnoccupiedDelayEntry = {
+} // namespace HoldTimeLimits
+namespace PIROccupiedToUnoccupiedDelay {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = OccupancySensing::Attributes::PIROccupiedToUnoccupiedDelay::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
-inline constexpr DataModel::AttributeEntry kPIRUnoccupiedToOccupiedDelayEntry = {
+} // namespace PIROccupiedToUnoccupiedDelay
+namespace PIRUnoccupiedToOccupiedDelay {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = OccupancySensing::Attributes::PIRUnoccupiedToOccupiedDelay::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
-inline constexpr DataModel::AttributeEntry kPIRUnoccupiedToOccupiedThresholdEntry = {
+} // namespace PIRUnoccupiedToOccupiedDelay
+namespace PIRUnoccupiedToOccupiedThreshold {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = OccupancySensing::Attributes::PIRUnoccupiedToOccupiedThreshold::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
-inline constexpr DataModel::AttributeEntry kUltrasonicOccupiedToUnoccupiedDelayEntry = {
+} // namespace PIRUnoccupiedToOccupiedThreshold
+namespace UltrasonicOccupiedToUnoccupiedDelay {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = OccupancySensing::Attributes::UltrasonicOccupiedToUnoccupiedDelay::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
-inline constexpr DataModel::AttributeEntry kUltrasonicUnoccupiedToOccupiedDelayEntry = {
+} // namespace UltrasonicOccupiedToUnoccupiedDelay
+namespace UltrasonicUnoccupiedToOccupiedDelay {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = OccupancySensing::Attributes::UltrasonicUnoccupiedToOccupiedDelay::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
-inline constexpr DataModel::AttributeEntry kUltrasonicUnoccupiedToOccupiedThresholdEntry = {
+} // namespace UltrasonicUnoccupiedToOccupiedDelay
+namespace UltrasonicUnoccupiedToOccupiedThreshold {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = OccupancySensing::Attributes::UltrasonicUnoccupiedToOccupiedThreshold::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
-inline constexpr DataModel::AttributeEntry kPhysicalContactOccupiedToUnoccupiedDelayEntry = {
+} // namespace UltrasonicUnoccupiedToOccupiedThreshold
+namespace PhysicalContactOccupiedToUnoccupiedDelay {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = OccupancySensing::Attributes::PhysicalContactOccupiedToUnoccupiedDelay::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
-inline constexpr DataModel::AttributeEntry kPhysicalContactUnoccupiedToOccupiedDelayEntry = {
+} // namespace PhysicalContactOccupiedToUnoccupiedDelay
+namespace PhysicalContactUnoccupiedToOccupiedDelay {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = OccupancySensing::Attributes::PhysicalContactUnoccupiedToOccupiedDelay::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
-inline constexpr DataModel::AttributeEntry kPhysicalContactUnoccupiedToOccupiedThresholdEntry = {
+} // namespace PhysicalContactUnoccupiedToOccupiedDelay
+namespace PhysicalContactUnoccupiedToOccupiedThreshold {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = OccupancySensing::Attributes::PhysicalContactUnoccupiedToOccupiedThreshold::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
+} // namespace PhysicalContactUnoccupiedToOccupiedThreshold
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-} // namespace Metadata
 } // namespace OccupancySensing
 } // namespace clusters
 } // namespace app

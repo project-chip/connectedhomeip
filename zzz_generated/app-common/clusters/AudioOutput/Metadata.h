@@ -15,42 +15,46 @@ namespace chip {
 namespace app {
 namespace clusters {
 namespace AudioOutput {
-namespace Metadata {
 
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-
-inline constexpr DataModel::AttributeEntry kOutputListEntry = {
+namespace OutputList {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = AudioOutput::Attributes::OutputList::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kCurrentOutputEntry = {
+} // namespace OutputList
+namespace CurrentOutput {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = AudioOutput::Attributes::CurrentOutput::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
+} // namespace CurrentOutput
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kSelectOutputEntry = {
+namespace SelectOutput {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = AudioOutput::Commands::SelectOutput::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
-inline constexpr DataModel::AcceptedCommandEntry kRenameOutputEntry = {
+} // namespace SelectOutput
+namespace RenameOutput {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = AudioOutput::Commands::RenameOutput::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
+} // namespace RenameOutput
 
 } // namespace Commands
-} // namespace Metadata
 } // namespace AudioOutput
 } // namespace clusters
 } // namespace app

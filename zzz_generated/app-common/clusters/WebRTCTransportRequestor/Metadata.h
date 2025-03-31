@@ -15,46 +15,52 @@ namespace chip {
 namespace app {
 namespace clusters {
 namespace WebRTCTransportRequestor {
-namespace Metadata {
 
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-
-inline constexpr DataModel::AttributeEntry kCurrentSessionsEntry = {
+namespace CurrentSessions {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = WebRTCTransportRequestor::Attributes::CurrentSessions::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kAdminister,
     .writePrivilege = std::nullopt,
 };
+} // namespace CurrentSessions
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kOfferEntry = {
+namespace Offer {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = WebRTCTransportRequestor::Commands::Offer::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
-inline constexpr DataModel::AcceptedCommandEntry kAnswerEntry = {
+} // namespace Offer
+namespace Answer {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = WebRTCTransportRequestor::Commands::Answer::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
-inline constexpr DataModel::AcceptedCommandEntry kICECandidatesEntry = {
+} // namespace Answer
+namespace ICECandidates {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = WebRTCTransportRequestor::Commands::ICECandidates::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
-inline constexpr DataModel::AcceptedCommandEntry kEndEntry = {
+} // namespace ICECandidates
+namespace End {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = WebRTCTransportRequestor::Commands::End::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
+} // namespace End
 
 } // namespace Commands
-} // namespace Metadata
 } // namespace WebRTCTransportRequestor
 } // namespace clusters
 } // namespace app

@@ -15,209 +15,270 @@ namespace chip {
 namespace app {
 namespace clusters {
 namespace PowerSource {
-namespace Metadata {
 
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-
-inline constexpr DataModel::AttributeEntry kStatusEntry = {
+namespace Status {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = PowerSource::Attributes::Status::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kOrderEntry = {
+} // namespace Status
+namespace Order {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = PowerSource::Attributes::Order::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kDescriptionEntry = {
+} // namespace Order
+namespace Description {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = PowerSource::Attributes::Description::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kWiredAssessedInputVoltageEntry = {
+} // namespace Description
+namespace WiredAssessedInputVoltage {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = PowerSource::Attributes::WiredAssessedInputVoltage::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kWiredAssessedInputFrequencyEntry = {
+} // namespace WiredAssessedInputVoltage
+namespace WiredAssessedInputFrequency {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = PowerSource::Attributes::WiredAssessedInputFrequency::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kWiredCurrentTypeEntry = {
+} // namespace WiredAssessedInputFrequency
+namespace WiredCurrentType {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = PowerSource::Attributes::WiredCurrentType::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kWiredAssessedCurrentEntry = {
+} // namespace WiredCurrentType
+namespace WiredAssessedCurrent {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = PowerSource::Attributes::WiredAssessedCurrent::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kWiredNominalVoltageEntry = {
+} // namespace WiredAssessedCurrent
+namespace WiredNominalVoltage {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = PowerSource::Attributes::WiredNominalVoltage::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kWiredMaximumCurrentEntry = {
+} // namespace WiredNominalVoltage
+namespace WiredMaximumCurrent {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = PowerSource::Attributes::WiredMaximumCurrent::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kWiredPresentEntry = {
+} // namespace WiredMaximumCurrent
+namespace WiredPresent {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = PowerSource::Attributes::WiredPresent::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kActiveWiredFaultsEntry = {
+} // namespace WiredPresent
+namespace ActiveWiredFaults {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = PowerSource::Attributes::ActiveWiredFaults::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kBatVoltageEntry = {
+} // namespace ActiveWiredFaults
+namespace BatVoltage {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = PowerSource::Attributes::BatVoltage::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kBatPercentRemainingEntry = {
+} // namespace BatVoltage
+namespace BatPercentRemaining {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = PowerSource::Attributes::BatPercentRemaining::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kBatTimeRemainingEntry = {
+} // namespace BatPercentRemaining
+namespace BatTimeRemaining {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = PowerSource::Attributes::BatTimeRemaining::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kBatChargeLevelEntry = {
+} // namespace BatTimeRemaining
+namespace BatChargeLevel {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = PowerSource::Attributes::BatChargeLevel::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kBatReplacementNeededEntry = {
+} // namespace BatChargeLevel
+namespace BatReplacementNeeded {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = PowerSource::Attributes::BatReplacementNeeded::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kBatReplaceabilityEntry = {
+} // namespace BatReplacementNeeded
+namespace BatReplaceability {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = PowerSource::Attributes::BatReplaceability::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kBatPresentEntry = {
+} // namespace BatReplaceability
+namespace BatPresent {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = PowerSource::Attributes::BatPresent::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kActiveBatFaultsEntry = {
+} // namespace BatPresent
+namespace ActiveBatFaults {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = PowerSource::Attributes::ActiveBatFaults::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kBatReplacementDescriptionEntry = {
+} // namespace ActiveBatFaults
+namespace BatReplacementDescription {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = PowerSource::Attributes::BatReplacementDescription::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kBatCommonDesignationEntry = {
+} // namespace BatReplacementDescription
+namespace BatCommonDesignation {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = PowerSource::Attributes::BatCommonDesignation::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kBatANSIDesignationEntry = {
+} // namespace BatCommonDesignation
+namespace BatANSIDesignation {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = PowerSource::Attributes::BatANSIDesignation::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kBatIECDesignationEntry = {
+} // namespace BatANSIDesignation
+namespace BatIECDesignation {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = PowerSource::Attributes::BatIECDesignation::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kBatApprovedChemistryEntry = {
+} // namespace BatIECDesignation
+namespace BatApprovedChemistry {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = PowerSource::Attributes::BatApprovedChemistry::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kBatCapacityEntry = {
+} // namespace BatApprovedChemistry
+namespace BatCapacity {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = PowerSource::Attributes::BatCapacity::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kBatQuantityEntry = {
+} // namespace BatCapacity
+namespace BatQuantity {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = PowerSource::Attributes::BatQuantity::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kBatChargeStateEntry = {
+} // namespace BatQuantity
+namespace BatChargeState {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = PowerSource::Attributes::BatChargeState::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kBatTimeToFullChargeEntry = {
+} // namespace BatChargeState
+namespace BatTimeToFullCharge {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = PowerSource::Attributes::BatTimeToFullCharge::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kBatFunctionalWhileChargingEntry = {
+} // namespace BatTimeToFullCharge
+namespace BatFunctionalWhileCharging {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = PowerSource::Attributes::BatFunctionalWhileCharging::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kBatChargingCurrentEntry = {
+} // namespace BatFunctionalWhileCharging
+namespace BatChargingCurrent {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = PowerSource::Attributes::BatChargingCurrent::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kActiveBatChargeFaultsEntry = {
+} // namespace BatChargingCurrent
+namespace ActiveBatChargeFaults {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = PowerSource::Attributes::ActiveBatChargeFaults::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kEndpointListEntry = {
+} // namespace ActiveBatChargeFaults
+namespace EndpointList {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = PowerSource::Attributes::EndpointList::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
+} // namespace EndpointList
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-} // namespace Metadata
 } // namespace PowerSource
 } // namespace clusters
 } // namespace app

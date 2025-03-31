@@ -15,93 +15,115 @@ namespace chip {
 namespace app {
 namespace clusters {
 namespace DemandResponseLoadControl {
-namespace Metadata {
 
 inline constexpr uint32_t kRevision = 4;
 
 namespace Attributes {
-
-inline constexpr DataModel::AttributeEntry kLoadControlProgramsEntry = {
+namespace LoadControlPrograms {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = DemandResponseLoadControl::Attributes::LoadControlPrograms::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kNumberOfLoadControlProgramsEntry = {
+} // namespace LoadControlPrograms
+namespace NumberOfLoadControlPrograms {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = DemandResponseLoadControl::Attributes::NumberOfLoadControlPrograms::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kEventsEntry = {
+} // namespace NumberOfLoadControlPrograms
+namespace Events {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = DemandResponseLoadControl::Attributes::Events::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kActiveEventsEntry = {
+} // namespace Events
+namespace ActiveEvents {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = DemandResponseLoadControl::Attributes::ActiveEvents::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kNumberOfEventsPerProgramEntry = {
+} // namespace ActiveEvents
+namespace NumberOfEventsPerProgram {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = DemandResponseLoadControl::Attributes::NumberOfEventsPerProgram::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kNumberOfTransitionsEntry = {
+} // namespace NumberOfEventsPerProgram
+namespace NumberOfTransitions {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = DemandResponseLoadControl::Attributes::NumberOfTransitions::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kDefaultRandomStartEntry = {
+} // namespace NumberOfTransitions
+namespace DefaultRandomStart {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = DemandResponseLoadControl::Attributes::DefaultRandomStart::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
-inline constexpr DataModel::AttributeEntry kDefaultRandomDurationEntry = {
+} // namespace DefaultRandomStart
+namespace DefaultRandomDuration {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = DemandResponseLoadControl::Attributes::DefaultRandomDuration::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
+} // namespace DefaultRandomDuration
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kRegisterLoadControlProgramRequestEntry = {
+namespace RegisterLoadControlProgramRequest {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = DemandResponseLoadControl::Commands::RegisterLoadControlProgramRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
-inline constexpr DataModel::AcceptedCommandEntry kUnregisterLoadControlProgramRequestEntry = {
+} // namespace RegisterLoadControlProgramRequest
+namespace UnregisterLoadControlProgramRequest {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = DemandResponseLoadControl::Commands::UnregisterLoadControlProgramRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
-inline constexpr DataModel::AcceptedCommandEntry kAddLoadControlEventRequestEntry = {
+} // namespace UnregisterLoadControlProgramRequest
+namespace AddLoadControlEventRequest {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = DemandResponseLoadControl::Commands::AddLoadControlEventRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
-inline constexpr DataModel::AcceptedCommandEntry kRemoveLoadControlEventRequestEntry = {
+} // namespace AddLoadControlEventRequest
+namespace RemoveLoadControlEventRequest {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = DemandResponseLoadControl::Commands::RemoveLoadControlEventRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
-inline constexpr DataModel::AcceptedCommandEntry kClearLoadControlEventsRequestEntry = {
+} // namespace RemoveLoadControlEventRequest
+namespace ClearLoadControlEventsRequest {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = DemandResponseLoadControl::Commands::ClearLoadControlEventsRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
+} // namespace ClearLoadControlEventsRequest
 
 } // namespace Commands
-} // namespace Metadata
 } // namespace DemandResponseLoadControl
 } // namespace clusters
 } // namespace app

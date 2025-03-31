@@ -15,53 +15,61 @@ namespace chip {
 namespace app {
 namespace clusters {
 namespace ThreadNetworkDirectory {
-namespace Metadata {
 
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-
-inline constexpr DataModel::AttributeEntry kPreferredExtendedPanIDEntry = {
+namespace PreferredExtendedPanID {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ThreadNetworkDirectory::Attributes::PreferredExtendedPanID::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kManage,
     .writePrivilege = Access::Privilege::kManage,
 };
-inline constexpr DataModel::AttributeEntry kThreadNetworksEntry = {
+} // namespace PreferredExtendedPanID
+namespace ThreadNetworks {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ThreadNetworkDirectory::Attributes::ThreadNetworks::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kOperate,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kThreadNetworkTableSizeEntry = {
+} // namespace ThreadNetworks
+namespace ThreadNetworkTableSize {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ThreadNetworkDirectory::Attributes::ThreadNetworkTableSize::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
+} // namespace ThreadNetworkTableSize
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kAddNetworkEntry = {
+namespace AddNetwork {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = ThreadNetworkDirectory::Commands::AddNetwork::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
     .invokePrivilege = Access::Privilege::kManage,
 };
-inline constexpr DataModel::AcceptedCommandEntry kRemoveNetworkEntry = {
+} // namespace AddNetwork
+namespace RemoveNetwork {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = ThreadNetworkDirectory::Commands::RemoveNetwork::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kTimed },
     .invokePrivilege = Access::Privilege::kManage,
 };
-inline constexpr DataModel::AcceptedCommandEntry kGetOperationalDatasetEntry = {
+} // namespace RemoveNetwork
+namespace GetOperationalDataset {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = ThreadNetworkDirectory::Commands::GetOperationalDataset::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
+} // namespace GetOperationalDataset
 
 } // namespace Commands
-} // namespace Metadata
 } // namespace ThreadNetworkDirectory
 } // namespace clusters
 } // namespace app

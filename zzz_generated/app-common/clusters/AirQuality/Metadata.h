@@ -15,23 +15,22 @@ namespace chip {
 namespace app {
 namespace clusters {
 namespace AirQuality {
-namespace Metadata {
 
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-
-inline constexpr DataModel::AttributeEntry kAirQualityEntry = {
+namespace AirQuality {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = AirQuality::Attributes::AirQuality::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
+} // namespace AirQuality
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-} // namespace Metadata
 } // namespace AirQuality
 } // namespace clusters
 } // namespace app

@@ -15,29 +15,30 @@ namespace chip {
 namespace app {
 namespace clusters {
 namespace LaundryDryerControls {
-namespace Metadata {
 
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-
-inline constexpr DataModel::AttributeEntry kSupportedDrynessLevelsEntry = {
+namespace SupportedDrynessLevels {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = LaundryDryerControls::Attributes::SupportedDrynessLevels::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kSelectedDrynessLevelEntry = {
+} // namespace SupportedDrynessLevels
+namespace SelectedDrynessLevel {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = LaundryDryerControls::Attributes::SelectedDrynessLevel::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
+} // namespace SelectedDrynessLevel
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-} // namespace Metadata
 } // namespace LaundryDryerControls
 } // namespace clusters
 } // namespace app

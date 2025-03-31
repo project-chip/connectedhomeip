@@ -15,58 +15,68 @@ namespace chip {
 namespace app {
 namespace clusters {
 namespace Timer {
-namespace Metadata {
 
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-
-inline constexpr DataModel::AttributeEntry kSetTimeEntry = {
+namespace SetTime {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = Timer::Attributes::SetTime::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kTimeRemainingEntry = {
+} // namespace SetTime
+namespace TimeRemaining {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = Timer::Attributes::TimeRemaining::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kTimerStateEntry = {
+} // namespace TimeRemaining
+namespace TimerState {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = Timer::Attributes::TimerState::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
+} // namespace TimerState
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kSetTimerEntry = {
+namespace SetTimer {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = Timer::Commands::SetTimer::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
-inline constexpr DataModel::AcceptedCommandEntry kResetTimerEntry = {
+} // namespace SetTimer
+namespace ResetTimer {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = Timer::Commands::ResetTimer::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
-inline constexpr DataModel::AcceptedCommandEntry kAddTimeEntry = {
+} // namespace ResetTimer
+namespace AddTime {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = Timer::Commands::AddTime::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
-inline constexpr DataModel::AcceptedCommandEntry kReduceTimeEntry = {
+} // namespace AddTime
+namespace ReduceTime {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = Timer::Commands::ReduceTime::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
+} // namespace ReduceTime
 
 } // namespace Commands
-} // namespace Metadata
 } // namespace Timer
 } // namespace clusters
 } // namespace app

@@ -15,49 +15,55 @@ namespace chip {
 namespace app {
 namespace clusters {
 namespace OvenMode {
-namespace Metadata {
 
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-
-inline constexpr DataModel::AttributeEntry kSupportedModesEntry = {
+namespace SupportedModes {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = OvenMode::Attributes::SupportedModes::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kCurrentModeEntry = {
+} // namespace SupportedModes
+namespace CurrentMode {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = OvenMode::Attributes::CurrentMode::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kStartUpModeEntry = {
+} // namespace CurrentMode
+namespace StartUpMode {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = OvenMode::Attributes::StartUpMode::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
-inline constexpr DataModel::AttributeEntry kOnModeEntry = {
+} // namespace StartUpMode
+namespace OnMode {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = OvenMode::Attributes::OnMode::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
+} // namespace OnMode
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kChangeToModeEntry = {
+namespace ChangeToMode {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = OvenMode::Commands::ChangeToMode::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
+} // namespace ChangeToMode
 
 } // namespace Commands
-} // namespace Metadata
 } // namespace OvenMode
 } // namespace clusters
 } // namespace app

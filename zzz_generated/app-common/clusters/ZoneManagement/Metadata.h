@@ -15,64 +15,76 @@ namespace chip {
 namespace app {
 namespace clusters {
 namespace ZoneManagement {
-namespace Metadata {
 
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-
-inline constexpr DataModel::AttributeEntry kSupportedZoneSourcesEntry = {
+namespace SupportedZoneSources {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ZoneManagement::Attributes::SupportedZoneSources::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kZonesEntry = {
+} // namespace SupportedZoneSources
+namespace Zones {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ZoneManagement::Attributes::Zones::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kTriggersEntry = {
+} // namespace Zones
+namespace Triggers {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ZoneManagement::Attributes::Triggers::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
-inline constexpr DataModel::AttributeEntry kSensitivityEntry = {
+} // namespace Triggers
+namespace Sensitivity {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ZoneManagement::Attributes::Sensitivity::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
+} // namespace Sensitivity
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kCreateTwoDCartesianZoneEntry = {
+namespace CreateTwoDCartesianZone {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = ZoneManagement::Commands::CreateTwoDCartesianZone::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
-inline constexpr DataModel::AcceptedCommandEntry kUpdateTwoDCartesianZoneEntry = {
+} // namespace CreateTwoDCartesianZone
+namespace UpdateTwoDCartesianZone {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = ZoneManagement::Commands::UpdateTwoDCartesianZone::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
-inline constexpr DataModel::AcceptedCommandEntry kGetTwoDCartesianZoneEntry = {
+} // namespace UpdateTwoDCartesianZone
+namespace GetTwoDCartesianZone {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = ZoneManagement::Commands::GetTwoDCartesianZone::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
-inline constexpr DataModel::AcceptedCommandEntry kRemoveZoneEntry = {
+} // namespace GetTwoDCartesianZone
+namespace RemoveZone {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = ZoneManagement::Commands::RemoveZone::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
+} // namespace RemoveZone
 
 } // namespace Commands
-} // namespace Metadata
 } // namespace ZoneManagement
 } // namespace clusters
 } // namespace app

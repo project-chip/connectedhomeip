@@ -15,43 +15,47 @@ namespace chip {
 namespace app {
 namespace clusters {
 namespace Chime {
-namespace Metadata {
 
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-
-inline constexpr DataModel::AttributeEntry kInstalledChimeSoundsEntry = {
+namespace InstalledChimeSounds {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = Chime::Attributes::InstalledChimeSounds::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kSelectedChimeEntry = {
+} // namespace InstalledChimeSounds
+namespace SelectedChime {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = Chime::Attributes::SelectedChime::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
-inline constexpr DataModel::AttributeEntry kEnabledEntry = {
+} // namespace SelectedChime
+namespace Enabled {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = Chime::Attributes::Enabled::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
+} // namespace Enabled
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kPlayChimeSoundEntry = {
+namespace PlayChimeSound {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = Chime::Commands::PlayChimeSound::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
+} // namespace PlayChimeSound
 
 } // namespace Commands
-} // namespace Metadata
 } // namespace Chime
 } // namespace clusters
 } // namespace app

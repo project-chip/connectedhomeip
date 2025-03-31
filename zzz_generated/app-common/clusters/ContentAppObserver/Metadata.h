@@ -15,22 +15,21 @@ namespace chip {
 namespace app {
 namespace clusters {
 namespace ContentAppObserver {
-namespace Metadata {
 
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {} // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kContentAppMessageEntry = {
+namespace ContentAppMessage {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = ContentAppObserver::Commands::ContentAppMessage::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
+} // namespace ContentAppMessage
 
 } // namespace Commands
-} // namespace Metadata
 } // namespace ContentAppObserver
 } // namespace clusters
 } // namespace app

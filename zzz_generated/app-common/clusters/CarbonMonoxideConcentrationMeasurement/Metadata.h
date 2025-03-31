@@ -15,83 +15,102 @@ namespace chip {
 namespace app {
 namespace clusters {
 namespace CarbonMonoxideConcentrationMeasurement {
-namespace Metadata {
 
 inline constexpr uint32_t kRevision = 3;
 
 namespace Attributes {
-
-inline constexpr DataModel::AttributeEntry kMeasuredValueEntry = {
+namespace MeasuredValue {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = CarbonMonoxideConcentrationMeasurement::Attributes::MeasuredValue::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kMinMeasuredValueEntry = {
+} // namespace MeasuredValue
+namespace MinMeasuredValue {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = CarbonMonoxideConcentrationMeasurement::Attributes::MinMeasuredValue::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kMaxMeasuredValueEntry = {
+} // namespace MinMeasuredValue
+namespace MaxMeasuredValue {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = CarbonMonoxideConcentrationMeasurement::Attributes::MaxMeasuredValue::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kPeakMeasuredValueEntry = {
+} // namespace MaxMeasuredValue
+namespace PeakMeasuredValue {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = CarbonMonoxideConcentrationMeasurement::Attributes::PeakMeasuredValue::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kPeakMeasuredValueWindowEntry = {
+} // namespace PeakMeasuredValue
+namespace PeakMeasuredValueWindow {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = CarbonMonoxideConcentrationMeasurement::Attributes::PeakMeasuredValueWindow::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kAverageMeasuredValueEntry = {
+} // namespace PeakMeasuredValueWindow
+namespace AverageMeasuredValue {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = CarbonMonoxideConcentrationMeasurement::Attributes::AverageMeasuredValue::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kAverageMeasuredValueWindowEntry = {
+} // namespace AverageMeasuredValue
+namespace AverageMeasuredValueWindow {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = CarbonMonoxideConcentrationMeasurement::Attributes::AverageMeasuredValueWindow::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kUncertaintyEntry = {
+} // namespace AverageMeasuredValueWindow
+namespace Uncertainty {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = CarbonMonoxideConcentrationMeasurement::Attributes::Uncertainty::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kMeasurementUnitEntry = {
+} // namespace Uncertainty
+namespace MeasurementUnit {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = CarbonMonoxideConcentrationMeasurement::Attributes::MeasurementUnit::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kMeasurementMediumEntry = {
+} // namespace MeasurementUnit
+namespace MeasurementMedium {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = CarbonMonoxideConcentrationMeasurement::Attributes::MeasurementMedium::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kLevelValueEntry = {
+} // namespace MeasurementMedium
+namespace LevelValue {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = CarbonMonoxideConcentrationMeasurement::Attributes::LevelValue::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
+} // namespace LevelValue
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-} // namespace Metadata
 } // namespace CarbonMonoxideConcentrationMeasurement
 } // namespace clusters
 } // namespace app

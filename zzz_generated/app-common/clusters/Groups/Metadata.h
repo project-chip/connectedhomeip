@@ -15,56 +15,66 @@ namespace chip {
 namespace app {
 namespace clusters {
 namespace Groups {
-namespace Metadata {
 
 inline constexpr uint32_t kRevision = 4;
 
 namespace Attributes {
-
-inline constexpr DataModel::AttributeEntry kNameSupportEntry = {
+namespace NameSupport {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = Groups::Attributes::NameSupport::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
+} // namespace NameSupport
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kAddGroupEntry = {
+namespace AddGroup {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = Groups::Commands::AddGroup::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kManage,
 };
-inline constexpr DataModel::AcceptedCommandEntry kViewGroupEntry = {
+} // namespace AddGroup
+namespace ViewGroup {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = Groups::Commands::ViewGroup::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kOperate,
 };
-inline constexpr DataModel::AcceptedCommandEntry kGetGroupMembershipEntry = {
+} // namespace ViewGroup
+namespace GetGroupMembership {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = Groups::Commands::GetGroupMembership::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kOperate,
 };
-inline constexpr DataModel::AcceptedCommandEntry kRemoveGroupEntry = {
+} // namespace GetGroupMembership
+namespace RemoveGroup {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = Groups::Commands::RemoveGroup::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kManage,
 };
-inline constexpr DataModel::AcceptedCommandEntry kRemoveAllGroupsEntry = {
+} // namespace RemoveGroup
+namespace RemoveAllGroups {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = Groups::Commands::RemoveAllGroups::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kManage,
 };
-inline constexpr DataModel::AcceptedCommandEntry kAddGroupIfIdentifyingEntry = {
+} // namespace RemoveAllGroups
+namespace AddGroupIfIdentifying {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = Groups::Commands::AddGroupIfIdentifying::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kManage,
 };
+} // namespace AddGroupIfIdentifying
 
 } // namespace Commands
-} // namespace Metadata
 } // namespace Groups
 } // namespace clusters
 } // namespace app

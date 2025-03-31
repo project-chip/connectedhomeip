@@ -15,29 +15,30 @@ namespace chip {
 namespace app {
 namespace clusters {
 namespace LocalizationConfiguration {
-namespace Metadata {
 
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-
-inline constexpr DataModel::AttributeEntry kActiveLocaleEntry = {
+namespace ActiveLocale {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = LocalizationConfiguration::Attributes::ActiveLocale::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
-inline constexpr DataModel::AttributeEntry kSupportedLocalesEntry = {
+} // namespace ActiveLocale
+namespace SupportedLocales {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = LocalizationConfiguration::Attributes::SupportedLocales::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
+} // namespace SupportedLocales
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-} // namespace Metadata
 } // namespace LocalizationConfiguration
 } // namespace clusters
 } // namespace app

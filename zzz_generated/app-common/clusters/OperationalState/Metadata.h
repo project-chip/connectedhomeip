@@ -15,76 +15,92 @@ namespace chip {
 namespace app {
 namespace clusters {
 namespace OperationalState {
-namespace Metadata {
 
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-
-inline constexpr DataModel::AttributeEntry kPhaseListEntry = {
+namespace PhaseList {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = OperationalState::Attributes::PhaseList::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kCurrentPhaseEntry = {
+} // namespace PhaseList
+namespace CurrentPhase {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = OperationalState::Attributes::CurrentPhase::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kCountdownTimeEntry = {
+} // namespace CurrentPhase
+namespace CountdownTime {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = OperationalState::Attributes::CountdownTime::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kOperationalStateListEntry = {
+} // namespace CountdownTime
+namespace OperationalStateList {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = OperationalState::Attributes::OperationalStateList::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kOperationalStateEntry = {
+} // namespace OperationalStateList
+namespace OperationalState {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = OperationalState::Attributes::OperationalState::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kOperationalErrorEntry = {
+} // namespace OperationalState
+namespace OperationalError {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = OperationalState::Attributes::OperationalError::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
+} // namespace OperationalError
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kPauseEntry = {
+namespace Pause {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = OperationalState::Commands::Pause::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
-inline constexpr DataModel::AcceptedCommandEntry kStopEntry = {
+} // namespace Pause
+namespace Stop {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = OperationalState::Commands::Stop::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
-inline constexpr DataModel::AcceptedCommandEntry kStartEntry = {
+} // namespace Stop
+namespace Start {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = OperationalState::Commands::Start::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
-inline constexpr DataModel::AcceptedCommandEntry kResumeEntry = {
+} // namespace Start
+namespace Resume {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = OperationalState::Commands::Resume::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
+} // namespace Resume
 
 } // namespace Commands
-} // namespace Metadata
 } // namespace OperationalState
 } // namespace clusters
 } // namespace app

@@ -15,29 +15,30 @@ namespace chip {
 namespace app {
 namespace clusters {
 namespace PowerTopology {
-namespace Metadata {
 
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-
-inline constexpr DataModel::AttributeEntry kAvailableEndpointsEntry = {
+namespace AvailableEndpoints {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = PowerTopology::Attributes::AvailableEndpoints::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kActiveEndpointsEntry = {
+} // namespace AvailableEndpoints
+namespace ActiveEndpoints {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = PowerTopology::Attributes::ActiveEndpoints::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
+} // namespace ActiveEndpoints
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-} // namespace Metadata
 } // namespace PowerTopology
 } // namespace clusters
 } // namespace app

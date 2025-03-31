@@ -15,27 +15,28 @@ namespace chip {
 namespace app {
 namespace clusters {
 namespace FaultInjection {
-namespace Metadata {
 
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {} // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kFailAtFaultEntry = {
+namespace FailAtFault {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = FaultInjection::Commands::FailAtFault::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
-inline constexpr DataModel::AcceptedCommandEntry kFailRandomlyAtFaultEntry = {
+} // namespace FailAtFault
+namespace FailRandomlyAtFault {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = FaultInjection::Commands::FailRandomlyAtFault::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
+} // namespace FailRandomlyAtFault
 
 } // namespace Commands
-} // namespace Metadata
 } // namespace FaultInjection
 } // namespace clusters
 } // namespace app

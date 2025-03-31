@@ -15,23 +15,22 @@ namespace chip {
 namespace app {
 namespace clusters {
 namespace BooleanState {
-namespace Metadata {
 
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-
-inline constexpr DataModel::AttributeEntry kStateValueEntry = {
+namespace StateValue {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = BooleanState::Attributes::StateValue::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
+} // namespace StateValue
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-} // namespace Metadata
 } // namespace BooleanState
 } // namespace clusters
 } // namespace app

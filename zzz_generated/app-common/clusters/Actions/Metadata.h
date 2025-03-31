@@ -15,98 +15,124 @@ namespace chip {
 namespace app {
 namespace clusters {
 namespace Actions {
-namespace Metadata {
 
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-
-inline constexpr DataModel::AttributeEntry kActionListEntry = {
+namespace ActionList {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = Actions::Attributes::ActionList::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kEndpointListsEntry = {
+} // namespace ActionList
+namespace EndpointLists {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = Actions::Attributes::EndpointLists::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kSetupURLEntry = {
+} // namespace EndpointLists
+namespace SetupURL {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = Actions::Attributes::SetupURL::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
+} // namespace SetupURL
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kInstantActionEntry = {
+namespace InstantAction {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = Actions::Commands::InstantAction::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
-inline constexpr DataModel::AcceptedCommandEntry kInstantActionWithTransitionEntry = {
+} // namespace InstantAction
+namespace InstantActionWithTransition {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = Actions::Commands::InstantActionWithTransition::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
-inline constexpr DataModel::AcceptedCommandEntry kStartActionEntry = {
+} // namespace InstantActionWithTransition
+namespace StartAction {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = Actions::Commands::StartAction::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
-inline constexpr DataModel::AcceptedCommandEntry kStartActionWithDurationEntry = {
+} // namespace StartAction
+namespace StartActionWithDuration {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = Actions::Commands::StartActionWithDuration::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
-inline constexpr DataModel::AcceptedCommandEntry kStopActionEntry = {
+} // namespace StartActionWithDuration
+namespace StopAction {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = Actions::Commands::StopAction::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
-inline constexpr DataModel::AcceptedCommandEntry kPauseActionEntry = {
+} // namespace StopAction
+namespace PauseAction {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = Actions::Commands::PauseAction::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
-inline constexpr DataModel::AcceptedCommandEntry kPauseActionWithDurationEntry = {
+} // namespace PauseAction
+namespace PauseActionWithDuration {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = Actions::Commands::PauseActionWithDuration::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
-inline constexpr DataModel::AcceptedCommandEntry kResumeActionEntry = {
+} // namespace PauseActionWithDuration
+namespace ResumeAction {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = Actions::Commands::ResumeAction::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
-inline constexpr DataModel::AcceptedCommandEntry kEnableActionEntry = {
+} // namespace ResumeAction
+namespace EnableAction {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = Actions::Commands::EnableAction::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
-inline constexpr DataModel::AcceptedCommandEntry kEnableActionWithDurationEntry = {
+} // namespace EnableAction
+namespace EnableActionWithDuration {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = Actions::Commands::EnableActionWithDuration::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
-inline constexpr DataModel::AcceptedCommandEntry kDisableActionEntry = {
+} // namespace EnableActionWithDuration
+namespace DisableAction {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = Actions::Commands::DisableAction::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
-inline constexpr DataModel::AcceptedCommandEntry kDisableActionWithDurationEntry = {
+} // namespace DisableAction
+namespace DisableActionWithDuration {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = Actions::Commands::DisableActionWithDuration::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
+} // namespace DisableActionWithDuration
 
 } // namespace Commands
-} // namespace Metadata
 } // namespace Actions
 } // namespace clusters
 } // namespace app

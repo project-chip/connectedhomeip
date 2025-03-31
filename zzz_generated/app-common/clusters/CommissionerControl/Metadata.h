@@ -15,36 +15,38 @@ namespace chip {
 namespace app {
 namespace clusters {
 namespace CommissionerControl {
-namespace Metadata {
 
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-
-inline constexpr DataModel::AttributeEntry kSupportedDeviceCategoriesEntry = {
+namespace SupportedDeviceCategories {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = CommissionerControl::Attributes::SupportedDeviceCategories::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kManage,
     .writePrivilege = std::nullopt,
 };
+} // namespace SupportedDeviceCategories
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kRequestCommissioningApprovalEntry = {
+namespace RequestCommissioningApproval {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = CommissionerControl::Commands::RequestCommissioningApproval::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
-inline constexpr DataModel::AcceptedCommandEntry kCommissionNodeEntry = {
+} // namespace RequestCommissioningApproval
+namespace CommissionNode {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = CommissionerControl::Commands::CommissionNode::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kManage,
 };
+} // namespace CommissionNode
 
 } // namespace Commands
-} // namespace Metadata
 } // namespace CommissionerControl
 } // namespace clusters
 } // namespace app

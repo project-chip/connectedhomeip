@@ -15,97 +15,119 @@ namespace chip {
 namespace app {
 namespace clusters {
 namespace FanControl {
-namespace Metadata {
 
 inline constexpr uint32_t kRevision = 5;
 
 namespace Attributes {
-
-inline constexpr DataModel::AttributeEntry kFanModeEntry = {
+namespace FanMode {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = FanControl::Attributes::FanMode::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
-inline constexpr DataModel::AttributeEntry kFanModeSequenceEntry = {
+} // namespace FanMode
+namespace FanModeSequence {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = FanControl::Attributes::FanModeSequence::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kPercentSettingEntry = {
+} // namespace FanModeSequence
+namespace PercentSetting {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = FanControl::Attributes::PercentSetting::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
-inline constexpr DataModel::AttributeEntry kPercentCurrentEntry = {
+} // namespace PercentSetting
+namespace PercentCurrent {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = FanControl::Attributes::PercentCurrent::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kSpeedMaxEntry = {
+} // namespace PercentCurrent
+namespace SpeedMax {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = FanControl::Attributes::SpeedMax::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kSpeedSettingEntry = {
+} // namespace SpeedMax
+namespace SpeedSetting {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = FanControl::Attributes::SpeedSetting::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
-inline constexpr DataModel::AttributeEntry kSpeedCurrentEntry = {
+} // namespace SpeedSetting
+namespace SpeedCurrent {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = FanControl::Attributes::SpeedCurrent::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kRockSupportEntry = {
+} // namespace SpeedCurrent
+namespace RockSupport {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = FanControl::Attributes::RockSupport::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kRockSettingEntry = {
+} // namespace RockSupport
+namespace RockSetting {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = FanControl::Attributes::RockSetting::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
-inline constexpr DataModel::AttributeEntry kWindSupportEntry = {
+} // namespace RockSetting
+namespace WindSupport {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = FanControl::Attributes::WindSupport::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kWindSettingEntry = {
+} // namespace WindSupport
+namespace WindSetting {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = FanControl::Attributes::WindSetting::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
-inline constexpr DataModel::AttributeEntry kAirflowDirectionEntry = {
+} // namespace WindSetting
+namespace AirflowDirection {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = FanControl::Attributes::AirflowDirection::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
+} // namespace AirflowDirection
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kStepEntry = {
+namespace Step {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = FanControl::Commands::Step::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
+} // namespace Step
 
 } // namespace Commands
-} // namespace Metadata
 } // namespace FanControl
 } // namespace clusters
 } // namespace app

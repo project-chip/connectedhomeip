@@ -15,22 +15,21 @@ namespace chip {
 namespace app {
 namespace clusters {
 namespace DiagnosticLogs {
-namespace Metadata {
 
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {} // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kRetrieveLogsRequestEntry = {
+namespace RetrieveLogsRequest {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = DiagnosticLogs::Commands::RetrieveLogsRequest::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
+} // namespace RetrieveLogsRequest
 
 } // namespace Commands
-} // namespace Metadata
 } // namespace DiagnosticLogs
 } // namespace clusters
 } // namespace app

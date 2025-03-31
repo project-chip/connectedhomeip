@@ -15,49 +15,55 @@ namespace chip {
 namespace app {
 namespace clusters {
 namespace OtaSoftwareUpdateRequestor {
-namespace Metadata {
 
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-
-inline constexpr DataModel::AttributeEntry kDefaultOTAProvidersEntry = {
+namespace DefaultOTAProviders {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = OtaSoftwareUpdateRequestor::Attributes::DefaultOTAProviders::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kAdminister,
 };
-inline constexpr DataModel::AttributeEntry kUpdatePossibleEntry = {
+} // namespace DefaultOTAProviders
+namespace UpdatePossible {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kUpdateStateEntry = {
+} // namespace UpdatePossible
+namespace UpdateState {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = OtaSoftwareUpdateRequestor::Attributes::UpdateState::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kUpdateStateProgressEntry = {
+} // namespace UpdateState
+namespace UpdateStateProgress {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = OtaSoftwareUpdateRequestor::Attributes::UpdateStateProgress::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
+} // namespace UpdateStateProgress
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kAnnounceOTAProviderEntry = {
+namespace AnnounceOTAProvider {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
+} // namespace AnnounceOTAProvider
 
 } // namespace Commands
-} // namespace Metadata
 } // namespace OtaSoftwareUpdateRequestor
 } // namespace clusters
 } // namespace app

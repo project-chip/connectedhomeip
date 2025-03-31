@@ -15,36 +15,38 @@ namespace chip {
 namespace app {
 namespace clusters {
 namespace SampleMei {
-namespace Metadata {
 
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-
-inline constexpr DataModel::AttributeEntry kFlipFlopEntry = {
+namespace FlipFlop {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = SampleMei::Attributes::FlipFlop::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
+} // namespace FlipFlop
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kPingEntry = {
+namespace Ping {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = SampleMei::Commands::Ping::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
-inline constexpr DataModel::AcceptedCommandEntry kAddArgumentsEntry = {
+} // namespace Ping
+namespace AddArguments {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = SampleMei::Commands::AddArguments::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
+} // namespace AddArguments
 
 } // namespace Commands
-} // namespace Metadata
 } // namespace SampleMei
 } // namespace clusters
 } // namespace app

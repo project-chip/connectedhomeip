@@ -15,47 +15,53 @@ namespace chip {
 namespace app {
 namespace clusters {
 namespace TlsClientManagement {
-namespace Metadata {
 
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-
-inline constexpr DataModel::AttributeEntry kMaxProvisionedEntry = {
+namespace MaxProvisioned {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = TlsClientManagement::Attributes::MaxProvisioned::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kProvisionedEndpointsEntry = {
+} // namespace MaxProvisioned
+namespace ProvisionedEndpoints {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = TlsClientManagement::Attributes::ProvisionedEndpoints::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
+} // namespace ProvisionedEndpoints
 
 } // namespace Attributes
 
 namespace Commands {
-
-inline constexpr DataModel::AcceptedCommandEntry kProvisionEndpointEntry = {
+namespace ProvisionEndpoint {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = TlsClientManagement::Commands::ProvisionEndpoint::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kAdminister,
 };
-inline constexpr DataModel::AcceptedCommandEntry kFindEndpointEntry = {
+} // namespace ProvisionEndpoint
+namespace FindEndpoint {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = TlsClientManagement::Commands::FindEndpoint::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kOperate,
 };
-inline constexpr DataModel::AcceptedCommandEntry kRemoveEndpointEntry = {
+} // namespace FindEndpoint
+namespace RemoveEndpoint {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = TlsClientManagement::Commands::RemoveEndpoint::Id,
     .flags           = BitFlags<DataModel::CommandQualityFlags>{ DataModel::CommandQualityFlags::kFabricScoped },
     .invokePrivilege = Access::Privilege::kAdminister,
 };
+} // namespace RemoveEndpoint
 
 } // namespace Commands
-} // namespace Metadata
 } // namespace TlsClientManagement
 } // namespace clusters
 } // namespace app

@@ -15,65 +15,78 @@ namespace chip {
 namespace app {
 namespace clusters {
 namespace ApplicationBasic {
-namespace Metadata {
 
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-
-inline constexpr DataModel::AttributeEntry kVendorNameEntry = {
+namespace VendorName {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ApplicationBasic::Attributes::VendorName::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kVendorIDEntry = {
+} // namespace VendorName
+namespace VendorID {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ApplicationBasic::Attributes::VendorID::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kApplicationNameEntry = {
+} // namespace VendorID
+namespace ApplicationName {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ApplicationBasic::Attributes::ApplicationName::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kProductIDEntry = {
+} // namespace ApplicationName
+namespace ProductID {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ApplicationBasic::Attributes::ProductID::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kApplicationEntry = {
+} // namespace ProductID
+namespace Application {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ApplicationBasic::Attributes::Application::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kStatusEntry = {
+} // namespace Application
+namespace Status {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ApplicationBasic::Attributes::Status::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kApplicationVersionEntry = {
+} // namespace Status
+namespace ApplicationVersion {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ApplicationBasic::Attributes::ApplicationVersion::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
-inline constexpr DataModel::AttributeEntry kAllowedVendorListEntry = {
+} // namespace ApplicationVersion
+namespace AllowedVendorList {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ApplicationBasic::Attributes::AllowedVendorList::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kAdminister,
     .writePrivilege = std::nullopt,
 };
+} // namespace AllowedVendorList
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-} // namespace Metadata
 } // namespace ApplicationBasic
 } // namespace clusters
 } // namespace app

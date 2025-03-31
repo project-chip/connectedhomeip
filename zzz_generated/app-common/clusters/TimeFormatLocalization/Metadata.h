@@ -15,35 +15,38 @@ namespace chip {
 namespace app {
 namespace clusters {
 namespace TimeFormatLocalization {
-namespace Metadata {
 
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-
-inline constexpr DataModel::AttributeEntry kHourFormatEntry = {
+namespace HourFormat {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = TimeFormatLocalization::Attributes::HourFormat::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
-inline constexpr DataModel::AttributeEntry kActiveCalendarTypeEntry = {
+} // namespace HourFormat
+namespace ActiveCalendarType {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = TimeFormatLocalization::Attributes::ActiveCalendarType::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
-inline constexpr DataModel::AttributeEntry kSupportedCalendarTypesEntry = {
+} // namespace ActiveCalendarType
+namespace SupportedCalendarTypes {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = TimeFormatLocalization::Attributes::SupportedCalendarTypes::Id,
     .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
+} // namespace SupportedCalendarTypes
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
-} // namespace Metadata
 } // namespace TimeFormatLocalization
 } // namespace clusters
 } // namespace app
