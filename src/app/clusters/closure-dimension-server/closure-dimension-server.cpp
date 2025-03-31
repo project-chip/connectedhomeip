@@ -36,33 +36,31 @@
  namespace Clusters {
  namespace ClosureDimension {
  
- using namespace Attributes;
- using namespace Commands;
  using namespace Protocols::InteractionModel;
  namespace {
  
- CHIP_ERROR TranslateErrorToIMStatus(CHIP_ERROR err)
- {
-     if (err == CHIP_NO_ERROR)
-     {
-         return err;
-     }
-     if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
-     {
-         return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-     }
-     if (err == CHIP_ERROR_INCORRECT_STATE)
-     {
-         // what actually gets returned here? This is really an internal error, so failure seems perhaps correct.
-         return CHIP_IM_GLOBAL_STATUS(Failure);
-     }
-     if (err == CHIP_ERROR_INVALID_ARGUMENT)
-     {
-         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
-     }
-     // Catch-all error
-     return CHIP_IM_GLOBAL_STATUS(Failure);
- }
+// Add fucntion comment explaining the map.
+CHIP_ERROR TranslateErrorToIMStatus(CHIP_ERROR err)
+{
+    if (err == CHIP_NO_ERROR)
+    {
+        return err;
+    }
+    if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
+    {
+        return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
+    }
+    if (err == CHIP_ERROR_INCORRECT_STATE)
+    {
+        return CHIP_IM_GLOBAL_STATUS(Failure);
+    }
+    if (err == CHIP_ERROR_INVALID_ARGUMENT)
+    {
+        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+    }
+    // Catch-all error
+    return CHIP_IM_GLOBAL_STATUS(Failure);
+}
  
  template <typename T, typename F>
  CHIP_ERROR EncodeRead(AttributeValueEncoder & aEncoder, const F & getter)
@@ -83,57 +81,57 @@
  {
      switch (aPath.mAttributeId)
      {
-     case Current::Id: {
+     case Attributes::Current::Id: {
          typedef GenericCurrentStruct T;
          return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetCurrent(ret); });
      }
-     case Target::Id: {
+     case Attributes::Target::Id: {
          typedef GenericTargetStruct T;
          return EncodeRead<T>(aEncoder,
                               [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetTarget(ret); });
      }
-     case Resolution::Id: {
-         typedef Resolution::TypeInfo::Type T;
+     case Attributes::Resolution::Id: {
+         typedef Attributes::Resolution::TypeInfo::Type T;
          return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetResolution(ret); });
      }
-     case StepValue::Id: {
-         typedef StepValue::TypeInfo::Type T;
+     case Attributes::StepValue::Id: {
+         typedef Attributes::StepValue::TypeInfo::Type T;
          return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetStepValue(ret); });
      }
-     case Unit::Id: {
-         typedef Unit::TypeInfo::Type T;
+     case Attributes::Unit::Id: {
+         typedef Attributes::Unit::TypeInfo::Type T;
          return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetUnit(ret); });
      }
-     case UnitRange::Id: {
-         typedef UnitRange::TypeInfo::Type T;
+     case Attributes::UnitRange::Id: {
+         typedef Attributes::UnitRange::TypeInfo::Type T;
          return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetUnitRange(ret); });
      }
-     case LimitRange::Id: {
-         typedef LimitRange::TypeInfo::Type T;
+     case Attributes::LimitRange::Id: {
+         typedef Attributes::LimitRange::TypeInfo::Type T;
          return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetLimitRange(ret); });
      }
-     case TranslationDirection::Id: {
-         typedef TranslationDirection::TypeInfo::Type T;
+     case Attributes::TranslationDirection::Id: {
+         typedef Attributes::TranslationDirection::TypeInfo::Type T;
          return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetTranslationDirection(ret); });
      }
-     case RotationAxis::Id: {
-         typedef RotationAxis::TypeInfo::Type T;
+     case Attributes::RotationAxis::Id: {
+         typedef Attributes::RotationAxis::TypeInfo::Type T;
          return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetRotationAxis(ret); });
      }
-     case Overflow::Id: {
-         typedef Overflow::TypeInfo::Type T;
+     case Attributes::Overflow::Id: {
+         typedef Attributes::Overflow::TypeInfo::Type T;
          return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetOverflow(ret); });
      }
-     case ModulationType::Id: {
-         typedef ModulationType::TypeInfo::Type T;
+     case Attributes::ModulationType::Id: {
+         typedef Attributes::ModulationType::TypeInfo::Type T;
          return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetModulationType(ret); });
      }
-     case FeatureMap::Id: {
-         typedef FeatureMap::TypeInfo::Type T;
+     case Attributes::FeatureMap::Id: {
+         typedef Attributes::FeatureMap::TypeInfo::Type T;
          return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetFeatureMap(ret); });
      }
-     case ClusterRevision::Id: {
-         typedef ClusterRevision::TypeInfo::Type T;
+     case Attributes::ClusterRevision::Id: {
+         typedef Attributes::ClusterRevision::TypeInfo::Type T;
          return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetClusterRevision(ret); });
      }
      default:
@@ -155,36 +153,18 @@
  {
      switch (handlerContext.mRequestPath.mCommandId)
      {
-     case SetTarget::Id:
-         HandleCommand<SetTarget::DecodableType>(
+     case Commands::SetTarget::Id:
+         HandleCommand<Commands::SetTarget::DecodableType>(
              handlerContext, [&logic = mClusterLogic](HandlerContext & ctx, const auto & commandData) {
-                 CHIP_ERROR err =
-                     logic.HandleSetTargetCommand(commandData.position.std_optional(), commandData.latch.std_optional(), commandData.speed.std_optional());
-                 Status status = Status::Success;
-                 if (err == CHIP_ERROR_INVALID_ARGUMENT)
-                 {
-                     status = Status::ConstraintError;
-                 }
-                 if (err != CHIP_NO_ERROR)
-                 {
-                     status = Status::Failure;
-                 }
+                Status status =
+                     logic.HandleSetTargetCommand(commandData.position,commandData.latch, commandData.speed);
                  ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
              });
          return;
-     case Step::Id:
-         HandleCommand<Step::DecodableType>(handlerContext,
+     case Commands::Step::Id:
+         HandleCommand<Commands::Step::DecodableType>(handlerContext,
                                              [&logic = mClusterLogic](HandlerContext & ctx, const auto & commandData) {
-                                                 CHIP_ERROR err = logic.HandleStepCommand(commandData.direction, commandData.numberOfSteps, commandData.speed.std_optional());
-                                                 Status status  = Status::Success;
-                                                 if (err == CHIP_ERROR_INVALID_ARGUMENT)
-                                                 {
-                                                     status = Status::ConstraintError;
-                                                 }
-                                                 if (err != CHIP_NO_ERROR)
-                                                 {
-                                                     status = Status::Failure;
-                                                 }
+                                                Status status = logic.HandleStepCommand(commandData.direction, commandData.numberOfSteps, commandData.speed);
                                                  ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
                                              });
          return;
@@ -193,13 +173,28 @@
  
  CHIP_ERROR Interface::Init()
  {
-     AttributeAccessInterfaceRegistry::Instance().Register(this);
-     CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this);
+    VerifyOrDieWithMsg(AttributeAccessInterfaceRegistry::Instance().Register(this),
+                        NotSpecified, "Failed to register attribute access");
+    VerifyOrDieWithMsg(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this)== CHIP_NO_ERROR,
+                        NotSpecified, "Failed to register command handler");
      return CHIP_NO_ERROR;
+ }
+ 
+ CHIP_ERROR Interface::Shutdown()
+ {
+    VerifyOrDieWithMsg(CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this)== CHIP_NO_ERROR,
+                        NotSpecified, "Failed to unregister command handler");
+    AttributeAccessInterfaceRegistry::Instance().Unregister(this);
+    return CHIP_NO_ERROR;
  }
  
  } // namespace ClosureDimension
  } // namespace Clusters
  } // namespace app
  } // namespace chip
+ 
+ // -----------------------------------------------------------------------------
+// Plugin initialization
+
+void MatterClosureDimensionPluginServerInitCallback() {}
  

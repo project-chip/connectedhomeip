@@ -50,7 +50,8 @@ public:
     // Registers this handler.
     CHIP_ERROR Init();
 
-    // TODO: Shutdown
+    // Unregisters the handler
+    CHIP_ERROR Shutdown();
 
 private:
     // This is owned by the caller and passed to the interface for its use.

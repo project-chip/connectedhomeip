@@ -29,7 +29,7 @@
  namespace ClosureDimension {
  
  /** @brief
-  *    Defines methods for implementing application-specific logic for the Valve Configuration and Control Cluster.
+  *    Defines methods for implementing application-specific logic for the Closure Dimension Cluster.
   */
  
  class DelegateBase

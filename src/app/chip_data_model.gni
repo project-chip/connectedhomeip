@@ -462,11 +462,6 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/${cluster}.h",
           "${_app_root}/clusters/${cluster}/closure-control-cluster-objects.h",
         ]
-      } else if (cluster == "camera-av-stream-management-server") {
-        sources += [
-          "${_app_root}/clusters/${cluster}/${cluster}.cpp",
-          "${_app_root}/clusters/${cluster}/${cluster}.h",
-        ]
       } else if (cluster == "closure-dimension-server") {
         sources += [
           "${_app_root}/clusters/${cluster}/closure-dimension-cluster-logic.h",
@@ -477,6 +472,11 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/closure-dimension-server.cpp",
           "${_app_root}/clusters/${cluster}/closure-dimension-matter-context.cpp",
           "${_app_root}/clusters/${cluster}/closure-dimension-cluster-logic.cpp",
+        ]
+      } else if (cluster == "camera-av-stream-management-server") {
+        sources += [
+          "${_app_root}/clusters/${cluster}/${cluster}.cpp",
+          "${_app_root}/clusters/${cluster}/${cluster}.h",
         ]
       } else {
         sources += [ "${_app_root}/clusters/${cluster}/${cluster}.cpp" ]
