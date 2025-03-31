@@ -350,16 +350,7 @@ public:
     /**
      *  Re-activate an inactive subscription.
      *
-     *  When subscribing to LIT-ICD and liveness timeout reached and OnResubscriptionNeeded returns
-     *  CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT, the read client will move to the InactiveICDSubscription state and
-     *  resubscription can be triggered via OnActiveModeNotification().
-     *
-     *  If the subscription is not in the `InactiveICDSubscription` state, this function will do nothing. So it is always safe to
-     *  call this function when a check-in message is received.
-     *
-     *  If the server sends out check-in message, and there is a active tracked active subscription in client side at the same time,
-     * it means current client does not realize this tracked subscription has gone, and we should forcibly timeout current
-     * subscription, and schedule a new one.
+     *  This function should be called when the peer is an ICD that is checking in and this ReadClient represents a subscription that would cause that ICD to not need to check in anymore.
      *
      *  This API only works when issuing subscription via SendAutoResubscribeRequest.
      */
@@ -385,6 +376,8 @@ public:
     NodeId GetPeerNodeId() const { return mPeer.GetNodeId(); }
     bool IsReadType() { return mInteractionType == InteractionType::Read; }
     bool IsSubscriptionType() const { return mInteractionType == InteractionType::Subscribe; };
+
+    NodeId GetLocalNodeId() const { return mLocal.GetNodeId(); }
 
     /*
      * Retrieve the reporting intervals associated with an active subscription. This should only be called if we're of subscription
@@ -645,6 +638,7 @@ private:
     uint16_t mMaxInterval              = 0;
     SubscriptionId mSubscriptionId     = 0;
     ScopedNodeId mPeer;
+    ScopedNodeId mLocal;
     InteractionType mInteractionType = InteractionType::Read;
     Timestamp mEventTimestamp;
 
