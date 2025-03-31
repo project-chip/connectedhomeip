@@ -109,39 +109,44 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
     rtc::Configuration config;
     mPeerConnection = std::make_shared<rtc::PeerConnection>(config);
 
-    // Use std::cout to print out to console
     mPeerConnection->onLocalDescription([this](rtc::Description description) {
         mLocalDescription = std::string(description);
-        std::cout << "Local Description:" << std::endl;
-        std::cout << mLocalDescription << std::endl;
+        ChipLogProgress(NotSpecified, "Local Description:");
+        ChipLogProgress(NotSpecified, "%s", mLocalDescription.c_str());
     });
 
     mPeerConnection->onLocalCandidate([this](rtc::Candidate candidate) {
         std::string candidateStr = std::string(candidate);
         mLocalCandidates.push_back(candidateStr);
-        std::cout << "Local Candidate:" << std::endl;
-        std::cout << candidateStr << std::endl << std::endl;
+        ChipLogProgress(NotSpecified, "Local Candidate:");
+        ChipLogProgress(NotSpecified, "%s", candidateStr.c_str());
     });
 
-    mPeerConnection->onStateChange(
-        [](rtc::PeerConnection::State state) { std::cout << "[PeerConnection State: " << state << "]" << std::endl; });
+    mPeerConnection->onStateChange([](rtc::PeerConnection::State state) {
+        ChipLogProgress(NotSpecified, "[PeerConnection State: %d]", static_cast<int>(state));
+    });
 
-    mPeerConnection->onGatheringStateChange(
-        [](rtc::PeerConnection::GatheringState state) { std::cout << "[Gathering State: " << state << "]" << std::endl; });
+    mPeerConnection->onGatheringStateChange([](rtc::PeerConnection::GatheringState state) {
+        ChipLogProgress(NotSpecified, "[Gathering State: %d]", static_cast<int>(state));
+    });
 
     // Create a data channel for this offerer
     mDataChannel = mPeerConnection->createDataChannel("test");
 
     if (mDataChannel)
     {
-        mDataChannel->onOpen([&]() { std::cout << "[DataChannel open: " << mDataChannel->label() << "]" << std::endl; });
+        mDataChannel->onOpen([&]() {
+            ChipLogProgress(NotSpecified, "[DataChannel open: %s]", mDataChannel ? mDataChannel->label().c_str() : "unknown");
+        });
 
-        mDataChannel->onClosed([&]() { std::cout << "[DataChannel closed: " << mDataChannel->label() << "]" << std::endl; });
+        mDataChannel->onClosed([&]() {
+            ChipLogProgress(NotSpecified, "[DataChannel closed: %s]", mDataChannel ? mDataChannel->label().c_str() : "unknown");
+        });
 
         mDataChannel->onMessage([](auto data) {
             if (std::holds_alternative<std::string>(data))
             {
-                std::cout << "[Received: " << std::get<std::string>(data) << "]" << std::endl;
+                ChipLogProgress(NotSpecified, "[Received: %s]", std::get<std::string>(data).c_str());
             }
         });
     }

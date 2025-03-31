@@ -129,9 +129,10 @@ public:
      *   use this `PeerId` to retrieve or track any existing secure session state as needed.
      *
      * @param[in] originatingEndpointId
-     *   This field SHALL indicate the endpoint that originates the ProvideOffer command.
-     *   When the server acts as a client to invoke commands on the Requestor cluster,
-     *   this endpoint SHALL be used as the target endpoint on the Requestor device.
+     *   The server implementing this handler (acting as the WebRTC Provider) MUST use this
+     *   endpoint ID as the target when sending commands back to the Requestor device.
+     *   This ensures that commands sent back by this Provider server correctly reach the
+     *   corresponding application logic on the Requestor device.
      *
      * @return
      *   - CHIP_NO_ERROR if the request succeeds and `outSession` is populated.

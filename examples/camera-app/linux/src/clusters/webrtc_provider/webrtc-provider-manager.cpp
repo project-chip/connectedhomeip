@@ -243,6 +243,7 @@ CHIP_ERROR WebRTCProviderManager::SendAnswerCommand(uint16_t sessionId, const st
         ChipLogError(NotSpecified, "Answer command failed: %" CHIP_ERROR_FORMAT, error.Format());
     };
 
+    // TODO:#38183 Use CASESessionManager instead of sessionHandle to send Answer Command
     Messaging::ExchangeManager & exchangeMgr = Server::GetInstance().GetExchangeManager();
     auto sessionHandle                       = exchangeMgr.GetSessionManager()->FindSecureSessionForNode(peerId);
     if (!sessionHandle.HasValue())
