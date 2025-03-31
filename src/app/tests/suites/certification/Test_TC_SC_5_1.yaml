@@ -152,7 +152,7 @@ tests:
                   {
                       FabricIndex: CurrentFabricIndexValue,
                       GroupId: 0x0103,
-                      GroupKeySetID: 0x01a3
+                      GroupKeySetID: 0x01a3,
                   },
               ]
 
@@ -252,7 +252,7 @@ tests:
                   {
                       FabricIndex: CurrentFabricIndexValue,
                       GroupId: 0x0103,
-                      GroupKeySetID: 0x01a3
+                      GroupKeySetID: 0x01a3,
                   },
               ]
 
