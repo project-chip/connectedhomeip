@@ -134,15 +134,13 @@ tests:
               - name: "ms"
                 value: 5000
 
-    # Start value 200, expected value 25 (200 + 80*(20/20) = 280 mod 255) with a tolerance of +/- 12 (15% of 80), so the expected value is in the range [13, 37]
+    # Start value 200, expected value 25.
     - label: "Step 2e: TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
-          constraints:
-              minValue: 13
-              maxValue: 37
+          value: 25
 
     - label:
           "Step 3a: TH sends MoveToHue command to DUT with Hue=50,
