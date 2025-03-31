@@ -515,9 +515,11 @@ class MatterIdlTransformer(Transformer):
             elif isinstance(item, Enum):
                 global_enums.append(dataclasses.replace(item, is_global=True))
             elif isinstance(item, Bitmap):
-                global_bitmaps.append(dataclasses.replace(item, is_global=True))
+                global_bitmaps.append(
+                    dataclasses.replace(item, is_global=True))
             elif isinstance(item, Struct):
-                global_structs.append(dataclasses.replace(item, is_global=True))
+                global_structs.append(
+                    dataclasses.replace(item, is_global=True))
             else:
                 raise Exception("UNKNOWN idl content item: %r" % item)
 
@@ -562,7 +564,8 @@ class GlobalMapping:
         self.enum_map = {e.name: e for e in idl.global_enums}
         self.struct_map = {s.name: s for s in idl.global_structs}
 
-        self.global_types = set(self.bitmap_map.keys()).union(set(self.enum_map.keys())).union(set(self.struct_map.keys()))
+        self.global_types = set(self.bitmap_map.keys()).union(
+            set(self.enum_map.keys())).union(set(self.struct_map.keys()))
 
         # Spec does not enforce unique naming in bitmap/enum/struct, however in practice
         # if we have both enum Foo and bitmap Foo for example, it would be impossible
@@ -580,9 +583,12 @@ class GlobalMapping:
         global_types_added = set()
 
         # cluster types are already accessible, so no need to add them back
-        global_types_added = global_types_added.union([v.name for v in cluster.bitmaps])
-        global_types_added = global_types_added.union([v.name for v in cluster.structs])
-        global_types_added = global_types_added.union([v.name for v in cluster.enums])
+        global_types_added = global_types_added.union(
+            [v.name for v in cluster.bitmaps])
+        global_types_added = global_types_added.union(
+            [v.name for v in cluster.structs])
+        global_types_added = global_types_added.union(
+            [v.name for v in cluster.enums])
 
         changed = True
         while changed:

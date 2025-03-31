@@ -986,7 +986,7 @@ server cluster A = 1 { /* Test comment */ }
                 Cluster(name="A", code=1, revision=1, enums=[
                     Enum(name="FooEnum", base_type="ENUM32",
                          entries=[ConstantEntry(name="B", code=234)])],
-                    structs=[
+                        structs=[
                         Struct(name="S", fields=[
                             Field(name="testEnum", code=0, data_type=DataType(
                                 name="FooEnum"), qualities=FieldQuality.NULLABLE)
