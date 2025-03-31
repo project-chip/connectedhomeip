@@ -670,11 +670,11 @@ public:
     CHIP_ERROR Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath, Privilege requestPrivilege);
 
     /**
-     * Validate whether an AccessControlEntryStruct is valid and complies with all defined constraints.
+     * Validate whether an ACL Entry is valid and complies with all defined constraints.
      *
-     * @retval true if all the fields within the AccessControlEntry are valid and compliant.
+     * @retval true if all the fields within the Entry are valid and compliant.
      */
-    bool IsValid(const Entry & entry);
+    static bool IsValid(const Entry & entry);
 
 #if CHIP_ACCESS_CONTROL_DUMP_ENABLED
     CHIP_ERROR Dump(const Entry & entry);
