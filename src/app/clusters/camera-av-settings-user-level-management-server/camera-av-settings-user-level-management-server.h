@@ -115,7 +115,7 @@ public:
     CHIP_ERROR setTiltMin(int16_t);
 
     CHIP_ERROR setTiltMax(int16_t);
-    
+
     CHIP_ERROR setPanMin(int16_t);
 
     CHIP_ERROR setPanMax(int16_t);
@@ -156,16 +156,16 @@ public:
     void setZoom(Optional<int8_t>);
 
     /**
-     * Allows for a delegate or application to provide the ID of an allocated video stream that is capable of digital movement. 
+     * Allows for a delegate or application to provide the ID of an allocated video stream that is capable of digital movement.
      * It is expected that this would be done by a delegate on the conclusion of allocating a video stream via the AV Stream
-     * Management cluster. 
+     * Management cluster.
      */
     void addMoveCapableVideoStreamID(uint16_t videoStreamID);
 
     /**
-     * Allows for a delegate or application to remove a video stream from the set that is capable of digital movement.  
+     * Allows for a delegate or application to remove a video stream from the set that is capable of digital movement.
      * It is expected that this would be done by a delegate on the conclusion of deallocating a video stream via the AV Stream
-     * Management cluster. 
+     * Management cluster.
      */
     void removeMoveCapableVideoStreamID(uint16_t videoStreamID);
 
@@ -185,7 +185,7 @@ private:
     // Next available preset ID
     uint8_t currentPresetID = 0;
 
-    // My known values for MPTZ.  
+    // My known values for MPTZ.
     MPTZStructType mMptzPosition;
 
     // Note, spec defaults, potentially overwritten by the delegate

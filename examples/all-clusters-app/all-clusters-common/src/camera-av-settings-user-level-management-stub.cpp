@@ -48,7 +48,7 @@ bool AVSettingsUserLevelManagementDelegate::CanChangeMPTZ()
     return true;
 }
 
-bool AVSettingsUserLevelManagementDelegate::IsValidVideoStreamID(uint16_t videoStreamID) 
+bool AVSettingsUserLevelManagementDelegate::IsValidVideoStreamID(uint16_t videoStreamID)
 {
     return true;
 }
@@ -80,7 +80,7 @@ Status AVSettingsUserLevelManagementDelegate::MPTZMoveToPreset(uint8_t preset, O
                                                                Optional<int8_t> zoom)
 {
     // The Cluster implementation has validated the preset is value, and provided the MPTZ values associated with that preset.
-    // Do any needed hardware interactions to actually set the camera to the new values of PTZ.  Then return a Status response. 
+    // Do any needed hardware interactions to actually set the camera to the new values of PTZ.  Then return a Status response.
     //
     return Status::Success;
 }
@@ -96,7 +96,7 @@ Status AVSettingsUserLevelManagementDelegate::MPTZSavePreset(uint8_t preset)
 Status AVSettingsUserLevelManagementDelegate::MPTZRemovePreset(uint8_t preset)
 {
     // The Cluster implementation has validated that there is a saved preset associated with the provided id.
-    // The application needs to confirm that this action is acceptable given the current state of the device. 
+    // The application needs to confirm that this action is acceptable given the current state of the device.
     //
     return Status::Success;
 }

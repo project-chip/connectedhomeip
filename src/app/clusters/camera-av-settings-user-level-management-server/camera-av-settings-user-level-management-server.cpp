@@ -182,7 +182,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::setMaxPresets(uint8_t aMaxPreset
     mMaxPresets = aMaxPresets;
     return CHIP_NO_ERROR;
 }
-    
+
 CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::setTiltMin(int16_t aTiltMin)
 {
     if ((aTiltMin < kMinTiltValue) || (aTiltMin > kMaxTiltValue-1) || (aTiltMin > mTiltMax))
@@ -282,8 +282,8 @@ void CameraAvSettingsUserLevelMgmtServer::addMoveCapableVideoStreamID(uint16_t v
     {
         // Not found, this is a good add.
         //
-        mDptzRelativeMove.push_back(videoStreamID); 
-    }   
+        mDptzRelativeMove.push_back(videoStreamID);
+    }
 }
 
 void CameraAvSettingsUserLevelMgmtServer::removeMoveCapableVideoStreamID(uint16_t videoStreamID)
@@ -302,7 +302,7 @@ void CameraAvSettingsUserLevelMgmtServer::removeMoveCapableVideoStreamID(uint16_
 
 }
 
-bool CameraAvSettingsUserLevelMgmtServer::knownVideoStreamID(uint16_t videoStreamID) 
+bool CameraAvSettingsUserLevelMgmtServer::knownVideoStreamID(uint16_t videoStreamID)
 {
     // Verify that this is a known ID, if it is, remove from the list
     //
@@ -437,7 +437,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::Read(const ConcreteReadAttribute
 
 void CameraAvSettingsUserLevelMgmtServer::LoadPersistentAttributes()
 {
-    // Currently there are no non-volatile attributes defined in the spec.  This however is under discussion and likely to change. 
+    // Currently there are no non-volatile attributes defined in the spec.  This however is under discussion and likely to change.
     // Hence this is here as a placeholder.
     // Signal delegate that all persistent configuration attributes have been loaded.
     mDelegate->PersistentAttributesLoadedCallback();
@@ -852,7 +852,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZSavePreset(HandlerContext & 
         presetToUse = preset.Value();
     }
 
-    // Call the delegate, make sure that it is ok to save a new preset, given the current 
+    // Call the delegate, make sure that it is ok to save a new preset, given the current
     // delegate aware values for MPTZ
     //
     status = mDelegate->MPTZSavePreset(presetToUse);
@@ -889,11 +889,11 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRemovePreset(HandlerContext 
 
     // Verify the provided presetID is within spec limits
     //
-    if (presetToRemove > mMaxPresets-1) 
+    if (presetToRemove > mMaxPresets-1)
     {
         ChipLogError(Zcl, "Preset to remove is out of range");
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
-        return;    
+        return;
     }
 
     // Is the provided ID known to us?
@@ -964,7 +964,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleDPTZRelativeMove(HandlerContext 
     uint16_t videoStreamID     = commandData.videoStreamID;
     Optional<int16_t> deltaX   = commandData.deltaX;
     Optional<int16_t> deltaY   = commandData.deltaY;
-    Optional<int8_t> zoomDelta = commandData.zoomDelta; 
+    Optional<int8_t> zoomDelta = commandData.zoomDelta;
 
     // Is this a video stream ID of which we have already been informed?
     // If not, ask the delegate if it's ok.  If yes, add to our set and proceed, if not, fail.
