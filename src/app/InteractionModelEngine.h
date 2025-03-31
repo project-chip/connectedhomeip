@@ -235,9 +235,9 @@ public:
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
     /**
      *
-     *  When a peer becomes active, it sends a check-in message because aMonitoredSubject does not have a subscription to it. 
+     *  When a peer becomes active, it sends a check-in message because aMonitoredSubject does not have a subscription to it.
      * Upon receiving this check-in message, the Client attempts to run the re-subscription process via OnActiveModeNotification
-     * 
+     *
      */
     void OnActiveModeNotification(ScopedNodeId aPeer, uint64_t aMonitoredSubject);
 

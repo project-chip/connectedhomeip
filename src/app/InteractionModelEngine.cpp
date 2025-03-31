@@ -1077,7 +1077,7 @@ void InteractionModelEngine::OnActiveModeNotification(ScopedNodeId aPeer, uint64
         // It is possible that pListItem is destroyed by the app in OnActiveModeNotification.
         // Get the next item before invoking `OnActiveModeNotification`.
         CATValues cats;
-        
+
         mpFabricTable->FetchCATs(pListItem->GetFabricIndex(), cats);
         if (ScopedNodeId(pListItem->GetPeerNodeId(), pListItem->GetFabricIndex()) == aPeer && (cats.CheckSubjectAgainstCATs(aMonitoredSubject) || aMonitoredSubject == pListItem->GetLocalNodeId()))
         {
