@@ -1279,7 +1279,7 @@ CHIP_ERROR ReadClient::SendSubscribeRequestImpl(const ReadPrepareParams & aReadP
     ReturnErrorOnFailure(mExchange->SendMessage(Protocols::InteractionModel::MsgType::SubscribeRequest, std::move(msgBuf),
                                                 Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse)));
 
-    mPeer = aReadPrepareParams.mSessionHolder->AsSecureSession()->GetPeer();
+    mPeer  = aReadPrepareParams.mSessionHolder->AsSecureSession()->GetPeer();
     mLocal = aReadPrepareParams.mSessionHolder->AsSecureSession()->GetLocalNodeId();
 
     MoveToState(ClientState::AwaitingInitialReport);

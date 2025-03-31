@@ -350,7 +350,8 @@ public:
     /**
      *  Re-activate an inactive subscription.
      *
-     *  This function should be called when the peer is an ICD that is checking in and this ReadClient represents a subscription that would cause that ICD to not need to check in anymore.
+     *  This function should be called when the peer is an ICD that is checking in and this ReadClient represents a subscription
+     * that would cause that ICD to not need to check in anymore.
      *
      *  This API only works when issuing subscription via SendAutoResubscribeRequest.
      */
