@@ -594,6 +594,13 @@ tests:
                       Subjects: null,
                       Targets: null,
                   },
+                  {
+                      FabricIndex: 0,
+                      Privilege: 3, # operate
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
               ]
 
     - label: "Verify"
@@ -604,6 +611,107 @@ tests:
                   {
                       FabricIndex: 1,
                       Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
+                  {
+                      FabricIndex: 1,
+                      Privilege: 3, # operate
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
+              ]
+
+    - label:
+          "Write invalid field in first ACL Entry, with 2nd ACL Entry completely
+          valid"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  {
+                      FabricIndex: 0,
+                      Privilege: 0, # invalid privilege
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
+                  {
+                      FabricIndex: 0,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: [12, 13, 14, 15],
+                      Targets: null,
+                  },
+              ]
+      response:
+          error: CONSTRAINT_ERROR
+
+    # Even though a malformed entry was sent, nothing has changed and we still retain the Valid ACLs from previous step
+    - label: "Verify"
+      command: "readAttribute"
+      attribute: "ACL"
+      response:
+          value: [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
+                  {
+                      FabricIndex: 1,
+                      Privilege: 3, # operate
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
+              ]
+
+    - label:
+          "Write invalid field in second ACL Entry, with 1st ACL Entry being
+          Valid"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  {
+                      FabricIndex: 0,
+                      Privilege: 1, # view
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
+                  {
+                      FabricIndex: 0,
+                      Privilege: 0, # invalid privilege
+                      AuthMode: 2, # case
+                      Subjects: [12, 13, 14, 15],
+                      Targets: null,
+                  },
+              ]
+      response:
+          error: CONSTRAINT_ERROR
+
+    # Test: If second ACL Entry had invalid field, even 1st ACL Entry should be rejected. While retaining the previous Valid ACLs
+    - label: "Verify"
+      command: "readAttribute"
+      attribute: "ACL"
+      response:
+          value: [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5, # administer
+                      AuthMode: 2, # case
+                      Subjects: null,
+                      Targets: null,
+                  },
+                  {
+                      FabricIndex: 1,
+                      Privilege: 3, # operate
                       AuthMode: 2, # case
                       Subjects: null,
                       Targets: null,

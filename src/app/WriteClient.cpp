@@ -248,9 +248,9 @@ CHIP_ERROR WriteClient::PutSinglePreencodedAttributeWritePayload(const chip::app
 }
 
 CHIP_ERROR
-WriteClient::TryPutPreencodedListIntoSingleAttributeWritePayload(const chip::app::ConcreteDataAttributePath & attributePath,
-                                                                 TLV::TLVReader & valueReader, bool & chunkingNeeded,
-                                                                 ListIndex & outEncodedItemCount)
+WriteClient::TryPutPreencodedAttributeWritePayloadIntoList(const chip::app::ConcreteDataAttributePath & attributePath,
+                                                           TLV::TLVReader & valueReader, bool & outChunkingNeeded,
+                                                           ListIndex & outEncodedItemCount)
 {
 
     ReturnErrorOnFailure(EnsureListStarted(attributePath));
@@ -270,8 +270,8 @@ WriteClient::TryPutPreencodedListIntoSingleAttributeWritePayload(const chip::app
         if (err == CHIP_ERROR_NO_MEMORY || err == CHIP_ERROR_BUFFER_TOO_SMALL)
         {
             mWriteRequestBuilder.GetWriteRequests().Rollback(backupWriter);
-            chunkingNeeded = true;
-            err            = CHIP_NO_ERROR;
+            outChunkingNeeded = true;
+            err               = CHIP_NO_ERROR;
             break;
         }
         ReturnErrorOnFailure(err);
@@ -320,8 +320,7 @@ CHIP_ERROR WriteClient::PutPreencodedAttribute(const ConcreteDataAttributePath &
             bool chunkingNeeded = false;
 
             ReturnErrorOnFailure(
-                TryPutPreencodedListIntoSingleAttributeWritePayload(path, valueReader, chunkingNeeded, encodedItemCount));
-
+                TryPutPreencodedAttributeWritePayloadIntoList(path, valueReader, chunkingNeeded, encodedItemCount));
             if (!chunkingNeeded)
             {
                 return CHIP_NO_ERROR;
