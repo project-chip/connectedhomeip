@@ -107,6 +107,8 @@ CHIP_ERROR OTAFirmwareProcessor::ApplyAction()
 CHIP_ERROR OTAFirmwareProcessor::AbortAction()
 {
     OTA_CancelImage();
+    OTA_ServiceDeInit();
+
     Clear();
 
     return CHIP_NO_ERROR;

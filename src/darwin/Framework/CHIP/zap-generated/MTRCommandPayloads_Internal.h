@@ -616,21 +616,21 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTROperationalCredentialsClusterSetVidVerificationStatementParams (InternalMethods)
+@interface MTROperationalCredentialsClusterSetVIDVerificationStatementParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
 @end
 
-@interface MTROperationalCredentialsClusterSignVidVerificationRequestParams (InternalMethods)
+@interface MTROperationalCredentialsClusterSignVIDVerificationRequestParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
 @end
 
-@interface MTROperationalCredentialsClusterSignVidVerificationResponseParams (InternalMethods)
+@interface MTROperationalCredentialsClusterSignVIDVerificationResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::OperationalCredentials::Commands::SignVidVerificationResponse::DecodableType &)decodableStruct;
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::OperationalCredentials::Commands::SignVIDVerificationResponse::DecodableType &)decodableStruct;
 
 @end
 
