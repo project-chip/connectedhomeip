@@ -521,7 +521,8 @@ void ReadClient::OnPeerTypeChange(PeerType aType)
 
     ChipLogProgress(DataManagement, "Peer is now %s LIT ICD.", mIsPeerLIT ? "a" : "not a");
 
-    // If the peer is no longer LIT and in inactive ICD subscription status, try to wake up the subscription and do resubscribe.
+    // If the peer is no longer LIT and we were waiting for a check-in to try to resubscribe,
+    // just try to resubscribe now, because a SIT is not going to send a check-in.
     if (!mIsPeerLIT && IsInactiveICDSubscription())
     {
         TriggerResubscriptionForLivenessTimeout(CHIP_ERROR_TIMEOUT);
