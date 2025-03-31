@@ -1446,12 +1446,7 @@ bool IsFlatCompositionForEndpoint(EndpointId endpoint)
 
 bool IsTreeCompositionForEndpoint(EndpointId endpoint)
 {
-    uint16_t index = emberAfIndexFromEndpoint(endpoint);
-    if (index == kEmberInvalidEndpointIndex)
-    {
-        return false;
-    }
-    return !emAfEndpoints[index].bitmask.Has(EmberAfEndpointOptions::isFlatComposition);
+    return !IsFlatCompositionForEndpoint(endpoint);
 }
 
 EndpointComposition GetCompositionForEndpointIndex(uint16_t endpointIndex)
