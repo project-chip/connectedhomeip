@@ -26,8 +26,8 @@
 
 using chip::app::DataModel::MakeNullable;
 using namespace ::chip::DeviceLayer::Internal;
-using namespace EFR32DoorLock;
-using namespace EFR32DoorLock::LockInitParams;
+using namespace SilabsDoorLock;
+using namespace SilabsDoorLockConfig::LockInitParams;
 
 static constexpr uint16_t LockUserInfoSize        = sizeof(LockUserInfo);
 static constexpr uint16_t LockCredentialInfoSize  = sizeof(LockCredentialInfo);
@@ -349,7 +349,9 @@ bool LockManager::GetUser(chip::EndpointId endpointId, uint16_t userIndex, Ember
 
     uint16_t size = LockUserInfoSize;
 
-    error = mStorage->SyncGetKeyValue(userKey.KeyName(), &mUserInStorage, size);
+    LockUserInfo userInStorage;
+
+    error = mStorage->SyncGetKeyValue(userKey.KeyName(), &userInStorage, size);
     // If no data is found at user key
     if (error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
@@ -361,9 +363,9 @@ bool LockManager::GetUser(chip::EndpointId endpointId, uint16_t userIndex, Ember
     // Else if KVS read was successful
     else if (error == CHIP_NO_ERROR)
     {
-        user.userStatus = mUserInStorage.userStatus;
+        user.userStatus = userInStorage.userStatus;
 
-        if (mUserInStorage.userStatus == UserStatusEnum::kAvailable)
+        if (userInStorage.userStatus == UserStatusEnum::kAvailable)
         {
             ChipLogDetail(Zcl, "Found unoccupied user [endpoint=%d]", endpointId);
             return true;
@@ -375,30 +377,44 @@ bool LockManager::GetUser(chip::EndpointId endpointId, uint16_t userIndex, Ember
         return false;
     }
 
-    VerifyOrReturnValue(mUserInStorage.currentCredentialCount <= kMaxCredentialsPerUser, false);
+    VerifyOrReturnValue(userInStorage.currentCredentialCount <= kMaxCredentialsPerUser, false);
 
-    user.userName       = chip::CharSpan(mUserInStorage.userName, mUserInStorage.userNameSize);
-    user.userUniqueId   = mUserInStorage.userUniqueId;
-    user.userType       = mUserInStorage.userType;
-    user.credentialRule = mUserInStorage.credentialRule;
+    VerifyOrReturnValue(userInStorage.userNameSize <= DOOR_LOCK_MAX_USER_NAME_SIZE, false);
+
+    // Copy username data from storage to the output parameter
+    memmove(user.userName.data(), userInStorage.userName, userInStorage.userNameSize);
+
+    // Resize Span to match the actual username size retrieved from storage
+    user.userName.reduce_size(userInStorage.userNameSize);
+
+    user.userUniqueId   = userInStorage.userUniqueId;
+    user.userType       = userInStorage.userType;
+    user.credentialRule = userInStorage.credentialRule;
     // So far there's no way to actually create the credential outside Matter, so here we always set the creation/modification
     // source to Matter
     user.creationSource     = DlAssetSource::kMatterIM;
-    user.createdBy          = mUserInStorage.createdBy;
+    user.createdBy          = userInStorage.createdBy;
     user.modificationSource = DlAssetSource::kMatterIM;
-    user.lastModifiedBy     = mUserInStorage.lastModifiedBy;
+    user.lastModifiedBy     = userInStorage.lastModifiedBy;
 
     // Get credential struct from nvm3
     chip::StorageKeyName credentialKey = LockUserCredentialMap(userIndex);
 
-    uint16_t credentialSize = static_cast<uint16_t>(CredentialStructSize * mUserInStorage.currentCredentialCount);
+    uint16_t credentialSize = static_cast<uint16_t>(CredentialStructSize * userInStorage.currentCredentialCount);
 
-    error = mStorage->SyncGetKeyValue(credentialKey.KeyName(), mCredentials, credentialSize);
+    CredentialStruct credentials[kMaxCredentialsPerUser];
+
+    error = mStorage->SyncGetKeyValue(credentialKey.KeyName(), credentials, credentialSize);
 
     // If KVS read was successful
     if (error == CHIP_NO_ERROR)
     {
-        user.credentials = chip::Span<const CredentialStruct>{ mCredentials, mUserInStorage.currentCredentialCount };
+
+        // Copy credentials attached to user from storage to the output parameter
+        memmove(user.credentials.data(), credentials, credentialSize);
+        
+        // Resize Span to match the actual size of credentials attached to user
+        user.credentials.reduce_size(userInStorage.currentCredentialCount);
     }
     else if (error != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
@@ -450,15 +466,17 @@ bool LockManager::SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip:
         return false;
     }
 
-    memmove(mUserInStorage.userName, userName.data(), userName.size());
-    mUserInStorage.userNameSize           = userName.size();
-    mUserInStorage.userUniqueId           = uniqueId;
-    mUserInStorage.userStatus             = userStatus;
-    mUserInStorage.userType               = usertype;
-    mUserInStorage.credentialRule         = credentialRule;
-    mUserInStorage.lastModifiedBy         = modifier;
-    mUserInStorage.createdBy              = creator;
-    mUserInStorage.currentCredentialCount = totalCredentials;
+    LockUserInfo userInStorage;
+
+    memmove(userInStorage.userName, userName.data(), userName.size());
+    userInStorage.userNameSize           = userName.size();
+    userInStorage.userUniqueId           = uniqueId;
+    userInStorage.userStatus             = userStatus;
+    userInStorage.userType               = usertype;
+    userInStorage.credentialRule         = credentialRule;
+    userInStorage.lastModifiedBy         = modifier;
+    userInStorage.createdBy              = creator;
+    userInStorage.currentCredentialCount = totalCredentials;
 
     // Save credential struct in nvm3
     chip::StorageKeyName credentialKey = LockUserCredentialMap(userIndex);
@@ -470,7 +488,7 @@ bool LockManager::SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip:
     // Save user in nvm3
     chip::StorageKeyName userKey = LockUserEndpoint(userIndex, endpointId);
 
-    VerifyOrReturnValue(mStorage->SyncSetKeyValue(userKey.KeyName(), &mUserInStorage, LockUserInfoSize) == CHIP_NO_ERROR, false);
+    VerifyOrReturnValue(mStorage->SyncSetKeyValue(userKey.KeyName(), &userInStorage, LockUserInfoSize) == CHIP_NO_ERROR, false);
 
     ChipLogProgress(Zcl, "Successfully set the user [mEndpointId=%d,index=%d]", endpointId, userIndex);
 
@@ -493,9 +511,11 @@ bool LockManager::GetCredential(chip::EndpointId endpointId, uint16_t credential
 
     chip::StorageKeyName key = LockCredentialEndpoint(credentialIndex, credentialType, endpointId);
 
+    LockCredentialInfo credentialInStorage;
+
     uint16_t size = LockCredentialInfoSize;
 
-    error = mStorage->SyncGetKeyValue(key.KeyName(), &mCredentialInStorage, size);
+    error = mStorage->SyncGetKeyValue(key.KeyName(), &credentialInStorage, size);
 
     // If no data is found at credential key
     if (error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
@@ -508,7 +528,7 @@ bool LockManager::GetCredential(chip::EndpointId endpointId, uint16_t credential
     // Else if KVS read was successful
     else if (error == CHIP_NO_ERROR)
     {
-        credential.status = mCredentialInStorage.status;
+        credential.status = credentialInStorage.status;
         ChipLogDetail(Zcl, "CredentialStatus: %d, CredentialIndex: %d ", (int) credential.status, credentialIndex);
         if (DlCredentialStatus::kAvailable == credential.status)
         {
@@ -522,10 +542,17 @@ bool LockManager::GetCredential(chip::EndpointId endpointId, uint16_t credential
         return false;
     }
 
-    credential.credentialType = mCredentialInStorage.credentialType;
-    credential.credentialData = chip::ByteSpan{ mCredentialInStorage.credentialData, mCredentialInStorage.credentialDataSize };
-    credential.createdBy      = mCredentialInStorage.createdBy;
-    credential.lastModifiedBy = mCredentialInStorage.lastModifiedBy;
+    VerifyOrReturnValue(credentialInStorage.credentialDataSize <= kMaxCredentialSize, false);
+    
+    // Copy credential data from storage to the output parameter
+    memmove(credential.credentialData.data(), credentialInStorage.credentialData, credentialInStorage.credentialDataSize);
+
+    // Resize Span to match the actual size of the credential data retrieved from storage
+    credential.credentialData.reduce_size(credentialInStorage.credentialDataSize);
+
+    credential.credentialType = credentialInStorage.credentialType;
+    credential.createdBy      = credentialInStorage.createdBy;
+    credential.lastModifiedBy = credentialInStorage.lastModifiedBy;
     // So far there's no way to actually create the credential outside Matter, so here we always set the creation/modification
     // source to Matter
     credential.creationSource     = DlAssetSource::kMatterIM;
@@ -555,20 +582,20 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credential
                     "[credentialStatus=%u,credentialType=%u,credentialDataSize=%u,creator=%d,modifier=%d]",
                     to_underlying(credentialStatus), to_underlying(credentialType), credentialData.size(), creator, modifier);
 
-    mCredentialInStorage.status             = credentialStatus;
-    mCredentialInStorage.credentialType     = credentialType;
-    mCredentialInStorage.createdBy          = creator;
-    mCredentialInStorage.lastModifiedBy     = modifier;
-    mCredentialInStorage.credentialDataSize = credentialData.size();
+    LockCredentialInfo credentialInStorage;
 
-    memmove(mCredentialInStorage.credentialData, credentialData.data(), mCredentialInStorage.credentialDataSize);
+    credentialInStorage.status             = credentialStatus;
+    credentialInStorage.credentialType     = credentialType;
+    credentialInStorage.createdBy          = creator;
+    credentialInStorage.lastModifiedBy     = modifier;
+    credentialInStorage.credentialDataSize = credentialData.size();
+
+    // Copy credential data to the storage struct
+    memmove(credentialInStorage.credentialData, credentialData.data(), credentialInStorage.credentialDataSize);
 
     chip::StorageKeyName key = LockCredentialEndpoint(credentialIndex, credentialType, endpointId);
 
-    error = mStorage->SyncSetKeyValue(key.KeyName(), &mCredentialInStorage, LockCredentialInfoSize);
-
-    // Clear mCredentialInStorage.credentialData
-    memset(mCredentialInStorage.credentialData, 0, kMaxCredentialSize);
+    error = mStorage->SyncSetKeyValue(key.KeyName(), &credentialInStorage, LockCredentialInfoSize);
 
     if (error != CHIP_NO_ERROR)
     {

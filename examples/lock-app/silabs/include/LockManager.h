@@ -23,75 +23,18 @@
 #include <stdint.h>
 
 #include "AppEvent.h"
+#include "CHIPProjectConfig.h"
 
 #include <cmsis_os2.h>
 #include <lib/core/CHIPError.h>
 
 #include <lib/support/DefaultStorageKeyAllocator.h>
 
-namespace EFR32DoorLock {
-namespace ResourceRanges {
-// Used to size arrays
-static constexpr uint16_t kMaxUsers                  = 10;
-static constexpr uint8_t kMaxCredentialsPerUser      = 10;
-static constexpr uint8_t kMaxWeekdaySchedulesPerUser = 10;
-static constexpr uint8_t kMaxYeardaySchedulesPerUser = 10;
-static constexpr uint8_t kMaxHolidaySchedules        = 10;
-static constexpr uint8_t kMaxCredentialSize          = 20;
-static constexpr uint8_t kNumCredentialTypes         = 6;
+namespace SilabsDoorLock {
 
-} // namespace ResourceRanges
-
-namespace LockInitParams {
-
-struct LockParam
-{
-    // Read from zap attributes
-    uint16_t numberOfUsers                  = 0;
-    uint8_t numberOfCredentialsPerUser      = 0;
-    uint8_t numberOfWeekdaySchedulesPerUser = 0;
-    uint8_t numberOfYeardaySchedulesPerUser = 0;
-    uint8_t numberOfHolidaySchedules        = 0;
-};
-
-class ParamBuilder
-{
-public:
-    ParamBuilder & SetNumberOfUsers(uint16_t numberOfUsers)
-    {
-        lockParam_.numberOfUsers = numberOfUsers;
-        return *this;
-    }
-    ParamBuilder & SetNumberOfCredentialsPerUser(uint8_t numberOfCredentialsPerUser)
-    {
-        lockParam_.numberOfCredentialsPerUser = numberOfCredentialsPerUser;
-        return *this;
-    }
-    ParamBuilder & SetNumberOfWeekdaySchedulesPerUser(uint8_t numberOfWeekdaySchedulesPerUser)
-    {
-        lockParam_.numberOfWeekdaySchedulesPerUser = numberOfWeekdaySchedulesPerUser;
-        return *this;
-    }
-    ParamBuilder & SetNumberOfYeardaySchedulesPerUser(uint8_t numberOfYeardaySchedulesPerUser)
-    {
-        lockParam_.numberOfYeardaySchedulesPerUser = numberOfYeardaySchedulesPerUser;
-        return *this;
-    }
-    ParamBuilder & SetNumberOfHolidaySchedules(uint8_t numberOfHolidaySchedules)
-    {
-        lockParam_.numberOfHolidaySchedules = numberOfHolidaySchedules;
-        return *this;
-    }
-    LockParam GetLockParam() { return lockParam_; }
-
-private:
-    LockParam lockParam_;
-};
-
-} // namespace LockInitParams
 namespace Storage {
 
-using namespace EFR32DoorLock::ResourceRanges;
+using namespace SilabsDoorLockConfig::ResourceRanges;
 struct WeekDayScheduleInfo
 {
     DlScheduleStatus status;
@@ -134,11 +77,11 @@ struct LockCredentialInfo
     size_t credentialDataSize;
 };
 } // namespace Storage
-} // namespace EFR32DoorLock
+} // namespace SilabsDoorLock
 
 using namespace ::chip;
-using namespace EFR32DoorLock::ResourceRanges;
-using namespace EFR32DoorLock::Storage;
+using namespace SilabsDoorLockConfig::ResourceRanges;
+using namespace SilabsDoorLock::Storage;
 
 class LockManager
 {
@@ -163,7 +106,7 @@ public:
     } State;
 
     CHIP_ERROR Init(chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> state,
-                    EFR32DoorLock::LockInitParams::LockParam lockParam, PersistentStorageDelegate * storage);
+        SilabsDoorLockConfig::LockInitParams::LockParam lockParam, PersistentStorageDelegate * storage);
     bool NextState();
     bool IsActionInProgress();
     bool InitiateAction(int32_t aActor, Action_t aAction);
@@ -271,7 +214,7 @@ private:
 
     osTimerId_t mLockTimer;
 
-    EFR32DoorLock::LockInitParams::LockParam LockParams;
+    SilabsDoorLockConfig::LockInitParams::LockParam LockParams;
 
     // Stores LockUserInfo corresponding to a user index
     static StorageKeyName LockUserEndpoint(uint16_t userIndex, chip::EndpointId endpoint)
