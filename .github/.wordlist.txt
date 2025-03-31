@@ -318,6 +318,7 @@ CPROTO
 cpuapp
 cpython
 CQM
+CRL
 crypto
 cryptographic
 CSA
@@ -1171,6 +1172,7 @@ PyFunction
 pylint
 PyObject
 pypi
+pyproject
 PyRun
 pytest
 PYTHONPATH

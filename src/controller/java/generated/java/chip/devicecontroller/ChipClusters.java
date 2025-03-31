@@ -16117,11 +16117,11 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void setVidVerificationStatement(DefaultClusterCallback callback, Optional<Integer> vendorID, Optional<byte[]> vidVerificationStatement, Optional<byte[]> vvsc) {
-      setVidVerificationStatement(callback, vendorID, vidVerificationStatement, vvsc, 0);
+    public void setVIDVerificationStatement(DefaultClusterCallback callback, Optional<Integer> vendorID, Optional<byte[]> VIDVerificationStatement, Optional<byte[]> vvsc) {
+      setVIDVerificationStatement(callback, vendorID, VIDVerificationStatement, vvsc, 0);
     }
 
-    public void setVidVerificationStatement(DefaultClusterCallback callback, Optional<Integer> vendorID, Optional<byte[]> vidVerificationStatement, Optional<byte[]> vvsc, int timedInvokeTimeoutMs) {
+    public void setVIDVerificationStatement(DefaultClusterCallback callback, Optional<Integer> vendorID, Optional<byte[]> VIDVerificationStatement, Optional<byte[]> vvsc, int timedInvokeTimeoutMs) {
       final long commandId = 12L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -16129,9 +16129,9 @@ public class ChipClusters {
       BaseTLVType vendorIDtlvValue = vendorID.<BaseTLVType>map((nonOptionalvendorID) -> new UIntType(nonOptionalvendorID)).orElse(new EmptyType());
       elements.add(new StructElement(vendorIDFieldID, vendorIDtlvValue));
 
-      final long vidVerificationStatementFieldID = 1L;
-      BaseTLVType vidVerificationStatementtlvValue = vidVerificationStatement.<BaseTLVType>map((nonOptionalvidVerificationStatement) -> new ByteArrayType(nonOptionalvidVerificationStatement)).orElse(new EmptyType());
-      elements.add(new StructElement(vidVerificationStatementFieldID, vidVerificationStatementtlvValue));
+      final long VIDVerificationStatementFieldID = 1L;
+      BaseTLVType VIDVerificationStatementtlvValue = VIDVerificationStatement.<BaseTLVType>map((nonOptionalVIDVerificationStatement) -> new ByteArrayType(nonOptionalVIDVerificationStatement)).orElse(new EmptyType());
+      elements.add(new StructElement(VIDVerificationStatementFieldID, VIDVerificationStatementtlvValue));
 
       final long vvscFieldID = 2L;
       BaseTLVType vvsctlvValue = vvsc.<BaseTLVType>map((nonOptionalvvsc) -> new ByteArrayType(nonOptionalvvsc)).orElse(new EmptyType());
@@ -16145,11 +16145,11 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void signVidVerificationRequest(SignVidVerificationResponseCallback callback, Integer fabricIndex, byte[] clientChallenge) {
-      signVidVerificationRequest(callback, fabricIndex, clientChallenge, 0);
+    public void signVIDVerificationRequest(SignVIDVerificationResponseCallback callback, Integer fabricIndex, byte[] clientChallenge) {
+      signVIDVerificationRequest(callback, fabricIndex, clientChallenge, 0);
     }
 
-    public void signVidVerificationRequest(SignVidVerificationResponseCallback callback, Integer fabricIndex, byte[] clientChallenge, int timedInvokeTimeoutMs) {
+    public void signVIDVerificationRequest(SignVIDVerificationResponseCallback callback, Integer fabricIndex, byte[] clientChallenge, int timedInvokeTimeoutMs) {
       final long commandId = 13L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -16209,7 +16209,7 @@ public class ChipClusters {
       void onSuccess(Integer statusCode, Optional<Integer> fabricIndex, Optional<String> debugText);
     }
 
-    public interface SignVidVerificationResponseCallback extends BaseClusterCallback {
+    public interface SignVIDVerificationResponseCallback extends BaseClusterCallback {
       void onSuccess(Integer fabricIndex, Integer fabricBindingVersion, byte[] signature);
     }
 

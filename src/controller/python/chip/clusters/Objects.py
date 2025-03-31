@@ -29,14 +29,12 @@ import typing
 from dataclasses import dataclass, field
 from enum import IntFlag
 
-from chip import ChipUtility
-from chip.clusters.enum import MatterIntEnum
-from chip.tlv import float32, uint
-
+from .. import ChipUtility
+from ..clusters.enum import MatterIntEnum
+from ..tlv import float32, uint
 from .ClusterObjects import (Cluster, ClusterAttributeDescriptor, ClusterCommand, ClusterEvent, ClusterObject,
                              ClusterObjectDescriptor, ClusterObjectFieldDescriptor)
 from .Types import Nullable, NullValue
-
 
 __all__ = [
     "Globals",
@@ -12349,7 +12347,7 @@ class OperationalCredentials(Cluster):
                         ClusterObjectFieldDescriptor(Label="fabricID", Tag=3, Type=uint),
                         ClusterObjectFieldDescriptor(Label="nodeID", Tag=4, Type=uint),
                         ClusterObjectFieldDescriptor(Label="label", Tag=5, Type=str),
-                        ClusterObjectFieldDescriptor(Label="vidVerificationStatement", Tag=6, Type=typing.Optional[bytes]),
+                        ClusterObjectFieldDescriptor(Label="VIDVerificationStatement", Tag=6, Type=typing.Optional[bytes]),
                         ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
@@ -12358,7 +12356,7 @@ class OperationalCredentials(Cluster):
             fabricID: 'uint' = 0
             nodeID: 'uint' = 0
             label: 'str' = ""
-            vidVerificationStatement: 'typing.Optional[bytes]' = None
+            VIDVerificationStatement: 'typing.Optional[bytes]' = None
             fabricIndex: 'uint' = 0
 
         @dataclass
@@ -12592,7 +12590,7 @@ class OperationalCredentials(Cluster):
             rootCACertificate: bytes = b""
 
         @dataclass
-        class SetVidVerificationStatement(ClusterCommand):
+        class SetVIDVerificationStatement(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0000003E
             command_id: typing.ClassVar[int] = 0x0000000C
             is_client: typing.ClassVar[bool] = True
@@ -12603,20 +12601,20 @@ class OperationalCredentials(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="vendorID", Tag=0, Type=typing.Optional[uint]),
-                        ClusterObjectFieldDescriptor(Label="vidVerificationStatement", Tag=1, Type=typing.Optional[bytes]),
+                        ClusterObjectFieldDescriptor(Label="VIDVerificationStatement", Tag=1, Type=typing.Optional[bytes]),
                         ClusterObjectFieldDescriptor(Label="vvsc", Tag=2, Type=typing.Optional[bytes]),
                     ])
 
             vendorID: typing.Optional[uint] = None
-            vidVerificationStatement: typing.Optional[bytes] = None
+            VIDVerificationStatement: typing.Optional[bytes] = None
             vvsc: typing.Optional[bytes] = None
 
         @dataclass
-        class SignVidVerificationRequest(ClusterCommand):
+        class SignVIDVerificationRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0000003E
             command_id: typing.ClassVar[int] = 0x0000000D
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = 'SignVidVerificationResponse'
+            response_type: typing.ClassVar[str] = 'SignVIDVerificationResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -12630,7 +12628,7 @@ class OperationalCredentials(Cluster):
             clientChallenge: bytes = b""
 
         @dataclass
-        class SignVidVerificationResponse(ClusterCommand):
+        class SignVIDVerificationResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0000003E
             command_id: typing.ClassVar[int] = 0x0000000E
             is_client: typing.ClassVar[bool] = False

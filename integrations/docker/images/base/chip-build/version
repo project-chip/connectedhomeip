@@ -1,1 +1,1 @@
-123 : [Tizen] Add arm64 target - Docker part
+126 : Upgrade docker to build with gstreamer for camera-app
