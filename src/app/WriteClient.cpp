@@ -279,9 +279,7 @@ WriteClient::TryPutPreencodedAttributeWritePayloadIntoList(const chip::app::Conc
     }
     VerifyOrReturnError(err == CHIP_END_OF_TLV || err == CHIP_NO_ERROR, err);
 
-    ReturnErrorOnFailure(EnsureListEnded());
-
-    return CHIP_NO_ERROR;
+    return EnsureListEnded();
 }
 
 CHIP_ERROR WriteClient::PutPreencodedAttribute(const ConcreteDataAttributePath & attributePath, const TLV::TLVReader & data)

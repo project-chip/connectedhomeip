@@ -432,8 +432,7 @@ private:
             outEncodedItemCount++;
         }
 
-        ReturnErrorOnFailure(EnsureListEnded());
-        return CHIP_NO_ERROR;
+        return EnsureListEnded();
     }
 
     /**
