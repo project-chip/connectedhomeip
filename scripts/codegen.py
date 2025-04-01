@@ -15,6 +15,7 @@
 
 import logging
 import sys
+from pathlib import Path
 
 import click
 
@@ -25,18 +26,13 @@ except ImportError:
     _has_coloredlogs = False
 
 try:
-    from matter.idl.matter_idl_parser import CreateParser
+    from matter import idl
 except ImportError:
-    import os
-    sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'py_matter_idl')))
-    from matter.idl.matter_idl_parser import CreateParser
-
-# isort: off
-from matter.idl.generators import FileSystemGeneratorStorage, GeneratorStorage
-from matter.idl.generators.registry import CodeGenerator, GENERATORS
+    sys.path.append(str(Path(__file__).resolve().parent / "py_matter_idl" / "matter"))
+    import idl
 
 
-class ListGeneratedFilesStorage(GeneratorStorage):
+class ListGeneratedFilesStorage(idl.GeneratorStorage):
     """
     A storage that prints out file names that would have content in them.
     """
@@ -70,7 +66,7 @@ __LOG_LEVELS__ = {
 @click.option(
     '--generator', '-g',
     default='java-jni',
-    help='What code generator to run.  The choices are: '+'|'.join(GENERATORS.keys())+'. ' +
+    help='What code generator to run.  The choices are: '+'|'.join(idl.GENERATORS.keys())+'. ' +
          'When using custom, provide the plugin path using `--generator custom:<path_to_plugin>:<plugin_module_name>` syntax. ' +
          'For example, `--generator custom:./my_plugin:my_plugin_module` will load `./my_plugin/my_plugin_module/__init.py__` ' +
          'that defines a subclass of CodeGenerator named CustomGenerator.')
@@ -119,10 +115,10 @@ def main(log_level, generator, option, output_dir, dry_run, name_only, expected_
     if name_only:
         storage = ListGeneratedFilesStorage()
     else:
-        storage = FileSystemGeneratorStorage(output_dir)
+        storage = idl.FileSystemGeneratorStorage(output_dir)
 
     logging.info("Parsing idl from %s" % idl_path)
-    idl_tree = CreateParser().parse(open(idl_path, "rt").read())
+    idl_tree = idl.CreateParser().parse(open(idl_path, "rt").read())
 
     plugin_module = None
     if generator.startswith('custom:'):
@@ -146,7 +142,7 @@ def main(log_level, generator, option, output_dir, dry_run, name_only, expected_
         extra_args[key] = value
 
     logging.info("Running code generator %s" % generator)
-    generator = CodeGenerator.FromString(generator).Create(storage, idl=idl_tree, plugin_module=plugin_module, **extra_args)
+    generator = idl.CodeGenerator.FromString(generator).Create(storage, idl=idl_tree, plugin_module=plugin_module, **extra_args)
     generator.render(dry_run)
 
     if expected_outputs:

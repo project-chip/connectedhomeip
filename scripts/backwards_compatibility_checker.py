@@ -16,6 +16,7 @@
 #
 import logging
 import sys
+from pathlib import Path
 
 import click
 
@@ -26,13 +27,11 @@ except ImportError:
     _has_coloredlogs = False
 
 try:
-    from matter.idl.matter_idl_parser import CreateParser
+    from matter import idl
 except ImportError:
-    import os
-    sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'py_matter_idl')))
-    from matter.idl.matter_idl_parser import CreateParser
+    sys.path.append(str(Path(__file__).resolve().parent / "py_matter_idl" / "matter"))
+    import idl
 
-from matter.idl.backwards_compatibility import is_backwards_compatible
 
 # Supported log levels, mapping string values required for argument
 # parsing into logging constants
@@ -75,12 +74,12 @@ def main(log_level, old_idl, new_idl):
         )
 
     logging.info("Parsing OLD idl from %s" % old_idl)
-    old_tree = CreateParser().parse(open(old_idl, "rt").read())
+    old_tree = idl.CreateParser().parse(open(old_idl, "rt").read())
 
     logging.info("Parsing NEW idl from %s" % new_idl)
-    new_tree = CreateParser().parse(open(new_idl, "rt").read())
+    new_tree = idl.CreateParser().parse(open(new_idl, "rt").read())
 
-    if not is_backwards_compatible(original=old_tree, updated=new_tree):
+    if not idl.is_backwards_compatible(original=old_tree, updated=new_tree):
         sys.exit(1)
 
     sys.exit(0)
