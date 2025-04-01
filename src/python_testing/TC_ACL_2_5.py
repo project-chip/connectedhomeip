@@ -70,7 +70,7 @@ class TC_ACL_2_5(MatterBaseTest):
                      "Result is SUCCESS, value is list of AccessControlExtensionChanged containing 1 element"),
             TestStep(6, "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 1 element", "Result is SUCCESS"),
             TestStep(7, "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlExtensionChanged events",
-                     "Result is SUCCESS, value is list of AccessControlExtensionChanged containing at least 2 new elements"),
+                     "Result is SUCCESS, value is list of AccessControlExtensionChanged containing 1 element"),
             TestStep(8, "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 1 element",
                      "Result is 0x87 (CONSTRAINT_ERROR)-Data value exceeds maximum length."),
             TestStep(9, "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlExtensionChanged event",
@@ -354,7 +354,7 @@ class TC_ACL_2_5(MatterBaseTest):
         too_long_extension = Clusters.AccessControl.Structs.AccessControlExtensionStruct(
             data=too_long_data)
 
-        # This should fail with RESOURCE_EXHAUSTED
+        # This should fail with CONSTRAINT_ERROR
         try:
             self.print_step(
                 f"Attempting to write extension that exceeds max length (should fail)", "")
@@ -456,7 +456,7 @@ class TC_ACL_2_5(MatterBaseTest):
                 f"Failed to write multiple extensions due to other error: {e}")
 
         self.step(11)
-        # Verify no event was generated for the second extension
+        # Verify no event was generated at all, since the whole extensions list was rejected.
         self.print_step(
             f"Reading events after failed write (multiple extensions)...", "")
 
@@ -475,7 +475,7 @@ class TC_ACL_2_5(MatterBaseTest):
 
             found_valid_event = False
 
-            # Ensure no events have the second extension data
+            # Ensure that no events were generated at all
             for event_data in events:
                 self.print_step(f"Examining event", str(event_data))
 
