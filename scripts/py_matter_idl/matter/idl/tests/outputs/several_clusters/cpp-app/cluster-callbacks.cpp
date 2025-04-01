@@ -18,3 +18,17 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
         break;
     }
 }
+
+// Cluster Shutdown Functions
+void emberAfClusterShutdownCallback(EndpointId endpoint, ClusterId clusterId)
+{
+    switch (clusterId)
+    {
+    case app::Clusters::Third::Id:
+        emberAfThirdClusterShutdownCallback(endpoint);
+        break;
+    default:
+        // Unrecognized cluster ID
+        break;
+    }
+}

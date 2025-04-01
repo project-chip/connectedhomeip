@@ -2097,6 +2097,7 @@ endpoint 1 {
     handle command Pause;
     handle command Resume;
     handle command OperationalCommandResponse;
+    handle command GoHome;
   }
 }
 

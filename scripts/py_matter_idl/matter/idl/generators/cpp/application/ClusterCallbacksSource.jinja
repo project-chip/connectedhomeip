@@ -10,9 +10,25 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
 {
     switch (clusterId)
     {
-  {%- for name in clusters | sort(attribute='name') | map(attribute='name') | unique %}
+  {%- for name in clusters | sort(attribute='name') | map(attribute='name') %}
     case app::Clusters::{{name}}::Id:
         emberAf{{name}}ClusterInitCallback(endpoint);
+        break;
+  {%- endfor %}
+    default:
+        // Unrecognized cluster ID
+        break;
+    }
+}
+
+// Cluster Shutdown Functions
+void emberAfClusterShutdownCallback(EndpointId endpoint, ClusterId clusterId)
+{
+    switch (clusterId)
+    {
+  {%- for name in clusters | sort(attribute='name') | map(attribute='name') %}
+    case app::Clusters::{{name}}::Id:
+        emberAf{{name}}ClusterShutdownCallback(endpoint);
         break;
   {%- endfor %}
     default:

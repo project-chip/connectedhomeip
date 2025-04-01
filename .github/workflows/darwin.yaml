@@ -112,7 +112,6 @@ jobs:
               working-directory: src/darwin/Framework
               run: |
                   mkdir -p /tmp/darwin/framework-tests
-                  ../../../out/debug/all-clusters-app/chip-all-clusters-app --interface-id -1 > >(tee /tmp/darwin/framework-tests/all-cluster-app.log) 2> >(tee /tmp/darwin/framework-tests/all-cluster-app-err.log >&2) &
 
                   export TEST_RUNNER_ASAN_OPTIONS=__CURRENT_VALUE__:detect_stack_use_after_return=1
 

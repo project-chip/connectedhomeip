@@ -23,8 +23,6 @@
 #import "MTRTestKeys.h"
 #import "MTRTestStorage.h"
 
-// Fixture 1: chip-all-clusters-app --KVS "$(mktemp -t chip-test-kvs)" --interface-id -1
-
 static const uint16_t kTestVendorId = 0xFFF1u;
 static const __auto_type kTestProductIds = @[ @(0x8000u), @(0x8001u), @(0x8002u) ];
 static const __auto_type kTestDiscriminators = @[ @(2000), @(3839u), @(3840u), @(0xb1e) ];
@@ -168,6 +166,7 @@ static NSDictionary<NSString *, id> * ResultSnapshot(MTRCommissionableBrowserRes
 
     // Start the helper apps our tests use. Note these payloads match kTestDiscriminators etc.
     for (NSString * payload in @[
+             @"MT:-24J0AFN00KA0648G00",
              @"MT:Y.K90SO527JA0648G00",
              @"MT:-24J0AFN00I40648G00",
          ]) {
