@@ -313,6 +313,7 @@ namespace Inet {
         mListenerSemaphore = nullptr;
 
         mSendSemaphore = nullptr;
+        mSystemQueue = nullptr;
     }
 
     void UDPEndPointImplNetworkFramework::Free()
