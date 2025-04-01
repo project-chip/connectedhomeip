@@ -67,12 +67,12 @@ def MatterTlvToJson(tlv_data: dict[int, Any]) -> dict[str, Any]:
     matter_json_dict = {}
 
     key_type_mappings = {
-        chip.tlv.uint: "UINT",
+        matter.tlv.uint: "UINT",
         int: "INT",
         bool: "BOOL",
         list: "ARRAY",
         dict: "STRUCT",
-        chip.tlv.float32: "FLOAT",
+        matter.tlv.float32: "FLOAT",
         float: "DOUBLE",
         bytes: "BYTES",
         str: "STRING",

@@ -42,8 +42,8 @@ from typing import Any, Iterable, List, Optional, Tuple
 
 # isort: off
 
-from matter import ChipDeviceCtrl  # Needed before chip.FabricAdmin
-import matter.FabricAdmin  # Needed before chip.CertificateAuthority
+from matter import ChipDeviceCtrl  # Needed before matter.FabricAdmin
+import matter.FabricAdmin  # Needed before matter.CertificateAuthority
 import matter.CertificateAuthority
 
 # isort: on
@@ -770,7 +770,7 @@ class MatterStackState:
         self._config = config
 
         if not hasattr(builtins, "chipStack"):
-            chip.native.Init(bluetoothAdapter=config.ble_controller)
+            matter.native.Init(bluetoothAdapter=config.ble_controller)
             if config.storage_path is None:
                 raise ValueError("Must have configured a MatterTestConfig.storage_path")
             self._init_stack(already_initialized=False, persistentStoragePath=config.storage_path)
@@ -791,10 +791,10 @@ class MatterStackState:
             self._chip_stack = ChipStack(**kwargs)
             builtins.chipStack = self._chip_stack
 
-        chip.logging.RedirectToPythonLogging()
+        matter.logging.RedirectToPythonLogging()
 
         self._storage = self._chip_stack.GetStorageManager()
-        self._certificate_authority_manager = chip.CertificateAuthority.CertificateAuthorityManager(chipStack=self._chip_stack)
+        self._certificate_authority_manager = matter.CertificateAuthority.CertificateAuthorityManager(chipStack=self._chip_stack)
         self._certificate_authority_manager.LoadAuthoritiesFromStorage()
 
         if (len(self._certificate_authority_manager.activeCaList) == 0):
@@ -1009,7 +1009,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         return unstash_globally(self.user_params.get("matter_stack"))
 
     @property
-    def certificate_authority_manager(self) -> chip.CertificateAuthority.CertificateAuthorityManager:
+    def certificate_authority_manager(self) -> matter.CertificateAuthority.CertificateAuthorityManager:
         return unstash_globally(self.user_params.get("certificate_authority_manager"))
 
     @property

@@ -127,7 +127,7 @@ def test_clusters_ctrl(device, controller):
     err, res = write_zcl_attribute(devCtrl, "AccessControl", "Acl", nodeId,  ALL_CLUSTERS_CTRL_TEST_ENDPOINT_ID,
                                    [entry0, entry1, entry2, entry3])
     assert err == 0
-    assert res[0].Status == chip.interaction_model.Status.Success
+    assert res[0].Status == matter.interaction_model.Status.Success
 
     err, res = read_zcl_attribute(devCtrl, "AccessControl", "Acl", nodeId, ALL_CLUSTERS_CTRL_TEST_ENDPOINT_ID)
     assert err == 0

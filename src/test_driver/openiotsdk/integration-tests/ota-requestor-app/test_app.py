@@ -153,7 +153,7 @@ def test_update_ctrl(device, controller, ota_provider, softwareVersion):
                                    [{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [requestorNodeId], "targets": NullValue},
                                     {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": NullValue, "targets": [{"cluster": 41, "endpoint": NullValue, "deviceType": NullValue}]}])
     assert err == 0
-    assert res[0].Status == chip.interaction_model.Status.Success
+    assert res[0].Status == matter.interaction_model.Status.Success
 
     ota_provider.set_verbose(False)
 

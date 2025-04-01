@@ -22,15 +22,16 @@ import logging
 import os
 import pathlib
 
-import chip.CertificateAuthority
-import chip.clusters as Clusters  # noqa: F401
-import chip.FabricAdmin
-import chip.logging
-import chip.native
 import coloredlogs
-from chip.ChipStack import ChipStack
 from rich import inspect, pretty
 from rich.console import Console
+
+import matter.CertificateAuthority
+import matter.clusters as Clusters  # noqa: F401
+import matter.FabricAdmin
+import matter.logging
+import matter.native
+from matter.ChipStack import ChipStack
 
 
 def ReplInit(debug):
@@ -57,7 +58,7 @@ def ReplInit(debug):
     console.rule()
 
     coloredlogs.install(level='DEBUG')
-    chip.logging.RedirectToPythonLogging()
+    matter.logging.RedirectToPythonLogging()
 
     if debug:
         logging.getLogger().setLevel(logging.DEBUG)
@@ -148,7 +149,7 @@ or run `os.chdir` to the root of your CHIP repository checkout.
         # nothing we can do ... things will NOT work
         return
 
-    chip.native.Init(bluetoothAdapter=args.ble_controller)
+    matter.native.Init(bluetoothAdapter=args.ble_controller)
 
     global certificateAuthorityManager
     global chipStack
@@ -158,7 +159,7 @@ or run `os.chdir` to the root of your CHIP repository checkout.
     ReplInit(args.debug)
 
     chipStack = ChipStack(persistentStoragePath=args.storagepath, enableServerInteractions=args.server_interactions)
-    certificateAuthorityManager = chip.CertificateAuthority.CertificateAuthorityManager(chipStack, chipStack.GetStorageManager())
+    certificateAuthorityManager = matter.CertificateAuthority.CertificateAuthorityManager(chipStack, chipStack.GetStorageManager())
 
     certificateAuthorityManager.LoadAuthoritiesFromStorage()
 

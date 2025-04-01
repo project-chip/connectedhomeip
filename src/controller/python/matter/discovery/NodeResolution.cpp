@@ -28,7 +28,7 @@ using namespace chip::Dnssd;
 
 namespace {
 
-// callback types shared with python code (see ptyhon code in chip.discovery.types)
+// callback types shared with python code (see python code in matter.discovery.types)
 using DiscoverSuccessCallback = void (*)(uint64_t fabricId, uint64_t nodeId, uint32_t interfaceId, const char * ip, uint16_t port);
 using DiscoverFailureCallback = void (*)(uint64_t fabricId, uint64_t nodeId, PyChipError error_code);
 

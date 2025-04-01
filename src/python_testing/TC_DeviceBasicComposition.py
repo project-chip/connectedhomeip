@@ -489,12 +489,12 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         # validate that all the returned attributes in the standard clusters contain only known attribute ids
         for endpoint_id, endpoint in self.endpoints_tlv.items():
             for cluster_id, cluster in endpoint.items():
-                if cluster_id not in chip.clusters.ClusterObjects.ALL_ATTRIBUTES:
+                if cluster_id not in matter.clusters.ClusterObjects.ALL_ATTRIBUTES:
                     # Skip clusters that are not part of the standard generated corpus (e.g. MS clusters)
                     continue
                 standard_attributes = [a for a in cluster[GlobalAttributeIds.ATTRIBUTE_LIST_ID]
                                        if a <= attribute_standard_range_max]
-                allowed_standard_attributes = chip.clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id]
+                allowed_standard_attributes = matter.clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id]
                 unexpected_standard_attributes = sorted(list(set(standard_attributes) - set(allowed_standard_attributes)))
                 for unexpected in unexpected_standard_attributes:
                     location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=unexpected)
@@ -518,18 +518,18 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         # Command lists only have a scoped range, so we only need to check for known command ids, no global range check
         for endpoint_id, endpoint in self.endpoints_tlv.items():
             for cluster_id, cluster in endpoint.items():
-                if cluster_id not in chip.clusters.ClusterObjects.ALL_CLUSTERS:
+                if cluster_id not in matter.clusters.ClusterObjects.ALL_CLUSTERS:
                     continue
                 standard_accepted_commands = [
                     a for a in cluster[GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID] if a <= command_standard_range_max]
                 standard_generated_commands = [
                     a for a in cluster[GlobalAttributeIds.GENERATED_COMMAND_LIST_ID] if a <= command_standard_range_max]
-                if cluster_id in chip.clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS:
-                    allowed_accepted_commands = [a for a in chip.clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS[cluster_id]]
+                if cluster_id in matter.clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS:
+                    allowed_accepted_commands = [a for a in matter.clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS[cluster_id]]
                 else:
                     allowed_accepted_commands = []
-                if cluster_id in chip.clusters.ClusterObjects.ALL_GENERATED_COMMANDS:
-                    allowed_generated_commands = [a for a in chip.clusters.ClusterObjects.ALL_GENERATED_COMMANDS[cluster_id]]
+                if cluster_id in matter.clusters.ClusterObjects.ALL_GENERATED_COMMANDS:
+                    allowed_generated_commands = [a for a in matter.clusters.ClusterObjects.ALL_GENERATED_COMMANDS[cluster_id]]
                 else:
                     allowed_generated_commands = []
 
@@ -628,7 +628,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         self.print_step(9, "Validate that all clusters in the standard range have a known cluster ID")
         for endpoint_id, endpoint in self.endpoints_tlv.items():
             standard_clusters = [a for a in endpoint.keys() if a < mei_range_min]
-            unknown_clusters = sorted(list(set(standard_clusters) - set(chip.clusters.ClusterObjects.ALL_CLUSTERS)))
+            unknown_clusters = sorted(list(set(standard_clusters) - set(matter.clusters.ClusterObjects.ALL_CLUSTERS)))
             for bad in unknown_clusters:
                 location = ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=bad)
                 self.record_error(self.get_test_name(
@@ -648,12 +648,12 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         self.print_step(11, "Validate that standard cluster FeatureMap attributes contains only known feature flags")
         for endpoint_id, endpoint in self.endpoints_tlv.items():
             for cluster_id, cluster in endpoint.items():
-                if cluster_id not in chip.clusters.ClusterObjects.ALL_CLUSTERS:
+                if cluster_id not in matter.clusters.ClusterObjects.ALL_CLUSTERS:
                     continue
                 feature_map = cluster[GlobalAttributeIds.FEATURE_MAP_ID]
                 feature_mask = 0
                 try:
-                    feature_map_enum = chip.clusters.ClusterObjects.ALL_CLUSTERS[cluster_id].Bitmaps.Feature
+                    feature_map_enum = matter.clusters.ClusterObjects.ALL_CLUSTERS[cluster_id].Bitmaps.Feature
                     for f in feature_map_enum:
                         feature_mask = feature_mask | f
                 except AttributeError:

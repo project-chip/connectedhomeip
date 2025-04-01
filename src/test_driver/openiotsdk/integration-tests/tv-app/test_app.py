@@ -100,7 +100,7 @@ TV_CTRL_TEST_APP_ADMIN_VENDOR_ID = 65521
 @pytest.mark.ctrltest
 def test_command_check(device):
     try:
-        chip.native.Init()
+        matter.native.Init()
     except exceptions.ChipStackException as ex:
         log.error("CHIP initialization failed {}".format(ex))
         assert False

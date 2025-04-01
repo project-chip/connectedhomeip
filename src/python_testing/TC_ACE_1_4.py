@@ -53,7 +53,7 @@ from matter.testing.matter_testing import MatterBaseTest, async_test_body, defau
 
 
 def str_to_cluster(str):
-    return getattr(sys.modules["chip.clusters.Objects"], str)
+    return getattr(sys.modules["matter.clusters.Objects"], str)
 
 
 def str_to_attribute(cluster, str):

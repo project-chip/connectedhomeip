@@ -42,7 +42,7 @@ from collections import namedtuple
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter import ChipDeviceCtrl  # Needed before chip.FabricAdmin
+from matter import ChipDeviceCtrl  # Needed before matter.FabricAdmin
 from matter.clusters import Globals
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status

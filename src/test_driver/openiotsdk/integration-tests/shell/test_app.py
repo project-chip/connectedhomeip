@@ -78,7 +78,7 @@ def test_smoke_test(device):
 @pytest.mark.ctrltest
 def test_command_check(device):
     try:
-        chip.native.Init()
+        matter.native.Init()
     except exceptions.ChipStackException as ex:
         log.error("CHIP initialization failed {}".format(ex))
         assert False

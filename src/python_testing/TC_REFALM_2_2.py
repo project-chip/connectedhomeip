@@ -43,15 +43,15 @@ from dataclasses import dataclass
 from time import sleep
 from typing import Any
 
-import chip.clusters as Clusters
-from chip import ChipUtility
-from chip.clusters.ClusterObjects import ClusterCommand, ClusterObjectDescriptor, ClusterObjectFieldDescriptor
-from chip.interaction_model import InteractionModelError, Status
-from chip.tlv import uint
 from mobly import asserts
 
+import matter.clusters as Clusters
+from matter import ChipUtility
+from matter.clusters.ClusterObjects import ClusterCommand, ClusterObjectDescriptor, ClusterObjectFieldDescriptor
+from matter.interaction_model import InteractionModelError, Status
 from matter.testing import matter_asserts
 from matter.testing.matter_testing import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.tlv import uint
 
 logger = logging.getLogger(__name__)
 
