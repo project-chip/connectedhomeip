@@ -245,12 +245,12 @@ from chip.webrtc.types import PeerDisconnectedCallback_t
 from chip.webrtc.types import StatsCallback_t
 
 
-
 class TC_WebRTCP_2_3(MatterBaseTest):
 
     def steps_TC_WEBRTC_2_3(self) -> list[TestStep]:
         steps = [TestStep(1, "TH Reads CurrentSessions attribute from WebRTC Transport Provider Cluster on TH_SERVER"),
-                 TestStep(2, "TH Sends the ProvideOffer command with a null WebRTCSessionID, and neither the VideoStreamID nor the AudioStreamID are present"),
+                 TestStep(
+                     2, "TH Sends the ProvideOffer command with a null WebRTCSessionID, and neither the VideoStreamID nor the AudioStreamID are present"),
                  TestStep(3, "TH sends the ProvideOffer command with a null WebRTCSessionID, and StreamUsage = 4(kUnknownEnumValue)"),
                  TestStep(4, "TH sends the ProvideOffer command with a null WebRTCSessionID, a null VideoStreamID, a null AudioStreamID, and valid values for the other parameters."),
                  TestStep(5, "TH Reads CurrentSessions attribute from WebRTC Transport Provider Cluster on TH_SERVER"),
@@ -262,7 +262,7 @@ class TC_WebRTCP_2_3(MatterBaseTest):
 
     @async_test_body
     async def test_TC_WEBRTC_2_3(self):
-        
+
         def on_answer(answer, peer):
             print("on_answer called")
 
@@ -278,9 +278,9 @@ class TC_WebRTCP_2_3(MatterBaseTest):
 
         def on_disconnected(peer):
             print("on_disconnected called")
-            if(peer == 1):
+            if (peer == 1):
                 webrtc.GetStats(client1)
-            elif(peer == 2):
+            elif (peer == 2):
                 webrtc.GetStats(client2)
 
         def on_stats(stats, peer):
@@ -295,7 +295,8 @@ class TC_WebRTCP_2_3(MatterBaseTest):
 
         client = chip.webrtc.CreateWebrtcClient(1)
 
-        chip.webrtc.SetCallbacks(client, answer_callback, ice_callback, error_callback, peer_connected_callback, peer_disconnected_callback, stats_callback)
+        chip.webrtc.SetCallbacks(client, answer_callback, ice_callback, error_callback,
+                                 peer_connected_callback, peer_disconnected_callback, stats_callback)
 
         chip.webrtc.InitialiseConnection(client)
 
@@ -309,14 +310,15 @@ class TC_WebRTCP_2_3(MatterBaseTest):
 
         current_sessions = await self.default_controller.ReadAttribute(self.dut_node_id, [(endpoint, Clusters.Objects.WebRTCTransportProvider.Attributes.CurrentSessions)])
 
-        asserts.assert_equal(len(current_sessions[endpoint][Clusters.Objects.WebRTCTransportProvider][Clusters.Objects.WebRTCTransportProvider.Attributes.CurrentSessions]), 0, "All Webrtc sessions should be closed")
+        asserts.assert_equal(len(current_sessions[endpoint][Clusters.Objects.WebRTCTransportProvider]
+                             [Clusters.Objects.WebRTCTransportProvider.Attributes.CurrentSessions]), 0, "All Webrtc sessions should be closed")
 
         self.print_step(2, "Send the ProvideOffer command with a null WebRTCSessionID, and neither the VideoStreamID nor the AudioStreamID")
 
         try:
             provide_offer_response: Clusters.WebRTCTransportProvider.Commands.ProvideOfferResponse = await self.send_single_cmd(
                 cmd=Clusters.WebRTCTransportProvider.Commands.ProvideOffer(
-                    webRTCSessionID = NullValue,
+                    webRTCSessionID=NullValue,
                     sdp="v=0\r\n",
                     streamUsage=Clusters.WebRTCTransportProvider.Enums.StreamUsageEnum.kUnknownEnumValue,
                 ), endpoint=endpoint
@@ -326,17 +328,16 @@ class TC_WebRTCP_2_3(MatterBaseTest):
                 e.status, Status.ConstraintError, "Unexpected error returned")
             pass
 
-
-        self.print_step(3, "Send the ProvideOffer command with a null WebRTCSessionID, and StreamUsage = 4(kUnknownEnumValue)") 
+        self.print_step(3, "Send the ProvideOffer command with a null WebRTCSessionID, and StreamUsage = 4(kUnknownEnumValue)")
 
         try:
             provide_offer_response: Clusters.WebRTCTransportProvider.Commands.ProvideOfferResponse = await self.send_single_cmd(
                 cmd=Clusters.WebRTCTransportProvider.Commands.ProvideOffer(
-                    webRTCSessionID = NullValue,
+                    webRTCSessionID=NullValue,
                     sdp="v=0",
                     streamUsage=Clusters.WebRTCTransportProvider.Enums.StreamUsageEnum.kUnknownEnumValue,
-                    videoStreamID = NullValue,
-                    audioStreamID = NullValue,
+                    videoStreamID=NullValue,
+                    audioStreamID=NullValue,
                 ), endpoint=endpoint
             )
         except InteractionModelError as e:
@@ -344,33 +345,38 @@ class TC_WebRTCP_2_3(MatterBaseTest):
                 e.status, Status.ConstraintError, "Unexpected error returned")
             pass
 
-         
-        self.print_step(4, "send the ProvideOffer command with a null WebRTCSessionID, a null VideoStreamID, a null AudioStreamID, and valid values for the other parameters") 
+        self.print_step(
+            4, "send the ProvideOffer command with a null WebRTCSessionID, a null VideoStreamID, a null AudioStreamID, and valid values for the other parameters")
 
         provide_offer_response: Clusters.WebRTCTransportProvider.Commands.ProvideOfferResponse = await self.send_single_cmd(
             cmd=Clusters.WebRTCTransportProvider.Commands.ProvideOffer(
-                webRTCSessionID = NullValue,
+                webRTCSessionID=NullValue,
                 sdp=offer,
                 streamUsage=Clusters.WebRTCTransportProvider.Enums.StreamUsageEnum.kLiveView,
-                videoStreamID = NullValue,
-                audioStreamID = NullValue,
+                videoStreamID=NullValue,
+                audioStreamID=NullValue,
             ), endpoint=endpoint
         )
 
         print(provide_offer_response)
 
-        #await aio.sleep(2)
+        # await aio.sleep(2)
 
         asserts.assert_equal(provide_offer_response.webRTCSessionID >= 0, True, "Invalid response")
 
-        self.print_step(5, "Read CurrentSessions attribute from WebRTC Transport Provider Cluster on TH_SERVER") 
+        self.print_step(5, "Read CurrentSessions attribute from WebRTC Transport Provider Cluster on TH_SERVER")
 
         current_sessions_ = await self.default_controller.ReadAttribute(self.dut_node_id, [(endpoint, Clusters.Objects.WebRTCTransportProvider.Attributes.CurrentSessions)])
 
         print(current_sessions_)
 
+<<<<<<< HEAD
         asserts.assert_equal(bool(current_sessions_[endpoint][Clusters.Objects.WebRTCTransportProvider][Clusters.Objects.WebRTCTransportProvider.Attributes.CurrentSessions]), True, "No existing webrtc session")
 >>>>>>> b64d5a7f8e (Add Python test scripts for Provider cluster basic test plans.)
+=======
+        asserts.assert_equal(bool(current_sessions_[endpoint][Clusters.Objects.WebRTCTransportProvider]
+                             [Clusters.Objects.WebRTCTransportProvider.Attributes.CurrentSessions]), True, "No existing webrtc session")
+>>>>>>> 87eecf4c4b (Restyled by autopep8)
 
 
 if __name__ == "__main__":
