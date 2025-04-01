@@ -403,6 +403,13 @@ void MatterOperationalCredentialsPluginServerInitCallback()
     DeviceLayer::PlatformMgrImpl().AddEventHandler(OnPlatformEventHandler);
 }
 
+void MatterOperationalCredentialsPluginServerShutdownCallback()
+{
+    DeviceLayer::PlatformMgrImpl().RemoveEventHandler(OnPlatformEventHandler);
+    Server::GetInstance().GetFabricTable().RemoveFabricDelegate(&gFabricDelegate);
+    AttributeAccessInterfaceRegistry::Instance().Unregister(&gAttrAccess);
+}
+
 bool emberAfOperationalCredentialsClusterRemoveFabricCallback(app::CommandHandler * commandObj,
                                                               const app::ConcreteCommandPath & commandPath,
                                                               const Commands::RemoveFabric::DecodableType & commandData)
