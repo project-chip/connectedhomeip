@@ -15,18 +15,19 @@
 
 import logging
 import sys
+from pathlib import Path
 from typing import Optional
 
 import click
 
-from .data_model_xml import ParseSource, ParseXmls
-from .generators import GeneratorStorage
-from .generators.idl import IdlGenerator
-from .matter_idl_parser import CreateParser
-from .matter_idl_types import Idl
+try:
+    from matter import idl
+except ImportError:
+    sys.path.append(str(Path(__file__).resolve().parent / ".." / "matter"))
+    import idl
 
 
-class InMemoryStorage(GeneratorStorage):
+class InMemoryStorage(idl.generators.GeneratorStorage):
     def __init__(self):
         super().__init__()
         self.content: Optional[str] = None
@@ -42,7 +43,7 @@ class InMemoryStorage(GeneratorStorage):
         self.content = content
 
 
-def normalize_order(idl: Idl):
+def normalize_order(idl: idl.types.Idl):
     """Re-sorts contents of things inside a cluster so that
        output is easily diffed by humans
     """
@@ -119,7 +120,7 @@ def main(log_level, no_print, output, compare, compare_output, filenames):
     such as using:
 
     \b
-       ./scripts/py_matter_idl/matter/idl/data_model_xml_parser.py       \\
+       ./scripts/py_matter_idl/scripts/matter-data-model-xml-parser.py   \\
           --compare src/controller/data_model/controller-clusters.matter \\
           --compare-output out/orig.matter                               \\
           --output out/from_xml.matter                                   \\
@@ -137,12 +138,12 @@ def main(log_level, no_print, output, compare, compare_output, filenames):
 
     logging.info("Starting to parse ...")
 
-    sources = [ParseSource(source=name) for name in filenames]
-    data = ParseXmls(sources)
+    sources = [idl.ParseSource(source=name) for name in filenames]
+    data = idl.ParseXmls(sources)
     logging.info("Parse completed")
 
     if compare:
-        other_idl = CreateParser(skip_meta=True).parse(
+        other_idl = idl.CreateParser(skip_meta=True).parse(
             open(compare).read(), file_name=compare)
 
         # ensure that input file is filtered to only interesting
@@ -156,12 +157,12 @@ def main(log_level, no_print, output, compare, compare_output, filenames):
         normalize_order(other_idl)
 
         storage = InMemoryStorage()
-        IdlGenerator(storage=storage, idl=other_idl).render(dry_run=False)
+        idl.GENERATORS['idl'].Create(storage=storage, idl=other_idl).render(dry_run=False)
         with open(compare_output, 'wt', encoding="utf8") as o:
             o.write(storage.content)
 
     storage = InMemoryStorage()
-    IdlGenerator(storage=storage, idl=data).render(dry_run=False)
+    idl.GENERATORS['idl'].Create(storage=storage, idl=data).render(dry_run=False)
 
     if output:
         with open(output, 'wt', encoding="utf8") as o:

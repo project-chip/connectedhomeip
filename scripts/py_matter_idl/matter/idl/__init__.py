@@ -12,18 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from . import lint
+from . import generators, lint
+from . import matter_idl_types as types
 from .backwards_compatibility import is_backwards_compatible
-from .generators import FileSystemGeneratorStorage, GeneratorStorage
-from .generators.registry import GENERATORS, CodeGenerator
+from .data_model_xml import ParseSource, ParseXmls
+from .generators.registry import GENERATORS
 from .matter_idl_parser import CreateParser
 
 __all__ = [
-    'CodeGenerator',
     'CreateParser',
-    'FileSystemGeneratorStorage',
+    'generators',
     'GENERATORS',
-    'GeneratorStorage',
     'is_backwards_compatible',
     'lint',
+    'ParseSource',
+    'ParseXmls',
+    'types',
 ]

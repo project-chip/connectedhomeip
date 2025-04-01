@@ -32,7 +32,7 @@ except ImportError:
     import idl
 
 
-class ListGeneratedFilesStorage(idl.GeneratorStorage):
+class ListGeneratedFilesStorage(idl.generators.GeneratorStorage):
     """
     A storage that prints out file names that would have content in them.
     """
@@ -115,7 +115,7 @@ def main(log_level, generator, option, output_dir, dry_run, name_only, expected_
     if name_only:
         storage = ListGeneratedFilesStorage()
     else:
-        storage = idl.FileSystemGeneratorStorage(output_dir)
+        storage = idl.generators.FileSystemGeneratorStorage(output_dir)
 
     logging.info("Parsing idl from %s" % idl_path)
     idl_tree = idl.CreateParser().parse(open(idl_path, "rt").read())
@@ -142,7 +142,8 @@ def main(log_level, generator, option, output_dir, dry_run, name_only, expected_
         extra_args[key] = value
 
     logging.info("Running code generator %s" % generator)
-    generator = idl.CodeGenerator.FromString(generator).Create(storage, idl=idl_tree, plugin_module=plugin_module, **extra_args)
+    generator = idl.generators.CodeGenerator.FromString(generator).Create(
+        storage, idl=idl_tree, plugin_module=plugin_module, **extra_args)
     generator.render(dry_run)
 
     if expected_outputs:

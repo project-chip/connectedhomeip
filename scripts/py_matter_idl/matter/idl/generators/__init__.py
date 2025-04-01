@@ -21,6 +21,7 @@ import jinja2
 
 from ..matter_idl_types import Idl
 from .filters import RegisterCommonFilters
+from .registry import CodeGenerator  # noqa: F401
 
 
 class GeneratorStorage:
