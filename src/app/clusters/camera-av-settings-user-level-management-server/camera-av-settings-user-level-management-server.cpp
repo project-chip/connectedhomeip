@@ -821,7 +821,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZMoveToPreset(HandlerContext 
     auto presetValues = it->GetMptzPosition();
 
     // Inform the delegate that the device is requested to move to PTZ values given by the selected preset id
-    // Call the delegate to allow the devcice to handle the physical changes, on success set the MPTZ values based on the preset
+    // Call the delegate to allow the device to handle the physical changes, on success set the MPTZ values based on the preset
     status = mDelegate->MPTZMoveToPreset(preset, presetValues.pan, presetValues.tilt, presetValues.zoom);
 
     if (status != Status::Success)
@@ -845,21 +845,36 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZSavePreset(HandlerContext & 
     chip::CharSpan presetName = commandData.name;
     uint8_t presetToUse       = currentPresetID;
 
-    // Make sure that the vector will not exceed the max size
-    // TO DO, handle the case where we're overwriting an existing preset id
-    //
-    if (mMptzPresetHelper.size() == mMaxPresets)
-    {
-        ChipLogError(Zcl, "No more space for additional presets, MPTZSavePreset not possible");
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ResourceExhausted);
-        return;
-    }
-
-    // Do we have a user provided preset ID?
+    // Do we have a user provided preset ID? If yes, is it in range?
     //
     if (preset.HasValue())
     {
+        if (preset.Value() > mMaxPresets - 1)
+        {
+            ChipLogError(Zcl, "Provided preset ID is out of range");
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+            return;
+        }
         presetToUse = preset.Value();
+    }
+
+    // Does the preset equate to an already known stored preset? If so we're updating that one rather than creating a new one
+    //
+    auto it = std::find_if(mMptzPresetHelper.begin(), mMptzPresetHelper.end(),
+                           [presetToUse](const MPTZPresetHelper & mptzph) { return mptzph.GetPresetID() == presetToUse; });
+
+    bool newPresetValue = (it == mMptzPresetHelper.end());
+
+    if (newPresetValue)
+    {
+        // Make sure that the vector will not exceed the max size
+        //
+        if (mMptzPresetHelper.size() == mMaxPresets)
+        {
+            ChipLogError(Zcl, "No more space for additional presets, MPTZSavePreset not possible");
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ResourceExhausted);
+            return;
+        }
     }
 
     // Call the delegate, make sure that it is ok to save a new preset, given the current
@@ -884,8 +899,18 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZSavePreset(HandlerContext & 
                   mptzPresetHelper.GetName().c_str());
 
     mptzPresetHelper.SetMptzPosition(mMptzPosition);
-    mMptzPresetHelper.push_back(mptzPresetHelper);
 
+    // Add to the set only if new, otherwise replace what is at the iterator
+    //
+    if (newPresetValue) 
+    {
+        mMptzPresetHelper.push_back(mptzPresetHelper);
+    }
+    else
+    {
+        *it = mptzPresetHelper;
+    }
+   
     // Update the current preset ID to the next available
     UpdatePresetID();
     markDirty(Attributes::MPTZPresets::Id);
