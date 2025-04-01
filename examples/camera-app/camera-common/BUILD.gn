@@ -30,7 +30,9 @@ source_set("camera-lib") {
   sources = [
     "include/camera-app.h",
     "include/camera-device-interface.h",
+    "include/video-source-impl.h",
     "src/camera-app.cpp",
+    "src/video-source-impl.cpp",
   ]
 
   deps = [
