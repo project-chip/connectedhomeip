@@ -2143,13 +2143,21 @@ class ChipDeviceController(ChipDeviceControllerBase):
             return await asyncio.futures.wrap_future(ctx.future)
 
     async def CommissionThread(self, discriminator, setupPinCode, nodeId, threadOperationalDataset: bytes, isShortDiscriminator: bool = False) -> int:
-        ''' Commissions a Thread device over BLE
+        ''' 
+        Commissions a Thread device over BLE
+
+        Returns:
+            - Effective Node ID of the device (as defined by the assigned NOC)
         '''
         self.SetThreadOperationalDataset(threadOperationalDataset)
         return await self.ConnectBLE(discriminator, setupPinCode, nodeId, isShortDiscriminator)
 
     async def CommissionWiFi(self, discriminator, setupPinCode, nodeId, ssid: str, credentials: str, isShortDiscriminator: bool = False) -> int:
-        ''' Commissions a Wi-Fi device over BLE.
+        ''' 
+        Commissions a Wi-Fi device over BLE.
+
+        Returns:
+            - Effective Node ID of the device (as defined by the assigned NOC)
         '''
         self.SetWiFiCredentials(ssid, credentials)
         return await self.ConnectBLE(discriminator, setupPinCode, nodeId, isShortDiscriminator)
