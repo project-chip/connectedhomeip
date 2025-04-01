@@ -664,7 +664,7 @@ public:
 };
 
 namespace {
-    static GeneralCommissioningFabricTableDelegate fabricDelegate;
+static GeneralCommissioningFabricTableDelegate fabricDelegate;
 }
 
 void MatterGeneralCommissioningPluginServerInitCallback()
