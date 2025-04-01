@@ -32,7 +32,8 @@ public:
         return *mInstance;
     }
 
-    DiagnosticDataDelegateImpl(Tracing::Diagnostics::CircularDiagnosticBuffer * storageInstance) : mStorageInstance(storageInstance) {}
+    DiagnosticDataDelegateImpl(Tracing::Diagnostics::CircularDiagnosticBuffer * storageInstance) : mStorageInstance(storageInstance)
+    {}
 
     CHIP_ERROR StartPeriodicDiagnostics(chip::System::Clock::Timeout aTimeout) override
     {
@@ -96,10 +97,7 @@ public:
             {
                 tempReader.Init(mReader);
                 DiagnosticEntry trace = {
-                    .label = label,
-                    .stringValue = value,
-                    .type = chip::Tracing::Diagnostics::ValueType::kCharString,
-                    .timestamp = 0
+                    .label = label, .stringValue = value, .type = chip::Tracing::Diagnostics::ValueType::kCharString, .timestamp = 0
                 };
                 err = Decode(tempReader, trace);
                 if (err == CHIP_NO_ERROR)
@@ -111,10 +109,7 @@ public:
                 tempReader.Init(mReader);
 
                 DiagnosticEntry metricInt32 = {
-                    .label = label,
-                    .intValue = 0,
-                    .type = chip::Tracing::Diagnostics::ValueType::kSignedInteger,
-                    .timestamp = 0
+                    .label = label, .intValue = 0, .type = chip::Tracing::Diagnostics::ValueType::kSignedInteger, .timestamp = 0
                 };
                 err = Decode(tempReader, metricInt32);
                 if (err == CHIP_NO_ERROR)
@@ -126,10 +121,7 @@ public:
                 tempReader.Init(mReader);
 
                 DiagnosticEntry metricUint32 = {
-                    .label = label,
-                    .uintValue = 0,
-                    .type = chip::Tracing::Diagnostics::ValueType::kUnsignedInteger,
-                    .timestamp = 0
+                    .label = label, .uintValue = 0, .type = chip::Tracing::Diagnostics::ValueType::kUnsignedInteger, .timestamp = 0
                 };
                 err = Decode(tempReader, metricUint32);
                 if (err == CHIP_NO_ERROR)
