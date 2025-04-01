@@ -45,11 +45,11 @@ public:
     bool HasFeature(const Feature & aFeature) const;
 
     // Attribute Accessors
-    DataModel::Nullable<MeterTypeEnum> GetMeterType() { return mMeterType; }
-    DataModel::Nullable<CharSpan> GetPointOfDelivery() { return mPointOfDelivery; }
-    DataModel::Nullable<CharSpan> GetMeterSerialNumber() { return mMeterSerialNumber; }
-    DataModel::Nullable<CharSpan> GetProtocolVersion() { return mProtocolVersion; }
-    DataModel::Nullable<Globals::Structs::PowerThresholdStruct::Type> GetPowerThreshold() { return mPowerThreshold; }
+    const DataModel::Nullable<MeterTypeEnum> & GetMeterType() const  { return mMeterType; }
+    const DataModel::Nullable<CharSpan> & GetPointOfDelivery()const  { return mPointOfDelivery; }
+    const DataModel::Nullable<CharSpan> & GetMeterSerialNumber() const { return mMeterSerialNumber; }
+    const DataModel::Nullable<CharSpan> & GetProtocolVersion() const { return mProtocolVersion; }
+    const DataModel::Nullable<Globals::Structs::PowerThresholdStruct::Type> & GetPowerThreshold() { return mPowerThreshold; }
 
     // Internal Application API to set attribute values
     CHIP_ERROR SetMeterType(const DataModel::Nullable<MeterTypeEnum> & value);
