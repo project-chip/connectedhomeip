@@ -105,16 +105,16 @@ class TC_LTIME_3_1(MatterBaseTest):
 
         self.step(1)
         hour_format = await self.read_single_attribute_check_success(self.cluster, self.cluster.Attributes.HourFormat)
-        logging.info(f"Hourformat {type(hour_format)} with value {hour_format}")
+        logging.info(f"HourFormat {type(hour_format)} with value {hour_format}")
         # Validate Enum8
-        matter_asserts.assert_valid_uint8(hour_format, description="Hourformat")
-        asserts.assert_true(isinstance(hour_format, self.cluster.Enums.HourFormatEnum), "Hourformat is not type of HourFormatEnum")
+        matter_asserts.assert_valid_uint8(hour_format, description="HourFormat")
+        asserts.assert_is_instance(hour_format, self.cluster.Enums.HourFormatEnum, "HourFormat is not type of HourFormatEnum")
         # Verify the values are 0,1 and 255
         asserts.assert_in(hour_format, hour_format_values)
 
         self.step(2)
         if self.pics_guard(self.check_pics("LTIME.S.M.12HR")):
-            await self.write_single_attribute(self.cluster.Attributes.HourFormat(0), self.endpoint, expect_success=True)
+            await self.write_single_attribute(self.cluster.Attributes.HourFormat(0), self.endpoint)
 
         self.step(3)
         if self.pics_guard(self.check_pics("LTIME.S.M.12HR")):
@@ -123,7 +123,7 @@ class TC_LTIME_3_1(MatterBaseTest):
 
         self.step(4)
         if self.pics_guard(self.check_pics("LTIME.S.M.24HR")):
-            await self.write_single_attribute(self.cluster.Attributes.HourFormat(1), self.endpoint, expect_success=True)
+            await self.write_single_attribute(self.cluster.Attributes.HourFormat(1), self.endpoint)
 
         self.step(5)
         if self.pics_guard(self.check_pics("LTIME.S.M.24HR")):
@@ -131,7 +131,7 @@ class TC_LTIME_3_1(MatterBaseTest):
             asserts.assert_equal(hour_format, 1)
 
         self.step(6)
-        await self.write_single_attribute(self.cluster.Attributes.HourFormat(255), self.endpoint, expect_success=True)
+        await self.write_single_attribute(self.cluster.Attributes.HourFormat(255), self.endpoint)
 
         self.step(7)
         hour_format = await self.read_single_attribute_check_success(self.cluster, self.cluster.Attributes.HourFormat)
@@ -140,15 +140,15 @@ class TC_LTIME_3_1(MatterBaseTest):
         self.step(8)
         activecalendartype_value = await self.read_single_attribute_check_success(self.cluster, self.cluster.Attributes.ActiveCalendarType)
         logging.info(f"Value for {activecalendartype_value}")
-        asserts.assert_true(isinstance(activecalendartype_value, self.cluster.Enums.CalendarTypeEnum),
-                            "Activecalendartype  is not type of CalendarTypeEnum")
+        asserts.assert_is_instance(activecalendartype_value, self.cluster.Enums.CalendarTypeEnum,
+                                   "Activecalendartype  is not type of CalendarTypeEnum")
         # Validate Enum8 range
         matter_asserts.assert_valid_uint8(activecalendartype_value, "ActiveCalendarType")
         # Is in range of 0-11,255
         asserts.assert_in(activecalendartype_value, calendar_type_values)
 
         self.step(9)
-        await self.write_single_attribute(self.cluster.Attributes.ActiveCalendarType(0), self.endpoint, expect_success=True)
+        await self.write_single_attribute(self.cluster.Attributes.ActiveCalendarType(0), self.endpoint)
         activecalendartype_value = await self.read_single_attribute_check_success(self.cluster, self.cluster.Attributes.ActiveCalendarType)
         asserts.assert_equal(activecalendartype_value, 0)
 
@@ -156,7 +156,7 @@ class TC_LTIME_3_1(MatterBaseTest):
         # These values are from
         logging.info(f"PIXIT.LTIME.SCT values {pixit_SCT}")
         for i in pixit_SCT:
-            await self.write_single_attribute(self.cluster.Attributes.ActiveCalendarType(i), self.endpoint, expect_success=True)
+            await self.write_single_attribute(self.cluster.Attributes.ActiveCalendarType(i), self.endpoint)
             activecalendartype_value = await self.read_single_attribute_check_success(self.cluster, self.cluster.Attributes.ActiveCalendarType)
             asserts.assert_equal(activecalendartype_value, i)
 
