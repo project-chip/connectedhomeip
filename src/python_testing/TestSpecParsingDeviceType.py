@@ -69,7 +69,7 @@ class TestSpecParsingDeviceType(MatterBaseTest):
                                     <features>
                                     {% for fname in features[k] %}
                                     <feature name="{{ fname }}">
-                                    <disallowConform/>
+                                    <mandatoryConform/>
                                     </feature>
                                     {% endfor %}
                                     </features>
@@ -78,7 +78,7 @@ class TestSpecParsingDeviceType(MatterBaseTest):
                                     <attributes>
                                     {% for name in attributes[k] %}
                                     <attribute name="{{ name }}">
-                                    <disallowConform/>
+                                    <mandatoryConform/>
                                     </attribute>
                                     {% endfor %}
                                     </attributes>
@@ -87,7 +87,7 @@ class TestSpecParsingDeviceType(MatterBaseTest):
                                     <commands>
                                     {% for name in commands[k] %}
                                     <command name="{{ name }}">
-                                    <disallowConform/>
+                                    <mandatoryConform/>
                                     </command>
                                     {% endfor %}
                                     </commands>
@@ -97,14 +97,13 @@ class TestSpecParsingDeviceType(MatterBaseTest):
                                     </clusters>
                                     </deviceType>""")
         # We're going to use the real cluster stuff so I don't need to write new XML. Device type uses Identify and Groups.
-        self.cluster_definition_xml, _ = build_xml_clusters()
         super().setup_class
 
     def test_device_type_clusters(self):
         xml = self.template.render(device_type_id=self.device_type_id, revision=self.revision, classification_class=self.classification_class,
                                    classification_scope=self.classification_scope, clusters=self.clusters)
         et = ElementTree.fromstring(xml)
-        device_type, problems = parse_single_device_type(et, self.cluster_definition_xml)
+        device_type, problems = parse_single_device_type(et, self.xml_clusters)
         asserts.assert_equal(len(problems), 0, "Unexpected problems parsing device type conformance")
         asserts.assert_equal(len(device_type.keys()), 1, "Unexpected number of device types returned")
         asserts.assert_true(self.device_type_id in device_type.keys(), "device type id not found in returned data")
@@ -121,7 +120,7 @@ class TestSpecParsingDeviceType(MatterBaseTest):
         xml = self.template.render(device_type_id=self.device_type_id, revision=self.revision, classification_class=self.classification_class,
                                    classification_scope=self.classification_scope, clusters=clusters)
         et = ElementTree.fromstring(xml)
-        device_type, problems = parse_single_device_type(et, self.cluster_definition_xml)
+        device_type, problems = parse_single_device_type(et, self.xml_clusters)
         asserts.assert_equal(len(problems), 0, "Unexpected problems parsing device type conformance")
         asserts.assert_equal(len(device_type.keys()), 1, "Unexpected number of device types returned")
         asserts.assert_true(self.device_type_id in device_type.keys(), "device type id not found in returned data")
@@ -132,21 +131,21 @@ class TestSpecParsingDeviceType(MatterBaseTest):
         xml = self.template.render(device_type_id="", revision=self.revision, classification_class=self.classification_class,
                                    classification_scope=self.classification_scope, clusters=self.clusters)
         et = ElementTree.fromstring(xml)
-        device_type, problems = parse_single_device_type(et, self.cluster_definition_xml)
+        device_type, problems = parse_single_device_type(et, self.xml_clusters)
         asserts.assert_equal(len(problems), 1, "Device with blank ID did not generate a problem notice")
 
     def test_bad_class(self):
         xml = self.template.render(device_type_id=self.device_type_id, revision=self.revision, classification_class="",
                                    classification_scope=self.classification_scope, clusters=self.clusters)
         et = ElementTree.fromstring(xml)
-        device_type, problems = parse_single_device_type(et, self.cluster_definition_xml)
+        device_type, problems = parse_single_device_type(et, self.xml_clusters)
         asserts.assert_equal(len(problems), 1, "Device with no class did not generate a problem notice")
 
     def test_bad_scope(self):
         xml = self.template.render(device_type_id=self.device_type_id, revision=self.revision, classification_class=self.classification_class,
                                    classification_scope="", clusters=self.clusters)
         et = ElementTree.fromstring(xml)
-        device_type, problems = parse_single_device_type(et, self.cluster_definition_xml)
+        device_type, problems = parse_single_device_type(et, self.xml_clusters)
         asserts.assert_equal(len(problems), 1, "Device with no scope did not generate a problem notice")
 
     def test_feature_overrides_good(self):
@@ -158,7 +157,7 @@ class TestSpecParsingDeviceType(MatterBaseTest):
                                    classification_scope=self.classification_scope, clusters=self.clusters, features=features)
         et = ElementTree.fromstring(xml)
 
-        device_type, self.problems = parse_single_device_type(et, self.cluster_definition_xml)
+        device_type, self.problems = parse_single_device_type(et, self.xml_clusters)
         asserts.assert_in(groups_id, device_type[self.device_type_id].server_clusters,
                           "Groups Cluster not found in device type parse")
         asserts.assert_in(Clusters.Identify.id,
@@ -166,7 +165,7 @@ class TestSpecParsingDeviceType(MatterBaseTest):
         asserts.assert_in(
             group_name_mask, device_type[self.device_type_id].server_clusters[groups_id].feature_overrides, "GroupName override not found in groups cluster")
         asserts.assert_equal(str(
-            device_type[self.device_type_id].server_clusters[groups_id].feature_overrides[group_name_mask]), "X", "Improper conformance override for GroupName feature")
+            device_type[self.device_type_id].server_clusters[groups_id].feature_overrides[group_name_mask]), "M", "Improper conformance override for GroupName feature")
         asserts.assert_equal(len(self.problems), 0, "Found problems when parsing good feature override")
 
     def test_feature_overrides_bad(self):
@@ -179,7 +178,7 @@ class TestSpecParsingDeviceType(MatterBaseTest):
                                    classification_scope=self.classification_scope, clusters=self.clusters, features=features)
         et = ElementTree.fromstring(xml)
 
-        device_type, self.problems = parse_single_device_type(et, self.cluster_definition_xml)
+        device_type, self.problems = parse_single_device_type(et, self.xml_clusters)
         # The two clusters should still appear there
         asserts.assert_in(groups_id, device_type[self.device_type_id].server_clusters,
                           "Groups Cluster not found in device type parse")
@@ -202,7 +201,7 @@ class TestSpecParsingDeviceType(MatterBaseTest):
                                    classification_scope=self.classification_scope, clusters=self.clusters, attributes=attributes)
         et = ElementTree.fromstring(xml)
 
-        device_type, self.problems = parse_single_device_type(et, self.cluster_definition_xml)
+        device_type, self.problems = parse_single_device_type(et, self.xml_clusters)
         asserts.assert_in(groups_id, device_type[self.device_type_id].server_clusters,
                           "Groups Cluster not found in device type parse")
         asserts.assert_in(Clusters.Identify.id,
@@ -210,7 +209,7 @@ class TestSpecParsingDeviceType(MatterBaseTest):
         asserts.assert_in(
             name_support_attr, device_type[self.device_type_id].server_clusters[groups_id].attribute_overrides, "NameSupport override not found in groups cluster")
         asserts.assert_equal(str(
-            device_type[self.device_type_id].server_clusters[groups_id].attribute_overrides[name_support_attr]), "X", "Improper conformance override")
+            device_type[self.device_type_id].server_clusters[groups_id].attribute_overrides[name_support_attr]), "M", "Improper conformance override")
         asserts.assert_equal(len(self.problems), 0, "Found problems when parsing good attribute override")
 
     def test_attribute_overrides_bad(self):
@@ -223,7 +222,7 @@ class TestSpecParsingDeviceType(MatterBaseTest):
                                    classification_scope=self.classification_scope, clusters=self.clusters, attributes=attributes)
         et = ElementTree.fromstring(xml)
 
-        device_type, self.problems = parse_single_device_type(et, self.cluster_definition_xml)
+        device_type, self.problems = parse_single_device_type(et, self.xml_clusters)
         # The two clusters should still appear there
         asserts.assert_in(groups_id, device_type[self.device_type_id].server_clusters,
                           "Groups Cluster not found in device type parse")
@@ -246,7 +245,7 @@ class TestSpecParsingDeviceType(MatterBaseTest):
                                    classification_scope=self.classification_scope, clusters=self.clusters, commands=commands)
         et = ElementTree.fromstring(xml)
 
-        device_type, self.problems = parse_single_device_type(et, self.cluster_definition_xml)
+        device_type, self.problems = parse_single_device_type(et, self.xml_clusters)
         asserts.assert_in(groups_id, device_type[self.device_type_id].server_clusters,
                           "Groups Cluster not found in device type parse")
         asserts.assert_in(Clusters.Identify.id,
@@ -254,7 +253,7 @@ class TestSpecParsingDeviceType(MatterBaseTest):
         asserts.assert_in(
             add_group_cmd, device_type[self.device_type_id].server_clusters[groups_id].command_overrides, "AddGroup override not found in groups cluster")
         asserts.assert_equal(str(
-            device_type[self.device_type_id].server_clusters[groups_id].command_overrides[add_group_cmd]), "X", "Improper conformance override")
+            device_type[self.device_type_id].server_clusters[groups_id].command_overrides[add_group_cmd]), "M", "Improper conformance override")
         asserts.assert_equal(len(self.problems), 0, "Found problems when parsing good attribute override")
 
     def test_command_overrides_bad(self):
@@ -267,7 +266,7 @@ class TestSpecParsingDeviceType(MatterBaseTest):
                                    classification_scope=self.classification_scope, clusters=self.clusters, commands=commands)
         et = ElementTree.fromstring(xml)
 
-        device_type, self.problems = parse_single_device_type(et, self.cluster_definition_xml)
+        device_type, self.problems = parse_single_device_type(et, self.xml_clusters)
         # The two clusters should still appear there
         asserts.assert_in(groups_id, device_type[self.device_type_id].server_clusters,
                           "Groups Cluster not found in device type parse")
