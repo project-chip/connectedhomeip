@@ -663,6 +663,10 @@ public:
     }
 };
 
+namespace {
+    static GeneralCommissioningFabricTableDelegate fabricDelegate;
+}
+
 void MatterGeneralCommissioningPluginServerInitCallback()
 {
     Breadcrumb::Set(0, 0);
@@ -670,13 +674,11 @@ void MatterGeneralCommissioningPluginServerInitCallback()
     ReturnOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&gGeneralCommissioningInstance));
     DeviceLayer::PlatformMgrImpl().AddEventHandler(OnPlatformEventHandler);
 
-    static GeneralCommissioningFabricTableDelegate fabricDelegate;
     Server::GetInstance().GetFabricTable().AddFabricDelegate(&fabricDelegate);
 }
 
 void MatterGeneralCommissioningPluginServerShutdownCallback()
 {
-    static GeneralCommissioningFabricTableDelegate fabricDelegate;
     Server::GetInstance().GetFabricTable().RemoveFabricDelegate(&fabricDelegate);
 
     DeviceLayer::PlatformMgrImpl().RemoveEventHandler(OnPlatformEventHandler);
