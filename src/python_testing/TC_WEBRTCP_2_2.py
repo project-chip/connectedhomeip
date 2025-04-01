@@ -123,9 +123,8 @@ from chip.clusters.Types import NullValue
 from mobly import asserts
 
 
-
 class TC_WebRTCP_2_2(MatterBaseTest):
-    
+
     def steps_TC_WEBRTCP_2_1(self) -> list[TestStep]:
         steps = [TestStep(1, "Read CurrentSessions attribute from WebRTC Transport Provider Cluster"),
                  TestStep(2, "Perform device specific steps to exit standby mode"),
@@ -146,19 +145,20 @@ class TC_WebRTCP_2_2(MatterBaseTest):
         provider = Clusters.Objects.WebRTCTransportProvider
         current_sessions = await self.default_controller.ReadAttribute(self.dut_node_id, [(endpoint, Clusters.Objects.WebRTCTransportProvider.Attributes.CurrentSessions)])
 
-        asserts.assert_equal(len(current_sessions[endpoint][Clusters.Objects.WebRTCTransportProvider][Clusters.Objects.WebRTCTransportProvider.Attributes.CurrentSessions]), 0, "All Webrtc sessions should be closed")
+        asserts.assert_equal(len(current_sessions[endpoint][Clusters.Objects.WebRTCTransportProvider]
+                             [Clusters.Objects.WebRTCTransportProvider.Attributes.CurrentSessions]), 0, "All Webrtc sessions should be closed")
 
         self.print_step(2, "Perform device specific steps to exit standby mode")
 
         # TODO: Check how to exit standby mode
 
-        self.print_step(3, "Send the SolicitOffer command with valid parameters") 
+        self.print_step(3, "Send the SolicitOffer command with valid parameters")
 
         solicit_offer_response: Clusters.WebRTCTransportProvider.Commands.SolicitOfferResponse = await self.send_single_cmd(
             cmd=Clusters.WebRTCTransportProvider.Commands.SolicitOffer(
                 streamUsage=Clusters.WebRTCTransportProvider.Enums.StreamUsageEnum.kLiveView,
-                videoStreamID = NullValue,
-                audioStreamID = NullValue,
+                videoStreamID=NullValue,
+                audioStreamID=NullValue,
             ), endpoint=endpoint
         )
 
@@ -169,9 +169,14 @@ class TC_WebRTCP_2_2(MatterBaseTest):
 
         current_sessions = await self.default_controller.ReadAttribute(self.dut_node_id, [(endpoint, Clusters.Objects.WebRTCTransportProvider.Attributes.CurrentSessions)])
 
+<<<<<<< HEAD
         asserts.assert_equal(bool(current_sessions[endpoint][Clusters.Objects.WebRTCTransportProvider][Clusters.Objects.WebRTCTransportProvider.Attributes.CurrentSessions]), True, "No existing Webrtc session")
 
 >>>>>>> b64d5a7f8e (Add Python test scripts for Provider cluster basic test plans.)
+=======
+        asserts.assert_equal(bool(current_sessions[endpoint][Clusters.Objects.WebRTCTransportProvider]
+                             [Clusters.Objects.WebRTCTransportProvider.Attributes.CurrentSessions]), True, "No existing Webrtc session")
+>>>>>>> 87eecf4c4b (Restyled by autopep8)
 
         # Verify the session contains the correct WebRTCSessionID
         asserts.assert_equal(current_sessions[0].id, current_session_id, "Session ID should match")
