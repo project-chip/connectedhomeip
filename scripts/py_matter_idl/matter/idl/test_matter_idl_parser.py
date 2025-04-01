@@ -1025,7 +1025,7 @@ server cluster A = 1 { /* Test comment */ }
                         Struct(name="SharedStruct", is_shared=True, fields=[
                             Field(name="abc", code=0, data_type=DataType(
                                 name="int16u"), qualities=FieldQuality.NULLABLE),
-                    ]),
+                        ]),
                     ],
                     enums=[
                         Enum(name="SharedEnum", is_shared=True, base_type="ENUM16",
@@ -1039,11 +1039,10 @@ server cluster A = 1 { /* Test comment */ }
                                    ConstantEntry(name="X", code=100),
                                    ConstantEntry(name="Y", code=200),
                                ])],
-            )
+                    )
         ])
 
         self.assertIdlEqual(actual, expected)
-
 
     def test_handle_commands(self):
         actual = parseText("""
