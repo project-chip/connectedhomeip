@@ -1080,7 +1080,8 @@ void InteractionModelEngine::OnActiveModeNotification(ScopedNodeId aPeer, uint64
 
         mpFabricTable->FetchCATs(pListItem->GetFabricIndex(), cats);
         if (ScopedNodeId(pListItem->GetPeerNodeId(), pListItem->GetFabricIndex()) == aPeer &&
-            (cats.CheckSubjectAgainstCATs(aMonitoredSubject) || aMonitoredSubject == pListItem->GetLocalNodeId()))
+           (cats.CheckSubjectAgainstCATs(aMonitoredSubject) ||
+            aMonitoredSubject == mpFabricTable->FindFabricWithIndex(pListItem->GetFabricIndex()->GetNodeId())))
         {
             pListItem->OnActiveModeNotification();
         }

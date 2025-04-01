@@ -378,8 +378,6 @@ public:
     bool IsReadType() { return mInteractionType == InteractionType::Read; }
     bool IsSubscriptionType() const { return mInteractionType == InteractionType::Subscribe; };
 
-    NodeId GetLocalNodeId() const { return mLocal; }
-
     /*
      * Retrieve the reporting intervals associated with an active subscription. This should only be called if we're of subscription
      * interaction type and after a subscription has been established.
@@ -639,7 +637,6 @@ private:
     uint16_t mMaxInterval              = 0;
     SubscriptionId mSubscriptionId     = 0;
     ScopedNodeId mPeer;
-    NodeId mLocal;
     InteractionType mInteractionType = InteractionType::Read;
     Timestamp mEventTimestamp;
 

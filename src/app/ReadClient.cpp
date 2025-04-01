@@ -1280,7 +1280,6 @@ CHIP_ERROR ReadClient::SendSubscribeRequestImpl(const ReadPrepareParams & aReadP
                                                 Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse)));
 
     mPeer  = aReadPrepareParams.mSessionHolder->AsSecureSession()->GetPeer();
-    mLocal = aReadPrepareParams.mSessionHolder->AsSecureSession()->GetLocalNodeId();
 
     MoveToState(ClientState::AwaitingInitialReport);
 
