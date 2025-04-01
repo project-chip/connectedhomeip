@@ -221,7 +221,6 @@ std::unique_ptr<EcosystemLocationStruct> EcosystemLocationStruct::Builder::Build
         mLocationDescriptor.mLocationName.size() <= kLocationDescriptorNameMaxSize, nullptr,
         ChipLogError(Zcl, "Location Name must be less than %u bytes", static_cast<uint16_t>(kLocationDescriptorNameMaxSize)));
 
-    // std::make_unique does not have access to private constructor we workaround with using new
     PrivateToken token;
     std::unique_ptr<EcosystemLocationStruct> ret =
         std::make_unique<EcosystemLocationStruct>(std::move(mLocationDescriptor), mLocationDescriptorLastEditEpochUs, token);
