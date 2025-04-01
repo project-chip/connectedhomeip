@@ -19,8 +19,8 @@ from enum import Enum
 from queue import Queue
 from typing import Optional
 
-from chip.internal import GetCommissioner
-from chip.internal.commissioner import PairingState
+from ...internal import GetCommissioner
+from ...internal.commissioner import PairingState
 
 TEST_NODE_ID = 11223344
 
