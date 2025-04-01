@@ -10766,7 +10766,7 @@ provisional cluster TlsClientManagement = 2050 {
   fabric command access(invoke: administer) RemoveEndpoint(RemoveEndpointRequest): DefaultSuccess = 4;
 }
 
-/** This field SHALL indicate the Power Threshold Information. */
+/** This Meter Identification Cluster provides attributes for determining advanced information about utility metering device. */
 provisional cluster MeterIdentification = 2822 {
   revision 1;
 

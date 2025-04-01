@@ -1329,6 +1329,11 @@ void emberAfTlsClientManagementClusterShutdownCallback(chip::EndpointId endpoint
 void emberAfMeterIdentificationClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfMeterIdentificationClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfUnitTestingClusterInitCallback(chip::EndpointId endpoint);

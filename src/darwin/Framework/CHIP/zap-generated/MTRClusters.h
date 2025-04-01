@@ -7242,7 +7242,7 @@ MTR_PROVISIONALLY_AVAILABLE
 
 /**
  * Cluster Meter Identification
- *    This field SHALL indicate the Power Threshold Information.
+ *    This Meter Identification Cluster provides attributes for determining advanced information about utility metering device.
  */
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRClusterMeterIdentification : MTRGenericCluster
