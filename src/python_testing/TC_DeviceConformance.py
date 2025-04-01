@@ -353,12 +353,45 @@ class DeviceConformanceTests(BasicCompositionTests):
                     if conformance_decision_with_choice.decision == ConformanceDecision.MANDATORY and cluster_id not in server_clusters:
                         record_error(location=location,
                                      problem=f"Mandatory cluster {cluster_requirement.name} for device type {xml_device.name} is not present in the server list")
-                        success = False
+                        continue
 
                     if cluster_id in server_clusters and not conformance_allowed(conformance_decision_with_choice, allow_provisional):
                         record_error(location=location,
                                      problem=f"Disallowed cluster {cluster_requirement.name} found in server list for device type {xml_device.name}")
-                        success = False
+                        continue
+
+                    if cluster_id not in server_clusters:
+                        # Optional cluster not on this endpoint
+                        continue
+
+                    cluster = Clusters.ClusterObjects.ALL_CLUSTERS[cluster_id]
+                    feature_map = endpoint[cluster][GlobalAttributeIds.FEATURE_MAP_ID]
+                    attribute_list = endpoint[cluster][GlobalAttributeIds.ATTRIBUTE_LIST_ID]
+                    cmd_list = endpoint[cluster][GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID]
+                    for mask, conformance in cluster_requirement.feature_overrides.items():
+                        conformance_decision_with_choice = conformance(feature_map, attribute_list, cmd_list)
+                        if conformance_decision_with_choice.decision == ConformanceDecision.MANDATORY and (feature_map & mask == 0):
+                            record_error(
+                                location=location, problem=f"Feature mask {mask} in cluster {cluster_requirement.name} is required by element override for device type {xml_device.name}, but is not present in the feature map")
+                        if not conformance_allowed(conformance_decision_with_choice, allow_provisional) and (feature_map & mask != 0):
+                            record_error(
+                                location=location, problem=f"Feature mask {mask} in cluster {cluster_requirement.name} is disallowed by element override for device type {xml_device.name}, but is present in the feature map")
+                    for id, conformance in cluster_requirement.attribute_overrides.items():
+                        conformance_decision_with_choice = conformance(feature_map, attribute_list, cmd_list)
+                        if conformance_decision_with_choice.decision == ConformanceDecision.MANDATORY and id not in attribute_list:
+                            record_error(
+                                location=location, problem=f"Attribute {id} in cluster {cluster_requirement.name} is required by element override for device type {xml_device.name}, but is not present in the attribute list")
+                        if not conformance_allowed(conformance_decision_with_choice, allow_provisional) and id in attribute_list:
+                            record_error(
+                                location=location, problem=f"Attribute {id} in cluster {cluster_requirement.name} is disallowed by element override for device type {xml_device.name}, but is present in the attribute list")
+                    for id, conformance in cluster_requirement.command_overrides.items():
+                        conformance_decision_with_choice = conformance(feature_map, attribute_list, cmd_list)
+                        if conformance_decision_with_choice.decision == ConformanceDecision.MANDATORY and id not in cmd_list:
+                            record_error(
+                                location=location, problem=f"Command {id} in cluster {cluster_requirement.name} is required by element override for device type {xml_device.name}, but is not present in the cmd list")
+                        if not conformance_allowed(conformance_decision_with_choice, allow_provisional) and id in cmd_list:
+                            record_error(
+                                location=location, problem=f"Command {id} in cluster {cluster_requirement.name} is disallowed by element override for device type {xml_device.name}, but is present in the cmd list")
                 # If we want to check for extra clusters on the endpoint, we need to know the entire set of clusters in all the device type
                 # lists across all the device types on the endpoint.
                 endpoint_clusters += xml_device.server_clusters.keys()
