@@ -137,6 +137,10 @@ if (chip_build_tests) {
       tests += [ "${chip_root}/src/ble/tests" ]
     }
 
+    if (chip_device_config_enable_wifipaf) {
+      tests += [ "${chip_root}/src/wifipaf/tests" ]
+    }
+
     # On nrfconnect, the controller tests run into
     # https://github.com/project-chip/connectedhomeip/issues/9630
     if (chip_device_platform != "nrfconnect") {

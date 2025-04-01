@@ -29,14 +29,12 @@ import typing
 from dataclasses import dataclass, field
 from enum import IntFlag
 
-from chip import ChipUtility
-from chip.clusters.enum import MatterIntEnum
-from chip.tlv import float32, uint
-
+from .. import ChipUtility
+from ..clusters.enum import MatterIntEnum
+from ..tlv import float32, uint
 from .ClusterObjects import (Cluster, ClusterAttributeDescriptor, ClusterCommand, ClusterEvent, ClusterObject,
                              ClusterObjectDescriptor, ClusterObjectFieldDescriptor)
 from .Types import Nullable, NullValue
-
 
 __all__ = [
     "Globals",
