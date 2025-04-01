@@ -33,3 +33,8 @@ ChimeDelegate & CameraDevice::GetChimeDelegate()
 {
     return mChimeManager;
 }
+
+WebRTCTransportProvider::Delegate & CameraDevice::GetWebRTCProviderDelegate()
+{
+    return mWebRTCProviderManager;
+}
