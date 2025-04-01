@@ -41,7 +41,7 @@ private:
     DataModel::Nullable<CharSpan> mProtocolVersion;
     DataModel::Nullable<Globals::Structs::PowerThresholdStruct::Type> mPowerThreshold;
 
-    static bool NullableCharSpanCompare(const DataModel::Nullable<CharSpan> & a, const DataModel::Nullable<CharSpan> & b)
+    static bool NullableCharSpansEqual(const DataModel::Nullable<CharSpan> & a, const DataModel::Nullable<CharSpan> & b)
     {
         if (a.IsNull() && b.IsNull())
         {
@@ -58,7 +58,7 @@ private:
 
     void SavePointOfDelivery(const DataModel::Nullable<CharSpan> & newValue)
     {
-        if (NullableCharSpanCompare(newValue, mPointOfDelivery))
+        if (NullableCharSpansEqual(newValue, mPointOfDelivery))
         {
             return;
         }
@@ -72,14 +72,14 @@ private:
         {
             const size_t len = newValue.IsNull() ? 0 : newValue.Value().size() < kMaximumStringSize ?
                 newValue.Value().size() : kMaximumStringSize;
-            memcpy(mPointOfDeliveryBuf, newValue.Value().data(), len);
-            mPointOfDelivery = chip::app::DataModel::MakeNullable(CharSpan(mPointOfDeliveryBuf, len));
+            memmove(mPointOfDeliveryBuf, newValue.Value().data(), len);
+            mPointOfDelivery = DataModel::MakeNullable(CharSpan(mPointOfDeliveryBuf, len));
         }
     }
 
     void SaveMeterSerialNumber(const DataModel::Nullable<CharSpan> & newValue)
     {
-        if (NullableCharSpanCompare(newValue, mMeterSerialNumber))
+        if (NullableCharSpansEqual(newValue, mMeterSerialNumber))
         {
             return;
         }
@@ -93,14 +93,14 @@ private:
         {
             const size_t len = newValue.IsNull() ? 0 : newValue.Value().size() < kMaximumStringSize ?
                 newValue.Value().size() : kMaximumStringSize;
-            memcpy(mMeterSerialNumberBuf, newValue.Value().data(), len);
-            mMeterSerialNumber = chip::app::DataModel::MakeNullable(CharSpan(mMeterSerialNumberBuf, len));
+            memmove(mMeterSerialNumberBuf, newValue.Value().data(), len);
+            mMeterSerialNumber = DataModel::MakeNullable(CharSpan(mMeterSerialNumberBuf, len));
         }
     }
 
     void SaveProtocolVersion(const DataModel::Nullable<CharSpan> & newValue)
     {
-        if (NullableCharSpanCompare(newValue, mProtocolVersion))
+        if (NullableCharSpansEqual(newValue, mProtocolVersion))
         {
             return;
         }
@@ -114,8 +114,8 @@ private:
         {
             const size_t len = newValue.IsNull() ? 0 : newValue.Value().size() < kMaximumStringSize ?
                 newValue.Value().size() : kMaximumStringSize;
-            memcpy(mProtocolVersionBuf, newValue.Value().data(), len);
-            mProtocolVersion = chip::app::DataModel::MakeNullable(CharSpan(mProtocolVersionBuf, len));
+            memmove(mProtocolVersionBuf, newValue.Value().data(), len);
+            mProtocolVersion = DataModel::MakeNullable(CharSpan(mProtocolVersionBuf, len));
         }
     }
 
@@ -126,7 +126,7 @@ private:
      */
     static std::string IncrementString(const std::string &&string)
     {
-        //The lexicographically smallest and largest characters
+        // The lexicographically smallest and largest characters
         constexpr char minC = ' ', maxC = '~';
 
         std::string ret{minC};
@@ -162,15 +162,7 @@ private:
         SavePointOfDelivery(mInstance->GetPointOfDelivery());
         SaveMeterSerialNumber(mInstance->GetMeterSerialNumber());
         SaveProtocolVersion(mInstance->GetProtocolVersion());
-        const auto && powerThreshold = mInstance->GetPowerThreshold();
-        if (!powerThreshold.IsNull())
-        {
-            mPowerThreshold.SetNonNull(powerThreshold.Value());
-        }
-        else
-        {
-            mPowerThreshold.SetNull();
-        }
+        mPowerThreshold = mInstance->GetPowerThreshold();
     }
 
     void ClearAttributes()
@@ -200,7 +192,7 @@ private:
         VerifyOrDieWithMsg(mInstance, AppServer, "Meter Identification instance is null");
         if (mInstance->GetMeterType().IsNull())
         {
-            mInstance->SetMeterType(chip::app::DataModel::NullNullable);
+            mInstance->SetMeterType(DataModel::MakeNullable(MeterTypeEnum::kUtility));
         }
         else
         {

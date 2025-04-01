@@ -915,7 +915,7 @@ void AllClustersAppCommandHandler::OnMeterIdentificationHandler(const Json::Valu
     const CHIP_ERROR error = MeterIdentification::LoadJson(param);
     if (CHIP_NO_ERROR != error)
     {
-        ChipLogError(NotSpecified, "Error: %s in the JSON: %s", ErrorStr(error), param.toStyledString().c_str());
+        ChipLogError(NotSpecified, "Error: %" CHIP_ERROR_FORMAT " in the JSON: %s", error.Format(), param.toStyledString().c_str());
     }
 }
 
