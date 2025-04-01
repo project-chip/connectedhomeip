@@ -24,49 +24,61 @@ import pdb
 import concurrent.futures
 import asyncio as aio
 
+
 def CreateWebrtcClient(client_id):
     handle = _GetWebRTCLibraryHandle()
     return handle.pychip_webrtc_CreateWebrtcClient(client_id)
+
 
 def InitialiseConnection(Client):
     handle = _GetWebRTCLibraryHandle()
     return handle.pychip_webrtc_InitialiseConnection(Client)
 
+
 def CloseConnection(Client):
     handle = _GetWebRTCLibraryHandle()
     return handle.pychip_webrtc_CloseConnection(Client)
+
 
 def DestroyClient(Client):
     handle = _GetWebRTCLibraryHandle()
     return handle.pychip_webrtc_DestroyClient(Client)
 
+
 def GetStats(Client):
     handle = _GetWebRTCLibraryHandle()
     handle.pychip_webrtc_GetStats(Client)
+
 
 def CreateOffer(Client):
     handle = _GetWebRTCLibraryHandle()
     handle.pychip_webrtc_CreateOffer(Client)
     return chip.webrtc.callbacks.future_offer.result()
 
+
 def SetAnswer(Client, answer):
     handle = _GetWebRTCLibraryHandle()
     handle.pychip_webrtc_SetAnswer(Client, answer)
+
 
 def GetLocalSDP(Client):
     handle = _GetWebRTCLibraryHandle()
     handle.pychip_webrtc_GetLocalSDP(Client)
 
+
 def GetCandidates():
     handle = _GetWebRTCLibraryHandle()
     return chip.webrtc.callbacks.future_ice.result()
+
 
 def SetCandidate(Client, candidate):
     handle = _GetWebRTCLibraryHandle()
     handle.pychip_webrtc_SetCandidate(Client, candidate)
 
+
 def SetCallbacks(Client, answer_callback, error_callback, peer_connected_callback, peer_disconnected_callback, stats_callback):
     chip.webrtc.callbacks.future_offer = concurrent.futures.Future()
     chip.webrtc.callbacks.future_ice = concurrent.futures.Future()
     handle = _GetWebRTCLibraryHandle()
-    handle.pychip_webrtc_SetCallbacks(Client, chip.webrtc.callbacks.offer_callback, answer_callback, chip.webrtc.callbacks.ice_callback, error_callback, peer_connected_callback, peer_disconnected_callback, stats_callback)
+    handle.pychip_webrtc_SetCallbacks(Client, chip.webrtc.callbacks.offer_callback, answer_callback,
+                                      chip.webrtc.callbacks.ice_callback, error_callback, peer_connected_callback, peer_disconnected_callback, stats_callback)

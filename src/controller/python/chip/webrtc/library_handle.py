@@ -30,6 +30,7 @@ from chip.webrtc.types import (
     StatsCallback_t,
 )
 
+
 def _GetWebRTCLibraryHandle() -> ctypes.CDLL:
     """ Get the native library handle with webrtc method initialization.
 
@@ -65,6 +66,6 @@ def _GetWebRTCLibraryHandle() -> ctypes.CDLL:
         setter.Set('pychip_webrtc_SetCandidate',
                    ctypes.c_void_p, [c_void_p, c_char_p])
         setter.Set('pychip_webrtc_SetCallbacks',
-                ctypes.c_void_p, [c_void_p, SdpOfferCallback_t, SdpAnswerCallback_t, IceCallback_t, ErrorCallback_t, PeerConnectedCallback_t, PeerDisconnectedCallback_t, StatsCallback_t])
+                   ctypes.c_void_p, [c_void_p, SdpOfferCallback_t, SdpAnswerCallback_t, IceCallback_t, ErrorCallback_t, PeerConnectedCallback_t, PeerDisconnectedCallback_t, StatsCallback_t])
 
     return handle
