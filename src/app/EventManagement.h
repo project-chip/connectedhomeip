@@ -414,7 +414,8 @@ private:
     };
 
     void VendEventNumber();
-    CHIP_ERROR CalculateEventSize(EventLoggingDelegate * apDelegate, const InternalEventOptions * apOptions, uint32_t & requiredSize);
+    CHIP_ERROR CalculateEventSize(EventLoggingDelegate * apDelegate, const InternalEventOptions * apOptions,
+                                  uint32_t & requiredSize);
     /**
      * @brief Helper function for writing event header and data according to event
      *   logging protocol.
@@ -429,7 +430,8 @@ private:
      *                          relevant to this event.
      *
      */
-    CHIP_ERROR ConstructEvent(EventLoadOutContext * apContext, EventLoggingDelegate * apDelegate, const InternalEventOptions * apOptions);
+    CHIP_ERROR ConstructEvent(EventLoadOutContext * apContext, EventLoggingDelegate * apDelegate,
+                              const InternalEventOptions * apOptions);
 
     // Internal function to log event
     CHIP_ERROR LogEventPrivate(EventLoggingDelegate * apDelegate, const EventOptions & aEventOptions, EventNumber & aEventNumber);
