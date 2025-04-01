@@ -15,14 +15,12 @@
 #  limitations under the License.
 #
 
-import chip.webrtc
-
-from chip.webrtc.library_handle import _GetWebRTCLibraryHandle
-import chip.webrtc.callbacks
-
-import pdb
-import concurrent.futures
 import asyncio as aio
+import concurrent.futures
+
+import chip.webrtc
+import chip.webrtc.callbacks
+from chip.webrtc.library_handle import _GetWebRTCLibraryHandle
 
 
 def CreateWebrtcClient(client_id):
