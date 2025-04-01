@@ -92,8 +92,10 @@ shared_library("ChipDeviceCtrl") {
       "chip/native/PyChipError.h",
       "chip/tracing/TracingSetup.cpp",
       "chip/utils/DeviceProxyUtils.cpp",
-      "chip/webrtc/RTCClient.cpp",
     ]
+    if (current_os == "linux") {
+      sources += [ "chip/webrtc/RTCClient.cpp", ]
+    }
     defines += [ "CHIP_CONFIG_MAX_GROUPS_PER_FABRIC=50" ]
     defines += [ "CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC=50" ]
 
@@ -218,16 +220,20 @@ chip_python_wheel_action("chip-core") {
         "chip/tracing/__init__.py",
         "chip/utils/CommissioningBuildingBlocks.py",
         "chip/utils/__init__.py",
-        "chip/webrtc/__init__.py",
-        "chip/webrtc/callbacks.py",
-        "chip/webrtc/library_handle.py",
-        "chip/webrtc/types.py",
         "chip/yaml/__init__.py",
         "chip/yaml/data_model_lookup.py",
         "chip/yaml/errors.py",
         "chip/yaml/format_converter.py",
         "chip/yaml/runner.py",
       ]
+      if (current_os == "linux") {
+        sources += [
+        "chip/webrtc/__init__.py",
+        "chip/webrtc/callbacks.py",
+        "chip/webrtc/library_handle.py",
+        "chip/webrtc/types.py",
+        ]
+      }
 
       if (chip_support_commissioning_in_controller) {
         sources += [ "chip/ChipDeviceCtrl.py" ]
@@ -276,6 +282,9 @@ chip_python_wheel_action("chip-core") {
     "chip.fault_injection",
     "chip.webrtc",
   ]
+  if (current_os == "linux") {
+    py_packages += [ "chip.webrtc",]
+  }
 
   if (!chip_support_commissioning_in_controller) {
     py_packages += [ "chip.server" ]
