@@ -27,12 +27,12 @@ except ModuleNotFoundError:
 import unittest
 from typing import Optional
 
-from matter.idl.generators import GeneratorStorage
 from matter.idl.generators.idl import IdlGenerator
 from matter.idl.matter_idl_types import (AccessPrivilege, ApiMaturity, Attribute, AttributeInstantiation, AttributeQuality,
                                          AttributeStorage, Bitmap, Cluster, Command, CommandInstantiation, CommandQuality,
                                          ConstantEntry, DataType, DeviceType, Endpoint, Enum, Event, EventPriority, EventQuality,
                                          Field, FieldQuality, Idl, ParseMetaData, ServerClusterInstantiation, Struct, StructTag)
+from scripts.py_matter_idl.matter.idl.generators.generator import GeneratorStorage
 
 
 class GeneratorContentStorage(GeneratorStorage):

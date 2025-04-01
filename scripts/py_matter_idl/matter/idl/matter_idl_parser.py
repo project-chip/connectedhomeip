@@ -14,7 +14,6 @@
 
 import dataclasses
 import functools
-import logging
 from typing import Dict, Optional, Set
 
 from lark import Lark

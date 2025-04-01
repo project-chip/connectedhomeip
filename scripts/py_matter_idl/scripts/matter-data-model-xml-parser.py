@@ -27,7 +27,7 @@ except ImportError:
     import idl
 
 
-class InMemoryStorage(idl.generators.GeneratorStorage):
+class InMemoryStorage(idl.GeneratorStorage):
     def __init__(self):
         super().__init__()
         self.content: Optional[str] = None
@@ -157,12 +157,12 @@ def main(log_level, no_print, output, compare, compare_output, filenames):
         normalize_order(other_idl)
 
         storage = InMemoryStorage()
-        idl.GENERATORS['idl'].Create(storage=storage, idl=other_idl).render(dry_run=False)
+        idl.generators.IdlGenerator(storage=storage, idl=other_idl).render(dry_run=False)
         with open(compare_output, 'wt', encoding="utf8") as o:
             o.write(storage.content)
 
     storage = InMemoryStorage()
-    idl.GENERATORS['idl'].Create(storage=storage, idl=data).render(dry_run=False)
+    idl.generators.IdlGenerator(storage=storage, idl=data).render(dry_run=False)
 
     if output:
         with open(output, 'wt', encoding="utf8") as o:

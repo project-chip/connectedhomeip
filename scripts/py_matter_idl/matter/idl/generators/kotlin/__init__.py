@@ -20,8 +20,8 @@ import os
 from typing import List, Optional, Set
 
 from ...matter_idl_types import Attribute, Cluster, Command, DataType, Field, FieldQuality, Idl, Struct, StructQuality, StructTag
-from .. import CodeGenerator, GeneratorStorage
 from ..filters import upfirst
+from ..generator import CodeGenerator, GeneratorStorage
 from ..type_definitions import (BasicInteger, BasicString, FundamentalType, IdlBitmapType, IdlEnumType, IdlType, ParseDataType,
                                 TypeLookupContext)
 

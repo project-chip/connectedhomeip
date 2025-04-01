@@ -22,8 +22,8 @@ from .zapxml import ParseSource, ParseXmls
 if __name__ == '__main__':
     import click
 
-    from matter.idl.generators import GeneratorStorage
     from matter.idl.generators.idl import IdlGenerator
+    from scripts.py_matter_idl.matter.idl.generators.generator import GeneratorStorage
 
     class InMemoryStorage(GeneratorStorage):
         def __init__(self):

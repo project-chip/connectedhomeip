@@ -17,7 +17,7 @@ from typing import Union
 
 from ...matter_idl_types import (AccessPrivilege, ApiMaturity, Attribute, AttributeQuality, AttributeStorage, Command,
                                  CommandQuality, Event, EventPriority, EventQuality, FieldQuality, Idl, StructQuality, StructTag)
-from .. import CodeGenerator, GeneratorStorage
+from ..generator import CodeGenerator, GeneratorStorage
 
 
 def human_text_string(value: Union[StructTag, StructQuality, EventPriority, EventQuality, AccessPrivilege, AttributeQuality, CommandQuality, ApiMaturity, AttributeStorage]) -> str:

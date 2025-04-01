@@ -15,8 +15,8 @@
 import os
 
 from ....matter_idl_types import Idl
-from ... import CodeGenerator, GeneratorStorage
 from ...cluster_selection import server_side_clusters
+from ...generator import CodeGenerator, GeneratorStorage
 
 
 class CppApplicationGenerator(CodeGenerator):

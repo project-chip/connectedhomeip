@@ -15,7 +15,7 @@
 import os
 
 from ...matter_idl_types import Idl
-from .. import CodeGenerator, GeneratorStorage
+from ..generator import CodeGenerator, GeneratorStorage
 
 
 class SummaryMarkdownGenerator(CodeGenerator):

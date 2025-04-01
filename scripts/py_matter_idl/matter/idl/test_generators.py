@@ -29,11 +29,11 @@ except ImportError:
     sys.path.append(str(Path(__file__).resolve().parent / ".." / ".."))
     from matter.idl.matter_idl_parser import CreateParser
 
-from matter.idl.generators import GeneratorStorage
 from matter.idl.generators.cpp.application import CppApplicationGenerator
 from matter.idl.generators.cpp.tlvmeta import TLVMetaDataGenerator
 from matter.idl.generators.java import JavaClassGenerator, JavaJNIGenerator
 from matter.idl.matter_idl_types import Idl
+from scripts.py_matter_idl.matter.idl.generators.generator import GeneratorStorage
 
 TESTS_DIR = os.path.join(os.path.dirname(__file__), "tests")
 REGENERATE_GOLDEN_IMAGES = False

@@ -26,10 +26,10 @@ except ImportError:
     sys.path.append(str(Path(__file__).resolve().parent / ".." / ".."))
     from matter.idl.data_model_xml import ParseSource, ParseXmls
 
-from matter.idl.generators import GeneratorStorage
 from matter.idl.generators.idl import IdlGenerator
 from matter.idl.matter_idl_parser import CreateParser
 from matter.idl.matter_idl_types import Idl
+from scripts.py_matter_idl.matter.idl.generators.generator import GeneratorStorage
 
 
 class GeneratorContentStorage(GeneratorStorage):
