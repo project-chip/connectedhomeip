@@ -270,7 +270,7 @@ CHIP_ERROR AccessControlAttribute::IsValidAclEntryList(const DataModel::Decodabl
     auto validationIterator = list.begin();
     while (validationIterator.Next())
     {
-        VerifyOrReturnError(GetAccessControl().IsValid(validationIterator.GetValue().GetEntry()), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(validationIterator.GetValue().GetEntry().IsValid(), CHIP_ERROR_INVALID_ARGUMENT);
     }
     ReturnErrorOnFailure(validationIterator.GetStatus());
 
@@ -296,10 +296,8 @@ CHIP_ERROR AccessControlAttribute::WriteAcl(const ConcreteDataAttributePath & aP
 
         VerifyOrReturnError(newCount <= maxCount, CHIP_IM_GLOBAL_STATUS(ResourceExhausted));
 
-        // Validating all ACL entries in the ReplaceAll list, before Updating or Deleting any entries, if any of the entries has an
+        // Validating all ACL entries in the ReplaceAll list before Updating or Deleting any entries. If any of the entries has an
         // invalid field, the whole "ReplaceAll" list will be rejected.
-        // TODO Discuss: if this fail, should we make it invalidate ALL received list Entries (i.e. even those that will be part of
-        // ListOperation::AppendItem? in case of chunking?)
         ReturnErrorOnFailure(IsValidAclEntryList(list));
 
         auto iterator = list.begin();
