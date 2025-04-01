@@ -401,7 +401,7 @@ public:
     /**
      *  Like SendSubscribeRequest, but the ReadClient will automatically attempt to re-establish the subscription if
      *  we decide that the subscription has dropped.  The exact behavior of the re-establishment can be controlled
-     *  by setting their implementation of Callback::OnResubscriptionNeeded().  If not set, a default behavior with exponential 
+     *  by overriding Callback::OnResubscriptionNeeded().  If not overridden, a default behavior with exponential 
      *  backoff from will be used.
      *
      *  The application has to know to
