@@ -865,9 +865,14 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
                 cluster = XmlDeviceTypeClusterRequirements(name=name, side=side, conformance=conformance)
 
                 def append_overrides(override_element_type: str):
+                    # Workaround for 1.3 device types with zigbee clusters and old scenes
+                    if cid not in cluster_definition_xml:
+                        return
                     if override_element_type == 'feature':
                         # The device types use feature name rather than feature code. So we need to build a new map.
                         map = {f.name: id for id, f in cluster_definition_xml[cid].features.items()}
+                        # But also...that's not universal, so let's be tolerant to using the code too.
+                        map.update(cluster_definition_xml[cid].feature_map)
                         override = cluster.feature_overrides
                     elif override_element_type == 'attribute':
                         map = cluster_definition_xml[cid].attribute_map
@@ -898,10 +903,20 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
                             if tmp_problem:
                                 # It's not actually a problem if there is no conformance override - it might be a constraint override. Just continue
                                 continue
-                            override[map[name]] = parse_device_type_callable_from_xml(conformance_xml)
+                            conformance_override = parse_device_type_callable_from_xml(conformance_xml)
+                            override[map[name]] = conformance_override
                         except KeyError as ex:
+                            # The thermostat in particular explicitly disallows some zigbee things that don't appear in the spec due to
+                            # ifdefs. We can ignore problems if the device type spec disallows things that don't exist.
+                            if is_disallowed(conformance_override):
+                                logging.info(
+                                    f"Ignoring unknown {override_element_type} {name} in cluster {cid} because the conformance is disallowed")
+                                continue
                             problems.append(ProblemNotice("Parse Device Type XML", location=location,
                                             severity=ProblemSeverity.WARNING, problem=f"Unknown {override_element_type} {name} in cluster {cid} - map = {map} {ex}"))
+                        except ConformanceException as ex:
+                            problems.append(ProblemNotice("Parse Device Type XML", location=location,
+                                            severity=ProblemSeverity.WARNING, problem=f"Unable to parse {override_element_type} conformance for {name} in cluster {cid}"))
 
                 append_overrides('feature')
                 append_overrides('attribute')

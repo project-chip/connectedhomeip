@@ -706,9 +706,9 @@ class DeviceTypePathLocation:
     cluster_id: Optional[int] = None
 
     def __str__(self):
-        msg = f'\n       DeviceType: {self.device_type_id}'
+        msg = f'\n       DeviceType: 0x{self.device_type_id:04X}'
         if self.cluster_id:
-            msg += f'\n       ClusterID: {self.cluster_id}'
+            msg += f'\n       ClusterID: 0x{self.cluster_id:04X}'
         return msg
 
 
