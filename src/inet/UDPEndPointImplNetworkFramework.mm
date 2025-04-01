@@ -586,7 +586,7 @@ namespace Inet {
         return err;
     }
 
-    void UDPEndPointImplNetworkFramework::HandleDataReceived(const nw_connection_t & aConnection)
+    void UDPEndPointImplNetworkFramework::HandleDataReceived(nw_connection_t aConnection)
     {
         nw_connection_receive_completion_t handler = ^(dispatch_data_t content, nw_content_context_t context, bool is_complete, nw_error_t receive_error) {
             dispatch_block_t schedule_next_receive = ^{
