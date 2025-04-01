@@ -54,5 +54,8 @@
     "Water Leak Detector": 67,
     "HeatPump": 777,
     "Water Freeze Detector": 65,
-    "Rain Sensor": 68
+    "Rain Sensor": 68,
+    "Oven": 123,
+    "Cooktop": 120,
+    "Cook Surface": 119
 }
