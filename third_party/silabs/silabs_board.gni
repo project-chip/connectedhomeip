@@ -48,6 +48,8 @@ declare_args() {
 
   wifi_soc = false
 
+  use_brd4357a = false
+
   #Disable MQTT by default
   enable_dic = false
 

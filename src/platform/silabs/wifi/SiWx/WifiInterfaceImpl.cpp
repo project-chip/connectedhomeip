@@ -72,11 +72,11 @@ using WiFiBandEnum = chip::app::Clusters::NetworkCommissioning::WiFiBandEnum;
 
 // TODO : Temporary work-around for wifi-init failure in 917NCP ACX module boards.
 // Can be removed after Wiseconnect fixes region code for all ACX module boards.
-#if defined(EXP_BOARD)
+#if defined(ACX_MODULE_BOARD)
 #define REGION_CODE IGNORE_REGION
 #else
 #define REGION_CODE US
-#endif
+#endif // ACX_MODULE_BOARD
 
 // TODO: This needs to be refactored so we don't need the global object
 WfxRsi_t wfx_rsi;
