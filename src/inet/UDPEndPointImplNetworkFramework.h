@@ -67,7 +67,7 @@ private:
                               InterfaceId interfaceIndex = InterfaceId::Null());
     CHIP_ERROR StartConnection(nw_connection_t aConnection);
     void GetPacketInfo(const nw_connection_t & aConnection, IPPacketInfo & aPacketInfo);
-    void HandleDataReceived(const nw_connection_t & aConnection);
+    void HandleDataReceived(nw_connection_t aConnection);
     CHIP_ERROR ReleaseListener();
     CHIP_ERROR ReleaseConnection();
     void ReleaseAll();
