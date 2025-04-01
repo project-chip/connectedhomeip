@@ -13,7 +13,7 @@
 # limitations under the License.
 
 declare_args() {
-  if ((target_os == "linux") && (target_cpu == "arm64")) {
+  if (target_os == "linux" && target_cpu == "arm64") {
     chip_enable_nfc_commissioning = true
   } else {
     chip_enable_nfc_commissioning = false
