@@ -4127,6 +4127,16 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID) attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeActiveNetworkFaultsListID) params:params];
 }
 
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeExtAddressWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID) attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeExtAddressID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeRloc16WithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID) attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRloc16ID) params:params];
+}
+
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID) attributeID:@(MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeGeneratedCommandListID) params:params];

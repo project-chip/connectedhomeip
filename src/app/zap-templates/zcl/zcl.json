@@ -393,7 +393,9 @@
             "Delay",
             "SecurityPolicy",
             "ChannelPage0Mask",
-            "OperationalDatasetComponents"
+            "OperationalDatasetComponents",
+            "ExtAddress",
+            "Rloc16"
         ],
         "Wi-Fi Network Diagnostics": [
             "BSSID",

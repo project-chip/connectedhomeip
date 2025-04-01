@@ -12302,6 +12302,16 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ActiveNetworkFaultsList", 1, value);
         }
+        case ThreadNetworkDiagnostics::Attributes::ExtAddress::Id: {
+            chip::app::DataModel::Nullable<uint64_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ExtAddress", 1, value);
+        }
+        case ThreadNetworkDiagnostics::Attributes::Rloc16::Id: {
+            chip::app::DataModel::Nullable<uint16_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("Rloc16", 1, value);
+        }
         case ThreadNetworkDiagnostics::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));

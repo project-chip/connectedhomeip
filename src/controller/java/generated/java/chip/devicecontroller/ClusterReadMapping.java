@@ -3722,6 +3722,28 @@ public class ClusterReadMapping {
           readThreadNetworkDiagnosticsActiveNetworkFaultsListCommandParams
         );
         result.put("readActiveNetworkFaultsListAttribute", readThreadNetworkDiagnosticsActiveNetworkFaultsListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readThreadNetworkDiagnosticsExtAddressCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readThreadNetworkDiagnosticsExtAddressAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster).readExtAddressAttribute(
+              (ChipClusters.ThreadNetworkDiagnosticsCluster.ExtAddressAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedThreadNetworkDiagnosticsClusterExtAddressAttributeCallback(),
+          readThreadNetworkDiagnosticsExtAddressCommandParams
+        );
+        result.put("readExtAddressAttribute", readThreadNetworkDiagnosticsExtAddressAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readThreadNetworkDiagnosticsRloc16CommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readThreadNetworkDiagnosticsRloc16AttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster).readRloc16Attribute(
+              (ChipClusters.ThreadNetworkDiagnosticsCluster.Rloc16AttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedThreadNetworkDiagnosticsClusterRloc16AttributeCallback(),
+          readThreadNetworkDiagnosticsRloc16CommandParams
+        );
+        result.put("readRloc16Attribute", readThreadNetworkDiagnosticsRloc16AttributeInteractionInfo);
      Map<String, CommandParameterInfo> readThreadNetworkDiagnosticsGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readThreadNetworkDiagnosticsGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

@@ -1430,6 +1430,14 @@ namespace ActiveNetworkFaultsList {
 static constexpr AttributeId Id = 0x0000003E;
 } // namespace ActiveNetworkFaultsList
 
+namespace ExtAddress {
+static constexpr AttributeId Id = 0x0000003F;
+} // namespace ExtAddress
+
+namespace Rloc16 {
+static constexpr AttributeId Id = 0x00000040;
+} // namespace Rloc16
+
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList
