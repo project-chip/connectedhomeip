@@ -322,4 +322,4 @@ RUN apt-get remove -y python3-gi
 
 RUN pip install --break-system-packages --no-cache-dir \
     python_lib/obj/src/python_testing/matter_testing_infrastructure/matter-testing._build_wheel/matter_testing-*.whl \
-    python_lib/controller/python/chip*.whl
+    python_lib/controller/python/matter*.whl
