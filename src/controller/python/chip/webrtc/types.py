@@ -19,9 +19,11 @@ from ctypes import *
 
 from chip.native import PyChipError
 
+
 class ErrorType(c_int):
     InvalidLocalOffer = 0
     InvalidRemoteOffer = 1
+
 
 # Define the callback types using ctypes
 SdpOfferCallback_t = CFUNCTYPE(
