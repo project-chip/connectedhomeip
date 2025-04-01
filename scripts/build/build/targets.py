@@ -667,6 +667,7 @@ def BuildTizenTarget():
     # board
     target.AppendFixedTargets([
         TargetPart('arm', board=TizenBoard.ARM),
+        TargetPart('arm64', board=TizenBoard.ARM64),
     ])
 
     # apps
