@@ -455,7 +455,11 @@ namespace Inet {
         __auto_type endpoint = GetEndPoint(mAddrType, aPktInfo->DestAddress, aPktInfo->DestPort, aPktInfo->Interface);
         VerifyOrReturnError(nullptr != endpoint, CHIP_ERROR_INCORRECT_STATE);
 
-        __auto_type connection = nw_connection_create(endpoint, mParameters);
+        __auto_type parameters = nw_parameters_copy(mParameters);
+        VerifyOrReturnError(parameters != nullptr, CHIP_ERROR_NO_MEMORY);
+
+        nw_parameters_set_local_endpoint(parameters, nullptr);
+        __auto_type connection = nw_connection_create(endpoint, parameters); // Let system pick ephemeral port
         VerifyOrReturnError(nullptr != connection, CHIP_ERROR_INCORRECT_STATE);
 
         return StartConnection(connection);
