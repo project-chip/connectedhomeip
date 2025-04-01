@@ -27,16 +27,16 @@ from enum import Enum, auto
 from importlib.abc import Traversable
 from typing import Callable, Optional, Union
 
-import chip.testing.conformance as conformance_support
-from chip.testing.conformance import (OPTIONAL_CONFORM, TOP_LEVEL_CONFORMANCE_TAGS, ConformanceDecision, ConformanceException,
-                                      ConformanceParseParameters, feature, is_disallowed, mandatory, optional, or_operation,
-                                      parse_callable_from_xml, parse_device_type_callable_from_xml)
-from chip.testing.global_attribute_ids import GlobalAttributeIds
-from chip.testing.matter_testing import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
-                                         EventPathLocation, FeaturePathLocation, ProblemLocation, ProblemNotice, ProblemSeverity)
-
 import matter.clusters as Clusters
 from matter.tlv import uint
+
+from . import conformance as conformance_support
+from .conformance import (OPTIONAL_CONFORM, TOP_LEVEL_CONFORMANCE_TAGS, ConformanceDecision, ConformanceException,
+                          ConformanceParseParameters, feature, is_disallowed, mandatory, optional, or_operation,
+                          parse_callable_from_xml, parse_device_type_callable_from_xml)
+from .global_attribute_ids import GlobalAttributeIds
+from .matter_testing import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
+                             EventPathLocation, FeaturePathLocation, ProblemLocation, ProblemNotice, ProblemSeverity)
 
 _PRIVILEGE_STR = {
     None: "N/A",

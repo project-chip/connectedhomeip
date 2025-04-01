@@ -40,11 +40,6 @@ from enum import Enum, IntFlag
 from itertools import chain
 from typing import Any, Iterable, List, Optional, Tuple
 
-import chip.testing.conversions as conversions
-import chip.testing.decorators as decorators
-import chip.testing.matchers as matchers
-import chip.testing.timeoperations as timeoperations
-
 # isort: off
 
 from matter import ChipDeviceCtrl  # Needed before chip.FabricAdmin
@@ -52,11 +47,7 @@ import matter.FabricAdmin  # Needed before chip.CertificateAuthority
 import matter.CertificateAuthority
 
 # isort: on
-from time import sleep
 
-from chip.testing.commissioning import CommissioningInfo, CustomCommissioningParameters, SetupPayloadInfo, commission_devices
-from chip.testing.global_attribute_ids import GlobalAttributeIds
-from chip.testing.pics import read_pics_from_file
 from mobly import asserts, base_test, signals, utils
 from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
 from mobly.test_runner import TestRunner
@@ -74,6 +65,11 @@ from matter.interaction_model import InteractionModelError, Status
 from matter.setup_payload import SetupPayload
 from matter.storage import PersistentStorage
 from matter.tracing import TracingContext
+
+from . import conversions, decorators, matchers, timeoperations
+from .commissioning import CommissioningInfo, CustomCommissioningParameters, SetupPayloadInfo, commission_devices
+from .global_attribute_ids import GlobalAttributeIds
+from .pics import read_pics_from_file
 
 try:
     from matter_yamltests.hooks import TestRunnerHooks
@@ -977,7 +973,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             with open(app_pipe_name, "w") as app_pipe:
                 app_pipe.write(command + "\n")
             # TODO(#31239): remove the need for sleep
-            sleep(0.001)
+            time.sleep(0.001)
         else:
             logging.info(f"Using DUT IP address: {dut_ip}")
 
