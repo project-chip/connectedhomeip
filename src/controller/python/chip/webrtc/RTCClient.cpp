@@ -17,59 +17,60 @@
 
 #include <controller/webrtc/libwebrtc.h>
 
-using namespace pywebrtc;
+using namespace chipwebrtc;
 
 extern "C" {
 
 void * pychip_webrtc_CreateWebrtcClient(int id)
 {
-    return pywebrtc::create_webrtc_client(id);
+    return chipwebrtc::create_webrtc_client(id);
 }
 
 void pychip_webrtc_InitialiseConnection(void * client)
 {
-    return pywebrtc::initialise_peer_connection(client);
+    return chipwebrtc::initialise_peer_connection(client);
 }
 
 void pychip_webrtc_CloseConnection(void * client)
 {
-    return pywebrtc::close_peer_connection(client);
+    return chipwebrtc::close_peer_connection(client);
 }
 
 void pychip_webrtc_DestroyClient(void * client)
 {
-    return pywebrtc::destroy_client(client);
+    return chipwebrtc::destroy_client(client);
 }
 
 void pychip_webrtc_GetStats(void * client)
 {
-    return pywebrtc::GetStats(client);
+    return chipwebrtc::GetStats(client);
 }
 
 void pychip_webrtc_CreateOffer(void * client)
 {
-    pywebrtc::CreateOffer(client);
+    chipwebrtc::CreateOffer(client);
 }
 
 const char * pychip_webrtc_GetLocalSDP(void * client)
 {
-    return pywebrtc::get_local_sdp(client);
+    return chipwebrtc::get_local_sdp(client);
 }
 
 void pychip_webrtc_SetAnswer(void * client, const char * answer)
 {
-    pywebrtc::SetAnswer(client, answer);
+    chipwebrtc::SetAnswer(client, answer);
 }
 
 void pychip_webrtc_SetCandidate(void * client, const char * candidate)
 {
-    pywebrtc::SetCandidate(client, candidate);
+    chipwebrtc::SetCandidate(client, candidate);
 }
 
 void pychip_webrtc_SetCallbacks(void * client, SdpOfferCallback offer_cb, SdpAnswerCallback answer_cb, IceCallback ice_cb,
                                 ErrorCallback error_cb, PeerConnectedCallback peer_connected_cb,
                                 PeerDisconnectedCallback peer_disconnected_cb, StatsCollectedCallback stats_callback)
 {
-    pywebrtc::set_callbacks(client, offer_cb, answer_cb, ice_cb, error_cb, peer_connected_cb, peer_disconnected_cb, stats_callback);
+    chipwebrtc::set_callbacks(client, offer_cb, answer_cb, ice_cb, error_cb, peer_connected_cb, peer_disconnected_cb,
+                              stats_callback);
 }
 }
