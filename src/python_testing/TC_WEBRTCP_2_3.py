@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 #
 #  Copyright (c) 2025 Project CHIP Authors
 #  All rights reserved.
@@ -224,25 +225,21 @@ class TC_WebRTCProvider_2_3(MatterBaseTest):
         )
         asserts.assert_equal(len(current_sessions), 1, "Expected CurrentSessions to be 1")
 =======
+=======
+import asyncio as aio
+>>>>>>> 524ab3f3ef (Restyled by isort)
 import logging
 import time
-import asyncio as aio
 
 import chip.clusters as Clusters
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import (MatterBaseTest, TestStep, type_matches, has_cluster,
-                                         async_test_body, run_if_endpoint_matches, default_matter_test_main)
-from chip.clusters.Types import NullValue
-from mobly import asserts
-
 import chip.webrtc
-from chip.webrtc.types import SdpOfferCallback_t
-from chip.webrtc.types import IceCallback_t
-from chip.webrtc.types import SdpAnswerCallback_t
-from chip.webrtc.types import ErrorCallback_t
-from chip.webrtc.types import PeerConnectedCallback_t
-from chip.webrtc.types import PeerDisconnectedCallback_t
-from chip.webrtc.types import StatsCallback_t
+from chip.clusters.Types import NullValue
+from chip.interaction_model import InteractionModelError, Status
+from chip.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_cluster,
+                                         run_if_endpoint_matches, type_matches)
+from chip.webrtc.types import (ErrorCallback_t, IceCallback_t, PeerConnectedCallback_t, PeerDisconnectedCallback_t,
+                               SdpAnswerCallback_t, SdpOfferCallback_t, StatsCallback_t)
+from mobly import asserts
 
 
 class TC_WebRTCP_2_3(MatterBaseTest):
