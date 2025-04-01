@@ -18,12 +18,12 @@
 
 #include "WebRTCManager.h"
 
-#include <app/dynamic_server/AccessControl.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/EventLogging.h>
+#include <app/dynamic_server/AccessControl.h>
 #include <app/reporting/reporting.h>
 #include <app/server/Server.h>
 #include <app/util/af-types.h>
@@ -41,7 +41,6 @@
 using namespace chip;
 using namespace chip::app;
 using namespace std::chrono_literals;
-
 
 WebRTCManager::WebRTCManager() {}
 
@@ -155,12 +154,13 @@ CHIP_ERROR WebRTCManager::ProvideOffer(DataModel::Nullable<uint16_t> webRTCSessi
 {
     ChipLogProgress(NotSpecified, "Sending ProvideOffer command to the peer device");
 
-    CHIP_ERROR err = mWebRTCProviderClient.ProvideOffer(webRTCSessionID, mLocalDescription, streamUsage, kWebRTCRequesterDynamicEndpointId,
-                                                        MakeOptional(DataModel::NullNullable), // "Null" for video
-                                                        MakeOptional(DataModel::NullNullable), // "Null" for audio
-                                                        NullOptional, // Omit ICEServers (Optional not present)
-                                                        NullOptional  // Omit ICETransportPolicy (Optional not present)
-    );
+    CHIP_ERROR err =
+        mWebRTCProviderClient.ProvideOffer(webRTCSessionID, mLocalDescription, streamUsage, kWebRTCRequesterDynamicEndpointId,
+                                           MakeOptional(DataModel::NullNullable), // "Null" for video
+                                           MakeOptional(DataModel::NullNullable), // "Null" for audio
+                                           NullOptional,                          // Omit ICEServers (Optional not present)
+                                           NullOptional                           // Omit ICETransportPolicy (Optional not present)
+        );
 
     if (err != CHIP_NO_ERROR)
     {
