@@ -579,3 +579,8 @@ void MatterWebRTCTransportProviderPluginServerInitCallback()
 {
     ChipLogProgress(Zcl, "Initializing WebRTC Transport Provider cluster.");
 }
+
+void MatterWebRTCTransportProviderPluginServerShutdownCallback()
+{
+    ChipLogProgress(Zcl, "Shutdown WebRTC Transport Provider cluster.");
+}
