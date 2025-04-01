@@ -176,11 +176,17 @@ bool CameraAvSettingsUserLevelMgmtServer::SupportsOptAttr(OptionalAttributes aOp
     return mOptionalAttrs.Has(aOptionalAttrs);
 }
 
+void CameraAvSettingsUserLevelMgmtServer::markDirty(AttributeId attrId)
+{
+    MatterReportingAttributeChangeCallback(mEndpointId, CameraAvSettingsUserLevelManagement::Id, attrId);
+}
+
 // Attribute mutators
 //
 CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::setMaxPresets(uint8_t aMaxPresets)
 {
     mMaxPresets = aMaxPresets;
+    markDirty(Attributes::MaxPresets::Id);
     return CHIP_NO_ERROR;
 }
 
@@ -192,8 +198,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::setTiltMin(int16_t aTiltMin)
     }
 
     mTiltMin = aTiltMin;
-    // TO DO
-    // handle subscription notifications for the change
+    markDirty(Attributes::TiltMin::Id);
     return CHIP_NO_ERROR;
 }
 
@@ -205,8 +210,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::setTiltMax(int16_t aTiltMax)
     }
 
     mTiltMax = aTiltMax;
-    // TO DO
-    // handle subscription notifications for the change
+    markDirty(Attributes::TiltMax::Id);
     return CHIP_NO_ERROR;
 }
 
@@ -218,8 +222,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::setPanMin(int16_t aPanMin)
     }
 
     mPanMin = aPanMin;
-    // TO DO
-    // handle subscription notifications for the change
+    markDirty(Attributes::PanMin::Id);
     return CHIP_NO_ERROR;
 }
 
@@ -231,8 +234,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::setPanMax(int16_t aPanMax)
     }
 
     mPanMax = aPanMax;
-    // TO DO
-    // handle subscription notifications for the change
+    markDirty(Attributes::PanMax::Id);
     return CHIP_NO_ERROR;
 }
 
@@ -244,8 +246,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::setZoomMax(int8_t aZoomMax)
     }
 
     mZoomMax = aZoomMax;
-    // TO DO
-    // handle subscription notifications for the change
+    markDirty(Attributes::ZoomMax::Id);
     return CHIP_NO_ERROR;
 }
 
@@ -256,6 +257,7 @@ void CameraAvSettingsUserLevelMgmtServer::setPan(Optional<int16_t> pan)
     if (pan.HasValue())
     {
         mMptzPosition.pan = pan;
+        markDirty(Attributes::MPTZPosition::Id);
     }
 }
 
@@ -264,6 +266,7 @@ void CameraAvSettingsUserLevelMgmtServer::setTilt(Optional<int16_t> tilt)
     if (tilt.HasValue())
     {
         mMptzPosition.tilt = tilt;
+        markDirty(Attributes::MPTZPosition::Id);
     }
 }
 
@@ -272,6 +275,7 @@ void CameraAvSettingsUserLevelMgmtServer::setZoom(Optional<int8_t> zoom)
     if (zoom.HasValue())
     {
         mMptzPosition.zoom = zoom;
+        markDirty(Attributes::MPTZPosition::Id);
     }
 }
 
@@ -284,6 +288,8 @@ void CameraAvSettingsUserLevelMgmtServer::addMoveCapableVideoStreamID(uint16_t v
         // Not found, this is a good add.
         //
         mDptzRelativeMove.push_back(videoStreamID);
+        markDirty(Attributes::DPTZRelativeMove::Id);
+
     }
 }
 
@@ -300,6 +306,7 @@ void CameraAvSettingsUserLevelMgmtServer::removeMoveCapableVideoStreamID(uint16_
     }
 
     mDptzRelativeMove.erase(it);
+    markDirty(Attributes::DPTZRelativeMove::Id);
 }
 
 bool CameraAvSettingsUserLevelMgmtServer::knownVideoStreamID(uint16_t videoStreamID)
@@ -651,6 +658,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZSetPosition(HandlerContext &
     setTilt(tilt);
     setZoom(zoom);
 
+    markDirty(Attributes::MPTZPosition::Id);
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
@@ -768,6 +776,8 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRelativeMove(HandlerContext 
     setTilt(Optional(static_cast<int16_t>(newTilt)));
     setZoom(Optional(static_cast<int8_t>(newZoom)));
 
+    markDirty(Attributes::MPTZPosition::Id);
+
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
@@ -821,6 +831,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZMoveToPreset(HandlerContext 
     }
 
     mMptzPosition = presetValues;
+    markDirty(Attributes::MPTZPosition::Id);
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::Success);
 }
@@ -877,6 +888,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZSavePreset(HandlerContext & 
 
     // Update the current preset ID to the next available
     UpdatePresetID();
+    markDirty(Attributes::MPTZPresets::Id);
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::Success);
 }
@@ -920,6 +932,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRemovePreset(HandlerContext 
     // Remove the identified item from the known set of presets
     //
     mMptzPresetHelper.erase(it);
+    markDirty(Attributes::MPTZPresets::Id);
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::Success);
 }
@@ -943,6 +956,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleDPTZSetViewport(HandlerContext &
             return;
         }
         addMoveCapableVideoStreamID(videoStreamID);
+        markDirty(Attributes::DPTZRelativeMove::Id);
     }
 
     // Call the delegate
@@ -978,6 +992,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleDPTZRelativeMove(HandlerContext 
             return;
         }
         addMoveCapableVideoStreamID(videoStreamID);
+        markDirty(Attributes::DPTZRelativeMove::Id);
     }
 
     // Call the delegate

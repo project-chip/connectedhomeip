@@ -230,6 +230,11 @@ private:
      * Helper function that validates whether a given video stream ID is already known
      */
     bool knownVideoStreamID(uint16_t videoStreamID);
+
+    /**
+     * Helper function for attribute handlers to mark the attribute as dirty
+     */
+    void markDirty(AttributeId attrId);
 };
 
 /** @brief
