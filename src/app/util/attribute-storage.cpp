@@ -218,10 +218,15 @@ void emberAfEndpointConfigure()
 
         constexpr const DeviceTypeId kRootnodeId   = 0x0016;
         constexpr const DeviceTypeId kAggregatorId = 0x000E;
+        constexpr const DeviceTypeId kBridgedNode  = 0x0013;
         emAfEndpoints[ep].bitmask.Set(EmberAfEndpointOptions::isEnabled);
         for (const auto & deviceType : emAfEndpoints[ep].deviceTypeList)
         {
-            if ((deviceType.deviceTypeId == kRootnodeId) || (deviceType.deviceTypeId == kAggregatorId))
+            // Default composition for all device types is set to tree. Except rootnode, aggregator and
+            // bridgednode which are full-family. Clients can manually override these defaults using
+            // SetFlatCompositionForEndpoint / SetTreeCompositionForEndpoint at application init.
+            if ((deviceType.deviceTypeId == kRootnodeId) || (deviceType.deviceTypeId == kAggregatorId) ||
+                (deviceType.deviceTypeId == kBridgedNode))
             {
                 emAfEndpoints[ep].bitmask.Set(EmberAfEndpointOptions::isFlatComposition);
                 break;
