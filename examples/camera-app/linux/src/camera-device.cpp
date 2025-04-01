@@ -41,6 +41,12 @@ CameraDevice::CameraDevice()
     InitializeCameraDevice();
 
     InitializeStreams();
+
+    // Initialize Video Sources
+    mNetworkVideoSource.Init(&mMediaController, VIDEO_STREAM_GST_DEST_PORT, StreamType::kVideo);
+
+    // Initialize Audio Sources
+    mNetworkVideoSource.Init(&mMediaController, AUDIO_STREAM_GST_DEST_PORT, StreamType::kAudio);
 }
 
 CameraDevice::~CameraDevice()
@@ -61,14 +67,14 @@ CameraError CameraDevice::InitializeCameraDevice()
         gstreamerInitialized = true;
     }
 
+    // TODO: Replace hardcoded device file with something passed in from
+    // camera-app.
     videoDeviceFd = open("/dev/video0", O_RDWR);
     if (videoDeviceFd == -1)
     {
-        ChipLogError(NotSpecified, "Error opening video device: %s", strerror(errno));
+        ChipLogError(Zcl, "Error opening video device: %s", strerror(errno));
         return CameraError::ERROR_INIT_FAILED;
     }
-
-    // TODO: Check capabilities of the camera
 
     return CameraError::SUCCESS;
 }
@@ -79,8 +85,6 @@ CameraError CameraDevice::InitializeStreams()
     InitializeAudioStreams();
     InitializeSnapshotStreams();
 
-    StartVideoStream(1);
-    StartSnapshotStream(1);
     return CameraError::SUCCESS;
 }
 
@@ -99,6 +103,13 @@ CameraError CameraDevice::VideoStreamAllocate(const VideoStreamStruct & allocate
             {
                 stream.isAllocated = true;
                 outStreamID        = stream.id;
+
+                // Start the video stream from HAL for serving.
+                StartVideoStream(stream.id);
+
+                // Start the network stream source
+                mNetworkVideoSource.Start(stream.id);
+
                 return CameraError::SUCCESS;
             }
         }
@@ -118,7 +129,11 @@ CameraError CameraDevice::VideoStreamDeallocate(const uint16_t streamID)
     {
         if (stream.id == streamID && stream.isAllocated)
         {
+            // Stop the video stream
+            StopVideoStream(stream.id);
+
             stream.isAllocated = false;
+
             break;
         }
     }
@@ -185,6 +200,10 @@ CameraError CameraDevice::SnapshotStreamAllocate(const SnapshotStreamStruct & al
             {
                 stream.isAllocated = true;
                 outStreamID        = stream.id;
+
+                // Start the snapshot stream for serving.
+                StartSnapshotStream(stream.id);
+
                 return CameraError::SUCCESS;
             }
         }
@@ -204,6 +223,8 @@ CameraError CameraDevice::SnapshotStreamDeallocate(const uint16_t streamID)
     {
         if (stream.id == streamID && stream.isAllocated)
         {
+            // Stop the snapshot stream for serving.
+            StopSnapshotStream(stream.id);
             stream.isAllocated = false;
             break;
         }
@@ -219,7 +240,8 @@ GstElement * CameraDevice::CreateSnapshotPipeline(const std::string & device, in
     GstElement *pipeline, *source, *jpeg_caps, *videorate, *videorate_caps, *queue, *filesink;
 
     // Create the pipeline elements
-    pipeline       = gst_pipeline_new("snapshot-pipeline");
+    pipeline = gst_pipeline_new("snapshot-pipeline");
+    // TODO: Have the video source passed in.
     source         = gst_element_factory_make("v4l2src", "source");
     jpeg_caps      = gst_element_factory_make("capsfilter", "jpeg_caps");
     videorate      = gst_element_factory_make("videorate", "videorate");
@@ -229,7 +251,7 @@ GstElement * CameraDevice::CreateSnapshotPipeline(const std::string & device, in
 
     if (!pipeline || !source || !jpeg_caps || !videorate || !videorate_caps || !queue || !filesink)
     {
-        ChipLogError(NotSpecified, "Not all elements could be created.");
+        ChipLogError(Zcl, "Not all elements could be created.");
         gst_object_unref(pipeline);
         error = CameraError::ERROR_INIT_FAILED;
         return nullptr;
@@ -241,7 +263,7 @@ GstElement * CameraDevice::CreateSnapshotPipeline(const std::string & device, in
     // Link the elements
     if (gst_element_link_many(source, jpeg_caps, videorate, videorate_caps, queue, filesink, NULL) != TRUE)
     {
-        ChipLogError(NotSpecified, "Elements could not be linked.");
+        ChipLogError(Zcl, "Elements could not be linked.");
         gst_object_unref(pipeline);
         error = CameraError::ERROR_INIT_FAILED;
         return nullptr;
@@ -262,13 +284,13 @@ GstElement * CameraDevice::CreateSnapshotPipeline(const std::string & device, in
 }
 
 // Helper function to create a GStreamer pipeline
-GstElement * CameraDevice::CreatePipeline(const std::string & pipelineString, CameraError & error)
+GstElement * CameraDevice::CreateVideoPipeline(const std::string & pipelineString, CameraError & error)
 {
     GError * gerror       = nullptr;
     GstElement * pipeline = gst_parse_launch(pipelineString.c_str(), &gerror);
     if (gerror != nullptr)
     {
-        ChipLogError(NotSpecified, "Error creating pipeline: %s", gerror->message);
+        ChipLogError(Zcl, "Error creating pipeline: %s", gerror->message);
         g_error_free(gerror);
         error = CameraError::ERROR_INIT_FAILED;
         return nullptr;
@@ -290,7 +312,7 @@ CameraError CameraDevice::SetV4l2Control(uint32_t controlId, int value)
 
     if (ioctl(videoDeviceFd, VIDIOC_S_CTRL, &control) == -1)
     {
-        ChipLogError(NotSpecified, "Error setting V4L2 control: %s", strerror(errno));
+        ChipLogError(Zcl, "Error setting V4L2 control: %s", strerror(errno));
 
         return CameraError::ERROR_CONFIG_FAILED;
     }
@@ -328,7 +350,7 @@ CameraError CameraDevice::CaptureSnapshot(const uint16_t streamID, const VideoRe
                            [streamID](const SnapshotStream & s) { return s.id == streamID; });
     if (it == snapshotStreams.end())
     {
-        ChipLogError(NotSpecified, "Snapshot streamID : %u not found", streamID);
+        ChipLogError(Zcl, "Snapshot streamID : %u not found", streamID);
         return CameraError::ERROR_CAPTURE_SNAPSHOT_FAILED;
     }
 
@@ -349,6 +371,7 @@ CameraError CameraDevice::StartVideoStream(uint16_t streamID)
         return CameraError::ERROR_VIDEO_STREAM_START_FAILED;
     }
 
+    // TODO: Replace with Gst API based pipeline creation
     // Construct RTP video pipeline
     std::string pipelineString = "v4l2src device=/dev/video0 ! "
                                  "video/x-raw,width=" +
@@ -368,11 +391,11 @@ CameraError CameraDevice::StartVideoStream(uint16_t streamID)
         return CameraError::ERROR_VIDEO_STREAM_START_FAILED;
     }
 
-    // pipelineString += "udpsink host=127.0.0.1 port=" + VIDEO_STREAM_GST_DEST_PORT; // Known socket
-    pipelineString += "udpsink host=127.0.0.1 port=5000"; // Known socket
+    pipelineString +=
+        "udpsink host=" + std::string(STREAM_GST_DEST_IP) + " port=" + std::to_string(VIDEO_STREAM_GST_DEST_PORT); // Known socket
 
     CameraError error = CameraError::SUCCESS;
-    it->videoPipeline = CreatePipeline(pipelineString, error);
+    it->videoPipeline = CreateVideoPipeline(pipelineString, error);
     if (it->videoPipeline == nullptr)
     {
         return error;
@@ -424,7 +447,7 @@ CameraError CameraDevice::StartSnapshotStream(uint16_t streamID)
                            [streamID](const SnapshotStream & s) { return s.id == streamID; });
     if (it == snapshotStreams.end())
     {
-        ChipLogError(NotSpecified, "Snapshot streamID : %u not found", streamID);
+        ChipLogError(Zcl, "Snapshot streamID : %u not found", streamID);
         return CameraError::ERROR_SNAPSHOT_STREAM_START_FAILED;
     }
 
@@ -441,7 +464,7 @@ CameraError CameraDevice::StartSnapshotStream(uint16_t streamID)
     GstStateChangeReturn result = gst_element_set_state(it->snapshotPipeline, GST_STATE_PLAYING);
     if (result == GST_STATE_CHANGE_FAILURE)
     {
-        ChipLogError(NotSpecified, "Failed to start snapshot pipeline.");
+        ChipLogError(Zcl, "Failed to start snapshot pipeline.");
         gst_object_unref(it->snapshotPipeline);
         it->snapshotPipeline = nullptr;
         return CameraError::ERROR_SNAPSHOT_STREAM_START_FAILED;
@@ -452,7 +475,7 @@ CameraError CameraDevice::StartSnapshotStream(uint16_t streamID)
     gst_element_get_state(it->snapshotPipeline, &state, nullptr, GST_CLOCK_TIME_NONE);
     if (state != GST_STATE_PLAYING)
     {
-        ChipLogError(NotSpecified, "Snapshot pipeline did not reach PLAYING state.");
+        ChipLogError(Zcl, "Snapshot pipeline did not reach PLAYING state.");
         gst_element_set_state(it->snapshotPipeline, GST_STATE_NULL);
         gst_object_unref(it->snapshotPipeline);
         it->snapshotPipeline = nullptr;

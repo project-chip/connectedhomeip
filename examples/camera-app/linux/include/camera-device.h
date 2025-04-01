@@ -21,10 +21,14 @@
 #include "camera-device-interface.h"
 #include "chime-manager.h"
 #include "webrtc-provider-manager.h"
-#include "camera-av-stream-manager.h"
+
+#include "media-controller.h"
+#include "network-stream-source.h"
+
 #include <protocols/interaction_model/StatusCode.h>
 
 #include <gst/gst.h>
+#define STREAM_GST_DEST_IP "127.0.0.1"
 #define VIDEO_STREAM_GST_DEST_PORT 5000
 #define AUDIO_STREAM_GST_DEST_PORT 5001
 
@@ -65,7 +69,6 @@ struct SnapshotStream
 class CameraDevice : public CameraDeviceInterface, public CameraDeviceInterface::CameraHALInterface
 {
 public:
-
     chip::app::Clusters::ChimeDelegate & GetChimeDelegate();
     chip::app::Clusters::WebRTCTransportProvider::Delegate & GetWebRTCProviderDelegate();
     chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtDelegate & GetCameraAVStreamMgmtDelegate();
@@ -143,7 +146,7 @@ private:
     void InitializeAudioStreams();
     void InitializeSnapshotStreams();
 
-    GstElement * CreatePipeline(const std::string & pipelineString, CameraError & error);
+    GstElement * CreateVideoPipeline(const std::string & pipelineString, CameraError & error);
     GstElement * CreateSnapshotPipeline(const std::string & device, int width, int height, int quality,
                                         const std::string & filename, CameraError & error);
     CameraError SetV4l2Control(uint32_t controlId, int value);
@@ -153,6 +156,10 @@ private:
     WebRTCProviderManager mWebRTCProviderManager;
 
     chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamManager mCameraAVStreamManager;
+
+    NetworkStreamSource mNetworkVideoSource;
+    NetworkStreamSource mNetworkAudioSource;
+    MediaController mMediaController;
 };
 
 } // namespace Camera
