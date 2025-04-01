@@ -19,7 +19,7 @@
 
 using SdpOfferCallback         = void (*)(const char *, const int);
 using SdpAnswerCallback        = void (*)(const char *, const int);
-using IceCallback              = void (*)(const char **, const int);
+using IceCallback              = void (*)(const char *, const int);
 using ErrorCallback            = void (*)(const char *, const int);
 using PeerConnectedCallback    = void (*)(const int);
 using PeerDisconnectedCallback = void (*)(const int);
