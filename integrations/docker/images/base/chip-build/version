@@ -1,1 +1,1 @@
-121 : [Telink] Update Docker image (Zephyr 3.3 & 3.7 support)
+126 : Upgrade docker to build with gstreamer for camera-app

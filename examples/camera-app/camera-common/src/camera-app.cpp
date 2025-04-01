@@ -30,6 +30,7 @@ void CameraApp::InitCameraDeviceClusters()
 {
     // Initialize Cluster Servers
     mChimeServer.Init();
+    mWebRTCTransportProvider.Init();
 }
 
 static constexpr EndpointId kCameraEndpointId = 1;

@@ -5924,8 +5924,6 @@ PICS:
     #
     # server / attributes
     #
-    - label: "Does the device implement the LastConfiguredBy attribute?"
-      id: S.S.A0000
 
     - label: "Does the device implement the SceneTableSize attribute?"
       id: S.S.A0001

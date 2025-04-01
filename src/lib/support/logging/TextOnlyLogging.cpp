@@ -151,6 +151,7 @@ static const char ModuleNames[kLogModule_Max][kMaxModuleNameLen + 1] = {
     "CSM", // CASESessionManager
     "ICD", // ICD
     "FS",  // FabricSync
+    "PAF", // WiFiPAF
 };
 
 } // namespace

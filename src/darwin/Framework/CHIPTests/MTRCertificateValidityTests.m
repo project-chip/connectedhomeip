@@ -19,12 +19,10 @@
 #import <Matter/Matter.h>
 
 #import "MTRErrorTestUtils.h"
+#import "MTRTestCase+ServerAppRunner.h"
+#import "MTRTestCase.h"
 #import "MTRTestKeys.h"
-#import "MTRTestResetCommissioneeHelper.h"
 #import "MTRTestStorage.h"
-
-// system dependencies
-#import <XCTest/XCTest.h>
 
 static const uint16_t kPairingTimeoutInSeconds = 30;
 static const uint16_t kTimeoutInSeconds = 3;
@@ -195,23 +193,16 @@ static MTRDeviceController * sController = nil;
 
 @end
 
-@interface MTRCertificateValidityTests : XCTestCase
+@interface MTRCertificateValidityTests : MTRTestCase
 @end
-
-static BOOL sNeedsStackShutdown = YES;
 
 @implementation MTRCertificateValidityTests
 
 + (void)tearDown
 {
     // Global teardown, runs once
-    if (sNeedsStackShutdown) {
-        // We don't need to worry about ResetCommissionee.  If we get here,
-        // we're running only one of our test methods (using
-        // -only-testing:MatterTests/MTROTAProviderTests/testMethodName), since
-        // we did not run test999_TearDown.
-        [self shutdownStack];
-    }
+    [self shutdownStack];
+    [super tearDown];
 }
 
 - (void)setUp
@@ -246,6 +237,11 @@ static BOOL sNeedsStackShutdown = YES;
 
 - (void)initStack:(MTRTestCertificateIssuer *)certificateIssuer
 {
+    BOOL started = [self startAppWithName:@"all-clusters"
+                                arguments:@[]
+                                  payload:kOnboardingPayload];
+    XCTAssertTrue(started);
+
     __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
     XCTAssertNotNil(factory);
 
@@ -289,8 +285,6 @@ static BOOL sNeedsStackShutdown = YES;
 
 + (void)shutdownStack
 {
-    sNeedsStackShutdown = NO;
-
     MTRDeviceController * controller = sController;
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
@@ -318,8 +312,6 @@ static BOOL sNeedsStackShutdown = YES;
         [toggleExpectation fulfill];
     }];
     [self waitForExpectations:@[ toggleExpectation ] timeout:kTimeoutInSeconds];
-
-    ResetCommissionee(sConnectedDevice, dispatch_get_main_queue(), self, kTimeoutInSeconds);
 
     [[self class] shutdownStack];
 }
