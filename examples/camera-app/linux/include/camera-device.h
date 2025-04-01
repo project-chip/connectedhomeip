@@ -21,7 +21,6 @@
 #include "camera-device-interface.h"
 #include "chime-manager.h"
 #include "webrtc-provider-manager.h"
-#include "camera-av-stream-manager.h"
 
 #include "media-controller.h"
 #include "network-stream-source.h"
@@ -69,7 +68,6 @@ struct SnapshotStream
 class CameraDevice : public CameraDeviceInterface, public CameraDeviceInterface::CameraHALInterface
 {
 public:
-
     chip::app::Clusters::ChimeDelegate & GetChimeDelegate();
     chip::app::Clusters::WebRTCTransportProvider::Delegate & GetWebRTCProviderDelegate();
     chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtDelegate & GetCameraAVStreamMgmtDelegate();

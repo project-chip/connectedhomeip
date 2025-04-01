@@ -18,9 +18,9 @@
 
 #pragma once
 
-#include <thread>
 #include <cstdint>
 #include <media-controller.h>
+#include <thread>
 
 // Network Stream Source
 class NetworkStreamSource

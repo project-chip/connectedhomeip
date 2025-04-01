@@ -17,19 +17,18 @@
  */
 
 #include "network-stream-source.h"
-#include <lib/support/logging/CHIPLogging.h>
 #include <arpa/inet.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <unistd.h>
-//#include <iostream>
 
 constexpr int kVideoBufferSize = 4096;
 
 void NetworkStreamSource::Init(MediaController * aMediaController, uint16_t aSrcPort)
 {
     mMediaController = aMediaController;
-    mSrcPort = aSrcPort;
+    mSrcPort         = aSrcPort;
 }
 
 void NetworkStreamSource::Start(uint16_t aStreamId)
@@ -38,7 +37,7 @@ void NetworkStreamSource::Start(uint16_t aStreamId)
 
     ChipLogDetail(NotSpecified, "Network socket listener for media stream - start listening ");
     this->mStreamSourceActive = true;
-    streamThreads.emplace_back([&](){ListenForStreamOnSocket();});
+    streamThreads.emplace_back([&]() { ListenForStreamOnSocket(); });
 }
 
 void NetworkStreamSource::Stop()
@@ -46,7 +45,8 @@ void NetworkStreamSource::Stop()
 
     this->mStreamSourceActive = false;
 
-    for(auto& t: streamThreads) {
+    for (auto & t : streamThreads)
+    {
         t.join();
     }
     ChipLogDetail(NotSpecified, "Network socket listener for media stream - stopping listening ");
@@ -63,11 +63,12 @@ void NetworkStreamSource::ListenForStreamOnSocket()
     }
 
     sockaddr_in serverAddress;
-    serverAddress.sin_family = AF_INET;
+    serverAddress.sin_family      = AF_INET;
     serverAddress.sin_addr.s_addr = INADDR_ANY;
-    serverAddress.sin_port = htons(mSrcPort);
+    serverAddress.sin_port        = htons(mSrcPort);
 
-    if (bind(serverSocket, reinterpret_cast<sockaddr*>(&serverAddress), sizeof(serverAddress)) == -1) {
+    if (bind(serverSocket, reinterpret_cast<sockaddr *>(&serverAddress), sizeof(serverAddress)) == -1)
+    {
         close(serverSocket);
         ChipLogError(NotSpecified, "Failed to bind socket.");
         return;
@@ -81,8 +82,8 @@ void NetworkStreamSource::ListenForStreamOnSocket()
 
     while (mStreamSourceActive)
     {
-        ssize_t bytesReceived = recvfrom(serverSocket, buffer, sizeof(buffer), 0,
-                                         reinterpret_cast<sockaddr*>(&clientAddress), &clientAddressLength);
+        ssize_t bytesReceived =
+            recvfrom(serverSocket, buffer, sizeof(buffer), 0, reinterpret_cast<sockaddr *>(&clientAddress), &clientAddressLength);
         if (bytesReceived == -1)
         {
             ChipLogError(NotSpecified, "Error receiving data.");
@@ -94,4 +95,3 @@ void NetworkStreamSource::ListenForStreamOnSocket()
 
     close(serverSocket);
 }
-

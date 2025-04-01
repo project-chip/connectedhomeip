@@ -19,9 +19,9 @@
 
 #pragma once
 
-#include <vector>
 #include <mutex>
 #include <transport.h>
+#include <vector>
 
 // Connection object to store transport and stream IDs
 struct Connection

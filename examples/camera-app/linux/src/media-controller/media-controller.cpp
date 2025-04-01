@@ -15,8 +15,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <algorithm>
 #include "media-controller.h"
+#include <algorithm>
 
 void MediaController::RegisterTransport(Transport * transport, uint16_t videoStreamID, uint16_t audioStreamID)
 {

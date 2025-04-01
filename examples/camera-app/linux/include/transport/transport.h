@@ -17,8 +17,8 @@
  */
 
 #include <cstddef>
-#include <cstring>
 #include <cstdint>
+#include <cstring>
 
 #pragma once
 // Base class for media transports(WebRTC, PushAV)
