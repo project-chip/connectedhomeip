@@ -3672,8 +3672,8 @@ private:
 | * UpdateFabricLabel                                                 |   0x09 |
 | * RemoveFabric                                                      |   0x0A |
 | * AddTrustedRootCertificate                                         |   0x0B |
-| * SetVidVerificationStatement                                       |   0x0C |
-| * SignVidVerificationRequest                                        |   0x0D |
+| * SetVIDVerificationStatement                                       |   0x0C |
+| * SignVIDVerificationRequest                                        |   0x0D |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * NOCs                                                              | 0x0000 |
@@ -3999,16 +3999,16 @@ private:
 };
 
 /*
- * Command SetVidVerificationStatement
+ * Command SetVIDVerificationStatement
  */
-class OperationalCredentialsSetVidVerificationStatement : public ClusterCommand
+class OperationalCredentialsSetVIDVerificationStatement : public ClusterCommand
 {
 public:
-    OperationalCredentialsSetVidVerificationStatement(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("set-vid-verification-statement", credsIssuerConfig)
+    OperationalCredentialsSetVIDVerificationStatement(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("set-vidverification-statement", credsIssuerConfig)
     {
         AddArgument("VendorID", 0, UINT16_MAX, &mRequest.vendorID);
-        AddArgument("VidVerificationStatement", &mRequest.vidVerificationStatement);
+        AddArgument("VIDVerificationStatement", &mRequest.VIDVerificationStatement);
         AddArgument("Vvsc", &mRequest.vvsc);
         ClusterCommand::AddArguments();
     }
@@ -4017,7 +4017,7 @@ public:
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::OperationalCredentials::Id;
         constexpr chip::CommandId commandId =
-            chip::app::Clusters::OperationalCredentials::Commands::SetVidVerificationStatement::Id;
+            chip::app::Clusters::OperationalCredentials::Commands::SetVIDVerificationStatement::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
                         commandId, endpointIds.at(0));
@@ -4028,7 +4028,7 @@ public:
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::OperationalCredentials::Id;
         constexpr chip::CommandId commandId =
-            chip::app::Clusters::OperationalCredentials::Commands::SetVidVerificationStatement::Id;
+            chip::app::Clusters::OperationalCredentials::Commands::SetVIDVerificationStatement::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
                         groupId);
@@ -4037,17 +4037,17 @@ public:
     }
 
 private:
-    chip::app::Clusters::OperationalCredentials::Commands::SetVidVerificationStatement::Type mRequest;
+    chip::app::Clusters::OperationalCredentials::Commands::SetVIDVerificationStatement::Type mRequest;
 };
 
 /*
- * Command SignVidVerificationRequest
+ * Command SignVIDVerificationRequest
  */
-class OperationalCredentialsSignVidVerificationRequest : public ClusterCommand
+class OperationalCredentialsSignVIDVerificationRequest : public ClusterCommand
 {
 public:
-    OperationalCredentialsSignVidVerificationRequest(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("sign-vid-verification-request", credsIssuerConfig)
+    OperationalCredentialsSignVIDVerificationRequest(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("sign-vidverification-request", credsIssuerConfig)
     {
         AddArgument("FabricIndex", 0, UINT8_MAX, &mRequest.fabricIndex);
         AddArgument("ClientChallenge", &mRequest.clientChallenge);
@@ -4057,7 +4057,7 @@ public:
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::OperationalCredentials::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::OperationalCredentials::Commands::SignVidVerificationRequest::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::OperationalCredentials::Commands::SignVIDVerificationRequest::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
                         commandId, endpointIds.at(0));
@@ -4067,7 +4067,7 @@ public:
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::OperationalCredentials::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::OperationalCredentials::Commands::SignVidVerificationRequest::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::OperationalCredentials::Commands::SignVIDVerificationRequest::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
                         groupId);
@@ -4076,7 +4076,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::OperationalCredentials::Commands::SignVidVerificationRequest::Type mRequest;
+    chip::app::Clusters::OperationalCredentials::Commands::SignVIDVerificationRequest::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -5982,7 +5982,6 @@ private:
 | * CopyScene                                                         |   0x40 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
-| * LastConfiguredBy                                                  | 0x0000 |
 | * SceneTableSize                                                    | 0x0001 |
 | * FabricSceneInfo                                                   | 0x0002 |
 | * GeneratedCommandList                                              | 0xFFF8 |
@@ -6001,13 +6000,13 @@ class ScenesManagementAddScene : public ClusterCommand
 {
 public:
     ScenesManagementAddScene(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("add-scene", credsIssuerConfig), mComplex_ExtensionFieldSets(&mRequest.extensionFieldSets)
+        ClusterCommand("add-scene", credsIssuerConfig), mComplex_ExtensionFieldSetStructs(&mRequest.extensionFieldSetStructs)
     {
         AddArgument("GroupID", 0, UINT16_MAX, &mRequest.groupID);
         AddArgument("SceneID", 0, UINT8_MAX, &mRequest.sceneID);
         AddArgument("TransitionTime", 0, UINT32_MAX, &mRequest.transitionTime);
         AddArgument("SceneName", &mRequest.sceneName);
-        AddArgument("ExtensionFieldSets", &mComplex_ExtensionFieldSets);
+        AddArgument("ExtensionFieldSetStructs", &mComplex_ExtensionFieldSetStructs);
         ClusterCommand::AddArguments();
     }
 
@@ -6034,8 +6033,9 @@ public:
 
 private:
     chip::app::Clusters::ScenesManagement::Commands::AddScene::Type mRequest;
-    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::Type>>
-        mComplex_ExtensionFieldSets;
+    TypedComplexArgument<
+        chip::app::DataModel::List<const chip::app::Clusters::ScenesManagement::Structs::ExtensionFieldSetStruct::Type>>
+        mComplex_ExtensionFieldSetStructs;
 };
 
 /*
@@ -14854,6 +14854,7 @@ public:
         ClusterCommand("solicit-offer", credsIssuerConfig), mComplex_ICEServers(&mRequest.ICEServers)
     {
         AddArgument("StreamUsage", 0, UINT8_MAX, &mRequest.streamUsage);
+        AddArgument("OriginatingEndpointID", 0, UINT16_MAX, &mRequest.originatingEndpointID);
         AddArgument("VideoStreamID", 0, UINT16_MAX, &mRequest.videoStreamID);
         AddArgument("AudioStreamID", 0, UINT16_MAX, &mRequest.audioStreamID);
         AddArgument("ICEServers", &mComplex_ICEServers, "", Argument::kOptional);
@@ -14902,6 +14903,7 @@ public:
         AddArgument("WebRTCSessionID", 0, UINT16_MAX, &mRequest.webRTCSessionID);
         AddArgument("Sdp", &mRequest.sdp);
         AddArgument("StreamUsage", 0, UINT8_MAX, &mRequest.streamUsage);
+        AddArgument("OriginatingEndpointID", 0, UINT16_MAX, &mRequest.originatingEndpointID);
         AddArgument("VideoStreamID", 0, UINT16_MAX, &mRequest.videoStreamID);
         AddArgument("AudioStreamID", 0, UINT16_MAX, &mRequest.audioStreamID);
         AddArgument("ICEServers", &mComplex_ICEServers, "", Argument::kOptional);
@@ -15509,7 +15511,7 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * InstalledChimeSounds                                              | 0x0000 |
-| * ActiveChimeID                                                     | 0x0001 |
+| * SelectedChime                                                     | 0x0001 |
 | * Enabled                                                           | 0x0002 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
@@ -15682,15 +15684,15 @@ private:
 | * RemoveRootCertificate                                             |   0x06 |
 | * TLSClientCSR                                                      |   0x07 |
 | * ProvisionClientCertificate                                        |   0x09 |
-| * FindClientCertificate                                             |   0x0B |
-| * LookupClientCertificate                                           |   0x0D |
-| * RemoveClientCertificate                                           |   0x0F |
+| * FindClientCertificate                                             |   0x0A |
+| * LookupClientCertificate                                           |   0x0C |
+| * RemoveClientCertificate                                           |   0x0E |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * MaxRootCertificates                                               | 0x0000 |
-| * CurrentRootCertificates                                           | 0x0001 |
+| * ProvisionedRootCertificates                                       | 0x0001 |
 | * MaxClientCertificates                                             | 0x0002 |
-| * CurrentClientCertificates                                         | 0x0003 |
+| * ProvisionedClientCertificates                                     | 0x0003 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -20307,8 +20309,8 @@ void registerClusterOperationalCredentials(Commands & commands, CredentialIssuer
         make_unique<OperationalCredentialsUpdateFabricLabel>(credsIssuerConfig),           //
         make_unique<OperationalCredentialsRemoveFabric>(credsIssuerConfig),                //
         make_unique<OperationalCredentialsAddTrustedRootCertificate>(credsIssuerConfig),   //
-        make_unique<OperationalCredentialsSetVidVerificationStatement>(credsIssuerConfig), //
-        make_unique<OperationalCredentialsSignVidVerificationRequest>(credsIssuerConfig),  //
+        make_unique<OperationalCredentialsSetVIDVerificationStatement>(credsIssuerConfig), //
+        make_unique<OperationalCredentialsSignVIDVerificationRequest>(credsIssuerConfig),  //
         //
         // Attributes
         //
@@ -22275,7 +22277,6 @@ void registerClusterScenesManagement(Commands & commands, CredentialIssuerComman
         // Attributes
         //
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<ReadAttribute>(Id, "last-configured-by", Attributes::LastConfiguredBy::Id, credsIssuerConfig),         //
         make_unique<ReadAttribute>(Id, "scene-table-size", Attributes::SceneTableSize::Id, credsIssuerConfig),             //
         make_unique<ReadAttribute>(Id, "fabric-scene-info", Attributes::FabricSceneInfo::Id, credsIssuerConfig),           //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
@@ -22284,9 +22285,6 @@ void registerClusterScenesManagement(Commands & commands, CredentialIssuerComman
         make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
-        make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::NodeId>>>(
-            Id, "last-configured-by", 0, UINT64_MAX, Attributes::LastConfiguredBy::Id, WriteCommandType::kForceWrite,
-            credsIssuerConfig), //
         make_unique<WriteAttribute<uint16_t>>(Id, "scene-table-size", 0, UINT16_MAX, Attributes::SceneTableSize::Id,
                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<
@@ -22304,7 +22302,6 @@ void registerClusterScenesManagement(Commands & commands, CredentialIssuerComman
         make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
                                               WriteCommandType::kForceWrite, credsIssuerConfig),                                //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<SubscribeAttribute>(Id, "last-configured-by", Attributes::LastConfiguredBy::Id, credsIssuerConfig),         //
         make_unique<SubscribeAttribute>(Id, "scene-table-size", Attributes::SceneTableSize::Id, credsIssuerConfig),             //
         make_unique<SubscribeAttribute>(Id, "fabric-scene-info", Attributes::FabricSceneInfo::Id, credsIssuerConfig),           //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
@@ -28831,7 +28828,7 @@ void registerClusterChime(Commands & commands, CredentialIssuerCommands * credsI
         //
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<ReadAttribute>(Id, "installed-chime-sounds", Attributes::InstalledChimeSounds::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "active-chime-id", Attributes::ActiveChimeID::Id, credsIssuerConfig),               //
+        make_unique<ReadAttribute>(Id, "selected-chime", Attributes::SelectedChime::Id, credsIssuerConfig),                //
         make_unique<ReadAttribute>(Id, "enabled", Attributes::Enabled::Id, credsIssuerConfig),                             //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
@@ -28843,7 +28840,7 @@ void registerClusterChime(Commands & commands, CredentialIssuerCommands * credsI
             WriteAttributeAsComplex<chip::app::DataModel::List<const chip::app::Clusters::Chime::Structs::ChimeSoundStruct::Type>>>(
             Id, "installed-chime-sounds", Attributes::InstalledChimeSounds::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<uint8_t>>(Id, "active-chime-id", 0, UINT8_MAX, Attributes::ActiveChimeID::Id,
+        make_unique<WriteAttribute<uint8_t>>(Id, "selected-chime", 0, UINT8_MAX, Attributes::SelectedChime::Id,
                                              WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<bool>>(Id, "enabled", 0, 1, Attributes::Enabled::Id, WriteCommandType::kWrite,
                                           credsIssuerConfig), //
@@ -28860,7 +28857,7 @@ void registerClusterChime(Commands & commands, CredentialIssuerCommands * credsI
                                               WriteCommandType::kForceWrite, credsIssuerConfig),                                //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<SubscribeAttribute>(Id, "installed-chime-sounds", Attributes::InstalledChimeSounds::Id, credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "active-chime-id", Attributes::ActiveChimeID::Id, credsIssuerConfig),               //
+        make_unique<SubscribeAttribute>(Id, "selected-chime", Attributes::SelectedChime::Id, credsIssuerConfig),                //
         make_unique<SubscribeAttribute>(Id, "enabled", Attributes::Enabled::Id, credsIssuerConfig),                             //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
@@ -29015,11 +29012,12 @@ void registerClusterTlsCertificateManagement(Commands & commands, CredentialIssu
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                       //
-        make_unique<ReadAttribute>(Id, "max-root-certificates", Attributes::MaxRootCertificates::Id, credsIssuerConfig),         //
-        make_unique<ReadAttribute>(Id, "current-root-certificates", Attributes::CurrentRootCertificates::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "max-client-certificates", Attributes::MaxClientCertificates::Id, credsIssuerConfig),     //
-        make_unique<ReadAttribute>(Id, "current-client-certificates", Attributes::CurrentClientCertificates::Id,
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                               //
+        make_unique<ReadAttribute>(Id, "max-root-certificates", Attributes::MaxRootCertificates::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "provisioned-root-certificates", Attributes::ProvisionedRootCertificates::Id,
+                                   credsIssuerConfig),                                                                       //
+        make_unique<ReadAttribute>(Id, "max-client-certificates", Attributes::MaxClientCertificates::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "provisioned-client-certificates", Attributes::ProvisionedClientCertificates::Id,
                                    credsIssuerConfig),                                                                     //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
@@ -29029,13 +29027,16 @@ void registerClusterTlsCertificateManagement(Commands & commands, CredentialIssu
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
         make_unique<WriteAttribute<uint8_t>>(Id, "max-root-certificates", 0, UINT8_MAX, Attributes::MaxRootCertificates::Id,
                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<uint8_t>>(Id, "current-root-certificates", 0, UINT8_MAX, Attributes::CurrentRootCertificates::Id,
-                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::TlsCertificateManagement::Structs::TLSCertStruct::Type>>>(
+            Id, "provisioned-root-certificates", Attributes::ProvisionedRootCertificates::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "max-client-certificates", 0, UINT8_MAX, Attributes::MaxClientCertificates::Id,
                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<uint8_t>>(Id, "current-client-certificates", 0, UINT8_MAX,
-                                             Attributes::CurrentClientCertificates::Id, WriteCommandType::kForceWrite,
-                                             credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<
+            const chip::app::Clusters::TlsCertificateManagement::Structs::TLSClientCertificateDetailStruct::Type>>>(
+            Id, "provisioned-client-certificates", Attributes::ProvisionedClientCertificates::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -29049,10 +29050,10 @@ void registerClusterTlsCertificateManagement(Commands & commands, CredentialIssu
                                               WriteCommandType::kForceWrite, credsIssuerConfig),                              //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                               //
         make_unique<SubscribeAttribute>(Id, "max-root-certificates", Attributes::MaxRootCertificates::Id, credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "current-root-certificates", Attributes::CurrentRootCertificates::Id,
+        make_unique<SubscribeAttribute>(Id, "provisioned-root-certificates", Attributes::ProvisionedRootCertificates::Id,
                                         credsIssuerConfig),                                                                       //
         make_unique<SubscribeAttribute>(Id, "max-client-certificates", Attributes::MaxClientCertificates::Id, credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "current-client-certificates", Attributes::CurrentClientCertificates::Id,
+        make_unique<SubscribeAttribute>(Id, "provisioned-client-certificates", Attributes::ProvisionedClientCertificates::Id,
                                         credsIssuerConfig),                                                                     //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //

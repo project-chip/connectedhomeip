@@ -130,7 +130,7 @@
                      wifi,
                      thread,
                      _deviceController.uniqueIdentifier,
-                     (unsigned long) self.state];
+                     (unsigned long) [MTR_SAFE_CAST(self._internalState[kMTRDeviceInternalPropertyDeviceState], NSNumber) unsignedLongValue]];
 }
 
 - (nullable NSNumber *)vendorID
@@ -372,8 +372,14 @@ static const auto * optionalInternalStateKeys = @{
 
 - (MTRDeviceState)state
 {
+    // TEMPORARY WORKAROUND for UNTIL WE HAVE the addDelegate flow fixed
+    if (![self delegateExists]) {
+        return MTRDeviceStateReachable;
+    }
+
     NSNumber * stateNumber = MTR_SAFE_CAST(self._internalState[kMTRDeviceInternalPropertyDeviceState], NSNumber);
     switch (static_cast<MTRDeviceState>(stateNumber.unsignedIntegerValue)) {
+    default:
     case MTRDeviceStateUnknown:
         return MTRDeviceStateUnknown;
 
@@ -552,7 +558,11 @@ MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(readAttributePaths
                              return;
                          }
 
-                         completion(responses, nil);
+                         if (error != nil) {
+                             MTR_LOG_ERROR("%@ got error trying to invokeCommands: %@", self, error);
+                         }
+
+                         completion(responses, error);
                      });
                  }];
     } @catch (NSException * exception) {

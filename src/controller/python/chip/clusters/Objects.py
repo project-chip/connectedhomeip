@@ -29,14 +29,12 @@ import typing
 from dataclasses import dataclass, field
 from enum import IntFlag
 
-from chip import ChipUtility
-from chip.clusters.enum import MatterIntEnum
-from chip.tlv import float32, uint
-
+from .. import ChipUtility
+from ..clusters.enum import MatterIntEnum
+from ..tlv import float32, uint
 from .ClusterObjects import (Cluster, ClusterAttributeDescriptor, ClusterCommand, ClusterEvent, ClusterObject,
                              ClusterObjectDescriptor, ClusterObjectFieldDescriptor)
 from .Types import Nullable, NullValue
-
 
 __all__ = [
     "Globals",
@@ -417,10 +415,10 @@ class Globals:
             kUnknownEnumValue = 3
 
         class ThreeLevelAutoEnum(MatterIntEnum):
-            kLow = 0x00
-            kMedium = 0x01
-            kHigh = 0x02
-            kAutomatic = 0x03
+            kAuto = 0x00
+            kLow = 0x01
+            kMedium = 0x02
+            kHigh = 0x03
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
@@ -12349,7 +12347,7 @@ class OperationalCredentials(Cluster):
                         ClusterObjectFieldDescriptor(Label="fabricID", Tag=3, Type=uint),
                         ClusterObjectFieldDescriptor(Label="nodeID", Tag=4, Type=uint),
                         ClusterObjectFieldDescriptor(Label="label", Tag=5, Type=str),
-                        ClusterObjectFieldDescriptor(Label="vidVerificationStatement", Tag=6, Type=typing.Optional[bytes]),
+                        ClusterObjectFieldDescriptor(Label="VIDVerificationStatement", Tag=6, Type=typing.Optional[bytes]),
                         ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
@@ -12358,7 +12356,7 @@ class OperationalCredentials(Cluster):
             fabricID: 'uint' = 0
             nodeID: 'uint' = 0
             label: 'str' = ""
-            vidVerificationStatement: 'typing.Optional[bytes]' = None
+            VIDVerificationStatement: 'typing.Optional[bytes]' = None
             fabricIndex: 'uint' = 0
 
         @dataclass
@@ -12592,7 +12590,7 @@ class OperationalCredentials(Cluster):
             rootCACertificate: bytes = b""
 
         @dataclass
-        class SetVidVerificationStatement(ClusterCommand):
+        class SetVIDVerificationStatement(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0000003E
             command_id: typing.ClassVar[int] = 0x0000000C
             is_client: typing.ClassVar[bool] = True
@@ -12603,20 +12601,20 @@ class OperationalCredentials(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="vendorID", Tag=0, Type=typing.Optional[uint]),
-                        ClusterObjectFieldDescriptor(Label="vidVerificationStatement", Tag=1, Type=typing.Optional[bytes]),
+                        ClusterObjectFieldDescriptor(Label="VIDVerificationStatement", Tag=1, Type=typing.Optional[bytes]),
                         ClusterObjectFieldDescriptor(Label="vvsc", Tag=2, Type=typing.Optional[bytes]),
                     ])
 
             vendorID: typing.Optional[uint] = None
-            vidVerificationStatement: typing.Optional[bytes] = None
+            VIDVerificationStatement: typing.Optional[bytes] = None
             vvsc: typing.Optional[bytes] = None
 
         @dataclass
-        class SignVidVerificationRequest(ClusterCommand):
+        class SignVIDVerificationRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0000003E
             command_id: typing.ClassVar[int] = 0x0000000D
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = 'SignVidVerificationResponse'
+            response_type: typing.ClassVar[str] = 'SignVIDVerificationResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -12630,7 +12628,7 @@ class OperationalCredentials(Cluster):
             clientChallenge: bytes = b""
 
         @dataclass
-        class SignVidVerificationResponse(ClusterCommand):
+        class SignVIDVerificationResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0000003E
             command_id: typing.ClassVar[int] = 0x0000000E
             is_client: typing.ClassVar[bool] = False
@@ -19766,7 +19764,6 @@ class ScenesManagement(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields=[
-                ClusterObjectFieldDescriptor(Label="lastConfiguredBy", Tag=0x00000000, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="sceneTableSize", Tag=0x00000001, Type=uint),
                 ClusterObjectFieldDescriptor(Label="fabricSceneInfo", Tag=0x00000002, Type=typing.List[ScenesManagement.Structs.SceneInfoStruct]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
@@ -19776,7 +19773,6 @@ class ScenesManagement(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    lastConfiguredBy: typing.Union[None, Nullable, uint] = None
     sceneTableSize: uint = 0
     fabricSceneInfo: typing.List[ScenesManagement.Structs.SceneInfoStruct] = field(default_factory=lambda: [])
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
@@ -19821,7 +19817,7 @@ class ScenesManagement(Cluster):
             valueSigned64: 'typing.Optional[int]' = None
 
         @dataclass
-        class ExtensionFieldSet(ClusterObject):
+        class ExtensionFieldSetStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
@@ -19870,14 +19866,14 @@ class ScenesManagement(Cluster):
                         ClusterObjectFieldDescriptor(Label="sceneID", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(Label="transitionTime", Tag=2, Type=uint),
                         ClusterObjectFieldDescriptor(Label="sceneName", Tag=3, Type=str),
-                        ClusterObjectFieldDescriptor(Label="extensionFieldSets", Tag=4, Type=typing.List[ScenesManagement.Structs.ExtensionFieldSet]),
+                        ClusterObjectFieldDescriptor(Label="extensionFieldSetStructs", Tag=4, Type=typing.List[ScenesManagement.Structs.ExtensionFieldSetStruct]),
                     ])
 
             groupID: uint = 0
             sceneID: uint = 0
             transitionTime: uint = 0
             sceneName: str = ""
-            extensionFieldSets: typing.List[ScenesManagement.Structs.ExtensionFieldSet] = field(default_factory=lambda: [])
+            extensionFieldSetStructs: typing.List[ScenesManagement.Structs.ExtensionFieldSetStruct] = field(default_factory=lambda: [])
 
         @dataclass
         class AddSceneResponse(ClusterCommand):
@@ -19933,7 +19929,7 @@ class ScenesManagement(Cluster):
                         ClusterObjectFieldDescriptor(Label="sceneID", Tag=2, Type=uint),
                         ClusterObjectFieldDescriptor(Label="transitionTime", Tag=3, Type=typing.Optional[uint]),
                         ClusterObjectFieldDescriptor(Label="sceneName", Tag=4, Type=typing.Optional[str]),
-                        ClusterObjectFieldDescriptor(Label="extensionFieldSets", Tag=5, Type=typing.Optional[typing.List[ScenesManagement.Structs.ExtensionFieldSet]]),
+                        ClusterObjectFieldDescriptor(Label="extensionFieldSetStructs", Tag=5, Type=typing.Optional[typing.List[ScenesManagement.Structs.ExtensionFieldSetStruct]]),
                     ])
 
             status: uint = 0
@@ -19941,7 +19937,7 @@ class ScenesManagement(Cluster):
             sceneID: uint = 0
             transitionTime: typing.Optional[uint] = None
             sceneName: typing.Optional[str] = None
-            extensionFieldSets: typing.Optional[typing.List[ScenesManagement.Structs.ExtensionFieldSet]] = None
+            extensionFieldSetStructs: typing.Optional[typing.List[ScenesManagement.Structs.ExtensionFieldSetStruct]] = None
 
         @dataclass
         class RemoveScene(ClusterCommand):
@@ -20156,22 +20152,6 @@ class ScenesManagement(Cluster):
             sceneIdentifierFrom: uint = 0
 
     class Attributes:
-        @dataclass
-        class LastConfiguredBy(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x00000062
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x00000000
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
-
-            value: typing.Union[None, Nullable, uint] = None
-
         @dataclass
         class SceneTableSize(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
@@ -47269,15 +47249,17 @@ class WebRTCTransportProvider(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="id", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(Label="peerNodeID", Tag=2, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="streamUsage", Tag=3, Type=WebRTCTransportProvider.Enums.StreamUsageEnum),
-                        ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=4, Type=typing.Union[Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=5, Type=typing.Union[Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="metadataOptions", Tag=6, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="peerEndpointID", Tag=3, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="streamUsage", Tag=4, Type=WebRTCTransportProvider.Enums.StreamUsageEnum),
+                        ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=5, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=6, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="metadataOptions", Tag=7, Type=uint),
                         ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
             id: 'uint' = 0
             peerNodeID: 'uint' = 0
+            peerEndpointID: 'uint' = 0
             streamUsage: 'WebRTCTransportProvider.Enums.StreamUsageEnum' = 0
             videoStreamID: 'typing.Union[Nullable, uint]' = NullValue
             audioStreamID: 'typing.Union[Nullable, uint]' = NullValue
@@ -47297,14 +47279,16 @@ class WebRTCTransportProvider(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="streamUsage", Tag=0, Type=WebRTCTransportProvider.Enums.StreamUsageEnum),
-                        ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=1, Type=typing.Union[None, Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=2, Type=typing.Union[None, Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="ICEServers", Tag=3, Type=typing.Optional[typing.List[WebRTCTransportProvider.Structs.ICEServerStruct]]),
-                        ClusterObjectFieldDescriptor(Label="ICETransportPolicy", Tag=4, Type=typing.Optional[str]),
-                        ClusterObjectFieldDescriptor(Label="metadataOptions", Tag=5, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="originatingEndpointID", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=2, Type=typing.Union[None, Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=3, Type=typing.Union[None, Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="ICEServers", Tag=4, Type=typing.Optional[typing.List[WebRTCTransportProvider.Structs.ICEServerStruct]]),
+                        ClusterObjectFieldDescriptor(Label="ICETransportPolicy", Tag=5, Type=typing.Optional[str]),
+                        ClusterObjectFieldDescriptor(Label="metadataOptions", Tag=6, Type=typing.Optional[uint]),
                     ])
 
             streamUsage: WebRTCTransportProvider.Enums.StreamUsageEnum = 0
+            originatingEndpointID: uint = 0
             videoStreamID: typing.Union[None, Nullable, uint] = None
             audioStreamID: typing.Union[None, Nullable, uint] = None
             ICEServers: typing.Optional[typing.List[WebRTCTransportProvider.Structs.ICEServerStruct]] = None
@@ -47347,16 +47331,18 @@ class WebRTCTransportProvider(Cluster):
                         ClusterObjectFieldDescriptor(Label="webRTCSessionID", Tag=0, Type=typing.Union[Nullable, uint]),
                         ClusterObjectFieldDescriptor(Label="sdp", Tag=1, Type=str),
                         ClusterObjectFieldDescriptor(Label="streamUsage", Tag=2, Type=WebRTCTransportProvider.Enums.StreamUsageEnum),
-                        ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=3, Type=typing.Union[None, Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=4, Type=typing.Union[None, Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="ICEServers", Tag=5, Type=typing.Optional[typing.List[WebRTCTransportProvider.Structs.ICEServerStruct]]),
-                        ClusterObjectFieldDescriptor(Label="ICETransportPolicy", Tag=6, Type=typing.Optional[str]),
-                        ClusterObjectFieldDescriptor(Label="metadataOptions", Tag=7, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="originatingEndpointID", Tag=3, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=4, Type=typing.Union[None, Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=5, Type=typing.Union[None, Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="ICEServers", Tag=6, Type=typing.Optional[typing.List[WebRTCTransportProvider.Structs.ICEServerStruct]]),
+                        ClusterObjectFieldDescriptor(Label="ICETransportPolicy", Tag=7, Type=typing.Optional[str]),
+                        ClusterObjectFieldDescriptor(Label="metadataOptions", Tag=8, Type=typing.Optional[uint]),
                     ])
 
             webRTCSessionID: typing.Union[Nullable, uint] = NullValue
             sdp: str = ""
             streamUsage: WebRTCTransportProvider.Enums.StreamUsageEnum = 0
+            originatingEndpointID: uint = 0
             videoStreamID: typing.Union[None, Nullable, uint] = None
             audioStreamID: typing.Union[None, Nullable, uint] = None
             ICEServers: typing.Optional[typing.List[WebRTCTransportProvider.Structs.ICEServerStruct]] = None
@@ -47619,15 +47605,17 @@ class WebRTCTransportRequestor(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="id", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(Label="peerNodeID", Tag=2, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="streamUsage", Tag=3, Type=WebRTCTransportRequestor.Enums.StreamUsageEnum),
-                        ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=4, Type=typing.Union[Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=5, Type=typing.Union[Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="metadataOptions", Tag=6, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="peerEndpointID", Tag=3, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="streamUsage", Tag=4, Type=WebRTCTransportRequestor.Enums.StreamUsageEnum),
+                        ClusterObjectFieldDescriptor(Label="videoStreamID", Tag=5, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="audioStreamID", Tag=6, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="metadataOptions", Tag=7, Type=uint),
                         ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
             id: 'uint' = 0
             peerNodeID: 'uint' = 0
+            peerEndpointID: 'uint' = 0
             streamUsage: 'WebRTCTransportRequestor.Enums.StreamUsageEnum' = 0
             videoStreamID: 'typing.Union[Nullable, uint]' = NullValue
             audioStreamID: 'typing.Union[Nullable, uint]' = NullValue
@@ -48391,7 +48379,7 @@ class Chime(Cluster):
         return ClusterObjectDescriptor(
             Fields=[
                 ClusterObjectFieldDescriptor(Label="installedChimeSounds", Tag=0x00000000, Type=typing.List[Chime.Structs.ChimeSoundStruct]),
-                ClusterObjectFieldDescriptor(Label="activeChimeID", Tag=0x00000001, Type=uint),
+                ClusterObjectFieldDescriptor(Label="selectedChime", Tag=0x00000001, Type=uint),
                 ClusterObjectFieldDescriptor(Label="enabled", Tag=0x00000002, Type=bool),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
@@ -48401,7 +48389,7 @@ class Chime(Cluster):
             ])
 
     installedChimeSounds: typing.List[Chime.Structs.ChimeSoundStruct] = field(default_factory=lambda: [])
-    activeChimeID: uint = 0
+    selectedChime: uint = 0
     enabled: bool = False
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
@@ -48455,7 +48443,7 @@ class Chime(Cluster):
             value: typing.List[Chime.Structs.ChimeSoundStruct] = field(default_factory=lambda: [])
 
         @dataclass
-        class ActiveChimeID(ClusterAttributeDescriptor):
+        class SelectedChime(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000556
@@ -48987,9 +48975,9 @@ class TlsCertificateManagement(Cluster):
         return ClusterObjectDescriptor(
             Fields=[
                 ClusterObjectFieldDescriptor(Label="maxRootCertificates", Tag=0x00000000, Type=uint),
-                ClusterObjectFieldDescriptor(Label="currentRootCertificates", Tag=0x00000001, Type=uint),
+                ClusterObjectFieldDescriptor(Label="provisionedRootCertificates", Tag=0x00000001, Type=typing.List[TlsCertificateManagement.Structs.TLSCertStruct]),
                 ClusterObjectFieldDescriptor(Label="maxClientCertificates", Tag=0x00000002, Type=uint),
-                ClusterObjectFieldDescriptor(Label="currentClientCertificates", Tag=0x00000003, Type=uint),
+                ClusterObjectFieldDescriptor(Label="provisionedClientCertificates", Tag=0x00000003, Type=typing.List[TlsCertificateManagement.Structs.TLSClientCertificateDetailStruct]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -48998,9 +48986,9 @@ class TlsCertificateManagement(Cluster):
             ])
 
     maxRootCertificates: uint = 0
-    currentRootCertificates: uint = 0
+    provisionedRootCertificates: typing.List[TlsCertificateManagement.Structs.TLSCertStruct] = field(default_factory=lambda: [])
     maxClientCertificates: uint = 0
-    currentClientCertificates: uint = 0
+    provisionedClientCertificates: typing.List[TlsCertificateManagement.Structs.TLSClientCertificateDetailStruct] = field(default_factory=lambda: [])
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -49015,11 +49003,11 @@ class TlsCertificateManagement(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="caid", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="certificate", Tag=1, Type=bytes),
+                        ClusterObjectFieldDescriptor(Label="certificate", Tag=1, Type=typing.Optional[bytes]),
                     ])
 
             caid: 'uint' = 0
-            certificate: 'bytes' = b""
+            certificate: 'typing.Optional[bytes]' = None
 
         @dataclass
         class TLSClientCertificateDetailStruct(ClusterObject):
@@ -49028,13 +49016,13 @@ class TlsCertificateManagement(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="ccdid", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="clientCertificate", Tag=1, Type=bytes),
-                        ClusterObjectFieldDescriptor(Label="intermediateCertificates", Tag=2, Type=typing.List[bytes]),
+                        ClusterObjectFieldDescriptor(Label="clientCertificate", Tag=1, Type=typing.Optional[bytes]),
+                        ClusterObjectFieldDescriptor(Label="intermediateCertificates", Tag=2, Type=typing.Optional[typing.List[bytes]]),
                     ])
 
             ccdid: 'uint' = 0
-            clientCertificate: 'bytes' = b""
-            intermediateCertificates: 'typing.List[bytes]' = field(default_factory=lambda: [])
+            clientCertificate: 'typing.Optional[bytes]' = None
+            intermediateCertificates: 'typing.Optional[typing.List[bytes]]' = None
 
     class Commands:
         @dataclass
@@ -49192,7 +49180,7 @@ class TlsCertificateManagement(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000801
             command_id: typing.ClassVar[int] = 0x00000009
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = 'ProvisionClientCertificateResponse'
+            response_type: typing.ClassVar[typing.Optional[str]] = None
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -49206,25 +49194,9 @@ class TlsCertificateManagement(Cluster):
             clientCertificateDetails: TlsCertificateManagement.Structs.TLSClientCertificateDetailStruct = field(default_factory=lambda: TlsCertificateManagement.Structs.TLSClientCertificateDetailStruct())
 
         @dataclass
-        class ProvisionClientCertificateResponse(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x00000801
-            command_id: typing.ClassVar[int] = 0x0000000A
-            is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[typing.Optional[str]] = None
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="ccdid", Tag=0, Type=uint),
-                    ])
-
-            ccdid: uint = 0
-
-        @dataclass
         class FindClientCertificate(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000801
-            command_id: typing.ClassVar[int] = 0x0000000B
+            command_id: typing.ClassVar[int] = 0x0000000A
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'FindClientCertificateResponse'
 
@@ -49232,15 +49204,15 @@ class TlsCertificateManagement(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="ccdid", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="ccdid", Tag=0, Type=typing.Union[Nullable, uint]),
                     ])
 
-            ccdid: uint = 0
+            ccdid: typing.Union[Nullable, uint] = NullValue
 
         @dataclass
         class FindClientCertificateResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000801
-            command_id: typing.ClassVar[int] = 0x0000000C
+            command_id: typing.ClassVar[int] = 0x0000000B
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[typing.Optional[str]] = None
 
@@ -49256,7 +49228,7 @@ class TlsCertificateManagement(Cluster):
         @dataclass
         class LookupClientCertificate(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000801
-            command_id: typing.ClassVar[int] = 0x0000000D
+            command_id: typing.ClassVar[int] = 0x0000000C
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = 'LookupClientCertificateResponse'
 
@@ -49272,7 +49244,7 @@ class TlsCertificateManagement(Cluster):
         @dataclass
         class LookupClientCertificateResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000801
-            command_id: typing.ClassVar[int] = 0x0000000E
+            command_id: typing.ClassVar[int] = 0x0000000D
             is_client: typing.ClassVar[bool] = False
             response_type: typing.ClassVar[typing.Optional[str]] = None
 
@@ -49288,7 +49260,7 @@ class TlsCertificateManagement(Cluster):
         @dataclass
         class RemoveClientCertificate(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000801
-            command_id: typing.ClassVar[int] = 0x0000000F
+            command_id: typing.ClassVar[int] = 0x0000000E
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[typing.Optional[str]] = None
 
@@ -49319,7 +49291,7 @@ class TlsCertificateManagement(Cluster):
             value: uint = 0
 
         @dataclass
-        class CurrentRootCertificates(ClusterAttributeDescriptor):
+        class ProvisionedRootCertificates(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000801
@@ -49330,9 +49302,9 @@ class TlsCertificateManagement(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.List[TlsCertificateManagement.Structs.TLSCertStruct])
 
-            value: uint = 0
+            value: typing.List[TlsCertificateManagement.Structs.TLSCertStruct] = field(default_factory=lambda: [])
 
         @dataclass
         class MaxClientCertificates(ClusterAttributeDescriptor):
@@ -49351,7 +49323,7 @@ class TlsCertificateManagement(Cluster):
             value: uint = 0
 
         @dataclass
-        class CurrentClientCertificates(ClusterAttributeDescriptor):
+        class ProvisionedClientCertificates(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000801
@@ -49362,9 +49334,9 @@ class TlsCertificateManagement(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.List[TlsCertificateManagement.Structs.TLSClientCertificateDetailStruct])
 
-            value: uint = 0
+            value: typing.List[TlsCertificateManagement.Structs.TLSClientCertificateDetailStruct] = field(default_factory=lambda: [])
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):

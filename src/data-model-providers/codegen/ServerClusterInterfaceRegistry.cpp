@@ -59,7 +59,7 @@ CHIP_ERROR ServerClusterInterfaceRegistry::Register(ServerClusterRegistration & 
 
     if (mContext.has_value())
     {
-        ReturnErrorOnFailure(entry.serverClusterInterface->Startup(&*mContext));
+        ReturnErrorOnFailure(entry.serverClusterInterface->Startup(*mContext));
     }
 
     entry.next     = mRegistrations;
@@ -155,7 +155,7 @@ CHIP_ERROR ServerClusterInterfaceRegistry::SetContext(ServerClusterContext && co
 
     for (ServerClusterRegistration * registration = mRegistrations; registration != nullptr; registration = registration->next)
     {
-        CHIP_ERROR err = registration->serverClusterInterface->Startup(&*mContext);
+        CHIP_ERROR err = registration->serverClusterInterface->Startup(*mContext);
         if (err != CHIP_NO_ERROR)
         {
 #if CHIP_ERROR_LOGGING

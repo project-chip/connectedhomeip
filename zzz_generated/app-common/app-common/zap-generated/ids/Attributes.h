@@ -3054,10 +3054,6 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace ScenesManagement {
 namespace Attributes {
 
-namespace LastConfiguredBy {
-static constexpr AttributeId Id = 0x00000000;
-} // namespace LastConfiguredBy
-
 namespace SceneTableSize {
 static constexpr AttributeId Id = 0x00000001;
 } // namespace SceneTableSize
@@ -7286,9 +7282,9 @@ namespace InstalledChimeSounds {
 static constexpr AttributeId Id = 0x00000000;
 } // namespace InstalledChimeSounds
 
-namespace ActiveChimeID {
+namespace SelectedChime {
 static constexpr AttributeId Id = 0x00000001;
-} // namespace ActiveChimeID
+} // namespace SelectedChime
 
 namespace Enabled {
 static constexpr AttributeId Id = 0x00000002;
@@ -7388,17 +7384,17 @@ namespace MaxRootCertificates {
 static constexpr AttributeId Id = 0x00000000;
 } // namespace MaxRootCertificates
 
-namespace CurrentRootCertificates {
+namespace ProvisionedRootCertificates {
 static constexpr AttributeId Id = 0x00000001;
-} // namespace CurrentRootCertificates
+} // namespace ProvisionedRootCertificates
 
 namespace MaxClientCertificates {
 static constexpr AttributeId Id = 0x00000002;
 } // namespace MaxClientCertificates
 
-namespace CurrentClientCertificates {
+namespace ProvisionedClientCertificates {
 static constexpr AttributeId Id = 0x00000003;
-} // namespace CurrentClientCertificates
+} // namespace ProvisionedClientCertificates
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;

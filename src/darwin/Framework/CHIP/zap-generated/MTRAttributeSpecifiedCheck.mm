@@ -2442,9 +2442,6 @@ static BOOL AttributeIsSpecifiedInScenesManagementCluster(AttributeId aAttribute
 {
     using namespace Clusters::ScenesManagement;
     switch (aAttributeId) {
-    case Attributes::LastConfiguredBy::Id: {
-        return YES;
-    }
     case Attributes::SceneTableSize::Id: {
         return YES;
     }
@@ -5913,7 +5910,7 @@ static BOOL AttributeIsSpecifiedInChimeCluster(AttributeId aAttributeId)
     case Attributes::InstalledChimeSounds::Id: {
         return YES;
     }
-    case Attributes::ActiveChimeID::Id: {
+    case Attributes::SelectedChime::Id: {
         return YES;
     }
     case Attributes::Enabled::Id: {
@@ -6003,13 +6000,13 @@ static BOOL AttributeIsSpecifiedInTLSCertificateManagementCluster(AttributeId aA
     case Attributes::MaxRootCertificates::Id: {
         return YES;
     }
-    case Attributes::CurrentRootCertificates::Id: {
+    case Attributes::ProvisionedRootCertificates::Id: {
         return YES;
     }
     case Attributes::MaxClientCertificates::Id: {
         return YES;
     }
-    case Attributes::CurrentClientCertificates::Id: {
+    case Attributes::ProvisionedClientCertificates::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
