@@ -16,39 +16,28 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/nlassert.gni")
 
+import("${chip_root}/build/chip/tools.gni")
+import("${chip_root}/src/app/common_flags.gni")
+
 import("${chip_root}/build/chip/buildconfig_header.gni")
 
 static_library("chip_webrtc") {
-        sources = [
-          "libwebrtc.cpp",
-          "libwebrtc.h",
-          "WebrtcObserver.cpp",
-          "WebrtcObserver.h",
-        ]
+      sources = [
+            "libwebrtc.cpp",
+            "libwebrtc.h",
+      ]
       cflags_cc = ["-Wno-shadow", "-Wno-deprecated-copy", "-Wno-return-type", "-Wno-unknown-pragmas"] 
-      defines = [ "WEBRTC_USE_H264" ]
+
       include_dirs = [
           "${chip_root}/src/controller/webrtc/",
+          "${chip_root}/third_party/libdatachannel/repo/include",
       ]
-
-      cflags = [ "-DWEBRTC_POSIX", ]
-#      libs = ["${chip_root}/third_party/webrtc/lib/libwebrtc.a", ]
 
       deps = [
-         ":webrtc",
-         "${chip_root}/third_party/jsoncpp",
+         "${chip_root}/third_party/libdatachannel:libdatachannel",
       ]
+#     libs = ["${chip_root}/third_party/libdatachannel/repo/build/libdatachannel.so", ]
 
-}
-
-source_set("webrtc") {
-     public_configs = [":webrtc_config"]
-}
-
-config("webrtc_config") {
-      include_dirs = [
-          "${chip_root}/third_party/webrtc/src/",
-          "${chip_root}/third_party/webrtc/src/third_party/abseil-cpp",
-      ]
-      libs = ["${chip_root}/third_party/webrtc/lib/libwebrtc.a", ]
+      libs = [ "datachannel" ]
+      lib_dirs = [ rebase_path("${chip_root}/third_party/libdatachannel/repo/build/") ]
 }
