@@ -22,7 +22,6 @@ Git:
 -->
 <configurator xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../zcl.xsd">
   <domain name="CHIP"/>
-  
   <struct name="LandmarkInfoStruct" apiMaturity="provisional">
     <cluster code="0x0150"/>
     <item fieldId="0" name="LandmarkTag" type="LandmarkTag"/>
@@ -53,7 +52,7 @@ Git:
     <item fieldId="0" name="AreaID" type="int32u"/>
     <item fieldId="1" name="Status" type="OperationalStatusEnum" min="0x00" max="0x03"/>
     <item fieldId="2" name="TotalOperationalTime" type="elapsed_s" optional="true" isNullable="true"/>
-    <item fieldId="3" name="InitialTimeEstimate" type="elapsed_s" optional="true" isNullable="true"/>
+    <item fieldId="3" name="EstimatedTime" type="elapsed_s" optional="true" isNullable="true"/>
   </struct>
 
   <enum name="OperationalStatusEnum" type="enum8">
@@ -88,7 +87,7 @@ Git:
     <define>SERVICE_AREA_CLUSTER</define>
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
-    <globalAttribute side="either" code="0xFFFD" value="1"/>
+    <globalAttribute side="either" code="0xFFFD" value="2"/>
     <features>
       <feature bit="0" code="SELRUN" name="SelectWhileRunning" summary="The device allows changing the selected areas while running">
         <optionalConform/>

@@ -29861,13 +29861,13 @@ class ServiceArea(Cluster):
                         ClusterObjectFieldDescriptor(Label="areaID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="status", Tag=1, Type=ServiceArea.Enums.OperationalStatusEnum),
                         ClusterObjectFieldDescriptor(Label="totalOperationalTime", Tag=2, Type=typing.Union[None, Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="initialTimeEstimate", Tag=3, Type=typing.Union[None, Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="estimatedTime", Tag=3, Type=typing.Union[None, Nullable, uint]),
                     ])
 
             areaID: 'uint' = 0
             status: 'ServiceArea.Enums.OperationalStatusEnum' = 0
             totalOperationalTime: 'typing.Union[None, Nullable, uint]' = None
-            initialTimeEstimate: 'typing.Union[None, Nullable, uint]' = None
+            estimatedTime: 'typing.Union[None, Nullable, uint]' = None
 
     class Commands:
         @dataclass

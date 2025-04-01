@@ -3961,10 +3961,10 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = LogValue("InitialTimeEstimate", indent + 1, value.initialTimeEstimate);
+        CHIP_ERROR err = LogValue("EstimatedTime", indent + 1, value.estimatedTime);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'InitialTimeEstimate'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'EstimatedTime'");
             return err;
         }
     }

@@ -11032,14 +11032,14 @@ static id _Nullable DecodeAttributeValueForServiceAreaCluster(AttributeId aAttri
                 } else {
                     newElement_0.totalOperationalTime = nil;
                 }
-                if (entry_0.initialTimeEstimate.HasValue()) {
-                    if (entry_0.initialTimeEstimate.Value().IsNull()) {
-                        newElement_0.initialTimeEstimate = nil;
+                if (entry_0.estimatedTime.HasValue()) {
+                    if (entry_0.estimatedTime.Value().IsNull()) {
+                        newElement_0.estimatedTime = nil;
                     } else {
-                        newElement_0.initialTimeEstimate = [NSNumber numberWithUnsignedInt:entry_0.initialTimeEstimate.Value().Value()];
+                        newElement_0.estimatedTime = [NSNumber numberWithUnsignedInt:entry_0.estimatedTime.Value().Value()];
                     }
                 } else {
-                    newElement_0.initialTimeEstimate = nil;
+                    newElement_0.estimatedTime = nil;
                 }
                 [array_0 addObject:newElement_0];
             }

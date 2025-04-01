@@ -26976,31 +26976,31 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     chip::JniReferences::GetInstance().CreateOptional(newElement_0_totalOperationalTimeInsideOptional,
                                                                       newElement_0_totalOperationalTime);
                 }
-                jobject newElement_0_initialTimeEstimate;
-                if (!entry_0.initialTimeEstimate.HasValue())
+                jobject newElement_0_estimatedTime;
+                if (!entry_0.estimatedTime.HasValue())
                 {
-                    chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_initialTimeEstimate);
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_estimatedTime);
                 }
                 else
                 {
-                    jobject newElement_0_initialTimeEstimateInsideOptional;
-                    if (entry_0.initialTimeEstimate.Value().IsNull())
+                    jobject newElement_0_estimatedTimeInsideOptional;
+                    if (entry_0.estimatedTime.Value().IsNull())
                     {
-                        newElement_0_initialTimeEstimateInsideOptional = nullptr;
+                        newElement_0_estimatedTimeInsideOptional = nullptr;
                     }
                     else
                     {
-                        std::string newElement_0_initialTimeEstimateInsideOptionalClassName     = "java/lang/Long";
-                        std::string newElement_0_initialTimeEstimateInsideOptionalCtorSignature = "(J)V";
-                        jlong jninewElement_0_initialTimeEstimateInsideOptional =
-                            static_cast<jlong>(entry_0.initialTimeEstimate.Value().Value());
+                        std::string newElement_0_estimatedTimeInsideOptionalClassName     = "java/lang/Long";
+                        std::string newElement_0_estimatedTimeInsideOptionalCtorSignature = "(J)V";
+                        jlong jninewElement_0_estimatedTimeInsideOptional =
+                            static_cast<jlong>(entry_0.estimatedTime.Value().Value());
                         chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
-                            newElement_0_initialTimeEstimateInsideOptionalClassName.c_str(),
-                            newElement_0_initialTimeEstimateInsideOptionalCtorSignature.c_str(),
-                            jninewElement_0_initialTimeEstimateInsideOptional, newElement_0_initialTimeEstimateInsideOptional);
+                            newElement_0_estimatedTimeInsideOptionalClassName.c_str(),
+                            newElement_0_estimatedTimeInsideOptionalCtorSignature.c_str(),
+                            jninewElement_0_estimatedTimeInsideOptional, newElement_0_estimatedTimeInsideOptional);
                     }
-                    chip::JniReferences::GetInstance().CreateOptional(newElement_0_initialTimeEstimateInsideOptional,
-                                                                      newElement_0_initialTimeEstimate);
+                    chip::JniReferences::GetInstance().CreateOptional(newElement_0_estimatedTimeInsideOptional,
+                                                                      newElement_0_estimatedTime);
                 }
 
                 {
@@ -27026,7 +27026,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
                     newElement_0 =
                         env->NewObject(progressStructStructClass_1, progressStructStructCtor_1, newElement_0_areaID,
-                                       newElement_0_status, newElement_0_totalOperationalTime, newElement_0_initialTimeEstimate);
+                                       newElement_0_status, newElement_0_totalOperationalTime, newElement_0_estimatedTime);
                 }
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }

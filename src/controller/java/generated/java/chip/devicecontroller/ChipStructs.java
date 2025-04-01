@@ -9752,22 +9752,22 @@ public static class ServiceAreaClusterProgressStruct {
   public Long areaID;
   public Integer status;
   public @Nullable Optional<Long> totalOperationalTime;
-  public @Nullable Optional<Long> initialTimeEstimate;
+  public @Nullable Optional<Long> estimatedTime;
   private static final long AREA_ID_ID = 0L;
   private static final long STATUS_ID = 1L;
   private static final long TOTAL_OPERATIONAL_TIME_ID = 2L;
-  private static final long INITIAL_TIME_ESTIMATE_ID = 3L;
+  private static final long ESTIMATED_TIME_ID = 3L;
 
   public ServiceAreaClusterProgressStruct(
     Long areaID,
     Integer status,
     @Nullable Optional<Long> totalOperationalTime,
-    @Nullable Optional<Long> initialTimeEstimate
+    @Nullable Optional<Long> estimatedTime
   ) {
     this.areaID = areaID;
     this.status = status;
     this.totalOperationalTime = totalOperationalTime;
-    this.initialTimeEstimate = initialTimeEstimate;
+    this.estimatedTime = estimatedTime;
   }
 
   public StructType encodeTlv() {
@@ -9775,7 +9775,7 @@ public static class ServiceAreaClusterProgressStruct {
     values.add(new StructElement(AREA_ID_ID, new UIntType(areaID)));
     values.add(new StructElement(STATUS_ID, new UIntType(status)));
     values.add(new StructElement(TOTAL_OPERATIONAL_TIME_ID, totalOperationalTime != null ? totalOperationalTime.<BaseTLVType>map((nonOptionaltotalOperationalTime) -> new UIntType(nonOptionaltotalOperationalTime)).orElse(new EmptyType()) : new NullType()));
-    values.add(new StructElement(INITIAL_TIME_ESTIMATE_ID, initialTimeEstimate != null ? initialTimeEstimate.<BaseTLVType>map((nonOptionalinitialTimeEstimate) -> new UIntType(nonOptionalinitialTimeEstimate)).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(ESTIMATED_TIME_ID, estimatedTime != null ? estimatedTime.<BaseTLVType>map((nonOptionalestimatedTime) -> new UIntType(nonOptionalestimatedTime)).orElse(new EmptyType()) : new NullType()));
 
     return new StructType(values);
   }
@@ -9787,7 +9787,7 @@ public static class ServiceAreaClusterProgressStruct {
     Long areaID = null;
     Integer status = null;
     @Nullable Optional<Long> totalOperationalTime = null;
-    @Nullable Optional<Long> initialTimeEstimate = null;
+    @Nullable Optional<Long> estimatedTime = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == AREA_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -9804,10 +9804,10 @@ public static class ServiceAreaClusterProgressStruct {
           UIntType castingValue = element.value(UIntType.class);
           totalOperationalTime = Optional.of(castingValue.value(Long.class));
         }
-      } else if (element.contextTagNum() == INITIAL_TIME_ESTIMATE_ID) {
+      } else if (element.contextTagNum() == ESTIMATED_TIME_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          initialTimeEstimate = Optional.of(castingValue.value(Long.class));
+          estimatedTime = Optional.of(castingValue.value(Long.class));
         }
       }
     }
@@ -9815,7 +9815,7 @@ public static class ServiceAreaClusterProgressStruct {
       areaID,
       status,
       totalOperationalTime,
-      initialTimeEstimate
+      estimatedTime
     );
   }
 
@@ -9832,8 +9832,8 @@ public static class ServiceAreaClusterProgressStruct {
     output.append("\ttotalOperationalTime: ");
     output.append(totalOperationalTime);
     output.append("\n");
-    output.append("\tinitialTimeEstimate: ");
-    output.append(initialTimeEstimate);
+    output.append("\testimatedTime: ");
+    output.append(estimatedTime);
     output.append("\n");
     output.append("}\n");
     return output.toString();

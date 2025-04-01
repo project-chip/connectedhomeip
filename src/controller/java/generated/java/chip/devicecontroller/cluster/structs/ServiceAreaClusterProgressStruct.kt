@@ -27,14 +27,14 @@ class ServiceAreaClusterProgressStruct(
   val areaID: ULong,
   val status: UInt,
   val totalOperationalTime: Optional<ULong>?,
-  val initialTimeEstimate: Optional<ULong>?,
+  val estimatedTime: Optional<ULong>?,
 ) {
   override fun toString(): String = buildString {
     append("ServiceAreaClusterProgressStruct {\n")
     append("\tareaID : $areaID\n")
     append("\tstatus : $status\n")
     append("\ttotalOperationalTime : $totalOperationalTime\n")
-    append("\tinitialTimeEstimate : $initialTimeEstimate\n")
+    append("\testimatedTime : $estimatedTime\n")
     append("}\n")
   }
 
@@ -51,13 +51,13 @@ class ServiceAreaClusterProgressStruct(
       } else {
         putNull(ContextSpecificTag(TAG_TOTAL_OPERATIONAL_TIME))
       }
-      if (initialTimeEstimate != null) {
-        if (initialTimeEstimate.isPresent) {
-          val optinitialTimeEstimate = initialTimeEstimate.get()
-          put(ContextSpecificTag(TAG_INITIAL_TIME_ESTIMATE), optinitialTimeEstimate)
+      if (estimatedTime != null) {
+        if (estimatedTime.isPresent) {
+          val optestimatedTime = estimatedTime.get()
+          put(ContextSpecificTag(TAG_ESTIMATED_TIME), optestimatedTime)
         }
       } else {
-        putNull(ContextSpecificTag(TAG_INITIAL_TIME_ESTIMATE))
+        putNull(ContextSpecificTag(TAG_ESTIMATED_TIME))
       }
       endStructure()
     }
@@ -67,7 +67,7 @@ class ServiceAreaClusterProgressStruct(
     private const val TAG_AREA_ID = 0
     private const val TAG_STATUS = 1
     private const val TAG_TOTAL_OPERATIONAL_TIME = 2
-    private const val TAG_INITIAL_TIME_ESTIMATE = 3
+    private const val TAG_ESTIMATED_TIME = 3
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ServiceAreaClusterProgressStruct {
       tlvReader.enterStructure(tlvTag)
@@ -84,26 +84,21 @@ class ServiceAreaClusterProgressStruct(
           tlvReader.getNull(ContextSpecificTag(TAG_TOTAL_OPERATIONAL_TIME))
           null
         }
-      val initialTimeEstimate =
+      val estimatedTime =
         if (!tlvReader.isNull()) {
-          if (tlvReader.isNextTag(ContextSpecificTag(TAG_INITIAL_TIME_ESTIMATE))) {
-            Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_INITIAL_TIME_ESTIMATE)))
+          if (tlvReader.isNextTag(ContextSpecificTag(TAG_ESTIMATED_TIME))) {
+            Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_ESTIMATED_TIME)))
           } else {
             Optional.empty()
           }
         } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_INITIAL_TIME_ESTIMATE))
+          tlvReader.getNull(ContextSpecificTag(TAG_ESTIMATED_TIME))
           null
         }
 
       tlvReader.exitContainer()
 
-      return ServiceAreaClusterProgressStruct(
-        areaID,
-        status,
-        totalOperationalTime,
-        initialTimeEstimate,
-      )
+      return ServiceAreaClusterProgressStruct(areaID, status, totalOperationalTime, estimatedTime)
     }
   }
 }

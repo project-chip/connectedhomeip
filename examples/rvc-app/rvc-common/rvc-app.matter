@@ -1498,7 +1498,7 @@ cluster RvcOperationalState = 97 {
 
 /** The Service Area cluster provides an interface for controlling the areas where a device should operate, and for querying the current area being serviced. */
 provisional cluster ServiceArea = 336 {
-  revision 1;
+  revision 2;
 
   enum OperationalStatusEnum : enum8 {
     kPending = 0;
@@ -1552,7 +1552,7 @@ provisional cluster ServiceArea = 336 {
     int32u areaID = 0;
     OperationalStatusEnum status = 1;
     optional nullable elapsed_s totalOperationalTime = 2;
-    optional nullable elapsed_s initialTimeEstimate = 3;
+    optional nullable elapsed_s estimatedTime = 3;
   }
 
   readonly attribute AreaStruct supportedAreas[] = 0;

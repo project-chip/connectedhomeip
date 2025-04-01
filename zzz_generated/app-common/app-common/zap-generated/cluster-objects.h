@@ -28012,7 +28012,7 @@ enum class Fields : uint8_t
     kAreaID               = 0,
     kStatus               = 1,
     kTotalOperationalTime = 2,
-    kInitialTimeEstimate  = 3,
+    kEstimatedTime        = 3,
 };
 
 struct Type
@@ -28021,7 +28021,7 @@ public:
     uint32_t areaID              = static_cast<uint32_t>(0);
     OperationalStatusEnum status = static_cast<OperationalStatusEnum>(0);
     Optional<DataModel::Nullable<uint32_t>> totalOperationalTime;
-    Optional<DataModel::Nullable<uint32_t>> initialTimeEstimate;
+    Optional<DataModel::Nullable<uint32_t>> estimatedTime;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
