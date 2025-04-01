@@ -103,6 +103,9 @@ struct LinuxDeviceOptions
     chip::Optional<chip::System::Clock::Milliseconds32> icdActiveModeDurationMs;
     chip::Optional<chip::System::Clock::Milliseconds32> icdIdleModeDurationMs;
 #endif
+#if CHIP_CONFIG_ENABLE_CAMERA_SERVER
+    bool cameraDeferredOffer = false;
+#endif
     static LinuxDeviceOptions & GetInstance();
 };
 
