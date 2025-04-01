@@ -376,7 +376,7 @@ cluster Descriptor = 29 {
     kTagList = 0x1;
   }
 
-  struct DeviceTypeStruct {
+  shared struct DeviceTypeStruct {
     devtype_id deviceType = 0;
     int16u revision = 1;
   }
@@ -2087,7 +2087,7 @@ labels. */
 cluster FixedLabel = 64 {
   revision 1; // NOTE: Default/not specifically set
 
-  struct LabelStruct {
+  shared struct LabelStruct {
     char_string<16> label = 0;
     char_string<16> value = 1;
   }
@@ -2105,7 +2105,7 @@ cluster FixedLabel = 64 {
 cluster UserLabel = 65 {
   revision 1; // NOTE: Default/not specifically set
 
-  struct LabelStruct {
+  shared struct LabelStruct {
     char_string<16> label = 0;
     char_string<16> value = 1;
   }
@@ -2132,7 +2132,7 @@ provisional cluster CameraAvStreamManagement = 1361 {
     kJPEG = 0;
   }
 
-  enum StreamUsageEnum : enum8 {
+  shared enum StreamUsageEnum : enum8 {
     kInternal = 0;
     kRecording = 1;
     kAnalysis = 2;
@@ -2241,7 +2241,7 @@ provisional cluster CameraAvStreamManagement = 1361 {
     optional int16u maxHDRFPS = 3;
   }
 
-  struct ViewportStruct {
+  shared struct ViewportStruct {
     int16u x1 = 0;
     int16u y1 = 1;
     int16u x2 = 2;
@@ -2408,14 +2408,14 @@ provisional cluster CameraAvStreamManagement = 1361 {
 provisional cluster WebRTCTransportProvider = 1363 {
   revision 1;
 
-  enum StreamUsageEnum : enum8 {
+  shared enum StreamUsageEnum : enum8 {
     kInternal = 0;
     kRecording = 1;
     kAnalysis = 2;
     kLiveView = 3;
   }
 
-  enum WebRTCEndReasonEnum : enum8 {
+  shared enum WebRTCEndReasonEnum : enum8 {
     kIceFailed = 0;
     kIceTimeout = 1;
     kUserHangup = 2;
@@ -2430,18 +2430,18 @@ provisional cluster WebRTCTransportProvider = 1363 {
     kUnknownReason = 11;
   }
 
-  bitmap WebRTCMetadataOptionsBitmap : bitmap8 {
+  shared bitmap WebRTCMetadataOptionsBitmap : bitmap8 {
     kDataTLV = 0x1;
   }
 
-  struct ICEServerStruct {
+  shared struct ICEServerStruct {
     char_string urls[] = 1;
     optional char_string username = 2;
     optional char_string credential = 3;
     optional int16u caid = 4;
   }
 
-  fabric_scoped struct WebRTCSessionStruct {
+  shared fabric_scoped struct WebRTCSessionStruct {
     int16u id = 1;
     node_id peerNodeID = 2;
     endpoint_no peerEndpointID = 3;
@@ -2526,14 +2526,14 @@ provisional cluster WebRTCTransportProvider = 1363 {
 provisional cluster WebRTCTransportRequestor = 1364 {
   revision 1;
 
-  enum StreamUsageEnum : enum8 {
+  shared enum StreamUsageEnum : enum8 {
     kInternal = 0;
     kRecording = 1;
     kAnalysis = 2;
     kLiveView = 3;
   }
 
-  enum WebRTCEndReasonEnum : enum8 {
+  shared enum WebRTCEndReasonEnum : enum8 {
     kIceFailed = 0;
     kIceTimeout = 1;
     kUserHangup = 2;
@@ -2548,18 +2548,18 @@ provisional cluster WebRTCTransportRequestor = 1364 {
     kUnknownReason = 11;
   }
 
-  bitmap WebRTCMetadataOptionsBitmap : bitmap8 {
+  shared bitmap WebRTCMetadataOptionsBitmap : bitmap8 {
     kDataTLV = 0x1;
   }
 
-  struct ICEServerStruct {
+  shared struct ICEServerStruct {
     char_string urls[] = 1;
     optional char_string username = 2;
     optional char_string credential = 3;
     optional int16u caid = 4;
   }
 
-  fabric_scoped struct WebRTCSessionStruct {
+  shared fabric_scoped struct WebRTCSessionStruct {
     int16u id = 1;
     node_id peerNodeID = 2;
     endpoint_no peerEndpointID = 3;

@@ -376,7 +376,7 @@ cluster Descriptor = 29 {
     kTagList = 0x1;
   }
 
-  struct DeviceTypeStruct {
+  shared struct DeviceTypeStruct {
     devtype_id deviceType = 0;
     int16u revision = 1;
   }
@@ -1644,12 +1644,12 @@ cluster RvcRunMode = 84 {
     kDirectModeChange = 0x10000;
   }
 
-  struct ModeTagStruct {
+  shared struct ModeTagStruct {
     optional vendor_id mfgCode = 0;
     enum16 value = 1;
   }
 
-  struct ModeOptionStruct {
+  shared struct ModeOptionStruct {
     char_string<64> label = 0;
     int8u mode = 1;
     ModeTagStruct modeTags[] = 2;
@@ -1706,12 +1706,12 @@ cluster RvcCleanMode = 85 {
     kDirectModeChange = 0x10000;
   }
 
-  struct ModeTagStruct {
+  shared struct ModeTagStruct {
     optional vendor_id mfgCode = 0;
     enum16 value = 1;
   }
 
-  struct ModeOptionStruct {
+  shared struct ModeOptionStruct {
     char_string<64> label = 0;
     int8u mode = 1;
     ModeTagStruct modeTags[] = 2;
@@ -1769,13 +1769,13 @@ cluster RvcOperationalState = 97 {
     kDocked = 66;
   }
 
-  struct ErrorStateStruct {
+  shared struct ErrorStateStruct {
     enum8 errorStateID = 0;
     optional char_string<64> errorStateLabel = 1;
     optional char_string<64> errorStateDetails = 2;
   }
 
-  struct OperationalStateStruct {
+  shared struct OperationalStateStruct {
     enum8 operationalStateID = 0;
     optional char_string<64> operationalStateLabel = 1;
   }
