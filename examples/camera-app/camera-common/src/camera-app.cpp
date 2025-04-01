@@ -21,6 +21,7 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Chime;
+using namespace chip::app::Clusters::WebRTCTransportProvider;
 using namespace chip::app::Clusters::CameraAvStreamManagement;
 
 template <typename T>
@@ -34,6 +35,10 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
 
     // Instantiate Chime Server
     mChimeServerPtr = std::make_unique<ChimeServer>(mEndpoint, mCameraDevice->GetChimeDelegate());
+
+    // Instantiate WebRTCTransport Provider
+    mWebRTCTransportProviderPtr =
+        std::make_unique<WebRTCTransportProviderServer>(mCameraDevice->GetWebRTCProviderDelegate(), mEndpoint);
 
     // Fetch all initialization parameters for CameraAVStreamMgmt Server
     BitFlags<Feature> features;
@@ -65,7 +70,7 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
 void CameraApp::InitCameraDeviceClusters()
 {
     // Initialize Cluster Servers
-    mWebRTCTransportProvider.Init();
+    mWebRTCTransportProviderPtr->Init();
 
     mChimeServerPtr->Init();
 
@@ -81,11 +86,11 @@ void CameraAppInit(CameraDeviceInterface * cameraDevice)
     gCameraApp = Platform::MakeUnique<CameraApp>(kCameraEndpointId, cameraDevice);
     gCameraApp.get()->InitCameraDeviceClusters();
 
-    ChipLogDetail(NotSpecified, "CameraAppInit: Initialized Camera clusters");
+    ChipLogDetail(Zcl, "CameraAppInit: Initialized Camera clusters");
 }
 
 void CameraAppShutdown()
 {
-    ChipLogDetail(NotSpecified, "CameraAppShutdown: Shutting down Camera app");
+    ChipLogDetail(Zcl, "CameraAppShutdown: Shutting down Camera app");
     gCameraApp = nullptr;
 }

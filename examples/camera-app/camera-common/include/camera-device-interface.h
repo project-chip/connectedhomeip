@@ -17,10 +17,16 @@
  */
 
 #pragma once
+#include <app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.h>
 #include <app/clusters/chime-server/chime-server.h>
 #include <app/clusters/webrtc-transport-provider-server/webrtc-transport-provider-server.h>
-#include <app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.h>
 
+using chip::app::Clusters::CameraAvStreamManagement::AudioStreamStruct;
+using chip::app::Clusters::CameraAvStreamManagement::ImageSnapshot;
+using chip::app::Clusters::CameraAvStreamManagement::SnapshotStreamStruct;
+using chip::app::Clusters::CameraAvStreamManagement::VideoResolutionStruct;
+using chip::app::Clusters::CameraAvStreamManagement::VideoSensorParamsStruct;
+using chip::app::Clusters::CameraAvStreamManagement::VideoStreamStruct;
 
 // Enumeration for common camera errors
 enum class CameraError

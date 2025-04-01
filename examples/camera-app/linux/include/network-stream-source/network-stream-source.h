@@ -1,4 +1,3 @@
-
 /*
  *
  *    Copyright (c) 2025 Project CHIP Authors
@@ -19,30 +18,34 @@
 
 #pragma once
 
-#include <mutex>
-#include <transport.h>
-#include <vector>
+#include <cstdint>
+#include <media-controller.h>
+#include <thread>
 
-// Connection object to store transport and stream IDs
-struct Connection
+enum class StreamType
 {
-    Transport * transport;
-    uint16_t videoStreamID;
-    uint16_t audioStreamID;
+    kVideo,
+    kAudio,
 };
 
-// Media Controller
-class MediaController
+// Network Stream Source
+class NetworkStreamSource
 {
 public:
-    MediaController() {}
-    virtual ~MediaController() {}
-    void RegisterTransport(Transport * transport, uint16_t videoStreamID, uint16_t audioStreamID);
-    void UnregisterTransport(Transport * transport);
-    void DistributeVideo(const char * data, size_t size, uint16_t videoStreamID);
-    void DistributeAudio(const char * data, size_t size, uint16_t audioStreamID);
+    NetworkStreamSource() {}
+    virtual ~NetworkStreamSource() {}
+    void Init(MediaController * aMediaController, uint16_t aSrcPort, StreamType streamType);
+    void Start(uint16_t streamId);
+    void Stop();
 
 private:
-    std::vector<Connection> connections;
-    std::mutex connectionsMutex;
+    void ListenForStreamOnSocket();
+
+    MediaController * mMediaController = nullptr;
+    uint16_t mSrcPort;
+    uint16_t mStreamId;
+    StreamType mStreamType;
+    bool mStreamSourceActive = false;
+
+    std::vector<std::thread> streamThreads;
 };
