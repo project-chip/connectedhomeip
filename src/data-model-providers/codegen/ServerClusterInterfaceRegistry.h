@@ -120,9 +120,11 @@ public:
     ~ServerClusterInterfaceRegistry();
 
     /// Add the given entry to the registry.
+    /// NOTE the requirement of entries to be part of the same endpoint.
     ///
     /// Requirements:
     ///   - entry MUST NOT be part of any other registration
+    ///   - paths MUST be part of the same endpoint (requirement for codegen server cluster interface implementations)
     ///   - LIFETIME of entry must outlive the Registry (or entry must be unregistered)
     ///
     /// There can be only a single registration for a given `endpointId/clusterId` path.
@@ -141,6 +143,9 @@ public:
     /// ClustersList points inside the internal registrations of the registry, so
     /// the list is only valid as long as the registry is not modified.
     ClustersList ClustersOnEndpoint(EndpointId endpointId);
+
+    /// Unregister all registrations for the given endpoint.
+    void UnregisterAllFromEndpoint(EndpointId endpointId);
 
     // Set up the underlying context for all clusters that are managed by this registry.
     //

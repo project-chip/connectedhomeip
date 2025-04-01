@@ -180,10 +180,15 @@ TEST_F(TestServerClusterInterfaceRegistry, BasicTest)
     EXPECT_EQ(registry.Register(registration2), CHIP_NO_ERROR);
     EXPECT_EQ(registry.Get({ kEp2, kCluster2 }), &cluster2);
 
-    // cleanup
-    (void) registry.Unregister(&cluster1);
-    (void) registry.Unregister(&cluster2);
-    (void) registry.Unregister(&cluster3);
+    // clean of an entire endpoint works
+    EXPECT_EQ(registry.Get({ kEp2, kCluster3 }), &cluster3);
+    registry.UnregisterAllFromEndpoint(kEp2);
+    EXPECT_EQ(registry.Get({ kEp1, kCluster1 }), &cluster1);
+    EXPECT_EQ(registry.Get({ kEp2, kCluster3 }), nullptr);
+
+    registry.UnregisterAllFromEndpoint(kEp1);
+    EXPECT_EQ(registry.Get({ kEp1, kCluster1 }), nullptr);
+    EXPECT_EQ(registry.Get({ kEp2, kCluster3 }), nullptr);
 }
 
 TEST_F(TestServerClusterInterfaceRegistry, StressTest)
@@ -238,35 +243,47 @@ TEST_F(TestServerClusterInterfaceRegistry, StressTest)
             }
         }
 
-        // shuffle unregister
-        std::vector<size_t> unregister_order;
-        unregister_order.reserve(kClusterTestCount);
-        for (size_t i = 0; i < kClusterTestCount; i++)
+        // clear endpoints. Stress test, unregister in different ways (bulk vs individual)
+        if (test % 2 == 1)
         {
-            unregister_order.push_back(i);
+            // shuffle unregister
+            std::vector<size_t> unregister_order;
+            unregister_order.reserve(kClusterTestCount);
+            for (size_t i = 0; i < kClusterTestCount; i++)
+            {
+                unregister_order.push_back(i);
+            }
+
+            std::default_random_engine eng(static_cast<std::default_random_engine::result_type>(rand()));
+            std::shuffle(unregister_order.begin(), unregister_order.end(), eng);
+
+            // unregister
+            for (auto cluster : unregister_order)
+            {
+                // item MUST exist and be accessible
+                ASSERT_EQ(registry.Get(items[cluster].GetPath()), &items[cluster]);
+                ASSERT_EQ(registry.Unregister(&items[cluster]), CHIP_NO_ERROR);
+
+                // once unregistered, it is not there anymore
+                ASSERT_EQ(registry.Get(items[cluster].GetPath()), nullptr);
+                ASSERT_EQ(registry.Unregister(&items[cluster]), CHIP_ERROR_NOT_FOUND);
+            }
+
+            // all endpoints should be clear
+            for (ClusterId cluster = 0; cluster < kClusterTestCount; cluster++)
+            {
+                for (EndpointId ep = 0; ep < kEndpointTestCount; ep++)
+                {
+                    ASSERT_EQ(registry.Get({ ep, cluster }), nullptr);
+                }
+            }
         }
-
-        std::default_random_engine eng(static_cast<std::default_random_engine::result_type>(rand()));
-        std::shuffle(unregister_order.begin(), unregister_order.end(), eng);
-
-        // unregister
-        for (auto cluster : unregister_order)
+        else
         {
-            // item MUST exist and be accessible
-            ASSERT_EQ(registry.Get(items[cluster].GetPath()), &items[cluster]);
-            ASSERT_EQ(registry.Unregister(&items[cluster]), CHIP_NO_ERROR);
-
-            // once unregistered, it is not there anymore
-            ASSERT_EQ(registry.Get(items[cluster].GetPath()), nullptr);
-            ASSERT_EQ(registry.Unregister(&items[cluster]), CHIP_ERROR_NOT_FOUND);
-        }
-
-        // all endpoints should be clear
-        for (ClusterId cluster = 0; cluster < kClusterTestCount; cluster++)
-        {
+            // bulk unregister
             for (EndpointId ep = 0; ep < kEndpointTestCount; ep++)
             {
-                ASSERT_EQ(registry.Get({ ep, cluster }), nullptr);
+                registry.UnregisterAllFromEndpoint(ep);
             }
         }
     }
@@ -396,6 +413,12 @@ TEST_F(TestServerClusterInterfaceRegistry, Context)
         EXPECT_TRUE(cluster1.HasContext());
         EXPECT_FALSE(cluster2.HasContext());
         EXPECT_TRUE(cluster3.HasContext());
+
+        // Removing an entire endpoint clears the context for clusters (shuts them down)
+        registry.UnregisterAllFromEndpoint(kEp1);
+        EXPECT_FALSE(cluster1.HasContext());
+        EXPECT_FALSE(cluster2.HasContext());
+        EXPECT_TRUE(cluster3.HasContext());
     }
 
     // destructor clears the context
@@ -407,9 +430,9 @@ TEST_F(TestServerClusterInterfaceRegistry, Context)
 TEST_F(TestServerClusterInterfaceRegistry, MultiPathRegistration)
 {
     const std::array<ConcreteClusterPath, 4> kTestPaths{ {
-        { 1, 100 },
+        { 15, 100 },
         { 15, 88 },
-        { 0, 20 },
+        { 15, 20 },
         { 15, 33 },
     } };
     MultiPathCluster cluster(kTestPaths);
@@ -432,18 +455,47 @@ TEST_F(TestServerClusterInterfaceRegistry, MultiPathRegistration)
     // Verify listing works
     ServerClusterInterfaceRegistry::ClustersList clusters = registry.ClustersOnEndpoint(15);
     auto it                                               = clusters.begin();
-    ASSERT_NE(it, clusters.end());
-    ASSERT_EQ(*it, 88u);
-    ++it;
-    ASSERT_NE(it, clusters.end());
-    ASSERT_EQ(*it, 33u);
-    ++it;
+
+    for (auto & p : kTestPaths)
+    {
+        ASSERT_NE(it, clusters.end());
+        ASSERT_EQ(*it, p.mClusterId);
+        ++it;
+    }
     ASSERT_EQ(it, clusters.end());
 
     ASSERT_EQ(registry.Unregister(&cluster), CHIP_NO_ERROR);
     for (auto & p : kTestPaths)
     {
         ASSERT_EQ(registry.Get(p), nullptr);
+    }
+}
+
+TEST_F(TestServerClusterInterfaceRegistry, RejectDifferentEndpointPaths)
+{
+    {
+        const std::array<ConcreteClusterPath, 2> kTestPaths{ {
+            { 1, 100 },
+            { 2, 88 },
+        } };
+        MultiPathCluster cluster(kTestPaths);
+        ServerClusterRegistration registration(cluster);
+
+        ServerClusterInterfaceRegistry registry;
+        ASSERT_EQ(registry.Register(registration), CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    {
+        const std::array<ConcreteClusterPath, 3> kTestPaths{ {
+            { 1, 100 },
+            { 1, 200 },
+            { 3, 100 },
+        } };
+        MultiPathCluster cluster(kTestPaths);
+        ServerClusterRegistration registration(cluster);
+
+        ServerClusterInterfaceRegistry registry;
+        ASSERT_EQ(registry.Register(registration), CHIP_ERROR_INVALID_ARGUMENT);
     }
 }
 
