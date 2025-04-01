@@ -22,6 +22,10 @@
 #include "chime-manager.h"
 #include "webrtc-provider-manager.h"
 #include "camera-av-stream-manager.h"
+
+#include "media-controller.h"
+#include "network-stream-source.h"
+
 #include <protocols/interaction_model/StatusCode.h>
 
 #include <gst/gst.h>
@@ -153,6 +157,10 @@ private:
     WebRTCProviderManager mWebRTCProviderManager;
 
     chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamManager mCameraAVStreamManager;
+
+    NetworkStreamSource mNetworkVideoSource;
+    NetworkStreamSource mNetworkAudioSource;
+    MediaController mMediaController;
 };
 
 } // namespace Camera

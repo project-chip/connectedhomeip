@@ -54,6 +54,8 @@ executable("chip-camera-app") {
     "${chip_root}/examples/camera-app/linux/src/clusters/webrtc_provider/webrtc-provider-manager.cpp",
     "${chip_root}/examples/camera-app/linux/src/clusters/camera-avstream-mgmt/camera-av-stream-manager.cpp",
     "${chip_root}/examples/camera-app/linux/include/media-controller/media-controller.h",
+    "${chip_root}/examples/camera-app/linux/src/media-controller/media-controller.cpp",
+    "${chip_root}/examples/camera-app/linux/src/network-stream-source/network-stream-source.cpp",
     "include/CHIPProjectAppConfig.h",
     "main.cpp",
   ]
@@ -75,6 +77,7 @@ executable("chip-camera-app") {
     "include/clusters/chime",
     "include/clusters/camera-avstream-mgmt",
     "include/media-controller",
+    "include/network-stream-source",
     "include/transport",
     "${chip_root}/examples/camera-app/camera-common/include",
   ]

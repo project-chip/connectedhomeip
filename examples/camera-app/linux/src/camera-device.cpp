@@ -41,6 +41,9 @@ CameraDevice::CameraDevice()
     InitializeCameraDevice();
 
     InitializeStreams();
+
+    // Initialize Video Sources
+    mNetworkVideoSource.Init(&mMediaController, 5000);
 }
 
 CameraDevice::~CameraDevice()
@@ -79,8 +82,6 @@ CameraError CameraDevice::InitializeStreams()
     InitializeAudioStreams();
     InitializeSnapshotStreams();
 
-    StartVideoStream(1);
-    StartSnapshotStream(1);
     return CameraError::SUCCESS;
 }
 
@@ -99,6 +100,13 @@ CameraError CameraDevice::VideoStreamAllocate(const VideoStreamStruct & allocate
             {
                 stream.isAllocated = true;
                 outStreamID        = stream.id;
+
+                // Start the video stream from HAL for serving.
+                StartVideoStream(stream.id);
+
+                // Start the network stream source
+                mNetworkVideoSource.Start(stream.id);
+
                 return CameraError::SUCCESS;
             }
         }
@@ -118,7 +126,11 @@ CameraError CameraDevice::VideoStreamDeallocate(const uint16_t streamID)
     {
         if (stream.id == streamID && stream.isAllocated)
         {
+            // Stop the video stream
+            StopVideoStream(stream.id);
+
             stream.isAllocated = false;
+
             break;
         }
     }
@@ -185,6 +197,10 @@ CameraError CameraDevice::SnapshotStreamAllocate(const SnapshotStreamStruct & al
             {
                 stream.isAllocated = true;
                 outStreamID        = stream.id;
+
+                // Start the snapshot stream for serving.
+                StartSnapshotStream(stream.id);
+
                 return CameraError::SUCCESS;
             }
         }
@@ -204,6 +220,8 @@ CameraError CameraDevice::SnapshotStreamDeallocate(const uint16_t streamID)
     {
         if (stream.id == streamID && stream.isAllocated)
         {
+            // Stop the snapshot stream for serving.
+            StopSnapshotStream(stream.id);
             stream.isAllocated = false;
             break;
         }

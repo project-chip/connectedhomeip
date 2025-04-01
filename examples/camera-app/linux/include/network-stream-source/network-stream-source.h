@@ -18,13 +18,27 @@
 
 #pragma once
 
-class DefaultTransport : public Transport
+#include <thread>
+#include <cstdint>
+#include <media-controller.h>
+
+// Network Stream Source
+class NetworkStreamSource
 {
 public:
-    void SendVideo(const char * data, size_t size, uint16_t videoStreamID) {}
-    void SendAudio(const char * data, size_t size, uint16_t audioStreamID) {}
-    void SendAudioVideo(const char * data, size_t size, uint16_t videoSTreamID, uint16_t audioStreamID) {}
-    bool CanSendVideo() { return true; }
-    bool CanSendAudio() { return true; }
-    virtual ~Transport() = default;
+    NetworkStreamSource() {}
+    virtual ~NetworkStreamSource() {}
+    void Init(MediaController * aMediaController, uint16_t aSrcPort);
+    void Start(uint16_t streamId);
+    void Stop();
+
+private:
+    void ListenForStreamOnSocket();
+
+    MediaController * mMediaController = nullptr;
+    uint16_t mSrcPort;
+    uint16_t mStreamId;
+    bool mStreamSourceActive = false;
+
+    std::vector<std::thread> streamThreads;
 };
