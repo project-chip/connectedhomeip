@@ -332,7 +332,7 @@ CHIP_ERROR emberAfSetDynamicEndpointWithEpUniqueId(uint16_t index, EndpointId id
 
     MutableCharSpan targetSpan(emAfEndpoints[index].endpointUniqueId);
     CopyCharSpanToMutableCharSpanWithTruncation(endpointUniqueId, targetSpan);
-    emAfEndpoints[index].endpointUniqueIdSize = endpointUniqueId.size();
+    emAfEndpoints[index].endpointUniqueIdSize = targetSpan.size();
 
     // Start the endpoint off as disabled.
     emAfEndpoints[index].bitmask.Clear(EmberAfEndpointOptions::isEnabled);
@@ -1103,9 +1103,7 @@ CHIP_ERROR GetEndpointUniqueIdForEndPoint(EndpointId endpoint, MutableCharSpan &
     }
 
     CharSpan epUniqueIdSpan(emAfEndpoints[endpointIndex].endpointUniqueId, emAfEndpoints[endpointIndex].endpointUniqueIdSize);
-    CopyCharSpanToMutableCharSpan(epUniqueIdSpan, epUniqueIdMutSpan);
-
-    return CHIP_NO_ERROR;
+    return CopyCharSpanToMutableCharSpan(epUniqueIdSpan, epUniqueIdMutSpan);
 }
 
 CHIP_ERROR emberAfSetDeviceTypeList(EndpointId endpoint, Span<const EmberAfDeviceType> deviceTypeList)
