@@ -18,8 +18,8 @@ from dataclasses import dataclass
 from typing import Optional
 from xml.sax.xmlreader import AttributesImpl
 
-from matter.idl.generators.type_definitions import GetDataTypeSizeInBits, IsSignedDataType
-from matter.idl.matter_idl_types import AccessPrivilege, Attribute, Command, ConstantEntry, DataType, Event, EventPriority, Field
+from ...generators.type_definitions import GetDataTypeSizeInBits, IsSignedDataType
+from ...matter_idl_types import AccessPrivilege, Attribute, Command, ConstantEntry, DataType, Event, EventPriority, Field
 
 LOGGER = logging.getLogger('data-model-xml-data-parsing')
 

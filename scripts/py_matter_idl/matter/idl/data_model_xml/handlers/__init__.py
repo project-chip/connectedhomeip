@@ -15,8 +15,7 @@
 import logging
 from xml.sax.xmlreader import AttributesImpl
 
-from matter.idl.matter_idl_types import Idl
-
+from ...matter_idl_types import Idl
 from .base import BaseHandler
 from .context import Context
 from .handlers import ClusterHandler

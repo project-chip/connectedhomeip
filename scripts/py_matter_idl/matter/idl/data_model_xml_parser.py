@@ -15,21 +15,15 @@
 
 import logging
 import sys
-from pathlib import Path
 from typing import Optional
 
 import click
 
-try:
-    from matter.idl.data_model_xml import ParseSource, ParseXmls
-except ImportError:
-    sys.path.append(str(Path(__file__).resolve().parent / ".." / ".."))
-    from matter.idl.data_model_xml import ParseSource, ParseXmls
-
-from matter.idl.generators import GeneratorStorage
-from matter.idl.generators.idl import IdlGenerator
-from matter.idl.matter_idl_parser import CreateParser
-from matter.idl.matter_idl_types import Idl
+from .data_model_xml import ParseSource, ParseXmls
+from .generators import GeneratorStorage
+from .generators.idl import IdlGenerator
+from .matter_idl_parser import CreateParser
+from .matter_idl_types import Idl
 
 
 class InMemoryStorage(GeneratorStorage):

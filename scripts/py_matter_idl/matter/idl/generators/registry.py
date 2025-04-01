@@ -15,12 +15,12 @@
 import enum
 import importlib
 
-from matter.idl.generators.cpp.application import CppApplicationGenerator
-from matter.idl.generators.cpp.tlvmeta import TLVMetaDataGenerator
-from matter.idl.generators.idl import IdlGenerator
-from matter.idl.generators.java import JavaClassGenerator, JavaJNIGenerator
-from matter.idl.generators.kotlin import KotlinClassGenerator
-from matter.idl.generators.markdown import SummaryMarkdownGenerator
+from .cpp.application import CppApplicationGenerator
+from .cpp.tlvmeta import TLVMetaDataGenerator
+from .idl import IdlGenerator
+from .java import JavaClassGenerator, JavaJNIGenerator
+from .kotlin import KotlinClassGenerator
+from .markdown import SummaryMarkdownGenerator
 
 
 class CodeGenerator(enum.Enum):

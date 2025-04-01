@@ -17,8 +17,7 @@ import dataclasses
 import logging
 from typing import Iterable, Optional, Protocol, TypeVar
 
-from matter.idl.matter_idl_types import Attribute, AttributeQuality, Bitmap, Cluster, Command, Enum, Event, Idl, Struct
-
+from ...matter_idl_types import Attribute, AttributeQuality, Bitmap, Cluster, Command, Enum, Event, Idl, Struct
 from .context import Context, IdlPostProcessor
 from .parsing import NormalizeName
 

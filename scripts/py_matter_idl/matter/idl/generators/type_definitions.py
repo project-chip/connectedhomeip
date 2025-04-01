@@ -17,8 +17,7 @@ import logging
 from dataclasses import dataclass
 from typing import Optional, Union
 
-from matter.idl import matter_idl_types  # to explicitly say 'Enum'
-from matter.idl.matter_idl_types import DataType
+from ..matter_idl_types import Bitmap, Cluster, DataType, Enum, Idl, Struct
 
 
 def ToPowerOfTwo(bits: int) -> int:
@@ -266,11 +265,11 @@ class TypeLookupContext:
 
     """
 
-    def __init__(self, idl: matter_idl_types.Idl, cluster: Optional[matter_idl_types.Cluster]):
+    def __init__(self, idl: Idl, cluster: Optional[Cluster]):
         self.idl = idl
         self.cluster = cluster
 
-    def find_enum(self, name) -> Optional[matter_idl_types.Enum]:
+    def find_enum(self, name) -> Optional[Enum]:
         """
         Find the first enumeration matching the given name for the given
         lookup rules (searches cluster first, then global).
@@ -281,14 +280,14 @@ class TypeLookupContext:
 
         return None
 
-    def find_struct(self, name) -> Optional[matter_idl_types.Struct]:
+    def find_struct(self, name) -> Optional[Struct]:
         for s in self.all_structs:
             if s.name == name:
                 return s
 
         return None
 
-    def find_bitmap(self, name) -> Optional[matter_idl_types.Bitmap]:
+    def find_bitmap(self, name) -> Optional[Bitmap]:
         for s in self.all_bitmaps:
             if s.name == name:
                 return s

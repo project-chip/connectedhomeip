@@ -16,8 +16,8 @@ import os
 from dataclasses import dataclass
 from typing import Generator, List, Optional
 
-from matter.idl.generators import CodeGenerator, GeneratorStorage
-from matter.idl.matter_idl_types import Cluster, Field, Idl, StructTag
+from ....matter_idl_types import Cluster, Field, Idl, StructTag
+from ... import CodeGenerator, GeneratorStorage
 
 
 @dataclass

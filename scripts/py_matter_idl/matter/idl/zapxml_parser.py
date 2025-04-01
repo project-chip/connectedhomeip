@@ -15,16 +15,9 @@
 # limitations under the License.
 
 import logging
-import sys
-from pathlib import Path
 from typing import Optional
 
-try:
-    from matter.idl.zapxml import ParseSource, ParseXmls
-except ImportError:
-    sys.path.append(str(Path(__file__).resolve().parent / ".." / ".."))
-    from matter.idl.zapxml import ParseSource, ParseXmls
-
+from .zapxml import ParseSource, ParseXmls
 
 if __name__ == '__main__':
     import click
@@ -56,20 +49,20 @@ if __name__ == '__main__':
         'fatal': logging.FATAL,
     }
 
-    @ click.command()
-    @ click.option(
+    @click.command()
+    @click.option(
         '--log-level',
         default='INFO',
         show_default=True,
         type=click.Choice(list(__LOG_LEVELS__.keys()), case_sensitive=False),
         help='Determines the verbosity of script output.')
-    @ click.option(
+    @click.option(
         '--no-print',
         show_default=True,
         default=False,
         is_flag=True,
         help='Do not pring output data (parsed data)')
-    @ click.argument('filenames', nargs=-1)
+    @click.argument('filenames', nargs=-1)
     def main(log_level, no_print, filenames):
         logging.basicConfig(
             level=__LOG_LEVELS__[log_level],

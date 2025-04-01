@@ -16,7 +16,7 @@
 
 from typing import List
 
-from matter.idl.matter_idl_types import Cluster, Idl
+from ..matter_idl_types import Cluster, Idl
 
 
 def server_side_clusters(idl: Idl) -> List[Cluster]:
