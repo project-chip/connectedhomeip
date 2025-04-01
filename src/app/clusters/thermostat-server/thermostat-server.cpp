@@ -1352,3 +1352,9 @@ void MatterThermostatPluginServerInitCallback()
     Server::GetInstance().GetFabricTable().AddFabricDelegate(&gThermostatAttrAccess);
     AttributeAccessInterfaceRegistry::Instance().Register(&gThermostatAttrAccess);
 }
+
+void MatterThermostatPluginServerShutdownCallback()
+{
+    Server::GetInstance().GetFabricTable().RemoveFabricDelegate(&gThermostatAttrAccess);
+    AttributeAccessInterfaceRegistry::Instance().Unregister(&gThermostatAttrAccess);
+}
