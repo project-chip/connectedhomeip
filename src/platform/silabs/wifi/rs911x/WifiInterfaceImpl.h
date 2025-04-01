@@ -43,7 +43,7 @@ public:
     CHIP_ERROR ResetCounters() override;
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     CHIP_ERROR ConfigureBroadcastFilter(bool enableBroadcastFilter) override;
-    CHIP_ERROR ConfigurePowerSave() override;
+    CHIP_ERROR ConfigurePowerSave(PowerSaveInterface::PowerSaveConfiguration configuration, uint32_t listenInterval);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     /**
@@ -103,6 +103,35 @@ private:
      */
     void HandleDHCPPolling();
 
+    /**
+     * @brief Function cancels the DHCP timer if it is running.
+     *        If the timer isn't running, function doesn't do anything.
+     */
+    void CancelDHCPTimer();
+
+    /**
+     * @brief Function starts the DHCP timer with the given timeout.
+     *
+     * TODO: change input to milliseconds type
+     *
+     * @param timeout timer duration in milliseconds
+     */
+    void StartDHCPTimer(uint32_t timeout);
+
+    /**
+     * @brief Function creates the DHCP timer
+     *
+     *
+     * @return sl_status_t SL_STATUS_OK, the timer was successfully created
+     */
+    sl_status_t CreateDHCPTimer();
+
+    /**
+     * @brief Callback function for the DHCP timer event.
+     */
+    static void DHCPTimerEventHandler(void * arg);
+
+    osTimerId_t mDHCPTimer;
     static WifiInterfaceImpl mInstance;
 };
 

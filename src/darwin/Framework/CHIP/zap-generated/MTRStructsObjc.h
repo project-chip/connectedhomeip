@@ -1086,7 +1086,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRScenesManagementClusterExtensionFieldSet : NSObject <NSCopying>
+@interface MTRScenesManagementClusterExtensionFieldSetStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull clusterID MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSArray * _Nonnull attributeValueList MTR_PROVISIONALLY_AVAILABLE;
 @end
@@ -2296,6 +2296,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @interface MTRWebRTCTransportProviderClusterWebRTCSessionStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull id MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull peerNodeID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull peerEndpointID MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull streamUsage MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable videoStreamID MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable audioStreamID MTR_PROVISIONALLY_AVAILABLE;
@@ -2315,6 +2316,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @interface MTRWebRTCTransportRequestorClusterWebRTCSessionStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull id MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull peerNodeID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull peerEndpointID MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull streamUsage MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable videoStreamID MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable audioStreamID MTR_PROVISIONALLY_AVAILABLE;

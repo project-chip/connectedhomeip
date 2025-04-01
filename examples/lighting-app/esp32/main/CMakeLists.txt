@@ -82,6 +82,13 @@ target_compile_options(${COMPONENT_LIB} PUBLIC
            "-DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>"
 )
 
+if (CONFIG_ENABLE_ENCRYPTED_OTA)
+	create_esp_enc_img(${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}.bin
+			   ${project_dir}/esp_image_encryption_public_key.pem
+			   ${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}-encrypted.bin
+			   app)
+endif()
+
 if (CONFIG_ENABLE_PW_RPC)
 
 get_filename_component(CHIP_ROOT ${CMAKE_SOURCE_DIR}/third_party/connectedhomeip REALPATH)

@@ -112,6 +112,14 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  */
 - (void)devicesChangedForController:(MTRDeviceController *)controller MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
+/**
+ * Notify the delegate that we have successfully communicated the network
+ * credentials to the device being commissioned and are about to tell it to join
+ * that network.  Note that for devices that are already on-network this
+ * notification will not happen.
+ */
+- (void)controller:(MTRDeviceController *)controller commissioneeHasReceivedNetworkCredentials:(NSNumber *)nodeID MTR_AVAILABLE(ios(18.5), macos(15.5), watchos(11.5), tvos(18.5));
+
 @end
 
 typedef NS_ENUM(NSUInteger, MTRPairingStatus) {

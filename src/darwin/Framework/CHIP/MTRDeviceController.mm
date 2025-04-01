@@ -715,6 +715,15 @@ using namespace chip::Tracing::DarwinFramework;
     } logString:__PRETTY_FUNCTION__];
 }
 
+- (void)controller:(MTRDeviceController *)controller commissioneeHasReceivedNetworkCredentials:(NSNumber *)nodeID
+{
+    [self _callDelegatesWithBlock:^(id<MTRDeviceControllerDelegate> delegate) {
+        if ([delegate respondsToSelector:@selector(controller:commissioneeHasReceivedNetworkCredentials:)]) {
+            [delegate controller:controller commissioneeHasReceivedNetworkCredentials:nodeID];
+        }
+    } logString:__PRETTY_FUNCTION__];
+}
+
 @end
 
 // TODO: This should not be in the superclass: either move to

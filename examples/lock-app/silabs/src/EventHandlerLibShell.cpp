@@ -209,4 +209,7 @@ void EventWorkerFunction(intptr_t context)
         break;
     }
     }
+
+    // free the allocated memory from the event handlers
+    Platform::Delete(data);
 }

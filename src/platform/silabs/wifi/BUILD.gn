@@ -15,6 +15,7 @@
 import("//build_overrides/chip.gni")
 import("//build_overrides/lwip.gni")
 import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/src/platform/silabs/tests/args.gni")
 import("${chip_root}/third_party/silabs/efr32_sdk.gni")
 import("${chip_root}/third_party/silabs/silabs_board.gni")
 
@@ -35,7 +36,8 @@ declare_args() {
   sl_enable_wifi_debug = false
 }
 
-if (chip_enable_wifi && !wifi_soc) {
+# Workaround to prevent the assert when we are building the unit tests
+if (chip_enable_wifi && !wifi_soc && !sl_build_unit_tests) {
   assert(use_rs9116 || use_wf200 || use_SiWx917)
   import("${chip_root}/src/platform/silabs/wifi/args.gni")
 
@@ -100,6 +102,12 @@ config("wifi-platform-config") {
   }
 }
 
+source_set("state-provider") {
+  sources = [ "${silabs_platform_dir}/wifi/WifiStateProvider.h" ]
+
+  public_configs = [ ":wifi-platform-config" ]
+}
+
 source_set("wifi-platform") {
   sources = [
     "${silabs_platform_dir}/wifi/WifiInterface.cpp",
@@ -110,9 +118,12 @@ source_set("wifi-platform") {
   public_configs = [ ":wifi-platform-config" ]
 
   public_deps = [
+    ":state-provider",
     "${chip_root}/src/app/icd/server:icd-server-config",
     "${chip_root}/src/inet",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/platform:platform_base",
+    "${silabs_platform_dir}/wifi/icd:power-save-interface",
   ]
 
   if (use_rs9116) {
@@ -135,9 +146,7 @@ source_set("wifi-platform") {
       "${silabs_platform_dir}/wifi/SiWx/WifiInterfaceImpl.h",
       "${silabs_platform_dir}/wifi/wiseconnect-interface/WiseconnectWifiInterface.cpp",
       "${silabs_platform_dir}/wifi/wiseconnect-interface/WiseconnectWifiInterface.h",
-
-      # Wi-Fi Config - Using the file sdk support until the wiseconnect file is fixed
-      "${matter_support_root}/sdk-copies/components/service/network_manager/src/sl_net_for_lwip.c",
+      "${wifi_sdk_root}/components/service/network_manager/src/sl_net_for_lwip.c",
     ]
 
     public_deps += [ "${lwip_root}:lwip" ]
@@ -153,14 +162,10 @@ source_set("wifi-platform") {
       "${silabs_platform_dir}/wifi/lwip-support/lwip_netif.h",
     ]
   }
-
-  # TODO: Once the WifiInterface refactor is done and becomes a class, we will inject an interface instead of having them in same source_set
   if (chip_enable_icd_server) {
-    public_deps += [ "${chip_root}/src/app/icd/server:configuration-data" ]
-
-    sources += [
-      "${silabs_platform_dir}/wifi/icd/WifiSleepManager.cpp",
-      "${silabs_platform_dir}/wifi/icd/WifiSleepManager.h",
+    public_deps += [
+      "${chip_root}/src/app/icd/server:configuration-data",
+      "${silabs_platform_dir}/wifi/icd:wifi-sleep-manager",
     ]
   }
 }

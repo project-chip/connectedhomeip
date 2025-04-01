@@ -20,11 +20,12 @@
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <platform/silabs/OTAImageProcessorImpl.h>
 #include <platform/silabs/SilabsConfig.h>
+#include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 #include <platform/silabs/wifi/WifiInterface.h>
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-#include <platform/silabs/wifi/icd/WifiSleepManager.h>
-#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+#include <platform/silabs/wifi/icd/WifiSleepManager.h> // nogncheck
+#endif                                                 // CHIP_CONFIG_ENABLE_ICD_SERVER
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,6 +43,8 @@ extern "C" {
 
 uint8_t flag = RPS_HEADER;
 static chip::OTAImageProcessorImpl gImageProcessor;
+
+using namespace chip::DeviceLayer::Silabs;
 
 namespace chip {
 
@@ -162,7 +165,7 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     // Setting the device in high performance - no-sleep mode during OTA tranfer
-    DeviceLayer::Silabs::WifiSleepManager::GetInstance().RequestHighPerformance();
+    DeviceLayer::Silabs::WifiSleepManager::GetInstance().RequestHighPerformanceWithTransition();
 #endif /* CHIP_CONFIG_ENABLE_ICD_SERVER*/
 
     imageProcessor->mDownloader->OnPreparedForDownload(CHIP_NO_ERROR);
@@ -220,7 +223,7 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     // Setting the device is in high performace - no-sleepy mode before soft reset as soft reset is not happening in sleep mode
-    DeviceLayer::Silabs::WifiSleepManager::GetInstance().RequestHighPerformance();
+    DeviceLayer::Silabs::WifiSleepManager::GetInstance().RequestHighPerformanceWithTransition();
 #endif /* CHIP_CONFIG_ENABLE_ICD_SERVER*/
 
     if (mReset)
@@ -229,7 +232,7 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
         // send system reset request to reset the MCU and upgrade the m4 image
         ChipLogProgress(SoftwareUpdate, "SoC Soft Reset initiated!");
         // Reboots the device
-        sl_si91x_soc_nvic_reset();
+        GetPlatform().SoftwareReset();
     }
 }
 

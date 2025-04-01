@@ -23,12 +23,18 @@ import("${chip_root}/src/lib/core/core.gni")
 assert(chip_build_tools)
 
 config("config") {
+  cflags = [
+    "-Wconversion",
+    "-Wno-shadow",
+  ]
+
   include_dirs = [
     ".",
     "${chip_root}/examples/common",
     "${chip_root}/zzz_generated/app-common/app-common",
     "${chip_root}/zzz_generated/chip-tool",
     "${chip_root}/src/lib",
+    "${chip_root}/third_party/libdatachannel/repo/include",
   ]
 
   defines = [ "CONFIG_USE_SEPARATE_EVENTLOOP=${config_use_separate_eventloop}" ]
@@ -63,6 +69,12 @@ static_library("camera-controller-utils") {
     "commands/pairing/OpenCommissioningWindowCommand.h",
     "commands/pairing/PairingCommand.cpp",
     "commands/pairing/ToTLVCert.cpp",
+    "commands/webrtc/WebRTCProviderCommands.cpp",
+    "commands/webrtc/WebRTCProviderCommands.h",
+    "webrtc_manager/WebRTCManager.cpp",
+    "webrtc_manager/WebRTCManager.h",
+    "webrtc_manager/WebRTCProviderClient.cpp",
+    "webrtc_manager/WebRTCProviderClient.h",
   ]
 
   deps = [ "${chip_root}/src/app:events" ]
@@ -101,17 +113,22 @@ static_library("camera-controller-utils") {
   output_dir = root_out_dir
 }
 
-executable("camera-controller") {
+executable("chip-camera-controller") {
   sources = [ "main.cpp" ]
 
   deps = [
     ":camera-controller-utils",
     "${chip_root}/src/platform/logging:stdio",
+    "${chip_root}/third_party/libdatachannel:libdatachannel",
   ]
+
+  libs = [ "datachannel" ]
+  lib_dirs =
+      [ rebase_path("${chip_root}/third_party/libdatachannel/repo/build") ]
 
   output_dir = root_out_dir
 }
 
 group("default") {
-  deps = [ ":camera-controller" ]
+  deps = [ ":chip-camera-controller" ]
 }

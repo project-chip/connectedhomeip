@@ -215,3 +215,14 @@ void emberAfFormaldehydeConcentrationMeasurementClusterInitCallback(EndpointId e
     gFormaldehydeConcentrationMeasurementInstance.SetUncertainty(0.0f);
     gFormaldehydeConcentrationMeasurementInstance.SetLevelValue(LevelValueEnum::kLow);
 }
+
+void emberAfCarbonDioxideConcentrationMeasurementClusterShutdownCallback(EndpointId endpoint) {}
+void emberAfCarbonMonoxideConcentrationMeasurementClusterShutdownCallback(EndpointId endpoint) {}
+void emberAfNitrogenDioxideConcentrationMeasurementClusterShutdownCallback(EndpointId endpoint) {}
+void emberAfPm1ConcentrationMeasurementClusterShutdownCallback(EndpointId endpoint) {}
+void emberAfPm10ConcentrationMeasurementClusterShutdownCallback(EndpointId endpoint) {}
+void emberAfPm25ConcentrationMeasurementClusterShutdownCallback(EndpointId endpoint) {}
+void emberAfRadonConcentrationMeasurementClusterShutdownCallback(EndpointId endpoint) {}
+void emberAfTotalVolatileOrganicCompoundsConcentrationMeasurementClusterShutdownCallback(EndpointId endpoint) {}
+void emberAfOzoneConcentrationMeasurementClusterShutdownCallback(EndpointId endpoint) {}
+void emberAfFormaldehydeConcentrationMeasurementClusterShutdownCallback(EndpointId endpoint) {}

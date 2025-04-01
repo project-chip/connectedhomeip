@@ -48,12 +48,14 @@ set(SRC_DIRS_LIST
                       "${CHEF}/common/clusters/low-power/"
                       "${CHEF}/common/clusters/media-input/"
                       "${CHEF}/common/clusters/media-playback/"
+                      "${CHEF}/common/clusters/oven-mode/"
                       "${CHEF}/common/clusters/refrigerator-and-temperature-controlled-cabinet-mode/"
                       "${CHEF}/common/clusters/resource-monitoring/"
                       "${CHEF}/common/clusters/switch/"
                       "${CHEF}/common/clusters/target-navigator/"
                       "${CHEF}/common/clusters/temperature-control/"
                       "${CHEF}/common/clusters/wake-on-lan/"
+                      "${CHEF}/common/clusters/window-covering/"
                       "${CHIP_ROOT}/zzz_generated/app-common/app-common/zap-generated/attributes"
 )
 

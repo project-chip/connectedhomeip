@@ -241,6 +241,7 @@ chip_test_suite("tests") {
     "TestReadInteraction.cpp",
     "TestReportScheduler.cpp",
     "TestReportingEngine.cpp",
+    "TestServer.cpp",
     "TestStatusIB.cpp",
     "TestStatusResponseMessage.cpp",
     "TestTestEventTriggerDelegate.cpp",

@@ -79,14 +79,14 @@ public:
     /// the supported ones.
     ///
     /// @param endpoint[in] Endpoint ID
-    /// @param extensionFieldSet[in] ExtensionFieldSets provided by the AddScene Command, pre initialized
-    /// @param serialisedBytes[out] Buffer to fill from the ExtensionFieldSet in command
+    /// @param extensionFieldSet[in] ExtensionFieldSetStruct provided by the AddScene Command, pre initialized
+    /// @param serialisedBytes[out] Buffer to fill from the ExtensionFieldSetStruct in command
     /// @return CHIP_NO_ERROR if successful, CHIP_ERROR value otherwise
     /// @note Only gets called after the scene-cluster has previously verified that the endpoint,cluster pair is supported by
     /// the handler. It is therefore the implementation's reponsibility to also implement the SupportsCluster method.
     virtual CHIP_ERROR
     SerializeAdd(EndpointId endpoint,
-                 const app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::DecodableType & extensionFieldSet,
+                 const app::Clusters::ScenesManagement::Structs::ExtensionFieldSetStruct::DecodableType & extensionFieldSet,
                  MutableByteSpan & serialisedBytes) = 0;
 
     /// @brief Called when handling StoreScene, and only if the handler supports the given endpoint and cluster.
@@ -101,24 +101,24 @@ public:
     /// @return CHIP_NO_ERROR if successful, CHIP_ERROR value otherwise
     virtual CHIP_ERROR SerializeSave(EndpointId endpoint, ClusterId cluster, MutableByteSpan & serializedBytes) = 0;
 
-    /// @brief Deserialize an ExtensionFieldSet into a cluster object (e.g. when handling ViewScene).
+    /// @brief Deserialize an ExtensionFieldSetStruct into a cluster object (e.g. when handling ViewScene).
     ///
     /// @param endpoint[in] Endpoint ID
     /// @param cluster[in] Cluster ID
-    /// @param serializedBytes[in] ExtensionFieldSet stored in NVM
+    /// @param serializedBytes[in] ExtensionFieldSetStruct stored in NVM
     ///
-    /// @param extensionFieldSet[out] ExtensionFieldSet in command format
+    /// @param extensionFieldSet[out] ExtensionFieldSetStruct in command format
     /// @return CHIP_NO_ERROR if successful, CHIP_ERROR value otherwise
     /// @note Only gets called for handlers for which SupportsCluster() is true for the given endpoint and cluster.
     virtual CHIP_ERROR Deserialize(EndpointId endpoint, ClusterId cluster, const ByteSpan & serializedBytes,
 
-                                   app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::Type & extensionFieldSet) = 0;
+                                   app::Clusters::ScenesManagement::Structs::ExtensionFieldSetStruct::Type & extensionFieldSet) = 0;
 
     /// @brief Restore a stored scene for the given cluster instance, over timeMs milliseconds (e.g. when handling RecallScene)
     ///
     /// @param endpoint[in] Endpoint ID
     /// @param cluster[in] Cluster ID
-    /// @param serializedBytes[in] ExtensionFieldSet stored in NVM
+    /// @param serializedBytes[in] ExtensionFieldSetStruct stored in NVM
     ///
     /// @param timeMs[in] Transition time in ms to apply the scene
     /// @return CHIP_NO_ERROR if successful, CHIP_ERROR value otherwise

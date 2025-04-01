@@ -312,10 +312,10 @@ static CHIP_ERROR Setup(const char * label,
 
 static void Finalize(chip::app::Clusters::ScenesManagement::Structs::AttributeValuePairStruct::Type & request);
 
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::Type & request,
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ScenesManagement::Structs::ExtensionFieldSetStruct::Type & request,
                         Json::Value & value);
 
-static void Finalize(chip::app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::Type & request);
+static void Finalize(chip::app::Clusters::ScenesManagement::Structs::ExtensionFieldSetStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ScenesManagement::Structs::SceneInfoStruct::Type & request,
                         Json::Value & value);

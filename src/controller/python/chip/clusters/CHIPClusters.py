@@ -3335,16 +3335,16 @@ class ChipClusters:
             },
             0x0000000C: {
                 "commandId": 0x0000000C,
-                "commandName": "SetVidVerificationStatement",
+                "commandName": "SetVIDVerificationStatement",
                 "args": {
                     "vendorID": "int",
-                    "vidVerificationStatement": "bytes",
+                    "VIDVerificationStatement": "bytes",
                     "vvsc": "bytes",
                 },
             },
             0x0000000D: {
                 "commandId": 0x0000000D,
-                "commandName": "SignVidVerificationRequest",
+                "commandName": "SignVIDVerificationRequest",
                 "args": {
                     "fabricIndex": "int",
                     "clientChallenge": "bytes",
@@ -5401,7 +5401,7 @@ class ChipClusters:
                     "sceneID": "int",
                     "transitionTime": "int",
                     "sceneName": "str",
-                    "extensionFieldSets": "ExtensionFieldSet",
+                    "extensionFieldSetStructs": "ExtensionFieldSetStruct",
                 },
             },
             0x00000001: {
@@ -5464,12 +5464,6 @@ class ChipClusters:
             },
         },
         "attributes": {
-            0x00000000: {
-                "attributeName": "LastConfiguredBy",
-                "attributeId": 0x00000000,
-                "type": "int",
-                "reportable": True,
-            },
             0x00000001: {
                 "attributeName": "SceneTableSize",
                 "attributeId": 0x00000001,
@@ -13095,6 +13089,7 @@ class ChipClusters:
                 "commandName": "SolicitOffer",
                 "args": {
                     "streamUsage": "int",
+                    "originatingEndpointID": "int",
                     "videoStreamID": "int",
                     "audioStreamID": "int",
                     "ICEServers": "ICEServerStruct",
@@ -13109,6 +13104,7 @@ class ChipClusters:
                     "webRTCSessionID": "int",
                     "sdp": "str",
                     "streamUsage": "int",
+                    "originatingEndpointID": "int",
                     "videoStreamID": "int",
                     "audioStreamID": "int",
                     "ICEServers": "ICEServerStruct",
