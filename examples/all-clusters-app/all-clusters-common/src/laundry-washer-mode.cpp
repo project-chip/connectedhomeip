@@ -103,3 +103,12 @@ void emberAfLaundryWasherModeClusterInitCallback(chip::EndpointId endpointId)
         new ModeBase::Instance(gLaundryWasherModeDelegate, 0x1, LaundryWasherMode::Id, chip::to_underlying(Feature::kOnOff));
     gLaundryWasherModeInstance->Init();
 }
+
+void emberAfLaundryWasherModeClusterShutdownCallback(chip::EndpointId endpointId)
+{
+    if (gLaundryWasherModeInstance)
+    {
+        gLaundryWasherModeInstance->Shutdown();
+    }
+    LaundryWasherMode::Shutdown();
+}

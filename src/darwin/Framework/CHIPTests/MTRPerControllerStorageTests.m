@@ -334,6 +334,21 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     BOOL _localTestStorageEnabledBeforeUnitTest;
 }
 
++ (void)setUp
+{
+    // Start one instance of all-clusters-app that the various tests below can
+    // then use, so we're not doing quite as much startup logging.  Though it's
+    // not clear that the ResetCommissionee logging is really shorter, so maybe
+    // we should start these on a per-test basis, e.g. in
+    // commissionWithController:newNodeID:onboardingPayload:
+    [super setUp];
+
+    BOOL started = [self startAppWithName:@"all-clusters"
+                                arguments:@[]
+                                  payload:kOnboardingPayload];
+    XCTAssertTrue(started);
+}
+
 - (void)setUp
 {
     // Set detectLeaks true first, in case our superclass wants to do something

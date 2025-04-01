@@ -23,7 +23,6 @@
 #import "MTRTestCase+ServerAppRunner.h"
 #import "MTRTestCase.h"
 #import "MTRTestKeys.h"
-#import "MTRTestResetCommissioneeHelper.h"
 #import "MTRTestStorage.h"
 
 // system dependencies
@@ -521,22 +520,14 @@ static MTROTAProviderDelegateImpl * sOTAProviderDelegate;
 @end
 
 static BOOL sStackInitRan = NO;
-static BOOL sNeedsStackShutdown = YES;
 
-@implementation MTROTAProviderTests {
-    NSMutableSet<NSNumber *> * _commissionedNodeIDs;
-}
+@implementation MTROTAProviderTests
 
 + (void)tearDown
 {
     // Global teardown, runs once
-    if (sNeedsStackShutdown) {
-        // We don't need to worry about ResetCommissionee.  If we get here,
-        // we're running only one of our test methods (using
-        // -only-testing:MatterTests/MTROTAProviderTests/testMethodName), since
-        // we did not run test999_TearDown.
-        [self shutdownStack];
-    }
+    [self shutdownStack];
+    [super tearDown];
 }
 
 - (void)setUp
@@ -548,8 +539,6 @@ static BOOL sNeedsStackShutdown = YES;
     if (sStackInitRan == NO) {
         [self initStack];
     }
-
-    _commissionedNodeIDs = [[NSMutableSet alloc] init];
 
     XCTAssertNil(sOTAProviderDelegate.queryImageHandler);
     XCTAssertNil(sOTAProviderDelegate.applyUpdateRequestHandler);
@@ -576,11 +565,6 @@ static BOOL sNeedsStackShutdown = YES;
 
 - (void)tearDown
 {
-    for (NSNumber * nodeID in _commissionedNodeIDs) {
-        __auto_type * device = [MTRBaseDevice deviceWithNodeID:nodeID controller:sController];
-        ResetCommissionee(device, dispatch_get_main_queue(), self, kTimeoutInSeconds);
-    }
-
     if (sController != nil) {
         [sController shutdown];
         XCTAssertFalse([sController isRunning]);
@@ -619,8 +603,6 @@ static BOOL sNeedsStackShutdown = YES;
 
     [self waitForExpectations:@[ expectation ] timeout:kPairingTimeoutInSeconds];
 
-    [_commissionedNodeIDs addObject:nodeID];
-
     return [MTRDevice deviceWithNodeID:nodeID controller:sController];
 }
 
@@ -645,8 +627,6 @@ static BOOL sNeedsStackShutdown = YES;
 
 + (void)shutdownStack
 {
-    sNeedsStackShutdown = NO;
-
     [[MTRDeviceControllerFactory sharedInstance] stopControllerFactory];
 }
 
