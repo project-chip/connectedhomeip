@@ -93,7 +93,7 @@ shared_library("ChipDeviceCtrl") {
       "chip/tracing/TracingSetup.cpp",
       "chip/utils/DeviceProxyUtils.cpp",
     ]
-    if (current_os == "linux") {
+    if (current_os == "linux" && current_cpu == "x64") {
       sources += [ "chip/webrtc/RTCClient.cpp" ]
     }
     defines += [ "CHIP_CONFIG_MAX_GROUPS_PER_FABRIC=50" ]
@@ -226,7 +226,7 @@ chip_python_wheel_action("chip-core") {
         "chip/yaml/format_converter.py",
         "chip/yaml/runner.py",
       ]
-      if (current_os == "linux") {
+      if (current_os == "linux" && current_cpu == "x64") {
         sources += [
           "chip/webrtc/__init__.py",
           "chip/webrtc/callbacks.py",
@@ -282,7 +282,7 @@ chip_python_wheel_action("chip-core") {
     "chip.fault_injection",
     "chip.webrtc",
   ]
-  if (current_os == "linux") {
+  if (current_os == "linux" && current_cpu == "x64") {
     py_packages += [ "chip.webrtc" ]
   }
 
