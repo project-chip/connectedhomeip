@@ -32,14 +32,12 @@ from ctypes import CFUNCTYPE, Structure, c_bool, c_char_p, c_uint16, c_uint32, c
 from threading import Condition, Lock
 from typing import Any, Optional
 
-import chip.native
-from chip.native import PyChipError
-
 from .bdx import Bdx
 from .clusters import Attribute as ClusterAttribute
 from .clusters import Command as ClusterCommand
 from .exceptions import ChipStackError, ChipStackException, DeviceError
 from .interaction_model import delegate as im
+from .native import FindNativeLibraryPath, GetLibraryHandle, Library, PyChipError
 from .storage import PersistentStorage
 
 __all__ = [
@@ -264,8 +262,8 @@ class ChipStack(object):
 
     def _loadLib(self):
         if self._ChipStackLib is None:
-            self._ChipStackLib = chip.native.GetLibraryHandle()
-            self._chipDLLPath = chip.native.FindNativeLibraryPath(chip.native.Library.CONTROLLER)
+            self._ChipStackLib = GetLibraryHandle()
+            self._chipDLLPath = FindNativeLibraryPath(Library.CONTROLLER)
 
             self._ChipStackLib.pychip_DeviceController_StackInit.argtypes = [c_void_p, c_bool]
             self._ChipStackLib.pychip_DeviceController_StackInit.restype = PyChipError

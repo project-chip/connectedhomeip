@@ -74,3 +74,18 @@ void emberAfOccupancySensingClusterInitCallback(EndpointId endpointId)
         ChipLogError(AppServer, "Error: invalid/unexpected OccupancySensing Cluster endpoint index.");
     }
 }
+
+void emberAfOccupancySensingClusterShutdownCallback(EndpointId endpointId)
+{
+    uint16_t epIndex = emberAfGetClusterServerEndpointIndex(endpointId, chip::app::Clusters::OccupancySensing::Id,
+                                                            MATTER_DM_OCCUPANCY_SENSING_CLUSTER_SERVER_ENDPOINT_COUNT);
+
+    if (epIndex < kOccupancySensingClusterTableSize)
+    {
+        if (gOccupancySensingClusterInstances[epIndex])
+        {
+            gOccupancySensingClusterInstances[epIndex]->Shutdown();
+        }
+        gOccupancySensingClusterInstances[epIndex] = nullptr;
+    }
+}
