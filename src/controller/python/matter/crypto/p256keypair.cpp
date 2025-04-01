@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include <controller/python/chip/crypto/p256keypair.h>
+#include <controller/python/matter/crypto/p256keypair.h>
 
 #include <cassert>
 #include <lib/support/Span.h>
@@ -28,8 +28,7 @@ using namespace chip::Crypto;
 
 pychip_P256Keypair::pychip_P256Keypair(void * aPyContext, pychip_P256Keypair_ECDSA_sign_msg aSignMsgFunct,
                                        pychip_P256Keypair_ECDH_derive_secret aDeriveSecretFunct) :
-    mPyContext(aPyContext),
-    mSignMsgFunct(aSignMsgFunct), mDeriveSecretFunct(aDeriveSecretFunct)
+    mPyContext(aPyContext), mSignMsgFunct(aSignMsgFunct), mDeriveSecretFunct(aDeriveSecretFunct)
 {}
 
 pychip_P256Keypair::~pychip_P256Keypair()

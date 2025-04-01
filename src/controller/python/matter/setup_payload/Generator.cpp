@@ -18,7 +18,7 @@
 #include <string>
 #include <type_traits>
 
-#include <controller/python/chip/native/PyChipError.h>
+#include <controller/python/matter/native/PyChipError.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>

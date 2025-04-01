@@ -31,7 +31,7 @@
 #include <system/SystemError.h>
 #include <system/SystemLayer.h>
 
-#include <controller/python/chip/native/PyChipError.h>
+#include <controller/python/matter/native/PyChipError.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>

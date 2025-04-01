@@ -23,8 +23,8 @@
 #include <app/DeviceProxy.h>
 #include <lib/support/CodeUtils.h>
 
-#include <controller/python/chip/interaction_model/Delegate.h>
-#include <controller/python/chip/native/PyChipError.h>
+#include <controller/python/matter/interaction_model/Delegate.h>
+#include <controller/python/matter/native/PyChipError.h>
 #include <cstdio>
 #include <lib/support/logging/CHIPLogging.h>
 

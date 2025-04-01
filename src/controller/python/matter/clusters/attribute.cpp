@@ -27,8 +27,8 @@
 #include <app/ReadClient.h>
 #include <app/WriteClient.h>
 #include <controller/CHIPDeviceController.h>
-#include <controller/python/chip/interaction_model/Delegate.h>
-#include <controller/python/chip/native/PyChipError.h>
+#include <controller/python/matter/interaction_model/Delegate.h>
+#include <controller/python/matter/native/PyChipError.h>
 #include <lib/support/CodeUtils.h>
 
 #include <cstdio>

@@ -21,9 +21,9 @@
 
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <controller/CHIPDeviceControllerSystemState.h>
-#include <controller/python/chip/bdx/bdx-transfer.h>
-#include <controller/python/chip/bdx/test-bdx-transfer-server.h>
-#include <controller/python/chip/native/PyChipError.h>
+#include <controller/python/matter/bdx/bdx-transfer.h>
+#include <controller/python/matter/bdx/test-bdx-transfer-server.h>
+#include <controller/python/matter/native/PyChipError.h>
 
 // The BDX transfer system is split into:
 // * BdxTransfer: A transfer object that contains the information about a transfer and is an ExchangeDelegate.

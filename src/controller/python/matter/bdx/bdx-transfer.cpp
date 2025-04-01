@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include <controller/python/chip/bdx/bdx-transfer.h>
+#include <controller/python/matter/bdx/bdx-transfer.h>
 
 #include <protocols/bdx/BdxTransferSession.h>
 

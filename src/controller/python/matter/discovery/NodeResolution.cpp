@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
-#include <chip/internal/ChipThreadWork.h>
-#include <controller/python/chip/native/PyChipError.h>
+#include <controller/python/matter/internal/ChipThreadWork.h>
+#include <controller/python/matter/native/PyChipError.h>
 #include <lib/dnssd/Resolver.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>

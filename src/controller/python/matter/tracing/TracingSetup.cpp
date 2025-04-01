@@ -16,8 +16,8 @@
  *    limitations under the License.
  */
 
-#include <controller/python/chip/native/ChipMainLoopWork.h>
-#include <controller/python/chip/native/PyChipError.h>
+#include <controller/python/matter/native/ChipMainLoopWork.h>
+#include <controller/python/matter/native/PyChipError.h>
 
 #include <tracing/json/json_tracing.h>
 #include <tracing/perfetto/event_storage.h>

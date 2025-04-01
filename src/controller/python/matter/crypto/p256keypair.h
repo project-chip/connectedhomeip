@@ -20,7 +20,7 @@
 
 #include <inttypes.h>
 
-#include <controller/python/chip/native/PyChipError.h>
+#include <controller/python/matter/native/PyChipError.h>
 #include <crypto/CHIPCryptoPAL.h>
 
 typedef bool (*pychip_P256Keypair_ECDSA_sign_msg)(void * pyObject, const uint8_t * msg, size_t msg_length, uint8_t * out_signature,

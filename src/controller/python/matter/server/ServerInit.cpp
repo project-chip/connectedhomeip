@@ -28,7 +28,7 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
-#include <controller/python/chip/native/PyChipError.h>
+#include <controller/python/matter/native/PyChipError.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
 // #include <support/CHIPMem.h>

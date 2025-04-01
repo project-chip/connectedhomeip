@@ -27,8 +27,8 @@
 
 #include <controller/CHIPDeviceController.h>
 #include <controller/CommissioningWindowOpener.h>
-#include <controller/python/chip/icd/PyChipCheckInDelegate.h>
-#include <controller/python/chip/native/PyChipError.h>
+#include <controller/python/matter/icd/PyChipCheckInDelegate.h>
+#include <controller/python/matter/native/PyChipError.h>
 
 namespace chip {
 namespace Controller {
