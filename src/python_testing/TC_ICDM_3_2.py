@@ -40,11 +40,11 @@ import logging
 import time
 from dataclasses import dataclass
 
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
@@ -187,7 +187,7 @@ class TC_ICDM_3_2(MatterBaseTest):
     # ICDM 3.2 Test Body
     #
 
-    @ async_test_body
+    @async_test_body
     async def test_TC_ICDM_3_2(self):
         is_ci = self.check_pics("PICS_SDK_CI_ONLY")
 

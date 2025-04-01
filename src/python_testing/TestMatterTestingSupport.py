@@ -20,17 +20,17 @@ import time
 import typing
 from datetime import datetime, timedelta, timezone
 
-from chip.testing.matter_testing import (MatterBaseTest, async_test_body, default_matter_test_main, parse_matter_test_args,
-                                         type_matches)
-from chip.testing.pics import parse_pics, parse_pics_xml
-from chip.testing.taglist_and_topology_test import (TagProblem, create_device_type_list_for_root, create_device_type_lists,
-                                                    find_tag_list_problems, find_tree_roots, flat_list_ok, get_all_children,
-                                                    get_direct_children_of_root, parts_list_problems, separate_endpoint_types)
-from chip.testing.timeoperations import compare_time, get_wait_seconds_from_set_time, utc_time_in_matter_epoch
 from mobly import asserts, signals
 
 import matter.clusters as Clusters
 from matter.clusters.Types import Nullable, NullValue
+from matter.testing.matter_testing import (MatterBaseTest, async_test_body, default_matter_test_main, parse_matter_test_args,
+                                           type_matches)
+from matter.testing.pics import parse_pics, parse_pics_xml
+from matter.testing.taglist_and_topology_test import (TagProblem, create_device_type_list_for_root, create_device_type_lists,
+                                                      find_tag_list_problems, find_tree_roots, flat_list_ok, get_all_children,
+                                                      get_direct_children_of_root, parts_list_problems, separate_endpoint_types)
+from matter.testing.timeoperations import compare_time, get_wait_seconds_from_set_time, utc_time_in_matter_epoch
 from matter.tlv import uint
 
 

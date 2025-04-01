@@ -16,10 +16,6 @@
 #
 import xml.etree.ElementTree as ElementTree
 
-from chip.testing.conformance import conformance_allowed
-from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
-from chip.testing.spec_parsing import (PrebuiltDataModelDirectory, build_xml_clusters, build_xml_device_types,
-                                       parse_single_device_type)
 from fake_device_builder import create_minimal_dt
 from jinja2 import Template
 from mobly import asserts
@@ -27,6 +23,10 @@ from TC_DeviceConformance import DeviceConformanceTests
 
 import matter.clusters as Clusters
 from matter.clusters import Attribute
+from matter.testing.conformance import conformance_allowed
+from matter.testing.matter_testing import MatterBaseTest, default_matter_test_main
+from matter.testing.spec_parsing import (PrebuiltDataModelDirectory, build_xml_clusters, build_xml_device_types,
+                                         parse_single_device_type)
 from matter.tlv import uint
 
 

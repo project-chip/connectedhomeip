@@ -37,13 +37,13 @@
 
 from datetime import timedelta
 
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
-from chip.testing.timeoperations import compare_time, utc_time_in_matter_epoch
 from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError
+from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from matter.testing.timeoperations import compare_time, utc_time_in_matter_epoch
 
 
 class TC_TIMESYNC_2_2(MatterBaseTest):

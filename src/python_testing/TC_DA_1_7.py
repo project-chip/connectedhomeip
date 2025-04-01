@@ -40,8 +40,6 @@ from glob import glob
 from pathlib import Path
 from typing import List, Optional
 
-from chip.testing.conversions import bytes_from_hex, hex_from_bytes
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import ec
@@ -50,6 +48,8 @@ from cryptography.x509 import AuthorityKeyIdentifier, Certificate, SubjectKeyIde
 from mobly import asserts
 
 import matter.clusters as Clusters
+from matter.testing.conversions import bytes_from_hex, hex_from_bytes
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 # Those are SDK samples that are known to be non-production.
 FORBIDDEN_AKID = [

@@ -582,7 +582,7 @@ def get_data_model_directory(data_model_directory: Union[PrebuiltDataModelDirect
         return data_model_directory
 
     # If it's a prebuilt directory, build the path based on the version and data model level
-    zip_path = pkg_resources.files(importlib.import_module('chip.testing')).joinpath(
+    zip_path = pkg_resources.files(importlib.import_module('matter.testing')).joinpath(
         'data_model').joinpath(data_model_directory.dirname).joinpath('allfiles.zip')
     path = zipfile.Path(zip_path)
 

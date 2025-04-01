@@ -33,13 +33,13 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-from chip.testing.matter_testing import (AttributeValue, ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep,
-                                         async_test_body, default_matter_test_main)
 from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
+from matter.testing.matter_testing import (AttributeValue, ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep,
+                                           async_test_body, default_matter_test_main)
 
 
 class TC_VALCC_3_2(MatterBaseTest):

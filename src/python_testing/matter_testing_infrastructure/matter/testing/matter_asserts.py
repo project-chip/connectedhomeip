@@ -299,7 +299,7 @@ def assert_valid_attribute_id(id: int, allow_test: bool = False) -> None:
     Raises:
         AssertionError: If the ID is not a valid attribute ID
     """
-    from chip.testing.global_attribute_ids import is_valid_attribute_id
+    from matter.testing.global_attribute_ids import is_valid_attribute_id
     asserts.assert_true(is_valid_attribute_id(id, allow_test),
                         f"Invalid attribute ID: {hex(id)}")
 
@@ -314,7 +314,7 @@ def assert_standard_attribute_id(id: int) -> None:
     Raises:
         AssertionError: If the ID is not a standard attribute ID
     """
-    from chip.testing.global_attribute_ids import is_standard_attribute_id
+    from matter.testing.global_attribute_ids import is_standard_attribute_id
     asserts.assert_true(is_standard_attribute_id(id),
                         f"Not a standard attribute ID: {hex(id)}")
 
@@ -330,7 +330,7 @@ def assert_valid_command_id(id: int, allow_test: bool = False) -> None:
     Raises:
         AssertionError: If the ID is not a valid command ID
     """
-    from chip.testing.global_attribute_ids import is_valid_command_id
+    from matter.testing.global_attribute_ids import is_valid_command_id
     asserts.assert_true(is_valid_command_id(id, allow_test),
                         f"Invalid command ID: {hex(id)}")
 
@@ -345,7 +345,7 @@ def assert_standard_command_id(id: int) -> None:
     Raises:
         AssertionError: If the ID is not a standard command ID
     """
-    from chip.testing.global_attribute_ids import is_standard_command_id
+    from matter.testing.global_attribute_ids import is_standard_command_id
     asserts.assert_true(is_standard_command_id(id),
                         f"Not a standard command ID: {hex(id)}")
 

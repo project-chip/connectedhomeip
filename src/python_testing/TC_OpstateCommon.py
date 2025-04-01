@@ -22,7 +22,6 @@ from dataclasses import dataclass
 from typing import Any
 
 import psutil
-from chip.testing.matter_testing import ClusterAttributeChangeAccumulator, EventChangeCallback, TestStep
 from mobly import asserts
 
 import matter.clusters as Clusters
@@ -30,6 +29,7 @@ from matter.clusters import ClusterObjects as ClusterObjects
 from matter.clusters.Attribute import EventReadResult, SubscriptionTransaction
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
+from matter.testing.matter_testing import ClusterAttributeChangeAccumulator, EventChangeCallback, TestStep
 
 
 def get_pid(name):

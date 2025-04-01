@@ -82,14 +82,14 @@ from datetime import datetime, timedelta
 from typing import Any
 
 import test_plan_support
-from chip.testing.matter_testing import (AttributeValue, ClusterAttributeChangeAccumulator, EventChangeCallback, MatterBaseTest,
-                                         TestStep, await_sequence_of_reports, default_matter_test_main, has_feature,
-                                         run_if_endpoint_matches)
 from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.clusters import ClusterObjects as ClusterObjects
 from matter.clusters.Attribute import EventReadResult
+from matter.testing.matter_testing import (AttributeValue, ClusterAttributeChangeAccumulator, EventChangeCallback, MatterBaseTest,
+                                           TestStep, await_sequence_of_reports, default_matter_test_main, has_feature,
+                                           run_if_endpoint_matches)
 from matter.tlv import uint
 
 logger = logging.getLogger(__name__)

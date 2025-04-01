@@ -37,8 +37,8 @@ import random
 from time import sleep
 from typing import Optional
 
-from matter_testing_infrastructure.chip.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body,
-                                                                       default_matter_test_main)
+from matter_testing_infrastructure.matter.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body,
+                                                                         default_matter_test_main)
 from mobly import asserts
 from support_modules.cadmin_support import CADMINSupport
 

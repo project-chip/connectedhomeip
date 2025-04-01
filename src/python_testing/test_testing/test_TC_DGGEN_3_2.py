@@ -20,10 +20,9 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
-from chip.testing.runner import MockTestRunner
-
 import matter.clusters as Clusters
 from matter.clusters import Attribute
+from matter.testing.runner import MockTestRunner
 
 
 @dataclass

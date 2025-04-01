@@ -36,12 +36,12 @@
 #       quiet: True
 # === END CI TEST ARGUMENTS ===
 
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.commissioning import ROOT_ENDPOINT_ID
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
 class TC_CGEN_2_8(MatterBaseTest):

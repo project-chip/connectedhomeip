@@ -20,12 +20,12 @@ import random
 import string
 import time
 
-from chip.testing.matter_testing import type_matches
 from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
+from matter.testing.matter_testing import type_matches
 
 
 class DRLK_COMMON:

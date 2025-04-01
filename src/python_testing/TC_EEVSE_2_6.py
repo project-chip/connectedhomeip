@@ -43,13 +43,13 @@
 import logging
 import time
 
-from chip.testing.matter_testing import (ClusterAttributeChangeAccumulator, EventChangeCallback, MatterBaseTest, TestStep,
-                                         async_test_body, default_matter_test_main)
 from mobly import asserts
 from TC_EEVSE_Utils import EEVSEBaseTestHelper
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
+from matter.testing.matter_testing import (ClusterAttributeChangeAccumulator, EventChangeCallback, MatterBaseTest, TestStep,
+                                           async_test_body, default_matter_test_main)
 
 logger = logging.getLogger(__name__)
 

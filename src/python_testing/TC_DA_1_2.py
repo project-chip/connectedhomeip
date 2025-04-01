@@ -40,9 +40,6 @@ import os
 import random
 import re
 
-from chip.testing.basic_composition import BasicCompositionTests
-from chip.testing.conversions import hex_from_bytes
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 from cryptography import x509
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat._oid import ExtensionOID
@@ -57,6 +54,9 @@ from pyasn1_modules import rfc5652
 
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
+from matter.testing.basic_composition import BasicCompositionTests
+from matter.testing.conversions import hex_from_bytes
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 from matter.tlv import TLVReader
 
 

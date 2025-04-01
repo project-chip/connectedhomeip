@@ -34,13 +34,13 @@
 
 import logging
 
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from chip.testing.timeoperations import utc_time_in_matter_epoch
 from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.timeoperations import utc_time_in_matter_epoch
 
 
 class TC_VALCC_4_4(MatterBaseTest):

@@ -39,7 +39,6 @@ import logging
 import random
 from dataclasses import dataclass
 
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
 
 import matter.clusters as Clusters
@@ -47,6 +46,7 @@ import matter.discovery as Discovery
 from matter import ChipUtility
 from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
+from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
 
 
 def get_all_cmds_for_cluster_id(cid: int) -> list[Clusters.ClusterObjects.ClusterCommand]:

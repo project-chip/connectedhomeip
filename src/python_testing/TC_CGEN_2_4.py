@@ -38,7 +38,6 @@ import logging
 import random
 import time
 
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
 import matter.CertificateAuthority
@@ -49,6 +48,7 @@ from matter import ChipDeviceCtrl
 from matter.ChipDeviceCtrl import CommissioningParameters
 from matter.exceptions import ChipStackError
 from matter.native import PyChipError
+from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 
 # Commissioning stage numbers - we should find a better way to match these to the C++ code
 # TODO: https://github.com/project-chip/connectedhomeip/issues/36629

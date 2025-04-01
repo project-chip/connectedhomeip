@@ -41,9 +41,7 @@
 import logging
 import queue
 
-import matter_testing_infrastructure.chip.testing.global_attribute_ids as global_attribute_ids
-from chip.testing.basic_composition import arls_populated
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+import matter_testing_infrastructure.matter.testing.global_attribute_ids as global_attribute_ids
 from mobly import asserts
 
 import matter.clusters as Clusters
@@ -52,6 +50,8 @@ from matter.clusters.ClusterObjects import ALL_ACCEPTED_COMMANDS, ALL_ATTRIBUTES
 from matter.clusters.Objects import AccessControl
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
+from matter.testing.basic_composition import arls_populated
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
 class EventChangeCallback:
