@@ -1010,6 +1010,41 @@ server cluster A = 1 { /* Test comment */ }
         ])
         self.assertIdlEqual(actual, expected)
 
+    def test_marks_shared_items(self):
+        actual = parseText("""
+            server cluster WithSharedItems = 1 {
+                shared struct SharedStruct { nullable int16u abc = 0; }
+                shared enum SharedEnum : ENUM16 { A = 1; B = 2; }
+                shared bitmap SharedBitmap : BITMAP32 { X = 100; Y = 200; }
+            }
+        """)
+
+        expected = Idl(clusters=[
+            Cluster(name="WithSharedItems", code=1,
+                    structs=[
+                        Struct(name="SharedStruct", is_shared=True, fields=[
+                            Field(name="abc", code=0, data_type=DataType(
+                                name="int16u"), qualities=FieldQuality.NULLABLE),
+                    ]),
+                    ],
+                    enums=[
+                        Enum(name="SharedEnum", is_shared=True, base_type="ENUM16",
+                             entries=[
+                                 ConstantEntry(name="A", code=1),
+                                 ConstantEntry(name="B", code=2),
+                             ])],
+                    bitmaps=[
+                        Bitmap(name="SharedBitmap", is_shared=True, base_type="BITMAP32",
+                               entries=[
+                                   ConstantEntry(name="X", code=100),
+                                   ConstantEntry(name="Y", code=200),
+                               ])],
+            )
+        ])
+
+        self.assertIdlEqual(actual, expected)
+
+
     def test_handle_commands(self):
         actual = parseText("""
             endpoint 1 {
