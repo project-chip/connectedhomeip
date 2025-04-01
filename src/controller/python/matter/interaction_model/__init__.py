@@ -34,7 +34,7 @@ __all__ = ["AttributePath", "AttributePathIBstruct", "DataVersionFilterIBstruct"
            "PyWriteAttributeData", "SessionParameters", "SessionParametersStruct", "Status", "TestOnlyPyBatchCommandsOverrides", "TestOnlyPyOnDoneInfo"]
 
 
-# defined src/controller/python/chip/interaction_model/Delegate.h
+# defined src/controller/python/matter/interaction_model/Delegate.h
 kUndefinedClusterStatus: int = 0xFF
 
 
