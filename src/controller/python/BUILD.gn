@@ -94,7 +94,7 @@ shared_library("ChipDeviceCtrl") {
       "chip/utils/DeviceProxyUtils.cpp",
     ]
     if (current_os == "linux") {
-      sources += [ "chip/webrtc/RTCClient.cpp", ]
+      sources += [ "chip/webrtc/RTCClient.cpp" ]
     }
     defines += [ "CHIP_CONFIG_MAX_GROUPS_PER_FABRIC=50" ]
     defines += [ "CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC=50" ]
@@ -228,10 +228,10 @@ chip_python_wheel_action("chip-core") {
       ]
       if (current_os == "linux") {
         sources += [
-        "chip/webrtc/__init__.py",
-        "chip/webrtc/callbacks.py",
-        "chip/webrtc/library_handle.py",
-        "chip/webrtc/types.py",
+          "chip/webrtc/__init__.py",
+          "chip/webrtc/callbacks.py",
+          "chip/webrtc/library_handle.py",
+          "chip/webrtc/types.py",
         ]
       }
 
@@ -283,7 +283,7 @@ chip_python_wheel_action("chip-core") {
     "chip.webrtc",
   ]
   if (current_os == "linux") {
-    py_packages += [ "chip.webrtc",]
+    py_packages += [ "chip.webrtc" ]
   }
 
   if (!chip_support_commissioning_in_controller) {
