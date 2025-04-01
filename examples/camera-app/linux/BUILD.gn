@@ -53,9 +53,19 @@ executable("chip-camera-app") {
     "${chip_root}/third_party/libdatachannel:libdatachannel",
   ]
 
-  libs = [ "datachannel" ]
-  lib_dirs =
-      [ rebase_path("${chip_root}/third_party/libdatachannel/repo/build") ]
+  libs = [
+    "datachannel",
+    "usrsctp",
+    "srtp2",
+    "juice",
+  ]
+
+  lib_dirs = [
+    rebase_path("${chip_root}/third_party/libdatachannel/repo/build"),
+    rebase_path("${chip_root}/third_party/libdatachannel/repo/build/deps/usrsctp/usrsctplib"),
+    rebase_path("${chip_root}/third_party/libdatachannel/repo/build/deps/libsrtp"),
+    rebase_path("${chip_root}/third_party/libdatachannel/repo/build/deps/libjuice"),
+  ]      
 
   output_dir = root_out_dir
 }
