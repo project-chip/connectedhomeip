@@ -941,6 +941,122 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         log_structured_data('==== json: ', json_str)
         log_structured_data('==== txt: ', txt_str)
 
+    @async_test_body
+    async def test_TC_DESC_2_1(self):
+        self.print_step(1, "TH reads DeviceTypeList and PartsList attributes from DUT for Endpoint 0")
+        self.print_step(2, "TH reads DeviceTypeList and PartsList attributes from DUT for each Endpoint supported by DUT(except Endpoint 0)")
+
+        self.print_step(3, "Verify the Descriptor cluster PartsList on endpoint 0 exactly lists all the other (non-0) endpoints on the DUT")
+
+        self.print_step(4, "Validate mandatory EndpointUniqueId attribute in Descriptor cluster")
+        unique_ids = set()
+        ROOT_NODE_DEVICE_TYPE = 0x16
+        listed_device_types = [i.deviceType for i in self.endpoints[0]
+                               [Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]]
+        cluster_revision = self.endpoints[0][Clusters.Descriptor][Clusters.Descriptor.Attributes.ClusterRevision]
+        print(listed_device_types, "listed_device_types")
+        if cluster_revision < 1:
+            self.fail_current_test()
+
+        if ROOT_NODE_DEVICE_TYPE not in listed_device_types:
+            self.record_error(self.get_test_name(), location=AttributePathLocation(endpoint_id=0),
+                              problem="Root node device type not listed on endpoint 0", spec_location="Root node device type")
+            self.fail_current_test()
+
+        for endpoint_id, endpoint in self.endpoints.items():
+            self.print_step(2, "TH reads ServerList attribute")
+            self.print_step(2, "TH reads ClientList attribute")
+            serverlist = endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.ServerList]
+            clientlist = endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.ClientList]
+            self.print_step(2, "TH reads PartsList attribute")
+            parts_list_per_ep = endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]
+            if len(parts_list_per_ep) > 1:
+                if Clusters.Descriptor.Attributes.TagList not in endpoint[Clusters.Descriptor]:
+                    continue
+                # taglist_ep = endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.TagList]
+                print(parts_list_per_ep, "****")
+            if len(parts_list_per_ep) > 0:
+                for ep in parts_list_per_ep:
+                    if not (ep >= 1) and not (ep <= 65534):
+                        self.fail_current_test()
+                    if ep == endpoint_id:
+                        self.fail_current_test()
+
+            if endpoint_id != 0:
+                if Clusters.Descriptor not in endpoint:
+                    continue
+                # parts_list_nonzero = endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]
+                # devicetype_list_nonzero = endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]
+                listed_device_types_non_zero = [i.deviceType for i in endpoint
+                                                [Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]]
+                cluster_revision_non_zero = endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.ClusterRevision]
+
+                if cluster_revision_non_zero <= 1:
+                    self.fail_current_test()
+                if len(listed_device_types_non_zero) < 1:
+                    self.fail_current_test()
+                if ROOT_NODE_DEVICE_TYPE in listed_device_types_non_zero:
+                    self.record_error(self.get_test_name(), location=AttributePathLocation(endpoint_id=0),
+                                      problem="Root node device type is listed on non zero endpoints", spec_location="Root node device type")
+                    self.fail_current_test()
+            # descriptor_cluster = endpoint[Clusters.Descriptor]
+
+        for endpoint_id, endpoint in self.endpoints.items():
+            if endpoint_id == 0:
+                if Clusters.Descriptor not in endpoint:
+                    continue
+                parts_list = endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]
+                devicetype_list = endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]
+
+            descriptor_cluster = endpoint[Clusters.Descriptor]
+
+            if len(parts_list) > 0:
+                if Clusters.Descriptor.Attributes.EndpointUniqueId in descriptor_cluster:
+                    value = descriptor_cluster[Clusters.Descriptor.Attributes.EndpointUniqueId]
+                    print("Endpoint UniqueId for end point", (endpoint_id), " is", (value))
+                    if isinstance(value, str):
+                        if not value:
+                            continue
+                        if len(value) > 32:
+                            location = AttributePathLocation(
+                                endpoint_id,
+                                Clusters.Descriptor.id,
+                                Clusters.Descriptor.Attributes.EndpointUniqueId.attribute_id
+                            )
+                            self.record_error(
+                                self.get_test_name(),
+                                location=location,
+                                problem=f"EndpointUniqueId attribute length is {len(value)} bytes which exceeds the maximum allowed 32 bytes",
+                                spec_location="EndpointUniqueId attribute"
+                            )
+                            self.fail_current_test()
+                        if value in unique_ids:
+                            location = AttributePathLocation(endpoint_id, Clusters.Descriptor.id,
+                                                             Clusters.Descriptor.Attributes.EndpointUniqueId.attribute_id)
+                            self.record_error(
+                                self.get_test_name(),
+                                location=location,
+                                problem=f"Duplicate EndpointUniqueId found: {value}",
+                                spec_location="EndpointUniqueId attribute"
+                            )
+                            self.fail_current_test()
+                        unique_ids.add(value)
+                    else:
+                        # If the attribute is present but not a string
+                        location = AttributePathLocation(
+                            endpoint_id,
+                            Clusters.Descriptor.id,
+                            Clusters.Descriptor.Attributes.EndpointUniqueId.attribute_id
+                        )
+                        self.record_error(
+                            self.get_test_name(),
+                            location=location,
+                            problem="EndpointUniqueId attribute is present but not a string",
+                            spec_location="EndpointUniqueId attribute"
+                        )
+                        self.fail_current_test()
+
 
 if __name__ == "__main__":
     default_matter_test_main()
+
