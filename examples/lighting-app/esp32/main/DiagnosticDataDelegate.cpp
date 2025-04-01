@@ -80,13 +80,13 @@ public:
 
         // Retrieve encoded data
         CHIP_ERROR err = mStorageInstance->Retrieve(encodedSpan, readEntries);
-        if (err != CHIP_NO_ERROR)
+        if (err != CHIP_NO_ERROR && err != CHIP_ERROR_BUFFER_TOO_SMALL && err != CHIP_ERROR_END_OF_TLV)
         {
             ESP_LOGE("Diagnostics", "Failed to retrieve data");
             return err;
         }
 
-        chip::TLV::TLVReader mReader;
+        chip::TLV::TLVReader mReader, tempReader;
         char label[kMaxStringValueSize];
         char value[kMaxStringValueSize];
         mReader.Init(encodedSpan.data(), encodedSpan.size());
@@ -94,7 +94,7 @@ public:
         {
             if (mReader.GetType() == chip::TLV::kTLVType_Structure && mReader.GetTag() == chip::TLV::AnonymousTag())
             {
-                chip::TLV::TLVReader tempReader(mReader);
+                tempReader.Init(mReader);
                 DiagnosticEntry trace = {
                     .label = label,
                     .stringValue = value,
@@ -108,7 +108,7 @@ public:
                     continue;
                 }
 
-                chip::TLV::TLVReader tempReader2(mReader);
+                tempReader.Init(mReader);
 
                 DiagnosticEntry metricInt32 = {
                     .label = label,
@@ -116,14 +116,14 @@ public:
                     .type = chip::Tracing::Diagnostics::ValueType::kSignedInteger,
                     .timestamp = 0
                 };
-                err = Decode(tempReader2, metricInt32);
+                err = Decode(tempReader, metricInt32);
                 if (err == CHIP_NO_ERROR)
                 {
                     LogMetricData(metricInt32.label, ValueType::kInt32, metricInt32.intValue);
                     continue;
                 }
 
-                chip::TLV::TLVReader tempReader3(mReader);
+                tempReader.Init(mReader);
 
                 DiagnosticEntry metricUint32 = {
                     .label = label,
@@ -131,7 +131,7 @@ public:
                     .type = chip::Tracing::Diagnostics::ValueType::kUnsignedInteger,
                     .timestamp = 0
                 };
-                err = Decode(tempReader3, metricUint32);
+                err = Decode(tempReader, metricUint32);
                 if (err == CHIP_NO_ERROR)
                 {
                     LogMetricData(metricUint32.label, ValueType::kUInt32, metricUint32.uintValue);

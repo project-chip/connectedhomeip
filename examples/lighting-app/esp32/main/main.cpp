@@ -69,7 +69,6 @@
 #include <tracing/registry.h>
 #define START_TIMEOUT_MS 10000
 #endif // CONFIG_ESP_INSIGHTS_ENABLED
-
 #endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
 
 using namespace ::chip;
