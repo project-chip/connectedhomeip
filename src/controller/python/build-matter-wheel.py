@@ -125,9 +125,8 @@ try:
     setup(
         name=packageName,
         version=packageVersion,
-        description="Python-base APIs and tools for Matter.",
+        description="Python-base APIs and tools for Matter SDK",
         url="https://github.com/project-chip/connectedhomeip",
-        license="Apache",
         classifiers=[
             "Intended Audience :: Developers",
             "License :: OSI Approved :: Apache Software License",
