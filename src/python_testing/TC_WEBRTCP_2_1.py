@@ -8,9 +8,8 @@ from chip.clusters.Types import NullValue
 from mobly import asserts
 
 
-
 class TC_WebRTCP_2_1(MatterBaseTest):
-    
+
     def steps_TC_WEBRTCP_2_1(self) -> list[TestStep]:
         steps = [TestStep(1, "Read CurrentSessions attribute from WebRTC Transport Provider Cluster"),
                  TestStep(2, "Send the SolicitOffer command with StreamUsage = 4(kUnknownEnumValue)"),
@@ -31,16 +30,17 @@ class TC_WebRTCP_2_1(MatterBaseTest):
         provider = Clusters.Objects.WebRTCTransportProvider
         current_sessions = await self.default_controller.ReadAttribute(self.dut_node_id, [(endpoint, Clusters.Objects.WebRTCTransportProvider.Attributes.CurrentSessions)])
 
-        asserts.assert_equal(len(current_sessions[endpoint][Clusters.Objects.WebRTCTransportProvider][Clusters.Objects.WebRTCTransportProvider.Attributes.CurrentSessions]), 0, "All Webrtc sessions should be closed")
+        asserts.assert_equal(len(current_sessions[endpoint][Clusters.Objects.WebRTCTransportProvider]
+                             [Clusters.Objects.WebRTCTransportProvider.Attributes.CurrentSessions]), 0, "All Webrtc sessions should be closed")
 
         self.print_step(2, "send the SolicitOffer command with StreamUsage = 4(kUnknownEnumValue)")
- 
+
         try:
             solicit_offer_response: Clusters.WebRTCTransportProvider.Commands.SolicitOfferResponse = await self.send_single_cmd(
                 cmd=Clusters.WebRTCTransportProvider.Commands.SolicitOffer(
                     streamUsage=Clusters.WebRTCTransportProvider.Enums.StreamUsageEnum.kUnknownEnumValue,
-                    videoStreamID = NullValue,
-                    audioStreamID = NullValue,
+                    videoStreamID=NullValue,
+                    audioStreamID=NullValue,
                 ), endpoint=endpoint
             )
         except InteractionModelError as e:
@@ -48,14 +48,13 @@ class TC_WebRTCP_2_1(MatterBaseTest):
                 e.status, Status.ConstraintError, "Unexpected error returned")
             pass
 
-
-        self.print_step(3, "Send the SolicitOffer command with valid parameters") 
+        self.print_step(3, "Send the SolicitOffer command with valid parameters")
 
         solicit_offer_response: Clusters.WebRTCTransportProvider.Commands.SolicitOfferResponse = await self.send_single_cmd(
             cmd=Clusters.WebRTCTransportProvider.Commands.SolicitOffer(
                 streamUsage=Clusters.WebRTCTransportProvider.Enums.StreamUsageEnum.kLiveView,
-                videoStreamID = NullValue,
-                audioStreamID = NullValue,
+                videoStreamID=NullValue,
+                audioStreamID=NullValue,
             ), endpoint=endpoint
         )
 
@@ -66,8 +65,8 @@ class TC_WebRTCP_2_1(MatterBaseTest):
 
         current_sessions = await self.default_controller.ReadAttribute(self.dut_node_id, [(endpoint, Clusters.Objects.WebRTCTransportProvider.Attributes.CurrentSessions)])
 
-        asserts.assert_equal(bool(current_sessions[endpoint][Clusters.Objects.WebRTCTransportProvider][Clusters.Objects.WebRTCTransportProvider.Attributes.CurrentSessions]), True, "No existing Webrtc session")
-
+        asserts.assert_equal(bool(current_sessions[endpoint][Clusters.Objects.WebRTCTransportProvider]
+                             [Clusters.Objects.WebRTCTransportProvider.Attributes.CurrentSessions]), True, "No existing Webrtc session")
 
 
 if __name__ == "__main__":
