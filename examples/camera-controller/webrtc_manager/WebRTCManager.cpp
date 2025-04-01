@@ -18,6 +18,7 @@
 
 #include "WebRTCManager.h"
 
+#include <app/dynamic_server/AccessControl.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
@@ -41,11 +42,6 @@ using namespace chip;
 using namespace chip::app;
 using namespace std::chrono_literals;
 
-namespace {
-
-constexpr EndpointId kWebRTCRequesterEndpointId = 1;
-
-} // namespace
 
 WebRTCManager::WebRTCManager() {}
 
@@ -159,7 +155,7 @@ CHIP_ERROR WebRTCManager::ProvideOffer(DataModel::Nullable<uint16_t> webRTCSessi
 {
     ChipLogProgress(NotSpecified, "Sending ProvideOffer command to the peer device");
 
-    CHIP_ERROR err = mWebRTCProviderClient.ProvideOffer(webRTCSessionID, mLocalDescription, streamUsage, kWebRTCRequesterEndpointId,
+    CHIP_ERROR err = mWebRTCProviderClient.ProvideOffer(webRTCSessionID, mLocalDescription, streamUsage, kWebRTCRequesterDynamicEndpointId,
                                                         MakeOptional(DataModel::NullNullable), // "Null" for video
                                                         MakeOptional(DataModel::NullNullable), // "Null" for audio
                                                         NullOptional, // Omit ICEServers (Optional not present)
@@ -216,7 +212,7 @@ void WebRTCManager::HandleCommandResponse(const ConcreteCommandPath & path, TLV:
     if (path.mClusterId == Clusters::WebRTCTransportProvider::Id &&
         path.mCommandId == Clusters::WebRTCTransportProvider::Commands::ProvideOfferResponse::Id)
     {
-        VerifyOrDie(path.mEndpointId == kWebRTCRequesterEndpointId);
+        VerifyOrDie(path.mEndpointId == kWebRTCRequesterDynamicEndpointId);
         HandleProvideOfferResponse(data);
     }
 }
