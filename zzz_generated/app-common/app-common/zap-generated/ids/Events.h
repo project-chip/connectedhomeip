@@ -453,6 +453,20 @@ static constexpr EventId Id = 0x00000001;
 } // namespace Events
 } // namespace WaterHeaterManagement
 
+namespace CommodityPrice {
+namespace Events {
+
+namespace PriceChange {
+static constexpr EventId Id = 0x00000000;
+} // namespace PriceChange
+
+namespace ForecastChange {
+static constexpr EventId Id = 0x00000001;
+} // namespace ForecastChange
+
+} // namespace Events
+} // namespace CommodityPrice
+
 namespace DemandResponseLoadControl {
 namespace Events {
 
