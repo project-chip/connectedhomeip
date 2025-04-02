@@ -43,6 +43,9 @@
 #include <clusters/ClosureDimension/CommandIds.h>
 #include <clusters/ColorControl/CommandIds.h>
 #include <clusters/CommissionerControl/CommandIds.h>
+#include <clusters/CommodityMetering/CommandIds.h>
+#include <clusters/CommodityPrice/CommandIds.h>
+#include <clusters/CommodityTariff/CommandIds.h>
 #include <clusters/ContentAppObserver/CommandIds.h>
 #include <clusters/ContentControl/CommandIds.h>
 #include <clusters/ContentLauncher/CommandIds.h>
@@ -84,6 +87,7 @@
 #include <clusters/MediaInput/CommandIds.h>
 #include <clusters/MediaPlayback/CommandIds.h>
 #include <clusters/Messages/CommandIds.h>
+#include <clusters/MeterIdentification/CommandIds.h>
 #include <clusters/MicrowaveOvenControl/CommandIds.h>
 #include <clusters/MicrowaveOvenMode/CommandIds.h>
 #include <clusters/ModeSelect/CommandIds.h>

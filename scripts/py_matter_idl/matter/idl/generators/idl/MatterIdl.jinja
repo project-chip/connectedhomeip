@@ -18,6 +18,7 @@
 {% macro render_struct(s) -%}{#
  Macro for the output of a complete struct
 #}
+{%- if s.is_shared%}shared {% endif -%}
 {%- if s.tag %}{{s.tag | idltxt}} {% endif -%}
 {% if s.qualities %}{{s.qualities | idltxt}} {% endif -%}
 struct {{s.name}} {##}
@@ -91,6 +92,7 @@ bitmap {{bitmap.name}} : {{ bitmap.base_type}} {
   {% endfor %}
 
   {%- for enum in cluster.enums | rejectattr("is_global")%}
+  {%+ if enum.is_shared%}shared {% endif -%}
   enum {{enum.name}} : {{ enum.base_type}} {
     {% for entry in enum.entries %}
     {{entry.name}} = {{entry.code}};
@@ -100,6 +102,7 @@ bitmap {{bitmap.name}} : {{ bitmap.base_type}} {
   {% endfor %}
 
   {%- for bitmap in cluster.bitmaps | rejectattr("is_global")%}
+  {%+ if bitmap.is_shared%}shared {% endif -%}
   bitmap {{bitmap.name}} : {{ bitmap.base_type}} {
     {% for entry in bitmap.entries %}
     {{entry.name}} = 0x{{"%X" | format(entry.code)}};
