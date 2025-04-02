@@ -262,6 +262,9 @@ public class ClusterIDMapping {
         if (clusterId == ClosureControl.ID) {
             return new ClosureControl();
         }
+        if (clusterId == ClosureDimension.ID) {
+            return new ClosureDimension();
+        }
         if (clusterId == ServiceArea.ID) {
             return new ServiceArea();
         }
@@ -11449,6 +11452,153 @@ public class ClusterIDMapping {
                     }
                     public static ConfigureFallbackCommandField value(int id) throws NoSuchFieldError {
                         for (ConfigureFallbackCommandField field : ConfigureFallbackCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }@Override
+        public String getAttributeName(long id) throws NoSuchFieldError {
+            return Attribute.value(id).toString();
+        }
+
+        @Override
+        public String getEventName(long id) throws NoSuchFieldError {
+            return Event.value(id).toString();
+        }
+
+        @Override
+        public String getCommandName(long id) throws NoSuchFieldError {
+            return Command.value(id).toString();
+        }
+
+        @Override
+        public long getAttributeID(String name) throws IllegalArgumentException {
+            return Attribute.valueOf(name).getID();
+        }
+
+        @Override
+        public long getEventID(String name) throws IllegalArgumentException {
+            return Event.valueOf(name).getID();
+        }
+
+        @Override
+        public long getCommandID(String name) throws IllegalArgumentException {
+            return Command.valueOf(name).getID();
+        }
+    }
+    public static class ClosureDimension implements BaseCluster {
+        public static final long ID = 261L;
+        public long getID() {
+            return ID;
+        }
+
+        public enum Attribute {
+            Current(0L),
+            Target(1L),
+            Resolution(2L),
+            StepValue(3L),
+            Unit(4L),
+            UnitRange(5L),
+            LimitRange(6L),
+            TranslationDirection(7L),
+            RotationAxis(8L),
+            Overflow(9L),
+            ModulationType(10L),
+            GeneratedCommandList(65528L),
+            AcceptedCommandList(65529L),
+            EventList(65530L),
+            AttributeList(65531L),
+            FeatureMap(65532L),
+            ClusterRevision(65533L),;
+            private final long id;
+            Attribute(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Attribute value(long id) throws NoSuchFieldError {
+                for (Attribute attribute : Attribute.values()) {
+                    if (attribute.getID() == id) {
+                        return attribute;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Event {;
+            private final long id;
+            Event(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Event value(long id) throws NoSuchFieldError {
+                for (Event event : Event.values()) {
+                    if (event.getID() == id) {
+                        return event;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Command {
+            SetTarget(0L),
+            Step(1L),;
+            private final long id;
+            Command(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Command value(long id) throws NoSuchFieldError {
+                for (Command command : Command.values()) {
+                    if (command.getID() == id) {
+                        return command;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }public enum SetTargetCommandField {Position(0),Latch(1),Speed(2),;
+                    private final int id;
+                    SetTargetCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static SetTargetCommandField value(int id) throws NoSuchFieldError {
+                        for (SetTargetCommandField field : SetTargetCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum StepCommandField {Direction(0),NumberOfSteps(1),Speed(2),;
+                    private final int id;
+                    StepCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static StepCommandField value(int id) throws NoSuchFieldError {
+                        for (StepCommandField field : StepCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
