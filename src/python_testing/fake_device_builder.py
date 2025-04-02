@@ -14,12 +14,13 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
+from typing import Any, Optional
+
 import chip.clusters as Clusters
 from chip.testing.conformance import ConformanceDecision
+from chip.testing.global_attribute_ids import GlobalAttributeIds
 from chip.testing.spec_parsing import XmlCluster, XmlDeviceType
 from chip.tlv import uint
-from chip.testing.global_attribute_ids import GlobalAttributeIds
-from typing import Any, Optional
 
 
 def _is_mandatory(conformance):
