@@ -14,7 +14,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "app/server-cluster/ServerClusterInterface.h"
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
 #include <access/AccessControl.h>
@@ -32,6 +31,7 @@
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/Provider.h>
 #include <app/server-cluster/ServerClusterContext.h>
+#include <app/server-cluster/ServerClusterInterface.h>
 #include <app/util/DataModelHandler.h>
 #include <app/util/IMClusterCommandHandler.h>
 #include <app/util/af-types.h>
