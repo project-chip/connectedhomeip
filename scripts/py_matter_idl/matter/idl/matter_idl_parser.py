@@ -5,7 +5,7 @@ import functools
 import logging
 import sys
 from pathlib import Path
-from typing import Dict, Optional, List
+from typing import Dict, List, Optional
 
 from lark import Lark
 from lark.lexer import Token
