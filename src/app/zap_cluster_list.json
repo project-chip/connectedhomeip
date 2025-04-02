@@ -332,7 +332,9 @@
         "WEB_RTC_TRANSPORT_PROVIDER_CLUSTER": [
             "webrtc-transport-provider-server"
         ],
-        "WEB_RTC_TRANSPORT_REQUESTOR_CLUSTER": [],
+        "WEB_RTC_TRANSPORT_REQUESTOR_CLUSTER": [
+            "webrtc-transport-requestor-server"
+        ],
         "WIFI_NETWORK_DIAGNOSTICS_CLUSTER": ["wifi-network-diagnostics-server"],
         "WIFI_NETWORK_MANAGEMENT_CLUSTER": ["wifi-network-management-server"],
         "WINDOW_COVERING_CLUSTER": ["window-covering-server"],

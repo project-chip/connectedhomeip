@@ -7642,30 +7642,6 @@ bool emberAfCameraAvSettingsUserLevelManagementClusterDPTZRelativeMoveCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::DPTZRelativeMove::DecodableType & commandData);
 /**
- * @brief WebRTC Transport Requestor Cluster Offer Command callback (from client)
- */
-bool emberAfWebRTCTransportRequestorClusterOfferCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::WebRTCTransportRequestor::Commands::Offer::DecodableType & commandData);
-/**
- * @brief WebRTC Transport Requestor Cluster Answer Command callback (from client)
- */
-bool emberAfWebRTCTransportRequestorClusterAnswerCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::WebRTCTransportRequestor::Commands::Answer::DecodableType & commandData);
-/**
- * @brief WebRTC Transport Requestor Cluster ICECandidates Command callback (from client)
- */
-bool emberAfWebRTCTransportRequestorClusterICECandidatesCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::WebRTCTransportRequestor::Commands::ICECandidates::DecodableType & commandData);
-/**
- * @brief WebRTC Transport Requestor Cluster End Command callback (from client)
- */
-bool emberAfWebRTCTransportRequestorClusterEndCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::WebRTCTransportRequestor::Commands::End::DecodableType & commandData);
-/**
  * @brief Push AV Stream Transport Cluster AllocatePushTransport Command callback (from client)
  */
 bool emberAfPushAvStreamTransportClusterAllocatePushTransportCallback(
