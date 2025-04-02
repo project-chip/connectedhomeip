@@ -68,14 +68,14 @@ tests:
           value:
               [
                   {
-                      FabricIndex: CurrentFabricIndexValue,
+                      FabricIndex: 0,
                       Privilege: 5,
                       AuthMode: 2,
                       Subjects: [commissionerNodeId],
                       Targets: null,
                   },
                   {
-                      FabricIndex: CurrentFabricIndexValue,
+                      FabricIndex: 0,
                       Privilege: 3,
                       AuthMode: 3,
                       Subjects: [0x0103],
@@ -150,7 +150,7 @@ tests:
           value:
               [
                   {
-                      FabricIndex: CurrentFabricIndexValue,
+                      FabricIndex: 0,
                       GroupId: 0x0103,
                       GroupKeySetID: 0x01a3,
                   },
@@ -340,7 +340,7 @@ tests:
           value:
               [
                   {
-                      FabricIndex: CurrentFabricIndexValue,
+                      FabricIndex: 0,
                       Privilege: 5,
                       AuthMode: 2,
                       Subjects: [commissionerNodeId],
