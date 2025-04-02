@@ -1292,3 +1292,9 @@ void MatterTimeSynchronizationPluginServerInitCallback()
     TimeSynchronizationServer::Instance().Init();
     AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
 }
+
+void MatterTimeSynchronizationPluginServerShutdownCallback()
+{
+    AttributeAccessInterfaceRegistry::Instance().Unregister(&gAttrAccess);
+    TimeSynchronizationServer::Instance().Shutdown();
+}

@@ -54,5 +54,7 @@
     "Water Leak Detector": 67,
     "HeatPump": 777,
     "Water Freeze Detector": 65,
-    "Rain Sensor": 68
+    "Rain Sensor": 68,
+    "Mounted On/Off Control": 271,
+    "Mounted Dimmable Load Control": 272
 }

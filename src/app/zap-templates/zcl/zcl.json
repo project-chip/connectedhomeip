@@ -21,7 +21,7 @@
         "boolean-state-cluster.xml",
         "boolean-state-configuration-cluster.xml",
         "actions-cluster.xml",
-        "bridged-device-basic-information.xml",
+        "bridged-device-basic-information-cluster.xml",
         "camera-av-settings-user-level-management-cluster.xml",
         "camera-av-stream-management-cluster.xml",
         "chime-cluster.xml",

@@ -241,3 +241,4 @@ void SetDelegate(EndpointId endpoint, OTAProviderDelegate * delegate)
 } // namespace chip
 
 void MatterOtaSoftwareUpdateProviderPluginServerInitCallback() {}
+void MatterOtaSoftwareUpdateProviderPluginServerShutdownCallback() {}
