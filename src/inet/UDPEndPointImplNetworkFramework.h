@@ -66,7 +66,7 @@ private:
     nw_endpoint_t GetEndPoint(const IPAddressType aAddressType, const IPAddress & aAddress, uint16_t aPort,
                               InterfaceId interfaceIndex = InterfaceId::Null());
     CHIP_ERROR StartConnection(nw_connection_t aConnection);
-    void GetPacketInfo(const nw_connection_t & aConnection, IPPacketInfo & aPacketInfo);
+    CHIP_ERROR GetPacketInfo(const nw_connection_t & aConnection, IPPacketInfo & aPacketInfo);
     void HandleDataReceived(nw_connection_t aConnection);
     CHIP_ERROR ReleaseListener();
     CHIP_ERROR ReleaseConnection();
