@@ -602,37 +602,34 @@ namespace Inet {
                         CHIP_ERROR error = CHIP_ERROR_POSIX(errno);
                         IPPacketInfo packetInfo;
                         if (CHIP_NO_ERROR == GetPacketInfo(aConnection, packetInfo)) {
-                            dispatch_async(mSystemQueue, ^{
-                                OnReceiveError((UDPEndPoint *) this, error, nullptr);
-                            });
+                            OnReceiveError((UDPEndPoint *) this, error, nullptr);
                         } else {
-                            dispatch_async(mSystemQueue, ^{
-                                OnReceiveError((UDPEndPoint *) this, error, &packetInfo);
-                            });
+                            OnReceiveError((UDPEndPoint *) this, error, &packetInfo);
                         }
                     }
                 }
             };
 
-            if (content != nullptr && OnMessageReceived != nullptr) {
-                size_t count = dispatch_data_get_size(content);
-                auto packetBufferHandle = System::PacketBufferHandle::New(count);
-                auto * packetBuffer = std::move(packetBufferHandle).UnsafeRelease();
-                dispatch_data_apply(content, ^(dispatch_data_t data, size_t offset, const void * buffer, size_t size) {
-                    memmove(packetBuffer->Start() + offset, buffer, size);
-                    return true;
-                });
-                packetBuffer->SetDataLength(count);
+            dispatch_async(mSystemQueue, ^{
+                if (content != nullptr && OnMessageReceived != nullptr) {
+                    size_t count = dispatch_data_get_size(content);
 
-                IPPacketInfo packetInfo;
-                GetPacketInfo(aConnection, packetInfo);
-                dispatch_async(mSystemQueue, ^{
+                    __auto_type packetBufferHandle = System::PacketBufferHandle::New(count);
+                    __auto_type * packetBuffer = std::move(packetBufferHandle).UnsafeRelease();
+                    dispatch_data_apply(content, ^(dispatch_data_t data, size_t offset, const void * buffer, size_t size) {
+                        memmove(packetBuffer->Start() + offset, buffer, size);
+                        return true;
+                    });
+                    packetBuffer->SetDataLength(count);
+
+                    IPPacketInfo packetInfo;
+                    GetPacketInfo(aConnection, packetInfo);
                     auto handle = System::PacketBufferHandle::Adopt(packetBuffer);
                     OnMessageReceived((UDPEndPoint *) this, std::move(handle), &packetInfo);
-                });
-            }
+                }
 
-            schedule_next_receive();
+                schedule_next_receive();
+            });
         };
 
         nw_connection_receive_message(aConnection, handler);
