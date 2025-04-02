@@ -2126,10 +2126,11 @@ class ChipDeviceController(ChipDeviceControllerBase):
         auto-commissioning should use the supplied "CommissionWithCode" function, which will
         establish the PASE connection and commission automatically.
 
-        Raises a ChipStackError on failure.
+        Raises:
+            - A ChipStackError on failure.
 
         Returns:
-            - Effective Node ID of the device (as defined by the assigned NOC)
+            - Effective Node ID of the device (as defined by the assigned NOC).
         '''
         self.CheckIsActive()
 
@@ -2144,10 +2145,17 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
     async def CommissionThread(self, discriminator, setupPinCode, nodeId, threadOperationalDataset: bytes, isShortDiscriminator: bool = False) -> int:
         ''' 
-        Commissions a Thread device over BLE
+        Commissions a Thread device over BLE.
+
+        Args:
+            discriminator (int): The discriminator to use for commissioning the device.
+            setupPinCode (str): The PIN code required for setup.
+            nodeId (int): The node ID of the device.
+            threadOperationalDataset (bytes): The operational dataset for the Thread device.
+            isShortDiscriminator (bool, optional): Whether the discriminator is short. Defaults to False.
 
         Returns:
-            - Effective Node ID of the device (as defined by the assigned NOC)
+            int: Effective Node ID of the device (as defined by the assigned NOC).
         '''
         self.SetThreadOperationalDataset(threadOperationalDataset)
         return await self.ConnectBLE(discriminator, setupPinCode, nodeId, isShortDiscriminator)
@@ -2157,13 +2165,18 @@ class ChipDeviceController(ChipDeviceControllerBase):
         Commissions a Wi-Fi device over BLE.
 
         Returns:
-            - Effective Node ID of the device (as defined by the assigned NOC)
+            int: Effective Node ID of the device (as defined by the assigned NOC).
         '''
         self.SetWiFiCredentials(ssid, credentials)
         return await self.ConnectBLE(discriminator, setupPinCode, nodeId, isShortDiscriminator)
 
     def SetWiFiCredentials(self, ssid: str, credentials: str):
-        ''' Set the Wi-Fi credentials to set during commissioning.'''
+        ''' 
+        Set the Wi-Fi credentials to set during commissioning.
+
+        Raises: 
+            ChipStackError: On failure.
+        '''
         self.CheckIsActive()
 
         self._ChipStack.Call(
@@ -2172,7 +2185,12 @@ class ChipDeviceController(ChipDeviceControllerBase):
         ).raise_on_error()
 
     def SetThreadOperationalDataset(self, threadOperationalDataset):
-        ''' Set the Thread operational dataset to set during commissioning.'''
+        ''' 
+        Set the Thread operational dataset to set during commissioning.
+
+        Raises: 
+            ChipStackError: On failure.
+        '''
         self.CheckIsActive()
 
         self._ChipStack.Call(
@@ -2181,56 +2199,96 @@ class ChipDeviceController(ChipDeviceControllerBase):
         ).raise_on_error()
 
     def ResetCommissioningParameters(self):
-        ''' Sets the commissioning parameters back to the default values.'''
+        ''' 
+        Sets the commissioning parameters back to the default values.
+
+        Raises: 
+            ChipStackError: On failure.
+        '''
         self.CheckIsActive()
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_ResetCommissioningParameters()
         ).raise_on_error()
 
     def SetTimeZone(self, offset: int, validAt: int, name: str = ""):
-        ''' Set the time zone to set during commissioning. Currently only one time zone entry is supported'''
+        ''' 
+        Set the time zone to set during commissioning. Currently only one time zone entry is supported.
+
+        Raises: 
+            ChipStackError: On failure.
+        '''
         self.CheckIsActive()
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_SetTimeZone(offset, validAt, name.encode("utf-8"))
         ).raise_on_error()
 
     def SetDSTOffset(self, offset: int, validStarting: int, validUntil: int):
-        ''' Set the DST offset to set during commissioning. Currently only one DST entry is supported'''
+        ''' 
+        Set the DST offset to set during commissioning. Currently only one DST entry is supported.
+
+        Raises: 
+            ChipStackError: On failure.
+        '''
         self.CheckIsActive()
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_SetDSTOffset(offset, validStarting, validUntil)
         ).raise_on_error()
 
     def SetTCAcknowledgements(self, tcAcceptedVersion: int, tcUserResponse: int):
-        ''' Set the TC acknowledgements to set during commissioning'''
+        ''' 
+        Set the TC acknowledgements to set during commissioning.
+
+        Raises: 
+            ChipStackError: On failure.
+        '''
         self.CheckIsActive()
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_SetTermsAcknowledgements(tcAcceptedVersion, tcUserResponse)
         ).raise_on_error()
 
     def SetSkipCommissioningComplete(self, skipCommissioningComplete: bool):
-        ''' Set whether to skip the commissioning complete callback'''
+        ''' 
+        Set whether to skip the commissioning complete callback.
+
+        Raises: 
+            ChipStackError: On failure.
+        '''
         self.CheckIsActive()
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_SetSkipCommissioningComplete(skipCommissioningComplete)
         ).raise_on_error()
 
     def SetDefaultNTP(self, defaultNTP: str):
-        ''' Set the DefaultNTP to set during commissioning'''
+        ''' 
+        Set the DefaultNTP to set during commissioning.
+
+        Raises: 
+            ChipStackError: On failure.
+        '''
         self.CheckIsActive()
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_SetDefaultNtp(defaultNTP.encode("utf-8"))
         ).raise_on_error()
 
     def SetTrustedTimeSource(self, nodeId: int, endpoint: int):
-        ''' Set the trusted time source nodeId to set during commissioning. This must be a node on the commissioner fabric.'''
+        ''' 
+        Set the trusted time source nodeId to set during commissioning. This must be a node on the commissioner fabric.
+
+        Raises: 
+            ChipStackError: On failure.
+        '''
         self.CheckIsActive()
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_SetTrustedTimeSource(nodeId, endpoint)
         ).raise_on_error()
 
     def SetCheckMatchingFabric(self, check: bool):
-        ''' Instructs the auto-commissioner to perform a matching fabric check before commissioning.'''
+        '''
+        Instructs the auto-commissioner to perform a matching fabric check before commissioning.
+
+        Raises: 
+            ChipStackError: On failure.
+        '''
         self.CheckIsActive()
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_SetCheckMatchingFabric(check)
