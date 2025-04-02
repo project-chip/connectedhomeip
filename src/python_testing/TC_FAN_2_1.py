@@ -57,12 +57,13 @@ class TC_FAN_2_1(MatterBaseTest):
 
     def steps_TC_FAN_2_1(self):
         return [TestStep(1, "[FC] Commissioning already done.", is_commissioning=True),
-                TestStep(2, "[FC] TH writes to the DUT the Auto (5) FanMode attribute value."),
-                TestStep(3, "[FC] TH reads from the DUT the FanMode attribute.",
+                TestStep(2, "[FC] TH checks for support of the Auto FanMode feature.",
+                         "If supported, perform the next step. If unsupported, skip the next step."),
+                TestStep(3, "[FC] TH reads from the DUT the FanModeSequence attribute.",
+                         "Verify that the DUT response contains an enum8 with value between 0 and 5 inclusive. Verify that the FanModeSequence attribute result contains one of the values that has the Auto FanMode option."),
+                TestStep(4, "[FC] TH writes to the DUT the Low (1) FanMode attribute value."),
+                TestStep(5, "[FC] TH reads from the DUT the FanMode attribute value.",
                          "Verify that the DUT response contains an enum8 with a value between 0 and 5, excluding 4."),
-                TestStep(4, "[FC] TH reads from the DUT the FanModeSequence attribute.",
-                         "Verify that the DUT response contains an enum8 with value between 0 and 5 inclusive. Verify that when FanMode is Auto (5), the FanModeSequence supports Auto mode."),
-                TestStep(5, "[FC] TH writes to the DUT the Low (1) FanMode attribute value."),
                 TestStep(6, "[FC] TH reads from the DUT the PercentSetting attribute.",
                          "Verify that the DUT response contains a uint8 with value between 0 and 100 inclusive."),
                 TestStep(7, "[FC] TH reads from the DUT the PercentCurrent attribute.",
@@ -98,18 +99,6 @@ class TC_FAN_2_1(MatterBaseTest):
 
         return value
 
-    async def verify_auto_conformance(self, fan_mode, fan_mode_sequence):
-        fm_enum = Clusters.FanControl.Enums.FanModeEnum
-        fms_enum = Clusters.FanControl.Enums.FanModeSequenceEnum
-
-        # FanModeSequence values that support Auto FanMode
-        fms_auto_values = [fms_enum.kOffLowMedHighAuto, fms_enum.kOffLowHighAuto, fms_enum.kOffHighAuto]
-
-        # If FanMode is Auto (5), verify FanModeSequence supports auto FanMode
-        if fan_mode == fm_enum.kAuto:
-            asserts.assert_in(fan_mode_sequence, fms_auto_values,
-                              f"[FC] FanModeSequence value ({fan_mode_sequence}:{fan_mode_sequence.name}) must support Auto FanMode")
-
     def pics_TC_FAN_2_1(self) -> list[str]:
         return ["FAN.S"]
 
@@ -119,41 +108,57 @@ class TC_FAN_2_1(MatterBaseTest):
         self.endpoint = self.get_endpoint(default=1)
         cluster = Clusters.FanControl
         attribute = cluster.Attributes
+        feature = cluster.Bitmaps.Feature
         fm_enum = cluster.Enums.FanModeEnum
         fms_enum = cluster.Enums.FanModeSequenceEnum
-        self.timeout_sec = 0.01  # Timeout given for item retreival from the attribute queue
 
         # *** STEP 1 ***
         # Commissioning already done
         self.step(1)
 
         # *** STEP 2 ***
-        # TH writes to the DUT the Auto (5) FanMode attribute value
+        # TH checks for support of the Auto FanMode feature
         self.step(2)
-        await self.write_setting(attribute.FanMode, fm_enum.kAuto)
+        feature_map = await self.read_setting(attribute.FeatureMap)
+        supports_auto_fan_mode = bool(feature_map & feature.kAuto)
 
-        # TH reads from the DUT the FanMode attribute
-        # Verify that the DUT response contains an enum8 with a value between 0 and 5, excluding 4
-        self.step(3)
-        fan_mode = await self.verify_setting(attribute.FanMode, fm_enum, [0, 1, 2, 3, 5])
+        if supports_auto_fan_mode:
+            # *** STEP 3 ***
+            # TH reads from the DUT the FanModeSequence attribute
+            # Verify that the DUT response contains an enum8 with value between 0 and 5 inclusive.
+            self.step(3)
+            fan_mode_sequence = await self.verify_setting(attribute.FanModeSequence, fms_enum, range(0, 6))
 
-        # TH reads from the DUT the FanModeSequence attribute
-        # Verify that the DUT response contains an enum8 with value between 0 and 5 inclusive.
-        self.step(4)
-        fan_mode_sequence = await self.verify_setting(attribute.FanModeSequence, fms_enum, range(0, 6))
+            # FanModeSequence values that support Auto FanMode
+            fan_mode_sequence_auto_values = [fms_enum.kOffLowMedHighAuto, fms_enum.kOffLowHighAuto, fms_enum.kOffHighAuto]
 
-        # Verify that when FanMode is Auto (5), the FanModeSequence supports Auto mode
-        await self.verify_auto_conformance(fan_mode, fan_mode_sequence)
+            # Verify that the FanModeSequence attribute result contains
+            # one of the values that has the Auto FanMode option
+            asserts.assert_in(fan_mode_sequence, fan_mode_sequence_auto_values,
+                                f"[FC] FanModeSequence ({fan_mode_sequence}:{fan_mode_sequence.name}) must contain the Auto FanMode option.")
+        else:
+            logging.info("[FC] Auto FanMode feature is unsupported, skipping FanModeSequence Auto conformance step.")
+            self.skip_step(3)
 
+        # *** STEP 4 ***
         # TH writes to the DUT the Low (1) FanMode attribute value
-        self.step(5)
+        self.step(4)
         await self.write_setting(attribute.FanMode, fm_enum.kLow)
+        
+        # *** STEP 5 ***
+        # TH reads from the DUT the FanMode attribute value
+        # Verify that the DUT response contains an enum8 with
+        # a value between 0 and 5, excluding 4
+        self.step(5)
+        await self.verify_setting(attribute.FanMode, fm_enum, [0, 1, 2, 3, 5])
 
+        # *** STEP 6 ***
         # TH reads from the DUT the PercentSetting attribute
         # Verify that the DUT response contains a uint8 with value between 0 and 100 inclusive.
         self.step(6)
         await self.verify_setting(attribute.PercentSetting, Uint8Type, range(0, 101))
 
+        # *** STEP 7 ***
         # TH reads from the DUT the PercentCurrent attribute
         # Verify that the DUT response contains a uint8 with value between 0 and 100 inclusive.
         self.step(7)
