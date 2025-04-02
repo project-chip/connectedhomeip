@@ -1904,3 +1904,4 @@ void CameraAVStreamMgmtServer::HandleCaptureSnapshot(HandlerContext & ctx,
  *
  */
 void MatterCameraAvStreamManagementPluginServerInitCallback() {}
+void MatterCameraAvStreamManagementPluginServerShutdownCallback() {}

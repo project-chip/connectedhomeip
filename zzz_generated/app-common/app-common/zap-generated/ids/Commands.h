@@ -1341,6 +1341,20 @@ static constexpr CommandId Id = 0x00000004;
 } // namespace Commands
 } // namespace ClosureControl
 
+namespace ClosureDimension {
+namespace Commands {
+
+namespace SetTarget {
+static constexpr CommandId Id = 0x00000000;
+} // namespace SetTarget
+
+namespace Step {
+static constexpr CommandId Id = 0x00000001;
+} // namespace Step
+
+} // namespace Commands
+} // namespace ClosureDimension
+
 namespace ServiceArea {
 namespace Commands {
 

@@ -18,6 +18,7 @@
 
 #pragma once
 #include <app/clusters/chime-server/chime-server.h>
+#include <app/clusters/webrtc-transport-provider-server/webrtc-transport-provider-server.h>
 
 // Camera Device Interface defines all the clusters that need to be implemented for a Camera Device
 class CameraDeviceInterface
@@ -27,4 +28,7 @@ public:
 
     // Getter for Chime Delegate
     virtual chip::app::Clusters::ChimeDelegate & GetChimeDelegate() = 0;
+
+    // Getter for WebRTCProvider Delegate
+    virtual chip::app::Clusters::WebRTCTransportProvider::Delegate & GetWebRTCProviderDelegate() = 0;
 };

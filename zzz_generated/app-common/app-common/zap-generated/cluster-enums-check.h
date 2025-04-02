@@ -2857,6 +2857,139 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ClosureControl::Trigger
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(ClosureDimension::ClosureUnitEnum val)
+{
+    using EnumType = ClosureDimension::ClosureUnitEnum;
+    switch (val)
+    {
+    case EnumType::kMillimeter:
+    case EnumType::kDegree:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(ClosureDimension::LatchingEnum val)
+{
+    using EnumType = ClosureDimension::LatchingEnum;
+    switch (val)
+    {
+    case EnumType::kLatchedAndSecured:
+    case EnumType::kLatchedButNotSecured:
+    case EnumType::kNotLatched:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(ClosureDimension::ModulationTypeEnum val)
+{
+    using EnumType = ClosureDimension::ModulationTypeEnum;
+    switch (val)
+    {
+    case EnumType::kSlatsOrientation:
+    case EnumType::kSlatsOpenwork:
+    case EnumType::kStripesAlignment:
+    case EnumType::kOpacity:
+    case EnumType::kVentilation:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(ClosureDimension::OverflowEnum val)
+{
+    using EnumType = ClosureDimension::OverflowEnum;
+    switch (val)
+    {
+    case EnumType::kNoOverflow:
+    case EnumType::kInside:
+    case EnumType::kOutside:
+    case EnumType::kTopInside:
+    case EnumType::kTopOutside:
+    case EnumType::kBottomInside:
+    case EnumType::kBottomOutside:
+    case EnumType::kLeftInside:
+    case EnumType::kLeftOutside:
+    case EnumType::kRightInside:
+    case EnumType::kRightOutside:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(ClosureDimension::RotationAxisEnum val)
+{
+    using EnumType = ClosureDimension::RotationAxisEnum;
+    switch (val)
+    {
+    case EnumType::kLeft:
+    case EnumType::kCenteredVertical:
+    case EnumType::kLeftAndRight:
+    case EnumType::kRight:
+    case EnumType::kTop:
+    case EnumType::kCenteredHorizontal:
+    case EnumType::kTopAndBottom:
+    case EnumType::kBottom:
+    case EnumType::kLeftBarrier:
+    case EnumType::kLeftAndRightBarriers:
+    case EnumType::kRightBarrier:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(ClosureDimension::StepDirectionEnum val)
+{
+    using EnumType = ClosureDimension::StepDirectionEnum;
+    switch (val)
+    {
+    case EnumType::kDecrease:
+    case EnumType::kIncrease:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(ClosureDimension::TargetLatchEnum val)
+{
+    using EnumType = ClosureDimension::TargetLatchEnum;
+    switch (val)
+    {
+    case EnumType::kLatch:
+    case EnumType::kUnlatch:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(ClosureDimension::TranslationDirectionEnum val)
+{
+    using EnumType = ClosureDimension::TranslationDirectionEnum;
+    switch (val)
+    {
+    case EnumType::kDownward:
+    case EnumType::kUpward:
+    case EnumType::kVerticalMask:
+    case EnumType::kVerticalSymmetry:
+    case EnumType::kLeftward:
+    case EnumType::kRightward:
+    case EnumType::kHorizontalMask:
+    case EnumType::kHorizontalSymmetry:
+    case EnumType::kForward:
+    case EnumType::kBackward:
+    case EnumType::kDepthMask:
+    case EnumType::kDepthSymmetry:
+    case EnumType::kCeilingSimple:
+    case EnumType::kCeilingMask:
+    case EnumType::kCeilingSidedSymmetry:
+    case EnumType::kCeilingCenteredSymmetry:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(ServiceArea::OperationalStatusEnum val)
 {
     using EnumType = ServiceArea::OperationalStatusEnum;

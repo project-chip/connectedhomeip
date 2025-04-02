@@ -253,3 +253,4 @@ Identify::~Identify()
 }
 
 void MatterIdentifyPluginServerInitCallback() {}
+void MatterIdentifyPluginServerShutdownCallback() {}
