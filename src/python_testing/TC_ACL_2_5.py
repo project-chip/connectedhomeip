@@ -122,12 +122,12 @@ class TC_ACL_2_5(MatterBaseTest):
         self.step(4)
         # Create an extension with a test string
         # Use a properly formatted byte string - not a string that looks like bytes
-        extension_data = bytes.fromhex('1718')
+        D_OK_EMPTY = bytes.fromhex('1718')
         extension = Clusters.AccessControl.Structs.AccessControlExtensionStruct(
-            data=extension_data)
+            data=D_OK_EMPTY)
 
         # Write the extension to the device - properly wrap the extensions list
-        self.print_step(f"Writing extension with data", extension_data.hex())
+        self.print_step(f"Writing extension with data", D_OK_EMPTY.hex())
         try:
             # Make sure we're creating the attribute value correctly
             extension_attr = Clusters.AccessControl.Attributes.Extension
@@ -136,7 +136,6 @@ class TC_ACL_2_5(MatterBaseTest):
             # Write the attribute
             result = await self.default_controller.WriteAttribute(
                 self.dut_node_id,
-                # Use named parameter 'value'
                 [(0, extension_attr(value=extensions_list))]
             )
             self.print_step(f"Write result", str(result))
@@ -158,7 +157,7 @@ class TC_ACL_2_5(MatterBaseTest):
 
         # Try multiple times with increasing timeouts
         max_attempts = 5
-        found_match = False  # Add flag to track if we found a match
+        found_match = False 
 
         for attempt in range(1, max_attempts + 1):
             try:
@@ -172,7 +171,7 @@ class TC_ACL_2_5(MatterBaseTest):
                 self.print_step(f"Events response", str(events_response))
 
                 # Extract events from the response
-                events = events_response  # Response is already a list of events
+                events = events_response  
                 self.print_step(f"Found {len(events)} events", "")
 
                 # Check if we got any events
@@ -235,15 +234,15 @@ class TC_ACL_2_5(MatterBaseTest):
         self.step(6)
         # Create a new extension with different data to replace the existing one
         # Use properly formatted binary data
-        new_extension_data = bytes.fromhex(
+        D_OK_SINGLE = bytes.fromhex(
             '17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018'
         )  # Create data that exceeds max length
         new_extension = Clusters.AccessControl.Structs.AccessControlExtensionStruct(
-            data=new_extension_data)
+            data=D_OK_SINGLE)
 
         # Write the new extension
         self.print_step(f"Writing new extension with data",
-                        new_extension_data.hex())
+                        D_OK_SINGLE.hex())
         try:
             # Create the Extension variable
             extension_attr = Clusters.AccessControl.Attributes.Extension
@@ -272,8 +271,7 @@ class TC_ACL_2_5(MatterBaseTest):
 
         # Try multiple attempts with increasing timeouts
         max_attempts = 5
-        found_remove = False
-        found_add = False
+        found_change = False
         found_event = False  # Flag to indicate if we found a relevant event
 
         for attempt in range(1, max_attempts + 1):
@@ -283,45 +281,33 @@ class TC_ACL_2_5(MatterBaseTest):
                 events_response = await self.default_controller.ReadEvent(
                     self.dut_node_id,
                     events=[(0, acec_event)],
-                    fabricFiltered=True
+                    fabricFiltered=True,
+                    eventNumberFilter=6
                 )
                 self.print_step(f"Events response", str(events_response))
 
                 # Extract events from the response
-                events = events_response  # Response is already a list of events
+                events = events_response  
                 self.print_step(f"Found {len(events)} events", "")
 
-                # We need to find both a remove event and an add event
+                # We need to find a change event
                 for event_data in events:
                     self.print_step(f"Examining event", str(event_data))
 
                     if hasattr(event_data, 'Data') and hasattr(event_data.Data, 'changeType'):
-                        # Check for remove event
-                        # Review: Does this event have to be of kRemoved, or can it be kChanged?
-                        # According to yaml this is what is expected
-                        if (event_data.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kRemoved or
-                            event_data.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged and
+                        # Check for changed event
+                        if (event_data.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged and
                             event_data.Data.adminNodeID == self.default_controller.nodeId and
                             isinstance(event_data.Data.adminPasscodeID, Nullable) and
-                            event_data.Data.latestValue.data == new_extension_data and
+                            event_data.Data.latestValue.data == D_OK_SINGLE and
                             event_data.Data.latestValue.fabricIndex == f1 and
-                                event_data.Data.fabricIndex == f1):
-                            found_remove = True
-                            self.print_step(f"Found Remove/Change event", "")
+                            event_data.Data.fabricIndex == f1):
+                            found_change = True
+                            self.print_step(f"Found Change event", "")
 
-                        # Check for add event with matching data
-                        elif (event_data.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded and
-                              event_data.Data.adminNodeID == self.default_controller.nodeId and
-                              isinstance(event_data.Data.adminPasscodeID, Nullable) and
-                              event_data.Data.latestValue.data == extension_data and
-                              event_data.Data.latestValue.fabricIndex == f1 and
-                              event_data.Data.fabricIndex == f1):
-                            found_add = True
-                            self.print_step(f"Found ADD event", "")
-
-                # If we found both events, we can proceed
-                if found_remove and found_add:
-                    self.print_step(f"Found both REMOVE and ADD events", "")
+                # If we found change event, we can proceed
+                if found_change:
+                    self.print_step(f"Found Change event", "")
                     break
 
                 # If not found, wait and try again
@@ -332,7 +318,7 @@ class TC_ACL_2_5(MatterBaseTest):
                     await asyncio.sleep(wait_time)
                 else:
                     self.print_step("ERROR: All attempts failed", "")
-                    asserts.fail("Did not find both REMOVE and ADD events")
+                    asserts.fail("Did not find Change event")
 
             except Exception as e:
                 self.print_step(
@@ -384,52 +370,19 @@ class TC_ACL_2_5(MatterBaseTest):
             events_response = await self.default_controller.ReadEvent(
                 self.dut_node_id,
                 events=[(0, acec_event)],
-                fabricFiltered=True
+                fabricFiltered=True,
+                eventNumberFilter=7
             )
             self.print_step(f"Events response", str(events_response))
 
             # Extract events from the response
             events = events_response  # Response is already a list of events
             self.print_step(f"Found {len(events)} events", "")
-
-            # Ensure no events have the too long data
-            for event_data in events:
-                self.print_step(f"Examining event", str(event_data))
-
-                if hasattr(event_data, 'Data') and hasattr(event_data.Data, 'changeType'):
-                    # Only check add events
-                    if event_data.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded:
-                        # Make sure it doesn't have the too long data
-                        latest_value = getattr(
-                            event_data.Data, 'latestValue', None)
-                        if latest_value and hasattr(latest_value, 'data'):
-                            # Convert to hex for better comparison if possible
-                            latest_data_hex = ""
-                            if hasattr(latest_value.data, 'hex'):
-                                latest_data_hex = latest_value.data.hex()
-                                self.print_step(
-                                    f"Checking latest data (hex)", latest_data_hex)
-                            else:
-                                self.print_step(
-                                    f"Checking latest data", str(latest_value.data))
-
-                            too_long_data_hex = ""
-                            if hasattr(too_long_data, 'hex'):
-                                too_long_data_hex = too_long_data.hex()
-                                self.print_step(
-                                    f"Doesn't match too long data (hex)", too_long_data_hex)
-                            else:
-                                self.print_step(
-                                    f"Doesn't match too long data", str(too_long_data))
-
-                            asserts.assert_not_equal(latest_value.data, too_long_data,
-                                                     "Should not have event for extension with too large data")
-
-            self.print_step(f"Verified: no events with too large data", "")
+            asserts.assert_equal(len(events), 0, "There should be no events found")
 
         except Exception as e:
             self.print_step(f"Error reading events", str(e))
-            # Continue test even if this read fails
+            asserts.fail("Should have been able to read events")
 
         self.step(10)
         # This should fail with CONSTRAINT_ERROR
@@ -465,34 +418,15 @@ class TC_ACL_2_5(MatterBaseTest):
             events_response = await self.default_controller.ReadEvent(
                 self.dut_node_id,
                 events=[(0, acec_event)],
-                fabricFiltered=True
+                fabricFiltered=True,
+                eventNumberFilter=7
             )
             self.print_step(f"Events response", str(events_response))
 
             # Extract events from the response
             events = events_response  # Response is already a list of events
             self.print_step(f"Found {len(events)} events", "")
-
-            found_valid_event = False
-
-            # Ensure that no events were generated at all
-            for event_data in events:
-                self.print_step(f"Examining event", str(event_data))
-
-                if hasattr(event_data, 'Data') and hasattr(event_data.Data, 'changeType'):
-                    # Check for add event with specific data
-                    if (event_data.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded and
-                        event_data.Data.adminNodeID == self.default_controller.nodeId and
-                        isinstance(event_data.Data.adminPasscodeID, Nullable) and
-                        event_data.Data.latestValue.data == extension_data and
-                        event_data.Data.latestValue.fabricIndex == f1 and
-                            event_data.Data.fabricIndex == f1):
-                        found_valid_event = True
-                        self.print_step(f"Found valid ADD event", "")
-
-            asserts.assert_true(
-                found_valid_event, "Found the expected ADD event with specified fields")
-            self.print_step(f"Verified: found valid ADD event", "")
+            asserts.assert_equal(len(events), 0, "There should be no events found")
 
         except Exception as e:
             self.print_step(f"Error reading events", str(e))
@@ -557,7 +491,7 @@ class TC_ACL_2_5(MatterBaseTest):
                         if (event_data.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kRemoved and
                             event_data.Data.adminNodeID == self.default_controller.nodeId and
                             isinstance(event_data.Data.adminPasscodeID, Nullable) and
-                            event_data.Data.latestValue.data == new_extension_data and
+                            event_data.Data.latestValue.data == D_OK_SINGLE and
                             event_data.Data.latestValue.fabricIndex == f1 and
                                 event_data.Data.fabricIndex == f1):
                             found_valid_event = True
