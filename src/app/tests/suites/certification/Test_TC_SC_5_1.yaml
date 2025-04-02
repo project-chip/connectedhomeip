@@ -147,14 +147,7 @@ tests:
       command: "writeAttribute"
       attribute: "GroupKeyMap"
       arguments:
-          value:
-              [
-                  {
-                      FabricIndex: 0,
-                      GroupId: 0x0103,
-                      GroupKeySetID: 0x01a3,
-                  },
-              ]
+          value: [{ FabricIndex: 0, GroupId: 0x0103, GroupKeySetID: 0x01a3 }]
 
     - label:
           "Step 4: TH sends RemoveAllGroups command to the DUT on
