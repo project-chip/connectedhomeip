@@ -20,8 +20,8 @@
  *   This file implements the handler for data model messages.
  */
 
-#include <AppConfig.h>
 #include "ClosureControlManager.h"
+#include <AppConfig.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
@@ -55,7 +55,8 @@ void MatterPostAttributeChangeCallback(const app::ConcreteAttributePath & attrib
 void MatterClosureControlClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath)
 {
     ChipLogProgress(Zcl, "Closure cluster ID: " ChipLogFormatMEI, ChipLogValueMEI(attributePath.mAttributeId));
-    if(attributePath.mClusterId == app::Clusters::ClosureControl::Id) {
+    if (attributePath.mClusterId == app::Clusters::ClosureControl::Id)
+    {
         ClosureCtrlMgr().ClosureControlAttributeChangeHandler(attributePath.mEndpointId, attributePath.mAttributeId);
     }
 }

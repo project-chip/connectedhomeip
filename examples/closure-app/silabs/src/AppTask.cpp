@@ -53,7 +53,7 @@
 
 namespace {
 
-constexpr chip::EndpointId kClosureEndpoint = 1;
+constexpr chip::EndpointId kClosureEndpoint       = 1;
 constexpr chip::EndpointId kClosurePanelEndpoint1 = 2;
 constexpr chip::EndpointId kClosurePanelEndpoint2 = 3;
 
@@ -74,7 +74,7 @@ namespace app {
 namespace Clusters {
 namespace ClosureControl {
 
-static chip::BitMask<Feature> sFeatureMap(Feature::kCalibration,Feature::kPositioning,Feature::kMotionLatching,Feature::kSpeed);
+static chip::BitMask<Feature> sFeatureMap(Feature::kCalibration, Feature::kPositioning, Feature::kMotionLatching, Feature::kSpeed);
 
 } // namespace ClosureControl
 } // namespace Clusters
@@ -87,7 +87,8 @@ void ApplicationInit()
 {
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     SILABS_LOG("==================================================");
-    SILABS_LOG("Closure-app ClosureControl starting for endpoint EP%d. featureMap 0x%08lx",kClosureEndpoint, ClosureControl::sFeatureMap.Raw());
+    SILABS_LOG("Closure-app ClosureControl starting for endpoint EP%d. featureMap 0x%08lx", kClosureEndpoint,
+               ClosureControl::sFeatureMap.Raw());
     ClosureControlInit(kClosureEndpoint);
     SILABS_LOG("==================================================");
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();

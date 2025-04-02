@@ -43,22 +43,25 @@ const ClosureErrorEnum kCurrentErrorList[] = {
 };
 
 std::unordered_map<TagPositionEnum, PositioningEnum> targetToStatePositionMap = {
-    {TagPositionEnum::kCloseInFull, PositioningEnum::kFullyClosed},
-    {TagPositionEnum::kOpenInFull, PositioningEnum::kFullyOpened},
-    {TagPositionEnum::kPedestrian, PositioningEnum::kOpenedForPedestrian},
-    {TagPositionEnum::kVentilation, PositioningEnum::kOpenedForVentilation},
-    {TagPositionEnum::kSignature, PositioningEnum::kOpenedAtSignature},
+    { TagPositionEnum::kCloseInFull, PositioningEnum::kFullyClosed },
+    { TagPositionEnum::kOpenInFull, PositioningEnum::kFullyOpened },
+    { TagPositionEnum::kPedestrian, PositioningEnum::kOpenedForPedestrian },
+    { TagPositionEnum::kVentilation, PositioningEnum::kOpenedForVentilation },
+    { TagPositionEnum::kSignature, PositioningEnum::kOpenedAtSignature },
 };
 
-PositioningEnum getStatePositionFromTarget(TagPositionEnum tagPosition) {
+PositioningEnum getStatePositionFromTarget(TagPositionEnum tagPosition)
+{
     auto it = targetToStatePositionMap.find(tagPosition);
-    if (it != targetToStatePositionMap.end()) {
+    if (it != targetToStatePositionMap.end())
+    {
         return it->second;
-    } else {
+    }
+    else
+    {
         return PositioningEnum::kUnknownEnumValue;
     }
 }
-
 
 void ClosureControlManager::SetClosureControlInstance(ClosureControl::Instance & instance)
 {
@@ -76,18 +79,18 @@ ClosureControlManager ClosureControlManager::sClosureCtrlMgr;
 // Return default value, will add timers and attribute handling in next phase
 DataModel::Nullable<uint32_t> ClosureControlManager::GetCountdownTime()
 {
-    //TODO: handle countdown timer
+    // TODO: handle countdown timer
     return DataModel::NullNullable;
 }
 
 // Return default value, will add attribute handling in next phase
 CHIP_ERROR ClosureControlManager::StartCurrentErrorListRead()
 {
-    //Notify device that errorlist is being read and data should locked
+    // Notify device that errorlist is being read and data should locked
     return CHIP_NO_ERROR;
 }
 
-//TODO: Return emualted error list, will add event handling along with Events
+// TODO: Return emualted error list, will add event handling along with Events
 CHIP_ERROR ClosureControlManager::GetCurrentErrorListAtIndex(size_t Index, ClosureErrorEnum & closureError)
 {
     if (Index >= MATTER_ARRAY_SIZE(kCurrentErrorList))
@@ -103,72 +106,83 @@ CHIP_ERROR ClosureControlManager::GetCurrentErrorListAtIndex(size_t Index, Closu
 // Return default value, will add attribute handling in next phase
 CHIP_ERROR ClosureControlManager::EndCurrentErrorListRead()
 {
-    //Notify device that errorlist is being read completed and lock on data is removed
+    // Notify device that errorlist is being read completed and lock on data is removed
     return CHIP_NO_ERROR;
 }
 
 // Return default success, will add command handling in next phase
 Protocols::InteractionModel::Status ClosureControlManager::Stop()
 {
-    //TODO: device should stop the action
+    // TODO: device should stop the action
     return Status::Success;
-
 }
 
 // Return default success, will add command handling in next phase
 Protocols::InteractionModel::Status ClosureControlManager::MoveTo(const Optional<TagPositionEnum> & tag,
-                                                                   const Optional<TagLatchEnum> & latch,
-                                                                   const Optional<Globals::ThreeLevelAutoEnum> & speed)
+                                                                  const Optional<TagLatchEnum> & latch,
+                                                                  const Optional<Globals::ThreeLevelAutoEnum> & speed)
 {
-    MainStateEnum state = mpClosureControlInstance->GetMainState();
+    MainStateEnum state              = mpClosureControlInstance->GetMainState();
     GenericOverallState overallState = mpClosureControlInstance->GetOverallState();
 
-    if(tag.HasValue()) {
-        VerifyOrReturnValue(Clusters::EnsureKnownEnumValue(tag.Value()) != TagPositionEnum::kUnknownEnumValue,Status::ConstraintError);
-        VerifyOrReturnValue(mpClosureControlInstance->HasFeature(Feature::kPositioning),Status::Success);
+    if (tag.HasValue())
+    {
+        VerifyOrReturnValue(Clusters::EnsureKnownEnumValue(tag.Value()) != TagPositionEnum::kUnknownEnumValue,
+                            Status::ConstraintError);
+        VerifyOrReturnValue(mpClosureControlInstance->HasFeature(Feature::kPositioning), Status::Success);
         ChipLogDetail(DataManagement, "ClosureControlManager::positioning");
 
-        //TODO: CheckErrorondevice() -> if device error state move state to error and give failure
-        //TODO: IsDeviceReadytoMove()
+        // TODO: CheckErrorondevice() -> if device error state move state to error and give failure
+        // TODO: IsDeviceReadytoMove()
 
-        if ((state == MainStateEnum::kStopped) || (state == MainStateEnum::kError)) {
-            //TODO: set target for motion
+        if ((state == MainStateEnum::kStopped) || (state == MainStateEnum::kError))
+        {
+            // TODO: set target for motion
         }
 
-        if ((state == MainStateEnum::kWaitingForMotion) || (state == MainStateEnum::kMoving) )
+        if ((state == MainStateEnum::kWaitingForMotion) || (state == MainStateEnum::kMoving))
         {
-            //TODO: change target for motion
+            // TODO: change target for motion
         }
 
         overallState.positioning.SetValue(getStatePositionFromTarget(tag.Value()));
     }
 
-    if(latch.HasValue()){
-        VerifyOrReturnValue(Clusters::EnsureKnownEnumValue(latch.Value()) == TagLatchEnum::kUnknownEnumValue,Status::ConstraintError);
-        VerifyOrReturnValue(mpClosureControlInstance->HasFeature(Feature::kMotionLatching),Status::Success);
+    if (latch.HasValue())
+    {
+        VerifyOrReturnValue(Clusters::EnsureKnownEnumValue(latch.Value()) == TagLatchEnum::kUnknownEnumValue,
+                            Status::ConstraintError);
+        VerifyOrReturnValue(mpClosureControlInstance->HasFeature(Feature::kMotionLatching), Status::Success);
         ChipLogDetail(DataManagement, "ClosureControlManager::latch");
-        VerifyOrReturnValue(IsManualLatch(),Status::InvalidAction);
+        VerifyOrReturnValue(IsManualLatch(), Status::InvalidAction);
 
-        //TODO: device to perform latch operation
+        // TODO: device to perform latch operation
 
-        if(latch.Value() == TagLatchEnum::kLatch){
+        if (latch.Value() == TagLatchEnum::kLatch)
+        {
             overallState.latching.SetValue(LatchingEnum::kLatchedAndSecured);
         }
-        if(latch.Value() == TagLatchEnum::kUnlatch){
+        if (latch.Value() == TagLatchEnum::kUnlatch)
+        {
             overallState.latching.SetValue(LatchingEnum::kNotLatched);
         }
     }
 
-    if(speed.HasValue()){
-        VerifyOrReturnValue(Clusters::EnsureKnownEnumValue(speed.Value()) == Globals::ThreeLevelAutoEnum::kUnknownEnumValue,Status::ConstraintError);
-        VerifyOrReturnValue(mpClosureControlInstance->HasFeature(Feature::kSpeed),Status::Success);
+    if (speed.HasValue())
+    {
+        VerifyOrReturnValue(Clusters::EnsureKnownEnumValue(speed.Value()) == Globals::ThreeLevelAutoEnum::kUnknownEnumValue,
+                            Status::ConstraintError);
+        VerifyOrReturnValue(mpClosureControlInstance->HasFeature(Feature::kSpeed), Status::Success);
         ChipLogDetail(DataManagement, "ClosureControlManager::speed");
-        if(!(latch.HasValue() || tag.HasValue())) {
-            if ((state == MainStateEnum::kMoving) || (state == MainStateEnum::kWaitingForMotion) )
+        if (!(latch.HasValue() || tag.HasValue()))
+        {
+            if ((state == MainStateEnum::kMoving) || (state == MainStateEnum::kWaitingForMotion))
             {
                 overallState.speed = speed;
-                //TODO: device to change speed
-            } else {
+                // TODO: device to change speed
+            }
+            else
+            {
                 overallState.speed.SetValue(Globals::ThreeLevelAutoEnum::kAuto);
             }
         }
@@ -176,12 +190,15 @@ Protocols::InteractionModel::Status ClosureControlManager::MoveTo(const Optional
 
     mpClosureControlInstance->SetOverallState(overallState);
 
-    if(IsDeviceReadytoMove()) {
+    if (IsDeviceReadytoMove())
+    {
         mpClosureControlInstance->SetMainState(MainStateEnum::kMoving);
-        //TODO: move the device
-    } else {
+        // TODO: move the device
+    }
+    else
+    {
         mpClosureControlInstance->SetMainState(MainStateEnum::kWaitingForMotion);
-        //TODO: device to wait for ready to move and the move the device.
+        // TODO: device to wait for ready to move and the move the device.
     }
 
     return Status::Success;
@@ -190,39 +207,42 @@ Protocols::InteractionModel::Status ClosureControlManager::MoveTo(const Optional
 // Return default success, will add command handling in next phase
 Protocols::InteractionModel::Status ClosureControlManager::Calibrate()
 {
-    //TODO: Calibrate Device
+    // TODO: Calibrate Device
     return Status::Success;
 }
 
-void ClosureControlManager::ClosureControlAttributeChangeHandler(EndpointId endpointId, AttributeId attributeId) {
+void ClosureControlManager::ClosureControlAttributeChangeHandler(EndpointId endpointId, AttributeId attributeId)
+{
     switch (attributeId)
     {
     case Attributes::CountdownTime::Id:
-        //Display CountdownTime in UI
+        // Display CountdownTime in UI
         break;
     case Attributes::MainState::Id:
-        //Display Mainstate in UI
+        // Display Mainstate in UI
         break;
     case Attributes::CurrentErrorList::Id:
-        //Display ErrorList in UI
+        // Display ErrorList in UI
         break;
     case Attributes::OverallState::Id:
-        //Display Overallstate in UI
+        // Display Overallstate in UI
         break;
     case Attributes::OverallTarget::Id:
-        //Display TargetState in UI
+        // Display TargetState in UI
         break;
     default:
         return;
     }
 }
 
-bool ClosureControlManager::IsManualLatch(){
-    //TODO: Check the latch is manual or not on device
+bool ClosureControlManager::IsManualLatch()
+{
+    // TODO: Check the latch is manual or not on device
     return false;
 }
 
-bool ClosureControlManager::IsDeviceReadytoMove(){
-    //TODO: Check if device is ready to move or should wait.
+bool ClosureControlManager::IsDeviceReadytoMove()
+{
+    // TODO: Check if device is ready to move or should wait.
     return true;
 }

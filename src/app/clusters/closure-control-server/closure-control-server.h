@@ -221,8 +221,10 @@ private:
     void InvokeCommand(HandlerContext & handlerContext) override;
 
     chip::Protocols::InteractionModel::Status HandleStop(HandlerContext & ctx, const Commands::Stop::DecodableType & commandData);
-    chip::Protocols::InteractionModel::Status HandleMoveTo(HandlerContext & ctx, const Commands::MoveTo::DecodableType & commandData);
-    chip::Protocols::InteractionModel::Status HandleCalibrate(HandlerContext & ctx, const Commands::Calibrate::DecodableType & commandData);
+    chip::Protocols::InteractionModel::Status HandleMoveTo(HandlerContext & ctx,
+                                                           const Commands::MoveTo::DecodableType & commandData);
+    chip::Protocols::InteractionModel::Status HandleCalibrate(HandlerContext & ctx,
+                                                              const Commands::Calibrate::DecodableType & commandData);
 };
 
 } // namespace ClosureControl

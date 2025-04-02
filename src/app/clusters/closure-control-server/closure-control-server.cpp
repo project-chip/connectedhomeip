@@ -88,15 +88,18 @@ bool Instance::CheckCommandStateCompatiblilty(CommandId cmd, MainStateEnum state
     switch (cmd)
     {
     case Commands::Stop::Id:
-        VerifyOrReturnValue(state == MainStateEnum::kError,true);
+        VerifyOrReturnValue(state == MainStateEnum::kError, true);
         break;
     case Commands::MoveTo::Id:
-        VerifyOrReturnValue(state == MainStateEnum::kCalibrating,true);
+        VerifyOrReturnValue(state == MainStateEnum::kCalibrating, true);
         break;
     case Commands::Calibrate::Id:
-        if ((state == MainStateEnum::kMoving) || (state == MainStateEnum::kWaitingForMotion)) {
+        if ((state == MainStateEnum::kMoving) || (state == MainStateEnum::kWaitingForMotion))
+        {
             return false;
-        } else {
+        }
+        else
+        {
             return true;
         }
         break;
@@ -108,7 +111,8 @@ bool Instance::CheckCommandStateCompatiblilty(CommandId cmd, MainStateEnum state
 
 void Instance::ReportCurrentErrorListChange()
 {
-    MatterReportingAttributeChangeCallback(ConcreteAttributePath(mDelegate.GetEndpointId(), ClosureControl::Id, Attributes::CurrentErrorList::Id));
+    MatterReportingAttributeChangeCallback(
+        ConcreteAttributePath(mDelegate.GetEndpointId(), ClosureControl::Id, Attributes::CurrentErrorList::Id));
 }
 
 CHIP_ERROR Instance::SetMainState(MainStateEnum aMainState)
@@ -285,19 +289,22 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
     case Stop::Id:
         if (!HasFeature(Feature::kInstantaneous))
         {
-            HandleCommand<Stop::DecodableType>(
-                handlerContext, [this, &status](HandlerContext & ctx, const auto & commandData) { status = HandleStop(ctx, commandData); });
+            HandleCommand<Stop::DecodableType>(handlerContext, [this, &status](HandlerContext & ctx, const auto & commandData) {
+                status = HandleStop(ctx, commandData);
+            });
         }
         break;
     case MoveTo::Id:
-        HandleCommand<MoveTo::DecodableType>(
-            handlerContext, [this, &status](HandlerContext & ctx, const auto & commandData) { status = HandleMoveTo(ctx, commandData); });
+        HandleCommand<MoveTo::DecodableType>(handlerContext, [this, &status](HandlerContext & ctx, const auto & commandData) {
+            status = HandleMoveTo(ctx, commandData);
+        });
         break;
     case Calibrate::Id:
         if (HasFeature(Feature::kCalibration))
         {
             HandleCommand<Calibrate::DecodableType>(
-                handlerContext, [this, &status](HandlerContext & ctx, const auto & commandData) { status = HandleCalibrate(ctx, commandData); });
+                handlerContext,
+                [this, &status](HandlerContext & ctx, const auto & commandData) { status = HandleCalibrate(ctx, commandData); });
         }
         break;
     }
@@ -311,7 +318,7 @@ Status Instance::HandleStop(HandlerContext & ctx, const Commands::Stop::Decodabl
 
     Status status = Status::Failure;
 
-    VerifyOrReturnValue(CheckCommandStateCompatiblilty(Commands::Stop::Id,state), Status::InvalidInState);
+    VerifyOrReturnValue(CheckCommandStateCompatiblilty(Commands::Stop::Id, state), Status::InvalidInState);
     if (state == MainStateEnum::kStopped)
     {
         return Status::Success;
@@ -329,15 +336,15 @@ Status Instance::HandleStop(HandlerContext & ctx, const Commands::Stop::Decodabl
 Status Instance::HandleMoveTo(HandlerContext & ctx, const Commands::MoveTo::DecodableType & commandData)
 {
     MainStateEnum state = GetMainState();
-    VerifyOrReturnValue(CheckCommandStateCompatiblilty(Commands::Stop::Id,state), Status::InvalidInState);
+    VerifyOrReturnValue(CheckCommandStateCompatiblilty(Commands::Stop::Id, state), Status::InvalidInState);
     return mDelegate.MoveTo(commandData.tag, commandData.latch, commandData.speed);
 }
 
 Status Instance::HandleCalibrate(HandlerContext & ctx, const Commands::Calibrate::DecodableType & commandData)
 {
     MainStateEnum state = GetMainState();
-    Status status = Status::Failure;
-    VerifyOrReturnValue(CheckCommandStateCompatiblilty(Commands::Calibrate::Id,state), Status::InvalidInState);
+    Status status       = Status::Failure;
+    VerifyOrReturnValue(CheckCommandStateCompatiblilty(Commands::Calibrate::Id, state), Status::InvalidInState);
 
     if (state == MainStateEnum::kCalibrating)
     {
