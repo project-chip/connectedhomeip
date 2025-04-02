@@ -406,7 +406,7 @@ cluster Descriptor = 29 {
     kTagList = 0x1;
   }
 
-  struct DeviceTypeStruct {
+  shared struct DeviceTypeStruct {
     devtype_id deviceType = 0;
     int16u revision = 1;
   }
@@ -1576,7 +1576,7 @@ labels. */
 cluster FixedLabel = 64 {
   revision 1; // NOTE: Default/not specifically set
 
-  struct LabelStruct {
+  shared struct LabelStruct {
     char_string<16> label = 0;
     char_string<16> value = 1;
   }
@@ -1594,18 +1594,18 @@ cluster FixedLabel = 64 {
 cluster HepaFilterMonitoring = 113 {
   revision 1; // NOTE: Default/not specifically set
 
-  enum ChangeIndicationEnum : enum8 {
+  shared enum ChangeIndicationEnum : enum8 {
     kOK = 0;
     kWarning = 1;
     kCritical = 2;
   }
 
-  enum DegradationDirectionEnum : enum8 {
+  shared enum DegradationDirectionEnum : enum8 {
     kUp = 0;
     kDown = 1;
   }
 
-  enum ProductIdentifierTypeEnum : enum8 {
+  shared enum ProductIdentifierTypeEnum : enum8 {
     kUPC = 0;
     kGTIN8 = 1;
     kEAN = 2;
@@ -1645,18 +1645,18 @@ cluster HepaFilterMonitoring = 113 {
 cluster ActivatedCarbonFilterMonitoring = 114 {
   revision 1; // NOTE: Default/not specifically set
 
-  enum ChangeIndicationEnum : enum8 {
+  shared enum ChangeIndicationEnum : enum8 {
     kOK = 0;
     kWarning = 1;
     kCritical = 2;
   }
 
-  enum DegradationDirectionEnum : enum8 {
+  shared enum DegradationDirectionEnum : enum8 {
     kUp = 0;
     kDown = 1;
   }
 
-  enum ProductIdentifierTypeEnum : enum8 {
+  shared enum ProductIdentifierTypeEnum : enum8 {
     kUPC = 0;
     kGTIN8 = 1;
     kEAN = 2;
