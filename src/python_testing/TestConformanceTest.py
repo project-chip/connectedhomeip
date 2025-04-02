@@ -15,12 +15,10 @@
 #    limitations under the License.
 #
 
-from typing import Any, Optional
+from typing import Any
 
 import chip.clusters as Clusters
 from chip.testing.basic_composition import arls_populated
-from chip.testing.conformance import ConformanceDecision
-from chip.testing.global_attribute_ids import GlobalAttributeIds
 from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 from chip.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, build_xml_device_types
 from fake_device_builder import create_minimal_dt
