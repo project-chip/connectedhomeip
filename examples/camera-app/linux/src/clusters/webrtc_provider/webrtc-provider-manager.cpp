@@ -199,7 +199,6 @@ CHIP_ERROR WebRTCProviderManager::HandleEndSession(uint16_t sessionId, WebRTCEnd
     {
         mCurrentSessionId      = 0;
         mOriginatingEndpointId = 0;
-        mOriginatingEndpointId = 0;
         mPeerId                = ScopedNodeId();
         mSdpAnswer.clear();
     }
@@ -219,21 +218,54 @@ WebRTCProviderManager::ValidateStreamUsage(StreamUsageEnum streamUsage,
 void WebRTCProviderManager::ScheduleAnswerSend()
 {
     DeviceLayer::SystemLayer().ScheduleLambda([this]() {
-        CHIP_ERROR err = SendAnswerCommand(mCurrentSessionId, mSdpAnswer, mPeerId, mOriginatingEndpointId);
+        ChipLogProgress(NotSpecified, "Sending Answer command to node " ChipLogFormatX64, ChipLogValueX64(mPeerId.GetNodeId()));
 
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(NotSpecified, "Answer failed: %" CHIP_ERROR_FORMAT, err.Format());
-        }
+        mCommandType = CommandType::kAnswer;
 
-        mOriginatingEndpointId = 0;
-        mOriginatingEndpointId = 0;
-        mPeerId                = ScopedNodeId();
+        // Attempt to find or establish a CASE session to the target PeerId.
+        CASESessionManager * caseSessionMgr = Server::GetInstance().GetCASESessionManager();
+        VerifyOrReturn(caseSessionMgr != nullptr);
+
+        caseSessionMgr->FindOrEstablishSession(mPeerId, &mOnConnectedCallback, &mOnConnectionFailureCallback);
     });
 }
 
-CHIP_ERROR WebRTCProviderManager::SendAnswerCommand(uint16_t sessionId, const std::string & sdpAnswer, const ScopedNodeId & peerId,
-                                                    EndpointId originatingEndpointId)
+void WebRTCProviderManager::OnDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr,
+                                              const SessionHandle & sessionHandle)
+{
+    WebRTCProviderManager * self = reinterpret_cast<WebRTCProviderManager *>(context);
+    VerifyOrReturn(self != nullptr, ChipLogError(NotSpecified, "OnDeviceConnected:: context is null"));
+
+    ChipLogProgress(NotSpecified, "CASE session established, sending command with Command Type: %d...",
+                    static_cast<int>(self->mCommandType));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    switch (self->mCommandType)
+    {
+    case CommandType::kAnswer:
+        err = self->SendAnswerCommand(exchangeMgr, sessionHandle);
+        break;
+
+    default:
+        err = CHIP_ERROR_INVALID_ARGUMENT;
+        break;
+    }
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "OnDeviceConnected::SendCommand failed: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+}
+
+void WebRTCProviderManager::OnDeviceConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR err)
+{
+    LogErrorOnFailure(err);
+    WebRTCProviderManager * self = reinterpret_cast<WebRTCProviderManager *>(context);
+    VerifyOrReturn(self != nullptr, ChipLogError(NotSpecified, "OnDeviceConnectionFailure: context is null"));
+}
+
+CHIP_ERROR WebRTCProviderManager::SendAnswerCommand(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
 {
     auto onSuccess = [](const ConcreteCommandPath & commandPath, const StatusIB & status, const auto & dataResponse) {
         ChipLogProgress(NotSpecified, "Answer command succeeds");
@@ -243,21 +275,11 @@ CHIP_ERROR WebRTCProviderManager::SendAnswerCommand(uint16_t sessionId, const st
         ChipLogError(NotSpecified, "Answer command failed: %" CHIP_ERROR_FORMAT, error.Format());
     };
 
-    // TODO:#38183 Use CASESessionManager instead of sessionHandle to send Answer Command
-    Messaging::ExchangeManager & exchangeMgr = Server::GetInstance().GetExchangeManager();
-    auto sessionHandle                       = exchangeMgr.GetSessionManager()->FindSecureSessionForNode(peerId);
-    if (!sessionHandle.HasValue())
-    {
-        ChipLogError(NotSpecified, "No secure session found for PeerId, cannot send Answer");
-        return CHIP_ERROR_NOT_CONNECTED;
-    }
-
     // Build the command
     WebRTCTransportRequestor::Commands::Answer::Type command;
-    command.webRTCSessionID = sessionId;
-    command.sdp             = CharSpan::fromCharString(sdpAnswer.c_str());
+    command.webRTCSessionID = mCurrentSessionId;
+    command.sdp             = CharSpan::fromCharString(mSdpAnswer.c_str());
 
     // Now invoke the command using the found session handle
-    return Controller::InvokeCommandRequest(&exchangeMgr, sessionHandle.Value(), originatingEndpointId, command, onSuccess,
-                                            onFailure);
+    return Controller::InvokeCommandRequest(&exchangeMgr, sessionHandle, mOriginatingEndpointId, command, onSuccess, onFailure);
 }
