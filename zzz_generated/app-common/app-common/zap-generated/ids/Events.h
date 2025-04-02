@@ -40,6 +40,7 @@
 #include <clusters/Channel/EventIds.h>
 #include <clusters/Chime/EventIds.h>
 #include <clusters/ClosureControl/EventIds.h>
+#include <clusters/ClosureDimension/EventIds.h>
 #include <clusters/ColorControl/EventIds.h>
 #include <clusters/CommissionerControl/EventIds.h>
 #include <clusters/ContentAppObserver/EventIds.h>

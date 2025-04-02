@@ -26,6 +26,7 @@ chip_all_cluster_id_targets = [
   "${chip_root}/zzz_generated/app-common/clusters/Channel:ids",
   "${chip_root}/zzz_generated/app-common/clusters/Chime:ids",
   "${chip_root}/zzz_generated/app-common/clusters/ClosureControl:ids",
+  "${chip_root}/zzz_generated/app-common/clusters/ClosureDimension:ids",
   "${chip_root}/zzz_generated/app-common/clusters/ColorControl:ids",
   "${chip_root}/zzz_generated/app-common/clusters/CommissionerControl:ids",
   "${chip_root}/zzz_generated/app-common/clusters/ContentAppObserver:ids",

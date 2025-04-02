@@ -149,6 +149,10 @@ static_library("Linux") {
   if (chip_enable_ble) {
     public_deps += [ "dbus/bluez" ]
   }
+
+  if (chip_device_config_enable_wifipaf) {
+    public_deps += [ "${chip_root}/src/wifipaf" ]
+  }
 }
 
 source_set("logging") {

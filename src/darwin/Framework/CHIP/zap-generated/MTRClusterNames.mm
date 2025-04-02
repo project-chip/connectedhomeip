@@ -252,6 +252,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeClosureControlID:
         result = @"ClosureControl";
         break;
+    case MTRClusterIDTypeClosureDimensionID:
+        result = @"ClosureDimension";
+        break;
     case MTRClusterIDTypeServiceAreaID:
         result = @"ServiceArea";
         break;
@@ -4984,6 +4987,81 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             break;
 
         case MTRAttributeIDTypeClusterClosureControlAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeClosureDimensionID:
+
+        switch (attributeID) {
+
+            // Cluster ClosureDimension attributes
+        case MTRAttributeIDTypeClusterClosureDimensionAttributeCurrentID:
+            result = @"Current";
+            break;
+
+        case MTRAttributeIDTypeClusterClosureDimensionAttributeTargetID:
+            result = @"Target";
+            break;
+
+        case MTRAttributeIDTypeClusterClosureDimensionAttributeResolutionID:
+            result = @"Resolution";
+            break;
+
+        case MTRAttributeIDTypeClusterClosureDimensionAttributeStepValueID:
+            result = @"StepValue";
+            break;
+
+        case MTRAttributeIDTypeClusterClosureDimensionAttributeUnitID:
+            result = @"Unit";
+            break;
+
+        case MTRAttributeIDTypeClusterClosureDimensionAttributeUnitRangeID:
+            result = @"UnitRange";
+            break;
+
+        case MTRAttributeIDTypeClusterClosureDimensionAttributeLimitRangeID:
+            result = @"LimitRange";
+            break;
+
+        case MTRAttributeIDTypeClusterClosureDimensionAttributeTranslationDirectionID:
+            result = @"TranslationDirection";
+            break;
+
+        case MTRAttributeIDTypeClusterClosureDimensionAttributeRotationAxisID:
+            result = @"RotationAxis";
+            break;
+
+        case MTRAttributeIDTypeClusterClosureDimensionAttributeOverflowID:
+            result = @"Overflow";
+            break;
+
+        case MTRAttributeIDTypeClusterClosureDimensionAttributeModulationTypeID:
+            result = @"ModulationType";
+            break;
+
+        case MTRAttributeIDTypeClusterClosureDimensionAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterClosureDimensionAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterClosureDimensionAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterClosureDimensionAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterClosureDimensionAttributeClusterRevisionID:
             result = @"ClusterRevision";
             break;
 
@@ -10278,6 +10356,24 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
         }
         break;
 
+    case MTRClusterIDTypeClosureDimensionID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterClosureDimensionCommandSetTargetID:
+            result = @"SetTarget";
+            break;
+
+        case MTRCommandIDTypeClusterClosureDimensionCommandStepID:
+            result = @"Step";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeServiceAreaID:
 
         switch (commandID) {
@@ -12448,6 +12544,16 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
         }
         break;
 
+    case MTRClusterIDTypeClosureDimensionID:
+
+        switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeServiceAreaID:
 
         switch (commandID) {
@@ -14336,6 +14442,16 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
         break;
 
     case MTRClusterIDTypeClosureControlID:
+
+        switch (eventID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeClosureDimensionID:
 
         switch (eventID) {
 

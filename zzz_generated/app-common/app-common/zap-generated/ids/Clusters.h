@@ -40,6 +40,7 @@
 #include <clusters/Channel/ClusterId.h>
 #include <clusters/Chime/ClusterId.h>
 #include <clusters/ClosureControl/ClusterId.h>
+#include <clusters/ClosureDimension/ClusterId.h>
 #include <clusters/ColorControl/ClusterId.h>
 #include <clusters/CommissionerControl/ClusterId.h>
 #include <clusters/ContentAppObserver/ClusterId.h>

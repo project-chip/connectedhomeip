@@ -40,6 +40,7 @@
 #include <clusters/Channel/AttributeIds.h>
 #include <clusters/Chime/AttributeIds.h>
 #include <clusters/ClosureControl/AttributeIds.h>
+#include <clusters/ClosureDimension/AttributeIds.h>
 #include <clusters/ColorControl/AttributeIds.h>
 #include <clusters/CommissionerControl/AttributeIds.h>
 #include <clusters/ContentAppObserver/AttributeIds.h>

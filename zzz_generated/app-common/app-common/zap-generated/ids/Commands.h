@@ -40,6 +40,7 @@
 #include <clusters/Channel/CommandIds.h>
 #include <clusters/Chime/CommandIds.h>
 #include <clusters/ClosureControl/CommandIds.h>
+#include <clusters/ClosureDimension/CommandIds.h>
 #include <clusters/ColorControl/CommandIds.h>
 #include <clusters/CommissionerControl/CommandIds.h>
 #include <clusters/ContentAppObserver/CommandIds.h>
