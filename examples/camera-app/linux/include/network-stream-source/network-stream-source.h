@@ -1,4 +1,5 @@
 /*
+ *
  *    Copyright (c) 2025 Project CHIP Authors
  *    All rights reserved.
  *
@@ -15,32 +16,29 @@
  *    limitations under the License.
  */
 
-#include "camera-app.h"
-#include "camera-device.h"
-#include <AppMain.h>
-#include <platform/CHIPDeviceConfig.h>
+#pragma once
 
-using namespace chip;
-using namespace chip::app;
-using namespace chip::app::Clusters;
-using namespace Camera;
+#include <cstdint>
+#include <media-controller.h>
+#include <thread>
 
-void ApplicationInit()
+// Network Stream Source
+class NetworkStreamSource
 {
-    ChipLogProgress(Zcl, "Matter Camera Linux App: ApplicationInit()");
-    CameraAppInit(&Camera::CameraDevice::GetInstance());
-}
+public:
+    NetworkStreamSource() {}
+    virtual ~NetworkStreamSource() {}
+    void Init(MediaController * aMediaController, uint16_t aSrcPort);
+    void Start(uint16_t streamId);
+    void Stop();
 
-void ApplicationShutdown()
-{
-    CameraAppShutdown();
-}
+private:
+    void ListenForStreamOnSocket();
 
-int main(int argc, char * argv[])
-{
-    VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
+    MediaController * mMediaController = nullptr;
+    uint16_t mSrcPort;
+    uint16_t mStreamId;
+    bool mStreamSourceActive = false;
 
-    ChipLinuxAppMainLoop();
-
-    return 0;
-}
+    std::vector<std::thread> streamThreads;
+};
