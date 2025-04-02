@@ -11215,7 +11215,7 @@ provisional cluster MeterIdentification = 2822 {
 cluster CommodityMetering = 2823 {
   revision 1;
 
-  enum MeasurementTypeEnum : enum16 {
+  shared enum MeasurementTypeEnum : enum16 {
     kUnspecified = 0;
     kVoltage = 1;
     kActiveCurrent = 2;
