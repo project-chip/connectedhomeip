@@ -27,7 +27,7 @@ namespace chip {
 namespace Tracing {
 namespace Diagnostics {
 
-namespace Utils {
+namespace {
 // Implements a murmurhash with 0 seed.
 uint32_t MurmurHash(const void * key)
 {
@@ -57,11 +57,10 @@ uint32_t MurmurHash(const void * key)
 
     return hash;
 }
-} // namespace Utils
+} // anonymous namespace
 
 constexpr size_t kPermitListMaxSize = CONFIG_MAX_PERMIT_LIST_SIZE;
 using HashValue                     = uint32_t;
-using namespace Utils;
 
 /*
  * gPermitList will allow the following traces to be stored in the storage instance while other traces are skipped.

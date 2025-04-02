@@ -79,7 +79,7 @@ size_t LogProvider::GetSizeForIntent(IntentEnum intent)
 {
     switch (intent)
     {
-    case IntentEnum::kEndUserSupport: {
+    case IntentEnum::kEndUserSupport:
 #ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
         VerifyOrReturnError(mStorageInstance != nullptr, 0,
                             ChipLogError(DeviceLayer, "Diagnostic Storage instance cannot be null."));
@@ -87,8 +87,6 @@ size_t LogProvider::GetSizeForIntent(IntentEnum intent)
 #else
         return static_cast<size_t>(endUserSupportLogEnd - endUserSupportLogStart);
 #endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
-    }
-    break;
     case IntentEnum::kNetworkDiag:
         return static_cast<size_t>(networkDiagnosticLogEnd - networkDiagnosticLogStart);
     case IntentEnum::kCrashLogs:

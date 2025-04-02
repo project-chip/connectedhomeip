@@ -50,7 +50,12 @@ public:
 
 private:
     ESPDiagnosticCounter() {}
-    static std::map<const char *, uint32_t> mCounterList;
+    // Custom comparator for the map to store the label count
+    struct StringCompare
+    {
+        bool operator()(const char * a, const char * b) const { return strcmp(a, b) < 0; }
+    };
+    static std::map<const char *, uint32_t, StringCompare> mCounterList;
     static void IncreaseCount(const char * label);
 };
 

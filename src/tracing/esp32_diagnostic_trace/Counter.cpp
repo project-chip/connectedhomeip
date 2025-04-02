@@ -23,23 +23,17 @@ namespace chip {
 namespace Tracing {
 namespace Diagnostics {
 
-std::map<const char *, uint32_t> ESPDiagnosticCounter::mCounterList;
+std::map<const char *, uint32_t, ESPDiagnosticCounter::StringCompare> ESPDiagnosticCounter::mCounterList;
 
 void ESPDiagnosticCounter::IncreaseCount(const char * label)
 {
-    if (mCounterList.find(label) != mCounterList.end())
-    {
-        mCounterList[label]++;
-    }
-    else
-    {
-        mCounterList[label] = 1;
-    }
+    mCounterList[label]++;
 }
 
 uint32_t ESPDiagnosticCounter::GetInstanceCount(const char * label) const
 {
-    return mCounterList[label];
+    auto it = mCounterList.find(label);
+    return (it != mCounterList.end()) ? it->second : 0;
 }
 
 CHIP_ERROR ESPDiagnosticCounter::ReportMetrics(const char * label, CircularDiagnosticBuffer * storageInstance)
