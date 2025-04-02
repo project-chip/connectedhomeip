@@ -33,9 +33,9 @@
 #   run1:
 #     script-args: >
 #       --storage-path admin_storage.json
-#       --string-arg app_path:../../out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app
-#       --string-arg dac_provider_base_path:../../credentials/test/revoked-attestation-certificates/dac-provider-test-vectors
-#       --string-arg revocation_set_base_path:../../credentials/test/revoked-attestation-certificates/dac-provider-test-vectors/revocation-sets
+#       --string-arg app_path:out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app
+#       --string-arg dac_provider_base_path:credentials/test/revoked-attestation-certificates/dac-provider-test-vectors
+#       --string-arg revocation_set_base_path:credentials/test/revoked-attestation-certificates/dac-provider-test-vectors/revocation-sets
 #       --string-arg app_log_path:/tmp/TC_DA_1_9
 #       --bool-arg is_ci:true
 #       --trace-to json:${TRACE_TEST_JSON}.json
