@@ -9421,7 +9421,7 @@ NS_ASSUME_NONNULL_BEGIN
     return self.rootCACertificate;
 }
 @end
-@implementation MTROperationalCredentialsClusterSetVidVerificationStatementParams
+@implementation MTROperationalCredentialsClusterSetVIDVerificationStatementParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -9439,7 +9439,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTROperationalCredentialsClusterSetVidVerificationStatementParams alloc] init];
+    auto other = [[MTROperationalCredentialsClusterSetVIDVerificationStatementParams alloc] init];
 
     other.vendorID = self.vendorID;
     other.vidVerificationStatement = self.vidVerificationStatement;
@@ -9458,11 +9458,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTROperationalCredentialsClusterSetVidVerificationStatementParams (InternalMethods)
+@implementation MTROperationalCredentialsClusterSetVIDVerificationStatementParams (InternalMethods)
 
 - (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
 {
-    chip::app::Clusters::OperationalCredentials::Commands::SetVidVerificationStatement::Type encodableStruct;
+    chip::app::Clusters::OperationalCredentials::Commands::SetVIDVerificationStatement::Type encodableStruct;
     ListFreer listFreer;
     {
         if (self.vendorID != nil) {
@@ -9472,7 +9472,7 @@ NS_ASSUME_NONNULL_BEGIN
     }
     {
         if (self.vidVerificationStatement != nil) {
-            auto & definedValue_0 = encodableStruct.vidVerificationStatement.Emplace();
+            auto & definedValue_0 = encodableStruct.VIDVerificationStatement.Emplace();
             definedValue_0 = AsByteSpan(self.vidVerificationStatement);
         }
     }
@@ -9521,7 +9521,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTROperationalCredentialsClusterSignVidVerificationRequestParams
+@implementation MTROperationalCredentialsClusterSignVIDVerificationRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -9537,7 +9537,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTROperationalCredentialsClusterSignVidVerificationRequestParams alloc] init];
+    auto other = [[MTROperationalCredentialsClusterSignVIDVerificationRequestParams alloc] init];
 
     other.fabricIndex = self.fabricIndex;
     other.clientChallenge = self.clientChallenge;
@@ -9555,11 +9555,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTROperationalCredentialsClusterSignVidVerificationRequestParams (InternalMethods)
+@implementation MTROperationalCredentialsClusterSignVIDVerificationRequestParams (InternalMethods)
 
 - (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
 {
-    chip::app::Clusters::OperationalCredentials::Commands::SignVidVerificationRequest::Type encodableStruct;
+    chip::app::Clusters::OperationalCredentials::Commands::SignVIDVerificationRequest::Type encodableStruct;
     ListFreer listFreer;
     {
         encodableStruct.fabricIndex = self.fabricIndex.unsignedCharValue;
@@ -9606,7 +9606,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTROperationalCredentialsClusterSignVidVerificationResponseParams
+@implementation MTROperationalCredentialsClusterSignVIDVerificationResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -9622,7 +9622,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTROperationalCredentialsClusterSignVidVerificationResponseParams alloc] init];
+    auto other = [[MTROperationalCredentialsClusterSignVIDVerificationResponseParams alloc] init];
 
     other.fabricIndex = self.fabricIndex;
     other.fabricBindingVersion = self.fabricBindingVersion;
@@ -9644,7 +9644,7 @@ NS_ASSUME_NONNULL_BEGIN
         return nil;
     }
 
-    using DecodableType = chip::app::Clusters::OperationalCredentials::Commands::SignVidVerificationResponse::DecodableType;
+    using DecodableType = chip::app::Clusters::OperationalCredentials::Commands::SignVIDVerificationResponse::DecodableType;
     chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
                                                                            clusterID:DecodableType::GetClusterId()
                                                                            commandID:DecodableType::GetCommandId()
@@ -9679,9 +9679,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTROperationalCredentialsClusterSignVidVerificationResponseParams (InternalMethods)
+@implementation MTROperationalCredentialsClusterSignVIDVerificationResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::OperationalCredentials::Commands::SignVidVerificationResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::OperationalCredentials::Commands::SignVIDVerificationResponse::DecodableType &)decodableStruct
 {
     {
         self.fabricIndex = [NSNumber numberWithUnsignedChar:decodableStruct.fabricIndex];
@@ -13587,7 +13587,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _sceneName = @"";
 
-        _extensionFieldSets = [NSArray array];
+        _extensionFieldSetStructs = [NSArray array];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -13602,7 +13602,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.sceneID = self.sceneID;
     other.transitionTime = self.transitionTime;
     other.sceneName = self.sceneName;
-    other.extensionFieldSets = self.extensionFieldSets;
+    other.extensionFieldSetStructs = self.extensionFieldSetStructs;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -13611,7 +13611,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; sceneID:%@; transitionTime:%@; sceneName:%@; extensionFieldSets:%@; >", NSStringFromClass([self class]), _groupID, _sceneID, _transitionTime, _sceneName, _extensionFieldSets];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; sceneID:%@; transitionTime:%@; sceneName:%@; extensionFieldSetStructs:%@; >", NSStringFromClass([self class]), _groupID, _sceneID, _transitionTime, _sceneName, _extensionFieldSetStructs];
     return descriptionString;
 }
 
@@ -13637,19 +13637,19 @@ NS_ASSUME_NONNULL_BEGIN
     }
     {
         {
-            using ListType_0 = std::remove_reference_t<decltype(encodableStruct.extensionFieldSets)>;
+            using ListType_0 = std::remove_reference_t<decltype(encodableStruct.extensionFieldSetStructs)>;
             using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-            if (self.extensionFieldSets.count != 0) {
-                auto * listHolder_0 = new ListHolder<ListMemberType_0>(self.extensionFieldSets.count);
+            if (self.extensionFieldSetStructs.count != 0) {
+                auto * listHolder_0 = new ListHolder<ListMemberType_0>(self.extensionFieldSetStructs.count);
                 if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
                     return CHIP_ERROR_INVALID_ARGUMENT;
                 }
                 listFreer.add(listHolder_0);
-                for (size_t i_0 = 0; i_0 < self.extensionFieldSets.count; ++i_0) {
-                    auto element_0 = MTR_SAFE_CAST(self.extensionFieldSets[i_0], MTRScenesManagementClusterExtensionFieldSet);
+                for (size_t i_0 = 0; i_0 < self.extensionFieldSetStructs.count; ++i_0) {
+                    auto element_0 = MTR_SAFE_CAST(self.extensionFieldSetStructs[i_0], MTRScenesManagementClusterExtensionFieldSetStruct);
                     if (!element_0) {
                         // Wrong kind of value.
-                        MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.extensionFieldSets[i_0], NSStringFromClass(MTRScenesManagementClusterExtensionFieldSet.class));
+                        MTR_LOG_ERROR("%@ incorrectly present in list of %@", self.extensionFieldSetStructs[i_0], NSStringFromClass(MTRScenesManagementClusterExtensionFieldSetStruct.class));
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
                     listHolder_0->mList[i_0].clusterID = element_0.clusterID.unsignedIntValue;
@@ -13709,9 +13709,9 @@ NS_ASSUME_NONNULL_BEGIN
                         }
                     }
                 }
-                encodableStruct.extensionFieldSets = ListType_0(listHolder_0->mList, self.extensionFieldSets.count);
+                encodableStruct.extensionFieldSetStructs = ListType_0(listHolder_0->mList, self.extensionFieldSetStructs.count);
             } else {
-                encodableStruct.extensionFieldSets = ListType_0();
+                encodableStruct.extensionFieldSetStructs = ListType_0();
             }
         }
     }
@@ -13945,7 +13945,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _sceneName = nil;
 
-        _extensionFieldSets = nil;
+        _extensionFieldSetStructs = nil;
     }
     return self;
 }
@@ -13959,14 +13959,14 @@ NS_ASSUME_NONNULL_BEGIN
     other.sceneID = self.sceneID;
     other.transitionTime = self.transitionTime;
     other.sceneName = self.sceneName;
-    other.extensionFieldSets = self.extensionFieldSets;
+    other.extensionFieldSetStructs = self.extensionFieldSetStructs;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupID:%@; sceneID:%@; transitionTime:%@; sceneName:%@; extensionFieldSets:%@; >", NSStringFromClass([self class]), _status, _groupID, _sceneID, _transitionTime, _sceneName, _extensionFieldSets];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupID:%@; sceneID:%@; transitionTime:%@; sceneName:%@; extensionFieldSetStructs:%@; >", NSStringFromClass([self class]), _status, _groupID, _sceneID, _transitionTime, _sceneName, _extensionFieldSetStructs];
     return descriptionString;
 }
 
@@ -14044,14 +14044,14 @@ NS_ASSUME_NONNULL_BEGIN
         }
     }
     {
-        if (decodableStruct.extensionFieldSets.HasValue()) {
+        if (decodableStruct.extensionFieldSetStructs.HasValue()) {
             { // Scope for our temporary variables
                 auto * array_1 = [NSMutableArray new];
-                auto iter_1 = decodableStruct.extensionFieldSets.Value().begin();
+                auto iter_1 = decodableStruct.extensionFieldSetStructs.Value().begin();
                 while (iter_1.Next()) {
                     auto & entry_1 = iter_1.GetValue();
-                    MTRScenesManagementClusterExtensionFieldSet * newElement_1;
-                    newElement_1 = [MTRScenesManagementClusterExtensionFieldSet new];
+                    MTRScenesManagementClusterExtensionFieldSetStruct * newElement_1;
+                    newElement_1 = [MTRScenesManagementClusterExtensionFieldSetStruct new];
                     newElement_1.clusterID = [NSNumber numberWithUnsignedInt:entry_1.clusterID];
                     { // Scope for our temporary variables
                         auto * array_3 = [NSMutableArray new];
@@ -14115,10 +14115,10 @@ NS_ASSUME_NONNULL_BEGIN
                 if (err != CHIP_NO_ERROR) {
                     return err;
                 }
-                self.extensionFieldSets = array_1;
+                self.extensionFieldSetStructs = array_1;
             }
         } else {
-            self.extensionFieldSets = nil;
+            self.extensionFieldSetStructs = nil;
         }
     }
     return CHIP_NO_ERROR;
@@ -22162,6 +22162,200 @@ NS_ASSUME_NONNULL_BEGIN
 {
     chip::app::Clusters::ClosureControl::Commands::CancelFallback::Type encodableStruct;
     ListFreer listFreer;
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRClosureDimensionClusterSetTargetParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _position = nil;
+
+        _latch = nil;
+
+        _speed = nil;
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRClosureDimensionClusterSetTargetParams alloc] init];
+
+    other.position = self.position;
+    other.latch = self.latch;
+    other.speed = self.speed;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: position:%@; latch:%@; speed:%@; >", NSStringFromClass([self class]), _position, _latch, _speed];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRClosureDimensionClusterSetTargetParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::ClosureDimension::Commands::SetTarget::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        if (self.position != nil) {
+            auto & definedValue_0 = encodableStruct.position.Emplace();
+            definedValue_0 = self.position.unsignedShortValue;
+        }
+    }
+    {
+        if (self.latch != nil) {
+            auto & definedValue_0 = encodableStruct.latch.Emplace();
+            definedValue_0 = static_cast<std::remove_reference_t<decltype(definedValue_0)>>(self.latch.unsignedCharValue);
+        }
+    }
+    {
+        if (self.speed != nil) {
+            auto & definedValue_0 = encodableStruct.speed.Emplace();
+            definedValue_0 = static_cast<std::remove_reference_t<decltype(definedValue_0)>>(self.speed.unsignedCharValue);
+        }
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRClosureDimensionClusterStepParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _direction = @(0);
+
+        _numberOfSteps = @(0);
+
+        _speed = nil;
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRClosureDimensionClusterStepParams alloc] init];
+
+    other.direction = self.direction;
+    other.numberOfSteps = self.numberOfSteps;
+    other.speed = self.speed;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: direction:%@; numberOfSteps:%@; speed:%@; >", NSStringFromClass([self class]), _direction, _numberOfSteps, _speed];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRClosureDimensionClusterStepParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::ClosureDimension::Commands::Step::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.direction = static_cast<std::remove_reference_t<decltype(encodableStruct.direction)>>(self.direction.unsignedCharValue);
+    }
+    {
+        encodableStruct.numberOfSteps = self.numberOfSteps.unsignedShortValue;
+    }
+    {
+        if (self.speed != nil) {
+            auto & definedValue_0 = encodableStruct.speed.Emplace();
+            definedValue_0 = static_cast<std::remove_reference_t<decltype(definedValue_0)>>(self.speed.unsignedCharValue);
+        }
+    }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
     if (buffer.IsNull()) {
@@ -34501,6 +34695,8 @@ NS_ASSUME_NONNULL_BEGIN
 
         _streamUsage = @(0);
 
+        _originatingEndpointID = @(0);
+
         _videoStreamID = nil;
 
         _audioStreamID = nil;
@@ -34521,6 +34717,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRWebRTCTransportProviderClusterSolicitOfferParams alloc] init];
 
     other.streamUsage = self.streamUsage;
+    other.originatingEndpointID = self.originatingEndpointID;
     other.videoStreamID = self.videoStreamID;
     other.audioStreamID = self.audioStreamID;
     other.iceServers = self.iceServers;
@@ -34534,7 +34731,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: streamUsage:%@; videoStreamID:%@; audioStreamID:%@; iceServers:%@; iceTransportPolicy:%@; metadataOptions:%@; >", NSStringFromClass([self class]), _streamUsage, _videoStreamID, _audioStreamID, _iceServers, _iceTransportPolicy, _metadataOptions];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: streamUsage:%@; originatingEndpointID:%@; videoStreamID:%@; audioStreamID:%@; iceServers:%@; iceTransportPolicy:%@; metadataOptions:%@; >", NSStringFromClass([self class]), _streamUsage, _originatingEndpointID, _videoStreamID, _audioStreamID, _iceServers, _iceTransportPolicy, _metadataOptions];
     return descriptionString;
 }
 
@@ -34548,6 +34745,9 @@ NS_ASSUME_NONNULL_BEGIN
     ListFreer listFreer;
     {
         encodableStruct.streamUsage = static_cast<std::remove_reference_t<decltype(encodableStruct.streamUsage)>>(self.streamUsage.unsignedCharValue);
+    }
+    {
+        encodableStruct.originatingEndpointID = self.originatingEndpointID.unsignedShortValue;
     }
     {
         if (self.videoStreamID != nil) {
@@ -34808,6 +35008,8 @@ NS_ASSUME_NONNULL_BEGIN
 
         _streamUsage = @(0);
 
+        _originatingEndpointID = @(0);
+
         _videoStreamID = nil;
 
         _audioStreamID = nil;
@@ -34830,6 +35032,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.webRTCSessionID = self.webRTCSessionID;
     other.sdp = self.sdp;
     other.streamUsage = self.streamUsage;
+    other.originatingEndpointID = self.originatingEndpointID;
     other.videoStreamID = self.videoStreamID;
     other.audioStreamID = self.audioStreamID;
     other.iceServers = self.iceServers;
@@ -34843,7 +35046,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: webRTCSessionID:%@; sdp:%@; streamUsage:%@; videoStreamID:%@; audioStreamID:%@; iceServers:%@; iceTransportPolicy:%@; metadataOptions:%@; >", NSStringFromClass([self class]), _webRTCSessionID, _sdp, _streamUsage, _videoStreamID, _audioStreamID, _iceServers, _iceTransportPolicy, _metadataOptions];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: webRTCSessionID:%@; sdp:%@; streamUsage:%@; originatingEndpointID:%@; videoStreamID:%@; audioStreamID:%@; iceServers:%@; iceTransportPolicy:%@; metadataOptions:%@; >", NSStringFromClass([self class]), _webRTCSessionID, _sdp, _streamUsage, _originatingEndpointID, _videoStreamID, _audioStreamID, _iceServers, _iceTransportPolicy, _metadataOptions];
     return descriptionString;
 }
 
@@ -34868,6 +35071,9 @@ NS_ASSUME_NONNULL_BEGIN
     }
     {
         encodableStruct.streamUsage = static_cast<std::remove_reference_t<decltype(encodableStruct.streamUsage)>>(self.streamUsage.unsignedCharValue);
+    }
+    {
+        encodableStruct.originatingEndpointID = self.originatingEndpointID.unsignedShortValue;
     }
     {
         if (self.videoStreamID != nil) {

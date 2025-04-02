@@ -50,7 +50,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:119
+            image: ghcr.io/project-chip/chip-build:125
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
@@ -88,12 +88,14 @@ jobs:
               #
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/py_matter_idl/matter_idl/zapxml_parser.py \
+                    "./scripts/py_matter_idl/matter/idl/zapxml_parser.py \
                       --no-print \
                       --log-level info \
                       src/app/zap-templates/zcl/data-model/chip/global-attributes.xml \
+                      src/app/zap-templates/zcl/data-model/chip/bridged-device-basic-information-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/chime-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/closure-control-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/closure-dimension-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/global-bitmaps.xml \
                       src/app/zap-templates/zcl/data-model/chip/global-enums.xml \
                       src/app/zap-templates/zcl/data-model/chip/global-structs.xml \
@@ -112,7 +114,6 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/binding-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/boolean-state-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/actions-cluster.xml \
-                      src/app/zap-templates/zcl/data-model/chip/bridged-device-basic-information.xml \
                       src/app/zap-templates/zcl/data-model/chip/camera-av-settings-user-level-management-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/camera-av-stream-management-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/chip-ota.xml \
@@ -463,7 +464,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:119
+            image: ghcr.io/project-chip/chip-build:125
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 
