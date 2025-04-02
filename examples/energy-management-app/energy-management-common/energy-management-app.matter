@@ -196,6 +196,12 @@ enum PositionTag : enum8 {
   kColumn = 6;
 }
 
+enum PowerThresholdSourceEnum : enum8 {
+  kContract = 0;
+  kRegulator = 1;
+  kEquipment = 2;
+}
+
 enum RelativePositionTag : enum8 {
   kUnder = 0;
   kNextTo = 1;
@@ -1746,6 +1752,8 @@ cluster ElectricalPowerMeasurement = 144 {
     kPowerFactor = 12;
     kNeutralCurrent = 13;
     kElectricalEnergy = 14;
+    kReactiveEnergy = 15;
+    kApparentEnergy = 16;
   }
 
   enum PowerModeEnum : enum8 {
@@ -1851,6 +1859,8 @@ cluster ElectricalEnergyMeasurement = 145 {
     kPowerFactor = 12;
     kNeutralCurrent = 13;
     kElectricalEnergy = 14;
+    kReactiveEnergy = 15;
+    kApparentEnergy = 16;
   }
 
   bitmap Feature : bitmap32 {

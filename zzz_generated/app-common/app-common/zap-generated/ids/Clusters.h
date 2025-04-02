@@ -223,6 +223,9 @@ static constexpr ClusterId Id = 0x00000091;
 namespace WaterHeaterManagement {
 static constexpr ClusterId Id = 0x00000094;
 } // namespace WaterHeaterManagement
+namespace CommodityPrice {
+static constexpr ClusterId Id = 0x00000095;
+} // namespace CommodityPrice
 namespace DemandResponseLoadControl {
 static constexpr ClusterId Id = 0x00000096;
 } // namespace DemandResponseLoadControl
@@ -400,6 +403,9 @@ static constexpr ClusterId Id = 0x00000555;
 namespace Chime {
 static constexpr ClusterId Id = 0x00000556;
 } // namespace Chime
+namespace CommodityTariff {
+static constexpr ClusterId Id = 0x00000700;
+} // namespace CommodityTariff
 namespace EcosystemInformation {
 static constexpr ClusterId Id = 0x00000750;
 } // namespace EcosystemInformation
@@ -412,6 +418,12 @@ static constexpr ClusterId Id = 0x00000801;
 namespace TlsClientManagement {
 static constexpr ClusterId Id = 0x00000802;
 } // namespace TlsClientManagement
+namespace MeterIdentification {
+static constexpr ClusterId Id = 0x00000B06;
+} // namespace MeterIdentification
+namespace CommodityMetering {
+static constexpr ClusterId Id = 0x00000B07;
+} // namespace CommodityMetering
 namespace UnitTesting {
 static constexpr ClusterId Id = 0xFFF1FC05;
 } // namespace UnitTesting
