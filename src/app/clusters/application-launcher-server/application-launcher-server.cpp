@@ -497,3 +497,8 @@ void MatterApplicationLauncherPluginServerInitCallback()
 {
     app::AttributeAccessInterfaceRegistry::Instance().Register(&gApplicationLauncherAttrAccess);
 }
+
+void MatterApplicationLauncherPluginServerShutdownCallback()
+{
+    app::AttributeAccessInterfaceRegistry::Instance().Unregister(&gApplicationLauncherAttrAccess);
+}
