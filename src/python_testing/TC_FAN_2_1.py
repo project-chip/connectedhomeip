@@ -88,7 +88,7 @@ class TC_FAN_2_1(MatterBaseTest):
 
         # Verify response is of expected type
         if type is Uint8Type:
-            asserts.assert_true(is_valid_uint_value(value),
+            asserts.assert_true(is_valid_uint_value(value, bit_count=8),
                                 f"[FC] {attribute.__name__} result ({value}) isn't of type {type.__name__}")
         else:
             asserts.assert_is_instance(value, type,
