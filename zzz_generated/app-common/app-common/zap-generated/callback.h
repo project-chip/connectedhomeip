@@ -699,6 +699,11 @@ void emberAfWaterHeaterManagementClusterShutdownCallback(chip::EndpointId endpoi
 void emberAfCommodityPriceClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfCommodityPriceClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfDemandResponseLoadControlClusterInitCallback(chip::EndpointId endpoint);
@@ -1294,6 +1299,11 @@ void emberAfChimeClusterShutdownCallback(chip::EndpointId endpoint);
 void emberAfCommodityTariffClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfCommodityTariffClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfEcosystemInformationClusterInitCallback(chip::EndpointId endpoint);
@@ -1339,9 +1349,19 @@ void emberAfTlsClientManagementClusterShutdownCallback(chip::EndpointId endpoint
 void emberAfMeterIdentificationClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfMeterIdentificationClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfCommodityMeteringClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfCommodityMeteringClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
