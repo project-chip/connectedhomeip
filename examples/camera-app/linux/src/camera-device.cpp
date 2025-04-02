@@ -99,7 +99,10 @@ CameraError CameraDevice::VideoStreamAllocate(const VideoStreamStruct & allocate
         {
             foundAvailableStream = true;
 
-            if (stream.codec == allocateArgs.videoCodec)
+            if (stream.codec == allocateArgs.videoCodec && stream.frameRate >= allocateArgs.minFrameRate
+                && stream.frameRate <= allocateArgs.maxFrameRate && stream.videoRes.width >= allocateArgs.minResolution.width
+                && stream.videoRes.height >= allocateArgs.minResolution.height && stream.videoRes.width <= allocateArgs.maxResolution.width
+                && stream.videoRes.height <= allocateArgs.maxResolution.height)
             {
                 stream.isAllocated = true;
                 outStreamID        = stream.id;
