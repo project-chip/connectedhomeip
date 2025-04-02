@@ -819,6 +819,11 @@ void emberAfClosureControlClusterShutdownCallback(chip::EndpointId endpoint);
 void emberAfClosureDimensionClusterInitCallback(chip::EndpointId endpoint);
 
 /**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfClosureDimensionClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfServiceAreaClusterInitCallback(chip::EndpointId endpoint);
