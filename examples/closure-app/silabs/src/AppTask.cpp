@@ -72,9 +72,7 @@ using namespace chip::TLV;
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace ClosureControl {
-
-} // namespace ClosureControl
+namespace ClosureControl {} // namespace ClosureControl
 } // namespace Clusters
 } // namespace app
 } // namespace chip
