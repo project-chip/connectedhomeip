@@ -59,7 +59,7 @@ public:
     // ------------------------------------------------------------------
     // Get attribute methods
     virtual DataModel::Nullable<uint32_t> GetCountdownTime() = 0;
-
+    
     /* These functions are called by the ReadAttribute handler to iterate through lists
      * The cluster server will call Start<Type>Read to allow the delegate to create a temporary
      * lock on the data.
@@ -67,7 +67,9 @@ public:
      * until the End<Type>Read() has been called (i.e. releasing a lock on the data)
      */
     virtual CHIP_ERROR StartCurrentErrorListRead() = 0;
-    virtual CHIP_ERROR EndCurrentErrorListRead() = 0;
+    // The delegate is expected to return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED to indicate end of list.
+    virtual CHIP_ERROR GetCurrentErrorListAtIndex(size_t, ClosureErrorEnum &) = 0;
+    virtual CHIP_ERROR EndCurrentErrorListRead()                              = 0;
 
 protected:
     EndpointId mEndpointId = chip::kInvalidEndpointId;
@@ -130,6 +132,13 @@ public:
      * @return CHIP_NO_ERROR if set was successful.
      */
     CHIP_ERROR SetOverallTarget(const GenericOverallTarget & aOverallTarget);
+    
+    /**
+     * @brief Add Error to CurretErrorList.
+     * @param[in] error The error to be added.
+     * @return CHIP_NO_ERROR if error was successful added and CHIP_ERROR_BAD_REQUEST if add failed.
+     */
+    CHIP_ERROR AddErrorToCurrentErrorList(const ClosureErrorEnum error);
 
     // Attribute getters
     /**
@@ -164,6 +173,14 @@ public:
     bool IsSupportedState(MainStateEnum aMainState);
     
     /**
+     * @brief This function checks if specifc command is supported on specific state or not.
+     * @param[in] cmd Command to be supported.
+     * @param[in] state MainState on which command should be supported.
+     * @return true if command is supported on specific state, false if not supported.
+     */
+    bool CheckCommandStateCompatiblilty(CommandId cmd, MainStateEnum state);
+    
+    /**
      * Reports that the contents of the current error list has changed.
      * The device SHALL call this method whenever it changes the current error list.
      */
@@ -193,13 +210,6 @@ private:
     MainStateEnum mMainState;
     GenericOverallState mOverallState;
     GenericOverallTarget mOverallTarget;
-    
-    /**
-     * This is used by the SDK to populate the error list attribute. If the contents of this list changes, the
-     * device SHALL call the Instance's ReportCurrentErrorListChange method to report that this attribute has changed.
-     * @param ClosureErrorEnum  The MutableCharSpan is filled.
-     */
-    std::unordered_set<ClosureErrorEnum> currentErrorList;
 
     // AttributeAccessInterface
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
@@ -210,9 +220,9 @@ private:
     // CommandHandlerInterface
     void InvokeCommand(HandlerContext & handlerContext) override;
 
-    void HandleStop(HandlerContext & ctx, const Commands::Stop::DecodableType & commandData);
-    void HandleMoveTo(HandlerContext & ctx, const Commands::MoveTo::DecodableType & commandData);
-    void HandleCalibrate(HandlerContext & ctx, const Commands::Calibrate::DecodableType & commandData);
+    chip::Protocols::InteractionModel::Status HandleStop(HandlerContext & ctx, const Commands::Stop::DecodableType & commandData);
+    chip::Protocols::InteractionModel::Status HandleMoveTo(HandlerContext & ctx, const Commands::MoveTo::DecodableType & commandData);
+    chip::Protocols::InteractionModel::Status HandleCalibrate(HandlerContext & ctx, const Commands::Calibrate::DecodableType & commandData);
 };
 
 } // namespace ClosureControl
