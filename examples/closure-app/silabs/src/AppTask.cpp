@@ -74,7 +74,7 @@ namespace app {
 namespace Clusters {
 namespace ClosureControl {
 
-static chip::BitMask<Feature> sFeatureMap(Feature::kCalibration);
+static chip::BitMask<Feature> sFeatureMap(Feature::kCalibration,Feature::kPositioning,Feature::kMotionLatching,Feature::kSpeed);
 
 } // namespace ClosureControl
 } // namespace Clusters
