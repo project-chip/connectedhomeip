@@ -135,7 +135,7 @@ class TC_FAN_2_1(MatterBaseTest):
             # Verify that the FanModeSequence attribute result contains
             # one of the values that has the Auto FanMode option
             asserts.assert_in(fan_mode_sequence, fan_mode_sequence_auto_values,
-                                f"[FC] FanModeSequence ({fan_mode_sequence}:{fan_mode_sequence.name}) must contain the Auto FanMode option.")
+                              f"[FC] FanModeSequence ({fan_mode_sequence}:{fan_mode_sequence.name}) must contain the Auto FanMode option.")
         else:
             logging.info("[FC] Auto FanMode feature is unsupported, skipping FanModeSequence Auto conformance step.")
             self.skip_step(3)
@@ -144,7 +144,7 @@ class TC_FAN_2_1(MatterBaseTest):
         # TH writes to the DUT the Low (1) FanMode attribute value
         self.step(4)
         await self.write_setting(attribute.FanMode, fm_enum.kLow)
-        
+
         # *** STEP 5 ***
         # TH reads from the DUT the FanMode attribute value
         # Verify that the DUT response contains an enum8 with
