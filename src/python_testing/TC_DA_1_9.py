@@ -175,10 +175,12 @@ class TC_DA_1_9(MatterBaseTest):
                     f"Or Commissioning fails with device attestation error {test_case['expects_att_err']}\n"
                 )
 
+                # TODO: run the chip-tool and commission the TH, parse the output and check if it matches the expected results
                 if self.is_ci:
                     resp = 'Y' if test_case['expects_commissioning_success'] else 'N'
                 else:
                     resp = self.wait_for_user_input(prompt_msg)
+
                 commissioning_success = resp.lower() == 'y'
 
                 # Verify results
