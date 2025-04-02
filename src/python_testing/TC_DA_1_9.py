@@ -35,9 +35,9 @@
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
-#       --string-arg app_path:../../out/host/chip-all-clusters-app 
-#       --string-arg dac_provider_base_path:../../credentials/test/revoked-attestation-certificates/dac-provider-test-vectors 
-#       --string-arg revocation_set_base_path:../../credentials/test/revoked-attestation-certificates/dac-provider-test-vectors/revocation-sets 
+#       --string-arg app_path:../../out/host/chip-all-clusters-app
+#       --string-arg dac_provider_base_path:../../credentials/test/revoked-attestation-certificates/dac-provider-test-vectors
+#       --string-arg revocation_set_base_path:../../credentials/test/revoked-attestation-certificates/dac-provider-test-vectors/revocation-sets
 #       --string-arg app_log_path:/tmp/TC_DA_1_9
 #       --bool-arg is_ci:true
 #       --trace-to json:${TRACE_TEST_JSON}.json
@@ -53,6 +53,7 @@ import subprocess
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
+
 class TC_DA_1_9(MatterBaseTest):
     def setup_class(self):
         super().setup_class()
@@ -64,7 +65,7 @@ class TC_DA_1_9(MatterBaseTest):
 
     def desc_TC_DA_1_9(self) -> str:
         return "[TC-DA-1.9] Device Attestation Revocation [DUT-Commissioner]"
-    
+
     def pics_TC_DA_1_9(self) -> list[str]:
         pics = [
             "MCORE.ROLE.COMMISSIONER",
@@ -73,20 +74,20 @@ class TC_DA_1_9(MatterBaseTest):
 
     def steps_TC_DA_1_9(self) -> list[TestStep]:
         return [
-            TestStep(1, "Test commissioning with revoked DAC", 
-                    "(DUT)Commissioner warns about commissioning the non-genuine device, Or Commissioning fails with device attestation error 302"),
-            TestStep(2, "Test commissioning with revoked PAI", 
-                    "(DUT)Commissioner warns about commissioning the non-genuine device, Or Commissioning fails with device attestation error 202"),
-            TestStep(3, "Test commissioning with both DAC and PAI revoked", 
-                    "(DUT)Commissioner warns about commissioning the non-genuine device, Or Commissioning fails with device attestation error 208"),
-            TestStep(4, "Test commissioning with revoked DAC using delegated CRL signer", 
-                    "(DUT)Commissioner warns about commissioning the non-genuine device, Or Commissioning fails with device attestation error 302"),
-            TestStep(5, "Test commissioning with revoked PAI using delegated CRL signer", 
-                    "(DUT)Commissioner warns about commissioning the non-genuine device, Or Commissioning fails with device attestation error 202"),
-            TestStep(6, "Test commissioning with both DAC and PAI revoked using delegated CRL signer", 
-                    "(DUT)Commissioner warns about commissioning the non-genuine device, Or Commissioning fails with device attestation error 208"),
-            TestStep(7, "Test commissioning with valid DAC and PAI", 
-                    "Commissioning succeeds without any attestation errors"),
+            TestStep(1, "Test commissioning with revoked DAC",
+                     "(DUT)Commissioner warns about commissioning the non-genuine device, Or Commissioning fails with device attestation error 302"),
+            TestStep(2, "Test commissioning with revoked PAI",
+                     "(DUT)Commissioner warns about commissioning the non-genuine device, Or Commissioning fails with device attestation error 202"),
+            TestStep(3, "Test commissioning with both DAC and PAI revoked",
+                     "(DUT)Commissioner warns about commissioning the non-genuine device, Or Commissioning fails with device attestation error 208"),
+            TestStep(4, "Test commissioning with revoked DAC using delegated CRL signer",
+                     "(DUT)Commissioner warns about commissioning the non-genuine device, Or Commissioning fails with device attestation error 302"),
+            TestStep(5, "Test commissioning with revoked PAI using delegated CRL signer",
+                     "(DUT)Commissioner warns about commissioning the non-genuine device, Or Commissioning fails with device attestation error 202"),
+            TestStep(6, "Test commissioning with both DAC and PAI revoked using delegated CRL signer",
+                     "(DUT)Commissioner warns about commissioning the non-genuine device, Or Commissioning fails with device attestation error 208"),
+            TestStep(7, "Test commissioning with valid DAC and PAI",
+                     "Commissioning succeeds without any attestation errors"),
         ]
 
     @async_test_body
@@ -152,14 +153,14 @@ class TC_DA_1_9(MatterBaseTest):
             # Create log files for this test case
             os.makedirs(self.app_log_path, exist_ok=True)
             app_log_file_name = f"{self.app_log_path}/{test_case['name']}_app.log"
-            
+
             with open(app_log_file_name, 'w') as app_log_file:
                 # Start the all-clusters-app with appropriate DAC provider
                 app_args = '--trace_decode 1 --KVS /tmp/tmpkvs'
                 if test_case['dac_provider']:
                     dac_provider_path = os.path.join(self.dac_provider_base_path, test_case['dac_provider'])
                     app_args += f' --dac_provider {dac_provider_path}'
-                
+
                 app_cmd = f"{self.app_path} {app_args}"
 
                 # Run the all-clusters-app in background
@@ -185,7 +186,7 @@ class TC_DA_1_9(MatterBaseTest):
 
                 # Verify results
                 asserts.assert_equal(
-                    commissioning_success, 
+                    commissioning_success,
                     test_case['expects_commissioning_success'],
                     f"Commissioning {'succeeded' if commissioning_success else 'failed'} when it should have {'succeeded' if test_case['expects_commissioning_success'] else 'failed'}"
                 )
