@@ -368,9 +368,10 @@ namespace Inet {
         return err;
     }
 
-    void UDPEndPointImplNetworkFramework::GetPacketInfo(const nw_connection_t & aConnection, IPPacketInfo & aPacketInfo)
+    CHIP_ERROR UDPEndPointImplNetworkFramework::GetPacketInfo(const nw_connection_t & aConnection, IPPacketInfo & aPacketInfo)
     {
         nw_path_t path = nw_connection_copy_current_path(aConnection);
+        VerifyOrReturnError(nullptr != path, CHIP_ERROR_INVALID_ARGUMENT);
         nw_endpoint_t dest_endpoint = nw_path_copy_effective_local_endpoint(path);
         nw_endpoint_t src_endpoint = nw_path_copy_effective_remote_endpoint(path);
 
@@ -394,6 +395,8 @@ namespace Inet {
         aPacketInfo.DestAddress.ToString(dstAddrStr);
         ChipLogError(Inet, "Packet received from %s to %s", srcAddrStr, dstAddrStr);
 #endif
+
+        return CHIP_NO_ERROR;
     }
 
     nw_endpoint_t UDPEndPointImplNetworkFramework::GetEndPoint(const IPAddressType aAddressType,
@@ -598,10 +601,15 @@ namespace Inet {
                     if (!(error_domain == nw_error_domain_posix && errno == ECANCELED)) {
                         CHIP_ERROR error = CHIP_ERROR_POSIX(errno);
                         IPPacketInfo packetInfo;
-                        GetPacketInfo(aConnection, packetInfo);
-                        dispatch_async(mSystemQueue, ^{
-                            OnReceiveError((UDPEndPoint *) this, error, &packetInfo);
-                        });
+                        if (CHIP_NO_ERROR == GetPacketInfo(aConnection, packetInfo)) {
+                            dispatch_async(mSystemQueue, ^{
+                                OnReceiveError((UDPEndPoint *) this, error, nullptr);
+                            });
+                        } else {
+                            dispatch_async(mSystemQueue, ^{
+                                OnReceiveError((UDPEndPoint *) this, error, &packetInfo);
+                            });
+                        }
                     }
                 }
             };
