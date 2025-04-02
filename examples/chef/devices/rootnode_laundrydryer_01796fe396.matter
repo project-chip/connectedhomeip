@@ -406,7 +406,7 @@ cluster Descriptor = 29 {
     kTagList = 0x1;
   }
 
-  struct DeviceTypeStruct {
+  shared struct DeviceTypeStruct {
     devtype_id deviceType = 0;
     int16u revision = 1;
   }
@@ -1503,13 +1503,13 @@ cluster OperationalState = 96 {
     kError = 3;
   }
 
-  struct ErrorStateStruct {
+  shared struct ErrorStateStruct {
     enum8 errorStateID = 0;
     optional char_string<64> errorStateLabel = 1;
     optional char_string<64> errorStateDetails = 2;
   }
 
-  struct OperationalStateStruct {
+  shared struct OperationalStateStruct {
     enum8 operationalStateID = 0;
     optional char_string<64> operationalStateLabel = 1;
   }
