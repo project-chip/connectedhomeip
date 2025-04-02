@@ -1038,6 +1038,8 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("electricalEnergyMeasurement", writeElectricalEnergyMeasurementInteractionInfo);
     Map<String, InteractionInfo> writeWaterHeaterManagementInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("waterHeaterManagement", writeWaterHeaterManagementInteractionInfo);
+    Map<String, InteractionInfo> writeCommodityPriceInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("commodityPrice", writeCommodityPriceInteractionInfo);
     Map<String, InteractionInfo> writeDemandResponseLoadControlInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeDemandResponseLoadControlDefaultRandomStartCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo demandResponseLoadControldefaultRandomStartCommandParameterInfo =
@@ -3798,6 +3800,8 @@ public class ClusterWriteMapping {
     );
     writeChimeInteractionInfo.put("writeEnabledAttribute", writeChimeEnabledAttributeInteractionInfo);
     writeAttributeMap.put("chime", writeChimeInteractionInfo);
+    Map<String, InteractionInfo> writeCommodityTariffInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("commodityTariff", writeCommodityTariffInteractionInfo);
     Map<String, InteractionInfo> writeEcosystemInformationInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("ecosystemInformation", writeEcosystemInformationInteractionInfo);
     Map<String, InteractionInfo> writeCommissionerControlInteractionInfo = new LinkedHashMap<>();
@@ -3806,6 +3810,10 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("tlsCertificateManagement", writeTlsCertificateManagementInteractionInfo);
     Map<String, InteractionInfo> writeTlsClientManagementInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("tlsClientManagement", writeTlsClientManagementInteractionInfo);
+    Map<String, InteractionInfo> writeMeterIdentificationInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("meterIdentification", writeMeterIdentificationInteractionInfo);
+    Map<String, InteractionInfo> writeCommodityMeteringInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("commodityMetering", writeCommodityMeteringInteractionInfo);
     Map<String, InteractionInfo> writeUnitTestingInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeUnitTestingBooleanCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo unitTestingbooleanCommandParameterInfo =
