@@ -28,7 +28,7 @@ class GeneratorStorage:
     Handles file operations for generator output. Specifically can create
     required files for output.
 
-    Is overriden for unit tests.
+    Is overridden for unit tests.
     """
 
     def __init__(self):

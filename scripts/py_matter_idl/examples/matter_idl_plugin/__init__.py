@@ -14,8 +14,8 @@
 
 import os
 
+from matter.idl.generators.generator import CodeGenerator, GeneratorStorage
 from matter.idl.matter_idl_types import Cluster, Command, Field, Idl
-from scripts.py_matter_idl.matter.idl.generators.generator import CodeGenerator, GeneratorStorage
 
 
 def toUpperSnakeCase(s):

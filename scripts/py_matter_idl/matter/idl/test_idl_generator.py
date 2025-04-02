@@ -27,9 +27,9 @@ except ImportError:
     sys.path.append(str(Path(__file__).resolve().parent / ".." / ".."))
     from matter.idl.matter_idl_parser import CreateParser
 
+from matter.idl.generators.generator import GeneratorStorage
 from matter.idl.generators.idl import IdlGenerator
 from matter.idl.matter_idl_types import Idl
-from scripts.py_matter_idl.matter.idl.generators.generator import GeneratorStorage
 
 
 class TestCaseStorage(GeneratorStorage):
