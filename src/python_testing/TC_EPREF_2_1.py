@@ -36,6 +36,7 @@ import logging
 import chip.clusters as Clusters
 from chip.interaction_model import Status
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_asserts import assert_valid_uint8
 from mobly import asserts
 
 
@@ -47,15 +48,16 @@ class TC_EPREF_2_1(MatterBaseTest):
     def steps_TC_EPREF_2_1(self) -> list[TestStep]:
         steps = [
             TestStep("1", "Commissioning, already done", is_commissioning=True),
-            TestStep("2", "TH reads from the DUT the EnergyBalances attribute."),
-            TestStep("3", "TH reads from the DUT the CurrentEnergyBalance attribute."),
-            TestStep("3a", "TH writes to the DUT the CurrentEnergyBalance attribute"),
-            TestStep("3b", "TH writes to the DUT the CurrentEnergyBalance attribute with an out of index value"),
-            TestStep("4", "TH reads from the DUT the EnergyPriorities attribute"),
-            TestStep("5", "TH reads from the DUT the LowPowerModeSensitivites attribute"),
-            TestStep("6", "TH reads from the DUT the CurrentLowPowerModeSensitivity attribute"),
-            TestStep("6a", "TH writes to the DUT the CurrentLowPowerModeSensitivity attribute"),
-            TestStep("6b", "TH writes to the DUT the CurrentLowPowerModeSensitivity attribute with an out of index value"),
+            TestStep("2", "TH reads from the DUT the FeatureMap attribute."),
+            TestStep("3", "TH reads from the DUT the EnergyBalances attribute."),
+            TestStep("4", "TH reads from the DUT the CurrentEnergyBalance attribute."),
+            TestStep("4a", "TH writes to the DUT the CurrentEnergyBalance attribute"),
+            TestStep("4b", "TH writes to the DUT the CurrentEnergyBalance attribute with an out of index value"),
+            TestStep("5", "TH reads from the DUT the EnergyPriorities attribute"),
+            TestStep("6", "TH reads from the DUT the LowPowerModeSensitivites attribute"),
+            TestStep("7", "TH reads from the DUT the CurrentLowPowerModeSensitivity attribute"),
+            TestStep("7a", "TH writes to the DUT the CurrentLowPowerModeSensitivity attribute"),
+            TestStep("7b", "TH writes to the DUT the CurrentLowPowerModeSensitivity attribute with an out of index value"),
         ]
         return steps
 
@@ -68,6 +70,10 @@ class TC_EPREF_2_1(MatterBaseTest):
     async def read_epref_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.EnergyPreference
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
+
+    async def read_feature_map(self, endpoint):
+        return await self.read_epref_attribute_expect_success(endpoint=endpoint,
+                                                              attribute=Clusters.EnergyPreference.Attributes.FeatureMap)
 
     async def read_energy_balances(self, endpoint):
         return await self.read_epref_attribute_expect_success(endpoint=endpoint,
@@ -101,14 +107,17 @@ class TC_EPREF_2_1(MatterBaseTest):
     async def test_TC_EPREF_2_1(self):
 
         endpoint = self.user_params.get("endpoint", 1)
-        UINT8_MIN_VALUE = 0  # Minimum value for uint8 data type
-        UINT8_MAX_VALUE = 255  # Maximum value for uint8 data type
 
         self.step("1")
         self.print_step(1, "Commissioning, already done")
 
         self.step("2")
-        if self.pics_guard(self.check_pics("EPREF.S.A0000")):
+        feature_map = await self.read_feature_map(endpoint=endpoint)
+        # Logging the FeatureMap Attribute output responses from the DUT:
+        logging.info(f"FeatureMap: {feature_map}")
+        if Clusters.EnergyPreference.Bitmaps.Feature.kEnergyBalance & feature_map:
+
+            self.step("3")
             energy_balances = await self.read_energy_balances(endpoint=endpoint)
 
             # Logging the EnergyBalances Attribute output responses from the DUT:
@@ -122,18 +131,14 @@ class TC_EPREF_2_1(MatterBaseTest):
                 logging.info("}")
 
             # Verify the DUT response contains a list of BalanceStruct Type
-            asserts.assert_true(isinstance(energy_balances, list), "EnergyBalances should be a list of BalanceStructs")
+            asserts.assert_is_instance(energy_balances, list, "EnergyBalances should be a list of BalanceStructs")
 
-            # Verify the DUT response contains a list of BalanceStruct Type
-            asserts.assert_true(
-                all(isinstance(entry, Clusters.EnergyPreference.Structs.BalanceStruct) for entry in
-                    energy_balances),
-                "EnergyBalances should be a list of BalanceStructs"
-            )
+            for entry in energy_balances:
+                asserts.assert_is_instance(entry, Clusters.EnergyPreference.Structs.BalanceStruct,
+                                           "Each entry in EnergyBalances should be a BalanceStruct")
 
             # Verify the size of the list is at least 2 and not more than 10
-            list_size = len(energy_balances)
-            asserts.assert_in(list_size, range(2, 11), f"List size {list_size} is out of the expected range (2-10)")
+            asserts.assert_in(energy_balances_entries, range(2, 11), f"List size {energy_balances_entries} is out of the expected range (2-10)")
 
             # Verify the "step" value of the first BalanceStruct is 0
             first_balance_struct = energy_balances[0]
@@ -147,28 +152,19 @@ class TC_EPREF_2_1(MatterBaseTest):
 
             # If there are more than 2 BalanceStructs, verify the 'step' values are in ascending order
             for i, (current_balance, next_balance) in enumerate(zip(energy_balances[:-1], energy_balances[1:])):
-                asserts.assert_true(current_balance.step < next_balance.step,
+                asserts.assert_less(current_balance.step, next_balance.step,
                                     f"The step at index {i+1} ({next_balance.step}) should larger than the previous step ({current_balance.step})")
 
-        else:
-            logging.info("Test step skipped EnergyBalances Attribute")
 
-        self.step("3")
-        if self.pics_guard(self.check_pics("EPREF.S.A0001")):
+            self.step("4")
             existing_current_energy_balance = await self.read_current_energy_balances(endpoint=endpoint)
             # Logging the CurrentEnergyBalance Attribute output responses from the DUT:
             logging.info(f"CurrentEnergyBalance: {existing_current_energy_balance}")
             # Verify that the DUT response is of uint8 type
-            asserts.assert_true(isinstance(existing_current_energy_balance, int),
+            assert_valid_uint8(existing_current_energy_balance,
                                 "CurrentEnergyBalance should be of type uint8 (integer)")
-            asserts.assert_in(existing_current_energy_balance, range(UINT8_MIN_VALUE, UINT8_MAX_VALUE + 1),
-                              f"CurrentEnergyBalance value {existing_current_energy_balance} is out of the expected range (0-255)")
 
-        else:
-            logging.info("Test step skipped")
-
-        self.step("3a")
-        if self.pics_guard(self.check_pics("EPREF.S.A0000") and self.check_pics("EPREF.S.A0001")):
+            self.step("4a")
             energy_balances = await self.read_energy_balances(endpoint=endpoint)
             if energy_balances:
                 energy_balances_entries = len(energy_balances)
@@ -182,11 +178,7 @@ class TC_EPREF_2_1(MatterBaseTest):
             else:
                 logging.error("EnergyBalances list is empty. Cannot write CurrentEnergyBalance.")
 
-        else:
-            logging.info("Test step skipped")
-
-        self.step("3b")
-        if self.pics_guard(self.check_pics("EPREF.S.A0001")):
+            self.step("4b")
             energy_balances = await self.read_energy_balances(endpoint=endpoint)
             energy_balances_entries = len(energy_balances)
             status = await self.write_current_energy_balance(endpoint=endpoint,
@@ -196,11 +188,7 @@ class TC_EPREF_2_1(MatterBaseTest):
             if status == Status.ConstraintError:
                 logging.info("CurrentEnergyBalance Attribute Write Response - Status: 0x87 (CONSTRAINT_ERROR)")
 
-        else:
-            logging.info("Test step skipped")
-
-        self.step("4")
-        if self.pics_guard(self.check_pics("EPREF.S.A0002")):
+            self.step("5")
             energy_priorities = await self.read_energy_priorities(endpoint=endpoint)
 
             # Logging the EnergyPriorities Attribute output responses from the DUT:
@@ -227,16 +215,16 @@ class TC_EPREF_2_1(MatterBaseTest):
                  Clusters.EnergyPreference.Enums.EnergyPriorityEnum.kWaterConsumption}
             ]
             response_set = set(energy_priorities)
-            asserts.assert_true(
-                response_set in valid_combinations,
+            asserts.assert_in(response_set, valid_combinations,
                 f"EnergyPriorities list items {energy_priorities} do not match any of the expected combinations: {valid_combinations}"
             )
 
         else:
-            logging.info("Test step skipped")
+            logging.info("Device does not support EnergyBalance feature and related attributes, skipped Test Step 2 to 5")
 
-        self.step("5")
-        if self.pics_guard(self.check_pics("EPREF.S.A0003")):
+        if Clusters.EnergyPreference.Bitmaps.Feature.kLowPowerModeSensitivity & feature_map:
+
+            self.step("6")
             low_power_mode_sensitivities = await self.read_low_power_mode_sensitivities(endpoint=endpoint)
 
             # Logging the LowPowerModeSensitivities Attribute output responses from the DUT:
@@ -257,10 +245,9 @@ class TC_EPREF_2_1(MatterBaseTest):
             )
 
             # Verify the size of the list is at least 2 and not more than 10
-            list_size = len(low_power_mode_sensitivities)
             asserts.assert_in(
-                list_size, range(2, 11),
-                f"List size {list_size} is out of the expected range (2-10)"
+                num_of_entries, range(2, 11),
+                f"List size {num_of_entries} is out of the expected range (2-10)"
             )
 
             # If there are more than 2 BalanceStructs, verify that the Step field is in ascending order
@@ -268,27 +255,16 @@ class TC_EPREF_2_1(MatterBaseTest):
                 asserts.assert_true(current_balance.step < next_balance.step,
                                     f"The step at index {i+1} ({next_balance.step}) should larger than the previous step ({current_balance.step})")
 
-        else:
-            logging.info("Test step skipped")
-
-        self.step("6")
-        if self.pics_guard(self.check_pics("EPREF.S.A0004")):
+            self.step("7")
             current_low_power_mode_sensitivity = await self.read_current_low_power_mode_sensitivity(endpoint=endpoint)
 
             # Logging the CurrentLowPowerModeSensitivity Attribute output responses from the DUT:
             logging.info(f"CurrentLowPowerModeSensitivity: {current_low_power_mode_sensitivity}")
 
             # Verify that the DUT response is of uint8 type
-            asserts.assert_true(isinstance(current_low_power_mode_sensitivity, int),
-                                "CurrentLowPowerModeSensitivity should be of type uint8 (integer)")
-            asserts.assert_in(current_low_power_mode_sensitivity, range(UINT8_MIN_VALUE, UINT8_MAX_VALUE + 1),
-                              f"CurrentLowPowerModeSensitivity value {current_low_power_mode_sensitivity} is out of the expected range (0-255)")
+            assert_valid_uint8(current_low_power_mode_sensitivity, "CurrentLowPowerModeSensitivity should be of type uint8 (integer)")
 
-        else:
-            logging.info("Test step skipped")
-
-        self.step("6a")
-        if self.pics_guard(self.check_pics("EPREF.S.A0004")):
+            self.step("7a")
             low_power_mode_sensitivities = await self.read_low_power_mode_sensitivities(endpoint=endpoint)
             if len(low_power_mode_sensitivities) > 0:
                 low_power_mode_sensitivity_entries = len(low_power_mode_sensitivities)
@@ -305,11 +281,7 @@ class TC_EPREF_2_1(MatterBaseTest):
             else:
                 logging.error("CurrentLowPowerModeSensitivity list is empty. Cannot write CurrentLowPowerModeSensitivity.")
 
-        else:
-            logging.info("Test step skipped")
-
-        self.step("6b")
-        if self.pics_guard(self.check_pics("EPREF.S.A0004")):
+            self.step("7b")
             low_power_mode_sensitivities = await self.read_low_power_mode_sensitivities(endpoint=endpoint)
             low_power_mode_sensitivity_entries = len(low_power_mode_sensitivities)
             status = await self.write_current_low_power_mode_sensitivity(endpoint=endpoint,
@@ -320,7 +292,7 @@ class TC_EPREF_2_1(MatterBaseTest):
                 logging.info("CurrentLowPowerModeSensitivity Attribute Write Response - Status: 0x87 (CONSTRAINT_ERROR)")
 
         else:
-            logging.info("Test step skipped")
+            logging.info("Device does not support EnergyBalance feature and related attributes, skipped Test Step 5 to 6b")
 
 
 if __name__ == "__main__":
