@@ -92,6 +92,7 @@ bitmap {{bitmap.name}} : {{ bitmap.base_type}} {
   {% endfor %}
 
   {%- for enum in cluster.enums | rejectattr("is_global")%}
+  {#- #}  {# For indent-#}
   {% if enum.is_shared%}shared {% endif -%}
   enum {{enum.name}} : {{ enum.base_type}} {
     {% for entry in enum.entries %}
@@ -102,6 +103,7 @@ bitmap {{bitmap.name}} : {{ bitmap.base_type}} {
   {% endfor %}
 
   {%- for bitmap in cluster.bitmaps | rejectattr("is_global")%}
+  {#- #}  {# For indent-#}
   {% if bitmap.is_shared%}shared {% endif -%}
   bitmap {{bitmap.name}} : {{ bitmap.base_type}} {
     {% for entry in bitmap.entries %}
