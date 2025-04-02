@@ -18,25 +18,24 @@ import ctypes
 from enum import Enum, auto
 from typing import Optional
 
-import chip.native
-from chip.native import PyChipError
+from ..native import GetLibraryHandle, HandleFlags, NativeLibraryHandleMethodArguments, PyChipError
 
 
 def _GetTracingLibraryHandle() -> ctypes.CDLL:
     """ Get the native library handle with tracing methods initialized.
 
-      Retreives the CHIP native library handle and attaches signatures to
+      Retrieves the CHIP native library handle and attaches signatures to
       native methods.
       """
 
     # Getting a handle without requiring init, as tracing methods
     # do not require chip stack startup
-    handle = chip.native.GetLibraryHandle(chip.native.HandleFlags(0))
+    handle = GetLibraryHandle(HandleFlags(0))
 
     # Uses one of the type decorators as an indicator for everything being
     # initialized.
     if not handle.pychip_tracing_start_json_file.argtypes:
-        setter = chip.native.NativeLibraryHandleMethodArguments(handle)
+        setter = NativeLibraryHandleMethodArguments(handle)
 
         setter.Set('pychip_tracing_start_json_log', None, [])
         setter.Set('pychip_tracing_start_json_file', PyChipError, [ctypes.c_char_p])

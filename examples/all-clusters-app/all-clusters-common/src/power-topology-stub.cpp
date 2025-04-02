@@ -70,3 +70,13 @@ void emberAfPowerTopologyClusterInitCallback(chip::EndpointId endpointId)
         gInstance->Init();
     }
 }
+
+void emberAfPowerTopologyClusterShutdownCallback(chip::EndpointId endpointId)
+{
+    if (gInstance)
+    {
+        gInstance->Shutdown();
+    }
+    gInstance = nullptr;
+    gDelegate = nullptr;
+}

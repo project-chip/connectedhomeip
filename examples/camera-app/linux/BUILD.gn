@@ -28,6 +28,7 @@ config("config") {
   include_dirs = [
     "include",
     "include/clusters/chime",
+    "include/clusters/webrtc_provider",
     "${chip_root}/examples/camera-app/camera-common/include",
     "${chip_root}/third_party/libdatachannel/repo/include",
   ]
@@ -39,6 +40,7 @@ executable("chip-camera-app") {
   sources = [
     "${chip_root}/examples/camera-app/linux/src/camera-device.cpp",
     "${chip_root}/examples/camera-app/linux/src/clusters/chime/chime-manager.cpp",
+    "${chip_root}/examples/camera-app/linux/src/clusters/webrtc_provider/webrtc-provider-manager.cpp",
     "include/CHIPProjectAppConfig.h",
     "main.cpp",
   ]

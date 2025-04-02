@@ -273,7 +273,8 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadProvision(ByteSpan netInfo)
 
     int threadErr = THREAD_ERROR_NONE;
 
-    threadErr = thread_network_set_active_dataset_tlvs(mThreadInstance, netInfo.data(), netInfo.size());
+    VerifyOrReturnError(CanCastTo<int>(netInfo.size()), CHIP_ERROR_INTERNAL);
+    threadErr = thread_network_set_active_dataset_tlvs(mThreadInstance, netInfo.data(), static_cast<int>(netInfo.size()));
     VerifyOrExit(threadErr == THREAD_ERROR_NONE,
                  ChipLogError(DeviceLayer, "FAIL: Thread set active dataset TLVs: %s", get_error_message(threadErr)));
 

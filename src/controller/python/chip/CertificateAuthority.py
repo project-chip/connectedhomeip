@@ -24,10 +24,9 @@ from ctypes import c_void_p
 from datetime import timedelta
 from typing import List, Optional
 
-import chip.exceptions
-from chip import ChipStack, FabricAdmin
-from chip.native import PyChipError
-from chip.storage import PersistentStorage
+from . import ChipStack, FabricAdmin
+from .native import GetLibraryHandle, PyChipError
+from .storage import PersistentStorage
 
 LOGGER = logging.getLogger(__name__)
 
@@ -53,7 +52,7 @@ class CertificateAuthority:
     '''
     @classmethod
     def _Handle(cls):
-        return chip.native.GetLibraryHandle()
+        return GetLibraryHandle()
 
     @classmethod
     def logger(cls):
@@ -229,7 +228,7 @@ class CertificateAuthorityManager:
     '''
     @classmethod
     def _Handle(cls):
-        return chip.native.GetLibraryHandle()
+        return GetLibraryHandle()
 
     @classmethod
     def logger(cls):

@@ -17,7 +17,7 @@
 from ctypes import CFUNCTYPE, c_char_p, c_uint8, c_uint16, c_uint32, c_uint64, create_string_buffer
 from typing import Optional
 
-from chip.native import GetLibraryHandle, NativeLibraryHandleMethodArguments, PyChipError
+from ..native import GetLibraryHandle, NativeLibraryHandleMethodArguments, PyChipError
 
 
 class SetupPayload:

@@ -512,3 +512,4 @@ bool emberAfSmokeCoAlarmClusterSelfTestRequestCallback(CommandHandler * commandO
 }
 
 void MatterSmokeCoAlarmPluginServerInitCallback() {}
+void MatterSmokeCoAlarmPluginServerShutdownCallback() {}

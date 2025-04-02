@@ -23,8 +23,9 @@ import platform
 import typing
 from dataclasses import dataclass
 
-import chip.exceptions
 import construct  # type: ignore
+
+from ..exceptions import ChipStackError
 
 
 class Library(enum.Enum):
@@ -121,9 +122,9 @@ class PyChipError(ctypes.Structure):
             return None
         return self.code & 0xFF
 
-    def to_exception(self) -> typing.Optional[chip.exceptions.ChipStackError]:
+    def to_exception(self) -> typing.Optional[ChipStackError]:
         if not self.is_success:
-            return chip.exceptions.ChipStackError.from_chip_error(self)
+            return ChipStackError.from_chip_error(self)
         return None
 
     def __str__(self):
@@ -139,7 +140,7 @@ class PyChipError(ctypes.Structure):
             return self.code == other
         if isinstance(other, PyChipError):
             return self.code == other.code
-        if isinstance(other, chip.exceptions.ChipStackError):
+        if isinstance(other, ChipStackError):
             return self.code == other.err
         raise ValueError(f"Cannot compare PyChipError with {type(other)}")
 

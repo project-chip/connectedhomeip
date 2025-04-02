@@ -387,3 +387,4 @@ bool emberAfGroupsClusterEndpointInGroupCallback(chip::FabricIndex fabricIndex, 
 void emberAfPluginGroupsServerSetGroupNameCallback(EndpointId endpoint, GroupId groupId, const CharSpan & groupName) {}
 
 void MatterGroupsPluginServerInitCallback() {}
+void MatterGroupsPluginServerShutdownCallback() {}

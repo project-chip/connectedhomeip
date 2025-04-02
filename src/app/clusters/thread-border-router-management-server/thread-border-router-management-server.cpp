@@ -379,3 +379,4 @@ void MatterThreadBorderRouterManagementPluginServerInitCallback()
 {
     // Nothing to do, the server init routine will be done in Instance::Init()
 }
+void MatterThreadBorderRouterManagementPluginServerShutdownCallback() {}
