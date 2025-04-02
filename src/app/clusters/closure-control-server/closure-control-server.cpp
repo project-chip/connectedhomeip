@@ -84,7 +84,7 @@ bool Instance::CheckCommandStateCompatiblilty(CommandId cmd, MainStateEnum state
     {
         return false;
     }
-    
+
     switch (cmd)
     {
     case Commands::Stop::Id:
@@ -102,7 +102,7 @@ bool Instance::CheckCommandStateCompatiblilty(CommandId cmd, MainStateEnum state
         break;
     default:
         return false;
-    }   
+    }
     return false;
 }
 
@@ -233,7 +233,7 @@ CHIP_ERROR Instance::EncodeCurrentErrorList(const AttributeValueEncoder::ListEnc
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     ReturnErrorOnFailure(mDelegate.StartCurrentErrorListRead());
-    
+
     for (size_t i = 0; true; i++)
     {
         ClosureErrorEnum error;
@@ -298,31 +298,31 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
         {
             HandleCommand<Calibrate::DecodableType>(
                 handlerContext, [this, &status](HandlerContext & ctx, const auto & commandData) { status = HandleCalibrate(ctx, commandData); });
-        } 
+        }
         break;
     }
-    
+
     handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, status);
 }
 
 Status Instance::HandleStop(HandlerContext & ctx, const Commands::Stop::DecodableType & commandData)
 {
     MainStateEnum state = GetMainState();
-    
+
     Status status = Status::Failure;
-    
+
     VerifyOrReturnValue(CheckCommandStateCompatiblilty(Commands::Stop::Id,state), Status::InvalidInState);
-    if (state == MainStateEnum::kStopped) 
+    if (state == MainStateEnum::kStopped)
     {
         return Status::Success;
     }
-    
+
     if ((state == MainStateEnum::kMoving) || (state == MainStateEnum::kWaitingForMotion))
     {
         status = mDelegate.Stop();
-        SetMainState(MainStateEnum::kStopped); 
+        SetMainState(MainStateEnum::kStopped);
     }
-    
+
     return status;
 }
 
@@ -338,18 +338,18 @@ Status Instance::HandleCalibrate(HandlerContext & ctx, const Commands::Calibrate
     MainStateEnum state = GetMainState();
     Status status = Status::Failure;
     VerifyOrReturnValue(CheckCommandStateCompatiblilty(Commands::Calibrate::Id,state), Status::InvalidInState);
-    
-    if (state == MainStateEnum::kCalibrating) 
+
+    if (state == MainStateEnum::kCalibrating)
     {
         return Status::Success;
     }
-    
+
     if ((state == MainStateEnum::kStopped))
     {
         status = mDelegate.Calibrate();
         SetMainState(MainStateEnum::kCalibrating);
     }
-    
+
     return status;
 }
 

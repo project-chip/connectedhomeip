@@ -59,7 +59,7 @@ public:
     // ------------------------------------------------------------------
     // Get attribute methods
     virtual DataModel::Nullable<uint32_t> GetCountdownTime() = 0;
-    
+
     /* These functions are called by the ReadAttribute handler to iterate through lists
      * The cluster server will call Start<Type>Read to allow the delegate to create a temporary
      * lock on the data.
@@ -132,7 +132,7 @@ public:
      * @return CHIP_NO_ERROR if set was successful.
      */
     CHIP_ERROR SetOverallTarget(const GenericOverallTarget & aOverallTarget);
-    
+
     /**
      * @brief Add Error to CurretErrorList.
      * @param[in] error The error to be added.
@@ -171,7 +171,7 @@ public:
      * @return true if State is supported, false if State is not supported
      */
     bool IsSupportedState(MainStateEnum aMainState);
-    
+
     /**
      * @brief This function checks if specifc command is supported on specific state or not.
      * @param[in] cmd Command to be supported.
@@ -179,7 +179,7 @@ public:
      * @return true if command is supported on specific state, false if not supported.
      */
     bool CheckCommandStateCompatiblilty(CommandId cmd, MainStateEnum state);
-    
+
     /**
      * Reports that the contents of the current error list has changed.
      * The device SHALL call this method whenever it changes the current error list.

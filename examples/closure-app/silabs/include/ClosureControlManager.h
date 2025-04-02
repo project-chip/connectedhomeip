@@ -59,7 +59,7 @@ public:
     CHIP_ERROR StartCurrentErrorListRead() override;
     CHIP_ERROR GetCurrentErrorListAtIndex(size_t Index, ClosureErrorEnum & closureError) override;
     CHIP_ERROR EndCurrentErrorListRead() override;
-    
+
     void ClosureControlAttributeChangeHandler(EndpointId endpointId, AttributeId attributeId);
 
 private:
