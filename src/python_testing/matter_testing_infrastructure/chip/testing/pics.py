@@ -70,15 +70,19 @@ def parse_pics_xml(contents: str) -> dict[str, bool]:
         name_elem = pi.find('itemNumber')
         support_elem = pi.find('support')
 
-        # Skip if either element is None
-        if name_elem is None or support_elem is None:
-            continue
+        # Raise an error if either element is None
+        if name_elem is None:
+            raise ValueError(f"PICS XML item missing 'itemNumber' element: {ET.tostring(pi, encoding='unicode')}")
+        if support_elem is None:
+            raise ValueError(f"PICS XML item missing 'support' element: {ET.tostring(pi, encoding='unicode')}")
 
-        # Skip if either text is None
+        # Raise an error if either text is None
         name = name_elem.text
         support = support_elem.text
-        if name is None or support is None:
-            continue
+        if name is None:
+            raise ValueError(f"PICS XML item 'itemNumber' element missing text: {ET.tostring(pi, encoding='unicode')}")
+        if support is None:
+            raise ValueError(f"PICS XML item 'support' element missing text: {ET.tostring(pi, encoding='unicode')}")
 
         pics[name] = int(json.loads(support.lower())) == 1
     return pics
