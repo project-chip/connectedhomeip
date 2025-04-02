@@ -558,9 +558,6 @@ class TC_CGEN_2_2(MatterBaseTest):
                              "The trusted_roots list size should match the original trusted_roots list size.")
 
         self.step(26)
-        basic_commissioning_info = await self.read_single_attribute_check_success(cluster=Clusters.GeneralCommissioning, attribute=Clusters.GeneralCommissioning.Attributes.BasicCommissioningInfo)
-        logger.info(f'Step #26 - basic_commissioning_info: {basic_commissioning_info}')
-
         logger.info('Step #26 - Fully commissioned started')
         resp = await TH2.CommissionOnNetwork(
             nodeId=newNodeId+1, setupPinCode=setup_pin_code,
