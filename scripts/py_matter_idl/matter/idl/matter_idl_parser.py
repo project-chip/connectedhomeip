@@ -5,7 +5,7 @@ import functools
 import logging
 import sys
 from pathlib import Path
-from typing import Dict, Optional, Set
+from typing import Dict, List, Optional
 
 from lark import Lark
 from lark.lexer import Token
@@ -544,9 +544,9 @@ class MatterIdlTransformer(Transformer):
             self.doc_comments.append(PrefixCppDocComment(token))
 
 
-def _referenced_type_names(cluster: Cluster) -> Set[str]:
+def _referenced_type_names(cluster: Cluster) -> List[str]:
     """
-    Return the names of all data types referenced by the given cluster.
+    Return the ORDERED and UNIQUE names of all data types referenced by the given cluster.
     """
     types = set()
     for s in cluster.structs:
@@ -560,7 +560,9 @@ def _referenced_type_names(cluster: Cluster) -> Set[str]:
     for a in cluster.attributes:
         types.add(a.definition.data_type.name)
 
-    return types
+    # We want things to be ordered, so that AST ordering (and insert of globals)
+    # is well behaved/reproducible
+    return sorted(types)
 
 
 class GlobalMapping:
