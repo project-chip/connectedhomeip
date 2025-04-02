@@ -758,6 +758,15 @@ static BOOL CommandNeedsTimedInvokeInClosureControlCluster(AttributeId aAttribut
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInClosureDimensionCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::ClosureDimension;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInServiceAreaCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::ServiceArea;
@@ -1484,6 +1493,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::ClosureControl::Id: {
         return CommandNeedsTimedInvokeInClosureControlCluster(commandID);
+    }
+    case Clusters::ClosureDimension::Id: {
+        return CommandNeedsTimedInvokeInClosureDimensionCluster(commandID);
     }
     case Clusters::ServiceArea::Id: {
         return CommandNeedsTimedInvokeInServiceAreaCluster(commandID);
