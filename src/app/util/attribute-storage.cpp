@@ -225,6 +225,7 @@ void emberAfEndpointConfigure()
             // Default composition for all device types is set to tree. Except rootnode, aggregator and
             // bridgednode, which are full-family. Clients can manually override these defaults using
             // SetFlatCompositionForEndpoint / SetTreeCompositionForEndpoint at application init.
+            // TODO: This information should come from the schema XML, not be hardcoded.
             if ((deviceType.deviceTypeId == kRootnodeId) || (deviceType.deviceTypeId == kAggregatorId) ||
                 (deviceType.deviceTypeId == kBridgedNode))
             {
