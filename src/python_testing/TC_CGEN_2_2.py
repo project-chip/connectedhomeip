@@ -56,7 +56,7 @@ class TC_CGEN_2_2(MatterBaseTest):
     cluster_opcreds = Clusters.OperationalCredentials
     cluster_cgen = Clusters.GeneralCommissioning
 
-    default_failsafe = 20
+    default_failsafe = 1
     RUN_TEST_CI = "CI Test"
     RUN_TEST_CERT = "Cert Test"
 
@@ -77,9 +77,6 @@ class TC_CGEN_2_2(MatterBaseTest):
         Returns:
             response: The response from the command sent to the device.
         '''
-        # Buffer for latency
-        buffer_latency = .5
-
         # Resetting the failsafe timer to 1 seconds to clean up resources and avoid waiting in CI.
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=expiration_time_seconds, breadcrumb=2)
         # Sending the command to the DUT (Device Under Test).
@@ -87,11 +84,11 @@ class TC_CGEN_2_2(MatterBaseTest):
 
         start_time = time.time()
         # Wait for the expiration time (fail-safe will expire after this time), plus buffer for latency
-        logger.info(f'Waiting for {expiration_time_seconds} seconds (with additional buffer {buffer_latency} seconds for latency).')
-        await asyncio.sleep(expiration_time_seconds + buffer_latency)
+        logger.info(f'Waiting for {expiration_time_seconds} seconds.')
+        await asyncio.sleep(expiration_time_seconds)
         elapsed_time = time.time() - start_time
         logger.info(
-            f'Failsafe timer expired after: {elapsed_time:.2f} seconds (including {buffer_latency} seconds for latency buffer).')
+            f'Failsafe timer expired after: {elapsed_time:.2f} seconds.')
 
         return resp
 
@@ -242,7 +239,7 @@ class TC_CGEN_2_2(MatterBaseTest):
                      TH1 sends an AddTrustedRootCertificate command to the Node Operational Credentials cluster to install this new certificate.'''),
             TestStep(6, 'TH1 reads the TrustedRootCertificate attribute.'),
             TestStep(7, '''TH1 sends an ArmFailSafe command to the DUT with ExpiryLengthSeconds field set to 1 and the Breadcrumb value as 2. 
-                     TH1 then waits 1.5 seconds to ensure the failsafe timer has expired'''),
+                     TH1 then waits 1 seconds to ensure the failsafe timer has expired'''),
             TestStep('8-9', 'TH1 execute function run_steps_8_to_9 to run steps #8 through #9.'),
             TestStep(8, 'TH1 reads the TrustedRootCertificates attribute from the Node Operational Credentials cluster.'),
             TestStep(9, 'TH1 reads the Breadcrumb attribute and verify that the breadcrumb attribute is 0.'),
@@ -573,17 +570,8 @@ class TC_CGEN_2_2(MatterBaseTest):
         self.step(27)
         # TH2 TrustedRootCertificate response with FAILSAFE_REQUIRED
         try:
-            logger.info("Step #27 - TH2 Generating a new CSR to update the root certificate...")
-            # Flow generates a new TrustedRootCertificate - Request CSR (Certificate Signing Request) and update NOC (Node Operational Certificate)
-            cmd = self.cluster_opcreds.Commands.CSRRequest(CSRNonce=random.randbytes(32), isForUpdateNOC=False)
-            th2_csr = await self.send_single_cmd(dev_ctrl=TH2, node_id=newNodeId+1, cmd=cmd)
-
-            # Flow generates a new TrustedRootCertificate - Isue the certificates
-            th2_certs_new = await TH2.IssueNOCChain(th2_csr, newNodeId+1)
-            th2_new_root_cert = th2_certs_new.rcacBytes
-
-            # Flow generates a new TrustedRootCertificate - Send command to add new trusted root certificate
-            cmd = self.cluster_opcreds.Commands.AddTrustedRootCertificate(th2_new_root_cert)
+            # Flow generates a new TrustedRootCertificate - Send command to add trusted root certificate
+            cmd = self.cluster_opcreds.Commands.AddTrustedRootCertificate(new_root_cert)
             resp = await self.send_single_cmd(dev_ctrl=TH2, node_id=newNodeId+1, cmd=cmd)
 
         except InteractionModelError as e:
@@ -669,15 +657,15 @@ class TC_CGEN_2_2(MatterBaseTest):
                 f'Step #33: {run_type} - Waiting for the failsafe timer '
                 f'(PIXIT.CGEN.FailsafeExpiryLengthSeconds --adjusted time for CI) to approach expiration, '
                 f'but not allowing it to fully expire. Waiting for: {failsafe_timeout_less_than_max} seconds.')
-            # Wait PIXIT.CGEN.FailsafeExpiryLengthSeconds time with an additional 0.5-second buffer, not allowing the fully exire (max_fail_safe).
-            await asyncio.sleep(failsafe_timeout_less_than_max + .5)
+            # Wait PIXIT.CGEN.FailsafeExpiryLengthSeconds time, not allowing the fully exire (max_fail_safe).
+            await asyncio.sleep(failsafe_timeout_less_than_max)
         else:
             logger.info(
                 f'Step #33: {run_type} - Waiting for the failsafe timer '
                 f'(FAILSAFE_EXPIRATION_SECONDS constant) to approach expiration, '
                 f'but not allowing it to fully expire. Waiting for: {failsafe_timeout_less_than_max} seconds.')
-            # Wait FAILSAFE_EXPIRATION_SECONDS constant time with an additional 0.5-second buffer, not allowing the fully exire (max_fail_safe).
-            await asyncio.sleep(failsafe_timeout_less_than_max + .5)
+            # Wait FAILSAFE_EXPIRATION_SECONDS constant time, not allowing the fully exire (max_fail_safe).
+            await asyncio.sleep(failsafe_timeout_less_than_max)
 
         self.step(34)
         trusted_root_list_original_updated = await self.read_single_attribute_check_success(
@@ -762,9 +750,9 @@ class TC_CGEN_2_2(MatterBaseTest):
             logger.info(
                 f'Step #41: {run_type} - Bypassing due to failsafe expiration workaround to avoid unnecessary delays in CI environment.')
         else:
-            # Make TH1 wait until the target_time is greater than or equal to half of the maxFailsafe time with an additional 0.5-second buffer.
+            # Make TH1 wait until the target_time is greater than or equal to half of the maxFailsafe time.
             target_time = maxFailsafe/2
-            await asyncio.sleep(target_time + .5)
+            await asyncio.sleep(target_time)
 
             c_time = time.time()
             elapsed_time = (c_time - t_start) * 1000
@@ -805,8 +793,8 @@ class TC_CGEN_2_2(MatterBaseTest):
                 f'Test continues without the original wait.'
             )
         else:
-            # Calculate the target time (Tstart + maxFailsafe) with an additional 0.5-second buffer
-            target_time = (t_start + maxFailsafe) + .5
+            # Calculate the target time (Tstart + maxFailsafe)
+            target_time = (t_start + maxFailsafe)
 
             # Wait until the target_time is reached using asyncio.sleep to avoid busy-waiting
             await asyncio.sleep(target_time - time.time())
