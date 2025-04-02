@@ -64,8 +64,10 @@ CHIP_ERROR ClosureControlInit(EndpointId endpointId)
     }
 
     /* Manufacturer may optionally not support all features, commands & attributes */
-    gClosureCtrlInstance = std::make_unique<ClosureControlInstance>(EndpointId(endpointId), *gClosureCtrlDelegate,
-                            BitMask<Feature, uint32_t>(Feature::kCalibration, Feature::kPositioning, Feature::kSpeed,Feature::kMotionLatching), OptionalAttribute::kCountdownTime);
+    gClosureCtrlInstance = std::make_unique<ClosureControlInstance>(
+        EndpointId(endpointId), *gClosureCtrlDelegate,
+        BitMask<Feature, uint32_t>(Feature::kCalibration, Feature::kPositioning, Feature::kSpeed, Feature::kMotionLatching),
+        OptionalAttribute::kCountdownTime);
     if (!gClosureCtrlInstance)
     {
         ChipLogError(AppServer, "Failed to allocate memory for ClosureControlInstance");

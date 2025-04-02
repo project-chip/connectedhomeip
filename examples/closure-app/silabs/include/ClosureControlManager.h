@@ -62,7 +62,6 @@ public:
     void ClosureControlAttributeChangeHandler(EndpointId endpointId, AttributeId attributeId);
 
 private:
-
     friend ClosureControlManager & ClosureCtrlMgr();
 
     /***************************************************************************
