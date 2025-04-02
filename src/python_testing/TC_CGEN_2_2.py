@@ -29,7 +29,7 @@
 #       --discriminator 1234
 #       --passcode 20202021
 #       --PICS src/app/tests/suites/certification/ci-pics-values
-#       --int-arg PIXIT.CGEN.FailsafeExpiryLengthSeconds:1
+#       --int-arg PIXIT.CGEN.FailsafeExpiryLengthSeconds:${pixit_failsafe_expiry_length_seconds}
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -356,7 +356,7 @@ class TC_CGEN_2_2(MatterBaseTest):
         # Step 7 - 'set_failsafe_timer' function is used to force the failsafe timer to expire,
         # avoiding unnecessary delays in CI/Cert environments
 
-        # By default, the failsafe expiration time is set to 20 seconds, but this value can be adjusted through
+        # By default, the failsafe expiration time is set to 1 seconds, but this value can be adjusted through
         # the configuration parameter 'PIXIT.CGEN.FailsafeExpiryLengthSeconds'. If not specified, the default is used.
 
         logger.info(
@@ -366,7 +366,7 @@ class TC_CGEN_2_2(MatterBaseTest):
         resp = await self.set_failsafe_timer(
             dev_ctrl=self.default_controller,
             node_id=self.dut_node_id,
-            expiration_time_seconds=failsafe_expiration_seconds)
+            expiration_time_seconds=1)
 
         logger.info(
             f'Step #7: {run_type} - Failsafe timer expired after sending ArmFailSafe command. ExpiryLengthSeconds was set to {failsafe_expiration_seconds} seconds.'
