@@ -71,6 +71,8 @@ class Efr32App(Enum):
             return 'matter-silabs-device_tests'
         elif self == Efr32App.AIR_QUALITY_SENSOR:
             return 'matter-silabs-air-quality-sensor-example'
+        elif self == Efr32App.CLOSURE:
+            return 'matter-silabs-closure-example'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -91,6 +93,8 @@ class Efr32App(Enum):
             return os.path.join('tests', 'efr32_device_tests.flashbundle.txt')
         elif self == Efr32App.AIR_QUALITY_SENSOR:
             return 'air_quality_sensor_app.flashbundle.txt'
+        elif self == Efr32App.CLOSURE:
+            return 'closure_app.flashbundle.txt'
         else:
             raise Exception('Unknown app type: %r' % self)
 
