@@ -292,7 +292,7 @@ class TC_EPREF_2_1(MatterBaseTest):
                 logging.info("CurrentLowPowerModeSensitivity Attribute Write Response - Status: 0x87 (CONSTRAINT_ERROR)")
 
         else:
-            logging.info("Device does not support EnergyBalance feature and related attributes, skipped Test Step 5 to 6b")
+            logging.info("Device does not support EnergyBalance feature and related attributes, skipped Test Step 6 to 7b")
 
 
 if __name__ == "__main__":
