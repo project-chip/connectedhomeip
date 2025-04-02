@@ -131,8 +131,9 @@ void ServerClusterInterfaceRegistry::UnregisterAllFromEndpoint(EndpointId endpoi
         // Requirements for Paths:
         //   - GetPaths() MUST be non-empty
         //   - GetPaths() MUST belong to the same endpoint
-        const ConcreteClusterPath & path = current->serverClusterInterface->GetPaths()[0];
-        if (path.mEndpointId == endpointId)
+        // Loop below relies on that: if the endpoint matches, it can be removed
+        auto paths =current->serverClusterInterface->GetPaths();
+        if (paths.empty() || paths.front().mEndpointId == endpointId)
         {
             if (mCachedInterface == current->serverClusterInterface)
             {
