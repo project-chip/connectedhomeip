@@ -188,3 +188,8 @@ void MatterEthernetNetworkDiagnosticsPluginServerInitCallback()
 {
     AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
 }
+
+void MatterEthernetNetworkDiagnosticsPluginServerShutdownCallback()
+{
+    AttributeAccessInterfaceRegistry::Instance().Unregister(&gAttrAccess);
+}

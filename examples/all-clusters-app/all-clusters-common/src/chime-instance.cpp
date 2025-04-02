@@ -69,3 +69,5 @@ void emberAfChimeClusterInitCallback(EndpointId endpoint)
 {
     gChimeClusterServerInstance.Init();
 }
+
+void emberAfChimeClusterShutdownCallback(EndpointId endpoint) {}
