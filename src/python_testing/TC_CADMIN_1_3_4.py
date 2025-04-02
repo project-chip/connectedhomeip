@@ -194,8 +194,7 @@ class TC_CADMIN(MatterBaseTest):
             self.step(8)
             # TH_CR2 writes and reads the Basic Information Cluster’s NodeLabel mandatory attribute of DUT_CE
             val = await self.read_nl_attr(th=self.th2, attr_val=self.nl_attribute)
-            self.print_step(
-                "basic information cluster node label attr value", val)
+            self.print_step("basic information cluster node label attr value", val)
             await self.write_nl_attr(th=self.th2, attr_val=self.nl_attribute)
             await self.read_nl_attr(th=self.th2, attr_val=self.nl_attribute)
 
