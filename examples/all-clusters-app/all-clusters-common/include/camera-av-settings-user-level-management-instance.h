@@ -43,17 +43,17 @@ public:
     /**
      * delegate command handlers
      */
-    Protocols::InteractionModel::Status MPTZSetPosition(Optional<int16_t> pan, Optional<int16_t> tilt,
-                                                        Optional<int8_t> zoom) override;
-    Protocols::InteractionModel::Status MPTZRelativeMove(Optional<int16_t> pan, Optional<int16_t> tilt,
-                                                         Optional<int8_t> zoom) override;
-    Protocols::InteractionModel::Status MPTZMoveToPreset(uint8_t preset, Optional<int16_t> pan, Optional<int16_t> tilt,
-                                                         Optional<int8_t> zoom) override;
-    Protocols::InteractionModel::Status MPTZSavePreset(uint8_t preset) override;
-    Protocols::InteractionModel::Status MPTZRemovePreset(uint8_t preset) override;
-    Protocols::InteractionModel::Status DPTZSetViewport(uint16_t videoStreamID, Structs::ViewportStruct::Type viewport) override;
-    Protocols::InteractionModel::Status DPTZRelativeMove(uint16_t videoStreamID, Optional<int16_t> deltaX, Optional<int16_t> deltaY,
-                                                         Optional<int8_t> zoomDelta) override;
+    Protocols::InteractionModel::Status MPTZSetPosition(Optional<int16_t> aPan, Optional<int16_t> aTilt,
+                                                        Optional<int8_t> aZoom) override;
+    Protocols::InteractionModel::Status MPTZRelativeMove(Optional<int16_t> aPan, Optional<int16_t> aTilt,
+                                                         Optional<int8_t> aZoom) override;
+    Protocols::InteractionModel::Status MPTZMoveToPreset(uint8_t aPreset, Optional<int16_t> aPan, Optional<int16_t> aTilt,
+                                                         Optional<int8_t> aZoom) override;
+    Protocols::InteractionModel::Status MPTZSavePreset(uint8_t aPreset) override;
+    Protocols::InteractionModel::Status MPTZRemovePreset(uint8_t aPreset) override;
+    Protocols::InteractionModel::Status DPTZSetViewport(uint16_t aVideoStreamID, Structs::ViewportStruct::Type aViewport) override;
+    Protocols::InteractionModel::Status DPTZRelativeMove(uint16_t aVideoStreamID, Optional<int16_t> aDeltaX, Optional<int16_t> aDeltaY,
+                                                         Optional<int8_t> aZoomDelta) override;
 };
 
 CameraAvSettingsUserLevelMgmtServer * GetInstance();

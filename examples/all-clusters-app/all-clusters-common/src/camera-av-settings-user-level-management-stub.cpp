@@ -48,7 +48,7 @@ bool AVSettingsUserLevelManagementDelegate::CanChangeMPTZ()
     return true;
 }
 
-bool AVSettingsUserLevelManagementDelegate::IsValidVideoStreamID(uint16_t videoStreamID)
+bool AVSettingsUserLevelManagementDelegate::IsValidVideoStreamID(uint16_t aVideoStreamID)
 {
     return true;
 }
@@ -58,7 +58,7 @@ Status AVSettingsUserLevelManagementDelegate::PersistentAttributesLoadedCallback
     return Status::Success;
 }
 
-Status AVSettingsUserLevelManagementDelegate::MPTZSetPosition(Optional<int16_t> pan, Optional<int16_t> tilt, Optional<int8_t> zoom)
+Status AVSettingsUserLevelManagementDelegate::MPTZSetPosition(Optional<int16_t> aPan, Optional<int16_t> aTilt, Optional<int8_t> aZoom)
 {
     // The Cluster implementation has validated that the Feature Flags are set and the values themselves are in range. Do any needed
     // hardware interactions to actually set the camera to the new values of PTZ.  Then return a Status response. The server itself
@@ -67,7 +67,7 @@ Status AVSettingsUserLevelManagementDelegate::MPTZSetPosition(Optional<int16_t> 
     return Status::Success;
 }
 
-Status AVSettingsUserLevelManagementDelegate::MPTZRelativeMove(Optional<int16_t> pan, Optional<int16_t> tilt, Optional<int8_t> zoom)
+Status AVSettingsUserLevelManagementDelegate::MPTZRelativeMove(Optional<int16_t> aPan, Optional<int16_t> aTilt, Optional<int8_t> aZoom)
 {
     // The Cluster implementation has validated that the Feature Flags are set and the values themselves are in range. Do any needed
     // hardware interactions to actually set the camera to the new values of PTZ.  Then return a Status response. The server itself
@@ -76,8 +76,8 @@ Status AVSettingsUserLevelManagementDelegate::MPTZRelativeMove(Optional<int16_t>
     return Status::Success;
 }
 
-Status AVSettingsUserLevelManagementDelegate::MPTZMoveToPreset(uint8_t preset, Optional<int16_t> pan, Optional<int16_t> tilt,
-                                                               Optional<int8_t> zoom)
+Status AVSettingsUserLevelManagementDelegate::MPTZMoveToPreset(uint8_t aPreset, Optional<int16_t> aPan, Optional<int16_t> aTilt,
+                                                               Optional<int8_t> aZoom)
 {
     // The Cluster implementation has validated the preset is value, and provided the MPTZ values associated with that preset.
     // Do any needed hardware interactions to actually set the camera to the new values of PTZ.  Then return a Status response.
@@ -85,7 +85,7 @@ Status AVSettingsUserLevelManagementDelegate::MPTZMoveToPreset(uint8_t preset, O
     return Status::Success;
 }
 
-Status AVSettingsUserLevelManagementDelegate::MPTZSavePreset(uint8_t preset)
+Status AVSettingsUserLevelManagementDelegate::MPTZSavePreset(uint8_t aPreset)
 {
     // The Cluster implementation has validated that there is space, and provided the new preset id.
     // The application needs to confirm that the current MPTZ values can be save in a new preset.
@@ -93,7 +93,7 @@ Status AVSettingsUserLevelManagementDelegate::MPTZSavePreset(uint8_t preset)
     return Status::Success;
 }
 
-Status AVSettingsUserLevelManagementDelegate::MPTZRemovePreset(uint8_t preset)
+Status AVSettingsUserLevelManagementDelegate::MPTZRemovePreset(uint8_t aPreset)
 {
     // The Cluster implementation has validated that there is a saved preset associated with the provided id.
     // The application needs to confirm that this action is acceptable given the current state of the device.
@@ -101,7 +101,7 @@ Status AVSettingsUserLevelManagementDelegate::MPTZRemovePreset(uint8_t preset)
     return Status::Success;
 }
 
-Status AVSettingsUserLevelManagementDelegate::DPTZSetViewport(uint16_t videoStreamID, Structs::ViewportStruct::Type viewport)
+Status AVSettingsUserLevelManagementDelegate::DPTZSetViewport(uint16_t aVideoStreamID, Structs::ViewportStruct::Type aViewport)
 {
     // The Cluster implementation has ensured that the videoStreamID represents a valid stream.
     // The application needs to interact with its instance of AVStreamManagement to access the stream, validate the viewport
@@ -110,8 +110,8 @@ Status AVSettingsUserLevelManagementDelegate::DPTZSetViewport(uint16_t videoStre
     return Status::Success;
 }
 
-Status AVSettingsUserLevelManagementDelegate::DPTZRelativeMove(uint16_t videoStreamID, Optional<int16_t> deltaX,
-                                                               Optional<int16_t> deltaY, Optional<int8_t> zoomDelta)
+Status AVSettingsUserLevelManagementDelegate::DPTZRelativeMove(uint16_t aVideoStreamID, Optional<int16_t> aDeltaX,
+                                                               Optional<int16_t> aDeltaY, Optional<int8_t> aZoomDelta)
 {
     // The Cluster implementation has ensured that the videoStreamID represents a valid stream.
     // The application needs to interact with its instance of AVStreamManagement to access the stream, validate the viewport
@@ -120,9 +120,9 @@ Status AVSettingsUserLevelManagementDelegate::DPTZRelativeMove(uint16_t videoStr
     return Status::Success;
 }
 
-void emberAfCameraAvSettingsUserLevelManagementClusterInitCallback(chip::EndpointId endpointId)
+void emberAfCameraAvSettingsUserLevelManagementClusterInitCallback(chip::EndpointId aEndpointId)
 {
-    VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
+    VerifyOrDie(aEndpointId == 1); // this cluster is only enabled for endpoint 1.
     VerifyOrDie(gDelegate == nullptr && gAVSettingsUserLevelManagementCluster == nullptr);
     const int16_t appPanMin  = -90;
     const int16_t appPanMax  = 90;
@@ -152,9 +152,9 @@ void emberAfCameraAvSettingsUserLevelManagementClusterInitCallback(chip::Endpoin
     gAVSettingsUserLevelManagementCluster->Init();
 
     // Set app specific limits to pan, tilt, zoom
-    gAVSettingsUserLevelManagementCluster->setPanMin(appPanMin);
-    gAVSettingsUserLevelManagementCluster->setPanMax(appPanMax);
-    gAVSettingsUserLevelManagementCluster->setTiltMin(appTiltMin);
-    gAVSettingsUserLevelManagementCluster->setTiltMax(appTiltMax);
-    gAVSettingsUserLevelManagementCluster->setZoomMax(appZoomMax);
+    gAVSettingsUserLevelManagementCluster->SetPanMin(appPanMin);
+    gAVSettingsUserLevelManagementCluster->SetPanMax(appPanMax);
+    gAVSettingsUserLevelManagementCluster->SetTiltMin(appTiltMin);
+    gAVSettingsUserLevelManagementCluster->SetTiltMax(appTiltMax);
+    gAVSettingsUserLevelManagementCluster->SetZoomMax(appZoomMax);
 }
