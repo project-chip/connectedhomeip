@@ -104,3 +104,13 @@ void emberAfDishwasherModeClusterInitCallback(chip::EndpointId endpointId)
         new ModeBase::Instance(gDishwasherModeDelegate, 0x1, DishwasherMode::Id, chip::to_underlying(Feature::kOnOff));
     gDishwasherModeInstance->Init();
 }
+
+void emberAfDishwasherModeClusterShutdownCallback(chip::EndpointId endpointId)
+{
+    VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
+    if (gDishwasherModeInstance)
+    {
+        gDishwasherModeInstance->Shutdown();
+    }
+    DishwasherMode::Shutdown();
+}
