@@ -108,6 +108,7 @@ mcxw71_k32w1_executable("contact_sensor_app") {
     "CONFIG_THREAD_DEVICE_TYPE=kThreadDeviceType_SleepyEndDevice",
     "CONFIG_OPERATIONAL_KEYSTORE=1",
     "EXTERNAL_FACTORY_DATA_PROVIDER_HEADER=\"platform/nxp/common/factory_data/legacy/FactoryDataProvider.h\"",
+    "CONFIG_APP_FREERTOS_OS=1",
   ]
 
   if (chip_with_diag_logs_demo) {
