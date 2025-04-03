@@ -275,7 +275,7 @@ class TC_ACL_2_7(MatterBaseTest):
 
                 if hasattr(event_data, 'Data') and hasattr(event_data.Data, 'changeType'):
                     if (event_data.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded and
-                        event_data.Data.adminNodeID == self.th2.nodeId and 
+                        event_data.Data.adminNodeID == self.th2.nodeId and
                         isinstance(event_data.Data.adminPasscodeID, Nullable) and
                         event_data.Data.latestValue.data == D_OK_SINGLE and
                         event_data.Data.latestValue.fabricIndex == f2 and
