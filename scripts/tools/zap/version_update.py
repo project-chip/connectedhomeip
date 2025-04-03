@@ -38,7 +38,7 @@ __LOG_LEVELS__ = {
 #
 # At this time we hard-code nightly however we may need to figure out a more
 # generic version string once we stop using nightly builds
-ZAP_VERSION_RE = re.compile(r'v(\d\d\d\d)\.(\d\d)\.(\d\d)(-nightly|\.\d+)')
+ZAP_VERSION_RE = re.compile(r'^v(\d\d\d\d)\.(\d\d)\.(\d\d)(-nightly)?$')
 
 # A list of files where ZAP is maintained. You can get a similar list using:
 #
