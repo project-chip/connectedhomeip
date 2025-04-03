@@ -98,7 +98,11 @@ extern "C" WEAK void OtaHookReset()
 
     // Set the bootloader flags
     OTA_SetNewImageFlag();
+#if CONFIG_CHIP_OTA_POSTED_OPERATIONS_IN_IDLE
     chip::DeviceLayer::PlatformMgrImpl().ScheduleResetInIdle();
+#else
+    chip::DeviceLayer::PlatformMgrImpl().Reset();
+#endif
 }
 
 extern "C" WEAK void OtaHookAbort()
