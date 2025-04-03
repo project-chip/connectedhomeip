@@ -7041,6 +7041,132 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRClosureDimensionClusterCurrentStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _position = nil;
+
+        _latching = nil;
+
+        _speed = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRClosureDimensionClusterCurrentStruct alloc] init];
+
+    other.position = self.position;
+    other.latching = self.latching;
+    other.speed = self.speed;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: position:%@; latching:%@; speed:%@; >", NSStringFromClass([self class]), _position, _latching, _speed];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRClosureDimensionClusterRangePercent100thsStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _min = @(0);
+
+        _max = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRClosureDimensionClusterRangePercent100thsStruct alloc] init];
+
+    other.min = self.min;
+    other.max = self.max;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: min:%@; max:%@; >", NSStringFromClass([self class]), _min, _max];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRClosureDimensionClusterTargetStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _position = nil;
+
+        _latch = nil;
+
+        _speed = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRClosureDimensionClusterTargetStruct alloc] init];
+
+    other.position = self.position;
+    other.latch = self.latch;
+    other.speed = self.speed;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: position:%@; latch:%@; speed:%@; >", NSStringFromClass([self class]), _position, _latch, _speed];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRClosureDimensionClusterUnitRangeStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _min = @(0);
+
+        _max = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRClosureDimensionClusterUnitRangeStruct alloc] init];
+
+    other.min = self.min;
+    other.max = self.max;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: min:%@; max:%@; >", NSStringFromClass([self class]), _min, _max];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRServiceAreaClusterLandmarkInfoStruct
 - (instancetype)init
 {

@@ -2563,6 +2563,94 @@ provisional cluster WebRTCTransportProvider = 1363 {
   fabric command EndSession(EndSessionRequest): DefaultSuccess = 7;
 }
 
+/** The WebRTC transport requestor cluster provides a way for stream consumers (e.g. Matter Stream Viewer) to establish a WebRTC connection with a stream provider. */
+provisional cluster WebRTCTransportRequestor = 1364 {
+  revision 1;
+
+  enum StreamUsageEnum : enum8 {
+    kInternal = 0;
+    kRecording = 1;
+    kAnalysis = 2;
+    kLiveView = 3;
+  }
+
+  enum WebRTCEndReasonEnum : enum8 {
+    kIceFailed = 0;
+    kIceTimeout = 1;
+    kUserHangup = 2;
+    kUserBusy = 3;
+    kReplaced = 4;
+    kNoUserMedia = 5;
+    kInviteTimeout = 6;
+    kAnsweredElsewhere = 7;
+    kOutOfResources = 8;
+    kMediaTimeout = 9;
+    kLowPower = 10;
+    kUnknownReason = 11;
+  }
+
+  bitmap WebRTCMetadataOptionsBitmap : bitmap8 {
+    kDataTLV = 0x1;
+  }
+
+  struct ICEServerStruct {
+    char_string urls[] = 1;
+    optional char_string username = 2;
+    optional char_string credential = 3;
+    optional int16u caid = 4;
+  }
+
+  fabric_scoped struct WebRTCSessionStruct {
+    int16u id = 1;
+    node_id peerNodeID = 2;
+    endpoint_no peerEndpointID = 3;
+    StreamUsageEnum streamUsage = 4;
+    nullable int16u videoStreamID = 5;
+    nullable int16u audioStreamID = 6;
+    WebRTCMetadataOptionsBitmap metadataOptions = 7;
+    fabric_idx fabricIndex = 254;
+  }
+
+  readonly attribute access(read: administer) WebRTCSessionStruct currentSessions[] = 0;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct OfferRequest {
+    int16u webRTCSessionID = 0;
+    char_string sdp = 1;
+    optional ICEServerStruct ICEServers[] = 2;
+    optional char_string ICETransportPolicy = 3;
+  }
+
+  request struct AnswerRequest {
+    int16u webRTCSessionID = 0;
+    char_string sdp = 1;
+  }
+
+  request struct ICECandidatesRequest {
+    int16u webRTCSessionID = 0;
+    char_string ICECandidates[] = 1;
+  }
+
+  request struct EndRequest {
+    int16u webRTCSessionID = 0;
+    WebRTCEndReasonEnum reason = 1;
+  }
+
+  /** This command provides the stream requestor with WebRTC session details. */
+  command Offer(OfferRequest): DefaultSuccess = 1;
+  /** This command provides the stream requestor with the WebRTC session details (i.e. Session ID and SDP answer), It is the next command in the Offer/Answer flow to the ProvideOffer command. */
+  command Answer(AnswerRequest): DefaultSuccess = 2;
+  /** This command allows for string based https://rfc-editor.org/rfc/rfc8839#section-5.1 generated after the initial Offer / Answer exchange, via a JSEP https://datatracker.ietf.org/doc/html/rfc9429#section-4.1.20 event, a DOM https://www.w3.org/TR/webrtc/#dom-rtcpeerconnectioniceevent event, or other WebRTC compliant implementations, to be added to a session during the gathering phase. */
+  command ICECandidates(ICECandidatesRequest): DefaultSuccess = 3;
+  /** This command notifies the stream requestor that the provider has ended the WebRTC session. */
+  command End(EndRequest): DefaultSuccess = 4;
+}
+
 /** This cluster provides facilities to configure and play Chime sounds, such as those used in a doorbell. */
 provisional cluster Chime = 1366 {
   revision 1;
@@ -2961,6 +3049,7 @@ endpoint 0 {
 endpoint 1 {
   device type ma_camera = 322, version 1;
 
+  binding cluster WebRTCTransportRequestor;
 
   server cluster Identify {
     ram      attribute identifyTime default = 0x0000;

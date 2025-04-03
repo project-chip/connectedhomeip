@@ -385,3 +385,4 @@ bool IsPowerSettingNumberInRange(uint8_t powerSettingNum, uint8_t minCookPowerNu
  *
  */
 void MatterMicrowaveOvenControlPluginServerInitCallback() {}
+void MatterMicrowaveOvenControlPluginServerShutdownCallback() {}

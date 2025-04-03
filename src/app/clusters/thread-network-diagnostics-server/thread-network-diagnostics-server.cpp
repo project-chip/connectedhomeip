@@ -207,3 +207,9 @@ void MatterThreadNetworkDiagnosticsPluginServerInitCallback()
     AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
     GetDiagnosticDataProvider().SetThreadDiagnosticsDelegate(&gDiagnosticDelegate);
 }
+
+void MatterThreadNetworkDiagnosticsPluginServerShutdownCallback()
+{
+    AttributeAccessInterfaceRegistry::Instance().Unregister(&gAttrAccess);
+    GetDiagnosticDataProvider().SetThreadDiagnosticsDelegate(nullptr);
+}
