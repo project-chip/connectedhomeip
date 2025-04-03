@@ -7,6 +7,8 @@ namespace Logging {
 
 // X-Macro style enumeration of log modules and associated short names
 // Note: For any module added here, a CHIP_CONFIG_LOG_MODULE_* macro needs to be defined below.
+// This list is used to generate the array of strings backing GetModuleName(), and can also
+// be used by platform-specific code, e.g. Darwin generates an array of non-abbreviated names.
 #define CHIP_LOGMODULES_ENUMERATE(X)                                                                                               \
     X(NotSpecified, "-")                                                                                                           \
     X(Inet, "IN")                                                                                                                  \
