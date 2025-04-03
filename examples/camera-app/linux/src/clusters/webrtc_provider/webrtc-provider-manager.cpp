@@ -224,7 +224,7 @@ void WebRTCProviderManager::ScheduleAnswerSend()
 
         // Attempt to find or establish a CASE session to the target PeerId.
         CASESessionManager * caseSessionMgr = Server::GetInstance().GetCASESessionManager();
-        VerifyOrReturn(caseSessionMgr != nullptr);
+        VerifyOrDie(caseSessionMgr != nullptr);
 
         caseSessionMgr->FindOrEstablishSession(mPeerId, &mOnConnectedCallback, &mOnConnectionFailureCallback);
     });
