@@ -42,25 +42,23 @@ const ClosureErrorEnum kCurrentErrorList[] = {
     },
 };
 
-std::unordered_map<TagPositionEnum, PositioningEnum> targetToStatePositionMap = {
-    { TagPositionEnum::kCloseInFull, PositioningEnum::kFullyClosed },
-    { TagPositionEnum::kOpenInFull, PositioningEnum::kFullyOpened },
-    { TagPositionEnum::kPedestrian, PositioningEnum::kOpenedForPedestrian },
-    { TagPositionEnum::kVentilation, PositioningEnum::kOpenedForVentilation },
-    { TagPositionEnum::kSignature, PositioningEnum::kOpenedAtSignature },
-};
-
 PositioningEnum getStatePositionFromTarget(TagPositionEnum tagPosition)
 {
-    auto it = targetToStatePositionMap.find(tagPosition);
-    if (it != targetToStatePositionMap.end())
-    {
-        return it->second;
+    switch (tagPosition) {
+        case TagPositionEnum::kCloseInFull:
+            return PositioningEnum::kFullyClosed;
+        case TagPositionEnum::kOpenInFull:
+            return PositioningEnum::kFullyOpened;
+        case TagPositionEnum::kPedestrian:
+            return PositioningEnum::kOpenedForPedestrian;
+        case TagPositionEnum::kVentilation:
+            return PositioningEnum::kOpenedForVentilation;
+        case TagPositionEnum::kSignature:
+            return PositioningEnum::kOpenedAtSignature;
+        default:
+            break;
     }
-    else
-    {
-        return PositioningEnum::kUnknownEnumValue;
-    }
+    return PositioningEnum::kUnknownEnumValue;
 }
 
 void ClosureControlManager::SetClosureControlInstance(ClosureControl::Instance & instance)
@@ -93,13 +91,8 @@ CHIP_ERROR ClosureControlManager::StartCurrentErrorListRead()
 // TODO: Return emualted error list, will add event handling along with Events
 CHIP_ERROR ClosureControlManager::GetCurrentErrorListAtIndex(size_t Index, ClosureErrorEnum & closureError)
 {
-    if (Index >= MATTER_ARRAY_SIZE(kCurrentErrorList))
-    {
-        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
-    }
-
+    VerifyOrReturnError(Index < MATTER_ARRAY_SIZE(kCurrentErrorList),CHIP_ERROR_PROVIDER_LIST_EXHAUSTED);
     closureError = kCurrentErrorList[Index];
-
     return CHIP_NO_ERROR;
 }
 
