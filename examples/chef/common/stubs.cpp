@@ -366,31 +366,29 @@ void emberAfWakeOnLanClusterInitCallback(EndpointId endpoint)
  */
 void RefrigeratorTemperatureControlledCabinetInit()
 {
-    EndpointId kRefEndpointId           = 1;
-    EndpointId kColdCabinetEndpointId   = 2;
-    EndpointId kFreezeCabinetEndpointId = 3;
-    if (DeviceTypes::EndpointHasDeviceType(kRefEndpointId, DeviceTypes::kRefrigeratorDeviceId))
+    EndpointId kRefEndpointId           = DeviceTypes::ExpectedEndpointId::kRefrigerator;
+    EndpointId kColdCabinetEndpointId   = DeviceTypes::ExpectedEndpointId::kColdCabinetPartOfRefrigerator;
+    EndpointId kFreezeCabinetEndpointId = DeviceTypes::ExpectedEndpointId::kFreezeCabinetPartOfRefrigerator;
+    if (!DeviceTypes::EndpointHasDeviceType(kRefEndpointId, DeviceTypes::kRefrigeratorDeviceId))
     {
-        ChipLogDetail(NotSpecified, "Refrigerator device type on EP: %d", kRefEndpointId);
-        SetTreeCompositionForEndpoint(kRefEndpointId);
+        return;
+    }
+    ChipLogDetail(NotSpecified, "Refrigerator device type on EP: %d", kRefEndpointId);
+    SetTreeCompositionForEndpoint(kRefEndpointId);
 
-        // Cold Cabinet
-        if (DeviceTypes::EndpointHasDeviceType(kColdCabinetEndpointId, DeviceTypes::kTemperatureControlledCabinetDeviceId))
-        {
-            ChipLogDetail(NotSpecified, "Temperature controlled cabinet device type on EP: %d", kColdCabinetEndpointId);
-            SetParentEndpointForEndpoint(kColdCabinetEndpointId, kRefEndpointId);
-            SetTagList(kColdCabinetEndpointId,
-                       Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gRefrigeratorTagList));
-        }
+    if (DeviceTypes::EndpointHasDeviceType(kColdCabinetEndpointId, DeviceTypes::kTemperatureControlledCabinetDeviceId))
+    {
+        ChipLogDetail(NotSpecified, "Temperature controlled cabinet device type on EP: %d", kColdCabinetEndpointId);
+        SetParentEndpointForEndpoint(kColdCabinetEndpointId, kRefEndpointId);
+        SetTagList(kColdCabinetEndpointId,
+                   Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gRefrigeratorTagList));
+    }
 
-        // Freeze Cabinet
-        if (DeviceTypes::EndpointHasDeviceType(kFreezeCabinetEndpointId, DeviceTypes::kTemperatureControlledCabinetDeviceId))
-        {
-            ChipLogDetail(NotSpecified, "Temperature controlled cabinet device type on EP: %d", kFreezeCabinetEndpointId);
-            SetParentEndpointForEndpoint(kFreezeCabinetEndpointId, kRefEndpointId);
-            SetTagList(kFreezeCabinetEndpointId,
-                       Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gFreezerTagList));
-        }
+    if (DeviceTypes::EndpointHasDeviceType(kFreezeCabinetEndpointId, DeviceTypes::kTemperatureControlledCabinetDeviceId))
+    {
+        ChipLogDetail(NotSpecified, "Temperature controlled cabinet device type on EP: %d", kFreezeCabinetEndpointId);
+        SetParentEndpointForEndpoint(kFreezeCabinetEndpointId, kRefEndpointId);
+        SetTagList(kFreezeCabinetEndpointId, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gFreezerTagList));
     }
 }
 
@@ -405,11 +403,11 @@ void CooktopCookSurfaceInit(EndpointId kCooktopEpId)
     SetTreeCompositionForEndpoint(kCooktopEpId);
     switch (kCooktopEpId)
     {
-    case 1: // Standalone cooktop.
+    case DeviceTypes::ExpectedEndpointId::kCooktopStandAlone:
         if (DeviceTypes::EndpointHasDeviceType(kCooktopEpId, DeviceTypes::kCooktopDeviceId))
         {
             ChipLogDetail(NotSpecified, "Cooktop device type on EP: %d", kCooktopEpId);
-            EndpointId kCookSurfaceEpId = 2;
+            EndpointId kCookSurfaceEpId = DeviceTypes::ExpectedEndpointId::kCookSurfacePartOfCooktop;
             if (DeviceTypes::EndpointHasDeviceType(kCookSurfaceEpId, DeviceTypes::kCookSurfaceDeviceId))
             {
                 ChipLogDetail(NotSpecified, "Cook Surface device type on EP: %d", kCookSurfaceEpId);
@@ -419,14 +417,14 @@ void CooktopCookSurfaceInit(EndpointId kCooktopEpId)
             }
         }
         break;
-    case 3: // Cooktop part of oven.
-        EndpointId kOvenEpId = 1;
+    case DeviceTypes::ExpectedEndpointId::kCooktopPartOfOven:
+        EndpointId kOvenEpId = DeviceTypes::ExpectedEndpointId::kOven;
         if (DeviceTypes::EndpointHasDeviceType(kCooktopEpId, DeviceTypes::kCooktopDeviceId) &&
             DeviceTypes::EndpointHasDeviceType(kOvenEpId, DeviceTypes::kOvenDeviceId))
         {
             ChipLogDetail(NotSpecified, "Cooktop device type on EP: %d", kCooktopEpId);
             SetParentEndpointForEndpoint(kCooktopEpId, kOvenEpId);
-            EndpointId kCookSurfaceEpId = 4;
+            EndpointId kCookSurfaceEpId = DeviceTypes::ExpectedEndpointId::kCookSurfacePartOfCooktopOven;
             if (DeviceTypes::EndpointHasDeviceType(kCookSurfaceEpId, DeviceTypes::kCookSurfaceDeviceId))
             {
                 ChipLogDetail(NotSpecified, "Cook Surface device type on EP: %d", kCookSurfaceEpId);
@@ -444,24 +442,25 @@ void CooktopCookSurfaceInit(EndpointId kCooktopEpId)
  */
 void OvenTemperatureControlledCabinetCooktopCookSurfaceInit()
 {
-    EndpointId kOvenEpId                         = 1;
-    EndpointId kTemperatureControlledCabinetEpId = 2;
-    EndpointId kCooktopEpId                      = 3;
-    if (DeviceTypes::EndpointHasDeviceType(kOvenEpId, DeviceTypes::kOvenDeviceId))
+    EndpointId kOvenEpId                         = DeviceTypes::ExpectedEndpointId::kOven;
+    EndpointId kTemperatureControlledCabinetEpId = DeviceTypes::ExpectedEndpointId::kTopCabinetPartOfOven;
+    EndpointId kCooktopEpId                      = DeviceTypes::ExpectedEndpointId::kCooktopPartOfOven;
+    if (!DeviceTypes::EndpointHasDeviceType(kOvenEpId, DeviceTypes::kOvenDeviceId))
     {
-        ChipLogDetail(NotSpecified, "Oven device type on EP: %d", kOvenEpId);
-        SetTreeCompositionForEndpoint(kOvenEpId);
-
-        if (DeviceTypes::EndpointHasDeviceType(kTemperatureControlledCabinetEpId,
-                                               DeviceTypes::kTemperatureControlledCabinetDeviceId))
-        {
-            ChipLogDetail(NotSpecified, "Temperature controlled cabinet device type on EP: %d", kTemperatureControlledCabinetEpId);
-            SetParentEndpointForEndpoint(kTemperatureControlledCabinetEpId, kOvenEpId);
-            SetTagList(kTemperatureControlledCabinetEpId,
-                       Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(PostionSemanticTag::kTopTagList));
-        }
-        CooktopCookSurfaceInit(kCooktopEpId);
+        return;
     }
+
+    ChipLogDetail(NotSpecified, "Oven device type on EP: %d", kOvenEpId);
+    SetTreeCompositionForEndpoint(kOvenEpId);
+
+    if (DeviceTypes::EndpointHasDeviceType(kTemperatureControlledCabinetEpId, DeviceTypes::kTemperatureControlledCabinetDeviceId))
+    {
+        ChipLogDetail(NotSpecified, "Temperature controlled cabinet device type on EP: %d", kTemperatureControlledCabinetEpId);
+        SetParentEndpointForEndpoint(kTemperatureControlledCabinetEpId, kOvenEpId);
+        SetTagList(kTemperatureControlledCabinetEpId,
+                   Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(PostionSemanticTag::kTopTagList));
+    }
+    CooktopCookSurfaceInit(kCooktopEpId);
 }
 
 void ApplicationInit()

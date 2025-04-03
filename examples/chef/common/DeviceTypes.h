@@ -33,6 +33,25 @@ constexpr chip::DeviceTypeId kOvenDeviceId                         = 0x007B;
 constexpr chip::DeviceTypeId kRefrigeratorDeviceId                 = 0x0070;
 constexpr chip::DeviceTypeId kTemperatureControlledCabinetDeviceId = 0x0071;
 
+// Expected endpoint IDs for different device types
+enum class ExpectedEndpointId : chip::EndpointId
+{
+    // Oven
+    kOven                         = 1,
+    kTopCabinetPartOfOven         = 2,
+    kCooktopPartOfOven            = 3,
+    kCookSurfacePartOfCooktopOven = 4,
+
+    // Cooktop
+    kCooktopStandAlone        = 1,
+    kCookSurfacePartOfCooktop = 2,
+
+    // Refrigerator
+    kRefrigerator                    = 1,
+    kColdCabinetPartOfRefrigerator   = 2,
+    kFreezeCabinetPartOfRefrigerator = 3,
+};
+
 // Devicetype APIs
 
 /**
