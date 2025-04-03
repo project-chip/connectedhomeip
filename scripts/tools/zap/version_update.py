@@ -38,7 +38,7 @@ __LOG_LEVELS__ = {
 #
 # At this time we hard-code nightly however we may need to figure out a more
 # generic version string once we stop using nightly builds
-ZAP_VERSION_RE = re.compile(r'v(\d\d\d\d)\.(\d\d)\.(\d\d)-nightly')
+ZAP_VERSION_RE = re.compile(r'v(\d\d\d\d)\.(\d\d)\.(\d\d)(-nightly|\.\d+)')
 
 # A list of files where ZAP is maintained. You can get a similar list using:
 #
@@ -110,7 +110,7 @@ def version_update(log_level, update, new_version):
         #
         # This makes every group element (date section) to a base 10 integer,
         # so for 'v2023.01.11-nightly' this gets (2023, 1, 11)
-        zap_min_version = tuple(map(lambda x: int(x, 10), parsed.groups()))
+        zap_min_version = tuple(map(lambda x: int(x, 10), parsed.groups()[:3]))
 
     files_to_update = []
     if UpdateChoice.USAGE in update:
