@@ -31,12 +31,6 @@ class AVSettingsUserLevelManagementDelegate : public Delegate
 public:
     AVSettingsUserLevelManagementDelegate(){};
 
-    /**
-     *  @brief Callback into the delegate once persistent attributes managed by
-     *  the Cluster have been loaded from Storage.
-     */
-    Protocols::InteractionModel::Status PersistentAttributesLoadedCallback() override;
-
     bool CanChangeMPTZ() override;
     bool IsValidVideoStreamID(uint16_t videoStreamID) override;
 

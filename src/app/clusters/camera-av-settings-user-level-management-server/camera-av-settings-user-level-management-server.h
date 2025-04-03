@@ -21,7 +21,6 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
-#include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <protocols/interaction_model/StatusCode.h>
 #include <vector>
 
@@ -38,8 +37,8 @@ constexpr int16_t kMinPanValue  = -180;
 constexpr int16_t kMaxPanValue  = 180;
 constexpr int16_t kMinTiltValue = -180;
 constexpr int16_t kMaxTiltValue = 180;
-constexpr int16_t kMinZoomValue = 1;
-constexpr uint8_t kMaxZoomValue = 100;
+constexpr int8_t  kMinZoomValue = 1;
+constexpr int8_t  kMaxZoomValue = 100;
 
  // Spec defined defaulta for Pan, Tilt, and Zoom
  constexpr int16_t defaultPan  = 0;
@@ -217,11 +216,6 @@ private:
     void HandleDPTZRelativeMove(HandlerContext & ctx, const Commands::DPTZRelativeMove::DecodableType & commandData);
 
     /**
-     * Helper function that loads all the persistent attributes from the KVS.
-     */
-    void LoadPersistentAttributes();
-
-    /**
      * Helper function that manages preset IDs
      */
     void UpdatePresetID();
@@ -246,12 +240,6 @@ class Delegate
 public:
     Delegate()          = default;
     virtual ~Delegate() = default;
-
-    /**
-     *  @brief Callback into the delegate once persistent attributes managed by
-     *  the Cluster have been loaded from Storage.
-     */
-    virtual Protocols::InteractionModel::Status PersistentAttributesLoadedCallback() { return Status::Success; };
 
     /**
      * Allows the delegate to determine whether a change in MPTZ is possible given current device status

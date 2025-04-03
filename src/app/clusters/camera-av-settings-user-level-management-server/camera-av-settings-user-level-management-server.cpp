@@ -19,7 +19,6 @@
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/InteractionModelEngine.h>
-#include <app/SafeAttributePersistenceProvider.h>
 #include <app/clusters/camera-av-settings-user-level-management-server/camera-av-settings-user-level-management-server.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
@@ -153,8 +152,6 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::Init()
                                          "enabled, then MechanicalPan feature is required",
                                          mEndpointId));
     }
-
-    LoadPersistentAttributes();
 
     // Set default MPTZ
     mMptzPosition.pan  = Optional<int16_t>(defaultPan);
@@ -355,8 +352,8 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::ReadAndEncodeMPTZPresets(Attribu
             aPresetStruct.presetID = aPreset;
             aPresetStruct.name     = CharSpan(aName.c_str(), aName.size());
             aPresetStruct.settings = mptzPresets.GetMptzPosition();
-            ChipLogDetail(Zcl, "Encoding an instance of MPTPresetStruct. ID = %d. Name = %s", aPresetStruct.presetID,
-                          aPresetStruct.name.data());
+            ChipLogDetail(Zcl, "Encoding an instance of MPTPresetStruct. ID = %d. Name = %.*s", aPresetStruct.presetID,
+                          static_cast<int>(aPresetStruct.name.size()), aPresetStruct.name.data());
             ReturnErrorOnFailure(encoder.Encode(aPresetStruct));
         }
 
@@ -380,7 +377,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::ReadAndEncodeDPTZRelativeMove(At
 CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     VerifyOrDie(aPath.mClusterId == CameraAvSettingsUserLevelManagement::Id);
-    ChipLogError(Zcl, "Camera AV Settings User Level Management: Reading");
+    ChipLogProgress(Zcl, "Camera AV Settings User Level Management: Reading");
 
     switch (aPath.mAttributeId)
     {
@@ -439,14 +436,6 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::Read(const ConcreteReadAttribute
     }
 
     return CHIP_NO_ERROR;
-}
-
-void CameraAvSettingsUserLevelMgmtServer::LoadPersistentAttributes()
-{
-    // Currently there are no non-volatile attributes defined in the spec.  This however is under discussion and likely to change.
-    // Hence this is here as a placeholder.
-    // Signal delegate that all persistent configuration attributes have been loaded.
-    mDelegate->PersistentAttributesLoadedCallback();
 }
 
 // CommandHandlerInterface
@@ -688,6 +677,13 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRelativeMove(HandlerContext 
             return;
         }
         int16_t panDeltaValue = panDelta.Value();
+        if (panDeltaValue > (mPanMax-mPanMin) || panDeltaValue < -(mPanMax-mPanMin))
+        {
+            ChipLogError(Zcl, "PanDelta value received is out of range.");
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+            return;
+        }
+
         newPan                = static_cast<int16_t>(newPan + panDeltaValue);
         if (newPan > mPanMax)
         {
@@ -710,6 +706,13 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRelativeMove(HandlerContext 
             return;
         }
         int16_t tiltDeltaValue = tiltDelta.Value();
+        if (tiltDeltaValue > (mTiltMax-mTiltMin) || tiltDeltaValue < -(mTiltMax-mTiltMin))
+        {
+            ChipLogError(Zcl, "TiltDelta value received is out of range.");
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+            return;
+        }
+
         newTilt                = static_cast<int16_t>(newTilt + tiltDeltaValue);
         if (newTilt > mTiltMax)
         {
@@ -732,6 +735,13 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRelativeMove(HandlerContext 
             return;
         }
         int8_t zoomDeltaValue = zoomDelta.Value();
+        if (zoomDeltaValue > (mZoomMax-1) || zoomDeltaValue < -(mZoomMax-1))
+        {
+            ChipLogError(Zcl, "ZoomDelta value received is out of range.");
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+            return;
+        }
+
         newZoom               = static_cast<int8_t>(newZoom + zoomDeltaValue);
         if (newZoom > mZoomMax)
         {
@@ -789,13 +799,12 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZMoveToPreset(HandlerContext 
     Status status  = Status::Success;
     uint8_t preset = commandData.presetID;
 
-    // This is effectively a manipulation of the current PTZ settings, ensure that the device is in a state wherein a PTZ change is
-    // possible
+    // Verify the provided presetID is within spec limits
     //
-    if (!mDelegate->CanChangeMPTZ())
+    if (preset > mMaxPresets - 1)
     {
-        ChipLogDetail(Zcl, "Device not able to process move to MPTZ preset");
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Busy);
+        ChipLogError(Zcl, "Preset provided is out of range");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
         return;
     }
 
@@ -817,6 +826,16 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZMoveToPreset(HandlerContext 
     {
         ChipLogError(Zcl, "No matching presets, MoveToPreset not possible");
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+        return;
+    }
+
+    // This is effectively a manipulation of the current PTZ settings, ensure that the device is in a state wherein a PTZ change is
+    // possible
+    //
+    if (!mDelegate->CanChangeMPTZ())
+    {
+        ChipLogDetail(Zcl, "Device not able to process move to MPTZ preset");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Busy);
         return;
     }
 
@@ -979,7 +998,8 @@ void CameraAvSettingsUserLevelMgmtServer::HandleDPTZSetViewport(HandlerContext &
         //
         if (!mDelegate->IsValidVideoStreamID(videoStreamID))
         {
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidAction);
+            ChipLogError(Zcl, "Unknown Video Stream ID provided.");
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
             return;
         }
         AddMoveCapableVideoStreamID(videoStreamID);
@@ -1006,6 +1026,18 @@ void CameraAvSettingsUserLevelMgmtServer::HandleDPTZRelativeMove(HandlerContext 
     Optional<int16_t> deltaY   = commandData.deltaY;
     Optional<int8_t> zoomDelta = commandData.zoomDelta;
 
+    // Verify that a received Zoom Delta is within constraints
+    //
+    if (zoomDelta.HasValue()) 
+    {
+        int8_t zoomDeltaValue = zoomDelta.Value();
+        if (zoomDeltaValue < -100 || zoomDeltaValue > 100)
+        {
+            ChipLogError(Zcl, "Provided Digital Zoom Delta is out of range");
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+            return;            
+        }
+    }
     // Is this a video stream ID of which we have already been informed?
     // If not, ask the delegate if it's ok.  If yes, add to our set and proceed, if not, fail.
     //
@@ -1015,7 +1047,8 @@ void CameraAvSettingsUserLevelMgmtServer::HandleDPTZRelativeMove(HandlerContext 
         //
         if (!mDelegate->IsValidVideoStreamID(videoStreamID))
         {
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidAction);
+            ChipLogError(Zcl, "Unknown Video Stream ID provided.");
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
             return;
         }
         AddMoveCapableVideoStreamID(videoStreamID);

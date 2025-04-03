@@ -45,17 +45,16 @@ void Shutdown()
 
 bool AVSettingsUserLevelManagementDelegate::CanChangeMPTZ()
 {
+    // The server needs to verify that the camera is in a state whereby changing the MPTZ is possible. 
+    // Device specific logic will be required.
     return true;
 }
 
 bool AVSettingsUserLevelManagementDelegate::IsValidVideoStreamID(uint16_t aVideoStreamID)
 {
+    // The server needs to verify that the provided Video Stream ID is valid and known and subject to digital modification
+    // The camera app needs to also have an instance of AV Stream Management, querying that to determine validity of the provided id.
     return true;
-}
-
-Status AVSettingsUserLevelManagementDelegate::PersistentAttributesLoadedCallback()
-{
-    return Status::Success;
 }
 
 Status AVSettingsUserLevelManagementDelegate::MPTZSetPosition(Optional<int16_t> aPan, Optional<int16_t> aTilt, Optional<int8_t> aZoom)
