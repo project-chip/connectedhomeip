@@ -1,0 +1,28 @@
+CODE_SIGN_STYLE = Automatic
+DEFINES_MODULE = YES
+DEVELOPMENT_TEAM =
+DYLIB_COMPATIBILITY_VERSION = 1
+DYLIB_CURRENT_VERSION = 1
+DYLIB_INSTALL_NAME_BASE = @rpath
+GCC_PREPROCESSOR_DEFINITIONS = $(inherited) CHIP_HAVE_CONFIG_H CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1
+INFOPLIST_FILE = CHIP/Info.plist
+INSTALLHDRS_SCRIPT_PHASE = YES
+INSTALL_PATH = $(LOCAL_LIBRARY_DIR)/Frameworks
+IPHONEOS_DEPLOYMENT_TARGET = 14.0
+LIBRARY_SEARCH_PATHS = $(TEMP_DIR)/out/lib
+MODULEMAP_FILE = CHIP/Matter.modulemap
+OTHER_CFLAGS = -fmacro-prefix-map=$(SRCROOT)/CHIP/=
+OTHER_CPLUSPLUSFLAGS = $(OTHER_CFLAGS) -fno-c++-static-destructors -DCHIP_CONFIG_GLOBALS_NO_DESTRUCT=1
+OTHER_LDFLAGS =
+OTHER_LDFLAGS[config=Debug][sdk=*] = -framework CoreData -framework Foundation -framework CoreBluetooth -lnetwork -Wl,-unexported_symbol,"__Z*" -Wl,-unexported_symbol,"___*" -Wl,-unexported_symbol,"__Unwind_*" -Wl,-unexported_symbol,"_unw_*" -Wl,-hidden-lCHIP
+OTHER_LDFLAGS[config=Debug][sdk=macosx*] = -framework IOKit -framework CoreWLAN -framework SystemConfiguration -lnetwork -framework CoreBluetooth -framework CoreData -Wl,-unexported_symbol,"__Z*" -Wl,-unexported_symbol,"___*" -Wl,-unexported_symbol,"__Unwind_*" -Wl,-unexported_symbol,"_unw_*" -Wl,-hidden-lCHIP
+OTHER_LDFLAGS[config=Release][sdk=*] = -framework CoreData -framework Foundation -framework CoreBluetooth -lnetwork -Wl,-unexported_symbol,"__Z*" -Wl,-unexported_symbol,"___*" -Wl,-unexported_symbol,"__Unwind_*" -Wl,-unexported_symbol,"_unw_*" -Wl,-unexported_symbol,"_OBJC_IVAR_*" -Wl,-hidden-lCHIP
+OTHER_LDFLAGS[config=Release][sdk=macosx*] = -framework IOKit -framework CoreWLAN -framework SystemConfiguration -lnetwork -framework CoreBluetooth -framework CoreData -Wl,-unexported_symbol,"__Z*" -Wl,-unexported_symbol,"___*" -Wl,-unexported_symbol,"__Unwind_*" -Wl,-unexported_symbol,"_unw_*" -Wl,-unexported_symbol,"_OBJC_IVAR_*" -Wl,-hidden-lCHIP
+PRODUCT_BUNDLE_IDENTIFIER = com.csa.matter
+PRODUCT_NAME = $(TARGET_NAME:c99extidentifier)
+SDKROOT = iphoneos
+STRIP_STYLE = non-global
+SYSTEM_HEADER_SEARCH_PATHS = $(TEMP_DIR)/out/gen/include $(CHIP_ROOT)/src/darwin/Framework/CHIP/ $(CHIP_ROOT)/src $(CHIP_ROOT)/src/include $(CHIP_ROOT)/zzz_generated/ $(CHIP_ROOT)/zzz_generated/app-common $(CHIP_ROOT)/third_party/nlassert/repo/include $(CHIP_ROOT)/third_party/nlio/repo/include
+TAPI_VERIFY_MODE = Pedantic
+TARGETED_DEVICE_FAMILY = 1,2,3,4
+VERSION_INFO_EXPORT_DECL = __attribute__((visibility("hidden")))
