@@ -94,6 +94,11 @@ public:
      */
     void HandleStopStateCallback(OperationalState::GenericOperationalError & err) override;
 
+    /**
+     * Handle Command Callback in application: GoHome
+     */
+    void HandleGoHomeCommandCallback(OperationalState::GenericOperationalError & err) override;
+
     uint32_t mRunningTime = 0;
     uint32_t mPausedTime  = 0;
     app::DataModel::Nullable<uint32_t> mCountdownTime;

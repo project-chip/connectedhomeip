@@ -401,8 +401,8 @@ public:
     /**
      *  Like SendSubscribeRequest, but the ReadClient will automatically attempt to re-establish the subscription if
      *  we decide that the subscription has dropped.  The exact behavior of the re-establishment can be controlled
-     *  by setting mResubscribePolicy in the ReadPrepareParams.  If not set, a default behavior with exponential backoff will be
-     *  used.
+     *  by overriding Callback::OnResubscriptionNeeded().  If not overridden, a default behavior with exponential
+     *  backoff from will be used.
      *
      *  The application has to know to
      *  a) allocate a ReadPrepareParams object that will have fields mpEventPathParamsList and mpAttributePathParamsList and
