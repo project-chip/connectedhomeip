@@ -98,7 +98,7 @@ class TC_CC_2_1(MatterBaseTest):
             TestStep(21, 'TH reads from the DUT the (0x400c) ColorTempPhysicalMaxMireds attribute'),
             TestStep(22, 'TH reads from the DUT the (0x400d) CoupleColorTempToLevelMinMireds attribute'),
             TestStep(23, 'TH reads from the DUT the (0x4010) StartUpColorTemperatureMireds attribute'),
-            TestStep(24, 'TH reads from the DUT the (0x0010) NumberOfPrimaries attribute'),
+            TestStep(24, 'Verify that the DUT response contains an uint8 and value SHALL be in range from 1..6. NumberOfPrimaries attribute equals to the Primary<X,Y,Intensity> attributes provided.'),
             TestStep(
                 25, 'TH reads Primary1X attribute from DUT and Verify that the DUT response contains an uint16 [Min:0 Max:0xfeff] if NumberOfPrimaries is 1 or more'),
             TestStep(
@@ -329,10 +329,10 @@ class TC_CC_2_1(MatterBaseTest):
         # After this is resolved, check not 0.
 
         self.step(24)
-        # Get the total number of primaries avaiable in the cluster
+        # Read NUmberofPrimaries from the cluster.
+        numberofprimaries_value = await self._verify_attribute(self.attributes.NumberOfPrimaries, ValueTypesEnum.UINT8, min_len=0, max_len=6)
+        # Get the total number of primaries avaiable in the cluster.
         primariesfound = await self._get_totalnumberofprimaries()
-        # Get the total of Primariesattributes
-        numberofprimaries_value = await self._verify_attribute(self.attributes.NumberOfPrimaries, ValueTypesEnum.UINT8, max_len=6)
         logger.info(f"Fetched Primaries attributes {primariesfound}")
         asserts.assert_equal(numberofprimaries_value, primariesfound,
                              "NumberOfPrimaries does not match with the Primaries found in the cluster.")
@@ -340,6 +340,7 @@ class TC_CC_2_1(MatterBaseTest):
         # We are at step 24 before all the number of primaries checks
         current_step = 24
 
+        # range is defined from 1-6
         for primariesindex in range(1, 7):
             skip_steps_verifynp = self._verify_for_numberofprimaries_value(numberofprimaries_value, primariesindex)
             if skip_steps_verifynp:
