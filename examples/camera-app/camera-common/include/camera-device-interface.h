@@ -33,9 +33,6 @@ enum class CameraError
 {
     SUCCESS,
     ERROR_INIT_FAILED,
-    ERROR_VIDEO_STREAM_ALLOC_FAILED,
-    ERROR_AUDIO_STREAM_ALLOC_FAILED,
-    ERROR_SNAPSHOT_STREAM_ALLOC_FAILED,
     ERROR_VIDEO_STREAM_START_FAILED,
     ERROR_VIDEO_STREAM_STOP_FAILED,
     ERROR_AUDIO_STREAM_START_FAILED,
@@ -77,14 +74,6 @@ public:
 
         // Configure camera settings (e.g., exposure, focus)
         // virtual CameraError Configure(const std::string & setting, const std::string & value) = 0;
-
-        virtual CameraError VideoStreamAllocate(const VideoStreamStruct & videoStreamParams, uint16_t & outStreamID)       = 0;
-        virtual CameraError AudioStreamAllocate(const AudioStreamStruct & videoStreamParams, uint16_t & outStreamID)       = 0;
-        virtual CameraError SnapshotStreamAllocate(const SnapshotStreamStruct & videoStreamParams, uint16_t & outStreamID) = 0;
-
-        virtual CameraError VideoStreamDeallocate(uint16_t streamID)    = 0;
-        virtual CameraError AudioStreamDeallocate(uint16_t streamID)    = 0;
-        virtual CameraError SnapshotStreamDeallocate(uint16_t streamID) = 0;
 
         // Capture a snapshot image
         virtual CameraError CaptureSnapshot(uint16_t streamID, const VideoResolutionStruct & resolution,

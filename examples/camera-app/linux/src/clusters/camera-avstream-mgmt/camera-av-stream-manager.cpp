@@ -41,25 +41,47 @@ using chip::Protocols::InteractionModel::Status;
 Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamAllocate(const VideoStreamStruct & allocateArgs,
                                                                                uint16_t & outStreamID)
 {
-    outStreamID = kInvalidStreamID;
+    outStreamID               = kInvalidStreamID;
+    bool foundAvailableStream = false;
+    auto videoStreams         = CameraDevice::GetInstance().GetAvailableVideoStreams();
 
-    CameraError error = CameraDevice::GetInstance().VideoStreamAllocate(allocateArgs, outStreamID);
-    switch (error)
+    for (VideoStream & stream : videoStreams)
     {
-    case CameraError::SUCCESS:
-        return Status::Success;
-    case CameraError::ERROR_RESOURCE_EXHAUSTED:
-        return Status::ResourceExhausted;
-    default:
-        return Status::Failure;
+        if (!stream.isAllocated)
+        {
+            foundAvailableStream = true;
+
+            if (stream.codec == allocateArgs.videoCodec && stream.frameRate >= allocateArgs.minFrameRate &&
+                stream.frameRate <= allocateArgs.maxFrameRate && stream.videoRes.width >= allocateArgs.minResolution.width &&
+                stream.videoRes.height >= allocateArgs.minResolution.height &&
+                stream.videoRes.width <= allocateArgs.maxResolution.width &&
+                stream.videoRes.height <= allocateArgs.maxResolution.height)
+            {
+                stream.isAllocated = true;
+                outStreamID        = stream.id;
+
+                // Start the video stream from HAL for serving.
+                CameraDevice::GetInstance().StartVideoStream(stream.id);
+
+                return Status::Success;
+            }
+        }
     }
+
+    if (!foundAvailableStream)
+    {
+        return Status::ResourceExhausted;
+    }
+
+    return Status::Failure;
 }
 
 Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamModify(const uint16_t streamID,
                                                                              const chip::Optional<bool> waterMarkEnabled,
                                                                              const chip::Optional<bool> osdEnabled)
 {
-    // TODO : change
+    // TODO : Needs Change
+    auto videoStreams = CameraDevice::GetInstance().GetAvailableVideoStreams();
     for (VideoStream & stream : videoStreams)
     {
         if (stream.id == streamID && stream.isAllocated)
@@ -75,7 +97,19 @@ Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamModify(con
 
 Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamDeallocate(const uint16_t streamID)
 {
-    CameraDevice::GetInstance().VideoStreamDeallocate(streamID);
+    auto videoStreams = CameraDevice::GetInstance().GetAvailableVideoStreams();
+    for (VideoStream & stream : videoStreams)
+    {
+        if (stream.id == streamID && stream.isAllocated)
+        {
+            // Stop the video stream
+            CameraDevice::GetInstance().StopVideoStream(stream.id);
+
+            stream.isAllocated = false;
+
+            break;
+        }
+    }
 
     return Status::Success;
 }
@@ -83,23 +117,52 @@ Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamDeallocate
 Protocols::InteractionModel::Status CameraAVStreamManager::AudioStreamAllocate(const AudioStreamStruct & allocateArgs,
                                                                                uint16_t & outStreamID)
 {
-    outStreamID = kInvalidStreamID;
+    outStreamID               = kInvalidStreamID;
+    bool foundAvailableStream = false;
+    auto audioStreams         = CameraDevice::GetInstance().GetAvailableAudioStreams();
 
-    CameraError error = CameraDevice::GetInstance().AudioStreamAllocate(allocateArgs, outStreamID);
-    switch (error)
+    for (AudioStream & stream : audioStreams)
     {
-    case CameraError::SUCCESS:
-        return Status::Success;
-    case CameraError::ERROR_RESOURCE_EXHAUSTED:
-        return Status::ResourceExhausted;
-    default:
-        return Status::Failure;
+        if (!stream.isAllocated)
+        {
+            foundAvailableStream = true;
+
+            if (stream.codec == allocateArgs.audioCodec && stream.channelCount == allocateArgs.channelCount &&
+                stream.sampleRate == allocateArgs.sampleRate)
+            {
+                stream.isAllocated = true;
+                outStreamID        = stream.id;
+
+                // Start the audio stream from HAL for serving.
+                CameraDevice::GetInstance().StartAudioStream(stream.id);
+
+                return Status::Success;
+            }
+        }
     }
+
+    if (!foundAvailableStream)
+    {
+        return Status::ResourceExhausted;
+    }
+
+    return Status::Failure;
 }
 
 Protocols::InteractionModel::Status CameraAVStreamManager::AudioStreamDeallocate(const uint16_t streamID)
 {
-    CameraDevice::GetInstance().AudioStreamDeallocate(streamID);
+    auto audioStreams = CameraDevice::GetInstance().GetAvailableAudioStreams();
+    for (AudioStream & stream : audioStreams)
+    {
+        if (stream.id == streamID && stream.isAllocated)
+        {
+            // Stop the audio stream
+            CameraDevice::GetInstance().StopAudioStream(stream.id);
+
+            stream.isAllocated = false;
+            break;
+        }
+    }
 
     return Status::Success;
 }
@@ -107,18 +170,39 @@ Protocols::InteractionModel::Status CameraAVStreamManager::AudioStreamDeallocate
 Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamAllocate(const SnapshotStreamStruct & allocateArgs,
                                                                                   uint16_t & outStreamID)
 {
-    outStreamID = kInvalidStreamID;
+    outStreamID               = kInvalidStreamID;
+    bool foundAvailableStream = false;
+    auto snapshotStreams      = CameraDevice::GetInstance().GetAvailableSnapshotStreams();
 
-    CameraError error = CameraDevice::GetInstance().SnapshotStreamAllocate(allocateArgs, outStreamID);
-    switch (error)
+    for (SnapshotStream & stream : snapshotStreams)
     {
-    case CameraError::SUCCESS:
-        return Status::Success;
-    case CameraError::ERROR_RESOURCE_EXHAUSTED:
-        return Status::ResourceExhausted;
-    default:
-        return Status::Failure;
+        if (!stream.isAllocated)
+        {
+            foundAvailableStream = true;
+
+            if (stream.codec == allocateArgs.imageCodec && stream.quality == allocateArgs.quality &&
+                stream.frameRate <= allocateArgs.frameRate && stream.videoRes.width >= allocateArgs.minResolution.width &&
+                stream.videoRes.height >= allocateArgs.minResolution.height &&
+                stream.videoRes.width <= allocateArgs.maxResolution.width &&
+                stream.videoRes.height <= allocateArgs.maxResolution.height)
+            {
+                stream.isAllocated = true;
+                outStreamID        = stream.id;
+
+                // Start the snapshot stream for serving.
+                CameraDevice::GetInstance().StartSnapshotStream(stream.id);
+
+                return Status::Success;
+            }
+        }
     }
+
+    if (!foundAvailableStream)
+    {
+        return Status::ResourceExhausted;
+    }
+
+    return Status::Failure;
 }
 
 Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamModify(const uint16_t streamID,
@@ -126,6 +210,7 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamModify(
                                                                                 const chip::Optional<bool> osdEnabled)
 {
     // TODO : change
+    auto snapshotStreams = CameraDevice::GetInstance().GetAvailableSnapshotStreams();
     for (SnapshotStream & stream : snapshotStreams)
     {
         if (stream.id == streamID && stream.isAllocated)
@@ -141,7 +226,18 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamModify(
 
 Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamDeallocate(const uint16_t streamID)
 {
-    CameraDevice::GetInstance().SnapshotStreamDeallocate(streamID);
+    auto snapshotStreams = CameraDevice::GetInstance().GetAvailableSnapshotStreams();
+    for (SnapshotStream & stream : snapshotStreams)
+    {
+        if (stream.id == streamID && stream.isAllocated)
+        {
+            // Stop the snapshot stream for serving.
+            CameraDevice::GetInstance().StopSnapshotStream(stream.id);
+
+            stream.isAllocated = false;
+            break;
+        }
+    }
 
     return Status::Success;
 }
@@ -160,9 +256,14 @@ Protocols::InteractionModel::Status CameraAVStreamManager::CaptureSnapshot(const
                                                                            const VideoResolutionStruct & resolution,
                                                                            ImageSnapshot & outImageSnapshot)
 {
-    CameraDevice::GetInstance().CaptureSnapshot(streamID, resolution, outImageSnapshot);
-
-    return Status::Success;
+    if (CameraDevice::GetInstance().CaptureSnapshot(streamID, resolution, outImageSnapshot) == CameraError::SUCCESS)
+    {
+        return Status::Success;
+    }
+    else
+    {
+        return Status::Failure;
+    }
 }
 
 CHIP_ERROR

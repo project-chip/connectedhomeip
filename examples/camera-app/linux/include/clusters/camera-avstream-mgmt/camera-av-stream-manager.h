@@ -27,33 +27,6 @@ namespace app {
 namespace Clusters {
 namespace CameraAvStreamManagement {
 
-constexpr uint8_t kMaxVideoStreams  = 10; // Maximum number of pre-allocated streams
-constexpr uint16_t kInvalidStreamID = 65500;
-
-struct VideoStream
-{
-    uint16_t id;          // Stream ID
-    bool isAllocated;     // Flag to indicate if the stream is allocated
-    VideoCodecEnum codec; // Codec information (e.g., "H.264", "HEVC")
-    uint16_t frameRate;   // frame rate
-};
-
-struct AudioStream
-{
-    uint16_t id;          // Stream ID
-    bool isAllocated;     // Flag to indicate if the stream is allocated
-    AudioCodecEnum codec; // Codec information (e.g., "OPUS", "AACLC")
-    uint8_t channelCount; // channel count
-};
-
-struct SnapshotStream
-{
-    uint16_t id;          // Stream ID
-    bool isAllocated;     // Flag to indicate if the stream is allocated
-    ImageCodecEnum codec; // Codec information (e.g., "JPEG")
-    uint8_t quality;      // Quality
-};
-
 /**
  * The application delegate to define the options & implement commands.
  */
@@ -100,13 +73,6 @@ public:
     ~CameraAVStreamManager() = default;
 
 private:
-    std::vector<VideoStream> videoStreams;       // Vector to hold available video streams
-    std::vector<AudioStream> audioStreams;       // Vector to hold available audio streams
-    std::vector<SnapshotStream> snapshotStreams; // Vector to hold available snapshot streams
-
-    void InitializeAvailableVideoStreams();
-    void InitializeAvailableAudioStreams();
-    void InitializeAvailableSnapshotStreams();
 };
 
 } // namespace CameraAvStreamManagement
