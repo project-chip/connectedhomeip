@@ -78,9 +78,7 @@ class TC_LWM_1_2(MatterBaseTest, ModeBaseClusterChecks):
         self.step(2)
         # Verify common checks for Mode Base as described in the TC-LWM-1.2
         supported_modes = await self.check_supported_modes_and_labels(endpoint=endpoint)
-        # According to the spec, there should be at least one like
-        # Normal, Delicate, Heavy, or Whites
-        # tag in the ones supported.
+        # According to the spec, Normal tag should be a supported tag.
         additional_tags = [cluster_lwm_mode.Enums.ModeTag.kNormal]
         self.check_tags_in_lists(supported_modes=supported_modes, required_tags=additional_tags)
 
