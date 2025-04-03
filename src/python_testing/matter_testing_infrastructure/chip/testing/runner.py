@@ -480,23 +480,14 @@ class MockTestRunner():
     mocking the controller's Read method and other interactions.
     """
 
-    def __init__(self,
-                 abs_filename: str,
-                 classname: str,
-                 test: str,
-                 endpoint: int = None,
-                 pics: dict[str,
-                            bool] = None,
-                 paa_trust_store_path=None):
+    def __init__(self, abs_filename: str, classname: str, test: str, endpoint: int = None,
+                 pics: dict[str, bool] = None, paa_trust_store_path=None):
 
         from chip.testing.matter_testing import MatterStackState, MatterTestConfig
 
         self.kvs_storage = 'kvs_admin.json'
-        self.config = MatterTestConfig(
-            endpoint=endpoint,
-            paa_trust_store_path=paa_trust_store_path,
-            pics=pics,
-            storage_path=self.kvs_storage)
+        self.config = MatterTestConfig(endpoint=endpoint, paa_trust_store_path=paa_trust_store_path,
+                                       pics=pics, storage_path=self.kvs_storage)
         self.set_test(abs_filename, classname, test)
 
         self.set_test_config(self.config)
@@ -535,22 +526,12 @@ class MockTestRunner():
     def Shutdown(self):
         self.stack.Shutdown()
 
-    def run_test_with_mock_read(
-            self,
-            read_cache: Attribute.AsyncReadTransaction.ReadResponse,
-            hooks=None):
+    def run_test_with_mock_read(self, read_cache: Attribute.AsyncReadTransaction.ReadResponse, hooks=None):
         self.default_controller.Read = AsyncMock(return_value=read_cache)
         # This doesn't need to do anything since we are overriding the read
         # anyway
-        self.default_controller.FindOrEstablishPASESession = AsyncMock(
-            return_value=None)
-        self.default_controller.GetConnectedDevice = AsyncMock(
-            return_value=None)
+        self.default_controller.FindOrEstablishPASESession = AsyncMock(return_value=None)
+        self.default_controller.GetConnectedDevice = AsyncMock(return_value=None)
         with asyncio.Runner() as runner:
-            return run_tests_no_exit(
-                self.test_class,
-                self.config,
-                runner.get_loop(),
-                hooks,
-                self.default_controller,
-                self.stack)
+            return run_tests_no_exit(self.test_class, self.config, runner.get_loop(),
+                                     hooks, self.default_controller, self.stack)
