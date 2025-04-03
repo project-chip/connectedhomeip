@@ -1066,6 +1066,7 @@
 		D4CA5BE22D9E29C700D44744 /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
 		D4CA5BE42D9E29C700D44744 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
 		D4CA5BE52D9E29C700D44744 /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
+		D4CA5BE92D9E2DE200D44744 /* Base.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Base.xcconfig; sourceTree = "<group>"; };
 		E04AC67B2BEEA17F00BA409B /* ember-io-storage.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "ember-io-storage.cpp"; path = "util/ember-io-storage.cpp"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -2038,6 +2039,7 @@
 		D4CA5BE62D9E29C700D44744 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				D4CA5BE92D9E2DE200D44744 /* Base.xcconfig */,
 				D4CA5BE42D9E29C700D44744 /* Debug.xcconfig */,
 				D4CA5BE52D9E29C700D44744 /* Release.xcconfig */,
 			);
@@ -2730,6 +2732,7 @@
 /* Begin XCBuildConfiguration section */
 		037C3CAD2991A44B00B7EEE2 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D4CA5BD92D9E29C700D44744 /* Debug.xcconfig */;
 			buildSettings = {
 				CHIP_BUILD_TOOLS = true;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -2812,6 +2815,7 @@
 		};
 		037C3CAE2991A44B00B7EEE2 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D4CA5BDA2D9E29C700D44744 /* Release.xcconfig */;
 			buildSettings = {
 				CHIP_BUILD_TOOLS = true;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -2895,6 +2899,7 @@
 		};
 		BA09EB732474881D00605257 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D4CA5BE42D9E29C700D44744 /* Debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CHIP_ROOT = "$(PROJECT_DIR)/../../..";
@@ -2968,6 +2973,7 @@
 		};
 		BA09EB742474881D00605257 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D4CA5BDD2D9E29C700D44744 /* Debug.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
@@ -3047,6 +3053,7 @@
 		};
 		BA09EB752474881D00605257 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D4CA5BE12D9E29C700D44744 /* Debug.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
@@ -3067,6 +3074,7 @@
 		};
 		BA09EB772474882200605257 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D4CA5BE52D9E29C700D44744 /* Release.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CHIP_ROOT = "$(PROJECT_DIR)/../../..";
@@ -3138,6 +3146,7 @@
 		};
 		BA09EB782474882200605257 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D4CA5BDE2D9E29C700D44744 /* Release.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
@@ -3219,6 +3228,7 @@
 		};
 		BA09EB792474882200605257 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D4CA5BE22D9E29C700D44744 /* Release.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
