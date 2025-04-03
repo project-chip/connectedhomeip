@@ -30,7 +30,8 @@ assert(chip_device_platform == "nxp")
 
 declare_args() {
   # Enable OTA encryption
-  chip_with_ota_encryption =  false
+  chip_with_ota_encryption = false
+
   # AES key encryption for OTA encryption (16 bytes)
   chip_with_ota_key = "1234567890ABCDEFA1B2C3D4E5F6F1B4"
 }
