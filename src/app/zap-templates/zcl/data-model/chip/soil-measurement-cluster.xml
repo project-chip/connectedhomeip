@@ -31,11 +31,7 @@ Git:
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
     <globalAttribute code="0xFFFD" side="either" value="1"/>
-    <attribute code="0x0000" side="server" name="SoilMoistureMeasuredValue" define="SOIL_MOISTURE_MEASURED_VALUE" type="percent" isNullable="true" max="100"/>
-    <attribute code="0x0001" side="server" name="SoilMoistureMinMeasurableValue" define="SOIL_MOISTURE_MIN_MEASURABLE_VALUE" type="percent" max="99"/>
-    <attribute code="0x0002" side="server" name="SoilMoistureMaxMeasurableValue" define="SOIL_MOISTURE_MAX_MEASURABLE_VALUE" type="percent" min="1" max="100"/>
-    <attribute code="0x0003" side="server" name="SoilMoistureTolerance" define="SOIL_MOISTURE_TOLERANCE" type="percent" max="10" default="10" optional="true">
-      <optionalConform/>
-    </attribute>
+    <attribute code="0x0000" side="server" name="SoilMeasurementLimits" define="SOIL_MOISTURE_MEASURED_VALUE" type="array" entryType="MeasurementAccuracyStruct" minLength="1"/>
+    <attribute code="0x0001" side="server" name="SoilMoistureMeasuredValue" define="SOIL_MOISTURE_MIN_MEASURABLE_VALUE" type="percent" isNullable="true" min="1"/>
   </cluster>
 </configurator>
