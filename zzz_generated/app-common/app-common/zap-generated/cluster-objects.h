@@ -219,6 +219,82 @@ public:
 using DecodableType = Type;
 
 } // namespace ApplicationStruct
+namespace AccessControlTargetStruct {
+enum class Fields : uint8_t
+{
+    kCluster    = 0,
+    kEndpoint   = 1,
+    kDeviceType = 2,
+};
+
+struct Type
+{
+public:
+    DataModel::Nullable<chip::ClusterId> cluster;
+    DataModel::Nullable<chip::EndpointId> endpoint;
+    DataModel::Nullable<chip::DeviceTypeId> deviceType;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace AccessControlTargetStruct
+namespace AccessControlEntryStruct {
+enum class Fields : uint8_t
+{
+    kPrivilege   = 1,
+    kAuthMode    = 2,
+    kSubjects    = 3,
+    kTargets     = 4,
+    kFabricIndex = 254,
+};
+
+struct Type
+{
+public:
+    AccessControlEntryPrivilegeEnum privilege = static_cast<AccessControlEntryPrivilegeEnum>(0);
+    AccessControlEntryAuthModeEnum authMode   = static_cast<AccessControlEntryAuthModeEnum>(0);
+    DataModel::Nullable<DataModel::List<const uint64_t>> subjects;
+    DataModel::Nullable<DataModel::List<const Structs::AccessControlTargetStruct::Type>> targets;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
+
+    static constexpr bool kIsFabricScoped = true;
+
+    auto GetFabricIndex() const { return fabricIndex; }
+
+    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
+
+    CHIP_ERROR EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
+
+private:
+    CHIP_ERROR DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const;
+};
+
+struct DecodableType
+{
+public:
+    AccessControlEntryPrivilegeEnum privilege = static_cast<AccessControlEntryPrivilegeEnum>(0);
+    AccessControlEntryAuthModeEnum authMode   = static_cast<AccessControlEntryAuthModeEnum>(0);
+    DataModel::Nullable<DataModel::DecodableList<uint64_t>> subjects;
+    DataModel::Nullable<DataModel::DecodableList<Structs::AccessControlTargetStruct::DecodableType>> targets;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = true;
+
+    auto GetFabricIndex() const { return fabricIndex; }
+
+    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
+};
+
+} // namespace AccessControlEntryStruct
 namespace ErrorStateStruct {
 enum class Fields : uint8_t
 {
@@ -2567,82 +2643,8 @@ public:
 };
 
 } // namespace AccessRestrictionEntryStruct
-namespace AccessControlTargetStruct {
-enum class Fields : uint8_t
-{
-    kCluster    = 0,
-    kEndpoint   = 1,
-    kDeviceType = 2,
-};
-
-struct Type
-{
-public:
-    DataModel::Nullable<chip::ClusterId> cluster;
-    DataModel::Nullable<chip::EndpointId> endpoint;
-    DataModel::Nullable<chip::DeviceTypeId> deviceType;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-using DecodableType = Type;
-
-} // namespace AccessControlTargetStruct
-namespace AccessControlEntryStruct {
-enum class Fields : uint8_t
-{
-    kPrivilege   = 1,
-    kAuthMode    = 2,
-    kSubjects    = 3,
-    kTargets     = 4,
-    kFabricIndex = 254,
-};
-
-struct Type
-{
-public:
-    AccessControlEntryPrivilegeEnum privilege = static_cast<AccessControlEntryPrivilegeEnum>(0);
-    AccessControlEntryAuthModeEnum authMode   = static_cast<AccessControlEntryAuthModeEnum>(0);
-    DataModel::Nullable<DataModel::List<const uint64_t>> subjects;
-    DataModel::Nullable<DataModel::List<const Structs::AccessControlTargetStruct::Type>> targets;
-    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
-
-    static constexpr bool kIsFabricScoped = true;
-
-    auto GetFabricIndex() const { return fabricIndex; }
-
-    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
-
-    CHIP_ERROR EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-    CHIP_ERROR EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
-
-private:
-    CHIP_ERROR DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const;
-};
-
-struct DecodableType
-{
-public:
-    AccessControlEntryPrivilegeEnum privilege = static_cast<AccessControlEntryPrivilegeEnum>(0);
-    AccessControlEntryAuthModeEnum authMode   = static_cast<AccessControlEntryAuthModeEnum>(0);
-    DataModel::Nullable<DataModel::DecodableList<uint64_t>> subjects;
-    DataModel::Nullable<DataModel::DecodableList<Structs::AccessControlTargetStruct::DecodableType>> targets;
-    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = true;
-
-    auto GetFabricIndex() const { return fabricIndex; }
-
-    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
-};
-
-} // namespace AccessControlEntryStruct
+namespace AccessControlTargetStruct = Clusters::detail::Structs::AccessControlTargetStruct;
+namespace AccessControlEntryStruct  = Clusters::detail::Structs::AccessControlEntryStruct;
 namespace AccessControlExtensionStruct {
 enum class Fields : uint8_t
 {

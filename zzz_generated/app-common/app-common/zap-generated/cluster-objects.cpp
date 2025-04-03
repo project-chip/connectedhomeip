@@ -376,6 +376,137 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
 } // namespace ApplicationStruct
 
+namespace AccessControlTargetStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kCluster), cluster);
+    encoder.Encode(to_underlying(Fields::kEndpoint), endpoint);
+    encoder.Encode(to_underlying(Fields::kDeviceType), deviceType);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kCluster))
+        {
+            err = DataModel::Decode(reader, cluster);
+        }
+        else if (__context_tag == to_underlying(Fields::kEndpoint))
+        {
+            err = DataModel::Decode(reader, endpoint);
+        }
+        else if (__context_tag == to_underlying(Fields::kDeviceType))
+        {
+            err = DataModel::Decode(reader, deviceType);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace AccessControlTargetStruct
+
+namespace AccessControlEntryStruct {
+CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    return DoEncode(aWriter, aTag, NullOptional);
+}
+
+CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
+{
+    return DoEncode(aWriter, aTag, MakeOptional(aAccessingFabricIndex));
+}
+
+CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const
+{
+    bool includeSensitive = !aAccessingFabricIndex.HasValue() || (aAccessingFabricIndex.Value() == fabricIndex);
+
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+
+    if (includeSensitive)
+    {
+        encoder.Encode(to_underlying(Fields::kPrivilege), privilege);
+    }
+    if (includeSensitive)
+    {
+        encoder.Encode(to_underlying(Fields::kAuthMode), authMode);
+    }
+    if (includeSensitive)
+    {
+        encoder.Encode(to_underlying(Fields::kSubjects), subjects);
+    }
+    if (includeSensitive)
+    {
+        encoder.Encode(to_underlying(Fields::kTargets), targets);
+    }
+    if (aAccessingFabricIndex.HasValue())
+    {
+        encoder.Encode(to_underlying(Fields::kFabricIndex), fabricIndex);
+    }
+
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kPrivilege))
+        {
+            err = DataModel::Decode(reader, privilege);
+        }
+        else if (__context_tag == to_underlying(Fields::kAuthMode))
+        {
+            err = DataModel::Decode(reader, authMode);
+        }
+        else if (__context_tag == to_underlying(Fields::kSubjects))
+        {
+            err = DataModel::Decode(reader, subjects);
+        }
+        else if (__context_tag == to_underlying(Fields::kTargets))
+        {
+            err = DataModel::Decode(reader, targets);
+        }
+        else if (__context_tag == to_underlying(Fields::kFabricIndex))
+        {
+            err = DataModel::Decode(reader, fabricIndex);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace AccessControlEntryStruct
+
 namespace ErrorStateStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
@@ -2397,137 +2528,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 }
 
 } // namespace AccessRestrictionEntryStruct
-
-namespace AccessControlTargetStruct {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kCluster), cluster);
-    encoder.Encode(to_underlying(Fields::kEndpoint), endpoint);
-    encoder.Encode(to_underlying(Fields::kDeviceType), deviceType);
-    return encoder.Finalize();
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    detail::StructDecodeIterator __iterator(reader);
-    while (true)
-    {
-        auto __element = __iterator.Next();
-        if (std::holds_alternative<CHIP_ERROR>(__element))
-        {
-            return std::get<CHIP_ERROR>(__element);
-        }
-
-        CHIP_ERROR err              = CHIP_NO_ERROR;
-        const uint8_t __context_tag = std::get<uint8_t>(__element);
-
-        if (__context_tag == to_underlying(Fields::kCluster))
-        {
-            err = DataModel::Decode(reader, cluster);
-        }
-        else if (__context_tag == to_underlying(Fields::kEndpoint))
-        {
-            err = DataModel::Decode(reader, endpoint);
-        }
-        else if (__context_tag == to_underlying(Fields::kDeviceType))
-        {
-            err = DataModel::Decode(reader, deviceType);
-        }
-        else
-        {
-        }
-
-        ReturnErrorOnFailure(err);
-    }
-}
-
-} // namespace AccessControlTargetStruct
-
-namespace AccessControlEntryStruct {
-CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    return DoEncode(aWriter, aTag, NullOptional);
-}
-
-CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
-{
-    return DoEncode(aWriter, aTag, MakeOptional(aAccessingFabricIndex));
-}
-
-CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const
-{
-    bool includeSensitive = !aAccessingFabricIndex.HasValue() || (aAccessingFabricIndex.Value() == fabricIndex);
-
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-
-    if (includeSensitive)
-    {
-        encoder.Encode(to_underlying(Fields::kPrivilege), privilege);
-    }
-    if (includeSensitive)
-    {
-        encoder.Encode(to_underlying(Fields::kAuthMode), authMode);
-    }
-    if (includeSensitive)
-    {
-        encoder.Encode(to_underlying(Fields::kSubjects), subjects);
-    }
-    if (includeSensitive)
-    {
-        encoder.Encode(to_underlying(Fields::kTargets), targets);
-    }
-    if (aAccessingFabricIndex.HasValue())
-    {
-        encoder.Encode(to_underlying(Fields::kFabricIndex), fabricIndex);
-    }
-
-    return encoder.Finalize();
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    detail::StructDecodeIterator __iterator(reader);
-    while (true)
-    {
-        auto __element = __iterator.Next();
-        if (std::holds_alternative<CHIP_ERROR>(__element))
-        {
-            return std::get<CHIP_ERROR>(__element);
-        }
-
-        CHIP_ERROR err              = CHIP_NO_ERROR;
-        const uint8_t __context_tag = std::get<uint8_t>(__element);
-
-        if (__context_tag == to_underlying(Fields::kPrivilege))
-        {
-            err = DataModel::Decode(reader, privilege);
-        }
-        else if (__context_tag == to_underlying(Fields::kAuthMode))
-        {
-            err = DataModel::Decode(reader, authMode);
-        }
-        else if (__context_tag == to_underlying(Fields::kSubjects))
-        {
-            err = DataModel::Decode(reader, subjects);
-        }
-        else if (__context_tag == to_underlying(Fields::kTargets))
-        {
-            err = DataModel::Decode(reader, targets);
-        }
-        else if (__context_tag == to_underlying(Fields::kFabricIndex))
-        {
-            err = DataModel::Decode(reader, fabricIndex);
-        }
-        else
-        {
-        }
-
-        ReturnErrorOnFailure(err);
-    }
-}
-
-} // namespace AccessControlEntryStruct
 
 namespace AccessControlExtensionStruct {
 CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const

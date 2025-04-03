@@ -28,6 +28,34 @@ namespace Clusters {
 namespace detail {
 // Enums shared across multiple clusters.
 
+// Enum for AccessControlEntryAuthModeEnum
+enum class AccessControlEntryAuthModeEnum : uint8_t
+{
+    kPase  = 0x01,
+    kCase  = 0x02,
+    kGroup = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 0,
+};
+
+// Enum for AccessControlEntryPrivilegeEnum
+enum class AccessControlEntryPrivilegeEnum : uint8_t
+{
+    kView       = 0x01,
+    kProxyView  = 0x02,
+    kOperate    = 0x03,
+    kManage     = 0x04,
+    kAdminister = 0x05,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 0,
+};
+
 // Enum for ChangeIndicationEnum
 enum class ChangeIndicationEnum : uint8_t
 {
@@ -657,33 +685,9 @@ namespace Binding {} // namespace Binding
 
 namespace AccessControl {
 
-// Enum for AccessControlEntryAuthModeEnum
-enum class AccessControlEntryAuthModeEnum : uint8_t
-{
-    kPase  = 0x01,
-    kCase  = 0x02,
-    kGroup = 0x03,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 0,
-};
+using AccessControlEntryAuthModeEnum = Clusters::detail::AccessControlEntryAuthModeEnum;
 
-// Enum for AccessControlEntryPrivilegeEnum
-enum class AccessControlEntryPrivilegeEnum : uint8_t
-{
-    kView       = 0x01,
-    kProxyView  = 0x02,
-    kOperate    = 0x03,
-    kManage     = 0x04,
-    kAdminister = 0x05,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 0,
-};
+using AccessControlEntryPrivilegeEnum = Clusters::detail::AccessControlEntryPrivilegeEnum;
 
 // Enum for AccessRestrictionTypeEnum
 enum class AccessRestrictionTypeEnum : uint8_t

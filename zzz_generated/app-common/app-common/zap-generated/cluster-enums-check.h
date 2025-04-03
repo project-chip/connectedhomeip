@@ -24,6 +24,34 @@
 namespace chip {
 namespace app {
 namespace Clusters {
+static auto __attribute__((unused)) EnsureKnownEnumValue(detail::AccessControlEntryAuthModeEnum val)
+{
+    using EnumType = detail::AccessControlEntryAuthModeEnum;
+    switch (val)
+    {
+    case EnumType::kPase:
+    case EnumType::kCase:
+    case EnumType::kGroup:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(detail::AccessControlEntryPrivilegeEnum val)
+{
+    using EnumType = detail::AccessControlEntryPrivilegeEnum;
+    switch (val)
+    {
+    case EnumType::kView:
+    case EnumType::kProxyView:
+    case EnumType::kOperate:
+    case EnumType::kManage:
+    case EnumType::kAdminister:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
 static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::AreaTypeTag val)
 {
     using EnumType = Globals::AreaTypeTag;
@@ -573,34 +601,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(LevelControl::StepModeE
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(AccessControl::AccessControlEntryAuthModeEnum val)
-{
-    using EnumType = AccessControl::AccessControlEntryAuthModeEnum;
-    switch (val)
-    {
-    case EnumType::kPase:
-    case EnumType::kCase:
-    case EnumType::kGroup:
-        return val;
-    default:
-        return EnumType::kUnknownEnumValue;
-    }
-}
-static auto __attribute__((unused)) EnsureKnownEnumValue(AccessControl::AccessControlEntryPrivilegeEnum val)
-{
-    using EnumType = AccessControl::AccessControlEntryPrivilegeEnum;
-    switch (val)
-    {
-    case EnumType::kView:
-    case EnumType::kProxyView:
-    case EnumType::kOperate:
-    case EnumType::kManage:
-    case EnumType::kAdminister:
-        return val;
-    default:
-        return EnumType::kUnknownEnumValue;
-    }
-}
 static auto __attribute__((unused)) EnsureKnownEnumValue(AccessControl::AccessRestrictionTypeEnum val)
 {
     using EnumType = AccessControl::AccessRestrictionTypeEnum;
