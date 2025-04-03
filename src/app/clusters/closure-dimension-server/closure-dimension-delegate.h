@@ -21,7 +21,6 @@
  #include <app-common/zap-generated/cluster-enums.h>
  #include <app/data-model/Nullable.h>
  #include <app/util/basic-types.h>
- #include <lib/core/CHIPError.h>
  
  namespace chip {
  namespace app {
@@ -37,10 +36,24 @@
  public:
     DelegateBase(){};
     virtual ~DelegateBase() = default;
-     
+    
+    /**
+     * @brief This function handles SetTarget command implementaion.
+     * @param [in] pos Target position to be set
+     * @param [in] latch Target Latch to be set
+     * @param [in] speed Target speed to be set
+     * @return CHIP_NO_ERROR when succesfully implemented or return error.
+     */
     virtual CHIP_ERROR HandleSetTarget(const Optional<Percent100ths> & pos, const Optional<TargetLatchEnum> & latch,
         const Optional<Globals::ThreeLevelAutoEnum> & speed) = 0;
  
+    /**
+     * @brief This function handles Step command implementaion.
+     * @param [in] direction step direction
+     * @param [in] numberOfSteps total number of steps
+     * @param [in] speed speed of each step
+     * @return CHIP_NO_ERROR when succesfully implemented or return error.
+     */    
     virtual CHIP_ERROR HandleStep(const StepDirectionEnum & direction, const uint16_t & numberOfSteps,
         const Optional<Globals::ThreeLevelAutoEnum> & speed) = 0;
  };

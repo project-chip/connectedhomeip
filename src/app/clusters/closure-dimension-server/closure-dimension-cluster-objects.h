@@ -19,7 +19,6 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <lib/support/CommonIterator.h>
 
 namespace chip {
 namespace app {
@@ -31,7 +30,7 @@ namespace ClosureDimension {
  */
 struct GenericCurrentStruct : public Structs::CurrentStruct::Type
 {
-    GenericCurrentStruct(Optional<chip::Percent100ths> positionValue      = NullOptional,
+    GenericCurrentStruct(Optional<Percent100ths> positionValue      = NullOptional,
                         Optional<LatchingEnum> latchingValue             = NullOptional,
                         Optional<Globals::ThreeLevelAutoEnum> speedValue = NullOptional)
     {
@@ -46,7 +45,7 @@ struct GenericCurrentStruct : public Structs::CurrentStruct::Type
         return *this;
     }
 
-    void Set(Optional<chip::Percent100ths> positioningValue = NullOptional, Optional<LatchingEnum> latchingValue = NullOptional,
+    void Set(Optional<Percent100ths> positioningValue = NullOptional, Optional<LatchingEnum> latchingValue = NullOptional,
              Optional<Globals::ThreeLevelAutoEnum> speedValue = NullOptional)
     {
         position = positioningValue;
@@ -70,7 +69,7 @@ struct GenericCurrentStruct : public Structs::CurrentStruct::Type
  */
 struct GenericTargetStruct : public Structs::TargetStruct::Type
 {
-    GenericTargetStruct(Optional<chip::Percent100ths> positionValue       = NullOptional,
+    GenericTargetStruct(Optional<Percent100ths> positionValue       = NullOptional,
                          Optional<TargetLatchEnum> latchValue             = NullOptional,
                          Optional<Globals::ThreeLevelAutoEnum> speedValue = NullOptional)
     {
@@ -85,7 +84,7 @@ struct GenericTargetStruct : public Structs::TargetStruct::Type
         return *this;
     }
 
-    void Set(Optional<chip::Percent100ths> positionValue = NullOptional, Optional<TargetLatchEnum> latchValue = NullOptional,
+    void Set(Optional<Percent100ths> positionValue = NullOptional, Optional<TargetLatchEnum> latchValue = NullOptional,
              Optional<Globals::ThreeLevelAutoEnum> speedValue = NullOptional)
     {
         position = positionValue;

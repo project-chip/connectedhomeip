@@ -23,11 +23,6 @@
  #include "closure-dimension-delegate.h"
  #include "closure-dimension-matter-context.h"
  #include "closure-dimension-cluster-objects.h"
- #include <app-common/zap-generated/cluster-objects.h>
- #include <app/cluster-building-blocks/QuieterReporting.h>
- #include <app/data-model/Nullable.h>
- #include <lib/core/CHIPError.h>
- #include <system/SystemLayer.h>
  
  namespace chip {
  namespace app {
@@ -71,8 +66,10 @@
  class ClusterLogic
  {
  public:
-     // Instantiates a ClusterLogic class. The caller maintains ownership of the driver and the context, but provides them for use by
-     // the ClusterLogic class.
+    /**
+     *  @brief Instantiates a ClusterLogic class. The caller maintains ownership of the driver and the context,
+     *           but provides them for use by the ClusterLogic class.
+     */ 
      ClusterLogic(DelegateBase & clusterDriver, MatterContext & matterContext) :
          mClusterDriver(clusterDriver), mMatterContext(matterContext)
      {
@@ -84,10 +81,13 @@
      const ClusterConformance & GetConformance() { return mConformance; }
      
     
- 
-     // Validates the conformance and performs initialization.
-     // Returns CHIP_ERROR_INCORRECT_STATE if the cluster has already been initialized.
-     // Returns CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR if the conformance is incorrect.
+    /**
+     *  @brief Validates the conformance and performs initialization
+     *  @param [in] conformance cluster conformance 
+     *  @return Returns CHIP_ERROR_INCORRECT_STATE if the cluster has already been initialized,
+     *          Returns CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR if the conformance is incorrect.
+     *          Returns CHIP_NO_ERROR on succesful initialization.
+     */
     CHIP_ERROR Init(const ClusterConformance & conformance);
     
     /**
@@ -167,7 +167,7 @@
      */
     CHIP_ERROR SetModulationType(const ModulationTypeEnum modulationType);
  
-    // All Get functions:
+     // All Get functions:
      // Return CHIP_ERROR_INCORRECT_STATE if the class has not been initialized.
      // Return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if the attribute is not supported by the conformance.
      // Otherwise return CHIP_NO_ERROR and set the input parameter value to the current cluster state value
@@ -185,15 +185,29 @@
      CHIP_ERROR GetFeatureMap(Attributes::FeatureMap::TypeInfo::Type & featureMap);
      CHIP_ERROR GetClusterRevision(Attributes::ClusterRevision::TypeInfo::Type & clusterRevision);
  
-     // Returns CHIP_ERROR_INCORRECT_STATE if the class has not been initialized.
-     // Returns CHIP_ERROR_INVALID_ARGUMENT if the input values are out is out of range or the targetLevel is supplied when LVL is
-     // not supported.
-     // Calls delegate HandleOpen function after validating the parameters
-     chip::Protocols::InteractionModel::Status HandleSetTargetCommand(chip::Optional<chip::Percent100ths> position, chip::Optional<TargetLatchEnum> latch, chip::Optional<Globals::ThreeLevelAutoEnum> speed);
+     /**
+     *  @brief Calls delegate HandleSetTarget function after validating the parameters
+     *  @param [in] position target position
+     *  @param [in] latch Target latch
+     *  @param [in] speed Target speed
+     *  @return Returns CHIP_ERROR_INCORRECT_STATE if the class has not been initialized.
+     *          Returns CHIP_ERROR_INVALID_ARGUMENT if the input values are out is out of range
+     *          Returns CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR if the conformance is incorrect.
+     *          Returns CHIP_NO_ERROR on succesful initialization.
+     */
+     Protocols::InteractionModel::Status HandleSetTargetCommand(Optional<Percent100ths> position, Optional<TargetLatchEnum> latch, Optional<Globals::ThreeLevelAutoEnum> speed);
  
-     // Returns CHIP_ERROR_INCORRECT_STATE if the class has not been initialized.
-     // Calls delegate HandleClose function after validating the parameters and stops any open duration timers.
-     chip::Protocols::InteractionModel::Status HandleStepCommand(StepDirectionEnum direction, uint16_t numberOfSteps, chip::Optional<Globals::ThreeLevelAutoEnum> speed);
+     /**
+     *  @brief Calls delegate HandleStep function after validating the parameters
+     *  @param [in] direction step direction
+     *  @param [in] numberOfSteps Number of steps
+     *  @param [in] speed step speed
+     *  @return Returns CHIP_ERROR_INCORRECT_STATE if the class has not been initialized.
+     *          Returns CHIP_ERROR_INVALID_ARGUMENT if the input values are out is out of range
+     *          Returns CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR if the conformance is incorrect.
+     *          Returns CHIP_NO_ERROR on succesful initialization.
+     */
+     Protocols::InteractionModel::Status HandleStepCommand(StepDirectionEnum direction, uint16_t numberOfSteps, Optional<Globals::ThreeLevelAutoEnum> speed);
  
  private:
     // This cluster implements version 1 of the valve cluster. Do not change this revision without updating

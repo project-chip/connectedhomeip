@@ -19,13 +19,7 @@
  */
 
  #include "closure-dimension-cluster-logic.h"
-
- #include <chrono>
  
- #include <app-common/zap-generated/ids/Attributes.h>
- #include <lib/core/CHIPError.h>
- #include <platform/CHIPDeviceLayer.h>
- #include <system/SystemClock.h> 
  namespace chip {
  namespace app {
  namespace Clusters {
@@ -306,31 +300,27 @@ CHIP_ERROR ClusterLogic::Init(const ClusterConformance & conformance)
      return CHIP_NO_ERROR;
  }
  
-Status ClusterLogic::HandleSetTargetCommand(chip::Optional<chip::Percent100ths> position, chip::Optional<TargetLatchEnum> latch, chip::Optional<Globals::ThreeLevelAutoEnum> speed)
+Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Optional<TargetLatchEnum> latch, Optional<Globals::ThreeLevelAutoEnum> speed)
  {
      VerifyOrReturnError(mInitialized, Status::Failure);
      //TODO: If this command is sent while the device is in a non-compatible internal-state, a status code of INVALID_IN_STATE SHALL be returned.
-     VerifyOrReturnError((position.Value() <= 10000), Status::ConstraintError);
-     VerifyOrReturnError(EnsureKnownEnumValue(latch.Value()) != TargetLatchEnum::kUnknownEnumValue, Status::ConstraintError);
-     VerifyOrReturnError(EnsureKnownEnumValue(speed.Value()) != Globals::ThreeLevelAutoEnum::kUnknownEnumValue, Status::ConstraintError);
-     
      
     if(position.HasValue()) {
-        VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning),Status::Success);
-        
+        VerifyOrReturnError((position.Value() <= 10000), Status::ConstraintError);
+        VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning),Status::Success);    
         //TODO: not an integer multiple of the Resolution attribute, then Target.Position is updated to the closest integer multiple of the Resolution attribute according to the server, and a status code of SUCCESS is returned. 
         //TODO: supported then the device (depending of its current state) start or change the course of its motion procedure and update Target.Position.
     }
     
     if(latch.HasValue()) {
+        VerifyOrReturnError(EnsureKnownEnumValue(latch.Value()) != TargetLatchEnum::kUnknownEnumValue, Status::ConstraintError);
         VerifyOrReturnError(mConformance.HasFeature(Feature::kMotionLatching),Status::Success);
-        
         //TODO: If the device supports the Latching(LT) feature, the device dimension SHALL either fulfill the latch order and update Target.Latch or, if manual intervention is required to latch, respond with INVALID_ACTION and remain in its current state.
     }
     
     if(speed.HasValue()) {
         VerifyOrReturnError(mConformance.HasFeature(Feature::kSpeed),Status::Success);
-        
+        VerifyOrReturnError(EnsureKnownEnumValue(speed.Value()) != Globals::ThreeLevelAutoEnum::kUnknownEnumValue, Status::ConstraintError);
         //TODO: If Speed(SP) feature is enabled then Target.Speed is updated with the Speed Field.
         //TODO: In case a SetTarget command is sent with only the Speed field then if: It SHOULD affect the current dimension motion speed of the device (this change speed on the fly).
         
@@ -338,7 +328,7 @@ Status ClusterLogic::HandleSetTargetCommand(chip::Optional<chip::Percent100ths> 
      return Status::Success;;
  }
  
-Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t numberOfSteps, chip::Optional<Globals::ThreeLevelAutoEnum> speed)
+Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t numberOfSteps, Optional<Globals::ThreeLevelAutoEnum> speed)
  {
      VerifyOrReturnError(mInitialized, Status::Failure);
      VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning),Status::Failure);

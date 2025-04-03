@@ -20,7 +20,6 @@
 
  #include <app-common/zap-generated/ids/Clusters.h>
  #include <app/reporting/reporting.h>
- #include <lib/support/DefaultStorageKeyAllocator.h>
  
  namespace chip {
  namespace app {

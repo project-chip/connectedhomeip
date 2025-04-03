@@ -18,18 +18,6 @@
 
  #include "closure-dimension-server.h"
  #include "closure-dimension-cluster-logic.h"
-
- #include <app-common/zap-generated/cluster-objects.h>
- #include <app-common/zap-generated/ids/Attributes.h>
- #include <app-common/zap-generated/ids/Clusters.h>
- #include <app/AttributeAccessInterface.h>
- #include <app/AttributeAccessInterfaceRegistry.h>
- #include <app/CommandHandlerInterface.h>
- #include <app/CommandHandlerInterfaceRegistry.h>
- #include <app/ConcreteCommandPath.h>
- #include <app/data-model/Encode.h>
- #include <app/util/config.h>
- #include <lib/core/CHIPError.h>
  
  namespace chip {
  namespace app {
@@ -39,40 +27,13 @@
  using namespace Protocols::InteractionModel;
  namespace {
  
-// Add fucntion comment explaining the map.
-CHIP_ERROR TranslateErrorToIMStatus(CHIP_ERROR err)
-{
-    if (err == CHIP_NO_ERROR)
-    {
-        return err;
-    }
-    if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
-    {
-        return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-    }
-    if (err == CHIP_ERROR_INCORRECT_STATE)
-    {
-        return CHIP_IM_GLOBAL_STATUS(Failure);
-    }
-    if (err == CHIP_ERROR_INVALID_ARGUMENT)
-    {
-        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
-    }
-    // Catch-all error
-    return CHIP_IM_GLOBAL_STATUS(Failure);
-}
- 
  template <typename T, typename F>
  CHIP_ERROR EncodeRead(AttributeValueEncoder & aEncoder, const F & getter)
  {
-     T ret;
-     CHIP_ERROR err = getter(ret);
-     if (err == CHIP_NO_ERROR)
-     {
-         err = aEncoder.Encode(ret);
-     }
-
-     return TranslateErrorToIMStatus(err);
+    T ret;
+    CHIP_ERROR err = getter(ret);
+    VerifyOrReturnValue(err == CHIP_NO_ERROR,err);
+    return aEncoder.Encode(ret);
  }
  
  } // namespace
@@ -82,13 +43,12 @@ CHIP_ERROR TranslateErrorToIMStatus(CHIP_ERROR err)
      switch (aPath.mAttributeId)
      {
      case Attributes::Current::Id: {
-         typedef GenericCurrentStruct T;
+        typedef GenericCurrentStruct T;
          return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetCurrent(ret); });
      }
      case Attributes::Target::Id: {
          typedef GenericTargetStruct T;
-         return EncodeRead<T>(aEncoder,
-                              [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetTarget(ret); });
+         return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetTarget(ret); });
      }
      case Attributes::Resolution::Id: {
          typedef Attributes::Resolution::TypeInfo::Type T;

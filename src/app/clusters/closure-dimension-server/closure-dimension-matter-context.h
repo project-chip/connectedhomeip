@@ -18,8 +18,6 @@
 
  #pragma once
 
- #include <app/data-model/Nullable.h>
- #include <lib/core/CHIPError.h>
  #include <lib/core/CHIPPersistentStorageDelegate.h>
  #include <lib/core/DataModelTypes.h>
  
@@ -38,7 +36,10 @@
         mEndpoint(endpoint), mPersistentStorageDelegate(persistentStorageDelegate)
     {}
  
-    // MarkDirty
+    /**
+     * @brief calls the attribute change callback
+     * @param[in] attributeId Attribute ID whose value need to be marked dirty.
+     */
     virtual void MarkDirty(AttributeId attributeId);
  
     virtual ~MatterContext() = default;
