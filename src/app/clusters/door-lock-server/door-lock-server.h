@@ -771,16 +771,12 @@ struct EmberAfPluginDoorLockCredentialInfo
 {
     DlCredentialStatus status = DlCredentialStatus::kAvailable; /**< Indicates if credential slot is occupied or not. */
     CredentialTypeEnum credentialType;                          /**< Specifies the type of the credential (PIN, RFID, etc.). */
-#if DOOR_LOCK_USE_LOCAL_BUFFER
     chip::MutableByteSpan credentialData;                       /**< Credential data bytes. */
-#else
-    chip::ByteSpan credentialData;                              /**< Credential data bytes. */
-#endif
     DlAssetSource creationSource;
-    chip::FabricIndex createdBy;                                /**< Index of the fabric that created the user. */
+    chip::FabricIndex createdBy; /**< Index of the fabric that created the user. */
 
     DlAssetSource modificationSource;
-    chip::FabricIndex lastModifiedBy;                           /**< ID of the fabric that modified the user. */
+    chip::FabricIndex lastModifiedBy; /**< ID of the fabric that modified the user. */
 
 #if DOOR_LOCK_USE_LOCAL_BUFFER
     uint8_t credentialDataBuffer[DOOR_LOCK_CREDENTIAL_BUFFER_LENGTH];
@@ -793,22 +789,17 @@ struct EmberAfPluginDoorLockCredentialInfo
  */
 struct EmberAfPluginDoorLockUserInfo
 {
-#if DOOR_LOCK_USE_LOCAL_BUFFER
     chip::MutableCharSpan userName;                         /**< Name of the user. */
     chip::Span<CredentialStruct> credentials;               /**< Credentials that are associated with user (without data).*/
-#else
-    chip::CharSpan userName;                                /**< Name of the user. */
-    chip::Span<const CredentialStruct> credentials;         /**< Credentials that are associated with user (without data).*/
-#endif
     uint32_t userUniqueId;                                  /**< Unique user identifier. */
     UserStatusEnum userStatus = UserStatusEnum::kAvailable; /**< Status of the user slot (available/occupied). */
     UserTypeEnum userType;                                  /**< Type of the user. */
     CredentialRuleEnum credentialRule;                      /**< Number of supported credentials. */
 
     DlAssetSource creationSource;
-    chip::FabricIndex createdBy;                            /**< ID of the fabric that created the user. */
+    chip::FabricIndex createdBy; /**< ID of the fabric that created the user. */
     DlAssetSource modificationSource;
-    chip::FabricIndex lastModifiedBy;                       /**< ID of the fabric that modified the user. */
+    chip::FabricIndex lastModifiedBy; /**< ID of the fabric that modified the user. */
 
 #if DOOR_LOCK_USE_LOCAL_BUFFER
     char nameBuffer[DOOR_LOCK_MAX_USER_NAME_SIZE];

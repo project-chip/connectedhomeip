@@ -412,7 +412,8 @@ bool LockManager::GetUser(chip::EndpointId endpointId, uint16_t userIndex, Ember
     error = mStorage->SyncGetKeyValue(credentialKey.KeyName(), credentials, credentialSize);
 
     // Check size out param matches what we expect to read
-    VerifyOrReturnValue(credentialSize == static_cast<uint16_t>(CredentialStructSize * userInStorage.currentCredentialCount), false);
+    VerifyOrReturnValue(credentialSize == static_cast<uint16_t>(CredentialStructSize * userInStorage.currentCredentialCount),
+                        false);
 
     // If KVS read was successful
     if (error == CHIP_NO_ERROR)
@@ -420,7 +421,7 @@ bool LockManager::GetUser(chip::EndpointId endpointId, uint16_t userIndex, Ember
 
         // Copy credentials attached to user from storage to the output parameter
         memmove(user.credentials.data(), credentials, credentialSize);
-        
+
         // Resize Span to match the actual size of credentials attached to user
         user.credentials.reduce_size(userInStorage.currentCredentialCount);
     }
@@ -445,13 +446,6 @@ bool LockManager::SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip:
                           const chip::CharSpan & userName, uint32_t uniqueId, UserStatusEnum userStatus, UserTypeEnum usertype,
                           CredentialRuleEnum credentialRule, const CredentialStruct * credentials, size_t totalCredentials)
 {
-
-    ChipLogProgress(Zcl,
-                    "Door Lock App: LockManager::SetUser "
-                    "[endpoint=%d,userIndex=%d,creator=%d,modifier=%d,userName=%s,uniqueId=%ld "
-                    "userStatus=%u,userType=%u,credentialRule=%u,credentials=%p,totalCredentials=%u]",
-                    endpointId, userIndex, creator, modifier, userName.data(), uniqueId, to_underlying(userStatus),
-                    to_underlying(usertype), to_underlying(credentialRule), credentials, totalCredentials);
 
     VerifyOrReturnValue(kInvalidEndpointId != endpointId, false);
 
@@ -554,7 +548,7 @@ bool LockManager::GetCredential(chip::EndpointId endpointId, uint16_t credential
     }
 
     VerifyOrReturnValue(credentialInStorage.credentialDataSize <= kMaxCredentialSize, false);
-    
+
     // Copy credential data from storage to the output parameter
     memmove(credential.credentialData.data(), credentialInStorage.credentialData, credentialInStorage.credentialDataSize);
 
@@ -645,7 +639,7 @@ DlStatus LockManager::GetWeekdaySchedule(chip::EndpointId endpointId, uint8_t we
     error = mStorage->SyncGetKeyValue(scheduleDataKey.KeyName(), &weekDayScheduleInStorage, size);
 
     // Check size out param matches what we expect to read
-    VerifyOrReturnValue(size == WeekDayScheduleInfoSize, DlStatus::kFailure);    
+    VerifyOrReturnValue(size == WeekDayScheduleInfoSize, DlStatus::kFailure);
 
     // If no data is found at scheduleDataKey
     if (error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
@@ -733,7 +727,7 @@ DlStatus LockManager::GetYeardaySchedule(chip::EndpointId endpointId, uint8_t ye
     error = mStorage->SyncGetKeyValue(scheduleDataKey.KeyName(), &yearDayScheduleInStorage, size);
 
     // Check size out param matches what we expect to read
-    VerifyOrReturnValue(size == YearDayScheduleInfoSize, DlStatus::kFailure); 
+    VerifyOrReturnValue(size == YearDayScheduleInfoSize, DlStatus::kFailure);
 
     // If no data is found at scheduleDataKey
     if (error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
@@ -815,7 +809,7 @@ DlStatus LockManager::GetHolidaySchedule(chip::EndpointId endpointId, uint8_t ho
     error = mStorage->SyncGetKeyValue(scheduleDataKey.KeyName(), &holidayScheduleInStorage, size);
 
     // Check size out param matches what we expect to read
-    VerifyOrReturnValue(size == HolidayScheduleInfoSize, DlStatus::kFailure); 
+    VerifyOrReturnValue(size == HolidayScheduleInfoSize, DlStatus::kFailure);
 
     // If no data is found at scheduleDataKey
     if (error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
@@ -896,8 +890,6 @@ bool LockManager::setLockState(chip::EndpointId endpointId, const Nullable<chip:
                                OperationErrorEnum & err)
 {
 
-    CHIP_ERROR error;
-
     VerifyOrReturnValue(kInvalidEndpointId != endpointId, false);
 
     // Assume pin is required until told otherwise
@@ -927,74 +919,51 @@ bool LockManager::setLockState(chip::EndpointId endpointId, const Nullable<chip:
     }
 
     // Check all pin codes associated to all users to see if this pin code exists
-    for (int userIndex = 0; userIndex < kMaxUsers; userIndex++)
+    for (uint32_t userIndex = 1; userIndex <= kMaxUsers; userIndex++)
     {
-        // Get user data to obtain currentCredentialCount
-        chip::StorageKeyName userKey = LockUserEndpoint(endpointId, userIndex);
+        EmberAfPluginDoorLockUserInfo user;
 
-        uint16_t userSize = LockUserInfoSize;
-
-        error = mStorage->SyncGetKeyValue(userKey.KeyName(), &mUserInStorage, userSize);
-
-        // User exists at this index
-        if (error == CHIP_NO_ERROR)
+        if (!GetUser(endpointId, userIndex, user))
         {
-            chip::StorageKeyName credentialKey = LockUserCredentialMap(userIndex);
-
-            uint16_t credentialStructSize = CredentialStructSize * mUserInStorage.currentCredentialCount;
-
-            // Get array of credential indices and types associated to user
-            error = mStorage->SyncGetKeyValue(credentialKey.KeyName(), &mCredentials, credentialStructSize);
-
-            // Credential data associated with user
-            if (error == CHIP_NO_ERROR)
+            ChipLogError(Zcl, "Unable to get the user - internal error [endpointId=%d,userIndex=%lu]", endpointId, userIndex);
+            return false;
+        }
+        // Loop through each credential attached to the user
+        for (uint32_t userCredentialIndex = 0; userCredentialIndex < user.credentials.size(); userCredentialIndex++)
+        {
+            // If the current credential is a pin type, then check it against pin input. Otherwise ignore
+            if (user.credentials.data()[userCredentialIndex].credentialType == CredentialTypeEnum::kPin)
             {
-                // Loop through each credential attached to the user
-                for (int userCredentialIndex = 0; userCredentialIndex < mUserInStorage.currentCredentialCount;
-                     userCredentialIndex++)
+                EmberAfPluginDoorLockCredentialInfo credential;
+
+                if (!GetCredential(endpointId, user.credentials.data()[userCredentialIndex].credentialIndex,
+                                   user.credentials.data()[userCredentialIndex].credentialType, credential))
                 {
-                    // If the current credential is a pin type, then check it against pin input. Otherwise ignore
-                    if (mCredentials[userCredentialIndex].credentialType == CredentialTypeEnum::kPin)
+                    ChipLogError(Zcl, "Unable to get credential: app error [endpointId=%d,credentialType=%u,credentialIndex=%d]",
+                                 endpointId, to_underlying(user.credentials.data()[userCredentialIndex].credentialType),
+                                 user.credentials.data()[userCredentialIndex].credentialIndex);
+                    return false;
+                }
+
+                if (credential.status == DlCredentialStatus::kOccupied)
+                {
+
+                    // See if credential retrieved from storage matches the provided PIN
+                    if (credential.credentialData.data_equal(pin.Value()))
                     {
-                        // Read the individual credential at userCredentialIndex
-                        chip::StorageKeyName key =
-                            LockCredentialEndpoint(endpointId, mCredentials[userCredentialIndex].credentialType, mCredentials[userCredentialIndex].credentialIndex);
+                        ChipLogDetail(Zcl,
+                                      "Lock App: specified PIN code was found in the database, setting lock state to "
+                                      "\"%s\" [endpointId=%d]",
+                                      lockStateToString(lockState), endpointId);
 
-                        uint16_t credentialSize = LockCredentialInfoSize;
+                        LockOpCredentials userCredential[] = { { CredentialTypeEnum::kPin,
+                                                                 user.credentials.data()[userCredentialIndex].credentialIndex } };
+                        auto userCredentials               = MakeNullable<List<const LockOpCredentials>>(userCredential);
 
-                        error = mStorage->SyncGetKeyValue(key.KeyName(), &mCredentialInStorage, credentialSize);
+                        DoorLockServer::Instance().SetLockState(endpointId, lockState, OperationSourceEnum::kRemote, userIndex,
+                                                                userCredentials, fabricIdx, nodeId);
 
-                        if (error == CHIP_NO_ERROR)
-                        {
-                            if (mCredentialInStorage.status == DlCredentialStatus::kOccupied)
-                            {
-                                chip::ByteSpan currentCredential =
-                                    chip::ByteSpan{ mCredentialInStorage.credentialData, mCredentialInStorage.credentialDataSize };
-
-                                // See if credential retrieved from storage matches the provided PIN
-                                if (currentCredential.data_equal(pin.Value()))
-                                {
-                                    ChipLogDetail(Zcl,
-                                                  "Lock App: specified PIN code was found in the database, setting lock state to "
-                                                  "\"%s\" [endpointId=%d]",
-                                                  lockStateToString(lockState), endpointId);
-
-                                    LockOpCredentials userCredential[] = { { CredentialTypeEnum::kPin,
-                                                                             mCredentials[userCredentialIndex].credentialIndex } };
-                                    auto userCredentials = MakeNullable<List<const LockOpCredentials>>(userCredential);
-
-                                    DoorLockServer::Instance().SetLockState(endpointId, lockState, OperationSourceEnum::kRemote,
-                                                                            userIndex, userCredentials, fabricIdx, nodeId);
-
-                                    return true;
-                                }
-                            }
-                        }
-                        else if (error != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
-                        {
-                            ChipLogError(Zcl, "Error reading credential");
-                            return false;
-                        }
+                        return true;
                     }
                 }
             }

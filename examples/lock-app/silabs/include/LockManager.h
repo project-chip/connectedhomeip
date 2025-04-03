@@ -106,7 +106,7 @@ public:
     } State;
 
     CHIP_ERROR Init(chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> state,
-        SilabsDoorLockConfig::LockInitParams::LockParam lockParam, PersistentStorageDelegate * storage);
+                    SilabsDoorLockConfig::LockInitParams::LockParam lockParam, PersistentStorageDelegate * storage);
     bool NextState();
     bool IsActionInProgress();
     bool InitiateAction(int32_t aActor, Action_t aAction);
@@ -222,9 +222,10 @@ private:
         return StorageKeyName::Formatted("g/e/%x/lu/%x", endpoint, userIndex);
     }
     // Stores LockCredentialInfo corresponding to a credential index and type
-    static StorageKeyName LockCredentialEndpoint(chip::EndpointId endpoint, CredentialTypeEnum credentialType, uint16_t credentialIndex)
+    static StorageKeyName LockCredentialEndpoint(chip::EndpointId endpoint, CredentialTypeEnum credentialType,
+                                                 uint16_t credentialIndex)
     {
-        return StorageKeyName::Formatted("g/e/%x/t/%x/lc/%x", endpoint, static_cast<uint16_t>(credentialType), credentialIndex);
+        return StorageKeyName::Formatted("g/e/%x/ct/%x/lc/%x", endpoint, static_cast<uint16_t>(credentialType), credentialIndex);
     }
     // Stores all the credential indices that belong to a user
     static StorageKeyName LockUserCredentialMap(uint16_t userIndex) { return StorageKeyName::Formatted("g/lu/%x/lc", userIndex); }
@@ -234,22 +235,18 @@ private:
         return StorageKeyName::Formatted("g/e/%x/lu/%x/lw/%x", endpoint, userIndex, scheduleIndex);
     }
     // Stores YearDayScheduleInfo corresponding to a user and schedule index
-    static StorageKeyName LockUserYearDayScheduleEndpoint(uint16_t userIndex, uint16_t scheduleIndex, chip::EndpointId endpoint)
+    static StorageKeyName LockUserYearDayScheduleEndpoint(chip::EndpointId endpoint, uint16_t userIndex, uint16_t scheduleIndex)
     {
         return StorageKeyName::Formatted("g/e/%x/lu/%x/ly/%x", endpoint, userIndex, scheduleIndex);
     }
     // Stores HolidayScheduleInfo corresponding to a schedule index
-    static StorageKeyName LockHolidayScheduleEndpoint(uint16_t scheduleIndex, chip::EndpointId endpoint)
+    static StorageKeyName LockHolidayScheduleEndpoint(chip::EndpointId endpoint, uint16_t scheduleIndex)
     {
         return StorageKeyName::Formatted("g/e/%x/lh/%x", endpoint, scheduleIndex);
     }
 
     // Pointer to the PeristentStorage
     PersistentStorageDelegate * mStorage = nullptr;
-
-    LockUserInfo mUserInStorage;
-    LockCredentialInfo mCredentialInStorage;
-    CredentialStruct mCredentials[kMaxCredentialsPerUser];
 };
 
 LockManager & LockMgr();
