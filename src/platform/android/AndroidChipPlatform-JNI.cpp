@@ -127,9 +127,11 @@ JNI_METHOD(void, initChipStack)(JNIEnv * env, jobject self)
 }
 
 // for NFCCommissioningManager
-JNI_METHOD(void, nativeSetNFCCommissioningManager)(JNIEnv *, jobject, jobject manager)
+JNI_METHOD(void, nativeSetNFCCommissioningManager)(JNIEnv * env, jobject, jobject manager)
 {
     ChipLogProgress(DeviceLayer, "(Android JNI) nativeSetNFCCommissioningManager()");
+
+    VerifyOrReturn(env != nullptr);
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC_COMMISSIONING
     chip::DeviceLayer::StackLock lock;
     chip::DeviceLayer::Internal::NFCCommissioningMgrImpl().InitializeWithObject(manager);
@@ -140,6 +142,7 @@ JNI_METHOD(void, onNfcTagResponse)(JNIEnv * env, jobject self, jbyteArray jbArra
 {
     ChipLogProgress(Controller, "%p (Android JNI) onNfcTagResponse()", self);
 
+    VerifyOrReturn(env != nullptr);
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC_COMMISSIONING
     chip::DeviceLayer::StackLock lock;
 
