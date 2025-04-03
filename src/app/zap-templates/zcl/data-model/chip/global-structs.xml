@@ -42,9 +42,9 @@ Git:
   </struct>
 
   <struct name="LocationDescriptorStruct">
-    <item fieldId="0" name="LocationName" type="char_string" length="128"/>
-    <item fieldId="1" name="FloorNumber" type="int16s" isNullable="true"/>
-    <item fieldId="2" name="AreaType" type="AreaTypeTag" isNullable="true"/>
+    <item fieldId="0" name="LocationName" type="char_string" length="128" isNullable="false" optional="false"/>
+    <item fieldId="1" name="FloorNumber" type="int16s" isNullable="true" optional="false"/>
+    <item fieldId="2" name="AreaType" type="AreaTypeTag" isNullable="true" optional="false"/>
   </struct>
 
   <!--
@@ -87,8 +87,8 @@ Git:
   </struct>
 
   <struct name="TestGlobalStruct">
-    <item fieldId="0" name="Name" type="char_string" length="128"/>
-    <item fieldId="1" name="MyBitmap" type="TestGlobalBitmap" isNullable="true"/>
+    <item fieldId="0" name="Name" type="char_string" length="128" isNullable="false" optional="false"/>
+    <item fieldId="1" name="MyBitmap" type="TestGlobalBitmap" isNullable="true" optional="false"/>
     <item fieldId="2" name="MyEnum" type="TestGlobalEnum" isNullable="true" optional="true"/>
   </struct>
 </configurator>
