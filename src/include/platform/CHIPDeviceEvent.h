@@ -255,6 +255,11 @@ enum PublicEventTypes
      * Signals that secure session is established.
      */
     kSecureSessionEstablished,
+
+    /**
+     * Signals that factory reset has started.
+     */
+    kFactoryReset,
 };
 
 /**
@@ -282,8 +287,10 @@ enum InternalEventTypes
      */
     kCHIPoBLEConnectionError,
     kCHIPoBLENotifyConfirm,
-    kCHIPoWiFiPAFWriteReceived,
+    kCHIPoWiFiPAFReceived,
     kCHIPoWiFiPAFConnected,
+    kCHIPoWiFiPAFCancelConnect,
+    kCHIPoWiFiPAFWriteDone,
 };
 
 static_assert(kEventTypeNotSet == 0, "kEventTypeNotSet must be defined as 0");
@@ -390,6 +397,10 @@ typedef void (*AsyncWorkFunct)(intptr_t arg);
 #include <system/SystemEvent.h>
 #include <system/SystemLayer.h>
 #include <system/SystemPacketBuffer.h>
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+#include <wifipaf/WiFiPAFRole.h>
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 
 namespace chip {
 namespace DeviceLayer {
@@ -502,7 +513,9 @@ struct ChipDeviceEvent final
         struct
         {
             chip::System::PacketBuffer * Data;
-        } CHIPoWiFiPAFWriteReceived;
+            chip::WiFiPAF::WiFiPAFSession SessionInfo;
+            bool result;
+        } CHIPoWiFiPAFReceived;
 #endif
         struct
         {

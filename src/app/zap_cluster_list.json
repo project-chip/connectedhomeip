@@ -24,9 +24,13 @@
         "CHIME_CLUSTER": [],
         "CLIENT_MONITORING_CLUSTER": [],
         "CLOSURE_CONTROL_CLUSTER": [],
+        "CLOSURE_DIMENSION_CLUSTER": [],
         "COLOR_CONTROL_CLUSTER": [],
         "COMMISSIONER_CONTROL_CLUSTER": [],
         "COMMISSIONING_CLUSTER": [],
+        "COMMODITY_METERING_CLUSTER": [],
+        "COMMODITY_PRICE_CLUSTER": [],
+        "COMMODITY_TARIFF_CLUSTER": [],
         "CONTENT_LAUNCHER_CLUSTER": [],
         "CONTENT_CONTROL_CLUSTER": [],
         "CONTENT_APP_OBSERVER_CLUSTER": [],
@@ -37,6 +41,7 @@
         "DIAGNOSTIC_LOGS_CLUSTER": [],
         "DISHWASHER_ALARM_CLUSTER": [],
         "DISHWASHER_MODE_CLUSTER": [],
+        "METER_IDENTIFICATION_CLUSTER": [],
         "MICROWAVE_OVEN_MODE_CLUSTER": [],
         "DOOR_LOCK_CLUSTER": [],
         "ECOSYSTEM_INFORMATION_CLUSTER": [],
@@ -169,7 +174,9 @@
             "bridged-device-basic-information-server"
         ],
         "CAMERA_AV_SETTINGS_USER_LEVEL_MANAGEMENT_CLUSTER": [],
-        "CAMERA_AV_STREAM_MANAGEMENT_CLUSTER": [],
+        "CAMERA_AV_STREAM_MANAGEMENT_CLUSTER": [
+            "camera-av-stream-management-server"
+        ],
         "CARBON_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER": [
             "concentration-measurement-server"
         ],
@@ -179,9 +186,13 @@
         "CHANNEL_CLUSTER": ["channel-server"],
         "CHIME_CLUSTER": ["chime-server"],
         "CLOSURE_CONTROL_CLUSTER": ["closure-control-server"],
+        "CLOSURE_DIMENSION_CLUSTER": [],
         "COLOR_CONTROL_CLUSTER": ["color-control-server"],
         "COMMISSIONER_CONTROL_CLUSTER": ["commissioner-control-server"],
         "COMMISSIONING_CLUSTER": [],
+        "COMMODITY_METERING_CLUSTER": [],
+        "COMMODITY_PRICE_CLUSTER": [],
+        "COMMODITY_TARIFF_CLUSTER": [],
         "CONTENT_LAUNCHER_CLUSTER": ["content-launch-server"],
         "CONTENT_CONTROL_CLUSTER": ["content-control-server"],
         "CONTENT_APP_OBSERVER_CLUSTER": ["content-app-observer"],
@@ -192,6 +203,7 @@
         "DIAGNOSTIC_LOGS_CLUSTER": ["diagnostic-logs-server"],
         "DISHWASHER_ALARM_CLUSTER": ["dishwasher-alarm-server"],
         "DISHWASHER_MODE_CLUSTER": ["mode-base-server"],
+        "METER_IDENTIFICATION_CLUSTER": [],
         "MICROWAVE_OVEN_MODE_CLUSTER": ["mode-base-server"],
         "DOOR_LOCK_CLUSTER": ["door-lock-server"],
         "ECOSYSTEM_INFORMATION_CLUSTER": ["ecosystem-information-server"],
@@ -325,8 +337,12 @@
         "WAKE_ON_LAN_CLUSTER": ["wake-on-lan-server"],
         "LAUNDRY_WASHER_CONTROLS_CLUSTER": ["laundry-washer-controls-server"],
         "LAUNDRY_DRYER_CONTROLS_CLUSTER": ["laundry-dryer-controls-server"],
-        "WEB_RTC_TRANSPORT_PROVIDER_CLUSTER": [],
-        "WEB_RTC_TRANSPORT_REQUESTOR_CLUSTER": [],
+        "WEB_RTC_TRANSPORT_PROVIDER_CLUSTER": [
+            "webrtc-transport-provider-server"
+        ],
+        "WEB_RTC_TRANSPORT_REQUESTOR_CLUSTER": [
+            "webrtc-transport-requestor-server"
+        ],
         "WIFI_NETWORK_DIAGNOSTICS_CLUSTER": ["wifi-network-diagnostics-server"],
         "WIFI_NETWORK_MANAGEMENT_CLUSTER": ["wifi-network-management-server"],
         "WINDOW_COVERING_CLUSTER": ["window-covering-server"],

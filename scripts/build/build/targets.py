@@ -31,6 +31,7 @@ from builders.nuttx import NuttXApp, NuttXBoard, NuttXBuilder
 from builders.nxp import NxpApp, NxpBoard, NxpBoardVariant, NxpBuilder, NxpBuildSystem, NxpLogLevel, NxpOsUsed
 from builders.openiotsdk import OpenIotSdkApp, OpenIotSdkBuilder, OpenIotSdkCryptoBackend
 from builders.qpg import QpgApp, QpgBoard, QpgBuilder
+from builders.realtek import RealtekApp, RealtekBoard, RealtekBuilder
 from builders.stm32 import stm32App, stm32Board, stm32Builder
 from builders.telink import TelinkApp, TelinkBoard, TelinkBuilder
 from builders.ti import TIApp, TIBoard, TIBuilder
@@ -666,6 +667,7 @@ def BuildTizenTarget():
     # board
     target.AppendFixedTargets([
         TargetPart('arm', board=TizenBoard.ARM),
+        TargetPart('arm64', board=TizenBoard.ARM64),
     ])
 
     # apps
@@ -818,6 +820,25 @@ def BuildTelinkTarget():
     return target
 
 
+def BuildRealtekTarget():
+    target = BuildTarget('realtek', RealtekBuilder)
+
+    # board
+    target.AppendFixedTargets([
+        TargetPart('rtl8777g', board=RealtekBoard.RTL8777G),
+    ])
+
+    # apps
+    target.AppendFixedTargets([
+        TargetPart('lighting', app=RealtekApp.LIGHT),
+        TargetPart('light-switch', app=RealtekApp.LIGHT_SWITCH),
+        TargetPart('lock', app=RealtekApp.LOCK),
+        TargetPart('window', app=RealtekApp.WINDOW),
+    ])
+
+    return target
+
+
 def BuildOpenIotSdkTargets():
     target = BuildTarget('openiotsdk', OpenIotSdkBuilder)
 
@@ -856,6 +877,7 @@ BUILD_TARGETS = [
     BuildNrfNativeTarget(),
     BuildNuttXTarget(),
     BuildQorvoTarget(),
+    BuildRealtekTarget(),
     BuildStm32Target(),
     BuildTizenTarget(),
     BuildTelinkTarget(),
