@@ -19,8 +19,6 @@ import("${chip_root}/build/chip/tools.gni")
 import("${chip_root}/examples/chip-tool/chip-tool.gni")
 import("${chip_root}/src/lib/core/core.gni")
 
-#import("${chip_root}/src/nfc/nfc.gni")
-
 if (config_use_interactive_mode) {
   import("//build_overrides/editline.gni")
 }

@@ -197,7 +197,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
                                                         ,
                                                         Transport::WiFiPAFListenParameters()
 #endif
-#if CHIP_DEVICE_CONFIG_ENABLE_NFC_COMMISSIONING
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
                                                             ,
                                                         Transport::NfcListenParameters(nullptr)
 #endif

@@ -71,7 +71,7 @@
 #include <app/TimerDelegates.h>
 #include <app/reporting/ReportSchedulerImpl.h>
 #include <transport/raw/UDP.h>
-#if CHIP_DEVICE_CONFIG_ENABLE_NFC_COMMISSIONING
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
 #include <transport/raw/NFC.h>
 #endif
 
@@ -115,7 +115,7 @@ using ServerTransportMgr = chip::TransportMgr<chip::Transport::UDP
                                               ,
                                               chip::Transport::WiFiPAFBase
 #endif
-#if CHIP_DEVICE_CONFIG_ENABLE_NFC_COMMISSIONING
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
                                               ,
                                               chip::Transport::NFC
 #endif

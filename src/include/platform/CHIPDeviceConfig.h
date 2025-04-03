@@ -571,12 +571,12 @@
 // -------------------- NFC/CHIPoNFC Configuration --------------------
 
 /**
- * CHIP_DEVICE_CONFIG_ENABLE_NFC_COMMISSIONING
+ * CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
  *
  * Enable support for NFC Commissioning (chip-over-NFC).
  */
-#ifndef CHIP_DEVICE_CONFIG_ENABLE_NFC_COMMISSIONING
-#define CHIP_DEVICE_CONFIG_ENABLE_NFC_COMMISSIONING 0
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+#define CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING 0
 #endif
 
 // -------------------- BLE/CHIPoBLE Configuration --------------------

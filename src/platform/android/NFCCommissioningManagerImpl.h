@@ -29,7 +29,7 @@
 
 #include <platform/internal/NFCCommissioningManager.h>
 
-#if CHIP_DEVICE_CONFIG_ENABLE_NFC_COMMISSIONING
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
 
 namespace chip {
 namespace DeviceLayer {
@@ -103,4 +103,4 @@ inline NFCCommissioningManagerImpl & NFCCommissioningMgrImpl()
 } // namespace DeviceLayer
 } // namespace chip
 
-#endif // CHIP_DEVICE_CONFIG_ENABLE_NFC_COMMISSIONING
+#endif // CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING

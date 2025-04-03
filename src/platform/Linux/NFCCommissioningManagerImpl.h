@@ -27,7 +27,7 @@
 
 #include <platform/internal/NFCCommissioningManager.h>
 
-#if CHIP_DEVICE_CONFIG_ENABLE_NFC_COMMISSIONING
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
 
 namespace chip {
 namespace DeviceLayer {
@@ -70,6 +70,7 @@ private:
     static NFCCommissioningManagerImpl sInstance;
     static void SendChainedAPDUs(intptr_t arg);
 
+    CHIP_ERROR ConnectToCard(void);
     CHIP_ERROR SendTransportAPDU(uint8_t * dataToSend, uint32_t dataToSendLength, bool isLastBlock, uint32_t totalLength,
                                  uint8_t * pRcvBuffer, uint32_t * pRcvLength);
     CHIP_ERROR GetResponse(uint8_t length, uint8_t * pRcvBuffer, uint32_t * pRcvLength);
@@ -127,4 +128,4 @@ inline NFCCommissioningManagerImpl & NFCCommissioningMgrImpl()
 } // namespace DeviceLayer
 } // namespace chip
 
-#endif // CHIP_DEVICE_CONFIG_ENABLE_NFC_COMMISSIONING
+#endif // CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING

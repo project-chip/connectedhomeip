@@ -132,10 +132,10 @@ JNI_METHOD(void, nativeSetNFCCommissioningManager)(JNIEnv * env, jobject, jobjec
     ChipLogProgress(DeviceLayer, "(Android JNI) nativeSetNFCCommissioningManager()");
 
     VerifyOrReturn(env != nullptr);
-#if CHIP_DEVICE_CONFIG_ENABLE_NFC_COMMISSIONING
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
     chip::DeviceLayer::StackLock lock;
     chip::DeviceLayer::Internal::NFCCommissioningMgrImpl().InitializeWithObject(manager);
-#endif // CHIP_DEVICE_CONFIG_ENABLE_NFC_COMMISSIONING
+#endif // CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
 }
 
 JNI_METHOD(void, onNfcTagResponse)(JNIEnv * env, jobject self, jbyteArray jbArray)
@@ -143,7 +143,7 @@ JNI_METHOD(void, onNfcTagResponse)(JNIEnv * env, jobject self, jbyteArray jbArra
     ChipLogProgress(Controller, "%p (Android JNI) onNfcTagResponse()", self);
 
     VerifyOrReturn(env != nullptr);
-#if CHIP_DEVICE_CONFIG_ENABLE_NFC_COMMISSIONING
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
     chip::DeviceLayer::StackLock lock;
 
     jbyte * data = env->GetByteArrayElements(jbArray, nullptr);
@@ -153,17 +153,17 @@ JNI_METHOD(void, onNfcTagResponse)(JNIEnv * env, jobject self, jbyteArray jbArra
         System::PacketBufferHandle::NewWithData(reinterpret_cast<const uint8_t *>(data), static_cast<size_t>(length));
 
     chip::DeviceLayer::Internal::NFCCommissioningMgrImpl().OnNfcTagResponse(std::move(buffer));
-#endif // CHIP_DEVICE_CONFIG_ENABLE_NFC_COMMISSIONING
+#endif // CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
 }
 
 JNI_METHOD(void, onNfcTagError)(JNIEnv * env, jobject self)
 {
     ChipLogProgress(DeviceLayer, "(Android JNI) onNfcTagError()");
 
-#if CHIP_DEVICE_CONFIG_ENABLE_NFC_COMMISSIONING
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
     chip::DeviceLayer::StackLock lock;
     chip::DeviceLayer::Internal::NFCCommissioningMgrImpl().OnNfcTagError();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_NFC_COMMISSIONING
+#endif // CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
 }
 
 // for BLEManager

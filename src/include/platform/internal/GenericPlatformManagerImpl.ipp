@@ -30,6 +30,7 @@
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/BLEManager.h>
+#include <platform/internal/NFCCommissioningManager.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/EventLogging.h>
 #include <platform/internal/GenericPlatformManagerImpl.h>
@@ -125,6 +126,16 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
     VerifyOrExit(
         err == CHIP_NO_ERROR,
         ChipLogError(DeviceLayer, "NFC onboarding payload manager initialization failed: %" CHIP_ERROR_FORMAT, err.Format()));
+#endif
+
+    // Initialize the CHIP NFC manager for NFC-based Commissioning
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+    err = NFCCommissioningMgr().Init();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "NFC-based Commissioning Manager initialization failed: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    SuccessOrExit(err);
 #endif
 
     // TODO Initialize CHIP Event Logging.

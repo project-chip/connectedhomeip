@@ -28,7 +28,7 @@
 #include <lib/support/SafeInt.h>
 #include <platform/internal/NFCCommissioningManager.h>
 
-#if CHIP_DEVICE_CONFIG_ENABLE_NFC_COMMISSIONING
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
 
 using namespace chip;
 using namespace ::nl;
@@ -138,4 +138,4 @@ CHIP_ERROR NFCCommissioningManagerImpl::OnNfcTagError()
 } // namespace DeviceLayer
 } // namespace chip
 
-#endif // CHIP_DEVICE_CONFIG_ENABLE_NFC_COMMISSIONING
+#endif // CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING

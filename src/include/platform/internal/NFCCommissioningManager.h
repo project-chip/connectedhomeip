@@ -26,7 +26,7 @@
 #include <lib/support/CodeUtils.h>
 #include <platform/ConnectivityManager.h>
 
-#if CHIP_DEVICE_CONFIG_ENABLE_NFC_COMMISSIONING
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
 
 namespace chip {
 namespace DeviceLayer {
@@ -107,4 +107,4 @@ inline CHIP_ERROR NFCCommissioningManager::Init()
 } // namespace DeviceLayer
 } // namespace chip
 
-#endif // CHIP_DEVICE_CONFIG_ENABLE_NFC_COMMISSIONING
+#endif // CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING

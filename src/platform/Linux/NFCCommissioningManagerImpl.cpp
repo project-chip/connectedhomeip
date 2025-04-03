@@ -32,7 +32,7 @@
 
 #include <winscard.h>
 
-#if CHIP_DEVICE_CONFIG_ENABLE_NFC_COMMISSIONING
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
 
 using namespace chip;
 using namespace ::nl;
@@ -52,7 +52,15 @@ NFCCommissioningManagerImpl NFCCommissioningManagerImpl::sInstance;
 #define TYPE4_SIMPLE_APDU_MAX_TX_SIZE 245 // NB: 245 is the optimum size to get the biggest TX chunks and thus the max throughput
 #define TYPE4_SIMPLE_APDU_MAX_RX_SIZE 250 // NB: 250 is the optimum size to get the biggest RX chunks and thus the max throughput
 
-static SCARDHANDLE hCard;
+#ifndef MAX
+#define MAX(x, y) (((x) > (y)) ? (x) : (y))
+#endif
+
+#ifndef MIN
+#define MIN(x, y) (((x) < (y)) ? (x) : (y))
+#endif
+
+static SCARDHANDLE hCard = 0;
 static SCARD_IO_REQUEST pioSendPci;
 
 #define CHECK(f, rv)                                                                                                               \
@@ -67,6 +75,21 @@ static SCARD_IO_REQUEST pioSendPci;
 CHIP_ERROR NFCCommissioningManagerImpl::_Init()
 {
     ChipLogProgress(DeviceLayer, "NFCCommissioningManagerImpl::_Init()");
+
+    return CHIP_NO_ERROR;
+}
+
+// ===== start implement virtual methods on NfcApplicationDelegate.
+
+void NFCCommissioningManagerImpl::SetNFCBase(Transport::NFCBase * nfcBase)
+{
+    ChipLogProgress(DeviceLayer, "NFCCommissioningManagerImpl::SetNFCBase()");
+    mNFCBase = nfcBase;
+}
+
+CHIP_ERROR NFCCommissioningManagerImpl::ConnectToCard()
+{
+    ChipLogProgress(DeviceLayer, "NFCCommissioningManagerImpl::ConnectToCard()");
 
     long rv;
     SCARDCONTEXT hContext;
@@ -125,19 +148,16 @@ CHIP_ERROR NFCCommissioningManagerImpl::_Init()
     return result;
 }
 
-// ===== start implement virtual methods on NfcApplicationDelegate.
-
-void NFCCommissioningManagerImpl::SetNFCBase(Transport::NFCBase * nfcBase)
-{
-    ChipLogProgress(DeviceLayer, "NFCCommissioningManagerImpl::SetNFCBase()");
-    mNFCBase = nfcBase;
-}
 
 CHIP_ERROR NFCCommissioningManagerImpl::SelectMatterApplet(void)
 {
     ChipLogProgress(DeviceLayer, "NFCCommissioningManagerImpl::SelectMatterApplet()");
 
-    VerifyOrReturnLogError(hCard != 0, CHIP_ERROR_INCORRECT_STATE);
+    if (hCard == 0) {
+       CHIP_ERROR ret = ConnectToCard();
+       VerifyOrReturnLogError(ret == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
+       VerifyOrReturnLogError(hCard != 0, CHIP_ERROR_INTERNAL);
+    }
 
     BYTE dataReceived[10];
     DWORD receivedLength        = sizeof(dataReceived);
@@ -154,8 +174,6 @@ CHIP_ERROR NFCCommissioningManagerImpl::SelectMatterApplet(void)
 CHIP_ERROR NFCCommissioningManagerImpl::SendToNfcTag(System::PacketBufferHandle && msgBuf)
 {
     ChipLogProgress(DeviceLayer, "NFCCommissioningManagerImpl::SendToNfcTag()");
-
-    VerifyOrReturnLogError(hCard != 0, CHIP_ERROR_INCORRECT_STATE);
 
     mDataToSendLength = (uint32_t) msgBuf->DataLength();
     VerifyOrReturnLogError(mDataToSendLength <= sizeof(mDataToSend), CHIP_ERROR_INTERNAL);
@@ -447,6 +465,12 @@ CHIP_ERROR NFCCommissioningManagerImpl::Transceive(const char * commandName, uin
 {
     CHIP_ERROR ret;
 
+    if (hCard == 0) {
+       ret = ConnectToCard();
+       VerifyOrReturnLogError(ret == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
+       VerifyOrReturnLogError(hCard != 0, CHIP_ERROR_INTERNAL);
+    }
+
     // Use a local 'dwRecvLength' variable to avoid cast of pRcvLength from 'uint32_t *' to 'DWORD *'.
     // Before the transceive action, those variables contain contain the size of pRcvBuffer buffer.
     // After the transceive, they will contain the length of the received data.
@@ -489,4 +513,4 @@ CHIP_ERROR NFCCommissioningManagerImpl::OnNfcTagError()
 } // namespace DeviceLayer
 } // namespace chip
 
-#endif // CHIP_DEVICE_CONFIG_ENABLE_NFC_COMMISSIONING
+#endif // CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING

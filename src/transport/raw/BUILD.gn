@@ -52,7 +52,7 @@ static_library("raw") {
     ]
   }
 
-  if (chip_enable_nfc_commissioning) {
+  if (chip_enable_nfc_based_commissioning) {
     sources += [
       "NFC.cpp",
       "NFC.h",

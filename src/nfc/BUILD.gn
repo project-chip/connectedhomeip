@@ -29,7 +29,7 @@ buildconfig_header("nfc_buildconfig") {
   header_dir = "nfc"
 
   defines = [
-    "CONFIG_NETWORK_LAYER_NFC=${chip_enable_nfc_commissioning}",
+    "CONFIG_NETWORK_LAYER_NFC=${chip_enable_nfc_based_commissioning}",
     "CHIP_ENABLE_CHIPONFC_TEST=false",
   ]
 
@@ -55,7 +55,7 @@ source_set("nfc_config_header") {
   ]
 }
 
-if (chip_enable_nfc_commissioning) {
+if (chip_enable_nfc_based_commissioning) {
   static_library("nfc") {
     output_name = "libNfcLayer"
 
