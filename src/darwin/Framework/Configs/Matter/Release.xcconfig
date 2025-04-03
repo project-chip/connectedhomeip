@@ -13,6 +13,3 @@ OTHER_TAPI_FLAGS = -x objective-c++ -std=gnu++17 -fvisibility=hidden -fobjc-arc
 SDKROOT = iphoneos
 
 SWIFT_INSTALL_OBJC_HEADER = NO
-
-VALIDATE_PRODUCT = YES
-

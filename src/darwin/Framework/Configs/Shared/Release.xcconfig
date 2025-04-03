@@ -1,1 +1,3 @@
 #include "Base.xcconfig"
+
+VALIDATE_PRODUCT = YES

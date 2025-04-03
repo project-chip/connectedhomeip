@@ -2879,10 +2879,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = D4CA5BE42D9E29C700D44744 /* Debug.xcconfig */;
 			buildSettings = {
-				CHIP_ROOT = "$(PROJECT_DIR)/../../..";
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
 					"DEBUG=1",
@@ -2890,12 +2887,8 @@
 					"MTR_ENABLE_PROVISIONAL=1",
 					"MTR_ENABLE_UNSTABLE_API=1",
 				);
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
-				ONLY_ACTIVE_ARCH = YES;
-				OTHER_TAPI_FLAGS = "-x objective-c++ -std=gnu++17 -fvisibility=hidden -fobjc-arc";
 				SUPPORTED_PLATFORMS = "macosx iphonesimulator iphoneos appletvos appletvsimulator watchos watchsimulator";
 				SUPPORTS_TEXT_BASED_API = YES;
-				SWIFT_INSTALL_OBJC_HEADER = NO;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				TAPI_ENABLE_PROJECT_HEADERS = YES;
 				WARNING_CFLAGS = (
@@ -3011,24 +3004,15 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = D4CA5BE52D9E29C700D44744 /* Release.xcconfig */;
 			buildSettings = {
-				CHIP_ROOT = "$(PROJECT_DIR)/../../..";
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
 					"MTR_NO_AVAILABILITY=1",
 					"MTR_ENABLE_PROVISIONAL=1",
 					"MTR_ENABLE_UNSTABLE_API=1",
 				);
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
-				ONLY_ACTIVE_ARCH = YES;
-				OTHER_TAPI_FLAGS = "-x objective-c++ -std=gnu++17 -fvisibility=hidden -fobjc-arc";
 				SUPPORTED_PLATFORMS = "macosx iphonesimulator iphoneos appletvos appletvsimulator watchos watchsimulator";
 				SUPPORTS_TEXT_BASED_API = YES;
-				SWIFT_INSTALL_OBJC_HEADER = NO;
-				VALIDATE_PRODUCT = YES;
 				WARNING_CFLAGS = (
 					"-Wformat",
 					"-Wformat-nonliteral",
