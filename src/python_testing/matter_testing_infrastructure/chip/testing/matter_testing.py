@@ -190,18 +190,14 @@ class EventChangeCallback:
     def wait_for_event_report(self, expected_event: ClusterObjects.ClusterEvent, timeout_sec: float = 10.0) -> Any:
         """This function allows a test script to block waiting for the specific event to be the next event
            to arrive within a timeout (specified in seconds). It returns the event data so that the values can be checked."""
-        logging.info(
-            f"Waiting for {expected_event} for {timeout_sec:.1f} seconds")
+        logging.info(f"Waiting for {expected_event} for {timeout_sec:.1f} seconds")
         try:
             res = self._q.get(block=True, timeout=timeout_sec)
         except queue.Empty:
-            asserts.fail(
-                "Failed to receive a report for the event {}".format(expected_event))
+            asserts.fail("Failed to receive a report for the event {}".format(expected_event))
 
-        asserts.assert_equal(res.Header.ClusterId, expected_event.cluster_id,
-                             "Expected cluster ID not found in event report")
-        asserts.assert_equal(res.Header.EventId, expected_event.event_id,
-                             "Expected event ID not found in event report")
+        asserts.assert_equal(res.Header.ClusterId, expected_event.cluster_id, "Expected cluster ID not found in event report")
+        asserts.assert_equal(res.Header.EventId, expected_event.event_id, "Expected event ID not found in event report")
         logging.info(f"Successfully waited for {expected_event}")
         return res.Data
 
@@ -250,8 +246,7 @@ class AttributeChangeCallback:
 
         asserts.assert_equal(path.AttributeType, self._expected_attribute,
                              f"[AttributeChangeCallback] Attribute mismatch. Expected: {self._expected_attribute}, received: {path.AttributeType}")
-        logging.debug(
-            f"[AttributeChangeCallback] Attribute update callback for {path.AttributeType}")
+        logging.debug(f"[AttributeChangeCallback] Attribute update callback for {path.AttributeType}")
         q = (path, transaction)
         self._output.put(q)
 
@@ -316,20 +311,17 @@ def await_sequence_of_reports(report_queue: queue.Queue, endpoint_id: int, attri
 
     while time_remaining > 0:
         expected_value = sequence[sequence_idx]
-        logging.info(
-            f"Expecting value {expected_value} for attribute {attribute} on endpoint {endpoint_id}")
+        logging.info(f"Expecting value {expected_value} for attribute {attribute} on endpoint {endpoint_id}")
         logging.info(f"Waiting for {timeout_sec:.1f} seconds for all reports.")
         try:
-            item: AttributeValue = report_queue.get(
-                block=True, timeout=time_remaining)
+            item: AttributeValue = report_queue.get(block=True, timeout=time_remaining)
 
             # Track arrival of all values for the given attribute.
             if item.endpoint_id == endpoint_id and item.attribute == attribute:
                 actual_values.append(item.value)
 
                 if item.value == expected_value:
-                    logging.info(
-                        f"Got expected attribute change {sequence_idx+1}/{len(sequence)} for attribute {attribute}")
+                    logging.info(f"Got expected attribute change {sequence_idx+1}/{len(sequence)} for attribute {attribute}")
                     sequence_idx += 1
                 else:
                     asserts.assert_equal(item.value, expected_value,
@@ -346,8 +338,7 @@ def await_sequence_of_reports(report_queue: queue.Queue, endpoint_id: int, attri
         elapsed = time.time() - start_time
         time_remaining = timeout_sec - elapsed
 
-    asserts.fail(
-        f"Did not get full sequence {sequence} in {timeout_sec:.1f} seconds. Got {actual_values} before time-out.")
+    asserts.fail(f"Did not get full sequence {sequence} in {timeout_sec:.1f} seconds. Got {actual_values} before time-out.")
 
 
 class ClusterAttributeChangeAccumulator:
@@ -400,8 +391,7 @@ class ClusterAttributeChangeAccumulator:
             data = transaction.GetAttribute(path)
             value = AttributeValue(endpoint_id=path.Path.EndpointId, attribute=path.AttributeType,
                                    value=data, timestamp_utc=datetime.now(timezone.utc))
-            logging.info(
-                f"Got subscription report for {path.AttributeType}: {data}")
+            logging.info(f"Got subscription report for {path.AttributeType}: {data}")
             self._q.put(value)
             with self._lock:
                 self._attribute_report_counts[path.AttributeType] += 1
@@ -418,8 +408,7 @@ class ClusterAttributeChangeAccumulator:
         elapsed = 0.0
         time_remaining = timeout_sec
 
-        last_report_matches: dict[int, bool] = {
-            idx: False for idx, _ in enumerate(expected_final_values)}
+        last_report_matches: dict[int, bool] = {idx: False for idx, _ in enumerate(expected_final_values)}
 
         for element in expected_final_values:
             logging.info(
@@ -437,8 +426,7 @@ class ClusterAttributeChangeAccumulator:
                     if report.endpoint_id == expected_element.endpoint_id:
                         last_value = report.value
 
-                last_report_matches[expected_idx] = (
-                    last_value is not None and last_value == expected_element.value)
+                last_report_matches[expected_idx] = (last_value is not None and last_value == expected_element.value)
 
             # Determine if all were met
             if all(last_report_matches.values()):
@@ -450,14 +438,11 @@ class ClusterAttributeChangeAccumulator:
             time.sleep(0.1)
 
         # If we reach here, there was no early return and we failed to find all the values.
-        logging.error(
-            "Reached time-out without finding all expected report values.")
+        logging.error("Reached time-out without finding all expected report values.")
         logging.info("Values found:")
         for expected_idx, expected_element in enumerate(expected_final_values):
-            logging.info(
-                f"  -> {expected_element} found: {last_report_matches.get(expected_idx)}")
-        asserts.fail(
-            "Did not find all expected last report values before time-out")
+            logging.info(f"  -> {expected_element} found: {last_report_matches.get(expected_idx)}")
+        asserts.fail("Did not find all expected last report values before time-out")
 
     def await_sequence_of_reports(self, attribute: TypedAttributePath, sequence: list[Any], timeout_sec: float) -> None:
         """Await a given expected sequence of attribute reports in the accumulator for the endpoint associated.
@@ -553,8 +538,7 @@ class MatterTestConfig:
     # By default, we commission with CAT tags specified for RR-1.1
     # so the cert tests can be run without re-commissioning the device
     # for this one test. This can be overwritten from the command line
-    controller_cat_tags: List[int] = field(
-        default_factory=lambda: [0x0001_0001])
+    controller_cat_tags: List[int] = field(default_factory=lambda: [0x0001_0001])
 
     # Fabric ID which to use
     fabric_id: int = 1
@@ -682,8 +666,7 @@ class UnknownProblemLocation:
         return '\n      Unknown Locations - see message for more details'
 
 
-ProblemLocation = typing.Union[ClusterPathLocation,
-                               DeviceTypePathLocation, UnknownProblemLocation]
+ProblemLocation = typing.Union[ClusterPathLocation, DeviceTypePathLocation, UnknownProblemLocation]
 
 # ProblemSeverity is not using StrEnum, but rather Enum, since StrEnum only
 # appeared in 3.11. To make it JSON serializable easily, multiple inheritance
@@ -741,10 +724,8 @@ class MatterStackState:
         if not hasattr(builtins, "chipStack"):
             chip.native.Init(bluetoothAdapter=config.ble_interface_id)
             if config.storage_path is None:
-                raise ValueError(
-                    "Must have configured a MatterTestConfig.storage_path")
-            self._init_stack(already_initialized=False,
-                             persistentStoragePath=config.storage_path)
+                raise ValueError("Must have configured a MatterTestConfig.storage_path")
+            self._init_stack(already_initialized=False, persistentStoragePath=config.storage_path)
             self._we_initialized_the_stack = True
         else:
             self._init_stack(already_initialized=True)
@@ -755,8 +736,7 @@ class MatterStackState:
             self._chip_stack = builtins.chipStack
             self._logger.warn(
                 "Re-using existing ChipStack object found in current interpreter: "
-                "storage path %s will be ignored!" % (
-                    self._config.storage_path)
+                "storage path %s will be ignored!" % (self._config.storage_path)
             )
             # TODO: Warn that storage will not follow what we set in config
         else:
@@ -766,23 +746,19 @@ class MatterStackState:
         chip.logging.RedirectToPythonLogging()
 
         self._storage = self._chip_stack.GetStorageManager()
-        self._certificate_authority_manager = chip.CertificateAuthority.CertificateAuthorityManager(
-            chipStack=self._chip_stack)
+        self._certificate_authority_manager = chip.CertificateAuthority.CertificateAuthorityManager(chipStack=self._chip_stack)
         self._certificate_authority_manager.LoadAuthoritiesFromStorage()
 
         if (len(self._certificate_authority_manager.activeCaList) == 0):
             self._logger.warn(
                 "Didn't find any CertificateAuthorities in storage -- creating a new CertificateAuthority + FabricAdmin...")
-            ca = self._certificate_authority_manager.NewCertificateAuthority(
-                caIndex=self._config.root_of_trust_index)
+            ca = self._certificate_authority_manager.NewCertificateAuthority(caIndex=self._config.root_of_trust_index)
             ca.maximizeCertChains = self._config.maximize_cert_chains
             ca.certificateValidityPeriodSec = self._config.certificate_validity_period
             ca.NewFabricAdmin(vendorId=0xFFF1, fabricId=self._config.fabric_id)
         elif (len(self._certificate_authority_manager.activeCaList[0].adminList) == 0):
-            self._logger.warn(
-                "Didn't find any FabricAdmins in storage -- creating a new one...")
-            self._certificate_authority_manager.activeCaList[0].NewFabricAdmin(
-                vendorId=0xFFF1, fabricId=self._config.fabric_id)
+            self._logger.warn("Didn't find any FabricAdmins in storage -- creating a new one...")
+            self._certificate_authority_manager.activeCaList[0].NewFabricAdmin(vendorId=0xFFF1, fabricId=self._config.fabric_id)
 
     # TODO: support getting access to chip-tool credentials issuer's data
 
@@ -910,8 +886,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             app_pipe_name = self.get_default_app_pipe_name()
 
         if not isinstance(app_pipe_name, str):
-            raise TypeError(
-                "the named pipe must be provided as a string value")
+            raise TypeError("the named pipe must be provided as a string value")
 
         if not isinstance(command_dict, dict):
             raise TypeError("the command must be passed as a dictionary value")
@@ -919,6 +894,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         import json
         command = json.dumps(command_dict)
 
+        import os
         dut_ip = os.getenv('LINUX_DUT_IP')
 
         if dut_ip is None:
@@ -935,14 +911,12 @@ class MatterBaseTest(base_test.BaseTestClass):
             logging.info(f"Using DUT IP address: {dut_ip}")
 
             dut_uname = os.getenv('LINUX_DUT_USER')
-            asserts.assert_true(
-                dut_uname is not None, "The LINUX_DUT_USER environment variable must be set")
+            asserts.assert_true(dut_uname is not None, "The LINUX_DUT_USER environment variable must be set")
 
             logging.info(f"Using DUT user name: {dut_uname}")
 
             command_fixed = command.replace('\"', '\\"')
-            cmd = "echo \"%s\" | ssh %s@%s \'cat > %s\'" % (
-                command_fixed, dut_uname, dut_ip, app_pipe_name)
+            cmd = "echo \"%s\" | ssh %s@%s \'cat > %s\'" % (command_fixed, dut_uname, dut_ip, app_pipe_name)
             os.system(cmd)
 
     # Override this if the test requires a different default timeout.
@@ -1004,10 +978,8 @@ class MatterBaseTest(base_test.BaseTestClass):
             num_steps = 1 if steps is None else len(steps)
             filename = inspect.getfile(self.__class__)
             desc = self.get_test_desc(test_name)
-            steps_descriptions = [] if steps is None else [
-                step.description for step in steps]
-            self.runner_hook.test_start(
-                filename=filename, name=desc, count=num_steps, steps=steps_descriptions)
+            steps_descriptions = [] if steps is None else [step.description for step in steps]
+            self.runner_hook.test_start(filename=filename, name=desc, count=num_steps, steps=steps_descriptions)
             # If we don't have defined steps, we're going to start the one and only step now
             # if there are steps defined by the test, rely on the test calling the step() function
             # to indicates how it is proceeding
@@ -1017,14 +989,12 @@ class MatterBaseTest(base_test.BaseTestClass):
     def teardown_class(self):
         """Final teardown after all tests: log all problems."""
         if len(self.problems) > 0:
-            logging.info(
-                "###########################################################")
+            logging.info("###########################################################")
             logging.info("Problems found:")
             logging.info("===============")
             for problem in self.problems:
                 logging.info(str(problem))
-            logging.info(
-                "###########################################################")
+            logging.info("###########################################################")
         super().teardown_class()
 
     def check_pics(self, pics_key: str) -> bool:
@@ -1059,8 +1029,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         try:
             commissioning_params = await dev_ctrl.OpenCommissioningWindow(nodeid=node_id, timeout=timeout, iteration=1000,
                                                                           discriminator=rnd_discriminator, option=1)
-            params = CustomCommissioningParameters(
-                commissioning_params, rnd_discriminator)
+            params = CustomCommissioningParameters(commissioning_params, rnd_discriminator)
             return params
 
         except InteractionModelError as e:
@@ -1087,8 +1056,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         read_err_msg = f"Error reading {str(cluster)}:{str(attribute)} = {attr_ret}"
         desired_type = attribute.attribute_type.Type
         type_err_msg = f'Returned attribute {attribute} is wrong type expected {desired_type}, got {type(attr_ret)}'
-        read_ok = attr_ret is not None and not isinstance(
-            attr_ret, Clusters.Attribute.ValueDecodeFailure)
+        read_ok = attr_ret is not None and not isinstance(attr_ret, Clusters.Attribute.ValueDecodeFailure)
         type_ok = type_matches(attr_ret, desired_type)
         if assert_on_error:
             asserts.assert_true(read_ok, read_err_msg)
@@ -1097,12 +1065,10 @@ class MatterBaseTest(base_test.BaseTestClass):
             location = AttributePathLocation(endpoint_id=endpoint, cluster_id=cluster.id,
                                              attribute_id=attribute.attribute_id)
             if not read_ok:
-                self.record_error(test_name=test_name,
-                                  location=location, problem=read_err_msg)
+                self.record_error(test_name=test_name, location=location, problem=read_err_msg)
                 return None
             elif not type_ok:
-                self.record_error(test_name=test_name,
-                                  location=location, problem=type_err_msg)
+                self.record_error(test_name=test_name, location=location, problem=type_err_msg)
                 return None
         return attr_ret
 
@@ -1119,8 +1085,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabric_filtered)
         attr_ret = result[endpoint][cluster][attribute]
-        err_msg = "Did not see expected error when reading {}:{}".format(
-            str(cluster), str(attribute))
+        err_msg = "Did not see expected error when reading {}:{}".format(str(cluster), str(attribute))
         error_type_ok = attr_ret is not None and isinstance(
             attr_ret, Clusters.Attribute.ValueDecodeFailure) and isinstance(attr_ret.Reason, InteractionModelError)
         if assert_on_error:
@@ -1129,8 +1094,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         elif not error_type_ok or attr_ret.Reason.status != error:
             location = AttributePathLocation(endpoint_id=endpoint, cluster_id=cluster.id,
                                              attribute_id=attribute.attribute_id)
-            self.record_error(test_name=test_name,
-                              location=location, problem=err_msg)
+            self.record_error(test_name=test_name, location=location, problem=err_msg)
             return None
 
         return attr_ret
@@ -1206,23 +1170,19 @@ class MatterBaseTest(base_test.BaseTestClass):
         cluster = Clusters.Objects.GeneralDiagnostics
         # GeneralDiagnostics cluster is meant to be on Endpoint 0 (Root)
         test_event_enabled = await self.read_single_attribute_check_success(endpoint=0, cluster=cluster, attribute=full_attr)
-        asserts.assert_equal(test_event_enabled, True,
-                             "TestEventTriggersEnabled is False")
+        asserts.assert_equal(test_event_enabled, True, "TestEventTriggersEnabled is False")
 
     def print_step(self, stepnum: typing.Union[int, str], title: str) -> None:
         logging.info(f'***** Test Step {stepnum} : {title}')
 
     def record_error(self, test_name: str, location: ProblemLocation, problem: str, spec_location: str = ""):
-        self.problems.append(ProblemNotice(
-            test_name, location, ProblemSeverity.ERROR, problem, spec_location))
+        self.problems.append(ProblemNotice(test_name, location, ProblemSeverity.ERROR, problem, spec_location))
 
     def record_warning(self, test_name: str, location: ProblemLocation, problem: str, spec_location: str = ""):
-        self.problems.append(ProblemNotice(
-            test_name, location, ProblemSeverity.WARNING, problem, spec_location))
+        self.problems.append(ProblemNotice(test_name, location, ProblemSeverity.WARNING, problem, spec_location))
 
     def record_note(self, test_name: str, location: ProblemLocation, problem: str, spec_location: str = ""):
-        self.problems.append(ProblemNotice(
-            test_name, location, ProblemSeverity.NOTE, problem, spec_location))
+        self.problems.append(ProblemNotice(test_name, location, ProblemSeverity.NOTE, problem, spec_location))
 
     def on_fail(self, record):
         ''' Called by Mobly on test failure
@@ -1234,19 +1194,16 @@ class MatterBaseTest(base_test.BaseTestClass):
             exception = record.termination_signal.exception
 
             try:
-                step_duration = (datetime.now(timezone.utc) -
-                                 self.step_start_time) / timedelta(microseconds=1)
+                step_duration = (datetime.now(timezone.utc) - self.step_start_time) / timedelta(microseconds=1)
             except AttributeError:
                 # If we failed during setup, these may not be populated
                 step_duration = 0
             try:
-                test_duration = (datetime.now(timezone.utc) -
-                                 self.test_start_time) / timedelta(microseconds=1)
+                test_duration = (datetime.now(timezone.utc) - self.test_start_time) / timedelta(microseconds=1)
             except AttributeError:
                 test_duration = 0
             # TODO: I have no idea what logger, logs, request or received are. Hope None works because I have nothing to give
-            self.runner_hook.step_failure(
-                logger=None, logs=None, duration=step_duration, request=None, received=None)
+            self.runner_hook.step_failure(logger=None, logs=None, duration=step_duration, request=None, received=None)
             self.runner_hook.test_stop(
                 exception=exception, duration=test_duration)
 
@@ -1260,8 +1217,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
                 if isinstance(exception, signals.TestError) or isinstance(exception, signals.TestFailure):
                     # Exception gets raised by the mobly framework, so the proximal error is one line back in the stack trace
-                    assert_candidates = [idx for idx, line in enumerate(
-                        trace) if "asserts" in line and "asserts.py" not in line]
+                    assert_candidates = [idx for idx, line in enumerate(trace) if "asserts" in line and "asserts.py" not in line]
                     if not assert_candidates:
                         return "Unknown error, please see stack trace above", ""
                     assert_candidate_idx = assert_candidates[-1]
@@ -1271,15 +1227,13 @@ class MatterBaseTest(base_test.BaseTestClass):
                 probable_error = trace[assert_candidate_idx]
 
                 # Find the file marker immediately above the probable error
-                file_candidates = [idx for idx, line in enumerate(
-                    trace[:assert_candidate_idx]) if "File" in line]
+                file_candidates = [idx for idx, line in enumerate(trace[:assert_candidate_idx]) if "File" in line]
                 if not file_candidates:
                     return probable_error, "Unknown file"
                 return probable_error.strip(), trace[file_candidates[-1]].strip()
 
             probable_error, probable_file = extract_error_text()
-            test_steps = self.get_defined_test_steps(
-                self.current_test_info.name)
+            test_steps = self.get_defined_test_steps(self.current_test_info.name)
             test_step = str(test_steps[self.current_step_index-1]
                             ) if test_steps is not None else 'UNKNOWN - no test steps provided in test script'
             logging.error(textwrap.dedent(f"""
@@ -1308,12 +1262,9 @@ class MatterBaseTest(base_test.BaseTestClass):
         if self.runner_hook and not self.is_commissioning:
             # What is request? This seems like an implementation detail for the runner
             # TODO: As with failure, I have no idea what logger, logs or request are meant to be
-            step_duration = (datetime.now(timezone.utc) -
-                             self.step_start_time) / timedelta(microseconds=1)
-            test_duration = (datetime.now(timezone.utc) -
-                             self.test_start_time) / timedelta(microseconds=1)
-            self.runner_hook.step_success(
-                logger=None, logs=None, duration=step_duration, request=None)
+            step_duration = (datetime.now(timezone.utc) - self.step_start_time) / timedelta(microseconds=1)
+            test_duration = (datetime.now(timezone.utc) - self.test_start_time) / timedelta(microseconds=1)
+            self.runner_hook.step_success(logger=None, logs=None, duration=step_duration, request=None)
 
         # TODO: this check could easily be annoying when doing dev. flag it somehow? Ditto with the in-order check
         steps = self.get_defined_test_steps(record.test_name)
@@ -1336,8 +1287,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             record is of type TestResultRecord
         '''
         if self.runner_hook and not self.is_commissioning:
-            test_duration = (datetime.now(timezone.utc) -
-                             self.test_start_time) / timedelta(microseconds=1)
+            test_duration = (datetime.now(timezone.utc) - self.test_start_time) / timedelta(microseconds=1)
             test_name = self.current_test_info.name
             filename = inspect.getfile(self.__class__)
             self.runner_hook.test_skipped(filename, test_name)
@@ -1381,8 +1331,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                   # skip step 2 if condition not met
            """
         await self._populate_wildcard()
-        attr_condition = _has_attribute(
-            wildcard=self.stored_global_wildcard, endpoint=endpoint, attribute=attribute)
+        attr_condition = _has_attribute(wildcard=self.stored_global_wildcard, endpoint=endpoint, attribute=attribute)
         if not attr_condition:
             self.mark_current_step_skipped()
         return attr_condition
@@ -1401,8 +1350,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                   # skip step 2 if condition not met
            """
         await self._populate_wildcard()
-        cmd_condition = _has_command(
-            wildcard=self.stored_global_wildcard, endpoint=endpoint, command=command)
+        cmd_condition = _has_command(wildcard=self.stored_global_wildcard, endpoint=endpoint, command=command)
         if not cmd_condition:
             self.mark_current_step_skipped()
         return cmd_condition
@@ -1421,8 +1369,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                   # skip step 2 if condition not met
            """
         await self._populate_wildcard()
-        feat_condition = _has_feature(
-            wildcard=self.stored_global_wildcard, endpoint=endpoint, cluster=cluster, feature=feature_int)
+        feat_condition = _has_feature(wildcard=self.stored_global_wildcard, endpoint=endpoint, cluster=cluster, feature=feature_int)
         if not feat_condition:
             self.mark_current_step_skipped()
         return feat_condition
@@ -1431,8 +1378,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         try:
             steps = self.get_test_steps(self.current_test_info.name)
             if self.current_step_index == 0:
-                asserts.fail(
-                    "Script error: mark_current_step_skipped cannot be called before step()")
+                asserts.fail("Script error: mark_current_step_skipped cannot be called before step()")
             num = steps[self.current_step_index - 1].test_plan_number
         except KeyError:
             num = self.current_step_index
@@ -1463,8 +1409,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                 starting_step_idx = idx
                 break
         else:
-            asserts.fail(
-                "skip_all_remaining_steps was provided with invalid starting_step_num")
+            asserts.fail("skip_all_remaining_steps was provided with invalid starting_step_num")
         remaining = steps[starting_step_idx:]
         for step in remaining:
             self.skip_step(step.test_plan_number)
@@ -1475,8 +1420,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         # TODO: this might be annoying during dev. Remove? Flag?
         if len(steps) <= self.current_step_index or steps[self.current_step_index].test_plan_number != step:
-            asserts.fail(
-                f'Unexpected test step: {step} - steps not called in order, or step does not exist')
+            asserts.fail(f'Unexpected test step: {step} - steps not called in order, or step does not exist')
 
         current_step = steps[self.current_step_index]
         self.print_step(step, current_step.description)
@@ -1654,8 +1598,7 @@ def float_named_arg(s: str) -> Tuple[str, float]:
     regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>.*)$"
     match = re.match(regex, s)
     if not match:
-        raise ValueError(
-            "Invalid float argument format, does not match %s" % regex)
+        raise ValueError("Invalid float argument format, does not match %s" % regex)
 
     name = match.group("name")
     value = float(match.group("value"))
@@ -1667,8 +1610,7 @@ def json_named_arg(s: str) -> Tuple[str, object]:
     regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>.*)$"
     match = re.match(regex, s)
     if not match:
-        raise ValueError(
-            "Invalid JSON argument format, does not match %s" % regex)
+        raise ValueError("Invalid JSON argument format, does not match %s" % regex)
 
     name = match.group("name")
     value = json.loads(match.group("value"))
@@ -1680,8 +1622,7 @@ def bool_named_arg(s: str) -> Tuple[str, bool]:
     regex = r"^(?P<name>[a-zA-Z_0-9.]+):((?P<truth_value>true|false)|(?P<decimal_value>[01]))$"
     match = re.match(regex, s.lower())
     if not match:
-        raise ValueError(
-            "Invalid bool argument format, does not match %s" % regex)
+        raise ValueError("Invalid bool argument format, does not match %s" % regex)
 
     name = match.group("name")
     if match.group("truth_value"):
@@ -1696,15 +1637,13 @@ def bytes_as_hex_named_arg(s: str) -> Tuple[str, bytes]:
     regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>[0-9a-fA-F:]+)$"
     match = re.match(regex, s)
     if not match:
-        raise ValueError(
-            "Invalid bytes as hex argument format, does not match %s" % regex)
+        raise ValueError("Invalid bytes as hex argument format, does not match %s" % regex)
 
     name = match.group("name")
     value_str = match.group("value")
     value_str = value_str.replace(":", "")
     if len(value_str) % 2 != 0:
-        raise ValueError(
-            "Byte string argument value needs to be event number of hex chars")
+        raise ValueError("Byte string argument value needs to be event number of hex chars")
     value = unhexlify(value_str)
 
     return (name, value)
