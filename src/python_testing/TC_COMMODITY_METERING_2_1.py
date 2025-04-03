@@ -70,8 +70,11 @@ class COMMODITY_METERING_2_1(MatterBaseTest):
             TestStep("1", "Read MeteredQuantity attribute"),
             TestStep("2", "Read MeteredQuantityTimestamp attribute"),
             TestStep("3", "Read MeasurementType attribute"),
+            TestStep("4", "Read MaximumMeteredQuantities attribute"),
         ]
         return steps
+
+    MaximumMeteredQuantities = None
 
     @run_if_endpoint_matches(has_cluster(Clusters.CommodityMetering))
     async def test_COMMODITY_METERING_2_1(self):
@@ -97,6 +100,12 @@ class COMMODITY_METERING_2_1(MatterBaseTest):
         if val is not NullValue:
             matter_asserts.assert_valid_enum(
                 val, "MeasurementType attribute must return a MeasurementTypeEnum", Globals.Enums.MeasurementTypeEnum)
+            asserts.assert_less_equal(val, self.MaximumMeteredQuantities)
+
+        self.step("4")
+        self.MaximumMeteredQuantities = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MaximumMeteredQuantities)
+        if self.MaximumMeteredQuantities is not NullValue:
+            matter_asserts.assert_valid_uint16(self.MaximumMeteredQuantities, 'MaximumMeteredQuantities')
 
     async def test_checkMeteredQuantityStruct(self,
                                               endpoint: int = None,
@@ -106,6 +115,7 @@ class COMMODITY_METERING_2_1(MatterBaseTest):
         matter_asserts.assert_list_element_type(
             struct.tariffComponentIDs, "TariffComponentIDs attribute must contain int elements", int)
         matter_asserts.assert_valid_int64(struct.quantity, 'Quantity')
+
 
 if __name__ == "__main__":
     default_matter_test_main()
