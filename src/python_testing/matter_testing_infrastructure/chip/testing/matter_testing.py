@@ -1398,6 +1398,8 @@ class MatterBaseTest(base_test.BaseTestClass):
             self.mark_current_step_skipped()
         return pics_condition
 
+    guard = pics_guard
+
     async def _populate_wildcard(self):
         """ Populates self.stored_global_wildcard if not already filled. """
         if self.stored_global_wildcard is None:

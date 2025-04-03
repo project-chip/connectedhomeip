@@ -113,14 +113,17 @@ class TC_CNET_4_3(MatterBaseTest):
         logging.info(f"Connected networks count by endpoint: {connected_network_count}")
         asserts.assert_equal(sum(connected_network_count.values()), 1,
                              "Verify that only one entry has connected status as TRUE across ALL endpoints")
+        current_cluster_connected = connected_network_count[self.get_endpoint()] == 1
 
         self.step(5)
+        self.guard(current_cluster_connected)
         interface_enabled = await self.read_single_attribute_check_success(
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.InterfaceEnabled)
         asserts.assert_true(interface_enabled, "Verify that InterfaceEnabled attribute value is true")
 
         self.step(6)
+        self.guard(current_cluster_connected)
         last_networking_status = await self.read_single_attribute_check_success(
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.LastNetworkingStatus)
@@ -128,6 +131,7 @@ class TC_CNET_4_3(MatterBaseTest):
         asserts.assert_is(last_networking_status, expected_status, "Verify that LastNetworkingStatus attribute value is success")
 
         self.step(7)
+        self.guard(current_cluster_connected)
         last_network_id = await self.read_single_attribute_check_success(
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.LastNetworkID)
@@ -138,6 +142,7 @@ class TC_CNET_4_3(MatterBaseTest):
                             "Verify LastNetworkID attribute value will be of type octstr with a length range of 1 to 32")
 
         self.step(8)
+        self.guard(current_cluster_connected)
         last_connect_error_value = await self.read_single_attribute_check_success(
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.LastConnectErrorValue)
