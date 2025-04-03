@@ -90,25 +90,27 @@ def find_tree_roots(tree_endpoints: list[int], endpoint_dict: dict[int, Any]) ->
     return tree_roots
 
 
-def parts_list_cycles(tree_endpoints: list[int], endpoint_dict: dict[int, Any]) -> list[int]:
-    """Returns a list of all the endpoints in the tree_endpoints list that contain cycles"""
-    def parts_list_cycle_detect(visited: set, current_id: int) -> bool:
+def parts_list_problems(tree_endpoints: list[int], endpoint_dict: dict[int, Any]) -> list[int]:
+    """Returns a list of all the endpoints in the tree_endpoints list that contain cycles or nodes with multiple paths to the root or non-existent endpoints"""
+    def parts_list_problem_detect(visited: set, current_id: int) -> bool:
         if current_id in visited:
             return True
         visited.add(current_id)
+        if current_id not in endpoint_dict:
+            return True
         for child in endpoint_dict[current_id][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]:
-            child_has_cycles = parts_list_cycle_detect(visited, child)
+            child_has_cycles = parts_list_problem_detect(visited, child)
             if child_has_cycles:
                 return True
         return False
 
-    cycles = []
+    problems = []
     # This is quick enough that we can do all the endpoints without searching for the roots
     for endpoint_id in tree_endpoints:
         visited = set()
-        if parts_list_cycle_detect(visited, endpoint_id):
-            cycles.append(endpoint_id)
-    return cycles
+        if parts_list_problem_detect(visited, endpoint_id):
+            problems.append(endpoint_id)
+    return problems
 
 
 def create_device_type_lists(roots: list[int], endpoint_dict: dict[int, Any]) -> dict[int, dict[int, set[int]]]:
