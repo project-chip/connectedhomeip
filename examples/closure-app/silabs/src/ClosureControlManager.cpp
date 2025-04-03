@@ -44,19 +44,20 @@ const ClosureErrorEnum kCurrentErrorList[] = {
 
 PositioningEnum getStatePositionFromTarget(TagPositionEnum tagPosition)
 {
-    switch (tagPosition) {
-        case TagPositionEnum::kCloseInFull:
-            return PositioningEnum::kFullyClosed;
-        case TagPositionEnum::kOpenInFull:
-            return PositioningEnum::kFullyOpened;
-        case TagPositionEnum::kPedestrian:
-            return PositioningEnum::kOpenedForPedestrian;
-        case TagPositionEnum::kVentilation:
-            return PositioningEnum::kOpenedForVentilation;
-        case TagPositionEnum::kSignature:
-            return PositioningEnum::kOpenedAtSignature;
-        default:
-            break;
+    switch (tagPosition)
+    {
+    case TagPositionEnum::kCloseInFull:
+        return PositioningEnum::kFullyClosed;
+    case TagPositionEnum::kOpenInFull:
+        return PositioningEnum::kFullyOpened;
+    case TagPositionEnum::kPedestrian:
+        return PositioningEnum::kOpenedForPedestrian;
+    case TagPositionEnum::kVentilation:
+        return PositioningEnum::kOpenedForVentilation;
+    case TagPositionEnum::kSignature:
+        return PositioningEnum::kOpenedAtSignature;
+    default:
+        break;
     }
     return PositioningEnum::kUnknownEnumValue;
 }
@@ -91,7 +92,7 @@ CHIP_ERROR ClosureControlManager::StartCurrentErrorListRead()
 // TODO: Return emualted error list, will add event handling along with Events
 CHIP_ERROR ClosureControlManager::GetCurrentErrorListAtIndex(size_t Index, ClosureErrorEnum & closureError)
 {
-    VerifyOrReturnError(Index < MATTER_ARRAY_SIZE(kCurrentErrorList),CHIP_ERROR_PROVIDER_LIST_EXHAUSTED);
+    VerifyOrReturnError(Index < MATTER_ARRAY_SIZE(kCurrentErrorList), CHIP_ERROR_PROVIDER_LIST_EXHAUSTED);
     closureError = kCurrentErrorList[Index];
     return CHIP_NO_ERROR;
 }
