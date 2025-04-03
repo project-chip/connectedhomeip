@@ -1111,6 +1111,25 @@ class MatterBaseTest(base_test.BaseTestClass):
         data = result[endpoint]
         return list(data.values())[0][attribute]
 
+    async def read_single_attribute_all_endpoints(
+            self, cluster: Clusters.ClusterObjects.ClusterCommand, attribute: Clusters.ClusterObjects.ClusterAttributeDescriptor,
+            dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None):
+        """Reads a single attribute of a specified cluster across all endpoints.
+
+        Returns:
+            dict: endpoint to attribute value
+
+        """
+        dev_ctrl = dev_ctrl or self.default_controller
+        node_id = node_id or self.dut_node_id
+
+        read_response = await dev_ctrl.ReadAttribute(node_id, [(attribute)])
+        attrs = {}
+        for endpoint in read_response:
+            attr_ret = read_response[endpoint][cluster][attribute]
+            attrs[endpoint] = attr_ret
+        return attrs
+
     async def read_single_attribute_check_success(
             self, cluster: Clusters.ClusterObjects.ClusterCommand, attribute: Clusters.ClusterObjects.ClusterAttributeDescriptor,
             dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, endpoint: Optional[int] = None, fabric_filtered: bool = True, assert_on_error: bool = True, test_name: str = "") -> object:
