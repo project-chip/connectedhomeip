@@ -682,7 +682,7 @@ CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, a
         }
         else
         {
-            err = encoder.Encode(*(uint64_t *)extAddress->m8);
+            err = encoder.Encode(*(uint64_t *) extAddress->m8);
         }
     }
     break;
