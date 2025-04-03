@@ -29,6 +29,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRTestCase : XCTestCase
 
++ (void)setUp NS_REQUIRES_SUPER;
++ (void)tearDown NS_REQUIRES_SUPER;
+- (void)setUp NS_REQUIRES_SUPER;
+- (void)tearDown NS_REQUIRES_SUPER;
+
 // It would be nice to do the leak-detection automatically, but running "leaks"
 // on every single sub-test is slow, and some of our tests seem to have leaks
 // outside Matter.framework.  So have it be opt-in for now, and improve later.
