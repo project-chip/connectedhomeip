@@ -704,11 +704,6 @@ void emberAfCommodityPriceClusterInitCallback(chip::EndpointId endpoint);
 void emberAfCommodityPriceClusterShutdownCallback(chip::EndpointId endpoint);
 
 /**
- * @param endpoint    Endpoint that is being shutdown
- */
-void emberAfDemandResponseLoadControlClusterShutdownCallback(chip::EndpointId endpoint);
-
-/**
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfMessagesClusterInitCallback(chip::EndpointId endpoint);

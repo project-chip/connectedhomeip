@@ -608,15 +608,6 @@ static BOOL CommandNeedsTimedInvokeInCommodityPriceCluster(AttributeId aAttribut
     }
     }
 }
-static BOOL CommandNeedsTimedInvokeInDemandResponseLoadControlCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::DemandResponseLoadControl;
-    switch (aAttributeId) {
-    default: {
-        return NO;
-    }
-    }
-}
 static BOOL CommandNeedsTimedInvokeInMessagesCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::Messages;

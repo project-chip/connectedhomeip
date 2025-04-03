@@ -12622,16 +12622,6 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
         }
         break;
 
-    case MTRClusterIDTypeDemandResponseLoadControlID:
-
-        switch (commandID) {
-
-        default:
-            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
-            break;
-        }
-        break;
-
     case MTRClusterIDTypeMessagesID:
 
         switch (commandID) {

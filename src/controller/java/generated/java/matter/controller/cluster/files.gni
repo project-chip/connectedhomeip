@@ -333,7 +333,6 @@ matter_clusters_sources = [
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/ContentAppObserverCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/ContentControlCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/ContentLauncherCluster.kt",
-  "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/DemandResponseLoadControlCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/DescriptorCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/DeviceEnergyManagementCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/DeviceEnergyManagementModeCluster.kt",
