@@ -73,6 +73,10 @@ class TC_CNET_4_3(MatterBaseTest):
         ]
         return steps
 
+    def pics_TC_CNET_4_3(self):
+        """Return the PICS definitions associated with this test."""
+        return ["CNET.S.F02"]
+
     @run_if_endpoint_matches(has_feature(Clusters.NetworkCommissioning,
                                          Clusters.NetworkCommissioning.Bitmaps.Feature.kEthernetNetworkInterface))
     async def test_TC_CNET_4_3(self):
