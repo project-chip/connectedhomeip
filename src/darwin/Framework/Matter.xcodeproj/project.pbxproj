@@ -1055,6 +1055,17 @@
 		D444F9A62C6E8F9D007761E5 /* MTRXPCServerProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRXPCServerProtocol.h; sourceTree = "<group>"; };
 		D444F9A82C6E99CA007761E5 /* MTRXPCClientProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRXPCClientProtocol.h; sourceTree = "<group>"; };
 		D4772A45285AE98300383630 /* MTRClusterConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRClusterConstants.h; sourceTree = "<group>"; };
+		D4CA5BD82D9E29C700D44744 /* Base.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Base.xcconfig; sourceTree = "<group>"; };
+		D4CA5BD92D9E29C700D44744 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
+		D4CA5BDA2D9E29C700D44744 /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
+		D4CA5BDC2D9E29C700D44744 /* Base.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Base.xcconfig; sourceTree = "<group>"; };
+		D4CA5BDD2D9E29C700D44744 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
+		D4CA5BDE2D9E29C700D44744 /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
+		D4CA5BE02D9E29C700D44744 /* Base.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Base.xcconfig; sourceTree = "<group>"; };
+		D4CA5BE12D9E29C700D44744 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
+		D4CA5BE22D9E29C700D44744 /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
+		D4CA5BE42D9E29C700D44744 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
+		D4CA5BE52D9E29C700D44744 /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
 		E04AC67B2BEEA17F00BA409B /* ember-io-storage.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "ember-io-storage.cpp"; path = "util/ember-io-storage.cpp"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -1577,6 +1588,7 @@
 			children = (
 				510A07482A685D3900A9241C /* Matter.apinotes */,
 				BA107AEE2470CFBB004287EB /* chip_xcode_build_connector.sh */,
+				D4CA5BE72D9E29C700D44744 /* Configs */,
 				B202528F2459E34F00F97062 /* CHIP */,
 				B202529A2459E34F00F97062 /* CHIPTests */,
 				037C3CA82991A44B00B7EEE2 /* darwin-framework-tool */,
@@ -1991,6 +2003,56 @@
 				D444F9A62C6E8F9D007761E5 /* MTRXPCServerProtocol.h */,
 			);
 			path = "XPC Protocol";
+			sourceTree = "<group>";
+		};
+		D4CA5BDB2D9E29C700D44744 /* darwin-framework-tool */ = {
+			isa = PBXGroup;
+			children = (
+				D4CA5BD82D9E29C700D44744 /* Base.xcconfig */,
+				D4CA5BD92D9E29C700D44744 /* Debug.xcconfig */,
+				D4CA5BDA2D9E29C700D44744 /* Release.xcconfig */,
+			);
+			path = "darwin-framework-tool";
+			sourceTree = "<group>";
+		};
+		D4CA5BDF2D9E29C700D44744 /* Matter */ = {
+			isa = PBXGroup;
+			children = (
+				D4CA5BDC2D9E29C700D44744 /* Base.xcconfig */,
+				D4CA5BDD2D9E29C700D44744 /* Debug.xcconfig */,
+				D4CA5BDE2D9E29C700D44744 /* Release.xcconfig */,
+			);
+			path = Matter;
+			sourceTree = "<group>";
+		};
+		D4CA5BE32D9E29C700D44744 /* MatterTests */ = {
+			isa = PBXGroup;
+			children = (
+				D4CA5BE02D9E29C700D44744 /* Base.xcconfig */,
+				D4CA5BE12D9E29C700D44744 /* Debug.xcconfig */,
+				D4CA5BE22D9E29C700D44744 /* Release.xcconfig */,
+			);
+			path = MatterTests;
+			sourceTree = "<group>";
+		};
+		D4CA5BE62D9E29C700D44744 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				D4CA5BE42D9E29C700D44744 /* Debug.xcconfig */,
+				D4CA5BE52D9E29C700D44744 /* Release.xcconfig */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		D4CA5BE72D9E29C700D44744 /* Configs */ = {
+			isa = PBXGroup;
+			children = (
+				D4CA5BDB2D9E29C700D44744 /* darwin-framework-tool */,
+				D4CA5BDF2D9E29C700D44744 /* Matter */,
+				D4CA5BE32D9E29C700D44744 /* MatterTests */,
+				D4CA5BE62D9E29C700D44744 /* Shared */,
+			);
+			path = Configs;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
