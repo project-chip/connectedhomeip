@@ -35,8 +35,8 @@ import logging
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
-from chip.testing.matter_asserts import assert_valid_uint8
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_asserts import assert_valid_uint8
 from mobly import asserts
 
 
@@ -138,8 +138,7 @@ class TC_EPREF_2_1(MatterBaseTest):
                                            "Each entry in EnergyBalances should be a BalanceStruct")
 
             # Verify the size of the list is at least 2 and not more than 10
-            asserts.assert_in(energy_balances_entries, range(2, 11),
-                              f"List size {energy_balances_entries} is out of the expected range (2-10)")
+            asserts.assert_in(energy_balances_entries, range(2, 11), f"List size {energy_balances_entries} is out of the expected range (2-10)")
 
             # Verify the "step" value of the first BalanceStruct is 0
             first_balance_struct = energy_balances[0]
@@ -156,13 +155,13 @@ class TC_EPREF_2_1(MatterBaseTest):
                 asserts.assert_less(current_balance.step, next_balance.step,
                                     f"The step at index {i+1} ({next_balance.step}) should larger than the previous step ({current_balance.step})")
 
+
             self.step("4")
             existing_current_energy_balance = await self.read_current_energy_balances(endpoint=endpoint)
             # Logging the CurrentEnergyBalance Attribute output responses from the DUT:
             logging.info(f"CurrentEnergyBalance: {existing_current_energy_balance}")
             # Verify that the DUT response is of uint8 type
-            assert_valid_uint8(existing_current_energy_balance,
-                               "CurrentEnergyBalance should be of type uint8 (integer)")
+            assert_valid_uint8(existing_current_energy_balance, "CurrentEnergyBalance")
 
             self.step("4a")
             energy_balances = await self.read_energy_balances(endpoint=endpoint)
@@ -216,8 +215,8 @@ class TC_EPREF_2_1(MatterBaseTest):
             ]
             response_set = set(energy_priorities)
             asserts.assert_in(response_set, valid_combinations,
-                              f"EnergyPriorities list items {energy_priorities} do not match any of the expected combinations: {valid_combinations}"
-                              )
+                f"EnergyPriorities list items {energy_priorities} do not match any of the expected combinations: {valid_combinations}"
+            )
 
         else:
             logging.info("Device does not support EnergyBalance feature and related attributes, skipped Test Step 2 to 5")
@@ -238,11 +237,11 @@ class TC_EPREF_2_1(MatterBaseTest):
                 logging.info("}")
 
             # Verify the DUT response contains a list of BalanceStruct Type
-            asserts.assert_true(
-                all(isinstance(entry, Clusters.EnergyPreference.Structs.BalanceStruct) for entry in
-                    low_power_mode_sensitivities),
-                "LowPowerModeSensitivities should be a list of BalanceStructs"
-            )
+            asserts.assert_is_instance(low_power_mode_sensitivities, list, "LowPowerModeSensitivites should be a list of BalanceStructs")
+
+            for entry in low_power_mode_sensitivities:
+                asserts.assert_is_instance(entry, Clusters.EnergyPreference.Structs.BalanceStruct,
+                                           "Each entry in LowPowerModeSensitivities should be a BalanceStruct")
 
             # Verify the size of the list is at least 2 and not more than 10
             asserts.assert_in(
@@ -262,8 +261,7 @@ class TC_EPREF_2_1(MatterBaseTest):
             logging.info(f"CurrentLowPowerModeSensitivity: {current_low_power_mode_sensitivity}")
 
             # Verify that the DUT response is of uint8 type
-            assert_valid_uint8(current_low_power_mode_sensitivity,
-                               "CurrentLowPowerModeSensitivity should be of type uint8 (integer)")
+            assert_valid_uint8(current_low_power_mode_sensitivity, "CurrentLowPowerModeSensitivity")
 
             self.step("7a")
             low_power_mode_sensitivities = await self.read_low_power_mode_sensitivities(endpoint=endpoint)
@@ -293,7 +291,7 @@ class TC_EPREF_2_1(MatterBaseTest):
                 logging.info("CurrentLowPowerModeSensitivity Attribute Write Response - Status: 0x87 (CONSTRAINT_ERROR)")
 
         else:
-            logging.info("Device does not support EnergyBalance feature and related attributes, skipped Test Step 6 to 7b")
+            logging.info("Device does not support LowPowerModeSensitivity feature and related attributes, skipped Test Step 6 to 7b")
 
 
 if __name__ == "__main__":
