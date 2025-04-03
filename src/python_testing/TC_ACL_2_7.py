@@ -14,19 +14,6 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-
-import asyncio
-import logging
-import random
-import time
-
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.clusters.Types import Nullable
-from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from mobly import asserts
-
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
@@ -44,6 +31,14 @@ from mobly import asserts
 #       --endpoint 1
 # === END CI TEST ARGUMENTS ===
 
+
+import chip.clusters as Clusters
+from chip import ChipDeviceCtrl
+from chip.clusters.Types import Nullable
+from chip.interaction_model import Status
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from mobly import asserts
+import random
 
 D_OK_EMPTY = bytes.fromhex('1718')
 D_OK_SINGLE = bytes.fromhex(
