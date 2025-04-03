@@ -4309,6 +4309,14 @@ void MatterDoorLockPluginServerInitCallback()
     AttributeAccessInterfaceRegistry::Instance().Register(&DoorLockServer::Instance());
 }
 
+void MatterDoorLockPluginServerShutdownCallback()
+{
+    ChipLogProgress(Zcl, "Door Lock server shutdown");
+    Server::GetInstance().GetFabricTable().RemoveFabricDelegate(&gFabricDelegate);
+
+    AttributeAccessInterfaceRegistry::Instance().Unregister(&DoorLockServer::Instance());
+}
+
 void MatterDoorLockClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath) {}
 
 void MatterDoorLockClusterServerShutdownCallback(EndpointId endpoint)

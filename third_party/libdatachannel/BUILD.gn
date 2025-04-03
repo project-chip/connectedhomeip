@@ -18,6 +18,23 @@ action("build_libdatachannel") {
   args = []
 }
 
-shared_library("libdatachannel") {
+config("datachannel_config") {
+  libs = [
+    "datachannel",
+    "usrsctp",
+    "srtp2",
+    "juice",
+  ]
+
+  lib_dirs = [
+    rebase_path("repo/build"),
+    rebase_path("repo/build/deps/usrsctp/usrsctplib"),
+    rebase_path("repo/build/deps/libsrtp"),
+    rebase_path("repo/build/deps/libjuice"),
+  ]
+}
+
+static_library("libdatachannel") {
   deps = [ ":build_libdatachannel" ]
+  public_configs = [ ":datachannel_config" ]
 }

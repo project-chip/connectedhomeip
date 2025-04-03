@@ -89,6 +89,11 @@ void MatterPowerSourcePluginServerInitCallback()
     AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
 }
 
+void MatterPowerSourcePluginServerShutdownCallback()
+{
+    AttributeAccessInterfaceRegistry::Instance().Unregister(&gAttrAccess);
+}
+
 namespace chip {
 namespace app {
 namespace Clusters {

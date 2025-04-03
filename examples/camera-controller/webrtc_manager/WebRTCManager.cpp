@@ -18,21 +18,10 @@
 
 #include "WebRTCManager.h"
 
-#include <app-common/zap-generated/ids/Attributes.h>
-#include <app-common/zap-generated/ids/Clusters.h>
-#include <app/AttributeAccessInterfaceRegistry.h>
-#include <app/ConcreteAttributePath.h>
-#include <app/EventLogging.h>
-#include <app/reporting/reporting.h>
-#include <app/server/Server.h>
-#include <app/util/af-types.h>
-#include <app/util/attribute-storage.h>
-#include <app/util/endpoint-config-api.h>
-#include <app/util/util.h>
+#include <app/dynamic_server/AccessControl.h>
 #include <commands/interactive/InteractiveCommands.h>
 #include <crypto/RandUtils.h>
 #include <lib/support/StringBuilder.h>
-#include <lib/support/ZclString.h>
 
 #include <cstdio>
 #include <string>
@@ -41,13 +30,7 @@ using namespace chip;
 using namespace chip::app;
 using namespace std::chrono_literals;
 
-namespace {
-
-constexpr EndpointId kWebRTCRequesterEndpointId = 1;
-
-} // namespace
-
-WebRTCManager::WebRTCManager() {}
+WebRTCManager::WebRTCManager() : mWebRTCRequestorServer(kWebRTCRequesterDynamicEndpointId, mWebRTCRequestorDelegate) {}
 
 WebRTCManager::~WebRTCManager()
 {
@@ -67,7 +50,8 @@ WebRTCManager::~WebRTCManager()
 
 void WebRTCManager::Init()
 {
-    // TODO:: mWebRTCRequestorServer.Init();
+    dynamic_server::InitAccessControl();
+    mWebRTCRequestorServer.Init();
 }
 
 CHIP_ERROR WebRTCManager::SetRemoteDescription(uint16_t webRTCSessionID, const std::string & sdp)
@@ -159,12 +143,13 @@ CHIP_ERROR WebRTCManager::ProvideOffer(DataModel::Nullable<uint16_t> webRTCSessi
 {
     ChipLogProgress(NotSpecified, "Sending ProvideOffer command to the peer device");
 
-    CHIP_ERROR err = mWebRTCProviderClient.ProvideOffer(webRTCSessionID, mLocalDescription, streamUsage, kWebRTCRequesterEndpointId,
-                                                        MakeOptional(DataModel::NullNullable), // "Null" for video
-                                                        MakeOptional(DataModel::NullNullable), // "Null" for audio
-                                                        NullOptional, // Omit ICEServers (Optional not present)
-                                                        NullOptional  // Omit ICETransportPolicy (Optional not present)
-    );
+    CHIP_ERROR err =
+        mWebRTCProviderClient.ProvideOffer(webRTCSessionID, mLocalDescription, streamUsage, kWebRTCRequesterDynamicEndpointId,
+                                           MakeOptional(DataModel::NullNullable), // "Null" for video
+                                           MakeOptional(DataModel::NullNullable), // "Null" for audio
+                                           NullOptional,                          // Omit ICEServers (Optional not present)
+                                           NullOptional                           // Omit ICETransportPolicy (Optional not present)
+        );
 
     if (err != CHIP_NO_ERROR)
     {
@@ -213,10 +198,13 @@ void WebRTCManager::HandleCommandResponse(const ConcreteCommandPath & path, TLV:
 {
     ChipLogProgress(NotSpecified, "Command Response received.");
 
+    // TODO: Upon receiving, the client SHALL create a new WebRTCSessionStruct populated with the values from this command, along
+    // with the accessing Peer Node ID and Local Fabric Index entries stored in the Secure Session Context, as the PeerNodeID and
+    // FabricIndex values, and store in the Requestor clusters CurrentSessions.
     if (path.mClusterId == Clusters::WebRTCTransportProvider::Id &&
         path.mCommandId == Clusters::WebRTCTransportProvider::Commands::ProvideOfferResponse::Id)
     {
-        VerifyOrDie(path.mEndpointId == kWebRTCRequesterEndpointId);
+        VerifyOrDie(path.mEndpointId == kWebRTCRequesterDynamicEndpointId);
         HandleProvideOfferResponse(data);
     }
 }
