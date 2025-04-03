@@ -23,6 +23,7 @@ def main():
         "-DUSE_NICE=0",
         "-DCMAKE_BUILD_TYPE=Release",
         "-DCMAKE_CXX_FLAGS=-Wno-shadow",
+        "-DBUILD_SHARED_LIBS=OFF"
     ]
 
     print(f"Running: {' '.join(cmake_cmd)}")

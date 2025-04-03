@@ -51,6 +51,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Water Heater Management
     - Water Heater Mode
     - WebRTC Transport Provider
+    - WebRTC Transport Requestor
     - General Commissioning
     - General Diagnostics
     - Software Diagnostics
