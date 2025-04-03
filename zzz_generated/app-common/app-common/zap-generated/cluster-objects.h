@@ -8492,7 +8492,7 @@ struct TypeInfo
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeshLocalPrefix::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
-    static constexpr size_t MaxLength() { return 254; }
+    static constexpr size_t MaxLength() { return 17; }
 };
 } // namespace MeshLocalPrefix
 namespace OverrunCount {

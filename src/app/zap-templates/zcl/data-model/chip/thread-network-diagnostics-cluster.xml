@@ -126,7 +126,7 @@ Git: 0.7-summer-2025-777-gfe83c3ac1
     <attribute side="server" code="0x02" name="NetworkName" define="NETWORK_NAME" type="char_string" length="16" isNullable="true"/>
     <attribute side="server" code="0x03" name="PanId" define="DIAG_PAN_ID" type="int16u" isNullable="true"/>
     <attribute side="server" code="0x04" name="ExtendedPanId" define="DIAG_EXTENDED_PAN_ID" type="int64u" isNullable="true"/>
-    <attribute side="server" code="0x05" name="MeshLocalPrefix" define="MESH_LOCAL_PREFIX" type="octet_string" isNullable="true"/>
+    <attribute side="server" code="0x05" name="MeshLocalPrefix" define="MESH_LOCAL_PREFIX" type="octet_string" length="17" isNullable="true"/>
     <attribute side="server" code="0x06" name="OverrunCount" define="DIAG_OVERRUN_COUNT" type="int64u" default="0x0000000000000000" optional="true">
       <quality changeOmitted="true"/>
       <mandatoryConform>
