@@ -585,7 +585,6 @@ data_model_XMLS_master = [
   "${chip_root}/data_model/master/clusters/ContentAppObserver.xml",
   "${chip_root}/data_model/master/clusters/ContentControl.xml",
   "${chip_root}/data_model/master/clusters/ContentLauncher.xml",
-  "${chip_root}/data_model/master/clusters/DemandResponseLoadControl.xml",
   "${chip_root}/data_model/master/clusters/Descriptor-Cluster.xml",
   "${chip_root}/data_model/master/clusters/DeviceEnergyManagement.xml",
   "${chip_root}/data_model/master/clusters/DiagnosticLogsCluster.xml",

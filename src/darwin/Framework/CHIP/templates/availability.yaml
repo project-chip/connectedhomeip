@@ -7804,8 +7804,6 @@
                   - WaterMarks
   provisional:
       clusters:
-          # DemandResponseLoadControl not finalized as of Matter 1.4 (Fall 2024).
-          - DemandResponseLoadControl
           # Timer does not seem to exist in the Matter specification.
           - Timer
           # ContentControl is provisional in Matter 1.4 (Fall 2024).

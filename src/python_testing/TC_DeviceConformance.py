@@ -115,7 +115,7 @@ class DeviceConformanceTests(BasicCompositionTests):
         # TODO: Remove this once we have a scrape without items not going to the test events
         # These are clusters that weren't part of the 1.3 or 1.4 spec that landed in the SDK before the branch cut
         # They're not marked provisional, but are present in the ToT spec under an ifdef.
-        provisional_cluster_ids.extend([Clusters.DemandResponseLoadControl.id])
+        provisional_cluster_ids.extend([])
 
         for endpoint_id, endpoint in self.endpoints_tlv.items():
             for cluster_id, cluster in endpoint.items():
