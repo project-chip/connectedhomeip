@@ -28,7 +28,12 @@ using namespace chip::app;
 bool DeviceTypes::EndpointHasDeviceType(EndpointId endpoint, DeviceTypeId deviceTypeId)
 {
     DataModel::ListBuilder<DataModel::DeviceTypeEntry> deviceTypesList;
-    InteractionModelEngine::GetInstance()->GetDataModelProvider()->DeviceTypes(endpoint, deviceTypesList);
+    CHIP_ERROR err = InteractionModelEngine::GetInstance()->GetDataModelProvider()->DeviceTypes(endpoint, deviceTypesList);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "GetDataModelProvider DeviceTypes returned error: %" CHIP_ERROR_FORMAT, err.Format());
+        return false;
+    }
     auto deviceTypes = deviceTypesList.TakeBuffer();
     for (const auto & type : deviceTypes)
     {
@@ -43,7 +48,12 @@ bool DeviceTypes::EndpointHasDeviceType(EndpointId endpoint, DeviceTypeId device
 DataModel::ListBuilder<EndpointId> DeviceTypes::GetAllEndpointsHavingDeviceType(DeviceTypeId deviceTypeId)
 {
     DataModel::ListBuilder<DataModel::EndpointEntry> endpointsList;
-    InteractionModelEngine::GetInstance()->GetDataModelProvider()->Endpoints(endpointsList);
+    CHIP_ERROR err = InteractionModelEngine::GetInstance()->GetDataModelProvider()->Endpoints(endpointsList);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "GetDataModelProvider Endpoints returned error: %" CHIP_ERROR_FORMAT, err.Format());
+        return DataModel::ListBuilder<EndpointId>();
+    }
     auto allEndpoints = endpointsList.TakeBuffer();
 
     DataModel::ListBuilder<EndpointId> endpoints;
