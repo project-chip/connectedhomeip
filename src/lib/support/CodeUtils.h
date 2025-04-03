@@ -718,6 +718,29 @@ inline void chipDie(void)
 #define ArraySize(a) (sizeof(a) / sizeof((a)[0]))
 
 /**
+ * @def MATTER_ARRAY_SIZE(aArray)
+ *
+ * @brief
+ *   Returns the size of an array in number of elements.
+ *
+ * Example Usage:
+ *
+ * @code
+ * int numbers[10];
+ * SortNumbers(numbers, MATTER_ARRAY_SIZE(numbers));
+ * @endcode
+ *
+ * @return      The size of an array in number of elements.
+ *
+ * @note Clever template-based solutions seem to fail when MATTER_ARRAY_SIZE is used
+ *       with a variable-length array argument, so we just do the C-compatible
+ *       thing in C++ as well.
+ */
+#ifndef MATTER_ARRAY_SIZE
+#define MATTER_ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
+#endif
+
+/**
  * @brief Ensures that if `str` is NULL, a non-null `default_str_value` is provided
  *
  * @param str - null-terminated string pointer or nullptr
