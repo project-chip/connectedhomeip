@@ -1,5 +1,5 @@
-#include "Base.xcconfig"
 #include "../Shared/Debug.xcconfig"
+#include "Base.xcconfig"
 
 CLANG_ENABLE_MODULES = YES
 CODE_SIGN_STYLE = Automatic

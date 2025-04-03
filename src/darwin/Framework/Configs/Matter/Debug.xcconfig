@@ -1,5 +1,5 @@
-#include "Base.xcconfig"
 #include "../Shared/Debug.xcconfig"
+#include "Base.xcconfig"
 
 ALWAYS_SEARCH_USER_PATHS = NO
 

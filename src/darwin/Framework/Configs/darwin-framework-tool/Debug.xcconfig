@@ -1,5 +1,5 @@
-#include "Base.xcconfig"
 #include "../Shared/Debug.xcconfig"
+#include "Base.xcconfig"
 
 CHIP_BUILD_TOOLS = true
 CLANG_ANALYZER_NONNULL = YES
