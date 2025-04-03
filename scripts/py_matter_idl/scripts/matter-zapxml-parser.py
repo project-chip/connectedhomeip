@@ -76,8 +76,8 @@ def main(log_level, no_print, filenames):
 
     logging.info("Starting to parse ...")
 
-    sources = [idl.ParseSource(source=name) for name in filenames]
-    data = idl.ParseXmls(sources)
+    sources = [idl.data_model_xml.ParseSource(source=name) for name in filenames]
+    data = idl.data_model_xml.ParseXmls(sources)
     logging.info("Parse completed")
 
     if not no_print:

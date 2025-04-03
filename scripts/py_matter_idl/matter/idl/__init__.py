@@ -14,18 +14,14 @@
 
 from . import backwards_compatibility, generators, lint
 from . import matter_idl_types as types
-from .data_model_xml import ParseSource, ParseXmls
-from .generators.generator import FileSystemGeneratorStorage, GeneratorStorage
+from . import data_model_xml
 from .matter_idl_parser import CreateParser
 
 __all__ = [
     'backwards_compatibility',
     'CreateParser',
-    'FileSystemGeneratorStorage',
     'generators',
-    'GeneratorStorage',
     'lint',
-    'ParseSource',
-    'ParseXmls',
+    'data_model_xml',
     'types',
 ]
