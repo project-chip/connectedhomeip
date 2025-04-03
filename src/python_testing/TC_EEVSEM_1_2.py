@@ -78,9 +78,7 @@ class TC_EEVSEM_1_2(MatterBaseTest, ModeBaseClusterChecks):
         self.step(2)
         # Verify common checks for Mode Base as described in the TC-EEVSEM-1.2
         supported_modes = await self.check_supported_modes_and_labels(endpoint=endpoint)
-
-        # According to the spec, there should be at least one Manual or Time of Use
-        # tag in the ones supported.
+        # According to the spec, Manual tag should be a supported tag.
         additional_tags = [cluster_eevsem_mode.Enums.ModeTag.kManual]
         self.check_tags_in_lists(supported_modes=supported_modes, required_tags=additional_tags)
 
