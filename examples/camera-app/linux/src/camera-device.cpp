@@ -67,7 +67,7 @@ CameraError CameraDevice::InitializeCameraDevice()
         gstreamerInitialized = true;
     }
 
-    // TODO: Replace hardcoded device file with something passed in from
+    // TODO: Replace hardcoded device file with device passed in from
     // camera-app.
     videoDeviceFd = open("/dev/video0", O_RDWR);
     if (videoDeviceFd == -1)
@@ -84,154 +84,6 @@ CameraError CameraDevice::InitializeStreams()
     InitializeVideoStreams();
     InitializeAudioStreams();
     InitializeSnapshotStreams();
-
-    return CameraError::SUCCESS;
-}
-
-CameraError CameraDevice::VideoStreamAllocate(const VideoStreamStruct & allocateArgs, uint16_t & outStreamID)
-{
-    outStreamID               = kInvalidStreamID;
-    bool foundAvailableStream = false;
-
-    for (VideoStream & stream : videoStreams)
-    {
-        if (!stream.isAllocated)
-        {
-            foundAvailableStream = true;
-
-            if (stream.codec == allocateArgs.videoCodec && stream.frameRate >= allocateArgs.minFrameRate
-                && stream.frameRate <= allocateArgs.maxFrameRate && stream.videoRes.width >= allocateArgs.minResolution.width
-                && stream.videoRes.height >= allocateArgs.minResolution.height && stream.videoRes.width <= allocateArgs.maxResolution.width
-                && stream.videoRes.height <= allocateArgs.maxResolution.height)
-            {
-                stream.isAllocated = true;
-                outStreamID        = stream.id;
-
-                // Start the video stream from HAL for serving.
-                StartVideoStream(stream.id);
-
-                // Start the network stream source
-                mNetworkVideoSource.Start(stream.id);
-
-                return CameraError::SUCCESS;
-            }
-        }
-    }
-
-    if (!foundAvailableStream)
-    {
-        return CameraError::ERROR_RESOURCE_EXHAUSTED;
-    }
-
-    return CameraError::ERROR_VIDEO_STREAM_ALLOC_FAILED;
-}
-
-CameraError CameraDevice::VideoStreamDeallocate(const uint16_t streamID)
-{
-    for (VideoStream & stream : videoStreams)
-    {
-        if (stream.id == streamID && stream.isAllocated)
-        {
-            // Stop the video stream
-            StopVideoStream(stream.id);
-
-            stream.isAllocated = false;
-
-            break;
-        }
-    }
-
-    return CameraError::SUCCESS;
-}
-
-CameraError CameraDevice::AudioStreamAllocate(const AudioStreamStruct & allocateArgs, uint16_t & outStreamID)
-{
-    outStreamID = kInvalidStreamID;
-
-    bool foundAvailableStream = false;
-
-    for (AudioStream & stream : audioStreams)
-    {
-        if (!stream.isAllocated)
-        {
-            foundAvailableStream = true;
-
-            if (stream.codec == allocateArgs.audioCodec)
-            {
-                stream.isAllocated = true;
-                outStreamID        = stream.id;
-                return CameraError::SUCCESS;
-            }
-        }
-    }
-
-    if (!foundAvailableStream)
-    {
-        return CameraError::ERROR_RESOURCE_EXHAUSTED;
-    }
-
-    return CameraError::ERROR_AUDIO_STREAM_ALLOC_FAILED;
-}
-
-CameraError CameraDevice::AudioStreamDeallocate(const uint16_t streamID)
-{
-    for (AudioStream & stream : audioStreams)
-    {
-        if (stream.id == streamID && stream.isAllocated)
-        {
-            stream.isAllocated = false;
-            break;
-        }
-    }
-
-    return CameraError::SUCCESS;
-}
-
-CameraError CameraDevice::SnapshotStreamAllocate(const SnapshotStreamStruct & allocateArgs, uint16_t & outStreamID)
-{
-    outStreamID = kInvalidStreamID;
-
-    bool foundAvailableStream = false;
-
-    for (SnapshotStream & stream : snapshotStreams)
-    {
-        if (!stream.isAllocated)
-        {
-            foundAvailableStream = true;
-
-            if (stream.codec == allocateArgs.imageCodec)
-            {
-                stream.isAllocated = true;
-                outStreamID        = stream.id;
-
-                // Start the snapshot stream for serving.
-                StartSnapshotStream(stream.id);
-
-                return CameraError::SUCCESS;
-            }
-        }
-    }
-
-    if (!foundAvailableStream)
-    {
-        return CameraError::ERROR_RESOURCE_EXHAUSTED;
-    }
-
-    return CameraError::ERROR_SNAPSHOT_STREAM_ALLOC_FAILED;
-}
-
-CameraError CameraDevice::SnapshotStreamDeallocate(const uint16_t streamID)
-{
-    for (SnapshotStream & stream : snapshotStreams)
-    {
-        if (stream.id == streamID && stream.isAllocated)
-        {
-            // Stop the snapshot stream for serving.
-            StopSnapshotStream(stream.id);
-            stream.isAllocated = false;
-            break;
-        }
-    }
 
     return CameraError::SUCCESS;
 }
@@ -407,6 +259,9 @@ CameraError CameraDevice::StartVideoStream(uint16_t streamID)
     // Start the pipeline
     gst_element_set_state(it->videoPipeline, GST_STATE_PLAYING);
 
+    // Start the network stream source after the Gstreamer pipeline is setup
+    mNetworkVideoSource.Start(streamID);
+
     return CameraError::SUCCESS;
 }
 
@@ -552,7 +407,7 @@ void CameraDevice::SetHDRMode(bool hdrMode) {}
 
 void CameraDevice::InitializeVideoStreams()
 {
-    // Allocate single video stream with typical supported parameters
+    // Create single video stream with typical supported parameters
     VideoStream videoStream = { 1, false, VideoCodecEnum::kH264, { 640, 480 }, 30, nullptr };
 
     videoStreams.push_back(videoStream);
@@ -560,16 +415,16 @@ void CameraDevice::InitializeVideoStreams()
 
 void CameraDevice::InitializeAudioStreams()
 {
-    // Allocate single audio stream with typical supported parameters
-    AudioStream audioStream = { 1, false, AudioCodecEnum::kOpus, 2, nullptr };
+    // Create single audio stream with typical supported parameters
+    AudioStream audioStream = { 1, false, AudioCodecEnum::kOpus, 2, 48000, nullptr };
 
     audioStreams.push_back(audioStream);
 }
 
 void CameraDevice::InitializeSnapshotStreams()
 {
-    // Allocate single snapshot stream with typical supported parameters
-    snapshotStreams.push_back({ 1, false, ImageCodecEnum::kJpeg, { 320, 240 }, 90, nullptr });
+    // Create single snapshot stream with typical supported parameters
+    snapshotStreams.push_back({ 1, false, ImageCodecEnum::kJpeg, { 320, 240 }, 90, 30, nullptr });
 }
 
 ChimeDelegate & CameraDevice::GetChimeDelegate()

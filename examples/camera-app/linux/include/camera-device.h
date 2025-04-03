@@ -43,7 +43,8 @@ struct VideoStream
     bool isAllocated;                                                    // Flag to indicate if the stream is allocated
     chip::app::Clusters::CameraAvStreamManagement::VideoCodecEnum codec; // Codec information (e.g., "H.264", "HEVC")
     VideoResolutionStruct videoRes;
-    uint16_t frameRate; // frame rate
+    uint16_t frameRate; // Rate at which frames are captured in frames per
+                        // second.
     GstElement * videoPipeline;
 };
 
@@ -53,6 +54,7 @@ struct AudioStream
     bool isAllocated;                                                    // Flag to indicate if the stream is allocated
     chip::app::Clusters::CameraAvStreamManagement::AudioCodecEnum codec; // Codec information (e.g., "OPUS", "AACLC")
     uint8_t channelCount;                                                // channel count
+    uint32_t sampleRate;
     GstElement * audioPipeline;
 };
 
@@ -62,7 +64,9 @@ struct SnapshotStream
     bool isAllocated;                                                    // Flag to indicate if the stream is allocated
     chip::app::Clusters::CameraAvStreamManagement::ImageCodecEnum codec; // Codec information (e.g., "JPEG")
     VideoResolutionStruct videoRes;
-    uint8_t quality; // Quality
+    uint8_t quality;    // Quality metric between 1 and 100
+    uint16_t frameRate; // Rate at which frames are captured in frames per
+                        // second.
     GstElement * snapshotPipeline;
 };
 
@@ -87,18 +91,6 @@ public:
     CameraError InitializeCameraDevice();
 
     CameraError InitializeStreams();
-
-    CameraError VideoStreamAllocate(const VideoStreamStruct & allocateArgs, uint16_t & outStreamID);
-
-    CameraError VideoStreamDeallocate(const uint16_t streamID);
-
-    CameraError AudioStreamAllocate(const AudioStreamStruct & allocateArgs, uint16_t & outStreamID);
-
-    CameraError AudioStreamDeallocate(const uint16_t streamID);
-
-    CameraError SnapshotStreamAllocate(const SnapshotStreamStruct & allocateArgs, uint16_t & outStreamID);
-
-    CameraError SnapshotStreamDeallocate(const uint16_t streamID);
 
     CameraError CaptureSnapshot(const uint16_t streamID, const VideoResolutionStruct & resolution,
                                 ImageSnapshot & outImageSnapshot);
@@ -133,6 +125,12 @@ public:
     uint16_t GetFrameRate();
 
     void SetHDRMode(bool hdrMode);
+
+    const std::vector<VideoStream> & GetAvailableVideoStreams() const { return videoStreams; }
+
+    const std::vector<AudioStream> & GetAvailableAudioStreams() const { return audioStreams; }
+
+    const std::vector<SnapshotStream> & GetAvailableSnapshotStreams() const { return snapshotStreams; }
 
 private:
     CameraDevice();
