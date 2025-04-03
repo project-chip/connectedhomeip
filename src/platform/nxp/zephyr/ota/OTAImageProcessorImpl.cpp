@@ -41,6 +41,15 @@ namespace chip {
 
 using namespace ::chip::DeviceLayer;
 
+CHIP_ERROR OTAImageProcessorImpl::Init(OTADownloader * downloader)
+{
+    VerifyOrReturnError(downloader != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    gImageProcessor.SetOTADownloader(downloader);
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 {
     VerifyOrReturnError(mDownloader != nullptr, CHIP_ERROR_INCORRECT_STATE);

@@ -29,6 +29,7 @@ class OTAImageProcessorImpl : public OTAImageProcessorInterface
 public:
     static constexpr size_t kBufferSize = CONFIG_CHIP_OTA_REQUESTOR_BUFFER_SIZE;
 
+    CHIP_ERROR Init(OTADownloader * downloader);
     void SetOTADownloader(OTADownloader * downloader) { mDownloader = downloader; };
 
     CHIP_ERROR PrepareDownload() override;
