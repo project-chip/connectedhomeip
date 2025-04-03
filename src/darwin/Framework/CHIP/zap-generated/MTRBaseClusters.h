@@ -18949,8 +18949,6 @@ typedef NS_OPTIONS(uint32_t, MTRElectricalEnergyMeasurementFeature) {
     MTRElectricalEnergyMeasurementFeatureExportedEnergy MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x2,
     MTRElectricalEnergyMeasurementFeatureCumulativeEnergy MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x4,
     MTRElectricalEnergyMeasurementFeaturePeriodicEnergy MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6)) = 0x8,
-    MTRElectricalEnergyMeasurementFeatureApparentEnergy MTR_PROVISIONALLY_AVAILABLE = 0x10,
-    MTRElectricalEnergyMeasurementFeatureReactiveEnergy MTR_PROVISIONALLY_AVAILABLE = 0x20,
 } MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 
 typedef NS_ENUM(uint8_t, MTRWaterHeaterManagementBoostState) {

@@ -1400,9 +1400,9 @@
           ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* ApparentCurrent */                             \
         { ZAP_EMPTY_DEFAULT(), 0x00000008, 8, ZAP_TYPE(POWER_MW),                                                                  \
           ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* ActivePower */                                 \
-        { ZAP_EMPTY_DEFAULT(), 0x00000009, 8, ZAP_TYPE(POWER_MVAR),                                                                \
+        { ZAP_EMPTY_DEFAULT(), 0x00000009, 8, ZAP_TYPE(POWER_MW),                                                                  \
           ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* ReactivePower */                               \
-        { ZAP_EMPTY_DEFAULT(), 0x0000000A, 8, ZAP_TYPE(POWER_MVA),                                                                 \
+        { ZAP_EMPTY_DEFAULT(), 0x0000000A, 8, ZAP_TYPE(POWER_MW),                                                                  \
           ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* ApparentPower */                               \
         { ZAP_EMPTY_DEFAULT(), 0x0000000B, 8, ZAP_TYPE(VOLTAGE_MV),                                                                \
           ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* RMSVoltage */                                  \

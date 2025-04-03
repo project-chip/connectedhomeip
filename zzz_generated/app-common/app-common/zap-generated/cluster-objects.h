@@ -554,40 +554,6 @@ using DecodableType = Type;
 
 } // namespace AtomicAttributeStatusStruct
 
-namespace SuppliedAttributionData {
-enum class Fields : uint8_t
-{
-    kContextInformation = 0,
-    kSourceContext      = 1,
-    kFabricIndex        = 254,
-};
-
-struct Type
-{
-public:
-    uint8_t contextInformation = static_cast<uint8_t>(0);
-    Optional<uint32_t> sourceContext;
-    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = true;
-
-    auto GetFabricIndex() const { return fabricIndex; }
-
-    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
-
-    CHIP_ERROR EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-    CHIP_ERROR EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
-
-private:
-    CHIP_ERROR DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const;
-};
-
-using DecodableType = Type;
-
-} // namespace SuppliedAttributionData
-
 } // namespace Structs
 
 namespace Attributes {
@@ -20788,8 +20754,6 @@ enum class Fields : uint8_t
     kEndTimestamp   = 2,
     kStartSystime   = 3,
     kEndSystime     = 4,
-    kApparentEnergy = 5,
-    kReactiveEnergy = 6,
 };
 
 struct Type
@@ -20800,8 +20764,6 @@ public:
     Optional<uint32_t> endTimestamp;
     Optional<uint64_t> startSystime;
     Optional<uint64_t> endSystime;
-    Optional<int64_t> apparentEnergy;
-    Optional<int64_t> reactiveEnergy;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
