@@ -28,6 +28,8 @@
  namespace app {
  namespace Clusters {
  namespace ClosureDimension {
+    
+static constexpr uint16_t PERCENT100THS_MAX_VALUE = 10000;
  
  struct ClusterConformance
  {
@@ -41,7 +43,7 @@
         if (supportsOverflow && !(supportsRotation || supportsMotionLatching))
         {
             ChipLogError(Zcl,
-                         "Invalid Valve configuration and control conformance - Overflow is not supported without Rotation or MotionLatching features");
+                         "Invalid closure dimension cluster conformance - Overflow is not supported without Rotation or MotionLatching features");
             return false;
         }
         return true;
@@ -94,20 +96,26 @@
      * @brief Set Current.
      * @param[in] current Current Position, Latching and/or Speed.
      * @return CHIP_NO_ERROR if set was successful.
+     *         CHIP_ERROR_INVALID_ARGUMENT if arguments are not valid
+     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
      */
-    CHIP_ERROR SetCurrent(GenericCurrentStruct & current);
+    CHIP_ERROR SetCurrent(const GenericCurrentStruct & current);
     
     /**
      * @brief Set Target.
      * @param[in] target Target Position, Latching and/or Speed.
      * @return CHIP_NO_ERROR if set was successful.
+     *         CHIP_ERROR_INVALID_ARGUMENT if arguments are not valid
+     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported. 
      */
-    CHIP_ERROR SetTarget(GenericTargetStruct & target);
+    CHIP_ERROR SetTarget(const GenericTargetStruct & target);
     
     /**
      * @brief Set Resolution.
      * @param[in] resolution Minimal acceptable change of Position fields of attributes.
      * @return CHIP_NO_ERROR if set was successful.
+     *         CHIP_ERROR_INVALID_ARGUMENT if arguments are not valid
+     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported. 
      */
     CHIP_ERROR SetResolution(const Percent100ths resolution);
     
@@ -115,6 +123,8 @@
      * @brief Set StepValue.
      * @param[in] stepValue One step value for Step command
      * @return CHIP_NO_ERROR if set was successful.
+     *         CHIP_ERROR_INVALID_ARGUMENT if arguments are not valid
+     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
      */
     CHIP_ERROR SetStepValue(const Percent100ths stepValue);
     
@@ -122,6 +132,8 @@
      * @brief Set Unit.
      * @param[in] unit Unit related to the Positioning.
      * @return CHIP_NO_ERROR if set was successful.
+     *         CHIP_ERROR_INVALID_ARGUMENT if arguments are not valid
+     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
      */
     CHIP_ERROR SetUnit(const ClosureUnitEnum unit);
     
@@ -129,20 +141,24 @@
      * @brief Set UnitRange.
      * @param[in] unitRange Minimum and Maximum values expressed by positioning following the unit.
      * @return CHIP_NO_ERROR if set was successful.
+     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
      */
-    CHIP_ERROR SetUnitRange(Structs::UnitRangeStruct::Type & unitRange);
+    CHIP_ERROR SetUnitRange(const Structs::UnitRangeStruct::Type & unitRange);
     
     /**
      * @brief Set LimitRange.
      * @param[in] limitRange Range of possible values for the position field in Current attribute.
      * @return CHIP_NO_ERROR if set was successful.
+     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
      */
-    CHIP_ERROR SetLimitRange(Structs::RangePercent100thsStruct::Type & limitRange);
+    CHIP_ERROR SetLimitRange(const Structs::RangePercent100thsStruct::Type & limitRange);
     
     /**
      * @brief Set TranslationDirection.
      * @param[in] translationDirection Direction of the translation.
      * @return CHIP_NO_ERROR if set was successful.
+     *         CHIP_ERROR_INVALID_ARGUMENT if arguments are not valid
+     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported 
      */
     CHIP_ERROR SetTranslationDirection(const TranslationDirectionEnum translationDirection);
     
@@ -150,6 +166,8 @@
      * @brief Set RotationAxis.
      * @param[in] rotationAxis Axis of the rotation.
      * @return CHIP_NO_ERROR if set was successful.
+     *         CHIP_ERROR_INVALID_ARGUMENT if arguments are not valid 
+     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported
      */
     CHIP_ERROR SetRotationAxis(const RotationAxisEnum rotationAxis);
     
@@ -157,6 +175,8 @@
      * @brief Set Overflow.
      * @param[in] overflow Overflow related to Rotation.
      * @return CHIP_NO_ERROR if set was successful.
+     *         CHIP_ERROR_INVALID_ARGUMENT if arguments are not valid
+     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
      */
     CHIP_ERROR SetOverflow(const OverflowEnum overflow);
     
@@ -164,6 +184,8 @@
      * @brief Set ModulationType.
      * @param[in] modulationType Modulation type.
      * @return CHIP_NO_ERROR if set was successful.
+     *         CHIP_ERROR_INVALID_ARGUMENT if arguments are not valid
+     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
      */
     CHIP_ERROR SetModulationType(const ModulationTypeEnum modulationType);
  
@@ -210,7 +232,7 @@
      Protocols::InteractionModel::Status HandleStepCommand(StepDirectionEnum direction, uint16_t numberOfSteps, Optional<Globals::ThreeLevelAutoEnum> speed);
  
  private:
-    // This cluster implements version 1 of the valve cluster. Do not change this revision without updating
+    // This cluster implements version 1 of the Closure Dimension cluster. Do not change this revision without updating
     // the cluster to implement the newest features.
     static constexpr Attributes::ClusterRevision::TypeInfo::Type kClusterRevision = 1u;
      

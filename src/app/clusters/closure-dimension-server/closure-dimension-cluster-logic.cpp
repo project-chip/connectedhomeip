@@ -29,149 +29,155 @@ using namespace Protocols::InteractionModel;
  
 CHIP_ERROR ClusterLogic::Init(const ClusterConformance & conformance)
 {
-   if (!conformance.Valid())
-   {
-       return CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR;
-   }
-   
+   VerifyOrReturnError(conformance.Valid(), CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR);
    mConformance = conformance;
    mInitialized = true;
    return CHIP_NO_ERROR;
 }
 
- CHIP_ERROR ClusterLogic::SetCurrent(GenericCurrentStruct & current)
+ CHIP_ERROR ClusterLogic::SetCurrent(const GenericCurrentStruct & current)
  {
     //TODO : Q reporting for this attribute
-    if(mConformance.HasFeature(Feature::kPositioning)) {
-        if(current.position.HasValue()) {
-            VerifyOrReturnError(current.position.Value() <= 10000, CHIP_ERROR_INVALID_ARGUMENT);
-        }
-    } else {
-        current.position.ClearValue();
+    if(current.position.HasValue()) {
+        VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning),CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+        VerifyOrReturnError(current.position.Value() <= PERCENT100THS_MAX_VALUE, CHIP_ERROR_INVALID_ARGUMENT);
     }
-    if(mConformance.HasFeature(Feature::kMotionLatching)) {
+    if(current.latching.HasValue()) {
+        VerifyOrReturnError(mConformance.HasFeature(Feature::kMotionLatching),CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
         VerifyOrReturnError(EnsureKnownEnumValue(current.latching.Value()) != LatchingEnum::kUnknownEnumValue, CHIP_ERROR_INVALID_ARGUMENT);
-    } else {
-        current.latching.ClearValue();
     }
-    if(mConformance.HasFeature(Feature::kSpeed)) {
+    if(current.speed.HasValue()) {
+        VerifyOrReturnError(mConformance.HasFeature(Feature::kSpeed),CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
         VerifyOrReturnError(EnsureKnownEnumValue(current.speed.Value()) != Globals::ThreeLevelAutoEnum::kUnknownEnumValue, CHIP_ERROR_INVALID_ARGUMENT);
-        current.speed.ClearValue();
     }
       
     //TODO: Current.Position value SHALL follow the scaling from "Resolution Attribute".
     
-    VerifyOrReturnError(current == mState.current,CHIP_NO_ERROR);
+    if (current != mState.current) {
+        mState.current = current;
+        mMatterContext.MarkDirty(Attributes::Current::Id);
+    }
     
-    mState.current = current;
-    mMatterContext.MarkDirty(Attributes::Current::Id);
     return CHIP_NO_ERROR;
  }
  
- CHIP_ERROR ClusterLogic::SetTarget(GenericTargetStruct & target)
+ CHIP_ERROR ClusterLogic::SetTarget(const GenericTargetStruct & target)
  {
-    if(mConformance.HasFeature(Feature::kPositioning)) {
-        if(target.position.HasValue()) {
-            VerifyOrReturnError(target.position.Value() <= 10000, CHIP_ERROR_INVALID_ARGUMENT);
-        }
-    } else {
-        target.position.ClearValue();
+    if(target.position.HasValue()) {
+        VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning),CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+        VerifyOrReturnError(target.position.Value() <= PERCENT100THS_MAX_VALUE, CHIP_ERROR_INVALID_ARGUMENT);
     }
-    if(mConformance.HasFeature(Feature::kMotionLatching)) {
+    if(target.latch.HasValue()) {
+        VerifyOrReturnError(mConformance.HasFeature(Feature::kMotionLatching),CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
         VerifyOrReturnError(EnsureKnownEnumValue(target.latch.Value()) != TargetLatchEnum::kUnknownEnumValue, CHIP_ERROR_INVALID_ARGUMENT);
-    } else {
-        target.latch.ClearValue();
     }
-    if(mConformance.HasFeature(Feature::kSpeed)) {
+    if(target.speed.HasValue()) {
+        VerifyOrReturnError(mConformance.HasFeature(Feature::kSpeed),CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
         VerifyOrReturnError(EnsureKnownEnumValue(target.speed.Value()) != Globals::ThreeLevelAutoEnum::kUnknownEnumValue, CHIP_ERROR_INVALID_ARGUMENT);
-        target.speed.ClearValue();
     }
     
     //TODO: Target.Position value SHALL follow the scaling from "Resolution Attribute".
-    VerifyOrReturnError(target == mState.target,CHIP_NO_ERROR);
+    if (target != mState.target) {
+        mState.target = target;
+        mMatterContext.MarkDirty(Attributes::Target::Id);   
+    }
     
-    mState.target = target;
-    mMatterContext.MarkDirty(Attributes::Target::Id);
     return CHIP_NO_ERROR;
  }
  
  CHIP_ERROR ClusterLogic::SetResolution(const Percent100ths resolution)
  {
     VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning),CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    VerifyOrReturnError(resolution <= 10000,CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(resolution == mState.resolution,CHIP_NO_ERROR);
+    VerifyOrReturnError(resolution <= PERCENT100THS_MAX_VALUE,CHIP_ERROR_INVALID_ARGUMENT);
     
-    mState.resolution = resolution;
-    mMatterContext.MarkDirty(Attributes::Resolution::Id);
+    if (resolution != mState.resolution) {
+        mState.resolution = resolution;
+        mMatterContext.MarkDirty(Attributes::Resolution::Id);
+    }
+
     return CHIP_NO_ERROR;
  }
  
  CHIP_ERROR ClusterLogic::SetStepValue(const Percent100ths stepValue)
  {
     VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning),CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    VerifyOrReturnError(stepValue <= 10000,CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(stepValue == mState.stepValue,CHIP_NO_ERROR);
+    VerifyOrReturnError(stepValue <= PERCENT100THS_MAX_VALUE,CHIP_ERROR_INVALID_ARGUMENT);
+    
     
     //TODO: The value of this attribute SHALL be equal to an integer multiple of the Resolution attribute.
     //TODO: The value of this attribute should be large enough to cause a visible change on the closure when the Step command is received.
-    mState.stepValue = stepValue;
-    mMatterContext.MarkDirty(Attributes::StepValue::Id);
+    if (stepValue != mState.stepValue) {
+        mState.stepValue = stepValue;
+        mMatterContext.MarkDirty(Attributes::StepValue::Id);
+    }
+    
     return CHIP_NO_ERROR;
  }
  
  CHIP_ERROR ClusterLogic::SetUnit(const ClosureUnitEnum unit)
  {
     VerifyOrReturnError(mConformance.HasFeature(Feature::kUnit),CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    VerifyOrReturnError(unit == mState.unit,CHIP_NO_ERROR);
-
-    mState.unit = unit;
-    mMatterContext.MarkDirty(Attributes::Unit::Id);
+    VerifyOrReturnError(EnsureKnownEnumValue(unit) != ClosureUnitEnum::kUnknownEnumValue, CHIP_ERROR_INVALID_ARGUMENT);
+    
+    if (unit != mState.unit) {
+        mState.unit = unit;
+        mMatterContext.MarkDirty(Attributes::Unit::Id);
+    }
+    
     return CHIP_NO_ERROR;
  }
  
- CHIP_ERROR ClusterLogic::SetUnitRange(Structs::UnitRangeStruct::Type & unitRange)
+ CHIP_ERROR ClusterLogic::SetUnitRange(const Structs::UnitRangeStruct::Type & unitRange)
  {
     VerifyOrReturnError(mConformance.HasFeature(Feature::kUnit),CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    VerifyOrReturnError(((unitRange.min  == mState.unitRange.min) && (unitRange.max == mState.unitRange.max)) ,CHIP_NO_ERROR);
+    
+    if ((unitRange.min  != mState.unitRange.min) || (unitRange.max != mState.unitRange.max)) {
+        mState.unitRange.min = unitRange.min;
+        mState.unitRange.max = unitRange.max;
+        mMatterContext.MarkDirty(Attributes::UnitRange::Id);
+    }
  
-    mState.unitRange.min = unitRange.min;
-    mState.unitRange.max = unitRange.max;
-    mMatterContext.MarkDirty(Attributes::UnitRange::Id);
     return CHIP_NO_ERROR;
  }
  
- CHIP_ERROR ClusterLogic::SetLimitRange(Structs::RangePercent100thsStruct::Type & limitRange)
+ CHIP_ERROR ClusterLogic::SetLimitRange(const Structs::RangePercent100thsStruct::Type & limitRange)
  {
     VerifyOrReturnError(mConformance.HasFeature(Feature::kLimitation),CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    VerifyOrReturnError(((limitRange.min == mState.limitRange.min) && (limitRange.max == mState.limitRange.max)),CHIP_NO_ERROR);
     
-    mState.limitRange.min = limitRange.min;
-    mState.limitRange.max = limitRange.max;
-    mMatterContext.MarkDirty(Attributes::LimitRange::Id);
+    if ((limitRange.min != mState.limitRange.min) || (limitRange.max != mState.limitRange.max)) {
+        mState.limitRange.min = limitRange.min;
+        mState.limitRange.max = limitRange.max;
+        mMatterContext.MarkDirty(Attributes::LimitRange::Id);  
+    }
+    
     return CHIP_NO_ERROR;
  }
  
  CHIP_ERROR ClusterLogic::SetTranslationDirection(const TranslationDirectionEnum translationDirection)
  {
     VerifyOrReturnError(mConformance.HasFeature(Feature::kTranslation),CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    VerifyOrReturnError(translationDirection == mState.translationDirection,CHIP_NO_ERROR);
-    
+    VerifyOrReturnError(EnsureKnownEnumValue(translationDirection) != TranslationDirectionEnum::kUnknownEnumValue, CHIP_ERROR_INVALID_ARGUMENT);
     //TODO:  This attribute is not supposed to change once the installation is finalized.
      
-    mState.translationDirection = translationDirection;
-    mMatterContext.MarkDirty(Attributes::TranslationDirection::Id);
+    if (translationDirection != mState.translationDirection) {
+        mState.translationDirection = translationDirection;
+        mMatterContext.MarkDirty(Attributes::TranslationDirection::Id);
+    }
+    
     return CHIP_NO_ERROR;
  }
  
  CHIP_ERROR ClusterLogic::SetRotationAxis(const RotationAxisEnum rotationAxis)
  {
     VerifyOrReturnError(mConformance.HasFeature(Feature::kRotation),CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    VerifyOrReturnError(rotationAxis == mState.rotationAxis,CHIP_NO_ERROR);
+    VerifyOrReturnError(EnsureKnownEnumValue(rotationAxis) != RotationAxisEnum::kUnknownEnumValue, CHIP_ERROR_INVALID_ARGUMENT);
     
     //TODO:  This attribute is not supposed to change once the installation is finalized.
-
-    mState.rotationAxis = rotationAxis;
-    mMatterContext.MarkDirty(Attributes::RotationAxis::Id);
+    if (rotationAxis != mState.rotationAxis) {
+        mState.rotationAxis = rotationAxis;
+        mMatterContext.MarkDirty(Attributes::RotationAxis::Id);
+    }
+    
     return CHIP_NO_ERROR;
  }
  
@@ -179,23 +185,30 @@ CHIP_ERROR ClusterLogic::Init(const ClusterConformance & conformance)
  {
     VerifyOrReturnError((mConformance.HasFeature(Feature::kRotation) || mConformance.HasFeature(Feature::kMotionLatching)), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
      VerifyOrReturnError(mConformance.supportsOverflow, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    VerifyOrReturnError(overflow == mState.overflow,CHIP_NO_ERROR);
-
+     VerifyOrReturnError(EnsureKnownEnumValue(overflow) != OverflowEnum::kUnknownEnumValue, CHIP_ERROR_INVALID_ARGUMENT);
+    
     //TODO:  If the axis is centered, one part goes Outside and the other part goes Inside. In this case, this attribute SHALL use Top/Bottom/Left/Right Inside or Top/Bottom/Left/Right Outside enumerated value.
     
-    mState.overflow = overflow;
-    mMatterContext.MarkDirty(Attributes::Overflow::Id);
+    if (overflow != mState.overflow) {
+        mState.overflow = overflow;
+        mMatterContext.MarkDirty(Attributes::Overflow::Id);
+    }      
+    
     return CHIP_NO_ERROR;
  }
  
  CHIP_ERROR ClusterLogic::SetModulationType(const ModulationTypeEnum modulationType)
  {
     VerifyOrReturnError(mConformance.HasFeature(Feature::kModulation),CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    VerifyOrReturnError(modulationType == mState.modulationType,CHIP_NO_ERROR);
+    VerifyOrReturnError(EnsureKnownEnumValue(modulationType) != ModulationTypeEnum::kUnknownEnumValue, CHIP_ERROR_INVALID_ARGUMENT);
+    
     //TODO:  This attribute is not supposed to change once the installation is finalized.
     
-    mState.modulationType = modulationType;
-    mMatterContext.MarkDirty(Attributes::ModulationType::Id);
+    if (modulationType != mState.modulationType) {
+        mState.modulationType = modulationType;
+        mMatterContext.MarkDirty(Attributes::ModulationType::Id);
+    }
+    
     return CHIP_NO_ERROR;
  }
  

@@ -32,8 +32,7 @@
  class MatterContext
  {
  public:
-    MatterContext(EndpointId endpoint, PersistentStorageDelegate & persistentStorageDelegate) :
-        mEndpoint(endpoint), mPersistentStorageDelegate(persistentStorageDelegate)
+    MatterContext(EndpointId endpoint) : mEndpoint(endpoint)
     {}
  
     /**
@@ -46,7 +45,6 @@
  
  private:
     EndpointId mEndpoint;
-    PersistentStorageDelegate & mPersistentStorageDelegate;
  };
  
  } // namespace ClosureDimension
