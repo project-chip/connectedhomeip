@@ -47,3 +47,9 @@ ONLY_ACTIVE_ARCH = YES
 OTHER_TAPI_FLAGS = "-x objective-c++ -std=gnu++17 -fvisibility=hidden -fobjc-arc"
 
 WARNING_CFLAGS = -Wformat -Wformat-nonliteral -Wformat-security
+
+ENABLE_STRICT_OBJC_MSGSEND = YES;
+
+SUPPORTS_TEXT_BASED_API = YES;
+
+SUPPORTED_PLATFORMS = macOS iOS tvOS watchOS

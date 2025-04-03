@@ -2879,11 +2879,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = D4CA5BE42D9E29C700D44744 /* Debug.xcconfig */;
 			buildSettings = {
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				SUPPORTED_PLATFORMS = "macosx iphonesimulator iphoneos appletvos appletvsimulator watchos watchsimulator";
-				SUPPORTS_TEXT_BASED_API = YES;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				TAPI_ENABLE_PROJECT_HEADERS = YES;
 			};
 			name = Debug;
 		};
@@ -2992,9 +2987,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = D4CA5BE52D9E29C700D44744 /* Release.xcconfig */;
 			buildSettings = {
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				SUPPORTED_PLATFORMS = "macosx iphonesimulator iphoneos appletvos appletvsimulator watchos watchsimulator";
-				SUPPORTS_TEXT_BASED_API = YES;
 			};
 			name = Release;
 		};
