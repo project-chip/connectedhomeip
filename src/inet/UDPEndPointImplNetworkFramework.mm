@@ -267,8 +267,18 @@ namespace Inet {
 
         ReturnErrorOnFailure(GetConnection(pktInfo));
 
+        // Wrap the PacketBufferHandle in a shared_ptr so we can capture it by value
+        __auto_type retainedHandle = std::make_shared<System::PacketBufferHandle>(std::move(msg));
+        __auto_type content = dispatch_data_create(
+            retainedHandle->operator->()->Start(),
+            retainedHandle->operator->()->DataLength(),
+            mSystemQueue,
+            ^{
+                // Keep retainedHandle alive until the dispatch_data is released
+                [[maybe_unused]] auto cleanup = retainedHandle;
+            });
+
         // Send a message, and wait for it to be dispatched.
-        __auto_type content = dispatch_data_create(msg->Start(), msg->DataLength(), mSystemQueue, DISPATCH_DATA_DESTRUCTOR_DEFAULT);
         __auto_type group = dispatch_group_create();
         dispatch_group_enter(group);
 
