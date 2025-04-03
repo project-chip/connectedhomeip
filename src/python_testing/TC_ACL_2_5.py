@@ -106,17 +106,17 @@ class TC_ACL_2_5(MatterBaseTest):
                 events=[(0, acec_event)],
                 fabricFiltered=True
             )
-            self.print_step(f"Initial events response", str(events_response))
+            self.print_step("Initial events response", str(events_response))
 
             # Extract events from the response
             events = events_response
             self.print_step(f"Found {len(events)} initial events", "")
 
             for event_data in events:
-                self.print_step(f"Initial event", str(event_data))
+                self.print_step("Initial event", str(event_data))
 
         except Exception as e:
-            self.print_step(f"Error reading initial events", str(e))
+            self.print_step("Error reading initial events", str(e))
             asserts.fail(f"Failed to read initial events: {e}")
 
         self.step(4)
@@ -127,7 +127,7 @@ class TC_ACL_2_5(MatterBaseTest):
             data=D_OK_EMPTY)
 
         # Write the extension to the device - properly wrap the extensions list
-        self.print_step(f"Writing extension with data", D_OK_EMPTY.hex())
+        self.print_step("Writing extension with data", D_OK_EMPTY.hex())
         try:
             # Make sure we're creating the attribute value correctly
             extension_attr = Clusters.AccessControl.Attributes.Extension
@@ -138,22 +138,21 @@ class TC_ACL_2_5(MatterBaseTest):
                 self.dut_node_id,
                 [(0, extension_attr(value=extensions_list))]
             )
-            self.print_step(f"Write result", str(result))
+            self.print_step("Write result", str(result))
             asserts.assert_equal(
                 result[0].Status, Status.Success, "Write should have succeeded")
 
         except Exception as e:
-            self.print_step(f"Error writing extension", str(e))
+            self.print_step("Error writing extension", str(e))
             asserts.fail(f"Failed to write extension: {e}")
 
         # Wait for the change to be processed
-        self.print_step(f"Waiting 5 seconds for event generation...", "")
+        self.print_step("Waiting 5 seconds for event generation...", "")
         await asyncio.sleep(5)  # Increased wait time
 
         self.step(5)
         # Read the events directly instead of relying on subscription
-        self.print_step(
-            f"Reading AccessControlExtensionChanged events after write...", "")
+        self.print_step("Reading AccessControlExtensionChanged events after write...", "")
 
         # Try multiple times with increasing timeouts
         max_attempts = 5
@@ -161,8 +160,7 @@ class TC_ACL_2_5(MatterBaseTest):
 
         for attempt in range(1, max_attempts + 1):
             try:
-                self.print_step(
-                    f"Attempt {attempt}/{max_attempts} to read events", "")
+                self.print_step(f"Attempt {attempt}/{max_attempts} to read events", "")
                 events_response = await self.default_controller.ReadEvent(
                     self.dut_node_id,
                     events=[(0, acec_event)],
@@ -205,8 +203,7 @@ class TC_ACL_2_5(MatterBaseTest):
 
                 # If no events, wait and try again (up to 5 times)
                 else:
-                    self.print_step(f"No events found on attempt {
-                                    attempt}, waiting to try again...", "")
+                    self.print_step(f"No events found on attempt {attempt}, waiting to try again...", "")
                     if attempt < max_attempts:
                         wait_time = attempt * 2  # Increasing wait time with each attempt
                         await asyncio.sleep(wait_time)
@@ -216,8 +213,7 @@ class TC_ACL_2_5(MatterBaseTest):
                             "Did not receive AccessControlExtensionChanged event")
 
             except Exception as e:
-                self.print_step(
-                    f"Error reading events (attempt {attempt})", str(e))
+                self.print_step(f"Error reading events (attempt {attempt})", str(e))
                 if attempt < max_attempts:
                     wait_time = attempt * 2
                     await asyncio.sleep(wait_time)
@@ -241,8 +237,7 @@ class TC_ACL_2_5(MatterBaseTest):
             data=D_OK_SINGLE)
 
         # Write the new extension
-        self.print_step(f"Writing new extension with data",
-                        D_OK_SINGLE.hex())
+        self.print_step("Writing new extension with data", D_OK_SINGLE.hex())
         try:
             # Create the Extension variable
             extension_attr = Clusters.AccessControl.Attributes.Extension
@@ -253,21 +248,21 @@ class TC_ACL_2_5(MatterBaseTest):
                 self.dut_node_id,
                 [(0, extension_attr(value=extensions_list))]
             )
-            self.print_step(f"Write result", str(result))
+            self.print_step("Write result", str(result))
             asserts.assert_equal(
                 result[0].Status, Status.Success, "Write should have succeeded")
 
         except Exception as e:
-            self.print_step(f"Error writing new extension", str(e))
+            self.print_step("Error writing new extension", str(e))
             asserts.fail(f"Failed to write new extension: {e}")
 
         # Wait for the change to be processed
-        self.print_step(f"Waiting 5 seconds for event generation...", "")
+        self.print_step("Waiting 5 seconds for event generation...", "")
         await asyncio.sleep(5)  # Wait longer to ensure events are generated
 
         self.step(7)
         # Read events directly
-        self.print_step(f"Reading events after replacing extension...", "")
+        self.print_step("Reading events after replacing extension...", "")
 
         # Try multiple attempts with increasing timeouts
         max_attempts = 5
@@ -276,8 +271,7 @@ class TC_ACL_2_5(MatterBaseTest):
 
         for attempt in range(1, max_attempts + 1):
             try:
-                self.print_step(
-                    f"Attempt {attempt}/{max_attempts} to read events", "")
+                self.print_step(f"Attempt {attempt}/{max_attempts} to read events", "")
                 events_response = await self.default_controller.ReadEvent(
                     self.dut_node_id,
                     events=[(0, acec_event)],
@@ -303,32 +297,29 @@ class TC_ACL_2_5(MatterBaseTest):
                             event_data.Data.latestValue.fabricIndex == f1 and
                             event_data.Data.fabricIndex == f1):
                             found_change = True
-                            self.print_step(f"Found Change event", "")
+                            self.print_step("Found Change event", "")
 
                 # If we found change event, we can proceed
                 if found_change:
-                    self.print_step(f"Found Change event", "")
+                    self.print_step("Found Change event", "")
                     break
 
                 # If not found, wait and try again
                 if attempt < max_attempts:
                     wait_time = attempt * 2
-                    self.print_step(f"No matching events found on attempt {
-                                    attempt}, waiting {wait_time}s...", "")
+                    self.print_step(f"No matching events found on attempt {attempt}, waiting {wait_time}s...", "")
                     await asyncio.sleep(wait_time)
                 else:
                     self.print_step("ERROR: All attempts failed", "")
                     asserts.fail("Did not find Change event")
 
             except Exception as e:
-                self.print_step(
-                    f"Error reading events (attempt {attempt})", str(e))
+                self.print_step(f"Error reading events (attempt {attempt})", str(e))
                 if attempt < max_attempts:
                     wait_time = attempt * 2
                     await asyncio.sleep(wait_time)
                 else:
-                    self.print_step(
-                        "ERROR: All attempts failed with exceptions", "")
+                    self.print_step("ERROR: All attempts failed with exceptions", "")
                     asserts.fail(f"Failed to read events: {e}")
 
         self.step(8)
@@ -342,8 +333,7 @@ class TC_ACL_2_5(MatterBaseTest):
 
         # This should fail with CONSTRAINT_ERROR
         try:
-            self.print_step(
-                f"Attempting to write extension that exceeds max length (should fail)", "")
+            self.print_step("Attempting to write extension that exceeds max length (should fail)", "")
             # Create the Extension attribute
             extension_attr = Clusters.AccessControl.Attributes.Extension
             # Create proper extensions list
@@ -353,17 +343,16 @@ class TC_ACL_2_5(MatterBaseTest):
                 self.dut_node_id,
                 [(0, extension_attr(value=extensions_list))]
             )
-            self.print_step(f"Write result", str(a))
+            self.print_step("Write result", str(a))
             asserts.assert_equal(a[0].Status, Status.ConstraintError,
                                  "Write should have failed with CONSTRAINT_ERROR 135")
 
         except Exception as e:
-            self.print_step(f"Got expected error", str(e))
+            self.print_step("Got expected error", str(e))
 
         self.step(9)
         # Verify no event was generated for the failed write
-        self.print_step(
-            f"Reading events after failed write (too long extension)...", "")
+        self.print_step("Reading events after failed write (too long extension)...", "")
 
         # Try to read events directly
         try:
@@ -381,14 +370,13 @@ class TC_ACL_2_5(MatterBaseTest):
             asserts.assert_equal(len(events), 0, "There should be no events found")
 
         except Exception as e:
-            self.print_step(f"Error reading events", str(e))
+            self.print_step("Error reading events", str(e))
             asserts.fail("Should have been able to read events")
 
         self.step(10)
         # This should fail with CONSTRAINT_ERROR
         try:
-            self.print_step(
-                f"Attempting to write multiple extensions (should fail)", "")
+            self.print_step("Attempting to write multiple extensions (should fail)", "")
             # Create the Extension attribute
             extension_attr = Clusters.AccessControl.Attributes.Extension
             # Create proper extensions list with multiple extensions
@@ -398,20 +386,18 @@ class TC_ACL_2_5(MatterBaseTest):
                 self.dut_node_id,
                 [(0, extension_attr(value=extensions_list))]
             )
-            self.print_step(f"Write result", str(b))
+            self.print_step("Write result", str(b))
             asserts.assert_equal(b[0].Status, Status.ConstraintError,
                                  "Write should have failed with CONSTRAINT_ERROR")
 
         except Exception as e:
-            self.print_step(
-                f"Error writing multiple extensions other than constraint error", str(e))
+            self.print_step("Error writing multiple extensions other than constraint error", str(e))
             asserts.fail(
                 f"Failed to write multiple extensions due to other error: {e}")
 
         self.step(11)
         # Verify no event was generated at all, since the whole extensions list was rejected.
-        self.print_step(
-            f"Reading events after failed write (multiple extensions)...", "")
+        self.print_step("Reading events after failed write (multiple extensions)...", "")
 
         # Try to read events directly
         try:
@@ -429,13 +415,12 @@ class TC_ACL_2_5(MatterBaseTest):
             asserts.assert_equal(len(events), 0, "There should be no events found")
 
         except Exception as e:
-            self.print_step(f"Error reading events", str(e))
+            self.print_step("Error reading events", str(e))
             asserts.fail(f"Failed to read events: {e}")
 
         self.step(12)
         # Write an empty list to clear all extensions
-        self.print_step(
-            f"Writing empty extension list to clear all extensions", "")
+        self.print_step("Writing empty extension list to clear all extensions", "")
         try:
             # Create the Extension attribute
             extension_attr = Clusters.AccessControl.Attributes.Extension
@@ -446,21 +431,21 @@ class TC_ACL_2_5(MatterBaseTest):
                 self.dut_node_id,
                 [(0, extension_attr(value=extensions_list2))]
             )
-            self.print_step(f"Write result", str(result))
+            self.print_step("Write result", str(result))
             asserts.assert_equal(
                 result[0].Status, Status.Success, "Write should have succeeded")
 
         except Exception as e:
-            self.print_step(f"Error clearing extensions", str(e))
+            self.print_step("Error clearing extensions", str(e))
             asserts.fail(f"Failed to clear extensions: {e}")
 
         # Allow time for event to be generated
-        self.print_step(f"Waiting 5 seconds for event generation...", "")
+        self.print_step("Waiting 5 seconds for event generation...", "")
         await asyncio.sleep(5)
 
         self.step(13)
         # Read events directly
-        self.print_step(f"Reading events after clearing extensions...", "")
+        self.print_step("Reading events after clearing extensions...", "")
 
         # Try multiple attempts with increasing timeouts
         max_attempts = 5
@@ -468,8 +453,7 @@ class TC_ACL_2_5(MatterBaseTest):
 
         for attempt in range(1, max_attempts + 1):
             try:
-                self.print_step(
-                    f"Attempt {attempt}/{max_attempts} to read events", "")
+                self.print_step(f"Attempt {attempt}/{max_attempts} to read events", "")
                 events_response = await self.default_controller.ReadEvent(
                     self.dut_node_id,
                     events=[(0, acec_event)],
@@ -495,39 +479,35 @@ class TC_ACL_2_5(MatterBaseTest):
                             event_data.Data.latestValue.fabricIndex == f1 and
                                 event_data.Data.fabricIndex == f1):
                             found_valid_event = True
-                            self.print_step(f"Found valid REMOVE event", "")
+                            self.print_step("Found valid REMOVE event", "")
                             break
 
                 # If we found the valid event, we can proceed
                 if found_valid_event:
-                    self.print_step(
-                        f"Found valid REMOVE event, proceeding", "")
+                    self.print_step("Found valid REMOVE event, proceeding", "")
                     break
 
                 # If not found, wait and try again
                 if attempt < max_attempts:
                     wait_time = attempt * 2
-                    self.print_step(f"No matching events found on attempt {
-                                    attempt}, waiting {wait_time}s...", "")
+                    self.print_step(f"No matching events found on attempt {attempt}, waiting {wait_time}s...", "")
                     await asyncio.sleep(wait_time)
                 else:
                     self.print_step("ERROR: All attempts failed", "")
 
             except Exception as e:
-                self.print_step(
-                    f"Error reading events (attempt {attempt})", str(e))
+                self.print_step(f"Error reading events (attempt {attempt})", str(e))
                 if attempt < max_attempts:
                     wait_time = attempt * 2
                     await asyncio.sleep(wait_time)
                 else:
-                    self.print_step(
-                        "ERROR: All attempts failed with exceptions", "")
+                    self.print_step("ERROR: All attempts failed with exceptions", "")
                     asserts.fail(f"Failed to read events: {e}")
 
         # After all attempts, check if we found the valid event
         asserts.assert_true(
             found_valid_event, "Did not find the expected REMOVE event with specified fields")
-        self.print_step(f"Successfully verified the expected REMOVE event", "")
+        self.print_step("Successfully verified the expected REMOVE event", "")
 
 
 if __name__ == "__main__":
