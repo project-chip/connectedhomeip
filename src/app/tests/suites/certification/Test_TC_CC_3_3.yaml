@@ -234,14 +234,15 @@ tests:
               - name: "ms"
                 value: 5000
 
+    # Expected value 205 (50 - 100*(20/20) = -50 mod 255) with a tolerance of +/- 2, so the expected value is in the range [203, 207]
     - label: "Step 3e: TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 190
-              maxValue: 220
+              minValue: 203
+              maxValue: 207
 
     - label: "Step 4a: TH reads ColorMode attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0008
