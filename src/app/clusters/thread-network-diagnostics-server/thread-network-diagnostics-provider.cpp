@@ -684,11 +684,11 @@ CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, a
         {
             err = encoder.Encode(*(uint64_t *)extAddress->m8);
         }
-    } 
+    }
     break;
     case Attributes::Rloc16::Id: {
         err = encoder.Encode(otThreadGetRloc16(otInst));
-    } 
+    }
     break;
     default: {
         err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
