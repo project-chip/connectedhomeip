@@ -27,6 +27,7 @@ from .markdown import SummaryMarkdownGenerator
 __all__ = [
     'CodeGenerator',
     'CppApplicationGenerator',
+    'Generator',
     'GENERATORS',
     'IdlGenerator',
     'JavaClassGenerator',
