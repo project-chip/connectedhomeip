@@ -92,46 +92,11 @@ struct AttributeEntry
     AttributeId attributeId;
 
     // Constructor
-    constexpr AttributeEntry(AttributeId id = 0,
-                             std::underlying_type_t<AttributeQualityFlags> attrQualityFlags = 0,
-                             std::underlying_type_t<Access::Privilege> readPriv = kNoPrivilege,
-                             std::underlying_type_t<Access::Privilege> writePriv = kNoPrivilege
+    constexpr AttributeEntry(AttributeId id = 0, // attributeId initial value
+                             std::underlying_type_t<AttributeQualityFlags> attrQualityFlags = 0, // mask.flags initial value
+                             std::underlying_type_t<Access::Privilege> readPriv = kNoPrivilege, // mask.readPrivilege initial value
+                             std::underlying_type_t<Access::Privilege> writePriv = kNoPrivilege // mask.writePrivilege initial value
                             ) : attributeId(id), mask{ attrQualityFlags, readPriv, writePriv } {}
-
-
-    enum class ReadWriteFlag : uint8_t
-    {
-        AssignReadPrivilege  = 1 << 0,
-        AssignWritePrivilege = 1 << 1
-    };
-
-    ReadWriteFlag opFlag {ReadWriteFlag::AssignReadPrivilege};
-
-    
-    // Overload assignment operator for privileges
-    AttributeEntry& operator=(Access::Privilege value) 
-    {
-        // Static ASSERT to check size of readPrivilege type vs entry parameter.
-        static_assert(sizeof(std::underlying_type_t<Access::Privilege>) >= 
-                      sizeof(chip::to_underlying(value)),
-                      "Size of input privilege is not able to accomodate parameter (value).");
-
-        switch (opFlag)
-        {
-            case ReadWriteFlag::AssignReadPrivilege :
-                this->mask.readPrivilege = to_underlying(value);
-                break;
-
-            case ReadWriteFlag::AssignWritePrivilege :
-                this->mask.writePrivilege = to_underlying(value);
-                break;
-
-            default :
-                break;
-        }
-                      
-        return *this;
-    }
 
 
     // Getter for mask.readPrivilege
@@ -139,8 +104,8 @@ struct AttributeEntry
     {
         return static_cast< Access::Privilege >(mask.readPrivilege);
     }
-
     
+
     // Getter for mask.writePrivilege
     Access::Privilege GetWritePrivilege() const
     {
@@ -178,10 +143,25 @@ struct AttributeEntry
 
             // attribute quality flags
             //
+            // flags is a uint32_t bitfield of size 7, in order to accomodate all
+            // the different values of "enum class AttributeQualityFlags".
+            //
+            // Consider that any modification on the declaration of
+            // "enum class AttributeQualityFlags" will affect flags.
             std::underlying_type_t<AttributeQualityFlags> flags : 7 ;
 
             // read/write access privilege variables
             //
+            // readPrivilege is a uint8_t bitfield of size 5, in order to accomodate all
+            // the different values of "enum class Privilege".
+            // Same case for writePrivilege.
+            //
+            // Consider that any modification on the declaration of "enum class Privilege"
+            // will affect both readPrivilege and writePrivilege.
+            //
+            // The use of bitfields means that each variable holds an individual
+            // Access::Privilege value, as a bitwise value. This allows us to
+            // handle Access::Privilege information without any bit fiddling.
             std::underlying_type_t<Access::Privilege> readPrivilege : 5 ;
             std::underlying_type_t<Access::Privilege> writePrivilege : 5 ;
 
@@ -212,25 +192,11 @@ struct AcceptedCommandEntry
     CommandId commandId;
 
     // Constructor
-    constexpr AcceptedCommandEntry(CommandId id = 0,
-                                   std::underlying_type_t<CommandQualityFlags> cmdQualityFlags = 0,
-                                   std::underlying_type_t<Access::Privilege> invokePriv = kNoPrivilege
+    constexpr AcceptedCommandEntry(CommandId id = 0, // commandId initial value
+                                   std::underlying_type_t<CommandQualityFlags> cmdQualityFlags = 0, // mask.flags initial value
+                                   std::underlying_type_t<Access::Privilege> invokePriv = kNoPrivilege // mask.invokePrivilege initial value
                                 ) : commandId(id), mask{ cmdQualityFlags, invokePriv } {}
  
-
-
-    // Overload assignment operator for mask.invokePrivilege
-    AcceptedCommandEntry& operator=(Access::Privilege value)
-    {
-        // Static ASSERT to check size of invokePrivilege type vs entry parameter.
-        static_assert(sizeof(std::underlying_type_t<Access::Privilege>) >= 
-                             sizeof(chip::to_underlying(value)),
-                             "Size of invokePrivilege is not able to accomodate parameter (value).");
-
-        this->mask.invokePrivilege = chip::to_underlying(value);
-        return *this;
-    }
-
 
     // Getter for mask.invokePrivilege
     Access::Privilege GetInvokePrivilege() const

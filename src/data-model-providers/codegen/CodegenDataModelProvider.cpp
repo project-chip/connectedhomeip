@@ -55,10 +55,10 @@ DataModel::AcceptedCommandEntry AcceptedCommandEntryFor(const ConcreteCommandPat
 {
     const CommandId commandId = path.mCommandId;
 
-    DataModel::AcceptedCommandEntry entry;
+    DataModel::AcceptedCommandEntry entry(path.mCommandId, 0,
+                                          chip::to_underlying(RequiredPrivilege::ForInvokeCommand(path))
+                                         );
 
-    entry.commandId       = path.mCommandId;
-    entry = RequiredPrivilege::ForInvokeCommand(path);
     entry.SetFlags(DataModel::CommandQualityFlags::kTimed, CommandNeedsTimedInvoke(path.mClusterId, commandId));
     entry.SetFlags(DataModel::CommandQualityFlags::kFabricScoped, CommandIsFabricScoped(path.mClusterId, commandId));
     entry.SetFlags(DataModel::CommandQualityFlags::kLargeMessage, CommandHasLargePayload(path.mClusterId, commandId));
@@ -94,16 +94,14 @@ DataModel::ServerClusterEntry ServerClusterEntryFrom(EndpointId endpointId, cons
 
 DataModel::AttributeEntry AttributeEntryFrom(const ConcreteClusterPath & clusterPath, const EmberAfAttributeMetadata & attribute)
 {
-    DataModel::AttributeEntry entry;
-
     const ConcreteAttributePath attributePath(clusterPath.mEndpointId, clusterPath.mClusterId, attribute.attributeId);
 
-    entry.attributeId   = attribute.attributeId;
-    entry = RequiredPrivilege::ForReadAttribute(attributePath);
-    if (!attribute.IsReadOnly())
-    {
-        entry = chip::to_underlying(RequiredPrivilege::ForWriteAttribute(attributePath));
-    }
+    DataModel::AttributeEntry entry(attribute.attributeId, 0,
+                                    chip::to_underlying(RequiredPrivilege::ForReadAttribute(attributePath)),
+                                    !attribute.IsReadOnly() ? 
+                                        chip::to_underlying(RequiredPrivilege::ForWriteAttribute(attributePath)) : 0
+                                   );
+
 
     entry.SetFlags(DataModel::AttributeQualityFlags::kListAttribute, (attribute.attributeType == ZCL_ARRAY_ATTRIBUTE_TYPE));
     entry.SetFlags(DataModel::AttributeQualityFlags::kTimed, attribute.MustUseTimedWrite());
@@ -292,9 +290,11 @@ CHIP_ERROR CodegenDataModelProvider::Attributes(const ConcreteClusterPath & path
     //   - lists of elements
     //   - read-only, with read privilege view
     //   - fixed value (no such flag exists, so this is not a quality flag we set/track)
-    DataModel::AttributeEntry globalListEntry;
+    DataModel::AttributeEntry globalListEntry(0,
+                                              0,
+                                              chip::to_underlying(Access::Privilege::kView),
+                                              0);
 
-    globalListEntry = Access::Privilege::kView;
     globalListEntry.SetFlags(DataModel::AttributeQualityFlags::kListAttribute);
 
     for (auto & attribute : GlobalAttributesNotInMetadata)
