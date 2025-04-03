@@ -78,9 +78,7 @@ class TC_OTCCM_1_2(MatterBaseTest, ModeBaseClusterChecks):
         self.step(2)
         # Verify common checks for Mode Base as described in the TC-OTCCM-1.2
         supported_modes = await self.check_supported_modes_and_labels(endpoint=endpoint)
-        # According to the spec, there should be at least one like
-        # Bake, Convection, Grill, Roast, Clean, Convection Bake, Convection Roast, Warming, Proofing
-        # tag in the ones supported.
+        # According to the spec, Bake tag should be a supported tag.
         additional_tags = [cluster_otccm_mode.Enums.ModeTag.kBake]
         self.check_tags_in_lists(supported_modes=supported_modes, required_tags=additional_tags)
 
