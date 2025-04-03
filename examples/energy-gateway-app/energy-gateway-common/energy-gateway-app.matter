@@ -276,12 +276,6 @@ struct AtomicAttributeStatusStruct {
   status statusCode = 1;
 }
 
-fabric_scoped struct SuppliedAttributionData {
-  enum8 contextInformation = 0;
-  optional int32u sourceContext = 1;
-  fabric_idx fabricIndex = 254;
-}
-
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
 cluster Identify = 3 {
   revision 4;
@@ -340,7 +334,7 @@ cluster Descriptor = 29 {
     kTagList = 0x1;
   }
 
-  struct DeviceTypeStruct {
+  shared struct DeviceTypeStruct {
     devtype_id deviceType = 0;
     int16u revision = 1;
   }

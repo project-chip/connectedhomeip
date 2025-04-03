@@ -276,12 +276,6 @@ struct AtomicAttributeStatusStruct {
   status statusCode = 1;
 }
 
-fabric_scoped struct SuppliedAttributionData {
-  enum8 contextInformation = 0;
-  optional int32u sourceContext = 1;
-  fabric_idx fabricIndex = 254;
-}
-
 /** The Access Control Cluster exposes a data model view of a
       Node's Access Control List (ACL), which codifies the rules used to manage
       and enforce Access Control for the Node's endpoints and their associated
