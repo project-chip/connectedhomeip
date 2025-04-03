@@ -22,6 +22,7 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
 #include <protocols/interaction_model/StatusCode.h>
+#include <string>
 #include <vector>
 
 namespace chip {
@@ -29,7 +30,7 @@ namespace app {
 namespace Clusters {
 namespace CameraAvSettingsUserLevelManagement {
 
-using chip::Protocols::InteractionModel::Status;
+using chip::Protocols::InteractionModel;
 using MPTZStructType       = Structs::MPTZStruct::Type;
 using MPTZPresetStructType = Structs::MPTZPresetStruct::Type;
 
@@ -95,15 +96,15 @@ public:
     /**
      * Creates a server instance. The Init() function needs to be called for this instance to be registered and
      * called by the interaction model at the appropriate times.
-     * @param aEndpointId The endpoint on which this cluster exists. This must match the zap configuration.
-     * @param aDelegate   A reference to the delegate to be used by this server.
-     * @param aFeature                        The bitflags value that identifies which features are supported by this instance.
-     * @param aOptionalAttrs                    The bitflags value that identifies the optional attributes supported by this
-     *                                          instance.
+     * @param aEndpointId       The endpoint on which this cluster exists. This must match the zap configuration.
+     * @param aDelegate         A reference to the delegate to be used by this server.
+     * @param aFeatures         The bitflags value that identifies which features are supported by this instance.
+     * @param aOptionalAttrs    The bitflags value that identifies the optional attributes supported by this instance.
+     *                                           instance.
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
     CameraAvSettingsUserLevelMgmtServer(EndpointId aEndpointId, Delegate * aDelegate, BitFlags<Feature> aFeatures,
-                                        const BitFlags<OptionalAttributes> aOptionalAttrs);
+                                        BitFlags<OptionalAttributes> aOptionalAttrs);
     ~CameraAvSettingsUserLevelMgmtServer() override;
 
     CHIP_ERROR Init();
@@ -275,16 +276,16 @@ public:
      * @param tilt The validated value of the tilt that is to be set
      * @param zoom The validated value of the zoom that is to be set
      */
-    virtual Protocols::InteractionModel::Status MPTZRelativeMove(Optional<int16_t> aPan, Optional<int16_t> aTilt,
+    virtual Status MPTZRelativeMove(Optional<int16_t> aPan, Optional<int16_t> aTilt,
                                                                  Optional<int8_t> aZoom) = 0;
 
-    virtual Protocols::InteractionModel::Status MPTZMoveToPreset(uint8_t aPreset, Optional<int16_t> aPan, Optional<int16_t> aTilt,
+    virtual Status MPTZMoveToPreset(uint8_t aPreset, Optional<int16_t> aPan, Optional<int16_t> aTilt,
                                                                  Optional<int8_t> aZoom)                                 = 0;
-    virtual Protocols::InteractionModel::Status MPTZSavePreset(uint8_t aPreset)                                          = 0;
-    virtual Protocols::InteractionModel::Status MPTZRemovePreset(uint8_t aPreset)                                        = 0;
-    virtual Protocols::InteractionModel::Status DPTZSetViewport(uint16_t aVideoStreamID,
+    virtual Status MPTZSavePreset(uint8_t aPreset)                                          = 0;
+    virtual Status MPTZRemovePreset(uint8_t aPreset)                                        = 0;
+    virtual Status DPTZSetViewport(uint16_t aVideoStreamID,
                                                                 Structs::ViewportStruct::Type aViewport)                 = 0;
-    virtual Protocols::InteractionModel::Status DPTZRelativeMove(uint16_t aVideoStreamID, Optional<int16_t> aDeltaX,
+    virtual Status DPTZRelativeMove(uint16_t aVideoStreamID, Optional<int16_t> aDeltaX,
                                                                  Optional<int16_t> aDeltaY, Optional<int8_t> aZoomDelta) = 0;
 
 private:

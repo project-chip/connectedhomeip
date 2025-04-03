@@ -81,7 +81,7 @@ Status AVSettingsUserLevelManagementDelegate::MPTZRelativeMove(Optional<int16_t>
 Status AVSettingsUserLevelManagementDelegate::MPTZMoveToPreset(uint8_t aPreset, Optional<int16_t> aPan, Optional<int16_t> aTilt,
                                                                Optional<int8_t> aZoom)
 {
-    // The Cluster implementation has validated the preset is value, and provided the MPTZ values associated with that preset.
+    // The Cluster implementation has validated the preset is valid, and provided the MPTZ values associated with that preset.
     // Do any needed hardware interactions to actually set the camera to the new values of PTZ.  Then return a Status response.
     //
     return Status::Success;
