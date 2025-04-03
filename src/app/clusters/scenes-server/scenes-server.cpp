@@ -1167,3 +1167,8 @@ void MatterScenesManagementPluginServerInitCallback()
         ChipLogError(Zcl, "ScenesServer::Instance().Init() error: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
+
+void MatterScenesManagementPluginServerShutdownCallback()
+{
+    ScenesServer::Instance().Shutdown();
+}
