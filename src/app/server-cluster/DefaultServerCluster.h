@@ -17,6 +17,7 @@
 #pragma once
 
 #include <app/server-cluster/ServerClusterInterface.h>
+#include <optional>
 
 namespace chip {
 namespace app {
@@ -45,7 +46,7 @@ public:
     /// been initialized.
     ///
     /// Call Shutdown to de-initialize the object.
-    CHIP_ERROR Startup(ServerClusterContext * context) override;
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
     void Shutdown() override;
 
     [[nodiscard]] DataVersion GetDataVersion() const override { return mDataVersion; }
