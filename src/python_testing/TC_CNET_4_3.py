@@ -35,6 +35,7 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import logging
 import chip.clusters as Clusters
 import test_plan_support
 from chip.clusters.Types import NullValue
@@ -100,10 +101,18 @@ class TC_CNET_4_3(MatterBaseTest):
                                                 "All elements in list are of type NetworkInfoStruct")
         matter_asserts.assert_all(networks, lambda x: isinstance(x.networkID, bytes) and 1 <= len(x.networkID) <= 32,
                                   "NetworkID field is an octet string within a length range 1 to 32")
-        connected_networks_count = sum(map(lambda x: x.connected, networks))
-        asserts.assert_equal(connected_networks_count, 1, "Verify that only one entry has connected status as TRUE")
         asserts.assert_less_equal(len(networks), max_networks_count,
                                   "Number of entries in the Networks attribute is less than or equal to 'MaxNetworksValue'")
+        networks_dict = await self.read_single_attribute_all_endpoints(
+            cluster=Clusters.NetworkCommissioning,
+            attribute=Clusters.NetworkCommissioning.Attributes.Networks)
+        logging.info(f"Networks by endpoint: {networks_dict}")
+        connected_network_count = {}
+        for ep in networks_dict:
+            connected_network_count[ep] = sum(map(lambda x: x.connected, networks_dict[ep]))
+        logging.info(f"Connected networks count by endpoint: {connected_network_count}")
+        asserts.assert_equal(sum(connected_network_count.values()), 1,
+                             "Verify that only one entry has connected status as TRUE across ALL endpoints")
 
         self.step(5)
         interface_enabled = await self.read_single_attribute_check_success(
