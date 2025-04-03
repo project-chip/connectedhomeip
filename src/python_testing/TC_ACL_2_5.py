@@ -156,7 +156,7 @@ class TC_ACL_2_5(MatterBaseTest):
 
         # Try multiple times with increasing timeouts
         max_attempts = 5
-        found_match = False 
+        found_match = False
 
         for attempt in range(1, max_attempts + 1):
             try:
@@ -169,7 +169,7 @@ class TC_ACL_2_5(MatterBaseTest):
                 self.print_step(f"Events response", str(events_response))
 
                 # Extract events from the response
-                events = events_response  
+                events = events_response
                 self.print_step(f"Found {len(events)} events", "")
 
                 # Check if we got any events
@@ -281,7 +281,7 @@ class TC_ACL_2_5(MatterBaseTest):
                 self.print_step(f"Events response", str(events_response))
 
                 # Extract events from the response
-                events = events_response  
+                events = events_response
                 self.print_step(f"Found {len(events)} events", "")
 
                 # We need to find a change event
@@ -295,7 +295,7 @@ class TC_ACL_2_5(MatterBaseTest):
                             isinstance(event_data.Data.adminPasscodeID, Nullable) and
                             event_data.Data.latestValue.data == D_OK_SINGLE and
                             event_data.Data.latestValue.fabricIndex == f1 and
-                            event_data.Data.fabricIndex == f1):
+                                event_data.Data.fabricIndex == f1):
                             found_change = True
                             self.print_step("Found Change event", "")
 
