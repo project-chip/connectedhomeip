@@ -257,12 +257,6 @@ void WebRTCTransportRequestorServer::HandleAnswer(HandlerContext & ctx, const Co
     uint16_t sessionId = req.webRTCSessionID;
     auto sdpSpan       = req.sdp;
 
-    // BUG: https://github.com/project-chip/connectedhomeip/issues/38212
-    // FIXME: This Bug has been raised to discuss with dev team about how to handle this issue.
-    // WebRTCRequestorServer shall provide an API to update mCurrentSessions, but whether delegate
-    // can have write access to WebRTCRequestorServer's mCurrentSessions is still under discussion.
-    // For now, we just validate the sdp as mentioned in the specification.
-
     // Check if the session, NodeID are valid
     if (!IsPeerNodeSessionValid(sessionId, ctx))
     {
