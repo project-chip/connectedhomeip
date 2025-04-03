@@ -148,14 +148,13 @@ appropriate
      * list, at initialization. Once loaded, the cluster server would be serving Reads on these attributes. The list is updatable
      * via the Add/Remove functions for the respective transport connections.
      */
-    virtual Protocols::InteractionModel::Status LoadCurrentConnections(std::vector<uint16_t> & currentConnections) = 0;
+    virtual CHIP_ERROR LoadCurrentConnections(std::vector<uint16_t> & currentConnections) = 0;
 
     /**
      *  @brief Callback into the delegate once persistent attributes managed by
      *  the Cluster have been loaded from Storage.
      */
-    virtual Protocols::InteractionModel::Status PersistentAttributesLoadedCallback() = 0;
-
+    virtual CHIP_ERROR PersistentAttributesLoadedCallback() = 0;
 };
 
 class PushAvStreamTransportServer : private AttributeAccessInterface, private CommandHandlerInterface
@@ -168,8 +167,7 @@ public:
      * @param aDelegate A reference to the delegate to be used by this server.
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
-    PushAvStreamTransportServer(EndpointId endpointId, PushAvStreamTransportDelegate & delegate, const BitFlags<Feature> aFeatures,
-                                PersistentStorageDelegate & aPersistentStorage);
+    PushAvStreamTransportServer(EndpointId endpointId, PushAvStreamTransportDelegate & delegate);
 
     ~PushAvStreamTransportServer() override;
 
@@ -196,7 +194,6 @@ public:
 
 private:
     PushAvStreamTransportDelegate & mDelegate;
-    const BitFlags<Feature> mFeature;
 
     // Attributes
     BitMask<SupportedContainerFormatsBitmap> mSupportedContainerFormats;
@@ -204,35 +201,11 @@ private:
     // lists
     std::vector<uint16_t> mCurrentConnections;
 
-    // Utility function to set and persist attributes
-    template <typename T>
-    CHIP_ERROR SetAttributeIfDifferent(T & currentValue, const T & newValue, AttributeId attributeId, bool shouldPersist = true)
-    {
-        if (currentValue != newValue)
-        {
-            currentValue = newValue;
-            auto path    = ConcreteAttributePath(mEndpointId, PushAvStreamTransport::Id, attributeId);
-            if (shouldPersist)
-            {
-                ReturnErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(path, currentValue));
-            }
-            mDelegate.OnAttributeChanged(attributeId);
-            MatterReportingAttributeChangeCallback(path);
-        }
-        return CHIP_NO_ERROR;
-    }
-
     /**
      * IM-level implementation of read
      * @return appropriately mapped CHIP_ERROR if applicable
      */
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-
-    /**
-     * IM-level implementation of write
-     * @return appropriately mapped CHIP_ERROR if applicable
-     */
-    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 
     /**
      * Helper function that loads all the persistent attributes from the KVS.

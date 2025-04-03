@@ -37,23 +37,21 @@ using namespace chip::app::Clusters::PushAvStreamTransport;
 using namespace chip::app::Clusters::PushAvStreamTransport::Structs;
 using namespace chip::app::Clusters::PushAvStreamTransport::Attributes;
 using namespace Protocols::InteractionModel;
+using chip::Protocols::InteractionModel::Status;
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace PushAvStreamTransport {
 
-PushAvStreamTransportServer::PushAvStreamTransportServer(EndpointId aEndpointId, PushAvStreamTransportDelegate & aDelegate,
-                                                         const BitFlags<Feature> aFeatures,
-                                                         PersistentStorageDelegate & aPersistentStorage) :
+PushAvStreamTransportServer::PushAvStreamTransportServer(EndpointId aEndpointId, PushAvStreamTransportDelegate & aDelegate) :
     CommandHandlerInterface(MakeOptional(aEndpointId), CameraAvStreamManagement::Id),
-    AttributeAccessInterface(MakeOptional(aEndpointId), CameraAvStreamManagement::Id), mDelegate(aDelegate), mFeature(aFeatures)
+    AttributeAccessInterface(MakeOptional(aEndpointId), CameraAvStreamManagement::Id), mDelegate(aDelegate)
 {}
 
 PushAvStreamTransportServer::~PushAvStreamTransportServer()
 {
     Shutdown();
-
 }
 
 CHIP_ERROR PushAvStreamTransportServer::Init()
@@ -71,11 +69,6 @@ void PushAvStreamTransportServer::Shutdown()
     AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 
-bool PushAvStreamTransportServer::HasFeature(Feature feature) const
-{
-    return mFeature.Has(feature);
-}
-
 CHIP_ERROR PushAvStreamTransportServer::ReadAndEncodeCurrentConnections(const AttributeValueEncoder::ListEncodeHelper & encoder)
 {
     for (const auto & currentConnections : mCurrentConnections)
@@ -89,7 +82,8 @@ CHIP_ERROR PushAvStreamTransportServer::ReadAndEncodeCurrentConnections(const At
 CHIP_ERROR PushAvStreamTransportServer::AddStreamTransportConnection(const uint16_t transportConnectionId)
 {
     mCurrentConnections.push_back(transportConnectionId);
-    auto path = ConcreteAttributePath(AttributeAccessInterface::GetEndpointId().Value(), PushAvStreamTransport::Id, Attributes::CurrentConnections::Id);
+    auto path = ConcreteAttributePath(AttributeAccessInterface::GetEndpointId().Value(), PushAvStreamTransport::Id,
+                                      Attributes::CurrentConnections::Id);
     mDelegate.OnAttributeChanged(Attributes::CurrentConnections::Id);
     MatterReportingAttributeChangeCallback(path);
 
@@ -101,7 +95,8 @@ CHIP_ERROR PushAvStreamTransportServer::RemoveStreamTransportConnection(const ui
     mCurrentConnections.erase(std::remove_if(mCurrentConnections.begin(), mCurrentConnections.end(),
                                              [&](const uint16_t connectionID) { return connectionID == transportConnectionId; }),
                               mCurrentConnections.end());
-    auto path = ConcreteAttributePath(AttributeAccessInterface::GetEndpointId().Value(), PushAvStreamTransport::Id, Attributes::CurrentConnections::Id);
+    auto path = ConcreteAttributePath(AttributeAccessInterface::GetEndpointId().Value(), PushAvStreamTransport::Id,
+                                      Attributes::CurrentConnections::Id);
     mDelegate.OnAttributeChanged(Attributes::CurrentConnections::Id);
     MatterReportingAttributeChangeCallback(path);
 
@@ -111,36 +106,16 @@ CHIP_ERROR PushAvStreamTransportServer::RemoveStreamTransportConnection(const ui
 CHIP_ERROR PushAvStreamTransportServer::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     VerifyOrDie(aPath.mClusterId == PushAvStreamTransport::Id);
-    ChipLogError(Zcl, "Push AV Stream Transport[ep=%d]: Reading",AttributeAccessInterface::GetEndpointId().Value());
+    ChipLogError(Zcl, "Push AV Stream Transport[ep=%d]: Reading", AttributeAccessInterface::GetEndpointId().Value());
 
-    switch (aPath.mAttributeId)
+    if (aPath.mClusterId == PushAvStreamTransport::Id && aPath.mAttributeId == Attributes::CurrentConnections::Id)
     {
-    case FeatureMap::Id:
-        ReturnErrorOnFailure(aEncoder.Encode(mFeature));
-        break;
 
-    case SupportedContainerFormats::Id:
-        ReturnErrorOnFailure(aEncoder.Encode(mSupportedContainerFormats));
-        break;
-
-    case SupportedIngestMethods::Id:
-        ReturnErrorOnFailure(aEncoder.Encode(mSupportedIngestMethods));
-        break;
-
-    case CurrentConnections::Id:
         ReturnErrorOnFailure(aEncoder.EncodeList(
             [this](const auto & encoder) -> CHIP_ERROR { return this->ReadAndEncodeCurrentConnections(encoder); }));
-        break;
     }
 
     return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR PushAvStreamTransportServer::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
-{
-    VerifyOrDie(aPath.mClusterId == PushAvStreamTransport::Id);
-
-    return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
 }
 
 void PushAvStreamTransportServer::LoadPersistentAttributes()
@@ -148,7 +123,11 @@ void PushAvStreamTransportServer::LoadPersistentAttributes()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Load currentConnections
-    mDelegate.LoadCurrentConnections(mCurrentConnections);
+    err = mDelegate.LoadCurrentConnections(mCurrentConnections);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogDetail(Zcl, "PushAVStreamTransport: Unable to load allocated connections from the KVS.");
+    }
 
     // Signal delegate that all persistent configuration attributes have been loaded.
     mDelegate.PersistentAttributesLoadedCallback();
@@ -211,6 +190,10 @@ void PushAvStreamTransportServer::InvokeCommand(HandlerContext & handlerContext)
             handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleFindTransport(ctx, commandData); });
 
         break;
+    default:
+        // Mark unrecognized command as UnsupportedCommand
+        handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::UnsupportedCommand);
+        break;
     }
 }
 
@@ -248,6 +231,13 @@ void PushAvStreamTransportServer::HandleAllocatePushTransport(HandlerContext & c
     Commands::AllocatePushTransportResponse::Type response;
     auto & transportOptions = commandData.transportOptions;
 
+    if (!transportOptions.videoStreamID.HasValue() || !transportOptions.audioStreamID.HasValue())
+    {
+        ChipLogError(Zcl, "HandleAllocatePushTransport: Audio or Video streams missing");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+        return;
+    }
+
     uint16_t connectionID                  = GenerateConnectionID();
     TransportStatusEnum outTransportStatus = TransportStatusEnum::kUnknownEnumValue;
 
@@ -277,6 +267,13 @@ void PushAvStreamTransportServer::HandleDeallocatePushTransport(
     Status status         = Status::Success;
     uint16_t connectionID = commandData.connectionID;
 
+    if (!FindStreamTransportConnection(connectionID))
+    {
+        ChipLogError(Zcl, "HandleDeallocatePushTransport: ConnectionID Not Found.");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
+        return;
+    }
+
     // Call the delegate
     status = mDelegate.DeallocatePushTransport(connectionID);
 
@@ -294,6 +291,13 @@ void PushAvStreamTransportServer::HandleModifyPushTransport(HandlerContext & ctx
     uint16_t connectionID      = commandData.connectionID;
     auto & outTransportOptions = commandData.transportOptions;
 
+    if (!FindStreamTransportConnection(connectionID))
+    {
+        ChipLogError(Zcl, "HandleModifyPushTransport: ConnectionID Not Found.");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
+        return;
+    }
+
     // Call the delegate
     status = mDelegate.ModifyPushTransport(connectionID, outTransportOptions);
 
@@ -306,6 +310,13 @@ void PushAvStreamTransportServer::HandleSetTransportStatus(HandlerContext & ctx,
     Status status          = Status::Success;
     uint16_t connectionID  = commandData.connectionID;
     auto & transportStatus = commandData.transportStatus;
+
+    if (!FindStreamTransportConnection(connectionID))
+    {
+        ChipLogError(Zcl, "HandleSetTransportStatus: ConnectionID Not Found.");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
+        return;
+    }
 
     // Call the delegate
     status = mDelegate.SetTransportStatus(connectionID, transportStatus);
@@ -320,6 +331,13 @@ void PushAvStreamTransportServer::HandleManuallyTriggerTransport(
     uint16_t connectionID   = commandData.connectionID;
     auto & activationReason = commandData.activationReason;
     auto & timeControl      = commandData.timeControl;
+
+    if (!FindStreamTransportConnection(connectionID))
+    {
+        ChipLogError(Zcl, "HandleManuallyTriggerTransport: ConnectionID Not Found.");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
+        return;
+    }
 
     // Call the delegate
     status = mDelegate.ManuallyTriggerTransport(connectionID, activationReason, timeControl);
@@ -339,6 +357,13 @@ void PushAvStreamTransportServer::HandleFindTransport(HandlerContext & ctx,
 
     // Call the delegate
     status = mDelegate.FindTransport(connectionID, outStreamConfigurations);
+
+    if (connectionID.HasValue() && outStreamConfigurations.size() == 0)
+    {
+        ChipLogError(Zcl, "HandleFindTransport: No allocated transport for connectionID.");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
+        return;
+    }
     if (status == Status::Success)
     {
         response.streamConfigurations = outStreamConfigurations;
