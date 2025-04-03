@@ -1035,7 +1035,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 // whether it might be.
 - (void)_triggerResubscribeWithReason:(NSString *)reason nodeLikelyReachable:(BOOL)nodeLikelyReachable
 {
-    MTR_LOG("%@ _triggerResubscribeWithReason called with reason %@", self, reason);
+    MTR_LOG("%@ _triggerResubscribeWithReason called with reason %@, nodeLikelyReachable: %@", self, reason, MTR_YES_NO(nodeLikelyReachable));
     assertChipStackLockedByCurrentThread();
 
     // We might want to trigger a resubscribe on our existing ReadClient.  Do
