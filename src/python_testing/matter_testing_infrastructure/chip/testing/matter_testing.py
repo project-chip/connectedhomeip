@@ -264,8 +264,7 @@ class AttributeChangeCallback:
             logging.info(
                 f"[AttributeChangeCallback] Got attribute subscription report. Attribute {path.AttributeType}. Updated value: {attribute_value}. SubscriptionId: {transaction.subscriptionId}")
         except KeyError:
-            asserts.fail(
-                f"[AttributeChangeCallback] Attribute {self._expected_attribute} not found in returned report")
+            asserts.fail(f"[AttributeChangeCallback] Attribute {self._expected_attribute} not found in returned report")
 
 
 def clear_queue(report_queue: queue.Queue):
@@ -1204,8 +1203,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                 test_duration = 0
             # TODO: I have no idea what logger, logs, request or received are. Hope None works because I have nothing to give
             self.runner_hook.step_failure(logger=None, logs=None, duration=step_duration, request=None, received=None)
-            self.runner_hook.test_stop(
-                exception=exception, duration=test_duration)
+            self.runner_hook.test_stop(exception=exception, duration=test_duration)
 
             def extract_error_text() -> tuple[str, str]:
                 no_stack_trace = ("Stack Trace Unavailable", "")
@@ -1429,10 +1427,8 @@ class MatterBaseTest(base_test.BaseTestClass):
             # If we've reached the next step with no assertion and the step wasn't skipped, it passed
             if not self.step_skipped and self.current_step_index != 0:
                 # TODO: As with failure, I have no idea what loger, logs or request are meant to be
-                step_duration = (datetime.now(timezone.utc) -
-                                 self.step_start_time) / timedelta(microseconds=1)
-                self.runner_hook.step_success(
-                    logger=None, logs=None, duration=step_duration, request=None)
+                step_duration = (datetime.now(timezone.utc) - self.step_start_time) / timedelta(microseconds=1)
+                self.runner_hook.step_success(logger=None, logs=None, duration=step_duration, request=None)
 
             # TODO: it seems like the step start should take a number and a name
             name = f'{step} : {current_step.description}'
@@ -1448,13 +1444,11 @@ class MatterBaseTest(base_test.BaseTestClass):
             try:
                 setup_payloads.append(SetupPayload().ParseQrCode(qr_code))
             except ChipStackError:
-                asserts.fail(
-                    f"QR code '{qr_code} failed to parse properly as a Matter setup code.")
+                asserts.fail(f"QR code '{qr_code} failed to parse properly as a Matter setup code.")
 
         for manual_code in self.matter_test_config.manual_code:
             try:
-                setup_payloads.append(
-                    SetupPayload().ParseManualPairingCode(manual_code))
+                setup_payloads.append(SetupPayload().ParseManualPairingCode(manual_code))
             except ChipStackError:
                 asserts.fail(
                     f"Manual code code '{manual_code}' failed to parse properly as a Matter setup code. Check that all digits are correct and length is 11 or 21 characters.")
@@ -1471,12 +1465,9 @@ class MatterBaseTest(base_test.BaseTestClass):
                 info.filter_value = setup_payload.long_discriminator
             infos.append(info)
 
-        num_passcodes = 0 if self.matter_test_config.setup_passcodes is None else len(
-            self.matter_test_config.setup_passcodes)
-        num_discriminators = 0 if self.matter_test_config.discriminators is None else len(
-            self.matter_test_config.discriminators)
-        asserts.assert_equal(num_passcodes, num_discriminators,
-                             "Must have same number of discriminators as passcodes")
+        num_passcodes = 0 if self.matter_test_config.setup_passcodes is None else len(self.matter_test_config.setup_passcodes)
+        num_discriminators = 0 if self.matter_test_config.discriminators is None else len(self.matter_test_config.discriminators)
+        asserts.assert_equal(num_passcodes, num_discriminators, "Must have same number of discriminators as passcodes")
         if self.matter_test_config.discriminators:
             for idx, discriminator in enumerate(self.matter_test_config.discriminators):
                 info = SetupPayloadInfo()
@@ -1515,8 +1506,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                                          placeholder=prompt_msg_placeholder,
                                          default_value=default_value)
 
-        logging.info(
-            f"========= USER PROMPT for Endpoint {endpoint_id} =========")
+        logging.info(f"========= USER PROMPT for Endpoint {endpoint_id} =========")
         logging.info(f">>> {prompt_msg.rstrip()} (press enter to confirm)")
         try:
             return input()
@@ -1534,8 +1524,7 @@ def _find_test_class():
     Raises:
       SystemExit: Raised if the number of test classes is not exactly one.
     """
-    subclasses = utils.find_subclasses_in_module(
-        [MatterBaseTest], sys.modules['__main__'])
+    subclasses = utils.find_subclasses_in_module([MatterBaseTest], sys.modules['__main__'])
     subclasses = [c for c in subclasses if c.__name__ != "MatterBaseTest"]
     if len(subclasses) != 1:
         print(
@@ -1563,8 +1552,7 @@ def str_from_manual_code(s: str) -> str:
     regex = r"^([0-9]{11}|[0-9]{21})$"
     match = re.match(regex, s)
     if not match:
-        raise ValueError(
-            "Invalid manual code format, does not match %s" % regex)
+        raise ValueError("Invalid manual code format, does not match %s" % regex)
 
     return s
 
@@ -1573,8 +1561,7 @@ def int_named_arg(s: str) -> Tuple[str, int]:
     regex = r"^(?P<name>[a-zA-Z_0-9.]+):((?P<hex_value>0x[0-9a-fA-F_]+)|(?P<decimal_value>-?\d+))$"
     match = re.match(regex, s)
     if not match:
-        raise ValueError(
-            "Invalid int argument format, does not match %s" % regex)
+        raise ValueError("Invalid int argument format, does not match %s" % regex)
 
     name = match.group("name")
     if match.group("hex_value"):
@@ -1588,8 +1575,7 @@ def str_named_arg(s: str) -> Tuple[str, str]:
     regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>.*)$"
     match = re.match(regex, s)
     if not match:
-        raise ValueError(
-            "Invalid string argument format, does not match %s" % regex)
+        raise ValueError("Invalid string argument format, does not match %s" % regex)
 
     return (match.group("name"), match.group("value"))
 
@@ -1673,8 +1659,7 @@ def populate_commissioning_args(args: argparse.Namespace, config: MatterTestConf
     config.fabric_id = args.fabric_id if args.fabric_id is not None else config.root_of_trust_index
 
     if args.chip_tool_credentials_path is not None and not args.chip_tool_credentials_path.exists():
-        print("error: chip-tool credentials path %s doesn't exist!" %
-              args.chip_tool_credentials_path)
+        print("error: chip-tool credentials path %s doesn't exist!" % args.chip_tool_credentials_path)
         return False
     config.chip_tool_credentials_path = args.chip_tool_credentials_path
 
@@ -1700,8 +1685,7 @@ def populate_commissioning_args(args: argparse.Namespace, config: MatterTestConf
         print("error: supplied number of discriminators does not match number of passcodes")
         return False
 
-    device_descriptors = config.qr_code_content + \
-        config.manual_code + config.discriminators
+    device_descriptors = config.qr_code_content + config.manual_code + config.discriminators
 
     if not config.dut_node_ids:
         config.dut_node_ids = [_DEFAULT_DUT_NODE_ID]
@@ -1738,27 +1722,23 @@ def populate_commissioning_args(args: argparse.Namespace, config: MatterTestConf
 
     if config.commissioning_method == "ble-wifi":
         if args.wifi_ssid is None:
-            print(
-                "error: missing --wifi-ssid <SSID> for --commissioning-method ble-wifi!")
+            print("error: missing --wifi-ssid <SSID> for --commissioning-method ble-wifi!")
             return False
 
         if args.wifi_passphrase is None:
-            print(
-                "error: missing --wifi-passphrase <passphrasse> for --commissioning-method ble-wifi!")
+            print("error: missing --wifi-passphrase <passphrasse> for --commissioning-method ble-wifi!")
             return False
 
         config.wifi_ssid = args.wifi_ssid
         config.wifi_passphrase = args.wifi_passphrase
     elif config.commissioning_method == "ble-thread":
         if args.thread_dataset_hex is None:
-            print(
-                "error: missing --thread-dataset-hex <DATASET_HEX> for --commissioning-method ble-thread!")
+            print("error: missing --thread-dataset-hex <DATASET_HEX> for --commissioning-method ble-thread!")
             return False
         config.thread_operational_dataset = args.thread_dataset_hex
     elif config.commissioning_method == "on-network-ip":
         if args.ip_addr is None:
-            print(
-                "error: missing --ip-addr <IP_ADDRESS> for --commissioning-method on-network-ip")
+            print("error: missing --ip-addr <IP_ADDRESS> for --commissioning-method on-network-ip")
             return False
         config.commissionee_ip_address_just_for_testing = args.ip_addr
 
@@ -1779,18 +1759,14 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
     if not populate_commissioning_args(args, config):
         sys.exit(1)
 
-    config.storage_path = pathlib.Path(
-        _DEFAULT_STORAGE_PATH) if args.storage_path is None else args.storage_path
-    config.logs_path = pathlib.Path(
-        _DEFAULT_LOG_PATH) if args.logs_path is None else args.logs_path
+    config.storage_path = pathlib.Path(_DEFAULT_STORAGE_PATH) if args.storage_path is None else args.storage_path
+    config.logs_path = pathlib.Path(_DEFAULT_LOG_PATH) if args.logs_path is None else args.logs_path
     config.paa_trust_store_path = args.paa_trust_store_path
     config.ble_interface_id = args.ble_interface_id
     config.pics = {} if args.PICS is None else read_pics_from_file(args.PICS)
     config.tests = list(chain.from_iterable(args.tests or []))
-    # This can be none, we pull the default from the test if it's unspecified
-    config.timeout = args.timeout
-    # This can be None, the get_endpoint function allows the tests to supply a default
-    config.endpoint = args.endpoint
+    config.timeout = args.timeout  # This can be none, we pull the default from the test if it's unspecified
+    config.endpoint = args.endpoint  # This can be None, the get_endpoint function allows the tests to supply a default
     config.app_pid = 0 if args.app_pid is None else args.app_pid
     config.fail_on_skipped_tests = args.fail_on_skipped
 
@@ -1813,18 +1789,15 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
         config.global_test_params[name] = value
 
     # Embed the rest of the config in the global test params dict which will be passed to Mobly tests
-    config.global_test_params["meta_config"] = {
-        k: v for k, v in dataclass_asdict(config).items() if k != "global_test_params"}
+    config.global_test_params["meta_config"] = {k: v for k, v in dataclass_asdict(config).items() if k != "global_test_params"}
 
     return config
 
 
 def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig:
-    parser = argparse.ArgumentParser(
-        description='Matter standalone Python test')
+    parser = argparse.ArgumentParser(description='Matter standalone Python test')
 
-    basic_group = parser.add_argument_group(
-        title="Basic arguments", description="Overall test execution arguments")
+    basic_group = parser.add_argument_group(title="Basic arguments", description="Overall test execution arguments")
 
     basic_group.add_argument('--tests', '--test-case', action='append', nargs='+', type=str, metavar='test_NAME',
                              help='A list of tests in the test class to execute.')
@@ -1834,8 +1807,7 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
                              help="Where to trace (e.g perfetto, perfetto:path, json:log, json:path)")
     basic_group.add_argument('--storage-path', action="store", type=pathlib.Path,
                              metavar="PATH", help="Location for persisted storage of instance")
-    basic_group.add_argument('--logs-path', action="store",
-                             type=pathlib.Path, metavar="PATH", help="Location for test logs")
+    basic_group.add_argument('--logs-path', action="store", type=pathlib.Path, metavar="PATH", help="Location for test logs")
     paa_path_default = get_default_paa_trust_store(pathlib.Path.cwd())
     basic_group.add_argument('--paa-trust-store-path', action="store", type=pathlib.Path, metavar="PATH", default=paa_path_default,
                              help="PAA trust store path (default: %s)" % str(paa_path_default))
@@ -1851,26 +1823,20 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
                              metavar='NODE_ID', dest='dut_node_ids', default=[],
                              help='Node ID for primary DUT communication, '
                              'and NodeID to assign if commissioning (default: %d)' % _DEFAULT_DUT_NODE_ID, nargs="+")
-    basic_group.add_argument('--endpoint', type=int,
-                             default=None, help="Endpoint under test")
-    basic_group.add_argument('--app-pid', type=int, default=0,
-                             help="The PID of the app against which the test is going to run")
-    basic_group.add_argument('--timeout', type=int,
-                             help="Test timeout in seconds")
+    basic_group.add_argument('--endpoint', type=int, default=None, help="Endpoint under test")
+    basic_group.add_argument('--app-pid', type=int, default=0, help="The PID of the app against which the test is going to run")
+    basic_group.add_argument('--timeout', type=int, help="Test timeout in seconds")
     basic_group.add_argument("--PICS", help="PICS file path", type=str)
 
-    commission_group = parser.add_argument_group(
-        title="Commissioning", description="Arguments to commission a node")
+    commission_group = parser.add_argument_group(title="Commissioning", description="Arguments to commission a node")
 
     commission_group.add_argument('-m', '--commissioning-method', type=str,
                                   metavar='METHOD_NAME',
-                                  choices=["on-network", "ble-wifi",
-                                           "ble-thread", "on-network-ip"],
+                                  choices=["on-network", "ble-wifi", "ble-thread", "on-network-ip"],
                                   help='Name of commissioning method to use')
     commission_group.add_argument('--in-test-commissioning-method', type=str,
                                   metavar='METHOD_NAME',
-                                  choices=["on-network", "ble-wifi",
-                                           "ble-thread", "on-network-ip"],
+                                  choices=["on-network", "ble-wifi", "ble-thread", "on-network-ip"],
                                   help='Name of commissioning method to use, for commissioning tests')
     commission_group.add_argument('-d', '--discriminator', type=int_decimal_or_hex,
                                   metavar='LONG_DISCRIMINATOR',
@@ -1907,11 +1873,9 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
     commission_group.add_argument('--commission-only', action="store_true", default=False,
                                   help="If true, test exits after commissioning without running subsequent tests")
 
-    commission_group.add_argument(
-        '--tc-version-to-simulate', type=int, help="Terms and conditions version")
+    commission_group.add_argument('--tc-version-to-simulate', type=int, help="Terms and conditions version")
 
-    commission_group.add_argument(
-        '--tc-user-response-to-simulate', type=int, help="Terms and conditions acknowledgements")
+    commission_group.add_argument('--tc-user-response-to-simulate', type=int, help="Terms and conditions acknowledgements")
 
     code_group = parser.add_mutually_exclusive_group(required=False)
 
@@ -1935,8 +1899,7 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
                               metavar='PATH',
                               help='Path to chip-tool credentials file root')
 
-    args_group = parser.add_argument_group(
-        title="Config arguments", description="Test configuration global arguments set")
+    args_group = parser.add_argument_group(title="Config arguments", description="Test configuration global arguments set")
     args_group.add_argument('--int-arg', nargs='+', action='append', type=int_named_arg, metavar="NAME:VALUE",
                             help="Add a named test argument for an integer as hex or decimal (e.g. -2 or 0xFFFF_1234)")
     args_group.add_argument('--bool-arg', nargs='+', action='append', type=bool_named_arg, metavar="NAME:VALUE",
@@ -1961,8 +1924,7 @@ def _async_runner(body, self: MatterBaseTest, *args, **kwargs):
     return self.event_loop.run_until_complete(asyncio.wait_for(body(self, *args, **kwargs), timeout=timeout))
 
 
-EndpointCheckFunction = typing.Callable[[
-    Clusters.Attribute.AsyncReadTransaction.ReadResponse, int], bool]
+EndpointCheckFunction = typing.Callable[[Clusters.Attribute.AsyncReadTransaction.ReadResponse, int], bool]
 
 
 def get_cluster_from_attribute(attribute: ClusterObjects.ClusterAttributeDescriptor) -> ClusterObjects.Cluster:
