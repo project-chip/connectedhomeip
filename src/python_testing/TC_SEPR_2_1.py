@@ -41,22 +41,19 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import copy
 import logging
-import random
 
 import chip.clusters as Clusters
-from chip import ChipDeviceCtrl  # Needed before chip.FabricAdmin
 from chip.clusters import Globals
 from chip.clusters.Types import NullValue
-from chip.interaction_model import InteractionModelError, Status
 from chip.testing import matter_asserts
-from chip.testing.matter_testing import MatterBaseTest, TestStep, run_if_endpoint_matches, has_cluster, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
 
 cluster = Clusters.CommodityPrice
+
 
 class SEPR_2_1(MatterBaseTest):
 
@@ -84,74 +81,83 @@ class SEPR_2_1(MatterBaseTest):
 
         self.step("1")
         val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.TariffUnit)
-        matter_asserts.assert_valid_enum(val, "TariffUnit attribute must return a TariffUnitEnum", Globals.Enums.TariffUnitEnum)
+        matter_asserts.assert_valid_enum(
+            val, "TariffUnit attribute must return a TariffUnitEnum", Globals.Enums.TariffUnitEnum)
 
         self.step("2")
         val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.Currency)
         if val is not NullValue:
-            asserts.assert_true(isinstance(val, Globals.Structs.CurrencyStruct), f"val must be of type CurrencyStruct")
+            asserts.assert_true(isinstance(
+                val, Globals.Structs.CurrencyStruct), "val must be of type CurrencyStruct")
             await self.test_checkCurrencyStruct(endpoint=endpoint, cluster=cluster, struct=val)
 
         self.step("3")
         val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentPrice)
         if val is not NullValue:
-            asserts.assert_true(isinstance(val, cluster.Structs.CommodityPriceStruct), f"val must be of type CommodityPriceStruct")
+            asserts.assert_true(isinstance(
+                val, cluster.Structs.CommodityPriceStruct), "val must be of type CommodityPriceStruct")
             await self.test_checkCommodityPriceStruct(endpoint=endpoint, cluster=cluster, struct=val)
 
         self.step("4")
         if await self.attribute_guard(endpoint=endpoint, attribute=attributes.PriceForecast):
             val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.PriceForecast)
             matter_asserts.assert_list(val, "PriceForecast attribute must return a list")
-            matter_asserts.assert_list_element_type(val,  "PriceForecast attribute must contain CommodityPriceStruct elements", cluster.Structs.CommodityPriceStruct)
+            matter_asserts.assert_list_element_type(
+                val, "PriceForecast attribute must contain CommodityPriceStruct elements", cluster.Structs.CommodityPriceStruct)
             for item in val:
                 await self.test_checkCommodityPriceStruct(endpoint=endpoint, cluster=cluster, struct=item)
 
-    async def test_checkCommodityPriceComponentStruct(self, 
-                                 endpoint: int = None, 
-                                 cluster: Clusters.CommodityPrice = None, 
-                                 struct: Clusters.CommodityPrice.Structs.CommodityPriceComponentStruct = None):
+    async def test_checkCommodityPriceComponentStruct(self,
+                                                      endpoint: int = None,
+                                                      cluster: Clusters.CommodityPrice = None,
+                                                      struct: Clusters.CommodityPrice.Structs.CommodityPriceComponentStruct = None):
         matter_asserts.assert_valid_int64(struct.price, 'Price')
-        matter_asserts.assert_valid_enum(struct.source, "Source attribute must return a TariffPriceTypeEnum", Globals.Enums.TariffPriceTypeEnum)
+        matter_asserts.assert_valid_enum(
+            struct.source, "Source attribute must return a TariffPriceTypeEnum", Globals.Enums.TariffPriceTypeEnum)
         if struct.description is not None:
             matter_asserts.assert_is_string(struct.description, "Description must be a string")
             asserts.assert_less_equal(len(struct.description), 32, "Description must have length at most 32!")
         if struct.tariffComponentId is not None:
             matter_asserts.assert_valid_uint32(struct.tariffComponentID, 'TariffComponentID')
 
-    async def test_checkCommodityPriceStruct(self, 
-                                 endpoint: int = None, 
-                                 cluster: Clusters.CommodityPrice = None, 
-                                 struct: Clusters.CommodityPrice.Structs.CommodityPriceStruct = None):
+    async def test_checkCommodityPriceStruct(self,
+                                             endpoint: int = None,
+                                             cluster: Clusters.CommodityPrice = None,
+                                             struct: Clusters.CommodityPrice.Structs.CommodityPriceStruct = None):
         matter_asserts.assert_valid_uint32(struct.periodStart, 'PeriodStart')
         if struct.periodEnd is not NullValue:
             matter_asserts.assert_valid_uint32(struct.periodEnd, 'PeriodEnd')
-        asserts.assert_true(isinstance(struct.price, Globals.Structs.PriceStruct), f"struct.price must be of type PriceStruct")
+        asserts.assert_true(isinstance(
+            struct.price, Globals.Structs.PriceStruct), "struct.price must be of type PriceStruct")
         await self.test_checkPriceStruct(endpoint=endpoint, cluster=cluster, struct=struct.price)
         if struct.description is not None:
             matter_asserts.assert_is_string(struct.description, "Description must be a string")
             asserts.assert_less_equal(len(struct.description), 32, "Description must have length at most 32!")
         if struct.components is not None:
             matter_asserts.assert_list(struct.components, "Components attribute must return a list")
-            matter_asserts.assert_list_element_type(struct.components,  "Components attribute must contain CommodityPriceComponentStruct elements", cluster.Structs.CommodityPriceComponentStruct)
+            matter_asserts.assert_list_element_type(
+                struct.components, "Components attribute must contain CommodityPriceComponentStruct elements", cluster.Structs.CommodityPriceComponentStruct)
             for item in struct.components:
                 await self.test_checkCommodityPriceComponentStruct(endpoint=endpoint, cluster=cluster, struct=item)
             asserts.assert_less_equal(len(struct.components), 10, "Components must have at most 10 entries!")
 
-    async def test_checkCurrencyStruct(self, 
-                                 endpoint: int = None, 
-                                 cluster: Clusters.CommodityPrice = None, 
-                                 struct: Globals.Structs.CurrencyStruct = None):
+    async def test_checkCurrencyStruct(self,
+                                       endpoint: int = None,
+                                       cluster: Clusters.CommodityPrice = None,
+                                       struct: Globals.Structs.CurrencyStruct = None):
         matter_asserts.assert_valid_uint16(struct.currency, 'Currency')
         asserts.assert_less_equal(struct.currency, 999)
         matter_asserts.assert_valid_uint8(struct.decimalPoints, 'DecimalPoints')
 
-    async def test_checkPriceStruct(self, 
-                                 endpoint: int = None, 
-                                 cluster: Clusters.CommodityPrice = None, 
-                                 struct: Globals.Structs.PriceStruct = None):
+    async def test_checkPriceStruct(self,
+                                    endpoint: int = None,
+                                    cluster: Clusters.CommodityPrice = None,
+                                    struct: Globals.Structs.PriceStruct = None):
         matter_asserts.assert_valid_int64(struct.amount, 'Amount')
-        asserts.assert_true(isinstance(struct.currency, Globals.Structs.CurrencyStruct), f"struct.currency must be of type CurrencyStruct")
+        asserts.assert_true(isinstance(
+            struct.currency, Globals.Structs.CurrencyStruct), "struct.currency must be of type CurrencyStruct")
         await self.test_checkCurrencyStruct(endpoint=endpoint, cluster=cluster, struct=struct.currency)
+
 
 if __name__ == "__main__":
     default_matter_test_main()
