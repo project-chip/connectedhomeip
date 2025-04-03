@@ -28,7 +28,7 @@ except ImportError:
     import idl
 
 
-class InMemoryStorage(idl.GeneratorStorage):
+class InMemoryStorage(idl.generators.storage.GeneratorStorage):
     def __init__(self):
         super().__init__()
         self.content: Optional[str] = None

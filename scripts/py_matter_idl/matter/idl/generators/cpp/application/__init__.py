@@ -16,7 +16,8 @@ import os
 
 from ....matter_idl_types import Idl
 from ...cluster_selection import server_side_clusters
-from ...generator import CodeGenerator, GeneratorStorage
+from ...generator import CodeGenerator
+from ...storage import GeneratorStorage
 
 
 class CppApplicationGenerator(CodeGenerator):
@@ -26,7 +27,7 @@ class CppApplicationGenerator(CodeGenerator):
 
     def __init__(self, storage: GeneratorStorage, idl: Idl, **kargs):
         """
-        Inintialization is specific for java generation and will add
+        Initialization is specific for java generation and will add
         filters as required by the java .jinja templates to function.
         """
         super().__init__(storage, idl, fs_loader_searchpath=os.path.dirname(__file__))

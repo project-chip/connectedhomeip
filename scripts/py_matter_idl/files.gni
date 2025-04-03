@@ -40,6 +40,7 @@ matter_idl_generator_sources = [
   "${chip_root}/scripts/py_matter_idl/matter/idl/generators/generator.py",
   "${chip_root}/scripts/py_matter_idl/matter/idl/generators/idl/__init__.py",
   "${chip_root}/scripts/py_matter_idl/matter/idl/generators/java/__init__.py",
+  "${chip_root}/scripts/py_matter_idl/matter/idl/generators/storage.py",
   "${chip_root}/scripts/py_matter_idl/matter/idl/generators/type_definitions.py",
   "${chip_root}/scripts/py_matter_idl/matter/idl/lint/__init__.py",
   "${chip_root}/scripts/py_matter_idl/matter/idl/lint/lint_rules_parser.py",

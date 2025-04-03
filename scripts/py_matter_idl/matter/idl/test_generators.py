@@ -31,8 +31,8 @@ except ImportError:
 
 from matter.idl.generators.cpp.application import CppApplicationGenerator
 from matter.idl.generators.cpp.tlvmeta import TLVMetaDataGenerator
-from matter.idl.generators.generator import GeneratorStorage
 from matter.idl.generators.java import JavaClassGenerator, JavaJNIGenerator
+from matter.idl.generators.storage import GeneratorStorage
 from matter.idl.matter_idl_types import Idl
 
 TESTS_DIR = os.path.join(os.path.dirname(__file__), "tests")
