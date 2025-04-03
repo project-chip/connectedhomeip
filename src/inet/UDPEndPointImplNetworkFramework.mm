@@ -35,6 +35,10 @@
 #define NETWORK_FRAMEWORK_DEBUG 0
 
 namespace {
+constexpr uint64_t kSendTimeoutInSeconds = 10 * NSEC_PER_SEC;
+constexpr uint64_t kConnectTimeoutInSeconds = 10 * NSEC_PER_SEC;
+constexpr uint64_t kListenerTimeoutInSeconds = 10 * NSEC_PER_SEC;
+
 #if !NETWORK_FRAMEWORK_DEBUG
 void DebugPrintListenerState(nw_listener_state_t state) {};
 void DebugPrintConnectionState(nw_connection_state_t state) {};
@@ -218,9 +222,6 @@ namespace Inet {
         mConnectionSemaphore = dispatch_semaphore_create(0);
         VerifyOrReturnError(nullptr != mConnectionSemaphore, CHIP_ERROR_NO_MEMORY, ReleaseAll());
 
-        mSendSemaphore = dispatch_semaphore_create(0);
-        VerifyOrReturnError(nullptr != mSendSemaphore, CHIP_ERROR_NO_MEMORY, ReleaseAll());
-
         mSystemQueue = static_cast<System::LayerSocketsLoop &>(GetSystemLayer()).GetDispatchQueue();
         mAddrType = addressType;
         mConnection = nullptr;
@@ -268,6 +269,8 @@ namespace Inet {
 
         // Send a message, and wait for it to be dispatched.
         __auto_type content = dispatch_data_create(msg->Start(), msg->DataLength(), mSystemQueue, DISPATCH_DATA_DESTRUCTOR_DEFAULT);
+        __auto_type group = dispatch_group_create();
+        dispatch_group_enter(group);
 
         // If there is a current message pending and the state of the network connection changes (e.g switch to a
         // different network) the connection will enter a nw_connection_state_failed state and the completion handler
@@ -282,11 +285,11 @@ namespace Inet {
             } else {
                 err = CHIP_NO_ERROR;
             }
-            dispatch_semaphore_signal(mSendSemaphore);
+            dispatch_group_leave(group);
         });
 
-        dispatch_semaphore_wait(mSendSemaphore, DISPATCH_TIME_FOREVER);
-
+        __auto_type timeout = dispatch_time(DISPATCH_TIME_NOW, kSendTimeoutInSeconds);
+        dispatch_group_wait(group, timeout);
         return err;
     }
 
@@ -312,7 +315,6 @@ namespace Inet {
         mListenerQueue = nullptr;
         mListenerSemaphore = nullptr;
 
-        mSendSemaphore = nullptr;
         mSystemQueue = nullptr;
     }
 
@@ -491,7 +493,7 @@ namespace Inet {
             StartConnection(connection);
         });
 
-        __block CHIP_ERROR err = CHIP_NO_ERROR;
+        __block CHIP_ERROR err = CHIP_ERROR_INTERNAL;
         nw_listener_set_state_changed_handler(mListener, ^(nw_listener_state_t state, nw_error_t error) {
             DebugPrintListenerState(state);
 
@@ -526,7 +528,8 @@ namespace Inet {
         });
 
         nw_listener_start(mListener);
-        dispatch_semaphore_wait(mListenerSemaphore, DISPATCH_TIME_FOREVER);
+        __auto_type timeout = dispatch_time(DISPATCH_TIME_NOW, kListenerTimeoutInSeconds);
+        dispatch_semaphore_wait(mListenerSemaphore, timeout);
 
         if (CHIP_NO_ERROR != err) {
             mListener = nullptr;
@@ -578,7 +581,8 @@ namespace Inet {
         });
 
         nw_connection_start(aConnection);
-        dispatch_semaphore_wait(mConnectionSemaphore, DISPATCH_TIME_FOREVER);
+        __auto_type timeout = dispatch_time(DISPATCH_TIME_NOW, kConnectTimeoutInSeconds);
+        dispatch_semaphore_wait(mConnectionSemaphore, timeout);
 
         if (CHIP_NO_ERROR == err) {
             DebugPrintConnection(aConnection);

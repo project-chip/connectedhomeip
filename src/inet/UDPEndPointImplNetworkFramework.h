@@ -57,7 +57,6 @@ private:
     nw_connection_t mConnection               = nullptr;
     dispatch_semaphore_t mConnectionSemaphore = nullptr;
     dispatch_queue_t mConnectionQueue         = nullptr;
-    dispatch_semaphore_t mSendSemaphore       = nullptr;
     dispatch_queue_t mSystemQueue             = nullptr;
 
     CHIP_ERROR ConfigureProtocol(IPAddressType aAddressType, const nw_parameters_t & aParameters);
