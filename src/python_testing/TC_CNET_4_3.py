@@ -36,6 +36,7 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
+
 import chip.clusters as Clusters
 import test_plan_support
 from chip.clusters.Types import NullValue
