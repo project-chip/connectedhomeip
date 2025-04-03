@@ -340,7 +340,7 @@ cluster Descriptor = 29 {
     kTagList = 0x1;
   }
 
-  struct DeviceTypeStruct {
+  shared struct DeviceTypeStruct {
     devtype_id deviceType = 0;
     int16u revision = 1;
   }
@@ -1809,7 +1809,7 @@ cluster RelativeHumidityMeasurement = 1029 {
 cluster CarbonMonoxideConcentrationMeasurement = 1036 {
   revision 3;
 
-  enum LevelValueEnum : enum8 {
+  shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
     kMedium = 2;
@@ -1817,13 +1817,13 @@ cluster CarbonMonoxideConcentrationMeasurement = 1036 {
     kCritical = 4;
   }
 
-  enum MeasurementMediumEnum : enum8 {
+  shared enum MeasurementMediumEnum : enum8 {
     kAir = 0;
     kWater = 1;
     kSoil = 2;
   }
 
-  enum MeasurementUnitEnum : enum8 {
+  shared enum MeasurementUnitEnum : enum8 {
     kPPM = 0;
     kPPB = 1;
     kPPT = 2;
@@ -1866,7 +1866,7 @@ cluster CarbonMonoxideConcentrationMeasurement = 1036 {
 cluster CarbonDioxideConcentrationMeasurement = 1037 {
   revision 3;
 
-  enum LevelValueEnum : enum8 {
+  shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
     kMedium = 2;
@@ -1874,13 +1874,13 @@ cluster CarbonDioxideConcentrationMeasurement = 1037 {
     kCritical = 4;
   }
 
-  enum MeasurementMediumEnum : enum8 {
+  shared enum MeasurementMediumEnum : enum8 {
     kAir = 0;
     kWater = 1;
     kSoil = 2;
   }
 
-  enum MeasurementUnitEnum : enum8 {
+  shared enum MeasurementUnitEnum : enum8 {
     kPPM = 0;
     kPPB = 1;
     kPPT = 2;
@@ -1923,7 +1923,7 @@ cluster CarbonDioxideConcentrationMeasurement = 1037 {
 cluster NitrogenDioxideConcentrationMeasurement = 1043 {
   revision 3;
 
-  enum LevelValueEnum : enum8 {
+  shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
     kMedium = 2;
@@ -1931,13 +1931,13 @@ cluster NitrogenDioxideConcentrationMeasurement = 1043 {
     kCritical = 4;
   }
 
-  enum MeasurementMediumEnum : enum8 {
+  shared enum MeasurementMediumEnum : enum8 {
     kAir = 0;
     kWater = 1;
     kSoil = 2;
   }
 
-  enum MeasurementUnitEnum : enum8 {
+  shared enum MeasurementUnitEnum : enum8 {
     kPPM = 0;
     kPPB = 1;
     kPPT = 2;
@@ -1980,7 +1980,7 @@ cluster NitrogenDioxideConcentrationMeasurement = 1043 {
 cluster OzoneConcentrationMeasurement = 1045 {
   revision 3;
 
-  enum LevelValueEnum : enum8 {
+  shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
     kMedium = 2;
@@ -1988,13 +1988,13 @@ cluster OzoneConcentrationMeasurement = 1045 {
     kCritical = 4;
   }
 
-  enum MeasurementMediumEnum : enum8 {
+  shared enum MeasurementMediumEnum : enum8 {
     kAir = 0;
     kWater = 1;
     kSoil = 2;
   }
 
-  enum MeasurementUnitEnum : enum8 {
+  shared enum MeasurementUnitEnum : enum8 {
     kPPM = 0;
     kPPB = 1;
     kPPT = 2;
@@ -2037,7 +2037,7 @@ cluster OzoneConcentrationMeasurement = 1045 {
 cluster Pm25ConcentrationMeasurement = 1066 {
   revision 3;
 
-  enum LevelValueEnum : enum8 {
+  shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
     kMedium = 2;
@@ -2045,13 +2045,13 @@ cluster Pm25ConcentrationMeasurement = 1066 {
     kCritical = 4;
   }
 
-  enum MeasurementMediumEnum : enum8 {
+  shared enum MeasurementMediumEnum : enum8 {
     kAir = 0;
     kWater = 1;
     kSoil = 2;
   }
 
-  enum MeasurementUnitEnum : enum8 {
+  shared enum MeasurementUnitEnum : enum8 {
     kPPM = 0;
     kPPB = 1;
     kPPT = 2;
@@ -2094,7 +2094,7 @@ cluster Pm25ConcentrationMeasurement = 1066 {
 cluster FormaldehydeConcentrationMeasurement = 1067 {
   revision 3;
 
-  enum LevelValueEnum : enum8 {
+  shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
     kMedium = 2;
@@ -2102,13 +2102,13 @@ cluster FormaldehydeConcentrationMeasurement = 1067 {
     kCritical = 4;
   }
 
-  enum MeasurementMediumEnum : enum8 {
+  shared enum MeasurementMediumEnum : enum8 {
     kAir = 0;
     kWater = 1;
     kSoil = 2;
   }
 
-  enum MeasurementUnitEnum : enum8 {
+  shared enum MeasurementUnitEnum : enum8 {
     kPPM = 0;
     kPPB = 1;
     kPPT = 2;
@@ -2151,7 +2151,7 @@ cluster FormaldehydeConcentrationMeasurement = 1067 {
 cluster Pm1ConcentrationMeasurement = 1068 {
   revision 3;
 
-  enum LevelValueEnum : enum8 {
+  shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
     kMedium = 2;
@@ -2159,13 +2159,13 @@ cluster Pm1ConcentrationMeasurement = 1068 {
     kCritical = 4;
   }
 
-  enum MeasurementMediumEnum : enum8 {
+  shared enum MeasurementMediumEnum : enum8 {
     kAir = 0;
     kWater = 1;
     kSoil = 2;
   }
 
-  enum MeasurementUnitEnum : enum8 {
+  shared enum MeasurementUnitEnum : enum8 {
     kPPM = 0;
     kPPB = 1;
     kPPT = 2;
@@ -2208,7 +2208,7 @@ cluster Pm1ConcentrationMeasurement = 1068 {
 cluster Pm10ConcentrationMeasurement = 1069 {
   revision 3;
 
-  enum LevelValueEnum : enum8 {
+  shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
     kMedium = 2;
@@ -2216,13 +2216,13 @@ cluster Pm10ConcentrationMeasurement = 1069 {
     kCritical = 4;
   }
 
-  enum MeasurementMediumEnum : enum8 {
+  shared enum MeasurementMediumEnum : enum8 {
     kAir = 0;
     kWater = 1;
     kSoil = 2;
   }
 
-  enum MeasurementUnitEnum : enum8 {
+  shared enum MeasurementUnitEnum : enum8 {
     kPPM = 0;
     kPPB = 1;
     kPPT = 2;
@@ -2265,7 +2265,7 @@ cluster Pm10ConcentrationMeasurement = 1069 {
 cluster TotalVolatileOrganicCompoundsConcentrationMeasurement = 1070 {
   revision 3;
 
-  enum LevelValueEnum : enum8 {
+  shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
     kMedium = 2;
@@ -2273,13 +2273,13 @@ cluster TotalVolatileOrganicCompoundsConcentrationMeasurement = 1070 {
     kCritical = 4;
   }
 
-  enum MeasurementMediumEnum : enum8 {
+  shared enum MeasurementMediumEnum : enum8 {
     kAir = 0;
     kWater = 1;
     kSoil = 2;
   }
 
-  enum MeasurementUnitEnum : enum8 {
+  shared enum MeasurementUnitEnum : enum8 {
     kPPM = 0;
     kPPB = 1;
     kPPT = 2;
@@ -2322,7 +2322,7 @@ cluster TotalVolatileOrganicCompoundsConcentrationMeasurement = 1070 {
 cluster RadonConcentrationMeasurement = 1071 {
   revision 3;
 
-  enum LevelValueEnum : enum8 {
+  shared enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
     kMedium = 2;
@@ -2330,13 +2330,13 @@ cluster RadonConcentrationMeasurement = 1071 {
     kCritical = 4;
   }
 
-  enum MeasurementMediumEnum : enum8 {
+  shared enum MeasurementMediumEnum : enum8 {
     kAir = 0;
     kWater = 1;
     kSoil = 2;
   }
 
-  enum MeasurementUnitEnum : enum8 {
+  shared enum MeasurementUnitEnum : enum8 {
     kPPM = 0;
     kPPB = 1;
     kPPT = 2;

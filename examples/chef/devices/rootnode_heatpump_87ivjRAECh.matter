@@ -340,7 +340,7 @@ cluster Descriptor = 29 {
     kTagList = 0x1;
   }
 
-  struct DeviceTypeStruct {
+  shared struct DeviceTypeStruct {
     devtype_id deviceType = 0;
     int16u revision = 1;
   }
@@ -1594,7 +1594,7 @@ cluster GroupKeyManagement = 63 {
 cluster ElectricalPowerMeasurement = 144 {
   revision 3;
 
-  enum MeasurementTypeEnum : enum16 {
+  shared enum MeasurementTypeEnum : enum16 {
     kUnspecified = 0;
     kVoltage = 1;
     kActiveCurrent = 2;
@@ -1628,7 +1628,7 @@ cluster ElectricalPowerMeasurement = 144 {
     kPowerQuality = 0x10;
   }
 
-  struct MeasurementAccuracyRangeStruct {
+  shared struct MeasurementAccuracyRangeStruct {
     int64s rangeMin = 0;
     int64s rangeMax = 1;
     optional percent100ths percentMax = 2;
@@ -1639,7 +1639,7 @@ cluster ElectricalPowerMeasurement = 144 {
     optional int64u fixedTypical = 7;
   }
 
-  struct MeasurementAccuracyStruct {
+  shared struct MeasurementAccuracyStruct {
     MeasurementTypeEnum measurementType = 0;
     boolean measured = 1;
     int64s minMeasuredValue = 2;
@@ -1701,7 +1701,7 @@ cluster ElectricalPowerMeasurement = 144 {
 cluster ElectricalEnergyMeasurement = 145 {
   revision 2;
 
-  enum MeasurementTypeEnum : enum16 {
+  shared enum MeasurementTypeEnum : enum16 {
     kUnspecified = 0;
     kVoltage = 1;
     kActiveCurrent = 2;
@@ -1730,7 +1730,7 @@ cluster ElectricalEnergyMeasurement = 145 {
     kReactiveEnergy = 0x20;
   }
 
-  struct MeasurementAccuracyRangeStruct {
+  shared struct MeasurementAccuracyRangeStruct {
     int64s rangeMin = 0;
     int64s rangeMax = 1;
     optional percent100ths percentMax = 2;
@@ -1741,7 +1741,7 @@ cluster ElectricalEnergyMeasurement = 145 {
     optional int64u fixedTypical = 7;
   }
 
-  struct MeasurementAccuracyStruct {
+  shared struct MeasurementAccuracyStruct {
     MeasurementTypeEnum measurementType = 0;
     boolean measured = 1;
     int64s minMeasuredValue = 2;
@@ -2057,12 +2057,12 @@ provisional cluster DeviceEnergyManagementMode = 159 {
     kOnOff = 0x1;
   }
 
-  struct ModeTagStruct {
+  shared struct ModeTagStruct {
     optional vendor_id mfgCode = 0;
     enum16 value = 1;
   }
 
-  struct ModeOptionStruct {
+  shared struct ModeOptionStruct {
     char_string<64> label = 0;
     int8u mode = 1;
     ModeTagStruct modeTags[] = 2;
