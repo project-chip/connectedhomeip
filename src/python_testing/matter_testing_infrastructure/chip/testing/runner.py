@@ -503,8 +503,10 @@ class MockTestRunner():
 
         self.stack = MatterStackState(self.config)
         self.default_controller = self.stack.certificate_authorities[0].adminList[0].NewController(
-            nodeId=self.config.controller_node_id, paaTrustStorePath=str(
-                self.config.paa_trust_store_path), catTags=self.config.controller_cat_tags)
+            nodeId=self.config.controller_node_id,
+            paaTrustStorePath=str(self.config.paa_trust_store_path),
+            catTags=self.config.controller_cat_tags
+        )
 
     def set_test(self, abs_filename: str, classname: str, test: str):
         self.test = test

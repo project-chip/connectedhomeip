@@ -893,7 +893,6 @@ class MatterBaseTest(base_test.BaseTestClass):
         import json
         command = json.dumps(command_dict)
 
-        import os
         dut_ip = os.getenv('LINUX_DUT_IP')
 
         if dut_ip is None:
