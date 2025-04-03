@@ -41,6 +41,7 @@ tests:
               type: bitmap8
               minValue: 0
               maxValue: 7
+          saveAs: RockSupportValue
 
     - label: "Step 3: TH reads from the DUT the the RockSetting attribute"
       PICS: FAN.S.A0008
@@ -49,5 +50,4 @@ tests:
       response:
           constraints:
               type: bitmap8
-              minValue: 0
-              maxValue: 7
+              python: "(value & RockSupportValue) == value"
