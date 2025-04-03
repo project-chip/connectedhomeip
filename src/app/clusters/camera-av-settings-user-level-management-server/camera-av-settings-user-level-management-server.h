@@ -275,14 +275,17 @@ public:
      * @param tilt The validated value of the tilt that is to be set
      * @param zoom The validated value of the zoom that is to be set
      */
-    virtual Protocols::InteractionModel::Status MPTZRelativeMove(Optional<int16_t> aPan, Optional<int16_t> aTilt, Optional<int8_t> aZoom) = 0;
+    virtual Protocols::InteractionModel::Status MPTZRelativeMove(Optional<int16_t> aPan, Optional<int16_t> aTilt,
+                                                                 Optional<int8_t> aZoom) = 0;
 
-    virtual Protocols::InteractionModel::Status MPTZMoveToPreset(uint8_t aPreset, Optional<int16_t> aPan, Optional<int16_t> aTilt, Optional<int8_t> aZoom) = 0;
-    virtual Protocols::InteractionModel::Status MPTZSavePreset(uint8_t aPreset)                                                                            = 0;
-    virtual Protocols::InteractionModel::Status MPTZRemovePreset(uint8_t aPreset)                                                                          = 0;
-    virtual Protocols::InteractionModel::Status DPTZSetViewport(uint16_t aVideoStreamID, Structs::ViewportStruct::Type aViewport)                          = 0;
-    virtual Protocols::InteractionModel::Status DPTZRelativeMove(uint16_t aVideoStreamID, Optional<int16_t> aDeltaX, Optional<int16_t> aDeltaY,
-                                                                 Optional<int8_t> aZoomDelta)                                                              = 0;
+    virtual Protocols::InteractionModel::Status MPTZMoveToPreset(uint8_t aPreset, Optional<int16_t> aPan, Optional<int16_t> aTilt,
+                                                                 Optional<int8_t> aZoom)                                 = 0;
+    virtual Protocols::InteractionModel::Status MPTZSavePreset(uint8_t aPreset)                                          = 0;
+    virtual Protocols::InteractionModel::Status MPTZRemovePreset(uint8_t aPreset)                                        = 0;
+    virtual Protocols::InteractionModel::Status DPTZSetViewport(uint16_t aVideoStreamID,
+                                                                Structs::ViewportStruct::Type aViewport)                 = 0;
+    virtual Protocols::InteractionModel::Status DPTZRelativeMove(uint16_t aVideoStreamID, Optional<int16_t> aDeltaX,
+                                                                 Optional<int16_t> aDeltaY, Optional<int8_t> aZoomDelta) = 0;
 
 private:
     friend class CameraAvSettingsUserLevelMgmtServer;
