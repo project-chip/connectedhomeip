@@ -286,7 +286,6 @@ void CameraAvSettingsUserLevelMgmtServer::AddMoveCapableVideoStreamID(uint16_t a
         //
         mDptzRelativeMove.push_back(aVideoStreamID);
         MarkDirty(Attributes::DPTZRelativeMove::Id);
-
     }
 }
 
@@ -677,14 +676,14 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRelativeMove(HandlerContext 
             return;
         }
         int16_t panDeltaValue = panDelta.Value();
-        if (panDeltaValue > (mPanMax-mPanMin) || panDeltaValue < -(mPanMax-mPanMin))
+        if (panDeltaValue > (mPanMax - mPanMin) || panDeltaValue < -(mPanMax - mPanMin))
         {
             ChipLogError(Zcl, "PanDelta value received is out of range.");
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
             return;
         }
 
-        newPan                = static_cast<int16_t>(newPan + panDeltaValue);
+        newPan = static_cast<int16_t>(newPan + panDeltaValue);
         if (newPan > mPanMax)
         {
             newPan = mPanMax;
@@ -706,14 +705,14 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRelativeMove(HandlerContext 
             return;
         }
         int16_t tiltDeltaValue = tiltDelta.Value();
-        if (tiltDeltaValue > (mTiltMax-mTiltMin) || tiltDeltaValue < -(mTiltMax-mTiltMin))
+        if (tiltDeltaValue > (mTiltMax - mTiltMin) || tiltDeltaValue < -(mTiltMax - mTiltMin))
         {
             ChipLogError(Zcl, "TiltDelta value received is out of range.");
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
             return;
         }
 
-        newTilt                = static_cast<int16_t>(newTilt + tiltDeltaValue);
+        newTilt = static_cast<int16_t>(newTilt + tiltDeltaValue);
         if (newTilt > mTiltMax)
         {
             newTilt = mTiltMax;
@@ -735,14 +734,14 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRelativeMove(HandlerContext 
             return;
         }
         int8_t zoomDeltaValue = zoomDelta.Value();
-        if (zoomDeltaValue > (mZoomMax-1) || zoomDeltaValue < -(mZoomMax-1))
+        if (zoomDeltaValue > (mZoomMax - 1) || zoomDeltaValue < -(mZoomMax - 1))
         {
             ChipLogError(Zcl, "ZoomDelta value received is out of range.");
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
             return;
         }
 
-        newZoom               = static_cast<int8_t>(newZoom + zoomDeltaValue);
+        newZoom = static_cast<int8_t>(newZoom + zoomDeltaValue);
         if (newZoom > mZoomMax)
         {
             newZoom = mZoomMax;
