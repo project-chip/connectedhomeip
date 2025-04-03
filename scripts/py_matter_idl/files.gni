@@ -58,18 +58,6 @@ matter_idl_generator_sources = [
   "${chip_root}/scripts/py_matter_idl/scripts/matter-zapxml-parser.py",
 ]
 
-matter_idl_generator_tests = [
-  "${chip_root}/scripts/py_matter_idl/matter/idl/test_backwards_compatibility.py",
-  "${chip_root}/scripts/py_matter_idl/matter/idl/test_case_conversion.py",
-  "${chip_root}/scripts/py_matter_idl/matter/idl/test_data_model_xml.py",
-  "${chip_root}/scripts/py_matter_idl/matter/idl/test_matter_idl_parser.py",
-  "${chip_root}/scripts/py_matter_idl/matter/idl/test_generators.py",
-  "${chip_root}/scripts/py_matter_idl/matter/idl/test_idl_generator.py",
-  "${chip_root}/scripts/py_matter_idl/matter/idl/test_supported_types.py",
-  "${chip_root}/scripts/py_matter_idl/matter/idl/test_zapxml.py",
-]
-
 # All the files that the matter idl infrastructure will use
 matter_idl_generator_files =
-    matter_idl_generator_templates + matter_idl_generator_sources +
-    matter_idl_generator_tests
+    matter_idl_generator_templates + matter_idl_generator_sources
