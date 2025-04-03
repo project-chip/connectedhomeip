@@ -126,9 +126,6 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/clusters-extensions.xml \
                       src/app/zap-templates/zcl/data-model/chip/color-control-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/commissioner-control-cluster.xml \
-                      src/app/zap-templates/zcl/data-model/chip/commodity-metering-cluster.xml \
-                      src/app/zap-templates/zcl/data-model/chip/commodity-price-cluster.xml \
-                      src/app/zap-templates/zcl/data-model/chip/commodity-tariff-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/concentration-measurement-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/content-launch-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/content-app-observer-cluster.xml \
@@ -142,7 +139,6 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/measurement-and-sensing.xml \
                       src/app/zap-templates/zcl/data-model/chip/microwave-oven-mode-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/microwave-oven-control-cluster.xml \
-                      src/app/zap-templates/zcl/data-model/chip/meter-identification-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/door-lock-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/ecosystem-information-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/energy-evse-cluster.xml \
