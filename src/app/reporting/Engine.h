@@ -67,7 +67,7 @@ public:
     /**
      * Initializes the reporting engine. Should only be called once.
      *
-     * @param[in] A pointer to EventManagement, should not be a nullptr.
+     * @param[in] apEventManagement A pointer to EventManagement, should not be a nullptr.
      *
      * @retval #CHIP_NO_ERROR On success.
      * @retval other           Was unable to retrieve data and write it into the writer.

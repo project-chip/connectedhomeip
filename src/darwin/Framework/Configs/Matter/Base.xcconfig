@@ -1,8 +1,34 @@
+#include "../Shared/Base.xcconfig"
+
 PRODUCT_BUNDLE_IDENTIFIER = com.csa.matter
 TARGETED_DEVICE_FAMILY = 1,2,3,4
 INFOPLIST_FILE = CHIP/Info.plist
 MACOSX_DEPLOYMENT_TARGET = 15.0
 IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+MODULEMAP_FILE = CHIP/Matter.modulemap
+
+DWARF_DSYM_FILE_SHOULD_ACCOMPANY_PRODUCT = YES
+
+SUPPORTS_TEXT_BASED_API = YES
+
+WARNING_CFLAGS = -Wformat -Wformat-nonliteral -Wformat-security
+
+GCC_SYMBOLS_PRIVATE_EXTERN = YES
+GCC_TREAT_WARNINGS_AS_ERRORS = YES
+GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR
+GCC_WARN_UNDECLARED_SELECTOR = YES
+GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE
+GCC_WARN_UNUSED_FUNCTION = YES
+GCC_WARN_UNUSED_VARIABLE = YES
+
+DEBUG_INFORMATION_FORMAT = dwarf-with-dsym
+
+SUPPORTED_PLATFORMS = macosx iphonesimulator iphoneos appletvos appletvsimulator watchos watchsimulator
+
+ONLY_ACTIVE_ARCH = YES
+
+GCC_C_LANGUAGE_STANDARD = gnu11
+GCC_NO_COMMON_BLOCKS = YES
 
 HEADER_SEARCH_PATHS[arch=*] = \
   $(inherited) \
@@ -37,3 +63,28 @@ HEADER_SEARCH_PATHS[arch=*] = \
   $(CHIP_ROOT)/examples/chip-tool/commands/clusters \
   $(CHIP_ROOT)/examples/common \
   $(CHIP_ROOT)/zzz_generated/chip-tool
+
+OTHER_LDFLAGS = \
+  -framework CoreData \
+  -framework Foundation \
+  -framework CoreBluetooth \
+  -lnetwork \
+  -Wl,-unexported_symbol,"__Z*" \
+  -Wl,-unexported_symbol,"___*" \
+  -Wl,-unexported_symbol,"__Unwind_*" \
+  -Wl,-unexported_symbol,"_unw_*" \
+  -Wl,-hidden-lCHIP
+
+OTHER_LDFLAGS[sdk=macosx*] = \
+  -framework IOKit \
+  -framework CoreWLAN \
+  -framework SystemConfiguration \
+  -lnetwork \
+  -framework CoreBluetooth \
+  -framework CoreData \
+  -framework Foundation \
+  -Wl,-unexported_symbol,"__Z*" \
+  -Wl,-unexported_symbol,"___*" \
+  -Wl,-unexported_symbol,"__Unwind_*" \
+  -Wl,-unexported_symbol,"_unw_*" \
+  -Wl,-hidden-lCHIP

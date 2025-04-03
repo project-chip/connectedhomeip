@@ -1,1 +1,3 @@
+#include "../Shared/Base.xcconfig"
 
+CODE_SIGN_ENTITLEMENTS = $(CHIP_ROOT)/examples/darwin-framework-tool/entitlements/darwin-framework-tool.entitlements
