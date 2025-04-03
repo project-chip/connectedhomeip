@@ -18,6 +18,7 @@ structs_sources = [
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/BasicInformationClusterCapabilityMinimaStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/BasicInformationClusterProductAppearanceStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/BindingClusterTargetStruct.kt",
+  "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/BridgedDeviceBasicInformationClusterCapabilityMinimaStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/BridgedDeviceBasicInformationClusterProductAppearanceStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/CameraAvSettingsUserLevelManagementClusterMPTZPresetStruct.kt",
   "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/structs/CameraAvSettingsUserLevelManagementClusterMPTZStruct.kt",
