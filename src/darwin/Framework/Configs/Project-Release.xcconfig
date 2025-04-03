@@ -1,0 +1,3 @@
+#include "Project.xcconfig"
+
+ENABLE_NS_ASSERTIONS = NO

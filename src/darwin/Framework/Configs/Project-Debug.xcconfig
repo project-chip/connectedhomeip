@@ -1,0 +1,4 @@
+#include "Project.xcconfig"
+
+GCC_OPTIMIZATION_LEVEL = 0
+SWIFT_OPTIMIZATION_LEVEL = -Onone
