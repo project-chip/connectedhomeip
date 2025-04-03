@@ -59,7 +59,7 @@ CHIP_ERROR WebRTCProviderClient::ProvideOffer(
     CASESessionManager * caseSessionMgr = engine->GetCASESessionManager();
     VerifyOrReturnError(caseSessionMgr != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    caseSessionMgr->FindOrEstablishSession(mPeerId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+    caseSessionMgr->FindOrEstablishSession(mPeerId, &mOnConnectedCallback, &mOnConnectionFailureCallback);
 
     return CHIP_NO_ERROR;
 }
@@ -80,7 +80,7 @@ CHIP_ERROR WebRTCProviderClient::ProvideICECandidates(uint16_t webRTCSessionID, 
     CASESessionManager * caseSessionMgr = engine->GetCASESessionManager();
     VerifyOrReturnError(caseSessionMgr != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    caseSessionMgr->FindOrEstablishSession(mPeerId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+    caseSessionMgr->FindOrEstablishSession(mPeerId, &mOnConnectedCallback, &mOnConnectionFailureCallback);
 
     return CHIP_NO_ERROR;
 }
@@ -139,11 +139,11 @@ CHIP_ERROR WebRTCProviderClient::SendCommandForType(Messaging::ExchangeManager &
     }
 }
 
-void WebRTCProviderClient::OnDeviceConnectedFn(void * context, Messaging::ExchangeManager & exchangeMgr,
-                                               const SessionHandle & sessionHandle)
+void WebRTCProviderClient::OnDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr,
+                                             const SessionHandle & sessionHandle)
 {
     WebRTCProviderClient * self = reinterpret_cast<WebRTCProviderClient *>(context);
-    VerifyOrReturn(self != nullptr, ChipLogError(NotSpecified, "OnDeviceConnectedFn: context is null"));
+    VerifyOrReturn(self != nullptr, ChipLogError(NotSpecified, "OnDeviceConnected: context is null"));
 
     ChipLogProgress(NotSpecified, "CASE session established, sending WebRTCTransportProvider command...");
     CHIP_ERROR sendErr = self->SendCommandForType(exchangeMgr, sessionHandle, self->mCommandType);
@@ -153,10 +153,10 @@ void WebRTCProviderClient::OnDeviceConnectedFn(void * context, Messaging::Exchan
     }
 }
 
-void WebRTCProviderClient::OnDeviceConnectionFailureFn(void * context, const ScopedNodeId & peerId, CHIP_ERROR err)
+void WebRTCProviderClient::OnDeviceConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR err)
 {
     LogErrorOnFailure(err);
     WebRTCProviderClient * self = reinterpret_cast<WebRTCProviderClient *>(context);
-    VerifyOrReturn(self != nullptr, ChipLogError(NotSpecified, "OnDeviceConnectedFn: context is null"));
+    VerifyOrReturn(self != nullptr, ChipLogError(NotSpecified, "OnDeviceConnectionFailure: context is null"));
     self->OnDone(nullptr);
 }
