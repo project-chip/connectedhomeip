@@ -1,4 +1,3 @@
-
 /*
  *
  *    Copyright (c) 2025 Project CHIP Authors
@@ -20,6 +19,7 @@
 #include <algorithm>
 #include <esp_err.h>
 #include <esp_log.h>
+#include <lib/support/CHIPMemString.h>
 #include <tracing/esp32_diagnostic_trace/Counter.h>
 #include <tracing/esp32_diagnostic_trace/DiagnosticTracing.h>
 
@@ -112,36 +112,31 @@ void ESP32Diagnostics::LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo & info) {}
 void ESP32Diagnostics::LogMetricEvent(const MetricEvent & event)
 {
     VerifyOrReturn(mStorageInstance != nullptr, ChipLogError(DeviceLayer, "Diagnostic Storage Instance cannot be NULL"));
+    DiagnosticEntry entry;
     switch (event.ValueType())
     {
-    case ValueType::kInt32: {
+    case ValueType::kInt32:
         ChipLogDetail(DeviceLayer, "The value of %s is %" PRId32, event.key(), event.ValueInt32());
-        DiagnosticEntry entry = { .label     = const_cast<char *>(event.key()),
-                                  .intValue  = event.ValueInt32(),
-                                  .type      = Diagnostics::ValueType::kSignedInteger,
-                                  .timestamp = esp_log_timestamp() };
+        Platform::CopyString(entry.label, event.key());
+        entry.intValue                 = event.ValueInt32();
+        entry.type                     = Diagnostics::ValueType::kSignedInteger;
+        entry.timestamps_ms_since_boot = esp_log_timestamp();
         ReturnOnFailure(mStorageInstance->Store(entry));
-    }
-    break;
-
-    case ValueType::kUInt32: {
-        ChipLogDetail(DeviceLayer, "The value of %s is %" PRId32, event.key(), event.ValueUInt32());
-        DiagnosticEntry entry = { .label     = const_cast<char *>(event.key()),
-                                  .uintValue = event.ValueUInt32(),
-                                  .type      = Diagnostics::ValueType::kUnsignedInteger,
-                                  .timestamp = esp_log_timestamp() };
+        break;
+    case ValueType::kUInt32:
+        ChipLogDetail(DeviceLayer, "The value of %s is %" PRIu32, event.key(), event.ValueUInt32());
+        Platform::CopyString(entry.label, event.key());
+        entry.uintValue                = event.ValueUInt32();
+        entry.type                     = Diagnostics::ValueType::kUnsignedInteger;
+        entry.timestamps_ms_since_boot = esp_log_timestamp();
         ReturnOnFailure(mStorageInstance->Store(entry));
-    }
-    break;
-
+        break;
     case ValueType::kChipErrorCode:
         ChipLogDetail(DeviceLayer, "The value of %s is error with code %lu ", event.key(), event.ValueErrorCode());
         break;
-
     case ValueType::kUndefined:
         ChipLogDetail(DeviceLayer, "The value of %s is undefined", event.key());
         break;
-
     default:
         ChipLogDetail(DeviceLayer, "The value of %s is of an UNKNOWN TYPE", event.key());
         break;
@@ -150,7 +145,9 @@ void ESP32Diagnostics::LogMetricEvent(const MetricEvent & event)
 
 void ESP32Diagnostics::TraceCounter(const char * label)
 {
-    ReturnOnFailure(ESPDiagnosticCounter::GetInstance(label).ReportMetrics(label, mStorageInstance));
+    ESPDiagnosticCounter & counter = ESPDiagnosticCounter::GetInstance();
+    counter.IncreaseCount(label);
+    ReturnOnFailure(counter.ReportMetrics(label, mStorageInstance));
 }
 
 void ESP32Diagnostics::TraceBegin(const char * label, const char * group)
@@ -173,10 +170,11 @@ CHIP_ERROR ESP32Diagnostics::StoreDiagnostics(const char * label, const char * g
                         ChipLogError(DeviceLayer, "Diagnostic Storage Instance cannot be NULL"));
 
     // Create diagnostic entry
-    DiagnosticEntry entry = { .label       = const_cast<char *>(label),
-                              .stringValue = const_cast<char *>(group),
-                              .type        = Diagnostics::ValueType::kCharString,
-                              .timestamp   = esp_log_timestamp() };
+    DiagnosticEntry entry;
+    Platform::CopyString(entry.label, label);
+    Platform::CopyString(entry.stringValue, group);
+    entry.type                     = Diagnostics::ValueType::kCharString;
+    entry.timestamps_ms_since_boot = esp_log_timestamp();
 
     return mStorageInstance->Store(entry);
 }

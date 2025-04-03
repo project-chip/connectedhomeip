@@ -40,8 +40,7 @@ CHIP_ERROR CircularDiagnosticBuffer::Retrieve(MutableByteSpan & span, uint32_t &
     writer.Init(span.data(), span.size());
     read_entries = 0;
 
-    bool close_success                = true; // To check if the last TLV is copied successfully.
-    uint32_t successful_written_bytes = 0;    // Store temporary writer length in case last TLV is not copied successfully.
+    uint32_t successful_written_bytes = 0; // Store temporary writer length in case last TLV is not copied successfully.
 
     while ((err = mReader.Next()) == CHIP_NO_ERROR)
     {
@@ -53,25 +52,41 @@ CHIP_ERROR CircularDiagnosticBuffer::Retrieve(MutableByteSpan & span, uint32_t &
                 successful_written_bytes = writer.GetLengthWritten();
                 read_entries++;
             }
+            else if (err == CHIP_ERROR_BUFFER_TOO_SMALL)
+            {
+                // If we ran out of space, this is expected - not an error
+                ChipLogProgress(DeviceLayer, "Buffer full after %lu entries", read_entries);
+                err = CHIP_NO_ERROR;
+                break;
+            }
             else
             {
-                close_success = false;
+                // error occurred during copy
+                ChipLogError(DeviceLayer, "Error copying TLV element: %" CHIP_ERROR_FORMAT, err.Format());
                 break;
             }
         }
         else
         {
-            ChipLogDetail(DeviceLayer, "Skipping unexpected TLV element");
+            ChipLogDetail(DeviceLayer, "Skipping TLV element. Found unexpected type: %d", static_cast<int>(mReader.GetType()));
         }
     }
-    ReturnErrorOnFailure(writer.Finalize());
-    if (close_success)
+
+    // Only finalize if we have at least one successful entry
+    if (read_entries > 0)
     {
-        successful_written_bytes = writer.GetLengthWritten();
+        ReturnErrorOnFailure(writer.Finalize());
     }
+    else if (err != CHIP_END_OF_TLV && err != CHIP_NO_ERROR)
+    {
+        return err;
+    }
+
     span.reduce_size(successful_written_bytes);
-    ChipLogDetail(DeviceLayer, "---------------Total Retrieved bytes : %ld----------------\n", successful_written_bytes);
-    return err;
+    ChipLogProgress(DeviceLayer, "Total Retrieved bytes: %lu (%lu entries)", successful_written_bytes, read_entries);
+
+    // CHIP_END_OF_TLV is expected when we reach the end of the buffer
+    return CHIP_NO_ERROR;
 }
 
 bool CircularDiagnosticBuffer::IsBufferEmpty()

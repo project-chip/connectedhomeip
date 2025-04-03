@@ -37,12 +37,12 @@ namespace Diagnostics {
 class ESPDiagnosticCounter
 {
 public:
-    static ESPDiagnosticCounter & GetInstance(const char * label)
+    static ESPDiagnosticCounter & GetInstance()
     {
         static ESPDiagnosticCounter instance;
-        IncreaseCount(label);
         return instance;
     }
+    static void IncreaseCount(const char * label);
 
     uint32_t GetInstanceCount(const char * label) const;
 
@@ -56,7 +56,6 @@ private:
         bool operator()(const char * a, const char * b) const { return strcmp(a, b) < 0; }
     };
     static std::map<const char *, uint32_t, StringCompare> mCounterList;
-    static void IncreaseCount(const char * label);
 };
 
 } // namespace Diagnostics

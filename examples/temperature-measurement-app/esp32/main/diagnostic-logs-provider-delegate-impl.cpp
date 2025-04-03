@@ -126,7 +126,7 @@ CHIP_ERROR LogProvider::PrepareLogContextForIntent(LogContext * context, IntentE
                             ChipLogError(DeviceLayer, "Empty Diagnostic buffer"));
         // Retrieve data from the diagnostic storage
         CHIP_ERROR err = mStorageInstance->Retrieve(endUserSupportSpan, sReadEntries);
-        if (err != CHIP_NO_ERROR && err != CHIP_ERROR_BUFFER_TOO_SMALL && err != CHIP_ERROR_END_OF_TLV)
+        if (err != CHIP_NO_ERROR)
         {
             ChipLogError(DeviceLayer, "Failed to retrieve data: %s", ErrorStr(err));
             return err;

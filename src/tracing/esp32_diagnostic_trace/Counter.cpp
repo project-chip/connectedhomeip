@@ -17,6 +17,7 @@
  */
 
 #include <esp_log.h>
+#include <lib/support/CHIPMemString.h>
 #include <tracing/esp32_diagnostic_trace/Counter.h>
 
 namespace chip {
@@ -40,11 +41,11 @@ CHIP_ERROR ESPDiagnosticCounter::ReportMetrics(const char * label, CircularDiagn
 {
     VerifyOrReturnError(storageInstance != nullptr, CHIP_ERROR_INCORRECT_STATE,
                         ChipLogError(DeviceLayer, "Diagnostic Storage Instance cannot be NULL"));
-    // Create diagnostic entry
-    DiagnosticEntry entry = { .label     = const_cast<char *>(label),
-                              .uintValue = GetInstanceCount(label),
-                              .type      = ValueType::kUnsignedInteger,
-                              .timestamp = esp_log_timestamp() };
+    DiagnosticEntry entry;
+    Platform::CopyString(entry.label, label);
+    entry.uintValue                = GetInstanceCount(label);
+    entry.type                     = Diagnostics::ValueType::kUnsignedInteger;
+    entry.timestamps_ms_since_boot = esp_log_timestamp();
 
     return storageInstance->Store(entry);
 }

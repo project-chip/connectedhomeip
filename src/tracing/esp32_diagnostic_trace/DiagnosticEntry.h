@@ -36,25 +36,26 @@ enum class ValueType
 struct DiagnosticEntry
 {
     // mutable label because modified in decode
-    char * label;
+    char label[kMaxStringValueSize + 1];
     union
     {
         // mutable stringValue because modified in decode
-        char * stringValue;
+        char stringValue[kMaxStringValueSize + 1];
         uint32_t uintValue;
         int32_t intValue;
     };
     ValueType type;
-    uint32_t timestamp;
+    uint32_t timestamps_ms_since_boot;
 };
 
 enum class DiagTag : uint8_t
 {
-    TIMESTAMP = 0,
-    LABEL     = 1,
-    VALUE     = 2,
+    kTimestamp = 0,
+    kLabel     = 1,
+    kValue     = 2,
 };
 
+CHIP_ERROR WriteString(chip::TLV::TLVWriter & writer, const DiagTag tag, const char * str);
 CHIP_ERROR Encode(chip::TLV::TLVWriter & writer, const DiagnosticEntry & entry);
 CHIP_ERROR Decode(chip::TLV::TLVReader & reader, DiagnosticEntry & entry);
 

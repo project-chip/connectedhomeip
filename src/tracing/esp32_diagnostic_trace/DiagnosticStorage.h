@@ -55,8 +55,6 @@ public:
      *                      number of successfully read diagnostic entries.
      *
      * @retval CHIP_NO_ERROR             If the operation succeeded and all data was copied.
-     * @retval CHIP_ERROR_BUFFER_TOO_SMALL If the buffer was not large enough to hold all data.
-     * @retval CHIP_ERROR_END_OF_TLV      If the end of the TLV stream is reached.
      * @retval CHIP_ERROR                 If any other failure occurred during the operation.
      */
     CHIP_ERROR Retrieve(MutableByteSpan & payload, uint32_t & read_entries);
