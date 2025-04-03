@@ -45,3 +45,5 @@ GCC_NO_COMMON_BLOCKS = YES
 ONLY_ACTIVE_ARCH = YES
 
 OTHER_TAPI_FLAGS = "-x objective-c++ -std=gnu++17 -fvisibility=hidden -fobjc-arc"
+
+WARNING_CFLAGS = -Wformat -Wformat-nonliteral -Wformat-security

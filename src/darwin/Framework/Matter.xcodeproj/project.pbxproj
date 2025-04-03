@@ -2880,22 +2880,10 @@
 			baseConfigurationReference = D4CA5BE42D9E29C700D44744 /* Debug.xcconfig */;
 			buildSettings = {
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"$(inherited)",
-					"DEBUG=1",
-					"MTR_NO_AVAILABILITY=1",
-					"MTR_ENABLE_PROVISIONAL=1",
-					"MTR_ENABLE_UNSTABLE_API=1",
-				);
 				SUPPORTED_PLATFORMS = "macosx iphonesimulator iphoneos appletvos appletvsimulator watchos watchsimulator";
 				SUPPORTS_TEXT_BASED_API = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				TAPI_ENABLE_PROJECT_HEADERS = YES;
-				WARNING_CFLAGS = (
-					"-Wformat",
-					"-Wformat-nonliteral",
-					"-Wformat-security",
-				);
 			};
 			name = Debug;
 		};
@@ -3005,19 +2993,8 @@
 			baseConfigurationReference = D4CA5BE52D9E29C700D44744 /* Release.xcconfig */;
 			buildSettings = {
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"$(inherited)",
-					"MTR_NO_AVAILABILITY=1",
-					"MTR_ENABLE_PROVISIONAL=1",
-					"MTR_ENABLE_UNSTABLE_API=1",
-				);
 				SUPPORTED_PLATFORMS = "macosx iphonesimulator iphoneos appletvos appletvsimulator watchos watchsimulator";
 				SUPPORTS_TEXT_BASED_API = YES;
-				WARNING_CFLAGS = (
-					"-Wformat",
-					"-Wformat-nonliteral",
-					"-Wformat-security",
-				);
 			};
 			name = Release;
 		};
