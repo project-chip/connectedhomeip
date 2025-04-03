@@ -114,7 +114,7 @@ CHIP_ERROR OTATlvProcessor::vOtaProcessInternalEncryption(MutableByteSpan & bloc
 {
     /*
      * This method decrypts an encrypted OTA block with AES CTR mode
-    */
+     */
 
     uint8_t iv[16];
     uint8_t key[kOTAEncryptionKeyLength];

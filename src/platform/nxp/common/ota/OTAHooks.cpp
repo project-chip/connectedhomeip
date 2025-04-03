@@ -16,8 +16,8 @@
  *    limitations under the License.
  */
 
-#include <platform/nxp/common/ota/OTAImageProcessorImpl.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/nxp/common/ota/OTAImageProcessorImpl.h>
 
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 
@@ -27,8 +27,8 @@
 #include <platform/nxp/common/ota/OTAFactoryDataProcessor.h>
 #endif // CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
 
-#include "OtaSupport.h"
 #include "EmbeddedTypes.h"
+#include "OtaSupport.h"
 
 #ifndef CONFIG_CHIP_MAX_ENTRIES_TEST
 #define CONFIG_CHIP_MAX_ENTRIES_TEST 0

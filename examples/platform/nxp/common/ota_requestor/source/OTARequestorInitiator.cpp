@@ -27,19 +27,19 @@ using namespace chip;
 
 void chip::NXP::App::OTARequestorInitiator::HandleSelfTest()
 {
-    /* 
+    /*
      * If the application running is in test state after an OTA update,
      * and since we have arrived this far, the image can be marked as valid
      * and the update state can be switched to permanent.
      */
-    
+
     otaResult_t status;
     status = OTA_Initialize();
-    
-    if (status != gOtaSuccess_c) 
+
+    if (status != gOtaSuccess_c)
     {
         ChipLogError(SoftwareUpdate, "Self-testing : Failed to transition the image to permanent state");
     }
-    
+
     /* If the image is not marked ok, the bootloader will automatically revert back to primary application at next reboot */
 }

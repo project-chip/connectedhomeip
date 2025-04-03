@@ -26,7 +26,7 @@ constexpr uint16_t requestedOtaBlockSize = 1024;
 void chip::NXP::App::OTARequestorInitiator::InitOTA(intptr_t context)
 {
     auto * otaRequestorInit = reinterpret_cast<OTARequestorInitiator *>(context);
-    auto & imageProcessor = OTAImageProcessorImpl::GetDefaultInstance();
+    auto & imageProcessor   = OTAImageProcessorImpl::GetDefaultInstance();
     // Set the global instance of the OTA requestor core component
     SetRequestorInstance(&otaRequestorInit->gRequestorCore);
 

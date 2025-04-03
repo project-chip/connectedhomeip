@@ -165,7 +165,7 @@ CHIP_ERROR OTAFirmwareProcessor::ExitAction()
     /*
      * The image will be commited in the context of HandleApply after all ApplyAction are completed.
      * So here, we return no error.
-    */
+     */
 
     return CHIP_NO_ERROR;
 }

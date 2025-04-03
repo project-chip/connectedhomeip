@@ -18,13 +18,13 @@
 
 #pragma once
 
-#include <lib/core/OTAImageHeader.h>
-#include <map>
-#include <platform/nxp/common/ota/OTATlvProcessor.h>
 #include <app/clusters/ota-requestor/OTADownloader.h>
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
+#include <lib/core/OTAImageHeader.h>
+#include <map>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/OTAImageProcessor.h>
+#include <platform/nxp/common/ota/OTATlvProcessor.h>
 
 /*
  * OTA hooks that can be overwritten by application.

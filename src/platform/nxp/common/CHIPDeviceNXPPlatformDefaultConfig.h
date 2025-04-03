@@ -109,9 +109,9 @@
  * Enables default OTA TLV factory data processor.
  * Disabled by default.
  */
- #ifndef CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
- #define CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR 0
- #endif // CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
+#ifndef CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
+#define CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR 0
+#endif // CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
 
 // ========== Platform-specific Configuration Overrides =========
 #ifndef CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE
