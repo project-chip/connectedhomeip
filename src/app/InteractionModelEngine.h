@@ -233,12 +233,12 @@ public:
 
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
     /**
-     *  Activate the idle subscriptions.
      *
-     *  When subscribing to ICD and liveness timeout reached, the read client will move to `InactiveICDSubscription` state and
-     * resubscription can be triggered via OnActiveModeNotification().
+     *  Notification that aPeer has sent a check-in message because aMonitoredSubject does
+     *  not have a subscription to it.
+     *
      */
-    void OnActiveModeNotification(ScopedNodeId aPeer);
+    void OnActiveModeNotification(ScopedNodeId aPeer, uint64_t aMonitoredSubject);
 
     /**
      *  Used to notify when a peer becomes LIT ICD or vice versa.
