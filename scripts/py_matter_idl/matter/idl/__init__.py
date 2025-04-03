@@ -12,16 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from . import backwards_compatibility, generators, lint
-from . import matter_idl_types as types
-from . import data_model_xml
-from .matter_idl_parser import CreateParser
+from . import backwards_compatibility, data_model_xml, generators, lint, matter_idl_parser, matter_idl_types
 
 __all__ = [
     'backwards_compatibility',
-    'CreateParser',
+    'matter_idl_parser',
     'generators',
     'lint',
     'data_model_xml',
-    'types',
+    'matter_idl_types',
 ]

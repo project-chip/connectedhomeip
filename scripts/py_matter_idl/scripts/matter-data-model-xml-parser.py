@@ -43,7 +43,7 @@ class InMemoryStorage(idl.generators.storage.GeneratorStorage):
         self.content = content
 
 
-def normalize_order(idl: idl.types.Idl):
+def normalize_order(idl: idl.matter_idl_types.Idl):
     """Re-sorts contents of things inside a cluster so that
        output is easily diffed by humans
     """
@@ -143,7 +143,7 @@ def main(log_level, no_print, output, compare, compare_output, filenames):
     logging.info("Parse completed")
 
     if compare:
-        other_idl = idl.CreateParser(skip_meta=True).parse(
+        other_idl = idl.matter_idl_parser.CreateParser(skip_meta=True).parse(
             open(compare).read(), file_name=compare)
 
         # ensure that input file is filtered to only interesting

@@ -41,7 +41,7 @@ def main(log_level, filename=None):
     )
 
     logging.info("Starting to parse ...")
-    data = idl.CreateParser().parse(open(filename).read(), file_name=filename)
+    data = idl.matter_idl_parser.CreateParser().parse(open(filename).read(), file_name=filename)
     logging.info("Parse completed")
 
     logging.info("Data:")
