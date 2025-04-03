@@ -155,6 +155,13 @@ def _get_targets(coverage: Optional[bool]) -> list[ApplicationTarget]:
     )
     targets.append(
         ApplicationTarget(
+            key="AIR_PURIFIER_APP",
+            target=f"{target_prefix}-air-purifier-{suffix}",
+            binary="chip-air-purifier-app",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
             key="CHIP_MICROWAVE_OVEN_APP",
             target=f"{target_prefix}-microwave-oven-{suffix}",
             binary="chip-microwave-oven-app",
