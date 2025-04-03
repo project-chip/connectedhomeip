@@ -923,7 +923,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZSavePreset(HandlerContext & 
 
     // Add to the set only if new, otherwise replace what is at the iterator
     //
-    if (newPresetValue) 
+    if (newPresetValue)
     {
         mMptzPresetHelpers.push_back(aMptzPresetHelper);
     }
@@ -931,7 +931,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZSavePreset(HandlerContext & 
     {
         *it = aMptzPresetHelper;
     }
-   
+
     // Update the current preset ID to the next available
     UpdatePresetID();
     MarkDirty(Attributes::MPTZPresets::Id);
@@ -1028,14 +1028,14 @@ void CameraAvSettingsUserLevelMgmtServer::HandleDPTZRelativeMove(HandlerContext 
 
     // Verify that a received Zoom Delta is within constraints
     //
-    if (zoomDelta.HasValue()) 
+    if (zoomDelta.HasValue())
     {
         int8_t zoomDeltaValue = zoomDelta.Value();
         if (zoomDeltaValue < -100 || zoomDeltaValue > 100)
         {
             ChipLogError(Zcl, "Provided Digital Zoom Delta is out of range");
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
-            return;            
+            return;
         }
     }
     // Is this a video stream ID of which we have already been informed?

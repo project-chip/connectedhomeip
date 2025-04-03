@@ -45,7 +45,7 @@ void Shutdown()
 
 bool AVSettingsUserLevelManagementDelegate::CanChangeMPTZ()
 {
-    // The server needs to verify that the camera is in a state whereby changing the MPTZ is possible. 
+    // The server needs to verify that the camera is in a state whereby changing the MPTZ is possible.
     // Device specific logic will be required.
     return true;
 }
