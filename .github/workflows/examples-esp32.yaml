@@ -179,3 +179,6 @@ jobs:
 
             - name: Build example Lock App (Target:ESP32C6)
               run: scripts/examples/esp_example.sh lock-app sdkconfig.defaults esp32c6
+
+            - name: Build example thread-br-app (Target:ESP32S3)
+              run: scripts/examples/esp_example.sh thread-br-app sdkconfig.defaults esp32s3
