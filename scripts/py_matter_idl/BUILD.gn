@@ -57,7 +57,16 @@ pw_python_package("matter_idl") {
 
   sources = matter_idl_generator_sources
 
-  tests = matter_idl_generator_tests
+  tests = [
+    "matter/idl/test_backwards_compatibility.py",
+    "matter/idl/test_case_conversion.py",
+    "matter/idl/test_data_model_xml.py",
+    "matter/idl/test_matter_idl_parser.py",
+    "matter/idl/test_generators.py",
+    "matter/idl/test_idl_generator.py",
+    "matter/idl/test_supported_types.py",
+    "matter/idl/test_zapxml.py",
+  ]
 
   # TODO: at a future time consider enabling all (* or missing) here to get
   #       pylint checking these files

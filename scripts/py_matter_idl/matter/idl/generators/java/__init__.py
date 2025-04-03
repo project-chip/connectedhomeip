@@ -723,7 +723,7 @@ class __JavaCodeGenerator(CodeGenerator):
 
     def __init__(self, storage: GeneratorStorage, idl: Idl, **kargs):
         """
-        Inintialization is specific for java generation and will add
+        Initialization is specific for java generation and will add
         filters as required by the java .jinja templates to function.
         """
         super().__init__(storage, idl, fs_loader_searchpath=os.path.dirname(__file__))
