@@ -136,6 +136,24 @@ appropriate
                   DataModel::List<TransportConfigurationStruct> & outtransportConfigurations) = 0;
 
     /**
+     * @brief Validates the requested stream usage against the camera's resource management
+     *        and stream priority policies.
+     *
+     * The implementation SHALL ensure:
+     *  - The requested stream usage (streamUsage) is allowed given the current allocation of
+     *    camera resources (e.g. CPU, memory, network bandwidth) and the prioritized stream list.
+     *
+     * @param[in] streamUsage    The desired usage type for the stream (e.g. live view, recording, etc.).
+     * @param[in] videoStreamId  Optional identifier for the requested video stream.
+     * @param[in] audioStreamId  Optional identifier for the requested audio stream.
+     *
+     * @return CHIP_ERROR CHIP_NO_ERROR if the stream usage is valid; an appropriate error code otherwise.
+     */
+    virtual CHIP_ERROR ValidateStreamUsage(StreamUsageEnum streamUsage,
+                                           const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
+                                           const Optional<DataModel::Nullable<uint16_t>> & audioStreamId) = 0;
+
+    /**
      *   @brief Delegate callback for notifying change in an attribute.
      *
      */
@@ -148,14 +166,13 @@ appropriate
      * list, at initialization. Once loaded, the cluster server would be serving Reads on these attributes. The list is updatable
      * via the Add/Remove functions for the respective transport connections.
      */
-    virtual Protocols::InteractionModel::Status LoadCurrentConnections(std::vector<uint16_t> & currentConnections) = 0;
+    virtual CHIP_ERROR LoadCurrentConnections(std::vector<uint16_t> & currentConnections) = 0;
 
     /**
      *  @brief Callback into the delegate once persistent attributes managed by
      *  the Cluster have been loaded from Storage.
      */
-    virtual Protocols::InteractionModel::Status PersistentAttributesLoadedCallback() = 0;
-
+    virtual CHIP_ERROR PersistentAttributesLoadedCallback() = 0;
 };
 
 class PushAvStreamTransportServer : private AttributeAccessInterface, private CommandHandlerInterface
@@ -168,8 +185,7 @@ public:
      * @param aDelegate A reference to the delegate to be used by this server.
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
-    PushAvStreamTransportServer(EndpointId endpointId, PushAvStreamTransportDelegate & delegate, const BitFlags<Feature> aFeatures,
-                                PersistentStorageDelegate & aPersistentStorage);
+    PushAvStreamTransportServer(EndpointId endpointId, PushAvStreamTransportDelegate & delegate);
 
     ~PushAvStreamTransportServer() override;
 
@@ -196,43 +212,18 @@ public:
 
 private:
     PushAvStreamTransportDelegate & mDelegate;
-    const BitFlags<Feature> mFeature;
 
     // Attributes
     BitMask<SupportedContainerFormatsBitmap> mSupportedContainerFormats;
     BitMask<SupportedIngestMethodsBitmap> mSupportedIngestMethods;
     // lists
-    std::vector<uint16_t> mCurrentConnections;
-
-    // Utility function to set and persist attributes
-    template <typename T>
-    CHIP_ERROR SetAttributeIfDifferent(T & currentValue, const T & newValue, AttributeId attributeId, bool shouldPersist = true)
-    {
-        if (currentValue != newValue)
-        {
-            currentValue = newValue;
-            auto path    = ConcreteAttributePath(mEndpointId, PushAvStreamTransport::Id, attributeId);
-            if (shouldPersist)
-            {
-                ReturnErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(path, currentValue));
-            }
-            mDelegate.OnAttributeChanged(attributeId);
-            MatterReportingAttributeChangeCallback(path);
-        }
-        return CHIP_NO_ERROR;
-    }
+    std::vector<TransportConfigurationStruct> mCurrentConnections;
 
     /**
      * IM-level implementation of read
      * @return appropriately mapped CHIP_ERROR if applicable
      */
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-
-    /**
-     * IM-level implementation of write
-     * @return appropriately mapped CHIP_ERROR if applicable
-     */
-    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 
     /**
      * Helper function that loads all the persistent attributes from the KVS.
@@ -243,6 +234,7 @@ private:
     CHIP_ERROR ReadAndEncodeCurrentConnections(const AttributeValueEncoder::ListEncodeHelper & encoder);
 
     // Helper functions
+
     bool FindStreamTransportConnection(const uint16_t connectionID);
     uint16_t GenerateConnectionID();
 
