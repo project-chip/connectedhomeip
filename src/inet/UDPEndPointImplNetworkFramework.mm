@@ -493,7 +493,7 @@ namespace Inet {
         mListenerSemaphore = dispatch_semaphore_create(0);
         VerifyOrReturnError(nullptr != mListenerSemaphore, CHIP_ERROR_NO_MEMORY, ReleaseAll());
 
-        mListenerQueue = dispatch_queue_create("inet_dispatch_listener", DISPATCH_QUEUE_CONCURRENT);
+        mListenerQueue = dispatch_queue_create("inet_dispatch_listener", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
         VerifyOrReturnError(nullptr != mListenerQueue, CHIP_ERROR_NO_MEMORY, ReleaseAll());
 
         nw_listener_set_queue(mListener, mListenerQueue);
