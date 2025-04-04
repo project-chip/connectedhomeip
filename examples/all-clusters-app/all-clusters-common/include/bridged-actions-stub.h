@@ -39,8 +39,8 @@ private:
         ActionStructStorage(2, CharSpan::fromCharString("ToggleLight"), ActionTypeEnum::kScene, 2, 0, ActionStateEnum::kInactive)
     };
 
-    std::vector<EndpointId> firstEpList  = { 0 };
-    std::vector<EndpointId> secondEpList = { 0, 1 };
+    std::vector<EndpointId> firstEpList  = { 1 };
+    std::vector<EndpointId> secondEpList = { 1, 2 };
     std::vector<EndpointId> thirdEpList  = { 1, 2, 3 };
 
     std::vector<EndpointListStorage> kEndpointList = {
