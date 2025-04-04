@@ -34,7 +34,7 @@ using namespace chip;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 
-#if CONFIG_CHIP_LOAD_REAL_FACTORY_DATA && CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
+#if CONFIG_CHIP_PLAT_LOAD_REAL_FACTORY_DATA && CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
 /**
  * Custom factory data restore mechanism. This function must be implemented by vendors.
  */
@@ -59,7 +59,7 @@ CHIP_ERROR NXP::App::AppFactoryData_PreMatterStackInit(void)
  */
 CHIP_ERROR NXP::App::AppFactoryData_PostMatterStackInit(void)
 {
-#if CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
+#if CONFIG_CHIP_PLAT_LOAD_REAL_FACTORY_DATA
     ReturnErrorOnFailure(FactoryDataDrv().Init());
 #if CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
     FactoryDataPrvdImpl().RegisterRestoreMechanism(CustomFactoryDataRestoreMechanism);
