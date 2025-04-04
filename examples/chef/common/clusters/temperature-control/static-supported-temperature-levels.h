@@ -36,7 +36,7 @@ struct EndpointPair
 
     /// Temperature levels supported by the temperature control cluster at this endpoint.
     /// This should point to a const char span array initialized statically.
-    const chip::Span<const chip::CharSpan> mTemperatureLevels;
+    chip::Span<const chip::CharSpan> mTemperatureLevels;
 
     EndpointPair() : mEndpointId(chip::kInvalidEndpointId), mTemperatureLevels() {}
 
@@ -63,10 +63,9 @@ public:
 
     CHIP_ERROR Next(MutableCharSpan & item) override;
 
-    static void SetSupportedEndpointPair(uint16_t index, EndpointId aEndpointId, const Span<const CharSpan> TemperatureLevels)
+    static void SetSupportedEndpointPair(uint16_t index, chef::Configuration::TemperatureControl::EndpointPair endpointPair)
     {
-        supportedOptionsByEndpoints[index].mEndpointId        = aEndpointId;
-        supportedOptionsByEndpoints[index].mTemperatureLevels = TemperatureLevels;
+        supportedOptionsByEndpoints[index] = endpointPair;
     }
 
     ~AppSupportedTemperatureLevelsDelegate() {}
