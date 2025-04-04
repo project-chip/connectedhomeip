@@ -53,6 +53,10 @@ extern "C" {
 #define FACTORY_DATA_PROVIDER_PRINTF(...)
 #endif
 
+#if CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
+#error ("OTA FACTORY DATA PROCESSOR NOT SUPPORTED WITH THIS FACTORY DATA PRVD IMPL")
+#endif
+
 /* Grab symbol for the base address from the linker file. */
 extern uint32_t __FACTORY_DATA_START_OFFSET[];
 extern uint32_t __FACTORY_DATA_SIZE[];
@@ -277,6 +281,11 @@ CHIP_ERROR FactoryDataProviderImpl::Init(void)
     els_enable();
 
     return CHIP_NO_ERROR;
+}
+
+FactoryDataProvider & FactoryDataPrvdImpl()
+{
+    return FactoryDataProviderImpl::sInstance;
 }
 
 } // namespace DeviceLayer
