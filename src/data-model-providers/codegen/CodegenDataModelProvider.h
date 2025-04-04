@@ -121,6 +121,8 @@ private:
 
     /// Find the index of the given endpoint id
     std::optional<unsigned> TryFindEndpointIndex(EndpointId id) const;
+
+    std::optional<ServerClusterContext> mServerClusterContext;
 };
 
 } // namespace app

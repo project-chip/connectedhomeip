@@ -48,7 +48,7 @@ public:
     CHIP_ERROR Startup(ServerClusterContext * context) override;
     void Shutdown() override;
 
-    [[nodiscard]] DataVersion GetDataVersion() const override { return mDataVersion; }
+    [[nodiscard]] DataVersion GetDataVersion(const ConcreteClusterPath & path) const override { return mDataVersion; }
     [[nodiscard]] BitFlags<DataModel::ClusterQualityFlags> GetClusterFlags() const override;
 
     /// Default implementation errors out with an unsupported write on every attribute.
