@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023, 2025 Project CHIP Authors
+ *    Copyright (c) 2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,7 +24,8 @@
 #include <platform/nxp/common/ota/OTAImageProcessorImpl.h>
 #include <platform/nxp/common/ota/OTATlvProcessor.h>
 #if OTA_ENCRYPTION_ENABLE
-#include "mbedtls/aes.h"
+#include "OtaUtils.h"
+#include "rom_aes.h"
 #endif
 namespace chip {
 
@@ -112,20 +113,14 @@ CHIP_ERROR OTADataAccumulator::Accumulate(ByteSpan & block)
 #if OTA_ENCRYPTION_ENABLE
 CHIP_ERROR OTATlvProcessor::vOtaProcessInternalEncryption(MutableByteSpan & block)
 {
-    /*
-     * This method decrypts an encrypted OTA block with AES CTR mode
-     */
-
     uint8_t iv[16];
     uint8_t key[kOTAEncryptionKeyLength];
-    uint8_t keystream[16] = { 0 };
+    uint8_t dataOut[16] = { 0 };
     uint32_t u32IVCount;
     uint32_t Offset = 0;
     uint8_t data;
-    mbedtls_aes_context aesCtx;
-
-    // Init the AES context
-    mbedtls_aes_init(&aesCtx);
+    tsReg128 sKey;
+    aesContext_t Context;
 
     memcpy(iv, au8Iv, sizeof(au8Iv));
 
@@ -137,40 +132,36 @@ CHIP_ERROR OTATlvProcessor::vOtaProcessInternalEncryption(MutableByteSpan & bloc
     iv[14] = (uint8_t) ((u32IVCount >> 8) & 0xff);
     iv[15] = (uint8_t) (u32IVCount & 0xff);
 
-    // Convert the encryption key from hexadecimal to bytes
     if (Encoding::HexToBytes(OTA_ENCRYPTION_KEY, strlen(OTA_ENCRYPTION_KEY), key, kOTAEncryptionKeyLength) !=
         kOTAEncryptionKeyLength)
     {
-        mbedtls_aes_free(&aesCtx);
+        // Failed to convert the OTAEncryptionKey string to octstr type value
         return CHIP_ERROR_INVALID_STRING_LENGTH;
     }
 
-    // Set the AES encryption key
-    if (mbedtls_aes_setkey_dec(&aesCtx, key, kOTAEncryptionKeyLength * 8) != 0)
-    {
-        mbedtls_aes_free(&aesCtx);
-        return CHIP_ERROR_INTERNAL;
-    }
+    ByteSpan KEY = ByteSpan(key);
+    Encoding::LittleEndian::Reader reader_key(KEY.data(), KEY.size());
+    ReturnErrorOnFailure(reader_key.Read32(&sKey.u32register0)
+                             .Read32(&sKey.u32register1)
+                             .Read32(&sKey.u32register2)
+                             .Read32(&sKey.u32register3)
+                             .StatusCode());
 
-    // Process the block in 16 bytes chunks
     while (Offset + 16 <= block.size())
     {
         /*Encrypt the IV*/
-        if (mbedtls_aes_crypt_ecb(&aesCtx, MBEDTLS_AES_ENCRYPT, iv, keystream) != 0)
-        {
-            mbedtls_aes_free(&aesCtx);
-            return CHIP_ERROR_INTERNAL;
-        }
+        Context.mode         = AES_MODE_ECB_ENCRYPT;
+        Context.pSoftwareKey = (uint32_t *) &sKey;
+        AES_128_ProcessBlocks(&Context, (uint32_t *) &iv[0], (uint32_t *) &dataOut[0], 1);
 
         /* Decrypt a block of the buffer */
         for (uint8_t i = 0; i < 16; i++)
         {
-            // XOR with ciphertext to get plaintext
-            data = block[Offset + i] ^ keystream[i];
+            data = block[Offset + i] ^ dataOut[i];
             memcpy(&block[Offset + i], &data, sizeof(uint8_t));
         }
 
-        /* increment the IV counter for the next block  */
+        /* increment the IV for the next block  */
         u32IVCount++;
 
         iv[12] = (uint8_t) ((u32IVCount >> 24) & 0xff);
@@ -182,11 +173,7 @@ CHIP_ERROR OTATlvProcessor::vOtaProcessInternalEncryption(MutableByteSpan & bloc
         mIVOffset += 16;
     }
 
-    // Cleanup AES context
-    mbedtls_aes_free(&aesCtx);
-
     return CHIP_NO_ERROR;
 }
-
 #endif
 } // namespace chip

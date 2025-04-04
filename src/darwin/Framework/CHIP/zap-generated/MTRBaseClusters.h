@@ -9171,13 +9171,13 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
 /**
  * Command SelectAreas
  *
- * Command used to select a set of device areas, where the device is to operate.
+ * This command is used to select a set of device areas, where the device is to operate.
  */
 - (void)selectAreasWithParams:(MTRServiceAreaClusterSelectAreasParams *)params completion:(void (^)(MTRServiceAreaClusterSelectAreasResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 /**
  * Command SkipArea
  *
- * This command is used to skip an area where the device operates.
+ * This command is used to skip the given area, and to attempt operating at other areas on the SupportedAreas attribute list.
  */
 - (void)skipAreaWithParams:(MTRServiceAreaClusterSkipAreaParams *)params completion:(void (^)(MTRServiceAreaClusterSkipAreaResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
