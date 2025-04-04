@@ -13,9 +13,12 @@
 # limitations under the License.
 
 action("build_libdatachannel") {
+  output_dir = "$target_gen_dir/repo/build-$current_cpu"
   script = "scripts/build_libdatachannel.py"
-  outputs = [ "$target_gen_dir/repo/build/libdatachannel.so" ]
-  args = []
+  outputs = [ "$output_dir/libdatachannel.so" ]
+  args = [
+    "--target_cpu_type=$current_cpu",
+  ]
 }
 
 config("datachannel_config") {
@@ -26,11 +29,13 @@ config("datachannel_config") {
     "juice",
   ]
 
+  output_dir = "repo/build-$current_cpu"
+
   lib_dirs = [
-    rebase_path("repo/build"),
-    rebase_path("repo/build/deps/usrsctp/usrsctplib"),
-    rebase_path("repo/build/deps/libsrtp"),
-    rebase_path("repo/build/deps/libjuice"),
+    rebase_path("$output_dir"),
+    rebase_path("$output_dir/deps/usrsctp/usrsctplib"),
+    rebase_path("$output_dir/deps/libsrtp"),
+    rebase_path("$output_dir/deps/libjuice"),
   ]
 }
 
