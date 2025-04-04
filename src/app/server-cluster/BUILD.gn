@@ -34,12 +34,3 @@ source_set("server-cluster") {
     "${chip_root}/src/lib/support",
   ]
 }
-
-source_set("codegen-server-cluster") {
-  sources = [
-    "CodegenServerCluster.cpp",
-    "CodegenServerCluster.h",
-  ]
-
-  public_deps = [ ":server-cluster" ]
-}
