@@ -28,7 +28,7 @@ namespace ClosureDimension {
 
 /**
  *  @brief App should instantiate and init one Interface per endpoint
-*/ 
+*/
 class Interface : public AttributeAccessInterface, public CommandHandlerInterface
 {
 public:
@@ -36,7 +36,7 @@ public:
         AttributeAccessInterface(Optional<EndpointId>(endpoint), Id), CommandHandlerInterface(Optional<EndpointId>(endpoint), Id),
         mClusterLogic(clusterLogic)
     {}
-    
+
     /**
      * @brief Overides the Callback for reading attributes.
      *
@@ -46,14 +46,14 @@ public:
      * @return return error for failed read, return CHIP_NO_ERROR for succesful read.
      */
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-    
+
     /**
      * @brief  Callback for writing attributes.
      *
      * @param [in] aPath indicates which exact data is being written.
      * @param [in] aDecoder the AttributeValueDecoder to use for decoding the
      *             data.
-     * 
+     *
      *@return return error for failed write, return CHIP_NO_ERROR for succesful write.
      */
     CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;

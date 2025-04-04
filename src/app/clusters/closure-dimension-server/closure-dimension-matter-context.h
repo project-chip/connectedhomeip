@@ -20,12 +20,12 @@
 
  #include <lib/core/CHIPPersistentStorageDelegate.h>
  #include <lib/core/DataModelTypes.h>
- 
+
  namespace chip {
  namespace app {
  namespace Clusters {
  namespace ClosureDimension {
- 
+
  /** @brief
   *    Interface to allow interaction with interaction model and ember layers. Can be faked for unit testing.
   */
@@ -34,21 +34,20 @@
  public:
     MatterContext(EndpointId endpoint) : mEndpoint(endpoint)
     {}
- 
+
     /**
      * @brief calls the attribute change callback
      * @param[in] attributeId Attribute ID whose value need to be marked dirty.
      */
     virtual void MarkDirty(AttributeId attributeId);
- 
+
     virtual ~MatterContext() = default;
- 
+
  private:
     EndpointId mEndpoint;
  };
- 
+
  } // namespace ClosureDimension
  } // namespace Clusters
  } // namespace app
  } // namespace chip
- 

@@ -57,7 +57,7 @@ struct GenericCurrentStateStruct : public Structs::CurrentStruct::Type
     {
         return position == rhs.position && latching == rhs.latching && speed == rhs.speed;
     }
-    
+
     bool operator!=(const Structs::CurrentStruct::Type & rhs) const
     {
         return position != rhs.position || latching != rhs.latching || speed != rhs.speed;
@@ -96,7 +96,7 @@ struct GenericTargetStruct : public Structs::TargetStruct::Type
     {
         return position == rhs.position && latch == rhs.latch && speed == rhs.speed;
     }
-    
+
     bool operator!=(const Structs::TargetStruct::Type & rhs) const
     {
         return position != rhs.position && latch != rhs.latch && speed != rhs.speed;

@@ -20,19 +20,18 @@
 
  #include <app-common/zap-generated/ids/Clusters.h>
  #include <app/reporting/reporting.h>
- 
+
  namespace chip {
  namespace app {
  namespace Clusters {
  namespace ClosureDimension {
- 
+
  void MatterContext::MarkDirty(const AttributeId attributeId)
  {
      MatterReportingAttributeChangeCallback(mEndpoint, Id, attributeId);
  }
- 
+
  } // namespace ClosureDimension
  } // namespace Clusters
  } // namespace app
  } // namespace chip
- 

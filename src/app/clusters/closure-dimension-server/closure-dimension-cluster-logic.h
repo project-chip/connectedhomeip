@@ -23,14 +23,14 @@
  #include "closure-dimension-delegate.h"
  #include "closure-dimension-matter-context.h"
  #include "closure-dimension-cluster-objects.h"
- 
+
  namespace chip {
  namespace app {
  namespace Clusters {
  namespace ClosureDimension {
-    
+
 static constexpr uint16_t PERCENT100THS_MAX_VALUE = 10000;
- 
+
  struct ClusterConformance
  {
     inline bool HasFeature(Feature feature) const { return featureMap & to_underlying(feature); }
@@ -58,7 +58,7 @@ static constexpr uint16_t PERCENT100THS_MAX_VALUE = 10000;
         return true;
     }
  };
- 
+
  struct ClusterState
  {
     GenericCurrentStateStruct currentState{};
@@ -73,32 +73,32 @@ static constexpr uint16_t PERCENT100THS_MAX_VALUE = 10000;
     OverflowEnum overflow = OverflowEnum::kBottomInside;
     ModulationTypeEnum modulationType = ModulationTypeEnum::kOpacity;
  };
- 
+
  class ClusterLogic
  {
  public:
     /**
      *  @brief Instantiates a ClusterLogic class. The caller maintains ownership of the driver and the context,
      *           but provides them for use by the ClusterLogic class.
-     */ 
+     */
      ClusterLogic(DelegateBase & clusterDriver, MatterContext & matterContext) :
          mClusterDriver(clusterDriver), mMatterContext(matterContext)
      {}
-     
+
      const ClusterState & GetState() { return mState; }
-     
+
      const ClusterConformance & GetConformance() { return mConformance; }
-     
-    
+
+
     /**
      *  @brief Validates the conformance and performs initialization
-     *  @param [in] conformance cluster conformance 
+     *  @param [in] conformance cluster conformance
      *  @return Returns CHIP_ERROR_INCORRECT_STATE if the cluster has already been initialized,
      *          Returns CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR if the conformance is incorrect.
      *          Returns CHIP_NO_ERROR on succesful initialization.
      */
     CHIP_ERROR Init(const ClusterConformance & conformance);
-    
+
     /**
      * @brief Set Current State.
      * @param[in] currentState Current State Position, Latching and/or Speed.
@@ -106,7 +106,7 @@ static constexpr uint16_t PERCENT100THS_MAX_VALUE = 10000;
      *         CHIP_ERROR_INVALID_ARGUMENT if arguments are not valid
      */
     CHIP_ERROR SetCurrentState(GenericCurrentStateStruct & currentState);
-    
+
     /**
      * @brief Set Target.
      * @param[in] target Target Position, Latching and/or Speed.
@@ -114,16 +114,16 @@ static constexpr uint16_t PERCENT100THS_MAX_VALUE = 10000;
      *         CHIP_ERROR_INVALID_ARGUMENT if arguments are not valid
      */
     CHIP_ERROR SetTarget(GenericTargetStruct & target);
-    
+
     /**
      * @brief Set Resolution.
      * @param[in] resolution Minimal acceptable change of Position fields of attributes.
      * @return CHIP_NO_ERROR if set was successful.
      *         CHIP_ERROR_INVALID_ARGUMENT if arguments are not valid
-     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported. 
+     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
      */
     CHIP_ERROR SetResolution(const Percent100ths resolution);
-    
+
     /**
      * @brief Set StepValue.
      * @param[in] stepValue One step value for Step command
@@ -132,7 +132,7 @@ static constexpr uint16_t PERCENT100THS_MAX_VALUE = 10000;
      *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
      */
     CHIP_ERROR SetStepValue(const Percent100ths stepValue);
-    
+
     /**
      * @brief Set Unit.
      * @param[in] unit Unit related to the Positioning.
@@ -141,7 +141,7 @@ static constexpr uint16_t PERCENT100THS_MAX_VALUE = 10000;
      *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
      */
     CHIP_ERROR SetUnit(const ClosureUnitEnum unit);
-    
+
     /**
      * @brief Set UnitRange.
      * @param[in] unitRange Minimum and Maximum values expressed by positioning following the unit.
@@ -149,7 +149,7 @@ static constexpr uint16_t PERCENT100THS_MAX_VALUE = 10000;
      *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
      */
     CHIP_ERROR SetUnitRange(const Structs::UnitRangeStruct::Type & unitRange);
-    
+
     /**
      * @brief Set LimitRange.
      * @param[in] limitRange Range of possible values for the position field in Current attribute.
@@ -157,25 +157,25 @@ static constexpr uint16_t PERCENT100THS_MAX_VALUE = 10000;
      *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
      */
     CHIP_ERROR SetLimitRange(const Structs::RangePercent100thsStruct::Type & limitRange);
-    
+
     /**
      * @brief Set TranslationDirection.
      * @param[in] translationDirection Direction of the translation.
      * @return CHIP_NO_ERROR if set was successful.
      *         CHIP_ERROR_INVALID_ARGUMENT if arguments are not valid
-     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported 
+     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported
      */
     CHIP_ERROR SetTranslationDirection(const TranslationDirectionEnum translationDirection);
-    
+
     /**
      * @brief Set RotationAxis.
      * @param[in] rotationAxis Axis of the rotation.
      * @return CHIP_NO_ERROR if set was successful.
-     *         CHIP_ERROR_INVALID_ARGUMENT if arguments are not valid 
+     *         CHIP_ERROR_INVALID_ARGUMENT if arguments are not valid
      *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported
      */
     CHIP_ERROR SetRotationAxis(const RotationAxisEnum rotationAxis);
-    
+
     /**
      * @brief Set Overflow.
      * @param[in] overflow Overflow related to Rotation.
@@ -184,7 +184,7 @@ static constexpr uint16_t PERCENT100THS_MAX_VALUE = 10000;
      *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
      */
     CHIP_ERROR SetOverflow(const OverflowEnum overflow);
-    
+
     /**
      * @brief Set ModulationType.
      * @param[in] modulationType Modulation type.
@@ -193,7 +193,7 @@ static constexpr uint16_t PERCENT100THS_MAX_VALUE = 10000;
      *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
      */
     CHIP_ERROR SetModulationType(const ModulationTypeEnum modulationType);
- 
+
      // All Get functions:
      // Return CHIP_ERROR_INCORRECT_STATE if the class has not been initialized.
      // Return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if the attribute is not supported by the conformance.
@@ -211,7 +211,7 @@ static constexpr uint16_t PERCENT100THS_MAX_VALUE = 10000;
      CHIP_ERROR GetModulationType(ModulationTypeEnum & modulationType);
      CHIP_ERROR GetFeatureMap(Attributes::FeatureMap::TypeInfo::Type & featureMap);
      CHIP_ERROR GetClusterRevision(Attributes::ClusterRevision::TypeInfo::Type & clusterRevision);
- 
+
      /**
      *  @brief Calls delegate HandleSetTarget function after validating the parameters
      *  @param [in] position target position
@@ -223,7 +223,7 @@ static constexpr uint16_t PERCENT100THS_MAX_VALUE = 10000;
      *          Returns CHIP_NO_ERROR on succesful initialization.
      */
      Protocols::InteractionModel::Status HandleSetTargetCommand(Optional<Percent100ths> position, Optional<TargetLatchEnum> latch, Optional<Globals::ThreeLevelAutoEnum> speed);
- 
+
      /**
      *  @brief Calls delegate HandleStep function after validating the parameters
      *  @param [in] direction step direction
@@ -235,21 +235,20 @@ static constexpr uint16_t PERCENT100THS_MAX_VALUE = 10000;
      *          Returns CHIP_NO_ERROR on succesful initialization.
      */
      Protocols::InteractionModel::Status HandleStepCommand(StepDirectionEnum direction, uint16_t numberOfSteps, Optional<Globals::ThreeLevelAutoEnum> speed);
- 
+
  private:
     // This cluster implements version 1 of the Closure Dimension cluster. Do not change this revision without updating
     // the cluster to implement the newest features.
     static constexpr Attributes::ClusterRevision::TypeInfo::Type kClusterRevision = 1u;
-     
+
     bool mInitialized;
     ClusterState mState;
     ClusterConformance mConformance;
     DelegateBase & mClusterDriver;
     MatterContext & mMatterContext;
  };
- 
+
  } // namespace ClosureDimension
  } // namespace Clusters
  } // namespace app
  } // namespace chip
- 

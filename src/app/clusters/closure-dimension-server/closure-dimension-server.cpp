@@ -18,15 +18,15 @@
 
  #include "closure-dimension-server.h"
  #include "closure-dimension-cluster-logic.h"
- 
+
  namespace chip {
  namespace app {
  namespace Clusters {
  namespace ClosureDimension {
- 
+
  using namespace Protocols::InteractionModel;
  namespace {
- 
+
  template <typename T, typename F>
  CHIP_ERROR EncodeRead(AttributeValueEncoder & aEncoder, const F & getter)
  {
@@ -35,9 +35,9 @@
     VerifyOrReturnValue(err == CHIP_NO_ERROR,err);
     return aEncoder.Encode(ret);
  }
- 
+
  } // namespace
- 
+
  CHIP_ERROR Interface::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
  {
      switch (aPath.mAttributeId)
@@ -98,7 +98,7 @@
          return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
      }
  }
- 
+
  CHIP_ERROR Interface::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
  {
      switch (aPath.mAttributeId)
@@ -107,7 +107,7 @@
          return CHIP_IM_GLOBAL_STATUS(UnsupportedWrite);
      }
  }
- 
+
  // CommandHandlerInterface
  void Interface::InvokeCommand(HandlerContext & handlerContext)
  {
@@ -130,7 +130,7 @@
          return;
      }
  }
- 
+
  CHIP_ERROR Interface::Init()
  {
     VerifyOrDieWithMsg(AttributeAccessInterfaceRegistry::Instance().Register(this),
@@ -139,7 +139,7 @@
                         NotSpecified, "Failed to register command handler");
      return CHIP_NO_ERROR;
  }
- 
+
  CHIP_ERROR Interface::Shutdown()
  {
     VerifyOrDieWithMsg(CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this)== CHIP_NO_ERROR,
@@ -147,14 +147,13 @@
     AttributeAccessInterfaceRegistry::Instance().Unregister(this);
     return CHIP_NO_ERROR;
  }
- 
+
  } // namespace ClosureDimension
  } // namespace Clusters
  } // namespace app
  } // namespace chip
- 
+
  // -----------------------------------------------------------------------------
 // Plugin initialization
 
 void MatterClosureDimensionPluginServerInitCallback() {}
- 
