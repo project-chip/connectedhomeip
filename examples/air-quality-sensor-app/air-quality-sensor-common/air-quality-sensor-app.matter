@@ -1846,7 +1846,7 @@ cluster CarbonMonoxideConcentrationMeasurement = 1036 {
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
   readonly attribute optional single uncertainty = 7;
   readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
+  readonly attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -1903,7 +1903,7 @@ cluster CarbonDioxideConcentrationMeasurement = 1037 {
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
   readonly attribute optional single uncertainty = 7;
   readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
+  readonly attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -1960,7 +1960,7 @@ cluster NitrogenDioxideConcentrationMeasurement = 1043 {
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
   readonly attribute optional single uncertainty = 7;
   readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
+  readonly attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -2017,7 +2017,7 @@ cluster OzoneConcentrationMeasurement = 1045 {
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
   readonly attribute optional single uncertainty = 7;
   readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
+  readonly attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -2074,7 +2074,7 @@ cluster Pm25ConcentrationMeasurement = 1066 {
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
   readonly attribute optional single uncertainty = 7;
   readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
+  readonly attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -2131,7 +2131,7 @@ cluster FormaldehydeConcentrationMeasurement = 1067 {
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
   readonly attribute optional single uncertainty = 7;
   readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
+  readonly attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -2188,7 +2188,7 @@ cluster Pm1ConcentrationMeasurement = 1068 {
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
   readonly attribute optional single uncertainty = 7;
   readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
+  readonly attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -2245,7 +2245,7 @@ cluster Pm10ConcentrationMeasurement = 1069 {
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
   readonly attribute optional single uncertainty = 7;
   readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
+  readonly attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -2302,7 +2302,7 @@ cluster TotalVolatileOrganicCompoundsConcentrationMeasurement = 1070 {
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
   readonly attribute optional single uncertainty = 7;
   readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
+  readonly attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -2359,7 +2359,7 @@ cluster RadonConcentrationMeasurement = 1071 {
   readonly attribute optional elapsed_s averageMeasuredValueWindow = 6;
   readonly attribute optional single uncertainty = 7;
   readonly attribute optional MeasurementUnitEnum measurementUnit = 8;
-  readonly attribute optional MeasurementMediumEnum measurementMedium = 9;
+  readonly attribute MeasurementMediumEnum measurementMedium = 9;
   readonly attribute optional LevelValueEnum levelValue = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -2733,6 +2733,7 @@ endpoint 1 {
     callback attribute measuredValue;
     callback attribute minMeasuredValue;
     callback attribute maxMeasuredValue;
+    callback attribute measurementMedium;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -2744,6 +2745,7 @@ endpoint 1 {
     callback attribute measuredValue;
     callback attribute minMeasuredValue;
     callback attribute maxMeasuredValue;
+    callback attribute measurementMedium;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -2755,6 +2757,7 @@ endpoint 1 {
     callback attribute measuredValue;
     callback attribute minMeasuredValue;
     callback attribute maxMeasuredValue;
+    callback attribute measurementMedium;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -2766,6 +2769,7 @@ endpoint 1 {
     callback attribute measuredValue;
     callback attribute minMeasuredValue;
     callback attribute maxMeasuredValue;
+    callback attribute measurementMedium;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -2777,6 +2781,7 @@ endpoint 1 {
     callback attribute measuredValue;
     callback attribute minMeasuredValue;
     callback attribute maxMeasuredValue;
+    callback attribute measurementMedium;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -2788,6 +2793,7 @@ endpoint 1 {
     callback attribute measuredValue;
     callback attribute minMeasuredValue;
     callback attribute maxMeasuredValue;
+    callback attribute measurementMedium;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -2799,6 +2805,7 @@ endpoint 1 {
     callback attribute measuredValue;
     callback attribute minMeasuredValue;
     callback attribute maxMeasuredValue;
+    callback attribute measurementMedium;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -2810,6 +2817,7 @@ endpoint 1 {
     callback attribute measuredValue;
     callback attribute minMeasuredValue;
     callback attribute maxMeasuredValue;
+    callback attribute measurementMedium;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -2821,6 +2829,7 @@ endpoint 1 {
     callback attribute measuredValue;
     callback attribute minMeasuredValue;
     callback attribute maxMeasuredValue;
+    callback attribute measurementMedium;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -2832,6 +2841,7 @@ endpoint 1 {
     callback attribute measuredValue;
     callback attribute minMeasuredValue;
     callback attribute maxMeasuredValue;
+    callback attribute measurementMedium;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
