@@ -32,7 +32,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Step 2: TH reads from the DUT the the RockSupport attribute"
+    - label: "Step 2: TH reads from the DUT the RockSupport attribute"
       PICS: FAN.S.A0007
       command: "readAttribute"
       attribute: "RockSupport"
@@ -43,11 +43,13 @@ tests:
               maxValue: 7
           saveAs: RockSupportValue
 
-    - label: "Step 3: TH reads from the DUT the the RockSetting attribute"
+    - label: "Step 3: TH reads from the DUT the RockSetting attribute"
       PICS: FAN.S.A0008
       command: "readAttribute"
       attribute: "RockSetting"
       response:
           constraints:
               type: bitmap8
+              minValue: 0
+              maxValue: 7              
               python: "(value & RockSupportValue) == value"
