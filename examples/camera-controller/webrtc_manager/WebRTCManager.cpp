@@ -19,6 +19,7 @@
 #include "WebRTCManager.h"
 
 #include <app/dynamic_server/AccessControl.h>
+#include <arpa/inet.h>
 #include <commands/interactive/InteractiveCommands.h>
 #include <crypto/RandUtils.h>
 #include <lib/support/StringBuilder.h>
@@ -89,8 +90,14 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
 
     rtc::InitLogger(rtc::LogLevel::Warning);
 
+    initializeSocket();
+
     // Create the peer connection
     rtc::Configuration config;
+    config.iceServers.emplace_back("stun:stun.l.google.com:19302");
+    config.iceServers.emplace_back("stun:stun1.l.google.com:19302");
+    config.enableIceUdpMux = true;
+
     mPeerConnection = std::make_shared<rtc::PeerConnection>(config);
 
     mPeerConnection->onLocalDescription([this](rtc::Description description) {
@@ -113,27 +120,30 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
         ChipLogProgress(Camera, "[Gathering State: %d]", static_cast<int>(state));
     });
 
-    // Create a data channel for this offerer
-    mDataChannel = mPeerConnection->createDataChannel("test");
+    mMedia = rtc::Description::Video("video", rtc::Description::Direction::RecvOnly);
+    mMedia.addH264Codec(96);
+    mMedia.setBitrate(3000);
+    mTrack = mPeerConnection->addTrack(mMedia);
 
-    if (mDataChannel)
-    {
-        mDataChannel->onOpen(
-            [&]() { ChipLogProgress(Camera, "[DataChannel open: %s]", mDataChannel ? mDataChannel->label().c_str() : "unknown"); });
-
-        mDataChannel->onClosed([&]() {
-            ChipLogProgress(Camera, "[DataChannel closed: %s]", mDataChannel ? mDataChannel->label().c_str() : "unknown");
-        });
-
-        mDataChannel->onMessage([](auto data) {
-            if (std::holds_alternative<std::string>(data))
-            {
-                ChipLogProgress(Camera, "[Received: %s]", std::get<std::string>(data).c_str());
-            }
-        });
-    }
+    mDepacketizer = std::make_shared<rtc::H264RtpDepacketizer>();
+    mTrack->setMediaHandler(mDepacketizer);
+    mTrack->onFrame([this](rtc::binary message, rtc::FrameInfo frameInfo) {
+        ChipLogProgress(Camera, "Sending H264 Frame");
+        sendto(sock, reinterpret_cast<const char *>(message.data()), int(message.size()), 0,
+               reinterpret_cast<const struct sockaddr *>(&socket_address), sizeof(socket_address));
+    });
+    mPeerConnection->setLocalDescription();
 
     return CHIP_NO_ERROR;
+}
+
+void WebRTCManager::initializeSocket()
+{
+    sock                           = socket(AF_INET, SOCK_DGRAM, 0);
+    socket_address                 = {};
+    socket_address.sin_family      = AF_INET;
+    socket_address.sin_addr.s_addr = inet_addr("127.0.0.1");
+    socket_address.sin_port        = htons(5000);
 }
 
 CHIP_ERROR WebRTCManager::ProvideOffer(DataModel::Nullable<uint16_t> webRTCSessionID,
