@@ -25,7 +25,7 @@ assert(chip_build_tools)
 
 config("config") {
   cflags = [
-    "-Wconversion",
+    "-Wno-conversion",
     "-Wno-shadow",
   ]
 
