@@ -130,12 +130,11 @@ class TC_FAN_2_1(MatterBaseTest):
             fan_mode_sequence = await self.verify_setting(attribute.FanModeSequence, fms_enum, range(0, 6))
 
             # FanModeSequence values that support Auto FanMode
-            fan_mode_sequence_auto_values = [fms_enum.kOffLowMedHighAuto, fms_enum.kOffLowHighAuto, fms_enum.kOffHighAuto]
+            fan_mode_sequence_non_auto_values = [fms_enum.kOffHigh, fms_enum.kOffLowHigh, fms_enum.kOffLowMedHigh]
 
-            # Verify that the FanModeSequence attribute result contains
-            # one of the values that has the Auto FanMode option
-            asserts.assert_in(fan_mode_sequence, fan_mode_sequence_auto_values,
-                              f"[FC] FanModeSequence ({fan_mode_sequence}:{fan_mode_sequence.name}) must contain the Auto FanMode option.")
+            # Verify that the FanModeSequence attribute is a non-Auto FanMode sequence
+            asserts.assert_in(fan_mode_sequence, fan_mode_sequence_non_auto_values,
+                              f"[FC] FanModeSequence ({fan_mode_sequence}:{fan_mode_sequence.name}) must be a non-Auto FanMode sequence.")
         else:
             logging.info("[FC] Auto FanMode feature is unsupported, skipping FanModeSequence Auto conformance step.")
             self.skip_step(3)
