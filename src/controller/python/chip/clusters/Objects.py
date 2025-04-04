@@ -45206,9 +45206,11 @@ class AccountLogin(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="node", Tag=0, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
             node: typing.Optional[uint] = None
+            fabricIndex: uint = 0
 
 
 @dataclass
