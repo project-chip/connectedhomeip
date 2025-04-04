@@ -129,7 +129,7 @@ public:
                 bool aSuppressResponse = false) :
         mpExchangeMgr(apExchangeMgr),
         mExchangeCtx(*this), mpCallback(apCallback), mTimedWriteTimeoutMs(aTimedWriteTimeoutMs),
-        mSuppressResponse(aSuppressResponse)
+        mSuppressResponse(aSuppressResponse), mIsWriteRequestChunked(false)
     {
         assertChipStackLockedByCurrentThread();
     }
@@ -272,6 +272,11 @@ public:
      *  consumer is responsible for calling Shutdown on the WriteClient.
      */
     CHIP_ERROR SendWriteRequest(const SessionHandle & session, System::Clock::Timeout timeout = System::Clock::kZero);
+
+    /**
+     *  Returns true if the WriteRequest is Chunked.
+     */
+    bool IsWriteRequestChunked() { return mIsWriteRequestChunked; };
 
 private:
     friend class TestWriteInteraction;
@@ -503,6 +508,8 @@ private:
 
     // A list of buffers, one buffer for each chunk.
     System::PacketBufferHandle mChunks;
+
+    bool mIsWriteRequestChunked = false;
 
     // TODO: This file might be compiled with different build flags on Darwin platform (when building WriteClient.cpp and
     // CHIPClustersObjc.mm), which will cause undefined behavior when building write requests. Uncomment the #if and #endif after

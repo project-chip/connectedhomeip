@@ -169,6 +169,7 @@ CHIP_ERROR WriteClient::StartNewMessage()
     if (mState == State::AddAttribute)
     {
         ReturnErrorOnFailure(FinalizeMessage(true));
+        mIsWriteRequestChunked = true;
     }
 
     // Do not allow timed request with chunks.
@@ -247,6 +248,7 @@ CHIP_ERROR WriteClient::PutSinglePreencodedAttributeWritePayload(const chip::app
     return err;
 }
 
+// TODO Add Unit Tests for PutPreencodedAttribute and for TryPutPreencodedAttributeWritePayloadIntoList
 CHIP_ERROR
 WriteClient::TryPutPreencodedAttributeWritePayloadIntoList(const chip::app::ConcreteDataAttributePath & attributePath,
                                                            TLV::TLVReader & valueReader, bool & outChunkingNeeded,
