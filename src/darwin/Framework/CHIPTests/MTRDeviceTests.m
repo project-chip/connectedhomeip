@@ -32,18 +32,14 @@
 #import "MTRDeviceTestDelegate.h"
 #import "MTRDevice_Internal.h"
 #import "MTRErrorTestUtils.h"
+#import "MTRTestCase+ServerAppRunner.h"
+#import "MTRTestCase.h"
 #import "MTRTestDeclarations.h"
 #import "MTRTestKeys.h"
-#import "MTRTestResetCommissioneeHelper.h"
 #import "MTRTestStorage.h"
 
 #import <math.h> // For INFINITY
 #import <os/lock.h>
-
-// system dependencies
-#import <XCTest/XCTest.h>
-
-// Fixture: chip-all-clusters-app --KVS "$(mktemp -t chip-test-kvs)" --interface-id -1
 
 static const uint16_t kPairingTimeoutInSeconds = 30;
 static const uint16_t kTimeoutInSeconds = 3;
@@ -128,7 +124,7 @@ static MTRBaseDevice * GetConnectedDevice(void)
 
 @end
 
-@interface MTRDeviceTests : XCTestCase
+@interface MTRDeviceTests : MTRTestCase
 
 @end
 
@@ -138,6 +134,13 @@ static BOOL slocalTestStorageEnabledBeforeUnitTest;
 
 + (void)setUp
 {
+    [super setUp];
+
+    BOOL started = [self startAppWithName:@"all-clusters"
+                                arguments:@[]
+                                  payload:kOnboardingPayload];
+    XCTAssertTrue(started);
+
     XCTestExpectation * pairingExpectation = [[XCTestExpectation alloc] initWithDescription:@"Pairing Complete"];
 
     slocalTestStorageEnabledBeforeUnitTest = MTRDeviceControllerLocalTestStorage.localTestStorageEnabled;
@@ -190,8 +193,6 @@ static BOOL slocalTestStorageEnabledBeforeUnitTest;
 
 + (void)tearDown
 {
-    ResetCommissionee(GetConnectedDevice(), dispatch_get_main_queue(), nil, kTimeoutInSeconds);
-
     // Restore testing setting to previous state, and remove all persisted attributes
     MTRDeviceControllerLocalTestStorage.localTestStorageEnabled = slocalTestStorageEnabledBeforeUnitTest;
     [sController.controllerDataStore clearAllStoredClusterData];
