@@ -36,7 +36,7 @@ namespace app {
 namespace Clusters {
 namespace ClosureControl {
 
-static std::unique_ptr<ClosureControlDelegate> gClosureCtrlDelegate;
+static std::unique_ptr<ClosureControlManager> gClosureCtrlDelegate;
 static std::unique_ptr<ClosureControlInstance> gClosureCtrlInstance;
 
 /*
@@ -56,16 +56,18 @@ CHIP_ERROR ClosureControlInit(EndpointId endpointId)
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    gClosureCtrlDelegate = std::make_unique<ClosureControlDelegate>(endpointId);
+    gClosureCtrlDelegate = std::make_unique<ClosureControlManager>();
     if (!gClosureCtrlDelegate)
     {
-        ChipLogError(AppServer, "Failed to allocate memory for ClosureControlDelegate");
+        ChipLogError(AppServer, "Failed to allocate memory for ClosureControlManager");
         return CHIP_ERROR_NO_MEMORY;
     }
 
     /* Manufacturer may optionally not support all features, commands & attributes */
-    gClosureCtrlInstance = std::make_unique<ClosureControlInstance>(EndpointId(endpointId), *gClosureCtrlDelegate,
-                                                                    Feature::kCalibration, OptionalAttribute::kCountdownTime);
+    gClosureCtrlInstance = std::make_unique<ClosureControlInstance>(
+        EndpointId(endpointId), *gClosureCtrlDelegate,
+        BitMask<Feature, uint32_t>(Feature::kCalibration, Feature::kPositioning, Feature::kSpeed, Feature::kMotionLatching),
+        OptionalAttribute::kCountdownTime);
     if (!gClosureCtrlInstance)
     {
         ChipLogError(AppServer, "Failed to allocate memory for ClosureControlInstance");

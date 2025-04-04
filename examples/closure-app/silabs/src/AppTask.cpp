@@ -29,7 +29,7 @@
 #endif // QR_CODE_ENABLED
 #endif // DISPLAY_ENABLED
 
-#include <ClosureAppCommonMain.h>
+#include <ClosureControlMain.h>
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -53,7 +53,9 @@
 
 namespace {
 
-constexpr chip::EndpointId kClosureBaseEndpoint = 1;
+constexpr chip::EndpointId kClosureEndpoint       = 1;
+constexpr chip::EndpointId kClosurePanelEndpoint1 = 2;
+constexpr chip::EndpointId kClosurePanelEndpoint2 = 3;
 
 } // namespace
 
@@ -70,28 +72,19 @@ using namespace chip::TLV;
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace ClosureControl {
-
-static chip::BitMask<Feature> sFeatureMap(Feature::kCalibration);
-
-} // namespace ClosureControl
+namespace ClosureControl {} // namespace ClosureControl
 } // namespace Clusters
 } // namespace app
 } // namespace chip
 
 AppTask AppTask::sAppTask;
 
-EndpointId GetClosureDeviceEndpointId()
-{
-    return kClosureBaseEndpoint;
-}
-
 void ApplicationInit()
 {
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     SILABS_LOG("==================================================");
-    SILABS_LOG("Closure-app ClosureControl starting. featureMap 0x%08lx", ClosureControl::sFeatureMap.Raw());
-    ClosureApplicationInit();
+    SILABS_LOG("Closure-app ClosureControl starting for endpoint EP%d", kClosureEndpoint);
+    ClosureControlInit(kClosureEndpoint);
     SILABS_LOG("==================================================");
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 }
@@ -99,7 +92,7 @@ void ApplicationInit()
 void ApplicationShutdown()
 {
     chip::DeviceLayer::PlatformMgr().LockChipStack();
-    ClosureApplicationShutdown();
+    ClosureControlShutdown();
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 }
 
