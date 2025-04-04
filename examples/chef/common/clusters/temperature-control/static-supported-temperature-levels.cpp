@@ -35,7 +35,7 @@ namespace chef {
 namespace Configuration {
 namespace TemperatureControl {
 
-static const CharSpan temperatureLevelOptions[3] = { "Low"_span, "Medium"_span, "High"_span };
+static const CharSpan kTemperatureLevelOptions[3] = { "Low"_span, "Medium"_span, "High"_span };
 } // namespace TemperatureControl
 } // namespace Configuration
 } // namespace chef
@@ -84,7 +84,7 @@ void emberAfTemperatureControlClusterInitCallback(EndpointId endpoint)
     sAppSupportedTemperatureLevelsDelegate.SetSupportedEndpointPair(
         epIndex,
         chef::Configuration::TemperatureControl::EndpointPair(
-            endpoint /* endpointId */, Span<const CharSpan>(chef::Configuration::TemperatureControl::temperatureLevelOptions)));
+            endpoint /* endpointId */, Span<const CharSpan>(chef::Configuration::TemperatureControl::kTemperatureLevelOptions)));
 
     chip::app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
 }
