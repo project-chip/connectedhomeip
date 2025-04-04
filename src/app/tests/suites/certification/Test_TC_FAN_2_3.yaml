@@ -39,7 +39,7 @@ tests:
       response:
           constraints:
               type: bitmap8
-              minValue: 0
+              minValue: 1
               maxValue: 7
           saveAs: RockSupportValue
 
