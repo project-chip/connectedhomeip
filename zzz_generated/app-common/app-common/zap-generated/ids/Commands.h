@@ -979,6 +979,28 @@ static constexpr CommandId Id = 0x00000001;
 } // namespace Commands
 } // namespace WaterHeaterManagement
 
+namespace CommodityPrice {
+namespace Commands {
+
+namespace GetDetailedPriceRequest {
+static constexpr CommandId Id = 0x00000000;
+} // namespace GetDetailedPriceRequest
+
+namespace GetDetailedPriceResponse {
+static constexpr CommandId Id = 0x00000001;
+} // namespace GetDetailedPriceResponse
+
+namespace GetDetailedForecastRequest {
+static constexpr CommandId Id = 0x00000002;
+} // namespace GetDetailedForecastRequest
+
+namespace GetDetailedForecastResponse {
+static constexpr CommandId Id = 0x00000003;
+} // namespace GetDetailedForecastResponse
+
+} // namespace Commands
+} // namespace CommodityPrice
+
 namespace DemandResponseLoadControl {
 namespace Commands {
 
@@ -1310,6 +1332,20 @@ static constexpr CommandId Id = 0x00000004;
 
 } // namespace Commands
 } // namespace ClosureControl
+
+namespace ClosureDimension {
+namespace Commands {
+
+namespace SetTarget {
+static constexpr CommandId Id = 0x00000000;
+} // namespace SetTarget
+
+namespace Step {
+static constexpr CommandId Id = 0x00000001;
+} // namespace Step
+
+} // namespace Commands
+} // namespace ClosureDimension
 
 namespace ServiceArea {
 namespace Commands {
@@ -2062,6 +2098,28 @@ static constexpr CommandId Id = 0x00000000;
 
 } // namespace Commands
 } // namespace Chime
+
+namespace CommodityTariff {
+namespace Commands {
+
+namespace GetTariffComponent {
+static constexpr CommandId Id = 0x00000000;
+} // namespace GetTariffComponent
+
+namespace GetTariffComponentResponse {
+static constexpr CommandId Id = 0x00000000;
+} // namespace GetTariffComponentResponse
+
+namespace GetDayEntry {
+static constexpr CommandId Id = 0x00000001;
+} // namespace GetDayEntry
+
+namespace GetDayEntryResponse {
+static constexpr CommandId Id = 0x00000001;
+} // namespace GetDayEntryResponse
+
+} // namespace Commands
+} // namespace CommodityTariff
 
 namespace CommissionerControl {
 namespace Commands {

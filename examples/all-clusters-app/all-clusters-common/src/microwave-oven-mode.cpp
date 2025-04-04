@@ -103,3 +103,12 @@ void emberAfMicrowaveOvenModeClusterInitCallback(chip::EndpointId endpointId)
     gMicrowaveOvenModeInstance = new ModeBase::Instance(gMicrowaveOvenModeDelegate, endpointId, MicrowaveOvenMode::Id, 0);
     gMicrowaveOvenModeInstance->Init();
 }
+
+void emberAfMicrowaveOvenModeClusterShutdownCallback(chip::EndpointId endpointId)
+{
+    if (gMicrowaveOvenModeInstance)
+    {
+        gMicrowaveOvenModeInstance->Shutdown();
+    }
+    MicrowaveOvenMode::Shutdown();
+}
