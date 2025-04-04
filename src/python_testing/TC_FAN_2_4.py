@@ -99,8 +99,8 @@ class TC_FAN_2_4(MatterBaseTest):
         self.step(2)
         supports_wind = await self.feature_guard(self.endpoint, cluster, wind_feature)
         if not supports_wind:
-            logger.info("The Wind (WND) feature must be supported by the DUT for this test, skipping test.")
-            self.skip_step(2)
+            logger.info("[Fc] The Wind (WND) feature must be supported by the DUT for this test, skipping test.")
+            self.skip_all_remaining_steps()
 
         # *** STEP 3 ***
         # TH reads from the DUT the WindSupport attribute
