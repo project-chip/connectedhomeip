@@ -27,7 +27,7 @@ class CodegenServerCluster : public ServerClusterInterface
 public:
     CodegenServerCluster() = default;
 
-    CHIP_ERROR Startup(ServerClusterContext * context);
+    CHIP_ERROR Startup(ServerClusterContext * context) override;
     void Shutdown() override;
 
     DataVersion GetDataVersion(const ConcreteClusterPath & path) const override;
