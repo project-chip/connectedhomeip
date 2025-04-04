@@ -54,9 +54,12 @@ class TC_FAN_2_4(MatterBaseTest):
         return [TestStep(1, "[FC] Commissioning already done.", is_commissioning=True),
                 TestStep(2, "[FC] TH checks the DUT for support of the Wind feature (WND).",
                          "If the DUT does not support the feature, the test is skipped."),
-                TestStep(3, "[FC] TH reads from the DUT the WindSupport attribute.", "Verify that the WindSupport attribute value is of uint8 type. Verify that the WindSupport attribute's value is between 1 and 3 inclusive."),
-                TestStep(4, "[FC] TH reads from the DUT the WindSetting attribute.", "Verify that the WindSetting attribute value is of uint8 type. Verify that the WindSetting attribute's value is between 0 and 3 inclusive"),
-                TestStep(5, "[FC] TH checks that WindSetting is conformant with WindSupport.", "Verify that all bits set in WindSetting are also set in WindSupport."),
+                TestStep(3, "[FC] TH reads from the DUT the WindSupport attribute.",
+                         "Verify that the WindSupport attribute value is of uint8 type. Verify that the WindSupport attribute's value is between 1 and 3 inclusive."),
+                TestStep(4, "[FC] TH reads from the DUT the WindSetting attribute.",
+                         "Verify that the WindSetting attribute value is of uint8 type. Verify that the WindSetting attribute's value is between 0 and 3 inclusive"),
+                TestStep(5, "[FC] TH checks that WindSetting is conformant with WindSupport.",
+                         "Verify that all bits set in WindSetting are also set in WindSupport."),
                 ]
 
     async def read_setting(self, attribute: Any) -> Any:
@@ -108,7 +111,8 @@ class TC_FAN_2_4(MatterBaseTest):
         assert_valid_uint8(wind_support, "WindSupport")
 
         # Verify that the WindSupport attribute's value is between 1 and 3 inclusive
-        asserts.assert_in(wind_support, range(1, 4), f"[FC] WindSupport attribute value ({wind_support}) is not between 1 and 3 inclusive")
+        asserts.assert_in(wind_support, range(
+            1, 4), f"[FC] WindSupport attribute value ({wind_support}) is not between 1 and 3 inclusive")
 
         # *** STEP 4 ***
         # TH reads from the DUT the WindSetting attribute
@@ -117,15 +121,16 @@ class TC_FAN_2_4(MatterBaseTest):
 
         # Verify that the WindSetting attribute value is of uint8 type
         assert_valid_uint8(wind_setting, "WindSetting")
-        
+
         # Verify that the WindSetting attribute's value is between 0 and 3 inclusive
-        asserts.assert_in(wind_setting, range(0, 4), f"[FC] WindSetting attribute value ({wind_setting}) is not between 0 and 3 inclusive")
+        asserts.assert_in(wind_setting, range(
+            0, 4), f"[FC] WindSetting attribute value ({wind_setting}) is not between 0 and 3 inclusive")
 
         # *** STEP 5 ***
         # TH checks that WindSetting is conformant with WindSupport
         # Verify that all bits set in WindSetting are also set in WindSupport
         self.step(5)
-        is_wind_conformant = (wind_setting & wind_support) == wind_setting 
+        is_wind_conformant = (wind_setting & wind_support) == wind_setting
         asserts.assert_true(is_wind_conformant, "[FC] WindSetting contains unsupported bits; it is not conformant with WindSupport")
 
 
