@@ -88,8 +88,8 @@ static_library("nxp_platform") {
     sources += [
       "../common/ota/OTAImageProcessorImpl.cpp",
       "../common/ota/OTAImageProcessorImpl.h",
-      "../common/ota/OTATlvProcessor.cpp",
-      "../common/ota/OTATlvProcessor.h",
+      "OTATlvProcessor.cpp",
+      "OTATlvProcessor.h",
     ]
 
     if (nxp_enable_ota_firmware_processor) {
