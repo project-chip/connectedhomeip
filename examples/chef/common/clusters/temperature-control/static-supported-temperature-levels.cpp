@@ -49,7 +49,7 @@ uint8_t AppSupportedTemperatureLevelsDelegate::Size()
     {
         if (endpointPair.mEndpointId == mEndpoint)
         {
-            return endpointPair.mSize;
+            return endpointPair.mTemperatureLevels.size();
         }
     }
     return 0;
@@ -61,7 +61,7 @@ CHIP_ERROR AppSupportedTemperatureLevelsDelegate::Next(MutableCharSpan & item)
     {
         if (endpointPair.mEndpointId == mEndpoint)
         {
-            if (endpointPair.mSize > mIndex)
+            if (endpointPair.mTemperatureLevels.size() > mIndex)
             {
                 CHIP_ERROR err = CopyCharSpanToMutableCharSpan(endpointPair.mTemperatureLevels[mIndex], item);
                 if (err != CHIP_NO_ERROR)
@@ -84,8 +84,7 @@ void emberAfTemperatureControlClusterInitCallback(EndpointId endpoint)
     sAppSupportedTemperatureLevelsDelegate.SetSupportedEndpointPair(
         epIndex,
         chef::Configuration::TemperatureControl::EndpointPair(
-            endpoint /* endpointId */, chef::Configuration::TemperatureControl::temperatureLevelOptions,
-            MATTER_ARRAY_SIZE(chef::Configuration::TemperatureControl::temperatureLevelOptions)));
+            endpoint /* endpointId */, Span<const CharSpan>(chef::Configuration::TemperatureControl::temperatureLevelOptions)));
 
     chip::app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
 }

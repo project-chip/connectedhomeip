@@ -36,15 +36,12 @@ struct EndpointPair
 
     /// Temperature levels supported by the temperature control cluster at this endpoint.
     /// This should point to a const char span array initialized statically.
-    const chip::CharSpan * mTemperatureLevels;
+    const chip::Span<const chip::CharSpan> mTemperatureLevels;
 
-    /// Size of the temperature levels array.
-    uint8_t mSize;
+    EndpointPair() : mEndpointId(chip::kInvalidEndpointId), mTemperatureLevels() {}
 
-    EndpointPair() : mEndpointId(chip::kInvalidEndpointId), mTemperatureLevels(NULL), mSize(0) {}
-
-    EndpointPair(chip::EndpointId aEndpointId, const chip::CharSpan * TemperatureLevels, uint8_t size) :
-        mEndpointId(aEndpointId), mTemperatureLevels(TemperatureLevels), mSize(size)
+    EndpointPair(chip::EndpointId aEndpointId, chip::Span<const chip::CharSpan> TemperatureLevels) :
+        mEndpointId(aEndpointId), mTemperatureLevels(TemperatureLevels)
     {}
 };
 } // namespace TemperatureControl
