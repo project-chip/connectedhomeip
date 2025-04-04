@@ -104,7 +104,7 @@ void WebRTCProviderClient::OnResponse(CommandSender * client, const ConcreteComm
     {
         if (data == nullptr)
         {
-            ChipLogError(NotSpecified, "Response Failure: data is null");
+            ChipLogError(Camera, "Response Failure: data is null");
             return;
         }
 
@@ -171,13 +171,13 @@ void WebRTCProviderClient::OnDeviceConnectionFailure(void * context, const Scope
 
 void WebRTCProviderClient::HandleProvideOfferResponse(TLV::TLVReader & data)
 {
-    ChipLogProgress(NotSpecified, "WebRTCProviderClient::HandleProvideOfferResponse.");
+    ChipLogProgress(Camera, "WebRTCProviderClient::HandleProvideOfferResponse.");
 
     Clusters::WebRTCTransportProvider::Commands::ProvideOfferResponse::DecodableType value;
     CHIP_ERROR error = app::DataModel::Decode(data, value);
     if (error != CHIP_NO_ERROR)
     {
-        ChipLogError(NotSpecified, "Failed to decode command response value. Error: %" CHIP_ERROR_FORMAT, error.Format());
+        ChipLogError(Camera, "Failed to decode command response value. Error: %" CHIP_ERROR_FORMAT, error.Format());
         return;
     }
 
@@ -188,7 +188,7 @@ void WebRTCProviderClient::HandleProvideOfferResponse(TLV::TLVReader & data)
     session.fabricIndex    = mPeerId.GetFabricIndex();
     session.peerEndpointID = mEndpointId;
 
-    //TODO:: spec needs to clarify how to set streamUsage here
+    // TODO:: spec needs to clarify how to set streamUsage here
 
     // Populate optional fields for video/audio stream IDs if present; set them to Null otherwise
     if (value.videoStreamID.HasValue())
@@ -211,7 +211,7 @@ void WebRTCProviderClient::HandleProvideOfferResponse(TLV::TLVReader & data)
 
     if (mRequestorServer == nullptr)
     {
-        ChipLogError(NotSpecified, "WebRTCProviderClient is not initialized");
+        ChipLogError(Camera, "WebRTCProviderClient is not initialized");
         return;
     }
 
