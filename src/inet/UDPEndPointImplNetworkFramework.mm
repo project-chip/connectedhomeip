@@ -39,6 +39,15 @@ constexpr uint64_t kSendTimeoutInSeconds = 10 * NSEC_PER_SEC;
 constexpr uint64_t kConnectTimeoutInSeconds = 10 * NSEC_PER_SEC;
 constexpr uint64_t kListenerTimeoutInSeconds = 10 * NSEC_PER_SEC;
 
+class WorkFlag {
+public:
+    void MarkDead() { mAlive = false; }
+    bool IsAlive() const { return mAlive; }
+
+private:
+    std::atomic<bool> mAlive { true };
+};
+
 #if !NETWORK_FRAMEWORK_DEBUG
 void DebugPrintListenerState(nw_listener_state_t state) {};
 void DebugPrintConnectionState(nw_connection_state_t state) {};
@@ -225,6 +234,8 @@ namespace Inet {
         mSystemQueue = static_cast<System::LayerSocketsLoop &>(GetSystemLayer()).GetDispatchQueue();
         mAddrType = addressType;
         mConnection = nullptr;
+        mWorkFlagStrong = Platform::MakeShared<WorkFlag>();
+        mWorkFlagWeak = mWorkFlagStrong;
 
         return CHIP_NO_ERROR;
     }
@@ -305,6 +316,10 @@ namespace Inet {
 
     void UDPEndPointImplNetworkFramework::CloseImpl()
     {
+        if (mWorkFlagStrong) {
+            mWorkFlagStrong->MarkDead();
+            mWorkFlagStrong.reset();
+        }
         ReleaseAll();
     }
 
@@ -630,7 +645,13 @@ namespace Inet {
                 }
             };
 
+            auto localWeakFlag = mWorkFlagWeak;
             dispatch_async(mSystemQueue, ^{
+                auto workFlag = localWeakFlag.lock();
+                if (!workFlag || !workFlag->IsAlive()) {
+                    return;
+                }
+
                 if (content != nullptr && OnMessageReceived != nullptr) {
                     size_t count = dispatch_data_get_size(content);
 

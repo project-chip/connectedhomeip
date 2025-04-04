@@ -59,6 +59,19 @@ private:
     dispatch_queue_t mConnectionQueue         = nullptr;
     dispatch_queue_t mSystemQueue             = nullptr;
 
+    class WorkFlag
+    {
+    public:
+        void MarkDead() { mAlive = false; }
+        bool IsAlive() const { return mAlive; }
+
+    private:
+        std::atomic<bool> mAlive{ true };
+    };
+
+    Platform::WeakPtr<WorkFlag> mWorkFlagWeak;
+    Platform::SharedPtr<WorkFlag> mWorkFlagStrong;
+
     CHIP_ERROR ConfigureProtocol(IPAddressType aAddressType, const nw_parameters_t & aParameters);
     CHIP_ERROR StartListener();
     CHIP_ERROR GetConnection(const IPPacketInfo * aPktInfo);
