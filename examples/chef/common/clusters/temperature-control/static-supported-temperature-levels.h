@@ -63,9 +63,10 @@ public:
 
     CHIP_ERROR Next(MutableCharSpan & item) override;
 
-    static void SetSupportedEndpointPair(uint16_t index, chef::Configuration::TemperatureControl::EndpointPair endpointPair)
+    static void SetSupportedEndpointPair(uint16_t index, EndpointId aEndpointId, const Span<const CharSpan> TemperatureLevels)
     {
-        supportedOptionsByEndpoints[index] = endpointPair;
+        supportedOptionsByEndpoints[index].mEndpointId        = aEndpointId;
+        supportedOptionsByEndpoints[index].mTemperatureLevels = TemperatureLevels;
     }
 
     ~AppSupportedTemperatureLevelsDelegate() {}
