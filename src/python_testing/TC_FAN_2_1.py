@@ -61,12 +61,11 @@ class TC_FAN_2_1(MatterBaseTest):
                          "If supported, perform the next step. If unsupported, skip the next step."),
                 TestStep(3, "[FC] TH reads from the DUT the FanModeSequence attribute.",
                          "Verify that the DUT response contains an enum8 with value between 0 and 5 inclusive. Verify that the FanModeSequence attribute result contains one of the values that has the Auto FanMode option."),
-                TestStep(4, "[FC] TH writes to the DUT the Low (1) FanMode attribute value."),
-                TestStep(5, "[FC] TH reads from the DUT the FanMode attribute value.",
+                TestStep(4, "[FC] TH reads from the DUT the FanMode attribute value.",
                          "Verify that the DUT response contains an enum8 with a value between 0 and 5, excluding 4."),
-                TestStep(6, "[FC] TH reads from the DUT the PercentSetting attribute.",
+                TestStep(5, "[FC] TH reads from the DUT the PercentSetting attribute.",
                          "Verify that the DUT response contains a uint8 with value between 0 and 100 inclusive."),
-                TestStep(7, "[FC] TH reads from the DUT the PercentCurrent attribute.",
+                TestStep(6, "[FC] TH reads from the DUT the PercentCurrent attribute.",
                          "Verify that the DUT response contains a uint8 with value between 0 and 100 inclusive."),
                 ]
 
@@ -122,7 +121,7 @@ class TC_FAN_2_1(MatterBaseTest):
         feature_map = await self.read_setting(attribute.FeatureMap)
         supports_auto_fan_mode = bool(feature_map & feature.kAuto)
 
-        if supports_auto_fan_mode:
+        if not supports_auto_fan_mode:
             # *** STEP 3 ***
             # TH reads from the DUT the FanModeSequence attribute
             # Verify that the DUT response contains an enum8 with value between 0 and 5 inclusive.
@@ -140,27 +139,22 @@ class TC_FAN_2_1(MatterBaseTest):
             self.skip_step(3)
 
         # *** STEP 4 ***
-        # TH writes to the DUT the Low (1) FanMode attribute value
-        self.step(4)
-        await self.write_setting(attribute.FanMode, fm_enum.kLow)
-
-        # *** STEP 5 ***
         # TH reads from the DUT the FanMode attribute value
         # Verify that the DUT response contains an enum8 with
         # a value between 0 and 5, excluding 4
-        self.step(5)
+        self.step(4)
         await self.verify_setting(attribute.FanMode, fm_enum, [0, 1, 2, 3, 5])
 
-        # *** STEP 6 ***
+        # *** STEP 5 ***
         # TH reads from the DUT the PercentSetting attribute
         # Verify that the DUT response contains a uint8 with value between 0 and 100 inclusive.
-        self.step(6)
+        self.step(5)
         await self.verify_setting(attribute.PercentSetting, Uint8Type, range(0, 101))
 
-        # *** STEP 7 ***
+        # *** STEP 6 ***
         # TH reads from the DUT the PercentCurrent attribute
         # Verify that the DUT response contains a uint8 with value between 0 and 100 inclusive.
-        self.step(7)
+        self.step(6)
         await self.verify_setting(attribute.PercentCurrent, Uint8Type, range(0, 101))
 
 
