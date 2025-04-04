@@ -113,22 +113,18 @@ class TC_LTIME_3_1(MatterBaseTest):
         asserts.assert_in(hour_format, hour_format_values)
 
         self.step(2)
-        if self.pics_guard(self.check_pics("LTIME.S.M.12HR")):
-            await self.write_single_attribute(self.cluster.Attributes.HourFormat(0), self.endpoint)
+        await self.write_single_attribute(self.cluster.Attributes.HourFormat(0), self.endpoint)
 
         self.step(3)
-        if self.pics_guard(self.check_pics("LTIME.S.M.12HR")):
-            hour_format = await self.read_single_attribute_check_success(self.cluster, self.cluster.Attributes.HourFormat)
-            asserts.assert_equal(hour_format, 0)
+        hour_format = await self.read_single_attribute_check_success(self.cluster, self.cluster.Attributes.HourFormat)
+        asserts.assert_equal(hour_format, 0)
 
         self.step(4)
-        if self.pics_guard(self.check_pics("LTIME.S.M.24HR")):
-            await self.write_single_attribute(self.cluster.Attributes.HourFormat(1), self.endpoint)
+        await self.write_single_attribute(self.cluster.Attributes.HourFormat(1), self.endpoint)
 
         self.step(5)
-        if self.pics_guard(self.check_pics("LTIME.S.M.24HR")):
-            hour_format = await self.read_single_attribute_check_success(self.cluster, self.cluster.Attributes.HourFormat)
-            asserts.assert_equal(hour_format, 1)
+        hour_format = await self.read_single_attribute_check_success(self.cluster, self.cluster.Attributes.HourFormat)
+        asserts.assert_equal(hour_format, 1)
 
         self.step(6)
         await self.write_single_attribute(self.cluster.Attributes.HourFormat(255), self.endpoint)
