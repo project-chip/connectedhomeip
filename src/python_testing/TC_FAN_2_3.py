@@ -105,33 +105,33 @@ class TC_FAN_2_3(MatterBaseTest):
         # *** STEP 3 ***
         # TH reads from the DUT the RockSupport attribute
         self.step(3)
-        wind_support = await self.read_setting(attr.RockSupport)
+        rock_support = await self.read_setting(attr.RockSupport)
 
         # Verify that the RockSupport attribute value is of uint8 type
-        assert_valid_uint8(wind_support, "RockSupport")
+        assert_valid_uint8(rock_support, "RockSupport")
 
         # Verify that the RockSupport attribute's value is between 1 and 7 inclusive
-        asserts.assert_in(wind_support, range(
-            1, 8), f"[FC] RockSupport attribute value ({wind_support}) is not between 1 and 7 inclusive")
+        asserts.assert_in(rock_support, range(
+            1, 8), f"[FC] RockSupport attribute value ({rock_support}) is not between 1 and 7 inclusive")
 
         # *** STEP 4 ***
         # TH reads from the DUT the RockSetting attribute
         self.step(4)
-        wind_setting = await self.read_setting(attr.RockSetting)
+        rock_setting = await self.read_setting(attr.RockSetting)
 
         # Verify that the RockSetting attribute value is of uint8 type
-        assert_valid_uint8(wind_setting, "RockSetting")
+        assert_valid_uint8(rock_setting, "RockSetting")
 
         # Verify that the RockSetting attribute's value is between 0 and 7 inclusive
-        asserts.assert_in(wind_setting, range(
-            0, 8), f"[FC] RockSetting attribute value ({wind_setting}) is not between 0 and 7 inclusive")
+        asserts.assert_in(rock_setting, range(
+            0, 8), f"[FC] RockSetting attribute value ({rock_setting}) is not between 0 and 7 inclusive")
 
         # *** STEP 5 ***
         # TH checks that RockSetting is conformant with RockSupport
         # Verify that all bits set in RockSetting are also set in RockSupport
         self.step(5)
-        is_wind_conformant = (wind_setting & wind_support) == wind_setting
-        asserts.assert_true(is_wind_conformant, "[FC] RockSetting contains unsupported bits; it is not conformant with RockSupport")
+        is_rock_conformant = (rock_setting & rock_support) == rock_setting
+        asserts.assert_true(is_rock_conformant, "[FC] RockSetting contains unsupported bits; it is not conformant with RockSupport")
 
 
 if __name__ == "__main__":
