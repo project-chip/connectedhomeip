@@ -1120,8 +1120,10 @@ class MatterBaseTest(base_test.BaseTestClass):
             dict: endpoint to attribute value
 
         """
-        dev_ctrl = dev_ctrl or self.default_controller
-        node_id = node_id or self.dut_node_id
+        if dev_ctrl is None:
+            dev_ctrl = self.default_controller
+        if node_id is None:
+            node_id = self.dut_node_id
 
         read_response = await dev_ctrl.ReadAttribute(node_id, [(attribute)])
         attrs = {}
