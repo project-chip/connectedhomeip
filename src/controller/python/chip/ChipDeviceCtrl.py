@@ -602,8 +602,15 @@ class ChipDeviceControllerBase():
         return self._isActive
 
     def Shutdown(self):
-        ''' Shuts down this controller and reclaims any used resources, including the bound
-            C++ constructor instance in the SDK.
+        ''' 
+        Shuts down this controller and reclaims any used resources, including the bound
+        C++ constructor instance in the SDK.
+
+        Raises: 
+            ChipStackError: On failure.
+
+        Returns:
+            None
         '''
         if not self._isActive:
             return
@@ -639,6 +646,12 @@ class ChipDeviceControllerBase():
         ChipDeviceController.activeList.clear()
 
     def CheckIsActive(self):
+        '''
+        Checks if the device controller is active.
+
+        Raises: 
+            RuntimeError: On failure.
+        '''
         if (not self._isActive):
             raise RuntimeError(
                 "DeviceCtrl instance was already shutdown previously!")
@@ -647,6 +660,12 @@ class ChipDeviceControllerBase():
         self.Shutdown()
 
     def IsConnected(self):
+        '''
+        Checks if the device controller is connected.
+
+        Returns:
+            bool: True if is connected, False if not connected.
+        '''
         self.CheckIsActive()
 
         return self._ChipStack.Call(
@@ -655,11 +674,12 @@ class ChipDeviceControllerBase():
         )
 
     async def ConnectBLE(self, discriminator: int, setupPinCode: int, nodeid: int, isShortDiscriminator: bool = False) -> int:
-        """Connect to a BLE device using the given discriminator and setup pin code.
+        '''
+        Connect to a BLE device using the given discriminator and setup pin code.
 
         Returns:
-            - Effective Node ID of the device (as defined by the assigned NOC)
-        """
+            Effective Node ID of the device (as defined by the assigned NOC)
+        '''
         self.CheckIsActive()
 
         async with self._commissioning_context as ctx:
@@ -672,6 +692,12 @@ class ChipDeviceControllerBase():
             return await asyncio.futures.wrap_future(ctx.future)
 
     async def UnpairDevice(self, nodeid: int) -> None:
+        '''
+        Unpairs the device with the specified node ID.
+
+        Returns:
+            None.
+        '''
         self.CheckIsActive()
 
         async with self._unpair_device_context as ctx:
@@ -683,6 +709,12 @@ class ChipDeviceControllerBase():
             return await asyncio.futures.wrap_future(ctx.future)
 
     def CloseBLEConnection(self):
+        '''
+        Closes the BLE connection for the device controller.
+
+        Raises: 
+            ChipStackError: On failure.
+        '''
         self.CheckIsActive()
 
         self._ChipStack.Call(
@@ -691,13 +723,17 @@ class ChipDeviceControllerBase():
         ).raise_on_error()
 
     def ExpireSessions(self, nodeid):
-        """Close all sessions with `nodeid` (if any existed) so that sessions get re-established.
+        '''
+        Close all sessions with `nodeid` (if any existed) so that sessions get re-established.
 
         This is needed to properly handle operations that invalidate a node's state, such as
         UpdateNOC.
 
         WARNING: ONLY CALL THIS IF YOU UNDERSTAND THE SIDE-EFFECTS
-        """
+
+        Raises: 
+            ChipStackError: On failure.
+        '''
         self.CheckIsActive()
 
         self._ChipStack.Call(lambda: self._dmLib.pychip_ExpireSessions(self.devCtrl, nodeid)).raise_on_error()
@@ -778,6 +814,12 @@ class ChipDeviceControllerBase():
         )
 
     def GetTestCommissionerUsed(self):
+        '''
+        Retrieves the status of test commissioner in use.
+
+        Returns:
+            bool: True if the test commissioner is in use, False if not.
+        '''
         return self._ChipStack.Call(
             lambda: self._dmLib.pychip_TestCommissionerUsed()
         )
@@ -786,28 +828,64 @@ class ChipDeviceControllerBase():
         self._dmLib.pychip_ResetCommissioningTests()
 
     def SetTestCommissionerSimulateFailureOnStage(self, stage: int):
+        '''
+        Simulates a failure on a specific stage of the test commissioner.
+
+        Returns:
+            bool: True if the failure simulate success, False if not.
+        '''
         return self._dmLib.pychip_SetTestCommissionerSimulateFailureOnStage(
             stage)
 
     def SetTestCommissionerSimulateFailureOnReport(self, stage: int):
+        '''
+        Simulates a failure on report of the test commissioner.
+
+        Returns:
+            bool: True if the failure simulate success, False if not.
+        '''
         return self._dmLib.pychip_SetTestCommissionerSimulateFailureOnReport(
             stage)
 
     def SetTestCommissionerPrematureCompleteAfter(self, stage: int):
+        '''
+        Premature complete of the test commissioner.
+
+        Returns:
+            bool: True if the premature complete success, False if not.
+        '''
         return self._dmLib.pychip_SetTestCommissionerPrematureCompleteAfter(
             stage)
 
     def CheckTestCommissionerCallbacks(self):
+        '''
+        Check the test commissioner callbacks.
+
+        Returns:
+            bool: True if the test commissioner callbacks success, False if not.
+        '''
         return self._ChipStack.Call(
             lambda: self._dmLib.pychip_TestCommissioningCallbacks()
         )
 
     def CheckStageSuccessful(self, stage: int):
+        '''
+        Check the test commissioner stage sucess.
+
+        Returns:
+            bool: True if test commissioner stage success, False if not.
+        '''
         return self._ChipStack.Call(
             lambda: self._dmLib.pychip_TestCommissioningStageSuccessful(stage)
         )
 
     def CheckTestCommissionerPaseConnection(self, nodeid):
+        '''
+        Check the test commissioner Pase connection sucess.
+
+        Returns:
+            bool: True if test commissioner Pase connection success, False if not.
+        '''
         return self._dmLib.pychip_TestPaseConnection(nodeid)
 
     def ResolveNode(self, nodeid):
@@ -816,6 +894,12 @@ class ChipDeviceControllerBase():
         self.GetConnectedDeviceSync(nodeid, allowPASE=False)
 
     def GetAddressAndPort(self, nodeid):
+        '''
+        Retrieves the address and port.
+
+        Returns:
+            tuple: The address and port if no error occurs or None on failure.
+        '''
         self.CheckIsActive()
 
         address = create_string_buffer(64)
@@ -846,6 +930,9 @@ class ChipDeviceControllerBase():
 
             This function will always return a list of CommissionableDevice. When stopOnFirst is set,
             this function will return when at least one device is discovered or on timeout.
+
+        Returns:
+            list: A list of discovered devices.
         '''
         self.CheckIsActive()
 
@@ -880,6 +967,12 @@ class ChipDeviceControllerBase():
             return await self.GetDiscoveredDevices()
 
     async def GetDiscoveredDevices(self):
+        '''
+        Retrieves the discovered devices.
+
+        Returns:
+            list: A list of discovered devices.
+        '''
         def GetDevices(devCtrl):
             devices = []
 
@@ -896,6 +989,12 @@ class ChipDeviceControllerBase():
         return await self._ChipStack.CallAsyncWithResult(lambda: GetDevices(self))
 
     def GetIPForDiscoveredDevice(self, idx, addrStr, length):
+        '''
+        Retrieves the IP address for a discovered device.
+
+        Returns:
+            bool: True if IP for discovered device success, False if not.
+        '''
         self.CheckIsActive()
 
         return self._ChipStack.Call(
