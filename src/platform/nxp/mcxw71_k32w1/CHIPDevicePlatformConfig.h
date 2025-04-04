@@ -81,6 +81,15 @@
 #define CHIP_DEVICE_LAYER_BLE_CONN_CFG_TAG 1
 #endif // CHIP_DEVICE_LAYER_BLE_CONN_CFG_TAG
 
+/**
+ * @def CHIP_DEVICE_LAYER_OTA_REBOOT_DELAY
+ *
+ * The delay before rebooting after an OTA process was finished.
+ */
+#ifndef CHIP_DEVICE_LAYER_OTA_REBOOT_DELAY
+#define CHIP_DEVICE_LAYER_OTA_REBOOT_DELAY 3000
+#endif // CHIP_DEVICE_LAYER_OTA_REBOOT_DELAY
+
 // ========== Platform-specific Configuration Overrides =========
 #ifndef CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE
 #define CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE (6 * 1024)
