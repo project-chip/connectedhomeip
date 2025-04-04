@@ -93,10 +93,13 @@ struct AttributeEntry
 
     // Constructor
     constexpr AttributeEntry(AttributeId id = 0, // attributeId initial value
-                             std::underlying_type_t<AttributeQualityFlags> attrQualityFlags = 0, // mask.flags initial value
-                             std::underlying_type_t<Access::Privilege> readPriv = kNoPrivilege, // mask.readPrivilege initial value
-                             std::underlying_type_t<Access::Privilege> writePriv = kNoPrivilege // mask.writePrivilege initial value
-                            ) : attributeId(id), mask{ attrQualityFlags, readPriv, writePriv } {}
+                             AttributeQualityFlags attrQualityFlags = AttributeQualityFlags::kListAttribute, // mask.flags initial value
+                             Access::Privilege readPriv = Access::Privilege::kView, // mask.readPrivilege initial value
+                             Access::Privilege writePriv = Access::Privilege::kView // mask.writePrivilege initial value
+                            ) : attributeId(id), mask{ to_underlying(attrQualityFlags), 
+                                                       to_underlying(readPriv), 
+                                                       to_underlying(writePriv) 
+                                                    } {}
 
 
     // Getter for mask.readPrivilege
@@ -175,6 +178,8 @@ struct AttributeEntry
 
 };
 
+// Static ASSERT to check size of AttributeEntry.
+static_assert(sizeof(AttributeEntry) <= 8, "Size of AttributeEntry is not as expected.");
 
 
 // Bitmask values for different Command qualities.
@@ -193,9 +198,11 @@ struct AcceptedCommandEntry
 
     // Constructor
     constexpr AcceptedCommandEntry(CommandId id = 0, // commandId initial value
-                                   std::underlying_type_t<CommandQualityFlags> cmdQualityFlags = 0, // mask.flags initial value
-                                   std::underlying_type_t<Access::Privilege> invokePriv = kNoPrivilege // mask.invokePrivilege initial value
-                                ) : commandId(id), mask{ cmdQualityFlags, invokePriv } {}
+                                   CommandQualityFlags cmdQualityFlags = CommandQualityFlags::kFabricScoped, // mask.flags initial value
+                                   Access::Privilege invokePriv = Access::Privilege::kView // mask.invokePrivilege initial value
+                                ) : commandId(id), mask{ to_underlying(cmdQualityFlags), 
+                                                         to_underlying(invokePriv)
+                                                       } {}
  
 
     // Getter for mask.invokePrivilege
