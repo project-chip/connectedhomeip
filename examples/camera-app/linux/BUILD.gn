@@ -53,10 +53,6 @@ executable("chip-camera-app") {
     "${chip_root}/third_party/libdatachannel:libdatachannel",
   ]
 
-  libs = [ "datachannel" ]
-  lib_dirs =
-      [ rebase_path("${chip_root}/third_party/libdatachannel/repo/build") ]
-
   output_dir = root_out_dir
 }
 
