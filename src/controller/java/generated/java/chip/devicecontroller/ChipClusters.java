@@ -63242,7 +63242,7 @@ public class ChipClusters {
       elements.add(new StructElement(tiltFieldID, tilttlvValue));
 
       final long zoomFieldID = 2L;
-      BaseTLVType zoomtlvValue = zoom.<BaseTLVType>map((nonOptionalzoom) -> new IntType(nonOptionalzoom)).orElse(new EmptyType());
+      BaseTLVType zoomtlvValue = zoom.<BaseTLVType>map((nonOptionalzoom) -> new UIntType(nonOptionalzoom)).orElse(new EmptyType());
       elements.add(new StructElement(zoomFieldID, zoomtlvValue));
 
       StructType commandArgs = new StructType(elements);

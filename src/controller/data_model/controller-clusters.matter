@@ -10248,7 +10248,7 @@ provisional cluster CameraAvSettingsUserLevelManagement = 1362 {
   struct MPTZStruct {
     optional int16s pan = 0;
     optional int16s tilt = 1;
-    optional int8s zoom = 2;
+    optional int8u zoom = 2;
   }
 
   struct MPTZPresetStruct {
@@ -10268,7 +10268,7 @@ provisional cluster CameraAvSettingsUserLevelManagement = 1362 {
   readonly attribute optional int8u maxPresets = 1;
   readonly attribute optional MPTZPresetStruct MPTZPresets[] = 2;
   readonly attribute optional int16u DPTZRelativeMove[] = 3;
-  readonly attribute optional int8s zoomMax = 4;
+  readonly attribute optional int8u zoomMax = 4;
   readonly attribute optional int16s tiltMin = 5;
   readonly attribute optional int16s tiltMax = 6;
   readonly attribute optional int16s panMin = 7;
@@ -10283,7 +10283,7 @@ provisional cluster CameraAvSettingsUserLevelManagement = 1362 {
   request struct MPTZSetPositionRequest {
     optional int16s pan = 0;
     optional int16s tilt = 1;
-    optional int8s zoom = 2;
+    optional int8u zoom = 2;
   }
 
   request struct MPTZRelativeMoveRequest {

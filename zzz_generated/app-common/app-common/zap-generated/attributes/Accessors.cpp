@@ -37748,9 +37748,9 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value)
 
 namespace ZoomMax {
 
-Protocols::InteractionModel::Status Get(EndpointId endpoint, int8_t * value)
+Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value)
 {
-    using Traits = NumericAttributeTraits<int8_t>;
+    using Traits = NumericAttributeTraits<uint8_t>;
     Traits::StorageType temp;
     uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
     Protocols::InteractionModel::Status status =
@@ -37764,9 +37764,9 @@ Protocols::InteractionModel::Status Get(EndpointId endpoint, int8_t * value)
     return status;
 }
 
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int8_t value, MarkAttributeDirty markDirty)
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty)
 {
-    using Traits = NumericAttributeTraits<int8_t>;
+    using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return Protocols::InteractionModel::Status::ConstraintError;
@@ -37775,12 +37775,12 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, int8_t value, MarkA
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
     return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::CameraAvSettingsUserLevelManagement::Id, Id),
-                                 EmberAfWriteDataInput(writable, ZCL_INT8S_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
+                                 EmberAfWriteDataInput(writable, ZCL_INT8U_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
-Protocols::InteractionModel::Status Set(EndpointId endpoint, int8_t value)
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value)
 {
-    using Traits = NumericAttributeTraits<int8_t>;
+    using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return Protocols::InteractionModel::Status::ConstraintError;
@@ -37789,7 +37789,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, int8_t value)
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
     return emberAfWriteAttribute(endpoint, Clusters::CameraAvSettingsUserLevelManagement::Id, Id, writable,
-                                 ZCL_INT8S_ATTRIBUTE_TYPE);
+                                 ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ZoomMax

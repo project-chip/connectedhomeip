@@ -59,7 +59,7 @@ bool AVSettingsUserLevelManagementDelegate::IsValidVideoStreamID(uint16_t aVideo
 }
 
 Status AVSettingsUserLevelManagementDelegate::MPTZSetPosition(Optional<int16_t> aPan, Optional<int16_t> aTilt,
-                                                              Optional<int8_t> aZoom)
+                                                              Optional<uint8_t> aZoom)
 {
     // The Cluster implementation has validated that the Feature Flags are set and the values themselves are in range. Do any needed
     // hardware interactions to actually set the camera to the new values of PTZ.  Then return a Status response. The server itself
@@ -69,7 +69,7 @@ Status AVSettingsUserLevelManagementDelegate::MPTZSetPosition(Optional<int16_t> 
 }
 
 Status AVSettingsUserLevelManagementDelegate::MPTZRelativeMove(Optional<int16_t> aPan, Optional<int16_t> aTilt,
-                                                               Optional<int8_t> aZoom)
+                                                               Optional<uint8_t> aZoom)
 {
     // The Cluster implementation has validated that the Feature Flags are set and the values themselves are in range. Do any needed
     // hardware interactions to actually set the camera to the new values of PTZ.  Then return a Status response. The server itself
@@ -79,7 +79,7 @@ Status AVSettingsUserLevelManagementDelegate::MPTZRelativeMove(Optional<int16_t>
 }
 
 Status AVSettingsUserLevelManagementDelegate::MPTZMoveToPreset(uint8_t aPreset, Optional<int16_t> aPan, Optional<int16_t> aTilt,
-                                                               Optional<int8_t> aZoom)
+                                                               Optional<uint8_t> aZoom)
 {
     // The Cluster implementation has validated the preset is valid, and provided the MPTZ values associated with that preset.
     // Do any needed hardware interactions to actually set the camera to the new values of PTZ.  Then return a Status response.
@@ -130,7 +130,7 @@ void emberAfCameraAvSettingsUserLevelManagementClusterInitCallback(chip::Endpoin
     const int16_t appPanMax  = 90;
     const int16_t appTiltMin = -45;
     const int16_t appTiltMax = 45;
-    const int8_t appZoomMax  = 75;
+    const uint8_t appZoomMax  = 75;
 
     gDelegate = new AVSettingsUserLevelManagementDelegate;
     BitFlags<CameraAvSettingsUserLevelManagement::Feature, uint32_t> avsumFeatures(

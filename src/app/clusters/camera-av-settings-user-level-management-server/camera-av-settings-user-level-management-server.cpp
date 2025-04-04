@@ -156,7 +156,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::Init()
     // Set default MPTZ
     mMptzPosition.pan  = Optional<int16_t>(defaultPan);
     mMptzPosition.tilt = Optional<int16_t>(defaultTilt);
-    mMptzPosition.zoom = Optional<int8_t>(defaultZoom);
+    mMptzPosition.zoom = Optional<uint8_t>(defaultZoom);
 
     VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INTERNAL);
     ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
@@ -235,7 +235,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::SetPanMax(int16_t aPanMax)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::SetZoomMax(int8_t aZoomMax)
+CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::SetZoomMax(uint8_t aZoomMax)
 {
     if ((aZoomMax > kMaxZoomValue) || (aZoomMax < kMinZoomValue + 1))
     {
@@ -267,7 +267,7 @@ void CameraAvSettingsUserLevelMgmtServer::SetTilt(Optional<int16_t> aTilt)
     }
 }
 
-void CameraAvSettingsUserLevelMgmtServer::SetZoom(Optional<int8_t> aZoom)
+void CameraAvSettingsUserLevelMgmtServer::SetZoom(Optional<uint8_t> aZoom)
 {
     if (aZoom.HasValue())
     {
@@ -557,7 +557,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZSetPosition(HandlerContext &
 
     Optional<int16_t> pan  = commandData.pan;
     Optional<int16_t> tilt = commandData.tilt;
-    Optional<int8_t> zoom  = commandData.zoom;
+    Optional<uint8_t> zoom = commandData.zoom;
 
     // Validate the received command fields
     //
@@ -605,7 +605,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZSetPosition(HandlerContext &
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
             return;
         }
-        int8_t zoomValue = zoom.Value();
+        uint8_t zoomValue = zoom.Value();
         if ((zoomValue > mZoomMax) || (zoomValue < kMinZoomValue))
         {
             ChipLogError(Zcl, "Received Zoom value out of range");
@@ -660,10 +660,10 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRelativeMove(HandlerContext 
 
     Optional<int16_t> panDelta  = commandData.panDelta;
     Optional<int16_t> tiltDelta = commandData.tiltDelta;
-    Optional<int8_t> zoomDelta  = commandData.zoomDelta;
+    Optional<uint8_t> zoomDelta = commandData.zoomDelta;
     int16_t newPan              = mMptzPosition.pan.Value();
     int16_t newTilt             = mMptzPosition.tilt.Value();
-    int8_t newZoom              = mMptzPosition.zoom.Value();
+    int8_t newZoom              = static_cast<int8_t>(mMptzPosition.zoom.Value());
 
     // Validate the received command fields
     //
@@ -774,7 +774,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRelativeMove(HandlerContext 
     // Call the delegate to simply set the newly calculated MPTZ values based on the deltas received
     //
     status = mDelegate->MPTZRelativeMove(Optional(static_cast<int16_t>(newPan)), Optional(static_cast<int16_t>(newTilt)),
-                                         Optional(static_cast<int8_t>(newZoom)));
+                                         Optional(static_cast<uint8_t>(newZoom)));
 
     if (status != Status::Success)
     {
@@ -785,7 +785,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRelativeMove(HandlerContext 
     // Set the local values of pan, tilt, and zoom
     SetPan(Optional<int16_t>(newPan));
     SetTilt(Optional<int16_t>(newTilt));
-    SetZoom(Optional<int8_t>(newZoom));
+    SetZoom(Optional<uint8_t>(newZoom));
 
     MarkDirty(Attributes::MPTZPosition::Id);
 

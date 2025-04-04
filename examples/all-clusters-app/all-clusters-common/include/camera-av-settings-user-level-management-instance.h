@@ -38,11 +38,11 @@ public:
      * delegate command handlers
      */
     Protocols::InteractionModel::Status MPTZSetPosition(Optional<int16_t> aPan, Optional<int16_t> aTilt,
-                                                        Optional<int8_t> aZoom) override;
+                                                        Optional<uint8_t> aZoom) override;
     Protocols::InteractionModel::Status MPTZRelativeMove(Optional<int16_t> aPan, Optional<int16_t> aTilt,
-                                                         Optional<int8_t> aZoom) override;
+                                                         Optional<uint8_t> aZoom) override;
     Protocols::InteractionModel::Status MPTZMoveToPreset(uint8_t aPreset, Optional<int16_t> aPan, Optional<int16_t> aTilt,
-                                                         Optional<int8_t> aZoom) override;
+                                                         Optional<uint8_t> aZoom) override;
     Protocols::InteractionModel::Status MPTZSavePreset(uint8_t aPreset) override;
     Protocols::InteractionModel::Status MPTZRemovePreset(uint8_t aPreset) override;
     Protocols::InteractionModel::Status DPTZSetViewport(uint16_t aVideoStreamID, Structs::ViewportStruct::Type aViewport) override;

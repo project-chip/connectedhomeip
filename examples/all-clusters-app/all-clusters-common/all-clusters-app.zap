@@ -5174,7 +5174,7 @@
               "isEnabled": 1
             },
             {
-              "name": "SetVidVerificationStatement",
+              "name": "SetVIDVerificationStatement",
               "code": 12,
               "mfgCode": null,
               "source": "client",
@@ -5182,7 +5182,7 @@
               "isEnabled": 1
             },
             {
-              "name": "SignVidVerificationRequest",
+              "name": "SignVIDVerificationRequest",
               "code": 13,
               "mfgCode": null,
               "source": "client",
@@ -5190,7 +5190,7 @@
               "isEnabled": 1
             },
             {
-              "name": "SignVidVerificationResponse",
+              "name": "SignVIDVerificationResponse",
               "code": 14,
               "mfgCode": null,
               "source": "server",
@@ -20923,7 +20923,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -20955,7 +20955,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -21003,7 +21003,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -21019,7 +21019,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -21243,7 +21243,7 @@
               "code": 4,
               "mfgCode": null,
               "side": "server",
-              "type": "int8u",
+              "type": "uint8s",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,

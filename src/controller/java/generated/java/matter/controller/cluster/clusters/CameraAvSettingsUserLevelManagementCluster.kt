@@ -22,7 +22,6 @@ import java.util.logging.Level
 import java.util.logging.Logger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.transform
-import matter.controller.ByteSubscriptionState
 import matter.controller.InvokeRequest
 import matter.controller.InvokeResponse
 import matter.controller.MatterController
@@ -124,7 +123,7 @@ class CameraAvSettingsUserLevelManagementCluster(
   suspend fun MPTZSetPosition(
     pan: Short?,
     tilt: Short?,
-    zoom: Byte?,
+    zoom: UByte?,
     timedInvokeTimeout: Duration? = null,
   ) {
     val commandId: UInt = 0u
@@ -715,7 +714,7 @@ class CameraAvSettingsUserLevelManagementCluster(
     }
   }
 
-  suspend fun readZoomMaxAttribute(): Byte? {
+  suspend fun readZoomMaxAttribute(): UByte? {
     val ATTRIBUTE_ID: UInt = 4u
 
     val attributePath =
@@ -741,9 +740,9 @@ class CameraAvSettingsUserLevelManagementCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Byte? =
+    val decodedValue: UByte? =
       if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getByte(AnonymousTag)
+        tlvReader.getUByte(AnonymousTag)
       } else {
         null
       }
@@ -754,7 +753,7 @@ class CameraAvSettingsUserLevelManagementCluster(
   suspend fun subscribeZoomMaxAttribute(
     minInterval: Int,
     maxInterval: Int,
-  ): Flow<ByteSubscriptionState> {
+  ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 4u
     val attributePaths =
       listOf(
@@ -773,7 +772,7 @@ class CameraAvSettingsUserLevelManagementCluster(
       when (subscriptionState) {
         is SubscriptionState.SubscriptionErrorNotification -> {
           emit(
-            ByteSubscriptionState.Error(
+            UByteSubscriptionState.Error(
               Exception(
                 "Subscription terminated with error code: ${subscriptionState.terminationCause}"
               )
@@ -790,17 +789,17 @@ class CameraAvSettingsUserLevelManagementCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: Byte? =
+          val decodedValue: UByte? =
             if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getByte(AnonymousTag)
+              tlvReader.getUByte(AnonymousTag)
             } else {
               null
             }
 
-          decodedValue?.let { emit(ByteSubscriptionState.Success(it)) }
+          decodedValue?.let { emit(UByteSubscriptionState.Success(it)) }
         }
         SubscriptionState.SubscriptionEstablished -> {
-          emit(ByteSubscriptionState.SubscriptionEstablished)
+          emit(UByteSubscriptionState.SubscriptionEstablished)
         }
       }
     }

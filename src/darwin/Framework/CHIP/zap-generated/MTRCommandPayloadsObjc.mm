@@ -34550,7 +34550,7 @@ NS_ASSUME_NONNULL_BEGIN
     {
         if (self.zoom != nil) {
             auto & definedValue_0 = encodableStruct.zoom.Emplace();
-            definedValue_0 = self.zoom.charValue;
+            definedValue_0 = self.zoom.unsignedCharValue;
         }
     }
 

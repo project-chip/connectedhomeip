@@ -37,13 +37,13 @@ constexpr int16_t kMinPanValue  = -180;
 constexpr int16_t kMaxPanValue  = 180;
 constexpr int16_t kMinTiltValue = -180;
 constexpr int16_t kMaxTiltValue = 180;
-constexpr int8_t kMinZoomValue  = 1;
-constexpr int8_t kMaxZoomValue  = 100;
+constexpr uint8_t kMinZoomValue = 1;
+constexpr uint8_t kMaxZoomValue = 100;
 
 // Spec defined defaulta for Pan, Tilt, and Zoom
 constexpr int16_t defaultPan  = 0;
 constexpr int16_t defaultTilt = 0;
-constexpr int8_t defaultZoom  = 1;
+constexpr uint8_t defaultZoom  = 1;
 
 class Delegate;
 
@@ -124,7 +124,7 @@ public:
 
     CHIP_ERROR SetPanMax(int16_t aPanMax);
 
-    CHIP_ERROR SetZoomMax(int8_t aZoomMax);
+    CHIP_ERROR SetZoomMax(uint8_t aZoomMax);
 
     const MPTZStructType & GetMptzPosition() const { return mMptzPosition; }
 
@@ -132,7 +132,7 @@ public:
 
     const std::vector<uint16_t> GetDptzRelativeMove() const { return mDptzRelativeMove; }
 
-    int8_t GetZoomMax() const { return mZoomMax; }
+    uint8_t GetZoomMax() const { return mZoomMax; }
 
     int16_t GetTiltMin() const { return mTiltMin; }
 
@@ -157,7 +157,7 @@ public:
      * Allows for a delegate or application to set the zoom value given physical changes on the device itself, possibly due to
      * direct user changes
      */
-    void SetZoom(Optional<int8_t> aZoom);
+    void SetZoom(Optional<uint8_t> aZoom);
 
     /**
      * Allows for a delegate or application to provide the ID of an allocated video stream that is capable of digital movement.
@@ -193,7 +193,7 @@ private:
     int16_t mPanMax     = 180;
     int16_t mTiltMin    = -90;
     int16_t mTiltMax    = 90;
-    int8_t mZoomMax     = 100;
+    uint8_t mZoomMax    = 100;
 
     std::vector<MPTZPresetHelper> mMptzPresetHelpers;
     std::vector<uint16_t> mDptzRelativeMove;
@@ -264,7 +264,7 @@ public:
      * @param zoom The validated value of the zoom that is to be set
      */
     virtual Protocols::InteractionModel::Status MPTZSetPosition(Optional<int16_t> aPan, Optional<int16_t> aTilt,
-                                                                Optional<int8_t> aZoom) = 0;
+                                                                Optional<uint8_t> aZoom) = 0;
 
     /**
      * Allows any needed app handling given provided and already validated pan, tilt, and zoom values that are to be set based on
@@ -276,10 +276,10 @@ public:
      * @param zoom The validated value of the zoom that is to be set
      */
     virtual Protocols::InteractionModel::Status MPTZRelativeMove(Optional<int16_t> aPan, Optional<int16_t> aTilt,
-                                                                 Optional<int8_t> aZoom) = 0;
+                                                                 Optional<uint8_t> aZoom) = 0;
 
     virtual Protocols::InteractionModel::Status MPTZMoveToPreset(uint8_t aPreset, Optional<int16_t> aPan, Optional<int16_t> aTilt,
-                                                                 Optional<int8_t> aZoom)                                 = 0;
+                                                                 Optional<uint8_t> aZoom)                                 = 0;
     virtual Protocols::InteractionModel::Status MPTZSavePreset(uint8_t aPreset)                                          = 0;
     virtual Protocols::InteractionModel::Status MPTZRemovePreset(uint8_t aPreset)                                        = 0;
     virtual Protocols::InteractionModel::Status DPTZSetViewport(uint16_t aVideoStreamID,

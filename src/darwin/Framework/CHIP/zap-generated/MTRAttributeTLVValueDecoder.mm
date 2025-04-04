@@ -18106,7 +18106,7 @@ static id _Nullable DecodeAttributeValueForCameraAVSettingsUserLevelManagementCl
             value.tilt = nil;
         }
         if (cppValue.zoom.HasValue()) {
-            value.zoom = [NSNumber numberWithChar:cppValue.zoom.Value()];
+            value.zoom = [NSNumber numberWithUnsignedChar:cppValue.zoom.Value()];
         } else {
             value.zoom = nil;
         }
@@ -18157,7 +18157,7 @@ static id _Nullable DecodeAttributeValueForCameraAVSettingsUserLevelManagementCl
                     newElement_0.settings.tilt = nil;
                 }
                 if (entry_0.settings.zoom.HasValue()) {
-                    newElement_0.settings.zoom = [NSNumber numberWithChar:entry_0.settings.zoom.Value()];
+                    newElement_0.settings.zoom = [NSNumber numberWithUnsignedChar:entry_0.settings.zoom.Value()];
                 } else {
                     newElement_0.settings.zoom = nil;
                 }
@@ -18206,7 +18206,7 @@ static id _Nullable DecodeAttributeValueForCameraAVSettingsUserLevelManagementCl
             return nil;
         }
         NSNumber * _Nonnull value;
-        value = [NSNumber numberWithChar:cppValue];
+        value = [NSNumber numberWithUnsignedChar:cppValue];
         return value;
     }
     case Attributes::TiltMin::Id: {

@@ -26,7 +26,7 @@ import matter.tlv.TlvWriter
 class CameraAvSettingsUserLevelManagementClusterMPTZStruct(
   val pan: Optional<Short>,
   val tilt: Optional<Short>,
-  val zoom: Optional<Byte>,
+  val zoom: Optional<UByte>,
 ) {
   override fun toString(): String = buildString {
     append("CameraAvSettingsUserLevelManagementClusterMPTZStruct {\n")
@@ -79,7 +79,7 @@ class CameraAvSettingsUserLevelManagementClusterMPTZStruct(
         }
       val zoom =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_ZOOM))) {
-          Optional.of(tlvReader.getByte(ContextSpecificTag(TAG_ZOOM)))
+          Optional.of(tlvReader.getUByte(ContextSpecificTag(TAG_ZOOM)))
         } else {
           Optional.empty()
         }
