@@ -16,24 +16,23 @@
  *    limitations under the License.
  */
 
- #pragma once
+#pragma once
 
- #include <lib/core/CHIPPersistentStorageDelegate.h>
- #include <lib/core/DataModelTypes.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
+#include <lib/core/DataModelTypes.h>
 
- namespace chip {
- namespace app {
- namespace Clusters {
- namespace ClosureDimension {
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace ClosureDimension {
 
- /** @brief
-  *    Interface to allow interaction with interaction model and ember layers. Can be faked for unit testing.
-  */
- class MatterContext
- {
- public:
-    MatterContext(EndpointId endpoint) : mEndpoint(endpoint)
-    {}
+/** @brief
+ *    Interface to allow interaction with interaction model and ember layers. Can be faked for unit testing.
+ */
+class MatterContext
+{
+public:
+    MatterContext(EndpointId endpoint) : mEndpoint(endpoint) {}
 
     /**
      * @brief calls the attribute change callback
@@ -43,11 +42,11 @@
 
     virtual ~MatterContext() = default;
 
- private:
+private:
     EndpointId mEndpoint;
- };
+};
 
- } // namespace ClosureDimension
- } // namespace Clusters
- } // namespace app
- } // namespace chip
+} // namespace ClosureDimension
+} // namespace Clusters
+} // namespace app
+} // namespace chip

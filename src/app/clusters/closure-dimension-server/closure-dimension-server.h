@@ -28,7 +28,7 @@ namespace ClosureDimension {
 
 /**
  *  @brief App should instantiate and init one Interface per endpoint
-*/
+ */
 class Interface : public AttributeAccessInterface, public CommandHandlerInterface
 {
 public:

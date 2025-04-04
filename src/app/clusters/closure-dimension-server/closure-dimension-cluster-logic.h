@@ -18,38 +18,41 @@
  * @file Cross-platform API to handle cluster-specific logic for the valve configuration and control cluster on a single endpoint.
  */
 
- #pragma once
+#pragma once
 
- #include "closure-dimension-delegate.h"
- #include "closure-dimension-matter-context.h"
- #include "closure-dimension-cluster-objects.h"
+#include "closure-dimension-cluster-objects.h"
+#include "closure-dimension-delegate.h"
+#include "closure-dimension-matter-context.h"
 
- namespace chip {
- namespace app {
- namespace Clusters {
- namespace ClosureDimension {
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace ClosureDimension {
 
 static constexpr uint16_t PERCENT100THS_MAX_VALUE = 10000;
 
- struct ClusterConformance
- {
+struct ClusterConformance
+{
     inline bool HasFeature(Feature feature) const { return featureMap & to_underlying(feature); }
     uint32_t featureMap;
     bool supportsOverflow = false;
     bool Valid() const
     {
-        bool supportsRotation = HasFeature(Feature::kRotation);
+        bool supportsRotation       = HasFeature(Feature::kRotation);
         bool supportsMotionLatching = HasFeature(Feature::kMotionLatching);
 
-        //Overflow attribute can only be supported if device supports Rotation or MotionLatching features
-        if (supportsOverflow && !(supportsRotation || supportsMotionLatching)) {
+        // Overflow attribute can only be supported if device supports Rotation or MotionLatching features
+        if (supportsOverflow && !(supportsRotation || supportsMotionLatching))
+        {
             ChipLogError(Zcl,
-                         "Invalid closure dimension cluster conformance - Overflow is not supported without Rotation or MotionLatching features");
+                         "Invalid closure dimension cluster conformance - Overflow is not supported without Rotation or "
+                         "MotionLatching features");
             return false;
         }
 
-        //if device supports Rotation feature , Overflow attribute should be supported as per attribute conformance
-        if (supportsRotation && !supportsOverflow) {
+        // if device supports Rotation feature , Overflow attribute should be supported as per attribute conformance
+        if (supportsRotation && !supportsOverflow)
+        {
             ChipLogError(Zcl,
                          "Invalid closure dimension cluster conformance - Overflow is mandatory attribute for Rotation feature");
             return false;
@@ -57,38 +60,37 @@ static constexpr uint16_t PERCENT100THS_MAX_VALUE = 10000;
 
         return true;
     }
- };
+};
 
- struct ClusterState
- {
+struct ClusterState
+{
     GenericCurrentStateStruct currentState{};
     GenericTargetStruct target{};
     Percent100ths resolution = 0;
-    Percent100ths stepValue = 0;
-    ClosureUnitEnum unit = ClosureUnitEnum::kMillimeter;
+    Percent100ths stepValue  = 0;
+    ClosureUnitEnum unit     = ClosureUnitEnum::kMillimeter;
     Structs::UnitRangeStruct::Type unitRange{};
     Structs::RangePercent100thsStruct::Type limitRange{};
     TranslationDirectionEnum translationDirection = TranslationDirectionEnum::kBackward;
-    RotationAxisEnum rotationAxis = RotationAxisEnum::kBottom;
-    OverflowEnum overflow = OverflowEnum::kBottomInside;
-    ModulationTypeEnum modulationType = ModulationTypeEnum::kOpacity;
- };
+    RotationAxisEnum rotationAxis                 = RotationAxisEnum::kBottom;
+    OverflowEnum overflow                         = OverflowEnum::kBottomInside;
+    ModulationTypeEnum modulationType             = ModulationTypeEnum::kOpacity;
+};
 
- class ClusterLogic
- {
- public:
+class ClusterLogic
+{
+public:
     /**
      *  @brief Instantiates a ClusterLogic class. The caller maintains ownership of the driver and the context,
      *           but provides them for use by the ClusterLogic class.
      */
-     ClusterLogic(DelegateBase & clusterDriver, MatterContext & matterContext) :
-         mClusterDriver(clusterDriver), mMatterContext(matterContext)
-     {}
+    ClusterLogic(DelegateBase & clusterDriver, MatterContext & matterContext) :
+        mClusterDriver(clusterDriver), mMatterContext(matterContext)
+    {}
 
-     const ClusterState & GetState() { return mState; }
+    const ClusterState & GetState() { return mState; }
 
-     const ClusterConformance & GetConformance() { return mConformance; }
-
+    const ClusterConformance & GetConformance() { return mConformance; }
 
     /**
      *  @brief Validates the conformance and performs initialization
@@ -194,25 +196,25 @@ static constexpr uint16_t PERCENT100THS_MAX_VALUE = 10000;
      */
     CHIP_ERROR SetModulationType(const ModulationTypeEnum modulationType);
 
-     // All Get functions:
-     // Return CHIP_ERROR_INCORRECT_STATE if the class has not been initialized.
-     // Return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if the attribute is not supported by the conformance.
-     // Otherwise return CHIP_NO_ERROR and set the input parameter value to the current cluster state value
-     CHIP_ERROR GetCurrentState(GenericCurrentStateStruct & currentState);
-     CHIP_ERROR GetTarget(GenericTargetStruct & target);
-     CHIP_ERROR GetResolution(Percent100ths & resolution);
-     CHIP_ERROR GetStepValue(Percent100ths & stepValue);
-     CHIP_ERROR GetUnit(ClosureUnitEnum & unit);
-     CHIP_ERROR GetUnitRange(DataModel::Nullable<Structs::UnitRangeStruct::Type> & unitRange);
-     CHIP_ERROR GetLimitRange(Structs::RangePercent100thsStruct::Type & limitRange);
-     CHIP_ERROR GetTranslationDirection(TranslationDirectionEnum & translationDirection);
-     CHIP_ERROR GetRotationAxis(RotationAxisEnum & rotationAxis);
-     CHIP_ERROR GetOverflow(OverflowEnum & overflow);
-     CHIP_ERROR GetModulationType(ModulationTypeEnum & modulationType);
-     CHIP_ERROR GetFeatureMap(Attributes::FeatureMap::TypeInfo::Type & featureMap);
-     CHIP_ERROR GetClusterRevision(Attributes::ClusterRevision::TypeInfo::Type & clusterRevision);
+    // All Get functions:
+    // Return CHIP_ERROR_INCORRECT_STATE if the class has not been initialized.
+    // Return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if the attribute is not supported by the conformance.
+    // Otherwise return CHIP_NO_ERROR and set the input parameter value to the current cluster state value
+    CHIP_ERROR GetCurrentState(GenericCurrentStateStruct & currentState);
+    CHIP_ERROR GetTarget(GenericTargetStruct & target);
+    CHIP_ERROR GetResolution(Percent100ths & resolution);
+    CHIP_ERROR GetStepValue(Percent100ths & stepValue);
+    CHIP_ERROR GetUnit(ClosureUnitEnum & unit);
+    CHIP_ERROR GetUnitRange(DataModel::Nullable<Structs::UnitRangeStruct::Type> & unitRange);
+    CHIP_ERROR GetLimitRange(Structs::RangePercent100thsStruct::Type & limitRange);
+    CHIP_ERROR GetTranslationDirection(TranslationDirectionEnum & translationDirection);
+    CHIP_ERROR GetRotationAxis(RotationAxisEnum & rotationAxis);
+    CHIP_ERROR GetOverflow(OverflowEnum & overflow);
+    CHIP_ERROR GetModulationType(ModulationTypeEnum & modulationType);
+    CHIP_ERROR GetFeatureMap(Attributes::FeatureMap::TypeInfo::Type & featureMap);
+    CHIP_ERROR GetClusterRevision(Attributes::ClusterRevision::TypeInfo::Type & clusterRevision);
 
-     /**
+    /**
      *  @brief Calls delegate HandleSetTarget function after validating the parameters
      *  @param [in] position target position
      *  @param [in] latch Target latch
@@ -222,9 +224,10 @@ static constexpr uint16_t PERCENT100THS_MAX_VALUE = 10000;
      *          Returns CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR if the conformance is incorrect.
      *          Returns CHIP_NO_ERROR on succesful initialization.
      */
-     Protocols::InteractionModel::Status HandleSetTargetCommand(Optional<Percent100ths> position, Optional<TargetLatchEnum> latch, Optional<Globals::ThreeLevelAutoEnum> speed);
+    Protocols::InteractionModel::Status HandleSetTargetCommand(Optional<Percent100ths> position, Optional<TargetLatchEnum> latch,
+                                                               Optional<Globals::ThreeLevelAutoEnum> speed);
 
-     /**
+    /**
      *  @brief Calls delegate HandleStep function after validating the parameters
      *  @param [in] direction step direction
      *  @param [in] numberOfSteps Number of steps
@@ -234,9 +237,10 @@ static constexpr uint16_t PERCENT100THS_MAX_VALUE = 10000;
      *          Returns CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR if the conformance is incorrect.
      *          Returns CHIP_NO_ERROR on succesful initialization.
      */
-     Protocols::InteractionModel::Status HandleStepCommand(StepDirectionEnum direction, uint16_t numberOfSteps, Optional<Globals::ThreeLevelAutoEnum> speed);
+    Protocols::InteractionModel::Status HandleStepCommand(StepDirectionEnum direction, uint16_t numberOfSteps,
+                                                          Optional<Globals::ThreeLevelAutoEnum> speed);
 
- private:
+private:
     // This cluster implements version 1 of the Closure Dimension cluster. Do not change this revision without updating
     // the cluster to implement the newest features.
     static constexpr Attributes::ClusterRevision::TypeInfo::Type kClusterRevision = 1u;
@@ -246,9 +250,9 @@ static constexpr uint16_t PERCENT100THS_MAX_VALUE = 10000;
     ClusterConformance mConformance;
     DelegateBase & mClusterDriver;
     MatterContext & mMatterContext;
- };
+};
 
- } // namespace ClosureDimension
- } // namespace Clusters
- } // namespace app
- } // namespace chip
+} // namespace ClosureDimension
+} // namespace Clusters
+} // namespace app
+} // namespace chip

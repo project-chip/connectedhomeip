@@ -30,9 +30,9 @@ namespace ClosureDimension {
  */
 struct GenericCurrentStateStruct : public Structs::CurrentStruct::Type
 {
-    GenericCurrentStateStruct(Optional<Percent100ths> positionValue      = NullOptional,
-                        Optional<LatchingEnum> latchingValue             = NullOptional,
-                        Optional<Globals::ThreeLevelAutoEnum> speedValue = NullOptional)
+    GenericCurrentStateStruct(Optional<Percent100ths> positionValue            = NullOptional,
+                              Optional<LatchingEnum> latchingValue             = NullOptional,
+                              Optional<Globals::ThreeLevelAutoEnum> speedValue = NullOptional)
     {
         Set(positionValue, latchingValue, speedValue);
     }
@@ -49,8 +49,8 @@ struct GenericCurrentStateStruct : public Structs::CurrentStruct::Type
              Optional<Globals::ThreeLevelAutoEnum> speedValue = NullOptional)
     {
         position = positioningValue;
-        latching   = latchingValue;
-        speed       = speedValue;
+        latching = latchingValue;
+        speed    = speedValue;
     }
 
     bool operator==(const Structs::CurrentStruct::Type & rhs) const
@@ -69,9 +69,8 @@ struct GenericCurrentStateStruct : public Structs::CurrentStruct::Type
  */
 struct GenericTargetStruct : public Structs::TargetStruct::Type
 {
-    GenericTargetStruct(Optional<Percent100ths> positionValue       = NullOptional,
-                         Optional<TargetLatchEnum> latchValue             = NullOptional,
-                         Optional<Globals::ThreeLevelAutoEnum> speedValue = NullOptional)
+    GenericTargetStruct(Optional<Percent100ths> positionValue = NullOptional, Optional<TargetLatchEnum> latchValue = NullOptional,
+                        Optional<Globals::ThreeLevelAutoEnum> speedValue = NullOptional)
     {
         Set(positionValue, latchValue, speedValue);
     }

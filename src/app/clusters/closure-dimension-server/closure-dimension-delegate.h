@@ -16,24 +16,24 @@
  *    limitations under the License.
  */
 
- #pragma once
+#pragma once
 
- #include <app-common/zap-generated/cluster-enums.h>
- #include <app/data-model/Nullable.h>
- #include <app/util/basic-types.h>
+#include <app-common/zap-generated/cluster-enums.h>
+#include <app/data-model/Nullable.h>
+#include <app/util/basic-types.h>
 
- namespace chip {
- namespace app {
- namespace Clusters {
- namespace ClosureDimension {
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace ClosureDimension {
 
- /** @brief
-  *    Defines methods for implementing application-specific logic for the Closure Dimension Cluster.
-  */
+/** @brief
+ *    Defines methods for implementing application-specific logic for the Closure Dimension Cluster.
+ */
 
- class DelegateBase
- {
- public:
+class DelegateBase
+{
+public:
     DelegateBase(){};
     virtual ~DelegateBase() = default;
 
@@ -45,7 +45,7 @@
      * @return CHIP_NO_ERROR when succesfully implemented or return error.
      */
     virtual CHIP_ERROR HandleSetTarget(const Optional<Percent100ths> & pos, const Optional<TargetLatchEnum> & latch,
-        const Optional<Globals::ThreeLevelAutoEnum> & speed) = 0;
+                                       const Optional<Globals::ThreeLevelAutoEnum> & speed) = 0;
 
     /**
      * @brief This function handles Step command implementaion.
@@ -55,10 +55,10 @@
      * @return CHIP_NO_ERROR when succesfully implemented or return error.
      */
     virtual CHIP_ERROR HandleStep(const StepDirectionEnum & direction, const uint16_t & numberOfSteps,
-        const Optional<Globals::ThreeLevelAutoEnum> & speed) = 0;
- };
+                                  const Optional<Globals::ThreeLevelAutoEnum> & speed) = 0;
+};
 
- } // namespace ClosureDimension
- } // namespace Clusters
- } // namespace app
- } // namespace chip
+} // namespace ClosureDimension
+} // namespace Clusters
+} // namespace app
+} // namespace chip
