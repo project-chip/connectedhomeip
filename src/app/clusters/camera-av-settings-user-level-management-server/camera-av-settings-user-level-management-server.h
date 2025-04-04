@@ -43,7 +43,7 @@ constexpr uint8_t kMaxZoomValue = 100;
 // Spec defined defaulta for Pan, Tilt, and Zoom
 constexpr int16_t defaultPan  = 0;
 constexpr int16_t defaultTilt = 0;
-constexpr uint8_t defaultZoom  = 1;
+constexpr uint8_t defaultZoom = 1;
 
 class Delegate;
 
@@ -279,7 +279,7 @@ public:
                                                                  Optional<uint8_t> aZoom) = 0;
 
     virtual Protocols::InteractionModel::Status MPTZMoveToPreset(uint8_t aPreset, Optional<int16_t> aPan, Optional<int16_t> aTilt,
-                                                                 Optional<uint8_t> aZoom)                                 = 0;
+                                                                 Optional<uint8_t> aZoom)                                = 0;
     virtual Protocols::InteractionModel::Status MPTZSavePreset(uint8_t aPreset)                                          = 0;
     virtual Protocols::InteractionModel::Status MPTZRemovePreset(uint8_t aPreset)                                        = 0;
     virtual Protocols::InteractionModel::Status DPTZSetViewport(uint16_t aVideoStreamID,

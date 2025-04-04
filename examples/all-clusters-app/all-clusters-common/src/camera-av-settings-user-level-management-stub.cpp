@@ -130,7 +130,7 @@ void emberAfCameraAvSettingsUserLevelManagementClusterInitCallback(chip::Endpoin
     const int16_t appPanMax  = 90;
     const int16_t appTiltMin = -45;
     const int16_t appTiltMax = 45;
-    const uint8_t appZoomMax  = 75;
+    const uint8_t appZoomMax = 75;
 
     gDelegate = new AVSettingsUserLevelManagementDelegate;
     BitFlags<CameraAvSettingsUserLevelManagement::Feature, uint32_t> avsumFeatures(
