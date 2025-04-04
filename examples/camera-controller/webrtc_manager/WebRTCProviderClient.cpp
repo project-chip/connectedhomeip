@@ -189,7 +189,7 @@ void WebRTCProviderClient::HandleProvideOfferResponse(TLV::TLVReader & data)
     session.fabricIndex    = mPeerId.GetFabricIndex();
     session.peerEndpointID = mEndpointId;
 
-    //TODO:: spec needs to clarify how to set streamUsage here
+    // TODO:: spec needs to clarify how to set streamUsage here
 
     // Populate optional fields for video/audio stream IDs if present; set them to Null otherwise
     if (value.videoStreamID.HasValue())
