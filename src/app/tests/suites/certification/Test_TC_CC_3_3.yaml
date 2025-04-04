@@ -72,7 +72,7 @@ tests:
 
     - label:
           "Step 2b: TH sends StepHue command to DUT with StepMode=0x01 (up),
-          StepSize=60 and TransitionTime=200 (20s)"
+          StepSize=80 and TransitionTime=200 (20s)"
       PICS: CC.S.F00 && CC.S.C02.Rsp
       command: "StepHue"
       arguments:
@@ -80,64 +80,13 @@ tests:
               - name: "StepMode"
                 value: 1
               - name: "StepSize"
-                value: 60
+                value: 80
               - name: "TransitionTime"
                 value: 200
               - name: "OptionsMask"
                 value: 0
               - name: "OptionsOverride"
                 value: 0
-
-    - label: "Wait 10s"
-      PICS: CC.S.F00
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 10000
-
-    - label: "Step 2c: TH reads CurrentHue attribute from DUT"
-      PICS: CC.S.F00 && CC.S.A0000
-      command: "readAttribute"
-      attribute: "CurrentHue"
-      response:
-          constraints:
-              minValue: 195
-              maxValue: 254
-
-    - label: "Wait 10s"
-      PICS: CC.S.F00
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 10000
-
-    #Tolerance to be computed from the range
-    #Start value 230, expected value 5, 230 - 5 = 225, 225 % 15 = 34 , So 5+/-34 We need two range here as 254 is the max value
-    #Range will be: 230...254...0...39
-    #Multiple range not supported in YAML: https://github.com/project-chip/connectedhomeip/issues/23197
-    - label: "Step 2d: TH reads CurrentHue attribute from DUT"
-      PICS: CC.S.F00 && CC.S.A0000 && PICS_SKIP_SAMPLE_APP
-      verification: |
-          ./chip-tool colorcontrol read current-hue 1 1
-
-          After another 10 seconds , Verify that CurrentHue value is 5 On  TH(chip-tool)  Logs and below is the sample log provided for the raspi platform
-
-          [1649662328.012887][8447:8452] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0000 DataVersion: 4087279986
-          [1649662328.012957][8447:8452] CHIP:TOO:   Current hue: 5
-          [1649662328.013055][8447:8452] CHIP:EM: Sending Standalone Ack for MessageCounter:8634142 on exchange 13871i
-          (Value can vary)
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      arguments:
-          values:
-              - name: "message"
-                value: "Enter 'y' after success"
-              - name: "expectedValue"
-                value: "y"
 
     - label: "Wait 5s"
       PICS: CC.S.F00
@@ -148,25 +97,52 @@ tests:
               - name: "ms"
                 value: 5000
 
-    #Multiple range not supported in YAML: https://github.com/project-chip/connectedhomeip/issues/23197
-    - label: "Step 2e: TH reads CurrentHue attribute from DUT"
-      PICS: CC.S.F00 && CC.S.A0000 && PICS_SKIP_SAMPLE_APP
-      verification: |
-          ./chip-tool colorcontrol read current-hue 1 1
+    - label: "Step 2c: TH reads CurrentHue attribute from DUT" # Expects 220 (200 + 80*(5/20)) with a tolerance of +/- 3 (15% of 20), so the expected value is in the range [217, 223]
+      PICS: CC.S.F00 && CC.S.A0000
+      command: "readAttribute"
+      attribute: "CurrentHue"
+      response:
+          constraints:
+              minValue: 217
+              maxValue: 223
 
-          After another 5 seconds , Verify that CurrentHue value is 5 On  TH(chip-tool)  Logs and below is the sample log provided for the raspi platform
-
-          [1649662328.012887][8447:8452] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0000 DataVersion: 4087279986
-          [1649662328.012957][8447:8452] CHIP:TOO:   Current hue: 5
-          [1649662328.013055][8447:8452] CHIP:EM: Sending Standalone Ack for MessageCounter:8634142 on exchange 13871i
-      cluster: "LogCommands"
-      command: "UserPrompt"
+    - label: "Wait 15s"
+      PICS: CC.S.F00
+      cluster: "DelayCommands"
+      command: "WaitForMs"
       arguments:
           values:
-              - name: "message"
-                value: "Enter 'y' after success"
-              - name: "expectedValue"
-                value: "y"
+              - name: "ms"
+                value: 15000
+
+    # Start value 200, expected value 25 (200 + 80*(20/20) = 280 mod 255) with a tolerance of +/- 12 (15% of 80), so the expected value is in the range [13, 37]
+    - label: "Step 2d: TH reads CurrentHue attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0000
+      command: "readAttribute"
+      attribute: "CurrentHue"
+      response:
+          constraints:
+              minValue: 13
+              maxValue: 37
+
+    - label: "Wait 5s"
+      PICS: CC.S.F00
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5000
+
+    # Start value 200, expected value 25 (200 + 80*(20/20) = 280 mod 255) with a tolerance of +/- 2, so the expected value is in the range [23, 27]
+    - label: "Step 2e: TH reads CurrentHue attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0000
+      command: "readAttribute"
+      attribute: "CurrentHue"
+      response:
+          constraints:
+              minValue: 23
+              maxValue: 27
 
     - label:
           "Step 3a: TH sends MoveToHue command to DUT with Hue=50,
@@ -197,7 +173,7 @@ tests:
 
     - label:
           "Step 3b: TH sends StepHue command to DUT with StepMode=0x03 (down),
-          StepSize=60 and TransitionTime=200 (20s)"
+          StepSize=100 and TransitionTime=200 (20s)"
       PICS: CC.S.F00 && CC.S.C02.Rsp
       command: "StepHue"
       arguments:
@@ -205,49 +181,13 @@ tests:
               - name: "StepMode"
                 value: 3
               - name: "StepSize"
-                value: 60
+                value: 100
               - name: "TransitionTime"
                 value: 200
               - name: "OptionsMask"
                 value: 0
               - name: "OptionsOverride"
                 value: 0
-
-    - label: "Wait 10s"
-      PICS: CC.S.F00
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 10000
-
-    - label: "Step 3c: TH reads CurrentHue attribute from DUT"
-      PICS: CC.S.F00 && CC.S.A0000
-      command: "readAttribute"
-      attribute: "CurrentHue"
-      response:
-          constraints:
-              minValue: 17
-              maxValue: 23
-
-    - label: "Wait 10s"
-      PICS: CC.S.F00
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 10000
-
-    - label: "Step 3d: TH reads CurrentHue attribute from DUT"
-      PICS: CC.S.F00 && CC.S.A0000
-      command: "readAttribute"
-      attribute: "CurrentHue"
-      response:
-          constraints:
-              minValue: 208
-              maxValue: 255
 
     - label: "Wait 5s"
       PICS: CC.S.F00
@@ -258,14 +198,51 @@ tests:
               - name: "ms"
                 value: 5000
 
+    - label: "Step 3c: TH reads CurrentHue attribute from DUT" # Expects 25 (50 - 100*(5/20)) with a tolerance of +/- 4 (15% of 25), so the expected value is in the range [21, 29]
+      PICS: CC.S.F00 && CC.S.A0000
+      command: "readAttribute"
+      attribute: "CurrentHue"
+      response:
+          constraints:
+              minValue: 21
+              maxValue: 29
+
+    - label: "Wait 15s"
+      PICS: CC.S.F00
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 15000
+
+    - label: "Step 3d: TH reads CurrentHue attribute from DUT" # Expects 205 (50 - 100*(20/20) = -50 mod 255) with a tolerance of +/- 15 (15% of 100), so the expected value is in the range [190, 220]
+      PICS: CC.S.F00 && CC.S.A0000
+      command: "readAttribute"
+      attribute: "CurrentHue"
+      response:
+          constraints:
+              minValue: 190
+              maxValue: 220
+
+    - label: "Wait 5s"
+      PICS: CC.S.F00
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5000
+
+    # Expected value 205 (50 - 100*(20/20) = -50 mod 255) with a tolerance of +/- 2, so the expected value is in the range [203, 207]
     - label: "Step 3e: TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 208
-              maxValue: 255
+              minValue: 203
+              maxValue: 207
 
     - label: "Step 4a: TH reads ColorMode attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0008
