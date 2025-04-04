@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,7 +32,7 @@
 
 namespace chip {
 namespace Tracing {
-namespace Insights {
+namespace Diagnostics {
 class Scoped
 {
 public:
@@ -43,10 +43,10 @@ private:
     const char * mLabel;
     const char * mGroup;
 };
-} // namespace Insights
+} // namespace Diagnostics
 } // namespace Tracing
 } // namespace chip
 #define _CONCAT_IMPL(a, b) a##b
 #define _MACRO_CONCAT(a, b) _CONCAT_IMPL(a, b)
 
-#define MATTER_TRACE_SCOPE(label, group) ::chip::Tracing::Insights::Scoped _MACRO_CONCAT(_trace_scope, __COUNTER__)(label, group)
+#define MATTER_TRACE_SCOPE(label, group) ::chip::Tracing::Diagnostics::Scoped _MACRO_CONCAT(_trace_scope, __COUNTER__)(label, group)

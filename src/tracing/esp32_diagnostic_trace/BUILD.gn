@@ -1,5 +1,5 @@
 #
-#Copyright (c) 2023 Project CHIP Authors
+#Copyright (c) 2025 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,38 +20,28 @@ config("tracing") {
   include_dirs = [ "include" ]
 }
 
-declare_args() {
-  matter_enable_esp_insights_system_stats = false
-}
-
 static_library("backend") {
-  output_name = "libEsp32TracingBackend"
+  output_name = "libEsp32DiagnosticsBackend"
   output_dir = "${root_out_dir}/lib"
 
   sources = [
-    "counter.cpp",
-    "counter.h",
-    "esp32_tracing.cpp",
-    "esp32_tracing.h",
+    "Counter.cpp",
+    "Counter.h",
+    "DiagnosticEntry.cpp",
+    "DiagnosticEntry.h",
+    "DiagnosticStorage.cpp",
+    "DiagnosticStorage.h",
+    "DiagnosticTracing.cpp",
+    "DiagnosticTracing.h",
   ]
-  if (matter_enable_esp_insights_system_stats) {
-    sources += [
-      "insights_sys_stats.cpp",
-      "insights_sys_stats.h",
-    ]
-    deps = [
-      "${chip_root}/src/lib/core",
-      "${chip_root}/src/platform",
-      "${chip_root}/src/system",
-    ]
-  }
+
   public_deps = [
     "${chip_root}/src/lib/core",
     "${chip_root}/src/tracing",
   ]
 }
 
-source_set("esp32_trace_tracing") {
+source_set("esp32_diagnostic_tracing") {
   public = [ "include/matter/tracing/macros_impl.h" ]
   public_configs = [ ":tracing" ]
   deps = [ ":backend" ]
