@@ -2147,13 +2147,6 @@ class ChipDeviceController(ChipDeviceControllerBase):
         ''' 
         Commissions a Thread device over BLE.
 
-        Args:
-            discriminator (int): The discriminator to use for commissioning the device.
-            setupPinCode (str): The PIN code required for setup.
-            nodeId (int): The node ID of the device.
-            threadOperationalDataset (bytes): The operational dataset for the Thread device.
-            isShortDiscriminator (bool, optional): Whether the discriminator is short. Defaults to False.
-
         Returns:
             int: Effective Node ID of the device (as defined by the assigned NOC).
         '''
@@ -2295,7 +2288,14 @@ class ChipDeviceController(ChipDeviceControllerBase):
         ).raise_on_error()
 
     def GenerateICDRegistrationParameters(self):
-        ''' Generates ICD registration parameters for this controller. '''
+        ''' 
+        Generates ICD registration parameters for this controller. 
+
+        Returns:
+            ICDRegistrationParameters: An object containing the generated parameters 
+            including symmetricKey, checkInNodeId, monitoredSubject, stayActiveMs, 
+            and clientType.
+        '''
         return ICDRegistrationParameters(
             secrets.token_bytes(16),
             self._nodeId,
@@ -2308,6 +2308,9 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
         Args:
             parameters: A ICDRegistrationParameters for the parameters used for ICD registration, or None for default arguments.
+
+        Raises: 
+            ChipStackError: On failure.
         '''
         if parameters is None:
             raise ValueError("ICD registration parameter required.")
@@ -2321,14 +2324,24 @@ class ChipDeviceController(ChipDeviceControllerBase):
         ).raise_on_error()
 
     def DisableICDRegistration(self):
-        ''' Disables ICD registration. '''
+        ''' 
+        Disables ICD registration. 
+
+        Raises: 
+            ChipStackError: On failure.
+        '''
         self.CheckIsActive()
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_SetIcdRegistrationParameters(False, None)
         ).raise_on_error()
 
     def GetFabricCheckResult(self) -> int:
-        ''' Returns the fabric check result if SetCheckMatchingFabric was used.'''
+        ''' 
+        Returns the fabric check result if SetCheckMatchingFabric was used.
+
+        Returns:
+            int: The fabric check result, or `-1` if no check was performed.
+        '''
         return self._fabricCheckNodeId
 
     async def CommissionOnNetwork(self, nodeId: int, setupPinCode: int,
@@ -2350,7 +2363,8 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
         The filter can be an integer, a string or None depending on the actual type of selected filter.
 
-        Raises a ChipStackError on failure.
+        Raises: 
+            ChipStackError: On failure.       
 
         Returns:
             - Effective Node ID of the device (as defined by the assigned NOC)
@@ -2375,6 +2389,9 @@ class ChipDeviceController(ChipDeviceControllerBase):
         Passes captured RCAC data back to Python test modules for validation
         - Setting buffer size to max size mentioned in spec:
         - Ref: https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/06c4d55962954546ecf093c221fe1dab57645028/policies/matter_certificate_policy.adoc#615-key-sizes
+
+        Returns:
+             bytes: A bytes sentence representing the RCAC, or None if no data.
         '''
         rcac_size = 400
         rcac_buffer = (ctypes.c_uint8 * rcac_size)()  # Allocate buffer
@@ -2399,13 +2416,15 @@ class ChipDeviceController(ChipDeviceControllerBase):
         return rcac_bytes
 
     async def CommissionWithCode(self, setupPayload: str, nodeid: int, discoveryType: DiscoveryType = DiscoveryType.DISCOVERY_ALL) -> int:
-        ''' Commission with the given nodeid from the setupPayload.
-            setupPayload may be a QR or manual code.
+        ''' 
+        Commission with the given nodeid from the setupPayload.
+        setupPayload may be a QR or manual code.
 
-            Raises a ChipStackError on failure.
+        Raises: 
+            ChipStackError: On failure.
 
         Returns:
-            - Effective Node ID of the device (as defined by the assigned NOC)
+            Effective Node ID of the device (as defined by the assigned NOC)
         '''
         self.CheckIsActive()
 
@@ -2419,13 +2438,15 @@ class ChipDeviceController(ChipDeviceControllerBase):
             return await asyncio.futures.wrap_future(ctx.future)
 
     async def CommissionIP(self, ipaddr: str, setupPinCode: int, nodeid: int) -> int:
-        """ DEPRECATED, DO NOT USE! Use `CommissionOnNetwork` or `CommissionWithCode`
+        ''' 
+        DEPRECATED, DO NOT USE! Use `CommissionOnNetwork` or `CommissionWithCode`
 
-        Raises a ChipStackError on failure.
+        Raises: 
+            ChipStackError: On failure.
 
         Returns:
-            - Effective Node ID of the device (as defined by the assigned NOC)
-        """
+            Effective Node ID of the device (as defined by the assigned NOC)
+        '''
         self.CheckIsActive()
 
         async with self._commissioning_context as ctx:
@@ -2438,6 +2459,12 @@ class ChipDeviceController(ChipDeviceControllerBase):
             return await asyncio.futures.wrap_future(ctx.future)
 
     def NOCChainCallback(self, nocChain):
+        '''
+        Callback function for handling the NOC chain result.
+
+        Returns:
+            None
+        '''
         if self._issue_node_chain_context.future is None:
             LOGGER.exception("NOCChainCallback while not expecting a callback")
             return
@@ -2445,8 +2472,13 @@ class ChipDeviceController(ChipDeviceControllerBase):
         return
 
     async def IssueNOCChain(self, csr: Clusters.OperationalCredentials.Commands.CSRResponse, nodeId: int):
-        """Issue an NOC chain using the associated OperationalCredentialsDelegate.
-        The NOC chain will be provided in TLV cert format."""
+        '''
+        Issue an NOC chain using the associated OperationalCredentialsDelegate.
+        The NOC chain will be provided in TLV cert format.
+
+        Returns:
+            asyncio.Future: A future object that is the result of the NOC Chain operation.
+        '''
         self.CheckIsActive()
 
         async with self._issue_node_chain_context as ctx:
@@ -2458,10 +2490,14 @@ class ChipDeviceController(ChipDeviceControllerBase):
             return await asyncio.futures.wrap_future(ctx.future)
 
     def SetDACRevocationSetPath(self, dacRevocationSetPath: typing.Optional[str]):
-        ''' Set the path to the device attestation revocation set JSON file.
+        ''' 
+        Set the path to the device attestation revocation set JSON file.
 
         Args:
-            dacRevocationSetPath: Path to the JSON file containing the device attestation revocation set
+            dacRevocationSetPath: Path to the JSON file containing the device attestation revocation set.
+
+        Raises: 
+            ChipStackError: On failure.
         '''
         self.CheckIsActive()
         self._ChipStack.Call(
@@ -2471,12 +2507,14 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
 
 class BareChipDeviceController(ChipDeviceControllerBase):
-    ''' A bare device controller without AutoCommissioner support.
+    ''' 
+    A bare device controller without AutoCommissioner support.
     '''
 
     def __init__(self, operationalKey: p256keypair.P256Keypair, noc: bytes,
                  icac: typing.Union[bytes, None], rcac: bytes, ipk: typing.Union[bytes, None], adminVendorId: int, name: typing.Optional[str] = None):
-        '''Creates a controller without AutoCommissioner.
+        '''
+        Creates a controller without AutoCommissioner.
 
         The allocated controller uses the noc, icac, rcac and ipk instead of the default,
         random generated certificates / keys. Which is suitable for creating a controller
@@ -2491,6 +2529,9 @@ class BareChipDeviceController(ChipDeviceControllerBase):
                 will be used.
             adminVendorId: The adminVendorId of the controller.
             name: The name of the controller, for debugging use only.
+
+        Raises: 
+            ChipStackError: On failure
         '''
         super().__init__(name or f"ctrl(v/{adminVendorId})")
 
