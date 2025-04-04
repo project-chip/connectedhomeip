@@ -98,7 +98,7 @@ class TC_CC_2_1(MatterBaseTest):
             TestStep(21, 'TH reads from the DUT the (0x400c) ColorTempPhysicalMaxMireds attribute'),
             TestStep(22, 'TH reads from the DUT the (0x400d) CoupleColorTempToLevelMinMireds attribute'),
             TestStep(23, 'TH reads from the DUT the (0x4010) StartUpColorTemperatureMireds attribute'),
-            TestStep(24, 'Verify that the DUT response contains an uint8 and value SHALL be in range from 1..6. NumberOfPrimaries attribute equals to the Primary<X,Y,Intensity> attributes provided.'),
+            TestStep(24, 'TH reads from the DUT the (0x0010) NumberOfPrimaries attribute and verify that the DUT response contains an uint8 and value SHALL be in range from 0..6. NumberOfPrimaries attribute is consistent with the PrimaryN<X,Y,Intensity> attributes provided'),
             TestStep(
                 25, 'TH reads Primary1X attribute from DUT and Verify that the DUT response contains an uint16 [Min:0 Max:0xfeff] if NumberOfPrimaries is 1 or more'),
             TestStep(
@@ -144,20 +144,29 @@ class TC_CC_2_1(MatterBaseTest):
 
         return steps
 
-    async def _get_totalnumberofprimaries(self) -> int:
+    async def _get_totalnumberofprimaries(self, primaries: int) -> int:
         """Read the attributes which area Primaries<n>X attributes and return the total found and avaiable in the current cluster.
 
         Returns:
             numberofprimaries(int) : Number of Primary attributes found.
         """
+        # Generate the NumberofPrimaries we should find.
         numberofprimaries = 0
+        primary_attr_arr = [f"Primary{npindex}X" for npindex in range(1, primaries+1)]
+        # Read all Primary attributes avaiable in the cluster
         instance_attribute_names = [attr for attr in self.attributes.__dict__.keys(
         ) if not attr.startswith("__") and attr.startswith('Primary')]
         for primaryattr in instance_attribute_names:
            # Use X as reference
             primaryx_pattern = re.compile(r'^Primary\d{1,2}X$')
+            # Verify the attribute match and is available in the cluster the check if is contained in the generated list.
             if primaryx_pattern.match(str(primaryattr)) and await self.cluster_has_attribute(self.endpoint, getattr(self.attributes, str(primaryattr))):
-                numberofprimaries += 1
+                if primaryattr in primary_attr_arr:
+                    numberofprimaries += 1
+                else:
+                    asserts.fail(
+                        f"Attrute {primaryattr} from the cluster should not be present based on the the value provided for NumberofPrimaries: {numberofprimaries}")
+
         return numberofprimaries
 
     async def _verify_attribute(self, attribute: Attribute, data_type: ValueTypesEnum, enum_range: Optional[list] = None, min_len: Optional[int] = None, max_len: Optional[int] = None):
@@ -329,37 +338,41 @@ class TC_CC_2_1(MatterBaseTest):
         # After this is resolved, check not 0.
 
         self.step(24)
-        # Read NUmberofPrimaries from the cluster.
+        # Read NumberofPrimaries from the cluster.
         numberofprimaries_value = await self._verify_attribute(self.attributes.NumberOfPrimaries, ValueTypesEnum.UINT8, min_len=0, max_len=6)
-        # Get the total number of primaries avaiable in the cluster.
-        primariesfound = await self._get_totalnumberofprimaries()
-        logger.info(f"Fetched Primaries attributes {primariesfound}")
-        asserts.assert_equal(numberofprimaries_value, primariesfound,
-                             "NumberOfPrimaries does not match with the Primaries found in the cluster.")
-        # Verify for numberofprimaries section
-        # We are at step 24 before all the number of primaries checks
-        current_step = 24
+        if numberofprimaries_value == 0:
+            logger.info("NumberofPrimaries is 0 skipping from 25 to 43.")
+            for i in range(25, 43):
+                self.skip_step(i)
+        else:
+            primariesfound = await self._get_totalnumberofprimaries(primaries=numberofprimaries_value)
+            logger.info(f"Fetched Primaries attributes {primariesfound}")
+            asserts.assert_equal(numberofprimaries_value, primariesfound,
+                                 "NumberOfPrimaries does not match with the Primaries found in the cluster.")
+            # Verify for numberofprimaries section
+            # We are at step 24 before all the number of primaries checks
+            current_step = 24
 
-        # range is defined from 1-6
-        for primariesindex in range(1, 7):
-            skip_steps_verifynp = self._verify_for_numberofprimaries_value(numberofprimaries_value, primariesindex)
-            if skip_steps_verifynp:
-                # Skip the 3 steps
-                logger.info(f"Skipping for NumberofPrimaries {primariesindex}")
-                for i in range(1, 4):
-                    current_step += 1
-                    self.skip_step(current_step)
-                continue
-            # Get the attributes to check then perform guard (at _verify_attribute)
-            current_step += 1
-            self.step(current_step)
-            await self._verify_attribute(getattr(self.attributes, f"Primary{primariesindex}X"), ValueTypesEnum.UINT16, max_len=0xfeff)
-            current_step += 1
-            self.step(current_step)
-            await self._verify_attribute(getattr(self.attributes, f"Primary{primariesindex}Y"), ValueTypesEnum.UINT16, max_len=0xfeff)
-            current_step += 1
-            self.step(current_step)
-            await self._verify_attribute(getattr(self.attributes, f"Primary{primariesindex}Intensity"), ValueTypesEnum.UINT8)
+            # range is defined from 1-6
+            for primariesindex in range(1, 7):
+                skip_steps_verifynp = self._verify_for_numberofprimaries_value(numberofprimaries_value, primariesindex)
+                if skip_steps_verifynp:
+                    # Skip the 3 steps
+                    logger.info(f"Skipping for NumberofPrimaries {primariesindex}")
+                    for i in range(1, 4):
+                        current_step += 1
+                        self.skip_step(current_step)
+                    continue
+                # Get the attributes to check then perform guard (at _verify_attribute)
+                current_step += 1
+                self.step(current_step)
+                await self._verify_attribute(getattr(self.attributes, f"Primary{primariesindex}X"), ValueTypesEnum.UINT16, max_len=0xfeff)
+                current_step += 1
+                self.step(current_step)
+                await self._verify_attribute(getattr(self.attributes, f"Primary{primariesindex}Y"), ValueTypesEnum.UINT16, max_len=0xfeff)
+                current_step += 1
+                self.step(current_step)
+                await self._verify_attribute(getattr(self.attributes, f"Primary{primariesindex}Intensity"), ValueTypesEnum.UINT8)
 
         # No more check numberofprimaries at this point
         self.step(43)
