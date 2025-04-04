@@ -35,45 +35,74 @@ CHIP_ERROR ClusterLogic::Init(const ClusterConformance & conformance)
    return CHIP_NO_ERROR;
 }
 
- CHIP_ERROR ClusterLogic::SetCurrent(const GenericCurrentStruct & current)
+ CHIP_ERROR ClusterLogic::SetCurrentState(GenericCurrentStateStruct & currentState)
  {
     //TODO : Q reporting for this attribute
-    if(current.position.HasValue()) {
-        VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning),CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-        VerifyOrReturnError(current.position.Value() <= PERCENT100THS_MAX_VALUE, CHIP_ERROR_INVALID_ARGUMENT);
+       
+    if(currentState.position.HasValue()) {
+        if (mConformance.HasFeature(Feature::kPositioning)) {
+            VerifyOrReturnError(currentState.position.Value() <= PERCENT100THS_MAX_VALUE, CHIP_ERROR_INVALID_ARGUMENT);
+        } else {
+            ChipLogDetail(Zcl, "Disregarding the position value in the current state since the Positioning feature is not enabled.");
+            currentState.position.ClearValue();
+        }
     }
-    if(current.latching.HasValue()) {
-        VerifyOrReturnError(mConformance.HasFeature(Feature::kMotionLatching),CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-        VerifyOrReturnError(EnsureKnownEnumValue(current.latching.Value()) != LatchingEnum::kUnknownEnumValue, CHIP_ERROR_INVALID_ARGUMENT);
+    
+    if(currentState.latching.HasValue()) {
+        if(mConformance.HasFeature(Feature::kMotionLatching)) {
+            VerifyOrReturnError(EnsureKnownEnumValue(currentState.latching.Value()) != LatchingEnum::kUnknownEnumValue, CHIP_ERROR_INVALID_ARGUMENT);
+        } else {
+            ChipLogDetail(Zcl, "Disregarding the latch value in the current state since the MotionLatching feature is not enabled.");
+            currentState.latching.ClearValue();
+        }
     }
-    if(current.speed.HasValue()) {
-        VerifyOrReturnError(mConformance.HasFeature(Feature::kSpeed),CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-        VerifyOrReturnError(EnsureKnownEnumValue(current.speed.Value()) != Globals::ThreeLevelAutoEnum::kUnknownEnumValue, CHIP_ERROR_INVALID_ARGUMENT);
+    
+    if(currentState.speed.HasValue()) {
+        if(mConformance.HasFeature(Feature::kSpeed)) {
+            VerifyOrReturnError(EnsureKnownEnumValue(currentState.speed.Value()) != Globals::ThreeLevelAutoEnum::kUnknownEnumValue, CHIP_ERROR_INVALID_ARGUMENT);
+        } else {
+            ChipLogDetail(Zcl, "Disregarding the speed value in the current state since the Speed feature is not enabled.");
+            currentState.speed.ClearValue();
+        }
     }
       
-    //TODO: Current.Position value SHALL follow the scaling from "Resolution Attribute".
+    //TODO: currentState.Position value SHALL follow the scaling from "Resolution Attribute".
     
-    if (current != mState.current) {
-        mState.current = current;
+    if (currentState != mState.currentState) { 
+        mState.currentState = currentState;
         mMatterContext.MarkDirty(Attributes::Current::Id);
     }
     
     return CHIP_NO_ERROR;
  }
  
- CHIP_ERROR ClusterLogic::SetTarget(const GenericTargetStruct & target)
+ CHIP_ERROR ClusterLogic::SetTarget(GenericTargetStruct & target)
  {
     if(target.position.HasValue()) {
-        VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning),CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-        VerifyOrReturnError(target.position.Value() <= PERCENT100THS_MAX_VALUE, CHIP_ERROR_INVALID_ARGUMENT);
+        if (mConformance.HasFeature(Feature::kPositioning)) {
+            VerifyOrReturnError(target.position.Value() <= PERCENT100THS_MAX_VALUE, CHIP_ERROR_INVALID_ARGUMENT);
+        } else {
+            ChipLogDetail(Zcl, "Disregarding the position value in the target since the Positioning feature is not enabled.");
+            target.position.ClearValue();
+        }
     }
+    
     if(target.latch.HasValue()) {
-        VerifyOrReturnError(mConformance.HasFeature(Feature::kMotionLatching),CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-        VerifyOrReturnError(EnsureKnownEnumValue(target.latch.Value()) != TargetLatchEnum::kUnknownEnumValue, CHIP_ERROR_INVALID_ARGUMENT);
+        if(mConformance.HasFeature(Feature::kMotionLatching)) {
+            VerifyOrReturnError(EnsureKnownEnumValue(target.latch.Value()) != TargetLatchEnum::kUnknownEnumValue, CHIP_ERROR_INVALID_ARGUMENT);
+        } else {
+            ChipLogDetail(Zcl, "Disregarding the latch value in the target since the MotionLatching feature is not enabled.");
+            target.latch.ClearValue();
+        }
     }
+    
     if(target.speed.HasValue()) {
-        VerifyOrReturnError(mConformance.HasFeature(Feature::kSpeed),CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-        VerifyOrReturnError(EnsureKnownEnumValue(target.speed.Value()) != Globals::ThreeLevelAutoEnum::kUnknownEnumValue, CHIP_ERROR_INVALID_ARGUMENT);
+        if(mConformance.HasFeature(Feature::kSpeed)) {
+            VerifyOrReturnError(EnsureKnownEnumValue(target.speed.Value()) != Globals::ThreeLevelAutoEnum::kUnknownEnumValue, CHIP_ERROR_INVALID_ARGUMENT);
+        } else {
+            ChipLogDetail(Zcl, "Disregarding the speed value in the target since the Speed feature is not enabled.");
+            target.speed.ClearValue();
+        }
     }
     
     //TODO: Target.Position value SHALL follow the scaling from "Resolution Attribute".
@@ -212,10 +241,10 @@ CHIP_ERROR ClusterLogic::Init(const ClusterConformance & conformance)
     return CHIP_NO_ERROR;
  }
  
- CHIP_ERROR ClusterLogic::GetCurrent(GenericCurrentStruct & current)
+ CHIP_ERROR ClusterLogic::GetCurrentState(GenericCurrentStateStruct & currentState)
  {
      VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
-     current = mState.current;
+     currentState = mState.currentState;
      return CHIP_NO_ERROR;
  }
  

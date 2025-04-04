@@ -26,20 +26,20 @@ namespace Clusters {
 namespace ClosureDimension {
 
 /**
- * Structure represents the current struct of a closure dimension cluster derivation instance.
+ * Structure represents the current state struct of a closure dimension cluster derivation instance.
  */
-struct GenericCurrentStruct : public Structs::CurrentStruct::Type
+struct GenericCurrentStateStruct : public Structs::CurrentStruct::Type
 {
-    GenericCurrentStruct(Optional<Percent100ths> positionValue      = NullOptional,
+    GenericCurrentStateStruct(Optional<Percent100ths> positionValue      = NullOptional,
                         Optional<LatchingEnum> latchingValue             = NullOptional,
                         Optional<Globals::ThreeLevelAutoEnum> speedValue = NullOptional)
     {
         Set(positionValue, latchingValue, speedValue);
     }
 
-    GenericCurrentStruct(const GenericCurrentStruct & current) { *this = current; }
+    GenericCurrentStateStruct(const GenericCurrentStateStruct & currentState) { *this = currentState; }
 
-    GenericCurrentStruct & operator=(const GenericCurrentStruct & current)
+    GenericCurrentStateStruct & operator=(const GenericCurrentStateStruct & current)
     {
         Set(current.position, current.latching, current.speed);
         return *this;

@@ -35,30 +35,39 @@ static constexpr uint16_t PERCENT100THS_MAX_VALUE = 10000;
  {
     inline bool HasFeature(Feature feature) const { return featureMap & to_underlying(feature); }
     uint32_t featureMap;
-    bool supportsOverflow;
+    bool supportsOverflow = false;
     bool Valid() const
     {
         bool supportsRotation = HasFeature(Feature::kRotation);
         bool supportsMotionLatching = HasFeature(Feature::kMotionLatching);
-        if (supportsOverflow && !(supportsRotation || supportsMotionLatching))
-        {
+
+        //Overflow attribute can only be supported if device supports Rotation or MotionLatching features
+        if (supportsOverflow && !(supportsRotation || supportsMotionLatching)) {
             ChipLogError(Zcl,
                          "Invalid closure dimension cluster conformance - Overflow is not supported without Rotation or MotionLatching features");
             return false;
         }
+
+        //if device supports Rotation feature , Overflow attribute should be supported as per attribute conformance
+        if (supportsRotation && !supportsOverflow) {
+            ChipLogError(Zcl,
+                         "Invalid closure dimension cluster conformance - Overflow is mandatory attribute for Rotation feature");
+            return false;
+        }
+
         return true;
     }
  };
  
  struct ClusterState
  {
-    GenericCurrentStruct current;
-    GenericTargetStruct target;
+    GenericCurrentStateStruct currentState{};
+    GenericTargetStruct target{};
     Percent100ths resolution = 0;
     Percent100ths stepValue = 0;
     ClosureUnitEnum unit = ClosureUnitEnum::kMillimeter;
-    Structs::UnitRangeStruct::Type unitRange;
-    Structs::RangePercent100thsStruct::Type limitRange;
+    Structs::UnitRangeStruct::Type unitRange{};
+    Structs::RangePercent100thsStruct::Type limitRange{};
     TranslationDirectionEnum translationDirection = TranslationDirectionEnum::kBackward;
     RotationAxisEnum rotationAxis = RotationAxisEnum::kBottom;
     OverflowEnum overflow = OverflowEnum::kBottomInside;
@@ -74,9 +83,7 @@ static constexpr uint16_t PERCENT100THS_MAX_VALUE = 10000;
      */ 
      ClusterLogic(DelegateBase & clusterDriver, MatterContext & matterContext) :
          mClusterDriver(clusterDriver), mMatterContext(matterContext)
-     {
-         (void) mClusterDriver;
-     }
+     {}
      
      const ClusterState & GetState() { return mState; }
      
@@ -93,22 +100,20 @@ static constexpr uint16_t PERCENT100THS_MAX_VALUE = 10000;
     CHIP_ERROR Init(const ClusterConformance & conformance);
     
     /**
-     * @brief Set Current.
-     * @param[in] current Current Position, Latching and/or Speed.
+     * @brief Set Current State.
+     * @param[in] currentState Current State Position, Latching and/or Speed.
      * @return CHIP_NO_ERROR if set was successful.
      *         CHIP_ERROR_INVALID_ARGUMENT if arguments are not valid
-     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
      */
-    CHIP_ERROR SetCurrent(const GenericCurrentStruct & current);
+    CHIP_ERROR SetCurrentState(GenericCurrentStateStruct & currentState);
     
     /**
      * @brief Set Target.
      * @param[in] target Target Position, Latching and/or Speed.
      * @return CHIP_NO_ERROR if set was successful.
      *         CHIP_ERROR_INVALID_ARGUMENT if arguments are not valid
-     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported. 
      */
-    CHIP_ERROR SetTarget(const GenericTargetStruct & target);
+    CHIP_ERROR SetTarget(GenericTargetStruct & target);
     
     /**
      * @brief Set Resolution.
@@ -193,7 +198,7 @@ static constexpr uint16_t PERCENT100THS_MAX_VALUE = 10000;
      // Return CHIP_ERROR_INCORRECT_STATE if the class has not been initialized.
      // Return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if the attribute is not supported by the conformance.
      // Otherwise return CHIP_NO_ERROR and set the input parameter value to the current cluster state value
-     CHIP_ERROR GetCurrent(GenericCurrentStruct & current);
+     CHIP_ERROR GetCurrentState(GenericCurrentStateStruct & currentState);
      CHIP_ERROR GetTarget(GenericTargetStruct & target);
      CHIP_ERROR GetResolution(Percent100ths & resolution);
      CHIP_ERROR GetStepValue(Percent100ths & stepValue);

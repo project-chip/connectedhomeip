@@ -43,8 +43,8 @@
      switch (aPath.mAttributeId)
      {
      case Attributes::Current::Id: {
-        typedef GenericCurrentStruct T;
-         return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetCurrent(ret); });
+        typedef GenericCurrentStateStruct T;
+         return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetCurrentState(ret); });
      }
      case Attributes::Target::Id: {
          typedef GenericTargetStruct T;
