@@ -50,4 +50,6 @@ tests:
       response:
           constraints:
               type: bitmap8
+              minValue: 0
+              maxValue: 3
               python: "(value & WindSupportValue) == value"
