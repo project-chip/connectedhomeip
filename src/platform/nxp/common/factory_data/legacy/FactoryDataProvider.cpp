@@ -29,10 +29,6 @@
 #endif
 #include <cctype>
 
-#if CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
-extern "C" WEAK CHIP_ERROR FactoryDataDefaultRestoreMechanism();
-#endif
-
 #define CBC_INITIAL_VECTOR_SIZE 16
 
 using namespace chip::DeviceLayer::PersistedStorage;

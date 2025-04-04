@@ -19,6 +19,10 @@
 
 #include "fsl_adapter_flash.h"
 
+#if CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
+extern "C" WEAK CHIP_ERROR FactoryDataDefaultRestoreMechanism();
+#endif
+
 namespace chip {
 namespace DeviceLayer {
 
