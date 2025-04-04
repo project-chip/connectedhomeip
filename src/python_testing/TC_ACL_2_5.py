@@ -166,7 +166,7 @@ class TC_ACL_2_5(MatterBaseTest):
                     events=[(0, acec_event)],
                     fabricFiltered=True
                 )
-                self.print_step(f"Events response", str(events_response))
+                self.print_step("Events response", str(events_response))
 
                 # Extract events from the response
                 events = events_response
@@ -178,7 +178,7 @@ class TC_ACL_2_5(MatterBaseTest):
 
                     # Find the specific event we're looking for
                     for event_data in events:
-                        self.print_step(f"Examining event", str(event_data))
+                        self.print_step("Examining event", str(event_data))
 
                         # Check this event for required dictionary items
                         if (hasattr(event_data, 'Data') and
@@ -267,7 +267,6 @@ class TC_ACL_2_5(MatterBaseTest):
         # Try multiple attempts with increasing timeouts
         max_attempts = 5
         found_change = False
-        found_event = False  # Flag to indicate if we found a relevant event
 
         for attempt in range(1, max_attempts + 1):
             try:
@@ -278,7 +277,7 @@ class TC_ACL_2_5(MatterBaseTest):
                     fabricFiltered=True,
                     eventNumberFilter=6
                 )
-                self.print_step(f"Events response", str(events_response))
+                self.print_step("Events response", str(events_response))
 
                 # Extract events from the response
                 events = events_response
@@ -286,7 +285,7 @@ class TC_ACL_2_5(MatterBaseTest):
 
                 # We need to find a change event
                 for event_data in events:
-                    self.print_step(f"Examining event", str(event_data))
+                    self.print_step("Examining event", str(event_data))
 
                     if hasattr(event_data, 'Data') and hasattr(event_data.Data, 'changeType'):
                         # Check for changed event
@@ -467,11 +466,11 @@ class TC_ACL_2_5(MatterBaseTest):
 
                 # We need to find a remove event with specific fields
                 for event_data in events:
-                    self.print_step(f"Examining event", str(event_data))
+                    self.print_step("Examining event", str(event_data))
 
                     if hasattr(event_data, 'Data') and hasattr(event_data.Data, 'changeType'):
                         # Check for remove event with specific data
-                        self.print_step(f"event data", str(event_data))
+                        self.print_step("event data", str(event_data))
                         if (event_data.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kRemoved and
                             event_data.Data.adminNodeID == self.default_controller.nodeId and
                             isinstance(event_data.Data.adminPasscodeID, Nullable) and
