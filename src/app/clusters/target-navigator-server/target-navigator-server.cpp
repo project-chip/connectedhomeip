@@ -264,3 +264,8 @@ void MatterTargetNavigatorPluginServerInitCallback()
 {
     app::AttributeAccessInterfaceRegistry::Instance().Register(&gTargetNavigatorAttrAccess);
 }
+
+void MatterTargetNavigatorPluginServerShutdownCallback()
+{
+    app::AttributeAccessInterfaceRegistry::Instance().Unregister(&gTargetNavigatorAttrAccess);
+}

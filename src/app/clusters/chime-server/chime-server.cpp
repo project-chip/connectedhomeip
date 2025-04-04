@@ -277,3 +277,4 @@ void ChimeServer::HandlePlayChimeSound(HandlerContext & ctx, const Commands::Pla
  *
  */
 void MatterChimePluginServerInitCallback() {}
+void MatterChimePluginServerShutdownCallback() {}
