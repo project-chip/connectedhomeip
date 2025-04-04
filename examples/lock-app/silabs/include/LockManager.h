@@ -225,7 +225,7 @@ private:
     static StorageKeyName LockCredentialEndpoint(chip::EndpointId endpoint, CredentialTypeEnum credentialType,
                                                  uint16_t credentialIndex)
     {
-        return StorageKeyName::Formatted("g/e/%x/ct/%x/lc/%x", endpoint, static_cast<uint16_t>(credentialType), credentialIndex);
+        return StorageKeyName::Formatted("g/e/%x/ct/%x/lc/%x", endpoint, to_underlying(credentialType), credentialIndex);
     }
     // Stores all the credential indices that belong to a user
     static StorageKeyName LockUserCredentialMap(uint16_t userIndex) { return StorageKeyName::Formatted("g/lu/%x/lc", userIndex); }
