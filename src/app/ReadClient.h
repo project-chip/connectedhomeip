@@ -350,12 +350,10 @@ public:
     /**
      *  Re-activate an inactive subscription.
      *
-     *  When subscribing to LIT-ICD and liveness timeout reached and OnResubscriptionNeeded returns
-     * CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT, the read client will move to the InactiveICDSubscription state and
-     * resubscription can be triggered via OnActiveModeNotification().
+     *  This function should be called when the peer is an ICD that is checking in and this ReadClient represents a subscription
+     * that would cause that ICD to not need to check in anymore.
      *
-     *  If the subscription is not in the `InactiveICDSubscription` state, this function will do nothing. So it is always safe to
-     * call this function when a check-in message is received.
+     *  This API only works when issuing subscription via SendAutoResubscribeRequest.
      */
     void OnActiveModeNotification();
 
@@ -401,8 +399,8 @@ public:
     /**
      *  Like SendSubscribeRequest, but the ReadClient will automatically attempt to re-establish the subscription if
      *  we decide that the subscription has dropped.  The exact behavior of the re-establishment can be controlled
-     *  by setting mResubscribePolicy in the ReadPrepareParams.  If not set, a default behavior with exponential backoff will be
-     *  used.
+     *  by overriding Callback::OnResubscriptionNeeded().  If not overridden, a default behavior with exponential
+     *  backoff from will be used.
      *
      *  The application has to know to
      *  a) allocate a ReadPrepareParams object that will have fields mpEventPathParamsList and mpAttributePathParamsList and

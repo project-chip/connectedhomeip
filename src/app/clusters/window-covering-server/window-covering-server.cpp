@@ -975,3 +975,4 @@ MatterWindowCoveringClusterServerAttributeChangedCallback(const app::ConcreteAtt
  * @brief Cluster Plugin Init Callback
  */
 void MatterWindowCoveringPluginServerInitCallback() {}
+void MatterWindowCoveringPluginServerShutdownCallback() {}
