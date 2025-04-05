@@ -39,7 +39,3 @@ chip_codegen("cluster-tlv-metadata") {
 
   public_configs = [ "${chip_root}/src:includes" ]
 }
-
-chip_data_model("data_model") {
-  zap_file = "controller-clusters.zap"
-}
