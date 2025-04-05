@@ -389,7 +389,7 @@ void CameraAvSettingsUserLevelMgmtServer::UpdatePresetID()
 
     // Has the next possible incremented ID been used by a user set Preset?
     //
-    uint8_t nextIDToCheck = (mCurrentPresetID == mMaxPresets) ? 1 : mCurrentPresetID + 1;
+    uint8_t nextIDToCheck = (mCurrentPresetID == mMaxPresets) ? 1 : static_cast<uint8_t>(mCurrentPresetID + 1);
     ChipLogDetail(Zcl, "UpdatePresetID. Current Preset is %d. Next to Check is %d.", mCurrentPresetID, nextIDToCheck);
 
     for (uint8_t i = 1; i <= mMaxPresets; i++)
@@ -755,8 +755,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRelativeMove(HandlerContext 
         // Note that newPan is always between -180 and 180; and the panDeltaValue is constrained to -360 to 360 by the
         // code above, so the addition sum can never overflow int16_t.
         //
-        int16_t newPanValue = mMptzPosition.pan.Value();
-        newPanValue         = static_cast<int16_t>(newPanValue + panDeltaValue);
+        int16_t newPanValue = static_cast<int16_t>(mMptzPosition.pan.Value() + panDeltaValue);
         if (newPanValue > mPanMax)
         {
             newPanValue = mPanMax;
@@ -791,8 +790,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRelativeMove(HandlerContext 
         // Note that newTilt is always between -180 and 180; and the tiltDeltaValue is constrained to -360 to 360 by the
         // code above, so the addition sum can never overflow int16_t.
         //
-        int16_t newTiltValue = mMptzPosition.tilt.Value();
-        newTiltValue         = static_cast<int16_t>(newTiltValue + tiltDeltaValue);
+        int16_t newTiltValue = static_cast<int16_t>(mMptzPosition.tilt.Value() + tiltDeltaValue);
         if (newTiltValue > mTiltMax)
         {
             newTiltValue = mTiltMax;
@@ -825,8 +823,8 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRelativeMove(HandlerContext 
 
         // If we're here, then we'll also have an existing Pan value in MPTZPosition
         //
-        uint16_t newZoomValue = static_cast<uint16_t>(mMptzPosition.zoom.Value());
-        newZoomValue          = static_cast<int16_t>(newZoomValue + zoomDeltaValue);
+        int16_t newZoomValue = static_cast<int16_t>(mMptzPosition.zoom.Value() + zoomDeltaValue);
+
         if (newZoomValue > mZoomMax)
         {
             newZoomValue = static_cast<int16_t>(mZoomMax);
@@ -934,8 +932,10 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZMoveToPreset(HandlerContext 
         return;
     }
 
-    mMptzPosition = presetValues;
-    MarkDirty(Attributes::MPTZPosition::Id);
+    // Set individual Pan, Tilt, and Zoom from the preset
+    SetPan(presetValues.pan);
+    SetTilt(presetValues.tilt);
+    SetZoom(presetValues.zoom);
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Success);
 }
