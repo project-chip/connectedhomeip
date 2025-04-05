@@ -41,6 +41,8 @@
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
 
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 namespace chip {
 namespace app {
 
@@ -162,9 +164,17 @@ public:
 
     /**
      *  Encode a possibly-chunked list attribute value.  Will create a new chunk when necessary.
+     *
+     * This function will Attempt to to encode as many list items as possible into a SingleAttributeDataIB, which will be handled by
+     cluster server as a ReplaceAll Item operation
+     * If the list is too large, WriteRequest will be chunked and remaining items will be encoded as AppendItem operations, chunking
+     them as needed
+     *
+        // The items in this list will be decoded by servers as part of the ReplaceAll list.
+
      */
     template <class T>
-    CHIP_ERROR EncodeAttribute(const AttributePathParams & attributePath, const DataModel::List<T> & value,
+    CHIP_ERROR EncodeAttribute(const AttributePathParams & attributePath, const DataModel::List<T> & listValue,
                                const Optional<DataVersion> & aDataVersion = NullOptional)
     {
         // Here, we are using kInvalidEndpointId for missing endpoint id, which is used when sending group write requests.
@@ -172,15 +182,49 @@ public:
             ConcreteDataAttributePath(attributePath.HasWildcardEndpointId() ? kInvalidEndpointId : attributePath.mEndpointId,
                                       attributePath.mClusterId, attributePath.mAttributeId, aDataVersion);
 
-        ReturnErrorOnFailure(EnsureMessage());
+        ListIndex nextItemToAppendIndex = kInvalidListIndex;
+        uint16_t encodedItemCount       = 0;
+        bool chunkingNeeded             = false;
 
-        // Encode an empty list for the chunking protocol.
-        ReturnErrorOnFailure(EncodeSingleAttributeDataIB(path, DataModel::List<uint8_t>()));
+        // BACKWARD COMPATIBILITY: Legacy OTA Requestor Servers( Pre-Matter 1.4) only support having an empty list for ReplaceAll
+        // when writing to the DefaultOTAProviders attribute and they will only Decode List Items that are received as part of the
+        // AppendItem List operation. So we must allow this for backward compatiblity.
+        // TODO remove this special case when Matter 1.3 is Sunsetted
+        bool encodeEmptyListAsReplaceAll =
+            (path.mClusterId == Clusters::OtaSoftwareUpdateRequestor::Id &&
+             path.mAttributeId == Clusters::OtaSoftwareUpdateRequestor::Attributes::DefaultOTAProviders::Id);
+
+        if (encodeEmptyListAsReplaceAll)
+        {
+            ReturnErrorOnFailure(EnsureMessage());
+            ReturnErrorOnFailure(EncodeSingleAttributeDataIB(path, DataModel::List<uint8_t>()));
+        }
+        else
+        {
+            // StartNewMessage was called to make sure we always create a new chunk when we have a new Attribute to Encode, this
+            // might be more efficient
+            // TODO should we keep this or just use EnsureMessage; if we choose EnsureMessage, we will have to adapt
+            // EnsureListStarted to make sure we create a New Chunk if it fails (could happens when a new Attribute is added to the
+            // same chunk)
+            ReturnErrorOnFailure(StartNewMessage());
+
+            ReturnErrorOnFailure(TryEncodeListIntoSingleAttributeDataIB(path, listValue, chunkingNeeded, encodedItemCount));
+            if (!chunkingNeeded)
+            {
+                return CHIP_NO_ERROR;
+            }
+            // Start a new WriteRequest chunk.
+            ReturnErrorOnFailure(StartNewMessage());
+            nextItemToAppendIndex = encodedItemCount;
+        }
 
         path.mListOp = ConcreteDataAttributePath::ListOperation::AppendItem;
-        for (size_t i = 0; i < value.size(); i++)
+
+        ListIndex startIndex = encodeEmptyListAsReplaceAll ? 0 : nextItemToAppendIndex;
+
+        for (ListIndex i = startIndex; i < listValue.size(); i++)
         {
-            ReturnErrorOnFailure(EncodeSingleAttributeDataIB(path, value.data()[i]));
+            ReturnErrorOnFailure(EncodeSingleAttributeDataIB(path, listValue[i]));
         }
 
         return CHIP_NO_ERROR;
@@ -281,9 +325,84 @@ private:
         return CHIP_NO_ERROR;
     }
 
+    CHIP_ERROR EnsureListStarted(const ConcreteDataAttributePath & attributePath)
+    {
+        chip::TLV::TLVWriter * writer = nullptr;
+
+        TLV::TLVType outerType;
+
+        ReturnErrorOnFailure(
+            mMessageWriter.ReserveBuffer(kReservedSizeForEndOfListContainer + kReservedSizeForEndOfAttributeDataIB));
+
+        ReturnErrorOnFailure(PrepareAttributeIB(attributePath));
+        VerifyOrReturnError((writer = GetAttributeDataIBTLVWriter()) != nullptr, CHIP_ERROR_INCORRECT_STATE);
+        ReturnErrorOnFailure(
+            writer->StartContainer(chip::TLV::ContextTag(chip::app::AttributeDataIB::Tag::kData), TLV::kTLVType_Array, outerType));
+
+        VerifyOrDie(outerType == kAttributeDataIBType);
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR EnsureListEnded()
+    {
+        chip::TLV::TLVWriter * writer = nullptr;
+        VerifyOrReturnError((writer = GetAttributeDataIBTLVWriter()) != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+        // In the event of Chunking (we have a CHIP_ERROR_NO_MEMORY), we need to Unreserve two more Bytes in order to be able to
+        // Append EndOfContainer of the List + EndOfContainer of the AttributeDataIB
+        VerifyOrDie(writer->UnreserveBuffer(kReservedSizeForEndOfListContainer + kReservedSizeForEndOfAttributeDataIB) ==
+                    CHIP_NO_ERROR);
+        ReturnErrorOnFailure(writer->EndContainer(kAttributeDataIBType));
+        ReturnErrorOnFailure(FinishAttributeIB());
+
+        return CHIP_NO_ERROR;
+    }
+
+    template <class T>
+    CHIP_ERROR TryEncodeListIntoSingleAttributeDataIB(const ConcreteDataAttributePath & attributePath,
+                                                      const DataModel::List<T> & list, bool & chunkingNeeded,
+                                                      uint16_t & outEncodedItemCount)
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        TLV::TLVWriter backupWriter;
+
+        ReturnErrorOnFailure(EnsureListStarted(attributePath));
+
+        chip::TLV::TLVWriter * writer = nullptr;
+        VerifyOrReturnError((writer = GetAttributeDataIBTLVWriter()) != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+        outEncodedItemCount = 0;
+
+        for (auto & item : list)
+        {
+            mWriteRequestBuilder.GetWriteRequests().Checkpoint(backupWriter);
+            if constexpr (DataModel::IsFabricScoped<T>::value)
+            {
+                err = DataModel::EncodeForWrite(*writer, TLV::AnonymousTag(), item);
+            }
+            else
+            {
+                err = DataModel::Encode(*writer, TLV::AnonymousTag(), item);
+            }
+
+            if (err == CHIP_ERROR_NO_MEMORY || err == CHIP_ERROR_BUFFER_TOO_SMALL)
+            {
+                mWriteRequestBuilder.GetWriteRequests().Rollback(backupWriter);
+                chunkingNeeded = true;
+                break;
+            }
+            ReturnErrorOnFailure(err);
+            outEncodedItemCount++;
+        }
+
+        ReturnErrorOnFailure(EnsureListEnded());
+        return CHIP_NO_ERROR;
+    }
+
     /**
      * A wrapper for TryEncodeSingleAttributeDataIB which will start a new chunk when failed with CHIP_ERROR_NO_MEMORY or
-     * CHIP_ERROR_BUFFER_TOO_SMALL.
+     * CHIP_ERROR_BUFFER_TOO_SMALL. This will not be used for Lists
      */
     template <class T>
     CHIP_ERROR EncodeSingleAttributeDataIB(const ConcreteDataAttributePath & attributePath, const T & value)
@@ -322,6 +441,9 @@ private:
     CHIP_ERROR PutSinglePreencodedAttributeWritePayload(const ConcreteDataAttributePath & attributePath,
                                                         const TLV::TLVReader & data);
 
+    CHIP_ERROR TryPutPreencodedListIntoSingleAttributeWritePayload(const chip::app::ConcreteDataAttributePath & attributePath,
+                                                                   TLV::TLVReader & valueReader, bool & chunkingNeeded,
+                                                                   uint16_t & outEncodedItemCount);
     CHIP_ERROR EnsureMessage();
 
     /**
@@ -423,6 +545,13 @@ private:
     static constexpr uint16_t kReservedSizeForTLVEncodingOverhead = kReservedSizeForIMRevision + kReservedSizeForMoreChunksFlag +
         kReservedSizeForEndOfContainer + kReservedSizeForEndOfContainer;
     bool mHasDataVersion = false;
+
+    // These were not added to kReservedSizeForTLVEncodingOverhead since they will only be Reserved and Unreserved when Encoding
+    // Attributes that use a list Data Type
+    static constexpr uint32_t kReservedSizeForEndOfListContainer   = 1;
+    static constexpr uint32_t kReservedSizeForEndOfAttributeDataIB = 1;
+
+    static constexpr TLV::TLVType kAttributeDataIBType = TLV::kTLVType_Structure;
 };
 
 } // namespace app
