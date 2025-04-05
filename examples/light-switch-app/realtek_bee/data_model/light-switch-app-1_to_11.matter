@@ -509,13 +509,13 @@ cluster Binding = 30 {
 cluster AccessControl = 31 {
   revision 2;
 
-  enum AccessControlEntryAuthModeEnum : enum8 {
+  shared enum AccessControlEntryAuthModeEnum : enum8 {
     kPASE = 1;
     kCASE = 2;
     kGroup = 3;
   }
 
-  enum AccessControlEntryPrivilegeEnum : enum8 {
+  shared enum AccessControlEntryPrivilegeEnum : enum8 {
     kView = 1;
     kProxyView = 2;
     kOperate = 3;
@@ -559,13 +559,13 @@ cluster AccessControl = 31 {
     fabric_idx fabricIndex = 254;
   }
 
-  struct AccessControlTargetStruct {
+  shared struct AccessControlTargetStruct {
     nullable cluster_id cluster = 0;
     nullable endpoint_no endpoint = 1;
     nullable devtype_id deviceType = 2;
   }
 
-  fabric_scoped struct AccessControlEntryStruct {
+  shared fabric_scoped struct AccessControlEntryStruct {
     fabric_sensitive AccessControlEntryPrivilegeEnum privilege = 1;
     fabric_sensitive AccessControlEntryAuthModeEnum authMode = 2;
     nullable fabric_sensitive int64u subjects[] = 3;
