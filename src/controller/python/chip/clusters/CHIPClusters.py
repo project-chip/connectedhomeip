@@ -3968,12 +3968,6 @@ class ChipClusters:
         "clusterName": "OvenCavityOperationalState",
         "clusterId": 0x00000048,
         "commands": {
-            0x00000000: {
-                "commandId": 0x00000000,
-                "commandName": "Pause",
-                "args": {
-                },
-            },
             0x00000001: {
                 "commandId": 0x00000001,
                 "commandName": "Stop",
@@ -3983,12 +3977,6 @@ class ChipClusters:
             0x00000002: {
                 "commandId": 0x00000002,
                 "commandName": "Start",
-                "args": {
-                },
-            },
-            0x00000003: {
-                "commandId": 0x00000003,
-                "commandName": "Resume",
                 "args": {
                 },
             },
@@ -4086,20 +4074,6 @@ class ChipClusters:
                 "attributeId": 0x00000001,
                 "type": "int",
                 "reportable": True,
-            },
-            0x00000002: {
-                "attributeName": "StartUpMode",
-                "attributeId": 0x00000002,
-                "type": "int",
-                "reportable": True,
-                "writable": True,
-            },
-            0x00000003: {
-                "attributeName": "OnMode",
-                "attributeId": 0x00000003,
-                "type": "int",
-                "reportable": True,
-                "writable": True,
             },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
@@ -4292,20 +4266,6 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
             },
-            0x00000002: {
-                "attributeName": "StartUpMode",
-                "attributeId": 0x00000002,
-                "type": "int",
-                "reportable": True,
-                "writable": True,
-            },
-            0x00000003: {
-                "attributeName": "OnMode",
-                "attributeId": 0x00000003,
-                "type": "int",
-                "reportable": True,
-                "writable": True,
-            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,
@@ -4362,20 +4322,6 @@ class ChipClusters:
                 "attributeId": 0x00000001,
                 "type": "int",
                 "reportable": True,
-            },
-            0x00000002: {
-                "attributeName": "StartUpMode",
-                "attributeId": 0x00000002,
-                "type": "int",
-                "reportable": True,
-                "writable": True,
-            },
-            0x00000003: {
-                "attributeName": "OnMode",
-                "attributeId": 0x00000003,
-                "type": "int",
-                "reportable": True,
-                "writable": True,
             },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
@@ -4749,20 +4695,6 @@ class ChipClusters:
                 "attributeId": 0x00000001,
                 "type": "int",
                 "reportable": True,
-            },
-            0x00000002: {
-                "attributeName": "StartUpMode",
-                "attributeId": 0x00000002,
-                "type": "int",
-                "reportable": True,
-                "writable": True,
-            },
-            0x00000003: {
-                "attributeName": "OnMode",
-                "attributeId": 0x00000003,
-                "type": "int",
-                "reportable": True,
-                "writable": True,
             },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",

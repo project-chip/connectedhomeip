@@ -4496,7 +4496,6 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
  * Command ChangeToMode
  *
  * This command is used to change device modes.
-        On receipt of this command the device SHALL respond with a ChangeToModeResponse command.
  */
 - (void)changeToModeWithParams:(MTROvenModeClusterChangeToModeParams *)params completion:(void (^)(MTROvenModeClusterChangeToModeResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
