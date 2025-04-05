@@ -106,6 +106,7 @@ jobs:
                 --enable-flashbundle \
                 --target efr32-brd2605a-light-skip-rps-generation \
                 --target efr32-brd4338a-lock-skip-rps-generation \
+                --target efr32-brd4338a-closure-skip-rps-generation \
                 build \
                 --copy-artifacts-to out/artifacts \
              "
