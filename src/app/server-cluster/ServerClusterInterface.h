@@ -76,7 +76,7 @@ public:
     ///   maximum value. A cluster data version SHALL be maintained for each cluster instance.
     ///   [...]
     ///   A cluster data version SHALL be incremented if any attribute data changes.
-    [[nodiscard]] virtual DataVersion GetDataVersion() const = 0;
+    [[nodiscard]] virtual DataVersion GetDataVersion(const ConcreteClusterPath & path) const = 0;
 
     [[nodiscard]] virtual BitFlags<DataModel::ClusterQualityFlags> GetClusterFlags() const = 0;
 

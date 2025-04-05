@@ -2693,7 +2693,7 @@ TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesListClusters)
     // version as we use this data version to differentiate between the two
     DataVersion * versionPtr = emberAfDataVersionStorage(kTestClusterPath);
     ASSERT_NE(versionPtr, nullptr);
-    if (*versionPtr == fakeClusterServer.GetDataVersion())
+    if (*versionPtr == fakeClusterServer.GetDataVersion(kTestClusterPath))
     {
         fakeClusterServer.TestIncreaseDataVersion();
     }
@@ -2735,7 +2735,7 @@ TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesListClusters)
         {
             updatedClusterFound = true;
             EXPECT_EQ(registered.clusterId, original.clusterId);
-            EXPECT_EQ(registered.dataVersion, fakeClusterServer.GetDataVersion());
+            EXPECT_EQ(registered.dataVersion, fakeClusterServer.GetDataVersion(kTestClusterPath));
             EXPECT_EQ(registered.flags, fakeClusterServer.GetClusterFlags());
 
             // version MUST be different for ember for the test to make sense
