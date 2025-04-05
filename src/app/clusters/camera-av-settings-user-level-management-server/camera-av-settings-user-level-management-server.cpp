@@ -208,7 +208,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::SetTiltMin(int16_t aTiltMin)
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
 
-    if (aTiltMin != mTiltMin) 
+    if (aTiltMin != mTiltMin)
     {
         mTiltMin = aTiltMin;
         MarkDirty(Attributes::TiltMin::Id);
@@ -250,7 +250,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::SetPanMin(int16_t aPanMin)
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
 
-    if (aPanMin != mPanMin) 
+    if (aPanMin != mPanMin)
     {
         mPanMin = aPanMin;
         MarkDirty(Attributes::PanMin::Id);
@@ -305,7 +305,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::SetZoomMax(uint8_t aZoomMax)
 // Only set the value if the Feature Flag is set.
 // It is entirely possible for a mutator to be called with a parameter that has no value.  Case in point an invoke
 // of MPTZSetPosition, this will be handled if at least one of the three pan, tilt, or zoom have a value, with all
-// three parms passed through once validation is complete.  
+// three parms passed through once validation is complete.
 // An empty value is just ignored.
 //
 void CameraAvSettingsUserLevelMgmtServer::SetPan(Optional<int16_t> aPan)
@@ -336,7 +336,7 @@ void CameraAvSettingsUserLevelMgmtServer::SetZoom(Optional<uint8_t> aZoom)
 {
     if (HasFeature(Feature::kMechanicalZoom))
     {
-        if (aZoom.HasValue()) 
+        if (aZoom.HasValue())
         {
             mMptzPosition.zoom = aZoom;
             MarkDirty(Attributes::MPTZPosition::Id);
@@ -403,7 +403,7 @@ void CameraAvSettingsUserLevelMgmtServer::UpdatePresetID()
             break;
         }
         nextIDToCheck++;
-    } 
+    }
 }
 
 // Helper Read functions for complex attribute types
@@ -730,7 +730,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRelativeMove(HandlerContext 
     Optional<int16_t> panDelta  = commandData.panDelta;
     Optional<int16_t> tiltDelta = commandData.tiltDelta;
     Optional<int8_t> zoomDelta  = commandData.zoomDelta;
-    Optional<int16_t> newPan; 
+    Optional<int16_t> newPan;
     Optional<int16_t> newTilt;
     Optional<uint8_t> newZoom;
 
