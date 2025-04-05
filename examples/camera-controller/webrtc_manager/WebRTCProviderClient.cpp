@@ -27,7 +27,7 @@ void WebRTCProviderClient::Init(const ScopedNodeId & peerId, EndpointId endpoint
     mPeerId     = peerId;
     mEndpointId = endpointId;
 
-    ChipLogProgress(NotSpecified, "WebRTCProviderClient: Initialized with PeerId=0x" ChipLogFormatX64 ", endpoint=%u",
+    ChipLogProgress(Camera, "WebRTCProviderClient: Initialized with PeerId=0x" ChipLogFormatX64 ", endpoint=%u",
                     ChipLogValueX64(peerId.GetNodeId()), static_cast<unsigned>(endpointId));
 }
 
@@ -38,7 +38,7 @@ CHIP_ERROR WebRTCProviderClient::ProvideOffer(
     Optional<DataModel::List<const Clusters::WebRTCTransportProvider::Structs::ICEServerStruct::Type>> ICEServers,
     Optional<chip::CharSpan> ICETransportPolicy)
 {
-    ChipLogProgress(NotSpecified, "Sending ProvideOffer to node " ChipLogFormatX64, ChipLogValueX64(mPeerId.GetNodeId()));
+    ChipLogProgress(Camera, "Sending ProvideOffer to node " ChipLogFormatX64, ChipLogValueX64(mPeerId.GetNodeId()));
 
     // Store the command type
     mCommandType = CommandType::kProvideOffer;
@@ -66,7 +66,7 @@ CHIP_ERROR WebRTCProviderClient::ProvideOffer(
 
 CHIP_ERROR WebRTCProviderClient::ProvideICECandidates(uint16_t webRTCSessionID, DataModel::List<const chip::CharSpan> ICECandidates)
 {
-    ChipLogProgress(NotSpecified, "Sending ProvideICECandidates to node " ChipLogFormatX64, ChipLogValueX64(mPeerId.GetNodeId()));
+    ChipLogProgress(Camera, "Sending ProvideICECandidates to node " ChipLogFormatX64, ChipLogValueX64(mPeerId.GetNodeId()));
 
     // Store the command type
     mCommandType = CommandType::kProvideICECandidates;
@@ -88,12 +88,12 @@ CHIP_ERROR WebRTCProviderClient::ProvideICECandidates(uint16_t webRTCSessionID, 
 void WebRTCProviderClient::OnResponse(CommandSender * client, const ConcreteCommandPath & path, const StatusIB & status,
                                       TLV::TLVReader * data)
 {
-    ChipLogProgress(NotSpecified, "WebRTCProviderClient: OnResponse.");
+    ChipLogProgress(Camera, "WebRTCProviderClient: OnResponse.");
 
     CHIP_ERROR error = status.ToChipError();
     if (CHIP_NO_ERROR != error)
     {
-        ChipLogError(NotSpecified, "Response Failure: %s", ErrorStr(error));
+        ChipLogError(Camera, "Response Failure: %s", ErrorStr(error));
         return;
     }
 
@@ -105,13 +105,13 @@ void WebRTCProviderClient::OnResponse(CommandSender * client, const ConcreteComm
 
 void WebRTCProviderClient::OnError(const CommandSender * client, CHIP_ERROR error)
 {
-    ChipLogError(NotSpecified, "WebRTCProviderClient: OnError for command %u: %" CHIP_ERROR_FORMAT,
-                 static_cast<unsigned>(mCommandType), error.Format());
+    ChipLogError(Camera, "WebRTCProviderClient: OnError for command %u: %" CHIP_ERROR_FORMAT, static_cast<unsigned>(mCommandType),
+                 error.Format());
 }
 
 void WebRTCProviderClient::OnDone(CommandSender * client)
 {
-    ChipLogProgress(NotSpecified, "WebRTCProviderClient: OnDone for command %u.", static_cast<unsigned>(mCommandType));
+    ChipLogProgress(Camera, "WebRTCProviderClient: OnDone for command %u.", static_cast<unsigned>(mCommandType));
 
     // Reset command type, free up the CommandSender
     mCommandType = CommandType::kUndefined;
@@ -121,8 +121,7 @@ void WebRTCProviderClient::OnDone(CommandSender * client)
 CHIP_ERROR WebRTCProviderClient::SendCommandForType(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle,
                                                     CommandType commandType)
 {
-    ChipLogProgress(NotSpecified, "Sending command with Endpoint ID: %d, Command Type: %d", mEndpointId,
-                    static_cast<int>(commandType));
+    ChipLogProgress(Camera, "Sending command with Endpoint ID: %d, Command Type: %d", mEndpointId, static_cast<int>(commandType));
 
     switch (commandType)
     {
@@ -143,13 +142,13 @@ void WebRTCProviderClient::OnDeviceConnected(void * context, Messaging::Exchange
                                              const SessionHandle & sessionHandle)
 {
     WebRTCProviderClient * self = reinterpret_cast<WebRTCProviderClient *>(context);
-    VerifyOrReturn(self != nullptr, ChipLogError(NotSpecified, "OnDeviceConnected: context is null"));
+    VerifyOrReturn(self != nullptr, ChipLogError(Camera, "OnDeviceConnected: context is null"));
 
-    ChipLogProgress(NotSpecified, "CASE session established, sending WebRTCTransportProvider command...");
+    ChipLogProgress(Camera, "CASE session established, sending WebRTCTransportProvider command...");
     CHIP_ERROR sendErr = self->SendCommandForType(exchangeMgr, sessionHandle, self->mCommandType);
     if (sendErr != CHIP_NO_ERROR)
     {
-        ChipLogError(NotSpecified, "SendCommandForType failed: %" CHIP_ERROR_FORMAT, sendErr.Format());
+        ChipLogError(Camera, "SendCommandForType failed: %" CHIP_ERROR_FORMAT, sendErr.Format());
     }
 }
 
@@ -157,6 +156,6 @@ void WebRTCProviderClient::OnDeviceConnectionFailure(void * context, const Scope
 {
     LogErrorOnFailure(err);
     WebRTCProviderClient * self = reinterpret_cast<WebRTCProviderClient *>(context);
-    VerifyOrReturn(self != nullptr, ChipLogError(NotSpecified, "OnDeviceConnectionFailure: context is null"));
+    VerifyOrReturn(self != nullptr, ChipLogError(Camera, "OnDeviceConnectionFailure: context is null"));
     self->OnDone(nullptr);
 }
