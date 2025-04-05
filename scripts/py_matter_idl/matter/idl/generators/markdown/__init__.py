@@ -11,10 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import os
 
-from matter.idl.generators import CodeGenerator, GeneratorStorage
-from matter.idl.matter_idl_types import Idl
+from ...matter_idl_types import Idl
+from ..generator import CodeGenerator
+from ..storage import GeneratorStorage
 
 
 class SummaryMarkdownGenerator(CodeGenerator):

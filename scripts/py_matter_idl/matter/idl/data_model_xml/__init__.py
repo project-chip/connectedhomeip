@@ -18,8 +18,8 @@ import xml.sax.handler
 from dataclasses import dataclass
 from typing import List, Optional, Union
 
-from matter.idl.data_model_xml.handlers import Context, DataModelXmlHandler
-from matter.idl.matter_idl_types import Idl
+from ..matter_idl_types import Idl
+from .handlers import Context, DataModelXmlHandler
 
 
 class ParseHandler(xml.sax.handler.ContentHandler):
@@ -96,7 +96,7 @@ class ParseSource:
     # actual filename to use, None if the source is a filename already
     name: Optional[str] = None
 
-    @ property
+    @property
     def source_file_name(self):
         if self.name:
             return self.name
