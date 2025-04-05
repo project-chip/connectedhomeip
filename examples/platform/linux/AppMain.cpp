@@ -85,6 +85,9 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_BOOLEAN_STATE_CONFIGURATION_TRIGGER
 #include <app/clusters/boolean-state-configuration-server/BooleanStateConfigurationTestEventTriggerHandler.h>
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMODITY_PRICE_TRIGGER
+#include <app/clusters/commodity-price-server/CommodityPriceTestEventTriggerHandler.h>
+#endif
 #if CHIP_DEVICE_CONFIG_ENABLE_ENERGY_EVSE_TRIGGER
 #include <app/clusters/energy-evse-server/EnergyEvseTestEventTriggerHandler.h>
 #endif
@@ -677,6 +680,10 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
     static BooleanStateConfigurationTestEventTriggerHandler sBooleanStateConfigurationTestEventTriggerHandler;
     sTestEventTriggerDelegate.AddHandler(&sBooleanStateConfigurationTestEventTriggerHandler);
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMODITY_PRICE_TRIGGER
+    static CommodityPriceTestEventTriggerHandler sCommodityPriceTestEventTriggerHandler;
+    sTestEventTriggerDelegate.AddHandler(&sCommodityPriceTestEventTriggerHandler);
+#endif
 #if CHIP_DEVICE_CONFIG_ENABLE_ENERGY_EVSE_TRIGGER
     static EnergyEvseTestEventTriggerHandler sEnergyEvseTestEventTriggerHandler;
     sTestEventTriggerDelegate.AddHandler(&sEnergyEvseTestEventTriggerHandler);
@@ -781,9 +788,9 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
     signal(SIGTERM, StopSignalHandler);
     // NOLINTEND(bugprone-signal-handler)
 #else
-    struct sigaction sa                        = {};
-    sa.sa_handler                              = StopSignalHandler;
-    sa.sa_flags                                = SA_RESETHAND;
+    struct sigaction sa = {};
+    sa.sa_handler       = StopSignalHandler;
+    sa.sa_flags         = SA_RESETHAND;
     sigaction(SIGINT, &sa, nullptr);
     sigaction(SIGTERM, &sa, nullptr);
 #endif
