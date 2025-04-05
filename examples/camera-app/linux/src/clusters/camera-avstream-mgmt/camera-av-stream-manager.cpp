@@ -16,7 +16,6 @@
  *    limitations under the License.
  */
 
-#include "camera-device.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -35,15 +34,19 @@ using namespace chip::app;
 using namespace chip::app::DataModel;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::CameraAvStreamManagement;
-using namespace Camera;
 using chip::Protocols::InteractionModel::Status;
+
+void CameraAVStreamManager::SetCameraDeviceHAL(CameraDeviceInterface::CameraHALInterface * aCameraDeviceHAL)
+{
+    mCameraDeviceHAL = aCameraDeviceHAL;
+}
 
 Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamAllocate(const VideoStreamStruct & allocateArgs,
                                                                                uint16_t & outStreamID)
 {
     outStreamID               = kInvalidStreamID;
     bool foundAvailableStream = false;
-    auto videoStreams         = CameraDevice::GetInstance().GetAvailableVideoStreams();
+    auto videoStreams         = mCameraDeviceHAL->GetAvailableVideoStreams();
 
     for (VideoStream & stream : videoStreams)
     {
@@ -51,17 +54,17 @@ Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamAllocate(c
         {
             foundAvailableStream = true;
 
-            if (stream.codec == allocateArgs.videoCodec && stream.frameRate >= allocateArgs.minFrameRate &&
-                stream.frameRate <= allocateArgs.maxFrameRate && stream.videoRes.width >= allocateArgs.minResolution.width &&
-                stream.videoRes.height >= allocateArgs.minResolution.height &&
-                stream.videoRes.width <= allocateArgs.maxResolution.width &&
-                stream.videoRes.height <= allocateArgs.maxResolution.height)
+            if (stream.videoStreamParams.videoCodec == allocateArgs.videoCodec && stream.videoStreamParams.minFrameRate <= allocateArgs.minFrameRate &&
+                stream.videoStreamParams.maxFrameRate >= allocateArgs.maxFrameRate && stream.videoStreamParams.minResolution.width <= allocateArgs.minResolution.width &&
+                stream.videoStreamParams.minResolution.height <= allocateArgs.minResolution.height &&
+                stream.videoStreamParams.maxResolution.width >= allocateArgs.maxResolution.width &&
+                stream.videoStreamParams.maxResolution.height >= allocateArgs.maxResolution.height)
             {
                 stream.isAllocated = true;
-                outStreamID        = stream.id;
+                outStreamID        = stream.videoStreamParams.videoStreamID;
 
                 // Start the video stream from HAL for serving.
-                CameraDevice::GetInstance().StartVideoStream(stream.id);
+                mCameraDeviceHAL->StartVideoStream(outStreamID);
 
                 return Status::Success;
             }
@@ -81,10 +84,10 @@ Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamModify(con
                                                                              const chip::Optional<bool> osdEnabled)
 {
     // TODO : Needs Change
-    auto videoStreams = CameraDevice::GetInstance().GetAvailableVideoStreams();
+    auto videoStreams = mCameraDeviceHAL->GetAvailableVideoStreams();
     for (VideoStream & stream : videoStreams)
     {
-        if (stream.id == streamID && stream.isAllocated)
+        if (stream.videoStreamParams.videoStreamID == streamID && stream.isAllocated)
         {
             ChipLogError(Zcl, "Modified video stream with ID: %d", streamID);
             return Status::Success;
@@ -97,13 +100,13 @@ Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamModify(con
 
 Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamDeallocate(const uint16_t streamID)
 {
-    auto videoStreams = CameraDevice::GetInstance().GetAvailableVideoStreams();
+    auto videoStreams = mCameraDeviceHAL->GetAvailableVideoStreams();
     for (VideoStream & stream : videoStreams)
     {
-        if (stream.id == streamID && stream.isAllocated)
+        if (stream.videoStreamParams.videoStreamID == streamID && stream.isAllocated)
         {
             // Stop the video stream
-            CameraDevice::GetInstance().StopVideoStream(stream.id);
+            mCameraDeviceHAL->StopVideoStream(streamID);
 
             stream.isAllocated = false;
 
@@ -119,7 +122,7 @@ Protocols::InteractionModel::Status CameraAVStreamManager::AudioStreamAllocate(c
 {
     outStreamID               = kInvalidStreamID;
     bool foundAvailableStream = false;
-    auto audioStreams         = CameraDevice::GetInstance().GetAvailableAudioStreams();
+    auto audioStreams         = mCameraDeviceHAL->GetAvailableAudioStreams();
 
     for (AudioStream & stream : audioStreams)
     {
@@ -127,14 +130,14 @@ Protocols::InteractionModel::Status CameraAVStreamManager::AudioStreamAllocate(c
         {
             foundAvailableStream = true;
 
-            if (stream.codec == allocateArgs.audioCodec && stream.channelCount == allocateArgs.channelCount &&
-                stream.sampleRate == allocateArgs.sampleRate)
+            if (stream.audioStreamParams.audioCodec == allocateArgs.audioCodec && stream.audioStreamParams.channelCount == allocateArgs.channelCount &&
+                stream.audioStreamParams.sampleRate == allocateArgs.sampleRate)
             {
                 stream.isAllocated = true;
-                outStreamID        = stream.id;
+                outStreamID        = stream.audioStreamParams.audioStreamID;
 
                 // Start the audio stream from HAL for serving.
-                CameraDevice::GetInstance().StartAudioStream(stream.id);
+                mCameraDeviceHAL->StartAudioStream(outStreamID);
 
                 return Status::Success;
             }
@@ -151,13 +154,13 @@ Protocols::InteractionModel::Status CameraAVStreamManager::AudioStreamAllocate(c
 
 Protocols::InteractionModel::Status CameraAVStreamManager::AudioStreamDeallocate(const uint16_t streamID)
 {
-    auto audioStreams = CameraDevice::GetInstance().GetAvailableAudioStreams();
+    auto audioStreams = mCameraDeviceHAL->GetAvailableAudioStreams();
     for (AudioStream & stream : audioStreams)
     {
-        if (stream.id == streamID && stream.isAllocated)
+        if (stream.audioStreamParams.audioStreamID == streamID && stream.isAllocated)
         {
             // Stop the audio stream
-            CameraDevice::GetInstance().StopAudioStream(stream.id);
+            mCameraDeviceHAL->StopAudioStream(streamID);
 
             stream.isAllocated = false;
             break;
@@ -172,7 +175,7 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamAllocat
 {
     outStreamID               = kInvalidStreamID;
     bool foundAvailableStream = false;
-    auto snapshotStreams      = CameraDevice::GetInstance().GetAvailableSnapshotStreams();
+    auto snapshotStreams      = mCameraDeviceHAL->GetAvailableSnapshotStreams();
 
     for (SnapshotStream & stream : snapshotStreams)
     {
@@ -180,17 +183,17 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamAllocat
         {
             foundAvailableStream = true;
 
-            if (stream.codec == allocateArgs.imageCodec && stream.quality == allocateArgs.quality &&
-                stream.frameRate <= allocateArgs.frameRate && stream.videoRes.width >= allocateArgs.minResolution.width &&
-                stream.videoRes.height >= allocateArgs.minResolution.height &&
-                stream.videoRes.width <= allocateArgs.maxResolution.width &&
-                stream.videoRes.height <= allocateArgs.maxResolution.height)
+            if (stream.snapshotStreamParams.imageCodec == allocateArgs.imageCodec && stream.snapshotStreamParams.quality == allocateArgs.quality &&
+                stream.snapshotStreamParams.frameRate <= allocateArgs.frameRate && stream.snapshotStreamParams.minResolution.width <= allocateArgs.minResolution.width &&
+                stream.snapshotStreamParams.minResolution.height <= allocateArgs.minResolution.height &&
+                stream.snapshotStreamParams.maxResolution.width >= allocateArgs.maxResolution.width &&
+                stream.snapshotStreamParams.maxResolution.height >= allocateArgs.maxResolution.height)
             {
                 stream.isAllocated = true;
-                outStreamID        = stream.id;
+                outStreamID        = stream.snapshotStreamParams.snapshotStreamID;
 
                 // Start the snapshot stream for serving.
-                CameraDevice::GetInstance().StartSnapshotStream(stream.id);
+                mCameraDeviceHAL->StartSnapshotStream(outStreamID);
 
                 return Status::Success;
             }
@@ -210,10 +213,10 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamModify(
                                                                                 const chip::Optional<bool> osdEnabled)
 {
     // TODO : change
-    auto snapshotStreams = CameraDevice::GetInstance().GetAvailableSnapshotStreams();
+    auto snapshotStreams = mCameraDeviceHAL->GetAvailableSnapshotStreams();
     for (SnapshotStream & stream : snapshotStreams)
     {
-        if (stream.id == streamID && stream.isAllocated)
+        if (stream.snapshotStreamParams.snapshotStreamID == streamID && stream.isAllocated)
         {
             ChipLogError(Zcl, "Modified snapshot stream with ID: %d", streamID);
             return Status::Success;
@@ -226,13 +229,13 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamModify(
 
 Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamDeallocate(const uint16_t streamID)
 {
-    auto snapshotStreams = CameraDevice::GetInstance().GetAvailableSnapshotStreams();
+    auto snapshotStreams = mCameraDeviceHAL->GetAvailableSnapshotStreams();
     for (SnapshotStream & stream : snapshotStreams)
     {
-        if (stream.id == streamID && stream.isAllocated)
+        if (stream.snapshotStreamParams.snapshotStreamID == streamID && stream.isAllocated)
         {
             // Stop the snapshot stream for serving.
-            CameraDevice::GetInstance().StopSnapshotStream(stream.id);
+            mCameraDeviceHAL->StopSnapshotStream(streamID);
 
             stream.isAllocated = false;
             break;
@@ -256,7 +259,7 @@ Protocols::InteractionModel::Status CameraAVStreamManager::CaptureSnapshot(const
                                                                            const VideoResolutionStruct & resolution,
                                                                            ImageSnapshot & outImageSnapshot)
 {
-    if (CameraDevice::GetInstance().CaptureSnapshot(streamID, resolution, outImageSnapshot) == CameraError::SUCCESS)
+    if (mCameraDeviceHAL->CaptureSnapshot(streamID, resolution, outImageSnapshot) == CameraError::SUCCESS)
     {
         return Status::Success;
     }

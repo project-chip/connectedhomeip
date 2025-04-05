@@ -28,6 +28,30 @@ using chip::app::Clusters::CameraAvStreamManagement::VideoResolutionStruct;
 using chip::app::Clusters::CameraAvStreamManagement::VideoSensorParamsStruct;
 using chip::app::Clusters::CameraAvStreamManagement::VideoStreamStruct;
 
+struct VideoStream
+{
+    VideoStreamStruct videoStreamParams;
+    bool isAllocated; // Flag to indicate if the stream is allocated.
+    void * videoContext; // Platform-specific context object associated with
+                         // video stream;
+};
+
+struct AudioStream
+{
+    AudioStreamStruct audioStreamParams;
+    bool isAllocated; // Flag to indicate if the stream is allocated.
+    void * audioContext; // Platform-specific context object associated with
+                         // video stream;
+};
+
+struct SnapshotStream
+{
+    SnapshotStreamStruct snapshotStreamParams;
+    bool isAllocated; // Flag to indicate if the stream is allocated
+    void * snapshotContext; // Platform-specific context object associated with
+                            // snapshot stream;
+};
+
 // Enumeration for common camera errors
 enum class CameraError
 {
@@ -74,6 +98,12 @@ public:
 
         // Configure camera settings (e.g., exposure, focus)
         // virtual CameraError Configure(const std::string & setting, const std::string & value) = 0;
+
+        virtual const std::vector<VideoStream> & GetAvailableVideoStreams() const = 0;
+
+        virtual const std::vector<AudioStream> & GetAvailableAudioStreams() const = 0;
+
+        virtual const std::vector<SnapshotStream> & GetAvailableSnapshotStreams() const = 0;
 
         // Capture a snapshot image
         virtual CameraError CaptureSnapshot(uint16_t streamID, const VideoResolutionStruct & resolution,
