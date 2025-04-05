@@ -20,12 +20,6 @@ inline constexpr CommandId Id = 0x00000001;
 namespace Calibrate {
 inline constexpr CommandId Id = 0x00000002;
 } // namespace Calibrate
-namespace ConfigureFallback {
-inline constexpr CommandId Id = 0x00000003;
-} // namespace ConfigureFallback
-namespace CancelFallback {
-inline constexpr CommandId Id = 0x00000004;
-} // namespace CancelFallback
 } // namespace Commands
 } // namespace ClosureControl
 } // namespace Clusters

@@ -59,46 +59,6 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .writePrivilege = std::nullopt,
 };
 } // namespace OverallTarget
-namespace RestingProcedure {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ClosureControl::Attributes::RestingProcedure::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-} // namespace RestingProcedure
-namespace TriggerCondition {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ClosureControl::Attributes::TriggerCondition::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-} // namespace TriggerCondition
-namespace TriggerPosition {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ClosureControl::Attributes::TriggerPosition::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-} // namespace TriggerPosition
-namespace WaitingDelay {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ClosureControl::Attributes::WaitingDelay::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-} // namespace WaitingDelay
-namespace KickoffTimer {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ClosureControl::Attributes::KickoffTimer::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-} // namespace KickoffTimer
 
 } // namespace Attributes
 
@@ -124,20 +84,6 @@ inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .invokePrivilege = Access::Privilege::kManage,
 };
 } // namespace Calibrate
-namespace ConfigureFallback {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
-    .commandId       = ClosureControl::Commands::ConfigureFallback::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-} // namespace ConfigureFallback
-namespace CancelFallback {
-inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
-    .commandId       = ClosureControl::Commands::CancelFallback::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kOperate,
-};
-} // namespace CancelFallback
 
 } // namespace Commands
 } // namespace ClosureControl

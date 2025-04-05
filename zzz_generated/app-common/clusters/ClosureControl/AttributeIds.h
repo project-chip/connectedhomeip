@@ -27,21 +27,6 @@ inline constexpr AttributeId Id = 0x00000003;
 namespace OverallTarget {
 inline constexpr AttributeId Id = 0x00000004;
 } // namespace OverallTarget
-namespace RestingProcedure {
-inline constexpr AttributeId Id = 0x00000005;
-} // namespace RestingProcedure
-namespace TriggerCondition {
-inline constexpr AttributeId Id = 0x00000006;
-} // namespace TriggerCondition
-namespace TriggerPosition {
-inline constexpr AttributeId Id = 0x00000007;
-} // namespace TriggerPosition
-namespace WaitingDelay {
-inline constexpr AttributeId Id = 0x00000008;
-} // namespace WaitingDelay
-namespace KickoffTimer {
-inline constexpr AttributeId Id = 0x00000009;
-} // namespace KickoffTimer
 namespace GeneratedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList

@@ -16,7 +16,7 @@ namespace app {
 namespace clusters {
 namespace ServiceArea {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
 namespace SupportedAreas {
