@@ -6207,17 +6207,22 @@ public static class MediaPlaybackClusterStateChangedEvent {
 }
 public static class AccountLoginClusterLoggedOutEvent {
   public Optional<Long> node;
+  public Integer fabricIndex;
   private static final long NODE_ID = 0L;
+  private static final long FABRIC_INDEX_ID = 254L;
 
   public AccountLoginClusterLoggedOutEvent(
-    Optional<Long> node
+    Optional<Long> node,
+    Integer fabricIndex
   ) {
     this.node = node;
+    this.fabricIndex = fabricIndex;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(NODE_ID, node.<BaseTLVType>map((nonOptionalnode) -> new UIntType(nonOptionalnode)).orElse(new EmptyType())));
+    values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
 
     return new StructType(values);
   }
@@ -6227,16 +6232,23 @@ public static class AccountLoginClusterLoggedOutEvent {
       return null;
     }
     Optional<Long> node = Optional.empty();
+    Integer fabricIndex = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == NODE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
           node = Optional.of(castingValue.value(Long.class));
         }
+      } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          fabricIndex = castingValue.value(Integer.class);
+        }
       }
     }
     return new AccountLoginClusterLoggedOutEvent(
-      node
+      node,
+      fabricIndex
     );
   }
 
@@ -6246,6 +6258,9 @@ public static class AccountLoginClusterLoggedOutEvent {
     output.append("AccountLoginClusterLoggedOutEvent {\n");
     output.append("\tnode: ");
     output.append(node);
+    output.append("\n");
+    output.append("\tfabricIndex: ");
+    output.append(fabricIndex);
     output.append("\n");
     output.append("}\n");
     return output.toString();
