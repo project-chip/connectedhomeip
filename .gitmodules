@@ -358,3 +358,10 @@
 	path = third_party/openthread/ot-realtek
 	url = https://github.com/rtkconnectivity/ot-realtek.git
 	platforms = realtek_bee
+[submodule "third_party/libtrustymatter/repo"]
+	path = third_party/libtrustymatter/repo
+	url = https://github.com/nxp-imx/libtrustymatter
+[submodule "third_party/imx-secure-enclave/repo"]
+	path = third_party/imx-secure-enclave/repo
+	url = https://github.com/nxp-imx/imx-secure-enclave.git
+	branch = lf-6.12.3_1.0.0
