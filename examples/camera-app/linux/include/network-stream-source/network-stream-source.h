@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <atomic>
 #include <cstdint>
 #include <media-controller.h>
 #include <thread>
@@ -45,7 +46,7 @@ private:
     uint16_t mSrcPort;
     uint16_t mStreamId;
     StreamType mStreamType;
-    bool mStreamSourceActive = false;
+    std::atomic<bool> mStreamSourceActive = false;
 
     std::vector<std::thread> streamThreads;
 };

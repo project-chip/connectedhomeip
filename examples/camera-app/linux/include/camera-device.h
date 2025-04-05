@@ -34,42 +34,6 @@
 
 namespace Camera {
 
-constexpr uint8_t kMaxVideoStreams  = 10; // Maximum number of pre-allocated streams
-constexpr uint16_t kInvalidStreamID = 65500;
-
-struct VideoStream
-{
-    uint16_t id;                                                         // Stream ID
-    bool isAllocated;                                                    // Flag to indicate if the stream is allocated
-    chip::app::Clusters::CameraAvStreamManagement::VideoCodecEnum codec; // Codec information (e.g., "H.264", "HEVC")
-    VideoResolutionStruct videoRes;
-    uint16_t frameRate; // Rate at which frames are captured in frames per
-                        // second.
-    GstElement * videoPipeline;
-};
-
-struct AudioStream
-{
-    uint16_t id;                                                         // Stream ID
-    bool isAllocated;                                                    // Flag to indicate if the stream is allocated
-    chip::app::Clusters::CameraAvStreamManagement::AudioCodecEnum codec; // Codec information (e.g., "OPUS", "AACLC")
-    uint8_t channelCount;                                                // channel count
-    uint32_t sampleRate;
-    GstElement * audioPipeline;
-};
-
-struct SnapshotStream
-{
-    uint16_t id;                                                         // Stream ID
-    bool isAllocated;                                                    // Flag to indicate if the stream is allocated
-    chip::app::Clusters::CameraAvStreamManagement::ImageCodecEnum codec; // Codec information (e.g., "JPEG")
-    VideoResolutionStruct videoRes;
-    uint8_t quality;    // Quality metric between 1 and 100
-    uint16_t frameRate; // Rate at which frames are captured in frames per
-                        // second.
-    GstElement * snapshotPipeline;
-};
-
 class CameraDevice : public CameraDeviceInterface, public CameraDeviceInterface::CameraHALInterface
 {
 public:
@@ -77,13 +41,8 @@ public:
     chip::app::Clusters::WebRTCTransportProvider::Delegate & GetWebRTCProviderDelegate();
     chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtDelegate & GetCameraAVStreamMgmtDelegate();
 
+    CameraDevice();
     ~CameraDevice();
-
-    static CameraDevice & GetInstance()
-    {
-        static CameraDevice sCameraDevice;
-        return sCameraDevice;
-    }
 
     CameraDeviceInterface::CameraHALInterface & GetCameraHALInterface() { return *this; }
 
@@ -133,8 +92,6 @@ public:
     const std::vector<SnapshotStream> & GetAvailableSnapshotStreams() const { return snapshotStreams; }
 
 private:
-    CameraDevice();
-
     int videoDeviceFd = -1;
     std::vector<VideoStream> videoStreams;       // Vector to hold available video streams
     std::vector<AudioStream> audioStreams;       // Vector to hold available audio streams
@@ -145,7 +102,7 @@ private:
     void InitializeSnapshotStreams();
 
     GstElement * CreateVideoPipeline(const std::string & pipelineString, CameraError & error);
-    GstElement * CreateSnapshotPipeline(const std::string & device, int width, int height, int quality,
+    GstElement * CreateSnapshotPipeline(const std::string & device, int width, int height, int quality, int frameRate,
                                         const std::string & filename, CameraError & error);
     CameraError SetV4l2Control(uint32_t controlId, int value);
 

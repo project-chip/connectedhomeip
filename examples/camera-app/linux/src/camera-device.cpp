@@ -47,6 +47,9 @@ CameraDevice::CameraDevice()
 
     // Initialize Audio Sources
     mNetworkVideoSource.Init(&mMediaController, AUDIO_STREAM_GST_DEST_PORT, StreamType::kAudio);
+
+    // Set the CameraHALInterface in CameraAVStreamManager.
+    mCameraAVStreamManager.SetCameraDeviceHAL(this);
 }
 
 CameraDevice::~CameraDevice()
@@ -89,7 +92,7 @@ CameraError CameraDevice::InitializeStreams()
 }
 
 // Function to create the GStreamer pipeline
-GstElement * CameraDevice::CreateSnapshotPipeline(const std::string & device, int width, int height, int quality,
+GstElement * CameraDevice::CreateSnapshotPipeline(const std::string & device, int width, int height, int quality, int framerate,
                                                   const std::string & filename, CameraError & error)
 {
     GstElement *pipeline, *source, *jpeg_caps, *videorate, *videorate_caps, *queue, *filesink;
@@ -128,7 +131,7 @@ GstElement * CameraDevice::CreateSnapshotPipeline(const std::string & device, in
     g_object_set(source, "device", device.c_str(), "do-timestamp", TRUE, NULL);
 
     GstCaps * caps = gst_caps_new_simple("image/jpeg", "width", G_TYPE_INT, width, "height", G_TYPE_INT, height, "framerate",
-                                         GST_TYPE_FRACTION, 30, 1, "quality", G_TYPE_INT, quality, NULL);
+                                         GST_TYPE_FRACTION, framerate, 1, "quality", G_TYPE_INT, quality, NULL);
     g_object_set(jpeg_caps, "caps", caps, NULL);
     gst_caps_unref(caps);
 
@@ -178,6 +181,14 @@ CameraError CameraDevice::SetV4l2Control(uint32_t controlId, int value)
 CameraError CameraDevice::CaptureSnapshot(const uint16_t streamID, const VideoResolutionStruct & resolution,
                                           ImageSnapshot & outImageSnapshot)
 {
+    auto it = std::find_if(snapshotStreams.begin(), snapshotStreams.end(),
+                           [streamID](const SnapshotStream & s) { return s.snapshotStreamParams.snapshotStreamID == streamID; });
+    if (it == snapshotStreams.end())
+    {
+        ChipLogError(Zcl, "Snapshot streamID : %u not found", streamID);
+        return CameraError::ERROR_CAPTURE_SNAPSHOT_FAILED;
+    }
+
     // Read from image file stored from snapshot stream.
     std::ifstream file(SNAPSHOT_FILE_PATH, std::ios::binary | std::ios::ate);
     if (!file.is_open())
@@ -201,25 +212,17 @@ CameraError CameraDevice::CaptureSnapshot(const uint16_t streamID, const VideoRe
 
     file.close();
 
-    auto it = std::find_if(snapshotStreams.begin(), snapshotStreams.end(),
-                           [streamID](const SnapshotStream & s) { return s.id == streamID; });
-    if (it == snapshotStreams.end())
-    {
-        ChipLogError(Zcl, "Snapshot streamID : %u not found", streamID);
-        return CameraError::ERROR_CAPTURE_SNAPSHOT_FAILED;
-    }
-
-    outImageSnapshot.imageRes.width  = it->videoRes.width;
-    outImageSnapshot.imageRes.height = it->videoRes.height;
-    outImageSnapshot.imageCodec      = it->codec;
+    outImageSnapshot.imageRes.width  = it->snapshotStreamParams.minResolution.width;
+    outImageSnapshot.imageRes.height = it->snapshotStreamParams.minResolution.height;
+    outImageSnapshot.imageCodec      = it->snapshotStreamParams.imageCodec;
 
     return CameraError::SUCCESS;
 }
 
 CameraError CameraDevice::StartVideoStream(uint16_t streamID)
 {
-    auto it =
-        std::find_if(videoStreams.begin(), videoStreams.end(), [streamID](const VideoStream & s) { return s.id == streamID; });
+    auto it = std::find_if(videoStreams.begin(), videoStreams.end(),
+                           [streamID](const VideoStream & s) { return s.videoStreamParams.videoStreamID == streamID; });
 
     if (it == videoStreams.end())
     {
@@ -230,14 +233,15 @@ CameraError CameraDevice::StartVideoStream(uint16_t streamID)
     // Construct RTP video pipeline
     std::string pipelineString = "v4l2src device=/dev/video0 ! "
                                  "video/x-raw,width=" +
-        std::to_string(it->videoRes.width) + ",height=" + std::to_string(it->videoRes.height) +
-        ",framerate=" + std::to_string(it->frameRate) + "/1 ! ";
+        std::to_string(it->videoStreamParams.minResolution.width) +
+        ",height=" + std::to_string(it->videoStreamParams.minResolution.height) +
+        ",framerate=" + std::to_string(it->videoStreamParams.minFrameRate) + "/1 ! ";
 
-    if (it->codec == VideoCodecEnum::kH264)
+    if (it->videoStreamParams.videoCodec == VideoCodecEnum::kH264)
     {
         pipelineString += "videoconvert ! videoscale ! x264enc tune=zerolatency ! rtph264pay ! ";
     }
-    else if (it->codec == VideoCodecEnum::kHevc)
+    else if (it->videoStreamParams.videoCodec == VideoCodecEnum::kHevc)
     {
         pipelineString += ""; // TODO
     }
@@ -249,18 +253,23 @@ CameraError CameraDevice::StartVideoStream(uint16_t streamID)
     pipelineString +=
         "udpsink host=" + std::string(STREAM_GST_DEST_IP) + " port=" + std::to_string(VIDEO_STREAM_GST_DEST_PORT); // Known socket
 
-    CameraError error = CameraError::SUCCESS;
-    it->videoPipeline = CreateVideoPipeline(pipelineString, error);
-    if (it->videoPipeline == nullptr)
+    CameraError error          = CameraError::SUCCESS;
+    GstElement * videoPipeline = CreateVideoPipeline(pipelineString, error);
+    if (videoPipeline == nullptr)
     {
+        ChipLogError(Zcl, "Failed to create video pipeline.");
+        it->videoContext = nullptr;
         return error;
     }
 
     // Start the pipeline
-    gst_element_set_state(it->videoPipeline, GST_STATE_PLAYING);
+    gst_element_set_state(videoPipeline, GST_STATE_PLAYING);
 
     // Start the network stream source after the Gstreamer pipeline is setup
     mNetworkVideoSource.Start(streamID);
+
+    // Store in stream context
+    it->videoContext = videoPipeline;
 
     return CameraError::SUCCESS;
 }
@@ -268,19 +277,20 @@ CameraError CameraDevice::StartVideoStream(uint16_t streamID)
 // Stop video stream
 CameraError CameraDevice::StopVideoStream(uint16_t streamID)
 {
-    auto it =
-        std::find_if(videoStreams.begin(), videoStreams.end(), [streamID](const VideoStream & s) { return s.id == streamID; });
+    auto it = std::find_if(videoStreams.begin(), videoStreams.end(),
+                           [streamID](const VideoStream & s) { return s.videoStreamParams.videoStreamID == streamID; });
 
     if (it == videoStreams.end())
     {
         return CameraError::ERROR_VIDEO_STREAM_STOP_FAILED;
     }
 
-    if (it->videoPipeline != nullptr)
+    GstElement * videoPipeline = reinterpret_cast<GstElement *>(it->videoContext);
+    if (videoPipeline != nullptr)
     {
-        gst_element_set_state(it->videoPipeline, GST_STATE_NULL);
-        gst_object_unref(it->videoPipeline);
-        it->videoPipeline = nullptr;
+        gst_element_set_state(videoPipeline, GST_STATE_NULL);
+        gst_object_unref(videoPipeline);
+        it->videoContext = nullptr;
     }
 
     return CameraError::SUCCESS;
@@ -302,7 +312,7 @@ CameraError CameraDevice::StopAudioStream(uint16_t streamID)
 CameraError CameraDevice::StartSnapshotStream(uint16_t streamID)
 {
     auto it = std::find_if(snapshotStreams.begin(), snapshotStreams.end(),
-                           [streamID](const SnapshotStream & s) { return s.id == streamID; });
+                           [streamID](const SnapshotStream & s) { return s.snapshotStreamParams.snapshotStreamID == streamID; });
     if (it == snapshotStreams.end())
     {
         ChipLogError(Zcl, "Snapshot streamID : %u not found", streamID);
@@ -310,35 +320,41 @@ CameraError CameraDevice::StartSnapshotStream(uint16_t streamID)
     }
 
     // Create the GStreamer pipeline
-    CameraError error = CameraError::SUCCESS;
-    it->snapshotPipeline =
-        CreateSnapshotPipeline("/dev/video0", it->videoRes.width, it->videoRes.height, it->quality, "capture_snapshot.jpg", error);
-    if (it->snapshotPipeline == nullptr)
+    CameraError error             = CameraError::SUCCESS;
+    GstElement * snapshotPipeline = CreateSnapshotPipeline(
+        "/dev/video0", it->snapshotStreamParams.minResolution.width, it->snapshotStreamParams.minResolution.height,
+        it->snapshotStreamParams.quality, it->snapshotStreamParams.frameRate, "capture_snapshot.jpg", error);
+    if (snapshotPipeline == nullptr)
     {
+        ChipLogError(Zcl, "Failed to create snapshot pipeline.");
+        it->snapshotContext = nullptr;
         return error;
     }
 
     // Start the pipeline
-    GstStateChangeReturn result = gst_element_set_state(it->snapshotPipeline, GST_STATE_PLAYING);
+    GstStateChangeReturn result = gst_element_set_state(snapshotPipeline, GST_STATE_PLAYING);
     if (result == GST_STATE_CHANGE_FAILURE)
     {
         ChipLogError(Zcl, "Failed to start snapshot pipeline.");
-        gst_object_unref(it->snapshotPipeline);
-        it->snapshotPipeline = nullptr;
+        gst_object_unref(snapshotPipeline);
+        it->snapshotContext = nullptr;
         return CameraError::ERROR_SNAPSHOT_STREAM_START_FAILED;
     }
 
     // Wait for the pipeline to reach the PLAYING state
     GstState state;
-    gst_element_get_state(it->snapshotPipeline, &state, nullptr, GST_CLOCK_TIME_NONE);
+    gst_element_get_state(snapshotPipeline, &state, nullptr, GST_CLOCK_TIME_NONE);
     if (state != GST_STATE_PLAYING)
     {
         ChipLogError(Zcl, "Snapshot pipeline did not reach PLAYING state.");
-        gst_element_set_state(it->snapshotPipeline, GST_STATE_NULL);
-        gst_object_unref(it->snapshotPipeline);
-        it->snapshotPipeline = nullptr;
+        gst_element_set_state(snapshotPipeline, GST_STATE_NULL);
+        gst_object_unref(snapshotPipeline);
+        it->snapshotContext = nullptr;
         return CameraError::ERROR_SNAPSHOT_STREAM_START_FAILED;
     }
+
+    // Store in stream context
+    it->snapshotContext = snapshotPipeline;
 
     return CameraError::SUCCESS;
 }
@@ -347,24 +363,25 @@ CameraError CameraDevice::StartSnapshotStream(uint16_t streamID)
 CameraError CameraDevice::StopSnapshotStream(uint16_t streamID)
 {
     auto it = std::find_if(snapshotStreams.begin(), snapshotStreams.end(),
-                           [streamID](const SnapshotStream & s) { return s.id == streamID; });
+                           [streamID](const SnapshotStream & s) { return s.snapshotStreamParams.snapshotStreamID == streamID; });
     if (it == snapshotStreams.end())
     {
         return CameraError::ERROR_SNAPSHOT_STREAM_STOP_FAILED;
     }
 
-    if (it->snapshotPipeline != nullptr)
+    GstElement * snapshotPipeline = reinterpret_cast<GstElement *>(it->snapshotContext);
+    if (snapshotPipeline != nullptr)
     {
         // Stop the pipeline
-        GstStateChangeReturn result = gst_element_set_state(it->snapshotPipeline, GST_STATE_NULL);
+        GstStateChangeReturn result = gst_element_set_state(snapshotPipeline, GST_STATE_NULL);
         if (result == GST_STATE_CHANGE_FAILURE)
         {
             return CameraError::ERROR_SNAPSHOT_STREAM_STOP_FAILED;
         }
 
         // Unreference the pipeline
-        gst_object_unref(it->snapshotPipeline);
-        it->snapshotPipeline = nullptr;
+        gst_object_unref(snapshotPipeline);
+        it->snapshotContext = nullptr;
     }
 
     return CameraError::SUCCESS;
@@ -408,7 +425,22 @@ void CameraDevice::SetHDRMode(bool hdrMode) {}
 void CameraDevice::InitializeVideoStreams()
 {
     // Create single video stream with typical supported parameters
-    VideoStream videoStream = { 1, false, VideoCodecEnum::kH264, { 640, 480 }, 30, nullptr };
+    VideoStream videoStream = { { 1 /* Id */,
+                                  StreamUsageEnum::kLiveView /* StreamUsage */,
+                                  VideoCodecEnum::kH264,
+                                  30 /* MinFrameRate */,
+                                  120 /* MaxFrameRate */,
+                                  { 640, 480 } /* MinResolution */,
+                                  { 640, 480 } /* MaxResolution */,
+                                  500000 /* MinBitRate */,
+                                  2000000 /* MaxBitRate */,
+                                  1000 /* MinFragmentLen */,
+                                  10000 /* MaxFragmentLen */,
+                                  chip::MakeOptional(static_cast<bool>(false)) /* WMark */,
+                                  chip::MakeOptional(static_cast<bool>(false)) /* OSD */,
+                                  0 /* RefCount */ },
+                                false,
+                                nullptr };
 
     videoStreams.push_back(videoStream);
 }
@@ -416,7 +448,11 @@ void CameraDevice::InitializeVideoStreams()
 void CameraDevice::InitializeAudioStreams()
 {
     // Create single audio stream with typical supported parameters
-    AudioStream audioStream = { 1, false, AudioCodecEnum::kOpus, 2, 48000, nullptr };
+    AudioStream audioStream = { { 1 /* Id */, StreamUsageEnum::kLiveView /* StreamUsage */, AudioCodecEnum::kOpus,
+                                  2 /* ChannelCount */, 48000 /* SampleRate */, 20000 /* BitRate*/, 24 /* BitDepth */,
+                                  0 /* RefCount */ },
+                                false,
+                                nullptr };
 
     audioStreams.push_back(audioStream);
 }
@@ -424,7 +460,18 @@ void CameraDevice::InitializeAudioStreams()
 void CameraDevice::InitializeSnapshotStreams()
 {
     // Create single snapshot stream with typical supported parameters
-    snapshotStreams.push_back({ 1, false, ImageCodecEnum::kJpeg, { 320, 240 }, 90, 30, nullptr });
+    SnapshotStream snapshotStream = { { 1 /* Id */,
+                                        ImageCodecEnum::kJpeg,
+                                        30 /* FrameRate */,
+                                        512000 /* BitRate*/,
+                                        { 320, 240 } /* MinResolution*/,
+                                        { 320, 240 } /* MaxResolution */,
+                                        90 /* Quality */,
+                                        0 /* RefCount */ },
+                                      false,
+                                      nullptr };
+
+    snapshotStreams.push_back(snapshotStream);
 }
 
 ChimeDelegate & CameraDevice::GetChimeDelegate()

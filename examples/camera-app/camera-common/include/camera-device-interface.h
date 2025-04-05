@@ -28,6 +28,58 @@ using chip::app::Clusters::CameraAvStreamManagement::VideoResolutionStruct;
 using chip::app::Clusters::CameraAvStreamManagement::VideoSensorParamsStruct;
 using chip::app::Clusters::CameraAvStreamManagement::VideoStreamStruct;
 
+struct VideoStream
+{
+    VideoStreamStruct videoStreamParams;
+    bool isAllocated;    // Flag to indicate if the stream is allocated.
+    void * videoContext; // Platform-specific context object associated with
+                         // video stream;
+
+    bool IsCompatible(const VideoStreamStruct & inputParams) const
+    {
+        return (videoStreamParams.videoCodec == inputParams.videoCodec &&
+                videoStreamParams.minFrameRate <= inputParams.minFrameRate &&
+                videoStreamParams.maxFrameRate >= inputParams.maxFrameRate &&
+                videoStreamParams.minResolution.width <= inputParams.minResolution.width &&
+                videoStreamParams.minResolution.height <= inputParams.minResolution.height &&
+                videoStreamParams.maxResolution.width >= inputParams.maxResolution.width &&
+                videoStreamParams.maxResolution.height >= inputParams.maxResolution.height);
+    }
+};
+
+struct AudioStream
+{
+    AudioStreamStruct audioStreamParams;
+    bool isAllocated;    // Flag to indicate if the stream is allocated.
+    void * audioContext; // Platform-specific context object associated with
+                         // video stream;
+
+    bool IsCompatible(const AudioStreamStruct & inputParams) const
+    {
+        return (audioStreamParams.audioCodec == inputParams.audioCodec &&
+                audioStreamParams.channelCount == inputParams.channelCount &&
+                audioStreamParams.sampleRate == inputParams.sampleRate);
+    }
+};
+
+struct SnapshotStream
+{
+    SnapshotStreamStruct snapshotStreamParams;
+    bool isAllocated;       // Flag to indicate if the stream is allocated
+    void * snapshotContext; // Platform-specific context object associated with
+                            // snapshot stream;
+
+    bool IsCompatible(const SnapshotStreamStruct & inputParams) const
+    {
+        return (snapshotStreamParams.imageCodec == inputParams.imageCodec && snapshotStreamParams.quality == inputParams.quality &&
+                snapshotStreamParams.frameRate <= inputParams.frameRate &&
+                snapshotStreamParams.minResolution.width <= inputParams.minResolution.width &&
+                snapshotStreamParams.minResolution.height <= inputParams.minResolution.height &&
+                snapshotStreamParams.maxResolution.width >= inputParams.maxResolution.width &&
+                snapshotStreamParams.maxResolution.height >= inputParams.maxResolution.height);
+    }
+};
+
 // Enumeration for common camera errors
 enum class CameraError
 {
@@ -74,6 +126,12 @@ public:
 
         // Configure camera settings (e.g., exposure, focus)
         // virtual CameraError Configure(const std::string & setting, const std::string & value) = 0;
+
+        virtual const std::vector<VideoStream> & GetAvailableVideoStreams() const = 0;
+
+        virtual const std::vector<AudioStream> & GetAvailableAudioStreams() const = 0;
+
+        virtual const std::vector<SnapshotStream> & GetAvailableSnapshotStreams() const = 0;
 
         // Capture a snapshot image
         virtual CameraError CaptureSnapshot(uint16_t streamID, const VideoResolutionStruct & resolution,

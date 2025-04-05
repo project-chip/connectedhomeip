@@ -18,10 +18,12 @@
 
 #pragma once
 
+#include "camera-device-interface.h"
 #include <app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.h>
 #include <app/util/config.h>
 #include <vector>
 
+constexpr uint16_t kInvalidStreamID = 65500;
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -72,7 +74,10 @@ public:
     CameraAVStreamManager()  = default;
     ~CameraAVStreamManager() = default;
 
+    void SetCameraDeviceHAL(CameraDeviceInterface::CameraHALInterface * aCameraDevice);
+
 private:
+    CameraDeviceInterface::CameraHALInterface * mCameraDeviceHAL = nullptr;
 };
 
 } // namespace CameraAvStreamManagement
