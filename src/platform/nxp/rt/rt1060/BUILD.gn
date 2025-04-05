@@ -93,7 +93,10 @@ static_library("nxp_platform") {
     "CHIPDevicePlatformConfig.h",
     "PlatformManagerImpl.cpp",
   ]
-  deps = [ "${chip_root}/src/app:app_config" ]
+  deps = [
+    "${chip_root}/src/app:app_config",
+    "${chip_root}/src/app/common:ids",
+  ]
 
   if (chip_enable_ble) {
     sources += [

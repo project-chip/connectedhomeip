@@ -1,0 +1,86 @@
+// DO NOT EDIT MANUALLY - Generated file
+//
+// Cluster metadata information for cluster HepaFilterMonitoring (cluster code: 113/0x71)
+// based on src/controller/data_model/controller-clusters.matter
+#pragma once
+
+#include <app/data-model-provider/MetadataTypes.h>
+#include <lib/core/DataModelTypes.h>
+
+#include <cstdint>
+
+#include <clusters/HepaFilterMonitoring/Ids.h>
+
+namespace chip {
+namespace app {
+namespace clusters {
+namespace HepaFilterMonitoring {
+
+inline constexpr uint32_t kRevision = 1;
+
+namespace Attributes {
+namespace Condition {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
+    .attributeId    = HepaFilterMonitoring::Attributes::Condition::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+} // namespace Condition
+namespace DegradationDirection {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
+    .attributeId    = HepaFilterMonitoring::Attributes::DegradationDirection::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+} // namespace DegradationDirection
+namespace ChangeIndication {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
+    .attributeId    = HepaFilterMonitoring::Attributes::ChangeIndication::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+} // namespace ChangeIndication
+namespace InPlaceIndicator {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
+    .attributeId    = HepaFilterMonitoring::Attributes::InPlaceIndicator::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+} // namespace InPlaceIndicator
+namespace LastChangedTime {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
+    .attributeId    = HepaFilterMonitoring::Attributes::LastChangedTime::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = Access::Privilege::kOperate,
+};
+} // namespace LastChangedTime
+namespace ReplacementProductList {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
+    .attributeId    = HepaFilterMonitoring::Attributes::ReplacementProductList::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+} // namespace ReplacementProductList
+
+} // namespace Attributes
+
+namespace Commands {
+namespace ResetCondition {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
+    .commandId       = HepaFilterMonitoring::Commands::ResetCondition::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+} // namespace ResetCondition
+
+} // namespace Commands
+} // namespace HepaFilterMonitoring
+} // namespace clusters
+} // namespace app
+} // namespace chip

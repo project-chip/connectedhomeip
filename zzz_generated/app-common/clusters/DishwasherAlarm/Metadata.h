@@ -1,0 +1,77 @@
+// DO NOT EDIT MANUALLY - Generated file
+//
+// Cluster metadata information for cluster DishwasherAlarm (cluster code: 93/0x5D)
+// based on src/controller/data_model/controller-clusters.matter
+#pragma once
+
+#include <app/data-model-provider/MetadataTypes.h>
+#include <lib/core/DataModelTypes.h>
+
+#include <cstdint>
+
+#include <clusters/DishwasherAlarm/Ids.h>
+
+namespace chip {
+namespace app {
+namespace clusters {
+namespace DishwasherAlarm {
+
+inline constexpr uint32_t kRevision = 1;
+
+namespace Attributes {
+namespace Mask {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
+    .attributeId    = DishwasherAlarm::Attributes::Mask::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+} // namespace Mask
+namespace Latch {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
+    .attributeId    = DishwasherAlarm::Attributes::Latch::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+} // namespace Latch
+namespace State {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
+    .attributeId    = DishwasherAlarm::Attributes::State::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+} // namespace State
+namespace Supported {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
+    .attributeId    = DishwasherAlarm::Attributes::Supported::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+} // namespace Supported
+
+} // namespace Attributes
+
+namespace Commands {
+namespace Reset {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
+    .commandId       = DishwasherAlarm::Commands::Reset::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+} // namespace Reset
+namespace ModifyEnabledAlarms {
+inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
+    .commandId       = DishwasherAlarm::Commands::ModifyEnabledAlarms::Id,
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .invokePrivilege = Access::Privilege::kOperate,
+};
+} // namespace ModifyEnabledAlarms
+
+} // namespace Commands
+} // namespace DishwasherAlarm
+} // namespace clusters
+} // namespace app
+} // namespace chip

@@ -109,7 +109,10 @@ static_library("nxp_platform") {
     "CHIPDevicePlatformConfig.h",
     "PlatformManagerImpl.cpp",
   ]
-  deps = [ "${chip_root}/src/app:app_config" ]
+  deps = [
+    "${chip_root}/src/app:app_config",
+    "${chip_root}/src/app/common:ids",
+  ]
 
   if (nxp_nvm_component == "nvm_fwk" || nxp_nvm_component == "littlefs") {
     sources += [
@@ -179,11 +182,6 @@ static_library("nxp_platform") {
       "../../../OpenThread/OpenThreadUtils.cpp",
       "../../common/ThreadStackManagerImpl.cpp",
       "../../common/ThreadStackManagerImpl.h",
-    ]
-
-    deps += [
-      "${chip_root}/src/app:app_config",
-      "${chip_root}/src/app/common:ids",
     ]
 
     if (!nxp_build_matter_standalone_lib) {

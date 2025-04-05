@@ -121,7 +121,7 @@ source_set("global-attributes") {
   # as a dependency
   public_deps = [
     ":app_config",
-    "${chip_root}/src/app/common:ids",
+    "${chip_root}/src/app/common:global-ids",
     "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/lib/support",
   ]
