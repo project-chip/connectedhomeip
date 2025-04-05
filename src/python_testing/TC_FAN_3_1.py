@@ -21,8 +21,8 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app: ${AIR_PURIFIER_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace_file json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -30,140 +30,629 @@
 #       --passcode 20202021
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --timeout 600
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
 import time
+from dataclasses import dataclass
+from enum import Enum
+from typing import Any, Optional
 
 import chip.clusters as Clusters
+from chip.clusters import ClusterObjects as ClusterObjects
 from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import (ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, async_test_body,
+                                         default_matter_test_main)
 from mobly import asserts
+
+
+class OrderEnum(Enum):
+    Ascending = 1
+    Descending = 2
+
+
+@dataclass
+class InitSettings:
+    attr_to_update: ClusterObjects.ClusterAttributeDescriptor
+    attr_to_verify: ClusterObjects.ClusterAttributeDescriptor
+    iteration_range: list[Any]
+    order: OrderEnum
+    init_fan_mode: Clusters.FanControl.Enums.FanModeEnum
+    init_percent_setting: int
+    init_speed_setting: Optional[int]
+    init_attr_to_update_value: int
+    init_attr_to_verify_value: int
+
 
 logger = logging.getLogger(__name__)
 
 
 class TC_FAN_3_1(MatterBaseTest):
+    def desc_TC_FAN_3_1(self) -> str:
+        return "[TC-FAN-3.1] Mandatory functionality with DUT as Server"
 
-    async def read_fc_attribute_expect_success(self, endpoint, attribute):
+    def steps_TC_FAN_3_1(self):
+        return [TestStep(1, "[FC] Commissioning already done.", is_commissioning=True),
+                TestStep(2, "[FC] TH reads the FanModeSequence attribute from the DUT. This attribute specifies the available fan modes.",
+                         "Verify that the DUT response contains a FanModeSequenceEnum and store."),
+                TestStep(3, "[FC] TH checks the DUT for support of the MultiSpeed feature.",
+                         "If the MultiSpeed feature is supported the SpeedSetting attribute will be present."),
+                TestStep(4, "[FC] TH subscribes to the DUT's FanControl cluster.", "Enables the TH to receive attribute updates."),
+                TestStep(5, "[FC] TH tests the following scenario: - Attribute to update: PercentSetting - Attribute to verify: PercentSetting, FanMode and SpeedSetting (if present) - Update order: Ascending",
+                         "Update the value of the PercentSetting attribute iteratively, in ascending order, from 0 to 100. For each update, the DUT shall return either a SUCCESS or an INVALID_IN_STATE status code. If SUCCESS and a PercentSetting, FanMode (and/or SpeedSetting if present) attribute value change is triggered: Verify that the current value(s) is greater than the previous one. If INVALID_IN_STATE, no update operation occurred. Verify that the current value(s) is the same as the previous one"),
+                TestStep(6, "[FC] TH tests the following scenario: - Attribute to update: PercentSetting - Attribute to verify: PercentSetting, FanMode and SpeedSetting (if present) - Update order: Descending",
+                         "Update the value of the PercentSetting attribute iteratively, in descending order, from 100 to 0. For each update, the DUT shall return either a SUCCESS or an INVALID_IN_STATE status code. If SUCCESS and a PercentSetting, FanMode (and/or SpeedSetting if present) attribute value change is triggered. Verify that the current value(s) is less than the previous one. If INVALID_IN_STATE, no update operation occurred. Verify that the current value(s) is the same as the previous one"),
+                TestStep(7, "[FC] TH tests the following scenario: - Attribute to update: FanMode - Attribute to verify: FanMode, PercentSetting and SpeedSetting (if present) - Update order: Ascending",
+                         "Update the value of the FanMode attribute iteratively, in ascending order, from 0 (Off) to the number of available fan modes specified by the FanModeSequence attribute excluding modes beyond 3 (High). For each update, the DUT shall return either a SUCCESS or an INVALID_IN_STATE status code. If SUCCESS and a FanMode, PercentSetting (and/or SpeedSetting if present) attribute value change is triggered. Verify that the current value(s) is greater than the previous one. If INVALID_IN_STATE, no update operation occurred. Verify that the current value(s) is the same as the previous one"),
+                TestStep(8, "[FC] TH tests the following scenario: - Attribute to update: FanMode - Attribute to verify: FanMode, PercentSetting and SpeedSetting (if present) - Update order: Descending",
+                         "Update the value of the FanMode attribute iteratively, in descending order, from the number of available fan modes specified by the FanModeSequence attribute excluding modes beyond 3 (High) to 0 (Off). For each update, the DUT shall return either a SUCCESS or an INVALID_IN_STATE status code. If SUCCESS and a FanMode, PercentSetting (and/or SpeedSetting if present) attribute value change is triggered. Verify that the current value(s) is less than the previous one. If INVALID_IN_STATE, no update operation occurred. Verify that the current value(s) is the same as the previous one"),
+                ]
+
+    async def read_setting(self, endpoint: int, attribute: Any) -> Any:
+        """
+        Asynchronously reads a specified attribute from the FanControl cluster at a given endpoint.
+
+        Args:
+            endpoint (int): The endpoint identifier for the fan device.
+            attribute (Any): The attribute to be read.
+
+        Returns:
+            Any: The value of the specified attribute if the read operation is successful.
+
+        Raises:
+            AssertionError: If the read operation fails.
+        """
         cluster = Clusters.Objects.FanControl
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
-    async def read_fan_mode(self, endpoint):
-        return await self.read_fc_attribute_expect_success(endpoint, Clusters.FanControl.Attributes.FanMode)
+    async def write_and_verify_attribute(self, endpoint, attribute, value) -> Status:
+        """
+        Writes a value to a specified attribute on a given endpoint and verifies the write operation by reading back the value.
 
-    async def read_percent_setting(self, endpoint):
-        return await self.read_fc_attribute_expect_success(endpoint, Clusters.FanControl.Attributes.PercentSetting)
+        Args:
+            endpoint (Any): The endpoint identifier for the fan device.
+            attribute (Any): The attribute to be written.
+            value (Any): The value to write to the attribute.
 
-    async def read_percent_current(self, endpoint):
-        return await self.read_fc_attribute_expect_success(endpoint, Clusters.FanControl.Attributes.PercentCurrent)
+        Returns:
+            Status: The status of the write operation.
 
-    async def write_fan_mode(self, endpoint, fan_mode) -> Status:
-        result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, Clusters.FanControl.Attributes.FanMode(fan_mode))])
-        return result[0].Status
+        Raises:
+            AssertionError: If the value read back does not match the value written.
+        """
+        result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, attribute(value))])
+        write_status = result[0].Status
+        write_status_success = (write_status == Status.Success) or (write_status == Status.InvalidInState)
+        asserts.assert_true(write_status_success,
+                            f"[FC] {attribute.__name__} write did not return a result of either SUCCESS or INVALID_IN_STATE ({write_status.name})")
 
-    async def write_percent_setting(self, endpoint, percent_setting) -> Status:
-        result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, Clusters.FanControl.Attributes.PercentSetting(percent_setting))])
-        return result[0].Status
+        if write_status == Status.Success:
+            value_read = await self.read_setting(endpoint, attribute)
+            asserts.assert_equal(value_read, value,
+                                 f"[FC] Mismatch between written and read attribute value ({attribute.__name__} - written: {value}, read: {value_read})")
+        return write_status
+
+    async def get_attribute_value_from_queue(self, attribute) -> Optional[Any]:
+        """
+        Wait for the latest occurrence of a specific attribute update in the queue within a given timeout.
+
+        Args:
+            attribute (str): The attribute to wait for.
+
+        Returns:
+            Optional[Any]: The latest value of the attribute if found within the timeout, otherwise None.
+        """
+        queue = self.attribute_subscription.attribute_queue.queue
+        start_time = time.time()
+
+        while time.time() - start_time < self.timeout_sec:
+            if queue:
+                last_value = None
+                index_to_remove = None
+
+                # Iterate the queue in reverse order
+                for i in range(len(queue) - 1, -1, -1):
+
+                    # Find matching attribute in the queue
+                    if queue[i].attribute == attribute:
+                        last_value = queue[i].value
+
+                        # Mark matching item for removal
+                        index_to_remove = i
+                        break
+
+                # Remove matching item from the queue to
+                # avoid false positives in subsequent runs
+                if index_to_remove is not None:
+                    del queue[index_to_remove]
+
+                if last_value is not None:
+                    # Return the latest match
+                    return last_value
+
+            await asyncio.sleep(self.timeout_sec / 4)
+
+        # Return None if timeout expires
+        return None
+
+    async def get_fan_modes(self, endpoint, remove_auto: bool = False):
+        """
+        Gets the available fan modes provided by the FanModeSequence attribute.
+
+        Args:
+            endpoint (int): The endpoint identifier for the fan device.
+            remove_auto (bool, optional): If True, removes the 'Auto' fan mode from the results. Defaults to False.
+
+        Raises:
+            AssertionError: If the FanModeSequence attribute value is not an instance of FanModeSequenceEnum.
+
+        Returns:
+            None: The fan modes are stored in the instance variable `self.fan_modes`.
+        """
+        # Read FanModeSequence attribute value
+        fan_mode_sequence_attr = Clusters.FanControl.Attributes.FanModeSequence
+        fm_enum = Clusters.FanControl.Enums.FanModeEnum
+        fms_enum = Clusters.FanControl.Enums.FanModeSequenceEnum
+        self.fan_mode_sequence = await self.read_setting(endpoint, fan_mode_sequence_attr)
+
+        # Verify response contains a FanModeSequenceEnum
+        asserts.assert_is_instance(self.fan_mode_sequence, fms_enum,
+                                   f"[FC] FanModeSequence result isn't of enum type {fms_enum.__name__}")
+
+        fan_modes = None
+        if self.fan_mode_sequence == 0:
+            fan_modes = [fm_enum.kOff, fm_enum.kLow, fm_enum.kMedium, fm_enum.kHigh]
+        elif self.fan_mode_sequence == 1:
+            fan_modes = [fm_enum.kOff, fm_enum.kLow, fm_enum.kHigh]
+        elif self.fan_mode_sequence == 2:
+            fan_modes = [fm_enum.kOff, fm_enum.kLow, fm_enum.kMedium, fm_enum.kHigh, fm_enum.kAuto]
+        elif self.fan_mode_sequence == 3:
+            fan_modes = [fm_enum.kOff, fm_enum.kLow, fm_enum.kHigh, fm_enum.kAuto]
+        elif self.fan_mode_sequence == 4:
+            fan_modes = [fm_enum.kOff, fm_enum.kHigh, fm_enum.kAuto]
+        elif self.fan_mode_sequence == 5:
+            fan_modes = [fm_enum.kOff, fm_enum.kHigh]
+
+        self.fan_modes = [f for f in fan_modes if not (remove_auto and f == fm_enum.kAuto)]
+
+    async def get_initial_parametes(self, endpoint, attr_to_update, order) -> InitSettings:
+        """
+        This method gets the necessary initial parameters for updating fan control attributes
+        such as PercentSetting, FanMode, and SpeedSetting (if present). It determines the
+        attribute to verify, the iteration range for updates, and retrieves the initial state
+        of the fan.
+
+        Args:
+            endpoint (int): The endpoint identifier for the fan device.
+            attr_to_update (attribute): The attribute to be updated (PercentSetting or FanMode).
+            order (OrderEnum): The order of updates (ascending or descending).
+
+        Returns:
+            InitSettings: A dataclass instance containing:
+                - attr_to_update (ClusterAttributeDescriptor): The attribute to be updated.
+                - attr_to_verify (ClusterAttributeDescriptor): The attribute used for verification during updates.
+                - iteration_range (List[Any]): The range of values to iterate over for attribute updates.
+                - order (OrderEnum): The order of updates.
+                - init_fan_mode (FanModeEnum): The initial value of the FanMode attribute.
+                - init_percent_setting (int): The initial value of the PercentSetting attribute.
+                - init_speed_setting (Optional[int]): The initial SpeedSetting value if available, otherwise None.
+                - init_attr_to_update_value (int): The initial value of the attribute being updated.
+                - init_attr_to_verify_value (int): The initial value of the attribute being verified.
+        """
+        cluster = Clusters.FanControl
+        attribute = cluster.Attributes
+        percent_setting_max_value = 100  # PercentSetting max value is 100 as per the spec
+
+        # Sets the number of iterations for attribute updates
+        # Sets the update order (ascending or descending)
+        if attr_to_update == attribute.PercentSetting:
+            attr_to_verify = attribute.FanMode
+            iteration_range = range(0, percent_setting_max_value +
+                                    1) if order == OrderEnum.Ascending else range(percent_setting_max_value, -1, -1)
+        elif attr_to_update == attribute.FanMode:
+            attr_to_verify = attribute.PercentSetting
+            iteration_range = range(0, len(self.fan_modes)) if order == OrderEnum.Ascending else range(
+                len(self.fan_modes) - 1, -1, -1)
+
+        # Get fan initial state (FanMode, PercentSetting, SpeedSetting if present)
+        init_fan_mode = await self.read_setting(endpoint, attribute.FanMode)
+        init_percent_setting = await self.read_setting(endpoint, attribute.PercentSetting)
+        init_speed_setting = await self.read_setting(endpoint, attribute.SpeedSetting) if self.supports_multispeed else None
+
+        # Determine the initial values of the attributes to update and verify
+        init_attr_to_update_value = init_percent_setting if attr_to_update == attribute.PercentSetting else init_fan_mode
+        init_attr_to_verify_value = init_fan_mode if attr_to_verify == attribute.FanMode else init_percent_setting
+
+        return InitSettings(attr_to_update, attr_to_verify, iteration_range, order, init_fan_mode, init_percent_setting, init_speed_setting, init_attr_to_update_value, init_attr_to_verify_value)
+
+    @staticmethod
+    def handle_iteration_one_edge_cases(init_settings, attr_to_verify_value_current) -> None:
+        """
+        Handles edge cases for the first iteration of fan control attribute updates and verifications.
+
+        Args:
+            init_settings (InitSettings): A dataclass instance containing the initial parameters 
+                                          for fan control attribute updates.
+
+            attr_to_verify_value_current (int | Enum): The current value of the attribute to verify.
+
+        Returns:
+        None
+
+        Logs the changes in attribute values and asserts the correctness of the updated values based on the initial fan mode and the order of update.
+        """
+        cluster = Clusters.FanControl
+        attribute = cluster.Attributes
+        fm_enum = cluster.Enums.FanModeEnum
+
+        # Determine initial value of attribute to verify
+        if init_settings.attr_to_verify == attribute.PercentSetting:
+            init_value = init_settings.init_percent_setting
+        elif init_settings.attr_to_verify == attribute.SpeedSetting:
+            init_value = init_settings.init_speed_setting
+        elif init_settings.attr_to_verify == attribute.FanMode:
+            init_value = init_settings.init_fan_mode
+
+        # Logging attribute value change details
+        sub_text = f"({init_value}) to ({attr_to_verify_value_current})"
+        if init_settings.attr_to_verify == attribute.FanMode:
+            sub_text = f"({init_value}:{init_value.name}) to ({attr_to_verify_value_current}:{attr_to_verify_value_current.name})"
+        logging.info(f"\t\t[FC] {init_settings.attr_to_verify.__name__} changed from {sub_text}")
+
+        # The fan's general state is Off
+        if init_settings.init_fan_mode == fm_enum.kOff:
+            if init_settings.attr_to_update == attribute.PercentSetting:
+                if init_settings.order == OrderEnum.Ascending:
+                    asserts.assert_equal(attr_to_verify_value_current, init_value,
+                                         f"[FC] Current {init_settings.attr_to_verify.__name__} attribute value must be equal to the previous value")
+                elif init_settings.order == OrderEnum.Descending:
+                    asserts.assert_greater(attr_to_verify_value_current, init_value,
+                                           f"[FC] Current {init_settings.attr_to_verify.__name__} attribute value must be greater than the previous value")
+            if init_settings.attr_to_update == attribute.FanMode:
+                if init_settings.order == OrderEnum.Ascending:
+                    asserts.assert_equal(attr_to_verify_value_current, init_value,
+                                         f"[FC] Current {init_settings.attr_to_verify.__name__} attribute value must be equal to the previous value")
+                elif init_settings.order == OrderEnum.Descending:
+                    asserts.assert_greater(attr_to_verify_value_current, init_value,
+                                           f"[FC] Current {init_settings.attr_to_verify.__name__} attribute value must be greater than the previous value")
+
+        # The fan's general state is High
+        elif init_settings.init_fan_mode == fm_enum.kHigh:
+            if init_settings.attr_to_update == attribute.PercentSetting:
+                if init_settings.order == OrderEnum.Ascending:
+                    asserts.assert_less(attr_to_verify_value_current, init_value,
+                                        f"[FC] Current {init_settings.attr_to_verify.__name__} attribute value must be less than the previous value")
+                elif init_settings.order == OrderEnum.Descending:
+                    asserts.assert_greater_equal(attr_to_verify_value_current, init_value,
+                                                 f"[FC] Current {init_settings.attr_to_verify.__name__} attribute value must be greater or equal to the previous value")
+            if init_settings.attr_to_update == attribute.FanMode:
+                if init_settings.order == OrderEnum.Ascending:
+                    asserts.assert_less(attr_to_verify_value_current, init_value,
+                                        f"[FC] Current {init_settings.attr_to_verify.__name__} attribute value must be less than the previous value")
+                elif init_settings.order == OrderEnum.Descending:
+                    asserts.assert_equal(attr_to_verify_value_current, init_value,
+                                         f"[FC] Current {init_settings.attr_to_verify.__name__} attribute value must be equal to the previous value")
+
+        # The fan's general state is in between Off and High
+        else:
+            if init_settings.attr_to_update == attribute.PercentSetting:
+                if init_settings.order == OrderEnum.Ascending:
+                    asserts.assert_less(attr_to_verify_value_current, init_value,
+                                        f"[FC] Current {init_settings.attr_to_verify.__name__} attribute value must be less than the previous value")
+                elif init_settings.order == OrderEnum.Descending:
+                    asserts.assert_greater(attr_to_verify_value_current, init_value,
+                                           f"[FC] Current {init_settings.attr_to_verify.__name__} attribute value must be greater than the previous value")
+            if init_settings.attr_to_update == attribute.FanMode:
+                if init_settings.order == OrderEnum.Ascending:
+                    asserts.assert_less(attr_to_verify_value_current, init_value,
+                                        f"[FC] Current {init_settings.attr_to_verify.__name__} attribute value must be less than the previous value")
+                elif init_settings.order == OrderEnum.Descending:
+                    asserts.assert_greater(attr_to_verify_value_current, init_value,
+                                           f"[FC] Current {init_settings.attr_to_verify.__name__} attribute value must be greater than the previous value")
+
+    @staticmethod
+    def verify_attribute_change(attr_to_verify, value_current, value_previous, order) -> None:
+        """
+        Verifies that an attribute value has changed in the expected order and logs the change details.
+
+        Args:
+            attr_to_verify (Attribute): The attribute to verify.
+            value_current (Any): The current value of the attribute.
+            value_previous (Any): The previous value of the attribute.
+            order (OrderEnum): The expected order of the attribute change (Ascending or Descending).
+
+        Raises:
+            AssertionError: If the current attribute value does not follow the expected order compared to the previous value.
+
+        Logs:
+            Logs the attribute value change details
+        """
+        if order == OrderEnum.Ascending:
+            # Verify that the current attribute value is greater than the previous attribute value
+            asserts.assert_greater(value_current, value_previous,
+                                   f"[FC] Current {attr_to_verify.__name__} must be greater than previous {attr_to_verify.__name__}")
+        else:
+            # Verify that the current attribute value is less than the previous attribute value
+            asserts.assert_less(value_current, value_previous,
+                                f"[FC] Current {attr_to_verify.__name__} must be less than previous {attr_to_verify.__name__}")
+
+        # Logging attribute value change details
+        sub_text = f"({value_previous}) to ({value_current})"
+        if attr_to_verify == Clusters.FanControl.Attributes.FanMode:
+            sub_text = f"({value_previous}:{value_previous.name}) to ({value_current}:{value_current.name})"
+        logging.info(f"\t\t[FC] {attr_to_verify.__name__} changed from {sub_text}")
+
+    async def update_and_verify_attribute_progression(self, endpoint, attr_to_update, order) -> None:
+        """
+        Sets up the testing conditions for a given testing scenario.
+
+        This method sets up the testing conditions for the different attribute
+        update and verification scenarios. It retrieves the initial parameters
+        for the fan control attributes and then proceeds to update the specified
+        attribute in the given order. The method then monitors the corresponding
+        attributes to ensure they change correctly.
+
+        Args:
+            endpoint (int): The endpoint identifier for the fan device.
+            attr_to_update (Any): The attribute to be updated during the test.
+            order (OrderEnum): The order in which the attribute should be updated (ascending or descending).
+
+        Returns:
+            None
+
+        Raises:
+            AssertionError: If the attribute values do not progress as expected.
+
+        Test scenarios:
+            - Updating the PercentSetting attribute in ascending order and monitoring the PercentSetting, FanMode, (and SpeedSetting, if present) attributes.
+            - Updating the PercentSetting attribute in descending order and monitoring the PercentSetting, FanMode, (and SpeedSetting, if present) attributes.
+            - Updating the FanMode attribute in ascending order and monitoring the FanMode, PercentSetting, (and SpeedSetting, if present) attributes.
+            - Updating the FanMode attribute in descending order and monitoring the FanMode, PercentSetting, (and SpeedSetting, if present) attributes.
+        """
+        cluster = Clusters.FanControl
+        attribute = cluster.Attributes
+
+        # Get initial parameters
+        init_settings = await self.get_initial_parametes(endpoint, attr_to_update, order)
+
+        # *** NEXT STEP ***
+        # TH performs one of the testing scenarios previously defined
+        self.step(self.current_step_index + 1)
+
+        # Logging the scenario being tested
+        await self.log_scenario(init_settings)
+
+        # Flush the queue before starting the test
+        self.attribute_subscription.flush_reports()
+
+        # Update attribute iteratively
+        attr_to_update_value_current = None
+        attr_to_update_value_previous = None
+        attr_to_verify_value_current = None
+        attr_to_verify_value_previous = None
+        speed_setting_current = None
+        speed_setting_previous = None
+        iteration = 0
+        for value_to_write in init_settings.iteration_range:
+            iteration += 1
+
+            # Write to attribute
+            write_status = await self.write_and_verify_attribute(endpoint, attr_to_update, value_to_write)
+            logging.info(f"[FC] {attr_to_update.__name__} written: {value_to_write}")
+
+            # - If the write status is SUCCESS, it means the write operation
+            #   occurred and it triggered an update in the corresponding attribute(s)
+            # - Verify the correct progression of the attribute(s) value(s)
+            if write_status == Status.Success:
+                # queue = self.attribute_subscription.attribute_queue.queue
+
+                # Attribute to update check
+                attr_to_update_value_current, attr_to_update_value_previous = await self.verify_attribute_success(
+                    init_settings, attr_to_update_value_current, attr_to_update_value_previous, iteration, True)
+
+                # Attribute to verify check
+                attr_to_verify_value_current, attr_to_verify_value_previous = await self.verify_attribute_success(
+                    init_settings, attr_to_verify_value_current, attr_to_verify_value_previous, iteration, False)
+
+                # SpeedSetting attribute check (if present)
+                if self.supports_multispeed:
+                    speed_setting_current, speed_setting_previous = await self.verify_attribute_success(
+                        init_settings, speed_setting_current, speed_setting_previous, iteration, False, attribute.SpeedSetting)
+
+            # If the write status is INVALID_IN_STATE, it means no write operation occurred
+            # Verify that the current attribute value is equal to the previous value
+            elif write_status == Status.InvalidInState:
+                # Attribute to update check
+                await self.verify_attribute_invalid_in_state(init_settings, attr_to_update_value_current, attr_to_update_value_previous, iteration)
+
+                # Attribute to verify check
+                await self.verify_attribute_invalid_in_state(init_settings, attr_to_verify_value_current, attr_to_verify_value_previous, iteration)
+
+                # SpeedSetting attribute check (if present)
+                if self.supports_multispeed:
+                    await self.verify_attribute_invalid_in_state(init_settings, speed_setting_current, speed_setting_previous, iteration)
+
+        logging.info("[FC] *** Attribute(s) update and verification successful")
+
+    async def verify_attribute_invalid_in_state(self, init_settings, attr_to_verify_value_current, attr_to_verify_value_previous, iteration, self_verify: bool = False, optional_setting: ClusterObjects.ClusterAttributeDescriptor = None) -> None:
+        """
+        This method checks if the current value of the attribute-to-verify is equal to its previous value.
+        This is done when the write operation returns an INVALID_IN_STATE status.
+
+        Args:
+            init_settings (InitSettings): A dataclass instance containing the initial parameters 
+                                          for fan control attribute updates.
+            attr_to_verify_value_current (int | Enum): The current value of the attribute being verified.
+            attr_to_verify_value_previous (int | Enum): The previous value of the attribute being verified.
+            iteration (int): The current iteration number.
+            self_verify (bool, optional): If `True`, the attribut being updated and verified will be the same.
+                                          Defaults to `False`.
+            optional_setting (ClusterAttributeDescriptor, optional): If set, represents an optional
+                                                                     non-mandatory attribute to verify
+                                                                     which becomes the attribute to verify.
+                                                                     Defaults to `None`.
+
+        Raises:
+            AssertionError: If the current attribute value is not equal to the previous value.
+        """
+        if optional_setting is not None:
+            attr_to_verify = optional_setting
+            if attr_to_verify == Clusters.FanControl.Attributes.SpeedSetting:
+                init_attr_to_verify_value = init_settings.init_speed_setting
+        else:
+            attr_to_verify = init_settings.attr_to_update if self_verify else init_settings.attr_to_verify
+            init_attr_to_verify_value = init_settings.init_attr_to_update_value if self_verify else init_settings.init_attr_to_verify_value
+
+        # Get current attribute-to-verify value and verify it's equal to the previous value
+        attr_to_verify_value_previous = init_attr_to_verify_value if iteration == 1 else attr_to_verify_value_previous
+        asserts.assert_equal(attr_to_verify_value_current, attr_to_verify_value_previous,
+                             f"[FC] Current {attr_to_verify.__name__} attribute value ({attr_to_verify_value_current}) must be equal to the previous value ({attr_to_verify_value_previous})")
+
+    async def verify_attribute_success(self, init_settings, attr_to_verify_value_current, attr_to_verify_value_previous, iteration, self_verify: bool = False, optional_setting: ClusterObjects.ClusterAttributeDescriptor = None) -> tuple[Any, Any]:
+        """
+        Verifies the correct progression of the current and previous values of the attribute to verify.
+
+        Args:
+            init_settings (InitSettings): A dataclass instance containing the initial parameters 
+                                          for fan control attribute updates.
+            attr_to_verify_value_current (Any): The current value of the attribute being verified.
+            attr_to_verify_value_previous (Any): The previous value of the attribute being verified.
+            iteration (int): The current iteration number.
+            self_verify (bool, optional): If `True`, the attribut being updated and verified will be the same.
+                                            Defaults to `False`.
+            optional_setting (ClusterAttributeDescriptor, optional): If set, represents an optional
+                                                                        non-mandatory attribute to verify
+                                                                        which becomes the attribute to verify.
+                                                                        Defaults to `None`.
+
+        Returns:
+            tuple: A tuple containing the current and previous values of the attribute to verify.
+        """
+        if optional_setting is not None:
+            attr_to_verify = optional_setting
+            if attr_to_verify == Clusters.FanControl.Attributes.SpeedSetting:
+                init_attr_to_verify_value = init_settings.init_speed_setting
+        else:
+            attr_to_verify = init_settings.attr_to_update if self_verify else init_settings.attr_to_verify
+            init_attr_to_verify_value = init_settings.init_attr_to_update_value if self_verify else init_settings.init_attr_to_verify_value
+
+        # Get the current attribute-to-verify value from the attribute report queue
+        attr_to_verify_value_current = await self.get_attribute_value_from_queue(attr_to_verify)
+
+        if attr_to_verify_value_current is not None:
+            # Handle iteration 1 edge cases where:
+            #   - The fan can be in any initial state
+            #   - The attribute's previous-value becomes
+            #     the attributes initial-state value
+            #     (as opposed to the value written in the preceding iteration)
+            if iteration == 1:
+                self.handle_iteration_one_edge_cases(init_settings, attr_to_verify_value_current)
+            else:
+                # The attribute's previous-value may be None in some cases, defaulting to the attribute's initial state value if so
+                attr_to_verify_value_previous = init_attr_to_verify_value if attr_to_verify_value_previous is None else attr_to_verify_value_previous
+
+                # Verify attribute change
+                self.verify_attribute_change(attr_to_verify, attr_to_verify_value_current,
+                                             attr_to_verify_value_previous, init_settings.order)
+
+            attr_to_verify_value_previous = attr_to_verify_value_current
+        else:
+            attr_to_verify_value_current = attr_to_verify_value_previous
+
+        return attr_to_verify_value_current, attr_to_verify_value_previous
+
+    async def log_scenario(self, init_settings) -> None:
+        """
+        Logs the scenario being tested, including the initial state of the fan,
+        supported fan modes, and MultiSpeed feature support.
+
+        Args:
+            init_settings (InitSettings): A dataclass instance containing the initial parameters 
+                                          for fan control attribute updates.
+
+        Returns:
+            None
+        """
+        # Logging the scenario being tested
+        logging.info("[FC] ====================================================================")
+        speed_setting_scenario = " and SpeedSetting" if self.supports_multispeed else ""
+        logging.info(
+            f"[FC] *** Update {init_settings.attr_to_update.__name__} {init_settings.order.name}, verify {init_settings.attr_to_verify.__name__}{speed_setting_scenario}")
+
+        # Logging fan initial state (FanMode, PercentSetting, SpeedSetting if present)
+        speed_setting_log = f", SpeedSetting({init_settings.init_speed_setting})" if self.supports_multispeed else ""
+        logging.info(
+            f"[FC] *** Fan initial state: FanMode ({init_settings.init_fan_mode}:{init_settings.init_fan_mode.name}), PercentSetting ({init_settings.init_percent_setting}){speed_setting_log}")
+
+        # Logging supported fan modes
+        logging.info(f"[FC] *** Supported fan modes: {self.fan_mode_sequence.name}")
+
+        # Logging MultiSpeed feature support
+        logging.info(f"[FC] *** MultiSpeed feature supported: {self.supports_multispeed}")
 
     def pics_TC_FAN_3_1(self) -> list[str]:
         return ["FAN.S"]
 
     @async_test_body
     async def test_TC_FAN_3_1(self):
-        endpoint = self.get_endpoint(default=1)
+        # Setup
+        ep = self.get_endpoint(default=1)
+        cluster = Clusters.FanControl
+        attributes = cluster.Attributes
+        self.timeout_sec = 0.01  # Timeout given for item retreival from the attribute queue
 
-        self.print_step(1, "Commissioning, already done")
+        # *** STEP 1 ***
+        # Commissioning already done
+        self.step(1)
 
-        self.print_step("2a", "Read from the DUT the FanMode attribute and store")
-        existing_fan_mode = await self.read_fan_mode(endpoint=endpoint)
+        # *** STEP 2 ***
+        # TH reads the FanModeSequence attribute from the DUT
+        self.step(2)
+        await self.get_fan_modes(ep, remove_auto=True)
 
-        self.print_step("2b", "Write High to FanMode")
-        status = await self.write_fan_mode(endpoint=endpoint, fan_mode=Clusters.FanControl.Enums.FanModeEnum.kHigh)
-        status_ok = (status == Status.Success) or (status == Status.InvalidInState)
-        asserts.assert_true(status_ok, "FanMode write did not return a value of Success or InvalidInState")
+        # *** STEP 3 ***
+        # TH checks the DUT for support of the MultiSpeed feature
+        self.step(3)
+        feature_map = await self.read_setting(ep, attributes.FeatureMap)
+        self.supports_multispeed = bool(feature_map & cluster.Bitmaps.Feature.kMultiSpeed)
 
-        self.print_step("2c", "After a few seconds, read from the DUT the FanMode attribute")
-        time.sleep(3)
+        # *** STEP 4 ***
+        # TH subscribes to the DUT's FanControl cluster
+        self.step(4)
+        self.attribute_subscription = ClusterAttributeChangeAccumulator(cluster)
+        await self.attribute_subscription.start(self.default_controller, self.dut_node_id, ep)
 
-        new_fan_mode = await self.read_fan_mode(endpoint=endpoint)
+        # *** STEP 5 ***
+        # TH tests the following scenario:
+        #   - Attribute to update: PercentSetting
+        #   - Attribute to verify: PercentSetting, FanMode and SpeedSetting (if present)
+        #   - Update order: Ascending
+        await self.update_and_verify_attribute_progression(ep, attributes.PercentSetting, OrderEnum.Ascending)
 
-        if status == Status.Success:
-            asserts.assert_equal(new_fan_mode, Clusters.FanControl.Enums.FanModeEnum.kHigh, "FanMode is not High")
-        else:
-            asserts.assert_equal(new_fan_mode, existing_fan_mode, "FanMode is not unchanged")
+        # *** STEP 6 ***
+        # TH tests the following scenario:
+        #   - Attribute to update: PercentSetting
+        #   - Attribute to verify: PercentSetting, FanMode and SpeedSetting (if present)
+        #   - Update order: Descending
+        await self.update_and_verify_attribute_progression(ep, attributes.PercentSetting, OrderEnum.Descending)
 
-        self.print_step("3a", "Read from the DUT the PercentSetting attribute and store")
-        existing_percent_setting = await self.read_percent_setting(endpoint=endpoint)
+        # *** STEP 7 ***
+        # TH tests the following scenario:
+        #   - Attribute to update: FanMode
+        #   - Attribute to verify: FanMode, PercentSetting and SpeedSetting (if present)
+        #   - Update order: Ascending
+        await self.update_and_verify_attribute_progression(ep, attributes.FanMode, OrderEnum.Ascending)
 
-        self.print_step("3b", "Write Off to Fan Mode")
-        status = await self.write_fan_mode(endpoint=endpoint, fan_mode=Clusters.FanControl.Enums.FanModeEnum.kOff)
-        status_ok = (status == Status.Success) or (status == Status.InvalidInState)
-        asserts.assert_true(status_ok, "FanMode write did not return a value of Success or InvalidInState")
-
-        self.print_step("3c", "After a few seconds, read from the DUT the PercentSetting attribute")
-        time.sleep(3)
-
-        new_percent_setting = await self.read_percent_setting(endpoint=endpoint)
-
-        if status == Status.Success:
-            asserts.assert_equal(new_percent_setting, Clusters.FanControl.Enums.FanModeEnum.kOff, "PercentSetting is not Off")
-        else:
-            asserts.assert_equal(new_percent_setting, existing_percent_setting, "PercentSetting is not unchanged")
-
-        self.print_step("3d", "Read from the DUT the PercentCurrent attribute")
-        percent_current = await self.read_percent_current(endpoint=endpoint)
-
-        if status == Status.Success:
-            asserts.assert_equal(percent_current, 0, "PercentCurrent is not 0")
-        else:
-            asserts.assert_equal(percent_current, existing_percent_setting, "PercentCurrent is not unchanged")
-
-        self.print_step("4a", "Read from the DUT the PercentSetting attribute and store")
-        existing_percent_setting = await self.read_percent_setting(endpoint=endpoint)
-
-        self.print_step("4b", "Write PercentSetting to 30")
-        status = await self.write_percent_setting(endpoint=endpoint, percent_setting=30)
-        status_ok = (status == Status.Success) or (status == Status.InvalidInState)
-        asserts.assert_true(status_ok, "PercentSetting write did not return a value of Success or InvalidInState")
-
-        self.print_step("4c", "After a few seconds, read from the DUT the PercentSetting attribute")
-        time.sleep(3)
-
-        new_percent_setting = await self.read_percent_setting(endpoint=endpoint)
-
-        if status == Status.Success:
-            asserts.assert_equal(new_percent_setting, 30, "PercentSetting is not 30")
-        else:
-            asserts.assert_equal(new_percent_setting, existing_percent_setting, "PercentSetting is not unchanged")
-
-        self.print_step("4d", "Read from the DUT the PercentCurrent attribute")
-        percent_current = await self.read_percent_current(endpoint=endpoint)
-
-        if status == Status.Success:
-            asserts.assert_equal(percent_current, 30, "PercentCurrent is not 30")
-        else:
-            asserts.assert_equal(percent_current, existing_percent_setting, "PercentCurrent is not unchanged")
-
-        self.print_step("5a", "Read from the DUT the FanMode attribute and store")
-        existing_fan_mode = await self.read_fan_mode(endpoint=endpoint)
-
-        self.print_step("5b", "Write PercentSetting to 0")
-        status = await self.write_percent_setting(endpoint=endpoint, percent_setting=0)
-        status_ok = (status == Status.Success) or (status == Status.InvalidInState)
-        asserts.assert_true(status_ok, "PercentSetting write did not return a value of Success or InvalidInState")
-
-        self.print_step("5c", "After a few seconds, read from the DUT the FanMode attribute")
-        time.sleep(3)
-
-        new_fan_mode = await self.read_fan_mode(endpoint=endpoint)
-
-        if status == Status.Success:
-            asserts.assert_equal(new_fan_mode, Clusters.FanControl.Enums.FanModeEnum.kOff, "FanMode is not Off")
-        else:
-            asserts.assert_equal(new_fan_mode, existing_fan_mode, "FanMode is not unchanged")
+        # *** STEP 8 ***
+        # TH tests the following scenario:
+        #   - Attribute to update: FanMode
+        #   - Attribute to verify: FanMode, PercentSetting and SpeedSetting (if present)
+        #   - Update order: Descending
+        await self.update_and_verify_attribute_progression(ep, attributes.FanMode, OrderEnum.Descending)
 
 
 if __name__ == "__main__":
