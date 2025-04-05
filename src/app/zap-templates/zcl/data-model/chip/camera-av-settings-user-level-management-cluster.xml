@@ -36,7 +36,7 @@ Git: 0.7-summer-2025-1-ge4654a5ef
     <item fieldId="2" name="Zoom" type="int8u" optional="true" default="1" min="1"/>
   </struct>
 
-  <cluster apiMaturity="provisional">>
+  <cluster apiMaturity="provisional">
     <domain>Cameras</domain>
     <name>Camera AV Settings User Level Management</name>
     <code>0x0552</code>

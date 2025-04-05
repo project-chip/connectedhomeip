@@ -41,9 +41,9 @@ constexpr uint8_t kMinZoomValue = 1;
 constexpr uint8_t kMaxZoomValue = 100;
 
 // Spec defined defaulta for Pan, Tilt, and Zoom
-constexpr int16_t defaultPan  = 0;
-constexpr int16_t defaultTilt = 0;
-constexpr uint8_t defaultZoom = 1;
+constexpr int16_t kDefaultPan  = 0;
+constexpr int16_t kDefaultTilt = 0;
+constexpr uint8_t kDefaultZoom = 1;
 
 class Delegate;
 
@@ -182,7 +182,7 @@ private:
     BitMask<OptionalAttributes> mOptionalAttrs;
 
     // Next available preset ID
-    uint8_t mCurrentPresetID = 0;
+    uint8_t mCurrentPresetID = 1;
 
     // My known values for MPTZ.
     MPTZStructType mMptzPosition;

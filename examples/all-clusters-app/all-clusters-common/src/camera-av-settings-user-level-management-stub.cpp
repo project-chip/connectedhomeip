@@ -144,8 +144,8 @@ void emberAfCameraAvSettingsUserLevelManagementClusterInitCallback(chip::Endpoin
         CameraAvSettingsUserLevelManagement::OptionalAttributes::kMptzPresets,
         CameraAvSettingsUserLevelManagement::OptionalAttributes::kDptzRelativeMove,
         CameraAvSettingsUserLevelManagement::OptionalAttributes::kZoomMax,
-        CameraAvSettingsUserLevelManagement::OptionalAttributes::kZoomMax,
         CameraAvSettingsUserLevelManagement::OptionalAttributes::kTiltMin,
+        CameraAvSettingsUserLevelManagement::OptionalAttributes::kTiltMax,
         CameraAvSettingsUserLevelManagement::OptionalAttributes::kPanMin,
         CameraAvSettingsUserLevelManagement::OptionalAttributes::kPanMax);
 
