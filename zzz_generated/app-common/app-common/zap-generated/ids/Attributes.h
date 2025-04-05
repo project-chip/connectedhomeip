@@ -3557,64 +3557,6 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace CommodityPrice
 
-namespace DemandResponseLoadControl {
-namespace Attributes {
-
-namespace LoadControlPrograms {
-static constexpr AttributeId Id = 0x00000000;
-} // namespace LoadControlPrograms
-
-namespace NumberOfLoadControlPrograms {
-static constexpr AttributeId Id = 0x00000001;
-} // namespace NumberOfLoadControlPrograms
-
-namespace Events {
-static constexpr AttributeId Id = 0x00000002;
-} // namespace Events
-
-namespace ActiveEvents {
-static constexpr AttributeId Id = 0x00000003;
-} // namespace ActiveEvents
-
-namespace NumberOfEventsPerProgram {
-static constexpr AttributeId Id = 0x00000004;
-} // namespace NumberOfEventsPerProgram
-
-namespace NumberOfTransitions {
-static constexpr AttributeId Id = 0x00000005;
-} // namespace NumberOfTransitions
-
-namespace DefaultRandomStart {
-static constexpr AttributeId Id = 0x00000006;
-} // namespace DefaultRandomStart
-
-namespace DefaultRandomDuration {
-static constexpr AttributeId Id = 0x00000007;
-} // namespace DefaultRandomDuration
-
-namespace GeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
-} // namespace GeneratedCommandList
-
-namespace AcceptedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
-} // namespace AcceptedCommandList
-
-namespace AttributeList {
-static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
-} // namespace AttributeList
-
-namespace FeatureMap {
-static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-
-namespace ClusterRevision {
-static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
-
-} // namespace Attributes
-} // namespace DemandResponseLoadControl
-
 namespace Messages {
 namespace Attributes {
 

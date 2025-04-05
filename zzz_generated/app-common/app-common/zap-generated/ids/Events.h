@@ -467,16 +467,6 @@ static constexpr EventId Id = 0x00000001;
 } // namespace Events
 } // namespace CommodityPrice
 
-namespace DemandResponseLoadControl {
-namespace Events {
-
-namespace LoadControlEventStatusChange {
-static constexpr EventId Id = 0x00000000;
-} // namespace LoadControlEventStatusChange
-
-} // namespace Events
-} // namespace DemandResponseLoadControl
-
 namespace Messages {
 namespace Events {
 

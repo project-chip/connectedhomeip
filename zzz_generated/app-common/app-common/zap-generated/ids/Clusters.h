@@ -226,9 +226,6 @@ static constexpr ClusterId Id = 0x00000094;
 namespace CommodityPrice {
 static constexpr ClusterId Id = 0x00000095;
 } // namespace CommodityPrice
-namespace DemandResponseLoadControl {
-static constexpr ClusterId Id = 0x00000096;
-} // namespace DemandResponseLoadControl
 namespace Messages {
 static constexpr ClusterId Id = 0x00000097;
 } // namespace Messages
