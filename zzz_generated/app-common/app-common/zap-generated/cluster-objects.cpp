@@ -16092,7 +16092,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kCoolingTempOffset), coolingTempOffset);
-    encoder.Encode(to_underlying(Fields::kHeatingtTempOffset), heatingtTempOffset);
+    encoder.Encode(to_underlying(Fields::kHeatingTempOffset), heatingTempOffset);
     encoder.Encode(to_underlying(Fields::kCoolingTempSetpoint), coolingTempSetpoint);
     encoder.Encode(to_underlying(Fields::kHeatingTempSetpoint), heatingTempSetpoint);
     return encoder.Finalize();
@@ -16116,9 +16116,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, coolingTempOffset);
         }
-        else if (__context_tag == to_underlying(Fields::kHeatingtTempOffset))
+        else if (__context_tag == to_underlying(Fields::kHeatingTempOffset))
         {
-            err = DataModel::Decode(reader, heatingtTempOffset);
+            err = DataModel::Decode(reader, heatingTempOffset);
         }
         else if (__context_tag == to_underlying(Fields::kCoolingTempSetpoint))
         {
@@ -16210,9 +16210,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kEventID), eventID);
     encoder.Encode(to_underlying(Fields::kProgramID), programID);
+    encoder.Encode(to_underlying(Fields::kStatus), status);
     encoder.Encode(to_underlying(Fields::kControl), control);
-    encoder.Encode(to_underlying(Fields::kDeviceClass), deviceClass);
-    encoder.Encode(to_underlying(Fields::kEnrollmentGroup), enrollmentGroup);
     encoder.Encode(to_underlying(Fields::kCriticality), criticality);
     encoder.Encode(to_underlying(Fields::kStartTime), startTime);
     encoder.Encode(to_underlying(Fields::kTransitions), transitions);
@@ -16241,17 +16240,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, programID);
         }
+        else if (__context_tag == to_underlying(Fields::kStatus))
+        {
+            err = DataModel::Decode(reader, status);
+        }
         else if (__context_tag == to_underlying(Fields::kControl))
         {
             err = DataModel::Decode(reader, control);
-        }
-        else if (__context_tag == to_underlying(Fields::kDeviceClass))
-        {
-            err = DataModel::Decode(reader, deviceClass);
-        }
-        else if (__context_tag == to_underlying(Fields::kEnrollmentGroup))
-        {
-            err = DataModel::Decode(reader, enrollmentGroup);
         }
         else if (__context_tag == to_underlying(Fields::kCriticality))
         {
@@ -16281,7 +16276,6 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kProgramID), programID);
     encoder.Encode(to_underlying(Fields::kName), name);
-    encoder.Encode(to_underlying(Fields::kEnrollmentGroup), enrollmentGroup);
     encoder.Encode(to_underlying(Fields::kRandomStartMinutes), randomStartMinutes);
     encoder.Encode(to_underlying(Fields::kRandomDurationMinutes), randomDurationMinutes);
     return encoder.Finalize();
@@ -16308,10 +16302,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kName))
         {
             err = DataModel::Decode(reader, name);
-        }
-        else if (__context_tag == to_underlying(Fields::kEnrollmentGroup))
-        {
-            err = DataModel::Decode(reader, enrollmentGroup);
         }
         else if (__context_tag == to_underlying(Fields::kRandomStartMinutes))
         {
@@ -16474,26 +16464,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     }
 }
 } // namespace RemoveLoadControlEventRequest.
-namespace ClearLoadControlEventsRequest {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    return encoder.Finalize();
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    detail::StructDecodeIterator __iterator(reader);
-    while (true)
-    {
-        auto __element = __iterator.Next();
-        if (std::holds_alternative<CHIP_ERROR>(__element))
-        {
-            return std::get<CHIP_ERROR>(__element);
-        }
-    }
-}
-} // namespace ClearLoadControlEventsRequest.
 } // namespace Commands
 
 namespace Attributes {

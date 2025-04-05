@@ -3930,7 +3930,7 @@ public static class CommodityPriceClusterForecastChangeEvent {
 }
 public static class DemandResponseLoadControlClusterLoadControlEventStatusChangeEvent {
   public byte[] eventID;
-  public @Nullable Integer transitionIndex;
+  public Integer transitionIndex;
   public Integer status;
   public Integer criticality;
   public Integer control;
@@ -3952,7 +3952,7 @@ public static class DemandResponseLoadControlClusterLoadControlEventStatusChange
 
   public DemandResponseLoadControlClusterLoadControlEventStatusChangeEvent(
     byte[] eventID,
-    @Nullable Integer transitionIndex,
+    Integer transitionIndex,
     Integer status,
     Integer criticality,
     Integer control,
@@ -3977,7 +3977,7 @@ public static class DemandResponseLoadControlClusterLoadControlEventStatusChange
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(EVENT_ID_ID, new ByteArrayType(eventID)));
-    values.add(new StructElement(TRANSITION_INDEX_ID, transitionIndex != null ? new UIntType(transitionIndex) : new NullType()));
+    values.add(new StructElement(TRANSITION_INDEX_ID, new UIntType(transitionIndex)));
     values.add(new StructElement(STATUS_ID, new UIntType(status)));
     values.add(new StructElement(CRITICALITY_ID, new UIntType(criticality)));
     values.add(new StructElement(CONTROL_ID, new UIntType(control)));
@@ -3995,7 +3995,7 @@ public static class DemandResponseLoadControlClusterLoadControlEventStatusChange
       return null;
     }
     byte[] eventID = null;
-    @Nullable Integer transitionIndex = null;
+    Integer transitionIndex = null;
     Integer status = null;
     Integer criticality = null;
     Integer control = null;

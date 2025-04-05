@@ -5437,7 +5437,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _coolingTempOffset = nil;
 
-        _heatingtTempOffset = nil;
+        _heatingTempOffset = nil;
 
         _coolingTempSetpoint = nil;
 
@@ -5451,7 +5451,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRDemandResponseLoadControlClusterTemperatureControlStruct alloc] init];
 
     other.coolingTempOffset = self.coolingTempOffset;
-    other.heatingtTempOffset = self.heatingtTempOffset;
+    other.heatingTempOffset = self.heatingTempOffset;
     other.coolingTempSetpoint = self.coolingTempSetpoint;
     other.heatingTempSetpoint = self.heatingTempSetpoint;
 
@@ -5460,7 +5460,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: coolingTempOffset:%@; heatingtTempOffset:%@; coolingTempSetpoint:%@; heatingTempSetpoint:%@; >", NSStringFromClass([self class]), _coolingTempOffset, _heatingtTempOffset, _coolingTempSetpoint, _heatingTempSetpoint];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: coolingTempOffset:%@; heatingTempOffset:%@; coolingTempSetpoint:%@; heatingTempSetpoint:%@; >", NSStringFromClass([self class]), _coolingTempOffset, _heatingTempOffset, _coolingTempSetpoint, _heatingTempSetpoint];
     return descriptionString;
 }
 
@@ -5520,11 +5520,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _programID = nil;
 
+        _status = nil;
+
         _control = @(0);
-
-        _deviceClass = @(0);
-
-        _enrollmentGroup = nil;
 
         _criticality = @(0);
 
@@ -5541,9 +5539,8 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.eventID = self.eventID;
     other.programID = self.programID;
+    other.status = self.status;
     other.control = self.control;
-    other.deviceClass = self.deviceClass;
-    other.enrollmentGroup = self.enrollmentGroup;
     other.criticality = self.criticality;
     other.startTime = self.startTime;
     other.transitions = self.transitions;
@@ -5553,7 +5550,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: eventID:%@; programID:%@; control:%@; deviceClass:%@; enrollmentGroup:%@; criticality:%@; startTime:%@; transitions:%@; >", NSStringFromClass([self class]), [_eventID base64EncodedStringWithOptions:0], [_programID base64EncodedStringWithOptions:0], _control, _deviceClass, _enrollmentGroup, _criticality, _startTime, _transitions];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: eventID:%@; programID:%@; status:%@; control:%@; criticality:%@; startTime:%@; transitions:%@; >", NSStringFromClass([self class]), [_eventID base64EncodedStringWithOptions:0], [_programID base64EncodedStringWithOptions:0], _status, _control, _criticality, _startTime, _transitions];
     return descriptionString;
 }
 
@@ -5568,8 +5565,6 @@ NS_ASSUME_NONNULL_BEGIN
 
         _name = @"";
 
-        _enrollmentGroup = nil;
-
         _randomStartMinutes = nil;
 
         _randomDurationMinutes = nil;
@@ -5583,7 +5578,6 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.programID = self.programID;
     other.name = self.name;
-    other.enrollmentGroup = self.enrollmentGroup;
     other.randomStartMinutes = self.randomStartMinutes;
     other.randomDurationMinutes = self.randomDurationMinutes;
 
@@ -5592,7 +5586,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: programID:%@; name:%@; enrollmentGroup:%@; randomStartMinutes:%@; randomDurationMinutes:%@; >", NSStringFromClass([self class]), [_programID base64EncodedStringWithOptions:0], _name, _enrollmentGroup, _randomStartMinutes, _randomDurationMinutes];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: programID:%@; name:%@; randomStartMinutes:%@; randomDurationMinutes:%@; >", NSStringFromClass([self class]), [_programID base64EncodedStringWithOptions:0], _name, _randomStartMinutes, _randomDurationMinutes];
     return descriptionString;
 }
 
@@ -5605,7 +5599,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _eventID = [NSData data];
 
-        _transitionIndex = nil;
+        _transitionIndex = @(0);
 
         _status = @(0);
 

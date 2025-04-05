@@ -5514,8 +5514,6 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "AddLoadControlEventRequest";
         case chip::app::Clusters::DemandResponseLoadControl::Commands::RemoveLoadControlEventRequest::Id:
             return "RemoveLoadControlEventRequest";
-        case chip::app::Clusters::DemandResponseLoadControl::Commands::ClearLoadControlEventsRequest::Id:
-            return "ClearLoadControlEventsRequest";
         default:
             return "Unknown";
         }

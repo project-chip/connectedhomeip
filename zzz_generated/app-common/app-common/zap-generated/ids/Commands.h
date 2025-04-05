@@ -1028,10 +1028,6 @@ namespace RemoveLoadControlEventRequest {
 static constexpr CommandId Id = 0x00000003;
 } // namespace RemoveLoadControlEventRequest
 
-namespace ClearLoadControlEventsRequest {
-static constexpr CommandId Id = 0x00000004;
-} // namespace ClearLoadControlEventsRequest
-
 } // namespace Commands
 } // namespace DemandResponseLoadControl
 
