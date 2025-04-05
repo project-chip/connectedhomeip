@@ -18,5 +18,10 @@
 
 #pragma once
 
-void ElectricalEnergyTariffInit();
-void ElectricalEnergyTariffShutdown();
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+
+#include <lib/support/CodeUtils.h>
+
+CHIP_ERROR CommodityPriceInit(chip::EndpointId endpointId);
+CHIP_ERROR CommodityPriceShutdown();

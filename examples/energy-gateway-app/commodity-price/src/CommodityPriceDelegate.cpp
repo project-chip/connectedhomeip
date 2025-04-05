@@ -31,6 +31,14 @@ using namespace chip::app::Clusters::CommodityPrice;
 using namespace chip::app::Clusters::CommodityPrice::Attributes;
 using namespace chip::app::Clusters::CommodityPrice::Structs;
 
+// From ISO 4217 (non exhaustive selection)
+const CurrencyStruct::Type currencyCHF  = { .currency = 756, .decimalPoints = 2 };
+const CurrencyStruct::Type currencyEURO = { .currency = 978, .decimalPoints = 2 };
+const CurrencyStruct::Type currencyGBP  = { .currency = 826, .decimalPoints = 2 };
+const CurrencyStruct::Type currencyNOK  = { .currency = 578, .decimalPoints = 2 };
+const CurrencyStruct::Type currencySEK  = { .currency = 752, .decimalPoints = 2 };
+const CurrencyStruct::Type currencyUSD  = { .currency = 840, .decimalPoints = 2 };
+
 CHIP_ERROR CommodityPriceInstance::Init()
 {
     return Instance::Init();
@@ -40,6 +48,9 @@ void CommodityPriceInstance::Shutdown()
 {
     Instance::Shutdown();
 }
+
+CommodityPriceDelegate::CommodityPriceDelegate() : mTariffUnit(TariffUnitEnum::kKWh), mCurrencyStruct(currencyGBP), mCurrentPrice()
+{}
 
 // --------------- Internal Attribute Set APIs
 CHIP_ERROR CommodityPriceDelegate::SetTariffUnit(TariffUnitEnum newValue)
@@ -81,14 +92,6 @@ CHIP_ERROR CommodityPriceDelegate::SetCurrency(CurrencyStruct::Type newValue)
 
     return CHIP_NO_ERROR;
 }
-
-// From ISO 4217 (non exhaustive selection)
-const CurrencyStruct::Type currencyCHF  = { .currency = 756, .decimalPoints = 2 };
-const CurrencyStruct::Type currencyEURO = { .currency = 978, .decimalPoints = 2 };
-const CurrencyStruct::Type currencyGBP  = { .currency = 826, .decimalPoints = 2 };
-const CurrencyStruct::Type currencyNOK  = { .currency = 578, .decimalPoints = 2 };
-const CurrencyStruct::Type currencySEK  = { .currency = 752, .decimalPoints = 2 };
-const CurrencyStruct::Type currencyUSD  = { .currency = 840, .decimalPoints = 2 };
 
 /* @brief This function is called by the cluster server at the start of read cycle
  *        This could take a semaphore to stop a background update of the data

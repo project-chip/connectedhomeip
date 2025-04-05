@@ -34,8 +34,9 @@ config("includes") {
 
 executable("chip-energy-gateway-app") {
   sources = [
-    "${chip_root}/examples/energy-gateway-app/energy-gateway-common/common/src/EnergyGatewayAppCommonMain.cpp",
+    "${chip_root}/examples/energy-gateway-app/common/src/EnergyGatewayAppCommonMain.cpp",
     "${chip_root}/examples/energy-gateway-app/commodity-price/src/CommodityPriceDelegate.cpp",
+    "${chip_root}/examples/energy-gateway-app/commodity-price/src/CommodityPriceMain.cpp",
     "include/CHIPProjectAppConfig.h",
     "main.cpp",
   ]
@@ -57,7 +58,7 @@ executable("chip-energy-gateway-app") {
 
   include_dirs = [
     "include",
-    "${chip_root}/examples/energy-gateway-app/energy-gateway-common/common/include",
+    "${chip_root}/examples/energy-gateway-app/common/include",
     "${chip_root}/examples/energy-gateway-app/commodity-price/include",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/include",
   ]

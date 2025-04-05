@@ -191,7 +191,7 @@
         "COMMISSIONER_CONTROL_CLUSTER": ["commissioner-control-server"],
         "COMMISSIONING_CLUSTER": [],
         "COMMODITY_METERING_CLUSTER": [],
-        "COMMODITY_PRICE_CLUSTER": [],
+        "COMMODITY_PRICE_CLUSTER": ["commodity-price-server"],
         "COMMODITY_TARIFF_CLUSTER": [],
         "CONTENT_LAUNCHER_CLUSTER": ["content-launch-server"],
         "CONTENT_CONTROL_CLUSTER": ["content-control-server"],

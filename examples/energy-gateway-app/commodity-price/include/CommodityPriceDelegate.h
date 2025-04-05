@@ -34,14 +34,16 @@ constexpr bool operator!=(const Globals::Structs::CurrencyStruct::Type & lhs, co
 class CommodityPriceDelegate : public CommodityPrice::Delegate
 {
 public:
+    CommodityPriceDelegate();
     ~CommodityPriceDelegate() = default;
 
     static constexpr uint16_t kMaxCurrencyValue = 999; // From spec
 
     // Attribute Accessors
     Globals::TariffUnitEnum GetTariffUnit() override { return mTariffUnit; }
-    Globals::Structs::CurrencyStruct::Type GetCurrency() override { return mCurrencyStruct; };
-    const DataModel::Nullable<Structs::CommodityPriceStruct::Type> & GetCurrentPrice() override;
+    Globals::Structs::CurrencyStruct::Type GetCurrency() override { return mCurrencyStruct; }
+    // TODO think about a better way to do this in a delegate without needing mCurrentPrice copy
+    const DataModel::Nullable<Structs::CommodityPriceStruct::Type> & GetCurrentPrice() override { return mCurrentPrice; }
 
     /* These functions are called by the ReadAttribute handler to iterate through lists
      * The cluster server will call Start<Type>Read to allow the delegate to create a temporary
@@ -63,6 +65,7 @@ private:
     // Attribute storage
     Globals::TariffUnitEnum mTariffUnit;
     Globals::Structs::CurrencyStruct::Type mCurrencyStruct;
+    DataModel::Nullable<Structs::CommodityPriceStruct::Type> mCurrentPrice;
 };
 
 class CommodityPriceInstance : public Instance
