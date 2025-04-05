@@ -627,13 +627,17 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteHandlerReceiveInvalidMessage)
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
     EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
 
-    // Reserve all except the last 128 bytes, so that we make sure to chunk.
+    // Reserve all except the last 60 bytes, so that we make sure to chunk. it was empirically determined that with a list of 10
+    // ByteSpan items, we will be able to fit 5/6 list items into the initial ReplaceAll list; thus triggering chunking.
     app::WriteClient writeClient(&GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing(),
-                                 static_cast<uint16_t>(kMaxSecureSduLengthBytes - 128) /* reserved buffer size */);
+                                 static_cast<uint16_t>(kMaxSecureSduLengthBytes - 60) /* reserved buffer size */);
 
-    ByteSpan list[5];
+    constexpr uint8_t kTestListLength = 10;
+    ByteSpan list[kTestListLength];
 
-    EXPECT_EQ(writeClient.EncodeAttribute(attributePath, app::DataModel::List<ByteSpan>(list, 5)), CHIP_NO_ERROR);
+    EXPECT_EQ(writeClient.EncodeAttribute(attributePath, app::DataModel::List<ByteSpan>(list, kTestListLength)), CHIP_NO_ERROR);
+
+    EXPECT_TRUE(writeClient.IsWriteRequestChunked());
 
     GetLoopback().mSentMessageCount                 = 0;
     GetLoopback().mNumMessagesToDrop                = 1;
@@ -692,13 +696,17 @@ TEST_F(TestWriteInteraction, TestWriteHandlerInvalidateFabric)
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
     EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
 
-    // Reserve all except the last 128 bytes, so that we make sure to chunk.
+    // Reserve all except the last 60 bytes, so that we make sure to chunk. it was empirically determined that with a list of 10
+    // ByteSpan items, we will be able to fit 5/6 list items into the initial ReplaceAll list; thus triggering chunking.
     app::WriteClient writeClient(&GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing(),
-                                 static_cast<uint16_t>(kMaxSecureSduLengthBytes - 128) /* reserved buffer size */);
+                                 static_cast<uint16_t>(kMaxSecureSduLengthBytes - 60) /* reserved buffer size */);
 
-    ByteSpan list[5];
+    constexpr uint8_t kTestListLength = 10;
+    ByteSpan list[kTestListLength];
 
-    EXPECT_EQ(writeClient.EncodeAttribute(attributePath, app::DataModel::List<ByteSpan>(list, 5)), CHIP_NO_ERROR);
+    EXPECT_EQ(writeClient.EncodeAttribute(attributePath, app::DataModel::List<ByteSpan>(list, kTestListLength)), CHIP_NO_ERROR);
+
+    EXPECT_TRUE(writeClient.IsWriteRequestChunked());
 
     GetLoopback().mDroppedMessageCount              = 0;
     GetLoopback().mSentMessageCount                 = 0;
