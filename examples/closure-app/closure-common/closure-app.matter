@@ -2736,7 +2736,6 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_closurebase = 560, version 1;
 
 
   server cluster Identify {
