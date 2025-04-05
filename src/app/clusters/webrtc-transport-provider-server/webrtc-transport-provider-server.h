@@ -52,6 +52,7 @@ public:
         Optional<std::string> iceTransportPolicy;
         Optional<BitMask<WebRTCMetadataOptionsBitmap>> metadataOptions;
         NodeId peerNodeId;
+        FabricIndex fabricIndex;
     };
 
     struct ProvideOfferRequestArgs : OfferRequestArgs
@@ -123,12 +124,23 @@ public:
      *   method returns `CHIP_NO_ERROR`. If an error is returned, `outSession` is left unmodified or
      *   set to an invalid state.
      *
+     * @param[in]  peerId
+     *   Identifies the peer (requestor) connection over which this command was received. The delegate can
+     *   use this `PeerId` to retrieve or track any existing secure session state as needed.
+     *
+     * @param[in] originatingEndpointId
+     *   The server implementing this handler (acting as the WebRTC Provider) MUST use this
+     *   endpoint ID as the target when sending commands back to the Requestor device.
+     *   This ensures that commands sent back by this Provider server correctly reach the
+     *   corresponding application logic on the Requestor device.
+     *
      * @return
      *   - CHIP_NO_ERROR if the request succeeds and `outSession` is populated.
      *   - CHIP_ERROR_NO_MEMORY if the device cannot allocate a new session.
      *   - Appropriate error otherwise.
      */
-    virtual CHIP_ERROR HandleProvideOffer(const ProvideOfferRequestArgs & args, WebRTCSessionStruct & outSession) = 0;
+    virtual CHIP_ERROR HandleProvideOffer(const ProvideOfferRequestArgs & args, WebRTCSessionStruct & outSession,
+                                          const ScopedNodeId & peerId, EndpointId originatingEndpointId) = 0;
 
     /**
      * @brief
