@@ -44,14 +44,10 @@ public:
 
     CHIP_ERROR ProvideICECandidates(uint16_t webRTCSessionID);
 
-    void HandleCommandResponse(const chip::app::ConcreteCommandPath & path, chip::TLV::TLVReader & data);
-
 private:
     // Make the constructor private to enforce the singleton pattern
     WebRTCManager();
     ~WebRTCManager();
-
-    void HandleProvideOfferResponse(chip::TLV::TLVReader & data);
 
     chip::app::Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorServer mWebRTCRequestorServer;
 
