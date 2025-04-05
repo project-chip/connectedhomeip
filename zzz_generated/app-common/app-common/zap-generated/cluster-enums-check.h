@@ -4132,6 +4132,86 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(CommodityTariff::PeakPe
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(JointFabricDatastore::AccessControlEntryAuthModeEnum val)
+{
+    using EnumType = JointFabricDatastore::AccessControlEntryAuthModeEnum;
+    switch (val)
+    {
+    case EnumType::kPase:
+    case EnumType::kCase:
+    case EnumType::kGroup:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(JointFabricDatastore::AccessControlEntryPrivilegeEnum val)
+{
+    using EnumType = JointFabricDatastore::AccessControlEntryPrivilegeEnum;
+    switch (val)
+    {
+    case EnumType::kView:
+    case EnumType::kProxyView:
+    case EnumType::kOperate:
+    case EnumType::kManage:
+    case EnumType::kAdminister:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(JointFabricDatastore::DatastoreStateEnum val)
+{
+    using EnumType = JointFabricDatastore::DatastoreStateEnum;
+    switch (val)
+    {
+    case EnumType::kPending:
+    case EnumType::kCommitted:
+    case EnumType::kDeletePending:
+    case EnumType::kCommitFailed:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(JointFabricDatastore::FailureCodeEnum val)
+{
+    using EnumType = JointFabricDatastore::FailureCodeEnum;
+    switch (val)
+    {
+    case EnumType::kOk:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(JointFabricDatastore::GroupKeySecurityPolicyEnum val)
+{
+    using EnumType = JointFabricDatastore::GroupKeySecurityPolicyEnum;
+    switch (val)
+    {
+    case EnumType::kTrustFirst:
+    case EnumType::kCacheAndSync:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(JointFabricAdministrator::ICACResponseStatusEnum val)
+{
+    using EnumType = JointFabricAdministrator::ICACResponseStatusEnum;
+    switch (val)
+    {
+    case EnumType::kOk:
+    case EnumType::kInvalidPublicKey:
+    case EnumType::kInvalidICAC:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(TlsClientManagement::TLSEndpointStatusEnum val)
 {
     using EnumType = TlsClientManagement::TLSEndpointStatusEnum;
