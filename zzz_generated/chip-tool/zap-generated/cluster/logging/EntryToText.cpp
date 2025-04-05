@@ -1087,6 +1087,10 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "OperationalDatasetComponents";
         case chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::ActiveNetworkFaultsList::Id:
             return "ActiveNetworkFaultsList";
+        case chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::ExtAddress::Id:
+            return "ExtAddress";
+        case chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::Rloc16::Id:
+            return "Rloc16";
         case chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::AcceptedCommandList::Id:

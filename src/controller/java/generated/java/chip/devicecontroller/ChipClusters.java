@@ -10769,6 +10769,8 @@ public class ChipClusters {
     private static final long CHANNEL_PAGE0_MASK_ATTRIBUTE_ID = 60L;
     private static final long OPERATIONAL_DATASET_COMPONENTS_ATTRIBUTE_ID = 61L;
     private static final long ACTIVE_NETWORK_FAULTS_LIST_ATTRIBUTE_ID = 62L;
+    private static final long EXT_ADDRESS_ATTRIBUTE_ID = 63L;
+    private static final long RLOC16_ATTRIBUTE_ID = 64L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
@@ -10880,6 +10882,14 @@ public class ChipClusters {
 
     public interface ActiveNetworkFaultsListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Integer> value);
+    }
+
+    public interface ExtAddressAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(@Nullable Long value);
+    }
+
+    public interface Rloc16AttributeCallback extends BaseAttributeCallback {
+      void onSuccess(@Nullable Integer value);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -12534,6 +12544,58 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, ACTIVE_NETWORK_FAULTS_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readExtAddressAttribute(
+        ExtAddressAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EXT_ADDRESS_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, EXT_ADDRESS_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeExtAddressAttribute(
+        ExtAddressAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EXT_ADDRESS_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, EXT_ADDRESS_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readRloc16Attribute(
+        Rloc16AttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RLOC16_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, RLOC16_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeRloc16Attribute(
+        Rloc16AttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, RLOC16_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, RLOC16_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(

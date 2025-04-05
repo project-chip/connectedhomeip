@@ -1934,6 +1934,14 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"ActiveNetworkFaultsList";
             break;
 
+        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeExtAddressID:
+            result = @"ExtAddress";
+            break;
+
+        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRloc16ID:
+            result = @"Rloc16";
+            break;
+
         case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;

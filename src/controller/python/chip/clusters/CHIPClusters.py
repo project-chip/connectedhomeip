@@ -2577,6 +2577,18 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
             },
+            0x0000003F: {
+                "attributeName": "ExtAddress",
+                "attributeId": 0x0000003F,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000040: {
+                "attributeName": "Rloc16",
+                "attributeId": 0x00000040,
+                "type": "int",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,
