@@ -57,10 +57,23 @@ constexpr bdx::TransferRole kBdxRole = bdx::TransferRole::kSender;
 
 - (instancetype)initWithMTROTAImageTransferHandler:(MTROTAImageTransferHandler *)otaImageTransferHandler
 {
+    assertChipStackLockedByCurrentThread();
     if (self = [super init]) {
         _otaImageTransferHandler = otaImageTransferHandler;
     }
     return self;
+}
+
+- (MTROTAImageTransferHandler *)otaImageTransferHandler
+{
+    assertChipStackLockedByCurrentThread();
+    return _otaImageTransferHandler;
+}
+
+- (void)SetOtaImageTransferHandler:(MTROTAImageTransferHandler *)otaImageTransferHandler
+{
+    assertChipStackLockedByCurrentThread();
+    _otaImageTransferHandler = otaImageTransferHandler;
 }
 @end
 
