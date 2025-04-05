@@ -51,14 +51,26 @@ private:
     CHIP_ERROR SendMsgImpl(const IPPacketInfo * pktInfo, chip::System::PacketBufferHandle && msg) override;
     void CloseImpl() override;
 
-    nw_listener_t mListener;
-    dispatch_semaphore_t mListenerSemaphore;
-    dispatch_queue_t mListenerQueue;
-    nw_connection_t mConnection;
-    dispatch_semaphore_t mConnectionSemaphore;
-    dispatch_queue_t mConnectionQueue;
-    dispatch_semaphore_t mSendSemaphore;
-    dispatch_queue_t mSystemQueue;
+    nw_listener_t mListener                   = nullptr;
+    dispatch_semaphore_t mListenerSemaphore   = nullptr;
+    dispatch_queue_t mListenerQueue           = nullptr;
+    nw_connection_t mConnection               = nullptr;
+    dispatch_semaphore_t mConnectionSemaphore = nullptr;
+    dispatch_queue_t mConnectionQueue         = nullptr;
+    dispatch_queue_t mSystemQueue             = nullptr;
+
+    class WorkFlag
+    {
+    public:
+        void MarkDead() { mAlive = false; }
+        bool IsAlive() const { return mAlive; }
+
+    private:
+        std::atomic<bool> mAlive{ true };
+    };
+
+    Platform::WeakPtr<WorkFlag> mWorkFlagWeak;
+    Platform::SharedPtr<WorkFlag> mWorkFlagStrong;
 
     CHIP_ERROR ConfigureProtocol(IPAddressType aAddressType, const nw_parameters_t & aParameters);
     CHIP_ERROR StartListener();
@@ -66,8 +78,8 @@ private:
     nw_endpoint_t GetEndPoint(const IPAddressType aAddressType, const IPAddress & aAddress, uint16_t aPort,
                               InterfaceId interfaceIndex = InterfaceId::Null());
     CHIP_ERROR StartConnection(nw_connection_t aConnection);
-    void GetPacketInfo(const nw_connection_t & aConnection, IPPacketInfo & aPacketInfo);
-    void HandleDataReceived(const nw_connection_t & aConnection);
+    CHIP_ERROR GetPacketInfo(const nw_connection_t & aConnection, IPPacketInfo & aPacketInfo);
+    void HandleDataReceived(nw_connection_t aConnection);
     CHIP_ERROR ReleaseListener();
     CHIP_ERROR ReleaseConnection();
     void ReleaseAll();

@@ -35,6 +35,19 @@
 #define NETWORK_FRAMEWORK_DEBUG 0
 
 namespace {
+constexpr uint64_t kSendTimeoutInSeconds = 10 * NSEC_PER_SEC;
+constexpr uint64_t kConnectTimeoutInSeconds = 10 * NSEC_PER_SEC;
+constexpr uint64_t kListenerTimeoutInSeconds = 10 * NSEC_PER_SEC;
+
+class WorkFlag {
+public:
+    void MarkDead() { mAlive = false; }
+    bool IsAlive() const { return mAlive; }
+
+private:
+    std::atomic<bool> mAlive { true };
+};
+
 #if !NETWORK_FRAMEWORK_DEBUG
 void DebugPrintListenerState(nw_listener_state_t state) {};
 void DebugPrintConnectionState(nw_connection_state_t state) {};
@@ -181,14 +194,15 @@ namespace Inet {
         VerifyOrReturnError(!intfId.IsPresent(), CHIP_ERROR_NOT_IMPLEMENTED);
 
         __auto_type configure_tls = NW_PARAMETERS_DISABLE_PROTOCOL;
-        __auto_type parameters = nw_parameters_create_secure_udp(configure_tls, NW_PARAMETERS_DEFAULT_CONFIGURATION);
-        VerifyOrReturnError(nullptr != parameters, CHIP_ERROR_INVALID_ARGUMENT);
+        mParameters = nw_parameters_create_secure_udp(configure_tls, NW_PARAMETERS_DEFAULT_CONFIGURATION);
+        VerifyOrReturnError(nullptr != mParameters, CHIP_ERROR_INVALID_ARGUMENT, ReleaseAll());
 
         // Note: The ConfigureProtocol function uses nw_ip_options_set_version to set the IP version for this endpoint.
         //
         // This works as expected when the IPAddress is specified. However, when using a wildcard address (chip::Inet::IPAddressType::kAny)
         //  for an IPv6 socket, the specified IP version (nw_ip_version_6) may be ignored, allowing both IPv4 and IPv6 connections.
-        ReturnErrorOnFailure(ConfigureProtocol(addressType, parameters));
+        CHIP_ERROR err = ConfigureProtocol(addressType, mParameters);
+        VerifyOrReturnError(CHIP_NO_ERROR == err, err, ReleaseAll());
 
         // Note: Network.framework does not provide an API to set the SO_REUSEPORT socket option.
         // This limitation is not an issue when the port is set to 0, as the platform will choose a random port.
@@ -208,22 +222,20 @@ namespace Inet {
         }
 
         __auto_type endpoint = GetEndPoint(addressType, address, port);
-        VerifyOrReturnError(nullptr != endpoint, CHIP_ERROR_INTERNAL);
-        nw_parameters_set_local_endpoint(parameters, endpoint);
+        VerifyOrReturnError(nullptr != endpoint, CHIP_ERROR_INTERNAL, ReleaseAll());
+        nw_parameters_set_local_endpoint(mParameters, endpoint);
 
-        mConnectionQueue = dispatch_queue_create("inet_dispatch_global", DISPATCH_QUEUE_SERIAL);
-        VerifyOrReturnError(nullptr != mConnectionQueue, CHIP_ERROR_NO_MEMORY);
+        mConnectionQueue = dispatch_queue_create("inet_dispatch_global", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+        VerifyOrReturnError(nullptr != mConnectionQueue, CHIP_ERROR_NO_MEMORY, ReleaseAll());
 
         mConnectionSemaphore = dispatch_semaphore_create(0);
-        VerifyOrReturnError(nullptr != mConnectionSemaphore, CHIP_ERROR_NO_MEMORY);
-
-        mSendSemaphore = dispatch_semaphore_create(0);
-        VerifyOrReturnError(nullptr != mSendSemaphore, CHIP_ERROR_NO_MEMORY);
+        VerifyOrReturnError(nullptr != mConnectionSemaphore, CHIP_ERROR_NO_MEMORY, ReleaseAll());
 
         mSystemQueue = static_cast<System::LayerSocketsLoop &>(GetSystemLayer()).GetDispatchQueue();
         mAddrType = addressType;
         mConnection = nullptr;
-        mParameters = parameters;
+        mWorkFlagStrong = Platform::MakeShared<WorkFlag>();
+        mWorkFlagWeak = mWorkFlagStrong;
 
         return CHIP_NO_ERROR;
     }
@@ -266,8 +278,20 @@ namespace Inet {
 
         ReturnErrorOnFailure(GetConnection(pktInfo));
 
+        // Wrap the PacketBufferHandle in a shared_ptr so we can capture it by value
+        __auto_type retainedHandle = std::make_shared<System::PacketBufferHandle>(std::move(msg));
+        __auto_type content = dispatch_data_create(
+            retainedHandle->operator->()->Start(),
+            retainedHandle->operator->()->DataLength(),
+            mSystemQueue,
+            ^{
+                // Keep retainedHandle alive until the dispatch_data is released
+                [[maybe_unused]] auto cleanup = retainedHandle;
+            });
+
         // Send a message, and wait for it to be dispatched.
-        __auto_type content = dispatch_data_create(msg->Start(), msg->DataLength(), mSystemQueue, DISPATCH_DATA_DESTRUCTOR_DEFAULT);
+        __auto_type group = dispatch_group_create();
+        dispatch_group_enter(group);
 
         // If there is a current message pending and the state of the network connection changes (e.g switch to a
         // different network) the connection will enter a nw_connection_state_failed state and the completion handler
@@ -282,16 +306,20 @@ namespace Inet {
             } else {
                 err = CHIP_NO_ERROR;
             }
-            dispatch_semaphore_signal(mSendSemaphore);
+            dispatch_group_leave(group);
         });
 
-        dispatch_semaphore_wait(mSendSemaphore, DISPATCH_TIME_FOREVER);
-
+        __auto_type timeout = dispatch_time(DISPATCH_TIME_NOW, kSendTimeoutInSeconds);
+        dispatch_group_wait(group, timeout);
         return err;
     }
 
     void UDPEndPointImplNetworkFramework::CloseImpl()
     {
+        if (mWorkFlagStrong) {
+            mWorkFlagStrong->MarkDead();
+            mWorkFlagStrong.reset();
+        }
         ReleaseAll();
     }
 
@@ -312,7 +340,7 @@ namespace Inet {
         mListenerQueue = nullptr;
         mListenerSemaphore = nullptr;
 
-        mSendSemaphore = nullptr;
+        mSystemQueue = nullptr;
     }
 
     void UDPEndPointImplNetworkFramework::Free()
@@ -367,9 +395,10 @@ namespace Inet {
         return err;
     }
 
-    void UDPEndPointImplNetworkFramework::GetPacketInfo(const nw_connection_t & aConnection, IPPacketInfo & aPacketInfo)
+    CHIP_ERROR UDPEndPointImplNetworkFramework::GetPacketInfo(const nw_connection_t & aConnection, IPPacketInfo & aPacketInfo)
     {
         nw_path_t path = nw_connection_copy_current_path(aConnection);
+        VerifyOrReturnError(nullptr != path, CHIP_ERROR_INVALID_ARGUMENT);
         nw_endpoint_t dest_endpoint = nw_path_copy_effective_local_endpoint(path);
         nw_endpoint_t src_endpoint = nw_path_copy_effective_remote_endpoint(path);
 
@@ -393,6 +422,8 @@ namespace Inet {
         aPacketInfo.DestAddress.ToString(dstAddrStr);
         ChipLogError(Inet, "Packet received from %s to %s", srcAddrStr, dstAddrStr);
 #endif
+
+        return CHIP_NO_ERROR;
     }
 
     nw_endpoint_t UDPEndPointImplNetworkFramework::GetEndPoint(const IPAddressType aAddressType,
@@ -455,7 +486,11 @@ namespace Inet {
         __auto_type endpoint = GetEndPoint(mAddrType, aPktInfo->DestAddress, aPktInfo->DestPort, aPktInfo->Interface);
         VerifyOrReturnError(nullptr != endpoint, CHIP_ERROR_INCORRECT_STATE);
 
-        __auto_type connection = nw_connection_create(endpoint, mParameters);
+        __auto_type parameters = nw_parameters_copy(mParameters);
+        VerifyOrReturnError(parameters != nullptr, CHIP_ERROR_NO_MEMORY);
+
+        nw_parameters_set_local_endpoint(parameters, nullptr);
+        __auto_type connection = nw_connection_create(endpoint, parameters); // Let system pick ephemeral port
         VerifyOrReturnError(nullptr != connection, CHIP_ERROR_INCORRECT_STATE);
 
         return StartConnection(connection);
@@ -467,30 +502,30 @@ namespace Inet {
         VerifyOrReturnError(nullptr == mListenerSemaphore, CHIP_ERROR_INCORRECT_STATE);
         VerifyOrReturnError(nullptr == mListenerQueue, CHIP_ERROR_INCORRECT_STATE);
 
-        __auto_type listener = nw_listener_create(mParameters);
-        VerifyOrReturnError(nullptr != listener, CHIP_ERROR_INCORRECT_STATE);
+        mListener = nw_listener_create(mParameters);
+        VerifyOrReturnError(nullptr != mListener, CHIP_ERROR_INCORRECT_STATE, ReleaseAll());
 
         mListenerSemaphore = dispatch_semaphore_create(0);
-        VerifyOrReturnError(nullptr != mListenerSemaphore, CHIP_ERROR_NO_MEMORY);
+        VerifyOrReturnError(nullptr != mListenerSemaphore, CHIP_ERROR_NO_MEMORY, ReleaseAll());
 
-        mListenerQueue = dispatch_queue_create("inet_dispatch_listener", DISPATCH_QUEUE_CONCURRENT);
-        VerifyOrReturnError(nullptr != mListenerQueue, CHIP_ERROR_NO_MEMORY);
+        mListenerQueue = dispatch_queue_create("inet_dispatch_listener", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+        VerifyOrReturnError(nullptr != mListenerQueue, CHIP_ERROR_NO_MEMORY, ReleaseAll());
 
-        nw_listener_set_queue(listener, mListenerQueue);
+        nw_listener_set_queue(mListener, mListenerQueue);
 
-        nw_listener_set_new_connection_handler(listener, ^(nw_connection_t connection) {
+        nw_listener_set_new_connection_handler(mListener, ^(nw_connection_t connection) {
             ReleaseConnection();
             StartConnection(connection);
         });
 
-        __block CHIP_ERROR err = CHIP_NO_ERROR;
-        nw_listener_set_state_changed_handler(listener, ^(nw_listener_state_t state, nw_error_t error) {
+        __block CHIP_ERROR err = CHIP_ERROR_INTERNAL;
+        nw_listener_set_state_changed_handler(mListener, ^(nw_listener_state_t state, nw_error_t error) {
             DebugPrintListenerState(state);
 
             switch (state) {
             case nw_listener_state_invalid:
                 err = CHIP_ERROR_INCORRECT_STATE;
-                nw_listener_cancel(listener);
+                nw_listener_cancel(mListener);
                 break;
 
             case nw_listener_state_waiting:
@@ -517,11 +552,12 @@ namespace Inet {
             }
         });
 
-        nw_listener_start(listener);
-        dispatch_semaphore_wait(mListenerSemaphore, DISPATCH_TIME_FOREVER);
+        nw_listener_start(mListener);
+        __auto_type timeout = dispatch_time(DISPATCH_TIME_NOW, kListenerTimeoutInSeconds);
+        dispatch_semaphore_wait(mListenerSemaphore, timeout);
 
-        if (CHIP_NO_ERROR == err) {
-            mListener = listener;
+        if (CHIP_NO_ERROR != err) {
+            mListener = nullptr;
         }
 
         return err;
@@ -570,18 +606,21 @@ namespace Inet {
         });
 
         nw_connection_start(aConnection);
-        dispatch_semaphore_wait(mConnectionSemaphore, DISPATCH_TIME_FOREVER);
+        __auto_type timeout = dispatch_time(DISPATCH_TIME_NOW, kConnectTimeoutInSeconds);
+        dispatch_semaphore_wait(mConnectionSemaphore, timeout);
 
         if (CHIP_NO_ERROR == err) {
             DebugPrintConnection(aConnection);
 
             mConnection = aConnection;
-            HandleDataReceived(mConnection);
+            dispatch_async(mSystemQueue, ^{
+                HandleDataReceived(mConnection);
+            });
         }
         return err;
     }
 
-    void UDPEndPointImplNetworkFramework::HandleDataReceived(const nw_connection_t & aConnection)
+    void UDPEndPointImplNetworkFramework::HandleDataReceived(nw_connection_t aConnection)
     {
         nw_connection_receive_completion_t handler = ^(dispatch_data_t content, nw_content_context_t context, bool is_complete, nw_error_t receive_error) {
             dispatch_block_t schedule_next_receive = ^{
@@ -593,33 +632,47 @@ namespace Inet {
                     if (!(error_domain == nw_error_domain_posix && errno == ECANCELED)) {
                         CHIP_ERROR error = CHIP_ERROR_POSIX(errno);
                         IPPacketInfo packetInfo;
-                        GetPacketInfo(aConnection, packetInfo);
-                        dispatch_async(mSystemQueue, ^{
-                            OnReceiveError((UDPEndPoint *) this, error, &packetInfo);
-                        });
+                        if (CHIP_NO_ERROR == GetPacketInfo(aConnection, packetInfo)) {
+                            dispatch_async(mSystemQueue, ^{
+                                OnReceiveError((UDPEndPoint *) this, error, nullptr);
+                            });
+                        } else {
+                            dispatch_async(mSystemQueue, ^{
+                                OnReceiveError((UDPEndPoint *) this, error, &packetInfo);
+                            });
+                        }
                     }
                 }
             };
 
-            if (content != nullptr && OnMessageReceived != nullptr) {
-                size_t count = dispatch_data_get_size(content);
-                auto packetBufferHandle = System::PacketBufferHandle::New(count);
-                auto * packetBuffer = std::move(packetBufferHandle).UnsafeRelease();
-                dispatch_data_apply(content, ^(dispatch_data_t data, size_t offset, const void * buffer, size_t size) {
-                    memmove(packetBuffer->Start() + offset, buffer, size);
-                    return true;
-                });
-                packetBuffer->SetDataLength(count);
+            auto localWeakFlag = mWorkFlagWeak;
+            dispatch_async(mSystemQueue, ^{
+                auto workFlag = localWeakFlag.lock();
+                if (!workFlag || !workFlag->IsAlive()) {
+                    return;
+                }
 
-                IPPacketInfo packetInfo;
-                GetPacketInfo(aConnection, packetInfo);
-                dispatch_async(mSystemQueue, ^{
-                    auto handle = System::PacketBufferHandle::Adopt(packetBuffer);
-                    OnMessageReceived((UDPEndPoint *) this, std::move(handle), &packetInfo);
-                });
-            }
+                if (content != nullptr && OnMessageReceived != nullptr) {
+                    size_t count = dispatch_data_get_size(content);
 
-            schedule_next_receive();
+                    __auto_type packetBufferHandle = System::PacketBufferHandle::New(count);
+                    __auto_type * packetBuffer = std::move(packetBufferHandle).UnsafeRelease();
+                    dispatch_data_apply(content, ^(dispatch_data_t data, size_t offset, const void * buffer, size_t size) {
+                        memmove(packetBuffer->Start() + offset, buffer, size);
+                        return true;
+                    });
+                    packetBuffer->SetDataLength(count);
+
+                    IPPacketInfo packetInfo;
+                    GetPacketInfo(aConnection, packetInfo);
+                    dispatch_async(mSystemQueue, ^{
+                        auto handle = System::PacketBufferHandle::Adopt(packetBuffer);
+                        OnMessageReceived((UDPEndPoint *) this, std::move(handle), &packetInfo);
+                    });
+                }
+
+                schedule_next_receive();
+            });
         };
 
         nw_connection_receive_message(aConnection, handler);
