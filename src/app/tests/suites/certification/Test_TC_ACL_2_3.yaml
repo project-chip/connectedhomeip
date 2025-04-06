@@ -257,7 +257,7 @@ tests:
       command: "readAttribute"
       attribute: "Extension"
       response:
-          value: [{ Data: D_OK_FULL, FabricIndex: CurrentFabricIndexValue }]
+          value: [{ Data: D_OK_EMPTY, FabricIndex: CurrentFabricIndexValue }]
 
     - label:
           "Step 19: TH1 writes DUT Endpoint 0 AccessControl cluster Extension
