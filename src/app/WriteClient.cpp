@@ -304,8 +304,8 @@ CHIP_ERROR WriteClient::PutPreencodedAttribute(const ConcreteDataAttributePath &
         // SOLUTION: we treat ACL as an exception and avoid encoding an empty ReplaceAll list. Instead, we pack as many ACL entries
         // as possible into the ReplaceAll list, and send  any remaining entries in subsequent chunks are part of the AppendItem
         // list operation.
-        // TODO: Generalize this behavior; send a non-empty ReplaceAll list for all clusters in Matter 1.5 and enforce all clusters
-        // to support it in testing and in certification.
+        // TODO (#38270): Generalize this behavior; send a non-empty ReplaceAll list for all clusters in Matter 1.5 and enforce all
+        // clusters to support it in testing and in certification.
         bool encodeEmptyListAsReplaceAll =
             !(path.mClusterId == Clusters::AccessControl::Id && path.mAttributeId == Clusters::AccessControl::Attributes::Acl::Id);
 
