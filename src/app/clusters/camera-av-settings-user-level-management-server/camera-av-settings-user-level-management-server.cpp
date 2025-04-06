@@ -309,10 +309,9 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::SetZoomMax(uint8_t aZoomMax)
  * Mutators for server copies of Pan, Tilt, and Zoom that may be invoked by a delegate or the server itself in responding to command
  * callbacks, or due to local on device changes.
  * Only set the value if the Feature Flag is set.
- * It is entirely possible for a mutator to be called with a parameter that has no value.  Case in point an invoke of MPTZSetPosition,
- * this will be handled and the attributes updated if at least one of the three pan, tilt, or zoom have a value, with all three parms
- * passed through once validation is complete.
- * An empty value is just ignored.
+ * It is entirely possible for a mutator to be called with a parameter that has no value.  Case in point an invoke of
+ * MPTZSetPosition, this will be handled and the attributes updated if at least one of the three pan, tilt, or zoom have a value,
+ * with all three parms passed through once validation is complete. An empty value is just ignored.
  */
 void CameraAvSettingsUserLevelMgmtServer::SetPan(Optional<int16_t> aPan)
 {

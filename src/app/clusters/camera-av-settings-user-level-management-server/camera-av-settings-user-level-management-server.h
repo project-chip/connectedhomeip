@@ -290,7 +290,7 @@ public:
      * @param aZoom   The value for Zoom associated with the preset
      */
     virtual Protocols::InteractionModel::Status MPTZMoveToPreset(uint8_t aPreset, Optional<int16_t> aPan, Optional<int16_t> aTilt,
-                                                                 Optional<uint8_t> aZoom)                                = 0;
+                                                                 Optional<uint8_t> aZoom) = 0;
 
     /**
      * Informs the delegate that a request has been made to save the current PTZ values in a new (or updated) preset ID.
@@ -299,30 +299,31 @@ public:
      * save the current values of PTZ against the preset ID.
      * @param aPreset The preset ID that will be used for the saved values
      */
-    virtual Protocols::InteractionModel::Status MPTZSavePreset(uint8_t aPreset)                                          = 0;
+    virtual Protocols::InteractionModel::Status MPTZSavePreset(uint8_t aPreset) = 0;
 
     /**
      * Informs the delegate that a request has been made to remove the preset indicated. Allows any needed app handling and the
-     * possibility that the request is rejected depending on device state. On a success response the server will erases the indicated
-     * preset and its associated values.
+     * possibility that the request is rejected depending on device state. On a success response the server will erases the
+     * indicated preset and its associated values.
      * @param aPreset The preset ID that will be used for the saved values
      */
-    virtual Protocols::InteractionModel::Status MPTZRemovePreset(uint8_t aPreset)                                        = 0;
+    virtual Protocols::InteractionModel::Status MPTZRemovePreset(uint8_t aPreset) = 0;
 
     /**
-     * Informs the delegate that a request has been made to change the Viewport associated with the provided video stream ID. The server
-     * has already ensured that the video stream ID is for a valid video stream. The app needs to work with its AV Stream Managament
-     * instance to validate the stream ID, the provided new Viewport, ensure that the command is posssible, and apply the command logic
-     * to the camera.
+     * Informs the delegate that a request has been made to change the Viewport associated with the provided video stream ID. The
+     * server has already ensured that the video stream ID is for a valid video stream. The app needs to work with its AV Stream
+     * Managament instance to validate the stream ID, the provided new Viewport, ensure that the command is posssible, and apply the
+     * command logic to the camera.
      * @param aVideoStreamID The ID for the videa stream that is subject to change
      * @param aViewport      The new values of Viewport that are to be set
      */
     virtual Protocols::InteractionModel::Status DPTZSetViewport(uint16_t aVideoStreamID,
-                                                                Structs::ViewportStruct::Type aViewport)                 = 0;
-     /**
+                                                                Structs::ViewportStruct::Type aViewport) = 0;
+    /**
      * Informs the delegate that a request has been made to digitally alter the current rendered stream. The server has already
-     * validated that the Zoom Delta (if provided) is in range, and that the video stream ID is valid. The app needs to work with its AV Stream
-     * Managament instance to validate the stream ID, ensure that the command is posssible, and apply the command logic to the camera.
+     * validated that the Zoom Delta (if provided) is in range, and that the video stream ID is valid. The app needs to work with
+     * its AV Stream Managament instance to validate the stream ID, ensure that the command is posssible, and apply the command
+     * logic to the camera.
      * @param aVideoStreamID The ID for the videa stream that is subject to change
      * @param aDeltaX        Number of pixels to move in the X plane
      * @param aDeltaY        Number of pixels to move in the Y plane
