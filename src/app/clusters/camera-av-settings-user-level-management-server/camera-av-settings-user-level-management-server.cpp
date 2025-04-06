@@ -391,7 +391,7 @@ void CameraAvSettingsUserLevelMgmtServer::UpdatePresetID()
     // Has the next possible incremented ID been used by a user set Preset?
     //
     uint8_t nextIDToCheck = (mCurrentPresetID == mMaxPresets) ? 1 : static_cast<uint8_t>(mCurrentPresetID + 1);
-    ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: UpdatePresetID. Current Preset is %d. Next to Check is %d.", 
+    ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: UpdatePresetID. Current Preset is %d. Next to Check is %d.",
                   mEndpointId, mCurrentPresetID, nextIDToCheck);
 
     for (uint8_t i = 1; i <= mMaxPresets; i++)
@@ -421,7 +421,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::ReadAndEncodeMPTZPresets(Attribu
             presetStruct.presetID = preset;
             presetStruct.name     = CharSpan(name.c_str(), name.size());
             presetStruct.settings = mptzPresets.GetMptzPosition();
-            ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Encoding an instance of MPTZPresetStruct. ID = %d. Name = %.*s", 
+            ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Encoding an instance of MPTZPresetStruct. ID = %d. Name = %.*s",
                           mEndpointId, presetStruct.presetID, static_cast<int>(presetStruct.name.size()), presetStruct.name.data());
             ReturnErrorOnFailure(encoder.Encode(presetStruct));
         }
@@ -965,7 +965,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZSavePreset(HandlerContext & 
     {
         if (preset.Value() > mMaxPresets)
         {
-            ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Provided preset ID is out of range. Preset: %d", 
+            ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Provided preset ID is out of range. Preset: %d",
                          mEndpointId, preset.Value());
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
             return;
@@ -1011,7 +1011,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZSavePreset(HandlerContext & 
     aMptzPresetHelper.SetPresetID(presetToUse);
     aMptzPresetHelper.SetName(presetName);
 
-    ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Saving new MPTZ Preset.  Preset ID = %d. Preset Name = %s", 
+    ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Saving new MPTZ Preset.  Preset ID = %d. Preset Name = %s",
                   mEndpointId, presetToUse, aMptzPresetHelper.GetName().c_str());
 
     aMptzPresetHelper.SetMptzPosition(mMptzPosition);
@@ -1094,7 +1094,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleDPTZSetViewport(HandlerContext &
         //
         if (!mDelegate->IsValidVideoStreamID(videoStreamID))
         {
-            ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Unknown Video Stream ID provided. ID: %d", 
+            ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Unknown Video Stream ID provided. ID: %d",
                          mEndpointId, videoStreamID);
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
             return;
