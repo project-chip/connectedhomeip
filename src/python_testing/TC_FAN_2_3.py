@@ -99,7 +99,7 @@ class TC_FAN_2_3(MatterBaseTest):
         self.step(2)
         supports_wind = await self.feature_guard(self.endpoint, cluster, rock_feature)
         if not supports_wind:
-            logger.info("[Fc] The Rock (RCK) feature must be supported by the DUT for this test, skipping test.")
+            logger.info("[FC] The Rock (RCK) feature must be supported by the DUT for this test, skipping test.")
             self.skip_all_remaining_steps()
 
         # *** STEP 3 ***
