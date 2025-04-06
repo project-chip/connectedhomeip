@@ -281,7 +281,7 @@ public:
 
     /**
      * Allows any needed app handling given provided and already validated pan, tilt, and zoom values that are to be set based on
-     * receoption of an MPTZMoveToPreset command.  The server has already ensured the requested preset ID exists, and obtained the 
+     * receoption of an MPTZMoveToPreset command.  The server has already ensured the requested preset ID exists, and obtained the
      * values for PTZ defined by that preset. Returns a failure status if the physical device cannot realize these values. On
      * a success response the server will update the server held attribute values for PTZ.
      * @param aPreset The preset ID associated with the provided PTZ values
@@ -293,41 +293,41 @@ public:
                                                                  Optional<uint8_t> aZoom)                                = 0;
 
     /**
-     * Informs the delegate that a request has been made to save the current PTZ values in a new (or updated) preset ID.  
-     * The preset ID is provided, the delegate is already aware of the current PTZ values that will be saved. Allows any needed app 
-     * handling and the possibility that the request is rejected depending on device state. On a success response the server will 
+     * Informs the delegate that a request has been made to save the current PTZ values in a new (or updated) preset ID.
+     * The preset ID is provided, the delegate is already aware of the current PTZ values that will be saved. Allows any needed app
+     * handling and the possibility that the request is rejected depending on device state. On a success response the server will
      * save the current values of PTZ against the preset ID.
      * @param aPreset The preset ID that will be used for the saved values
-     */    
+     */
     virtual Protocols::InteractionModel::Status MPTZSavePreset(uint8_t aPreset)                                          = 0;
 
     /**
-     * Informs the delegate that a request has been made to remove the preset indicated. Allows any needed app handling and the 
+     * Informs the delegate that a request has been made to remove the preset indicated. Allows any needed app handling and the
      * possibility that the request is rejected depending on device state. On a success response the server will erases the indicated
-     * preset and its associated values. 
+     * preset and its associated values.
      * @param aPreset The preset ID that will be used for the saved values
-     */        
+     */
     virtual Protocols::InteractionModel::Status MPTZRemovePreset(uint8_t aPreset)                                        = 0;
 
     /**
      * Informs the delegate that a request has been made to change the Viewport associated with the provided video stream ID. The server
-     * has already ensured that the video stream ID is for a valid video stream. The app needs to work with its AV Stream Managament 
-     * instance to validate the stream ID, the provided new Viewport, ensure that the command is posssible, and apply the command logic 
-     * to the camera. 
+     * has already ensured that the video stream ID is for a valid video stream. The app needs to work with its AV Stream Managament
+     * instance to validate the stream ID, the provided new Viewport, ensure that the command is posssible, and apply the command logic
+     * to the camera.
      * @param aVideoStreamID The ID for the videa stream that is subject to change
      * @param aViewport      The new values of Viewport that are to be set
-     */   
+     */
     virtual Protocols::InteractionModel::Status DPTZSetViewport(uint16_t aVideoStreamID,
                                                                 Structs::ViewportStruct::Type aViewport)                 = 0;
      /**
      * Informs the delegate that a request has been made to digitally alter the current rendered stream. The server has already
-     * validated that the Zoom Delta (if provided) is in range, and that the video stream ID is valid. The app needs to work with its AV Stream 
-     * Managament instance to validate the stream ID, ensure that the command is posssible, and apply the command logic to the camera. 
+     * validated that the Zoom Delta (if provided) is in range, and that the video stream ID is valid. The app needs to work with its AV Stream
+     * Managament instance to validate the stream ID, ensure that the command is posssible, and apply the command logic to the camera.
      * @param aVideoStreamID The ID for the videa stream that is subject to change
      * @param aDeltaX        Number of pixels to move in the X plane
      * @param aDeltaY        Number of pixels to move in the Y plane
      * @param aZoomDelta     Relative change of digital zoom
-     */                                                                  
+     */
     virtual Protocols::InteractionModel::Status DPTZRelativeMove(uint16_t aVideoStreamID, Optional<int16_t> aDeltaX,
                                                                  Optional<int16_t> aDeltaY, Optional<int8_t> aZoomDelta) = 0;
 
