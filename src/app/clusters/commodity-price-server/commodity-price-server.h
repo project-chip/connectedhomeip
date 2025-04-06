@@ -46,7 +46,6 @@ public:
     virtual Globals::TariffUnitEnum GetTariffUnit()                                            = 0;
     virtual Globals::Structs::CurrencyStruct::Type GetCurrency()                               = 0;
     virtual const DataModel::Nullable<Structs::CommodityPriceStruct::Type> & GetCurrentPrice() = 0;
-    virtual int64_t GetPriceForecast()                                                         = 0;
 
     virtual CHIP_ERROR StartPriceForecastRead(CommodityPriceDetailBitmap bitmap)               = 0;
     virtual CHIP_ERROR GetPriceForecastByIndex(uint8_t, Structs::CommodityPriceStruct::Type &) = 0;

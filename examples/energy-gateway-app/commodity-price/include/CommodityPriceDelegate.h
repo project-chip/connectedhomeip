@@ -26,6 +26,8 @@ namespace app {
 namespace Clusters {
 namespace CommodityPrice {
 
+using chip::Protocols::InteractionModel::Status;
+
 constexpr bool operator!=(const Globals::Structs::CurrencyStruct::Type & lhs, const Globals::Structs::CurrencyStruct::Type & rhs)
 {
     return ((lhs.currency != rhs.currency) || (lhs.decimalPoints != rhs.decimalPoints));
@@ -58,8 +60,10 @@ public:
     // Internal Application API to set attribute values
     CHIP_ERROR SetTariffUnit(Globals::TariffUnitEnum);
     CHIP_ERROR SetCurrency(Globals::Structs::CurrencyStruct::Type);
-
+    CHIP_ERROR SetCurrentPrice(const DataModel::Nullable<Structs::CommodityPriceStruct::Type>);
     // TODO work out how to set forecast data and retrieve it
+
+    Status SendPriceChangeEvent();
 
 private:
     // Attribute storage

@@ -16,15 +16,49 @@
  *    limitations under the License.
  */
 
+#include "CommodityPriceMain.h"
 #include <app/clusters/commodity-price-server/CommodityPriceTestEventTriggerHandler.h>
+#include <app/util/af-types.h>
 
 using namespace chip;
+using namespace chip::app;
+using namespace chip::app::DataModel;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::CommodityPrice;
+using namespace chip::app::Clusters::CommodityPrice::Structs;
 
-void SetTestEventTrigger_PriceUpdate() {}
+CommodityPriceDelegate * GetCommodityPriceDelegate()
+{
+    CommodityPriceInstance * mInst = GetCommodityPriceInstance();
+    VerifyOrDieWithMsg(mInst != nullptr, AppServer, "CommodityPriceInstance is null");
+    CommodityPriceDelegate * dg = mInst->GetDelegate();
+    VerifyOrDieWithMsg(dg != nullptr, AppServer, "CommodityPriceDelegate is null");
 
-void SetTestEventTrigger_ForecastUpdate() {}
+    return dg;
+}
+
+void SetTestEventTrigger_PriceUpdate()
+{
+    // Change the value of CurrentPrice
+    Structs::CommodityPriceStruct::Type newPriceStruct;
+    DataModel::Nullable<Structs::CommodityPriceStruct::Type> newPrice;
+
+    newPriceStruct.periodStart = 1000; // TODO call getEpoch-s
+    newPriceStruct.periodEnd.SetNonNull(newPriceStruct.periodStart + 30 * 60);
+    newPriceStruct.price.currency.currency      = 981;
+    newPriceStruct.price.currency.decimalPoints = 5;
+    newPriceStruct.price.amount                 = 15916; // 15.916 p/kWh
+
+    newPrice.SetNonNull(newPriceStruct);
+
+    CommodityPriceDelegate * dg = GetCommodityPriceDelegate();
+    dg->SetCurrentPrice(newPrice);
+}
+
+void SetTestEventTrigger_ForecastUpdate()
+{
+    // TODO
+}
 
 bool HandleCommodityPriceTestEventTrigger(uint64_t eventTrigger)
 {

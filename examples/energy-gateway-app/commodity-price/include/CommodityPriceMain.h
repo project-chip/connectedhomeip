@@ -23,5 +23,26 @@
 
 #include <lib/support/CodeUtils.h>
 
+#include "CommodityPriceDelegate.h"
+
 CHIP_ERROR CommodityPriceInit(chip::EndpointId endpointId);
 CHIP_ERROR CommodityPriceShutdown();
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace CommodityPrice {
+
+/** @brief Helper function to return the singleton CommodityPriceInstance instance
+ *
+ * This is needed to support TestEventTriggers which are called outside of any
+ * class context. This allows the Delegate instance in which to invoke the test
+ * events on.
+ *
+ * This function is typically found in main.cpp or wherever the singleton is created.
+ */
+CommodityPriceInstance * GetCommodityPriceInstance();
+
+} // namespace CommodityPrice
+} // namespace Clusters
+} // namespace app
+} // namespace chip

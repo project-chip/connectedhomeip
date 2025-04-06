@@ -35,6 +35,11 @@ using namespace chip::app::Clusters::CommodityPrice;
 static std::unique_ptr<CommodityPriceDelegate> gCommodityPriceDelegate;
 static std::unique_ptr<CommodityPriceInstance> gCommodityPriceInstance;
 
+CommodityPriceInstance * CommodityPrice::GetCommodityPriceInstance()
+{
+    return gCommodityPriceInstance.get();
+}
+
 CHIP_ERROR CommodityPriceInit(EndpointId endpointId)
 {
     CHIP_ERROR err;

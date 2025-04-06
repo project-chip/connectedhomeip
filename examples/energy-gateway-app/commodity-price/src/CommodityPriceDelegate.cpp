@@ -17,6 +17,7 @@
  */
 
 #include <CommodityPriceDelegate.h>
+#include <app/EventLogging.h>
 #include <app/reporting/reporting.h>
 
 #include <app/clusters/commodity-price-server/commodity-price-server.h>
@@ -30,6 +31,8 @@ using namespace chip::app::Clusters::Globals::Structs;
 using namespace chip::app::Clusters::CommodityPrice;
 using namespace chip::app::Clusters::CommodityPrice::Attributes;
 using namespace chip::app::Clusters::CommodityPrice::Structs;
+
+using chip::Protocols::InteractionModel::Status;
 
 // From ISO 4217 (non exhaustive selection)
 const CurrencyStruct::Type currencyCHF  = { .currency = 756, .decimalPoints = 2 };
@@ -91,6 +94,58 @@ CHIP_ERROR CommodityPriceDelegate::SetCurrency(CurrencyStruct::Type newValue)
     }
 
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CommodityPriceDelegate::SetCurrentPrice(const DataModel::Nullable<Structs::CommodityPriceStruct::Type> newValue)
+{
+    // Check PeriodStart  < PeriodEnd (if not null)
+    if (!newValue.IsNull())
+    {
+        Structs::CommodityPriceStruct::Type tempValue;
+        if (!newValue.Value().periodEnd.IsNull() && (newValue.Value().periodStart > newValue.Value().periodEnd.Value()))
+        {
+            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+        }
+
+        tempValue.periodStart = newValue.Value().periodStart;
+        tempValue.periodEnd   = newValue.Value().periodEnd;
+        tempValue.price       = newValue.Value().price;
+        tempValue.description.ClearValue(); // CurrentPrice Attribute does not have a description
+        tempValue.components.ClearValue();  // CurrentPrice Attribute does not have a List of components
+
+        mCurrentPrice.SetNonNull(tempValue);
+    }
+    else
+    {
+        mCurrentPrice.SetNull();
+    }
+
+    ChipLogDetail(AppServer, "mCurrentPrice updated to Currency: %d DecimalPoints: %d", static_cast<int>(mCurrencyStruct.currency),
+                  static_cast<int>(mCurrencyStruct.decimalPoints));
+    MatterReportingAttributeChangeCallback(mEndpointId, CommodityPrice::Id, CurrentPrice::Id);
+
+    // generate a PriceChange Event
+    SendPriceChangeEvent();
+
+    return CHIP_NO_ERROR;
+}
+
+Status CommodityPriceDelegate::SendPriceChangeEvent()
+{
+    Events::PriceChange::Type event;
+    EventNumber eventNumber;
+
+    // TODO - I think the spec is wrong here and the event.currentPrice should be Nullable too.
+    if (!mCurrentPrice.IsNull())                    // THIS LINE SHOULD GO
+        event.currentPrice = mCurrentPrice.Value(); // THIS FAILS BECAUSE THE TYPES are different (shouldn't need .Value())
+
+    CHIP_ERROR err = LogEvent(event, mEndpointId, eventNumber);
+    if (CHIP_NO_ERROR != err)
+    {
+        ChipLogError(AppServer, "Unable to send notify event: %" CHIP_ERROR_FORMAT, err.Format());
+        return Status::Failure;
+    }
+    return Status::Success;
 }
 
 /* @brief This function is called by the cluster server at the start of read cycle
