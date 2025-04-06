@@ -140,7 +140,20 @@ tests:
                       {
                           AdminNodeID: CommissionerNodeId,
                           AdminPasscodeID: null,
-                          ChangeType: 0,
+                          ChangeType: 2,
+                          LatestValue:
+                              {
+                                  Data: D_OK_EMPTY,
+                                  FabricIndex: CurrentFabricIndexValue,
+                              },
+                          FabricIndex: CurrentFabricIndexValue,
+                      }
+          - values:
+                - value:
+                      {
+                          AdminNodeID: CommissionerNodeId,
+                          AdminPasscodeID: null,
+                          ChangeType: 1,
                           LatestValue:
                               {
                                   Data: D_OK_SINGLE,
@@ -161,17 +174,26 @@ tests:
       response:
           error: CONSTRAINT_ERROR
 
-      # Since a CONSTRAINT_ERROR was triggered in Step 8, no change will happen to the already-existing "Extension", and thus no AccessControlExtensionChanged event will be generated
-      # SKIP for Now, as there is currently no way to check that AccessControlExtensionChanged value is an empty list
     - label:
           "Step 9: TH1 reads DUT Endpoint 0 AccessControl cluster
           AccessControlExtensionChanged event"
-      PICS: PICS_SKIP_SAMPLE_APP && ACL.S.E01
+      PICS: ACL.S.E01
       command: "readEvent"
       event: "AccessControlExtensionChanged"
       eventNumber: "LastReceivedEventNumber + 1"
       response:
-          value: {}
+          value:
+              {
+                  AdminNodeID: CommissionerNodeId,
+                  AdminPasscodeID: null,
+                  ChangeType: 2,
+                  LatestValue:
+                      {
+                          Data: D_OK_SINGLE,
+                          FabricIndex: CurrentFabricIndexValue,
+                      },
+                  FabricIndex: CurrentFabricIndexValue,
+              }
 
     - label:
           "Step 10: TH1 writes DUT Endpoint 0 AccessControl cluster Extension
@@ -189,17 +211,26 @@ tests:
       response:
           error: CONSTRAINT_ERROR
 
-      # Since a CONSTRAINT_ERROR was triggered in Step 10, no change will happen to the already-existing "Extension", and thus no AccessControlExtensionChanged event will be generated
-      # SKIP for Now, as there is currently no way to check that AccessControlExtensionChanged value is an empty list
     - label:
           "Step 11: TH1 reads DUT Endpoint 0 AccessControl cluster
           AccessControlExtensionChanged event"
-      PICS: PICS_SKIP_SAMPLE_APP && ACL.S.E01
+      PICS: ACL.S.E01
       command: "readEvent"
       event: "AccessControlExtensionChanged"
       eventNumber: "LastReceivedEventNumber + 1"
       response:
-          value: {}
+          value:
+              {
+                  AdminNodeID: CommissionerNodeId,
+                  AdminPasscodeID: null,
+                  ChangeType: 1,
+                  LatestValue:
+                      {
+                          Data: D_OK_EMPTY,
+                          FabricIndex: CurrentFabricIndexValue,
+                      },
+                  FabricIndex: CurrentFabricIndexValue,
+              }
 
     - label:
           "Step 12: TH1 writes DUT Endpoint 0 AccessControl cluster Extension
@@ -223,9 +254,9 @@ tests:
                   AdminNodeID: CommissionerNodeId,
                   AdminPasscodeID: null,
                   ChangeType: 2,
-                  LatestValue: {
-                          # The Extension data D_OK_SINGLE that was "Changed" in Step in 7 will be removed
-                          Data: D_OK_SINGLE,
+                  LatestValue:
+                      {
+                          Data: D_OK_EMPTY,
                           FabricIndex: CurrentFabricIndexValue,
                       },
                   FabricIndex: CurrentFabricIndexValue,
