@@ -178,8 +178,12 @@ void CameraAvSettingsUserLevelMgmtServer::MarkDirty(AttributeId aAttributeId)
     MatterReportingAttributeChangeCallback(mEndpointId, CameraAvSettingsUserLevelManagement::Id, aAttributeId);
 }
 
-// Attribute mutators
-//
+/**
+ * Attribute mutators. In all cases, given that these may not have been enabled depending on the Feature Flags that are set,
+ * the associated Feature presence is checked. The attributes are updated, and marked dirty, only if there is a change in the 
+ * attribute value after constraint checking has been completed.
+ */
+
 CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::SetMaxPresets(uint8_t aMaxPresets)
 {
     if (!HasFeature(Feature::kMechanicalPresets))
@@ -301,13 +305,15 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::SetZoomMax(uint8_t aZoomMax)
     return CHIP_NO_ERROR;
 }
 
-// Mutators that may be invoked by a delegate in responding to command callbacks, or due to local on device changes
-// Only set the value if the Feature Flag is set.
-// It is entirely possible for a mutator to be called with a parameter that has no value.  Case in point an invoke
-// of MPTZSetPosition, this will be handled if at least one of the three pan, tilt, or zoom have a value, with all
-// three parms passed through once validation is complete.
-// An empty value is just ignored.
-//
+/**
+ * Mutators for server copies of Pan, Tilt, and Zoom that may be invoked by a delegate or the server itself in responding to command 
+ * callbacks, or due to local on device changes.
+ * Only set the value if the Feature Flag is set.
+ * It is entirely possible for a mutator to be called with a parameter that has no value.  Case in point an invoke of MPTZSetPosition, 
+ * this will be handled and the attributes updated if at least one of the three pan, tilt, or zoom have a value, with all three parms 
+ * passed through once validation is complete.
+ * An empty value is just ignored.
+ */
 void CameraAvSettingsUserLevelMgmtServer::SetPan(Optional<int16_t> aPan)
 {
     if (HasFeature(Feature::kMechanicalPan))
@@ -344,6 +350,9 @@ void CameraAvSettingsUserLevelMgmtServer::SetZoom(Optional<uint8_t> aZoom)
     }
 }
 
+/**
+ * Methods handling known video stream IDs, the addition and removal thereof. 
+ */
 void CameraAvSettingsUserLevelMgmtServer::AddMoveCapableVideoStreamID(uint16_t aVideoStreamID)
 {
     // Make sure this isn't a duplicate ID, if not, add to the list
@@ -365,7 +374,7 @@ void CameraAvSettingsUserLevelMgmtServer::RemoveMoveCapableVideoStreamID(uint16_
 
     if (it == mDptzRelativeMove.end())
     {
-        ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]. UNo matching video stream ID, removal not possible. ID=%d.",
+        ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]. No matching video stream ID, removal not possible. ID=%d.",
                      mEndpointId, aVideoStreamID);
         return;
     }
@@ -374,17 +383,23 @@ void CameraAvSettingsUserLevelMgmtServer::RemoveMoveCapableVideoStreamID(uint16_
     MarkDirty(Attributes::DPTZRelativeMove::Id);
 }
 
+/**
+ * @returns bool  True if the provided video stream ID is known to the server. False if not. 
+ */
 bool CameraAvSettingsUserLevelMgmtServer::KnownVideoStreamID(uint16_t aVideoStreamID)
 {
-    // Verify that this is a known ID, if it is, remove from the list
-    //
     auto it = std::find(mDptzRelativeMove.begin(), mDptzRelativeMove.end(), aVideoStreamID);
 
     return (it == mDptzRelativeMove.end() ? false : true);
 }
 
-// Helper function for setting the next preset ID to use
-//
+/**
+ * Helper function for setting the next preset ID to use in advance of reception of an MPTZSavePreset.
+ * The method loops over all possible saved presets (up the the defined Max), if the preset ID is in use, 
+ * it continues to the next possible value, looping back to 1. The checking is needed as the preset IDs aren't
+ * solely server generated, they can also be provided by a client.   
+ * If there are no free presets (which will happen if all slots are taken), the value is not updated. 
+ */
 void CameraAvSettingsUserLevelMgmtServer::UpdatePresetID()
 {
 
@@ -407,7 +422,9 @@ void CameraAvSettingsUserLevelMgmtServer::UpdatePresetID()
     }
 }
 
-// Helper Read functions for complex attribute types
+/**
+ * Helper Read functions for complex attribute types
+ */
 CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::ReadAndEncodeMPTZPresets(AttributeValueEncoder & aEncoder)
 {
     return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
@@ -443,7 +460,9 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::ReadAndEncodeDPTZRelativeMove(At
     });
 }
 
-// AttributeAccessInterface
+/**
+ * AttributeAccessInterface
+ */
 CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     VerifyOrDie(aPath.mClusterId == CameraAvSettingsUserLevelManagement::Id);
@@ -519,7 +538,9 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::Read(const ConcreteReadAttribute
     return CHIP_NO_ERROR;
 }
 
-// CommandHandlerInterface
+/**
+ * CommandHandlerInterface
+ */
 void CameraAvSettingsUserLevelMgmtServer::InvokeCommand(HandlerContext & handlerContext)
 {
     ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: InvokeCommand", mEndpointId);
@@ -746,6 +767,8 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRelativeMove(HandlerContext 
     Optional<int16_t> panDelta  = commandData.panDelta;
     Optional<int16_t> tiltDelta = commandData.tiltDelta;
     Optional<int8_t> zoomDelta  = commandData.zoomDelta;
+
+    // These will all be set to actual values if there is a delta provided, and constraint checking passes.  
     Optional<int16_t> newPan;
     Optional<int16_t> newTilt;
     Optional<uint8_t> newZoom;
@@ -843,7 +866,8 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRelativeMove(HandlerContext 
             return;
         }
 
-        // If we're here, then we'll also have an existing Pan value in MPTZPosition
+        // If we're here, then we'll also have an existing Pan value in MPTZPosition. The zoom values are constrained such that 
+        // we won't overflow newZoomValue
         //
         int16_t newZoomValue = static_cast<int16_t>(mMptzPosition.zoom.Value() + zoomDeltaValue);
 
