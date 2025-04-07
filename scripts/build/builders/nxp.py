@@ -100,18 +100,45 @@ class NxpBoard(Enum):
 
 
 class NxpBoardVariant(Enum):
+    DEFAULT = auto()
     RD = auto()
     FRDM = auto()
     EVKC = auto()
     EVKB = auto()
 
-    def BoardVariantName(self, board):
-        if self == NxpBoardVariant.RD:
-            return "rdrw612bga"
-        elif self == NxpBoardVariant.FRDM:
-            return "frdm"
-        elif self == NxpBoardVariant.EVKC:
-            return "evkcmimxrt1060"
+    def BoardVariantName(self, board, os_env):
+        if board == NxpBoard.RW61X and os_env == NxpOsUsed.FREERTOS:
+            if self == NxpBoardVariant.DEFAULT:
+                return "rdrw612bga"
+            elif self == NxpBoardVariant.FRDM:
+                return "frdmrw612"
+        elif board == NxpBoard.RW61X and os_env == NxpOsUsed.ZEPHYR:
+            if self == NxpBoardVariant.DEFAULT:
+                return "rd_rw612_bga"
+            elif self == NxpBoardVariant.FRDM:
+                return "frdm_rw612"
+        elif board == NxpBoard.RW61X_ETH and os_env == NxpOsUsed.ZEPHYR:
+            if self == NxpBoardVariant.DEFAULT:
+                return "rd_rw612_bga/rw612/ethernet"
+        elif board == NxpBoard.RT1060:
+            if self == NxpBoardVariant.DEFAULT:
+                return "evkbmimxrt1060"
+            elif self == NxpBoardVariant.EVKC:
+                return "evkcmimxrt1060"
+        elif board == NxpBoard.RT1170:
+            if self == NxpBoardVariant.DEFAULT:
+                return "evkbmimxrt1170"
+        elif board == NxpBoard.K32W0:
+            if self == NxpBoardVariant.DEFAULT:
+                return "k32w0"
+        elif board == NxpBoard.K32W1:
+            if self == NxpBoardVariant.DEFAULT:
+                return "k32w148evk"
+        elif board == NxpBoard.MCXW71:
+            if self == NxpBoardVariant.DEFAULT:
+                return "mcxw72evk"
+            elif self == NxpBoardVariant.FRDM:
+                return "frdmmcxw71"
 
 
 class NxpApp(Enum):
@@ -154,8 +181,11 @@ class NxpApp(Enum):
         else:
             raise Exception('Unknown app type: %r' % self)
 
-    def BuildRoot(self, root, board, os_env):
-        return os.path.join(root, 'examples', self.ExampleName(), 'nxp', board.FolderName(os_env))
+    def BuildRoot(self, root, board, os_env, build_system):
+        if ((os_env == NxpOsUsed.FREERTOS) and (build_system == NxpBuildSystem.CMAKE)):
+            return os.path.join(root, 'examples', self.ExampleName(), 'nxp')
+        else:
+            return os.path.join(root, 'examples', self.ExampleName(), 'nxp', board.FolderName(os_env))
 
 
 class NxpLogLevel(Enum):
@@ -173,7 +203,7 @@ class NxpBuilder(GnBuilder):
                  runner,
                  app: NxpApp = NxpApp.LIGHTING,
                  board: NxpBoard = NxpBoard.K32W0,
-                 board_variant: NxpBoardVariant = None,
+                 board_variant: NxpBoardVariant = NxpBoardVariant.DEFAULT,
                  os_env: NxpOsUsed = NxpOsUsed.FREERTOS,
                  build_system: NxpBuildSystem = NxpBuildSystem.GN,
                  low_power: bool = False,
@@ -191,6 +221,7 @@ class NxpBuilder(GnBuilder):
                  enable_shell: bool = False,
                  enable_ota: bool = False,
                  enable_factory_data_build: bool = False,
+                 enable_mtd: bool = False,
                  disable_pairing_autostart: bool = False,
                  iw416_transceiver: bool = False,
                  w8801_transceiver: bool = False,
@@ -198,7 +229,7 @@ class NxpBuilder(GnBuilder):
                  log_level: NxpLogLevel = NxpLogLevel.DEFAULT,
                  ):
         super(NxpBuilder, self).__init__(
-            root=app.BuildRoot(root, board, os_env),
+            root=app.BuildRoot(root, board, os_env, build_system),
             runner=runner)
         self.code_root = root
         self.app = app
@@ -220,6 +251,7 @@ class NxpBuilder(GnBuilder):
         self.enable_ota = enable_ota
         self.enable_shell = enable_shell
         self.enable_factory_data_build = enable_factory_data_build
+        self.enable_mtd = enable_mtd
         self.disable_pairing_autostart = disable_pairing_autostart
         self.board_variant = board_variant
         self.iw416_transceiver = iw416_transceiver
@@ -309,10 +341,13 @@ class NxpBuilder(GnBuilder):
 
         if self.board_variant:
             if self.board == NxpBoard.RT1060:
-                flag_board_variant = "evkname=\\\"%s\\\"" % self.board_variant.BoardVariantName(self.board)
+                flag_board_variant = "evkname=\\\"%s\\\"" % self.board_variant.BoardVariantName(self.board, self.os_env)
                 args.append(flag_board_variant)
             if self.board == NxpBoard.RW61X:
-                flag_board_variant = "board_version=\\\"%s\\\"" % self.board_variant.BoardVariantName(self.board)
+                if self.board_variant.BoardVariantName(self.board, self.os_env) == NxpBoardVariant.FRDM:
+                    flag_board_variant = "board_version=\"frdm\""
+                else:
+                    flag_board_variant = "board_version=\\\"%s\\\"" % self.board_variant.BoardVariantName(self.board, self.os_env)
                 args.append(flag_board_variant)
 
         if self.iw416_transceiver:
@@ -330,51 +365,64 @@ class NxpBuilder(GnBuilder):
     def CmakeBuildFlags(self):
         flags = []
 
-        if self.enable_factory_data:
-            if self.os_env == NxpOsUsed.ZEPHYR:
-                flags.append('-DFILE_SUFFIX=fdata')
-            else:
-                flags.append("-DCONFIG_CHIP_FACTORY_DATA=true")
+        if self.enable_factory_data and self.os_env == NxpOsUsed.ZEPHYR:
+            flags.append('-DFILE_SUFFIX=fdata')
 
-        if self.enable_ethernet:
-            if self.os_env == NxpOsUsed.ZEPHYR:
-                flags.append('-DEXTRA_CONF_FILE="prj_ethernet.conf"')
+        if self.enable_ethernet and self.os_env == NxpOsUsed.ZEPHYR:
+            flags.append('-DEXTRA_CONF_FILE="prj_ethernet.conf"')
 
         if self.has_sw_version_2:
             flags.append("-DCONFIG_CHIP_DEVICE_SOFTWARE_VERSION=2")
             flags.append("-DCONFIG_CHIP_DEVICE_SOFTWARE_VERSION_STRING=\"2.0\"")
 
-        if self.enable_ota:
-            flags.append("-DCONFIG_CHIP_OTA_REQUESTOR=true")
-            if self.os_env == NxpOsUsed.FREERTOS and self.board == NxpBoard.RW61X:
-                flags.append("-DCONFIG_BOOTLOADER_MCUBOOT=true")
-
-        if self.disable_ble:
-            flags.append("-DCONFIG_BT=false")
-
-        if self.enable_wifi:
-            flags.append('-DCONFIG_CHIP_WIFI=true')
-
-        if self.enable_thread:
-            flags.append("-DCONFIG_NET_L2_OPENTHREAD=true -DCONFIG_CHIP_IPV4=false")
-
         if self.enable_factory_data_build:
             # Generate the factory data binary
-            flags.append("-DCONFIG_CHIP_FACTORY_DATA_BUILD=true -DCONFIG_CHIP_FACTORY_DATA=true")
-
-        if self.enable_shell:
-            flags.append("-DCONFIG_CHIP_LIB_SHELL=true")
+            flags.append("-DCONFIG_CHIP_FACTORY_DATA_BUILD=y")
 
         if self.disable_pairing_autostart:
-            flags.append('-DCONFIG_CHIP_ENABLE_PAIRING_AUTOSTART=false')
-
-        if self.board_variant:
-            flag_board_variant = "-DCONFIG_BOARD_VARIANT=\"%s\"" % self.board_variant.BoardVariantName(self.board)
-            flags.append(flag_board_variant)
+            flags.append('-DCONFIG_CHIP_ENABLE_PAIRING_AUTOSTART=n')
+        
+        if self.iw416_transceiver:
+            flags.append('-DCONFIG_MCUX_COMPONENT_component.wifi_bt_module.IW416=y')
+        
+        if self.w8801_transceiver:
+            flags.append('-DCONFIG_MCUX_COMPONENT_component.wifi_bt_module.88W8801=y')
+        
+        if self.iwx12_transceiver:
+            flags.append('-DCONFIG_MCUX_COMPONENT_component.wifi_bt_module.IW61X=y')
+        
+        if self.board == NxpBoard.RT1170:
+            flags.append('-Dcore_id=cm7')
 
         build_flags = " ".join(flags)
 
         return build_flags
+
+    def get_conf_file(self):
+        if self.enable_wifi and self.enable_thread and self.enable_ota and self.enable_factory_data:
+            return "prj_thread_ftd_wifi_br_ota_fdata.conf"
+        elif self.enable_wifi and self.enable_thread and self.enable_ota:
+            return "prj_thread_ftd_wifi_br_ota.conf"
+        elif self.enable_wifi and self.enable_ota and self.enable_factory_data:
+            return "prj_wifi_ota_fdata.conf"
+        elif self.enable_wifi and self.enable_ota:
+            return "prj_wifi_ota.conf"
+        elif self.enable_wifi and self.enable_factory_data:
+            return "prj_wifi_fdata.conf"
+        elif self.enable_wifi and self.disable_ble:
+            return "prj_wifi_onnetwork.conf"
+        elif self.enable_wifi:
+            return "prj_wifi.conf"
+        elif self.enable_thread and self.enable_ota and self.enable_factory_data:
+            return "prj_thread_ftd_ota_fdata.conf"
+        elif self.enable_thread and self.enable_ota:
+            return "prj_thread_ftd_ota.conf"
+        elif self.enable_thread and self.enable_factory_data:
+            return "prj_thread_ftd_fdata.conf"
+        elif self.enable_thread and self.enable_mtd:
+            return "prj_thread_mtd.conf"
+        elif self.enable_thread:
+            return "prj_thread_ftd.conf"
 
     def generate(self):
         build_flags = self.CmakeBuildFlags()
@@ -388,14 +436,8 @@ class NxpBuilder(GnBuilder):
             cmd = 'export ZEPHYR_SDK_INSTALL_DIR="$ZEPHYR_NXP_SDK_INSTALL_DIR"'
             cmd += '\nexport ZEPHYR_BASE="$ZEPHYR_NXP_BASE"'
             cmd += '\nunset ZEPHYR_TOOLCHAIN_VARIANT'
-
-            cmd += '\nwest build -p --cmake-only -b {board_name} -d {out_folder} {example_folder} {build_flags}'.format(
-                board_name=self.board.Name(self.os_env),
-                out_folder=self.output_dir,
-                example_folder=self.app.BuildRoot(self.code_root, self.board, self.os_env),
-                build_flags=build_flags)
-            self._Execute(['bash', '-c', cmd], title='Generating ' + self.identifier)
         else:
+            build_flags += " " + "-DCONF_FILE_NAME=%s" % self.get_conf_file()
             cmd = ''
             # will be used with next sdk version to get sdk path
             if 'NXP_UPDATE_SDK_SCRIPT_DOCKER' in os.environ:
@@ -409,17 +451,16 @@ class NxpBuilder(GnBuilder):
                         cmd += 'export NXP_K32W0_SDK_ROOT="' + str(p.sdk_storage_location_abspath) + '" \n '
                     elif p.sdk_name == 'common':
                         cmd += 'export NXP_SDK_ROOT="' + str(p.sdk_storage_location_abspath) + '" \n '
-
+                        cmd += 'export McuxSDK_DIR=$NXP_SDK_ROOT' + ' \n '
+                        cmd += 'source $NXP_SDK_ROOT/mcux-env.sh' + ' \n '
+            
             if self.build_system == NxpBuildSystem.CMAKE:
-                cmd += '''
-                cmake -GNinja {build_flags} -H{example_folder} -B{out_folder}
-                '''.format(
-                    build_flags=build_flags,
-                    example_folder=self.app.BuildRoot(self.code_root, self.board, self.os_env),
-                    out_folder=self.output_dir).strip()
-                self._Execute(['bash', '-c', cmd], title='Generating ' + self.identifier)
+                if 'PW_ENVIRONMENT_ROOT' in os.environ:
+                    cmd += 'export ARMGCC_DIR=$PW_ENVIRONMENT_ROOT/cipd/packages/arm' + ' \n '
+                else:
+                    cmd += 'export ARMGCC_DIR=%s/.environment/cipd/packages/arm' % os.path.abspath(self.code_root) + ' \n '
 
-            elif self.build_system == NxpBuildSystem.GN:
+        if ((self.os_env == NxpOsUsed.FREERTOS) and (self.build_system == NxpBuildSystem.GN)):
                 # add empty space at the end to avoid concatenation issue when there is no --args
                 cmd += 'gn gen --check --fail-on-unused-args --add-export-compile-commands=* --root=%s ' % self.root
 
@@ -443,6 +484,13 @@ class NxpBuilder(GnBuilder):
                 title = 'Generating ' + self.identifier
 
                 self._Execute(['bash', '-c', cmd], title=title)
+        else:
+            cmd += '\nwest build -p --cmake-only -b {board_name} -d {out_folder} {example_folder} {build_flags}'.format(
+                board_name=self.board_variant.BoardVariantName(self.board, self.os_env),
+                out_folder=self.output_dir,
+                example_folder = self.app.BuildRoot(self.code_root, self.board, self.os_env, self.build_system),
+                build_flags=build_flags)
+            self._Execute(['bash', '-c', cmd], title='Generating ' + self.identifier)
 
     def build_outputs(self):
         name = 'chip-%s-%s' % (self.board.Name(self.os_env), self.app.NameSuffix())
