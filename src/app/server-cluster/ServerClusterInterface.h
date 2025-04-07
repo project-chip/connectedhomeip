@@ -201,7 +201,7 @@ public:
     ///   - `path` MUST match one of the paths returned by GetPaths.
     virtual CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, DataModel::ListBuilder<CommandId> & builder) = 0;
 
-    /// Returns if `GetPaths` contains the given path
+    /// Returns whether `GetPaths` contains the given path
     bool PathsContains(const ConcreteClusterPath & path)
     {
         for (const auto & myPath : GetPaths())
