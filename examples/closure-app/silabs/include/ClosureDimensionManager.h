@@ -19,8 +19,7 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/clusters/closure-dimension-server/closure-dimension-server.h>
-#include <app/clusters/closure-dimension-server/closure-dimension-delegate.h>
+#include <app/clusters/closure-control-server/closure-control-server.h>
 
 #include <lib/core/CHIPError.h>
 #include <protocols/interaction_model/StatusCode.h>
@@ -30,46 +29,59 @@ namespace app {
 namespace Clusters {
 namespace ClosureDimension {
 
-class ClosureDimensionDelegate : public DelegateBase
+// This is an application level delegate to handle Closure Dimension commands according to the specific business logic.
+class ClosureDimensionManager : public ClosureDimension::Delegate
 {
 public:
-    ClosureDimensionDelegate(EndpointId endpoint) : mEndpoint(endpoint) {}
-    CHIP_ERROR HandleSetTarget(const Optional<Percent100ths> & pos, const Optional<TargetLatchEnum> & latch,
-        const Optional<Globals::ThreeLevelAutoEnum> & speed) override;
+    void SetClosureDimensionInstance(ClosureDimension::Instance & instance);
 
-    CHIP_ERROR HandleStep(const StepDirectionEnum & direction, const uint16_t & numberOfSteps,
-            const Optional<Globals::ThreeLevelAutoEnum> & speed) override;
+    /*********************************************************************************
+     *
+     * Methods implementing the ClosureDimension::Delegate interface
+     *
+     *********************************************************************************/
+    Protocols::InteractionModel::Status Stop() override;
+    Protocols::InteractionModel::Status MoveTo(const Optional<TagPositionEnum> & tag, const Optional<TagLatchEnum> & latch,
+                                               const Optional<Globals::ThreeLevelAutoEnum> & speed) override;
+    Protocols::InteractionModel::Status Calibrate() override;
+
+    // ------------------------------------------------------------------
+    // Get attribute methods
+
+    DataModel::Nullable<uint32_t> GetCountdownTime() override;
+
+    /***************************************************************************
+     *
+     * ClosureDimensionDelegate specific methods
+     *
+     ***************************************************************************/
+    CHIP_ERROR StartCurrentErrorListRead() override;
+    CHIP_ERROR GetCurrentErrorListAtIndex(size_t Index, ClosureErrorEnum & closureError) override;
+    CHIP_ERROR EndCurrentErrorListRead() override;
+
+    void ClosureDimensionAttributeChangeHandler(EndpointId endpointId, AttributeId attributeId);
 
 private:
-    EndpointId mEndpoint;
+    friend ClosureDimensionManager & ClosureCtrlMgr();
+
+    /***************************************************************************
+     *
+     * ClosureDimensionDelegate specific variables
+     *
+     ***************************************************************************/
+
+    // Need the following so can determine which features are supported
+    ClosureDimension::Instance * mpClosureDimensionInstance = nullptr;
+    bool IsManualLatch();
+    bool IsDeviceReadytoMove();
+
+    static ClosureDimensionManager sClosureCtrlMgr;
 };
 
-class ClosureDimensionManager
+inline ClosureDimensionManager & ClosureCtrlMgr()
 {
-public:
-    ClosureDimensionManager(EndpointId endpoint) :
-        mEndpoint(endpoint), mContext(mEndpoint), mDelegate(mEndpoint), mLogic(mDelegate, mContext),
-        mInterface(mEndpoint, mLogic)
-    {}
-    CHIP_ERROR Init()
-    {
-        ReturnErrorOnFailure(mLogic.Init(kConformance));
-        ReturnErrorOnFailure(mInterface.Init());
-        return CHIP_NO_ERROR;
-    }
-
-private:
-    const ClusterConformance kConformance = {
-        .featureMap = 0, .supportsOverflow = false
-    };
-
-    EndpointId mEndpoint;
-    MatterContext mContext;
-    ClosureDimensionDelegate mDelegate;
-    ClusterLogic mLogic;
-    Interface mInterface;
-};
-
+    return ClosureDimensionManager::sClosureCtrlMgr;
+}
 } // namespace ClosureDimension
 } // namespace Clusters
 } // namespace app
