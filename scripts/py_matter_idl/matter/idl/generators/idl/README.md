@@ -26,7 +26,7 @@ A XML parser will use this code generator to output a human readable view of the
 parsed data:
 
 ```shell
-./scripts/py_matter_idl/scripts/matter-zapxml-parser.py \
+matter-zapxml-parser \
     ./src/app/zap-templates/zcl/data-model/chip/onoff-cluster.xml \
     ./src/app/zap-templates/zcl/data-model/chip/global-attributes.xml
 ```
