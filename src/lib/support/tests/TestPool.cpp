@@ -489,7 +489,7 @@ void TestPoolInterface()
     struct TestObject
     {
         TestObject(uint32_t * set, size_t id) : mSet(set), mId(id) { *mSet |= (1 << mId); }
-        ~TestObject() { *mSet &= ~(1 << mId); }
+        ~TestObject() { *mSet &= static_cast<uint32_t>(~(1 << mId)); }
         uint32_t * mSet;
         size_t mId;
     };
