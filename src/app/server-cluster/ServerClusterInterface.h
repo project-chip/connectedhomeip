@@ -188,7 +188,7 @@ public:
     /// if no commands are supported by the cluster.
     ///
     /// Precondition:
-    ///   - `path` cluster part MUST be a path that is part of `GetPaths` returned values.
+    ///   - `path` MUST match one of the paths returned by GetPaths.
     virtual CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
                                         DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder) = 0;
 
