@@ -135,7 +135,7 @@ public:
     /// included in a `Attributes` call.
     ///
     /// Precondition:
-    ///   - `request.path` cluster part MUST be a path that is part of `GetPaths` returned values.
+    ///   - `request.path` endpoint+cluster part MUST match one of the paths returned by GetPaths.
     virtual DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                          AttributeValueDecoder & decoder) = 0;
 
