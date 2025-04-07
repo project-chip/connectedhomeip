@@ -47,9 +47,9 @@ struct GenericOverallState : public Structs::OverallStateStruct::Type
         return *this;
     }
 
-    void Set(Optional<DataModel::Nullable<PositioningEnum>> positioningValue = NullOptional, 
+    void Set(Optional<DataModel::Nullable<PositioningEnum>> positioningValue = NullOptional,
              Optional<DataModel::Nullable<LatchingEnum>> latchingValue = NullOptional,
-             Optional<DataModel::Nullable<Globals::ThreeLevelAutoEnum>> speedValue = NullOptional, 
+             Optional<DataModel::Nullable<Globals::ThreeLevelAutoEnum>> speedValue = NullOptional,
              Optional<DataModel::Nullable<uint32_t>> extraInfoValue = NullOptional)
     {
         positioning = positioningValue;
