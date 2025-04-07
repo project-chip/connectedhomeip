@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2021-2023 Project CHIP Authors
+#    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -68,4 +68,3 @@ CONFIG_MBEDTLS_HKDF_C=y
 
 # Optimize IRAM
 CONFIG_FREERTOS_PLACE_FUNCTIONS_INTO_FLASH=y
-
