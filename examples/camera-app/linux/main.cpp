@@ -29,7 +29,7 @@ CameraDevice cameraDevice;
 
 void ApplicationInit()
 {
-    ChipLogProgress(Zcl, "Matter Camera Linux App: ApplicationInit()");
+    ChipLogProgress(Camera, "Matter Camera Linux App: ApplicationInit()");
     CameraAppInit(&cameraDevice);
 }
 

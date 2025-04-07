@@ -703,6 +703,7 @@ data_model_XMLS_master = [
   "${chip_root}/data_model/master/clusters/TemperatureMeasurement.xml",
   "${chip_root}/data_model/master/clusters/Thermostat.xml",
   "${chip_root}/data_model/master/clusters/ThermostatUserInterfaceConfiguration.xml",
+  "${chip_root}/data_model/master/clusters/ThreadBorderRouterDiagnostics.xml",
   "${chip_root}/data_model/master/clusters/ThreadBorderRouterManagement.xml",
   "${chip_root}/data_model/master/clusters/ThreadNetworkDirectory.xml",
   "${chip_root}/data_model/master/clusters/TimeSync.xml",

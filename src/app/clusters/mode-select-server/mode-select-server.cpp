@@ -418,6 +418,11 @@ void MatterModeSelectPluginServerInitCallback()
     AttributeAccessInterfaceRegistry::Instance().Register(&gModeSelectAttrAccess);
 }
 
+void MatterModeSelectPluginServerShutdownCallback()
+{
+    AttributeAccessInterfaceRegistry::Instance().Unregister(&gModeSelectAttrAccess);
+}
+
 /**
  * Callback for Mode Select Cluster Server Pre Attribute Changed
  * Enabled in src/app/zap-templates/templates/app/helper.js
