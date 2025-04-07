@@ -24,4 +24,5 @@ SYSTEM_HEADER_SEARCH_PATHS = $(TEMP_DIR)/out/gen/include $(CHIP_ROOT)/src/darwin
 TAPI_VERIFY_MODE = Pedantic
 VERSION_INFO_EXPORT_DECL = __attribute__((visibility("hidden")))
 
+// Include override file last, if it exists
 #include? "Matter.Override.xcconfig"

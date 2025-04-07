@@ -723,6 +723,10 @@
 		3DF9D1B12D9F331900129D07 /* darwin-framework-tool.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "darwin-framework-tool.xcconfig"; sourceTree = "<group>"; };
 		3DF9D1B22D9F44DB00129D07 /* Project.Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Project.Debug.xcconfig; sourceTree = "<group>"; };
 		3DF9D1B32D9F44E700129D07 /* Project.Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Project.Release.xcconfig; sourceTree = "<group>"; };
+		3DF9D1B92DA4770D00129D07 /* Matter.Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Matter.Debug.xcconfig; sourceTree = "<group>"; };
+		3DF9D1BA2DA4774100129D07 /* Matter.Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Matter.Release.xcconfig; sourceTree = "<group>"; };
+		3DF9D1BB2DA4775400129D07 /* darwin-framework-tool.Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "darwin-framework-tool.Debug.xcconfig"; sourceTree = "<group>"; };
+		3DF9D1BC2DA4777400129D07 /* darwin-framework-tool.Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "darwin-framework-tool.Release.xcconfig"; sourceTree = "<group>"; };
 		3DFCB3282966684500332B35 /* MTRCertificateInfoTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTRCertificateInfoTests.m; sourceTree = "<group>"; };
 		3DFCB32A2966827F00332B35 /* MTRDefines_Internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRDefines_Internal.h; sourceTree = "<group>"; };
 		3DFCB32B29678C9500332B35 /* MTRConversion.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRConversion.h; sourceTree = "<group>"; };
@@ -1482,8 +1486,12 @@
 				3DF9D1B22D9F44DB00129D07 /* Project.Debug.xcconfig */,
 				3DF9D1B32D9F44E700129D07 /* Project.Release.xcconfig */,
 				3DF9D1AF2D9F32FF00129D07 /* Matter.xcconfig */,
+				3DF9D1B92DA4770D00129D07 /* Matter.Debug.xcconfig */,
+				3DF9D1BA2DA4774100129D07 /* Matter.Release.xcconfig */,
 				3DF9D1B02D9F330A00129D07 /* MatterTests.xcconfig */,
 				3DF9D1B12D9F331900129D07 /* darwin-framework-tool.xcconfig */,
+				3DF9D1BB2DA4775400129D07 /* darwin-framework-tool.Debug.xcconfig */,
+				3DF9D1BC2DA4777400129D07 /* darwin-framework-tool.Release.xcconfig */,
 			);
 			path = Configs;
 			sourceTree = "<group>";
@@ -2688,14 +2696,14 @@
 /* Begin XCBuildConfiguration section */
 		037C3CAD2991A44B00B7EEE2 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3DF9D1B12D9F331900129D07 /* darwin-framework-tool.xcconfig */;
+			baseConfigurationReference = 3DF9D1BB2DA4775400129D07 /* darwin-framework-tool.Debug.xcconfig */;
 			buildSettings = {
 			};
 			name = Debug;
 		};
 		037C3CAE2991A44B00B7EEE2 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3DF9D1B12D9F331900129D07 /* darwin-framework-tool.xcconfig */;
+			baseConfigurationReference = 3DF9D1BC2DA4777400129D07 /* darwin-framework-tool.Release.xcconfig */;
 			buildSettings = {
 			};
 			name = Release;
@@ -2709,7 +2717,7 @@
 		};
 		BA09EB742474881D00605257 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3DF9D1AF2D9F32FF00129D07 /* Matter.xcconfig */;
+			baseConfigurationReference = 3DF9D1B92DA4770D00129D07 /* Matter.Debug.xcconfig */;
 			buildSettings = {
 			};
 			name = Debug;
@@ -2730,7 +2738,7 @@
 		};
 		BA09EB782474882200605257 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3DF9D1AF2D9F32FF00129D07 /* Matter.xcconfig */;
+			baseConfigurationReference = 3DF9D1BA2DA4774100129D07 /* Matter.Release.xcconfig */;
 			buildSettings = {
 			};
 			name = Release;
