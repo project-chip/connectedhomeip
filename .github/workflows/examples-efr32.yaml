@@ -84,6 +84,7 @@ jobs:
                 --target efr32-brd4187c-lock-rpc \
                 --target efr32-brd4187c-air-quality-sensor-app-shell-heap-monitoring \
                 --target efr32-brd4187c-window-covering-additional-data-advertising \
+                --target efr32-brd4187c-closure \
                 build \
                 --copy-artifacts-to out/artifacts \
              "
