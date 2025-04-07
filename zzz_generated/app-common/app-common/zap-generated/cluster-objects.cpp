@@ -7389,6 +7389,10 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, operationalDatasetComponents);
     case Attributes::ActiveNetworkFaultsList::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, activeNetworkFaultsList);
+    case Attributes::ExtAddress::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, extAddress);
+    case Attributes::Rloc16::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, rloc16);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, generatedCommandList);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():

@@ -7104,18 +7104,6 @@ bool emberAfValveConfigurationAndControlClusterCloseCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ValveConfigurationAndControl::Commands::Close::DecodableType & commandData);
 /**
- * @brief Commodity Price Cluster GetDetailedPriceRequest Command callback (from client)
- */
-bool emberAfCommodityPriceClusterGetDetailedPriceRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CommodityPrice::Commands::GetDetailedPriceRequest::DecodableType & commandData);
-/**
- * @brief Commodity Price Cluster GetDetailedForecastRequest Command callback (from client)
- */
-bool emberAfCommodityPriceClusterGetDetailedForecastRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CommodityPrice::Commands::GetDetailedForecastRequest::DecodableType & commandData);
-/**
  * @brief Demand Response Load Control Cluster RegisterLoadControlProgramRequest Command callback (from client)
  */
 bool emberAfDemandResponseLoadControlClusterRegisterLoadControlProgramRequestCallback(
