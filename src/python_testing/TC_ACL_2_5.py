@@ -32,10 +32,6 @@
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
-import logging
-import queue
-import time
-
 import chip.clusters as Clusters
 from chip.clusters.Types import Nullable
 from chip.interaction_model import Status
@@ -361,7 +357,7 @@ class TC_ACL_2_5(MatterBaseTest):
                 fabricFiltered=True,
                 eventNumberFilter=7
             )
-            self.print_step(f"Events response", str(events_response))
+            self.print_step("Events response", str(events_response))
 
             # Extract events from the response
             events = events_response  # Response is already a list of events
@@ -406,7 +402,7 @@ class TC_ACL_2_5(MatterBaseTest):
                 fabricFiltered=True,
                 eventNumberFilter=7
             )
-            self.print_step(f"Events response", str(events_response))
+            self.print_step("Events response", str(events_response))
 
             # Extract events from the response
             events = events_response  # Response is already a list of events
@@ -458,7 +454,7 @@ class TC_ACL_2_5(MatterBaseTest):
                     events=[(0, acec_event)],
                     fabricFiltered=True
                 )
-                self.print_step(f"Events response", str(events_response))
+                self.print_step("Events response", str(events_response))
 
                 # Extract events from the response
                 events = events_response
