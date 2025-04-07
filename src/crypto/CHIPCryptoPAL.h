@@ -122,15 +122,24 @@ inline constexpr uint8_t kFabricBindingVersionV1 = 1u;
 inline constexpr size_t kVendorIdVerificationClientChallengeSize = 32u;
 
 // VIDVerificationStatement := statement_version || vid_verification_signer_skid || vid_verification_statement_signature
-inline constexpr size_t kVendorIdVerificationStatementV1MaxSize = sizeof(uint8_t) + kSubjectKeyIdentifierLength + kP256_ECDSA_Signature_Length_Raw;
-static_assert(kVendorIdVerificationStatementV1MaxSize == 85, "Expected size of VendorIdVerificationStatement version 1 was computed incorrectly due to changes of fundamental constants");
+inline constexpr size_t kVendorIdVerificationStatementV1MaxSize =
+    sizeof(uint8_t) + kSubjectKeyIdentifierLength + kP256_ECDSA_Signature_Length_Raw;
+static_assert(
+    kVendorIdVerificationStatementV1MaxSize == 85,
+    "Expected size of VendorIdVerificationStatement version 1 was computed incorrectly due to changes of fundamental constants");
 
 // vendor_fabric_binding_message := fabric_binding_version (1 byte) || root_public_key || fabric_id || vendor_id
-inline constexpr size_t kVendorFabricBindingMessageV1MaxSize = sizeof(uint8_t) + CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES + sizeof(uint64_t) + sizeof(uint16_t);
-static_assert(kVendorFabricBindingMessageV1MaxSize == 76, "Expected size of VendorFabricBindingMessage version 1 was computed incorrectly due to changes of fundamental constants");
+inline constexpr size_t kVendorFabricBindingMessageV1MaxSize =
+    sizeof(uint8_t) + CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES + sizeof(uint64_t) + sizeof(uint16_t);
+static_assert(
+    kVendorFabricBindingMessageV1MaxSize == 76,
+    "Expected size of VendorFabricBindingMessage version 1 was computed incorrectly due to changes of fundamental constants");
 
-// vendor_id_verification_tbs := fabric_binding_version || client_challenge || attestation_challenge || fabric_index || vendor_fabric_binding_message || <vid_verification_statement>
-inline constexpr size_t kVendorIdVerificationTbsV1MaxSize = sizeof(uint8_t) + kVendorIdVerificationClientChallengeSize + CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES + sizeof(uint8_t) + kVendorFabricBindingMessageV1MaxSize + kVendorIdVerificationStatementV1MaxSize;
+// vendor_id_verification_tbs := fabric_binding_version || client_challenge || attestation_challenge || fabric_index ||
+// vendor_fabric_binding_message || <vid_verification_statement>
+inline constexpr size_t kVendorIdVerificationTbsV1MaxSize = sizeof(uint8_t) + kVendorIdVerificationClientChallengeSize +
+    CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES + sizeof(uint8_t) + kVendorFabricBindingMessageV1MaxSize +
+    kVendorIdVerificationStatementV1MaxSize;
 
 /*
  * Overhead to encode a raw ECDSA signature in X9.62 format in ASN.1 DER
@@ -1676,7 +1685,8 @@ CHIP_ERROR VerifyAttestationCertificateFormat(const ByteSpan & cert, Attestation
  *                            payload (otherwise CHIP_ERROR_BUFFER_TOO_SMALL) and will be resized to fit.
  * @return CHIP_NO_ERROR on success, otherwise another CHIP_ERROR value representative of the failure.
  */
-CHIP_ERROR GenerateVendorFabricBindingMessage(uint8_t fabricBindingVersion, const P256PublicKey & rootPublicKey, FabricId fabricId, uint16_t vendorId, MutableByteSpan &outputSpan);
+CHIP_ERROR GenerateVendorFabricBindingMessage(uint8_t fabricBindingVersion, const P256PublicKey & rootPublicKey, FabricId fabricId,
+                                              uint16_t vendorId, MutableByteSpan & outputSpan);
 
 /**
  * @brief Generate the message to be signed for the Fabric Table Vendor ID Verification Procedure.
@@ -1692,7 +1702,10 @@ CHIP_ERROR GenerateVendorFabricBindingMessage(uint8_t fabricBindingVersion, cons
  *                     payload (otherwise CHIP_ERROR_BUFFER_TOO_SMALL) and will be resized to fit.
  * @return CHIP_NO_ERROR on success, otherwise another CHIP_ERROR value representative of the failure.
  */
-CHIP_ERROR GenerateVendorIdVerificationToBeSigned(FabricIndex fabricIndex, const ByteSpan & clientChallenge, const ByteSpan & attestationChallenge, const ByteSpan & vendorFabricBindingMessage, const ByteSpan &vidVerificationStatement, MutableByteSpan &outputSpan);
+CHIP_ERROR GenerateVendorIdVerificationToBeSigned(FabricIndex fabricIndex, const ByteSpan & clientChallenge,
+                                                  const ByteSpan & attestationChallenge,
+                                                  const ByteSpan & vendorFabricBindingMessage,
+                                                  const ByteSpan & vidVerificationStatement, MutableByteSpan & outputSpan);
 
 /**
  * @brief Validate notBefore timestamp of a certificate (candidateCertificate) against validity period of the
