@@ -59,7 +59,7 @@ class TC_CNET_4_3(MatterBaseTest):
                      "Verify that each element in the Networks attribute list has the following fields: 'NetworkID', 'connected'.\n\
                       NetworkID field is of type octstr with a length range 1 to 32 \n\
                       The connected field is of type bool \n\
-                      Verify that only one entry has connected status as TRUE \n\
+                      Verify that only one entry has connected status as TRUE across ALL endpoints \n\
                       Verify that the number of entries in the Networks attribute is less than or equal to 'MaxNetworksValue'"),
             TestStep(4, "TH reads InterfaceEnabled attribute from the DUT", "Verify that InterfaceEnabled attribute value is true"),
             TestStep(5, "TH reads LastNetworkingStatus attribute from the DUT",
