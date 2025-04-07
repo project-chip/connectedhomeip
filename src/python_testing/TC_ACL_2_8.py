@@ -14,12 +14,6 @@
 #    limitations under the License.
 #
 
-import asyncio
-import logging
-import random
-import time
-
-import chip.clusters as Clusters
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
@@ -36,11 +30,14 @@ import chip.clusters as Clusters
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --endpoint 1
 # === END CI TEST ARGUMENTS ===
+
 from chip import ChipDeviceCtrl
+import chip.clusters as Clusters
 from chip.clusters.Types import Nullable
 from chip.interaction_model import Status
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+import random
 
 # Add these constants at the top of the file after imports
 D_OK_EMPTY = bytes.fromhex('1718')
