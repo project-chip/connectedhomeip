@@ -164,26 +164,24 @@ void rsi_ble_add_matter_service(void)
                                                    RSI_BLE_ATT_PROPERTY_INDICATE, // Set read, write, write without response
                                                data, sizeof(data), ATT_REC_MAINTAIN_IN_HOST);
 #ifdef CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
-    constexpr uuid_t custom_characteristic_C3 = { .size     = RSI_BLE_CUSTOM_CHARACTERISTIC_C3_SIZE,
-                                                  .reserved = { RSI_BLE_CUSTOM_CHARACTERISTIC_C3_RESERVED },
-                                                  .val      = { .val128 = {
-                                                                    .data1 = RSI_BLE_CUSTOM_CHARACTERISTIC_C3_VALUE_128_DATA_1,
-                                                                    .data2 = RSI_BLE_CUSTOM_CHARACTERISTIC_C3_VALUE_128_DATA_2,
-                                                                    .data3 = RSI_BLE_CUSTOM_CHARACTERISTIC_C3_VALUE_128_DATA_3,
-                                                                    .data4 = { RSI_BLE_CUSTOM_CHARACTERISTIC_C3_VALUE_128_DATA_4 } } } };
+    constexpr uuid_t custom_characteristic_C3 = { .size     = RSI_BLE_CHAR_C3_UUID_SIZE,
+                                                  .reserved = { RSI_BLE_CHAR_C3_RESERVED },
+                                                  .val      = { .val128 = { .data1 = RSI_BLE_CHAR_C3_VAL_128_DATA_1,
+                                                                            .data2 = RSI_BLE_CHAR_C3_VAL_128_DATA_2,
+                                                                            .data3 = RSI_BLE_CHAR_C3_VAL_128_DATA_3,
+                                                                            .data4 = { RSI_BLE_CHAR_C3_VAL_128_DATA_4 } } } };
 
     // Adding custom characteristic declaration to the custom service
     SilabsBleWrapper::rsi_ble_add_char_serv_att(
-        new_serv_resp.serv_handler, new_serv_resp.start_handle + RSI_BLE_CHARACTERISTIC_C3_ATTRIBUTE_HANDLE_LOCATION,
+        new_serv_resp.serv_handler, new_serv_resp.start_handle + RSI_BLE_CHAR_C3_ATTR_HANDLE_LOC,
         RSI_BLE_ATT_PROPERTY_READ, // Set read
-        new_serv_resp.start_handle + RSI_BLE_CHARACTERISTIC_C3_MEASUREMENT_HANDLE_LOCATION, custom_characteristic_C3);
+        new_serv_resp.start_handle + RSI_BLE_CHAR_C3_MEASUREMENT_HANDLE_LOC, custom_characteristic_C3);
 
     // Adding characteristic value attribute to the service
-    SilabsBleWrapper::rsi_ble_add_char_val_att(new_serv_resp.serv_handler,
-                                               new_serv_resp.start_handle + RSI_BLE_CHARACTERISTIC_C3_MEASUREMENT_HANDLE_LOCATION,
-                                               custom_characteristic_C3,
-                                               RSI_BLE_ATT_PROPERTY_READ, // Set read
-                                               data, sizeof(data), ATT_REC_IN_HOST);
+    SilabsBleWrapper::rsi_ble_add_char_val_att(
+        new_serv_resp.serv_handler, new_serv_resp.start_handle + RSI_BLE_CHAR_C3_MEASUREMENT_HANDLE_LOC, custom_characteristic_C3,
+        RSI_BLE_ATT_PROPERTY_READ, // Set read
+        data, sizeof(data), ATT_REC_IN_HOST);
 #endif // CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
 }
 
@@ -1043,21 +1041,21 @@ CHIP_ERROR BLEManagerImpl::EncodeAdditionalDataTlv()
     MutableByteSpan rotatingDeviceIdUniqueIdSpan(rotatingDeviceIdUniqueId);
 
     err = DeviceLayer::GetDeviceInstanceInfoProvider()->GetRotatingDeviceIdUniqueId(rotatingDeviceIdUniqueIdSpan);
-    SuccessOrExit(err);
+
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err, ChipLogError(DeviceLayer, "Failed to GetRotatingDeviceIdUniqueId"));
+
     err = ConfigurationMgr().GetLifetimeCounter(additionalDataPayloadParams.rotatingDeviceIdLifetimeCounter);
-    SuccessOrExit(err);
+
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err, ChipLogError(DeviceLayer, "Failed to GetLifetimeCounter"));
+
     additionalDataPayloadParams.rotatingDeviceIdUniqueId = rotatingDeviceIdUniqueIdSpan;
     additionalDataFields.Set(AdditionalDataFields::RotatingDeviceId);
 #endif /* CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID) */
 
     err = AdditionalDataPayloadGenerator().generateAdditionalDataPayload(
         additionalDataPayloadParams, sInstance.c3AdditionalDataBufferHandle, additionalDataFields);
-    SuccessOrExit(err);
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "Failed to generate TLV encoded Additional Data (%s)", __func__);
-    }
+
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err, ChipLogError(DeviceLayer, "Failed to generate TLV encoded Additional Data"));
 
     return err;
 }
