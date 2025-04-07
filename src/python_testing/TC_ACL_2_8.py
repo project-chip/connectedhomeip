@@ -44,7 +44,9 @@ from mobly import asserts
 
 # Add these constants at the top of the file after imports
 D_OK_EMPTY = bytes.fromhex('1718')
-D_OK_SINGLE = bytes.fromhex('17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018')
+D_OK_SINGLE = bytes.fromhex(
+    '17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018')
+
 
 class TC_ACL_2_8(MatterBaseTest):
     def desc_TC_ACL_2_8(self) -> str:
@@ -59,7 +61,7 @@ class TC_ACL_2_8(MatterBaseTest):
                      "DUT is commissioned on TH2 fabric"),
             TestStep(4, "TH2 reads DUT Endpoint 0 OperationalCredentials cluster CurrentFabricIndex attribute",
                      "Result is SUCCESS, value is stored as F2"),
-            TestStep(5, "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 1 element\n1. struct\nData field: D_OK_EMPTY", 
+            TestStep(5, "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 1 element\n1. struct\nData field: D_OK_EMPTY",
                      "Result is SUCCESS"),
             TestStep(6, "TH2 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is list of AccessControlExtensionStruct containing 1 element\n1. struct\nData field: D_OK_SINGLE",
                      "Result is SUCCESS"),
