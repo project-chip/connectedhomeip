@@ -152,7 +152,7 @@ public:
     /// See SPEC 7.13 Global Elements: `Global Attributes` table
     ///
     /// Precondition:
-    ///   - `path` cluster part MUST be a path that is part of `GetPaths` returned values.
+    ///   - `path` MUST match one of the paths returned by GetPaths.
     virtual CHIP_ERROR Attributes(const ConcreteClusterPath & path,
                                   DataModel::ListBuilder<DataModel::AttributeEntry> & builder) = 0;
 
