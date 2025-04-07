@@ -219,7 +219,7 @@ class TC_FAN_3_1(MatterBaseTest):
 
         self.fan_modes = [f for f in fan_modes if not (remove_auto and f == fm_enum.kAuto)]
 
-    async def get_initial_parametes(self, endpoint, attr_to_update, order) -> InitSettings:
+    async def get_initial_parameters(self, endpoint, attr_to_update, order) -> InitSettings:
         """
         This method gets the necessary initial parameters for updating fan control attributes
         such as PercentSetting, FanMode, and SpeedSetting (if present). It determines the
@@ -417,7 +417,7 @@ class TC_FAN_3_1(MatterBaseTest):
         attribute = cluster.Attributes
 
         # Get initial parameters
-        init_settings = await self.get_initial_parametes(endpoint, attr_to_update, order)
+        init_settings = await self.get_initial_parameters(endpoint, attr_to_update, order)
 
         # *** NEXT STEP ***
         # TH performs one of the testing scenarios previously defined
