@@ -79,7 +79,7 @@ public:
     ///   A cluster data version SHALL be incremented if any attribute data changes.
     ///
     /// Precondition:
-    ///   - `path` parameter MUST be part of `GetPaths` returned values.
+    ///   - `path` parameter MUST match one of the paths returned by GetPaths.
     [[nodiscard]] virtual DataVersion GetDataVersion(const ConcreteClusterPath & path) const = 0;
 
     /// Precondition:
