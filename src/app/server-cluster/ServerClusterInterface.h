@@ -121,7 +121,7 @@ public:
     ///     - GeneratedCommandList::Id
     ///
     /// Precondition:
-    ///   - `request.path` cluster part MUST be a path that is part of `GetPaths` returned values.
+    ///   - `request.path` endpoint+cluster part MUST match one of the paths returned by GetPaths.
     virtual DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                         AttributeValueEncoder & encoder) = 0;
 
