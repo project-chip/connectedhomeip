@@ -292,7 +292,7 @@ CHIP_ERROR CodegenDataModelProvider::ServerClusters(EndpointId endpointId,
         ConcreteClusterPath path(endpointId, clusterId);
         ServerClusterInterface * cluster = mRegistry.Get(path);
 
-        // path MUST be valid: we just requested for it by iteration...
+        // path MUST be valid: we just got it from iterating our registrations...
         VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_INTERNAL);
 
         ReturnErrorOnFailure(builder.Append({
