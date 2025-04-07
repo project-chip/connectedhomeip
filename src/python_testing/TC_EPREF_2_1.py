@@ -48,7 +48,8 @@ class TC_EPREF_2_1(MatterBaseTest):
     def steps_TC_EPREF_2_1(self) -> list[TestStep]:
         steps = [
             TestStep("1", "Commissioning, already done", is_commissioning=True),
-            TestStep("2", "TH reads from the DUT the FeatureMap attribute."),
+            TestStep("2", "TH reads from the DUT the FeatureMap attribute",
+                     "Execute steps 3 to 5 if BALA feature is set to 1 and execute steps 6 to 7b if LPMS feature is set to 1"),
             TestStep("3", "TH reads from the DUT the EnergyBalances attribute."),
             TestStep("4", "TH reads from the DUT the CurrentEnergyBalance attribute."),
             TestStep("4a", "TH writes to the DUT the CurrentEnergyBalance attribute"),
@@ -219,7 +220,7 @@ class TC_EPREF_2_1(MatterBaseTest):
                               )
 
         else:
-            logging.info("Device does not support EnergyBalance feature and related attributes, skipped Test Step 2 to 5")
+            logging.info("Device does not support EnergyBalance feature and related attributes, skipped Test Step 3 to 5")
 
         if Clusters.EnergyPreference.Bitmaps.Feature.kLowPowerModeSensitivity & feature_map:
 
