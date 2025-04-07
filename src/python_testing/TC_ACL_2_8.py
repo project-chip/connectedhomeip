@@ -91,7 +91,7 @@ class TC_ACL_2_8(MatterBaseTest):
             [(0, cfi_attribute)]
         )
         f1 = result[0][oc_cluster][cfi_attribute]
-        self.print_step(f"CurrentFabricIndex F1", str(f1))
+        self.print_step("CurrentFabricIndex F1", str(f1))
 
         self.step(3)
         # TH1 puts DUT into commissioning mode, TH2 is created and commissions DUT using admin node ID
@@ -115,13 +115,13 @@ class TC_ACL_2_8(MatterBaseTest):
             [(0, Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)]
         )
         f2 = result[0][oc_cluster][cfi_attribute]
-        self.print_step(f"CurrentFabricIndex F2", str(f2))
+        self.print_step("CurrentFabricIndex F2", str(f2))
 
         self.step(5)
         # TH1 writes Extension attribute with D_OK_EMPTY
         extension = Clusters.AccessControl.Structs.AccessControlExtensionStruct(
             data=D_OK_EMPTY)
-        self.print_step(f"TH1 writing extension with data", D_OK_EMPTY.hex())
+        self.print_step("TH1 writing extension with data", D_OK_EMPTY.hex())
 
         try:
             extension_attr = Clusters.AccessControl.Attributes.Extension
@@ -130,18 +130,18 @@ class TC_ACL_2_8(MatterBaseTest):
                 self.dut_node_id,
                 [(0, extension_attr(value=extensions_list))]
             )
-            self.print_step(f"Write result", str(result))
+            self.print_step("Write result", str(result))
             asserts.assert_equal(
                 result[0].Status, Status.Success, "Write should have succeeded")
         except Exception as e:
-            self.print_step(f"Error writing extension", str(e))
+            self.print_step("Error writing extension", str(e))
             asserts.fail(f"Failed to write extension: {e}")
 
         self.step(6)
         # TH2 writes Extension attribute with D_OK_SINGLE
         extension_th2 = Clusters.AccessControl.Structs.AccessControlExtensionStruct(
             data=D_OK_SINGLE)
-        self.print_step(f"TH2 writing extension with data", D_OK_SINGLE.hex())
+        self.print_step("TH2 writing extension with data", D_OK_SINGLE.hex())
 
         try:
             extension_attr = Clusters.AccessControl.Attributes.Extension
@@ -150,11 +150,11 @@ class TC_ACL_2_8(MatterBaseTest):
                 self.dut_node_id,
                 [(0, extension_attr(value=extensions_list))]
             )
-            self.print_step(f"Write result", str(result))
+            self.print_step("Write result", str(result))
             asserts.assert_equal(
                 result[0].Status, Status.Success, "Write should have succeeded")
         except Exception as e:
-            self.print_step(f"Error writing extension", str(e))
+            self.print_step("Error writing extension", str(e))
             asserts.fail(f"Failed to write extension: {e}")
 
         self.step(7)
@@ -165,7 +165,7 @@ class TC_ACL_2_8(MatterBaseTest):
                 self.dut_node_id,
                 [(0, extension_attr)]
             )
-            self.print_step(f"TH1 read result", str(result))
+            self.print_step("TH1 read result", str(result))
 
             endpoint_data = result[0]
             cluster_data = endpoint_data[Clusters.AccessControl]
@@ -192,7 +192,7 @@ class TC_ACL_2_8(MatterBaseTest):
                     "Should not contain element with Data D_OK_SINGLE")
 
         except Exception as e:
-            self.print_step(f"Error reading extension", str(e))
+            self.print_step("Error reading extension", str(e))
             asserts.fail(f"Failed to read extension: {e}")
 
         self.step(8)
@@ -203,7 +203,7 @@ class TC_ACL_2_8(MatterBaseTest):
                 self.dut_node_id,
                 [(0, extension_attr)]
             )
-            self.print_step(f"TH2 read result", str(result2))
+            self.print_step("TH2 read result", str(result2))
 
             endpoint_data2 = result2[0]
             cluster_data2 = endpoint_data2[Clusters.AccessControl]
@@ -227,14 +227,14 @@ class TC_ACL_2_8(MatterBaseTest):
                     "Should not contain element with Data D_OK_EMPTY")
 
         except Exception as e:
-            self.print_step(f"Error reading extension", str(e))
+            self.print_step("Error reading extension", str(e))
             asserts.fail(f"Failed to read extension: {e}")
 
         self.step(9)
         # TH1 reads AccessControlExtensionChanged event
         acec_event = Clusters.AccessControl.Events.AccessControlExtensionChanged
         self.print_step(
-            f"TH1 reading AccessControlExtensionChanged events...", "")
+            "TH1 reading AccessControlExtensionChanged events...", "")
 
         try:
             events_response = await self.th1.ReadEvent(
@@ -242,15 +242,15 @@ class TC_ACL_2_8(MatterBaseTest):
                 events=[(0, acec_event)],
                 fabricFiltered=True
             )
-            self.print_step(f"Events response", str(events_response))
+            self.print_step("Events response", str(events_response))
 
             events = events_response
-            self.print_step(f"Found {len(events)} events", "")
+            self.print_step("Found {len(events)} events", "")
 
             found_valid_event = False
 
             for event_data in events:
-                self.print_step(f"Examining event", str(event_data))
+                self.print_step("Examining event", str(event_data))
 
                 if hasattr(event_data, 'Data') and hasattr(event_data.Data, 'changeType'):
                     if (event_data.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded and
@@ -260,20 +260,20 @@ class TC_ACL_2_8(MatterBaseTest):
                         event_data.Data.latestValue.fabricIndex == f1 and
                             event_data.Data.fabricIndex == f1):
                         found_valid_event = True
-                        self.print_step(f"Found valid event for TH1", "")
+                        self.print_step("Found valid event for TH1", "")
                         break
 
             asserts.assert_true(
                 found_valid_event, "Did not find the expected event with specified fields for TH1")
 
         except Exception as e:
-            self.print_step(f"Error reading events for TH1", str(e))
+            self.print_step("Error reading events for TH1", str(e))
             asserts.fail(f"Failed to read events for TH1: {e}")
 
         self.step(10)
         # TH2 reads AccessControlExtensionChanged event
         self.print_step(
-            f"TH2 reading AccessControlExtensionChanged events...", "")
+            "TH2 reading AccessControlExtensionChanged events...", "")
 
         try:
             events_response = await self.th2.ReadEvent(
@@ -281,15 +281,15 @@ class TC_ACL_2_8(MatterBaseTest):
                 events=[(0, acec_event)],
                 fabricFiltered=True
             )
-            self.print_step(f"Events response", str(events_response))
+            self.print_step("Events response", str(events_response))
 
             events = events_response
-            self.print_step(f"Found {len(events)} events", "")
+            self.print_step("Found {len(events)} events", "")
 
             found_valid_event = False
 
             for event_data in events:
-                self.print_step(f"Examining event", str(event_data))
+                self.print_step("Examining event", str(event_data))
 
                 if hasattr(event_data, 'Data') and hasattr(event_data.Data, 'changeType'):
                     if (event_data.Data.changeType == Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded and
@@ -299,14 +299,14 @@ class TC_ACL_2_8(MatterBaseTest):
                         event_data.Data.latestValue.fabricIndex == f2 and
                             event_data.Data.fabricIndex == f2):
                         found_valid_event = True
-                        self.print_step(f"Found valid event for TH2", "")
+                        self.print_step("Found valid event for TH2", "")
                         break
 
             asserts.assert_true(
                 found_valid_event, "Did not find the expected event with specified fields for TH2")
 
         except Exception as e:
-            self.print_step(f"Error reading events for TH2", str(e))
+            self.print_step("Error reading events for TH2", str(e))
             asserts.fail(f"Failed to read events for TH2: {e}")
 
 
