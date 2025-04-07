@@ -32,6 +32,7 @@
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
+
 import chip.clusters as Clusters
 from chip.clusters.Types import Nullable
 from chip.interaction_model import Status
