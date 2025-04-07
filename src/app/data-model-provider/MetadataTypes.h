@@ -23,6 +23,12 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/BitFlags.h>
 
+
+#define StartBitFieldInit
+    _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wconversion\"")
+    _Pragma("GCC diagnostic ignored \"-Wnarrowing\"")
+#define EndBitFieldInit _Pragma("GCC diagnostic pop")
+
 namespace chip {
 namespace app {
 namespace DataModel {
@@ -91,14 +97,16 @@ struct AttributeEntry
 {
     AttributeId attributeId;
 
+    StartBitFieldInit //Start disabling conversion and narrowing warnings
+
     // Constructor
     constexpr AttributeEntry(AttributeId id = 0, // attributeId initial value
                              AttributeQualityFlags attrQualityFlags = AttributeQualityFlags::kListAttribute, // mask.flags initial value
                              Access::Privilege readPriv = Access::Privilege::kView, // mask.readPrivilege initial value
                              Access::Privilege writePriv = Access::Privilege::kView // mask.writePrivilege initial value
-                            ) : attributeId(id), mask{ to_underlying(attrQualityFlags), 
-                                                       to_underlying(readPriv), 
-                                                       to_underlying(writePriv) 
+                            ) : attributeId{id}, mask{ to_underlying(attrQualityFlags) & ((1 << 7) - 1), 
+                                                       to_underlying(readPriv) & ((1 << 5) - 1), 
+                                                       to_underlying(writePriv) & ((1 << 7) - 1) 
                                                     } {}
 
 
@@ -106,8 +114,7 @@ struct AttributeEntry
     Access::Privilege GetReadPrivilege() const
     {
         return static_cast< Access::Privilege >(mask.readPrivilege);
-    }
-    
+    }    
 
     // Getter for mask.writePrivilege
     Access::Privilege GetWritePrivilege() const
@@ -115,18 +122,16 @@ struct AttributeEntry
         return static_cast< Access::Privilege >(mask.writePrivilege);
     }
 
-
     AttributeQualityFlags SetFlags(AttributeQualityFlags f)
     {
-        return static_cast< AttributeQualityFlags >( mask.flags |= chip::to_underlying(f) ) ;
+        return static_cast< AttributeQualityFlags >( mask.flags |= ( chip::to_underlying(f) & ((1 << 7) - 1) ) ) ;
     }
-
 
     AttributeQualityFlags SetFlags(AttributeQualityFlags f, bool isSet)
     {
         return isSet ? 
           SetFlags(f) : 
-          static_cast< AttributeQualityFlags >( mask.flags &= ~chip::to_underlying(f) );
+          static_cast< AttributeQualityFlags >( mask.flags &= ~( chip::to_underlying(f) & ((1 << 7) - 1) ) );
     }
 
 
@@ -200,8 +205,8 @@ struct AcceptedCommandEntry
     constexpr AcceptedCommandEntry(CommandId id = 0, // commandId initial value
                                    CommandQualityFlags cmdQualityFlags = CommandQualityFlags::kFabricScoped, // mask.flags initial value
                                    Access::Privilege invokePriv = Access::Privilege::kView // mask.invokePrivilege initial value
-                                ) : commandId(id), mask{ to_underlying(cmdQualityFlags), 
-                                                         to_underlying(invokePriv)
+                                ) : commandId(id), mask{ to_underlying(cmdQualityFlags) & ((1 << 3) - 1), 
+                                                         to_underlying(invokePriv) & ((1 << 5) - 1)
                                                        } {}
  
 
@@ -214,7 +219,7 @@ struct AcceptedCommandEntry
  
     CommandQualityFlags SetFlags(CommandQualityFlags f)
     {
-        return static_cast< CommandQualityFlags >( mask.flags |= chip::to_underlying(f) ) ;
+        return static_cast< CommandQualityFlags >( mask.flags |= ( chip::to_underlying(f) & ((1 << 3) - 1) ) );
     }
 
 
@@ -222,8 +227,10 @@ struct AcceptedCommandEntry
     {
         return isSet ? 
           SetFlags(f) : 
-          static_cast< CommandQualityFlags >( mask.flags &= ~chip::to_underlying(f) );
+          static_cast< CommandQualityFlags >( mask.flags &= ~( chip::to_underlying(f) & ((1 << 3) - 1) ) );
     }
+
+    EndBitFieldInit //Start enabling conversion and narrowing warnings
    
 
     constexpr bool HasFlags(CommandQualityFlags f) const { return (mask.flags & chip::to_underlying(f)) != 0; }   

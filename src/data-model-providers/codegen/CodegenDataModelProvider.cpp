@@ -290,7 +290,7 @@ CHIP_ERROR CodegenDataModelProvider::Attributes(const ConcreteClusterPath & path
     //   - lists of elements
     //   - read-only, with read privilege view
     //   - fixed value (no such flag exists, so this is not a quality flag we set/track)
-    DataModel::AttributeEntry globalListEntry(0,
+    DataModel::AttributeEntry globalListEntry(0, /* default initial value, attributeId is assigned later */
                                               DataModel::AttributeQualityFlags::kListAttribute,
                                               Access::Privilege::kView,
                                               Access::Privilege::kView);
