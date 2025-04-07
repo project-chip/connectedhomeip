@@ -780,7 +780,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRelativeMove(HandlerContext 
         {
             ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Mechanical Pan not supported although panDelta value provided",
                          mEndpointId);
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
             return;
         }
         int16_t panDeltaValue = panDelta.Value();
@@ -817,7 +817,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRelativeMove(HandlerContext 
             ChipLogError(Zcl,
                          "CameraAVSettingsUserLevelMgmt[ep=%d]: Mechanical Tilt not supported although tiltDelta value provided",
                          mEndpointId);
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
             return;
         }
         int16_t tiltDeltaValue = tiltDelta.Value();
@@ -854,7 +854,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRelativeMove(HandlerContext 
             ChipLogError(Zcl,
                          "CameraAVSettingsUserLevelMgmt[ep=%d]: Mechanical Zoom not supported although zoomDelta value provided",
                          mEndpointId);
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
             return;
         }
         int8_t zoomDeltaValue = zoomDelta.Value();
@@ -940,7 +940,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZMoveToPreset(HandlerContext 
     if (mMptzPresetHelpers.empty())
     {
         ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: No stored presets, MoveToPreset not possible", mEndpointId);
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
         return;
     }
 
