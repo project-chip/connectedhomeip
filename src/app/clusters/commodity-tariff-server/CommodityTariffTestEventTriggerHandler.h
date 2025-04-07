@@ -42,40 +42,10 @@ namespace chip {
  */
 enum class CommodityTariffTrigger : uint64_t
 {
-    // Simulate a fixed forecast power usage including one or more PowerAdjustmentStructs
-    kPowerAdjustment = 0x0098'0000'0000'0000,
-    // Clear the PowerAdjustment structs
-    kPowerAdjustmentClear = 0x0098'0000'0000'0001,
-    // Simulate user opt-out of Local Optimization
-    kUserOptOutLocalOptimization = 0x0098'0000'0000'0002,
-    // Simulate user opt-out of Grid Optimization
-    kUserOptOutGridOptimization = 0x0098'0000'0000'0003,
-    // Remove all user opt-out opting out
-    kUserOptOutClearAll = 0x0098'0000'0000'0004,
-    // Simulate a fixed forecast with EarliestStartTime earlier than startTime, and LatestEndTime greater than EndTime
-    kStartTimeAdjustment = 0x0098'0000'0000'0005,
-    // Clear the StartTimeAdjustment simulated forecast
-    kStartTimeAdjustmentClear = 0x0098'0000'0000'0006,
-    // Simulate a fixed forecast with one pausable slo with MinPauseDuration >1, MaxPauseDuration>1 and one non pausable slot
-    kPausable = 0x0098'0000'0000'0007,
-    // Simulate a moving time to the next forecast slot
-    kPausableNextSlot = 0x0098'0000'0000'0008,
-    // Clear the Pausable simulated forecast
-    kPausableClear = 0x0098'0000'0000'0009,
-    // Simulate a forecast power usage with at least 2 and at most 4 slots
-    kForecastAdjustment = 0x0098'0000'0000'000A,
-    // Simulate moving time to the next forecast slot
-    kForecastAdjustmentNextSlot = 0x0098'0000'0000'000B,
-    // Clear the forecast adjustment
-    kForecastAdjustmentClear = 0x0098'0000'0000'000C,
-    // Simulate a forecast power usage with at least 2 and at most 4 slots
-    kConstraintBasedAdjustment = 0x0098'0000'0000'000D,
-    //  Clear the constraint based adjustment
-    kConstraintBasedAdjustmentClear = 0x0098'0000'0000'000E,
-    // Simulate a forecast with at least 1 slot
-    kForecast = 0x0098'0000'0000'000F,
-    // Clear the forecast
-    kForecastClear = 0x0098'0000'0000'0010,
+    // Simulate a tariff data update to trigger loading and validation of new data followed by the cluster attributes changes.
+    kTariffDataUpdated = 0x0700'0000'0000'0000,
+    // Force jump to next day to check of updating for time of day context-dependent attribute values.
+    kForcedOneDayForward = 0x0700'0000'0000'0001
 };
 
 class CommodityTariffTestEventTriggerHandler : public TestEventTriggerHandler

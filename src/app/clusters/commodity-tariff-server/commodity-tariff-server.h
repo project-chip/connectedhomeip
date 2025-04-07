@@ -58,30 +58,26 @@ public:
 
     // ------------------------------------------------------------------
     // Get attribute methods
-    virtual DataModel::List<Structs::CalendarPeriodStruct::Type>    GetCalendarPeriods() = 0;
-    virtual DataModel::List<Structs::DayPatternStruct::Type>        GetDayPatterns() = 0;
-    virtual DataModel::List<Structs::DayStruct::Type>               GetIndividualDays() = 0;
-    virtual DataModel::List<Structs::DayEntryStruct::Type>          GetDayEntries() = 0;
+    virtual DataModel::Nullable<Structs::TariffInformationStruct::Type> & GetTariffInfo()        = 0;
+    virtual Globals::TariffUnitEnum GetTariffUnit()                                              = 0;
+    virtual DataModel::Nullable<epoch_s> GetStartDate()                                          = 0;
+    virtual DataModel::Nullable<int16_t> GetDefaultRandomizationOffset()                         = 0;
+    virtual DataModel::Nullable<DayEntryRandomizationTypeEnum> GetDefaultRandomizationType()     = 0;
+    virtual DataModel::List<Structs::CalendarPeriodStruct::Type> & GetCalendarPeriods()          = 0;
+    virtual DataModel::List<Structs::DayPatternStruct::Type> & GetDayPatterns()                  = 0;
+    virtual DataModel::List<Structs::DayStruct::Type> & GetIndividualDays()                      = 0;
+    virtual DataModel::List<Structs::DayEntryStruct::Type> & GetDayEntries()                     = 0;
+    virtual DataModel::List<Structs::TariffPeriodStruct::Type> & GetTariffPeriods()              = 0;
+    virtual DataModel::List<Structs::TariffComponentStruct::Type> & GetTariffComponents()        = 0;
 
-    virtual DataModel::Nullable<Structs::DayStruct::Type> GetCurrentDay() = 0;
-    virtual DataModel::Nullable<Structs::DayStruct::Type> GetNextDay() = 0;
-    virtual DataModel::Nullable<Structs::DayEntryStruct::Type> GetCurrentDayEntry    () = 0;
-    virtual DataModel::Nullable<Structs::DayEntryStruct::Type> GetNextDayEntry() = 0;
-
-    virtual DataModel::Nullable<epoch_s>    GetStartDate() = 0;
-    virtual DataModel::Nullable<epoch_s>    GetCurrentDayEntryDate() = 0;
-    virtual DataModel::Nullable<epoch_s>    GetNextDayEntryDate() = 0;
-
-    virtual DataModel::List<Structs::TariffPeriodStruct::Type>      GetTariffPeriods() = 0;
-    virtual DataModel::List<Structs::TariffComponentStruct::Type>   GetTariffComponents() = 0;
-    virtual DataModel::List<Structs::TariffComponentStruct::Type>   GetCurrentTariffComponents() = 0;
-    virtual DataModel::List<Structs::TariffComponentStruct::Type>   GetNextTariffComponents() = 0;
-
-    virtual DataModel::Nullable<TariffUnitEnum>                     GetTariffUnit() = 0;
-    virtual DataModel::Nullable<Structs::TariffInformationStruct::Type> GetTariffInfo() = 0;
-
-    virtual DataModel::Nullable<int16_t> GetDefaultRandomizationOffset() = 0;
-    virtual DataModel::Nullable<DayEntryRandomizationTypeEnum> GetDefaultRandomizationType() = 0;
+    virtual DataModel::Nullable<Structs::DayStruct::Type> & GetCurrentDay()                      = 0;
+    virtual DataModel::Nullable<Structs::DayStruct::Type> & GetNextDay()                         = 0;
+    virtual DataModel::Nullable<Structs::DayEntryStruct::Type> & GetCurrentDayEntry()            = 0;
+    virtual DataModel::Nullable<Structs::DayEntryStruct::Type> & GetNextDayEntry()               = 0;
+    virtual DataModel::Nullable<epoch_s> GetCurrentDayEntryDate()                                = 0;
+    virtual DataModel::Nullable<epoch_s> GetNextDayEntryDate()                                   = 0;
+    virtual DataModel::List<Structs::TariffComponentStruct::Type> & GetCurrentTariffComponents() = 0;
+    virtual DataModel::List<Structs::TariffComponentStruct::Type> & GetNextTariffComponents()    = 0;
 
 protected:
     EndpointId mEndpointId = 0;
