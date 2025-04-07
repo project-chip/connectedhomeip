@@ -43,7 +43,8 @@ public:
      *
      *********************************************************************************/
     Protocols::InteractionModel::Status Stop() override;
-    Protocols::InteractionModel::Status MoveTo(const Optional<TargetPositionEnum> & position, const Optional<TargetLatchEnum> & latch,
+    Protocols::InteractionModel::Status MoveTo(const Optional<TargetPositionEnum> & position,
+                                               const Optional<TargetLatchEnum> & latch,
                                                const Optional<Globals::ThreeLevelAutoEnum> & speed) override;
     Protocols::InteractionModel::Status Calibrate() override;
 

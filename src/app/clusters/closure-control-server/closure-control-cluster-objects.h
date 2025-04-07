@@ -47,10 +47,10 @@ struct GenericOverallState : public Structs::OverallStateStruct::Type
         return *this;
     }
 
-    void Set(Optional<DataModel::Nullable<PositioningEnum>> positioningValue = NullOptional,
-             Optional<DataModel::Nullable<LatchingEnum>> latchingValue = NullOptional,
+    void Set(Optional<DataModel::Nullable<PositioningEnum>> positioningValue       = NullOptional,
+             Optional<DataModel::Nullable<LatchingEnum>> latchingValue             = NullOptional,
              Optional<DataModel::Nullable<Globals::ThreeLevelAutoEnum>> speedValue = NullOptional,
-             Optional<DataModel::Nullable<uint32_t>> extraInfoValue = NullOptional)
+             Optional<DataModel::Nullable<uint32_t>> extraInfoValue                = NullOptional)
     {
         positioning = positioningValue;
         latching    = latchingValue;
@@ -69,8 +69,8 @@ struct GenericOverallState : public Structs::OverallStateStruct::Type
  */
 struct GenericOverallTarget : public Structs::OverallTargetStruct::Type
 {
-    GenericOverallTarget(Optional<TargetPositionEnum> targetPositionValue       = NullOptional,
-                         Optional<TargetLatchEnum> targetLatchValue             = NullOptional,
+    GenericOverallTarget(Optional<TargetPositionEnum> targetPositionValue = NullOptional,
+                         Optional<TargetLatchEnum> targetLatchValue       = NullOptional,
                          Optional<Globals::ThreeLevelAutoEnum> speedValue = NullOptional)
     {
         Set(targetPositionValue, targetLatchValue, speedValue);
@@ -84,7 +84,8 @@ struct GenericOverallTarget : public Structs::OverallTargetStruct::Type
         return *this;
     }
 
-    void Set(Optional<TargetPositionEnum> targetPositionValue = NullOptional, Optional<TargetLatchEnum> targetLatchValue = NullOptional,
+    void Set(Optional<TargetPositionEnum> targetPositionValue = NullOptional,
+             Optional<TargetLatchEnum> targetLatchValue       = NullOptional,
              Optional<Globals::ThreeLevelAutoEnum> speedValue = NullOptional)
     {
         position = targetPositionValue;
