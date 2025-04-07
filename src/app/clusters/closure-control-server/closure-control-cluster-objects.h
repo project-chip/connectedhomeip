@@ -47,10 +47,10 @@ struct GenericOverallState : public Structs::OverallStateStruct::Type
         return *this;
     }
 
-    void Set(Optional<DataModel::Nullable<PositioningEnum>> positioningValue = NullOptional,
-             Optional<DataModel::Nullable<bool>> latchValue = NullOptional,
+    void Set(Optional<DataModel::Nullable<PositioningEnum>> positioningValue       = NullOptional,
+             Optional<DataModel::Nullable<bool>> latchValue                        = NullOptional,
              Optional<DataModel::Nullable<Globals::ThreeLevelAutoEnum>> speedValue = NullOptional,
-             Optional<DataModel::Nullable<bool>> secureStateValue = NullOptional)
+             Optional<DataModel::Nullable<bool>> secureStateValue                  = NullOptional)
     {
         positioning = positioningValue;
         latch       = latchValue;
@@ -69,8 +69,7 @@ struct GenericOverallState : public Structs::OverallStateStruct::Type
  */
 struct GenericOverallTarget : public Structs::OverallTargetStruct::Type
 {
-    GenericOverallTarget(Optional<TargetPositionEnum> positionValue       = NullOptional,
-                         Optional<bool> latchValue                        = NullOptional,
+    GenericOverallTarget(Optional<TargetPositionEnum> positionValue = NullOptional, Optional<bool> latchValue = NullOptional,
                          Optional<Globals::ThreeLevelAutoEnum> speedValue = NullOptional)
     {
         Set(positionValue, latchValue, speedValue);
