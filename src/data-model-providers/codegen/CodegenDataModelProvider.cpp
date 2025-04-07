@@ -56,8 +56,7 @@ DataModel::AcceptedCommandEntry AcceptedCommandEntryFor(const ConcreteCommandPat
     const CommandId commandId = path.mCommandId;
 
     DataModel::AcceptedCommandEntry entry(path.mCommandId, DataModel::CommandQualityFlags::kFabricScoped,
-                                          RequiredPrivilege::ForInvokeCommand(path)
-                                         );
+                                          RequiredPrivilege::ForInvokeCommand(path));
 
     entry.SetFlags(DataModel::CommandQualityFlags::kTimed, CommandNeedsTimedInvoke(path.mClusterId, commandId));
     entry.SetFlags(DataModel::CommandQualityFlags::kFabricScoped, CommandIsFabricScoped(path.mClusterId, commandId));
@@ -96,12 +95,9 @@ DataModel::AttributeEntry AttributeEntryFrom(const ConcreteClusterPath & cluster
 {
     const ConcreteAttributePath attributePath(clusterPath.mEndpointId, clusterPath.mClusterId, attribute.attributeId);
 
-    DataModel::AttributeEntry entry(attribute.attributeId, DataModel::AttributeQualityFlags::kListAttribute,
-                                    RequiredPrivilege::ForReadAttribute(attributePath),
-                                    !attribute.IsReadOnly() ? 
-                                        RequiredPrivilege::ForWriteAttribute(attributePath) : Access::Privilege::kView
-                                   );
-
+    DataModel::AttributeEntry entry(
+        attribute.attributeId, DataModel::AttributeQualityFlags::kListAttribute, RequiredPrivilege::ForReadAttribute(attributePath),
+        !attribute.IsReadOnly() ? RequiredPrivilege::ForWriteAttribute(attributePath) : Access::Privilege::kView);
 
     entry.SetFlags(DataModel::AttributeQualityFlags::kListAttribute, (attribute.attributeType == ZCL_ARRAY_ATTRIBUTE_TYPE));
     entry.SetFlags(DataModel::AttributeQualityFlags::kTimed, attribute.MustUseTimedWrite());
@@ -291,8 +287,7 @@ CHIP_ERROR CodegenDataModelProvider::Attributes(const ConcreteClusterPath & path
     //   - read-only, with read privilege view
     //   - fixed value (no such flag exists, so this is not a quality flag we set/track)
     DataModel::AttributeEntry globalListEntry(0, /* default initial value, attributeId is assigned later */
-                                              DataModel::AttributeQualityFlags::kListAttribute,
-                                              Access::Privilege::kView,
+                                              DataModel::AttributeQualityFlags::kListAttribute, Access::Privilege::kView,
                                               Access::Privilege::kView);
 
     globalListEntry.SetFlags(DataModel::AttributeQualityFlags::kListAttribute);
