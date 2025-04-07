@@ -97,9 +97,9 @@ class TC_FAN_2_3(MatterBaseTest):
         # TH checks the DUT for support of the Rock feature (RCK)
         #  - If the DUT does not support the feature, the test is skipped
         self.step(2)
-        supports_wind = await self.feature_guard(self.endpoint, cluster, rock_feature)
-        if not supports_wind:
-            logger.info("[FC] The Rock (RCK) feature must be supported by the DUT for this test, skipping test.")
+        supports_rock = await self.feature_guard(self.endpoint, cluster, rock_feature)
+        if not supports_rock:
+            logger.info("[FC] The Rock (RCK) feature is not supported by the DUT for this test, skipping remaining steps.")
             self.skip_all_remaining_steps()
 
         # *** STEP 3 ***
