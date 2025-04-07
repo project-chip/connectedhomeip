@@ -114,7 +114,7 @@ class TC_CLDIM_2_1(MatterBaseTest):
                 if is_positioning_supported:
                     asserts.assert_true(0 <= target.position <= 10000, "Position is not in the expected range")
                 if is_latching_supported:
-                    asserts.assert_is_instance(current_state.Latch, bool, "Latch is not a boolean")
+                    asserts.assert_is_instance(target.Latch, bool, "Latch is not a boolean")
                 if is_speed_supported:
                     asserts.assert_true(0 <= target.speed <= 3, "Speed is not in the expected range")
         else:
