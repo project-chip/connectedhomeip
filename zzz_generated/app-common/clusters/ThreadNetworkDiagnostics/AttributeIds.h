@@ -201,6 +201,12 @@ inline constexpr AttributeId Id = 0x0000003D;
 namespace ActiveNetworkFaultsList {
 inline constexpr AttributeId Id = 0x0000003E;
 } // namespace ActiveNetworkFaultsList
+namespace ExtAddress {
+inline constexpr AttributeId Id = 0x0000003F;
+} // namespace ExtAddress
+namespace Rloc16 {
+inline constexpr AttributeId Id = 0x00000040;
+} // namespace Rloc16
 namespace GeneratedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList

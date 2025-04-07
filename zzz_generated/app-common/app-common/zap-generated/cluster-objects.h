@@ -9265,6 +9265,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ActiveNetworkFaultsList
+namespace ExtAddress {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint64_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint64_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint64_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ExtAddress::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ExtAddress
+namespace Rloc16 {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint16_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint16_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint16_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Rloc16::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Rloc16
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -9368,6 +9392,8 @@ struct TypeInfo
         Attributes::ChannelPage0Mask::TypeInfo::DecodableType channelPage0Mask;
         Attributes::OperationalDatasetComponents::TypeInfo::DecodableType operationalDatasetComponents;
         Attributes::ActiveNetworkFaultsList::TypeInfo::DecodableType activeNetworkFaultsList;
+        Attributes::ExtAddress::TypeInfo::DecodableType extAddress;
+        Attributes::Rloc16::TypeInfo::DecodableType rloc16;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;

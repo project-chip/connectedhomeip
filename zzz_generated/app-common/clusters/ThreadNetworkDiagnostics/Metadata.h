@@ -16,7 +16,7 @@ namespace app {
 namespace clusters {
 namespace ThreadNetworkDiagnostics {
 
-inline constexpr uint32_t kRevision = 2;
+inline constexpr uint32_t kRevision = 3;
 
 namespace Attributes {
 namespace Channel {
@@ -523,6 +523,22 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .writePrivilege = std::nullopt,
 };
 } // namespace ActiveNetworkFaultsList
+namespace ExtAddress {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
+    .attributeId    = ThreadNetworkDiagnostics::Attributes::ExtAddress::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+} // namespace ExtAddress
+namespace Rloc16 {
+inline constexpr DataModel::AttributeEntry kMetadataEntry = {
+    .attributeId    = ThreadNetworkDiagnostics::Attributes::Rloc16::Id,
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .readPrivilege  = Access::Privilege::kView,
+    .writePrivilege = std::nullopt,
+};
+} // namespace Rloc16
 
 } // namespace Attributes
 
