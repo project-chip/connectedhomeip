@@ -48,7 +48,7 @@ function usage() { # status
     info "  --enable-<ARG>[=no]   Enables (or disables with '=no') a bool build arg"
     info "  --<ARG>=<VALUE>       Sets a (non-bool) build arg to the given value"
     info "  GN argument names can be specified with '-' instead of '_' and prefixes"
-    info "  like 'chip_' can be ommitted from names. For the full list of available"
+    info "  like 'chip_' can be omitted from names. For the full list of available"
     info "  build arguments, see the generated args.configured file."
     info ""
     info "  By default, the toolchain for the GN build will be configured from the usual"

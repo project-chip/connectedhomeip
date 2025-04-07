@@ -9,4 +9,4 @@
 click
 click-option-group
 
--e scripts/py_matter_idl
+-e ${PW_PROJECT_ROOT}/scripts/py_matter_idl
