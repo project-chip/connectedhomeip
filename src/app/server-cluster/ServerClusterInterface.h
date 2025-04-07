@@ -178,7 +178,7 @@ public:
     ///     convenience to make writing Invoke calls easier.
     ///
     /// Precondition:
-    ///   - `request.path` cluster part MUST be a path that is part of `GetPaths` returned values.
+    ///   - `request.path` endpoint+cluster part MUST match one of the paths returned by GetPaths.
     virtual std::optional<DataModel::ActionReturnStatus>
     InvokeCommand(const DataModel::InvokeRequest & request, chip::TLV::TLVReader & input_arguments, CommandHandler * handler) = 0;
 
