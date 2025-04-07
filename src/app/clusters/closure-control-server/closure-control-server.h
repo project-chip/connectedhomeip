@@ -155,29 +155,29 @@ public:
      * @return Current OverallTarget.
      */
     const GenericOverallTarget & GetOverallTarget() const;
-    
+
     /**
      * @brief Post event when a reportable error condition is detected
-     * @param[in] 
+     * @param[in]
      * @return CHIP_NO_ERROR if event posted succesfully
      *                       return error recieved from LogEvent.
      */
     CHIP_ERROR PostOperationalErrorEvent(const DataModel::List<const ClosureErrorEnum> errorState);
-    
+
     /**
      * @brief Post event, if supported, when the overall operation ends, either successfully or otherwise
      * @return CHIP_NO_ERROR if event posted succesfully or positioning feature is not supported.
      *                       return error recieved from LogEvent.
      */
     CHIP_ERROR PostMovementCompletedEvent();
-    
+
     /**
      * @brief Post event, if supported,when the MainStateEnum attribute changes state to and from disengaged
      * @param[in] EngageValue will indicate if the actuator is Engaged or Disengaged
      * @return CHIP_NO_ERROR if event posted succesfully or ManuallyOperable feature is not supported.
      */
     CHIP_ERROR PostEngageStateChangedEvent(const bool engageValue);
-    
+
     /**
      * @brief Post event, if supported, when the SecureState field in the OverallState attribute changes.
      * @param[in] secureValue will indicate whether a closure is securing a space against possible unauthorized entry.

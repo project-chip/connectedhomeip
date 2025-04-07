@@ -85,7 +85,7 @@ CHIP_ERROR Instance::SetMainState(MainStateEnum aMainState)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    
+
     // If the Main State has changed, trigger the attribute change callback
     if (mMainState != aMainState)
     {
@@ -97,7 +97,7 @@ CHIP_ERROR Instance::SetMainState(MainStateEnum aMainState)
         if(aMainState == MainStateEnum::kDisengaged){
             PostEngageStateChangedEvent(false);
         }
-        
+
         mMainState = aMainState;
         MatterReportingAttributeChangeCallback(mDelegate.GetEndpointId(), ClosureControl::Id, Attributes::MainState::Id);
         UpdateCountdownTimeFromClusterLogic();
@@ -117,10 +117,10 @@ CHIP_ERROR Instance::SetOverallState(const GenericOverallState & aOverallState)
                 PostSecureStateChangedEvent(aOverallState.secureState.Value().Value());
             }
         }
-        
+
         mOverallState = aOverallState;
         MatterReportingAttributeChangeCallback(mDelegate.GetEndpointId(), ClosureControl::Id, Attributes::OverallState::Id);
-        
+
     }
 
     return CHIP_NO_ERROR;
@@ -154,17 +154,17 @@ const GenericOverallTarget & Instance::GetOverallTarget() const
 }
 
 CHIP_ERROR Instance::PostOperationalErrorEvent(const DataModel::List<const ClosureErrorEnum> errorState) {
-    
+
     CHIP_ERROR err = CHIP_NO_ERROR;
     err = SetMainState(MainStateEnum::kError);
-    
+
     //TODO: Should CurrentErrorList attribute updated here.
-    
+
     if (CHIP_NO_ERROR != err)
     {
         ChipLogError(DataManagement, "ClosureControlCLuster: Operation error event set MainState as Error failed %" CHIP_ERROR_FORMAT, err.Format());
     }
-    
+
     Events::OperationalError::Type event{.errorState = errorState};
     EventNumber eventNumber;
     err = LogEvent(event, mDelegate.GetEndpointId(), eventNumber);
@@ -178,11 +178,11 @@ CHIP_ERROR Instance::PostOperationalErrorEvent(const DataModel::List<const Closu
 
 CHIP_ERROR Instance::PostMovementCompletedEvent() {
     Events::MovementCompleted::Type event{};
-    
+
     if(!HasFeature(Feature::kPositioning)) {
         return CHIP_NO_ERROR;
     }
-    
+
     //TODO: should the countdown time set to 0 here.
 
     EventNumber eventNumber;
@@ -197,7 +197,7 @@ CHIP_ERROR Instance::PostMovementCompletedEvent() {
 
 CHIP_ERROR Instance::PostEngageStateChangedEvent(const bool engageValue) {
     Events::EngageStateChanged::Type event{.engageValue = engageValue};
-    
+
     if(!HasFeature(Feature::kManuallyOperable)) {
         return CHIP_NO_ERROR;
     }
@@ -214,7 +214,7 @@ CHIP_ERROR Instance::PostEngageStateChangedEvent(const bool engageValue) {
 
 CHIP_ERROR Instance::PostSecureStateChangedEvent(const bool secureValue) {
     Events::SecureStateChanged::Type event{.secureValue = secureValue};
-    
+
     if(!(HasFeature(Feature::kPositioning) || HasFeature(Feature::kMotionLatching))) {
         return CHIP_NO_ERROR;
     }
