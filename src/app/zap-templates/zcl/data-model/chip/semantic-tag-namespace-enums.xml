@@ -15,6 +15,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <configurator>
+  <enum name="LocationTag" type="enum8">
+    <item value="0x00" name="Indoor"/>
+    <item value="0x01" name="Outdoor"/>
+    <item value="0x02" name="Inside"/>
+    <item value="0x03" name="Outside"/>
+  </enum>
+
   <enum name="PositionTag" type="enum8">
     <item value="0x00" name="Left"/>
     <item value="0x01" name="Right"/>
