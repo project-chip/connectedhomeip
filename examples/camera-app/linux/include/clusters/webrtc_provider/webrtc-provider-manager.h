@@ -19,6 +19,7 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-enums.h>
+#include <app/CASESessionManager.h>
 #include <app/clusters/webrtc-transport-provider-server/webrtc-transport-provider-server.h>
 #include <rtc/rtc.hpp>
 
@@ -27,7 +28,10 @@ namespace Camera {
 class WebRTCProviderManager : public chip::app::Clusters::WebRTCTransportProvider::Delegate
 {
 public:
-    WebRTCProviderManager() = default;
+    WebRTCProviderManager() :
+        mOnConnectedCallback(OnDeviceConnected, this), mOnConnectionFailureCallback(OnDeviceConnectionFailure, this)
+    {}
+
     ~WebRTCProviderManager() { CloseConnection(); };
 
     void CloseConnection();
@@ -54,9 +58,20 @@ public:
                                    const chip::Optional<chip::app::DataModel::Nullable<uint16_t>> & audioStreamId) override;
 
 private:
+    enum class CommandType : uint8_t
+    {
+        kUndefined = 0,
+        kAnswer    = 1,
+    };
+
     void ScheduleAnswerSend();
-    CHIP_ERROR SendAnswerCommand(uint16_t sessionId, const std::string & sdpAnswer, const chip::ScopedNodeId & peerId,
-                                 chip::EndpointId originatingEndpointId);
+
+    CHIP_ERROR SendAnswerCommand(chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle);
+
+    static void OnDeviceConnected(void * context, chip::Messaging::ExchangeManager & exchangeMgr,
+                                  const chip::SessionHandle & sessionHandle);
+
+    static void OnDeviceConnectionFailure(void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR error);
 
     std::shared_ptr<rtc::PeerConnection> mPeerConnection;
     std::shared_ptr<rtc::DataChannel> mDataChannel;
@@ -64,8 +79,13 @@ private:
     chip::ScopedNodeId mPeerId;
     chip::EndpointId mOriginatingEndpointId;
 
+    CommandType mCommandType = CommandType::kUndefined;
+
     uint16_t mCurrentSessionId = 0;
     std::string mSdpAnswer;
+
+    chip::Callback::Callback<chip::OnDeviceConnected> mOnConnectedCallback;
+    chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnConnectionFailureCallback;
 };
 
 } // namespace Camera

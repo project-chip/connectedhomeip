@@ -1430,6 +1430,14 @@ namespace ActiveNetworkFaultsList {
 static constexpr AttributeId Id = 0x0000003E;
 } // namespace ActiveNetworkFaultsList
 
+namespace ExtAddress {
+static constexpr AttributeId Id = 0x0000003F;
+} // namespace ExtAddress
+
+namespace Rloc16 {
+static constexpr AttributeId Id = 0x00000040;
+} // namespace Rloc16
+
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList
@@ -4349,26 +4357,6 @@ static constexpr AttributeId Id = 0x00000003;
 namespace OverallTarget {
 static constexpr AttributeId Id = 0x00000004;
 } // namespace OverallTarget
-
-namespace RestingProcedure {
-static constexpr AttributeId Id = 0x00000005;
-} // namespace RestingProcedure
-
-namespace TriggerCondition {
-static constexpr AttributeId Id = 0x00000006;
-} // namespace TriggerCondition
-
-namespace TriggerPosition {
-static constexpr AttributeId Id = 0x00000007;
-} // namespace TriggerPosition
-
-namespace WaitingDelay {
-static constexpr AttributeId Id = 0x00000008;
-} // namespace WaitingDelay
-
-namespace KickoffTimer {
-static constexpr AttributeId Id = 0x00000009;
-} // namespace KickoffTimer
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;

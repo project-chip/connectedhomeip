@@ -75,7 +75,7 @@ Davis, CA 95616, USA
     </cluster>
     <cluster id="0x0751" name="Commissioner Control" side="server">
       <mandatoryConform>
-        <attribute name="FabricSynchronization"/>
+        <condition name="FabricSynchronization"/>
       </mandatoryConform>
     </cluster>
   </clusters>
