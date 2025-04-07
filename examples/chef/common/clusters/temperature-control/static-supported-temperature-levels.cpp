@@ -75,7 +75,6 @@ CHIP_ERROR AppSupportedTemperatureLevelsDelegate::Next(MutableCharSpan & item)
 }
 void emberAfTemperatureControlClusterInitCallback(EndpointId endpoint)
 {
-
     chip::app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
 }
 #endif // MATTER_DM_PLUGIN_TEMPERATURE_CONTROL_SERVER
