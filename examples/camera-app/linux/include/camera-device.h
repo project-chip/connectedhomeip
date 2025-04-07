@@ -85,11 +85,11 @@ public:
 
     void SetHDRMode(bool hdrMode);
 
-    const std::vector<VideoStream> & GetAvailableVideoStreams() const { return videoStreams; }
+    std::vector<VideoStream> & GetAvailableVideoStreams() { return videoStreams; }
 
-    const std::vector<AudioStream> & GetAvailableAudioStreams() const { return audioStreams; }
+    std::vector<AudioStream> & GetAvailableAudioStreams() { return audioStreams; }
 
-    const std::vector<SnapshotStream> & GetAvailableSnapshotStreams() const { return snapshotStreams; }
+    std::vector<SnapshotStream> & GetAvailableSnapshotStreams() { return snapshotStreams; }
 
 private:
     int videoDeviceFd = -1;

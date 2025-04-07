@@ -127,11 +127,11 @@ public:
         // Configure camera settings (e.g., exposure, focus)
         // virtual CameraError Configure(const std::string & setting, const std::string & value) = 0;
 
-        virtual const std::vector<VideoStream> & GetAvailableVideoStreams() const = 0;
+        virtual std::vector<VideoStream> & GetAvailableVideoStreams() = 0;
 
-        virtual const std::vector<AudioStream> & GetAvailableAudioStreams() const = 0;
+        virtual std::vector<AudioStream> & GetAvailableAudioStreams() = 0;
 
-        virtual const std::vector<SnapshotStream> & GetAvailableSnapshotStreams() const = 0;
+        virtual std::vector<SnapshotStream> & GetAvailableSnapshotStreams() = 0;
 
         // Capture a snapshot image
         virtual CameraError CaptureSnapshot(uint16_t streamID, const VideoResolutionStruct & resolution,

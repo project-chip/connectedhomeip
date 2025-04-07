@@ -37,7 +37,7 @@ void MediaController::DistributeVideo(const char * data, size_t size, uint16_t v
     std::lock_guard<std::mutex> lock(connectionsMutex);
     for (const Connection & connection : connections)
     {
-        if (connection.videoStreamID == videoStreamID && connection.transport->CanSendVideo())
+        if (connection.videoStreamID == videoStreamID && connection.transport && connection.transport->CanSendVideo())
         {
             connection.transport->SendVideo(data, size, videoStreamID);
         }
@@ -49,7 +49,7 @@ void MediaController::DistributeAudio(const char * data, size_t size, uint16_t a
     std::lock_guard<std::mutex> lock(connectionsMutex);
     for (const Connection & connection : connections)
     {
-        if (connection.audioStreamID == audioStreamID && connection.transport->CanSendAudio())
+        if (connection.audioStreamID == audioStreamID && connection.transport && connection.transport->CanSendAudio())
         {
             connection.transport->SendAudio(data, size, audioStreamID);
         }

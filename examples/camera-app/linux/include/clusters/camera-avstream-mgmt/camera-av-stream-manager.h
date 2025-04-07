@@ -35,41 +35,44 @@ namespace CameraAvStreamManagement {
 class CameraAVStreamManager : public CameraAVStreamMgmtDelegate
 {
 public:
-    Protocols::InteractionModel::Status VideoStreamAllocate(const VideoStreamStruct & allocateArgs, uint16_t & outStreamID);
+    Protocols::InteractionModel::Status VideoStreamAllocate(const VideoStreamStruct & allocateArgs,
+                                                            uint16_t & outStreamID) override;
 
     Protocols::InteractionModel::Status VideoStreamModify(const uint16_t streamID, const chip::Optional<bool> waterMarkEnabled,
-                                                          const chip::Optional<bool> osdEnabled);
+                                                          const chip::Optional<bool> osdEnabled) override;
 
-    Protocols::InteractionModel::Status VideoStreamDeallocate(const uint16_t streamID);
+    Protocols::InteractionModel::Status VideoStreamDeallocate(const uint16_t streamID) override;
 
-    Protocols::InteractionModel::Status AudioStreamAllocate(const AudioStreamStruct & allocateArgs, uint16_t & outStreamID);
+    Protocols::InteractionModel::Status AudioStreamAllocate(const AudioStreamStruct & allocateArgs,
+                                                            uint16_t & outStreamID) override;
 
-    Protocols::InteractionModel::Status AudioStreamDeallocate(const uint16_t streamID);
+    Protocols::InteractionModel::Status AudioStreamDeallocate(const uint16_t streamID) override;
 
-    Protocols::InteractionModel::Status SnapshotStreamAllocate(const SnapshotStreamStruct & allocateArgs, uint16_t & outStreamID);
+    Protocols::InteractionModel::Status SnapshotStreamAllocate(const SnapshotStreamStruct & allocateArgs,
+                                                               uint16_t & outStreamID) override;
 
     Protocols::InteractionModel::Status SnapshotStreamModify(const uint16_t streamID, const chip::Optional<bool> waterMarkEnabled,
-                                                             const chip::Optional<bool> osdEnabled);
+                                                             const chip::Optional<bool> osdEnabled) override;
 
-    Protocols::InteractionModel::Status SnapshotStreamDeallocate(const uint16_t streamID);
+    Protocols::InteractionModel::Status SnapshotStreamDeallocate(const uint16_t streamID) override;
 
-    void OnRankedStreamPrioritiesChanged();
+    void OnRankedStreamPrioritiesChanged() override;
 
-    void OnAttributeChanged(AttributeId attributeId);
+    void OnAttributeChanged(AttributeId attributeId) override;
 
     Protocols::InteractionModel::Status CaptureSnapshot(const uint16_t streamID, const VideoResolutionStruct & resolution,
-                                                        ImageSnapshot & outImageSnapshot);
+                                                        ImageSnapshot & outImageSnapshot) override;
 
     CHIP_ERROR
-    LoadAllocatedVideoStreams(std::vector<VideoStreamStruct> & allocatedVideoStreams);
+    LoadAllocatedVideoStreams(std::vector<VideoStreamStruct> & allocatedVideoStreams) override;
 
     CHIP_ERROR
-    LoadAllocatedAudioStreams(std::vector<AudioStreamStruct> & allocatedAudioStreams);
+    LoadAllocatedAudioStreams(std::vector<AudioStreamStruct> & allocatedAudioStreams) override;
 
     CHIP_ERROR
-    LoadAllocatedSnapshotStreams(std::vector<SnapshotStreamStruct> & allocatedSnapshotStreams);
+    LoadAllocatedSnapshotStreams(std::vector<SnapshotStreamStruct> & allocatedSnapshotStreams) override;
 
-    CHIP_ERROR PersistentAttributesLoadedCallback();
+    CHIP_ERROR PersistentAttributesLoadedCallback() override;
 
     CameraAVStreamManager()  = default;
     ~CameraAVStreamManager() = default;

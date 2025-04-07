@@ -46,9 +46,8 @@ Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamAllocate(c
 {
     outStreamID               = kInvalidStreamID;
     bool foundAvailableStream = false;
-    auto videoStreams         = mCameraDeviceHAL->GetAvailableVideoStreams();
 
-    for (VideoStream & stream : videoStreams)
+    for (VideoStream & stream : mCameraDeviceHAL->GetAvailableVideoStreams())
     {
         if (!stream.isAllocated)
         {
@@ -80,8 +79,7 @@ Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamModify(con
                                                                              const chip::Optional<bool> osdEnabled)
 {
     // TODO : Needs Change
-    auto videoStreams = mCameraDeviceHAL->GetAvailableVideoStreams();
-    for (VideoStream & stream : videoStreams)
+    for (VideoStream & stream : mCameraDeviceHAL->GetAvailableVideoStreams())
     {
         if (stream.videoStreamParams.videoStreamID == streamID && stream.isAllocated)
         {
@@ -96,8 +94,7 @@ Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamModify(con
 
 Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamDeallocate(const uint16_t streamID)
 {
-    auto videoStreams = mCameraDeviceHAL->GetAvailableVideoStreams();
-    for (VideoStream & stream : videoStreams)
+    for (VideoStream & stream : mCameraDeviceHAL->GetAvailableVideoStreams())
     {
         if (stream.videoStreamParams.videoStreamID == streamID && stream.isAllocated)
         {
@@ -118,9 +115,8 @@ Protocols::InteractionModel::Status CameraAVStreamManager::AudioStreamAllocate(c
 {
     outStreamID               = kInvalidStreamID;
     bool foundAvailableStream = false;
-    auto audioStreams         = mCameraDeviceHAL->GetAvailableAudioStreams();
 
-    for (AudioStream & stream : audioStreams)
+    for (AudioStream & stream : mCameraDeviceHAL->GetAvailableAudioStreams())
     {
         if (!stream.isAllocated)
         {
@@ -149,8 +145,7 @@ Protocols::InteractionModel::Status CameraAVStreamManager::AudioStreamAllocate(c
 
 Protocols::InteractionModel::Status CameraAVStreamManager::AudioStreamDeallocate(const uint16_t streamID)
 {
-    auto audioStreams = mCameraDeviceHAL->GetAvailableAudioStreams();
-    for (AudioStream & stream : audioStreams)
+    for (AudioStream & stream : mCameraDeviceHAL->GetAvailableAudioStreams())
     {
         if (stream.audioStreamParams.audioStreamID == streamID && stream.isAllocated)
         {
@@ -170,9 +165,8 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamAllocat
 {
     outStreamID               = kInvalidStreamID;
     bool foundAvailableStream = false;
-    auto snapshotStreams      = mCameraDeviceHAL->GetAvailableSnapshotStreams();
 
-    for (SnapshotStream & stream : snapshotStreams)
+    for (SnapshotStream & stream : mCameraDeviceHAL->GetAvailableSnapshotStreams())
     {
         if (!stream.isAllocated)
         {
@@ -204,8 +198,7 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamModify(
                                                                                 const chip::Optional<bool> osdEnabled)
 {
     // TODO : change
-    auto snapshotStreams = mCameraDeviceHAL->GetAvailableSnapshotStreams();
-    for (SnapshotStream & stream : snapshotStreams)
+    for (SnapshotStream & stream : mCameraDeviceHAL->GetAvailableSnapshotStreams())
     {
         if (stream.snapshotStreamParams.snapshotStreamID == streamID && stream.isAllocated)
         {
@@ -220,8 +213,7 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamModify(
 
 Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamDeallocate(const uint16_t streamID)
 {
-    auto snapshotStreams = mCameraDeviceHAL->GetAvailableSnapshotStreams();
-    for (SnapshotStream & stream : snapshotStreams)
+    for (SnapshotStream & stream : mCameraDeviceHAL->GetAvailableSnapshotStreams())
     {
         if (stream.snapshotStreamParams.snapshotStreamID == streamID && stream.isAllocated)
         {

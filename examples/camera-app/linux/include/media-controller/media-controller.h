@@ -37,8 +37,14 @@ class MediaController
 public:
     MediaController() {}
     virtual ~MediaController() {}
+    // Transports register themselves with the media-controller for receiving
+    // media from stream sources.
     void RegisterTransport(Transport * transport, uint16_t videoStreamID, uint16_t audioStreamID);
+    // Transports must first unregister from the media-controller when they are
+    // getting destroyed.
     void UnregisterTransport(Transport * transport);
+    // Media controller goes through registered transports and dispatches media
+    // if the transport is ready.
     void DistributeVideo(const char * data, size_t size, uint16_t videoStreamID);
     void DistributeAudio(const char * data, size_t size, uint16_t audioStreamID);
 

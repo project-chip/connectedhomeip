@@ -21,7 +21,6 @@
 #include <fcntl.h> // For file descriptor operations
 #include <fstream>
 #include <gst/gst.h>
-#include <gst/video/videooverlay.h>
 #include <iostream>
 #include <lib/support/logging/CHIPLogging.h>
 #include <linux/videodev2.h> // For V4L2 definitions
@@ -46,7 +45,7 @@ CameraDevice::CameraDevice()
     mNetworkVideoSource.Init(&mMediaController, VIDEO_STREAM_GST_DEST_PORT, StreamType::kVideo);
 
     // Initialize Audio Sources
-    mNetworkVideoSource.Init(&mMediaController, AUDIO_STREAM_GST_DEST_PORT, StreamType::kAudio);
+    mNetworkAudioSource.Init(&mMediaController, AUDIO_STREAM_GST_DEST_PORT, StreamType::kAudio);
 
     // Set the CameraHALInterface in CameraAVStreamManager.
     mCameraAVStreamManager.SetCameraDeviceHAL(this);
@@ -382,6 +381,14 @@ CameraError CameraDevice::StopSnapshotStream(uint16_t streamID)
         // Unreference the pipeline
         gst_object_unref(snapshotPipeline);
         it->snapshotContext = nullptr;
+    }
+
+    // Remove the snapshot file
+    std::string fileName = SNAPSHOT_FILE_PATH;
+    if (unlink(fileName.c_str()) == -1)
+    {
+        ChipLogError(Camera, "Failed to remove snapshot file after stopping stream (err = %s).", strerror(errno));
+        return CameraError::ERROR_SNAPSHOT_STREAM_STOP_FAILED;
     }
 
     return CameraError::SUCCESS;

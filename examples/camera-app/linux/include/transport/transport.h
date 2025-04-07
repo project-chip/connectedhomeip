@@ -22,6 +22,11 @@
 
 #pragma once
 // Base class for media transports(WebRTC, PushAV)
+// Media Transports would implement this interface for the Media controller to
+// use.
+// Media Transports would be registered with the Media controller and indicated
+// by the CanSend<Video/Audio> when they are ready for data transfer.
+// Before being destroyed, they must be unregistered from the Media controller.
 class Transport
 {
 public:
