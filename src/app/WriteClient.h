@@ -167,10 +167,10 @@ public:
     /**
      *  Encode a possibly-chunked list attribute value.  Will create a new chunk when necessary.
      *
-     * This function will Attempt to to encode as many list items as possible into a SingleAttributeDataIB, which will be handled by
-     cluster server as a ReplaceAll Item operation
+     * This method will Attempt to to encode as many list items as possible into a SingleAttributeDataIB, which will be handled by
+     * cluster server as a ReplaceAll Item operation.
      * If the list is too large, the WriteRequest will be chunked and remaining items will be encoded as AppendItem operations,
-     chunking them as needed
+     chunking them as needed.
      *
      */
     template <class T>
@@ -212,16 +212,16 @@ public:
             ReturnErrorOnFailure(StartNewMessage());
 
             // Encode as many list-items as possible into a single AttributeDataIB, which will be included in a single
-            // WriteRequestMessage chunk
+            // WriteRequestMessage chunk.
             ReturnErrorOnFailure(TryEncodeListIntoSingleAttributeDataIB(path, listValue, chunkingNeeded, encodedItemCount));
 
             // If all list items fit perfectly into a single AttributeDataIB, there is no need for any `append-item` or chunking,
-            // and we can exit early
+            // and we can exit early.
             VerifyOrReturnError(chunkingNeeded, CHIP_NO_ERROR);
 
             // Start a new WriteRequest chunk, as there are still remaining list items to encode. These remaining items will be
             // appended one by one, each into its own AttributeDataIB. Unlike the first chunk (which contains only one
-            // AttributeDataIB), subsequent chunks may contain multiple AttributeDataIBs if space allows it
+            // AttributeDataIB), subsequent chunks may contain multiple AttributeDataIBs if space allows it.
             ReturnErrorOnFailure(StartNewMessage());
             nextItemToAppendIndex = encodedItemCount;
         }
@@ -388,7 +388,7 @@ private:
         VerifyOrReturnError((writer = GetAttributeDataIBTLVWriter()) != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
         // In the event of Chunking (we have a CHIP_ERROR_NO_MEMORY), we need to Unreserve two more Bytes in order to be able to
-        // Append EndOfContainer of the List + EndOfContainer of the AttributeDataIB
+        // Append EndOfContainer of the List + EndOfContainer of the AttributeDataIB.
         VerifyOrDie(writer->UnreserveBuffer(kReservedSizeForEndOfListContainer + kReservedSizeForEndOfAttributeDataIB) ==
                     CHIP_NO_ERROR);
         ReturnErrorOnFailure(writer->EndContainer(kAttributeDataIBType));
@@ -399,7 +399,7 @@ private:
 
     template <class T>
     CHIP_ERROR TryEncodeListIntoSingleAttributeDataIB(const ConcreteDataAttributePath & attributePath,
-                                                      const DataModel::List<T> & list, bool & chunkingNeeded,
+                                                      const DataModel::List<T> & list, bool & outChunkingNeeded,
                                                       uint16_t & outEncodedItemCount)
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -427,7 +427,7 @@ private:
             if (err == CHIP_ERROR_NO_MEMORY || err == CHIP_ERROR_BUFFER_TOO_SMALL)
             {
                 mWriteRequestBuilder.GetWriteRequests().Rollback(backupWriter);
-                chunkingNeeded = true;
+                outChunkingNeeded = true;
                 break;
             }
             ReturnErrorOnFailure(err);
@@ -439,7 +439,7 @@ private:
 
     /**
      * A wrapper for TryEncodeSingleAttributeDataIB which will start a new chunk when failed with CHIP_ERROR_NO_MEMORY or
-     * CHIP_ERROR_BUFFER_TOO_SMALL. This will not be used for Lists
+     * CHIP_ERROR_BUFFER_TOO_SMALL. This will not be used for Lists. For Lists, use TryEncodeListIntoSingleAttributeDataIB instead.
      */
     template <class T>
     CHIP_ERROR EncodeSingleAttributeDataIB(const ConcreteDataAttributePath & attributePath, const T & value)
