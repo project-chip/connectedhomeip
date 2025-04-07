@@ -391,12 +391,22 @@ static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
 {
     assertChipStackLockedByCurrentThread();
 
+    // emberAfClearDynamicEndpoint has to happen outside our lock, because it
+    // will try to walk our clusters as part of its dirty-marking and access
+    // checks and whatnot.
+    std::optional<uint16_t> endpointIndex;
+    {
+        std::lock_guard lock(_lock);
+        endpointIndex = _endpointIndex;
+    }
+
+    if (endpointIndex.has_value()) {
+        emberAfClearDynamicEndpoint(endpointIndex.value());
+    }
+
     std::lock_guard lock(_lock);
 
-    if (_endpointIndex.has_value()) {
-        emberAfClearDynamicEndpoint(_endpointIndex.value());
-        _endpointIndex.reset();
-    }
+    _endpointIndex.reset();
 
     for (MTRServerCluster * cluster in _serverClusters) {
         [cluster unregisterMatterCluster];
