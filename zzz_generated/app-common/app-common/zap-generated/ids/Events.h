@@ -573,6 +573,28 @@ static constexpr EventId Id = 0x00000004;
 } // namespace Events
 } // namespace DoorLock
 
+namespace ClosureControl {
+namespace Events {
+
+namespace OperationalError {
+static constexpr EventId Id = 0x00000000;
+} // namespace OperationalError
+
+namespace MovementCompleted {
+static constexpr EventId Id = 0x00000001;
+} // namespace MovementCompleted
+
+namespace EngageStateChanged {
+static constexpr EventId Id = 0x00000002;
+} // namespace EngageStateChanged
+
+namespace SecureStateChanged {
+static constexpr EventId Id = 0x00000003;
+} // namespace SecureStateChanged
+
+} // namespace Events
+} // namespace ClosureControl
+
 namespace PumpConfigurationAndControl {
 namespace Events {
 

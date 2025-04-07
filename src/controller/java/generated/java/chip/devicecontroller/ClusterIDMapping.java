@@ -11532,7 +11532,11 @@ public class ClusterIDMapping {
             }
         }
 
-        public enum Event {;
+        public enum Event {
+            OperationalError(0L),
+            MovementCompleted(1L),
+            EngageStateChanged(2L),
+            SecureStateChanged(3L),;
             private final long id;
             Event(long id) {
                 this.id = id;

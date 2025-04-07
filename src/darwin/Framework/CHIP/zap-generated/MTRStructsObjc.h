@@ -1658,9 +1658,9 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRClosureControlClusterOverallStateStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nullable positioning MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nullable latching MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable latch MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable speed MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nullable extraInfo MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable secureState MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -1668,6 +1668,25 @@ MTR_PROVISIONALLY_AVAILABLE
 @property (nonatomic, copy) NSNumber * _Nullable position MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable latch MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable speed MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRClosureControlClusterOperationalErrorEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSArray * _Nonnull errorState MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRClosureControlClusterMovementCompletedEvent : NSObject <NSCopying>
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRClosureControlClusterEngageStateChangedEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull engageValue MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRClosureControlClusterSecureStateChangedEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull secureValue MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE

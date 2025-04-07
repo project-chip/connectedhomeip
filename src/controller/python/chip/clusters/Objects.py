@@ -29679,25 +29679,16 @@ class ClosureControl(Cluster):
 
     class Enums:
         class ClosureErrorEnum(MatterIntEnum):
-            kBlocked = 0x00
-            kTemperatureLimited = 0x01
-            kMaintenanceRequired = 0x02
-            kInternalInterference = 0x03
+            kPhysicallyBlocked = 0x00
+            kBlockedBySensor = 0x01
+            kTemperatureLimited = 0x02
+            kMaintenanceRequired = 0x03
+            kInternalInterference = 0x04
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 4
-
-        class LatchingEnum(MatterIntEnum):
-            kLatchedAndSecured = 0x00
-            kLatchedButNotSecured = 0x01
-            kNotLatched = 0x02
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving an unknown
-            # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 3
+            kUnknownEnumValue = 5
 
         class MainStateEnum(MatterIntEnum):
             kStopped = 0x00
@@ -29726,15 +29717,6 @@ class ClosureControl(Cluster):
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 6
-
-        class TargetLatchEnum(MatterIntEnum):
-            kLatch = 0x00
-            kUnlatch = 0x01
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving an unknown
-            # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 2
 
         class TargetPositionEnum(MatterIntEnum):
             kCloseInFull = 0x00
@@ -29768,15 +29750,15 @@ class ClosureControl(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="positioning", Tag=0, Type=typing.Union[None, Nullable, ClosureControl.Enums.PositioningEnum]),
-                        ClusterObjectFieldDescriptor(Label="latching", Tag=1, Type=typing.Union[None, Nullable, ClosureControl.Enums.LatchingEnum]),
+                        ClusterObjectFieldDescriptor(Label="latch", Tag=1, Type=typing.Union[None, Nullable, bool]),
                         ClusterObjectFieldDescriptor(Label="speed", Tag=2, Type=typing.Union[None, Nullable, Globals.Enums.ThreeLevelAutoEnum]),
-                        ClusterObjectFieldDescriptor(Label="extraInfo", Tag=3, Type=typing.Union[None, Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="secureState", Tag=3, Type=typing.Union[None, Nullable, bool]),
                     ])
 
             positioning: 'typing.Union[None, Nullable, ClosureControl.Enums.PositioningEnum]' = None
-            latching: 'typing.Union[None, Nullable, ClosureControl.Enums.LatchingEnum]' = None
+            latch: 'typing.Union[None, Nullable, bool]' = None
             speed: 'typing.Union[None, Nullable, Globals.Enums.ThreeLevelAutoEnum]' = None
-            extraInfo: 'typing.Union[None, Nullable, uint]' = None
+            secureState: 'typing.Union[None, Nullable, bool]' = None
 
         @dataclass
         class OverallTargetStruct(ClusterObject):
@@ -29785,12 +29767,12 @@ class ClosureControl(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="position", Tag=0, Type=typing.Optional[ClosureControl.Enums.TargetPositionEnum]),
-                        ClusterObjectFieldDescriptor(Label="latch", Tag=1, Type=typing.Optional[ClosureControl.Enums.TargetLatchEnum]),
+                        ClusterObjectFieldDescriptor(Label="latch", Tag=1, Type=typing.Optional[bool]),
                         ClusterObjectFieldDescriptor(Label="speed", Tag=2, Type=typing.Optional[Globals.Enums.ThreeLevelAutoEnum]),
                     ])
 
             position: 'typing.Optional[ClosureControl.Enums.TargetPositionEnum]' = None
-            latch: 'typing.Optional[ClosureControl.Enums.TargetLatchEnum]' = None
+            latch: 'typing.Optional[bool]' = None
             speed: 'typing.Optional[Globals.Enums.ThreeLevelAutoEnum]' = None
 
     class Commands:
@@ -29819,12 +29801,12 @@ class ClosureControl(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="position", Tag=0, Type=typing.Optional[ClosureControl.Enums.TargetPositionEnum]),
-                        ClusterObjectFieldDescriptor(Label="latch", Tag=1, Type=typing.Optional[ClosureControl.Enums.TargetLatchEnum]),
+                        ClusterObjectFieldDescriptor(Label="latch", Tag=1, Type=typing.Optional[bool]),
                         ClusterObjectFieldDescriptor(Label="speed", Tag=2, Type=typing.Optional[Globals.Enums.ThreeLevelAutoEnum]),
                     ])
 
             position: typing.Optional[ClosureControl.Enums.TargetPositionEnum] = None
-            latch: typing.Optional[ClosureControl.Enums.TargetLatchEnum] = None
+            latch: typing.Optional[bool] = None
             speed: typing.Optional[Globals.Enums.ThreeLevelAutoEnum] = None
 
         @dataclass
@@ -30000,6 +29982,80 @@ class ClosureControl(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
+    class Events:
+        @dataclass
+        class OperationalError(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000104
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="errorState", Tag=0, Type=typing.List[ClosureControl.Enums.ClosureErrorEnum]),
+                    ])
+
+            errorState: typing.List[ClosureControl.Enums.ClosureErrorEnum] = field(default_factory=lambda: [])
+
+        @dataclass
+        class MovementCompleted(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000104
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000001
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                    ])
+
+        @dataclass
+        class EngageStateChanged(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000104
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000002
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="engageValue", Tag=0, Type=bool),
+                    ])
+
+            engageValue: bool = False
+
+        @dataclass
+        class SecureStateChanged(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000104
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000003
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="secureValue", Tag=0, Type=bool),
+                    ])
+
+            secureValue: bool = False
 
 
 @dataclass

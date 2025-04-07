@@ -29776,7 +29776,7 @@ public class ClusterInfoMapping {
     CommandParameterInfo closureControlmoveTopositionCommandParameterInfo = new CommandParameterInfo("position", Optional.class, Integer.class);
     closureControlmoveToCommandParams.put("position",closureControlmoveTopositionCommandParameterInfo);
 
-    CommandParameterInfo closureControlmoveTolatchCommandParameterInfo = new CommandParameterInfo("latch", Optional.class, Integer.class);
+    CommandParameterInfo closureControlmoveTolatchCommandParameterInfo = new CommandParameterInfo("latch", Optional.class, Boolean.class);
     closureControlmoveToCommandParams.put("latch",closureControlmoveTolatchCommandParameterInfo);
 
     CommandParameterInfo closureControlmoveTospeedCommandParameterInfo = new CommandParameterInfo("speed", Optional.class, Integer.class);
@@ -29787,7 +29787,7 @@ public class ClusterInfoMapping {
         .moveTo((DefaultClusterCallback) callback
         , (Optional<Integer>)
         commandArguments.get("position")
-        , (Optional<Integer>)
+        , (Optional<Boolean>)
         commandArguments.get("latch")
         , (Optional<Integer>)
         commandArguments.get("speed")

@@ -22,6 +22,7 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelEngine.h>
 #include <app/util/attribute-storage.h>
+#include <app/EventLogging.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -84,9 +85,19 @@ CHIP_ERROR Instance::SetMainState(MainStateEnum aMainState)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
+    
     // If the Main State has changed, trigger the attribute change callback
     if (mMainState != aMainState)
     {
+        //Present state is Disengaged and will be changed to new state , so set engageState to true.
+        if(mMainState == MainStateEnum::kDisengaged){
+            PostEngageStateChangedEvent(true);
+        }
+        //New state will be Disengaged , so set engageState to false.
+        if(aMainState == MainStateEnum::kDisengaged){
+            PostEngageStateChangedEvent(false);
+        }
+        
         mMainState = aMainState;
         MatterReportingAttributeChangeCallback(mDelegate.GetEndpointId(), ClosureControl::Id, Attributes::MainState::Id);
         UpdateCountdownTimeFromClusterLogic();
@@ -99,8 +110,17 @@ CHIP_ERROR Instance::SetOverallState(const GenericOverallState & aOverallState)
     // If the overall state has changed, trigger the attribute change callback
     if (!(mOverallState == aOverallState))
     {
+        if(mOverallState.secureState!= aOverallState.secureState) {
+            if(aOverallState.secureState.HasValue()) {
+                PostSecureStateChangedEvent(false);
+            } else {
+                PostSecureStateChangedEvent(aOverallState.secureState.Value().Value());
+            }
+        }
+        
         mOverallState = aOverallState;
         MatterReportingAttributeChangeCallback(mDelegate.GetEndpointId(), ClosureControl::Id, Attributes::OverallState::Id);
+        
     }
 
     return CHIP_NO_ERROR;
@@ -131,6 +151,82 @@ const GenericOverallState & Instance::GetOverallState() const
 const GenericOverallTarget & Instance::GetOverallTarget() const
 {
     return mOverallTarget;
+}
+
+CHIP_ERROR Instance::PostOperationalErrorEvent(const DataModel::List<const ClosureErrorEnum> errorState) {
+    
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    err = SetMainState(MainStateEnum::kError);
+    
+    //TODO: Should CurrentErrorList attribute updated here.
+    
+    if (CHIP_NO_ERROR != err)
+    {
+        ChipLogError(DataManagement, "ClosureControlCLuster: Operation error event set MainState as Error failed %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    
+    Events::OperationalError::Type event{.errorState = errorState};
+    EventNumber eventNumber;
+    err = LogEvent(event, mDelegate.GetEndpointId(), eventNumber);
+    if (CHIP_NO_ERROR != err)
+    {
+        ChipLogError(DataManagement, "ClosureControlCLuster: Operation error log event failed %" CHIP_ERROR_FORMAT, err.Format());
+    }
+
+    return err;
+}
+
+CHIP_ERROR Instance::PostMovementCompletedEvent() {
+    Events::MovementCompleted::Type event{};
+    
+    if(!HasFeature(Feature::kPositioning)) {
+        return CHIP_NO_ERROR;
+    }
+    
+    //TODO: should the countdown time set to 0 here.
+
+    EventNumber eventNumber;
+    CHIP_ERROR err = LogEvent(event, mDelegate.GetEndpointId(), eventNumber);
+    if (CHIP_NO_ERROR != err)
+    {
+        ChipLogError(DataManagement, "ClosureControlCLuster: Movement complete log event failed %" CHIP_ERROR_FORMAT, err.Format());
+    }
+
+    return err;
+}
+
+CHIP_ERROR Instance::PostEngageStateChangedEvent(const bool engageValue) {
+    Events::EngageStateChanged::Type event{.engageValue = engageValue};
+    
+    if(!HasFeature(Feature::kManuallyOperable)) {
+        return CHIP_NO_ERROR;
+    }
+
+    EventNumber eventNumber;
+    CHIP_ERROR err = LogEvent(event, mDelegate.GetEndpointId(), eventNumber);
+    if (CHIP_NO_ERROR != err)
+    {
+        ChipLogError(DataManagement, "ClosureControlCLuster: Engage State log event failed %" CHIP_ERROR_FORMAT, err.Format());
+    }
+
+    return err;
+}
+
+CHIP_ERROR Instance::PostSecureStateChangedEvent(const bool secureValue) {
+    Events::SecureStateChanged::Type event{.secureValue = secureValue};
+    
+    if(!(HasFeature(Feature::kPositioning) || HasFeature(Feature::kMotionLatching))) {
+        return CHIP_NO_ERROR;
+    }
+
+    EventNumber eventNumber;
+    CHIP_ERROR err = LogEvent(event, mDelegate.GetEndpointId(), eventNumber);
+    if (CHIP_NO_ERROR != err)
+    {
+        ChipLogError(DataManagement, "ClosureControlCLuster: Secured state log event failed %" CHIP_ERROR_FORMAT, err.Format());
+    }
+
+    return err;
 }
 
 void Instance::UpdateCountdownTime(bool fromDelegate)
