@@ -32,7 +32,7 @@ declare_args() {
   }
 
   # Inet implementation type.
-  if (chip_system_config_use_open_thread_inet_endpoints) {
+  if (chip_system_config_use_openthread_inet_endpoints) {
     chip_system_config_inet = "OpenThread"
   } else if (chip_system_config_use_lwip) {
     chip_system_config_inet = "LwIP"

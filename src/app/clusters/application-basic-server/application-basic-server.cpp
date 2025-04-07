@@ -248,3 +248,8 @@ void MatterApplicationBasicPluginServerInitCallback()
 {
     app::AttributeAccessInterfaceRegistry::Instance().Register(&gApplicationBasicAttrAccess);
 }
+
+void MatterApplicationBasicPluginServerShutdownCallback()
+{
+    app::AttributeAccessInterfaceRegistry::Instance().Unregister(&gApplicationBasicAttrAccess);
+}

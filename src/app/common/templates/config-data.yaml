@@ -37,6 +37,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Sample MEI
     - Microwave Oven Control
     - Chime
+    - Camera AV Stream Management
     - Commissioner Control
     - Energy EVSE
     - Energy EVSE Mode
@@ -49,6 +50,8 @@ CommandHandlerInterfaceOnlyClusters:
     - Thread Network Directory
     - Water Heater Management
     - Water Heater Mode
+    - WebRTC Transport Provider
+    - WebRTC Transport Requestor
     - General Commissioning
     - General Diagnostics
     - Software Diagnostics
