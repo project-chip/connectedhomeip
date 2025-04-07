@@ -688,7 +688,7 @@ CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, a
     break;
     case Attributes::Rloc16::Id:
         err = encoder.Encode(otThreadGetRloc16(otInst));
-    break;
+        break;
     default: {
         err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
     }
