@@ -5,3 +5,5 @@ VALIDATE_PRODUCT = YES
 
 // TODO: remove, only adding whitespace to match existing value
 GCC_PREPROCESSOR_DEFINITIONS = $(nothing) $(GCC_PREPROCESSOR_DEFINITIONS)
+
+#include? "Project.Release.Override.xcconfig"

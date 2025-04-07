@@ -5,3 +5,5 @@ LD_RUNPATH_SEARCH_PATHS = $(inherited) @executable_path/Frameworks @loader_path/
 PRODUCT_BUNDLE_IDENTIFIER = com.chip.CHIPTests
 PRODUCT_NAME = $(TARGET_NAME)
 SWIFT_OBJC_BRIDGING_HEADER = CHIPTests/MatterTests-Bridging-Header.h
+
+#include? "MatterTests.Override.xcconfig"

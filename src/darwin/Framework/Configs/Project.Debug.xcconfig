@@ -6,3 +6,5 @@ TAPI_ENABLE_PROJECT_HEADERS = YES
 
 // TODO: remove $(nothing), only there to match whitespace of existing value
 GCC_PREPROCESSOR_DEFINITIONS = $(nothing) DEBUG=1 $(inherited)
+
+#include? "Project.Debug.Override.xcconfig"

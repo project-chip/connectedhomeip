@@ -18,3 +18,5 @@ SDKROOT = macosx
 SUPPORTS_MACCATALYST = YES
 SYSTEM_HEADER_SEARCH_PATHS = $(CHIP_ROOT)/src/darwin/Framework/CHIP/
 WARNING_CFLAGS = -Wformat -Wformat-nonliteral -Wformat-security -Wconversion -Wno-documentation
+
+#include? "darwin-framework-tool.Override.xcconfig"
