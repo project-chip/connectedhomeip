@@ -53,13 +53,11 @@ class TC_FAN_2_4(MatterBaseTest):
 
     def steps_TC_FAN_2_4(self):
         return [TestStep(1, "[FC] Commissioning already done.", is_commissioning=True),
-                TestStep(2, "[FC] TH checks the DUT for support of the Wind feature (WND).",
-                         "If the DUT does not support the feature, the test is skipped."),
-                TestStep(3, "[FC] TH reads from the DUT the WindSupport attribute.",
+                TestStep(2, "[FC] TH reads from the DUT the WindSupport attribute.",
                          "Verify that the WindSupport attribute value is of uint8 type. Verify that the WindSupport attribute's value is between 1 and 3 inclusive."),
-                TestStep(4, "[FC] TH reads from the DUT the WindSetting attribute.",
+                TestStep(3, "[FC] TH reads from the DUT the WindSetting attribute.",
                          "Verify that the WindSetting attribute value is of uint8 type. Verify that the WindSetting attribute's value is between 0 and 3 inclusive"),
-                TestStep(5, "[FC] TH checks that WindSetting is conformant with WindSupport.",
+                TestStep(4, "[FC] TH checks that WindSetting is conformant with WindSupport.",
                          "Verify that all bits set in WindSetting are also set in WindSupport."),
                 ]
 
