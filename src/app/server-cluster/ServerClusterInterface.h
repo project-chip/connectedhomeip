@@ -83,7 +83,7 @@ public:
     [[nodiscard]] virtual DataVersion GetDataVersion(const ConcreteClusterPath & path) const = 0;
 
     /// Precondition:
-    ///   - `path` parameter MUST be part of `GetPaths` returned values.
+    ///   - `path` parameter MUST match one of the paths returned by GetPaths.
     [[nodiscard]] virtual BitFlags<DataModel::ClusterQualityFlags> GetClusterFlags(const ConcreteClusterPath &) const = 0;
 
     ///////////////////////////////////// Attribute Support ////////////////////////////////////////////////////////
