@@ -94,14 +94,14 @@ def run_fuzz_test(context):
     try:
         if context.run_mode == FuzzTestMode.UNIT_TEST_MODE:
             subprocess.run([context.fuzz_test_binary_path, ], env=env, check=True)
-            logging.info(f"Fuzz Test Suite executed in Unit Test Mode.")
+            logging.info("Fuzz Test Suite executed in Unit Test Mode.")
 
         elif context.run_mode == FuzzTestMode.CONTINUOUS_FUZZ_MODE:
             subprocess.run([context.fuzz_test_binary_path, f"--fuzz={context.selected_fuzz_test_case}"], env=env, check=True)
 
     # in FuzzTestMode.CONTINUOUS_FUZZ_MODE, the fuzzing will run indefinitely until stopped by the user
     except KeyboardInterrupt:
-        logging.info(f"\n===============\nContinuous-Mode Fuzzing Stopped")
+        logging.info("\n===============\nContinuous-Mode Fuzzing Stopped")
 
     except Exception as e:
         logging.error(f"Error running fuzz test: {e}")
@@ -158,7 +158,7 @@ def generate_coverage_report(context, output_dir_arg):
     with open(lcov_trace_file, "w") as file:
         subprocess.run(cmd, stdout=file, stderr=file)
 
-    logging.debug(f"Data exported into lcov trace format")
+    logging.debug("Data exported into lcov trace format")
 
     # Step3 Generate the coverage report
     cmd = ["genhtml"]
@@ -184,7 +184,7 @@ def generate_coverage_report(context, output_dir_arg):
         logging.error("genhtml not found. Please install lcov to generate the HTML coverage report")
         return
 
-    logging.info(f"Coverage report Generated.")
+    logging.info("Coverage report Generated.")
 
 
 @click.command(add_help_option=False)
@@ -203,7 +203,9 @@ def main(fuzz_test, output, help):
         },
     )
 
-    logging.info("\nThis Script:\n 1. Runs Google FuzzTests in CONTINUOUS_FUZZ_MODE or UNIT_TEST_MODE\n 2. Automatically generates HTML Coverage Report if FuzzTest is coverage-instrumented.\n")
+    logging.info("\nThis Script:")
+    logging.info("1. Runs Google FuzzTests in CONTINUOUS_FUZZ_MODE or UNIT_TEST_MODE")
+    logging.info("2. Automatically generates HTML Coverage Report if FuzzTest is coverage-instrumented.\n")
     logging.info("WARNING: This Script is designed to work with FuzzTests built using build_examples.py")
 
     print("=" * 70 + "\n")
@@ -230,9 +232,9 @@ def main(fuzz_test, output, help):
             if (build_target_dir != previous_build_target_dir):
                 is_coverage_build = "-coverage" in build_target_dir
                 if is_coverage_build:
-                    logging.info(f"\n----------- Coverage-instrumented FuzzTests -----------\n")
+                    logging.info("\n----------- Coverage-instrumented FuzzTests -----------\n")
                 else:
-                    logging.info(f"\n----------- FuzzTests without coverage-instrumentation -----------\n")
+                    logging.info("\n----------- FuzzTests without coverage-instrumentation -----------\n")
                 previous_build_target_dir = build_target_dir
             print(f"   {test}")
         return
@@ -250,8 +252,7 @@ def main(fuzz_test, output, help):
     if not context.is_coverage_instrumented:
         logging.error(
             f"\nFuzzTest Not coverage instrumented: No coverage report will be generated for: '{context.fuzz_test_binary_path}'\n")
-        logging.error(
-            f"for Coverage reports --> Build with Coverage by appending '-coverage' to target e.g.:\n\n\tpython scripts/build/build_examples.py --target linux-x64-tests-clang-pw-fuzztest-coverage build\n")
+        logging.error("for Coverage reports --> Build with Coverage by appending '-coverage' to target e.g.:\n\n\tpython scripts/build/build_examples.py --target linux-x64-tests-clang-pw-fuzztest-coverage build\n")
 
     get_fuzz_test_cases(context)
 
