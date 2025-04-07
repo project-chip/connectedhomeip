@@ -166,52 +166,6 @@ void Instance::HandleGetTariffComponent(HandlerContext & ctx, const Commands::Ge
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::Success);
 }
 
-/*
-bool emberAfCommodityTariffClusterGetDayEntryCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CommodityTariff::Commands::GetDayEntry::DecodableType & commandData)
-{
-    const auto & dayEntryID = commandData.dayEntryID;
-
-    Commands::GetDayEntryResponse::Type response;
-
-    Status status = mDelegate.GetDayEntryById(dayEntryID, response.dayEntry);
-    if (status != Status::Success)
-    {
-        commandObj->AddStatus(commandPath, status);
-        return true;
-    }
-
-    commandObj->AddResponse(commandPath, response);
-    commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Success);
-
-    return true;
-}
-
-bool emberAfCommodityTariffClusterGetTariffComponentCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CommodityTariff::Commands::GetTariffComponent::DecodableType & commandData)
-{
-    const auto & tariffComponentID = commandData.tariffComponentID;
-    Commands::GetTariffComponentResponse::Type response;
-
-    Status status = mDelegate.GetTariffComponentInfoById(tariffComponentID, 
-                                                         response.label,
-                                                         response.dayEntryIDs,
-                                                         response.tariffComponent);
-    if (status != Status::Success)
-    {
-        commandObj->AddStatus(commandPath, status);
-        return true;
-    }
-
-    commandObj->AddResponse(commandPath, response);
-    commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Success);
-
-    
-}
-*/
-
 } // namespace CommodityTariff
 } // namespace Clusters
 } // namespace app
