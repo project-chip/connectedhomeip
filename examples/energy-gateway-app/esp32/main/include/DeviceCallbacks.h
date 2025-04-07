@@ -1,4 +1,5 @@
 /*
+ *
  *    Copyright (c) 2025 Project CHIP Authors
  *    All rights reserved.
  *
@@ -14,35 +15,19 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#pragma once
 
-#include "camera-app.h"
-#include "camera-device.h"
-#include <AppMain.h>
-#include <platform/CHIPDeviceConfig.h>
+#include <app/util/af-types.h>
+#include <common/CHIPDeviceManager.h>
+#include <common/CommonDeviceCallbacks.h>
+#include <platform/CHIPDeviceLayer.h>
 
-using namespace chip;
-using namespace chip::app;
-using namespace chip::app::Clusters;
-using namespace Camera;
-
-CameraDevice cameraDevice;
-
-void ApplicationInit()
+class AppDeviceCallbacks : public CommonDeviceCallbacks
 {
-    ChipLogProgress(Camera, "Matter Camera Linux App: ApplicationInit()");
-    CameraAppInit(&cameraDevice);
-}
+public:
+    virtual void PostAttributeChangeCallback(chip::EndpointId endpointId, chip::ClusterId clusterId, chip::AttributeId attributeId,
+                                             uint8_t type, uint16_t size, uint8_t * value);
 
-void ApplicationShutdown()
-{
-    CameraAppShutdown();
-}
-
-int main(int argc, char * argv[])
-{
-    VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
-
-    ChipLinuxAppMainLoop();
-
-    return 0;
-}
+private:
+    void OnIdentifyPostAttributeChangeCallback(chip::EndpointId endpointId, chip::AttributeId attributeId, uint8_t * value);
+};

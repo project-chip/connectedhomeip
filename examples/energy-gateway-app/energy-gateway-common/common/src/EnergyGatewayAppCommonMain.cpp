@@ -1,4 +1,5 @@
 /*
+ *
  *    Copyright (c) 2025 Project CHIP Authors
  *    All rights reserved.
  *
@@ -15,34 +16,28 @@
  *    limitations under the License.
  */
 
-#include "camera-app.h"
-#include "camera-device.h"
-#include <AppMain.h>
-#include <platform/CHIPDeviceConfig.h>
+#include "EnergyGatewayAppCommonMain.h"
+
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app/data-model/Nullable.h>
+#include <lib/support/CodeUtils.h>
 
 using namespace chip;
 using namespace chip::app;
+using namespace chip::app::DataModel;
 using namespace chip::app::Clusters;
-using namespace Camera;
 
-CameraDevice cameraDevice;
+/*
+ *  @brief  Creates a Delegate and Instance for CommodityPrice clusters
+ *
+ * The Instance is a container around the Delegate, so
+ * create the Delegate first, then wrap it in the Instance
+ * Then call the Instance->Init() to register the attribute and command handlers
+ */
+void ElectricalPriceApplicationInit() {}
 
-void ApplicationInit()
+void ElectricalPriceApplicationShutdown()
 {
-    ChipLogProgress(Camera, "Matter Camera Linux App: ApplicationInit()");
-    CameraAppInit(&cameraDevice);
-}
-
-void ApplicationShutdown()
-{
-    CameraAppShutdown();
-}
-
-int main(int argc, char * argv[])
-{
-    VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
-
-    ChipLinuxAppMainLoop();
-
-    return 0;
+    ChipLogDetail(AppServer, "Energy Gateway App : ElectricalPriceApplicationShutdown()");
 }
