@@ -144,29 +144,31 @@ class TC_CC_2_1(MatterBaseTest):
 
         return steps
 
-    async def _get_totalnumberofprimaries(self, primaries: int) -> int:
-        """Read the attributes which area Primaries<n>X attributes and return the total found and avaiable in the current cluster.
+    async def verify_primary_index(self, primary_index) -> bool:
+        # Read all PrimaryN<X,Y,Intensity> attributes available in the cluster
+        instance_attribute_names = [attr for attr in self.attributes.__dict__.keys(
+        ) if not attr.startswith("__") and attr.startswith('Primary')]
+        # Attributes to search
+        primary_list = ["Primary{primary}X", "Primary{primary}Y", "Primary{primary}Intensity"]
+        # Validate the expected attribute is found.
+        for primary in primary_list:
+            attribute_str = primary.format(primary=primary_index)
+            if attribute_str not in instance_attribute_names or not await self.cluster_has_attribute(self.endpoint, getattr(self.attributes, attribute_str)):
+                return False
+        return True
 
+    async def _get_totalnumberofprimaries(self, primaries: int) -> int:
+        """Read the attributes which area Primaries<n>X,Y,Intensity attributes and return the total found and available in the current cluster.
         Returns:
             numberofprimaries(int) : Number of Primary attributes found.
         """
-        # Generate the NumberofPrimaries we should find.
         numberofprimaries = 0
-        primary_attr_arr = [f"Primary{npindex}X" for npindex in range(1, primaries+1)]
-        # Read all Primary attributes avaiable in the cluster
-        instance_attribute_names = [attr for attr in self.attributes.__dict__.keys(
-        ) if not attr.startswith("__") and attr.startswith('Primary')]
-        for primaryattr in instance_attribute_names:
-           # Use X as reference
-            primaryx_pattern = re.compile(r'^Primary\d{1,2}X$')
-            # Verify the attribute match and is available in the cluster the check if is contained in the generated list.
-            if primaryx_pattern.match(str(primaryattr)) and await self.cluster_has_attribute(self.endpoint, getattr(self.attributes, str(primaryattr))):
-                if primaryattr in primary_attr_arr:
-                    numberofprimaries += 1
-                else:
-                    asserts.fail(
-                        f"Attrute {primaryattr} from the cluster should not be present based on the the value provided for NumberofPrimaries: {numberofprimaries}")
-
+        for pindex in range(1, primaries+1):
+            if await self.verify_primary_index(pindex):
+                numberofprimaries += 1
+            else:
+                # Dont break to count all
+                logger.warning(f"PrimaryN<X,Y,Intensity> with index {pindex} was not found in the cluster.")
         return numberofprimaries
 
     async def _verify_attribute(self, attribute: Attribute, data_type: ValueTypesEnum, enum_range: Optional[list] = None, min_len: Optional[int] = None, max_len: Optional[int] = None):
