@@ -200,33 +200,4 @@ limitations under the License.
     <item value="0x32" name="Wine Cooler"/>
   </enum>
 
-  <enum name="FloorSurfaceTag" type="enum8">
-    <item value="0x00" name="Carpet"/>
-    <item value="0x01" name="Ceramic"/>
-    <item value="0x02" name="Concrete"/>
-    <item value="0x03" name="Cork"/>
-    <item value="0x04" name="Deep Carpet"/>
-    <item value="0x05" name="Dirt"/>
-    <item value="0x06" name="Engineered Wood"/>
-    <item value="0x07" name="Glass"/>
-    <item value="0x08" name="Grass"/>
-    <item value="0x09" name="Hardwood"/>
-    <item value="0x0A" name="Laminate"/>
-    <item value="0x0B" name="Linoleum"/>
-    <item value="0x0C" name="Mat"/>
-    <item value="0x0D" name="Metal"/>
-    <item value="0x0E" name="Plastic"/>
-    <item value="0x0F" name="Polished Concrete"/>
-    
-    <item value="0x10" name="Rubber"/>
-    <item value="0x11" name="Rug"/>
-    <item value="0x12" name="Sand"/>
-    <item value="0x13" name="Stone"/>
-    <item value="0x14" name="Tatami"/>
-    <item value="0x15" name="Terrazzo"/>
-    <item value="0x16" name="Tile"/>
-    <item value="0x17" name="Vinyl"/>
-  </enum>
-
-
 </configurator>
