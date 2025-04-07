@@ -3,13 +3,11 @@ import logging
 import os
 import re
 import subprocess
+from dataclasses import dataclass
+from typing import List, Optional
 
 import click
 import coloredlogs  # type: ignore
-from typing import Optional, List
-
-from dataclasses import dataclass
-
 
 profile_output_folder = "out/profiling_fuzztest"
 coverage_report_output_folder = "out/coverage_fuzztest"
