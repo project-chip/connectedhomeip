@@ -202,17 +202,7 @@ public:
     virtual CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, DataModel::ListBuilder<CommandId> & builder) = 0;
 
     /// Returns whether `GetPaths` contains the given path
-    bool PathsContains(const ConcreteClusterPath & path)
-    {
-        for (const auto & myPath : GetPaths())
-        {
-            if (path == myPath)
-            {
-                return true;
-            }
-        }
-        return false;
-    }
+    bool PathsContains(const ConcreteClusterPath & path);
 };
 
 } // namespace app
