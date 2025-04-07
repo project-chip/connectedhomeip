@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2023 Project CHIP Authors
+#    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,6 +28,7 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
+#       --endpoint 1
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -39,8 +40,8 @@ from typing import Any
 
 import chip.clusters as Clusters
 from chip.testing.matter_asserts import assert_valid_uint8
-from matter_testing_infrastructure.chip.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body,
-                                                                       default_matter_test_main)
+from matter_testing_infrastructure.chip.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main,
+                                                                       has_feature, run_if_endpoint_matches)
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
@@ -79,32 +80,22 @@ class TC_FAN_2_4(MatterBaseTest):
         return await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=cluster, attribute=attribute)
 
     def pics_TC_FAN_2_4(self) -> list[str]:
-        return ["FAN.S"]
+        return ["FAN.S.F03"]
 
-    @async_test_body
+    @run_if_endpoint_matches(has_feature(Clusters.FanControl, Clusters.FanControl.Bitmaps.Feature.kWind))
     async def test_TC_FAN_2_4(self):
         # Setup
         self.endpoint = self.get_endpoint(default=1)
         cluster = Clusters.FanControl
         attr = cluster.Attributes
-        wind_feature = cluster.Bitmaps.Feature.kWind
 
         # *** STEP 1 ***
         # Commissioning already done
         self.step(1)
 
         # *** STEP 2 ***
-        # TH checks the DUT for support of the Wind feature (WND)
-        #  - If the DUT does not support the feature, the test is skipped
-        self.step(2)
-        supports_wind = await self.feature_guard(self.endpoint, cluster, wind_feature)
-        if not supports_wind:
-            logger.info("[Fc] The Wind (WND) feature must be supported by the DUT for this test, skipping test.")
-            self.skip_all_remaining_steps()
-
-        # *** STEP 3 ***
         # TH reads from the DUT the WindSupport attribute
-        self.step(3)
+        self.step(2)
         wind_support = await self.read_setting(attr.WindSupport)
 
         # Verify that the WindSupport attribute value is of uint8 type
@@ -114,9 +105,9 @@ class TC_FAN_2_4(MatterBaseTest):
         asserts.assert_in(wind_support, range(
             1, 4), f"[FC] WindSupport attribute value ({wind_support}) is not between 1 and 3 inclusive")
 
-        # *** STEP 4 ***
+        # *** STEP 3 ***
         # TH reads from the DUT the WindSetting attribute
-        self.step(4)
+        self.step(3)
         wind_setting = await self.read_setting(attr.WindSetting)
 
         # Verify that the WindSetting attribute value is of uint8 type
@@ -126,10 +117,10 @@ class TC_FAN_2_4(MatterBaseTest):
         asserts.assert_in(wind_setting, range(
             0, 4), f"[FC] WindSetting attribute value ({wind_setting}) is not between 0 and 3 inclusive")
 
-        # *** STEP 5 ***
+        # *** STEP 4 ***
         # TH checks that WindSetting is conformant with WindSupport
         # Verify that all bits set in WindSetting are also set in WindSupport
-        self.step(5)
+        self.step(4)
         is_wind_conformant = (wind_setting & wind_support) == wind_setting
         asserts.assert_true(is_wind_conformant, "[FC] WindSetting contains unsupported bits; it is not conformant with WindSupport")
 
