@@ -2787,7 +2787,7 @@ endpoint 1 {
   }
 
   server cluster ClosureControl {
-    ram      attribute countdownTime;
+    callback attribute countdownTime;
     ram      attribute mainState;
     callback attribute currentErrorList;
     callback attribute overallState;

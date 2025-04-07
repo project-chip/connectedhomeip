@@ -5382,7 +5382,7 @@
               "side": "server",
               "type": "elapsed_s",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
