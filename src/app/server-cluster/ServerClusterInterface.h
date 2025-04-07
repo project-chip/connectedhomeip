@@ -97,7 +97,7 @@ public:
     ///   3) The opType argument indicates the type of notification (Start, Failure, Success).
     ///
     /// Precondition:
-    ///   - `path` cluster part MUST be a path that is part of `GetPaths` returned values.
+    ///   - `path` endpoint+cluster part MUST match one of the paths returned by GetPaths.
     virtual void ListAttributeWriteNotification(const ConcreteAttributePath & path, DataModel::ListWriteOperation opType) {}
 
     /// Reads the value of an existing attribute.
