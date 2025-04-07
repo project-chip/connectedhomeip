@@ -381,8 +381,6 @@ TEST_F(TestWriteChunking, TestListChunking_NonEmptyReplaceAllList)
 
         ChipLogDetail(DataManagement, "Running iteration %d\n", static_cast<int>(i));
 
-        gIterationCount = i;
-
         app::WriteClient writeClient(&GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing(),
                                      static_cast<uint16_t>(minReservationSize + i) /* reserved buffer size */);
 
@@ -513,7 +511,7 @@ TEST_F(TestWriteChunking, TestBadChunking)
 
 /*
  * A Variant of TestBadChunking above, that tests the Code Path where we encode a Non-Replace All List in WriteRequests, this
- * happens with the ACL Attribute
+ * happens with the ACL Attribute.
  */
 TEST_F(TestWriteChunking, TestBadChunking_NonEmptyReplaceAllList)
 {
@@ -536,21 +534,19 @@ TEST_F(TestWriteChunking, TestBadChunking_NonEmptyReplaceAllList)
 
     constexpr uint8_t kTestListLengthBadChunking = 5;
 
-    for (int i = 850; i < static_cast<int>(chip::app::kMaxSecureSduLengthBytes); i++)
+    for (int msgSize = 850; msgSize < static_cast<int>(chip::app::kMaxSecureSduLengthBytes); msgSize++)
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
         TestWriteCallback writeCallback;
 
-        ChipLogDetail(DataManagement, "Running iteration with OCTET_STRING length = %d\n", i);
-
-        gIterationCount = (uint32_t) i;
+        ChipLogDetail(DataManagement, "Running iteration with OCTET_STRING length = %d\n", msgSize);
 
         app::WriteClient writeClient(&GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing());
 
         ByteSpan list[kTestListLengthBadChunking];
         for (auto & item : list)
         {
-            item = ByteSpan(sByteSpanData, static_cast<uint32_t>(i));
+            item = ByteSpan(sByteSpanData, static_cast<uint32_t>(msgSize));
         }
 
         err = writeClient.EncodeAttribute(attributePath, app::DataModel::List<ByteSpan>(list, kTestListLengthBadChunking));
@@ -678,7 +674,7 @@ TEST_F(TestWriteChunking, TestConflictWrite)
 
 /*
  * A Variant of TestConflictWrite above, that tests the Code Path where we encode a Non-Replace All List in WriteRequests, this
- * happens with the ACL Attribute
+ * happens with the ACL Attribute.
  */
 TEST_F(TestWriteChunking, TestConflictWrite_NonEmptyReplaceAllList)
 {
@@ -828,7 +824,7 @@ TEST_F(TestWriteChunking, TestNonConflictWrite)
 
 /*
  * A Variant of TestNonConflictWrite above, that tests the Code Path where we encode a Non-Replace All List in WriteRequests, this
- * happens with the ACL Attribute
+ * happens with the ACL Attribute.
  */
 TEST_F(TestWriteChunking, TestNonConflictWrite_NonEmptyReplaceAllList)
 {
@@ -1094,7 +1090,7 @@ TEST_F(TestWriteChunking, TestTransactionalList)
 
 /*
  * A Variant of RunTest above, that tests the Code Path where we encode a Non-Replace All List in WriteRequests, this
- * happens with the ACL Attribute
+ * happens with the ACL Attribute.
  */
 void TestWriteChunking::RunTest_NonEmptyReplaceAll(Instructions instructions)
 {
@@ -1192,7 +1188,7 @@ void TestWriteChunking::RunTest_NonEmptyReplaceAll(Instructions instructions)
 
 TEST_F(TestWriteChunking, TestTransactionalList_NonEmptyReplaceAllList)
 {
-    // Initialize the ember side server logic
+    // Initialize the ember side server logic.
     app::InteractionModelEngine::GetInstance()->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
     InitDataModelHandler();
 

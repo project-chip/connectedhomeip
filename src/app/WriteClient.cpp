@@ -283,7 +283,7 @@ WriteClient::TryPutPreencodedAttributeWritePayloadIntoList(const chip::app::Conc
     return EnsureListEnded();
 }
 
-// TODO Add Unit Tests for PutPreencodedAttribute and for TryPutPreencodedAttributeWritePayloadIntoList
+// TODO #38287 Add Unit Tests for PutPreencodedAttribute and for TryPutPreencodedAttributeWritePayloadIntoList.
 CHIP_ERROR WriteClient::PutPreencodedAttribute(const ConcreteDataAttributePath & attributePath, const TLV::TLVReader & data)
 {
 
@@ -327,17 +327,17 @@ CHIP_ERROR WriteClient::PutPreencodedAttribute(const ConcreteDataAttributePath &
             bool chunkingNeeded = false;
 
             // Encode as many list-items as possible into a single AttributeDataIB, which will be included in a single
-            // WriteRequestMessage chunk
+            // WriteRequestMessage chunk.
             ReturnErrorOnFailure(
                 TryPutPreencodedAttributeWritePayloadIntoList(path, valueReader, chunkingNeeded, encodedItemCount));
 
             // If all list items fit perfectly into a single AttributeDataIB, there is no need for any `append-item` or chunking,
-            // and we can exit early
+            // and we can exit early.
             VerifyOrReturnError(chunkingNeeded, CHIP_NO_ERROR);
 
             // Start a new WriteRequest chunk, as there are still remaining list items to encode. These remaining items will be
             // appended one by one, each into its own AttributeDataIB. Unlike the first chunk (which contains only one
-            // AttributeDataIB), subsequent chunks may contain multiple AttributeDataIBs if space allows it
+            // AttributeDataIB), subsequent chunks may contain multiple AttributeDataIBs if space allows it.
             ReturnErrorOnFailure(StartNewMessage());
         }
         path.mListOp = ConcreteDataAttributePath::ListOperation::AppendItem;
