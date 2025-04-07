@@ -27,7 +27,7 @@
 using chip::app::DataModel::MakeNullable;
 using namespace ::chip::DeviceLayer::Internal;
 using namespace SilabsDoorLock;
-using namespace SilabsDoorLockConfig::LockInitParams;
+using namespace SilabsDoorLock::LockInitParams;
 
 static constexpr uint16_t LockUserInfoSize        = sizeof(LockUserInfo);
 static constexpr uint16_t LockCredentialInfoSize  = sizeof(LockCredentialInfo);

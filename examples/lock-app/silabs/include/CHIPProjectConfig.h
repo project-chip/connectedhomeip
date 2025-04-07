@@ -115,54 +115,6 @@ static constexpr uint8_t kMaxCredentialSize          = 20;
 static constexpr uint8_t kNumCredentialTypes         = 6;
 
 } // namespace ResourceRanges
-
-namespace LockInitParams {
-
-struct LockParam
-{
-    // Read from zap attributes
-    uint16_t numberOfUsers                  = 0;
-    uint8_t numberOfCredentialsPerUser      = 0;
-    uint8_t numberOfWeekdaySchedulesPerUser = 0;
-    uint8_t numberOfYeardaySchedulesPerUser = 0;
-    uint8_t numberOfHolidaySchedules        = 0;
-};
-
-class ParamBuilder
-{
-public:
-    ParamBuilder & SetNumberOfUsers(uint16_t numberOfUsers)
-    {
-        lockParam_.numberOfUsers = numberOfUsers;
-        return *this;
-    }
-    ParamBuilder & SetNumberOfCredentialsPerUser(uint8_t numberOfCredentialsPerUser)
-    {
-        lockParam_.numberOfCredentialsPerUser = numberOfCredentialsPerUser;
-        return *this;
-    }
-    ParamBuilder & SetNumberOfWeekdaySchedulesPerUser(uint8_t numberOfWeekdaySchedulesPerUser)
-    {
-        lockParam_.numberOfWeekdaySchedulesPerUser = numberOfWeekdaySchedulesPerUser;
-        return *this;
-    }
-    ParamBuilder & SetNumberOfYeardaySchedulesPerUser(uint8_t numberOfYeardaySchedulesPerUser)
-    {
-        lockParam_.numberOfYeardaySchedulesPerUser = numberOfYeardaySchedulesPerUser;
-        return *this;
-    }
-    ParamBuilder & SetNumberOfHolidaySchedules(uint8_t numberOfHolidaySchedules)
-    {
-        lockParam_.numberOfHolidaySchedules = numberOfHolidaySchedules;
-        return *this;
-    }
-    LockParam GetLockParam() { return lockParam_; }
-
-private:
-    LockParam lockParam_;
-};
-
-} // namespace LockInitParams
 } // namespace SilabsDoorLockConfig
 
 /**

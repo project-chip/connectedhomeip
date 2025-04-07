@@ -32,6 +32,54 @@
 
 namespace SilabsDoorLock {
 
+namespace LockInitParams {
+
+struct LockParam
+{
+    // Read from zap attributes
+    uint16_t numberOfUsers                  = 0;
+    uint8_t numberOfCredentialsPerUser      = 0;
+    uint8_t numberOfWeekdaySchedulesPerUser = 0;
+    uint8_t numberOfYeardaySchedulesPerUser = 0;
+    uint8_t numberOfHolidaySchedules        = 0;
+};
+
+class ParamBuilder
+{
+public:
+    ParamBuilder & SetNumberOfUsers(uint16_t numberOfUsers)
+    {
+        lockParam_.numberOfUsers = numberOfUsers;
+        return *this;
+    }
+    ParamBuilder & SetNumberOfCredentialsPerUser(uint8_t numberOfCredentialsPerUser)
+    {
+        lockParam_.numberOfCredentialsPerUser = numberOfCredentialsPerUser;
+        return *this;
+    }
+    ParamBuilder & SetNumberOfWeekdaySchedulesPerUser(uint8_t numberOfWeekdaySchedulesPerUser)
+    {
+        lockParam_.numberOfWeekdaySchedulesPerUser = numberOfWeekdaySchedulesPerUser;
+        return *this;
+    }
+    ParamBuilder & SetNumberOfYeardaySchedulesPerUser(uint8_t numberOfYeardaySchedulesPerUser)
+    {
+        lockParam_.numberOfYeardaySchedulesPerUser = numberOfYeardaySchedulesPerUser;
+        return *this;
+    }
+    ParamBuilder & SetNumberOfHolidaySchedules(uint8_t numberOfHolidaySchedules)
+    {
+        lockParam_.numberOfHolidaySchedules = numberOfHolidaySchedules;
+        return *this;
+    }
+    LockParam GetLockParam() { return lockParam_; }
+
+private:
+    LockParam lockParam_;
+};
+
+} // namespace LockInitParams
+
 namespace Storage {
 
 using namespace SilabsDoorLockConfig::ResourceRanges;
@@ -106,7 +154,7 @@ public:
     } State;
 
     CHIP_ERROR Init(chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> state,
-                    SilabsDoorLockConfig::LockInitParams::LockParam lockParam, PersistentStorageDelegate * storage);
+                    SilabsDoorLock::LockInitParams::LockParam lockParam, PersistentStorageDelegate * storage);
     bool NextState();
     bool IsActionInProgress();
     bool InitiateAction(int32_t aActor, Action_t aAction);
@@ -214,7 +262,7 @@ private:
 
     osTimerId_t mLockTimer;
 
-    SilabsDoorLockConfig::LockInitParams::LockParam LockParams;
+    SilabsDoorLock::LockInitParams::LockParam LockParams;
 
     // Stores LockUserInfo corresponding to a user index
     static StorageKeyName LockUserEndpoint(chip::EndpointId endpoint, uint16_t userIndex)

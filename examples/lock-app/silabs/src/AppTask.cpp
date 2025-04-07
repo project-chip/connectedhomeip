@@ -67,7 +67,7 @@ using namespace chip::app;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Silabs;
 using namespace ::chip::DeviceLayer::Internal;
-using namespace SilabsDoorLockConfig::LockInitParams;
+using namespace SilabsDoorLock::LockInitParams;
 
 namespace {
 LEDWidget sLockLED;

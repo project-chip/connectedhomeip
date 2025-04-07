@@ -771,7 +771,11 @@ struct EmberAfPluginDoorLockCredentialInfo
 {
     DlCredentialStatus status = DlCredentialStatus::kAvailable; /**< Indicates if credential slot is occupied or not. */
     CredentialTypeEnum credentialType;                          /**< Specifies the type of the credential (PIN, RFID, etc.). */
-    chip::MutableByteSpan credentialData;                       /**< Credential data bytes. */
+#if DOOR_LOCK_USE_LOCAL_BUFFER
+    chip::MutableByteSpan credentialData; /**< Credential data bytes. */
+#else
+    chip::ByteSpan credentialData; /**< Credential data bytes. */
+#endif
     DlAssetSource creationSource;
     chip::FabricIndex createdBy; /**< Index of the fabric that created the user. */
 
@@ -789,8 +793,13 @@ struct EmberAfPluginDoorLockCredentialInfo
  */
 struct EmberAfPluginDoorLockUserInfo
 {
-    chip::MutableCharSpan userName;                         /**< Name of the user. */
-    chip::Span<CredentialStruct> credentials;               /**< Credentials that are associated with user (without data).*/
+#if DOOR_LOCK_USE_LOCAL_BUFFER
+    chip::MutableCharSpan userName;           /**< Name of the user. */
+    chip::Span<CredentialStruct> credentials; /**< Credentials that are associated with user (without data).*/
+#else
+    chip::CharSpan userName;                        /**< Name of the user. */
+    chip::Span<const CredentialStruct> credentials; /**< Credentials that are associated with user (without data).*/
+#endif
     uint32_t userUniqueId;                                  /**< Unique user identifier. */
     UserStatusEnum userStatus = UserStatusEnum::kAvailable; /**< Status of the user slot (available/occupied). */
     UserTypeEnum userType;                                  /**< Type of the user. */
