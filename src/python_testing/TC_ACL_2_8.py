@@ -31,13 +31,14 @@
 #       --endpoint 1
 # === END CI TEST ARGUMENTS ===
 
-from chip import ChipDeviceCtrl
+import random
+
 import chip.clusters as Clusters
+from chip import ChipDeviceCtrl
 from chip.clusters.Types import Nullable
 from chip.interaction_model import Status
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
-import random
 
 # Add these constants at the top of the file after imports
 D_OK_EMPTY = bytes.fromhex('1718')
