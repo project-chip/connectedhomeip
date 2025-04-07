@@ -85,12 +85,12 @@ Protocols::InteractionModel::Status CameraAVStreamManager::VideoStreamModify(con
     {
         if (stream.videoStreamParams.videoStreamID == streamID && stream.isAllocated)
         {
-            ChipLogError(Zcl, "Modified video stream with ID: %d", streamID);
+            ChipLogError(Camera, "Modified video stream with ID: %d", streamID);
             return Status::Success;
         }
     }
 
-    ChipLogError(Zcl, "Allocated video stream with ID: %d not found", streamID);
+    ChipLogError(Camera, "Allocated video stream with ID: %d not found", streamID);
     return Status::Failure;
 }
 
@@ -209,12 +209,12 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamModify(
     {
         if (stream.snapshotStreamParams.snapshotStreamID == streamID && stream.isAllocated)
         {
-            ChipLogError(Zcl, "Modified snapshot stream with ID: %d", streamID);
+            ChipLogError(Camera, "Modified snapshot stream with ID: %d", streamID);
             return Status::Success;
         }
     }
 
-    ChipLogError(Zcl, "Allocated snapshot stream with ID: %d not found", streamID);
+    ChipLogError(Camera, "Allocated snapshot stream with ID: %d not found", streamID);
     return Status::Failure;
 }
 
@@ -238,12 +238,12 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamDealloc
 
 void CameraAVStreamManager::OnRankedStreamPrioritiesChanged()
 {
-    ChipLogProgress(Zcl, "Ranked stream priorities changed");
+    ChipLogProgress(Camera, "Ranked stream priorities changed");
 }
 
 void CameraAVStreamManager::OnAttributeChanged(AttributeId attributeId)
 {
-    ChipLogProgress(Zcl, "Attribute changed for AttributeId = " ChipLogFormatMEI, ChipLogValueMEI(attributeId));
+    ChipLogProgress(Camera, "Attribute changed for AttributeId = " ChipLogFormatMEI, ChipLogValueMEI(attributeId));
 }
 
 Protocols::InteractionModel::Status CameraAVStreamManager::CaptureSnapshot(const uint16_t streamID,
@@ -287,7 +287,7 @@ CameraAVStreamManager::LoadAllocatedSnapshotStreams(std::vector<SnapshotStreamSt
 CHIP_ERROR
 CameraAVStreamManager::PersistentAttributesLoadedCallback()
 {
-    ChipLogError(Zcl, "Persistent attributes loaded");
+    ChipLogError(Camera, "Persistent attributes loaded");
 
     return CHIP_NO_ERROR;
 }
