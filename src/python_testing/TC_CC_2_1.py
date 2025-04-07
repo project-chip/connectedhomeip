@@ -144,7 +144,7 @@ class TC_CC_2_1(MatterBaseTest):
 
         return steps
 
-    async def verify_primary_index(self, primary_index) -> bool:
+    async def verify_primary_index(self, primary_index: int) -> bool:
         # Read all PrimaryN<X,Y,Intensity> attributes available in the cluster
         instance_attribute_names = [attr for attr in self.attributes.__dict__.keys(
         ) if not attr.startswith("__") and attr.startswith('Primary')]
@@ -334,16 +334,16 @@ class TC_CC_2_1(MatterBaseTest):
             sctmr_val = await self.read_single_attribute_check_success(cluster=self.cluster, endpoint=self.endpoint, attribute=self.attributes.StartUpColorTemperatureMireds)
             asserts.assert_true(sctmr_val is None or (sctmr_val >= 1) and (sctmr_val <= 65279), "Value is out of range.")
 
-        # NumberofPrimaries will be used to verify Primary<n>[X|Y|Intensity]
+        # NumberOfPrimaries will be used to verify Primary<n>[X|Y|Intensity]
         # Number of primaries cant be 0, it should be greater or equal than 1.
-        # Issue: #9103 to address remove 0 in NumberofPrimaries.
+        # Issue: #9103 to address remove 0 in NumberoOfPrimaries.
         # After this is resolved, check not 0.
 
         self.step(24)
-        # Read NumberofPrimaries from the cluster.
+        # Read NumberOfPrimaries from the cluster.
         numberofprimaries_value = await self._verify_attribute(self.attributes.NumberOfPrimaries, ValueTypesEnum.UINT8, min_len=0, max_len=6)
         if numberofprimaries_value == 0:
-            logger.info("NumberofPrimaries is 0 skipping from 25 to 43.")
+            logger.info("NumberOfPrimaries is 0 skipping from 25 to 43.")
             for i in range(25, 43):
                 self.skip_step(i)
         else:
@@ -360,7 +360,7 @@ class TC_CC_2_1(MatterBaseTest):
                 skip_steps_verifynp = self._verify_for_numberofprimaries_value(numberofprimaries_value, primariesindex)
                 if skip_steps_verifynp:
                     # Skip the 3 steps
-                    logger.info(f"Skipping for NumberofPrimaries {primariesindex}")
+                    logger.info(f"Skipping for NumberOfPrimaries {primariesindex}")
                     for i in range(1, 4):
                         current_step += 1
                         self.skip_step(current_step)
