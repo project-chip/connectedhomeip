@@ -67,7 +67,7 @@ function usage() { # status
 }
 
 function main() { # ...
-    CHIP_ROOT=$(cd "$(dirname "$0")/.." && pwd)
+    CHIP_ROOT=$(cd "$(dirname "$0")/.." >/dev/null && pwd)
     BUILD_ENV_DEPS=(
         "${CHIP_ROOT}/scripts/setup/requirements.build.txt"
         "${CHIP_ROOT}/scripts/setup/constraints.txt"
@@ -99,7 +99,7 @@ function main() { # ...
     [[ -n "$PROJECT" || -n "$BUILD_ENV_DIR" ]] || usage 1
 
     if [[ -n "$PROJECT" ]]; then
-        PROJECT_PATH="$(cd "${CHIP_ROOT}" 2>/dev/null && cd "${PROJECT}" 2>/dev/null && pwd)"
+        PROJECT_PATH="$(cd "${CHIP_ROOT}" >/dev/null && cd "${PROJECT}" >/dev/null && pwd)"
         [[ -n "$PROJECT_PATH" && -r "${PROJECT_PATH}/.gn" ]] || fail "Invalid project '${PROJECT}' - missing .gn at '${PROJECT_PATH}'"
     fi
 
@@ -131,7 +131,7 @@ function main() { # ...
 
     if [[ -n "$BUILD_ENV_DIR" ]]; then
         mkdir -p "$BUILD_ENV_DIR"
-        BUILD_ENV_PATH="$(cd "$BUILD_ENV_DIR" && pwd)"
+        BUILD_ENV_PATH="$(cd "$BUILD_ENV_DIR" >/dev/null && pwd)"
         [[ -n "$BUILD_ENV_PATH" ]] || fail "Invalid build-env-dir '${BUILD_ENV_DIR}'"
         BUILD_ENV_DIR="$BUILD_ENV_PATH" # absolute
     else
