@@ -134,6 +134,7 @@ mcxw71_k32w1_executable("light_app") {
     "CONFIG_ENABLE_FEEDBACK=1",
     "APP_QUEUE_TICKS_TO_WAIT=pdMS_TO_TICKS(10)",
     "EXTERNAL_FACTORY_DATA_PROVIDER_HEADER=\"platform/nxp/common/factory_data/legacy/FactoryDataProvider.h\"",
+    "CONFIG_APP_FREERTOS_OS=1",
   ]
 
   # App common files

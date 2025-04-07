@@ -3990,6 +3990,48 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedThreadNetworkDiagnosticsClusterExtAddressAttributeCallback implements ChipClusters.ThreadNetworkDiagnosticsCluster.ExtAddressAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Long value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Long");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedThreadNetworkDiagnosticsClusterRloc16AttributeCallback implements ChipClusters.ThreadNetworkDiagnosticsCluster.Rloc16AttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Integer value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedThreadNetworkDiagnosticsClusterGeneratedCommandListAttributeCallback implements ChipClusters.ThreadNetworkDiagnosticsCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -29731,8 +29773,8 @@ public class ClusterInfoMapping {
 
     Map<String, CommandParameterInfo> closureControlmoveToCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    CommandParameterInfo closureControlmoveTotagCommandParameterInfo = new CommandParameterInfo("tag", Optional.class, Integer.class);
-    closureControlmoveToCommandParams.put("tag",closureControlmoveTotagCommandParameterInfo);
+    CommandParameterInfo closureControlmoveTopositionCommandParameterInfo = new CommandParameterInfo("position", Optional.class, Integer.class);
+    closureControlmoveToCommandParams.put("position",closureControlmoveTopositionCommandParameterInfo);
 
     CommandParameterInfo closureControlmoveTolatchCommandParameterInfo = new CommandParameterInfo("latch", Optional.class, Integer.class);
     closureControlmoveToCommandParams.put("latch",closureControlmoveTolatchCommandParameterInfo);
@@ -29744,7 +29786,7 @@ public class ClusterInfoMapping {
         ((ChipClusters.ClosureControlCluster) cluster)
         .moveTo((DefaultClusterCallback) callback
         , (Optional<Integer>)
-        commandArguments.get("tag")
+        commandArguments.get("position")
         , (Optional<Integer>)
         commandArguments.get("latch")
         , (Optional<Integer>)
@@ -29767,50 +29809,6 @@ public class ClusterInfoMapping {
         closureControlcalibrateCommandParams
     );
     closureControlClusterInteractionInfoMap.put("calibrate", closureControlcalibrateInteractionInfo);
-
-    Map<String, CommandParameterInfo> closureControlconfigureFallbackCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-
-    CommandParameterInfo closureControlconfigureFallbackrestingProcedureCommandParameterInfo = new CommandParameterInfo("restingProcedure", Optional.class, Integer.class);
-    closureControlconfigureFallbackCommandParams.put("restingProcedure",closureControlconfigureFallbackrestingProcedureCommandParameterInfo);
-
-    CommandParameterInfo closureControlconfigureFallbacktriggerConditionCommandParameterInfo = new CommandParameterInfo("triggerCondition", Optional.class, Integer.class);
-    closureControlconfigureFallbackCommandParams.put("triggerCondition",closureControlconfigureFallbacktriggerConditionCommandParameterInfo);
-
-    CommandParameterInfo closureControlconfigureFallbacktriggerPositionCommandParameterInfo = new CommandParameterInfo("triggerPosition", Optional.class, Integer.class);
-    closureControlconfigureFallbackCommandParams.put("triggerPosition",closureControlconfigureFallbacktriggerPositionCommandParameterInfo);
-
-    CommandParameterInfo closureControlconfigureFallbackwaitingDelayCommandParameterInfo = new CommandParameterInfo("waitingDelay", Optional.class, Long.class);
-    closureControlconfigureFallbackCommandParams.put("waitingDelay",closureControlconfigureFallbackwaitingDelayCommandParameterInfo);
-    InteractionInfo closureControlconfigureFallbackInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.ClosureControlCluster) cluster)
-        .configureFallback((DefaultClusterCallback) callback
-        , (Optional<Integer>)
-        commandArguments.get("restingProcedure")
-        , (Optional<Integer>)
-        commandArguments.get("triggerCondition")
-        , (Optional<Integer>)
-        commandArguments.get("triggerPosition")
-        , (Optional<Long>)
-        commandArguments.get("waitingDelay")
-        );
-      },
-      () -> new DelegatedDefaultClusterCallback(),
-        closureControlconfigureFallbackCommandParams
-    );
-    closureControlClusterInteractionInfoMap.put("configureFallback", closureControlconfigureFallbackInteractionInfo);
-
-    Map<String, CommandParameterInfo> closureControlcancelFallbackCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo closureControlcancelFallbackInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.ClosureControlCluster) cluster)
-        .cancelFallback((DefaultClusterCallback) callback
-        );
-      },
-      () -> new DelegatedDefaultClusterCallback(),
-        closureControlcancelFallbackCommandParams
-    );
-    closureControlClusterInteractionInfoMap.put("cancelFallback", closureControlcancelFallbackInteractionInfo);
 
     commandMap.put("closureControl", closureControlClusterInteractionInfoMap);
 
