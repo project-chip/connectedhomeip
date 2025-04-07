@@ -34,6 +34,7 @@ public:
     CHIP_ERROR GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & day) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR GetHardwareVersion(uint16_t & hardwareVersion) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR GetHardwareVersionString(char * buf, size_t bufSize) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetSoftwareVersionString(char * buf, size_t bufSize) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
 private:

@@ -91,6 +91,7 @@ public:
     CHIP_ERROR GetProductURL(char * buf, size_t bufSize) override;
     CHIP_ERROR GetProductLabel(char * buf, size_t bufSize) override;
     CHIP_ERROR GetHardwareVersionString(char * buf, size_t bufSize) override;
+    CHIP_ERROR GetSoftwareVersionString(char * buf, size_t bufSize) override;
     CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan) override;
     CHIP_ERROR GetSerialNumber(char * buf, size_t bufSize) override;
     CHIP_ERROR GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & day) override;

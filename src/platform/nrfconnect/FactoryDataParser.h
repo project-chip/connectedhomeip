@@ -47,6 +47,7 @@ struct FactoryData
     struct FactoryDataString product_label;
     uint16_t hw_ver;
     struct FactoryDataString hw_ver_str;
+    struct FactoryDataString sw_ver_str;
     struct FactoryDataString rd_uid;
     struct FactoryDataString dac_cert;
     struct FactoryDataString dac_priv_key;

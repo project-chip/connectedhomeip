@@ -219,6 +219,12 @@ CHIP_ERROR ESP32FactoryDataProvider::GetHardwareVersionString(char * buf, size_t
     return ESP32Config::ReadConfigValueStr(ESP32Config::kConfigKey_HardwareVersionString, buf, bufSize, hardwareVersionStringLen);
 }
 
+CHIP_ERROR ESP32FactoryDataProvider::GetSoftwareVersionString(char * buf, size_t bufSize)
+{
+    size_t softwareVersionStringLen = 0; // without counting null-terminator
+    return ESP32Config::ReadConfigValueStr(ESP32Config::kConfigKey_SoftwareVersionString, buf, bufSize, softwareVersionStringLen);
+}
+
 CHIP_ERROR ESP32FactoryDataProvider::GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan)
 {
     ChipError err = CHIP_ERROR_WRONG_KEY_TYPE;

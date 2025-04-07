@@ -358,6 +358,12 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::GetHardwareVersionString(char 
 }
 
 template <class FlashFactoryData>
+CHIP_ERROR FactoryDataProvider<FlashFactoryData>::GetSoftwareVersionString(char * buf, size_t bufSize)
+{
+    return GetFactoryDataString(mFactoryData.sw_ver_str, buf, bufSize);
+}
+
+template <class FlashFactoryData>
 CHIP_ERROR FactoryDataProvider<FlashFactoryData>::GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan)
 {
     VerifyOrReturnError(uniqueIdSpan.size() >= mFactoryData.rd_uid.len, CHIP_ERROR_BUFFER_TOO_SMALL);

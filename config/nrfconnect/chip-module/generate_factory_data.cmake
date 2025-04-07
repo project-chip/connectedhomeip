@@ -50,6 +50,7 @@ string(APPEND script_args "--vendor_name \"${CONFIG_CHIP_DEVICE_VENDOR_NAME}\"\n
 string(APPEND script_args "--product_name \"${CONFIG_CHIP_DEVICE_PRODUCT_NAME}\"\n")
 string(APPEND script_args "--hw_ver ${CONFIG_CHIP_DEVICE_HARDWARE_VERSION}\n")
 string(APPEND script_args "--hw_ver_str \"${CONFIG_CHIP_DEVICE_HARDWARE_VERSION_STRING}\"\n")
+string(APPEND script_args "--sw_ver_str \"${CONFIG_CHIP_DEVICE_SOFTWARE_VERSION_STRING}\"\n")  #+++x  Do we need to handle this differently since it's optional?
 
 # check if Rotating Device Id Unique Id should be generated
 if(CONFIG_CHIP_ROTATING_DEVICE_ID)

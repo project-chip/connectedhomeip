@@ -166,6 +166,7 @@ class TestGenerateFactoryData(unittest.TestCase):
                                    '--date', '2022-07-20',
                                    '--hw_ver', '101',
                                    '--hw_ver_str', 'v1.1',
+                                   '--sw_ver_str', 'v2.2',
                                    '--dac_key', os.path.join(outdir, 'DAC_key.der'),
                                    '--dac_cert', os.path.join(outdir, 'DAC_cert.der'),
                                    '--pai_cert', os.path.join(outdir, 'PAI_cert.der'),
@@ -197,6 +198,7 @@ class TestGenerateFactoryData(unittest.TestCase):
             self.assertEqual(factory_data.get('date'), '2022-07-20')
             self.assertEqual(factory_data.get('hw_ver'), 101)
             self.assertEqual(factory_data.get('hw_ver_str'), 'v1.1')
+            self.assertEqual(factory_data.get('sw_ver_str'), 'v2.2')
             self.assertEqual(factory_data.get('dac_key'), bytes_to_json(DAC_RAW_KEY))
             self.assertEqual(factory_data.get('dac_cert'), bytes_to_json(DAC_DER_CERT))
             self.assertEqual(factory_data.get('pai_cert'), bytes_to_json(PAI_DER_CERT))

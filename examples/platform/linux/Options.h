@@ -97,6 +97,14 @@ struct LinuxDeviceOptions
     chip::Optional<uint16_t> tcVersion;
     chip::Optional<uint16_t> tcRequired;
 #endif
+
+    chip::Optional<std::string> vendorName;
+    chip::Optional<std::string> productName;
+    chip::Optional<std::string> hardwareVersionString;
+    chip::Optional<std::string> softwareVersionString;
+    chip::Optional<std::string> serialNumber;
+    //+++x Adress this comment from the old PR: "The rest are mandatory, but this one might need an ifdef because it's an optional field."
+
     static LinuxDeviceOptions & GetInstance();
 };
 

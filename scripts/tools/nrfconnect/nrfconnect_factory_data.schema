@@ -90,6 +90,12 @@
             "minLength": 1,
             "maxLength": 64
         },
+        "sw_ver_str": {
+            "description": "A string representation of software version",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+        },
         "rd_uid": {
             "description": "A randomly-generated 128-bit or longer octet string. Length has been expanded with 'hex:' prefix",
             "type": "string",

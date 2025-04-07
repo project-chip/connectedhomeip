@@ -60,6 +60,7 @@ number to ensure you are writing to the right device.
 | --vendor_name        | optional             | string             | Provide the vendor name (Max 32 char).                                                  |
 | --hw_version         | optional             | dec/hex            | Provide the hardware version value (Max 2 bytes).                                       |
 | --hw_version_str     | optional             | string             | Provide the hardware version string (Max 64 char).                                      |
+| --sw_version_str     | optional             | string             | Provide the software version string (Max 64 char).                                      |
 | --unique_id          | optional             | Hex string         | A 128 bits hex string unique id (without 0x).                                           |
 | --serial_number      | optional             | string             | Provide serial number of the device (Max 32 char).                                      |
 | --commissioning_flow | optional             | dec/hex            | Provide Commissioning Flow 0=Standard, 1=User Action, 2=Custom.                         |

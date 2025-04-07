@@ -182,6 +182,15 @@ CHIP_ERROR GenericDeviceInstanceInfoProvider<ConfigClass>::GetHardwareVersionStr
 }
 
 template <class ConfigClass>
+CHIP_ERROR GenericDeviceInstanceInfoProvider<ConfigClass>::GetSoftwareVersionString(char * buf, size_t bufSize)
+{
+    VerifyOrReturnError(bufSize >= sizeof(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING), CHIP_ERROR_BUFFER_TOO_SMALL);
+    strcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
+    //+++x why does CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING not have the word "DEFAULT" like the hardware version does?
+    return CHIP_NO_ERROR;
+}
+
+template <class ConfigClass>
 CHIP_ERROR GenericDeviceInstanceInfoProvider<ConfigClass>::GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan)
 {
     ChipError err = CHIP_ERROR_WRONG_KEY_TYPE;

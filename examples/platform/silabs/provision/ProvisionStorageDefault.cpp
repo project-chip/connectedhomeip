@@ -330,7 +330,7 @@ CHIP_ERROR Storage::SetHardwareVersionString(const char * value, size_t len)
 
 CHIP_ERROR Storage::GetHardwareVersionString(char * value, size_t max)
 {
-    size_t hw_version_len = 0; // @ithout counting null-terminator
+    size_t hw_version_len = 0; // without counting null-terminator
 
     CHIP_ERROR err = SilabsConfig::ReadConfigValueStr(SilabsConfig::kConfigKey_HardwareVersionString, value, max, hw_version_len);
 #if defined(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING)
@@ -339,6 +339,29 @@ CHIP_ERROR Storage::GetHardwareVersionString(char * value, size_t max)
         VerifyOrReturnError(value != nullptr, CHIP_ERROR_NO_MEMORY);
         VerifyOrReturnError(max > strlen(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING), CHIP_ERROR_BUFFER_TOO_SMALL);
         Platform::CopyString(value, max, CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING);
+        err = CHIP_NO_ERROR;
+    }
+#endif
+    return err;
+}
+
+CHIP_ERROR Storage::SetSoftwareVersionString(const char * value, size_t len)
+{
+    return SilabsConfig::WriteConfigValueStr(SilabsConfig::kConfigKey_SoftwareVersionString, value, len);
+}
+
+CHIP_ERROR Storage::GetSoftwareVersionString(char * value, size_t max)
+{
+    size_t sw_version_len = 0; // without counting null-terminator
+
+    CHIP_ERROR err = SilabsConfig::ReadConfigValueStr(SilabsConfig::kConfigKey_SoftwareVersionString, value, max, sw_version_len);
+#if defined(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING)
+    if (CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND == err)
+    {
+        VerifyOrReturnError(value != nullptr, CHIP_ERROR_NO_MEMORY);
+        VerifyOrReturnError(max > strlen(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING), CHIP_ERROR_BUFFER_TOO_SMALL);
+        Platform::CopyString(value, max, CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
+        //+++x why does CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING not have the word "DEFAULT" like the hardware version does?
         err = CHIP_NO_ERROR;
     }
 #endif

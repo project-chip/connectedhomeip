@@ -194,6 +194,19 @@ public:
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
+
+    /**
+     * @brief Obtain a Software Version String from the device's factory data.
+     *
+     * @param[in, out] buf Buffer to copy string.
+     *                     On CHIP_NO_ERROR return from this function this buffer will be null-terminated.
+     *                     On error CHIP_ERROR_BUFFER_TOO_SMALL there is no guarantee that buffer will be null-terminated.
+     * @param[in] bufSize Size of data, including the null terminator, that can be written to buf.
+     *                    This size should be +1 higher than maximum possible string.
+     * @returns CHIP_NO_ERROR on success, CHIP_ERROR_BUFFER_TOO_SMALL if the buffer was too small to fit string and null
+     * terminating. or another CHIP_ERROR from the underlying implementation if access fails.
+     */
+    virtual CHIP_ERROR GetSoftwareVersionString(char * buf, size_t bufSize) = 0;
 };
 
 /**

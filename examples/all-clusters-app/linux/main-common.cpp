@@ -181,6 +181,7 @@ class ExampleDeviceInstanceInfoProvider : public DeviceInstanceInfoProvider
 public:
     void Init(DeviceInstanceInfoProvider * defaultProvider) { mDefaultProvider = defaultProvider; }
 
+    //+++x Where is the Darwin equivalent of these?  There is no `examples/all-clusters-app/darwin/*`
     CHIP_ERROR GetVendorName(char * buf, size_t bufSize) override { return mDefaultProvider->GetVendorName(buf, bufSize); }
     CHIP_ERROR GetVendorId(uint16_t & vendorId) override { return mDefaultProvider->GetVendorId(vendorId); }
     CHIP_ERROR GetProductName(char * buf, size_t bufSize) override { return mDefaultProvider->GetProductName(buf, bufSize); }
@@ -200,6 +201,10 @@ public:
     CHIP_ERROR GetHardwareVersionString(char * buf, size_t bufSize) override
     {
         return mDefaultProvider->GetHardwareVersionString(buf, bufSize);
+    }
+    CHIP_ERROR GetSoftwareVersionString(char * buf, size_t bufSize) override
+    {
+        return mDefaultProvider->GetSoftwareVersionString(buf, bufSize);
     }
     CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan) override
     {

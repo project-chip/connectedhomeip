@@ -40,6 +40,7 @@ class FactoryDataWriter:
     VENDOR_NAME_NVM3_KEY = "0x8720D:"
     PRODUCT_NAME_NVM3_KEY = "0x8720E:"
     HW_VER_STR_NVM3_KEY = "0x8720F:"
+    SW_VER_STR_NVM3_KEY = "0x87???:"  #+++x What value to use?
     UNIQUE_ID_NVM3_KEY = "0x8721F:"
     HW_VER_NVM3_KEY = "0x87308:"
     PRODUCT_LABEL_NVM3_KEY = "0x87210:"
@@ -129,6 +130,7 @@ class FactoryDataWriter:
         kMaxVendorNameLength = 32
         kMaxProductNameLength = 32
         kMaxHardwareVersionStringLength = 64
+        kMaxSoftwareVersionStringLength = 64
         kMaxSerialNumberLength = 32
         kUniqueIDLength = 16
         kMaxProductUrlLenght = 256
@@ -152,6 +154,8 @@ class FactoryDataWriter:
             assert (len(self._args.vendor_name) <= kMaxVendorNameLength), "Vendor name exceeds the size limit"
         if self._args.hw_version_str:
             assert (len(self._args.hw_version_str) <= kMaxHardwareVersionStringLength), "Hardware version string exceeds the size limit"
+        if self._args.sw_version_str:
+            assert (len(self._args.sw_version_str) <= kMaxSoftwareVersionStringLength), "Software version string exceeds the size limit"
         if self._args.serial_number:
             assert (len(self._args.serial_number) <= kMaxSerialNumberLength), "Serial number exceeds the size limit"
         if self._args.manufacturing_date:
@@ -259,6 +263,10 @@ class FactoryDataWriter:
             hwVersionByteArray = bytes(self._args.hw_version_str, 'utf-8').hex()
             cmd.extend(["--object", self.HW_VER_STR_NVM3_KEY + str(hwVersionByteArray)])
 
+        if self._args.sw_version_str:
+            swVersionByteArray = bytes(self._args.sw_version_str, 'utf-8').hex()
+            cmd.extend(["--object", self.SW_VER_STR_NVM3_KEY + str(swVersionByteArray)])
+
         if self._args.unique_id:
             cmd.extend(["--object", self.UNIQUE_ID_NVM3_KEY + self._args.unique_id])
 
@@ -331,6 +339,8 @@ def main():
                         help="[int | hex int] Provide the hardware version value[optional]")
     parser.add_argument("--hw_version_str", type=str,
                         help="[string] Provide the hardware version string[optional]")
+    parser.add_argument("--sw_version_str", type=str,
+                        help="[string] Provide the software version string[optional]")
     parser.add_argument("--product_label", type=str,
                         help="[string] Provide the product label [optional]")
     parser.add_argument("--product_url", type=str,
