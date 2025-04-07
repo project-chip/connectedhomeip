@@ -402,7 +402,8 @@ executed manually.
 > -   It is possible to build `FuzzTests` with Coverage instrumentation, by
 >     appending `-coverage` to the target, e.g.
 >     `linux-x64-tests-clang-pw-fuzztest-coverage`
-> -   these tests can be run using `scripts/tests/run_fuzztest_coverage.py`
+> -   Details:
+>     [Coverage Report Generation](https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/fuzz_testing.md#coverage-report-generation)
 
 Tests will be located in:
 `out/linux-x64-tests-clang-pw-fuzztest/chip_pw_fuzztest/tests/` where

@@ -284,9 +284,8 @@ $ ./fuzz-chip-cert-pw --fuzz=ChipCert.DecodeChipCertFuzzer
 -   Screenshot below shows how we can use a Coverage Report to identify a Fuzz
     Blocker
 -   We can see the number of executions of each line in the report.
--   Line (#2159) was unreached, in at least 129,452 executions.
--   The line (#2156) just above the unreached Code Paths is possibly a Fuzz
-    Blocker.
+-   Line (#2159) was not reached, in at least 129,452 executions.
+-   The line (#2156) just above it is possibly a Fuzz Blocker.
 
     -   The `data.fabricId` check is always failing and it is blocking the
         execution of the function that follows it.
