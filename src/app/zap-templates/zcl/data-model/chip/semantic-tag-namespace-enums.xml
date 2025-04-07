@@ -14,8 +14,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
-
-
 <configurator>
   <enum name="PositionTag" type="enum8">
     <item value="0x00" name="Left"/>
@@ -80,7 +78,6 @@ limitations under the License.
     <item value="0x25" name="Garden Door"/>
     <item value="0x26" name="Guest Bathroom"/>
     <item value="0x27" name="Guest Bedroom"/>
-    <item value="0x28" name="Guest Restroom"/>
     <item value="0x29" name="Guest Room"/>
     <item value="0x2A" name="Gym"/>
     <item value="0x2B" name="Hallway"/>
@@ -89,7 +86,6 @@ limitations under the License.
     <item value="0x2E" name="Kids Bedroom"/>
     <item value="0x2F" name="Kitchen"/>
 
-    <item value="0x30" name="Larder"/>
     <item value="0x31" name="Laundry Room"/>
     <item value="0x32" name="Lawn"/>
     <item value="0x33" name="Library"/>
@@ -115,7 +111,6 @@ limitations under the License.
     <item value="0x46" name="Ramp"/>
     <item value="0x47" name="Reception Room"/>
     <item value="0x48" name="Recreation Room"/>
-    <item value="0x49" name="Restroom"/>
     <item value="0x4A" name="Roof"/>
     <item value="0x4B" name="Sauna"/>
     <item value="0x4C" name="Scullery"/>
@@ -138,6 +133,7 @@ limitations under the License.
     <item value="0x5C" name="Utility Room"/>
     <item value="0x5D" name="Ward"/>
     <item value="0x5E" name="Workshop"/>
+    <item value="0x5F" name="Toilet"/>
   </enum>
 
   <enum name="LandmarkTag" type="enum8">
