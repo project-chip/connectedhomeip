@@ -1,6 +1,4 @@
 CHIP_BUILD_TOOLS = true
-CLANG_ANALYZER_NONNULL = YES
-CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES
 CODE_SIGN_ENTITLEMENTS = $(CHIP_ROOT)/examples/darwin-framework-tool/entitlements/darwin-framework-tool.entitlements
 CODE_SIGN_IDENTITY = -
 FRAMEWORK_SEARCH_PATHS = $(inherited) $(SDKROOT)/System/iOSSupport/System/Library/Frameworks

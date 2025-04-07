@@ -20,8 +20,8 @@ PRODUCT_BUNDLE_IDENTIFIER = com.csa.matter
 PRODUCT_NAME = $(TARGET_NAME)
 SDKROOT = iphoneos
 STRIP_STYLE = non-global
+SWIFT_INSTALL_OBJC_HEADER = NO
 SYSTEM_HEADER_SEARCH_PATHS = $(TEMP_DIR)/out/gen/include $(CHIP_ROOT)/src/darwin/Framework/CHIP $(CHIP_ROOT)/src $(CHIP_ROOT)/src/include $(CHIP_ROOT)/zzz_generated $(CHIP_ROOT)/zzz_generated/app-common $(CHIP_ROOT)/third_party/nlassert/repo/include $(CHIP_ROOT)/third_party/nlio/repo/include
-TAPI_VERIFY_MODE = Pedantic
 VERSION_INFO_EXPORT_DECL = __attribute__((visibility("hidden")))
 
 // Include override file last, if it exists
