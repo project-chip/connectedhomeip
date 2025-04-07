@@ -57,5 +57,7 @@
     "Rain Sensor": 68,
     "Oven": 123,
     "Cooktop": 120,
-    "Cook Surface": 119
+    "Cook Surface": 119,
+    "Mounted On/Off Control": 271,
+    "Mounted Dimmable Load Control": 272
 }
