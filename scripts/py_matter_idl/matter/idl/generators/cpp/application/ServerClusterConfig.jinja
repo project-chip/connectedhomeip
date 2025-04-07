@@ -20,7 +20,7 @@ namespace EmberApplicationConfig {
 {% if config.feature_bitmap_type -%}
 using FeatureBitmapType = Feature;
 {%- else -%}
-using FeatureBitmapType = uint32_t;
+using FeatureBitmapType = NoFeatureFlagsDefined;
 {%- endif %}
 
 inline constexpr std::array<EmberApplicationConfig::ClusterConfiguration<FeatureBitmapType>, {{config.endpoint_configs | length}}> kEmberClusterConfig = { {
