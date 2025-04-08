@@ -29,7 +29,46 @@ using namespace chip;
 using namespace chip::bdx;
 using namespace chip::app;
 
-constexpr uint32_t kMaxBdxBlockSize = 1024;
+constexpr uint16_t kMaxBdxBlockSize = 1024;
+
+// For Thread networks we want to reduce the BDX block size a bit, to reduce
+// the number of frames per BDX block. To pick a BDX block size for Thread
+// networks we came up with a number based on:
+//
+//  IEEE 802.15.4 frame size = 127 bytes
+//
+//  First fragment:
+//    IEEE 802.15.4 Header         = 21 bytes
+//    Fragmentation Header         = 4 bytes
+//    IPHC & UDPHC                 = 23 bytes
+//    Mesh Header                  = 5 bytes (applies only for multi hop)
+//  Subsequent fragments:
+//    IEEE 802.15.4 Header         = 21 bytes
+//    Fragmentation Header         = 6 bytes
+//    Mesh Header                  = 5 bytes (applies only for multi hop)
+//
+// That leaves 74 bytes in the first fragment and 95 bytes in following fragments.
+//
+//  Matter Message Header          = 8 bytes
+//  Matter Protocol Header         = 10 bytes (including an Acknowledged Message Counter)
+//  Matter Message Footer          = 16 bytes
+//
+//  BDX Counter                    = 4 bytes
+//
+// So the overhead per BDX block is 38 bytes.
+//
+// Given that, a BDX block of 511 bytes would fit into 6 frames, which is the
+// current default value.
+//
+// The number of Thread frames that we'll use per BDX block can be overridden
+// with `defaults write <domain> BDXThreadFramesPerBlock <numberOfFrames>`.
+
+constexpr uint8_t kMaxThreadFramesPerBdxBlock = 6;
+
+static uint16_t ComputeBdxBlockSizeForThread(uint8_t framesPerBlock)
+{
+    return 74 + (framesPerBlock - 1) * 95 - 38;
+}
 
 // Timeout for the BDX transfer session. The OTA Spec mandates this should be >= 5 minutes.
 constexpr System::Clock::Timeout kBdxTimeout = System::Clock::Seconds16(5 * 60);
@@ -95,7 +134,13 @@ CHIP_ERROR MTROTAImageTransferHandler::Init(Messaging::ExchangeContext * exchang
 
     BitFlags<bdx::TransferControlFlags> flags(bdx::TransferControlFlags::kReceiverDrive);
 
-    return AsyncResponder::Init(mSystemLayer, exchangeCtx, kBdxRole, flags, kMaxBdxBlockSize, kBdxTimeout);
+    uint16_t blockSize;
+    if (mIsPeerNodeAKnownThreadDevice) {
+        blockSize = ComputeBdxBlockSizeForThread(Platform::GetUserDefaultBDXThreadFramesPerBlock().value_or(kMaxThreadFramesPerBdxBlock));
+    } else {
+        blockSize = kMaxBdxBlockSize;
+    }
+    return AsyncResponder::Init(mSystemLayer, exchangeCtx, kBdxRole, flags, blockSize, kBdxTimeout);
 }
 
 MTROTAImageTransferHandler::~MTROTAImageTransferHandler()
@@ -180,7 +225,7 @@ CHIP_ERROR MTROTAImageTransferHandler::OnTransferSessionBegin(const TransferSess
 
     dispatch_async(delegateQueue, ^{
         if ([strongDelegate respondsToSelector:@selector
-                            (handleBDXTransferSessionBeginForNodeID:controller:fileDesignator:offset:completion:)]) {
+                (handleBDXTransferSessionBeginForNodeID:controller:fileDesignator:offset:completion:)]) {
             [strongDelegate handleBDXTransferSessionBeginForNodeID:nodeId
                                                         controller:controller
                                                     fileDesignator:fileDesignator
