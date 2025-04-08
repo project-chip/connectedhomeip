@@ -307,7 +307,6 @@ CHIP_ERROR FactoryDataProviderImpl::ReadAndCheckFactoryDataInFlash(void)
 /* the factory data must be sencrypted by AES-256 */
 CHIP_ERROR FactoryDataProviderImpl::DecryptAndCheckFactoryData(void)
 {
-    status_t status;
     bool encrypted           = false;
     uint16_t i               = 0;
     uint32_t factoryDataSize = mHeader.size;
@@ -415,8 +414,6 @@ CHIP_ERROR FactoryDataProviderImpl::ELS_SaveAesKeyBlob()
     uint32_t factoryDataAddress     = (uint32_t) __FACTORY_DATA_START_OFFSET;
     uint32_t factoryDataSize        = (uint32_t) __FACTORY_DATA_SIZE;
 
-    VerifyOrReturnError(factoryDataRamBuffer != nullptr, CHIP_ERROR_INTERNAL);
-
     uint8_t type = TAG_ID_FOR_AES_KEY_BOLB;
     ReturnErrorOnFailure(ELS_ExportBlob(blob, &blobSize));
     PLOG_DEBUG_BUFFER("els key blob", blob, blobSize);
@@ -454,7 +451,6 @@ CHIP_ERROR FactoryDataProviderImpl::ELS_ExportBlob(uint8_t * data, size_t * data
                       MCUXCLELS_KEYPROPERTY_VALUE_KEY_SIZE_256 | MCUXCLELS_KEYPROPERTY_VALUE_AES }
     };
 
-    mcuxClEls_KeyIndex_t key_index = MCUXCLELS_KEY_SLOTS;
     /* Import plain DAC key into S50 */
     status = import_plain_key_into_els(pAesKey, Crypto::kP256_PrivateKey_Length, plain_key_properties, &key_index);
     STATUS_SUCCESS_OR_EXIT_MSG("derive_key failed: 0x%08x", status);
