@@ -107,6 +107,12 @@ public:
 class WebRTCTransportRequestorServer : private AttributeAccessInterface, private CommandHandlerInterface
 {
 public:
+    enum class UpsertResultEnum : uint8_t
+    {
+        kInserted = 0x00,
+        kUpdated  = 0x01,
+    };
+
     /**
      * @brief
      *  Creates a WebRTCTransportRequestorServer instance with a given endpoint and delegate.
@@ -144,13 +150,16 @@ public:
      */
     std::vector<WebRTCSessionTypeStruct> GetCurrentSessions() const { return mCurrentSessions; }
 
-private:
-    enum class UpsertResultEnum : uint8_t
-    {
-        kInserted = 0x00,
-        kUpdated  = 0x01,
-    };
+    /**
+     * @brief
+     * Inserts a new session or updates an existing one based on session ID.
+     *
+     * @param session The session data to insert or update.
+     * @return kInserted if a new session was added, kUpdated if an existing one was modified.
+     */
+    UpsertResultEnum UpsertSession(const WebRTCSessionTypeStruct & session); // Now public
 
+private:
     WebRTCTransportRequestorDelegate & mDelegate;
     std::vector<WebRTCSessionTypeStruct> mCurrentSessions;
 
@@ -162,7 +171,6 @@ private:
 
     // Helper functions
     WebRTCSessionTypeStruct * FindSession(uint16_t sessionId);
-    UpsertResultEnum UpsertSession(const WebRTCSessionTypeStruct & session);
     uint16_t GenerateSessionId();
     void RemoveSession(uint16_t sessionId);
     bool IsPeerNodeSessionValid(uint16_t sessionId, HandlerContext & ctx);

@@ -20,6 +20,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandSender.h>
+#include <app/clusters/webrtc-transport-requestor-server/webrtc-transport-requestor-server.h>
 #include <controller/CHIPDeviceController.h>
 
 /**
@@ -42,11 +43,15 @@ public:
     {}
 
     /**
-     * @brief Initializes the WebRTCProviderClient with a ScopedNodeId, and EndpointId.
-     * @param peerId         The PeerId (fabric + nodeId) for the remote device.
-     * @param endpointId     The Matter endpoint on the remote device for WebRTCTransportProvider cluster.
+     * @brief Initializes the WebRTCProviderClient with a ScopedNodeId, an EndpointId, and an optional
+     *        pointer to the WebRTCTransportRequestorServer.
+     *
+     * @param peerId              The PeerId (fabric + nodeId) for the remote device.
+     * @param endpointId          The Matter endpoint on the remote device for WebRTCTransportProvider cluster.
+     * @param requestorServer     Pointer to a WebRTCTransportRequestorServer instance.
      */
-    void Init(const chip::ScopedNodeId & peerId, chip::EndpointId endpointId);
+    void Init(const chip::ScopedNodeId & peerId, chip::EndpointId endpointId,
+              chip::app::Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorServer * requestorServer);
 
     /**
      * @brief Sends a ProvideOffer command to the remote device.
@@ -140,11 +145,15 @@ private:
                                   const chip::SessionHandle & sessionHandle);
     static void OnDeviceConnectionFailure(void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR error);
 
+    void HandleProvideOfferResponse(chip::TLV::TLVReader & data);
+
     // Private data members
     chip::ScopedNodeId mPeerId;
     chip::EndpointId mEndpointId = chip::kInvalidEndpointId;
     CommandType mCommandType     = CommandType::kUndefined;
     std::unique_ptr<chip::app::CommandSender> mCommandSender;
+
+    chip::app::Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorServer * mRequestorServer = nullptr;
 
     // Data needed to send the WebRTCTransportProvider commands
     chip::app::Clusters::WebRTCTransportProvider::Commands::ProvideOffer::Type mProvideOfferData;
