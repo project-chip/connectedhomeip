@@ -125,9 +125,11 @@ class TC_SEPR_2_1(MatterBaseTest):
             val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.PriceForecast)
             matter_asserts.assert_list(val, "PriceForecast attribute must return a list")
             matter_asserts.assert_list_element_type(
-                val, "PriceForecast attribute must contain CommodityPriceStruct elements", cluster.Structs.CommodityPriceStruct)
+                val, "PriceForecast attribute must contain CommodityPriceStruct elements",
+                cluster.Structs.CommodityPriceStruct, allow_empty=True)
             for item in val:
-                await self.test_checkCommodityPriceStruct(endpoint=endpoint, cluster=cluster, struct=item)
+                # In the PriceForecast attribute we must not have Description or Components in this returned list
+                await self.test_checkCommodityPriceStruct(endpoint=endpoint, cluster=cluster, struct=item, bitmap=0)
 
     async def test_checkCommodityPriceComponentStruct(self,
                                                       endpoint: int = None,
@@ -145,23 +147,35 @@ class TC_SEPR_2_1(MatterBaseTest):
     async def test_checkCommodityPriceStruct(self,
                                              endpoint: int = None,
                                              cluster: Clusters.CommodityPrice = None,
-                                             struct: Clusters.CommodityPrice.Structs.CommodityPriceStruct = None):
+                                             struct: Clusters.CommodityPrice.Structs.CommodityPriceStruct = None,
+                                             bitmap: Clusters.CommodityPrice.Bitmaps.CommodityPriceDetailBitmap = 0):
         matter_asserts.assert_valid_uint32(struct.periodStart, 'PeriodStart')
         if struct.periodEnd is not NullValue:
             matter_asserts.assert_valid_uint32(struct.periodEnd, 'PeriodEnd')
         asserts.assert_true(isinstance(
             struct.price, Globals.Structs.PriceStruct), "struct.price must be of type PriceStruct")
         await self.test_checkPriceStruct(endpoint=endpoint, cluster=cluster, struct=struct.price)
-        if struct.description is not None:
-            matter_asserts.assert_is_string(struct.description, "Description must be a string")
-            asserts.assert_less_equal(len(struct.description), 32, "Description must have length at most 32!")
-        if struct.components is not None:
-            matter_asserts.assert_list(struct.components, "Components attribute must return a list")
-            matter_asserts.assert_list_element_type(
-                struct.components, "Components attribute must contain CommodityPriceComponentStruct elements", cluster.Structs.CommodityPriceComponentStruct)
-            for item in struct.components:
-                await self.test_checkCommodityPriceComponentStruct(endpoint=endpoint, cluster=cluster, struct=item)
-            asserts.assert_less_equal(len(struct.components), 10, "Components must have at most 10 entries!")
+
+        # In the attribute description and components must not be included based on Bitmap (default 0)
+        if bitmap & Clusters.CommodityPrice.Bitmaps.CommodityPriceDetailBitmap.kDescription:
+            if struct.description is not None:
+                matter_asserts.assert_is_string(struct.description, "Description must be a string")
+                asserts.assert_less_equal(len(struct.description), 32, "Description must have length at most 32!")
+        else:
+            asserts.assert_is_none(struct.description)
+
+        if bitmap & Clusters.CommodityPrice.Bitmaps.CommodityPriceDetailBitmap.kComponents:
+            if struct.components is not None:
+                matter_asserts.assert_list(struct.components, "Components attribute must return a list")
+                matter_asserts.assert_list_element_type(
+                    struct.components,
+                    "Components attribute must contain CommodityPriceComponentStruct elements",
+                    cluster.Structs.CommodityPriceComponentStruct, allow_empty=True)
+                for item in struct.components:
+                    await self.test_checkCommodityPriceComponentStruct(endpoint=endpoint, cluster=cluster, struct=item)
+                asserts.assert_less_equal(len(struct.components), 10, "Components must have at most 10 entries!")
+        else:
+            asserts.assert_is_none(struct.components)
 
     async def test_checkCurrencyStruct(self,
                                        endpoint: int = None,
