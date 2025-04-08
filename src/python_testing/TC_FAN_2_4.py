@@ -159,7 +159,7 @@ class TC_FAN_2_4(MatterBaseTest):
         self.step(6)
         wind_setting_read = await self.read_setting(attr.WindSetting)
         asserts.assert_equal(wind_setting_read, wind_setting_write,
-                            f"[FC] WindSetting attribute value ({wind_setting_read}) does not match the expected value ({wind_setting_write})")
+                             f"[FC] WindSetting attribute value ({wind_setting_read}) does not match the expected value ({wind_setting_write})")
 
 
 if __name__ == "__main__":
