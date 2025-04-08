@@ -189,11 +189,11 @@ private:
     // Note, where assigned, these are spec defaults, potentially overwritten by the delegate. Exception is MaxPresets that
     // is an F quality attribute and assigned by the constructor
     const uint8_t mMaxPresets;
-    int16_t mPanMin     = kMinPanValue;
-    int16_t mPanMax     = kMaxPanValue;
-    int16_t mTiltMin    = -90;
-    int16_t mTiltMax    = 90;
-    uint8_t mZoomMax    = kMaxZoomValue;
+    int16_t mPanMin  = kMinPanValue;
+    int16_t mPanMax  = kMaxPanValue;
+    int16_t mTiltMin = -90;
+    int16_t mTiltMax = 90;
+    uint8_t mZoomMax = kMaxZoomValue;
 
     std::vector<MPTZPresetHelper> mMptzPresetHelpers;
     std::vector<uint16_t> mDptzRelativeMove;

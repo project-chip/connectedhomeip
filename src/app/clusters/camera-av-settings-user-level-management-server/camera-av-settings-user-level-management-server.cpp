@@ -43,7 +43,7 @@ namespace CameraAvSettingsUserLevelManagement {
 CameraAvSettingsUserLevelMgmtServer::CameraAvSettingsUserLevelMgmtServer(EndpointId aEndpointId, Delegate * aDelegate,
                                                                          BitFlags<Feature> aFeatures,
                                                                          BitFlags<OptionalAttributes> aOptionalAttrs,
-                                                                         uint8_t aMaxPresets):
+                                                                         uint8_t aMaxPresets) :
     AttributeAccessInterface(MakeOptional(aEndpointId), CameraAvSettingsUserLevelManagement::Id),
     CommandHandlerInterface(MakeOptional(aEndpointId), CameraAvSettingsUserLevelManagement::Id), mDelegate(aDelegate),
     mEndpointId(aEndpointId), mFeatures(aFeatures), mOptionalAttrs(aOptionalAttrs), mMaxPresets(aMaxPresets)
@@ -1160,7 +1160,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleDPTZRelativeMove(HandlerContext 
     if (!KnownVideoStreamID(videoStreamID))
     {
         ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]. Unknown Video Stream ID provided. ID=%d.", mEndpointId,
-                         videoStreamID);
+                     videoStreamID);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
         return;
     }
