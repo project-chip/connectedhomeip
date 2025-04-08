@@ -194,8 +194,7 @@ public:
         // list operation.
         // TODO (#38270): Generalize this behavior; send a non-empty ReplaceAll list for all clusters in Matter 1.5 and enforce all
         // clusters to support it in testing and in certification.
-        bool encodeEmptyListAsReplaceAll =
-            !(path.mClusterId == Clusters::AccessControl::Id && path.mAttributeId == Clusters::AccessControl::Attributes::Acl::Id);
+        bool encodeEmptyListAsReplaceAll = !(path.mClusterId == Clusters::AccessControl::Id);
 
         if (encodeEmptyListAsReplaceAll)
         {
@@ -349,7 +348,7 @@ private:
         ReturnErrorOnFailure(
             writer->StartContainer(chip::TLV::ContextTag(chip::app::AttributeDataIB::Tag::kData), TLV::kTLVType_Array, outerType));
 
-        VerifyOrDie(outerType == kAttributeDataIBType);
+        VerifyOrReturnError(outerType == kAttributeDataIBType, CHIP_ERROR_INCORRECT_STATE);
 
         return CHIP_NO_ERROR;
     }
@@ -361,8 +360,7 @@ private:
 
         // In the event of Chunking (we have a CHIP_ERROR_NO_MEMORY), we need to Unreserve two more Bytes in order to be able to
         // Append EndOfContainer of the List + EndOfContainer of the AttributeDataIB.
-        VerifyOrDie(writer->UnreserveBuffer(kReservedSizeForEndOfListContainer + kReservedSizeForEndOfAttributeDataIB) ==
-                    CHIP_NO_ERROR);
+        ReturnErrorOnFailure(writer->UnreserveBuffer(kReservedSizeForEndOfListContainer + kReservedSizeForEndOfAttributeDataIB));
         ReturnErrorOnFailure(writer->EndContainer(kAttributeDataIBType));
         ReturnErrorOnFailure(FinishAttributeIB());
 
