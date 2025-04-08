@@ -1,0 +1,79 @@
+name: Coverage
+
+on:
+    push:
+        branches:
+            - master
+            - 'v*-branch'
+    pull_request:
+    merge_group:
+    workflow_dispatch:
+    workflow_call:
+      inputs:
+        run-codeql:
+          required: false
+          type: boolean
+
+concurrency:
+    group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
+    cancel-in-progress: true
+
+env:
+    CHIP_NO_LOG_TIMESTAMPS: true
+
+jobs:
+    build_linux_python_lib:
+        name: Build on Linux (python_lib)
+
+        runs-on: ubuntu-latest
+        if: github.actor != 'restyled-io[bot]'
+
+        container:
+            image: ghcr.io/project-chip/chip-build:125
+            volumes:
+                - "/:/runner-root-volume"
+                - "/tmp/log_output:/tmp/test_logs"
+            options: --sysctl "net.ipv6.conf.all.disable_ipv6=0
+                net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
+        steps:
+            - name: Dump GitHub context
+              env:
+                  GITHUB_CONTEXT: ${{ toJSON(github) }}
+              run: echo "$GITHUB_CONTEXT"
+            - name: Dump Concurrency context
+              env:
+                  CONCURRENCY_CONTEXT: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
+              run: echo "$CONCURRENCY_CONTEXT"
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
+              with:
+                platform: linux
+            - name: Setup test python environment
+              shell: bash
+              run: |
+                  scripts/run_in_build_env.sh 'virtualenv pyenv'
+                  source pyenv/bin/activate
+                  python -m ensurepip --upgrade
+                  python -m pip install coverage
+                  python -m pip install ./out/controller/python/chip_core-0.0-cp37-abi3-linux_x86_64.whl
+                  python -m pip install ./out/controller/python/chip_clusters-0.0-py3-none-any.whl
+                  python -m pip install ./out/controller/python/chip_repl-0.0-py3-none-any.whl
+
+            - name: Run Python tests
+              shell: bash
+              run: |
+                source pyenv/bin/activate
+                cd src/controller/python/test/unit_tests/
+                python -m coverage run -m unittest -v
+                coverage xml
+            - name: Upload result and clean output
+              shell: bash
+              run: |
+                curl -Os https://uploader.codecov.io/latest/linux/codecov
+                chmod +x codecov
+                ./codecov --verbose upload-process --fail-on-error -t ${{ secrets.CODECOV_TOKEN }} -n 'service'-${{ github.run_id }} -F service -f src/controller/python/test/unit_tests/coverage.xml
+                rm -rf src/controller/python/test/unit_tests/coverage.xml
+            - name: Clean previous outputs
+              run: rm -rf out pyenv
