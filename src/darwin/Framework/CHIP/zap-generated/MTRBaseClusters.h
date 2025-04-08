@@ -13725,13 +13725,13 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command SelectOutput
  *
- * Upon receipt, this SHALL change the output on the media device to the output at a specific index in the Output List.
+ * Upon receipt, this SHALL change the output on the device to the output at a specific index in the Output List.
  */
 - (void)selectOutputWithParams:(MTRAudioOutputClusterSelectOutputParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 /**
  * Command RenameOutput
  *
- * Upon receipt, this SHALL rename the output at a specific index in the Output List. Updates to the output name SHALL appear in the TV settings menus.
+ * Upon receipt, this SHALL rename the output at a specific index in the Output List.
  */
 - (void)renameOutputWithParams:(MTRAudioOutputClusterRenameOutputParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
