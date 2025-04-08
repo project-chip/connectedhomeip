@@ -47,6 +47,7 @@ public:
     CHIP_ERROR Init(void);
     CHIP_ERROR SignWithDacKey(const ByteSpan & digestToSign, MutableByteSpan & outSignBuffer);
     CHIP_ERROR SetEncryptionMode(EncryptionMode mode);
+
 private:
     uint8_t factoryDataRamBuffer[FACTORY_DATA_MAX_SIZE];
 

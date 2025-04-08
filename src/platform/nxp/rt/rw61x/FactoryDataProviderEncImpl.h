@@ -65,8 +65,8 @@ public:
 private:
     enum ElsOperation
     {
-        kDecrypt   = 0U,
-        kEncrypt  = 1U,
+        kDecrypt = 0U,
+        kEncrypt = 1U,
     };
     CHIP_ERROR EncryptDecryptFactoryData(uint8_t * FactoryDataBuff, ElsOperation operation);
     uint8_t factoryDataRamBuffer[FACTORY_DATA_MAX_SIZE];
@@ -82,7 +82,6 @@ private:
 };
 
 FactoryDataProvider & FactoryDataPrvdImpl();
-
 
 } // namespace DeviceLayer
 } // namespace chip

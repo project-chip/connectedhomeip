@@ -15,15 +15,15 @@
  *    limitations under the License.
  */
 
-#include <platform/KeyValueStoreManager.h>
 #include "FactoryDataDriverImpl.h"
+#include <platform/KeyValueStoreManager.h>
 #include <platform/nxp/common/factory_data/legacy/FactoryDataProvider.h>
 
 #if defined(__cplusplus)
 extern "C" {
 #endif
-#include "mflash_drv.h"
 #include "fsl_adapter_flash.h"
+#include "mflash_drv.h"
 #if defined(__cplusplus)
 }
 #endif /* __cplusplus */
@@ -110,8 +110,8 @@ CHIP_ERROR FactoryDataDriverImpl::ReadBackupInRam()
 
     memset(mFactoryDataRamBuff, 0, (uint32_t) __FACTORY_DATA_SIZE);
 
-    error =
-        KeyValueStoreMgr().Get(FactoryDataDriverImpl::GetFactoryBackupKey().KeyName(), mFactoryDataRamBuff, (uint32_t) __FACTORY_DATA_SIZE, &bytesRead);
+    error = KeyValueStoreMgr().Get(FactoryDataDriverImpl::GetFactoryBackupKey().KeyName(), mFactoryDataRamBuff,
+                                   (uint32_t) __FACTORY_DATA_SIZE, &bytesRead);
     ReturnErrorOnFailure(error);
     // to know that factory data ram buffer is encrypted when executing UpdateFactoryData function
     IsRamBackupFilled = true;
@@ -121,11 +121,11 @@ CHIP_ERROR FactoryDataDriverImpl::ReadBackupInRam()
 
 CHIP_ERROR FactoryDataDriverImpl::BackupFactoryData()
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
+    CHIP_ERROR error            = CHIP_NO_ERROR;
     uint32_t factoryDataAddress = (uint32_t) __FACTORY_DATA_START_OFFSET;
     uint32_t factoryDataSize    = (uint32_t) __FACTORY_DATA_SIZE;
-    uint8_t * data = nullptr;
-    data = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(factoryDataSize));
+    uint8_t * data              = nullptr;
+    data                        = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(factoryDataSize));
     /* Load the factory data into RAM buffer */
     if (mflash_drv_read(factoryDataAddress, (uint32_t *) data, factoryDataSize) != kStatus_Success)
     {
@@ -135,8 +135,7 @@ CHIP_ERROR FactoryDataDriverImpl::BackupFactoryData()
 
     /* Save current encrypted factory data into the file system to be able to restore them if an orror
     occured during the OTA process */
-    error = KeyValueStoreMgr().Put(FactoryDataDriverImpl::GetFactoryBackupKey().KeyName(), data,
-                                   (uint32_t) __FACTORY_DATA_SIZE);
+    error = KeyValueStoreMgr().Put(FactoryDataDriverImpl::GetFactoryBackupKey().KeyName(), data, (uint32_t) __FACTORY_DATA_SIZE);
     chip::Platform::MemoryFree(data);
     ReturnErrorOnFailure(error);
 
@@ -150,7 +149,7 @@ CHIP_ERROR FactoryDataDriverImpl::UpdateFactoryData(void)
 
     /* mFactoryDataRamBuff is containing uncyphered factory data that has been updated during OTA download,
     else the buffer is containing a copy of the previous (encrypted) factory data */
-    if(!IsRamBackupFilled)
+    if (!IsRamBackupFilled)
         FactoryDataPrvdImpl().EncryptFactoryData(mFactoryDataRamBuff);
 
     /* Erase flash factory data sectors */

@@ -251,7 +251,8 @@ CHIP_ERROR FactoryDataProviderImpl::SetKeyType(KeyType type)
         // by default if hw key is selected, kDCP_OTPMKKeyLow is choosen
         selectedKey = kDCP_OTPMKKeyLow;
     }
-    else{
+    else
+    {
         selectedKey = kDCP_UseSoftKey;
     }
     return CHIP_NO_ERROR;

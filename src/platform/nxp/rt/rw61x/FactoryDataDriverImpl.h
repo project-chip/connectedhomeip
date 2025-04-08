@@ -33,8 +33,8 @@ class FactoryDataDriverImpl : public FactoryDataDriver
 public:
     static FactoryDataDriverImpl sInstance;
 
-    FactoryDataDriverImpl()  = default;
-    ~FactoryDataDriverImpl() {};
+    FactoryDataDriverImpl() = default;
+    ~FactoryDataDriverImpl(){};
 
     bool DoesBackupExist(uint16_t *) override;
     CHIP_ERROR Init() override;
@@ -46,6 +46,7 @@ public:
     CHIP_ERROR UpdateFactoryData(void) override;
 
     static StorageKeyName GetFactoryBackupKey() { return StorageKeyName::FromConst("nxp/fact-bkp"); }
+
 private:
     bool IsRamBackupFilled = false;
 };

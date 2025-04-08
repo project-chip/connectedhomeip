@@ -51,7 +51,7 @@ extern "C" {
 #endif
 
 #if CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
-#pragma message ("EXPERIMENTAL SUPPORT OF OTA FACTORY DATA PROCESSOR")
+#pragma message("EXPERIMENTAL SUPPORT OF OTA FACTORY DATA PROCESSOR")
 extern "C" WEAK CHIP_ERROR FactoryDataDefaultRestoreMechanism();
 #endif
 
@@ -150,7 +150,8 @@ CHIP_ERROR FactoryDataProviderImpl::EncryptFactoryData(uint8_t * FactoryDataBuff
 
     FactoryDataProvider::Header * header = (FactoryDataProvider::Header *) FactoryDataBuff;
     /* Add padding if needed to be align on 16 bytes for encryption operation*/
-    if(header->size % 16 != 0){
+    if (header->size % 16 != 0)
+    {
         header->size = header->size + (16 - header->size % 16);
         chip::Crypto::Hash_SHA256(FactoryDataBuff + sizeof(FactoryDataProvider::Header), header->size, FactoryDataBuff);
         memcpy(header->hash, sha256Output, sizeof(header->hash));
@@ -161,11 +162,11 @@ CHIP_ERROR FactoryDataProviderImpl::EncryptFactoryData(uint8_t * FactoryDataBuff
 CHIP_ERROR FactoryDataProviderImpl::EncryptDecryptFactoryData(uint8_t * FactoryDataBuff, ElsOperation operation)
 {
     Header header;
-    uint32_t factoryDataAddress     = (uint32_t) __FACTORY_DATA_START_OFFSET;
+    uint32_t factoryDataAddress = (uint32_t) __FACTORY_DATA_START_OFFSET;
     uint32_t factoryDataSize    = (uint32_t) __FACTORY_DATA_SIZE;
     uint16_t len;
     bool is_encrypt_op;
-    if(operation == kDecrypt)
+    if (operation == kDecrypt)
         is_encrypt_op = 0;
     else
         is_encrypt_op = 1;
@@ -174,10 +175,10 @@ CHIP_ERROR FactoryDataProviderImpl::EncryptDecryptFactoryData(uint8_t * FactoryD
     uint16_t size = MEM_ALIGN_4(sizeof(uint8_t) + sizeof(uint16_t) + kAesKeyBlobLength);
     memcpy(&header, FactoryDataBuff, sizeof(Header));
 
-    if(header.size % 16 != 0 || header.size > factoryDataSize -(sizeof(Header) + size))
+    if (header.size % 16 != 0 || header.size > factoryDataSize - (sizeof(Header) + size))
         return CHIP_ERROR_INVALID_ARGUMENT;
 
-    len  = FactoryDataBuff[FACTORY_DATA_MAX_SIZE - size + kLengthOffset] +
+    len = FactoryDataBuff[FACTORY_DATA_MAX_SIZE - size + kLengthOffset] +
         (FactoryDataBuff[FACTORY_DATA_MAX_SIZE - size + kLengthOffset + 1] << 8);
     MutableByteSpan key(&FactoryDataBuff[FACTORY_DATA_MAX_SIZE - size + kValueOffset], len);
     mcuxClEls_KeyIndex_t index;
@@ -195,17 +196,17 @@ CHIP_ERROR FactoryDataProviderImpl::EncryptDecryptFactoryData(uint8_t * FactoryD
 CHIP_ERROR FactoryDataProviderImpl::ELS_ImportWrappedKey(MutableByteSpan & key)
 {
     static bool is_imported = false;
-    if(!is_imported)
+    if (!is_imported)
     {
         uint8_t els_key_blob[kAesKeyBlobLength];
-        size_t els_key_blob_size       = sizeof(els_key_blob);
-        status_t status                = STATUS_SUCCESS;
-        uint8_t public_key[64]         = { 0 };
-        size_t public_key_size         = sizeof(public_key);
+        size_t els_key_blob_size = sizeof(els_key_blob);
+        status_t status          = STATUS_SUCCESS;
+        uint8_t public_key[64]   = { 0 };
+        size_t public_key_size   = sizeof(public_key);
 
         mcuxClEls_KeyProp_t plain_key_properties = {
             .word = { .value = MCUXCLELS_KEYPROPERTY_VALUE_SECURE | MCUXCLELS_KEYPROPERTY_VALUE_PRIVILEGED |
-                        MCUXCLELS_KEYPROPERTY_VALUE_KEY_SIZE_256 | MCUXCLELS_KEYPROPERTY_VALUE_AES }
+                          MCUXCLELS_KEYPROPERTY_VALUE_KEY_SIZE_256 | MCUXCLELS_KEYPROPERTY_VALUE_AES }
         };
 
         if (key.data() == NULL)
@@ -494,7 +495,7 @@ CHIP_ERROR FactoryDataProviderImpl::Validate()
     uint8_t currentBlock[16];
 
     memset(factoryDataRamBuffer, 0, factoryDataSize);
-    memset(&mHeader, 0 , sizeof(Header));
+    memset(&mHeader, 0, sizeof(Header));
 
     ReturnLogErrorOnFailure(ReadAndCheckFactoryDataInFlash());
 
@@ -505,7 +506,7 @@ CHIP_ERROR FactoryDataProviderImpl::Validate()
     len  = factoryDataRamBuffer[FACTORY_DATA_MAX_SIZE - size + kLengthOffset] +
         (factoryDataRamBuffer[FACTORY_DATA_MAX_SIZE - size + kLengthOffset + 1] << 8);
     ChipLogProgress(DeviceLayer, "aes key blob type:%x, len:%d", type, len);
-    if ((type != TAG_ID_FOR_AES_KEY_BOLB) || (len =! kAesKeyBlobLength))
+    if ((type != TAG_ID_FOR_AES_KEY_BOLB) || (len = !kAesKeyBlobLength))
     {
         /* This situation is usually in production mode, the AES key is passed through Uart and only runs once.
         The AES Key is provisioined into Edge Lock, and the returned wrapped key is store in the end the factory data in TLV mode.
@@ -523,7 +524,7 @@ CHIP_ERROR FactoryDataProviderImpl::Validate()
         ReturnLogErrorOnFailure(ELS_SaveAesKeyBlob());
 
         memset(factoryDataRamBuffer, 0, factoryDataSize);
-        memset(&mHeader, 0 , sizeof(Header));
+        memset(&mHeader, 0, sizeof(Header));
 
         ReturnLogErrorOnFailure(ReadAndCheckFactoryDataInFlash());
     }
@@ -536,7 +537,6 @@ CHIP_ERROR FactoryDataProviderImpl::Validate()
     ELS_Cipher_Aes_Ecb(key_index, &factoryDataRamBuffer[0], mHeader.size, data, 0);
     memcpy(factoryDataRamBuffer, data, FACTORY_DATA_MAX_SIZE);
     chip::Platform::MemoryFree(data);
-
 
     if (mHeader.hashId != HASH_ID)
     {

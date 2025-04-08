@@ -43,8 +43,8 @@ public:
                            uint32_t * contentAddr = NULL);
     CHIP_ERROR SignWithDacKey(const ByteSpan & digestToSign, MutableByteSpan & outSignBuffer);
     CHIP_ERROR SetEncryptionMode(EncryptionMode mode);
-private:
 
+private:
     struct FactoryData
     {
         struct Header header;

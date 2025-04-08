@@ -18,9 +18,9 @@
 
 #include <credentials/CHIPCert.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
+#include <lib/core/CHIPError.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/internal/GenericDeviceInstanceInfoProvider.h>
-#include <lib/core/CHIPError.h>
 
 #if CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
 #include <lib/support/DefaultStorageKeyAllocator.h>
@@ -71,8 +71,8 @@ public:
     };
     enum KeyType
     {
-        kHwKey   = 0U,
-        kSftKey  = 1U,
+        kHwKey  = 0U,
+        kSftKey = 1U,
     };
 
     struct FactoryDataConfig
@@ -144,9 +144,9 @@ public:
                                    uint32_t * offset = nullptr);
     virtual CHIP_ERROR SetAesKey(const uint8_t * keyAes, AESKeySize keySize);
     virtual CHIP_ERROR SetEncryptionMode(EncryptionMode mode);
-    virtual CHIP_ERROR EncryptFactoryData(uint8_t * FactoryDataBuff){return CHIP_NO_ERROR;};
-    virtual CHIP_ERROR DecryptFactoryData(uint8_t * FactoryDataBuff){return CHIP_NO_ERROR;};
-    virtual CHIP_ERROR SetKeyType(KeyType type) {return CHIP_NO_ERROR;};
+    virtual CHIP_ERROR EncryptFactoryData(uint8_t * FactoryDataBuff) { return CHIP_NO_ERROR; };
+    virtual CHIP_ERROR DecryptFactoryData(uint8_t * FactoryDataBuff) { return CHIP_NO_ERROR; };
+    virtual CHIP_ERROR SetKeyType(KeyType type) { return CHIP_NO_ERROR; };
     virtual CHIP_ERROR SetCbcInitialVector(const uint8_t * iv, uint16_t ivSize);
 
 #if CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
@@ -198,10 +198,10 @@ public:
 
 protected:
     // Use when factory data are encrypted using aes key
-    const uint8_t * pAesKey          = nullptr;
+    const uint8_t * pAesKey = nullptr;
     // AES key size in bit
     AESKeySize pAESKeySize;
-    EncryptionMode encryptMode = encrypt_ecb;
+    EncryptionMode encryptMode       = encrypt_ecb;
     const uint8_t * cbcInitialVector = nullptr;
 
     Header mHeader;

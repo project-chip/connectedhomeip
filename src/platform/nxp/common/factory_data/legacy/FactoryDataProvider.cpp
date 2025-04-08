@@ -261,8 +261,7 @@ CHIP_ERROR FactoryDataProvider::SaveTargetVersion(uint32_t & version)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
 
-    error =
-        KeyValueStoreMgr().Put(FactoryDataProvider::GetTargetVersionKey().KeyName(), (uint8_t *) &version, sizeof(uint32_t));
+    error = KeyValueStoreMgr().Put(FactoryDataProvider::GetTargetVersionKey().KeyName(), (uint8_t *) &version, sizeof(uint32_t));
     ReturnErrorOnFailure(error);
 
     return CHIP_NO_ERROR;
@@ -544,9 +543,9 @@ CHIP_ERROR FactoryDataProvider::SetAesKey(const uint8_t * keyAes, AESKeySize key
     CHIP_ERROR error = CHIP_ERROR_INVALID_ARGUMENT;
     if (keyAes != nullptr)
     {
-        pAesKey = keyAes;
+        pAesKey     = keyAes;
         pAESKeySize = keySize;
-        error   = CHIP_NO_ERROR;
+        error       = CHIP_NO_ERROR;
     }
     return error;
 }
