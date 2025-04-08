@@ -39,6 +39,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Chime
     - Camera AV Stream Management
     - Commissioner Control
+    - Commodity Price
     - Energy EVSE
     - Energy EVSE Mode
     - Device Energy Management
