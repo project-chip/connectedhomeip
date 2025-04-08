@@ -85,7 +85,7 @@ public:
 
     CHIP_ERROR HandleEventTrigger(uint64_t eventTrigger) override
     {
-        eventTrigger = setEndpointInEventTrigger(eventTrigger);
+        eventTrigger = clearEndpointInEventTrigger(eventTrigger);
         if (HandleDeviceEnergyManagementTestEventTrigger(eventTrigger))
         {
             return CHIP_NO_ERROR;

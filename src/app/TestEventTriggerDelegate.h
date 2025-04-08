@@ -38,7 +38,7 @@ public:
      */
     virtual CHIP_ERROR HandleEventTrigger(uint64_t eventTrigger) = 0;
 
-    uint64_t setEndpointInEventTrigger(uint64_t eventTrigger)
+    uint64_t clearEndpointInEventTrigger(uint64_t eventTrigger)
     {
         uint64_t endpointMask = 0x0000FFFF00000000;
         return eventTrigger & ~endpointMask;
