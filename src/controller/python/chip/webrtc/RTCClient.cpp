@@ -15,62 +15,63 @@
  *    limitations under the License.
  */
 
-#include <controller/webrtc/libwebrtc.h>
+#include <controller/webrtc/WebRTC.h>
 
-using namespace chipwebrtc;
+using namespace chip;
+using namespace chip::webrtc;
 
 extern "C" {
 
 void * pychip_webrtc_CreateWebrtcClient(int id)
 {
-    return chipwebrtc::create_webrtc_client(id);
+    return chip::webrtc::CreateWebrtcClient(id);
 }
 
 void pychip_webrtc_InitialiseConnection(void * client)
 {
-    return chipwebrtc::initialise_peer_connection(client);
+    return chip::webrtc::InitialisePeerConnection(client);
 }
 
 void pychip_webrtc_CloseConnection(void * client)
 {
-    return chipwebrtc::close_peer_connection(client);
+    return chip::webrtc::ClosePeerConnection(client);
 }
 
 void pychip_webrtc_DestroyClient(void * client)
 {
-    return chipwebrtc::destroy_client(client);
+    return chip::webrtc::DestroyClient(client);
 }
 
 void pychip_webrtc_GetStats(void * client)
 {
-    return chipwebrtc::GetStats(client);
+    return chip::webrtc::GetStats(client);
 }
 
 void pychip_webrtc_CreateOffer(void * client)
 {
-    chipwebrtc::CreateOffer(client);
+    chip::webrtc::CreateOffer(client);
 }
 
 const char * pychip_webrtc_GetLocalSDP(void * client)
 {
-    return chipwebrtc::get_local_sdp(client);
+    return chip::webrtc::GetLocalSdp(client);
 }
 
 void pychip_webrtc_SetAnswer(void * client, const char * answer)
 {
-    chipwebrtc::SetAnswer(client, answer);
+    chip::webrtc::SetAnswer(client, answer);
 }
 
 void pychip_webrtc_SetCandidate(void * client, const char * candidate)
 {
-    chipwebrtc::SetCandidate(client, candidate);
+    chip::webrtc::SetCandidate(client, candidate);
 }
 
 void pychip_webrtc_SetCallbacks(void * client, SdpOfferCallback offer_cb, SdpAnswerCallback answer_cb, IceCallback ice_cb,
                                 ErrorCallback error_cb, PeerConnectedCallback peer_connected_cb,
                                 PeerDisconnectedCallback peer_disconnected_cb, StatsCollectedCallback stats_callback)
 {
-    chipwebrtc::set_callbacks(client, offer_cb, answer_cb, ice_cb, error_cb, peer_connected_cb, peer_disconnected_cb,
-                              stats_callback);
+    chip::webrtc::SetCallbacks(client, offer_cb, answer_cb, ice_cb, error_cb, peer_connected_cb, peer_disconnected_cb,
+                               stats_callback);
 }
 }
