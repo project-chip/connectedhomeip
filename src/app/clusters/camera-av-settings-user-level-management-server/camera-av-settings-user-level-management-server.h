@@ -40,7 +40,7 @@ constexpr int16_t kMaxTiltValue = 180;
 constexpr uint8_t kMinZoomValue = 1;
 constexpr uint8_t kMaxZoomValue = 100;
 
-// Spec defined defaulta for Pan, Tilt, and Zoom
+// Spec defined defaults for Pan, Tilt, and Zoom
 constexpr int16_t kDefaultPan  = 0;
 constexpr int16_t kDefaultTilt = 0;
 constexpr uint8_t kDefaultZoom = 1;
@@ -179,8 +179,8 @@ public:
 private:
     Delegate * mDelegate;
     EndpointId mEndpointId;
-    BitMask<Feature> mFeatures;
-    BitMask<OptionalAttributes> mOptionalAttrs;
+    BitFlags<Feature> mFeatures;
+    BitFlags<OptionalAttributes> mOptionalAttrs;
 
     // Next available preset ID
     uint8_t mCurrentPresetID = 1;
@@ -337,7 +337,7 @@ private:
 
     CameraAvSettingsUserLevelMgmtServer * mServer = nullptr;
 
-    // sets the Server pointer
+    // Sets the Server pointer
     void SetServer(CameraAvSettingsUserLevelMgmtServer * aServer) { mServer = aServer; }
 
 protected:
