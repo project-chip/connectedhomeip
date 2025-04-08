@@ -1,5 +1,6 @@
 /*
- *    Copyright (c) 2024 Project CHIP Authors
+ *
+ *    Copyright (c) 2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,9 +15,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/ConcreteAttributePath.h>
 
-void MatterReportingAttributeChangeCallback(const chip::app::ConcreteAttributePath & aPath)
-{
-    // TODO: should we add logic to track these calls for test purposes?
-}
+#pragma once
+
+void ElectricalPriceApplicationInit();
+void ElectricalPriceApplicationShutdown();
