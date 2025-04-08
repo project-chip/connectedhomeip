@@ -4,7 +4,7 @@
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 
-#include <clusters //AttributeIds.h>
-#include <clusters //ClusterId.h>
-#include <clusters //CommandIds.h>
-#include <clusters //EventIds.h>
+#include <clusters/RefrigeratorAndTemperatureControlledCabinetMode/AttributeIds.h>
+#include <clusters/RefrigeratorAndTemperatureControlledCabinetMode/ClusterId.h>
+#include <clusters/RefrigeratorAndTemperatureControlledCabinetMode/CommandIds.h>
+#include <clusters/RefrigeratorAndTemperatureControlledCabinetMode/EventIds.h>

@@ -4,7 +4,7 @@
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 
-#include <clusters //AttributeIds.h>
-#include <clusters //ClusterId.h>
-#include <clusters //CommandIds.h>
-#include <clusters //EventIds.h>
+#include <clusters/LowPower/AttributeIds.h>
+#include <clusters/LowPower/ClusterId.h>
+#include <clusters/LowPower/CommandIds.h>
+#include <clusters/LowPower/EventIds.h>

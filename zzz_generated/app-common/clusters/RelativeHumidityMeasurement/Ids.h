@@ -4,7 +4,7 @@
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 
-#include <clusters //AttributeIds.h>
-#include <clusters //ClusterId.h>
-#include <clusters //CommandIds.h>
-#include <clusters //EventIds.h>
+#include <clusters/RelativeHumidityMeasurement/AttributeIds.h>
+#include <clusters/RelativeHumidityMeasurement/ClusterId.h>
+#include <clusters/RelativeHumidityMeasurement/CommandIds.h>
+#include <clusters/RelativeHumidityMeasurement/EventIds.h>

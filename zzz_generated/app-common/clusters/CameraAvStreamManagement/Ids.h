@@ -4,7 +4,7 @@
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 
-#include <clusters //AttributeIds.h>
-#include <clusters //ClusterId.h>
-#include <clusters //CommandIds.h>
-#include <clusters //EventIds.h>
+#include <clusters/CameraAvStreamManagement/AttributeIds.h>
+#include <clusters/CameraAvStreamManagement/ClusterId.h>
+#include <clusters/CameraAvStreamManagement/CommandIds.h>
+#include <clusters/CameraAvStreamManagement/EventIds.h>
