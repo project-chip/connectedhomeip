@@ -34,5 +34,4 @@ pydoc-markdown -I ${SCRIPT_DIR}/../src/controller/python --py3 -m chip.ChipDevic
       add_full_prefix: true,
     }
   }' >"$1"/"$FILENAME"
-
 awk '/\(\#chip.ChipDeviceCtrl/ {gsub(/\./, "", $0)} 1' $1/$FILENAME >$1/tmp && mv $1/tmp $1/$FILENAME

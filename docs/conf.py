@@ -84,5 +84,4 @@ external_content_link_prefixes = [
     "data_model/",
 ]
 external_content_link_extensions = [".md", ".png", ".jpg", ".svg"]
-
 external_content_keep = ['**/ChipDeviceCtrlAPI.md']
