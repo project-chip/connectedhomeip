@@ -26,38 +26,27 @@ using namespace chip::app::Clusters::ClosurDimesnion;
 
 using Protocols::InteractionModel::Status;
 
-// Mock Error List generated for sample application usage.
-const ClosureErrorEnum kCurrentErrorList[] = {
-    {
-        ClosureErrorEnum::kBlocked,
-    },
-    {
-        ClosureErrorEnum::kInternalInterference,
-    },
-    {
-        ClosureErrorEnum::kMaintenanceRequired,
-    },
-    {
-        ClosureErrorEnum::kTemperatureLimited,
-    },
-};
+CHIP_ERROR ClosureDimensionDelegate::HandleSetTarget(const Optional<Percent100ths> & pos, const Optional<TargetLatchEnum> & latch,
+    const Optional<Globals::ThreeLevelAutoEnum> & speed) {
 
-PositioningEnum getStatePositionFromTarget(TagPositionEnum tagPosition)
-{
-    switch (tagPosition)
+    if (pos.HasValue())
     {
-    case TagPositionEnum::kCloseInFull:
-        return PositioningEnum::kFullyClosed;
-    case TagPositionEnum::kOpenInFull:
-        return PositioningEnum::kFullyOpened;
-    case TagPositionEnum::kPedestrian:
-        return PositioningEnum::kOpenedForPedestrian;
-    case TagPositionEnum::kVentilation:
-        return PositioningEnum::kOpenedForVentilation;
-    case TagPositionEnum::kSignature:
-        return PositioningEnum::kOpenedAtSignature;
-    default:
-        break;
+        uint16_t position = pos.Value(); // 0 - 10000
+
+        // TODO: Convert to hardware-specific range and move actuator using position
+
+        // Optionally handle latch and speed
+        if (latch.HasValue())
+        {
+            ChipLogProgress(NotSpecified, "Target latch mode: %d", static_cast<uint8_t>(latch.Value()));
+        }
+
+        if (speed.HasValue())
+        {
+            ChipLogProgress(NotSpecified, "Speed mode: %d", static_cast<uint8_t>(speed.Value()));
+        }
+
+        return CHIP_NO_ERROR;
     }
     return PositioningEnum::kUnknownEnumValue;
 }
@@ -104,139 +93,31 @@ CHIP_ERROR ClosureDimensionManager::EndCurrentErrorListRead()
     return CHIP_NO_ERROR;
 }
 
-// Return default success, will add command handling in next phase
-Protocols::InteractionModel::Status ClosureDimensionManager::Stop()
-{
-    // TODO: device should stop the action
-    return Status::Success;
+    return CHIP_ERROR_INVALID_ARGUMENT;
 }
 
-// Return default success, will add command handling in next phase
-Protocols::InteractionModel::Status ClosureDimensionManager::MoveTo(const Optional<TagPositionEnum> & tag,
-                                                                  const Optional<TagLatchEnum> & latch,
-                                                                  const Optional<Globals::ThreeLevelAutoEnum> & speed)
-{
-    MainStateEnum state              = mpClosureDimensionInstance->GetMainState();
-    GenericOverallState overallState = mpClosureDimensionInstance->GetOverallState();
+CHIP_ERROR ClosureDimensionDelegate::HandleStep(const StepDirectionEnum & direction, const uint16_t & numberOfSteps,
+        const Optional<Globals::ThreeLevelAutoEnum> & speed) {
 
-    if (tag.HasValue())
+    // Convert step to position delta
+    int32_t stepSize = 100; // Each step = 1%
+    int32_t delta = numberOfSteps * stepSize;
+
+    if (direction == StepDirectionEnum::kDown)
     {
-        VerifyOrReturnValue(Clusters::EnsureKnownEnumValue(tag.Value()) != TagPositionEnum::kUnknownEnumValue,
-                            Status::ConstraintError);
-        VerifyOrReturnValue(mpClosureDimensionInstance->HasFeature(Feature::kPositioning), Status::Success);
-        ChipLogDetail(DataManagement, "ClosureDimensionManager::positioning");
-
-        // TODO: CheckErrorondevice() -> if device error state move state to error and give failure
-        // TODO: IsDeviceReadytoMove()
-
-        if ((state == MainStateEnum::kStopped) || (state == MainStateEnum::kError))
-        {
-            // TODO: set target for motion
-        }
-
-        if ((state == MainStateEnum::kWaitingForMotion) || (state == MainStateEnum::kMoving))
-        {
-            // TODO: change target for motion
-        }
-
-        overallState.positioning.SetValue(getStatePositionFromTarget(tag.Value()));
+        delta = -delta;
     }
 
-    if (latch.HasValue())
-    {
-        VerifyOrReturnValue(Clusters::EnsureKnownEnumValue(latch.Value()) == TagLatchEnum::kUnknownEnumValue,
-                            Status::ConstraintError);
-        VerifyOrReturnValue(mpClosureDimensionInstance->HasFeature(Feature::kMotionLatching), Status::Success);
-        ChipLogDetail(DataManagement, "ClosureDimensionManager::latch");
-        VerifyOrReturnValue(IsManualLatch(), Status::InvalidAction);
+    // Get current position from your actuator or state
+    uint16_t currentPos = GetCurrentPosition(); // 0 - 10000
+    int32_t newPos = std::clamp(static_cast<int32_t>(currentPos) + delta, 0, 10000);
 
-        // TODO: device to perform latch operation
-
-        if (latch.Value() == TagLatchEnum::kLatch)
-        {
-            overallState.latching.SetValue(LatchingEnum::kLatchedAndSecured);
-        }
-        if (latch.Value() == TagLatchEnum::kUnlatch)
-        {
-            overallState.latching.SetValue(LatchingEnum::kNotLatched);
-        }
-    }
+    // TODO: MoveToPosition
 
     if (speed.HasValue())
     {
-        VerifyOrReturnValue(Clusters::EnsureKnownEnumValue(speed.Value()) == Globals::ThreeLevelAutoEnum::kUnknownEnumValue,
-                            Status::ConstraintError);
-        VerifyOrReturnValue(mpClosureDimensionInstance->HasFeature(Feature::kSpeed), Status::Success);
-        ChipLogDetail(DataManagement, "ClosureDimensionManager::speed");
-        if (!(latch.HasValue() || tag.HasValue()))
-        {
-            if ((state == MainStateEnum::kMoving) || (state == MainStateEnum::kWaitingForMotion))
-            {
-                overallState.speed = speed;
-                // TODO: device to change speed
-            }
-            else
-            {
-                overallState.speed.SetValue(Globals::ThreeLevelAutoEnum::kAuto);
-            }
-        }
+        ChipLogProgress(NotSpecified, "Speed mode: %d", static_cast<uint8_t>(speed.Value()));
     }
 
-    mpClosureDimensionInstance->SetOverallState(overallState);
-
-    if (IsDeviceReadytoMove())
-    {
-        mpClosureDimensionInstance->SetMainState(MainStateEnum::kMoving);
-        // TODO: move the device
-    }
-    else
-    {
-        mpClosureDimensionInstance->SetMainState(MainStateEnum::kWaitingForMotion);
-        // TODO: device to wait for ready to move and the move the device.
-    }
-
-    return Status::Success;
-}
-
-// Return default success, will add command handling in next phase
-Protocols::InteractionModel::Status ClosureDimensionManager::Calibrate()
-{
-    // TODO: Calibrate Device
-    return Status::Success;
-}
-
-void ClosureDimensionManager::ClosureDimensionAttributeChangeHandler(EndpointId endpointId, AttributeId attributeId)
-{
-    switch (attributeId)
-    {
-    case Attributes::CountdownTime::Id:
-        // Display CountdownTime in UI
-        break;
-    case Attributes::MainState::Id:
-        // Display Mainstate in UI
-        break;
-    case Attributes::CurrentErrorList::Id:
-        // Display ErrorList in UI
-        break;
-    case Attributes::OverallState::Id:
-        // Display Overallstate in UI
-        break;
-    case Attributes::OverallTarget::Id:
-        // Display TargetState in UI
-        break;
-    default:
-        return;
-    }
-}
-
-bool ClosureDimensionManager::IsManualLatch()
-{
-    // TODO: Check the latch is manual or not on device
-    return false;
-}
-
-bool ClosureDimensionManager::IsDeviceReadytoMove()
-{
-    // TODO: Check if device is ready to move or should wait.
-    return true;
+    return CHIP_NO_ERROR;
 }
