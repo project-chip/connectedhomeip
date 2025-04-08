@@ -226,7 +226,6 @@ class TC_EPREF_2_1(MatterBaseTest):
             self.skip_step("4b")
             self.skip_step("5")
             logging.info("Device does not support EnergyBalance feature and related attributes, skipped Test Step 3 to 5")
-            
 
         if Clusters.EnergyPreference.Bitmaps.Feature.kLowPowerModeSensitivity & feature_map:
 
