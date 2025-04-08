@@ -49,7 +49,7 @@ public:
     CHIP_ERROR SignWithDacKey(const ByteSpan & digestToSign, MutableByteSpan & outSignBuffer) override;
     CHIP_ERROR SearchForId(uint8_t searchedType, uint8_t * pBuf, size_t bufLength, uint16_t & length,
                            uint32_t * contentAddr = NULL);
- 
+
     CHIP_ERROR GetDeviceAttestationCert(MutableByteSpan & outBuffer) override;
 
 private:

@@ -535,9 +535,9 @@ CHIP_ERROR FactoryDataProviderImpl::Validate()
     ReturnLogErrorOnFailure(ELS_ImportWrappedKey(key));
     ELS_Cipher_Aes_Ecb(key_index, &factoryDataRamBuffer[0], mHeader.size, data, 0);
     memcpy(factoryDataRamBuffer, data, FACTORY_DATA_MAX_SIZE);
-    chip::Platform::MemoryFree(data);  
+    chip::Platform::MemoryFree(data);
 
-    
+
     if (mHeader.hashId != HASH_ID)
     {
         return CHIP_FACTORY_DATA_HASH_ID;

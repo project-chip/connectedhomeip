@@ -100,7 +100,7 @@ CHIP_ERROR FactoryDataDriverImpl::ReadBackupInRam()
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     size_t bytesRead = 0;
-    /* if ReadBackupInRam if executed during the OTA process, the buffer is already allocated 
+    /* if ReadBackupInRam if executed during the OTA process, the buffer is already allocated
     but if it is executed after a board reboot, it is not */
     if (mFactoryDataRamBuff == nullptr)
     {
@@ -133,7 +133,7 @@ CHIP_ERROR FactoryDataDriverImpl::BackupFactoryData()
         return CHIP_ERROR_INTERNAL;
     }
 
-    /* Save current encrypted factory data into the file system to be able to restore them if an orror 
+    /* Save current encrypted factory data into the file system to be able to restore them if an orror
     occured during the OTA process */
     error = KeyValueStoreMgr().Put(FactoryDataDriverImpl::GetFactoryBackupKey().KeyName(), data,
                                    (uint32_t) __FACTORY_DATA_SIZE);
