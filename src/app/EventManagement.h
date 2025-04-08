@@ -390,6 +390,14 @@ public:
                              EventNumber & generatedEventNumber) override;
 
 private:
+    class InternalEventOptions : public EventOptions
+    {
+    public:
+        InternalEventOptions() {}
+        InternalEventOptions(Timestamp aTimestamp) : mTimestamp(aTimestamp) {}
+        Timestamp mTimestamp;
+    };
+
     /**
      * @brief
      *  Internal structure for traversing events.
