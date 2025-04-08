@@ -123,14 +123,20 @@ Davis, CA 95616, USA
           </between>
         </constraint>
       </field>
-      <field id="1" name="StartTimestamp" type="epoch-s"/>
+      <field id="1" name="StartTimestamp" type="epoch-s">
+        <describedConform/>
+      </field>
       <field id="2" name="EndTimestamp" type="epoch-s">
+        <describedConform/>
         <constraint>
           <min value="StartTimestamp + 1"/>
         </constraint>
       </field>
-      <field id="3" name="StartSystime" type="systime-ms"/>
+      <field id="3" name="StartSystime" type="systime-ms">
+        <describedConform/>
+      </field>
       <field id="4" name="EndSystime" type="systime-ms">
+        <describedConform/>
         <constraint>
           <min value="StartSystime + 1"/>
         </constraint>

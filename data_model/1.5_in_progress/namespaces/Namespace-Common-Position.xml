@@ -57,74 +57,18 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0204" name="Thermostat User Interface Configuration Cluster" revision="2">
-  <revisionHistory>
-    <revision revision="1" summary="Mandatory global ClusterRevision attribute added"/>
-    <revision revision="2" summary="New data model format and notation, added &quot;Conversion of Temperature Values for Display&quot; section"/>
-  </revisionHistory>
-  <clusterIds>
-    <clusterId id="0x0204" name="Thermostat User Interface Configuration"/>
-  </clusterIds>
-  <classification hierarchy="base" role="application" picsCode="TSUIC" scope="Endpoint"/>
-  <dataTypes>
-    <enum name="KeypadLockoutEnum">
-      <item value="0" name="NoLockout" summary="All functionality available to the user">
-        <mandatoryConform/>
-      </item>
-      <item value="1" name="Lockout1" summary="Level 1 reduced functionality">
-        <mandatoryConform/>
-      </item>
-      <item value="2" name="Lockout2" summary="Level 2 reduced functionality">
-        <mandatoryConform/>
-      </item>
-      <item value="3" name="Lockout3" summary="Level 3 reduced functionality">
-        <mandatoryConform/>
-      </item>
-      <item value="4" name="Lockout4" summary="Level 4 reduced functionality">
-        <mandatoryConform/>
-      </item>
-      <item value="5" name="Lockout5" summary="Least functionality available to the user">
-        <mandatoryConform/>
-      </item>
-    </enum>
-    <enum name="ScheduleProgrammingVisibilityEnum">
-      <item value="0" name="ScheduleProgrammingPermitted" summary="Local schedule programming functionality is enabled at the thermostat">
-        <mandatoryConform/>
-      </item>
-      <item value="1" name="ScheduleProgrammingDenied" summary="Local schedule programming functionality is disabled at the thermostat">
-        <mandatoryConform/>
-      </item>
-    </enum>
-    <enum name="TemperatureDisplayModeEnum">
-      <item value="0" name="Celsius" summary="Temperature displayed in °C">
-        <mandatoryConform/>
-      </item>
-      <item value="1" name="Fahrenheit" summary="Temperature displayed in °F">
-        <mandatoryConform/>
-      </item>
-    </enum>
-  </dataTypes>
-  <attributes>
-    <attribute id="0x0000" name="TemperatureDisplayMode" type="TemperatureDisplayModeEnum">
-      <default>
-        <enum default="Celsius"/>
-      </default>
-      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <mandatoryConform/>
-    </attribute>
-    <attribute id="0x0001" name="KeypadLockout" type="KeypadLockoutEnum">
-      <default>
-        <enum default="NoLockout"/>
-      </default>
-      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <mandatoryConform/>
-    </attribute>
-    <attribute id="0x0002" name="ScheduleProgrammingVisibility" type="ScheduleProgrammingVisibilityEnum">
-      <default>
-        <enum default="ScheduleProgrammingPermitted"/>
-      </default>
-      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <optionalConform/>
-    </attribute>
-  </attributes>
-</cluster>
+<namespace xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd namespace namespace.xsd" id="0x0008" name="Common Position">
+  <tags>
+    <tag id="0x0000" name="Left"/>
+    <tag id="0x0001" name="Right"/>
+    <tag id="0x0002" name="Top"/>
+    <tag id="0x0003" name="Bottom"/>
+    <tag id="0x0004" name="Middle"/>
+    <tag id="0x0005" name="Row">
+      <description>Numeric value provided in Label field</description>
+    </tag>
+    <tag id="0x0006" name="Column">
+      <description>Numeric value provided in Label field</description>
+    </tag>
+  </tags>
+</namespace>

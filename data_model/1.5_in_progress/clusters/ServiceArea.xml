@@ -211,6 +211,7 @@ Davis, CA 95616, USA
     <attribute id="0x0003" name="CurrentArea" type="uint32" default="null">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
+      <describedConform/>
       <constraint>
         <desc/>
       </constraint>

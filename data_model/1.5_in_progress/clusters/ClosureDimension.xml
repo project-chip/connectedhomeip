@@ -320,8 +320,11 @@ Davis, CA 95616, USA
       <field id="1" name="Max" type="percent100ths">
         <mandatoryConform/>
         <constraint>
-          <between value="100">
-            <field name="Min"/>
+          <between>
+            <from>
+              <field name="Min"/>
+            </from>
+            <to value="100"/>
           </between>
         </constraint>
       </field>
@@ -359,8 +362,11 @@ Davis, CA 95616, USA
       <field id="1" name="Max" type="int16">
         <mandatoryConform/>
         <constraint>
-          <between value="32767">
-            <field name="Min"/>
+          <between>
+            <from>
+              <field name="Min"/>
+            </from>
+            <to value="32767"/>
           </between>
         </constraint>
       </field>

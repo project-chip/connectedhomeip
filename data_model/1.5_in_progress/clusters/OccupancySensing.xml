@@ -148,8 +148,12 @@ Davis, CA 95616, USA
         <mandatoryConform/>
         <constraint>
           <between>
-            <field name="HoldTimeMin"/>
-            <field name="HoldTimeMax"/>
+            <from>
+              <field name="HoldTimeMin"/>
+            </from>
+            <to>
+              <field name="HoldTimeMax"/>
+            </to>
           </between>
         </constraint>
       </field>
@@ -198,12 +202,16 @@ Davis, CA 95616, USA
       <optionalConform/>
       <constraint>
         <between>
-          <attribute name="HoldTimeLimits">
-            <field name="HoldTimeMin"/>
-          </attribute>
-          <attribute name="HoldTimeLimits">
-            <field name="HoldTimeMax"/>
-          </attribute>
+          <from>
+            <attribute name="HoldTimeLimits">
+              <field name="HoldTimeMin"/>
+            </attribute>
+          </from>
+          <to>
+            <attribute name="HoldTimeLimits">
+              <field name="HoldTimeMax"/>
+            </attribute>
+          </to>
         </between>
       </constraint>
     </attribute>

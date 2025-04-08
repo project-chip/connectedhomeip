@@ -86,8 +86,12 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <constraint>
         <between>
-          <attribute name="MinTemperature"/>
-          <attribute name="MaxTemperature"/>
+          <from>
+            <attribute name="MinTemperature"/>
+          </from>
+          <to>
+            <attribute name="MaxTemperature"/>
+          </to>
         </between>
       </constraint>
     </attribute>

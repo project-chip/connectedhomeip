@@ -375,7 +375,10 @@ Davis, CA 95616, USA
           <desc/>
         </constraint>
       </field>
-      <field id="2" name="Reason" type="WebRTCEndReasonEnum" default="UnknownReason">
+      <field id="2" name="Reason" type="WebRTCEndReasonEnum">
+        <default>
+          <enum default="UnknownReason"/>
+        </default>
         <mandatoryConform/>
         <constraint>
           <desc/>

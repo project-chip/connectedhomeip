@@ -248,6 +248,7 @@ Davis, CA 95616, USA
     <attribute id="0x0007" name="UserActiveModeTriggerInstruction" type="string" default="&quot;&quot;">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
+      <describedConform/>
       <constraint>
         <maxLength value="128"/>
       </constraint>
@@ -265,8 +266,11 @@ Davis, CA 95616, USA
         <feature name="CIP"/>
       </mandatoryConform>
       <constraint>
-        <between value="64800">
-          <attribute name="IdleModeDuration"/>
+        <between>
+          <from>
+            <attribute name="IdleModeDuration"/>
+          </from>
+          <to value="64800"/>
         </between>
       </constraint>
     </attribute>

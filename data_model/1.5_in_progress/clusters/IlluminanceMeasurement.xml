@@ -87,8 +87,12 @@ Davis, CA 95616, USA
       </constraint>
       <constraint>
         <between>
-          <attribute name="MinMeasuredValue"/>
-          <attribute name="MaxMeasuredValue"/>
+          <from>
+            <attribute name="MinMeasuredValue"/>
+          </from>
+          <to>
+            <attribute name="MaxMeasuredValue"/>
+          </to>
         </between>
       </constraint>
     </attribute>

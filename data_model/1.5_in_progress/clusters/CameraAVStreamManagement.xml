@@ -359,8 +359,11 @@ Davis, CA 95616, USA
       <field id="3" name="MinFrameRate" type="uint16">
         <mandatoryConform/>
         <constraint>
-          <between value="1">
-            <field name="MaxFrameRate"/>
+          <between>
+            <from value="1"/>
+            <to>
+              <field name="MaxFrameRate"/>
+            </to>
           </between>
         </constraint>
       </field>
@@ -379,8 +382,11 @@ Davis, CA 95616, USA
       <field id="7" name="MinBitRate" type="uint32">
         <mandatoryConform/>
         <constraint>
-          <between value="1">
-            <field name="MaxBitRate"/>
+          <between>
+            <from value="1"/>
+            <to>
+              <field name="MaxBitRate"/>
+            </to>
           </between>
         </constraint>
       </field>
@@ -401,8 +407,11 @@ Davis, CA 95616, USA
       <field id="10" name="MaxFragmentLen" type="uint16" default="4000">
         <mandatoryConform/>
         <constraint>
-          <between value="65500">
-            <field name="MinFragmentLen"/>
+          <between>
+            <from>
+              <field name="MinFragmentLen"/>
+            </from>
+            <to value="65500"/>
           </between>
         </constraint>
       </field>
@@ -642,8 +651,12 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <constraint>
         <between>
-          <attribute name="SpeakerMinLevel"/>
-          <attribute name="SpeakerMaxLevel"/>
+          <from>
+            <attribute name="SpeakerMinLevel"/>
+          </from>
+          <to>
+            <attribute name="SpeakerMaxLevel"/>
+          </to>
         </between>
       </constraint>
     </attribute>
@@ -656,8 +669,11 @@ Davis, CA 95616, USA
         </andTerm>
       </mandatoryConform>
       <constraint>
-        <between value="254">
-          <attribute name="SpeakerMinLevel"/>
+        <between>
+          <from>
+            <attribute name="SpeakerMinLevel"/>
+          </from>
+          <to value="254"/>
         </between>
       </constraint>
     </attribute>
@@ -690,8 +706,12 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <constraint>
         <between>
-          <attribute name="MicrophoneMinLevel"/>
-          <attribute name="MicrophoneMaxLevel"/>
+          <from>
+            <attribute name="MicrophoneMinLevel"/>
+          </from>
+          <to>
+            <attribute name="MicrophoneMaxLevel"/>
+          </to>
         </between>
       </constraint>
     </attribute>
@@ -701,8 +721,11 @@ Davis, CA 95616, USA
         <feature name="ADO"/>
       </mandatoryConform>
       <constraint>
-        <between value="254">
-          <attribute name="MicrophoneMinLevel"/>
+        <between>
+          <from>
+            <attribute name="MicrophoneMinLevel"/>
+          </from>
+          <to value="254"/>
         </between>
       </constraint>
     </attribute>
@@ -865,8 +888,11 @@ Davis, CA 95616, USA
       <field id="3" name="MinFrameRate" type="uint16">
         <mandatoryConform/>
         <constraint>
-          <between value="1">
-            <field name="MaxFrameRate"/>
+          <between>
+            <from value="1"/>
+            <to>
+              <field name="MaxFrameRate"/>
+            </to>
           </between>
         </constraint>
       </field>
@@ -885,8 +911,11 @@ Davis, CA 95616, USA
       <field id="7" name="MinBitRate" type="uint32">
         <mandatoryConform/>
         <constraint>
-          <between value="1">
-            <field name="MaxBitRate"/>
+          <between>
+            <from value="1"/>
+            <to>
+              <field name="MaxBitRate"/>
+            </to>
           </between>
         </constraint>
       </field>
@@ -907,17 +936,20 @@ Davis, CA 95616, USA
       <field id="10" name="MaxFragmentLen" type="uint16" default="4000">
         <mandatoryConform/>
         <constraint>
-          <between value="65500">
-            <field name="MinFragmentLen"/>
+          <between>
+            <from>
+              <field name="MinFragmentLen"/>
+            </from>
+            <to value="65500"/>
           </between>
         </constraint>
       </field>
-      <field id="11" name="WatermarkEnabled" type="bool" default="0">
+      <field id="11" name="WatermarkEnabled" type="bool" default="false">
         <mandatoryConform>
           <feature name="WMARK"/>
         </mandatoryConform>
       </field>
-      <field id="12" name="OSDEnabled" type="bool" default="0">
+      <field id="12" name="OSDEnabled" type="bool" default="false">
         <mandatoryConform>
           <feature name="OSD"/>
         </mandatoryConform>
@@ -1097,8 +1129,11 @@ Davis, CA 95616, USA
       <field id="3" name="MinFrameRate" type="uint16">
         <optionalConform/>
         <constraint>
-          <between value="1">
-            <field name="MaxFrameRate"/>
+          <between>
+            <from value="1"/>
+            <to>
+              <field name="MaxFrameRate"/>
+            </to>
           </between>
         </constraint>
       </field>
@@ -1117,8 +1152,11 @@ Davis, CA 95616, USA
       <field id="7" name="MinBitRate" type="uint32">
         <optionalConform/>
         <constraint>
-          <between value="1">
-            <field name="MaxBitRate"/>
+          <between>
+            <from value="1"/>
+            <to>
+              <field name="MaxBitRate"/>
+            </to>
           </between>
         </constraint>
       </field>
@@ -1139,8 +1177,11 @@ Davis, CA 95616, USA
       <field id="10" name="MaxFragmentLen" type="uint16">
         <optionalConform/>
         <constraint>
-          <between value="65500">
-            <field name="MinFragmentLen"/>
+          <between>
+            <from>
+              <field name="MinFragmentLen"/>
+            </from>
+            <to value="65500"/>
           </between>
         </constraint>
       </field>

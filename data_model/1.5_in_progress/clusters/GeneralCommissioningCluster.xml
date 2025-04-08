@@ -158,12 +158,16 @@ Davis, CA 95616, USA
       </constraint>
     </attribute>
     <attribute id="0x0002" name="RegulatoryConfig" type="RegulatoryLocationTypeEnum">
-      <attribute name="LocationCapability"/>
+      <default>
+        <attribute name="LocationCapability"/>
+      </default>
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x0003" name="LocationCapability" type="RegulatoryLocationTypeEnum">
-      <enum default="IndoorOutdoor"/>
+      <default>
+        <enum default="IndoorOutdoor"/>
+      </default>
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>

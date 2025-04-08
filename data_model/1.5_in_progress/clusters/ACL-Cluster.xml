@@ -70,7 +70,9 @@ Davis, CA 95616, USA
     <feature bit="0" code="EXTS" name="Extension" summary="Device provides ACL Extension attribute">
       <optionalConform/>
     </feature>
-    <feature bit="1" code="MNGD" name="ManagedDevice" summary="Device is managed"/>
+    <feature bit="1" code="MNGD" name="ManagedDevice" summary="Device is managed">
+      <describedConform/>
+    </feature>
   </features>
   <dataTypes>
     <enum name="AccessControlEntryAuthModeEnum">

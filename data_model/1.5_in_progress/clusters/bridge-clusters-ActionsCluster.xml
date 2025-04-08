@@ -245,6 +245,7 @@ Davis, CA 95616, USA
   <commands>
     <command id="0x00" name="InstantAction" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
+      <describedConform/>
       <field id="0" name="ActionID" type="uint16">
         <mandatoryConform/>
       </field>
@@ -254,6 +255,7 @@ Davis, CA 95616, USA
     </command>
     <command id="0x01" name="InstantActionWithTransition" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
+      <describedConform/>
       <field id="0" name="ActionID" type="uint16">
         <mandatoryConform/>
       </field>
@@ -266,6 +268,7 @@ Davis, CA 95616, USA
     </command>
     <command id="0x02" name="StartAction" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
+      <describedConform/>
       <field id="0" name="ActionID" type="uint16">
         <mandatoryConform/>
       </field>
@@ -275,6 +278,7 @@ Davis, CA 95616, USA
     </command>
     <command id="0x03" name="StartActionWithDuration" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
+      <describedConform/>
       <field id="0" name="ActionID" type="uint16">
         <mandatoryConform/>
       </field>
@@ -287,6 +291,7 @@ Davis, CA 95616, USA
     </command>
     <command id="0x04" name="StopAction" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
+      <describedConform/>
       <field id="0" name="ActionID" type="uint16">
         <mandatoryConform/>
       </field>
@@ -296,6 +301,7 @@ Davis, CA 95616, USA
     </command>
     <command id="0x05" name="PauseAction" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
+      <describedConform/>
       <field id="0" name="ActionID" type="uint16">
         <mandatoryConform/>
       </field>
@@ -305,6 +311,7 @@ Davis, CA 95616, USA
     </command>
     <command id="0x06" name="PauseActionWithDuration" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
+      <describedConform/>
       <field id="0" name="ActionID" type="uint16">
         <mandatoryConform/>
       </field>
@@ -317,6 +324,7 @@ Davis, CA 95616, USA
     </command>
     <command id="0x07" name="ResumeAction" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
+      <describedConform/>
       <field id="0" name="ActionID" type="uint16">
         <mandatoryConform/>
       </field>
@@ -326,6 +334,7 @@ Davis, CA 95616, USA
     </command>
     <command id="0x08" name="EnableAction" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
+      <describedConform/>
       <field id="0" name="ActionID" type="uint16">
         <mandatoryConform/>
       </field>
@@ -335,6 +344,7 @@ Davis, CA 95616, USA
     </command>
     <command id="0x09" name="EnableActionWithDuration" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
+      <describedConform/>
       <field id="0" name="ActionID" type="uint16">
         <mandatoryConform/>
       </field>
@@ -347,6 +357,7 @@ Davis, CA 95616, USA
     </command>
     <command id="0x0A" name="DisableAction" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
+      <describedConform/>
       <field id="0" name="ActionID" type="uint16">
         <mandatoryConform/>
       </field>
@@ -356,6 +367,7 @@ Davis, CA 95616, USA
     </command>
     <command id="0x0B" name="DisableActionWithDuration" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
+      <describedConform/>
       <field id="0" name="ActionID" type="uint16">
         <mandatoryConform/>
       </field>

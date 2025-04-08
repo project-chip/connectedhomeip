@@ -612,8 +612,11 @@ Davis, CA 95616, USA
         <entry type="ScheduleTransitionStruct"/>
         <mandatoryConform/>
         <constraint>
-          <countBetween value="1">
-            <attribute name="NumberOfScheduleTransitions"/>
+          <countBetween>
+            <from value="1"/>
+            <to>
+              <attribute name="NumberOfScheduleTransitions"/>
+            </to>
           </countBetween>
         </constraint>
       </field>
@@ -866,7 +869,9 @@ Davis, CA 95616, USA
       </constraint>
     </attribute>
     <attribute id="0x0015" name="MinHeatSetpointLimit" type="temperature">
-      <attribute name="AbsMinHeatSetpointLimit"/>
+      <default>
+        <attribute name="AbsMinHeatSetpointLimit"/>
+      </default>
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality persistence="nonVolatile"/>
       <optionalConform>
@@ -877,7 +882,9 @@ Davis, CA 95616, USA
       </constraint>
     </attribute>
     <attribute id="0x0016" name="MaxHeatSetpointLimit" type="temperature">
-      <attribute name="AbsMaxHeatSetpointLimit"/>
+      <default>
+        <attribute name="AbsMaxHeatSetpointLimit"/>
+      </default>
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality persistence="nonVolatile"/>
       <optionalConform>
@@ -888,7 +895,9 @@ Davis, CA 95616, USA
       </constraint>
     </attribute>
     <attribute id="0x0017" name="MinCoolSetpointLimit" type="temperature">
-      <attribute name="AbsMinCoolSetpointLimit"/>
+      <default>
+        <attribute name="AbsMinCoolSetpointLimit"/>
+      </default>
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality persistence="nonVolatile"/>
       <optionalConform>
@@ -899,7 +908,9 @@ Davis, CA 95616, USA
       </constraint>
     </attribute>
     <attribute id="0x0018" name="MaxCoolSetpointLimit" type="temperature">
-      <attribute name="AbsMaxCoolSetpointLimit"/>
+      <default>
+        <attribute name="AbsMaxCoolSetpointLimit"/>
+      </default>
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality persistence="nonVolatile"/>
       <optionalConform>
@@ -1039,8 +1050,12 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <constraint>
         <between>
-          <attribute name="OccupiedSetbackMin"/>
-          <attribute name="OccupiedSetbackMax"/>
+          <from>
+            <attribute name="OccupiedSetbackMin"/>
+          </from>
+          <to>
+            <attribute name="OccupiedSetbackMax"/>
+          </to>
         </between>
       </constraint>
     </attribute>
@@ -1063,8 +1078,11 @@ Davis, CA 95616, USA
         <feature name="SB"/>
       </mandatoryConform>
       <constraint>
-        <between value="254">
-          <attribute name="OccupiedSetbackMin"/>
+        <between>
+          <from>
+            <attribute name="OccupiedSetbackMin"/>
+          </from>
+          <to value="254"/>
         </between>
       </constraint>
     </attribute>
@@ -1079,8 +1097,12 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <constraint>
         <between>
-          <attribute name="UnoccupiedSetbackMin"/>
-          <attribute name="UnoccupiedSetbackMax"/>
+          <from>
+            <attribute name="UnoccupiedSetbackMin"/>
+          </from>
+          <to>
+            <attribute name="UnoccupiedSetbackMax"/>
+          </to>
         </between>
       </constraint>
     </attribute>
@@ -1109,8 +1131,11 @@ Davis, CA 95616, USA
         </andTerm>
       </mandatoryConform>
       <constraint>
-        <between value="254">
-          <attribute name="UnoccupiedSetbackMin"/>
+        <between>
+          <from>
+            <attribute name="UnoccupiedSetbackMin"/>
+          </from>
+          <to value="254"/>
         </between>
       </constraint>
     </attribute>
