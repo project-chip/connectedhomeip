@@ -16,6 +16,6 @@ inline constexpr EventId Id = 0x00000000;
 } // namespace Notify
 } // namespace Events
 } // namespace RefrigeratorAlarm
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

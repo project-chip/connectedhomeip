@@ -13,7 +13,7 @@
 
 namespace chip {
 namespace app {
-namespace clusters {
+namespace Clusters {
 namespace OperationalCredentials {
 
 inline constexpr uint32_t kRevision = 2;
@@ -38,7 +38,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace SupportedFabrics {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = OperationalCredentials::Attributes::SupportedFabrics::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -46,7 +46,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace CommissionedFabrics {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = OperationalCredentials::Attributes::CommissionedFabrics::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -62,11 +62,12 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace CurrentFabricIndex {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = OperationalCredentials::Attributes::CurrentFabricIndex::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace CurrentFabricIndex
+
 
 } // namespace Attributes
 
@@ -74,28 +75,28 @@ namespace Commands {
 namespace AttestationRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = OperationalCredentials::Commands::AttestationRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace AttestationRequest
 namespace CertificateChainRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = OperationalCredentials::Commands::CertificateChainRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace CertificateChainRequest
 namespace CSRRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = OperationalCredentials::Commands::CSRRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace CSRRequest
 namespace AddNOC {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = OperationalCredentials::Commands::AddNOC::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace AddNOC
@@ -116,14 +117,14 @@ inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
 namespace RemoveFabric {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = OperationalCredentials::Commands::RemoveFabric::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace RemoveFabric
 namespace AddTrustedRootCertificate {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = OperationalCredentials::Commands::AddTrustedRootCertificate::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace AddTrustedRootCertificate
@@ -137,13 +138,13 @@ inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
 namespace SignVIDVerificationRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = OperationalCredentials::Commands::SignVIDVerificationRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace SignVIDVerificationRequest
 
 } // namespace Commands
 } // namespace OperationalCredentials
-} // namespace clusters
+} // namespace Clusters
 } // namespace app
 } // namespace chip

@@ -13,7 +13,7 @@
 
 namespace chip {
 namespace app {
-namespace clusters {
+namespace Clusters {
 namespace Descriptor {
 
 inline constexpr uint32_t kRevision = 2;
@@ -60,10 +60,13 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 };
 } // namespace TagList
 
+
 } // namespace Attributes
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+
+} // namespace Commands
 } // namespace Descriptor
-} // namespace clusters
+} // namespace Clusters
 } // namespace app
 } // namespace chip

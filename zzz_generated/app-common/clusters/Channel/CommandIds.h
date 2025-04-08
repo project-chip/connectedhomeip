@@ -37,6 +37,6 @@ inline constexpr CommandId Id = 0x00000005;
 } // namespace ProgramGuideResponse
 } // namespace Commands
 } // namespace Channel
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

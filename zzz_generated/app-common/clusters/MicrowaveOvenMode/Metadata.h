@@ -13,7 +13,7 @@
 
 namespace chip {
 namespace app {
-namespace clusters {
+namespace Clusters {
 namespace MicrowaveOvenMode {
 
 inline constexpr uint32_t kRevision = 1;
@@ -30,16 +30,19 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace CurrentMode {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = MicrowaveOvenMode::Attributes::CurrentMode::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace CurrentMode
 
+
 } // namespace Attributes
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+
+} // namespace Commands
 } // namespace MicrowaveOvenMode
-} // namespace clusters
+} // namespace Clusters
 } // namespace app
 } // namespace chip

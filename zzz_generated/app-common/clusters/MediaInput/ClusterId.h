@@ -14,6 +14,6 @@ namespace MediaInput {
 inline constexpr ClusterId Id = 0x00000507;
 
 } // namespace MediaInput
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

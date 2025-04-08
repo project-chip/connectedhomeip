@@ -14,6 +14,6 @@ namespace RefrigeratorAlarm {
 inline constexpr ClusterId Id = 0x00000057;
 
 } // namespace RefrigeratorAlarm
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

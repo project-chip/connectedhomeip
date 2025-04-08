@@ -14,6 +14,6 @@ namespace ScenesManagement {
 inline constexpr ClusterId Id = 0x00000062;
 
 } // namespace ScenesManagement
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

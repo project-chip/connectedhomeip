@@ -19,6 +19,6 @@ inline constexpr CommandId Id = 0x00000001;
 } // namespace AddMoreTime
 } // namespace Commands
 } // namespace MicrowaveOvenControl
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

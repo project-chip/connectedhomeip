@@ -13,7 +13,7 @@
 
 namespace chip {
 namespace app {
-namespace clusters {
+namespace Clusters {
 namespace AdministratorCommissioning {
 
 inline constexpr uint32_t kRevision = 1;
@@ -22,7 +22,7 @@ namespace Attributes {
 namespace WindowStatus {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = AdministratorCommissioning::Attributes::WindowStatus::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -30,7 +30,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace AdminFabricIndex {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = AdministratorCommissioning::Attributes::AdminFabricIndex::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -38,11 +38,12 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace AdminVendorId {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = AdministratorCommissioning::Attributes::AdminVendorId::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace AdminVendorId
+
 
 } // namespace Attributes
 
@@ -71,6 +72,6 @@ inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
 
 } // namespace Commands
 } // namespace AdministratorCommissioning
-} // namespace clusters
+} // namespace Clusters
 } // namespace app
 } // namespace chip

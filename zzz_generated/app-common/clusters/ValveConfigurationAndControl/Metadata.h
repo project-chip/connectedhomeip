@@ -13,7 +13,7 @@
 
 namespace chip {
 namespace app {
-namespace clusters {
+namespace Clusters {
 namespace ValveConfigurationAndControl {
 
 inline constexpr uint32_t kRevision = 1;
@@ -22,7 +22,7 @@ namespace Attributes {
 namespace OpenDuration {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ValveConfigurationAndControl::Attributes::OpenDuration::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -30,7 +30,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace DefaultOpenDuration {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ValveConfigurationAndControl::Attributes::DefaultOpenDuration::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
@@ -38,7 +38,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace AutoCloseTime {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ValveConfigurationAndControl::Attributes::AutoCloseTime::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -46,7 +46,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace RemainingDuration {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ValveConfigurationAndControl::Attributes::RemainingDuration::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -54,7 +54,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace CurrentState {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ValveConfigurationAndControl::Attributes::CurrentState::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -62,7 +62,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace TargetState {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ValveConfigurationAndControl::Attributes::TargetState::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -70,7 +70,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace CurrentLevel {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ValveConfigurationAndControl::Attributes::CurrentLevel::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -78,7 +78,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace TargetLevel {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ValveConfigurationAndControl::Attributes::TargetLevel::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -86,7 +86,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace DefaultOpenLevel {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ValveConfigurationAndControl::Attributes::DefaultOpenLevel::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
@@ -94,7 +94,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace ValveFault {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ValveConfigurationAndControl::Attributes::ValveFault::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -102,11 +102,12 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace LevelStep {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ValveConfigurationAndControl::Attributes::LevelStep::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace LevelStep
+
 
 } // namespace Attributes
 
@@ -114,20 +115,20 @@ namespace Commands {
 namespace Open {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = ValveConfigurationAndControl::Commands::Open::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace Open
 namespace Close {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = ValveConfigurationAndControl::Commands::Close::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace Close
 
 } // namespace Commands
 } // namespace ValveConfigurationAndControl
-} // namespace clusters
+} // namespace Clusters
 } // namespace app
 } // namespace chip

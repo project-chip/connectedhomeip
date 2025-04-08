@@ -25,6 +25,6 @@ inline constexpr CommandId Id = 0x00000003;
 } // namespace GetDetailedForecastResponse
 } // namespace Commands
 } // namespace CommodityPrice
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

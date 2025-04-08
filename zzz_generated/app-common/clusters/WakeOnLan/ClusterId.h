@@ -14,6 +14,6 @@ namespace WakeOnLan {
 inline constexpr ClusterId Id = 0x00000503;
 
 } // namespace WakeOnLan
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

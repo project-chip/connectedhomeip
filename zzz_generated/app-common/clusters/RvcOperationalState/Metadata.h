@@ -13,7 +13,7 @@
 
 namespace chip {
 namespace app {
-namespace clusters {
+namespace Clusters {
 namespace RvcOperationalState {
 
 inline constexpr uint32_t kRevision = 1;
@@ -30,7 +30,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace CurrentPhase {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = RvcOperationalState::Attributes::CurrentPhase::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -38,7 +38,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace CountdownTime {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = RvcOperationalState::Attributes::CountdownTime::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -54,7 +54,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace OperationalState {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = RvcOperationalState::Attributes::OperationalState::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -62,11 +62,12 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace OperationalError {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = RvcOperationalState::Attributes::OperationalError::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace OperationalError
+
 
 } // namespace Attributes
 
@@ -74,27 +75,27 @@ namespace Commands {
 namespace Pause {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = RvcOperationalState::Commands::Pause::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace Pause
 namespace Resume {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = RvcOperationalState::Commands::Resume::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace Resume
 namespace GoHome {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = RvcOperationalState::Commands::GoHome::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace GoHome
 
 } // namespace Commands
 } // namespace RvcOperationalState
-} // namespace clusters
+} // namespace Clusters
 } // namespace app
 } // namespace chip

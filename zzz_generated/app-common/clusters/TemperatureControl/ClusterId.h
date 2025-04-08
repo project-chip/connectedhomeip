@@ -14,6 +14,6 @@ namespace TemperatureControl {
 inline constexpr ClusterId Id = 0x00000056;
 
 } // namespace TemperatureControl
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

@@ -13,7 +13,7 @@
 
 namespace chip {
 namespace app {
-namespace clusters {
+namespace Clusters {
 namespace RadonConcentrationMeasurement {
 
 inline constexpr uint32_t kRevision = 3;
@@ -22,7 +22,7 @@ namespace Attributes {
 namespace MeasuredValue {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = RadonConcentrationMeasurement::Attributes::MeasuredValue::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -30,7 +30,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace MinMeasuredValue {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = RadonConcentrationMeasurement::Attributes::MinMeasuredValue::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -38,7 +38,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace MaxMeasuredValue {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = RadonConcentrationMeasurement::Attributes::MaxMeasuredValue::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -46,7 +46,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace PeakMeasuredValue {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = RadonConcentrationMeasurement::Attributes::PeakMeasuredValue::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -54,7 +54,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace PeakMeasuredValueWindow {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = RadonConcentrationMeasurement::Attributes::PeakMeasuredValueWindow::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -62,7 +62,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace AverageMeasuredValue {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = RadonConcentrationMeasurement::Attributes::AverageMeasuredValue::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -70,7 +70,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace AverageMeasuredValueWindow {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = RadonConcentrationMeasurement::Attributes::AverageMeasuredValueWindow::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -78,7 +78,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Uncertainty {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = RadonConcentrationMeasurement::Attributes::Uncertainty::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -86,7 +86,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace MeasurementUnit {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = RadonConcentrationMeasurement::Attributes::MeasurementUnit::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -94,7 +94,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace MeasurementMedium {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = RadonConcentrationMeasurement::Attributes::MeasurementMedium::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -102,16 +102,19 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace LevelValue {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = RadonConcentrationMeasurement::Attributes::LevelValue::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace LevelValue
 
+
 } // namespace Attributes
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+
+} // namespace Commands
 } // namespace RadonConcentrationMeasurement
-} // namespace clusters
+} // namespace Clusters
 } // namespace app
 } // namespace chip

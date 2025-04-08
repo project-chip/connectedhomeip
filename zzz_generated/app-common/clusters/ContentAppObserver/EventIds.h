@@ -10,8 +10,9 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace ContentAppObserver {
-namespace Events {} // namespace Events
+namespace Events {
+} // namespace Events
 } // namespace ContentAppObserver
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

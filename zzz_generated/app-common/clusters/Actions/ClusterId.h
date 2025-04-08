@@ -14,6 +14,6 @@ namespace Actions {
 inline constexpr ClusterId Id = 0x00000025;
 
 } // namespace Actions
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

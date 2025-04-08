@@ -13,7 +13,7 @@
 
 namespace chip {
 namespace app {
-namespace clusters {
+namespace Clusters {
 namespace ClosureDimension {
 
 inline constexpr uint32_t kRevision = 1;
@@ -22,7 +22,7 @@ namespace Attributes {
 namespace Current {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ClosureDimension::Attributes::Current::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -30,7 +30,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Target {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ClosureDimension::Attributes::Target::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -38,7 +38,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Resolution {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ClosureDimension::Attributes::Resolution::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -46,7 +46,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace StepValue {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ClosureDimension::Attributes::StepValue::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -54,7 +54,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Unit {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ClosureDimension::Attributes::Unit::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -62,7 +62,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace UnitRange {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ClosureDimension::Attributes::UnitRange::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -70,7 +70,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace LimitRange {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ClosureDimension::Attributes::LimitRange::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -78,7 +78,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace TranslationDirection {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ClosureDimension::Attributes::TranslationDirection::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -86,7 +86,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace RotationAxis {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ClosureDimension::Attributes::RotationAxis::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -94,7 +94,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Overflow {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ClosureDimension::Attributes::Overflow::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -102,11 +102,12 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace ModulationType {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ClosureDimension::Attributes::ModulationType::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace ModulationType
+
 
 } // namespace Attributes
 
@@ -114,20 +115,20 @@ namespace Commands {
 namespace SetTarget {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = ClosureDimension::Commands::SetTarget::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace SetTarget
 namespace Step {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = ClosureDimension::Commands::Step::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace Step
 
 } // namespace Commands
 } // namespace ClosureDimension
-} // namespace clusters
+} // namespace Clusters
 } // namespace app
 } // namespace chip

@@ -10,8 +10,9 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace ModeSelect {
-namespace Events {} // namespace Events
+namespace Events {
+} // namespace Events
 } // namespace ModeSelect
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

@@ -40,6 +40,6 @@ inline constexpr CommandId Id = 0x000000FD;
 } // namespace AtomicResponse
 } // namespace Commands
 } // namespace Thermostat
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

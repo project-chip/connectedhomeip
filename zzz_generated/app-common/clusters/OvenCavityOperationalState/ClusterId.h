@@ -14,6 +14,6 @@ namespace OvenCavityOperationalState {
 inline constexpr ClusterId Id = 0x00000048;
 
 } // namespace OvenCavityOperationalState
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

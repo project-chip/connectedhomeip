@@ -10,8 +10,9 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace GroupKeyManagement {
-namespace Events {} // namespace Events
+namespace Events {
+} // namespace Events
 } // namespace GroupKeyManagement
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

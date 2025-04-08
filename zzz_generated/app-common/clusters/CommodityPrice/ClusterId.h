@@ -14,6 +14,6 @@ namespace CommodityPrice {
 inline constexpr ClusterId Id = 0x00000095;
 
 } // namespace CommodityPrice
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

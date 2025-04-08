@@ -25,6 +25,6 @@ inline constexpr CommandId Id = 0x00000001;
 } // namespace GetSetupPINResponse
 } // namespace Commands
 } // namespace AccountLogin
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

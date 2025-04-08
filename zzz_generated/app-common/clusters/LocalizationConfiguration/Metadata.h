@@ -13,7 +13,7 @@
 
 namespace chip {
 namespace app {
-namespace clusters {
+namespace Clusters {
 namespace LocalizationConfiguration {
 
 inline constexpr uint32_t kRevision = 1;
@@ -22,7 +22,7 @@ namespace Attributes {
 namespace ActiveLocale {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = LocalizationConfiguration::Attributes::ActiveLocale::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
@@ -36,10 +36,13 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 };
 } // namespace SupportedLocales
 
+
 } // namespace Attributes
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+
+} // namespace Commands
 } // namespace LocalizationConfiguration
-} // namespace clusters
+} // namespace Clusters
 } // namespace app
 } // namespace chip

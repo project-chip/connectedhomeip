@@ -13,7 +13,7 @@
 
 namespace chip {
 namespace app {
-namespace clusters {
+namespace Clusters {
 namespace Messages {
 
 inline constexpr uint32_t kRevision = 3;
@@ -36,6 +36,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 };
 } // namespace ActiveMessageIDs
 
+
 } // namespace Attributes
 
 namespace Commands {
@@ -56,6 +57,6 @@ inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
 
 } // namespace Commands
 } // namespace Messages
-} // namespace clusters
+} // namespace Clusters
 } // namespace app
 } // namespace chip

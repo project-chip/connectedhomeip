@@ -14,6 +14,6 @@ namespace AccessControl {
 inline constexpr ClusterId Id = 0x0000001F;
 
 } // namespace AccessControl
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

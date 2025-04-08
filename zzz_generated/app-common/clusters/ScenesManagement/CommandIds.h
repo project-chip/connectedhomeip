@@ -58,6 +58,6 @@ inline constexpr CommandId Id = 0x00000040;
 } // namespace CopySceneResponse
 } // namespace Commands
 } // namespace ScenesManagement
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

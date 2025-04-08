@@ -31,6 +31,6 @@ inline constexpr CommandId Id = 0x00000005;
 } // namespace KeySetReadAllIndicesResponse
 } // namespace Commands
 } // namespace GroupKeyManagement
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

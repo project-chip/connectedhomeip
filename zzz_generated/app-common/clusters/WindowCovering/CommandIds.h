@@ -34,6 +34,6 @@ inline constexpr CommandId Id = 0x00000008;
 } // namespace GoToTiltPercentage
 } // namespace Commands
 } // namespace WindowCovering
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

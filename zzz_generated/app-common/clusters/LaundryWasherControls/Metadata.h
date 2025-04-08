@@ -13,7 +13,7 @@
 
 namespace chip {
 namespace app {
-namespace clusters {
+namespace Clusters {
 namespace LaundryWasherControls {
 
 inline constexpr uint32_t kRevision = 1;
@@ -30,7 +30,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace SpinSpeedCurrent {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = LaundryWasherControls::Attributes::SpinSpeedCurrent::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
@@ -38,7 +38,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace NumberOfRinses {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = LaundryWasherControls::Attributes::NumberOfRinses::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
@@ -52,10 +52,13 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 };
 } // namespace SupportedRinses
 
+
 } // namespace Attributes
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+
+} // namespace Commands
 } // namespace LaundryWasherControls
-} // namespace clusters
+} // namespace Clusters
 } // namespace app
 } // namespace chip

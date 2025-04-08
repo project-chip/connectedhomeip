@@ -13,7 +13,7 @@
 
 namespace chip {
 namespace app {
-namespace clusters {
+namespace Clusters {
 namespace WebRTCTransportProvider {
 
 inline constexpr uint32_t kRevision = 1;
@@ -27,6 +27,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .writePrivilege = std::nullopt,
 };
 } // namespace CurrentSessions
+
 
 } // namespace Attributes
 
@@ -69,6 +70,6 @@ inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
 
 } // namespace Commands
 } // namespace WebRTCTransportProvider
-} // namespace clusters
+} // namespace Clusters
 } // namespace app
 } // namespace chip

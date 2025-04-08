@@ -13,7 +13,7 @@
 
 namespace chip {
 namespace app {
-namespace clusters {
+namespace Clusters {
 namespace AccessControl {
 
 inline constexpr uint32_t kRevision = 2;
@@ -38,7 +38,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace SubjectsPerAccessControlEntry {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = AccessControl::Attributes::SubjectsPerAccessControlEntry::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -46,7 +46,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace TargetsPerAccessControlEntry {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = AccessControl::Attributes::TargetsPerAccessControlEntry::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -54,7 +54,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace AccessControlEntriesPerFabric {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = AccessControl::Attributes::AccessControlEntriesPerFabric::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -76,6 +76,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 };
 } // namespace Arl
 
+
 } // namespace Attributes
 
 namespace Commands {
@@ -89,6 +90,6 @@ inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
 
 } // namespace Commands
 } // namespace AccessControl
-} // namespace clusters
+} // namespace Clusters
 } // namespace app
 } // namespace chip

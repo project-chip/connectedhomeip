@@ -19,6 +19,6 @@ inline constexpr EventId Id = 0x00000001;
 } // namespace ZoneStopped
 } // namespace Events
 } // namespace ZoneManagement
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

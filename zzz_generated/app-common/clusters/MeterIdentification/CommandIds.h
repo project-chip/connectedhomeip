@@ -10,8 +10,9 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace MeterIdentification {
-namespace Commands {} // namespace Commands
+namespace Commands {
+} // namespace Commands
 } // namespace MeterIdentification
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

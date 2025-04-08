@@ -10,8 +10,9 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace ThermostatUserInterfaceConfiguration {
-namespace Commands {} // namespace Commands
+namespace Commands {
+} // namespace Commands
 } // namespace ThermostatUserInterfaceConfiguration
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

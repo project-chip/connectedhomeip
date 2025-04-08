@@ -14,6 +14,6 @@ namespace EnergyEvse {
 inline constexpr ClusterId Id = 0x00000099;
 
 } // namespace EnergyEvse
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

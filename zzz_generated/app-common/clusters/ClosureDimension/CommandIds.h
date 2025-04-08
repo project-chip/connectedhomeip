@@ -19,6 +19,6 @@ inline constexpr CommandId Id = 0x00000001;
 } // namespace Step
 } // namespace Commands
 } // namespace ClosureDimension
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

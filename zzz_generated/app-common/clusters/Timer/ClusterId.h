@@ -14,6 +14,6 @@ namespace Timer {
 inline constexpr ClusterId Id = 0x00000047;
 
 } // namespace Timer
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

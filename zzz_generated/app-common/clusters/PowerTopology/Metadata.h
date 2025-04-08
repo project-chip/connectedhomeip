@@ -13,7 +13,7 @@
 
 namespace chip {
 namespace app {
-namespace clusters {
+namespace Clusters {
 namespace PowerTopology {
 
 inline constexpr uint32_t kRevision = 1;
@@ -36,10 +36,13 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 };
 } // namespace ActiveEndpoints
 
+
 } // namespace Attributes
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+
+} // namespace Commands
 } // namespace PowerTopology
-} // namespace clusters
+} // namespace Clusters
 } // namespace app
 } // namespace chip

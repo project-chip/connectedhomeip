@@ -14,6 +14,6 @@ namespace AudioOutput {
 inline constexpr ClusterId Id = 0x0000050B;
 
 } // namespace AudioOutput
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

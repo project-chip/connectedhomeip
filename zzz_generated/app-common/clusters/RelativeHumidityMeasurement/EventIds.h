@@ -10,8 +10,9 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace RelativeHumidityMeasurement {
-namespace Events {} // namespace Events
+namespace Events {
+} // namespace Events
 } // namespace RelativeHumidityMeasurement
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

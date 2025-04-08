@@ -22,6 +22,6 @@ inline constexpr EventId Id = 0x00000002;
 } // namespace DownloadError
 } // namespace Events
 } // namespace OtaSoftwareUpdateRequestor
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

@@ -10,8 +10,9 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace WebRTCTransportProvider {
-namespace Events {} // namespace Events
+namespace Events {
+} // namespace Events
 } // namespace WebRTCTransportProvider
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

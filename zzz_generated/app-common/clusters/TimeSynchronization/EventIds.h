@@ -28,6 +28,6 @@ inline constexpr EventId Id = 0x00000004;
 } // namespace MissingTrustedTimeSource
 } // namespace Events
 } // namespace TimeSynchronization
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

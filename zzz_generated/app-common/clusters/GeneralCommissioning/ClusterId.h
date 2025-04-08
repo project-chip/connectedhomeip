@@ -14,6 +14,6 @@ namespace GeneralCommissioning {
 inline constexpr ClusterId Id = 0x00000030;
 
 } // namespace GeneralCommissioning
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

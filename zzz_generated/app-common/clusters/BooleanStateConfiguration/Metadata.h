@@ -13,7 +13,7 @@
 
 namespace chip {
 namespace app {
-namespace clusters {
+namespace Clusters {
 namespace BooleanStateConfiguration {
 
 inline constexpr uint32_t kRevision = 1;
@@ -22,7 +22,7 @@ namespace Attributes {
 namespace CurrentSensitivityLevel {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = BooleanStateConfiguration::Attributes::CurrentSensitivityLevel::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
@@ -30,7 +30,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace SupportedSensitivityLevels {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = BooleanStateConfiguration::Attributes::SupportedSensitivityLevels::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -38,7 +38,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace DefaultSensitivityLevel {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = BooleanStateConfiguration::Attributes::DefaultSensitivityLevel::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -46,7 +46,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace AlarmsActive {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = BooleanStateConfiguration::Attributes::AlarmsActive::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -54,7 +54,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace AlarmsSuppressed {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = BooleanStateConfiguration::Attributes::AlarmsSuppressed::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -62,7 +62,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace AlarmsEnabled {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = BooleanStateConfiguration::Attributes::AlarmsEnabled::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -70,7 +70,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace AlarmsSupported {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = BooleanStateConfiguration::Attributes::AlarmsSupported::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -78,11 +78,12 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace SensorFault {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = BooleanStateConfiguration::Attributes::SensorFault::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace SensorFault
+
 
 } // namespace Attributes
 
@@ -90,20 +91,20 @@ namespace Commands {
 namespace SuppressAlarm {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = BooleanStateConfiguration::Commands::SuppressAlarm::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace SuppressAlarm
 namespace EnableDisableAlarm {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = BooleanStateConfiguration::Commands::EnableDisableAlarm::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace EnableDisableAlarm
 
 } // namespace Commands
 } // namespace BooleanStateConfiguration
-} // namespace clusters
+} // namespace Clusters
 } // namespace app
 } // namespace chip

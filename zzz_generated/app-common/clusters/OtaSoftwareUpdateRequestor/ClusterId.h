@@ -14,6 +14,6 @@ namespace OtaSoftwareUpdateRequestor {
 inline constexpr ClusterId Id = 0x0000002A;
 
 } // namespace OtaSoftwareUpdateRequestor
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

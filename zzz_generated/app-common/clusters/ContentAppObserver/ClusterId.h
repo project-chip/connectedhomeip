@@ -14,6 +14,6 @@ namespace ContentAppObserver {
 inline constexpr ClusterId Id = 0x00000510;
 
 } // namespace ContentAppObserver
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

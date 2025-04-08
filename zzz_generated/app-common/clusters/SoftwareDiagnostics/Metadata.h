@@ -13,7 +13,7 @@
 
 namespace chip {
 namespace app {
-namespace clusters {
+namespace Clusters {
 namespace SoftwareDiagnostics {
 
 inline constexpr uint32_t kRevision = 1;
@@ -30,7 +30,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace CurrentHeapFree {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = SoftwareDiagnostics::Attributes::CurrentHeapFree::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -38,7 +38,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace CurrentHeapUsed {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = SoftwareDiagnostics::Attributes::CurrentHeapUsed::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -46,11 +46,12 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace CurrentHeapHighWatermark {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace CurrentHeapHighWatermark
+
 
 } // namespace Attributes
 
@@ -58,13 +59,13 @@ namespace Commands {
 namespace ResetWatermarks {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = SoftwareDiagnostics::Commands::ResetWatermarks::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kManage,
 };
 } // namespace ResetWatermarks
 
 } // namespace Commands
 } // namespace SoftwareDiagnostics
-} // namespace clusters
+} // namespace Clusters
 } // namespace app
 } // namespace chip

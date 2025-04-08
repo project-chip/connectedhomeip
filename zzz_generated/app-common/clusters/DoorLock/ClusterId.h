@@ -14,6 +14,6 @@ namespace DoorLock {
 inline constexpr ClusterId Id = 0x00000101;
 
 } // namespace DoorLock
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

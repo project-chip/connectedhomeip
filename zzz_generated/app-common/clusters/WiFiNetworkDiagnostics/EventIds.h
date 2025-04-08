@@ -22,6 +22,6 @@ inline constexpr EventId Id = 0x00000002;
 } // namespace ConnectionStatus
 } // namespace Events
 } // namespace WiFiNetworkDiagnostics
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

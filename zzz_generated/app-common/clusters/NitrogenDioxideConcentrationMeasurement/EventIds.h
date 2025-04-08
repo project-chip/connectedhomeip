@@ -10,8 +10,9 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace NitrogenDioxideConcentrationMeasurement {
-namespace Events {} // namespace Events
+namespace Events {
+} // namespace Events
 } // namespace NitrogenDioxideConcentrationMeasurement
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

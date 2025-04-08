@@ -14,6 +14,6 @@ namespace Groups {
 inline constexpr ClusterId Id = 0x00000004;
 
 } // namespace Groups
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

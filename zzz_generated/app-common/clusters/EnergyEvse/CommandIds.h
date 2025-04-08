@@ -37,6 +37,6 @@ inline constexpr CommandId Id = 0x00000000;
 } // namespace GetTargetsResponse
 } // namespace Commands
 } // namespace EnergyEvse
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

@@ -14,6 +14,6 @@ namespace KeypadInput {
 inline constexpr ClusterId Id = 0x00000509;
 
 } // namespace KeypadInput
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

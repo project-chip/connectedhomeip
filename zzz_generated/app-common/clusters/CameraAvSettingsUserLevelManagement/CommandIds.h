@@ -34,6 +34,6 @@ inline constexpr CommandId Id = 0x00000006;
 } // namespace DPTZRelativeMove
 } // namespace Commands
 } // namespace CameraAvSettingsUserLevelManagement
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

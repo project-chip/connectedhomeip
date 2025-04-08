@@ -10,8 +10,9 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace BooleanState {
-namespace Commands {} // namespace Commands
+namespace Commands {
+} // namespace Commands
 } // namespace BooleanState
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

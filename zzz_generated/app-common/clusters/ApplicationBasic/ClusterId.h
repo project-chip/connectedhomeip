@@ -14,6 +14,6 @@ namespace ApplicationBasic {
 inline constexpr ClusterId Id = 0x0000050D;
 
 } // namespace ApplicationBasic
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

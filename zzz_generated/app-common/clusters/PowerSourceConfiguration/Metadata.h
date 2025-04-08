@@ -13,7 +13,7 @@
 
 namespace chip {
 namespace app {
-namespace clusters {
+namespace Clusters {
 namespace PowerSourceConfiguration {
 
 inline constexpr uint32_t kRevision = 1;
@@ -28,10 +28,13 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 };
 } // namespace Sources
 
+
 } // namespace Attributes
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+
+} // namespace Commands
 } // namespace PowerSourceConfiguration
-} // namespace clusters
+} // namespace Clusters
 } // namespace app
 } // namespace chip

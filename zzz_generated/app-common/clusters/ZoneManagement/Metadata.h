@@ -13,7 +13,7 @@
 
 namespace chip {
 namespace app {
-namespace clusters {
+namespace Clusters {
 namespace ZoneManagement {
 
 inline constexpr uint32_t kRevision = 1;
@@ -46,11 +46,12 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Sensitivity {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ZoneManagement::Attributes::Sensitivity::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
 } // namespace Sensitivity
+
 
 } // namespace Attributes
 
@@ -58,34 +59,34 @@ namespace Commands {
 namespace CreateTwoDCartesianZone {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = ZoneManagement::Commands::CreateTwoDCartesianZone::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kManage,
 };
 } // namespace CreateTwoDCartesianZone
 namespace UpdateTwoDCartesianZone {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = ZoneManagement::Commands::UpdateTwoDCartesianZone::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kManage,
 };
 } // namespace UpdateTwoDCartesianZone
 namespace GetTwoDCartesianZone {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = ZoneManagement::Commands::GetTwoDCartesianZone::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kManage,
 };
 } // namespace GetTwoDCartesianZone
 namespace RemoveZone {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = ZoneManagement::Commands::RemoveZone::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kManage,
 };
 } // namespace RemoveZone
 
 } // namespace Commands
 } // namespace ZoneManagement
-} // namespace clusters
+} // namespace Clusters
 } // namespace app
 } // namespace chip

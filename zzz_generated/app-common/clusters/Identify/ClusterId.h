@@ -14,6 +14,6 @@ namespace Identify {
 inline constexpr ClusterId Id = 0x00000003;
 
 } // namespace Identify
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

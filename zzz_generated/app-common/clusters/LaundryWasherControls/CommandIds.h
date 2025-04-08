@@ -10,8 +10,9 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace LaundryWasherControls {
-namespace Commands {} // namespace Commands
+namespace Commands {
+} // namespace Commands
 } // namespace LaundryWasherControls
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

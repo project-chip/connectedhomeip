@@ -13,7 +13,7 @@
 
 namespace chip {
 namespace app {
-namespace clusters {
+namespace Clusters {
 namespace EnergyPreference {
 
 inline constexpr uint32_t kRevision = 1;
@@ -30,7 +30,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace CurrentEnergyBalance {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = EnergyPreference::Attributes::CurrentEnergyBalance::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
@@ -54,16 +54,19 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace CurrentLowPowerModeSensitivity {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = EnergyPreference::Attributes::CurrentLowPowerModeSensitivity::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
 } // namespace CurrentLowPowerModeSensitivity
 
+
 } // namespace Attributes
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+
+} // namespace Commands
 } // namespace EnergyPreference
-} // namespace clusters
+} // namespace Clusters
 } // namespace app
 } // namespace chip

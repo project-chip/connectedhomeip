@@ -14,6 +14,6 @@ namespace GroupKeyManagement {
 inline constexpr ClusterId Id = 0x0000003F;
 
 } // namespace GroupKeyManagement
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

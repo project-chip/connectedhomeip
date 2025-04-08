@@ -14,6 +14,6 @@ namespace WindowCovering {
 inline constexpr ClusterId Id = 0x00000102;
 
 } // namespace WindowCovering
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

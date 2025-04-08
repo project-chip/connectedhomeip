@@ -14,6 +14,6 @@ namespace ThreadNetworkDiagnostics {
 inline constexpr ClusterId Id = 0x00000035;
 
 } // namespace ThreadNetworkDiagnostics
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

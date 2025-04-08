@@ -22,6 +22,6 @@ inline constexpr CommandId Id = 0x00000002;
 } // namespace RevokeCommissioning
 } // namespace Commands
 } // namespace AdministratorCommissioning
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

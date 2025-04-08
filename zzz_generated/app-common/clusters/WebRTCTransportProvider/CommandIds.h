@@ -34,6 +34,6 @@ inline constexpr CommandId Id = 0x00000004;
 } // namespace ProvideOfferResponse
 } // namespace Commands
 } // namespace WebRTCTransportProvider
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

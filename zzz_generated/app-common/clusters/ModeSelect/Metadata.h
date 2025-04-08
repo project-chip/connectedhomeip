@@ -13,7 +13,7 @@
 
 namespace chip {
 namespace app {
-namespace clusters {
+namespace Clusters {
 namespace ModeSelect {
 
 inline constexpr uint32_t kRevision = 2;
@@ -22,7 +22,7 @@ namespace Attributes {
 namespace Description {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ModeSelect::Attributes::Description::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -30,7 +30,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace StandardNamespace {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ModeSelect::Attributes::StandardNamespace::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -46,7 +46,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace CurrentMode {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ModeSelect::Attributes::CurrentMode::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -54,7 +54,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace StartUpMode {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ModeSelect::Attributes::StartUpMode::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
@@ -62,11 +62,12 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace OnMode {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ModeSelect::Attributes::OnMode::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
 } // namespace OnMode
+
 
 } // namespace Attributes
 
@@ -74,13 +75,13 @@ namespace Commands {
 namespace ChangeToMode {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = ModeSelect::Commands::ChangeToMode::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace ChangeToMode
 
 } // namespace Commands
 } // namespace ModeSelect
-} // namespace clusters
+} // namespace Clusters
 } // namespace app
 } // namespace chip

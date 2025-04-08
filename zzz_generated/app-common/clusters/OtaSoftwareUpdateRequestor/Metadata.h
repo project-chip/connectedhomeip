@@ -13,7 +13,7 @@
 
 namespace chip {
 namespace app {
-namespace clusters {
+namespace Clusters {
 namespace OtaSoftwareUpdateRequestor {
 
 inline constexpr uint32_t kRevision = 1;
@@ -30,7 +30,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace UpdatePossible {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -38,7 +38,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace UpdateState {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = OtaSoftwareUpdateRequestor::Attributes::UpdateState::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -46,11 +46,12 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace UpdateStateProgress {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = OtaSoftwareUpdateRequestor::Attributes::UpdateStateProgress::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace UpdateStateProgress
+
 
 } // namespace Attributes
 
@@ -58,13 +59,13 @@ namespace Commands {
 namespace AnnounceOTAProvider {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace AnnounceOTAProvider
 
 } // namespace Commands
 } // namespace OtaSoftwareUpdateRequestor
-} // namespace clusters
+} // namespace Clusters
 } // namespace app
 } // namespace chip

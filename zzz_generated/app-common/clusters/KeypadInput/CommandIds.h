@@ -19,6 +19,6 @@ inline constexpr CommandId Id = 0x00000001;
 } // namespace SendKeyResponse
 } // namespace Commands
 } // namespace KeypadInput
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

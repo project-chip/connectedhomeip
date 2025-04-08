@@ -19,6 +19,6 @@ inline constexpr EventId Id = 0x00000001;
 } // namespace SensorFault
 } // namespace Events
 } // namespace BooleanStateConfiguration
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

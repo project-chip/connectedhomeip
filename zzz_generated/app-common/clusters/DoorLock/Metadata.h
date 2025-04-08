@@ -13,7 +13,7 @@
 
 namespace chip {
 namespace app {
-namespace clusters {
+namespace Clusters {
 namespace DoorLock {
 
 inline constexpr uint32_t kRevision = 7;
@@ -22,7 +22,7 @@ namespace Attributes {
 namespace LockState {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = DoorLock::Attributes::LockState::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -30,7 +30,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace LockType {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = DoorLock::Attributes::LockType::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -38,7 +38,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace ActuatorEnabled {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = DoorLock::Attributes::ActuatorEnabled::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -46,7 +46,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace DoorState {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = DoorLock::Attributes::DoorState::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -54,7 +54,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace DoorOpenEvents {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = DoorLock::Attributes::DoorOpenEvents::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
@@ -62,7 +62,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace DoorClosedEvents {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = DoorLock::Attributes::DoorClosedEvents::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
@@ -70,7 +70,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace OpenPeriod {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = DoorLock::Attributes::OpenPeriod::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
@@ -78,7 +78,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace NumberOfTotalUsersSupported {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = DoorLock::Attributes::NumberOfTotalUsersSupported::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -86,7 +86,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace NumberOfPINUsersSupported {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = DoorLock::Attributes::NumberOfPINUsersSupported::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -94,7 +94,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace NumberOfRFIDUsersSupported {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = DoorLock::Attributes::NumberOfRFIDUsersSupported::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -102,7 +102,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace NumberOfWeekDaySchedulesSupportedPerUser {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = DoorLock::Attributes::NumberOfWeekDaySchedulesSupportedPerUser::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -110,7 +110,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace NumberOfYearDaySchedulesSupportedPerUser {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = DoorLock::Attributes::NumberOfYearDaySchedulesSupportedPerUser::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -118,7 +118,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace NumberOfHolidaySchedulesSupported {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = DoorLock::Attributes::NumberOfHolidaySchedulesSupported::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -126,7 +126,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace MaxPINCodeLength {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = DoorLock::Attributes::MaxPINCodeLength::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -134,7 +134,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace MinPINCodeLength {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = DoorLock::Attributes::MinPINCodeLength::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -142,7 +142,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace MaxRFIDCodeLength {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = DoorLock::Attributes::MaxRFIDCodeLength::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -150,7 +150,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace MinRFIDCodeLength {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = DoorLock::Attributes::MinRFIDCodeLength::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -158,7 +158,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace CredentialRulesSupport {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = DoorLock::Attributes::CredentialRulesSupport::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -166,7 +166,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace NumberOfCredentialsSupportedPerUser {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = DoorLock::Attributes::NumberOfCredentialsSupportedPerUser::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -174,7 +174,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Language {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = DoorLock::Attributes::Language::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
@@ -182,7 +182,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace LEDSettings {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = DoorLock::Attributes::LEDSettings::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
@@ -190,7 +190,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace AutoRelockTime {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = DoorLock::Attributes::AutoRelockTime::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
@@ -198,7 +198,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace SoundVolume {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = DoorLock::Attributes::SoundVolume::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
@@ -206,7 +206,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace OperatingMode {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = DoorLock::Attributes::OperatingMode::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
@@ -214,7 +214,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace SupportedOperatingModes {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = DoorLock::Attributes::SupportedOperatingModes::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -222,7 +222,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace DefaultConfigurationRegister {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = DoorLock::Attributes::DefaultConfigurationRegister::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -230,7 +230,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace EnableLocalProgramming {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = DoorLock::Attributes::EnableLocalProgramming::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kAdminister,
 };
@@ -238,7 +238,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace EnableOneTouchLocking {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = DoorLock::Attributes::EnableOneTouchLocking::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
@@ -246,7 +246,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace EnableInsideStatusLED {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = DoorLock::Attributes::EnableInsideStatusLED::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
@@ -254,7 +254,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace EnablePrivacyModeButton {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = DoorLock::Attributes::EnablePrivacyModeButton::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
@@ -262,7 +262,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace LocalProgrammingFeatures {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = DoorLock::Attributes::LocalProgrammingFeatures::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kAdminister,
 };
@@ -270,7 +270,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace WrongCodeEntryLimit {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = DoorLock::Attributes::WrongCodeEntryLimit::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kAdminister,
 };
@@ -278,7 +278,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace UserCodeTemporaryDisableTime {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = DoorLock::Attributes::UserCodeTemporaryDisableTime::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kAdminister,
 };
@@ -286,7 +286,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace SendPINOverTheAir {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = DoorLock::Attributes::SendPINOverTheAir::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kAdminister,
 };
@@ -294,7 +294,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace RequirePINforRemoteOperation {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = DoorLock::Attributes::RequirePINforRemoteOperation::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kAdminister,
 };
@@ -302,7 +302,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace ExpiringUserTimeout {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = DoorLock::Attributes::ExpiringUserTimeout::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kAdminister,
 };
@@ -310,7 +310,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace AliroReaderVerificationKey {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = DoorLock::Attributes::AliroReaderVerificationKey::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kAdminister,
     .writePrivilege = std::nullopt,
 };
@@ -318,7 +318,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace AliroReaderGroupIdentifier {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = DoorLock::Attributes::AliroReaderGroupIdentifier::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kAdminister,
     .writePrivilege = std::nullopt,
 };
@@ -326,7 +326,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace AliroReaderGroupSubIdentifier {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = DoorLock::Attributes::AliroReaderGroupSubIdentifier::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kAdminister,
     .writePrivilege = std::nullopt,
 };
@@ -342,7 +342,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace AliroGroupResolvingKey {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = DoorLock::Attributes::AliroGroupResolvingKey::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kAdminister,
     .writePrivilege = std::nullopt,
 };
@@ -358,7 +358,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace AliroBLEAdvertisingVersion {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = DoorLock::Attributes::AliroBLEAdvertisingVersion::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kAdminister,
     .writePrivilege = std::nullopt,
 };
@@ -366,7 +366,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace NumberOfAliroCredentialIssuerKeysSupported {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = DoorLock::Attributes::NumberOfAliroCredentialIssuerKeysSupported::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -374,11 +374,12 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace NumberOfAliroEndpointKeysSupported {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = DoorLock::Attributes::NumberOfAliroEndpointKeysSupported::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace NumberOfAliroEndpointKeysSupported
+
 
 } // namespace Attributes
 
@@ -407,63 +408,63 @@ inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
 namespace SetWeekDaySchedule {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = DoorLock::Commands::SetWeekDaySchedule::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace SetWeekDaySchedule
 namespace GetWeekDaySchedule {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = DoorLock::Commands::GetWeekDaySchedule::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace GetWeekDaySchedule
 namespace ClearWeekDaySchedule {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = DoorLock::Commands::ClearWeekDaySchedule::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace ClearWeekDaySchedule
 namespace SetYearDaySchedule {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = DoorLock::Commands::SetYearDaySchedule::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace SetYearDaySchedule
 namespace GetYearDaySchedule {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = DoorLock::Commands::GetYearDaySchedule::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace GetYearDaySchedule
 namespace ClearYearDaySchedule {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = DoorLock::Commands::ClearYearDaySchedule::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace ClearYearDaySchedule
 namespace SetHolidaySchedule {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = DoorLock::Commands::SetHolidaySchedule::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace SetHolidaySchedule
 namespace GetHolidaySchedule {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = DoorLock::Commands::GetHolidaySchedule::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace GetHolidaySchedule
 namespace ClearHolidaySchedule {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = DoorLock::Commands::ClearHolidaySchedule::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace ClearHolidaySchedule
@@ -477,7 +478,7 @@ inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
 namespace GetUser {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = DoorLock::Commands::GetUser::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace GetUser
@@ -498,7 +499,7 @@ inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
 namespace GetCredentialStatus {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = DoorLock::Commands::GetCredentialStatus::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kAdminister,
 };
 } // namespace GetCredentialStatus
@@ -533,6 +534,6 @@ inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
 
 } // namespace Commands
 } // namespace DoorLock
-} // namespace clusters
+} // namespace Clusters
 } // namespace app
 } // namespace chip

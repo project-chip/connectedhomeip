@@ -14,6 +14,6 @@ namespace DeviceEnergyManagement {
 inline constexpr ClusterId Id = 0x00000098;
 
 } // namespace DeviceEnergyManagement
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

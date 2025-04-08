@@ -13,7 +13,7 @@
 
 namespace chip {
 namespace app {
-namespace clusters {
+namespace Clusters {
 namespace EcosystemInformation {
 
 inline constexpr uint32_t kRevision = 1;
@@ -36,10 +36,13 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 };
 } // namespace LocationDirectory
 
+
 } // namespace Attributes
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+
+} // namespace Commands
 } // namespace EcosystemInformation
-} // namespace clusters
+} // namespace Clusters
 } // namespace app
 } // namespace chip

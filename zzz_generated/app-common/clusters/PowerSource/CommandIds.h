@@ -10,8 +10,9 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace PowerSource {
-namespace Commands {} // namespace Commands
+namespace Commands {
+} // namespace Commands
 } // namespace PowerSource
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

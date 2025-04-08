@@ -10,8 +10,9 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace ColorControl {
-namespace Events {} // namespace Events
+namespace Events {
+} // namespace Events
 } // namespace ColorControl
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

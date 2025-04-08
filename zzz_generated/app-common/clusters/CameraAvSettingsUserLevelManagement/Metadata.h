@@ -13,7 +13,7 @@
 
 namespace chip {
 namespace app {
-namespace clusters {
+namespace Clusters {
 namespace CameraAvSettingsUserLevelManagement {
 
 inline constexpr uint32_t kRevision = 1;
@@ -22,7 +22,7 @@ namespace Attributes {
 namespace MPTZPosition {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = CameraAvSettingsUserLevelManagement::Attributes::MPTZPosition::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -30,7 +30,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace MaxPresets {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = CameraAvSettingsUserLevelManagement::Attributes::MaxPresets::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -54,7 +54,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace ZoomMax {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = CameraAvSettingsUserLevelManagement::Attributes::ZoomMax::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -62,7 +62,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace TiltMin {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = CameraAvSettingsUserLevelManagement::Attributes::TiltMin::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -70,7 +70,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace TiltMax {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = CameraAvSettingsUserLevelManagement::Attributes::TiltMax::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -78,7 +78,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace PanMin {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = CameraAvSettingsUserLevelManagement::Attributes::PanMin::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -86,11 +86,12 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace PanMax {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = CameraAvSettingsUserLevelManagement::Attributes::PanMax::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace PanMax
+
 
 } // namespace Attributes
 
@@ -98,55 +99,55 @@ namespace Commands {
 namespace MPTZSetPosition {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = CameraAvSettingsUserLevelManagement::Commands::MPTZSetPosition::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace MPTZSetPosition
 namespace MPTZRelativeMove {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = CameraAvSettingsUserLevelManagement::Commands::MPTZRelativeMove::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace MPTZRelativeMove
 namespace MPTZMoveToPreset {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = CameraAvSettingsUserLevelManagement::Commands::MPTZMoveToPreset::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace MPTZMoveToPreset
 namespace MPTZSavePreset {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = CameraAvSettingsUserLevelManagement::Commands::MPTZSavePreset::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace MPTZSavePreset
 namespace MPTZRemovePreset {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = CameraAvSettingsUserLevelManagement::Commands::MPTZRemovePreset::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace MPTZRemovePreset
 namespace DPTZSetViewport {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = CameraAvSettingsUserLevelManagement::Commands::DPTZSetViewport::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace DPTZSetViewport
 namespace DPTZRelativeMove {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = CameraAvSettingsUserLevelManagement::Commands::DPTZRelativeMove::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace DPTZRelativeMove
 
 } // namespace Commands
 } // namespace CameraAvSettingsUserLevelManagement
-} // namespace clusters
+} // namespace Clusters
 } // namespace app
 } // namespace chip

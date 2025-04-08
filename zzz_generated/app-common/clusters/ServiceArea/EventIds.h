@@ -10,8 +10,9 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace ServiceArea {
-namespace Events {} // namespace Events
+namespace Events {
+} // namespace Events
 } // namespace ServiceArea
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

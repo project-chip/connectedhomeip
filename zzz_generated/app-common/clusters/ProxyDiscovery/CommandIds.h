@@ -10,8 +10,9 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace ProxyDiscovery {
-namespace Commands {} // namespace Commands
+namespace Commands {
+} // namespace Commands
 } // namespace ProxyDiscovery
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

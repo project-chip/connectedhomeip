@@ -14,6 +14,6 @@ namespace ContentLauncher {
 inline constexpr ClusterId Id = 0x0000050A;
 
 } // namespace ContentLauncher
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

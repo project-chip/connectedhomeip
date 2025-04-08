@@ -13,24 +13,27 @@
 
 namespace chip {
 namespace app {
-namespace clusters {
+namespace Clusters {
 namespace LowPower {
 
 inline constexpr uint32_t kRevision = 1;
 
-namespace Attributes {} // namespace Attributes
+namespace Attributes {
+
+
+} // namespace Attributes
 
 namespace Commands {
 namespace Sleep {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = LowPower::Commands::Sleep::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace Sleep
 
 } // namespace Commands
 } // namespace LowPower
-} // namespace clusters
+} // namespace Clusters
 } // namespace app
 } // namespace chip

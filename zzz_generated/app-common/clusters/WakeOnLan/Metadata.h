@@ -13,7 +13,7 @@
 
 namespace chip {
 namespace app {
-namespace clusters {
+namespace Clusters {
 namespace WakeOnLan {
 
 inline constexpr uint32_t kRevision = 1;
@@ -22,7 +22,7 @@ namespace Attributes {
 namespace MACAddress {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = WakeOnLan::Attributes::MACAddress::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -30,16 +30,19 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace LinkLocalAddress {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = WakeOnLan::Attributes::LinkLocalAddress::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace LinkLocalAddress
 
+
 } // namespace Attributes
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+
+} // namespace Commands
 } // namespace WakeOnLan
-} // namespace clusters
+} // namespace Clusters
 } // namespace app
 } // namespace chip

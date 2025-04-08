@@ -13,7 +13,7 @@
 
 namespace chip {
 namespace app {
-namespace clusters {
+namespace Clusters {
 namespace LaundryDryerControls {
 
 inline constexpr uint32_t kRevision = 1;
@@ -30,16 +30,19 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace SelectedDrynessLevel {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = LaundryDryerControls::Attributes::SelectedDrynessLevel::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
 } // namespace SelectedDrynessLevel
 
+
 } // namespace Attributes
 
-namespace Commands {} // namespace Commands
+namespace Commands {
+
+} // namespace Commands
 } // namespace LaundryDryerControls
-} // namespace clusters
+} // namespace Clusters
 } // namespace app
 } // namespace chip

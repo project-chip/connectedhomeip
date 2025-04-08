@@ -13,7 +13,7 @@
 
 namespace chip {
 namespace app {
-namespace clusters {
+namespace Clusters {
 namespace TargetNavigator {
 
 inline constexpr uint32_t kRevision = 2;
@@ -30,11 +30,12 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace CurrentTarget {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = TargetNavigator::Attributes::CurrentTarget::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace CurrentTarget
+
 
 } // namespace Attributes
 
@@ -42,13 +43,13 @@ namespace Commands {
 namespace NavigateTarget {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = TargetNavigator::Commands::NavigateTarget::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace NavigateTarget
 
 } // namespace Commands
 } // namespace TargetNavigator
-} // namespace clusters
+} // namespace Clusters
 } // namespace app
 } // namespace chip

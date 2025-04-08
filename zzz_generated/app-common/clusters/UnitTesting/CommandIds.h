@@ -142,6 +142,6 @@ inline constexpr CommandId Id = 0xFFF200BB;
 } // namespace TestDifferentVendorMeiResponse
 } // namespace Commands
 } // namespace UnitTesting
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

@@ -10,8 +10,9 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace RvcCleanMode {
-namespace Events {} // namespace Events
+namespace Events {
+} // namespace Events
 } // namespace RvcCleanMode
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

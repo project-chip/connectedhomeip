@@ -14,6 +14,6 @@ namespace CameraAvSettingsUserLevelManagement {
 inline constexpr ClusterId Id = 0x00000552;
 
 } // namespace CameraAvSettingsUserLevelManagement
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

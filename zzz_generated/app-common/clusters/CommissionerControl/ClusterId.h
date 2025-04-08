@@ -14,6 +14,6 @@ namespace CommissionerControl {
 inline constexpr ClusterId Id = 0x00000751;
 
 } // namespace CommissionerControl
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

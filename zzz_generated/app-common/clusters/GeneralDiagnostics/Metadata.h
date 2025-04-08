@@ -13,7 +13,7 @@
 
 namespace chip {
 namespace app {
-namespace clusters {
+namespace Clusters {
 namespace GeneralDiagnostics {
 
 inline constexpr uint32_t kRevision = 2;
@@ -30,7 +30,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace RebootCount {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = GeneralDiagnostics::Attributes::RebootCount::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -38,7 +38,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace UpTime {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = GeneralDiagnostics::Attributes::UpTime::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -46,7 +46,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace TotalOperationalHours {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = GeneralDiagnostics::Attributes::TotalOperationalHours::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -54,7 +54,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace BootReason {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = GeneralDiagnostics::Attributes::BootReason::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -86,11 +86,12 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace TestEventTriggersEnabled {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = GeneralDiagnostics::Attributes::TestEventTriggersEnabled::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace TestEventTriggersEnabled
+
 
 } // namespace Attributes
 
@@ -98,27 +99,27 @@ namespace Commands {
 namespace TestEventTrigger {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = GeneralDiagnostics::Commands::TestEventTrigger::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kManage,
 };
 } // namespace TestEventTrigger
 namespace TimeSnapshot {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = GeneralDiagnostics::Commands::TimeSnapshot::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace TimeSnapshot
 namespace PayloadTestRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = GeneralDiagnostics::Commands::PayloadTestRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kManage,
 };
 } // namespace PayloadTestRequest
 
 } // namespace Commands
 } // namespace GeneralDiagnostics
-} // namespace clusters
+} // namespace Clusters
 } // namespace app
 } // namespace chip

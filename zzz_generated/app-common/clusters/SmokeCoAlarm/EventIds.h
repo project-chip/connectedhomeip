@@ -46,6 +46,6 @@ inline constexpr EventId Id = 0x0000000A;
 } // namespace AllClear
 } // namespace Events
 } // namespace SmokeCoAlarm
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

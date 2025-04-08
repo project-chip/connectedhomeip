@@ -22,6 +22,6 @@ inline constexpr EventId Id = 0x00000002;
 } // namespace FabricRestrictionReviewUpdate
 } // namespace Events
 } // namespace AccessControl
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

@@ -16,6 +16,6 @@ inline constexpr CommandId Id = 0x00000000;
 } // namespace ChangeToMode
 } // namespace Commands
 } // namespace ModeSelect
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

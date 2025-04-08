@@ -19,6 +19,6 @@ inline constexpr CommandId Id = 0x00000001;
 } // namespace NetworkPassphraseResponse
 } // namespace Commands
 } // namespace WiFiNetworkManagement
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

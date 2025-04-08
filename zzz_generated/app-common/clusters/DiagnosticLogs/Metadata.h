@@ -13,24 +13,27 @@
 
 namespace chip {
 namespace app {
-namespace clusters {
+namespace Clusters {
 namespace DiagnosticLogs {
 
 inline constexpr uint32_t kRevision = 1;
 
-namespace Attributes {} // namespace Attributes
+namespace Attributes {
+
+
+} // namespace Attributes
 
 namespace Commands {
 namespace RetrieveLogsRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = DiagnosticLogs::Commands::RetrieveLogsRequest::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace RetrieveLogsRequest
 
 } // namespace Commands
 } // namespace DiagnosticLogs
-} // namespace clusters
+} // namespace Clusters
 } // namespace app
 } // namespace chip

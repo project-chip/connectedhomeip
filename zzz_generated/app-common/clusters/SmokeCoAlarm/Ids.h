@@ -8,3 +8,4 @@
 #include <clusters/SmokeCoAlarm/ClusterId.h>
 #include <clusters/SmokeCoAlarm/CommandIds.h>
 #include <clusters/SmokeCoAlarm/EventIds.h>
+

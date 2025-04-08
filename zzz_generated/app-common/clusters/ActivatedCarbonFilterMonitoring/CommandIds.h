@@ -16,6 +16,6 @@ inline constexpr CommandId Id = 0x00000000;
 } // namespace ResetCondition
 } // namespace Commands
 } // namespace ActivatedCarbonFilterMonitoring
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

@@ -14,6 +14,6 @@ namespace RefrigeratorAndTemperatureControlledCabinetMode {
 inline constexpr ClusterId Id = 0x00000052;
 
 } // namespace RefrigeratorAndTemperatureControlledCabinetMode
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

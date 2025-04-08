@@ -16,6 +16,6 @@ inline constexpr CommandId Id = 0x00000080;
 } // namespace KeepActive
 } // namespace Commands
 } // namespace BridgedDeviceBasicInformation
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

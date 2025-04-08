@@ -14,6 +14,6 @@ namespace Messages {
 inline constexpr ClusterId Id = 0x00000097;
 
 } // namespace Messages
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip

@@ -14,6 +14,6 @@ namespace PushAvStreamTransport {
 inline constexpr ClusterId Id = 0x00000555;
 
 } // namespace PushAvStreamTransport
-} // namespace Clusters
 } // namespace app
+} // namespace Clusters
 } // namespace chip
