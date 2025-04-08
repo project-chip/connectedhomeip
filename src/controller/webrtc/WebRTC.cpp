@@ -1,0 +1,300 @@
+/*
+ *
+ *    Copyright (c) 2025 Project CHIP Authors
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+#include "WebRTC.h"
+#include "Callbacks.h"
+
+#include <fstream>
+#include <iostream>
+#include <map>
+#include <memory>
+#include <queue>
+#include <sstream>
+#include <string>
+#include <thread>
+#include <unistd.h>
+
+#include <rtc/description.hpp>
+#include <rtc/rtc.h>
+#include <rtc/rtc.hpp>
+
+#include <lib/support/logging/CHIPLogging.h>
+
+namespace chip {
+namespace webrtc {
+
+class WebRTCClient
+{
+public:
+    int client_id;
+    std::shared_ptr<rtc::PeerConnection> pc;
+    rtc::Configuration config;
+    SdpOfferCallback offerCb;
+    SdpAnswerCallback answerCb;
+    IceCallback iceCb;
+    ErrorCallback errorCb;
+    PeerConnectedCallback peerConnectedCb;
+    PeerDisconnectedCallback peerDisconnectedCb;
+    StatsCollectedCallback statsCb;
+
+    WebRTCClient(int id) { client_id = id; }
+};
+
+// Function to read file content into a string
+char * readFile(const char * filename)
+{
+    FILE * file = fopen(filename, "r");
+    if (!file)
+    {
+        printf("Could not open %s\n", filename);
+        return NULL;
+    }
+    fseek(file, 0, SEEK_END);
+    long size = ftell(file);
+    fseek(file, 0, SEEK_SET);
+    char * content = (char *) malloc(size + 1);
+    fread(content, 1, size, file);
+    content[size] = '\0';
+    fclose(file);
+    return content;
+}
+
+// Function to read file content into a string
+std::string readFileString(std::string filename)
+{
+    std::ifstream ifs("myfile.txt");
+    std::string content((std::istreambuf_iterator<char>(ifs)), (std::istreambuf_iterator<char>()));
+    return content;
+}
+
+// Function to create a new WebRTC client
+void * CreateWebrtcClient(int id)
+{
+    WebRTCClient * client = new WebRTCClient(id);
+    return (void *) client;
+}
+
+// Function to initialize the peer connection
+void InitialisePeerConnection(void * Client)
+{
+    rtc::InitLogger(rtc::LogLevel::Verbose);
+
+    WebRTCClient * client = static_cast<WebRTCClient *>(Client);
+
+    // Add default ICE servers to the configuration
+    client->config.iceServers.emplace_back("stun.l.google.com:19302");
+
+    // Create a new peer connection
+    client->pc = std::make_shared<rtc::PeerConnection>(client->config);
+
+    // Set up event handlers for the peer connection
+    client->pc->onLocalDescription([client](rtc::Description description) {
+        std::string desc_string = std::string(description);
+        ChipLogProgress(NotSpecified, "Local Description (Paste this to the other peer): %s", desc_string.c_str());
+        if (client->offerCb)
+        {
+            client->offerCb(desc_string.c_str(), client->client_id);
+        }
+    });
+
+    client->pc->onLocalCandidate([client](rtc::Candidate candidate) {
+        std::string cand_string = std::string(candidate);
+        ChipLogProgress(NotSpecified, "Local Candidate (Paste this to the other peer after the local description): %s",
+                        cand_string.c_str());
+        if (client->iceCb)
+        {
+            client->iceCb(cand_string.c_str(), client->client_id);
+        }
+    });
+
+    client->pc->onStateChange([client](rtc::PeerConnection::State state) {
+        ChipLogProgress(NotSpecified, "[State: %u]", static_cast<unsigned>(state));
+        if (state == rtc::PeerConnection::State::Connected)
+        {
+            if (client->peerConnectedCb)
+            {
+                client->peerConnectedCb(client->client_id);
+            }
+        }
+        else if (state == rtc::PeerConnection::State::Disconnected)
+        {
+            if (client->peerDisconnectedCb)
+            {
+                client->peerDisconnectedCb(client->client_id);
+            }
+        }
+    });
+
+    client->pc->onGatheringStateChange([](rtc::PeerConnection::GatheringState state) {
+        ChipLogProgress(NotSpecified, "[Gathering State: %u]", static_cast<unsigned>(state));
+    });
+
+    // Create a data channel for communication
+    auto dc = client->pc->createDataChannel("test");
+
+    // Set up event handlers for the data channel
+    dc->onOpen([&]() { ChipLogProgress(NotSpecified, "[DataChannel open: %s]", dc->label().c_str()); });
+    dc->onClosed([&]() { ChipLogProgress(NotSpecified, "[DataChannel closed: %s]", dc->label().c_str()); });
+    dc->onMessage([](auto data) {
+        if (std::holds_alternative<std::string>(data))
+        {
+            ChipLogProgress(NotSpecified, "[Received message: %s]", std::get<std::string>(data).c_str());
+        }
+    });
+}
+
+// Function to destroy a WebRTC client
+void DestroyClient(void * Client) {}
+
+// API to close the peer connection and free up resources
+void ClosePeerConnection(void * Client)
+{
+    if (Client == nullptr)
+    {
+        ChipLogError(NotSpecified, "Client is null");
+        return;
+    }
+
+    WebRTCClient * rtcClient = static_cast<WebRTCClient *>(Client);
+    if (rtcClient->pc == nullptr)
+    {
+        ChipLogError(NotSpecified, "PeerConnection is null");
+        return;
+    }
+
+    rtcClient->pc->close();
+    delete rtcClient;
+}
+
+// Function to get statistics from the peer connection
+void GetStats(void * Client)
+{
+    if (Client == nullptr)
+    {
+        ChipLogError(NotSpecified, "Client is null");
+        return;
+    }
+
+    WebRTCClient * rtcClient = static_cast<WebRTCClient *>(Client);
+    if (rtcClient->pc == nullptr)
+    {
+        ChipLogError(NotSpecified, "PeerConnection is null");
+        return;
+    }
+
+    // Retrieve statistics from the peer connection
+    size_t bytesSent     = rtcClient->pc->bytesSent();
+    size_t bytesReceived = rtcClient->pc->bytesReceived();
+
+    // Print the data statistics
+    ChipLogProgress(NotSpecified, "Stats: Total bytes sent: %lu Total bytes received: %lu", bytesSent, bytesReceived);
+}
+
+// Function to create an offer for the peer connection
+void CreateOffer(void * Client)
+{
+    if (Client == nullptr)
+    {
+        ChipLogError(NotSpecified, "Client is null");
+        return;
+    }
+
+    WebRTCClient * rtcClient = static_cast<WebRTCClient *>(Client);
+    if (rtcClient->pc == nullptr)
+    {
+        ChipLogError(NotSpecified, "PeerConnection is null");
+        return;
+    }
+
+    // Create an offer for the peer connection
+    rtc::Description description = rtcClient->pc->createOffer();
+
+    // Call the offer callback with the offer description
+    if (rtcClient->offerCb)
+    {
+        rtcClient->offerCb(description.typeString().c_str(), rtcClient->client_id);
+    }
+}
+
+// Function to create an answer for the peer connection
+void CreateAnswer(void * Client, const std::string & offer, std::function<void(std::string)> callback, int index) {}
+
+// Function to get the local session description
+const char * GetLocalSdp(void * Client)
+{
+    if (Client == nullptr)
+    {
+        ChipLogError(NotSpecified, "Client is null");
+        return "";
+    }
+
+    WebRTCClient * rtcClient = static_cast<WebRTCClient *>(Client);
+    if (rtcClient->pc == nullptr)
+    {
+        ChipLogError(NotSpecified, "PeerConnection is null");
+        return "";
+    }
+
+    // Return the local session description as a string
+    return rtcClient->pc->localDescription()->typeString().c_str();
+}
+
+// Function to set the remote session description
+void SetAnswer(void * Client, const std::string & answer) {}
+
+// Function to set the remote candidate
+void SetCandidate(void * Client, const std::string & candidate)
+{
+    if (Client == nullptr)
+    {
+        ChipLogError(NotSpecified, "Client is null");
+        return;
+    }
+
+    WebRTCClient * rtcClient = static_cast<WebRTCClient *>(Client);
+    if (rtcClient->pc == nullptr)
+    {
+        ChipLogError(NotSpecified, "PeerConnection is null");
+        return;
+    }
+
+    // Add the remote candidate to the peer connection
+    rtcClient->pc->addRemoteCandidate(rtc::Candidate(candidate));
+}
+
+// Function to send data over the data channel
+void SendData(void * Client, const std::string & data) {}
+
+// Function to set callbacks for various events
+void SetCallbacks(void * Client, SdpOfferCallback offer_callback, SdpAnswerCallback answer_callback, IceCallback ice_callback,
+                  ErrorCallback error_callback, PeerConnectedCallback peer_connected_callback,
+                  PeerDisconnectedCallback peer_disconnected_callback, StatsCollectedCallback stats_callback)
+{
+    WebRTCClient * client = static_cast<WebRTCClient *>(Client);
+
+    // Set the callbacks for various events
+    client->offerCb            = offer_callback;
+    client->answerCb           = answer_callback;
+    client->iceCb              = ice_callback;
+    client->errorCb            = error_callback;
+    client->peerConnectedCb    = peer_connected_callback;
+    client->peerDisconnectedCb = peer_disconnected_callback;
+    client->statsCb            = stats_callback;
+}
+
+} // namespace webrtc
+} // namespace chip
