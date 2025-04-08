@@ -199,7 +199,7 @@ GstElement * CameraDevice::CreateVideoPipeline(const std::string & device, int w
 // Helper function to create a GStreamer pipeline
 GstElement * CameraDevice::CreateAudioPipeline(const std::string & device, int channels, int sampleRate, CameraError & error)
 {
-    GstElement *pipeline, *source, *capsfilter, *audioconvert, *opusenc, *rtpopuspay, udpsink;
+    GstElement *pipeline, *source, *capsfilter, *audioconvert, *opusenc, *rtpopuspay, *udpsink;
 
     // Create the pipeline elements
     pipeline = gst_pipeline_new("audio-pipeline");
@@ -323,35 +323,45 @@ CameraError CameraDevice::StartVideoStream(uint16_t streamID)
 
     // Create Gstreamer video pipeline
     CameraError error = CameraError::SUCCESS;
-    it->videoPipeline = CreateVideoPipeline("/dev/video0", it->videoRes.width, it->videoRes.height, it->frameRate, error);
-    if (it->videoPipeline == nullptr)
+    GstElement * videoPipeline =
+        CreateVideoPipeline("/dev/video0", it->videoStreamParams.minResolution.width, it->videoStreamParams.minResolution.height,
+                            it->videoStreamParams.minFrameRate, error);
+    if (videoPipeline == nullptr)
     {
         ChipLogError(Camera, "Failed to create video pipeline.");
+        it->videoContext = nullptr;
         return CameraError::ERROR_VIDEO_STREAM_START_FAILED;
     }
 
     // Start the pipeline
-    GstStateChangeReturn result = gst_element_set_state(it->videoPipeline, GST_STATE_PLAYING);
+    GstStateChangeReturn result = gst_element_set_state(videoPipeline, GST_STATE_PLAYING);
     if (result == GST_STATE_CHANGE_FAILURE)
     {
         ChipLogError(Camera, "Failed to start video pipeline.");
-        gst_object_unref(it->videoPipeline);
-        it->videoPipeline = nullptr;
+        gst_object_unref(videoPipeline);
+        it->videoContext = nullptr;
         return CameraError::ERROR_VIDEO_STREAM_START_FAILED;
     }
 
     // Start the pipeline
-    gst_element_set_state(videoPipeline, GST_STATE_PLAYING);
+    result = gst_element_set_state(videoPipeline, GST_STATE_PLAYING);
+    if (result == GST_STATE_CHANGE_FAILURE)
+    {
+        ChipLogError(Camera, "Failed to start video pipeline.");
+        gst_object_unref(videoPipeline);
+        it->videoContext = nullptr;
+        return CameraError::ERROR_VIDEO_STREAM_START_FAILED;
+    }
 
     // Wait for the pipeline to reach the PLAYING state
     GstState state;
-    gst_element_get_state(it->videoPipeline, &state, nullptr, GST_CLOCK_TIME_NONE);
+    gst_element_get_state(videoPipeline, &state, nullptr, GST_CLOCK_TIME_NONE);
     if (state != GST_STATE_PLAYING)
     {
-        ChipLogError(Zcl, "Video pipeline did not reach PLAYING state.");
-        gst_element_set_state(it->videoPipeline, GST_STATE_NULL);
-        gst_object_unref(it->videoPipeline);
-        it->videoPipeline = nullptr;
+        ChipLogError(Camera, "Video pipeline did not reach PLAYING state.");
+        gst_element_set_state(videoPipeline, GST_STATE_NULL);
+        gst_object_unref(videoPipeline);
+        it->videoContext = nullptr;
         return CameraError::ERROR_VIDEO_STREAM_START_FAILED;
     }
 
@@ -378,6 +388,12 @@ CameraError CameraDevice::StopVideoStream(uint16_t streamID)
     GstElement * videoPipeline = reinterpret_cast<GstElement *>(it->videoContext);
     if (videoPipeline != nullptr)
     {
+        GstStateChangeReturn result = gst_element_set_state(videoPipeline, GST_STATE_NULL);
+        if (result == GST_STATE_CHANGE_FAILURE)
+        {
+            return CameraError::ERROR_VIDEO_STREAM_STOP_FAILED;
+        }
+
         gst_element_set_state(videoPipeline, GST_STATE_NULL);
         gst_object_unref(videoPipeline);
         it->videoContext = nullptr;
@@ -389,49 +405,55 @@ CameraError CameraDevice::StopVideoStream(uint16_t streamID)
 // Start audio stream
 CameraError CameraDevice::StartAudioStream(uint16_t streamID)
 {
-    auto it =
-        std::find_if(audioStreams.begin(), audioStreams.end(), [streamID](const AudioStream & s) { return s.id == streamID; });
+    auto it = std::find_if(audioStreams.begin(), audioStreams.end(),
+                           [streamID](const AudioStream & s) { return s.audioStreamParams.audioStreamID == streamID; });
 
     if (it == audioStreams.end())
     {
+        ChipLogError(Camera, "Audio streamID : %u not found", streamID);
         return CameraError::ERROR_AUDIO_STREAM_START_FAILED;
     }
 
-    int channels   = audioStreams[streamID].channelCount;
-    int sampleRate = audioStreams[streamID].sampleRate;
+    int channels   = it->audioStreamParams.channelCount;
+    int sampleRate = it->audioStreamParams.sampleRate;
 
     // Create Gstreamer video pipeline
-    CameraError error = CameraError::SUCCESS;
-    it->audioPipeline = CreateAudioPipeline("/dev/audio0", channels, sampleRate, error);
-    if (it->audioPipeline == nullptr)
+    CameraError error          = CameraError::SUCCESS;
+    GstElement * audioPipeline = CreateAudioPipeline("/dev/audio0", channels, sampleRate, error);
+    if (audioPipeline == nullptr)
     {
+        ChipLogError(Camera, "Failed to create audio pipeline.");
+        it->audioContext = nullptr;
         return CameraError::ERROR_AUDIO_STREAM_START_FAILED;
     }
 
     // Start the pipeline
-    GstStateChangeReturn result = gst_element_set_state(it->audioPipeline, GST_STATE_PLAYING);
+    GstStateChangeReturn result = gst_element_set_state(audioPipeline, GST_STATE_PLAYING);
     if (result == GST_STATE_CHANGE_FAILURE)
     {
         ChipLogError(Camera, "Failed to start audio pipeline.");
-        gst_object_unref(it->audioPipeline);
-        it->audioPipeline = nullptr;
+        gst_object_unref(audioPipeline);
+        it->audioContext = nullptr;
         return CameraError::ERROR_AUDIO_STREAM_START_FAILED;
     }
 
     // Wait for the pipeline to reach the PLAYING state
     GstState state;
-    gst_element_get_state(it->audioPipeline, &state, nullptr, GST_CLOCK_TIME_NONE);
+    gst_element_get_state(audioPipeline, &state, nullptr, GST_CLOCK_TIME_NONE);
     if (state != GST_STATE_PLAYING)
     {
         ChipLogError(Camera, "Audio pipeline did not reach PLAYING state.");
-        gst_element_set_state(it->audioPipeline, GST_STATE_NULL);
-        gst_object_unref(it->audioPipeline);
-        it->audioPipeline = nullptr;
+        gst_element_set_state(audioPipeline, GST_STATE_NULL);
+        gst_object_unref(audioPipeline);
+        it->audioContext = nullptr;
         return CameraError::ERROR_AUDIO_STREAM_START_FAILED;
     }
 
     // Start the network stream source after the Gstreamer pipeline is setup
     mNetworkAudioSource.Start(streamID);
+
+    // Store in stream context
+    it->audioContext = audioPipeline;
 
     return CameraError::SUCCESS;
 }
@@ -439,19 +461,24 @@ CameraError CameraDevice::StartAudioStream(uint16_t streamID)
 // Stop audio stream
 CameraError CameraDevice::StopAudioStream(uint16_t streamID)
 {
-    auto it =
-        std::find_if(audioStreams.begin(), audioStreams.end(), [streamID](const AudioStream & s) { return s.id == streamID; });
+    auto it = std::find_if(audioStreams.begin(), audioStreams.end(),
+                           [streamID](const AudioStream & s) { return s.audioStreamParams.audioStreamID == streamID; });
 
     if (it == audioStreams.end())
     {
         return CameraError::ERROR_AUDIO_STREAM_STOP_FAILED;
     }
 
-    if (it->audioPipeline != nullptr)
+    GstElement * audioPipeline = reinterpret_cast<GstElement *>(it->audioContext);
+    if (audioPipeline != nullptr)
     {
-        gst_element_set_state(it->audioPipeline, GST_STATE_NULL);
-        gst_object_unref(it->audioPipeline);
-        it->audioPipeline = nullptr;
+        GstStateChangeReturn result = gst_element_set_state(audioPipeline, GST_STATE_NULL);
+        if (result == GST_STATE_CHANGE_FAILURE)
+        {
+            return CameraError::ERROR_SNAPSHOT_STREAM_STOP_FAILED;
+        }
+        gst_object_unref(audioPipeline);
+        it->audioContext = nullptr;
     }
 
     return CameraError::SUCCESS;
