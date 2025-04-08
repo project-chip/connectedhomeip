@@ -21,6 +21,7 @@
 #include <app/server/Server.h>
 #include <controller/InvokeInteraction.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <transport/webrtc-transport.h>
 
 #include <iostream>
 
@@ -101,6 +102,10 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
         outSession.audioStreamID.SetNull();
     }
 
+    if (webrtcTransportMap.find(args.sessionId) == webrtcTransportMap.end())
+    {
+        webrtcTransportMap[args.sessionId] = new WebrtcTransport(peerId.GetNodeId(), args.sessionId);
+    }
     // Process the SDP Offer, begin the ICE Candidate gathering phase, create the SDP Answer, and invoke Answer.
     CloseConnection();
 

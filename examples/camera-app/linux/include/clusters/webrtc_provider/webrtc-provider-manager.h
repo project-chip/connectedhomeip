@@ -22,6 +22,8 @@
 #include <app/CASESessionManager.h>
 #include <app/clusters/webrtc-transport-provider-server/webrtc-transport-provider-server.h>
 #include <rtc/rtc.hpp>
+#include <webrtc-transport.h>
+#include <unordered_map>
 
 namespace Camera {
 
@@ -86,6 +88,7 @@ private:
 
     chip::Callback::Callback<chip::OnDeviceConnected> mOnConnectedCallback;
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnConnectionFailureCallback;
+    std::unordered_map<uint16_t, WebrtcTransport*> webrtcTransportMap;
 };
 
 } // namespace Camera
