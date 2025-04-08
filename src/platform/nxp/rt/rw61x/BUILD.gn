@@ -157,8 +157,8 @@ static_library("nxp_platform") {
     defines += [ "CONFIG_CHIP_OTA_POSTED_OPERATIONS_IN_IDLE=1" ]
     sources += ota_sources
     if (nxp_enable_ota_factory_data_processor) {
-        defines += [ "CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR=1" ]
-      }
+      defines += [ "CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR=1" ]
+    }
     if (chip_with_ota_encryption) {
       defines += [
         "OTA_ENCRYPTION_ENABLE=1",
@@ -212,12 +212,11 @@ static_library("nxp_platform") {
   }
 
   if (nxp_use_factory_data) {
-
     sources += [
       "../../common/factory_data/legacy/FactoryDataProvider.cpp",
       "../../common/factory_data/legacy/FactoryDataProvider.h",
     ]
-    if(nxp_enable_ota_factory_data_processor){
+    if (nxp_enable_ota_factory_data_processor) {
       sources += [
         "../../common/factory_data/legacy/FactoryDataDriver.cpp",
         "../../common/factory_data/legacy/FactoryDataDriver.h",
