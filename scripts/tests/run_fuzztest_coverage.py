@@ -23,7 +23,6 @@ class FuzzTestContext:
     fuzz_test_binary_path: str
     build_target_name: str
     is_coverage_instrumented: bool
-    test_cases: Optional[List[str]] = None
     selected_fuzz_test_case: Optional[str] = None
     coverage_output_base_name: Optional[str] = None
     run_mode: Optional[FuzzTestMode] = None
@@ -69,8 +68,7 @@ def get_fuzz_test_cases(context):
         result = subprocess.run([context.fuzz_test_binary_path, "--list_fuzz_tests"], env=env, capture_output=True, text=True)
         output = result.stdout
         if output:
-            context.test_cases = re.findall(r'test:\s*(\S+)', output)
-            return
+            return re.findall(r'test:\s*(\S+)', output)
 
         else:
             logging.info("No test cases found.")
@@ -254,20 +252,23 @@ def main(fuzz_test, output, help):
             f"\nFuzzTest Not coverage instrumented: No coverage report will be generated for: '{context.fuzz_test_binary_path}'\n")
         logging.error("for Coverage reports --> Build with Coverage by appending '-coverage' to target e.g.:\n\n\tpython scripts/build/build_examples.py --target linux-x64-tests-clang-pw-fuzztest-coverage build\n")
 
-    get_fuzz_test_cases(context)
+    test_cases = get_fuzz_test_cases(context)
 
-    if context.test_cases:
+    if not test_cases:
+        logging.info("No FUZZ_TESTs (TestCases) found")
+        return
+    else:
         print("=" * 70 + "\n")
         logging.info("AVAILABLE TEST CASES --> Choose a number to run in 'Continuous Mode', continues until interrupted:\n")
-        for i, case in enumerate(context.test_cases, start=1):
+        for i, case in enumerate(test_cases, start=1):
             logging.info(f"\t{i}. {case}")
         logging.info("\nUNIT_TEST_MODE: Enter 0 to run all test cases in Unit Test Mode (just a few seconds of each FUZZ_TEST(testcase)\n")
 
         choice = click.prompt("Enter the number of the test case to run", type=int)
-        if 1 <= choice <= len(context.test_cases):
+        if 1 <= choice <= len(test_cases):
 
             context.run_mode = FuzzTestMode.CONTINUOUS_FUZZ_MODE
-            context.selected_fuzz_test_case = context.test_cases[choice - 1]
+            context.selected_fuzz_test_case = test_cases[choice - 1]
 
             # Use the FuzzTest (Test Case) Name  as the name for coverage output
             context.coverage_output_base_name = "{}".format(context.selected_fuzz_test_case.replace('.', "_"))
@@ -277,13 +278,10 @@ def main(fuzz_test, output, help):
             context.run_mode = FuzzTestMode.UNIT_TEST_MODE
 
             # Use the FuzzTest Suite Name as the name for coverage output
-            context.coverage_output_base_name = f"{context.test_cases[0].split('.')[0]}"
+            context.coverage_output_base_name = f"{test_cases[0].split('.')[0]}"
         else:
             logging.info("Invalid choice")
             return
-    else:
-        logging.info("No FUZZ_TESTs (TestCases) found")
-        return
     try:
         run_fuzz_test(context)
     finally:
