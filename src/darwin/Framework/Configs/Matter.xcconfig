@@ -34,4 +34,4 @@ STRIP_STYLE = non-global
 VERSION_INFO_EXPORT_DECL = __attribute__((visibility("hidden")))
 
 // Include override file last, if it exists
-#include? "Matter.Override.xcconfig"
+#include? "Matter.override.xcconfig"

@@ -5,4 +5,4 @@
 LDFLAGS_UNEXPORTS = $(inherited) -Wl,-unexported_symbol,"_OBJC_IVAR_*"
 
 // Include override file last, if it exists
-#include? "Matter.Release.Override.xcconfig"
+#include? "Matter.Release.override.xcconfig"

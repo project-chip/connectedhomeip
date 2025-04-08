@@ -64,4 +64,4 @@ TAPI_VERIFY_MODE = Pedantic
 VERSIONING_SYSTEM = apple-generic
 
 // Include override file last, if it exists
-#include? "Project.Override.xcconfig"
+#include? "Project.override.xcconfig"

@@ -16,4 +16,4 @@ SYSTEM_HEADER_SEARCH_PATHS = $(CHIP_ROOT)/src/darwin/Framework/CHIP
 WARNING_CFLAGS = -Wformat -Wformat-nonliteral -Wformat-security -Wconversion -Wno-documentation
 
 // Include override file last, if it exists
-#include? "darwin-framework-tool.Override.xcconfig"
+#include? "darwin-framework-tool.override.xcconfig"

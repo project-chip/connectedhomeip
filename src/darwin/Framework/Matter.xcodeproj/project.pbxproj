@@ -725,6 +725,14 @@
 		3DF9D1BA2DA4774100129D07 /* Matter.Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Matter.Release.xcconfig; sourceTree = "<group>"; };
 		3DF9D1BB2DA4775400129D07 /* darwin-framework-tool.Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "darwin-framework-tool.Debug.xcconfig"; sourceTree = "<group>"; };
 		3DF9D1BC2DA4777400129D07 /* darwin-framework-tool.Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "darwin-framework-tool.Release.xcconfig"; sourceTree = "<group>"; };
+		3DF9D72F2DA518A000129D07 /* Project.override.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Project.override.xcconfig; sourceTree = "<group>"; };
+		3DF9D7302DA5195A00129D07 /* Matter.override.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Matter.override.xcconfig; sourceTree = "<group>"; };
+		3DF9D7312DA52FD100129D07 /* Matter.Debug.override.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Matter.Debug.override.xcconfig; sourceTree = "<group>"; };
+		3DF9D7332DA530A500129D07 /* Matter.Release.override.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Matter.Release.override.xcconfig; sourceTree = "<group>"; };
+		3DF9D7342DA530E600129D07 /* MatterTests.override.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = MatterTests.override.xcconfig; sourceTree = "<group>"; };
+		3DF9D7352DA5310000129D07 /* darwin-framework-tool.override.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "darwin-framework-tool.override.xcconfig"; sourceTree = "<group>"; };
+		3DF9D7362DA5310E00129D07 /* darwin-framework-tool.Release.override.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "darwin-framework-tool.Release.override.xcconfig"; sourceTree = "<group>"; };
+		3DF9D7372DA5311000129D07 /* darwin-framework-tool.Debug.override.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "darwin-framework-tool.Debug.override.xcconfig"; sourceTree = "<group>"; };
 		3DFCB3282966684500332B35 /* MTRCertificateInfoTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTRCertificateInfoTests.m; sourceTree = "<group>"; };
 		3DFCB32A2966827F00332B35 /* MTRDefines_Internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRDefines_Internal.h; sourceTree = "<group>"; };
 		3DFCB32B29678C9500332B35 /* MTRConversion.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRConversion.h; sourceTree = "<group>"; };
@@ -1479,15 +1487,23 @@
 			isa = PBXGroup;
 			children = (
 				3DF9D1AE2D9F32F200129D07 /* Project.xcconfig */,
+				3DF9D72F2DA518A000129D07 /* Project.override.xcconfig */,
 				3DF9D1B22D9F44DB00129D07 /* Project.Debug.xcconfig */,
 				3DF9D1B32D9F44E700129D07 /* Project.Release.xcconfig */,
 				3DF9D1AF2D9F32FF00129D07 /* Matter.xcconfig */,
+				3DF9D7302DA5195A00129D07 /* Matter.override.xcconfig */,
 				3DF9D1B92DA4770D00129D07 /* Matter.Debug.xcconfig */,
+				3DF9D7312DA52FD100129D07 /* Matter.Debug.override.xcconfig */,
 				3DF9D1BA2DA4774100129D07 /* Matter.Release.xcconfig */,
+				3DF9D7332DA530A500129D07 /* Matter.Release.override.xcconfig */,
 				3DF9D1B02D9F330A00129D07 /* MatterTests.xcconfig */,
+				3DF9D7342DA530E600129D07 /* MatterTests.override.xcconfig */,
 				3DF9D1B12D9F331900129D07 /* darwin-framework-tool.xcconfig */,
+				3DF9D7352DA5310000129D07 /* darwin-framework-tool.override.xcconfig */,
 				3DF9D1BB2DA4775400129D07 /* darwin-framework-tool.Debug.xcconfig */,
+				3DF9D7372DA5311000129D07 /* darwin-framework-tool.Debug.override.xcconfig */,
 				3DF9D1BC2DA4777400129D07 /* darwin-framework-tool.Release.xcconfig */,
+				3DF9D7362DA5310E00129D07 /* darwin-framework-tool.Release.override.xcconfig */,
 			);
 			path = Configs;
 			sourceTree = "<group>";

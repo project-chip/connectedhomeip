@@ -6,4 +6,4 @@ TAPI_ENABLE_PROJECT_HEADERS = YES
 GCC_PREPROCESSOR_DEFINITIONS = $(inherited) DEBUG=1
 
 // Include override file last, if it exists
-#include? "Project.Debug.Override.xcconfig"
+#include? "Project.Debug.override.xcconfig"
