@@ -64,7 +64,7 @@ class TC_FAN_2_3(MatterBaseTest):
                 TestStep(5, "[FC] TH writes a valid bit from RockSupport to RockSetting.",
                          "Device shall return SUCCESS."),
                 TestStep(6, "[FC] TH reads the RockSetting attribute.",
-                         "Verify that the proper bit was set from the previous step."),                
+                         "Verify that the proper bit was set from the previous step."),
                 ]
 
     async def read_setting(self, attribute: Any) -> Any:
@@ -109,7 +109,7 @@ class TC_FAN_2_3(MatterBaseTest):
         cluster = Clusters.FanControl
         attr = cluster.Attributes
         valid_rock_support_range = range(1, 8)
-        valid_rock_setting_range = range(0, 8)        
+        valid_rock_setting_range = range(0, 8)
 
         # *** STEP 1 ***
         # Commissioning already done
@@ -159,7 +159,8 @@ class TC_FAN_2_3(MatterBaseTest):
         self.step(6)
         rock_setting_read = await self.read_setting(attr.RockSetting)
         asserts.assert_equal(rock_setting_read, rock_setting_write,
-                            f"[FC] RockSetting attribute value ({rock_setting_read}) does not match the expected value ({rock_setting_write})")
+                             f"[FC] RockSetting attribute value ({rock_setting_read}) does not match the expected value ({rock_setting_write})")
+
 
 if __name__ == "__main__":
     default_matter_test_main()
