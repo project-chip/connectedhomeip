@@ -29,8 +29,8 @@
 #endif // QR_CODE_ENABLED
 #endif // DISPLAY_ENABLED
 
-#include <ClosureDimensionManager.h>
 #include <ClosureAppCommonMain.h>
+#include <ClosureDimensionManager.h>
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -83,8 +83,8 @@ static chip::BitMask<Feature> sFeatureMap(Feature::kCalibration);
 
 AppTask AppTask::sAppTask;
 constexpr const uint8_t kNamespaceClosurePanel = 0x45;
-constexpr const uint8_t kNamespaceLift = 0x00;
-constexpr const uint8_t kNamespaceTilt = 0x01;
+constexpr const uint8_t kNamespaceLift         = 0x00;
+constexpr const uint8_t kNamespaceTilt         = 0x01;
 
 EndpointId GetClosureDeviceEndpointId()
 {
@@ -98,7 +98,6 @@ void ApplicationInit()
     SILABS_LOG("Closure-app ClosureControl starting. featureMap 0x%08lx", ClosureControl::sFeatureMap.Raw());
     ClosureApplicationInit();
     SILABS_LOG("==================================================");
-
 
     ClosureDimensionManager ep2(2);
     ClosureDimensionManager ep3(3);

@@ -27,7 +27,8 @@ using namespace chip::app::Clusters::ClosurDimesnion;
 using Protocols::InteractionModel::Status;
 
 CHIP_ERROR ClosureDimensionDelegate::HandleSetTarget(const Optional<Percent100ths> & pos, const Optional<TargetLatchEnum> & latch,
-    const Optional<Globals::ThreeLevelAutoEnum> & speed) {
+                                                     const Optional<Globals::ThreeLevelAutoEnum> & speed)
+{
 
     if (pos.HasValue())
     {
@@ -97,11 +98,12 @@ CHIP_ERROR ClosureDimensionManager::EndCurrentErrorListRead()
 }
 
 CHIP_ERROR ClosureDimensionDelegate::HandleStep(const StepDirectionEnum & direction, const uint16_t & numberOfSteps,
-        const Optional<Globals::ThreeLevelAutoEnum> & speed) {
+                                                const Optional<Globals::ThreeLevelAutoEnum> & speed)
+{
 
     // Convert step to position delta
     int32_t stepSize = 100; // Each step = 1%
-    int32_t delta = numberOfSteps * stepSize;
+    int32_t delta    = numberOfSteps * stepSize;
 
     if (direction == StepDirectionEnum::kDown)
     {
@@ -110,7 +112,7 @@ CHIP_ERROR ClosureDimensionDelegate::HandleStep(const StepDirectionEnum & direct
 
     // Get current position from your actuator or state
     uint16_t currentPos = GetCurrentPosition(); // 0 - 10000
-    int32_t newPos = std::clamp(static_cast<int32_t>(currentPos) + delta, 0, 10000);
+    int32_t newPos      = std::clamp(static_cast<int32_t>(currentPos) + delta, 0, 10000);
 
     // TODO: MoveToPosition
 
