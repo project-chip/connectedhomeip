@@ -175,6 +175,7 @@ private:
     chip::ScopedNodeId mPeerId;
     chip::EndpointId mEndpointId = chip::kInvalidEndpointId;
     CommandType mCommandType     = CommandType::kUndefined;
+    uint16_t mCurrentSessionId   = 0;
     std::unique_ptr<chip::app::CommandSender> mCommandSender;
 
     State mState = State::Idle;

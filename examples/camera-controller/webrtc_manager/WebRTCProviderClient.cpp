@@ -240,6 +240,9 @@ void WebRTCProviderClient::OnSessionEstablishTimeout(chip::System::Layer * syste
     WebRTCProviderClient * self = reinterpret_cast<WebRTCProviderClient *>(appState);
     VerifyOrReturn(self != nullptr, ChipLogError(Camera, "OnSessionEstablishTimeout: context is null"));
 
+    self->mRequestorServer->RemoveSession(self->mCurrentSessionId);
+    self->mCurrentSessionId = 0;
+
     ChipLogError(Camera, "WebRTC Session establishment has timed out!");
     self->MoveToState(State::Idle);
 }
@@ -262,6 +265,8 @@ void WebRTCProviderClient::HandleProvideOfferResponse(TLV::TLVReader & data)
     session.peerNodeID     = mPeerId.GetNodeId();
     session.fabricIndex    = mPeerId.GetFabricIndex();
     session.peerEndpointID = mEndpointId;
+
+    mCurrentSessionId = value.webRTCSessionID;
 
     // TODO:: spec needs to clarify how to set streamUsage here
 
