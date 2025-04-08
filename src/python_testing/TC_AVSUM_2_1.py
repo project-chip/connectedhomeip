@@ -58,15 +58,15 @@ class TC_AVSUM_2_1(MatterBaseTest):
     def steps_TC_AVSUM_2_1(self) -> list[TestStep]:
         steps = [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
-            TestStep(2, "Read MPTZPosition attribute, if supported."),
-            TestStep(3, "Read MaxPresets attribute, if supported."),
-            TestStep(4, "Read MPTZPresets attribute, if supported."),
-            TestStep(5, "Read DPTZRelativeMove attribute, if supported"),
-            TestStep(6, "Read ZoomMax attribute, if supported"),
-            TestStep(7, "Read TiltMin attribute, if supported"),
-            TestStep(8, "Read TiltMax attribute, if supported"),
-            TestStep(9, "Read PanMin attribute, if supported"),
-            TestStep(10, "Read PanMax attribute, if supported"),
+            TestStep(2, "Read and verify ZoomMax attribute, if supported"),
+            TestStep(3, "Read and verify TiltMin attribute, if supported"),
+            TestStep(4, "Read and verify TiltMax attribute, if supported"),
+            TestStep(5, "Read and verify PanMin attribute, if supported"),
+            TestStep(6, "Read and verify PanMax attribute, if supported"),
+            TestStep(7, "Read and verify MPTZPosition attribute."),
+            TestStep(8, "Read and verify MaxPresets attribute, if supported."),
+            TestStep(9, "Read and verify MPTZPresets attribute, if supported."),
+            TestStep(10,"Read and verify DPTZRelativeMove attribute, if supported"),
         ]
         return steps
 
@@ -78,13 +78,11 @@ class TC_AVSUM_2_1(MatterBaseTest):
 
     @async_test_body
     async def test_TC_AVSUM_2_1(self):
-        endpoint = self.matter_test_config.endpoint
+        endpoint = 1
         cluster = Clusters.Objects.CameraAvSettingsUserLevelManagement
         attributes = cluster.Attributes
 
         self.step(1)  # Already done, immediately go to step 2
-
-        self.step(2)
 
         feature_map = await self.read_avsum_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
         has_feature_dptz = (feature_map & cluster.Bitmaps.Feature.kDigitalPTZ) != 0
@@ -102,75 +100,88 @@ class TC_AVSUM_2_1(MatterBaseTest):
             logging.info("One of MPAN, MTILT, or MZOOM is mandatory")
             self.skip_all_remaining_steps(3)
 
+        if has_feature_mzoom:
+            self.step(2)
+            asserts.assert_in(attributes.ZoomMax.attribute_id, attribute_list, "ZoomMax attribute is a mandatory attribute if MZOOM.")
+            zoom_max_dut = await self.read_avsum_attribute_expect_success(endpoint=endpoint, attribute=attributes.ZoomMax)
+            asserts.assert_less_equal(zoom_max_dut, 100, "ZoomMaz is not in valid range.")
+            asserts.assert_greater_equal(zoom_max_dut, 1, "ZoomMax is not in valid range.")
+        else:
+            logging.info("MZOOM Feature not supported. Test step skipped")
+            self.mark_current_step_skipped()
+
+        if has_feature_mtilt:
+            self.step(3)
+            asserts.assert_in(attributes.TiltMin.attribute_id, attribute_list,
+                              "TiltMin attribute is a mandatory attribute if MTILT.")
+            tilt_min_dut = await self.read_avsum_attribute_expect_success(endpoint=endpoint, attribute=attributes.TiltMin)
+            asserts.assert_less_equal(tilt_min_dut, 179, "TiltMin is not in valid range.")
+            asserts.assert_greater_equal(tilt_min_dut, -180, "TiltMin is not in valid range.")
+
+            self.step(4)
+            asserts.assert_in(attributes.TiltMax.attribute_id, attribute_list,
+                              "TiltMax attribute is a mandatory attribute if MTILT.")
+            tilt_max_dut = await self.read_avsum_attribute_expect_success(endpoint=endpoint, attribute=attributes.TiltMax)    
+            asserts.assert_less_equal(tilt_max_dut, 180, "TiltMin is not in valid range.")
+            asserts.assert_greater_equal(tilt_max_dut, -179, "TiltMin is not in valid range.")
+        else: 
+            logging.info("MTILT Feature not supported. Test steps skipped")
+            self.skip_step(3)
+            self.skip_step(4)        
+
+        if has_feature_mpan:
+            self.step(5)
+            asserts.assert_in(attributes.PanMin.attribute_id, attribute_list,
+                              "PanMin attribute is a mandatory attribute if MPAN.")
+            pan_min_dut = await self.read_avsum_attribute_expect_success(endpoint=endpoint, attribute=attributes.PanMin)
+            asserts.assert_less_equal(pan_min_dut, 179, "PanMin is not in valid range.")
+            asserts.assert_greater_equal(pan_min_dut, -180, "PanMin is not in valid range.")
+
+            self.step(6)
+            asserts.assert_in(attributes.PanMax.attribute_id, attribute_list,
+                              "PanMax attribute is a mandatory attribute if MPAN.")
+            pan_max_dut = await self.read_avsum_attribute_expect_success(endpoint=endpoint, attribute=attributes.TiltMax)    
+            asserts.assert_less_equal(pan_max_dut, 180, "TiltMin is not in valid range.")
+            asserts.assert_greater_equal(pan_max_dut, -179, "TiltMin is not in valid range.")
+        else: 
+            logging.info("MTILT Feature not supported. Test steps skipped")
+            self.skip_step(5)
+            self.skip_step(6)    
+
         if has_feature_mpan | has_feature_mtilt | has_feature_mzoom:
+            self.step(7)
             asserts.assert_in(attributes.MPTZPosition.attribute_id, attribute_list, "MPTZPosition attribute is mandatory if MPAN or MTILT or MZOOM")
-            mptzposition_dut = await self.read_avsum_attribute_expect_success(endpoint=endpoint, attribute=attributes.MptzPosition)
+            mptzposition_dut = await self.read_avsum_attribute_expect_success(endpoint=endpoint, attribute=attributes.MPTZPosition)
+            apan = mptzposition_dut.pan
+            atilt = mptzposition_dut.tilt
+            azoom = mptzposition_dut.zoom
 
         if has_feature_mpresets:
-            self.step(3)
+            self.step(8)
             asserts.assert_in(attributes.MaxPresets.attribute_id, attribute_list,
                           "MaxPresets attribute is a mandatory attribute if MPRESETS.")
 
             max_presets_dut = await self.read_avsum_attribute_expect_success(endpoint=endpoint, attribute=attributes.MaxPresets)
 
-            self.step(4)
-            asserts.assert_in(attributes.MPtzPresets.attribute_id, attribute_list,
+            self.step(9)
+            asserts.assert_in(attributes.MPTZPresets.attribute_id, attribute_list,
                           "MPTZPresets attribute is a mandatory attribut if MPRESETS.")
 
-            mptz_presets_bitmap_dut = await self.read_avsum_attribute_expect_success(endpoint=endpoint, attribute=attributes.MptzPresets)
+            mptz_presets_bitmap_dut = await self.read_avsum_attribute_expect_success(endpoint=endpoint, attribute=attributes.MPTZPresets)
         else:
             logging.info("MPRESETS Feature not supported. Test steps skipped")
-            self.skip_step(3)
-            self.skip_step(4)
+            self.skip_step(8)
+            self.skip_step(9)
 
-        self.step(5)
         if has_feature_dptz:
-            asserts.assert_in(attributes.DPtzRelativeMove.attribute_id, attribute_list,
+            self.step(10)
+            asserts.assert_in(attributes.DPTZRelativeMove.attribute_id, attribute_list,
                           "DPTZRelativeMove attribute is a mandatory attribute if DPTZ.")
 
-            dptz_relative_move_dut = await self.read_avsum_attribute_expect_success(endpoint=endpoint, attribute=attributes.DptzRelativeMove)
+            dptz_relative_move_dut = await self.read_avsum_attribute_expect_success(endpoint=endpoint, attribute=attributes.DPTZRelativeMove)
         else:
             logging.info("DPTZ Feature not supported. Test step skipped")
             self.mark_current_step_skipped()
-
-        self.step(6)
-        if has_feature_mzoom:
-            asserts.assert_in(attributes.ZoomMax.attribute_id, attribute_list, "ZoomMax attribute is a mandatory attribute if MZOOM.")
-            zoom_max_dut = await self.read_avsum_attribute_expect_success(endpoint=endpoint, attribute=attributes.ZoomMax)
-            asserts.assert_less_equal(zoom_max_dut.zoomMax, 0x0001, "ZoomMaz is not in valid range.")
-            asserts.assert_greater_equal(zoom_max_dut.zoomMax, 0x0065, "ZoomMax is not in valid range.")
-        else:
-            logging.info("MZOOM Feature not supported. Test step skipped")
-            self.mark_current_step_skipped()
-
-        self.step(7)
-        if has_feature_mtilt:
-            asserts.assert_in(attributes.TiltMin.attribute_id, attribute_list,
-                              "TiltMin attribute is a mandatory attribute if MTILT.")
-            tilt_min_dut = await self.read_avsum_attribute_expect_success(endpoint=endpoint, attribute=attributes.TiltMin)
-
-            asserts.assert_in(attributes.TiltMax.attribute_id, attribute_list,
-                              "TiltMax attribute is a mandatory attribute if MTILT.")
-            tilt_max_dut = await self.read_avsum_attribute_expect_success(endpoint=endpoint, attribute=attributes.TiltMax)
-
-        else:
-            logging.info("MTILT feature not supported. Test steps skipped")
-            self.mark_current_step_skipped()
-
-        self.step(9)
-        if has_feature_mpan:
-            asserts.assert_in(attributes.PanMin.attribute_id, attribute_list,
-                              "PanMin attribute is a mandatory attribute if MPAN.")
-            pan_min_dut = await self.read_avsum_attribute_expect_success(endpoint=endpoint, attribute=attributes.PanMin)
-
-            asserts.assert_in(attributes.PanMax.attribute_id, attribute_list,
-                              "PanMax attribute is a mandatory attribute if MPAN.")
-            pan_max_dut = await self.read_avsum_attribute_expect_success(endpoint=endpoint, attribute=attributes.PanMax)
-
-        else:
-            logging.info("MPAN feature not supported. Test steps skipped")
-            self.mark_current_step_skipped()
-
 
 
 if __name__ == "__main__":
