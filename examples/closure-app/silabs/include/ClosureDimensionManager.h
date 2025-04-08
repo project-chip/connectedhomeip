@@ -19,8 +19,8 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/clusters/closure-dimension-server/closure-dimension-server.h>
 #include <app/clusters/closure-dimension-server/closure-dimension-delegate.h>
+#include <app/clusters/closure-dimension-server/closure-dimension-server.h>
 
 #include <lib/core/CHIPError.h>
 #include <protocols/interaction_model/StatusCode.h>
@@ -35,10 +35,10 @@ class ClosureDimensionDelegate : public DelegateBase
 public:
     ClosureDimensionDelegate(EndpointId endpoint) : mEndpoint(endpoint) {}
     CHIP_ERROR HandleSetTarget(const Optional<Percent100ths> & pos, const Optional<TargetLatchEnum> & latch,
-        const Optional<Globals::ThreeLevelAutoEnum> & speed) override;
+                               const Optional<Globals::ThreeLevelAutoEnum> & speed) override;
 
     CHIP_ERROR HandleStep(const StepDirectionEnum & direction, const uint16_t & numberOfSteps,
-            const Optional<Globals::ThreeLevelAutoEnum> & speed) override;
+                          const Optional<Globals::ThreeLevelAutoEnum> & speed) override;
 
 private:
     EndpointId mEndpoint;
@@ -48,8 +48,7 @@ class ClosureDimensionManager
 {
 public:
     ClosureDimensionManager(EndpointId endpoint) :
-        mEndpoint(endpoint), mContext(mEndpoint), mDelegate(mEndpoint), mLogic(mDelegate, mContext),
-        mInterface(mEndpoint, mLogic)
+        mEndpoint(endpoint), mContext(mEndpoint), mDelegate(mEndpoint), mLogic(mDelegate, mContext), mInterface(mEndpoint, mLogic)
     {}
     CHIP_ERROR Init()
     {
@@ -59,9 +58,7 @@ public:
     }
 
 private:
-    const ClusterConformance kConformance = {
-        .featureMap = 0, .supportsOverflow = false
-    };
+    const ClusterConformance kConformance = { .featureMap = 0, .supportsOverflow = false };
 
     EndpointId mEndpoint;
     MatterContext mContext;
