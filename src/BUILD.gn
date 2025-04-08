@@ -124,6 +124,12 @@ if (chip_build_tests) {
       tests += [ "${chip_root}/src/tracing/tests" ]
     }
 
+    if (matter_enable_tracing_support &&
+        matter_trace_config ==
+        "${chip_root}/src/tracing/esp32_diagnostic_trace") {
+      tests += [ "${chip_root}/src/tracing/tests" ]
+    }
+
     if (chip_device_platform != "none") {
       tests += [ "${chip_root}/src/lib/dnssd/minimal_mdns/tests" ]
     }
