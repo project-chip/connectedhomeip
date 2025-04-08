@@ -1,27 +1,36 @@
+// Product settings
 DEFINES_MODULE = YES
 DYLIB_COMPATIBILITY_VERSION = 1
 DYLIB_CURRENT_VERSION = 1
 DYLIB_INSTALL_NAME_BASE = @rpath
-GCC_PREPROCESSOR_DEFINITIONS = $(inherited) CHIP_HAVE_CONFIG_H CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1
 INFOPLIST_FILE = CHIP/Info.plist
-INSTALLHDRS_SCRIPT_PHASE = YES
 INSTALL_PATH = $(LOCAL_LIBRARY_DIR)/Frameworks
-IPHONEOS_DEPLOYMENT_TARGET = 14.0
-LIBRARY_SEARCH_PATHS = $(TEMP_DIR)/out/lib
 MODULEMAP_FILE = CHIP/Matter.modulemap
-OTHER_CFLAGS = -fmacro-prefix-map=$(SRCROOT)/CHIP/=
-OTHER_CPLUSPLUSFLAGS = $(OTHER_CFLAGS) -fno-c++-static-destructors -DCHIP_CONFIG_GLOBALS_NO_DESTRUCT=1
-OTHER_LDFLAGS =
-OTHER_LDFLAGS[config=Debug][sdk=*] = -framework CoreData -framework Foundation -framework CoreBluetooth -lnetwork -Wl,-unexported_symbol,"__Z*" -Wl,-unexported_symbol,"___*" -Wl,-unexported_symbol,"__Unwind_*" -Wl,-unexported_symbol,"_unw_*" -Wl,-hidden-lCHIP
-OTHER_LDFLAGS[config=Debug][sdk=macosx*] = -framework IOKit -framework CoreWLAN -framework SystemConfiguration -lnetwork -framework CoreBluetooth -framework CoreData -Wl,-unexported_symbol,"__Z*" -Wl,-unexported_symbol,"___*" -Wl,-unexported_symbol,"__Unwind_*" -Wl,-unexported_symbol,"_unw_*" -Wl,-hidden-lCHIP
-OTHER_LDFLAGS[config=Release][sdk=*] = -framework CoreData -framework Foundation -framework CoreBluetooth -lnetwork -Wl,-unexported_symbol,"__Z*" -Wl,-unexported_symbol,"___*" -Wl,-unexported_symbol,"__Unwind_*" -Wl,-unexported_symbol,"_unw_*" -Wl,-unexported_symbol,"_OBJC_IVAR_*" -Wl,-hidden-lCHIP
-OTHER_LDFLAGS[config=Release][sdk=macosx*] = -framework IOKit -framework CoreWLAN -framework SystemConfiguration -lnetwork -framework CoreBluetooth -framework CoreData -Wl,-unexported_symbol,"__Z*" -Wl,-unexported_symbol,"___*" -Wl,-unexported_symbol,"__Unwind_*" -Wl,-unexported_symbol,"_unw_*" -Wl,-unexported_symbol,"_OBJC_IVAR_*" -Wl,-hidden-lCHIP
 PRODUCT_BUNDLE_IDENTIFIER = com.csa.matter
 PRODUCT_NAME = $(TARGET_NAME)
-SDKROOT = iphoneos
-STRIP_STYLE = non-global
 SWIFT_INSTALL_OBJC_HEADER = NO
+
+// If TAPI needs to read project headers, CHIP SDK headers need to be generated during installhdrs
+INSTALLHDRS_SCRIPT_PHASE = $(TAPI_ENABLE_PROJECT_HEADERS)
+
+// Compiler settings
+GCC_PREPROCESSOR_DEFINITIONS = $(inherited) CHIP_HAVE_CONFIG_H CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1
+OTHER_CFLAGS = -fmacro-prefix-map=$(SRCROOT)/CHIP/=
+OTHER_CPLUSPLUSFLAGS = $(OTHER_CFLAGS) -fno-c++-static-destructors -DCHIP_CONFIG_GLOBALS_NO_DESTRUCT=1
 SYSTEM_HEADER_SEARCH_PATHS = $(TEMP_DIR)/out/gen/include $(CHIP_ROOT)/src/darwin/Framework/CHIP $(CHIP_ROOT)/src $(CHIP_ROOT)/src/include $(CHIP_ROOT)/zzz_generated $(CHIP_ROOT)/zzz_generated/app-common $(CHIP_ROOT)/third_party/nlassert/repo/include $(CHIP_ROOT)/third_party/nlio/repo/include
+
+// Linker settings
+OTHER_LDFLAGS = $(inherited) $(LDFLAGS_UNEXPORTS) // hide mangled C++ symbols and ASAN symbols
+LDFLAGS_UNEXPORTS = -Wl,-unexported_symbol,"__Z*" -Wl,-unexported_symbol,"___*" -Wl,-unexported_symbol,"__Unwind_*" -Wl,-unexported_symbol,"_unw_*"
+
+LIBRARY_SEARCH_PATHS = $(TEMP_DIR)/out/lib // libCHIP.a is built via GN
+OTHER_LDFLAGS = $(inherited) -Wl,-hidden-lCHIP // don't export any symbols from libCHIP
+
+OTHER_LDFLAGS = $(inherited) $(LDFLAGS_COMMON_LIBRARIES) $(LDFLAGS_PLATFORM_LIBRARIES) // dependencies
+LDFLAGS_COMMON_LIBRARIES = -framework Foundation -framework Security -framework CoreData -framework CoreBluetooth -lnetwork
+LDFLAGS_PLATFORM_LIBRARIES[sdk=macosx*] = -framework IOKit -framework CoreWLAN -framework SystemConfiguration
+
+STRIP_STYLE = non-global
 VERSION_INFO_EXPORT_DECL = __attribute__((visibility("hidden")))
 
 // Include override file last, if it exists
