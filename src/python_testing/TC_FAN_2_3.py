@@ -162,5 +162,6 @@ class TC_FAN_2_3(MatterBaseTest):
                              f"[FC] RockSetting attribute value ({rock_setting_read}) does not match the expected value ({rock_setting_write})")
 
 
+
 if __name__ == "__main__":
     default_matter_test_main()
