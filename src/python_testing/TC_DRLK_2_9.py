@@ -305,7 +305,6 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
         self.Attrib = 0
         numberofcredentialsupportedperuser = None
         self.app_cluster_endpoint = 1
-        invalid_credential_type = 9
         user_unique_id = 6459
         user_name = "xxx"
         credentialIndex_1 = 1
@@ -329,14 +328,6 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
 
         self.endpoint = self.get_endpoint(default=1)
         print("endpoint", self.endpoint)
-
-        # Aliro Keys for setting Aliro configuration and credential
-
-        aliroevictableendpointkey1 = bytes.fromhex(
-            "047a4c772d753924cdf3779a3c84fec2debaa6f0b3084450878acc7ddcce7856ae57b1ebbe2561015103dd7474c2a183675378ec55f1e465ac3436bf3dd5ca54d4")
-
-        aliroevictableendpointkey2 = bytes.fromhex(
-            "047a4c662d753924cdf3779a3c84fec2debaa6f0b3084450878acc7ddcce7856ae57b1ebbe2561015103dd7474c2a183675378ec55f1e465ac3436bf3dd5ca54d4")
 
         self.step("1")
         if self.pics_guard(self.check_pics("DRLK.S.F08") and self.check_pics("DRLK.S.A0011")):
