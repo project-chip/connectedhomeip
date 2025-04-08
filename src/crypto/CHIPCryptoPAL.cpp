@@ -32,6 +32,7 @@
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
+#include <lib/support/TypeTraits.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -922,54 +923,30 @@ CHIP_ERROR DeriveGroupOperationalCredentials(const ByteSpan & epoch_key, const B
     return CHIP_NO_ERROR;
 }
 
-/**
- * @brief Generate a VendorFabricBindingMessage as used by the Fabric Table Vendor ID Verification Procedure.
- *
- * @param[in] fabricBindingVersion - Version of binding payload to generate. outputSpan size requirements are based on this.
- * @param[in] rootPublicKey - Root public key for the fabric in question
- * @param[in] fabricId - Fabric ID for the fabric in question
- * @param[in] vendorId - Vendor ID for the fabric in question
- * @param[inout] outputSpan - Span that will receive the binding message. Must be large enough for the
- *                            payload (otherwise CHIP_ERROR_BUFFER_TOO_SMALL) and will be resized to fit.
- * @return CHIP_NO_ERROR on success, otherwise another CHIP_ERROR value representative of the failure.
- */
-CHIP_ERROR GenerateVendorFabricBindingMessage(uint8_t fabricBindingVersion, const P256PublicKey & rootPublicKey, FabricId fabricId,
-                                              uint16_t vendorId, MutableByteSpan & outputSpan)
+CHIP_ERROR GenerateVendorFabricBindingMessage(FabricBindingVersion fabricBindingVersion, const P256PublicKey & rootPublicKey,
+                                              FabricId fabricId, uint16_t vendorId, MutableByteSpan & outputSpan)
 {
     // Only V1 supported yet.
-    VerifyOrReturnError(fabricBindingVersion == kFabricBindingVersionV1, CHIP_ERROR_INVALID_ARGUMENT);
+    switch(fabricBindingVersion)
+    {
+        case FabricBindingVersion::kVersion1:
+            break;
+        default:
+            return CHIP_ERROR_INVALID_ARGUMENT;
+    }
 
-    VerifyOrReturnError(outputSpan.size() >= kVendorFabricBindingMessageV1MaxSize, CHIP_ERROR_BUFFER_TOO_SMALL);
-
-    Encoding::BigEndian::BufferWriter writer(outputSpan.data(), outputSpan.size());
+    Encoding::BigEndian::BufferWriter writer(outputSpan);
 
     // vendor_fabric_binding_message := fabric_binding_version (1 byte) || root_public_key || fabric_id || vendor_id
-    writer.Put8(fabricBindingVersion).Put(rootPublicKey.ConstBytes(), rootPublicKey.Length()).Put64(fabricId).Put16(vendorId);
+    writer.Put8(to_underlying(fabricBindingVersion)).Put(rootPublicKey.ConstBytes(), rootPublicKey.Length()).Put64(fabricId).Put16(vendorId);
 
     size_t actuallyWritten = 0;
-    if (!writer.Fit(actuallyWritten))
-    {
-        return CHIP_ERROR_BUFFER_TOO_SMALL;
-    }
+    VerifyOrReturnError(writer.Fit(actuallyWritten), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     outputSpan.reduce_size(actuallyWritten);
     return CHIP_NO_ERROR;
 }
 
-/**
- * @brief Generate the message to be signed for the Fabric Table Vendor ID Verification Procedure.
- *
- * The Fabric Binding Version value will be recovered from the vendorFabricBindingMessage.
- *
- * @param fabricIndex - Fabric Index for the fabric in question
- * @param clientChallenge - Client challenge to use
- * @param attestationChallenge - Attestation challenge to use
- * @param vendorFabricBindingMessage - The VendorFabricBindingMessage previously computed for the fabric
- * @param vidVerificationStatement - The VID Verification Statement to include in signature (may be empty)
- * @param outputSpan - Span that will receive the to-be-signed message. Must be large enough for the
- *                     payload (otherwise CHIP_ERROR_BUFFER_TOO_SMALL) and will be resized to fit.
- * @return CHIP_NO_ERROR on success, otherwise another CHIP_ERROR value representative of the failure.
- */
 CHIP_ERROR GenerateVendorIdVerificationToBeSigned(FabricIndex fabricIndex, const ByteSpan & clientChallenge,
                                                   const ByteSpan & attestationChallenge,
                                                   const ByteSpan & vendorFabricBindingMessage,
@@ -982,11 +959,9 @@ CHIP_ERROR GenerateVendorIdVerificationToBeSigned(FabricIndex fabricIndex, const
 
     // Extract binding version from vendorFabricBindingMessage. Only V1 supported yet.
     uint8_t fabricBindingVersion = vendorFabricBindingMessage[0];
-    VerifyOrReturnError(fabricBindingVersion == kFabricBindingVersionV1, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(fabricBindingVersion == to_underlying(FabricBindingVersion::kVersion1), CHIP_ERROR_INVALID_ARGUMENT);
 
-    VerifyOrReturnError(outputSpan.size() >= kVendorIdVerificationTbsV1MaxSize, CHIP_ERROR_BUFFER_TOO_SMALL);
-
-    Encoding::BigEndian::BufferWriter writer(outputSpan.data(), outputSpan.size());
+    Encoding::BigEndian::BufferWriter writer(outputSpan);
 
     // vendor_id_verification_tbs := fabric_binding_version || client_challenge || attestation_challenge || fabric_index ||
     // vendor_fabric_binding_message || <vid_verification_statement>
@@ -998,10 +973,7 @@ CHIP_ERROR GenerateVendorIdVerificationToBeSigned(FabricIndex fabricIndex, const
         .Put(vidVerificationStatement.data(), vidVerificationStatement.size());
 
     size_t actuallyWritten = 0;
-    if (!writer.Fit(actuallyWritten))
-    {
-        return CHIP_ERROR_BUFFER_TOO_SMALL;
-    }
+    VerifyOrReturnError(writer.Fit(actuallyWritten), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     outputSpan.reduce_size(actuallyWritten);
     return CHIP_NO_ERROR;

@@ -3033,20 +3033,19 @@ TEST_F(TestChipCryptoPAL, GenerateVendorFabricBindingMessageWorks)
 
     // Try with invalid FabricBinding version.
     {
-        uint8_t kInvalidFabricBindingVersion = 123u;
-        uint8_t bigEnoughBuffer[Crypto::kVendorFabricBindingMessageV1MaxSize];
+        uint8_t bigEnoughBuffer[Crypto::kVendorFabricBindingMessageV1Size];
         MutableByteSpan vendorFabricBindingMessage{ bigEnoughBuffer };
-        EXPECT_EQ(GenerateVendorFabricBindingMessage(kInvalidFabricBindingVersion, rootPublicKey, kFabricId, kVendorId,
+        EXPECT_EQ(GenerateVendorFabricBindingMessage(static_cast<Crypto::FabricBindingVersion>(123u), rootPublicKey, kFabricId, kVendorId,
                                                      vendorFabricBindingMessage),
                   CHIP_ERROR_INVALID_ARGUMENT);
     }
 
     // Try with buffer too small.
     {
-        uint8_t bufferTooSmall[Crypto::kVendorFabricBindingMessageV1MaxSize - 1];
+        uint8_t bufferTooSmall[Crypto::kVendorFabricBindingMessageV1Size - 1];
         MutableByteSpan bufferTooSmallSpan{ bufferTooSmall };
         EXPECT_EQ(
-            GenerateVendorFabricBindingMessage(kFabricBindingVersionV1, rootPublicKey, kFabricId, kVendorId, bufferTooSmallSpan),
+            GenerateVendorFabricBindingMessage(Crypto::FabricBindingVersion::kVersion1, rootPublicKey, kFabricId, kVendorId, bufferTooSmallSpan),
             CHIP_ERROR_BUFFER_TOO_SMALL);
     }
 
@@ -3059,9 +3058,9 @@ TEST_F(TestChipCryptoPAL, GenerateVendorFabricBindingMessageWorks)
             0xed, 0xb6, 0x7e, 0xc5, 0x4f, 0x7c, 0xbc, 0x6a, 0xde, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0xff, 0xf1
         };
 
-        uint8_t bigEnoughBuffer[Crypto::kVendorFabricBindingMessageV1MaxSize + 1];
+        uint8_t bigEnoughBuffer[Crypto::kVendorFabricBindingMessageV1Size + 1];
         MutableByteSpan vendorFabricBindingMessage{ bigEnoughBuffer };
-        EXPECT_EQ(GenerateVendorFabricBindingMessage(kFabricBindingVersionV1, rootPublicKey, kFabricId, kVendorId,
+        EXPECT_EQ(GenerateVendorFabricBindingMessage(Crypto::FabricBindingVersion::kVersion1, rootPublicKey, kFabricId, kVendorId,
                                                      vendorFabricBindingMessage),
                   CHIP_NO_ERROR);
         EXPECT_TRUE(vendorFabricBindingMessage.data_equal(ByteSpan{ kExpectedFabricBindingMessage }));
