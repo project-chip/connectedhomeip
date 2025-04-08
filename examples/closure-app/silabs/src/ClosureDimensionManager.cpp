@@ -28,10 +28,52 @@ using Protocols::InteractionModel::Status;
 
 CHIP_ERROR ClosureDimensionDelegate::HandleSetTarget(const Optional<Percent100ths> & pos, const Optional<TargetLatchEnum> & latch,
     const Optional<Globals::ThreeLevelAutoEnum> & speed) {
+
+    if (pos.HasValue())
+    {
+        uint16_t position = pos.Value(); // 0 - 10000
+
+        // TODO: Convert to hardware-specific range and move actuator using position
+
+        // Optionally handle latch and speed
+        if (latch.HasValue())
+        {
+            ChipLogProgress(NotSpecified, "Target latch mode: %d", static_cast<uint8_t>(latch.Value()));
+        }
+
+        if (speed.HasValue())
+        {
+            ChipLogProgress(NotSpecified, "Speed mode: %d", static_cast<uint8_t>(speed.Value()));
+        }
+
         return CHIP_NO_ERROR;
     }
 
+    return CHIP_ERROR_INVALID_ARGUMENT;
+}
+
 CHIP_ERROR ClosureDimensionDelegate::HandleStep(const StepDirectionEnum & direction, const uint16_t & numberOfSteps,
         const Optional<Globals::ThreeLevelAutoEnum> & speed) {
-            return CHIP_NO_ERROR;
-        }
+
+    // Convert step to position delta
+    int32_t stepSize = 100; // Each step = 1%
+    int32_t delta = numberOfSteps * stepSize;
+
+    if (direction == StepDirectionEnum::kDown)
+    {
+        delta = -delta;
+    }
+
+    // Get current position from your actuator or state
+    uint16_t currentPos = GetCurrentPosition(); // 0 - 10000
+    int32_t newPos = std::clamp(static_cast<int32_t>(currentPos) + delta, 0, 10000);
+
+    // TODO: MoveToPosition
+
+    if (speed.HasValue())
+    {
+        ChipLogProgress(NotSpecified, "Speed mode: %d", static_cast<uint8_t>(speed.Value()));
+    }
+
+    return CHIP_NO_ERROR;
+}
