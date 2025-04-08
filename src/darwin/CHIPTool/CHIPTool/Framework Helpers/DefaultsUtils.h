@@ -25,6 +25,10 @@ extern NSString * const kNetworkSSIDDefaultsKey;
 extern NSString * const kNetworkPasswordDefaultsKey;
 extern NSString * const kFabricIdKey;
 
+extern NSString * const MTRProductNameKey;
+extern NSString * const MTROnOffKey;
+
+
 MTRDeviceController * _Nullable InitializeMTR(void);
 MTRDeviceController * _Nullable MTRRestartController(MTRDeviceController * controller);
 id _Nullable MTRGetDomainValueForKey(NSString * domain, NSString * key);

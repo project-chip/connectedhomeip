@@ -33,6 +33,7 @@ MTR_DEPRECATED("Please use MTRBaseDevice deviceWithNodeID", ios(16.1, 16.4), mac
 typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NSError * _Nullable error);
 
 @class MTRCommissioningParameters;
+@class MTRNetworkRecoverableBrowserResult;
 @class MTRCommissionableBrowserResult;
 @class MTRSetupPayload;
 @protocol MTRDevicePairingDelegate;

@@ -1,6 +1,5 @@
 /**
- *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,16 +15,18 @@
  */
 
 #import <UIKit/UIKit.h>
-#import "DefaultsUtils.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface RootViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, MTRCommissionableBrowserDelegate>
-@property (strong, nonatomic) UITableView * tableView;
-@property (strong, nonatomic) NSArray * options;
-@property (strong, nonatomic) NSMutableArray *deviceList;
+@interface SwitchBindingViewController : UIViewController
+
+@property (nonatomic, assign) uint64_t deviceId;
+@property (nonatomic, strong) NSArray *lightDeviceList;
+@property (nonatomic, assign) NSInteger selectedIndex;
+@property (nonatomic, strong) UIButton *cancelButton;
+@property (nonatomic, strong) UIButton *okButton;
 @property (nonatomic) dispatch_queue_t matterQueue;
-@property (readwrite) MTRDeviceController * chipController;
+
 @end
 
 NS_ASSUME_NONNULL_END

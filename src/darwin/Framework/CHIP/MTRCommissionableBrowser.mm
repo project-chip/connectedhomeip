@@ -18,6 +18,7 @@
 #import "MTRCommissionableBrowser.h"
 #import "MTRCommissionableBrowserDelegate.h"
 #import "MTRCommissionableBrowserResult_Internal.h"
+#import "MTRNetworkRecoverableBrowserResult_Internal.h"
 #import "MTRDeviceController.h"
 #import "MTRLogging_Internal.h"
 #import "MTRMetricKeys.h"
@@ -56,6 +57,18 @@ using namespace chip::Tracing::DarwinFramework;
 @end
 
 @implementation MTRCommissionableBrowserResult
+@end
+
+@implementation MTRNetworkRecoverableBrowserResultInterfaces
+@end
+
+@interface MTRNetworkRecoverableBrowserResult ()
+@property (nonatomic) NSNumber * recoveryID;
+@property (nonatomic) NSNumber * recoveryReason;
+@property (nonatomic, strong, nullable) CBPeripheral * peripheral;
+@end
+
+@implementation MTRNetworkRecoverableBrowserResult
 @end
 
 class CommissionableBrowserInternal : public DiscoverNodeDelegate,

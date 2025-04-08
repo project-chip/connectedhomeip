@@ -15,17 +15,26 @@
  *    limitations under the License.
  */
 
-#import <UIKit/UIKit.h>
-#import "DefaultsUtils.h"
+#import <Foundation/Foundation.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface RootViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, MTRCommissionableBrowserDelegate>
-@property (strong, nonatomic) UITableView * tableView;
-@property (strong, nonatomic) NSArray * options;
-@property (strong, nonatomic) NSMutableArray *deviceList;
-@property (nonatomic) dispatch_queue_t matterQueue;
-@property (readwrite) MTRDeviceController * chipController;
+@interface MatterDevice : NSObject
+
+@property (assign, nonatomic) uint64_t nodeId;
+
+@property (strong, nonatomic) NSNumber * recoveryId;
+
+@property (strong, nonatomic) NSString * produceName;
+
+@property (strong, nonatomic) NSNumber * deviceType;
+
+@property (assign, nonatomic) bool onOff;
+
+@property (assign, nonatomic) bool isNetworkRecoverable;
+
+-(instancetype)initWithNodeId:(uint64_t)nodeId;
+
 @end
 
 NS_ASSUME_NONNULL_END

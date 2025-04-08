@@ -375,6 +375,8 @@
 		9BDA2A082C5D9AFB00A32BDD /* MTRDevice_Concrete.h in Headers */ = {isa = PBXBuildFile; fileRef = 9BDA2A072C5D9AFB00A32BDD /* MTRDevice_Concrete.h */; };
 		9BFE5D502C6D3075007D4319 /* MTRDeviceController_XPC.h in Headers */ = {isa = PBXBuildFile; fileRef = 9BFE5D4E2C6D3075007D4319 /* MTRDeviceController_XPC.h */; };
 		9BFE5D512C6D3075007D4319 /* MTRDeviceController_XPC.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9BFE5D4F2C6D3075007D4319 /* MTRDeviceController_XPC.mm */; };
+		9E4F90502D953E3000EF6B64 /* MTRNetworkRecoverableBrowserResult.h in Headers */ = {isa = PBXBuildFile; fileRef = 9E4F904F2D953E0700EF6B64 /* MTRNetworkRecoverableBrowserResult.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		9E4F90522D954EE300EF6B64 /* MTRNetworkRecoverableBrowserResult_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 9E4F90512D954ED400EF6B64 /* MTRNetworkRecoverableBrowserResult_Internal.h */; };
 		AF1CB86E2874B03B00865A96 /* MTROTAProviderDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = AF1CB86D2874B03B00865A96 /* MTROTAProviderDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		AF1CB8702874B04C00865A96 /* MTROTAProviderDelegateBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = AF1CB86F2874B04C00865A96 /* MTROTAProviderDelegateBridge.h */; };
 		AF5F90FF2878D351005503FA /* MTROTAProviderDelegateBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = AF5F90FE2878D351005503FA /* MTROTAProviderDelegateBridge.mm */; };
@@ -948,6 +950,8 @@
 		9BDA2A072C5D9AFB00A32BDD /* MTRDevice_Concrete.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRDevice_Concrete.h; sourceTree = "<group>"; };
 		9BFE5D4E2C6D3075007D4319 /* MTRDeviceController_XPC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRDeviceController_XPC.h; sourceTree = "<group>"; };
 		9BFE5D4F2C6D3075007D4319 /* MTRDeviceController_XPC.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRDeviceController_XPC.mm; sourceTree = "<group>"; };
+		9E4F904F2D953E0700EF6B64 /* MTRNetworkRecoverableBrowserResult.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRNetworkRecoverableBrowserResult.h; sourceTree = "<group>"; };
+		9E4F90512D954ED400EF6B64 /* MTRNetworkRecoverableBrowserResult_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRNetworkRecoverableBrowserResult_Internal.h; sourceTree = "<group>"; };
 		AF1CB86D2874B03B00865A96 /* MTROTAProviderDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTROTAProviderDelegate.h; sourceTree = "<group>"; };
 		AF1CB86F2874B04C00865A96 /* MTROTAProviderDelegateBridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTROTAProviderDelegateBridge.h; sourceTree = "<group>"; };
 		AF5F90FE2878D351005503FA /* MTROTAProviderDelegateBridge.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MTROTAProviderDelegateBridge.mm; sourceTree = "<group>"; };
@@ -1623,6 +1627,7 @@
 				1E4D654C29C208DD00BC3478 /* MTRCommissionableBrowser.h */,
 				1E4D654D29C208DD00BC3478 /* MTRCommissionableBrowserDelegate.h */,
 				1E4D654B29C208DD00BC3478 /* MTRCommissionableBrowserResult.h */,
+				9E4F904F2D953E0700EF6B64 /* MTRNetworkRecoverableBrowserResult.h */,
 				1E857311265519DE0050A4D9 /* app */,
 				3D843718294984AF0070D20A /* templates */,
 				1EC4CE5825CC26AB00D7304F /* zap-generated */,
@@ -1666,6 +1671,7 @@
 				5178E67F2AE098510069DF72 /* MTRCommandTimedCheck.h */,
 				51FE723E2ACDEF3E00437032 /* MTRCommandPayloadExtensions_Internal.h */,
 				5178E6802AE098520069DF72 /* MTRCommissionableBrowserResult_Internal.h */,
+				9E4F90512D954ED400EF6B64 /* MTRNetworkRecoverableBrowserResult_Internal.h */,
 				512E8E782D52F7B6009407E3 /* MTRCommandWithRequiredResponse.h */,
 				512E8E792D52F7B6009407E3 /* MTRCommandWithRequiredResponse.mm */,
 				3D010DCD2D408FA300CFFA02 /* MTRCommissioneeInfo.h */,
@@ -2066,6 +2072,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3D9F2FBE2D10DB4F003CA2BB /* MTRProductIdentity.h in Headers */,
+				9E4F90502D953E3000EF6B64 /* MTRNetworkRecoverableBrowserResult.h in Headers */,
 				51D0B1282B617246006E3511 /* MTRServerEndpoint.h in Headers */,
 				51565CB62A7B0D6600469F18 /* MTRDeviceControllerParameters.h in Headers */,
 				51565CB42A7AD78D00469F18 /* MTRDeviceControllerStorageDelegate.h in Headers */,
@@ -2109,6 +2116,7 @@
 				B289D4212639C0D300D4E314 /* MTROnboardingPayloadParser.h in Headers */,
 				513DDB862761F69300DAA01A /* MTRAttributeTLVValueDecoder_Internal.h in Headers */,
 				7534D1812CF8CE2000F64654 /* DefaultAttributePersistenceProvider.h in Headers */,
+				9E4F90522D954EE300EF6B64 /* MTRNetworkRecoverableBrowserResult_Internal.h in Headers */,
 				2CB7163F252F731E0026E2BB /* MTRDeviceControllerDelegate.h in Headers */,
 				88EBF8CE27FABDD500686BC1 /* MTRDeviceAttestationDelegate.h in Headers */,
 				2C222AD0255C620600E446B9 /* MTRBaseDevice.h in Headers */,

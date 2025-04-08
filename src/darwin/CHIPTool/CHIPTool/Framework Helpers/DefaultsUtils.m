@@ -25,6 +25,9 @@ NSString * const MTRNextAvailableDeviceIDKey = @"nextDeviceID";
 NSString * const kFabricIdKey = @"fabricId";
 NSString * const kDevicePairedKey = @"Paired";
 
+NSString * const MTRProductNameKey = @"name";
+NSString * const MTROnOffKey = @"onOff";
+
 id MTRGetDomainValueForKey(NSString * domain, NSString * key)
 {
     id value = (id) CFBridgingRelease(CFPreferencesCopyAppValue((CFStringRef) key, (CFStringRef) domain));

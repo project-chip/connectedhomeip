@@ -14,6 +14,7 @@
  *    limitations under the License.
  */
 #import <Matter/MTRCommissionableBrowserResult.h>
+#import <Matter/MTRNetworkRecoverableBrowserResult.h>
 #import <Matter/MTRDefines.h>
 #import <Matter/MTRDeviceControllerParameters.h>
 

@@ -15,17 +15,19 @@
  *    limitations under the License.
  */
 
-#import <UIKit/UIKit.h>
-#import "DefaultsUtils.h"
+#import "MatterDevice.h"
 
-NS_ASSUME_NONNULL_BEGIN
+@implementation MatterDevice
 
-@interface RootViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, MTRCommissionableBrowserDelegate>
-@property (strong, nonatomic) UITableView * tableView;
-@property (strong, nonatomic) NSArray * options;
-@property (strong, nonatomic) NSMutableArray *deviceList;
-@property (nonatomic) dispatch_queue_t matterQueue;
-@property (readwrite) MTRDeviceController * chipController;
+-(instancetype)initWithNodeId:(uint64_t)nodeId
+{
+    self = [super init];
+    if (self) {
+        // TODO: fetch recovery id from cluster
+        _recoveryId = [NSNumber numberWithLong:1234605616436508552];
+        _nodeId = nodeId;
+    }
+    return self;
+}
+
 @end
-
-NS_ASSUME_NONNULL_END

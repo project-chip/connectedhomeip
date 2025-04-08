@@ -23,6 +23,7 @@
 #import "MTRBaseDevice_Internal.h"
 #import "MTRCommissionableBrowser.h"
 #import "MTRCommissionableBrowserResult_Internal.h"
+#import "MTRNetworkRecoverableBrowserResult_Internal.h"
 #import "MTRCommissioningParameters.h"
 #import "MTRConversion.h"
 #import "MTRDeviceControllerDelegateBridge.h"

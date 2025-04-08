@@ -13,6 +13,8 @@
 		2C460C3225D97CB3000512D6 /* UnpairDevicesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C460C3025D97CB3000512D6 /* UnpairDevicesViewController.m */; };
 		51C8E3FB28261DCF00D47D00 /* FabricKeys.m in Sources */ = {isa = PBXBuildFile; fileRef = 51C8E3FA28261DCF00D47D00 /* FabricKeys.m */; };
 		991DC091247747F500C13860 /* EnumerateViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 991DC090247747F500C13860 /* EnumerateViewController.m */; };
+		9E4F905A2D9A5E5800EF6B64 /* MatterDevice.m in Sources */ = {isa = PBXBuildFile; fileRef = 9E4F90592D9A5E5800EF6B64 /* MatterDevice.m */; };
+		9EEAAF2A2D881042006A62DB /* SwitchBindingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9EEAAF292D881042006A62DB /* SwitchBindingViewController.m */; };
 		B204A621244E1D0600C7C0E1 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B204A620244E1D0600C7C0E1 /* AppDelegate.m */; };
 		B204A624244E1D0600C7C0E1 /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B204A623244E1D0600C7C0E1 /* SceneDelegate.m */; };
 		B204A627244E1D0600C7C0E1 /* QRCodeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B204A626244E1D0600C7C0E1 /* QRCodeViewController.m */; };
@@ -67,6 +69,10 @@
 		51C8E3FA28261DCF00D47D00 /* FabricKeys.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FabricKeys.m; sourceTree = "<group>"; };
 		991DC08F247747F500C13860 /* EnumerateViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EnumerateViewController.h; sourceTree = "<group>"; };
 		991DC090247747F500C13860 /* EnumerateViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EnumerateViewController.m; sourceTree = "<group>"; };
+		9E4F90582D9A5E5800EF6B64 /* MatterDevice.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MatterDevice.h; sourceTree = "<group>"; };
+		9E4F90592D9A5E5800EF6B64 /* MatterDevice.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MatterDevice.m; sourceTree = "<group>"; };
+		9EEAAF282D881042006A62DB /* SwitchBindingViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SwitchBindingViewController.h; sourceTree = "<group>"; };
+		9EEAAF292D881042006A62DB /* SwitchBindingViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SwitchBindingViewController.m; sourceTree = "<group>"; };
 		B204A61C244E1D0600C7C0E1 /* CHIPTool.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CHIPTool.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B204A61F244E1D0600C7C0E1 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		B204A620244E1D0600C7C0E1 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -162,6 +168,15 @@
 			path = UnpairDevices;
 			sourceTree = "<group>";
 		};
+		9E4F90532D9A5DE000EF6B64 /* View model */ = {
+			isa = PBXGroup;
+			children = (
+				9E4F90582D9A5E5800EF6B64 /* MatterDevice.h */,
+				9E4F90592D9A5E5800EF6B64 /* MatterDevice.m */,
+			);
+			path = "View model";
+			sourceTree = "<group>";
+		};
 		B20252DE2459EC7600F97062 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -199,6 +214,7 @@
 				B204A631244E1D0700C7C0E1 /* main.m */,
 				B232D8C0251A0EE200792CB4 /* Framework Helpers */,
 				B232D8BF251A0EC500792CB4 /* View Controllers */,
+				9E4F90532D9A5DE000EF6B64 /* View model */,
 				B232D8BE251A0EA300792CB4 /* UI Helpers */,
 			);
 			path = CHIPTool;
@@ -270,6 +286,8 @@
 			children = (
 				B2B0209025C9C1AC00A4C220 /* BindingsViewController.h */,
 				B2B0209125C9C1AC00A4C220 /* BindingsViewController.m */,
+				9EEAAF282D881042006A62DB /* SwitchBindingViewController.h */,
+				9EEAAF292D881042006A62DB /* SwitchBindingViewController.m */,
 			);
 			path = Bindings;
 			sourceTree = "<group>";
@@ -400,6 +418,8 @@
 				B2946A9B24C9A7BF005C87D0 /* DefaultsUtils.m in Sources */,
 				991DC091247747F500C13860 /* EnumerateViewController.m in Sources */,
 				B2C2267526289324009DAB8B /* FabricUIViewController.m in Sources */,
+				9EEAAF2A2D881042006A62DB /* SwitchBindingViewController.m in Sources */,
+				9E4F905A2D9A5E5800EF6B64 /* MatterDevice.m in Sources */,
 				B2B0209225C9C1AC00A4C220 /* BindingsViewController.m in Sources */,
 				B204A621244E1D0600C7C0E1 /* AppDelegate.m in Sources */,
 				B2F51E99252DCDC000911FA5 /* TemperatureSensorViewController.m in Sources */,
