@@ -57,12 +57,12 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0700" name="Energy Tariff Cluster" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0700" name="Commodity Tariff Cluster" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Matter revision"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x0700" name="Energy Tariff"/>
+    <clusterId id="0x0700" name="Commodity Tariff"/>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="SETRF" scope="Endpoint"/>
   <features>
@@ -81,11 +81,22 @@ Davis, CA 95616, USA
     <feature bit="4" code="PWRTHLD" name="PowerThreshold" summary="Supports information about power threshold">
       <optionalConform/>
     </feature>
-    <feature bit="5" code="RNDM" name="Randomization" summary="Supports information about randomization of calendar transitions">
+    <feature bit="5" code="RNDM" name="Randomization" summary="Supports information about randomization of calendar day entries">
       <optionalConform/>
     </feature>
   </features>
   <dataTypes>
+    <enum name="AuxiliaryLoadSettingEnum">
+      <item value="0" name="Off" summary="The switch should be in the OFF state">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="On" summary="The switch should be in the ON state">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="None" summary="No state is required">
+        <mandatoryConform/>
+      </item>
+    </enum>
     <enum name="BlockModeEnum">
       <item value="0" name="NoBlock" summary="Tariff has no usage blocks">
         <mandatoryConform/>
@@ -97,6 +108,23 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </item>
     </enum>
+    <enum name="DayEntryRandomizationTypeEnum">
+      <item value="0" name="None" summary="No randomization applied">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Fixed" summary="An unchanging offset">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="Random" summary="A random value">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="RandomPositive" summary="A random positive value">
+        <mandatoryConform/>
+      </item>
+      <item value="4" name="RandomNegative" summary="A random negative value">
+        <mandatoryConform/>
+      </item>
+    </enum>
     <enum name="DayTypeEnum">
       <item value="0" name="Standard" summary="Standard">
         <mandatoryConform/>
@@ -105,6 +133,9 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </item>
       <item value="2" name="Dynamic" summary="Dynamic Pricing">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="Event" summary="Individual Events">
         <mandatoryConform/>
       </item>
     </enum>
@@ -122,49 +153,6 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </item>
     </enum>
-    <enum name="TransitionRandomizationTypeEnum">
-      <item value="0" name="None" summary="No randomization applied">
-        <mandatoryConform/>
-      </item>
-      <item value="1" name="Fixed" summary="An unchanging offset">
-        <mandatoryConform/>
-      </item>
-      <item value="2" name="Random" summary="A random value">
-        <mandatoryConform/>
-      </item>
-      <item value="3" name="RandomPositive" summary="A random positive value">
-        <mandatoryConform/>
-      </item>
-      <item value="4" name="RandomNegative" summary="A random negative value">
-        <mandatoryConform/>
-      </item>
-    </enum>
-    <bitmap name="AuxiliaryLoadBitmap">
-      <bitfield name="AuxiliarySwitch1" bit="0" summary="Auxiliary Switch 1">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="AuxiliarySwitch2" bit="1" summary="Auxiliary Switch 2">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="AuxiliarySwitch3" bit="2" summary="Auxiliary Switch 3">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="AuxiliarySwitch4" bit="3" summary="Auxiliary Switch 4">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="AuxiliarySwitch5" bit="4" summary="Auxiliary Switch 5">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="AuxiliarySwitch6" bit="5" summary="Auxiliary Switch 6">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="AuxiliarySwitch7" bit="6" summary="Auxiliary Switch 7">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="AuxiliarySwitch8" bit="7" summary="Auxiliary Switch 8">
-        <mandatoryConform/>
-      </bitfield>
-    </bitmap>
     <bitmap name="DayPatternDayOfWeekBitmap">
       <bitfield name="Sunday" bit="0" summary="Sunday">
         <mandatoryConform/>
@@ -188,6 +176,23 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </bitfield>
     </bitmap>
+    <struct name="AuxiliaryLoadSwitchSettingsStruct">
+      <field id="0" name="Number" type="uint8">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="RequiredState" type="AuxiliaryLoadSettingEnum">
+        <mandatoryConform/>
+      </field>
+    </struct>
+    <struct name="AuxiliaryLoadSwitchesSettingsStruct">
+      <field id="0" name="SwitchStates" type="list">
+        <entry type="AuxiliaryLoadSwitchSettingsStruct"/>
+        <mandatoryConform/>
+        <constraint>
+          <maxCount value="8"/>
+        </constraint>
+      </field>
+    </struct>
     <struct name="CalendarPeriodStruct">
       <field id="0" name="StartDate" type="epoch-s">
         <quality nullable="true"/>
@@ -209,8 +214,8 @@ Davis, CA 95616, USA
         </constraint>
       </field>
     </struct>
-    <struct name="CalendarTransitionStruct">
-      <field id="0" name="CalendarTransitionID" type="uint32">
+    <struct name="DayEntryStruct">
+      <field id="0" name="DayEntryID" type="uint32">
         <mandatoryConform/>
       </field>
       <field id="1" name="StartTime" type="uint16">
@@ -230,7 +235,7 @@ Davis, CA 95616, USA
           <feature name="RNDM"/>
         </optionalConform>
       </field>
-      <field id="4" name="RandomizationType" type="TransitionRandomizationTypeEnum" default="None">
+      <field id="4" name="RandomizationType" type="DayEntryRandomizationTypeEnum" default="None">
         <optionalConform>
           <feature name="RNDM"/>
         </optionalConform>
@@ -243,7 +248,7 @@ Davis, CA 95616, USA
       <field id="1" name="DaysOfWeek" type="DayPatternDayOfWeekBitmap">
         <mandatoryConform/>
       </field>
-      <field id="2" name="TransitionIDs" type="list">
+      <field id="2" name="DayEntryIDs" type="list">
         <entry type="uint32"/>
         <mandatoryConform/>
         <constraint>
@@ -261,7 +266,7 @@ Davis, CA 95616, USA
       <field id="1" name="DayType" type="DayTypeEnum">
         <mandatoryConform/>
       </field>
-      <field id="2" name="TransitionIDs" type="list">
+      <field id="2" name="DayEntryIDs" type="list">
         <entry type="uint32"/>
         <mandatoryConform/>
         <constraint>
@@ -276,7 +281,7 @@ Davis, CA 95616, USA
       <field id="0" name="Severity" type="PeakPeriodSeverityEnum">
         <mandatoryConform/>
       </field>
-      <field id="1" name="PeakPeriod" type="uint16" default="0">
+      <field id="1" name="PeakPeriod" type="uint16">
         <mandatoryConform/>
         <constraint>
           <min value="1"/>
@@ -284,12 +289,8 @@ Davis, CA 95616, USA
       </field>
     </struct>
     <struct name="TariffComponentStruct">
-      <field id="0" name="TariffComponentId" type="uint32">
-        <mandatoryConform>
-          <notTerm>
-            <field name="Predicted"/>
-          </notTerm>
-        </mandatoryConform>
+      <field id="0" name="TariffComponentID" type="uint32">
+        <mandatoryConform/>
       </field>
       <field id="1" name="Price" type="TariffPriceStruct">
         <quality nullable="true"/>
@@ -302,7 +303,7 @@ Davis, CA 95616, USA
           <feature name="FCRED"/>
         </optionalConform>
       </field>
-      <field id="3" name="AuxiliaryLoad" type="AuxiliaryLoadBitmap">
+      <field id="3" name="AuxiliaryLoad" type="AuxiliaryLoadSwitchSettingsStruct">
         <optionalConform choice="a" more="true" min="1">
           <feature name="AUXLD"/>
         </optionalConform>
@@ -366,18 +367,24 @@ Davis, CA 95616, USA
           <maxLength value="128"/>
         </constraint>
       </field>
-      <field id="1" name="CalendarTransitionIDs" type="list">
+      <field id="1" name="DayEntryIDs" type="list">
         <entry type="uint32"/>
         <mandatoryConform/>
         <constraint>
-          <minCount value="1"/>
+          <countBetween>
+            <from value="1"/>
+            <to value="20"/>
+          </countBetween>
         </constraint>
       </field>
       <field id="2" name="TariffComponentIDs" type="list">
         <entry type="uint32"/>
         <mandatoryConform/>
         <constraint>
-          <minCount value="1"/>
+          <countBetween>
+            <from value="1"/>
+            <to value="20"/>
+          </countBetween>
         </constraint>
       </field>
     </struct>
@@ -394,17 +401,17 @@ Davis, CA 95616, USA
     </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="TariffInfo" type="TariffInformationStruct" default="null">
+    <attribute id="0x0000" name="TariffInfo" type="TariffInformationStruct">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0001" name="MeteringUnit" type="MeteringUnitEnum" default="null">
+    <attribute id="0x0001" name="TariffUnit" type="TariffUnitEnum">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0002" name="StartDate" type="epoch-s" default="null">
+    <attribute id="0x0002" name="StartDate" type="epoch-s">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
       <mandatoryConform/>
@@ -412,19 +419,19 @@ Davis, CA 95616, USA
         <desc/>
       </constraint>
     </attribute>
-    <attribute id="0x0003" name="Transitions" type="list" default="empty">
-      <entry type="CalendarTransitionStruct"/>
+    <attribute id="0x0003" name="DayEntries" type="list">
+      <entry type="DayEntryStruct"/>
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0004" name="DayPatterns" type="list" default="empty">
+    <attribute id="0x0004" name="DayPatterns" type="list">
       <entry type="DayPatternStruct"/>
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0005" name="CalendarPeriods" type="list" default="empty">
+    <attribute id="0x0005" name="CalendarPeriods" type="list">
       <entry type="CalendarPeriodStruct"/>
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
@@ -436,7 +443,7 @@ Davis, CA 95616, USA
         </countBetween>
       </constraint>
     </attribute>
-    <attribute id="0x0006" name="IndividualDays" type="list" default="empty">
+    <attribute id="0x0006" name="IndividualDays" type="list">
       <entry type="DayStruct"/>
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
@@ -445,37 +452,37 @@ Davis, CA 95616, USA
         <maxCount value="50"/>
       </constraint>
     </attribute>
-    <attribute id="0x0007" name="CurrentDay" type="DayStruct" default="null">
+    <attribute id="0x0007" name="CurrentDay" type="DayStruct">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0008" name="NextDay" type="DayStruct" default="null">
+    <attribute id="0x0008" name="NextDay" type="DayStruct">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0009" name="CurrentTransition" type="CalendarTransitionStruct" default="null">
+    <attribute id="0x0009" name="CurrentDayEntry" type="DayEntryStruct">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x000A" name="CurrentTransitionDate" type="epoch-s" default="null">
+    <attribute id="0x000A" name="CurrentDayEntryDate" type="epoch-s">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x000B" name="NextTransition" type="CalendarTransitionStruct" default="null">
+    <attribute id="0x000B" name="NextDayEntry" type="DayEntryStruct">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x000C" name="NextTransitionDate" type="epoch-s" default="null">
+    <attribute id="0x000C" name="NextDayEntryDate" type="epoch-s">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x000D" name="TariffComponents" type="list" default="empty">
+    <attribute id="0x000D" name="TariffComponents" type="list">
       <entry type="TariffComponentStruct"/>
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
@@ -484,7 +491,7 @@ Davis, CA 95616, USA
         <minCount value="1"/>
       </constraint>
     </attribute>
-    <attribute id="0x000E" name="TariffPeriods" type="list" default="empty">
+    <attribute id="0x000E" name="TariffPeriods" type="list">
       <entry type="TariffPeriodStruct"/>
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
@@ -493,19 +500,19 @@ Davis, CA 95616, USA
         <minCount value="1"/>
       </constraint>
     </attribute>
-    <attribute id="0x000F" name="CurrentTariffComponents" type="list" default="empty">
+    <attribute id="0x000F" name="CurrentTariffComponents" type="list">
       <entry type="TariffComponentStruct"/>
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0010" name="NextTariffComponents" type="list" default="empty">
+    <attribute id="0x0010" name="NextTariffComponents" type="list">
       <entry type="TariffComponentStruct"/>
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0011" name="DefaultRandomizationOffset" type="int16" default="null">
+    <attribute id="0x0011" name="DefaultRandomizationOffset" type="int16">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
       <mandatoryConform>
@@ -515,7 +522,7 @@ Davis, CA 95616, USA
         <desc/>
       </constraint>
     </attribute>
-    <attribute id="0x0012" name="DefaultRandomizationType" type="TransitionRandomizationTypeEnum" default="null">
+    <attribute id="0x0012" name="DefaultRandomizationType" type="DayEntryRandomizationTypeEnum">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
       <mandatoryConform>
@@ -524,7 +531,7 @@ Davis, CA 95616, USA
     </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="GetTariffComponent" direction="commandToServer" response="Y">
+    <command id="0x00" name="GetTariffComponent" direction="commandToServer" response="GetTariffComponentResponse">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="TariffComponentID" type="uint32">
@@ -540,7 +547,7 @@ Davis, CA 95616, USA
           <maxLength value="128"/>
         </constraint>
       </field>
-      <field id="1" name="CalendarTransitionIDs" type="list">
+      <field id="1" name="DayEntryIDs" type="list">
         <entry type="uint32"/>
         <mandatoryConform/>
         <constraint>
@@ -551,16 +558,16 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x01" name="GetCalendarTransition" direction="commandToServer" response="Y">
+    <command id="0x01" name="GetDayEntry" direction="commandToServer" response="GetDayEntryResponse">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
-      <field id="0" name="CalendarTransitionID" type="uint32">
+      <field id="0" name="DayEntryID" type="uint32">
         <mandatoryConform/>
       </field>
     </command>
-    <command id="0x01" name="GetCalendarTransitionResponse" direction="responseFromServer">
+    <command id="0x01" name="GetDayEntryResponse" direction="responseFromServer">
       <mandatoryConform/>
-      <field id="0" name="Transition" type="CalendarTransitionStruct">
+      <field id="0" name="DayEntry" type="DayEntryStruct">
         <mandatoryConform/>
       </field>
     </command>

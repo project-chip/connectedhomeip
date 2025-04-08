@@ -57,33 +57,38 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" name="Energy Metering Cluster" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0B07" name="Commodity Metering Cluster" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId name="Energy Metering"/>
+    <clusterId id="0x0B07" name="Commodity Metering"/>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="" scope="Endpoint"/>
   <dataTypes>
-    <struct name="MeteredEnergyStruct">
+    <struct name="MeteredQuantityStruct">
       <field id="0" name="TariffComponentIDs" type="list">
         <entry type="uint32"/>
         <mandatoryConform/>
       </field>
-      <field id="1" name="Energy" type="energy-mWh">
+      <field id="1" name="Quantity" type="int64">
         <mandatoryConform/>
       </field>
     </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="MeteredEnergy" type="list" default="null">
-      <entry type="MeteredEnergyStruct"/>
+    <attribute id="0x0000" name="MeteredQuantity" type="list">
+      <entry type="MeteredQuantityStruct"/>
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0001" name="MeteredEnergyTimestamp" type="epoch-s" default="null">
+    <attribute id="0x0001" name="MeteredQuantityTimestamp" type="epoch-s">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0002" name="MeasurementType" type="MeasurementTypeEnum">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
       <mandatoryConform/>

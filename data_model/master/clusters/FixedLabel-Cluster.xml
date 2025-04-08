@@ -57,9 +57,20 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<namespace xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd namespace namespace.xsd" name="Energy Tariff Flow">
-  <tags>
-    <tag id="0x0000" name="Import"/>
-    <tag id="0x0001" name="Export"/>
-  </tags>
-</namespace>
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0040" name="Fixed Label Cluster" revision="1">
+  <revisionHistory>
+    <revision revision="1" summary="Initial revision"/>
+  </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0040" name="Fixed Label"/>
+  </clusterIds>
+  <classification hierarchy="derived" baseCluster="Label" role="utility" picsCode="FLABEL" scope="Endpoint"/>
+  <attributes>
+    <attribute id="0x0000" name="LabelList" type="list" default="empty">
+      <entry type="LabelStruct"/>
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform/>
+    </attribute>
+  </attributes>
+</cluster>

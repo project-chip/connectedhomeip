@@ -57,10 +57,16 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<namespace xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd namespace namespace.xsd" id="0x000D" name="Energy Tariff Commodity">
+<namespace xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd namespace namespace.xsd" id="0x0048" name="Closure Cabinet">
   <tags>
-    <tag id="0x0000" name="ElectricalEnergy"/>
-    <tag id="0x0001" name="NaturalGas"/>
-    <tag id="0x0002" name="Water"/>
+    <tag id="0x0000" name="CabinetDoor">
+      <description>A hinged or sliding panel used to cover the opening of a cabinet, providing access to its interior.</description>
+    </tag>
+    <tag id="0x0001" name="Drawer">
+      <description>A sliding storage compartment, typically built into furniture like cabinets, desks, or dressers.</description>
+    </tag>
+    <tag id="0x0002" name="Flap">
+      <description>A hinged front or flexible cover that can be lifted or moved, providing access to its interior.</description>
+    </tag>
   </tags>
 </namespace>
