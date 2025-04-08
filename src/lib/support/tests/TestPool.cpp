@@ -162,7 +162,7 @@ void TestCreateReleaseStruct()
     {
         S(std::set<S *> & set) : mSet(set) { mSet.insert(this); }
         ~S() { mSet.erase(this); }
-        std::set<S *> & mSet;
+        std::set<S *> & mSet; // NOLINT(clang-analyzer-webkit.NoUncountedMemberChecker)
     };
     std::set<S *> objs1;
 
@@ -498,7 +498,7 @@ void TestPoolInterface()
     struct PoolHolder
     {
         PoolHolder(TestObjectPoolType & testObjectPool) : mTestObjectPoolInterface(testObjectPool) {}
-        TestObjectPoolType & mTestObjectPoolInterface;
+        TestObjectPoolType & mTestObjectPoolInterface; // NOLINT(clang-analyzer-webkit.NoUncountedMemberChecker)
     };
 
     constexpr size_t kSize = 10;
