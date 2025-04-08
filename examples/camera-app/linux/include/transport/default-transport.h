@@ -1,4 +1,5 @@
 /*
+ *
  *    Copyright (c) 2025 Project CHIP Authors
  *    All rights reserved.
  *
@@ -15,34 +16,15 @@
  *    limitations under the License.
  */
 
-#include "camera-app.h"
-#include "camera-device.h"
-#include <AppMain.h>
-#include <platform/CHIPDeviceConfig.h>
+#pragma once
 
-using namespace chip;
-using namespace chip::app;
-using namespace chip::app::Clusters;
-using namespace Camera;
-
-CameraDevice gCameraDevice;
-
-void ApplicationInit()
+class DefaultTransport : public Transport
 {
-    ChipLogProgress(Camera, "Matter Camera Linux App: ApplicationInit()");
-    CameraAppInit(&gCameraDevice);
-}
-
-void ApplicationShutdown()
-{
-    CameraAppShutdown();
-}
-
-int main(int argc, char * argv[])
-{
-    VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
-
-    ChipLinuxAppMainLoop();
-
-    return 0;
-}
+public:
+    void SendVideo(const char * data, size_t size, uint16_t videoStreamID) {}
+    void SendAudio(const char * data, size_t size, uint16_t audioStreamID) {}
+    void SendAudioVideo(const char * data, size_t size, uint16_t videoSTreamID, uint16_t audioStreamID) {}
+    bool CanSendVideo() { return true; }
+    bool CanSendAudio() { return true; }
+    virtual ~Transport() = default;
+};
