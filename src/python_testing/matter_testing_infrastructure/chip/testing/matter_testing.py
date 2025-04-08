@@ -1883,7 +1883,7 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
     config.app_pid = 0 if args.app_pid is None else args.app_pid
     config.fail_on_skipped_tests = args.fail_on_skipped
 
-    config.legacy = True if args.use_legacy_test_event_triggers else args.use_legacy_test_event_triggers
+    config.legacy = args.use_legacy_test_event_triggers
 
     config.controller_node_id = args.controller_node_id
     config.trace_to = args.trace_to
