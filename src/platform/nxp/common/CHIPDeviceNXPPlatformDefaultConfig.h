@@ -94,6 +94,25 @@
 // These are configuration options that are unique to the NXP platform.
 // These can be overridden by the application as needed.
 
+/**
+ * @def CHIP_DEVICE_LAYER_OTA_REBOOT_DELAY
+ *
+ * The delay before rebooting after an OTA process was finished.
+ */
+#ifndef CHIP_DEVICE_LAYER_OTA_REBOOT_DELAY
+#define CHIP_DEVICE_LAYER_OTA_REBOOT_DELAY 3000
+#endif // CHIP_DEVICE_LAYER_OTA_REBOOT_DELAY
+
+/**
+ * @def CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
+ *
+ * Enables default OTA TLV factory data processor.
+ * Disabled by default.
+ */
+#ifndef CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
+#define CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR 0
+#endif // CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
+
 // ========== Platform-specific Configuration Overrides =========
 #ifndef CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE
 #define CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE 10240

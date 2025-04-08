@@ -38,7 +38,7 @@ static constexpr uint16_t kEmberInvalidEndpointIndex = 0xFFFF;
 #endif
 
 #define DECLARE_DYNAMIC_ENDPOINT(endpointName, clusterList)                                                                        \
-    EmberAfEndpointType endpointName = { clusterList, ArraySize(clusterList), 0 }
+    EmberAfEndpointType endpointName = { clusterList, MATTER_ARRAY_SIZE(clusterList), 0 }
 
 #define DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(clusterListName) EmberAfCluster clusterListName[] = {
 
@@ -46,7 +46,7 @@ static constexpr uint16_t kEmberInvalidEndpointIndex = 0xFFFF;
 // It can be assigned with the ZAP_CLUSTER_MASK(SERVER) or ZAP_CLUSTER_MASK(CLUSTER) values.
 #define DECLARE_DYNAMIC_CLUSTER(clusterId, clusterAttrs, role, incomingCommands, outgoingCommands)                                 \
     {                                                                                                                              \
-        clusterId, clusterAttrs, ArraySize(clusterAttrs), 0, role, NULL, incomingCommands, outgoingCommands                        \
+        clusterId, clusterAttrs, MATTER_ARRAY_SIZE(clusterAttrs), 0, role, NULL, incomingCommands, outgoingCommands                \
     }
 
 #define DECLARE_DYNAMIC_CLUSTER_LIST_END }

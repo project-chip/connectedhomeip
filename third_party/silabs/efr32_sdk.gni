@@ -130,7 +130,10 @@ declare_args() {
 if (slc_generate || slc_reuse_files) {
   silabs_gen_folder = slc_gen_path
 } else {
-  print("Using pre-generate files")
+  if (!chip_build_all_platform_tests) {
+    # We can't print to the console when running our tests in the CSA CI otherwise CI fails.
+    print("Using pre-generate files")
+  }
   silabs_gen_folder = sl_pre_gen_path
 }
 
@@ -172,6 +175,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/bootloader",
       "${efr32_sdk_root}/platform/bootloader/config",
       "${efr32_sdk_root}/platform/bootloader/config/btl_interface",
+      "${efr32_sdk_root}/platform/bootloader/core/flash",
       "${efr32_sdk_root}/platform/bootloader/api",
       "${efr32_sdk_root}/platform/CMSIS/Core/Include",
       "${efr32_sdk_root}/platform/CMSIS/RTOS2/Include",
@@ -724,6 +728,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/CMSIS/RTOS2/Source/os_systick.c",
       "${efr32_sdk_root}/platform/bootloader/api/btl_interface.c",
       "${efr32_sdk_root}/platform/bootloader/api/btl_interface_storage.c",
+      "${efr32_sdk_root}/platform/bootloader/core/flash/btl_internal_flash.c",
       "${efr32_sdk_root}/platform/bootloader/security/sha/crypto_sha.c",
       "${efr32_sdk_root}/platform/common/src/sl_core_cortexm.c",
       "${efr32_sdk_root}/platform/common/src/sl_slist.c",

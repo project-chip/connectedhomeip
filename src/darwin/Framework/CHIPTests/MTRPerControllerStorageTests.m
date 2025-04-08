@@ -103,6 +103,19 @@ static const uint16_t kSubscriptionPoolBaseTimeoutInSeconds = 30;
 }
 @end
 
+@interface MTRPerControllerStorageTestsDeallocDelegate : NSObject <MTRDeviceControllerDelegate>
+@property (nonatomic, nullable) dispatch_block_t onDevicesChanged;
+@end
+
+@implementation MTRPerControllerStorageTestsDeallocDelegate
+- (void)devicesChangedForController:(MTRDeviceController *)controller
+{
+    if (self.onDevicesChanged) {
+        self.onDevicesChanged();
+    }
+}
+@end
+
 @interface MTRPerControllerStorageTestsCertificateIssuer : NSObject <MTROperationalCertificateIssuer>
 - (instancetype)initWithRootCertificate:(MTRCertificateDERBytes)rootCertificate
                 intermediateCertificate:(MTRCertificateDERBytes _Nullable)intermediateCertificate
@@ -319,6 +332,21 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 @implementation MTRPerControllerStorageTests {
     dispatch_queue_t _storageQueue;
     BOOL _localTestStorageEnabledBeforeUnitTest;
+}
+
++ (void)setUp
+{
+    // Start one instance of all-clusters-app that the various tests below can
+    // then use, so we're not doing quite as much startup logging.  Though it's
+    // not clear that the ResetCommissionee logging is really shorter, so maybe
+    // we should start these on a per-test basis, e.g. in
+    // commissionWithController:newNodeID:onboardingPayload:
+    [super setUp];
+
+    BOOL started = [self startAppWithName:@"all-clusters"
+                                arguments:@[]
+                                  payload:kOnboardingPayload];
+    XCTAssertTrue(started);
 }
 
 - (void)setUp
@@ -1774,9 +1802,9 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     XCTAssertNotNil([dataStore findResumptionInfoByNodeID:deviceID]);
     XCTAssertNotNil([dataStore getStoredDeviceDataForNodeID:deviceID]);
     XCTAssertNotNil([dataStore getStoredClusterDataForNodeID:deviceID]);
-    __auto_type * nodesWithStoredData = [controller nodesWithStoredData];
+    __auto_type * nodesWithStoredData = controller.nodesWithStoredData;
     XCTAssertTrue([nodesWithStoredData containsObject:deviceID]);
-    XCTAssertEqualObjects(nodesWithStoredData, [dataStore nodesWithStoredData]);
+    XCTAssertEqualObjects(nodesWithStoredData, dataStore.nodesWithStoredData);
     XCTAssertEqualObjects(nodesWithStoredData, deviceAttributeCounts.allKeys);
 
     [controller forgetDeviceWithNodeID:deviceID];
@@ -1785,9 +1813,9 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     XCTAssertNil([dataStore findResumptionInfoByNodeID:deviceID]);
     XCTAssertNil([dataStore getStoredDeviceDataForNodeID:deviceID]);
     XCTAssertNil([dataStore getStoredClusterDataForNodeID:deviceID]);
-    nodesWithStoredData = [controller nodesWithStoredData];
+    nodesWithStoredData = controller.nodesWithStoredData;
     XCTAssertFalse([nodesWithStoredData containsObject:deviceID]);
-    XCTAssertEqualObjects(nodesWithStoredData, [dataStore nodesWithStoredData]);
+    XCTAssertEqualObjects(nodesWithStoredData, dataStore.nodesWithStoredData);
 
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
@@ -3652,9 +3680,31 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     // We should have established CASE using our operational key.
     XCTAssertEqual(operationalKeys.signatureCount, 1);
 
+    // Before the test, clear the device controller in-memory MapTable
+    [controller forgetDeviceWithNodeID:deviceID];
+
     __block BOOL subscriptionReportEnd1 = NO;
     XCTestExpectation * subscriptionCallbackDeleted = [self expectationWithDescription:@"Subscription callback deleted"];
+    XCTestExpectation * controllerAddedDevice = [self expectationWithDescription:@"Controller added device"];
+    XCTestExpectation * controllerRemovedDevice = [self expectationWithDescription:@"Controller removed device"];
     @autoreleasepool {
+        // Expected the test device was added and removed
+        MTRPerControllerStorageTestsDeallocDelegate * controllerDelegate = [[MTRPerControllerStorageTestsDeallocDelegate alloc] init];
+        __block NSUInteger lastDeviceCount = controller.devices.count;
+        controllerDelegate.onDevicesChanged = ^{
+            // Use self as lock for lastDeviceCount access, so sanitizer doesn't complain
+            @synchronized(self) {
+                NSArray<MTRDevice *> * devices = controller.devices;
+                if (devices.count > lastDeviceCount) {
+                    [controllerAddedDevice fulfill];
+                } else if (devices.count < lastDeviceCount) {
+                    [controllerRemovedDevice fulfill];
+                }
+                lastDeviceCount = devices.count;
+            }
+        };
+        [controller addDeviceControllerDelegate:controllerDelegate queue:queue];
+
         __auto_type * device = [MTRDevice deviceWithNodeID:deviceID controller:controller];
         __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
 
@@ -3675,13 +3725,16 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
         [device setDelegate:delegate queue:queue];
 
         [self waitForExpectations:@[ subscriptionReportBegin ] timeout:60];
+
+        XCTAssertEqual(controller.devices.count, 1);
     }
 
     // report should still be ongoing
     XCTAssertFalse(subscriptionReportEnd1);
+    XCTAssertEqual(controller.devices.count, 0);
 
     // dealloc -> delete should be called soon after the autoreleasepool reaps
-    [self waitForExpectations:@[ subscriptionCallbackDeleted ] timeout:60];
+    [self waitForExpectations:@[ subscriptionCallbackDeleted, controllerAddedDevice, controllerRemovedDevice ] timeout:60];
 
     // Reset our commissionee.
     __auto_type * baseDevice = [MTRBaseDevice deviceWithNodeID:deviceID controller:controller];

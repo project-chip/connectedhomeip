@@ -173,10 +173,9 @@ using namespace chip::Tracing::DarwinFramework;
             storageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration *)storageBehaviorConfiguration
                           startSuspended:(BOOL)startSuspended
 {
-    if (self = [super initForSubclasses:startSuspended]) {
+    if (self = [super initForSubclasses:startSuspended uniqueIdentifier:uniqueIdentifier]) {
         // Make sure our storage is all set up to work as early as possible,
         // before we start doing anything else with the controller.
-        self.uniqueIdentifier = uniqueIdentifier;
 
         // Setup assertion variables
         _keepRunningAssertionCounter = 0;
@@ -1760,7 +1759,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         return @[];
     }
 
-    return [self.controllerDataStore nodesWithStoredData];
+    return self.controllerDataStore.nodesWithStoredData;
 }
 
 @end

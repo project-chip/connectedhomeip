@@ -52,8 +52,8 @@ class WebRTCTransportProviderCluster(
 
   class ProvideOfferResponse(
     val webRTCSessionID: UShort,
-    val videoStreamID: UShort,
-    val audioStreamID: UShort,
+    val videoStreamID: UShort?,
+    val audioStreamID: UShort?,
   )
 
   class CurrentSessionsAttribute(
@@ -111,6 +111,7 @@ class WebRTCTransportProviderCluster(
 
   suspend fun solicitOffer(
     streamUsage: UByte,
+    originatingEndpointID: UShort,
     videoStreamID: UShort?,
     audioStreamID: UShort?,
     ICEServers: List<WebRTCTransportProviderClusterICEServerStruct>?,
@@ -126,13 +127,16 @@ class WebRTCTransportProviderCluster(
     val TAG_STREAM_USAGE_REQ: Int = 0
     tlvWriter.put(ContextSpecificTag(TAG_STREAM_USAGE_REQ), streamUsage)
 
-    val TAG_VIDEO_STREAM_ID_REQ: Int = 1
+    val TAG_ORIGINATING_ENDPOINT_ID_REQ: Int = 1
+    tlvWriter.put(ContextSpecificTag(TAG_ORIGINATING_ENDPOINT_ID_REQ), originatingEndpointID)
+
+    val TAG_VIDEO_STREAM_ID_REQ: Int = 2
     videoStreamID?.let { tlvWriter.put(ContextSpecificTag(TAG_VIDEO_STREAM_ID_REQ), videoStreamID) }
 
-    val TAG_AUDIO_STREAM_ID_REQ: Int = 2
+    val TAG_AUDIO_STREAM_ID_REQ: Int = 3
     audioStreamID?.let { tlvWriter.put(ContextSpecificTag(TAG_AUDIO_STREAM_ID_REQ), audioStreamID) }
 
-    val TAG_ICE_SERVERS_REQ: Int = 3
+    val TAG_ICE_SERVERS_REQ: Int = 4
     ICEServers?.let {
       tlvWriter.startArray(ContextSpecificTag(TAG_ICE_SERVERS_REQ))
       for (item in ICEServers.iterator()) {
@@ -141,12 +145,12 @@ class WebRTCTransportProviderCluster(
       tlvWriter.endArray()
     }
 
-    val TAG_ICE_TRANSPORT_POLICY_REQ: Int = 4
+    val TAG_ICE_TRANSPORT_POLICY_REQ: Int = 5
     ICETransportPolicy?.let {
       tlvWriter.put(ContextSpecificTag(TAG_ICE_TRANSPORT_POLICY_REQ), ICETransportPolicy)
     }
 
-    val TAG_METADATA_OPTIONS_REQ: Int = 5
+    val TAG_METADATA_OPTIONS_REQ: Int = 6
     metadataOptions?.let {
       tlvWriter.put(ContextSpecificTag(TAG_METADATA_OPTIONS_REQ), metadataOptions)
     }
@@ -250,6 +254,7 @@ class WebRTCTransportProviderCluster(
     webRTCSessionID: UShort?,
     sdp: String,
     streamUsage: UByte,
+    originatingEndpointID: UShort,
     videoStreamID: UShort?,
     audioStreamID: UShort?,
     ICEServers: List<WebRTCTransportProviderClusterICEServerStruct>?,
@@ -273,13 +278,16 @@ class WebRTCTransportProviderCluster(
     val TAG_STREAM_USAGE_REQ: Int = 2
     tlvWriter.put(ContextSpecificTag(TAG_STREAM_USAGE_REQ), streamUsage)
 
-    val TAG_VIDEO_STREAM_ID_REQ: Int = 3
+    val TAG_ORIGINATING_ENDPOINT_ID_REQ: Int = 3
+    tlvWriter.put(ContextSpecificTag(TAG_ORIGINATING_ENDPOINT_ID_REQ), originatingEndpointID)
+
+    val TAG_VIDEO_STREAM_ID_REQ: Int = 4
     videoStreamID?.let { tlvWriter.put(ContextSpecificTag(TAG_VIDEO_STREAM_ID_REQ), videoStreamID) }
 
-    val TAG_AUDIO_STREAM_ID_REQ: Int = 4
+    val TAG_AUDIO_STREAM_ID_REQ: Int = 5
     audioStreamID?.let { tlvWriter.put(ContextSpecificTag(TAG_AUDIO_STREAM_ID_REQ), audioStreamID) }
 
-    val TAG_ICE_SERVERS_REQ: Int = 5
+    val TAG_ICE_SERVERS_REQ: Int = 6
     ICEServers?.let {
       tlvWriter.startArray(ContextSpecificTag(TAG_ICE_SERVERS_REQ))
       for (item in ICEServers.iterator()) {
@@ -288,12 +296,12 @@ class WebRTCTransportProviderCluster(
       tlvWriter.endArray()
     }
 
-    val TAG_ICE_TRANSPORT_POLICY_REQ: Int = 6
+    val TAG_ICE_TRANSPORT_POLICY_REQ: Int = 7
     ICETransportPolicy?.let {
       tlvWriter.put(ContextSpecificTag(TAG_ICE_TRANSPORT_POLICY_REQ), ICETransportPolicy)
     }
 
-    val TAG_METADATA_OPTIONS_REQ: Int = 7
+    val TAG_METADATA_OPTIONS_REQ: Int = 8
     metadataOptions?.let {
       tlvWriter.put(ContextSpecificTag(TAG_METADATA_OPTIONS_REQ), metadataOptions)
     }
@@ -328,11 +336,41 @@ class WebRTCTransportProviderCluster(
       }
 
       if (tag == ContextSpecificTag(TAG_VIDEO_STREAM_ID)) {
-        videoStreamID_decoded = tlvReader.getUShort(tag)
+        videoStreamID_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (!tlvReader.isNull()) {
+              if (tlvReader.isNextTag(tag)) {
+                tlvReader.getUShort(tag)
+              } else {
+                null
+              }
+            } else {
+              tlvReader.getNull(tag)
+              null
+            }
+          }
       }
 
       if (tag == ContextSpecificTag(TAG_AUDIO_STREAM_ID)) {
-        audioStreamID_decoded = tlvReader.getUShort(tag)
+        audioStreamID_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (!tlvReader.isNull()) {
+              if (tlvReader.isNextTag(tag)) {
+                tlvReader.getUShort(tag)
+              } else {
+                null
+              }
+            } else {
+              tlvReader.getNull(tag)
+              null
+            }
+          }
       } else {
         tlvReader.skipElement()
       }
@@ -340,14 +378,6 @@ class WebRTCTransportProviderCluster(
 
     if (webRTCSessionID_decoded == null) {
       throw IllegalStateException("webRTCSessionID not found in TLV")
-    }
-
-    if (videoStreamID_decoded == null) {
-      throw IllegalStateException("videoStreamID not found in TLV")
-    }
-
-    if (audioStreamID_decoded == null) {
-      throw IllegalStateException("audioStreamID not found in TLV")
     }
 
     tlvReader.exitContainer()
@@ -387,9 +417,9 @@ class WebRTCTransportProviderCluster(
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun provideICECandidate(
+  suspend fun provideICECandidates(
     webRTCSessionID: UShort,
-    ICECandidate: String,
+    ICECandidates: List<String>,
     timedInvokeTimeout: Duration? = null,
   ) {
     val commandId: UInt = 6u
@@ -400,8 +430,12 @@ class WebRTCTransportProviderCluster(
     val TAG_WEB_RTC_SESSION_ID_REQ: Int = 0
     tlvWriter.put(ContextSpecificTag(TAG_WEB_RTC_SESSION_ID_REQ), webRTCSessionID)
 
-    val TAG_ICE_CANDIDATE_REQ: Int = 1
-    tlvWriter.put(ContextSpecificTag(TAG_ICE_CANDIDATE_REQ), ICECandidate)
+    val TAG_ICE_CANDIDATES_REQ: Int = 1
+    tlvWriter.startArray(ContextSpecificTag(TAG_ICE_CANDIDATES_REQ))
+    for (item in ICECandidates.iterator()) {
+      tlvWriter.put(AnonymousTag, item)
+    }
+    tlvWriter.endArray()
     tlvWriter.endStructure()
 
     val request: InvokeRequest =

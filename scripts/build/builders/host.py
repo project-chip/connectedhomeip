@@ -88,6 +88,8 @@ class HostApp(Enum):
     ENERGY_MANAGEMENT = auto()
     WATER_LEAK_DETECTOR = auto()
     TERMS_AND_CONDITIONS = auto()
+    CAMERA = auto()
+    CAMERA_CONTROLLER = auto()
 
     def ExamplePath(self):
         if self == HostApp.ALL_CLUSTERS:
@@ -164,6 +166,10 @@ class HostApp(Enum):
             return 'water-leak-detector-app/linux'
         elif self == HostApp.TERMS_AND_CONDITIONS:
             return 'terms-and-conditions-app/linux'
+        elif self == HostApp.CAMERA:
+            return 'camera-app/linux'
+        elif self == HostApp.CAMERA_CONTROLLER:
+            return 'camera-controller'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -268,8 +274,8 @@ class HostApp(Enum):
             yield 'chip-rvc-app'
             yield 'chip-rvc-app.map'
         elif self == HostApp.AIR_PURIFIER:
-            yield 'air-purifier-app'
-            yield 'air-purifier-app.map'
+            yield 'chip-air-purifier-app'
+            yield 'chip-air-purifier-app.map'
         elif self == HostApp.LIT_ICD:
             yield 'lit-icd-app'
             yield 'lit-icd-app.map'
@@ -285,6 +291,12 @@ class HostApp(Enum):
         elif self == HostApp.TERMS_AND_CONDITIONS:
             yield 'chip-terms-and-conditions-app'
             yield 'chip-terms-and-conditions-app.map'
+        elif self == HostApp.CAMERA:
+            yield 'chip-camera-app'
+            yield 'chip-camera-app.map'
+        elif self == HostApp.CAMERA_CONTROLLER:
+            yield 'chip-camera-controller'
+            yield 'chip-camera-controller.map'
         else:
             raise Exception('Unknown app type: %r' % self)
 
