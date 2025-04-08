@@ -23,16 +23,20 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/BitFlags.h>
 
-#define StartBitFieldInit
+#define StartBitFieldInit_1
 _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wconversion\"") _Pragma("GCC diagnostic ignored \"-Wnarrowing\"")
-#define EndBitFieldInit _Pragma("GCC diagnostic pop")
+#define EndBitFieldInit_1 _Pragma("GCC diagnostic pop")
+#define StartBitFieldInit_2
+    _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wconversion\"")
+        _Pragma("GCC diagnostic ignored \"-Wnarrowing\"")
+#define EndBitFieldInit_2 _Pragma("GCC diagnostic pop")
 
-    namespace chip
+            namespace chip
 {
     namespace app {
     namespace DataModel {
 
-    /// Represents various endpoint composition patters as defined in the spec
+    /// Represents various endpoint composition patterns as defined in the spec
     /// as `9.2.1. Endpoint Composition patterns`
     enum class EndpointCompositionPattern : uint8_t
     {
@@ -40,7 +44,7 @@ _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wconversion\""
         // device types that support physical device composition (e.g. Refrigerator)
         kTree = 0x1,
 
-        // A full-family pattern is a list fo all descendant endpoints, with no
+        // A full-family pattern is a list of all descendant endpoints, with no
         // imposed hierarchy.
         //
         // For example the Root Node and Aggregator device types use the full-familiy
@@ -93,24 +97,20 @@ _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wconversion\""
     {
         AttributeId attributeId;
 
-        StartBitFieldInit // Start disabling conversion and narrowing warnings
+        StartBitFieldInit_1 // Start disabling conversion and narrowing warnings
 
             // Constructor
             constexpr AttributeEntry(
-                AttributeId id                         = 0,                                     // attributeId initial value
+                AttributeId id = 0,                                                             // attributeId initial value,
+                                                                                                // this could be altered later
                 AttributeQualityFlags attrQualityFlags = AttributeQualityFlags::kListAttribute, // mask.flags initial value
                 Access::Privilege readPriv             = Access::Privilege::kView,              // mask.readPrivilege initial value
                 Access::Privilege writePriv            = Access::Privilege::kView               // mask.writePrivilege initial value
                 ) :
-            attributeId{ id }, mask{ to_underlying(attrQualityFlags) & ((1 << 7) - 1), to_underlying(readPriv) & ((1 << 5) - 1),
-                                     to_underlying(writePriv) & ((1 << 7) - 1) }
+            attributeId{ id }, mask{ to_underlying(attrQualityFlags) & ((1 << 7) - 1), // Narrowing expression to 7 bits
+                                     to_underlying(readPriv) & ((1 << 5) - 1),         // Narrowing expression to 5 bits
+                                     to_underlying(writePriv) & ((1 << 5) - 1) }       // Narrowing expression to 5 bits
         {}
-
-        // Getter for mask.readPrivilege
-        Access::Privilege GetReadPrivilege() const { return static_cast<Access::Privilege>(mask.readPrivilege); }
-
-        // Getter for mask.writePrivilege
-        Access::Privilege GetWritePrivilege() const { return static_cast<Access::Privilege>(mask.writePrivilege); }
 
         AttributeQualityFlags SetFlags(AttributeQualityFlags f)
         {
@@ -122,6 +122,18 @@ _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wconversion\""
             return isSet ? SetFlags(f)
                          : static_cast<AttributeQualityFlags>(mask.flags &= ~(chip::to_underlying(f) & ((1 << 7) - 1)));
         }
+
+        EndBitFieldInit_1 // Start enabling conversion and narrowing warnings
+
+            // Getter for mask.readPrivilege
+            constexpr Access::Privilege
+            GetReadPrivilege() const
+        {
+            return static_cast<Access::Privilege>(mask.readPrivilege);
+        }
+
+        // Getter for mask.writePrivilege
+        constexpr Access::Privilege GetWritePrivilege() const { return static_cast<Access::Privilege>(mask.writePrivilege); }
 
         constexpr bool HasFlags(AttributeQualityFlags f) const { return (mask.flags & chip::to_underlying(f)) != 0; }
 
@@ -181,16 +193,18 @@ _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wconversion\""
     {
         CommandId commandId;
 
-        // Constructor
-        constexpr AcceptedCommandEntry(
-            CommandId id                        = 0,                                  // commandId initial value
-            CommandQualityFlags cmdQualityFlags = CommandQualityFlags::kFabricScoped, // mask.flags initial value
-            Access::Privilege invokePriv        = Access::Privilege::kView            // mask.invokePrivilege initial value
-            ) : commandId(id), mask{ to_underlying(cmdQualityFlags) & ((1 << 3) - 1), to_underlying(invokePriv) & ((1 << 5) - 1) }
-        {}
+        StartBitFieldInit_2 // Start disabling conversion and narrowing warnings
 
-        // Getter for mask.invokePrivilege
-        Access::Privilege GetInvokePrivilege() const { return static_cast<Access::Privilege>(mask.invokePrivilege); }
+            // Constructor
+            constexpr AcceptedCommandEntry(
+                CommandId id = 0,                                                         // commandId initial value,
+                                                                                          // this could be altered later
+                CommandQualityFlags cmdQualityFlags = CommandQualityFlags::kFabricScoped, // mask.flags initial value
+                Access::Privilege invokePriv        = Access::Privilege::kView            // mask.invokePrivilege initial value
+                ) :
+            commandId(id), mask{ to_underlying(cmdQualityFlags) & ((1 << 3) - 1), // Narrowing expression to 3 bits
+                                 to_underlying(invokePriv) & ((1 << 5) - 1) }     // Narrowing expression to 5 bits
+        {}
 
         CommandQualityFlags SetFlags(CommandQualityFlags f)
         {
@@ -202,13 +216,16 @@ _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wconversion\""
             return isSet ? SetFlags(f) : static_cast<CommandQualityFlags>(mask.flags &= ~(chip::to_underlying(f) & ((1 << 3) - 1)));
         }
 
-        EndBitFieldInit // Start enabling conversion and narrowing warnings
+        EndBitFieldInit_2 // Start enabling conversion and narrowing warnings
 
-            constexpr bool
-            HasFlags(CommandQualityFlags f) const
+            // Getter for mask.invokePrivilege
+            constexpr Access::Privilege
+            GetInvokePrivilege() const
         {
-            return (mask.flags & chip::to_underlying(f)) != 0;
+            return static_cast<Access::Privilege>(mask.invokePrivilege);
         }
+
+        constexpr bool HasFlags(CommandQualityFlags f) const { return (mask.flags & chip::to_underlying(f)) != 0; }
 
     private:
         // zero is not a valid privilege, just a default initial value for privileges
@@ -247,3 +264,8 @@ _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wconversion\""
     } // namespace DataModel
     } // namespace app
 } // namespace chip
+
+#undef StartBitFieldInit_1
+#undef EndBitFieldInit_1
+#undef StartBitFieldInit_2
+#undef EndBitFieldInit_2
