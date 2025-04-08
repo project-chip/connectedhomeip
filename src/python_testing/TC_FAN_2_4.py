@@ -88,8 +88,16 @@ class TC_FAN_2_4(MatterBaseTest):
         write_status = result[0].Status
         write_status_success = (write_status == Status.Success)
         asserts.assert_true(write_status_success,
-                            f"[FC] {attribute.__name__} write did not return a result of either SUCCESS ({write_status.name})")
+                            f"[FC] {attribute.__name__} write did not return a result of SUCCESS ({write_status.name}), value: {value}")
         return write_status
+
+    @staticmethod
+    def get_random_wind_setting(wind_support: int, wind_support_range: range) -> int:
+        """
+        Returns a random valid WinddSetting based on the given WindSupport bitmask.
+        """
+        valid_wind_setting_values = [i for i in wind_support_range if (i & wind_support) == i]
+        return random.choice(valid_wind_setting_values)
 
     def pics_TC_FAN_2_4(self) -> list[str]:
         return ["FAN.S.F03"]
@@ -142,7 +150,7 @@ class TC_FAN_2_4(MatterBaseTest):
         # TH writes a valid bit from WindSupport to WindSetting
         # Device shall return SUCCESS
         self.step(5)
-        wind_setting_write = random.choice(valid_wind_support_range)
+        wind_setting_write = self.get_random_wind_setting(wind_support, valid_wind_support_range)
         await self.write_setting(attr.WindSetting, wind_setting_write)
 
         # *** STEP 6 ***
