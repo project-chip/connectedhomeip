@@ -10,9 +10,8 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace CommodityTariff {
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 } // namespace CommodityTariff
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

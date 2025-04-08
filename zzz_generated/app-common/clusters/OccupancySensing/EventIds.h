@@ -16,6 +16,6 @@ inline constexpr EventId Id = 0x00000000;
 } // namespace OccupancyChanged
 } // namespace Events
 } // namespace OccupancySensing
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

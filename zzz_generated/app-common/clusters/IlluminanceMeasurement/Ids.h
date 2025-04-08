@@ -8,4 +8,3 @@
 #include <clusters/IlluminanceMeasurement/ClusterId.h>
 #include <clusters/IlluminanceMeasurement/CommandIds.h>
 #include <clusters/IlluminanceMeasurement/EventIds.h>
-

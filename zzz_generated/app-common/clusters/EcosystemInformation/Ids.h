@@ -8,4 +8,3 @@
 #include <clusters/EcosystemInformation/ClusterId.h>
 #include <clusters/EcosystemInformation/CommandIds.h>
 #include <clusters/EcosystemInformation/EventIds.h>
-

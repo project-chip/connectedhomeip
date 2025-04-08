@@ -14,6 +14,6 @@ namespace WebRTCTransportRequestor {
 inline constexpr ClusterId Id = 0x00000554;
 
 } // namespace WebRTCTransportRequestor
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

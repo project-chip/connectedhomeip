@@ -14,6 +14,6 @@ namespace IcdManagement {
 inline constexpr ClusterId Id = 0x00000046;
 
 } // namespace IcdManagement
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

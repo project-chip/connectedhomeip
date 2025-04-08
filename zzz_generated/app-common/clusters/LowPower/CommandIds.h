@@ -16,6 +16,6 @@ inline constexpr CommandId Id = 0x00000000;
 } // namespace Sleep
 } // namespace Commands
 } // namespace LowPower
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

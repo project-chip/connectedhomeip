@@ -30,7 +30,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace SelectedChime {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = Chime::Attributes::SelectedChime::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
@@ -38,12 +38,11 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Enabled {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = Chime::Attributes::Enabled::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kOperate,
 };
 } // namespace Enabled
-
 
 } // namespace Attributes
 
@@ -51,7 +50,7 @@ namespace Commands {
 namespace PlayChimeSound {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = Chime::Commands::PlayChimeSound::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace PlayChimeSound

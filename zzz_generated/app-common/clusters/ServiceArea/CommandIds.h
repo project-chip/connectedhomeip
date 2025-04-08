@@ -25,6 +25,6 @@ inline constexpr CommandId Id = 0x00000003;
 } // namespace SkipAreaResponse
 } // namespace Commands
 } // namespace ServiceArea
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

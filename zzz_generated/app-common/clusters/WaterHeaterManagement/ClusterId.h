@@ -14,6 +14,6 @@ namespace WaterHeaterManagement {
 inline constexpr ClusterId Id = 0x00000094;
 
 } // namespace WaterHeaterManagement
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

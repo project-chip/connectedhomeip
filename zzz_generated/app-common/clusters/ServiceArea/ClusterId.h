@@ -14,6 +14,6 @@ namespace ServiceArea {
 inline constexpr ClusterId Id = 0x00000150;
 
 } // namespace ServiceArea
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

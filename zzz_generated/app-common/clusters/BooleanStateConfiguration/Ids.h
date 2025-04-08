@@ -8,4 +8,3 @@
 #include <clusters/BooleanStateConfiguration/ClusterId.h>
 #include <clusters/BooleanStateConfiguration/CommandIds.h>
 #include <clusters/BooleanStateConfiguration/EventIds.h>
-

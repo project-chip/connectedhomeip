@@ -14,6 +14,6 @@ namespace PumpConfigurationAndControl {
 inline constexpr ClusterId Id = 0x00000200;
 
 } // namespace PumpConfigurationAndControl
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

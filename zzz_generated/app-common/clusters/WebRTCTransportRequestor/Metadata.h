@@ -28,35 +28,34 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 };
 } // namespace CurrentSessions
 
-
 } // namespace Attributes
 
 namespace Commands {
 namespace Offer {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = WebRTCTransportRequestor::Commands::Offer::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace Offer
 namespace Answer {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = WebRTCTransportRequestor::Commands::Answer::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace Answer
 namespace ICECandidates {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = WebRTCTransportRequestor::Commands::ICECandidates::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace ICECandidates
 namespace End {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = WebRTCTransportRequestor::Commands::End::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace End

@@ -10,9 +10,8 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace PowerTopology {
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 } // namespace PowerTopology
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

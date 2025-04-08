@@ -10,9 +10,8 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace BallastConfiguration {
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 } // namespace BallastConfiguration
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

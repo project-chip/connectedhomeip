@@ -8,4 +8,3 @@
 #include <clusters/ApplicationBasic/ClusterId.h>
 #include <clusters/ApplicationBasic/CommandIds.h>
 #include <clusters/ApplicationBasic/EventIds.h>
-

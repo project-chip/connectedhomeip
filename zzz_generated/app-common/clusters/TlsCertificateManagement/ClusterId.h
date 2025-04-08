@@ -14,6 +14,6 @@ namespace TlsCertificateManagement {
 inline constexpr ClusterId Id = 0x00000801;
 
 } // namespace TlsCertificateManagement
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

@@ -37,6 +37,6 @@ inline constexpr CommandId Id = 0x00000007;
 } // namespace CancelRequest
 } // namespace Commands
 } // namespace DeviceEnergyManagement
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

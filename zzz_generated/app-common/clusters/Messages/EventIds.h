@@ -22,6 +22,6 @@ inline constexpr EventId Id = 0x00000002;
 } // namespace MessageComplete
 } // namespace Events
 } // namespace Messages
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

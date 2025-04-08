@@ -14,6 +14,6 @@ namespace ProxyDiscovery {
 inline constexpr ClusterId Id = 0x00000043;
 
 } // namespace ProxyDiscovery
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

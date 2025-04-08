@@ -8,4 +8,3 @@
 #include <clusters/AirQuality/ClusterId.h>
 #include <clusters/AirQuality/CommandIds.h>
 #include <clusters/AirQuality/EventIds.h>
-

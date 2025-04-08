@@ -4,8 +4,8 @@
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 
-#include <lib/core/DataModelTypes.h>
 #include <app/common/GlobalIds.h>
+#include <lib/core/DataModelTypes.h>
 
 namespace chip {
 namespace app {
@@ -39,6 +39,6 @@ inline constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 
 } // namespace Attributes
 } // namespace EnergyEvseMode
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

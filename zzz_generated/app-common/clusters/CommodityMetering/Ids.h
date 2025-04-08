@@ -8,4 +8,3 @@
 #include <clusters/CommodityMetering/ClusterId.h>
 #include <clusters/CommodityMetering/CommandIds.h>
 #include <clusters/CommodityMetering/EventIds.h>
-

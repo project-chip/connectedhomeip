@@ -14,6 +14,6 @@ namespace RvcCleanMode {
 inline constexpr ClusterId Id = 0x00000055;
 
 } // namespace RvcCleanMode
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

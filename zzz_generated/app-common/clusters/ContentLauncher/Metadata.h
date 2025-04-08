@@ -30,12 +30,11 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace SupportedStreamingProtocols {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ContentLauncher::Attributes::SupportedStreamingProtocols::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace SupportedStreamingProtocols
-
 
 } // namespace Attributes
 
@@ -43,14 +42,14 @@ namespace Commands {
 namespace LaunchContent {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = ContentLauncher::Commands::LaunchContent::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace LaunchContent
 namespace LaunchURL {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = ContentLauncher::Commands::LaunchURL::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace LaunchURL

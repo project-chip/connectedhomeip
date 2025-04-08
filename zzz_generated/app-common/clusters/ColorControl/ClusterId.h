@@ -14,6 +14,6 @@ namespace ColorControl {
 inline constexpr ClusterId Id = 0x00000300;
 
 } // namespace ColorControl
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

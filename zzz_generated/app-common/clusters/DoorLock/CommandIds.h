@@ -94,6 +94,6 @@ inline constexpr CommandId Id = 0x00000025;
 } // namespace GetCredentialStatusResponse
 } // namespace Commands
 } // namespace DoorLock
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

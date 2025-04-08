@@ -64,6 +64,6 @@ inline constexpr EventId Id = 0x00000010;
 } // namespace TurbineOperation
 } // namespace Events
 } // namespace PumpConfigurationAndControl
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

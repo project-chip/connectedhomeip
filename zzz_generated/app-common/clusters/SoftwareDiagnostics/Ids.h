@@ -8,4 +8,3 @@
 #include <clusters/SoftwareDiagnostics/ClusterId.h>
 #include <clusters/SoftwareDiagnostics/CommandIds.h>
 #include <clusters/SoftwareDiagnostics/EventIds.h>
-

@@ -8,4 +8,3 @@
 #include <clusters/BridgedDeviceBasicInformation/ClusterId.h>
 #include <clusters/BridgedDeviceBasicInformation/CommandIds.h>
 #include <clusters/BridgedDeviceBasicInformation/EventIds.h>
-

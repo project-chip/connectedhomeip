@@ -14,6 +14,6 @@ namespace FaultInjection {
 inline constexpr ClusterId Id = 0xFFF1FC06;
 
 } // namespace FaultInjection
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

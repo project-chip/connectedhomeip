@@ -8,4 +8,3 @@
 #include <clusters/RvcOperationalState/ClusterId.h>
 #include <clusters/RvcOperationalState/CommandIds.h>
 #include <clusters/RvcOperationalState/EventIds.h>
-

@@ -10,9 +10,8 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace OtaSoftwareUpdateProvider {
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 } // namespace OtaSoftwareUpdateProvider
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

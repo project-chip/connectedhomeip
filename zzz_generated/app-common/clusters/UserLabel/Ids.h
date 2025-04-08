@@ -8,4 +8,3 @@
 #include <clusters/UserLabel/ClusterId.h>
 #include <clusters/UserLabel/CommandIds.h>
 #include <clusters/UserLabel/EventIds.h>
-

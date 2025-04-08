@@ -14,6 +14,6 @@ namespace NetworkCommissioning {
 inline constexpr ClusterId Id = 0x00000031;
 
 } // namespace NetworkCommissioning
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

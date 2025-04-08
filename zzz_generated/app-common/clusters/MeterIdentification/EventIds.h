@@ -10,9 +10,8 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace MeterIdentification {
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 } // namespace MeterIdentification
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

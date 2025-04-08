@@ -10,9 +10,8 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace MediaInput {
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 } // namespace MediaInput
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

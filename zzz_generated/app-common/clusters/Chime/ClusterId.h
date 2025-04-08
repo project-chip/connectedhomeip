@@ -14,6 +14,6 @@ namespace Chime {
 inline constexpr ClusterId Id = 0x00000556;
 
 } // namespace Chime
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

@@ -8,4 +8,3 @@
 #include <clusters/Pm1ConcentrationMeasurement/ClusterId.h>
 #include <clusters/Pm1ConcentrationMeasurement/CommandIds.h>
 #include <clusters/Pm1ConcentrationMeasurement/EventIds.h>
-

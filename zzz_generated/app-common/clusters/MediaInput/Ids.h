@@ -8,4 +8,3 @@
 #include <clusters/MediaInput/ClusterId.h>
 #include <clusters/MediaInput/CommandIds.h>
 #include <clusters/MediaInput/EventIds.h>
-

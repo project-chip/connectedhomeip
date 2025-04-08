@@ -22,7 +22,7 @@ namespace Attributes {
 namespace Mask {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = DishwasherAlarm::Attributes::Mask::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -30,7 +30,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Latch {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = DishwasherAlarm::Attributes::Latch::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -38,7 +38,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace State {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = DishwasherAlarm::Attributes::State::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -46,12 +46,11 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Supported {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = DishwasherAlarm::Attributes::Supported::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace Supported
-
 
 } // namespace Attributes
 
@@ -59,14 +58,14 @@ namespace Commands {
 namespace Reset {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = DishwasherAlarm::Commands::Reset::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace Reset
 namespace ModifyEnabledAlarms {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = DishwasherAlarm::Commands::ModifyEnabledAlarms::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace ModifyEnabledAlarms

@@ -8,4 +8,3 @@
 #include <clusters/ActivatedCarbonFilterMonitoring/ClusterId.h>
 #include <clusters/ActivatedCarbonFilterMonitoring/CommandIds.h>
 #include <clusters/ActivatedCarbonFilterMonitoring/EventIds.h>
-

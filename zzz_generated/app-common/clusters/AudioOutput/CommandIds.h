@@ -19,6 +19,6 @@ inline constexpr CommandId Id = 0x00000001;
 } // namespace RenameOutput
 } // namespace Commands
 } // namespace AudioOutput
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

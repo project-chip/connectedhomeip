@@ -8,4 +8,3 @@
 #include <clusters/BallastConfiguration/ClusterId.h>
 #include <clusters/BallastConfiguration/CommandIds.h>
 #include <clusters/BallastConfiguration/EventIds.h>
-

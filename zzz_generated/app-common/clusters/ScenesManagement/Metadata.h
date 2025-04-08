@@ -22,7 +22,7 @@ namespace Attributes {
 namespace SceneTableSize {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ScenesManagement::Attributes::SceneTableSize::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -35,7 +35,6 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .writePrivilege = std::nullopt,
 };
 } // namespace FabricSceneInfo
-
 
 } // namespace Attributes
 

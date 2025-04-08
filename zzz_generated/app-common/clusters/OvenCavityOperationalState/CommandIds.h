@@ -28,6 +28,6 @@ inline constexpr CommandId Id = 0x00000004;
 } // namespace OperationalCommandResponse
 } // namespace Commands
 } // namespace OvenCavityOperationalState
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

@@ -8,4 +8,3 @@
 #include <clusters/Channel/ClusterId.h>
 #include <clusters/Channel/CommandIds.h>
 #include <clusters/Channel/EventIds.h>
-

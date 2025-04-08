@@ -19,6 +19,6 @@ inline constexpr CommandId Id = 0x00000001;
 } // namespace CancelMessagesRequest
 } // namespace Commands
 } // namespace Messages
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

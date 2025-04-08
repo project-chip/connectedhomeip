@@ -14,6 +14,6 @@ namespace BooleanStateConfiguration {
 inline constexpr ClusterId Id = 0x00000080;
 
 } // namespace BooleanStateConfiguration
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

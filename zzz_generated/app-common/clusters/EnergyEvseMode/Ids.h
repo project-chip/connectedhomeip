@@ -8,4 +8,3 @@
 #include <clusters/EnergyEvseMode/ClusterId.h>
 #include <clusters/EnergyEvseMode/CommandIds.h>
 #include <clusters/EnergyEvseMode/EventIds.h>
-

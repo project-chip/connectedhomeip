@@ -28,7 +28,6 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 };
 } // namespace CurrentSessions
 
-
 } // namespace Attributes
 
 namespace Commands {

@@ -46,6 +46,6 @@ inline constexpr CommandId Id = 0x0000000A;
 } // namespace QueryIdentityResponse
 } // namespace Commands
 } // namespace NetworkCommissioning
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

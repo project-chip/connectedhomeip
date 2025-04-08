@@ -43,6 +43,6 @@ inline constexpr CommandId Id = 0x00000003;
 } // namespace RemoveGroupResponse
 } // namespace Commands
 } // namespace Groups
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

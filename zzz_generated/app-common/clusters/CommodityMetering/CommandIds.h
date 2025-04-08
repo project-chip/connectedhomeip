@@ -10,9 +10,8 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace CommodityMetering {
-namespace Commands {
-} // namespace Commands
+namespace Commands {} // namespace Commands
 } // namespace CommodityMetering
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

@@ -8,4 +8,3 @@
 #include <clusters/Timer/ClusterId.h>
 #include <clusters/Timer/CommandIds.h>
 #include <clusters/Timer/EventIds.h>
-

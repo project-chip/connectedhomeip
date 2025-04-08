@@ -14,6 +14,6 @@ namespace DiagnosticLogs {
 inline constexpr ClusterId Id = 0x00000032;
 
 } // namespace DiagnosticLogs
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

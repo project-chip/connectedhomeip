@@ -22,7 +22,7 @@ namespace Attributes {
 namespace Mask {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = RefrigeratorAlarm::Attributes::Mask::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -30,7 +30,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace State {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = RefrigeratorAlarm::Attributes::State::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -38,18 +38,15 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Supported {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = RefrigeratorAlarm::Attributes::Supported::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace Supported
 
-
 } // namespace Attributes
 
-namespace Commands {
-
-} // namespace Commands
+namespace Commands {} // namespace Commands
 } // namespace RefrigeratorAlarm
 } // namespace Clusters
 } // namespace app

@@ -38,7 +38,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace MaxGroupsPerFabric {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = GroupKeyManagement::Attributes::MaxGroupsPerFabric::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -46,12 +46,11 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace MaxGroupKeysPerFabric {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = GroupKeyManagement::Attributes::MaxGroupKeysPerFabric::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace MaxGroupKeysPerFabric
-
 
 } // namespace Attributes
 

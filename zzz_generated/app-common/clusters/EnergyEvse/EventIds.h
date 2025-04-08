@@ -31,6 +31,6 @@ inline constexpr EventId Id = 0x00000005;
 } // namespace Rfid
 } // namespace Events
 } // namespace EnergyEvse
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

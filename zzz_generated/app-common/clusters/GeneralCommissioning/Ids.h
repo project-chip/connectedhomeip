@@ -8,4 +8,3 @@
 #include <clusters/GeneralCommissioning/ClusterId.h>
 #include <clusters/GeneralCommissioning/CommandIds.h>
 #include <clusters/GeneralCommissioning/EventIds.h>
-

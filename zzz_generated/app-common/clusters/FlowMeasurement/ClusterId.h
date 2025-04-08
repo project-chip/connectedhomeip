@@ -14,6 +14,6 @@ namespace FlowMeasurement {
 inline constexpr ClusterId Id = 0x00000404;
 
 } // namespace FlowMeasurement
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

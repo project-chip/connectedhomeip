@@ -8,4 +8,3 @@
 #include <clusters/ThreadBorderRouterManagement/ClusterId.h>
 #include <clusters/ThreadBorderRouterManagement/CommandIds.h>
 #include <clusters/ThreadBorderRouterManagement/EventIds.h>
-

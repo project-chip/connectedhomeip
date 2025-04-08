@@ -25,6 +25,6 @@ inline constexpr CommandId Id = 0x00000001;
 } // namespace GetDayEntryResponse
 } // namespace Commands
 } // namespace CommodityTariff
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

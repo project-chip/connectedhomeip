@@ -14,6 +14,6 @@ namespace DemandResponseLoadControl {
 inline constexpr ClusterId Id = 0x00000096;
 
 } // namespace DemandResponseLoadControl
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

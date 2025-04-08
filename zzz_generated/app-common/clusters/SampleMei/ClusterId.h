@@ -14,6 +14,6 @@ namespace SampleMei {
 inline constexpr ClusterId Id = 0xFFF1FC20;
 
 } // namespace SampleMei
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

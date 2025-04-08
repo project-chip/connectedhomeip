@@ -22,7 +22,7 @@ namespace Attributes {
 namespace PhysicalMinLevel {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = BallastConfiguration::Attributes::PhysicalMinLevel::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -30,7 +30,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace PhysicalMaxLevel {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = BallastConfiguration::Attributes::PhysicalMaxLevel::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -38,7 +38,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace BallastStatus {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = BallastConfiguration::Attributes::BallastStatus::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -46,7 +46,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace MinLevel {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = BallastConfiguration::Attributes::MinLevel::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
@@ -54,7 +54,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace MaxLevel {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = BallastConfiguration::Attributes::MaxLevel::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
@@ -62,7 +62,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace IntrinsicBallastFactor {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = BallastConfiguration::Attributes::IntrinsicBallastFactor::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
@@ -70,7 +70,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace BallastFactorAdjustment {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = BallastConfiguration::Attributes::BallastFactorAdjustment::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
@@ -78,7 +78,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace LampQuantity {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = BallastConfiguration::Attributes::LampQuantity::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -86,7 +86,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace LampType {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = BallastConfiguration::Attributes::LampType::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
@@ -94,7 +94,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace LampManufacturer {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = BallastConfiguration::Attributes::LampManufacturer::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
@@ -102,7 +102,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace LampRatedHours {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = BallastConfiguration::Attributes::LampRatedHours::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
@@ -110,7 +110,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace LampBurnHours {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = BallastConfiguration::Attributes::LampBurnHours::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
@@ -118,7 +118,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace LampAlarmMode {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = BallastConfiguration::Attributes::LampAlarmMode::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
@@ -126,18 +126,15 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace LampBurnHoursTripPoint {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = BallastConfiguration::Attributes::LampBurnHoursTripPoint::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
 } // namespace LampBurnHoursTripPoint
 
-
 } // namespace Attributes
 
-namespace Commands {
-
-} // namespace Commands
+namespace Commands {} // namespace Commands
 } // namespace BallastConfiguration
 } // namespace Clusters
 } // namespace app

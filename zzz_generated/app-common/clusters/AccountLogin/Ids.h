@@ -8,4 +8,3 @@
 #include <clusters/AccountLogin/ClusterId.h>
 #include <clusters/AccountLogin/CommandIds.h>
 #include <clusters/AccountLogin/EventIds.h>
-

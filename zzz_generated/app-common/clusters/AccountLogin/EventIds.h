@@ -16,6 +16,6 @@ inline constexpr EventId Id = 0x00000000;
 } // namespace LoggedOut
 } // namespace Events
 } // namespace AccountLogin
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

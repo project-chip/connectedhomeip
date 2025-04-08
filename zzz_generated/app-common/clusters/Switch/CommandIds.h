@@ -10,9 +10,8 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace Switch {
-namespace Commands {
-} // namespace Commands
+namespace Commands {} // namespace Commands
 } // namespace Switch
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

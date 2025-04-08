@@ -14,6 +14,6 @@ namespace MicrowaveOvenMode {
 inline constexpr ClusterId Id = 0x0000005E;
 
 } // namespace MicrowaveOvenMode
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

@@ -8,4 +8,3 @@
 #include <clusters/NitrogenDioxideConcentrationMeasurement/ClusterId.h>
 #include <clusters/NitrogenDioxideConcentrationMeasurement/CommandIds.h>
 #include <clusters/NitrogenDioxideConcentrationMeasurement/EventIds.h>
-

@@ -22,7 +22,7 @@ namespace Attributes {
 namespace PreferredExtendedPanID {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ThreadNetworkDirectory::Attributes::PreferredExtendedPanID::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kManage,
     .writePrivilege = Access::Privilege::kManage,
 };
@@ -38,12 +38,11 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace ThreadNetworkTableSize {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = ThreadNetworkDirectory::Attributes::ThreadNetworkTableSize::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace ThreadNetworkTableSize
-
 
 } // namespace Attributes
 
@@ -65,7 +64,7 @@ inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
 namespace GetOperationalDataset {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = ThreadNetworkDirectory::Commands::GetOperationalDataset::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace GetOperationalDataset

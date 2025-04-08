@@ -31,6 +31,6 @@ inline constexpr CommandId Id = 0x00000003;
 } // namespace SetTimeZoneResponse
 } // namespace Commands
 } // namespace TimeSynchronization
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

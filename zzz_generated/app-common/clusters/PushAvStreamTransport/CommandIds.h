@@ -37,6 +37,6 @@ inline constexpr CommandId Id = 0x00000007;
 } // namespace FindTransportResponse
 } // namespace Commands
 } // namespace PushAvStreamTransport
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

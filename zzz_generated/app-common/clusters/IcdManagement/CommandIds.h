@@ -28,6 +28,6 @@ inline constexpr CommandId Id = 0x00000004;
 } // namespace StayActiveResponse
 } // namespace Commands
 } // namespace IcdManagement
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

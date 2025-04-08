@@ -14,6 +14,6 @@ namespace BallastConfiguration {
 inline constexpr ClusterId Id = 0x00000301;
 
 } // namespace BallastConfiguration
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

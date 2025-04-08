@@ -8,4 +8,3 @@
 #include <clusters/OvenCavityOperationalState/ClusterId.h>
 #include <clusters/OvenCavityOperationalState/CommandIds.h>
 #include <clusters/OvenCavityOperationalState/EventIds.h>
-

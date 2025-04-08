@@ -14,6 +14,6 @@ namespace ProxyConfiguration {
 inline constexpr ClusterId Id = 0x00000042;
 
 } // namespace ProxyConfiguration
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

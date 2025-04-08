@@ -14,6 +14,6 @@ namespace AirQuality {
 inline constexpr ClusterId Id = 0x0000005B;
 
 } // namespace AirQuality
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

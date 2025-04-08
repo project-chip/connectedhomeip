@@ -8,4 +8,3 @@
 #include <clusters/TotalVolatileOrganicCompoundsConcentrationMeasurement/ClusterId.h>
 #include <clusters/TotalVolatileOrganicCompoundsConcentrationMeasurement/CommandIds.h>
 #include <clusters/TotalVolatileOrganicCompoundsConcentrationMeasurement/EventIds.h>
-

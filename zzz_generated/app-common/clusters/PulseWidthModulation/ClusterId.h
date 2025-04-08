@@ -14,6 +14,6 @@ namespace PulseWidthModulation {
 inline constexpr ClusterId Id = 0x0000001C;
 
 } // namespace PulseWidthModulation
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

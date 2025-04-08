@@ -8,4 +8,3 @@
 #include <clusters/WindowCovering/ClusterId.h>
 #include <clusters/WindowCovering/CommandIds.h>
 #include <clusters/WindowCovering/EventIds.h>
-

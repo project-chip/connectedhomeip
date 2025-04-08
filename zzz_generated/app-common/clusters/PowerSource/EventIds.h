@@ -22,6 +22,6 @@ inline constexpr EventId Id = 0x00000002;
 } // namespace BatChargeFaultChange
 } // namespace Events
 } // namespace PowerSource
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

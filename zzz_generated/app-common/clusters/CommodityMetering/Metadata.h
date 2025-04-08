@@ -30,7 +30,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace MeteredQuantityTimestamp {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = CommodityMetering::Attributes::MeteredQuantityTimestamp::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -38,18 +38,15 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace MeasurementType {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = CommodityMetering::Attributes::MeasurementType::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace MeasurementType
 
-
 } // namespace Attributes
 
-namespace Commands {
-
-} // namespace Commands
+namespace Commands {} // namespace Commands
 } // namespace CommodityMetering
 } // namespace Clusters
 } // namespace app

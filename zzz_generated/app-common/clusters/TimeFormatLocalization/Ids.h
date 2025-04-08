@@ -8,4 +8,3 @@
 #include <clusters/TimeFormatLocalization/ClusterId.h>
 #include <clusters/TimeFormatLocalization/CommandIds.h>
 #include <clusters/TimeFormatLocalization/EventIds.h>
-

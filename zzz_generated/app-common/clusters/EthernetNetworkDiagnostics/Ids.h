@@ -8,4 +8,3 @@
 #include <clusters/EthernetNetworkDiagnostics/ClusterId.h>
 #include <clusters/EthernetNetworkDiagnostics/CommandIds.h>
 #include <clusters/EthernetNetworkDiagnostics/EventIds.h>
-

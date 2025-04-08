@@ -30,7 +30,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Lineup {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = Channel::Attributes::Lineup::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -38,12 +38,11 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace CurrentChannel {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = Channel::Attributes::CurrentChannel::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace CurrentChannel
-
 
 } // namespace Attributes
 
@@ -51,42 +50,42 @@ namespace Commands {
 namespace ChangeChannel {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = Channel::Commands::ChangeChannel::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace ChangeChannel
 namespace ChangeChannelByNumber {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = Channel::Commands::ChangeChannelByNumber::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace ChangeChannelByNumber
 namespace SkipChannel {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = Channel::Commands::SkipChannel::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace SkipChannel
 namespace GetProgramGuide {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = Channel::Commands::GetProgramGuide::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace GetProgramGuide
 namespace RecordProgram {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = Channel::Commands::RecordProgram::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace RecordProgram
 namespace CancelRecordProgram {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = Channel::Commands::CancelRecordProgram::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace CancelRecordProgram

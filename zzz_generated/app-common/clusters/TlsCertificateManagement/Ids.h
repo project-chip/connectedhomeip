@@ -8,4 +8,3 @@
 #include <clusters/TlsCertificateManagement/ClusterId.h>
 #include <clusters/TlsCertificateManagement/CommandIds.h>
 #include <clusters/TlsCertificateManagement/EventIds.h>
-

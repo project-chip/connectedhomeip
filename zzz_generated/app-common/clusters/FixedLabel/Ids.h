@@ -8,4 +8,3 @@
 #include <clusters/FixedLabel/ClusterId.h>
 #include <clusters/FixedLabel/CommandIds.h>
 #include <clusters/FixedLabel/EventIds.h>
-

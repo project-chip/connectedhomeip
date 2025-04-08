@@ -19,6 +19,6 @@ inline constexpr EventId Id = 0x00000001;
 } // namespace NetworkFaultChange
 } // namespace Events
 } // namespace ThreadNetworkDiagnostics
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

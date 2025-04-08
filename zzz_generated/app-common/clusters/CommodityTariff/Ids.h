@@ -8,4 +8,3 @@
 #include <clusters/CommodityTariff/ClusterId.h>
 #include <clusters/CommodityTariff/CommandIds.h>
 #include <clusters/CommodityTariff/EventIds.h>
-

@@ -8,4 +8,3 @@
 #include <clusters/GroupKeyManagement/ClusterId.h>
 #include <clusters/GroupKeyManagement/CommandIds.h>
 #include <clusters/GroupKeyManagement/EventIds.h>
-

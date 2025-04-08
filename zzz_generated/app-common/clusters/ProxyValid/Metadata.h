@@ -18,14 +18,9 @@ namespace ProxyValid {
 
 inline constexpr uint32_t kRevision = 1;
 
-namespace Attributes {
+namespace Attributes {} // namespace Attributes
 
-
-} // namespace Attributes
-
-namespace Commands {
-
-} // namespace Commands
+namespace Commands {} // namespace Commands
 } // namespace ProxyValid
 } // namespace Clusters
 } // namespace app

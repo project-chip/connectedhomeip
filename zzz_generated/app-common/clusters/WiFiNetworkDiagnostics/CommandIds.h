@@ -16,6 +16,6 @@ inline constexpr CommandId Id = 0x00000000;
 } // namespace ResetCounts
 } // namespace Commands
 } // namespace WiFiNetworkDiagnostics
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

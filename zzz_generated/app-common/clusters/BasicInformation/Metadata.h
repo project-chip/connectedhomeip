@@ -22,7 +22,7 @@ namespace Attributes {
 namespace DataModelRevision {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = BasicInformation::Attributes::DataModelRevision::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -30,7 +30,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace VendorName {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = BasicInformation::Attributes::VendorName::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -38,7 +38,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace VendorID {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = BasicInformation::Attributes::VendorID::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -46,7 +46,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace ProductName {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = BasicInformation::Attributes::ProductName::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -54,7 +54,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace ProductID {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = BasicInformation::Attributes::ProductID::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -62,7 +62,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace NodeLabel {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = BasicInformation::Attributes::NodeLabel::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
@@ -70,7 +70,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Location {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = BasicInformation::Attributes::Location::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kAdminister,
 };
@@ -78,7 +78,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace HardwareVersion {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = BasicInformation::Attributes::HardwareVersion::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -86,7 +86,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace HardwareVersionString {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = BasicInformation::Attributes::HardwareVersionString::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -94,7 +94,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace SoftwareVersion {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = BasicInformation::Attributes::SoftwareVersion::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -102,7 +102,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace SoftwareVersionString {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = BasicInformation::Attributes::SoftwareVersionString::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -110,7 +110,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace ManufacturingDate {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = BasicInformation::Attributes::ManufacturingDate::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -118,7 +118,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace PartNumber {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = BasicInformation::Attributes::PartNumber::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -126,7 +126,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace ProductURL {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = BasicInformation::Attributes::ProductURL::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -134,7 +134,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace ProductLabel {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = BasicInformation::Attributes::ProductLabel::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -142,7 +142,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace SerialNumber {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = BasicInformation::Attributes::SerialNumber::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -150,7 +150,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace LocalConfigDisabled {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = BasicInformation::Attributes::LocalConfigDisabled::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = Access::Privilege::kManage,
 };
@@ -158,7 +158,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace Reachable {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = BasicInformation::Attributes::Reachable::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -166,7 +166,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace UniqueID {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = BasicInformation::Attributes::UniqueID::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -174,7 +174,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace CapabilityMinima {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = BasicInformation::Attributes::CapabilityMinima::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -182,7 +182,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace ProductAppearance {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = BasicInformation::Attributes::ProductAppearance::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -190,7 +190,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace SpecificationVersion {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = BasicInformation::Attributes::SpecificationVersion::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
@@ -198,12 +198,11 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry = {
 namespace MaxPathsPerInvoke {
 inline constexpr DataModel::AttributeEntry kMetadataEntry = {
     .attributeId    = BasicInformation::Attributes::MaxPathsPerInvoke::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{  },
+    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
     .readPrivilege  = Access::Privilege::kView,
     .writePrivilege = std::nullopt,
 };
 } // namespace MaxPathsPerInvoke
-
 
 } // namespace Attributes
 
@@ -211,7 +210,7 @@ namespace Commands {
 namespace MfgSpecificPing {
 inline constexpr DataModel::AcceptedCommandEntry kMetatadaEntry = {
     .commandId       = BasicInformation::Commands::MfgSpecificPing::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{  },
+    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
     .invokePrivilege = Access::Privilege::kOperate,
 };
 } // namespace MfgSpecificPing

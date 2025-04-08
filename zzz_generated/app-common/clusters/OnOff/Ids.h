@@ -8,4 +8,3 @@
 #include <clusters/OnOff/ClusterId.h>
 #include <clusters/OnOff/CommandIds.h>
 #include <clusters/OnOff/EventIds.h>
-

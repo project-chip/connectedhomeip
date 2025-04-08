@@ -8,4 +8,3 @@
 #include <clusters/OtaSoftwareUpdateRequestor/ClusterId.h>
 #include <clusters/OtaSoftwareUpdateRequestor/CommandIds.h>
 #include <clusters/OtaSoftwareUpdateRequestor/EventIds.h>
-

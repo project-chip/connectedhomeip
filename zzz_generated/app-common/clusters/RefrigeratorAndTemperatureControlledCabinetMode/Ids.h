@@ -8,4 +8,3 @@
 #include <clusters/RefrigeratorAndTemperatureControlledCabinetMode/ClusterId.h>
 #include <clusters/RefrigeratorAndTemperatureControlledCabinetMode/CommandIds.h>
 #include <clusters/RefrigeratorAndTemperatureControlledCabinetMode/EventIds.h>
-

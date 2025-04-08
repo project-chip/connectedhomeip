@@ -14,6 +14,6 @@ namespace ThermostatUserInterfaceConfiguration {
 inline constexpr ClusterId Id = 0x00000204;
 
 } // namespace ThermostatUserInterfaceConfiguration
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

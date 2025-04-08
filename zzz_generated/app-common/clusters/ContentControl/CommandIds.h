@@ -46,6 +46,6 @@ inline constexpr CommandId Id = 0x00000002;
 } // namespace ResetPINResponse
 } // namespace Commands
 } // namespace ContentControl
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

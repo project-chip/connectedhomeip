@@ -14,6 +14,6 @@ namespace TargetNavigator {
 inline constexpr ClusterId Id = 0x00000505;
 
 } // namespace TargetNavigator
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

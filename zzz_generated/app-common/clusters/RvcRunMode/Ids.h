@@ -8,4 +8,3 @@
 #include <clusters/RvcRunMode/ClusterId.h>
 #include <clusters/RvcRunMode/CommandIds.h>
 #include <clusters/RvcRunMode/EventIds.h>
-

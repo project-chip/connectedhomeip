@@ -14,6 +14,6 @@ namespace RvcRunMode {
 inline constexpr ClusterId Id = 0x00000054;
 
 } // namespace RvcRunMode
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

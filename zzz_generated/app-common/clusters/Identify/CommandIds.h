@@ -19,6 +19,6 @@ inline constexpr CommandId Id = 0x00000040;
 } // namespace TriggerEffect
 } // namespace Commands
 } // namespace Identify
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

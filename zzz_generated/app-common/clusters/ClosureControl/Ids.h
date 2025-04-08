@@ -8,4 +8,3 @@
 #include <clusters/ClosureControl/ClusterId.h>
 #include <clusters/ClosureControl/CommandIds.h>
 #include <clusters/ClosureControl/EventIds.h>
-

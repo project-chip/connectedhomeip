@@ -14,6 +14,6 @@ namespace ModeSelect {
 inline constexpr ClusterId Id = 0x00000050;
 
 } // namespace ModeSelect
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

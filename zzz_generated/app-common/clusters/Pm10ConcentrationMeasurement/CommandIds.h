@@ -10,9 +10,8 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace Pm10ConcentrationMeasurement {
-namespace Commands {
-} // namespace Commands
+namespace Commands {} // namespace Commands
 } // namespace Pm10ConcentrationMeasurement
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

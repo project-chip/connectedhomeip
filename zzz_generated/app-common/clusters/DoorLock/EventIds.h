@@ -28,6 +28,6 @@ inline constexpr EventId Id = 0x00000004;
 } // namespace LockUserChange
 } // namespace Events
 } // namespace DoorLock
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

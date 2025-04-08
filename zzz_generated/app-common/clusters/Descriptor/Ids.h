@@ -8,4 +8,3 @@
 #include <clusters/Descriptor/ClusterId.h>
 #include <clusters/Descriptor/CommandIds.h>
 #include <clusters/Descriptor/EventIds.h>
-

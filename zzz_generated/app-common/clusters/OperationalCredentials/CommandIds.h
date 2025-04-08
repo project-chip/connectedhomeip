@@ -58,6 +58,6 @@ inline constexpr CommandId Id = 0x0000000E;
 } // namespace SignVIDVerificationResponse
 } // namespace Commands
 } // namespace OperationalCredentials
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

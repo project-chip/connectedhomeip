@@ -10,9 +10,8 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace ContentLauncher {
-namespace Events {
-} // namespace Events
+namespace Events {} // namespace Events
 } // namespace ContentLauncher
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

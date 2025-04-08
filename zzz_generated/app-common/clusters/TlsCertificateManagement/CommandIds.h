@@ -58,6 +58,6 @@ inline constexpr CommandId Id = 0x0000000D;
 } // namespace LookupClientCertificateResponse
 } // namespace Commands
 } // namespace TlsCertificateManagement
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

@@ -28,6 +28,6 @@ inline constexpr CommandId Id = 0x00000002;
 } // namespace DatasetResponse
 } // namespace Commands
 } // namespace ThreadBorderRouterManagement
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

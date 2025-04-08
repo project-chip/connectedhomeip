@@ -8,4 +8,3 @@
 #include <clusters/FanControl/ClusterId.h>
 #include <clusters/FanControl/CommandIds.h>
 #include <clusters/FanControl/EventIds.h>
-

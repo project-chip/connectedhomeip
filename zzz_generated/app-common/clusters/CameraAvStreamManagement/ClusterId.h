@@ -14,6 +14,6 @@ namespace CameraAvStreamManagement {
 inline constexpr ClusterId Id = 0x00000551;
 
 } // namespace CameraAvStreamManagement
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

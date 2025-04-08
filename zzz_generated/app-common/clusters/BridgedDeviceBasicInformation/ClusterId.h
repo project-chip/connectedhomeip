@@ -14,6 +14,6 @@ namespace BridgedDeviceBasicInformation {
 inline constexpr ClusterId Id = 0x00000039;
 
 } // namespace BridgedDeviceBasicInformation
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

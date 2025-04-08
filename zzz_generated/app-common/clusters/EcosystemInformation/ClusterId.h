@@ -14,6 +14,6 @@ namespace EcosystemInformation {
 inline constexpr ClusterId Id = 0x00000750;
 
 } // namespace EcosystemInformation
-} // namespace app
 } // namespace Clusters
+} // namespace app
 } // namespace chip

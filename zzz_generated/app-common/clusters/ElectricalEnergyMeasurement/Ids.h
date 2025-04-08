@@ -8,4 +8,3 @@
 #include <clusters/ElectricalEnergyMeasurement/ClusterId.h>
 #include <clusters/ElectricalEnergyMeasurement/CommandIds.h>
 #include <clusters/ElectricalEnergyMeasurement/EventIds.h>
-
