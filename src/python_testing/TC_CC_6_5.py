@@ -77,6 +77,13 @@ class TC_CC_6_5(MatterBaseTest):
         # Pre-Condition: Commissioning
         self.step("0")
         self.TH1 = self.default_controller
+        try:
+            await self.TH1.ResolveNode(self.dut_node_id)
+        except Exception as e:
+            self.logger.warning(f"Resolving node {self.dut_node_id} failed, continuing test anyway: {e}")
+        
+        if not self.TH1.HasSecureSessionToNode(self.dut_node_id):
+            raise Exception(f"Secure session to node {self.dut_node_id} could not be established.")
 
     @async_test_body
     async def test_TC_CC_6_5(self):
@@ -84,7 +91,7 @@ class TC_CC_6_5(MatterBaseTest):
         attributes = cluster.Attributes
         # Step 0a: Write 0x00 to Options attribute
         self.step("0a")
-        await self.TH1.WriteAttribute(self.dut_node_id, [(attributes.Options, 0x00)])
+        await self.TH1.WriteAttribute(self.dut_node_id, [(attributes.Options, attributes.Options.Type(0x00))])
 
         # Step 0b: Send On command
         self.step("0b")
@@ -129,7 +136,7 @@ class TC_CC_6_5(MatterBaseTest):
 
         # Step 2a: Write StartUpColorTemperatureMireds
         self.step("2a")
-        test_value = min_mireds + ((max_mireds - min_mireds) // 2)  # Use midpoint value
+        test_value = min_mireds.value + ((max_mireds.value - min_mireds.value) // 2) # Use midpoint value
         response = await self.TH1.WriteAttribute(self.dut_node_id, [(attributes.StartUpColorTemperatureMireds, test_value)])
 
         # Verify DUT responds with a successful (value 0x00) status response.
@@ -142,7 +149,7 @@ class TC_CC_6_5(MatterBaseTest):
         
         # Verify that the DUT response contains StartUpColorTemperatureMireds that matches the StartUpColorTemperatureMireds 
         # set in Step 2a
-        asserts.assert_equal(verify_startup, test_value, "StartUpColorTemperatureMireds write verification failed")
+        asserts.assert_equal(verify_startup.value, test_value, "StartUpColorTemperatureMireds write verification failed")
 
         # Step 3a & 3b: Power cycle handled by test harness
         self.step("3a")
@@ -158,7 +165,7 @@ class TC_CC_6_5(MatterBaseTest):
 
         # Verify that the DUT response indicates that the StartUpColorTemperatureMireds
         #  attribute matches the StartUpColorTemperatureMireds set in Step 2a
-        asserts.assert_equal(post_cycle_startup, test_value, 
+        asserts.assert_equal(post_cycle_startup.value, test_value, 
                              "StartUpColorTemperatureMireds matches StartUpColorTemperatureMireds after power cycle")
 
         # Step 4b: TH reads from the DUT the ColorTemperatureMireds attribute from DUT.
@@ -167,7 +174,7 @@ class TC_CC_6_5(MatterBaseTest):
 
         # Verify that the DUT response indicates that the ColorTemperatureMireds 
         # attribute is StartUpColorTemperatureMireds
-        asserts.assert_equal(post_cycle_color, test_value, 
+        asserts.assert_equal(post_cycle_color.value, test_value, 
                              "ColorTemperatureMireds matches StartUpColorTemperatureMireds after power cycle")
 
         # Step 5a: Read ColorMode
@@ -176,7 +183,7 @@ class TC_CC_6_5(MatterBaseTest):
 
         # Verify that the DUT response indicates that the ColorTemperatureMireds 
         # attribute is StartUpColorTemperatureMireds
-        asserts.assert_equal(color_mode, attributes.ColorMode.StartUpColorTemperatureMireds,
+        asserts.assert_equal(color_mode.value, attributes.ColorMode.StartUpColorTemperatureMireds,
                              "ColorMode attribute is StartUpColorTemperatureMireds")
 
         # Step 5b: Read EnhancedColorMode
@@ -185,7 +192,7 @@ class TC_CC_6_5(MatterBaseTest):
 
         # Verify that the DUT response indicates that the EnhancedColorMode attribute
         #  has the expected value 2 (ColorTemperatureMireds).
-        asserts.assert_equal(enhanced_mode, attributes.EnhancedColorMode.ColorTemperatureMireds,
+        asserts.assert_equal(enhanced_mode.value, attributes.EnhancedColorMode.ColorTemperatureMireds,
                              "EnhancedColorMode attribute is ColorTemperatureMireds")
 
 if __name__ == "__main__":
