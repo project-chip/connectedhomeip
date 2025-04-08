@@ -1077,6 +1077,27 @@ class MatterBaseTest(base_test.BaseTestClass):
     def is_pics_sdk_ci_only(self) -> bool:
         return self.check_pics('PICS_SDK_CI_ONLY')
 
+    def _update_legacy_test_event_triggers(self, eventTrigger: int) -> int:
+        """ This function updates eventTriged if legacy flag is activated. """
+        target_endpoint = 0
+
+        if self.matter_test_config.legacy:
+            logger.info("Legacy test event trigger activated")
+        else:
+            logger.info("Legacy test event trigger deactivated")
+            target_endpoint = self.get_endpoint()
+
+        if not (0 <= target_endpoint <= 0xFFFF):
+            raise ValueError("Target endpoint should be between 0 and 0xFFFF")
+
+        # Clean endpoint target
+        eventTrigger = eventTrigger & ~ (0xFFFF << 32)
+
+        # Sets endpoint in eventTrigger
+        eventTrigger |= (target_endpoint & 0xFFFF) << 32
+
+        return eventTrigger
+
     async def commission_devices(self) -> bool:
         dev_ctrl: ChipDeviceCtrl.ChipDeviceController = self.default_controller
         dut_node_ids: List[int] = self.matter_test_config.dut_node_ids
@@ -1208,26 +1229,6 @@ class MatterBaseTest(base_test.BaseTestClass):
                                             payloadCapability=payloadCapability)
         return result
 
-    async def check_legacy_test_event_triggers(self, eventTrigger: int) -> int:
-        target_endpoint = 0
-
-        if self.matter_test_config.legacy:
-            logger.info("Legacy test event trigger activated")
-        else:
-            logger.info("Legacy test event trigger deactivated")
-            target_endpoint = self.get_endpoint()
-
-        if not (0 <= target_endpoint <= 0xFFFF):
-            raise ValueError("Target endpoint should be between 0 and 0xFFFF")
-
-        # Clean endpoint target
-        eventTrigger = eventTrigger & ~ (0xFFFF << 32)
-
-        # Sets endpoint in eventTrigger
-        eventTrigger |= (target_endpoint & 0xFFFF) << 32
-
-        return eventTrigger
-
     async def send_test_event_triggers(self, eventTrigger: int, enableKey: bytes = None):
         """This helper function sends a test event trigger to the General Diagnostics cluster on endpoint 0
 
@@ -1244,7 +1245,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             else:
                 enableKey = self.matter_test_config.global_test_params['enableKey']
 
-        eventTrigger = await self.check_legacy_test_event_triggers(eventTrigger)
+        eventTrigger = self._update_legacy_test_event_triggers(eventTrigger)
 
         try:
             # GeneralDiagnostics cluster is meant to be on Endpoint 0 (Root)
