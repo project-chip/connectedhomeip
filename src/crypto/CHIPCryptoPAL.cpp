@@ -927,18 +927,21 @@ CHIP_ERROR GenerateVendorFabricBindingMessage(FabricBindingVersion fabricBinding
                                               FabricId fabricId, uint16_t vendorId, MutableByteSpan & outputSpan)
 {
     // Only V1 supported yet.
-    switch(fabricBindingVersion)
+    switch (fabricBindingVersion)
     {
-        case FabricBindingVersion::kVersion1:
-            break;
-        default:
-            return CHIP_ERROR_INVALID_ARGUMENT;
+    case FabricBindingVersion::kVersion1:
+        break;
+    default:
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     Encoding::BigEndian::BufferWriter writer(outputSpan);
 
     // vendor_fabric_binding_message := fabric_binding_version (1 byte) || root_public_key || fabric_id || vendor_id
-    writer.Put8(to_underlying(fabricBindingVersion)).Put(rootPublicKey.ConstBytes(), rootPublicKey.Length()).Put64(fabricId).Put16(vendorId);
+    writer.Put8(to_underlying(fabricBindingVersion))
+        .Put(rootPublicKey.ConstBytes(), rootPublicKey.Length())
+        .Put64(fabricId)
+        .Put16(vendorId);
 
     size_t actuallyWritten = 0;
     VerifyOrReturnError(writer.Fit(actuallyWritten), CHIP_ERROR_BUFFER_TOO_SMALL);
