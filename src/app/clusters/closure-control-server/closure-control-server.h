@@ -133,13 +133,6 @@ public:
      */
     CHIP_ERROR SetOverallTarget(const GenericOverallTarget & aOverallTarget);
 
-    /**
-     * @brief Add Error to CurretErrorList.
-     * @param[in] error The error to be added.
-     * @return CHIP_NO_ERROR if error was successful added and CHIP_ERROR_BAD_REQUEST if add failed.
-     */
-    CHIP_ERROR AddErrorToCurrentErrorList(const ClosureErrorEnum error);
-
     // Attribute getters
     /**
      * @brief Get MainState.
