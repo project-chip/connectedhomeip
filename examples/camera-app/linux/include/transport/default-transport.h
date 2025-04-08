@@ -1,5 +1,6 @@
 /*
- *    Copyright (c) 2024 Project CHIP Authors
+ *
+ *    Copyright (c) 2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,9 +15,16 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/ConcreteAttributePath.h>
 
-void MatterReportingAttributeChangeCallback(const chip::app::ConcreteAttributePath & aPath)
+#pragma once
+
+class DefaultTransport : public Transport
 {
-    // TODO: should we add logic to track these calls for test purposes?
-}
+public:
+    void SendVideo(const char * data, size_t size, uint16_t videoStreamID) {}
+    void SendAudio(const char * data, size_t size, uint16_t audioStreamID) {}
+    void SendAudioVideo(const char * data, size_t size, uint16_t videoSTreamID, uint16_t audioStreamID) {}
+    bool CanSendVideo() { return true; }
+    bool CanSendAudio() { return true; }
+    virtual ~Transport() = default;
+};
