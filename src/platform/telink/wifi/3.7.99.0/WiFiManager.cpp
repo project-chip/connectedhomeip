@@ -193,8 +193,18 @@ CHIP_ERROR WiFiManager::Scan(const ByteSpan & ssid, ScanResultCallback resultCal
     wifi_scan_params * scanParams{ nullptr };
     size_t scanParamsSize{ 0 };
 
-    if (!ssid.empty())
+    if (!ssid.empty()) // Directed Scanning, Main Spec, 11.9.7.1. "ScanNetworks Command"
     {
+        if (!mInternalScan) // don't erase in the middle of Connect procedure
+        {
+            Instance().mDirectedScanning = true;
+            mWantedNetwork.Erase();
+            memcpy(mWantedNetwork.ssid, ssid.data(), ssid.size());
+            mWantedNetwork.ssidLen = ssid.size();
+            ChipLogProgress(DeviceLayer, "Directed Scanning, looking for: %.*s",
+                            static_cast<int>(Instance().mWantedNetwork.GetSsidSpan().size()),
+                            Instance().mWantedNetwork.GetSsidSpan().data());
+        }
         /* We must assume that the ssid is handled as a NULL-terminated string.
            Note that the mScanSsidBuffer is initialized with zeros. */
         VerifyOrReturnError(ssid.size() < sizeof(mScanSsidBuffer), CHIP_ERROR_INVALID_ARGUMENT);
@@ -319,6 +329,11 @@ void WiFiManager::ScanResultHandler(Platform::UniquePtr<uint8_t> data, size_t le
     // Contrary to other handlers, offload accumulating of the scan results from the CHIP thread to the caller's thread
     const wifi_scan_result * scanResult = reinterpret_cast<const wifi_scan_result *>(data.get());
 
+    ChipLogDetail(DeviceLayer, "Found SSID: %.*s", scanResult->ssid_length, scanResult->ssid);
+
+    if (Instance().mDirectedScanning)
+        VerifyOrReturn(Instance().mWantedNetwork.GetSsidSpan().data_equal(ByteSpan(scanResult->ssid, scanResult->ssid_length)));
+
     if (Instance().mInternalScan &&
         Instance().mWantedNetwork.GetSsidSpan().data_equal(ByteSpan(scanResult->ssid, scanResult->ssid_length)))
     {
@@ -363,6 +378,9 @@ void WiFiManager::ScanDoneHandler(Platform::UniquePtr<uint8_t> data, size_t leng
 {
     // Validate that input data size matches the expected one.
     VerifyOrReturn(length == sizeof(wifi_status));
+
+    if (Instance().mDirectedScanning)
+        Instance().mDirectedScanning = false;
 
     CHIP_ERROR err = SystemLayer().ScheduleLambda([capturedData = data.get()] {
         Platform::UniquePtr<uint8_t> safePtr(capturedData);
