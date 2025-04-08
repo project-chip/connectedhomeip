@@ -334,7 +334,7 @@ void CameraAvSettingsUserLevelMgmtServer::SetZoom(Optional<uint8_t> aZoom)
 }
 
 /**
- * Methods handling known video stream IDs, the addition and removal thereof. 
+ * Methods handling known video stream IDs, the addition and removal thereof.
  */
 void CameraAvSettingsUserLevelMgmtServer::AddMoveCapableVideoStreamID(uint16_t aVideoStreamID)
 {
@@ -1154,8 +1154,8 @@ void CameraAvSettingsUserLevelMgmtServer::HandleDPTZRelativeMove(HandlerContext 
             return;
         }
     }
-    // Is this a video stream ID of which we have already been informed via DPTZSetViewport. We can't relative move on a 
-    // viewport that hasn't already been set, hence we fail if the provided id is not found. 
+    // Is this a video stream ID of which we have already been informed via DPTZSetViewport. We can't relative move on a
+    // viewport that hasn't already been set, hence we fail if the provided id is not found.
     //
     if (!KnownVideoStreamID(videoStreamID))
     {
