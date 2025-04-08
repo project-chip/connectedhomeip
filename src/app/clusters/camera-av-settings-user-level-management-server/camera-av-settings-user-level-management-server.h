@@ -103,7 +103,7 @@ public:
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      */
     CameraAvSettingsUserLevelMgmtServer(EndpointId aEndpointId, Delegate * aDelegate, BitFlags<Feature> aFeatures,
-                                        BitFlags<OptionalAttributes> aOptionalAttrs);
+                                        BitFlags<OptionalAttributes> aOptionalAttrs, uint8_t aMaxPresets);
     ~CameraAvSettingsUserLevelMgmtServer() override;
 
     CHIP_ERROR Init();
@@ -114,8 +114,6 @@ public:
     bool SupportsOptAttr(OptionalAttributes aOptionalAttr) const;
 
     // Attribute Accessors and Mutators
-    CHIP_ERROR SetMaxPresets(uint8_t aMaxPresets);
-
     CHIP_ERROR SetTiltMin(int16_t aTiltMin);
 
     CHIP_ERROR SetTiltMax(int16_t aTiltMax);
@@ -188,8 +186,9 @@ private:
     // My known values for MPTZ.
     MPTZStructType mMptzPosition;
 
-    // Note, spec defaults, potentially overwritten by the delegate
-    uint8_t mMaxPresets = 5;
+    // Note, where assigned, these are spec defaults, potentially overwritten by the delegate. Exception is MaxPresets that 
+    // is an F quality attribute and assigned by the constructor
+    const uint8_t mMaxPresets;
     int16_t mPanMin     = kMinPanValue;
     int16_t mPanMax     = kMaxPanValue;
     int16_t mTiltMin    = -90;

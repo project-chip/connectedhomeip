@@ -42,10 +42,11 @@ namespace CameraAvSettingsUserLevelManagement {
 
 CameraAvSettingsUserLevelMgmtServer::CameraAvSettingsUserLevelMgmtServer(EndpointId aEndpointId, Delegate * aDelegate,
                                                                          BitFlags<Feature> aFeatures,
-                                                                         const BitFlags<OptionalAttributes> aOptionalAttrs) :
+                                                                         BitFlags<OptionalAttributes> aOptionalAttrs,
+                                                                         uint8_t aMaxPresets):
     AttributeAccessInterface(MakeOptional(aEndpointId), CameraAvSettingsUserLevelManagement::Id),
     CommandHandlerInterface(MakeOptional(aEndpointId), CameraAvSettingsUserLevelManagement::Id), mDelegate(aDelegate),
-    mEndpointId(aEndpointId), mFeatures(aFeatures), mOptionalAttrs(aOptionalAttrs)
+    mEndpointId(aEndpointId), mFeatures(aFeatures), mOptionalAttrs(aOptionalAttrs), mMaxPresets(aMaxPresets)
 {
     mDelegate->SetServer(this);
 }
@@ -183,23 +184,6 @@ void CameraAvSettingsUserLevelMgmtServer::MarkDirty(AttributeId aAttributeId)
  * the associated Feature presence is checked. The attributes are updated, and marked dirty, only if there is a change in the
  * attribute value after constraint checking has been completed.
  */
-
-CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::SetMaxPresets(uint8_t aMaxPresets)
-{
-    if (!HasFeature(Feature::kMechanicalPresets))
-    {
-        return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-    }
-
-    if (aMaxPresets != mMaxPresets)
-    {
-        mMaxPresets = aMaxPresets;
-        MarkDirty(Attributes::MaxPresets::Id);
-    }
-
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::SetTiltMin(int16_t aTiltMin)
 {
     if (!HasFeature(Feature::kMechanicalTilt))
@@ -350,19 +334,12 @@ void CameraAvSettingsUserLevelMgmtServer::SetZoom(Optional<uint8_t> aZoom)
 }
 
 /**
- * Methods handling known video stream IDs, the addition and removal thereof.
+ * Methods handling known video stream IDs, the addition and removal thereof. 
  */
 void CameraAvSettingsUserLevelMgmtServer::AddMoveCapableVideoStreamID(uint16_t aVideoStreamID)
 {
-    // Make sure this isn't a duplicate ID, if not, add to the list
-    //
-    if (!KnownVideoStreamID(aVideoStreamID))
-    {
-        // Not found, this is a good add.
-        //
-        mDptzRelativeMove.push_back(aVideoStreamID);
-        MarkDirty(Attributes::DPTZRelativeMove::Id);
-    }
+    mDptzRelativeMove.push_back(aVideoStreamID);
+    MarkDirty(Attributes::DPTZRelativeMove::Id);
 }
 
 void CameraAvSettingsUserLevelMgmtServer::RemoveMoveCapableVideoStreamID(uint16_t aVideoStreamID)
@@ -1177,21 +1154,15 @@ void CameraAvSettingsUserLevelMgmtServer::HandleDPTZRelativeMove(HandlerContext 
             return;
         }
     }
-    // Is this a video stream ID of which we have already been informed?
-    // If not, ask the delegate if it's ok.  If yes, add to our set and proceed, if not, fail.
+    // Is this a video stream ID of which we have already been informed via DPTZSetViewport. We can't relative move on a 
+    // viewport that hasn't already been set, hence we fail if the provided id is not found. 
     //
     if (!KnownVideoStreamID(videoStreamID))
     {
-        // Call the delegate to validate that the videoStreamID is known; if yes then add to our list and proceed
-        //
-        if (!mDelegate->IsValidVideoStreamID(videoStreamID))
-        {
-            ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]. Unknown Video Stream ID provided. ID=%d.", mEndpointId,
+        ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]. Unknown Video Stream ID provided. ID=%d.", mEndpointId,
                          videoStreamID);
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
-            return;
-        }
-        AddMoveCapableVideoStreamID(videoStreamID);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
+        return;
     }
 
     // Call the delegate
