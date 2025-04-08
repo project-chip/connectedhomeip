@@ -27,7 +27,6 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include "DiagnosticDataProviderImpl.h"
-#include "fsl_adapter_rng.h"
 #include "fsl_os_abstraction.h"
 #include "fwk_platform_coex.h"
 #include <crypto/CHIPCryptoPAL.h>
