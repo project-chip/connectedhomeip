@@ -55,7 +55,7 @@ CHIP_ERROR CircularDiagnosticBuffer::Retrieve(MutableByteSpan & span, uint32_t &
             else if (err == CHIP_ERROR_BUFFER_TOO_SMALL)
             {
                 // If we ran out of space, this is expected - not an error
-                ChipLogProgress(DeviceLayer, "Buffer full after %lu entries", read_entries);
+                ChipLogProgress(DeviceLayer, "Buffer full after %" PRIu32 " entries", read_entries);
                 err = CHIP_NO_ERROR;
                 break;
             }
@@ -83,7 +83,8 @@ CHIP_ERROR CircularDiagnosticBuffer::Retrieve(MutableByteSpan & span, uint32_t &
     }
 
     span.reduce_size(successful_written_bytes);
-    ChipLogProgress(DeviceLayer, "Total Retrieved bytes: %lu (%lu entries)", successful_written_bytes, read_entries);
+    ChipLogProgress(DeviceLayer, "Total Retrieved bytes: %" PRIu32 " (%" PRIu32 " entries)", successful_written_bytes,
+                    read_entries);
 
     // CHIP_END_OF_TLV is expected when we reach the end of the buffer
     return CHIP_NO_ERROR;
