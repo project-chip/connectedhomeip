@@ -19,12 +19,12 @@ import logging
 import os
 import typing
 
-import chip.clusters as Clusters
-from chip.ChipDeviceCtrl import ChipDeviceController, NOCChain
-from chip.clusters import GeneralCommissioning as generalCommissioning
-from chip.clusters import OperationalCredentials as opCreds
-from chip.clusters.Types import NullValue
-from chip.FabricAdmin import FabricAdmin as FabricAdmin
+from .. import clusters as Clusters
+from ..ChipDeviceCtrl import ChipDeviceController, NOCChain
+from ..clusters import GeneralCommissioning as generalCommissioning
+from ..clusters import OperationalCredentials as opCreds
+from ..clusters.Types import NullValue
+from ..FabricAdmin import FabricAdmin as FabricAdmin
 
 _UINT16_MAX = 65535
 

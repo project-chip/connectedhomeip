@@ -36,6 +36,10 @@ if (NOT CHIP_ROOT)
     get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_LIST_DIR}/../../.. REALPATH)
 endif()
 
+if (NOT CHIP_APP_ZAP_DIR)
+    get_filename_component(CHIP_APP_ZAP_DIR ${CHIP_ROOT}/zzz_generated/app-common REALPATH)
+endif()
+
 # ==============================================================================
 # Find required programs
 # ==============================================================================
@@ -133,7 +137,8 @@ macro(matter_build target)
                                     --root-target=${GN_ROOT_TARGET}
                                     --dotfile=${GN_ROOT_TARGET}/.gn
                                     --script-executable=${Python3_EXECUTABLE}
-                                    gen --check --fail-on-unused-args ${CMAKE_CURRENT_BINARY_DIR}
+                                    gen --check --fail-on-unused-args --add-export-compile-commands=*
+                                    ${CMAKE_CURRENT_BINARY_DIR}
         COMMAND                 ninja
         COMMAND                 ${CMAKE_COMMAND} -E echo "Matter library build complete"
         INSTALL_COMMAND         ""
@@ -164,7 +169,7 @@ macro(matter_build target)
         ${CHIP_ROOT}/third_party/nlassert/repo/include
         ${CHIP_ROOT}/third_party/nlio/repo/include
         ${CHIP_ROOT}/third_party/nlfaultinjection/include
-        ${CHIP_ROOT}/zzz_generated/app-common
+        ${CHIP_APP_ZAP_DIR}
         ${CMAKE_CURRENT_BINARY_DIR}/gen/include
     )
 

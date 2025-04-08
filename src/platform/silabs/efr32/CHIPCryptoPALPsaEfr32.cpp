@@ -161,13 +161,14 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
         // Add the aligned part of the plaintext
         status = psa_aead_update(&operation, plaintext, block_aligned_length, ciphertext, block_aligned_length, &out_length);
         VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
-        VerifyOrReturnError(out_length == block_aligned_length, CHIP_ERROR_INTERNAL);
+        VerifyOrReturnError(out_length <= block_aligned_length, CHIP_ERROR_INTERNAL);
         ciphertext_length += out_length;
 
         if (partial_block_length > 0)
         {
             // The update output should fit in the temp buffer
             size_t max_output = PSA_AEAD_UPDATE_OUTPUT_SIZE(PSA_KEY_TYPE_AES, algorithm, partial_block_length);
+            VerifyOrReturnError(max_output <= sizeof(temp), CHIP_ERROR_INTERNAL);
 
             // Add the non-aligned end of the plaintext
             status =
@@ -254,13 +255,14 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length,
         // Add the aligned part of the ciphertext
         status = psa_aead_update(&operation, ciphertext, block_aligned_length, plaintext, block_aligned_length, &out_length);
         VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
-        VerifyOrReturnError(out_length == block_aligned_length, CHIP_ERROR_INTERNAL);
+        VerifyOrReturnError(out_length <= block_aligned_length, CHIP_ERROR_INTERNAL);
         plaintext_length += out_length;
 
         if (partial_block_length > 0)
         {
             // The update output should fit in the temp buffer
             size_t max_output = PSA_AEAD_UPDATE_OUTPUT_SIZE(PSA_KEY_TYPE_AES, algorithm, partial_block_length);
+            VerifyOrReturnError(max_output <= sizeof(temp), CHIP_ERROR_INTERNAL);
 
             // Add the non-aligned end of the ciphertext
             status =
