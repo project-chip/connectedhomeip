@@ -46,6 +46,7 @@ public:
     Globals::Structs::CurrencyStruct::Type GetCurrency() override { return mCurrencyStruct; }
     // TODO think about a better way to do this in a delegate without needing mCurrentPrice copy
     const DataModel::Nullable<Structs::CommodityPriceStruct::Type> & GetCurrentPrice() override { return mCurrentPrice; }
+    const DataModel::List<const Structs::CommodityPriceStruct::Type> & GetPriceForecast(CommodityPriceDetailBitmap bitmap) override;
 
     /* These functions are called by the ReadAttribute handler to iterate through lists
      * The cluster server will call Start<Type>Read to allow the delegate to create a temporary
@@ -61,6 +62,7 @@ public:
     CHIP_ERROR SetTariffUnit(Globals::TariffUnitEnum);
     CHIP_ERROR SetCurrency(Globals::Structs::CurrencyStruct::Type);
     CHIP_ERROR SetCurrentPrice(const DataModel::Nullable<Structs::CommodityPriceStruct::Type>);
+    CHIP_ERROR SetForecast(const DataModel::List<const Structs::CommodityPriceStruct::Type>  &);
     // TODO work out how to set forecast data and retrieve it
 
     Status SendPriceChangeEvent();
@@ -70,6 +72,7 @@ private:
     Globals::TariffUnitEnum mTariffUnit;
     Globals::Structs::CurrencyStruct::Type mCurrencyStruct;
     DataModel::Nullable<Structs::CommodityPriceStruct::Type> mCurrentPrice;
+    DataModel::List<const Structs::CommodityPriceStruct::Type> mPriceForecast;
 };
 
 class CommodityPriceInstance : public Instance

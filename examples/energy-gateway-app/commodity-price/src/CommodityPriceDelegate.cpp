@@ -148,6 +148,26 @@ Status CommodityPriceDelegate::SendPriceChangeEvent()
     return Status::Success;
 }
 
+CHIP_ERROR CommodityPriceDelegate::SetForecast(const DataModel::List<const Structs::CommodityPriceStruct::Type>  & priceForecast)
+{
+    assertChipStackLockedByCurrentThread();
+
+    mPriceForecast = priceForecast;
+
+    MatterReportingAttributeChangeCallback(mEndpointId, CommodityPrice::Id, PriceForecast::Id);
+
+    return CHIP_NO_ERROR;
+}
+
+const DataModel::List<const CommodityPriceStruct::Type> & CommodityPriceDelegate::GetPriceForecast(CommodityPriceDetailBitmap bitmap)
+{
+    ChipLogDetail(Zcl, "CommodityPriceDelegate::GetForecast");
+
+    //TODO using the bitmap we need to knock out description/components if they are not required
+
+    return mPriceForecast;
+}
+
 /* @brief This function is called by the cluster server at the start of read cycle
  *        This could take a semaphore to stop a background update of the data
  */

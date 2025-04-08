@@ -45,8 +45,10 @@ public:
     // Get attribute methods
     virtual Globals::TariffUnitEnum GetTariffUnit()                                            = 0;
     virtual Globals::Structs::CurrencyStruct::Type GetCurrency()                               = 0;
-    virtual const DataModel::Nullable<Structs::CommodityPriceStruct::Type> & GetCurrentPrice() = 0;
+    virtual const DataModel::Nullable<Structs::CommodityPriceStruct::Type> & GetCurrentPrice() = 0;   
+    virtual const DataModel::List<const Structs::CommodityPriceStruct::Type> & GetPriceForecast(CommodityPriceDetailBitmap bitmap) = 0;
 
+    // DELETE THESE...
     virtual CHIP_ERROR StartPriceForecastRead(CommodityPriceDetailBitmap bitmap)               = 0;
     virtual CHIP_ERROR GetPriceForecastByIndex(uint8_t, Structs::CommodityPriceStruct::Type &) = 0;
     virtual CHIP_ERROR EndPriceForecastRead()                                                  = 0;

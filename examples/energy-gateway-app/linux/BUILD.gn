@@ -59,7 +59,8 @@ executable("chip-energy-gateway-app") {
 
   include_dirs = [
     "include",
-
+    "${chip_root}/examples/energy-gateway-app/common/include",
+    "${chip_root}/examples/energy-gateway-app/commodity-price/include",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/include",
   ]
 
