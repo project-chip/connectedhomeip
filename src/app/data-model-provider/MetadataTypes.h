@@ -107,10 +107,9 @@ _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wconversion\""
                 Access::Privilege readPriv             = Access::Privilege::kView,              // mask.readPrivilege initial value
                 Access::Privilege writePriv            = Access::Privilege::kView               // mask.writePrivilege initial value
                 ) :
-            attributeId{ id },
-            mask{ to_underlying(attrQualityFlags) & ((1 << 7) - 1), // Narrowing expression to 7 bits
-                  to_underlying(readPriv) & ((1 << 5) - 1),         // Narrowing expression to 5 bits
-                  to_underlying(writePriv) & ((1 << 5) - 1) }       // Narrowing expression to 5 bits
+            attributeId{ id }, mask{ to_underlying(attrQualityFlags) & ((1 << 7) - 1), // Narrowing expression to 7 bits
+                                     to_underlying(readPriv) & ((1 << 5) - 1),         // Narrowing expression to 5 bits
+                                     to_underlying(writePriv) & ((1 << 5) - 1) }       // Narrowing expression to 5 bits
         {}
 
         AttributeQualityFlags SetFlags(AttributeQualityFlags f)
@@ -138,12 +137,12 @@ _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wconversion\""
 
         constexpr bool HasFlags(AttributeQualityFlags f) const { return (mask.flags & chip::to_underlying(f)) != 0; }
 
-        bool ReadAllowed() { return mask.readPrivilege != kNoPrivilege; }
-        bool WriteAllowed() { return mask.writePrivilege != kNoPrivilege; }
+        bool ReadAllowed() { return mask.readPrivilege != to_underlying(kNoPrivilege); }
+        bool WriteAllowed() { return mask.writePrivilege != to_underlying(kNoPrivilege); }
 
     private:
         // zero is not a valid privilege, just a default initial value for privileges
-        static constexpr std::underlying_type_t<Access::Privilege> kNoPrivilege{ 0 };
+        static constexpr Access::Privilege kNoPrivilege{ 0 };
 
         struct attribute_entry_mask_t
         {
@@ -203,9 +202,8 @@ _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wconversion\""
                 CommandQualityFlags cmdQualityFlags = CommandQualityFlags::kFabricScoped, // mask.flags initial value
                 Access::Privilege invokePriv        = Access::Privilege::kView            // mask.invokePrivilege initial value
                 ) :
-            commandId(id),
-            mask{ to_underlying(cmdQualityFlags) & ((1 << 3) - 1), // Narrowing expression to 3 bits
-                  to_underlying(invokePriv) & ((1 << 5) - 1) }     // Narrowing expression to 5 bits
+            commandId(id), mask{ to_underlying(cmdQualityFlags) & ((1 << 3) - 1), // Narrowing expression to 3 bits
+                                 to_underlying(invokePriv) & ((1 << 5) - 1) }     // Narrowing expression to 5 bits
         {}
 
         CommandQualityFlags SetFlags(CommandQualityFlags f)
@@ -230,9 +228,6 @@ _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wconversion\""
         constexpr bool HasFlags(CommandQualityFlags f) const { return (mask.flags & chip::to_underlying(f)) != 0; }
 
     private:
-        // zero is not a valid privilege, just a default initial value for privileges
-        static constexpr std::underlying_type_t<Access::Privilege> kNoPrivilege{ 0 };
-
         struct accepted_command_entry_mask_t
         {
 
