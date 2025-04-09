@@ -133,7 +133,6 @@
 		3DA1A3562ABAB3B4004F0BB9 /* MTRAsyncWorkQueue.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3DA1A3532ABAB3B4004F0BB9 /* MTRAsyncWorkQueue.mm */; };
 		3DA1A3582ABABF6A004F0BB9 /* MTRAsyncWorkQueueTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3DA1A3572ABABF69004F0BB9 /* MTRAsyncWorkQueueTests.m */; };
 		3DB9DAE52D67EE5A00704FAB /* MTRBleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3DB9DAE42D67EE5A00704FAB /* MTRBleTests.m */; };
-		3DECCB6E29347D2D00585AEC /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DECCB6D29347D2C00585AEC /* Security.framework */; };
 		3DECCB702934AECD00585AEC /* MTRLogging.h in Headers */ = {isa = PBXBuildFile; fileRef = 3DECCB6F2934AC1C00585AEC /* MTRLogging.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3DECCB722934AFE200585AEC /* MTRLogging.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3DECCB712934AFE200585AEC /* MTRLogging.mm */; };
 		3DECCB742934C21B00585AEC /* MTRDefines.h in Headers */ = {isa = PBXBuildFile; fileRef = 3DECCB732934C21B00585AEC /* MTRDefines.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -155,6 +154,7 @@
 		5117DD3929A931AE00FFA1AA /* MTROperationalBrowser.h in Headers */ = {isa = PBXBuildFile; fileRef = 5117DD3729A931AE00FFA1AA /* MTROperationalBrowser.h */; };
 		511913FB28C100EF009235E9 /* MTRBaseSubscriptionCallback.mm in Sources */ = {isa = PBXBuildFile; fileRef = 511913F928C100EF009235E9 /* MTRBaseSubscriptionCallback.mm */; };
 		511913FC28C100EF009235E9 /* MTRBaseSubscriptionCallback.h in Headers */ = {isa = PBXBuildFile; fileRef = 511913FA28C100EF009235E9 /* MTRBaseSubscriptionCallback.h */; };
+		511FAD1B2DA59A7000E75D18 /* MTRTestControllerDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 511FAD1A2DA59A7000E75D18 /* MTRTestControllerDelegate.mm */; };
 		512431252BA0C8B7000BC136 /* Commands.h in Headers */ = {isa = PBXBuildFile; fileRef = 512431182BA0C09A000BC136 /* Commands.h */; };
 		512431262BA0C8BA000BC136 /* ResetMRPParametersCommand.h in Headers */ = {isa = PBXBuildFile; fileRef = 512431192BA0C09A000BC136 /* ResetMRPParametersCommand.h */; };
 		512431272BA0C8BF000BC136 /* SetMRPParametersCommand.h in Headers */ = {isa = PBXBuildFile; fileRef = 5124311B2BA0C09A000BC136 /* SetMRPParametersCommand.h */; };
@@ -467,7 +467,6 @@
 		B4FCD5712B603A6300832859 /* DownloadLogCommand.h in Headers */ = {isa = PBXBuildFile; fileRef = B4FCD56E2B603A6300832859 /* DownloadLogCommand.h */; };
 		B4FCD5722B603A6300832859 /* DownloadLogCommand.mm in Sources */ = {isa = PBXBuildFile; fileRef = B4FCD56F2B603A6300832859 /* DownloadLogCommand.mm */; };
 		B4FCD5732B611EB300832859 /* MTRDiagnosticLogsDownloader.h in Headers */ = {isa = PBXBuildFile; fileRef = B4C8E6B32B3453AD00FCD54D /* MTRDiagnosticLogsDownloader.h */; };
-		BA09EB43247477BA00605257 /* libCHIP.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BA09EB3F2474762900605257 /* libCHIP.a */; };
 		CF3B63CF2CA31E71003C1C87 /* MTROTAImageTransferHandler.h in Headers */ = {isa = PBXBuildFile; fileRef = CF3B63CB2CA31E71003C1C87 /* MTROTAImageTransferHandler.h */; };
 		CF3B63D02CA31E71003C1C87 /* MTROTAUnsolicitedBDXMessageHandler.h in Headers */ = {isa = PBXBuildFile; fileRef = CF3B63CC2CA31E71003C1C87 /* MTROTAUnsolicitedBDXMessageHandler.h */; };
 		CF3B63D12CA31E71003C1C87 /* MTROTAImageTransferHandler.mm in Sources */ = {isa = PBXBuildFile; fileRef = CF3B63CD2CA31E71003C1C87 /* MTROTAImageTransferHandler.mm */; };
@@ -717,6 +716,24 @@
 		3DF5219B2D5E90BE008F8E52 /* UserDefaults.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = UserDefaults.mm; sourceTree = "<group>"; };
 		3DF5219C2D62C3E5008F8E52 /* MTRMockCB.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRMockCB.h; sourceTree = "<group>"; };
 		3DF5219D2D62C3E5008F8E52 /* MTRMockCB.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTRMockCB.m; sourceTree = "<group>"; };
+		3DF9D1AE2D9F32F200129D07 /* Project.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Project.xcconfig; sourceTree = "<group>"; };
+		3DF9D1AF2D9F32FF00129D07 /* Matter.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Matter.xcconfig; sourceTree = "<group>"; };
+		3DF9D1B02D9F330A00129D07 /* MatterTests.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = MatterTests.xcconfig; sourceTree = "<group>"; };
+		3DF9D1B12D9F331900129D07 /* darwin-framework-tool.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "darwin-framework-tool.xcconfig"; sourceTree = "<group>"; };
+		3DF9D1B22D9F44DB00129D07 /* Project.Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Project.Debug.xcconfig; sourceTree = "<group>"; };
+		3DF9D1B32D9F44E700129D07 /* Project.Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Project.Release.xcconfig; sourceTree = "<group>"; };
+		3DF9D1B92DA4770D00129D07 /* Matter.Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Matter.Debug.xcconfig; sourceTree = "<group>"; };
+		3DF9D1BA2DA4774100129D07 /* Matter.Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Matter.Release.xcconfig; sourceTree = "<group>"; };
+		3DF9D1BB2DA4775400129D07 /* darwin-framework-tool.Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "darwin-framework-tool.Debug.xcconfig"; sourceTree = "<group>"; };
+		3DF9D1BC2DA4777400129D07 /* darwin-framework-tool.Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "darwin-framework-tool.Release.xcconfig"; sourceTree = "<group>"; };
+		3DF9D72F2DA518A000129D07 /* Project.override.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Project.override.xcconfig; sourceTree = "<group>"; };
+		3DF9D7302DA5195A00129D07 /* Matter.override.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Matter.override.xcconfig; sourceTree = "<group>"; };
+		3DF9D7312DA52FD100129D07 /* Matter.Debug.override.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Matter.Debug.override.xcconfig; sourceTree = "<group>"; };
+		3DF9D7332DA530A500129D07 /* Matter.Release.override.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Matter.Release.override.xcconfig; sourceTree = "<group>"; };
+		3DF9D7342DA530E600129D07 /* MatterTests.override.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = MatterTests.override.xcconfig; sourceTree = "<group>"; };
+		3DF9D7352DA5310000129D07 /* darwin-framework-tool.override.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "darwin-framework-tool.override.xcconfig"; sourceTree = "<group>"; };
+		3DF9D7362DA5310E00129D07 /* darwin-framework-tool.Release.override.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "darwin-framework-tool.Release.override.xcconfig"; sourceTree = "<group>"; };
+		3DF9D7372DA5311000129D07 /* darwin-framework-tool.Debug.override.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "darwin-framework-tool.Debug.override.xcconfig"; sourceTree = "<group>"; };
 		3DFCB3282966684500332B35 /* MTRCertificateInfoTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTRCertificateInfoTests.m; sourceTree = "<group>"; };
 		3DFCB32A2966827F00332B35 /* MTRDefines_Internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRDefines_Internal.h; sourceTree = "<group>"; };
 		3DFCB32B29678C9500332B35 /* MTRConversion.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRConversion.h; sourceTree = "<group>"; };
@@ -735,6 +752,8 @@
 		5117DD3729A931AE00FFA1AA /* MTROperationalBrowser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTROperationalBrowser.h; sourceTree = "<group>"; };
 		511913F928C100EF009235E9 /* MTRBaseSubscriptionCallback.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRBaseSubscriptionCallback.mm; sourceTree = "<group>"; };
 		511913FA28C100EF009235E9 /* MTRBaseSubscriptionCallback.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRBaseSubscriptionCallback.h; sourceTree = "<group>"; };
+		511FAD192DA59A7000E75D18 /* MTRTestControllerDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRTestControllerDelegate.h; sourceTree = "<group>"; };
+		511FAD1A2DA59A7000E75D18 /* MTRTestControllerDelegate.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRTestControllerDelegate.mm; sourceTree = "<group>"; };
 		512431182BA0C09A000BC136 /* Commands.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Commands.h; sourceTree = "<group>"; };
 		512431192BA0C09A000BC136 /* ResetMRPParametersCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ResetMRPParametersCommand.h; sourceTree = "<group>"; };
 		5124311A2BA0C09A000BC136 /* ResetMRPParametersCommand.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ResetMRPParametersCommand.mm; sourceTree = "<group>"; };
@@ -1079,8 +1098,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3DECCB6E29347D2D00585AEC /* Security.framework in Frameworks */,
-				BA09EB43247477BA00605257 /* libCHIP.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1469,6 +1486,31 @@
 			path = ../../platform/Darwin;
 			sourceTree = SOURCE_ROOT;
 		};
+		3DF9D1AD2D9F32D000129D07 /* Configs */ = {
+			isa = PBXGroup;
+			children = (
+				3DF9D1AE2D9F32F200129D07 /* Project.xcconfig */,
+				3DF9D72F2DA518A000129D07 /* Project.override.xcconfig */,
+				3DF9D1B22D9F44DB00129D07 /* Project.Debug.xcconfig */,
+				3DF9D1B32D9F44E700129D07 /* Project.Release.xcconfig */,
+				3DF9D1AF2D9F32FF00129D07 /* Matter.xcconfig */,
+				3DF9D7302DA5195A00129D07 /* Matter.override.xcconfig */,
+				3DF9D1B92DA4770D00129D07 /* Matter.Debug.xcconfig */,
+				3DF9D7312DA52FD100129D07 /* Matter.Debug.override.xcconfig */,
+				3DF9D1BA2DA4774100129D07 /* Matter.Release.xcconfig */,
+				3DF9D7332DA530A500129D07 /* Matter.Release.override.xcconfig */,
+				3DF9D1B02D9F330A00129D07 /* MatterTests.xcconfig */,
+				3DF9D7342DA530E600129D07 /* MatterTests.override.xcconfig */,
+				3DF9D1B12D9F331900129D07 /* darwin-framework-tool.xcconfig */,
+				3DF9D7352DA5310000129D07 /* darwin-framework-tool.override.xcconfig */,
+				3DF9D1BB2DA4775400129D07 /* darwin-framework-tool.Debug.xcconfig */,
+				3DF9D7372DA5311000129D07 /* darwin-framework-tool.Debug.override.xcconfig */,
+				3DF9D1BC2DA4777400129D07 /* darwin-framework-tool.Release.xcconfig */,
+				3DF9D7362DA5310E00129D07 /* darwin-framework-tool.Release.override.xcconfig */,
+			);
+			path = Configs;
+			sourceTree = "<group>";
+		};
 		51189FC72A33ACE900184508 /* TestHelpers */ = {
 			isa = PBXGroup;
 			children = (
@@ -1476,6 +1518,8 @@
 				5131BF642BE2E1B000D5D6BC /* MTRTestCase.mm */,
 				D437613F285BDC0D0051FEA2 /* MTRTestKeys.h */,
 				51C8E3F72825CDB600D47D00 /* MTRTestKeys.m */,
+				511FAD192DA59A7000E75D18 /* MTRTestControllerDelegate.h */,
+				511FAD1A2DA59A7000E75D18 /* MTRTestControllerDelegate.mm */,
 				51F9F9D32BF7A9EE00FEA0E2 /* MTRTestCase+ServerAppRunner.h */,
 				51F9F9D42BF7A9EE00FEA0E2 /* MTRTestCase+ServerAppRunner.m */,
 				D4376140285BDC0D0051FEA2 /* MTRTestStorage.h */,
@@ -1577,6 +1621,7 @@
 			children = (
 				510A07482A685D3900A9241C /* Matter.apinotes */,
 				BA107AEE2470CFBB004287EB /* chip_xcode_build_connector.sh */,
+				3DF9D1AD2D9F32D000129D07 /* Configs */,
 				B202528F2459E34F00F97062 /* CHIP */,
 				B202529A2459E34F00F97062 /* CHIPTests */,
 				037C3CA82991A44B00B7EEE2 /* darwin-framework-tool */,
@@ -2600,6 +2645,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9BC9E5872D3099FF00784A21 /* MTRSwiftCertificateTests.swift in Sources */,
+				511FAD1B2DA59A7000E75D18 /* MTRTestControllerDelegate.mm in Sources */,
 				51742B4E29CB6B88009974FE /* MTRPairingTests.m in Sources */,
 				5131BF662BE2E1B000D5D6BC /* MTRTestCase.mm in Sources */,
 				51669AF02913204400F4AA36 /* MTRBackwardsCompatTests.m in Sources */,
@@ -2668,510 +2714,57 @@
 /* Begin XCBuildConfiguration section */
 		037C3CAD2991A44B00B7EEE2 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3DF9D1BB2DA4775400129D07 /* darwin-framework-tool.Debug.xcconfig */;
 			buildSettings = {
-				CHIP_BUILD_TOOLS = true;
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
-				CODE_SIGN_ENTITLEMENTS = "$(CHIP_ROOT)/examples/darwin-framework-tool/entitlements/darwin-framework-tool.entitlements";
-				CODE_SIGN_IDENTITY = "-";
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(SDKROOT)/System/iOSSupport/System/Library/Frameworks",
-				);
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"$(inherited)",
-					CHIP_HAVE_CONFIG_H,
-					"CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1",
-					CONFIG_BUILD_FOR_HOST_UNIT_TEST,
-					"CONFIG_USE_INTERACTIVE_MODE=1",
-				);
-				"HEADER_SEARCH_PATHS[arch=*]" = (
-					"$(CHIP_ROOT)/examples/darwin-framework-tool",
-					"$(CHIP_ROOT)/src",
-					"$(CHIP_ROOT)/third_party/nlassert/repo/include",
-					"$(CHIP_ROOT)/zzz_generated/app-common",
-					"$(CHIP_ROOT)/third_party/nlio/repo/include",
-					"$(CHIP_ROOT)/third_party/jsoncpp/repo/include",
-					"$(CHIP_ROOT)/zzz_generated/darwin-framework-tool",
-					"$(CHIP_ROOT)/third_party/editline/repo/include",
-					"$(CHIP_ROOT)/src/include",
-					"$(CONFIGURATION_TEMP_DIR)/Matter.build/out/gen/include",
-					"$(CHIP_ROOT)/third_party/inipp/repo/inipp",
-					"$(CHIP_ROOT)/third_party/editline/include",
-					"$(CHIP_ROOT)/third_party/libwebsockets/",
-					"$(CHIP_ROOT)/third_party/libwebsockets/repo/include",
-					"$(CHIP_ROOT)/third_party/libwebsockets/repo/lib/core",
-					"$(CHIP_ROOT)/third_party/libwebsockets/repo/lib/core-net",
-					"$(CHIP_ROOT)/third_party/libwebsockets/repo/lib/plat/unix",
-					"$(CHIP_ROOT)/third_party/libwebsockets/repo/lib/secure-streams",
-					"$(CHIP_ROOT)/third_party/libwebsockets/repo/lib/event-libs",
-					"$(CHIP_ROOT)/third_party/libwebsockets/repo/lib/system/metrics",
-					"$(CHIP_ROOT)/third_party/libwebsockets/repo/lib/roles",
-					"$(CHIP_ROOT)/third_party/libwebsockets/repo/lib/roles/http",
-					"$(CHIP_ROOT)/third_party/libwebsockets/repo/lib/roles/h1",
-					"$(CHIP_ROOT)/third_party/libwebsockets/repo/lib/roles/ws",
-					"$(CHIP_ROOT)/third_party/libwebsockets/repo/lib/system/async-dns",
-					"$(CHIP_ROOT)/examples/chip-tool",
-					"$(CHIP_ROOT)/examples/chip-tool/commands/clusters",
-					"$(CHIP_ROOT)/examples/common",
-					"$(CHIP_ROOT)/zzz_generated/chip-tool",
-				);
-				LD_RUNPATH_SEARCH_PATHS = (
-					"@executable_path",
-					"$(BUILT_PRODUCTS_DIR)",
-				);
-				"LIBRARY_SEARCH_PATHS[arch=*]" = (
-					"$(CONFIGURATION_TEMP_DIR)/Matter.build/out/lib",
-					"$(CONFIGURATION_TEMP_DIR)/Matter.build/out/obj/src/app/lib",
-				);
-				OTHER_CFLAGS = "-DLWS_PLAT_UNIX";
-				"OTHER_CFLAGS[sdk=iphoneos*]" = (
-					"-DLWS_PLAT_UNIX",
-					"-DLWS_DETECTED_PLAT_IOS",
-				);
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
-				"OTHER_CPLUSPLUSFLAGS[sdk=iphoneos*]" = "$(OTHER_CFLAGS)";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				SDKROOT = macosx;
-				SUPPORTS_MACCATALYST = YES;
-				SYSTEM_HEADER_SEARCH_PATHS = "$(CHIP_ROOT)/src/darwin/Framework/CHIP/";
-				WARNING_CFLAGS = (
-					"-Wformat",
-					"-Wformat-nonliteral",
-					"-Wformat-security",
-					"-Wconversion",
-					"-Wno-documentation",
-				);
 			};
 			name = Debug;
 		};
 		037C3CAE2991A44B00B7EEE2 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3DF9D1BC2DA4777400129D07 /* darwin-framework-tool.Release.xcconfig */;
 			buildSettings = {
-				CHIP_BUILD_TOOLS = true;
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
-				CODE_SIGN_ENTITLEMENTS = "$(CHIP_ROOT)/examples/darwin-framework-tool/entitlements/darwin-framework-tool.entitlements";
-				CODE_SIGN_IDENTITY = "-";
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(SDKROOT)/System/iOSSupport/System/Library/Frameworks",
-				);
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"$(inherited)",
-					CHIP_HAVE_CONFIG_H,
-					"CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1",
-					CONFIG_BUILD_FOR_HOST_UNIT_TEST,
-					"CONFIG_USE_INTERACTIVE_MODE=1",
-				);
-				"HEADER_SEARCH_PATHS[arch=*]" = (
-					"$(CHIP_ROOT)/examples//darwin-framework-tool",
-					"$(CHIP_ROOT)/src",
-					"$(CHIP_ROOT)/third_party/nlassert/repo/include",
-					"$(CHIP_ROOT)/zzz_generated/darwin-framework-tool",
-					"$(CHIP_ROOT)/zzz_generated/app-common",
-					"$(CHIP_ROOT)/third_party/nlio/repo/include",
-					"$(CHIP_ROOT)/third_party/jsoncpp/repo/include",
-					"$(CHIP_ROOT)/third_party/editline/repo/include",
-					"$(CHIP_ROOT)/third_party/libwebsockets",
-					"$(CHIP_ROOT)/third_party/libwebsockets/repo/include",
-					"$(CHIP_ROOT)/third_party/libwebsockets/repo/lib/core",
-					"$(CHIP_ROOT)/third_party/libwebsockets/repo/lib/core-net",
-					"$(CHIP_ROOT)/third_party/libwebsockets/repo/lib/plat/unix",
-					"$(CHIP_ROOT)/third_party/libwebsockets/repo/lib/secure-streams",
-					"$(CHIP_ROOT)/third_party/libwebsockets/repo/lib/event-libs",
-					"$(CHIP_ROOT)/third_party/libwebsockets/repo/lib/system/metrics",
-					"$(CHIP_ROOT)/third_party/libwebsockets/repo/lib/roles",
-					"$(CHIP_ROOT)/third_party/libwebsockets/repo/lib/roles/http",
-					"$(CHIP_ROOT)/third_party/libwebsockets/repo/lib/roles/h1",
-					"$(CHIP_ROOT)/third_party/libwebsockets/repo/lib/roles/ws",
-					"$(CHIP_ROOT)/third_party/libwebsockets/repo/lib/system/async-dns",
-					"$(CHIP_ROOT)/src/include",
-					"$(CONFIGURATION_TEMP_DIR)/Matter.build/out/gen/include",
-					"$(SRCROOT)/darwin-framework-tool",
-					"$(CHIP_ROOT)/third_party/inipp/repo/inipp",
-					"$(CHIP_ROOT)/third_party/editline/include",
-					"$(CHIP_ROOT)/examples/chip-tool/commands/clusters",
-					"$(CHIP_ROOT)/examples/chip-tool",
-					"$(CHIP_ROOT)/examples/common",
-					"$(CHIP_ROOT)/zzz_generated/chip-tool",
-				);
-				LD_RUNPATH_SEARCH_PATHS = (
-					"@executable_path",
-					"$(BUILT_PRODUCTS_DIR)",
-				);
-				"LIBRARY_SEARCH_PATHS[arch=*]" = (
-					"$(CONFIGURATION_TEMP_DIR)/Matter.build/out/lib",
-					"$(CONFIGURATION_TEMP_DIR)/Matter.build/out/obj/src/app/lib",
-				);
-				OTHER_CFLAGS = "-DLWS_PLAT_UNIX";
-				"OTHER_CFLAGS[sdk=iphoneos*]" = (
-					"-DLWS_PLAT_UNIX",
-					"-DLWS_DETECTED_PLAT_IOS",
-				);
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
-				"OTHER_CPLUSPLUSFLAGS[sdk=iphoneos*]" = "$(OTHER_CFLAGS)";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				SDKROOT = macosx;
-				SUPPORTS_MACCATALYST = YES;
-				SYSTEM_HEADER_SEARCH_PATHS = "$(CHIP_ROOT)/src/darwin/Framework/CHIP/";
-				WARNING_CFLAGS = (
-					"-Wformat",
-					"-Wformat-nonliteral",
-					"-Wformat-security",
-					"-Wconversion",
-					"-Wno-documentation",
-				);
 			};
 			name = Release;
 		};
 		BA09EB732474881D00605257 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3DF9D1B22D9F44DB00129D07 /* Project.Debug.xcconfig */;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				CHIP_ROOT = "$(PROJECT_DIR)/../../..";
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
-				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
-				CLANG_WARN_COMMA = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_INFINITE_RECURSION = YES;
-				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
-				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES_ERROR;
-				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
-				CLANG_WARN_STRICT_PROTOTYPES = YES;
-				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = YES;
-				CLANG_WARN_SUSPICIOUS_MOVE = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CURRENT_PROJECT_VERSION = 1;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DWARF_DSYM_FILE_SHOULD_ACCOMPANY_PRODUCT = YES;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"$(inherited)",
-					"DEBUG=1",
-					"MTR_NO_AVAILABILITY=1",
-					"MTR_ENABLE_PROVISIONAL=1",
-					"MTR_ENABLE_UNSTABLE_API=1",
-				);
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
-				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				ONLY_ACTIVE_ARCH = YES;
-				OTHER_LDFLAGS = "-Wl,-unexported_symbol,\"__Z*\"";
-				OTHER_TAPI_FLAGS = "-x objective-c++ -std=gnu++17 -fvisibility=hidden -fobjc-arc";
-				SDKROOT = iphoneos;
-				SUPPORTED_PLATFORMS = "macosx iphonesimulator iphoneos appletvos appletvsimulator watchos watchsimulator";
-				SUPPORTS_TEXT_BASED_API = YES;
-				SWIFT_INSTALL_OBJC_HEADER = NO;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 5.0;
-				TAPI_ENABLE_PROJECT_HEADERS = YES;
-				TARGETED_DEVICE_FAMILY = "1,2,3,4";
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-				WARNING_CFLAGS = (
-					"-Wformat",
-					"-Wformat-nonliteral",
-					"-Wformat-security",
-				);
 			};
 			name = Debug;
 		};
 		BA09EB742474881D00605257 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3DF9D1B92DA4770D00129D07 /* Matter.Debug.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = "";
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"$(inherited)",
-					CHIP_HAVE_CONFIG_H,
-					"CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1",
-				);
-				INFOPLIST_FILE = CHIP/Info.plist;
-				INSTALLHDRS_SCRIPT_PHASE = YES;
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
-				LIBRARY_SEARCH_PATHS = "$(TEMP_DIR)/out/lib";
-				MODULEMAP_FILE = CHIP/Matter.modulemap;
-				OTHER_CFLAGS = "-fmacro-prefix-map=$(SRCROOT)/CHIP/=";
-				OTHER_CPLUSPLUSFLAGS = (
-					"$(OTHER_CFLAGS)",
-					"-fno-c++-static-destructors",
-					"-DCHIP_CONFIG_GLOBALS_NO_DESTRUCT=1",
-				);
-				OTHER_LDFLAGS = "";
-				"OTHER_LDFLAGS[sdk=*]" = (
-					"-framework",
-					CoreData,
-					"-framework",
-					Foundation,
-					"-framework",
-					CoreBluetooth,
-					"-lnetwork",
-					"-Wl,-unexported_symbol,\"__Z*\"",
-					"-Wl,-unexported_symbol,\"___*\"",
-					"-Wl,-unexported_symbol,\"__Unwind_*\"",
-					"-Wl,-unexported_symbol,\"_unw_*\"",
-					"-Wl,-hidden-lCHIP",
-				);
-				"OTHER_LDFLAGS[sdk=macosx*]" = (
-					"-framework",
-					IOKit,
-					"-framework",
-					CoreWLAN,
-					"-framework",
-					SystemConfiguration,
-					"-lnetwork",
-					"-framework",
-					CoreBluetooth,
-					"-framework",
-					CoreData,
-					"-Wl,-unexported_symbol,\"__Z*\"",
-					"-Wl,-unexported_symbol,\"___*\"",
-					"-Wl,-unexported_symbol,\"__Unwind_*\"",
-					"-Wl,-unexported_symbol,\"_unw_*\"",
-					"-Wl,-hidden-lCHIP",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.csa.matter;
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SDKROOT = iphoneos;
-				STRIP_STYLE = "non-global";
-				SYSTEM_HEADER_SEARCH_PATHS = (
-					"$(TEMP_DIR)/out/gen/include",
-					"$(CHIP_ROOT)/src/darwin/Framework/CHIP/",
-					"$(CHIP_ROOT)/src",
-					"$(CHIP_ROOT)/src/include",
-					"$(CHIP_ROOT)/zzz_generated/",
-					"$(CHIP_ROOT)/zzz_generated/app-common",
-					"$(CHIP_ROOT)/third_party/nlassert/repo/include",
-					"$(CHIP_ROOT)/third_party/nlio/repo/include",
-				);
-				TAPI_VERIFY_MODE = Pedantic;
-				TARGETED_DEVICE_FAMILY = "1,2,3,4";
-				VERSION_INFO_EXPORT_DECL = "__attribute__((visibility(\"hidden\")))";
 			};
 			name = Debug;
 		};
 		BA09EB752474881D00605257 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3DF9D1B02D9F330A00129D07 /* MatterTests.xcconfig */;
 			buildSettings = {
-				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
-				"HEADER_SEARCH_PATHS[arch=*]" = "$(PROJECT_DIR)/../../../src";
-				INFOPLIST_FILE = CHIPTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.chip.CHIPTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "CHIPTests/MatterTests-Bridging-Header.h";
-				TARGETED_DEVICE_FAMILY = "1,2,3,4";
 			};
 			name = Debug;
 		};
 		BA09EB772474882200605257 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3DF9D1B32D9F44E700129D07 /* Project.Release.xcconfig */;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				CHIP_ROOT = "$(PROJECT_DIR)/../../..";
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
-				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
-				CLANG_WARN_COMMA = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_INFINITE_RECURSION = YES;
-				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
-				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES_ERROR;
-				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
-				CLANG_WARN_STRICT_PROTOTYPES = YES;
-				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = YES;
-				CLANG_WARN_SUSPICIOUS_MOVE = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CURRENT_PROJECT_VERSION = 1;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DWARF_DSYM_FILE_SHOULD_ACCOMPANY_PRODUCT = YES;
-				ENABLE_NS_ASSERTIONS = NO;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"$(inherited)",
-					"MTR_NO_AVAILABILITY=1",
-					"MTR_ENABLE_PROVISIONAL=1",
-					"MTR_ENABLE_UNSTABLE_API=1",
-				);
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
-				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				ONLY_ACTIVE_ARCH = YES;
-				OTHER_LDFLAGS = "-Wl,-unexported_symbol,\"__Z*\"";
-				OTHER_TAPI_FLAGS = "-x objective-c++ -std=gnu++17 -fvisibility=hidden -fobjc-arc";
-				SDKROOT = iphoneos;
-				SUPPORTED_PLATFORMS = "macosx iphonesimulator iphoneos appletvos appletvsimulator watchos watchsimulator";
-				SUPPORTS_TEXT_BASED_API = YES;
-				SWIFT_INSTALL_OBJC_HEADER = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,3,4";
-				VALIDATE_PRODUCT = YES;
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-				WARNING_CFLAGS = (
-					"-Wformat",
-					"-Wformat-nonliteral",
-					"-Wformat-security",
-				);
 			};
 			name = Release;
 		};
 		BA09EB782474882200605257 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3DF9D1BA2DA4774100129D07 /* Matter.Release.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = "";
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"$(inherited)",
-					CHIP_HAVE_CONFIG_H,
-					"CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1",
-				);
-				INFOPLIST_FILE = CHIP/Info.plist;
-				INSTALLHDRS_SCRIPT_PHASE = YES;
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
-				LIBRARY_SEARCH_PATHS = "$(TEMP_DIR)/out/lib";
-				MODULEMAP_FILE = CHIP/Matter.modulemap;
-				OTHER_CFLAGS = "-fmacro-prefix-map=$(SRCROOT)/CHIP/=";
-				OTHER_CPLUSPLUSFLAGS = (
-					"$(OTHER_CFLAGS)",
-					"-fno-c++-static-destructors",
-					"-DCHIP_CONFIG_GLOBALS_NO_DESTRUCT=1",
-				);
-				OTHER_LDFLAGS = "";
-				"OTHER_LDFLAGS[sdk=*]" = (
-					"-framework",
-					CoreData,
-					"-framework",
-					Foundation,
-					"-framework",
-					CoreBluetooth,
-					"-lnetwork",
-					"-Wl,-unexported_symbol,\"__Z*\"",
-					"-Wl,-unexported_symbol,\"___*\"",
-					"-Wl,-unexported_symbol,\"__Unwind_*\"",
-					"-Wl,-unexported_symbol,\"_unw_*\"",
-					"-Wl,-unexported_symbol,\"_OBJC_IVAR_*\"",
-					"-Wl,-hidden-lCHIP",
-				);
-				"OTHER_LDFLAGS[sdk=macosx*]" = (
-					"-framework",
-					IOKit,
-					"-framework",
-					CoreWLAN,
-					"-framework",
-					SystemConfiguration,
-					"-lnetwork",
-					"-framework",
-					CoreBluetooth,
-					"-framework",
-					CoreData,
-					"-Wl,-unexported_symbol,\"__Z*\"",
-					"-Wl,-unexported_symbol,\"___*\"",
-					"-Wl,-unexported_symbol,\"__Unwind_*\"",
-					"-Wl,-unexported_symbol,\"_unw_*\"",
-					"-Wl,-unexported_symbol,\"_OBJC_IVAR_*\"",
-					"-Wl,-hidden-lCHIP",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.csa.matter;
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SDKROOT = iphoneos;
-				STRIP_STYLE = "non-global";
-				SYSTEM_HEADER_SEARCH_PATHS = (
-					"$(TEMP_DIR)/out/gen/include",
-					"$(CHIP_ROOT)/src/darwin/Framework/CHIP/",
-					"$(CHIP_ROOT)/src",
-					"$(CHIP_ROOT)/src/include",
-					"$(CHIP_ROOT)/zzz_generated/",
-					"$(CHIP_ROOT)/zzz_generated/app-common",
-					"$(CHIP_ROOT)/third_party/nlassert/repo/include",
-					"$(CHIP_ROOT)/third_party/nlio/repo/include",
-				);
-				TAPI_VERIFY_MODE = Pedantic;
-				TARGETED_DEVICE_FAMILY = "1,2,3,4";
-				VERSION_INFO_EXPORT_DECL = "__attribute__((visibility(\"hidden\")))";
 			};
 			name = Release;
 		};
 		BA09EB792474882200605257 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3DF9D1B02D9F330A00129D07 /* MatterTests.xcconfig */;
 			buildSettings = {
-				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
-				"HEADER_SEARCH_PATHS[arch=*]" = "$(PROJECT_DIR)/../../../src";
-				INFOPLIST_FILE = CHIPTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.chip.CHIPTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "CHIPTests/MatterTests-Bridging-Header.h";
-				TARGETED_DEVICE_FAMILY = "1,2,3,4";
 			};
 			name = Release;
 		};

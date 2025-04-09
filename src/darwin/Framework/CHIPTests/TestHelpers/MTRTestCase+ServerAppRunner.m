@@ -17,8 +17,10 @@
 #import <Matter/Matter.h>
 
 #import "MTRTestCase+ServerAppRunner.h"
+#import "MTRTestControllerDelegate.h"
 
 static unsigned sAppRunnerIndex = 1;
+static const uint16_t kPairingTimeoutInSeconds = 30;
 
 #if HAVE_NSTASK
 // kBasePort gets the discriminator added to it to figure out the port the app
@@ -105,6 +107,53 @@ static const uint16_t kBasePort = 5542 - kMinDiscriminator;
     [self launchTask:[self doStartAppWithName:name arguments:arguments payload:payload]];
     return YES;
 #endif // HAVE_NSTASK
+}
+
++ (MTRDeviceController *)startCommissionedAppWithName:(NSString *)name arguments:(NSArray<NSString *> *)arguments payload:(NSString *)payload nodeID:(NSNumber *)nodeID
+{
+    BOOL started = [self startAppWithName:name arguments:arguments payload:payload];
+    XCTAssertTrue(started);
+
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+
+    XCTestExpectation * expectation = [[XCTestExpectation alloc] initWithDescription:@"Wait for commissioning to complete"];
+
+    MTRTestControllerDelegate * delegate = [[MTRTestControllerDelegate alloc] initWithExpectation:expectation newNodeID:nodeID];
+
+    [controller addDeviceControllerDelegate:delegate queue:dispatch_get_main_queue()];
+
+    NSError * error;
+    __auto_type * payloadObj = [MTRSetupPayload setupPayloadWithOnboardingPayload:payload error:&error];
+    XCTAssertNotNil(payload);
+    XCTAssertNil(error);
+
+    [controller setupCommissioningSessionWithPayload:payloadObj newNodeID:nodeID error:&error];
+    XCTAssertNil(error);
+
+    XCTAssertEqual([XCTWaiter waitForExpectations:@[ expectation ] timeout:kPairingTimeoutInSeconds], XCTWaiterResultCompleted);
+
+    return controller;
+}
+
++ (MTRDeviceController *)startCommissionedAppWithName:(NSString *)name arguments:(NSArray<NSString *> *)arguments nodeID:(NSNumber *)nodeID
+{
+    NSNumber * passcode = [MTRSetupPayload generateRandomSetupPasscode];
+    XCTAssertNotNil(passcode);
+
+    NSNumber * discriminator = @(arc4random() % (1 << 12)); // Discriminator is 12 bits.
+
+    __auto_type * payload = [[MTRSetupPayload alloc] initWithSetupPasscode:passcode discriminator:discriminator];
+    XCTAssertNotNil(payload);
+
+    payload.version = @(1);
+    payload.vendorID = @(0xFFF1);
+    payload.productID = @(0x8001);
+    payload.discoveryCapabilities = MTRDiscoveryCapabilitiesOnNetwork;
+
+    NSString * payloadString = [payload qrCodeString];
+    XCTAssertNotNil(payloadString);
+
+    return [self startCommissionedAppWithName:name arguments:arguments payload:payloadString nodeID:nodeID];
 }
 
 + (unsigned)nextUniqueIndex
