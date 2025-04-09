@@ -148,15 +148,15 @@ CHIP_ERROR NFCCommissioningManagerImpl::ConnectToCard()
     return result;
 }
 
-
 CHIP_ERROR NFCCommissioningManagerImpl::SelectMatterApplet(void)
 {
     ChipLogProgress(DeviceLayer, "NFCCommissioningManagerImpl::SelectMatterApplet()");
 
-    if (hCard == 0) {
-       CHIP_ERROR ret = ConnectToCard();
-       VerifyOrReturnLogError(ret == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
-       VerifyOrReturnLogError(hCard != 0, CHIP_ERROR_INTERNAL);
+    if (hCard == 0)
+    {
+        CHIP_ERROR ret = ConnectToCard();
+        VerifyOrReturnLogError(ret == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
+        VerifyOrReturnLogError(hCard != 0, CHIP_ERROR_INTERNAL);
     }
 
     BYTE dataReceived[10];
@@ -465,10 +465,11 @@ CHIP_ERROR NFCCommissioningManagerImpl::Transceive(const char * commandName, uin
 {
     CHIP_ERROR ret;
 
-    if (hCard == 0) {
-       ret = ConnectToCard();
-       VerifyOrReturnLogError(ret == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
-       VerifyOrReturnLogError(hCard != 0, CHIP_ERROR_INTERNAL);
+    if (hCard == 0)
+    {
+        ret = ConnectToCard();
+        VerifyOrReturnLogError(ret == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
+        VerifyOrReturnLogError(hCard != 0, CHIP_ERROR_INTERNAL);
     }
 
     // Use a local 'dwRecvLength' variable to avoid cast of pRcvLength from 'uint32_t *' to 'DWORD *'.

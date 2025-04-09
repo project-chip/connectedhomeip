@@ -30,10 +30,10 @@
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/BLEManager.h>
-#include <platform/internal/NFCCommissioningManager.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/EventLogging.h>
 #include <platform/internal/GenericPlatformManagerImpl.h>
+#include <platform/internal/NFCCommissioningManager.h>
 
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
