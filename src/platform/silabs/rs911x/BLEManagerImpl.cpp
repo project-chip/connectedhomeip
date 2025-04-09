@@ -164,12 +164,14 @@ void rsi_ble_add_matter_service(void)
                                                    RSI_BLE_ATT_PROPERTY_INDICATE, // Set read, write, write without response
                                                data, sizeof(data), ATT_REC_MAINTAIN_IN_HOST);
 #ifdef CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    // C3 characteristic is of 128 bit UUID format structure - where val128 is of uuid128_t which is composed of uint32_t data1,
+    // uint16_t data2, uint16_t data3, uint8_t data4[8];
     constexpr uuid_t custom_characteristic_C3 = { .size     = RSI_BLE_CHAR_C3_UUID_SIZE,
                                                   .reserved = { RSI_BLE_CHAR_C3_RESERVED },
-                                                  .val      = { .val128 = { .data1 = RSI_BLE_CHAR_C3_VAL_128_DATA_1,
-                                                                            .data2 = RSI_BLE_CHAR_C3_VAL_128_DATA_2,
-                                                                            .data3 = RSI_BLE_CHAR_C3_VAL_128_DATA_3,
-                                                                            .data4 = { RSI_BLE_CHAR_C3_VAL_128_DATA_4 } } } };
+                                                  .val      = { .val128 = { .data1 = RSI_BLE_CHAR_C3_UUID_1,
+                                                                            .data2 = RSI_BLE_CHAR_C3_UUID_2,
+                                                                            .data3 = RSI_BLE_CHAR_C3_UUID_3,
+                                                                            .data4 = { RSI_BLE_CHAR_C3_UUID_4 } } } };
 
     // Adding custom characteristic declaration to the custom service
     SilabsBleWrapper::rsi_ble_add_char_serv_att(
