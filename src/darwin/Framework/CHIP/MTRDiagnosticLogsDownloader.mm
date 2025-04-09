@@ -95,7 +95,9 @@ NS_ASSUME_NONNULL_BEGIN
                     completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
                           done:(void (^)(MTRDownload * finishedDownload))done;
 
-- (void)abortDownloadsForController:(MTRDeviceController_Concrete *)controller;
+// Abort either all downloads for the given controller (if nodeID is nil), or
+// just the ones for the relevant node ID.
+- (void)abortDownloadsForController:(MTRDeviceController_Concrete *)controller nodeID:(nullable NSNumber *)nodeID;
 
 @end
 
@@ -421,13 +423,17 @@ static void OnTransferTimeout(chip::System::Layer * layer, void * context)
     return download;
 }
 
-- (void)abortDownloadsForController:(MTRDeviceController_Concrete *)controller
+- (void)abortDownloadsForController:(MTRDeviceController_Concrete *)controller nodeID:(nullable NSNumber *)nodeID
 {
     assertChipStackLockedByCurrentThread();
 
     auto fabricIndex = @(controller.fabricIndex);
     for (MTRDownload * download in [_downloads copy]) {
         if (![download.fabricIndex isEqual:fabricIndex]) {
+            continue;
+        }
+
+        if (nodeID && ![download.nodeID isEqual:nodeID]) {
             continue;
         }
 
@@ -483,13 +489,13 @@ static void OnTransferTimeout(chip::System::Layer * layer, void * context)
                              type:(MTRDiagnosticLogType)type
                           timeout:(NSTimeInterval)timeout
                             queue:(dispatch_queue_t)queue
-                       completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion;
+                       completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
 {
     assertChipStackLockedByCurrentThread();
 
-    // Fow now, we only support one download at a time per controller; abort
+    // Fow now, we only support one download at a time per target device; abort
     // any existing ones so we can start this new one.
-    [self abortDownloadsForController:controller];
+    [self _abortDownloadsForController:controller nodeID:nodeID];
 
     // This block is always called when a download is finished.
     auto done = ^(MTRDownload * finishedDownload) {
@@ -521,18 +527,23 @@ static void OnTransferTimeout(chip::System::Layer * layer, void * context)
         controller.compressedFabricID.unsignedLongLongValue, nodeID.unsignedLongLongValue, nodeID.unsignedLongLongValue);
 }
 
-- (void)abortDownloadsForController:(MTRDeviceController_Concrete *)controller;
+- (void)abortDownloadsForController:(MTRDeviceController_Concrete *)controller
+{
+    [self _abortDownloadsForController:controller nodeID:nil];
+}
+
+- (void)_abortDownloadsForController:(MTRDeviceController_Concrete *)controller nodeID:(nullable NSNumber *)nodeID
 {
     assertChipStackLockedByCurrentThread();
 
-    [_downloads abortDownloadsForController:controller];
+    [_downloads abortDownloadsForController:controller nodeID:nodeID];
 }
 
 - (void)handleBDXTransferSessionBeginForFileDesignator:(NSString *)fileDesignator
                                            fabricIndex:(NSNumber *)fabricIndex
                                                 nodeID:(NSNumber *)nodeID
                                             completion:(MTRStatusCompletion)completion
-                                          abortHandler:(AbortHandler)abortHandler;
+                                          abortHandler:(AbortHandler)abortHandler
 {
     assertChipStackLockedByCurrentThread();
 

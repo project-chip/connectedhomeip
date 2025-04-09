@@ -598,6 +598,22 @@ void MatterAccessControlPluginServerInitCallback()
 #endif
 }
 
+void MatterAccessControlPluginServerShutdownCallback()
+{
+    ChipLogProgress(DataManagement, "AccessControlCluster: shutdown");
+
+#if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+    auto accessRestrictionProvider = GetAccessControl().GetAccessRestrictionProvider();
+    if (accessRestrictionProvider != nullptr)
+    {
+        accessRestrictionProvider->RemoveListener(sAttribute);
+    }
+#endif
+
+    GetAccessControl().RemoveEntryListener(sAttribute);
+    AttributeAccessInterfaceRegistry::Instance().Unregister(&sAttribute);
+}
+
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
 bool emberAfAccessControlClusterReviewFabricRestrictionsCallback(
     CommandHandler * commandObj, const ConcreteCommandPath & commandPath,

@@ -225,3 +225,9 @@ void MatterSoftwareDiagnosticsPluginServerInitCallback()
     AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
     CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&gCommandHandler);
 }
+
+void MatterSoftwareDiagnosticsPluginServerShutdownCallback()
+{
+    AttributeAccessInterfaceRegistry::Instance().Unregister(&gAttrAccess);
+    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(&gCommandHandler);
+}

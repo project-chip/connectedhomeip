@@ -1558,14 +1558,14 @@ TEST_F(TestChipCryptoPAL, TestCSR_GenByKeypair)
 
     Test_P256Keypair keypair;
     EXPECT_EQ(keypair.Initialize(ECPKeyTarget::ECDSA), CHIP_NO_ERROR);
-    EXPECT_EQ(keypair.NewCertificateSigningRequest(csr, length), CHIP_NO_ERROR);
-    EXPECT_GT(length, 0u);
+    ASSERT_EQ(keypair.NewCertificateSigningRequest(csr, length), CHIP_NO_ERROR);
+    ASSERT_GT(length, 2u);
 
     P256PublicKey pubkey;
     CHIP_ERROR err = VerifyCertificateSigningRequest(csr, length, pubkey);
     if (err != CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
     {
-        EXPECT_EQ(err, CHIP_NO_ERROR);
+        ASSERT_EQ(err, CHIP_NO_ERROR);
         EXPECT_EQ(pubkey.Length(), kP256_PublicKey_Length);
         EXPECT_EQ(memcmp(pubkey.ConstBytes(), keypair.Pubkey().ConstBytes(), pubkey.Length()), 0);
 

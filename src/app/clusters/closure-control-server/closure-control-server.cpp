@@ -311,3 +311,4 @@ void Instance::HandleCalibrate(HandlerContext & ctx, const Commands::Calibrate::
 // Plugin initialization
 
 void MatterClosureControlPluginServerInitCallback() {}
+void MatterClosureControlPluginServerShutdownCallback() {}

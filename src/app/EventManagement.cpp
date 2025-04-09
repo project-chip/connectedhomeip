@@ -262,7 +262,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR EventManagement::CalculateEventSize(EventLoggingDelegate * apDelegate, const EventOptions * apOptions,
+CHIP_ERROR EventManagement::CalculateEventSize(EventLoggingDelegate * apDelegate, const InternalEventOptions * apOptions,
                                                uint32_t & requiredSize)
 {
     System::PacketBufferTLVWriter writer;
@@ -285,7 +285,7 @@ CHIP_ERROR EventManagement::CalculateEventSize(EventLoggingDelegate * apDelegate
 }
 
 CHIP_ERROR EventManagement::ConstructEvent(EventLoadOutContext * apContext, EventLoggingDelegate * apDelegate,
-                                           const EventOptions * apOptions)
+                                           const InternalEventOptions * apOptions)
 {
     VerifyOrReturnError(apContext->mCurrentEventNumber >= apContext->mStartingEventNumber, CHIP_NO_ERROR
                         /* no-op: don't write event, but advance current event Number */);
@@ -425,7 +425,7 @@ CHIP_ERROR EventManagement::LogEventPrivate(EventLoggingDelegate * apDelegate, c
     aEventNumber                 = 0;
     CircularTLVWriter checkpoint = writer;
     EventLoadOutContext ctxt     = EventLoadOutContext(writer, aEventOptions.mPriority, mLastEventNumber);
-    EventOptions opts;
+    InternalEventOptions opts;
 
     Timestamp timestamp;
 #if CHIP_DEVICE_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS
@@ -442,7 +442,7 @@ CHIP_ERROR EventManagement::LogEventPrivate(EventLoggingDelegate * apDelegate, c
         timestamp         = Timestamp::System(systemTimeMs);
     }
 
-    opts = EventOptions(timestamp);
+    opts = InternalEventOptions(timestamp);
     // Start the event container (anonymous structure) in the circular buffer
     writer.Init(*mpEventBuffer);
 

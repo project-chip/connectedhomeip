@@ -22,6 +22,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <rtc/rtc.hpp>
 #include <webrtc_manager/WebRTCProviderClient.h>
+#include <webrtc_manager/WebRTCRequestorDelegate.h>
 
 class WebRTCManager
 {
@@ -43,16 +44,15 @@ public:
 
     CHIP_ERROR ProvideICECandidates(uint16_t webRTCSessionID);
 
-    void HandleCommandResponse(const chip::app::ConcreteCommandPath & path, chip::TLV::TLVReader & data);
-
 private:
     // Make the constructor private to enforce the singleton pattern
     WebRTCManager();
     ~WebRTCManager();
 
-    void HandleProvideOfferResponse(chip::TLV::TLVReader & data);
+    chip::app::Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorServer mWebRTCRequestorServer;
 
     WebRTCProviderClient mWebRTCProviderClient;
+    WebRTCRequestorDelegate mWebRTCRequestorDelegate;
 
     std::shared_ptr<rtc::PeerConnection> mPeerConnection;
     std::shared_ptr<rtc::DataChannel> mDataChannel;
