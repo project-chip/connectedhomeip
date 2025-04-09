@@ -8740,6 +8740,8 @@ endpoint 1 {
   server cluster LaundryWasherMode {
     callback attribute supportedModes;
     callback attribute currentMode;
+    ram      attribute startUpMode;
+    ram      attribute onMode;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -8753,6 +8755,8 @@ endpoint 1 {
   server cluster RefrigeratorAndTemperatureControlledCabinetMode {
     callback attribute supportedModes;
     callback attribute currentMode;
+    ram      attribute startUpMode;
+    ram      attribute onMode;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -8828,6 +8832,8 @@ endpoint 1 {
   server cluster DishwasherMode {
     callback attribute supportedModes;
     callback attribute currentMode;
+    ram      attribute startUpMode;
+    ram      attribute onMode;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
