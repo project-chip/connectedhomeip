@@ -1044,13 +1044,13 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZSavePreset(HandlerContext & 
     if (updatingExistingPreset)
     {
         ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Updating existing MPTZ Preset.  Preset ID = %d. Preset Name = %s",
-            mEndpointId, presetToUse, aMptzPresetHelper.GetName().c_str());
+                      mEndpointId, presetToUse, aMptzPresetHelper.GetName().c_str());
         *it = aMptzPresetHelper;
     }
     else
     {
         ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Saving new MPTZ Preset. Preset ID = %d. Preset Name = %s",
-            mEndpointId, presetToUse, aMptzPresetHelper.GetName().c_str());
+                      mEndpointId, presetToUse, aMptzPresetHelper.GetName().c_str());
         mMptzPresetHelpers.push_back(aMptzPresetHelper);
     }
 
