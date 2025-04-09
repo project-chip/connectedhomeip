@@ -852,7 +852,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRelativeMove(HandlerContext 
         // If we're here, then we'll also have an existing Zoom value in MPTZPosition. The zoom values are constrained such that
         // we won't overflow newZoomValue
         //
-        int newZoomValue = static_cast<int>(mMptzPosition.zoom.Value() + zoomDeltaValue);
+        int newZoomValue = static_cast<int>(mMptzPosition.zoom.Value()) + zoomDeltaValue;
 
         if (newZoomValue > mZoomMax)
         {
