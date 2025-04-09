@@ -7743,6 +7743,14 @@
           "enabled": 1,
           "commands": [
             {
+              "name": "Pause",
+              "code": 0,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
               "name": "Stop",
               "code": 1,
               "mfgCode": null,
@@ -7753,6 +7761,14 @@
             {
               "name": "Start",
               "code": 2,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
+              "name": "Resume",
+              "code": 3,
               "mfgCode": null,
               "source": "client",
               "isIncoming": 1,

@@ -575,7 +575,7 @@ void CameraAvSettingsUserLevelMgmtServer::InvokeCommand(HandlerContext & handler
         return;
 
     case Commands::MPTZSavePreset::Id:
-        ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Save new MPTZ Preset", mEndpointId);
+        ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Saving MPTZ Preset", mEndpointId);
 
         if (!HasFeature(Feature::kMechanicalPresets))
         {
@@ -980,7 +980,6 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZSavePreset(HandlerContext & 
     Optional<uint8_t> preset  = commandData.presetID;
     chip::CharSpan presetName = commandData.name;
     uint8_t presetToUse       = mCurrentPresetID;
-    bool newPresetValue       = true;
 
     // Do we have a user provided preset ID? If yes, is it in range?
     //
@@ -1001,13 +1000,13 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZSavePreset(HandlerContext & 
     auto it = std::find_if(mMptzPresetHelpers.begin(), mMptzPresetHelpers.end(),
                            [presetToUse](const MPTZPresetHelper & mptzph) { return mptzph.GetPresetID() == presetToUse; });
 
-    // The new preset indicator may be reset to false only if the current preset results in an entry from the current known set and
-    // there was a provided preset.
+    // If the current preset ID results in an entry from the current known set and there was a provided preset then we're updating
+    // an existing preset.  Only check for exhausting max presets if we're NOT updating. 
     // It is possible that mCurrentPresetID equates to a current preset in cases where the collection of presets is full
     //
-    newPresetValue = !((it != mMptzPresetHelpers.end()) && (preset.HasValue()));
+    bool updatingExistingPreset = (it != mMptzPresetHelpers.end()) && (preset.HasValue());
 
-    if (newPresetValue)
+    if (!updatingExistingPreset)
     {
         // Make sure that the vector will not exceed the max size
         //
@@ -1038,25 +1037,25 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZSavePreset(HandlerContext & 
 
     aMptzPresetHelper.SetPresetID(presetToUse);
     aMptzPresetHelper.SetName(presetName);
-
-    ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Saving new MPTZ Preset.  Preset ID = %d. Preset Name = %s",
-                  mEndpointId, presetToUse, aMptzPresetHelper.GetName().c_str());
-
     aMptzPresetHelper.SetMptzPosition(mMptzPosition);
 
-    // Add to the set only if new, otherwise replace what is at the iterator
+    // If an update, replace what is at the iterator, otherwise add to the set as tis is new 
     //
-    if (newPresetValue)
+    if (updatingExistingPreset)
     {
-        mMptzPresetHelpers.push_back(aMptzPresetHelper);
+        ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Updating existing MPTZ Preset.  Preset ID = %d. Preset Name = %s",
+            mEndpointId, presetToUse, aMptzPresetHelper.GetName().c_str());
+        *it = aMptzPresetHelper;
     }
     else
     {
-        *it = aMptzPresetHelper;
+        ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Saving new MPTZ Preset. Preset ID = %d. Preset Name = %s",
+            mEndpointId, presetToUse, aMptzPresetHelper.GetName().c_str());
+        mMptzPresetHelpers.push_back(aMptzPresetHelper);
     }
 
     // Update the current preset ID to the next available only if we actually used the current value.  A user provided preset
-    // could any value between 1 and MaxPresets
+    // could have any value between 1 and MaxPresets
     //
     if (presetToUse == mCurrentPresetID)
     {
