@@ -38,7 +38,7 @@ inline constexpr std::array<ClusterConfiguration<FeatureBitmapType>, 3> kCluster
     },
 } };
 
-} // namespace EmberApplicationConfig
+} // namespace StaticApplicationConfig
 } // namespace PowerSource
 } // namespace Clusters
 } // namespace app

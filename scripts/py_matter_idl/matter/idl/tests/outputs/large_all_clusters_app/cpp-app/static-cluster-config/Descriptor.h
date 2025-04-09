@@ -50,7 +50,7 @@ inline constexpr std::array<ClusterConfiguration<FeatureBitmapType>, 6> kCluster
     },
 } };
 
-} // namespace EmberApplicationConfig
+} // namespace StaticApplicationConfig
 } // namespace Descriptor
 } // namespace Clusters
 } // namespace app
