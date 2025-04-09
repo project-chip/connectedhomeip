@@ -69,7 +69,8 @@ public:
 
 private:
     void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext & handlerContext) final;
-    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) final;
+    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
+                                         DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder) final;
 
     bool mOverrideAcceptedCommands = false;
     bool mClaimNoCommands          = false;
@@ -105,8 +106,11 @@ void TestClusterCommandHandler::InvokeCommand(chip::app::CommandHandlerInterface
 }
 
 CHIP_ERROR TestClusterCommandHandler::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
-                                                                CommandHandlerInterface::CommandIdCallback callback, void * context)
+                                                                DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
+    using namespace Clusters::UnitTesting::Commands;
+    using Priv = Access::Privilege;
+
     if (!mOverrideAcceptedCommands)
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
@@ -117,9 +121,8 @@ CHIP_ERROR TestClusterCommandHandler::EnumerateAcceptedCommands(const ConcreteCl
         return CHIP_NO_ERROR;
     }
 
-    // We just have one command id.
-    callback(Clusters::UnitTesting::Commands::TestSimpleArgumentRequest::Id, context);
-    return CHIP_NO_ERROR;
+    static constexpr DataModel::AcceptedCommandEntry entries[] = { { TestSimpleArgumentRequest::Id, {}, Priv::kOperate } };
+    return builder.ReferenceExisting({ entries, std::size(entries) });
 }
 
 } // namespace
