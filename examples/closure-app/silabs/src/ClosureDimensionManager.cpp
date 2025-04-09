@@ -105,14 +105,14 @@ CHIP_ERROR ClosureDimensionDelegate::HandleStep(const StepDirectionEnum & direct
     int32_t stepSize = 100; // Each step = 1%
     int32_t delta    = numberOfSteps * stepSize;
 
-    if (direction == StepDirectionEnum::kDown)
+    if (direction == StepDirectionEnum::kDecrease)
     {
         delta = -delta;
     }
 
     // Get current position from your actuator or state
-    uint16_t currentPos = GetCurrentPosition(); // 0 - 10000
-    int32_t newPos      = std::clamp(static_cast<int32_t>(currentPos) + delta, 0, 10000);
+    uint16_t currentPos = 0;
+    //int32_t newPos      = std::clamp(static_cast<int32_t>(currentPos) + delta, 0, 10000);
 
     // TODO: MoveToPosition
 
@@ -122,4 +122,10 @@ CHIP_ERROR ClosureDimensionDelegate::HandleStep(const StepDirectionEnum & direct
     }
 
     return CHIP_NO_ERROR;
+}
+
+void ClosureDimensionManager::SetCallbacks(Callback_fn_initiated aActionInitiated_CB, Callback_fn_completed aActionCompleted_CB)
+{
+    mActionInitiated_CB = aActionInitiated_CB;
+    mActionCompleted_CB = aActionCompleted_CB;
 }

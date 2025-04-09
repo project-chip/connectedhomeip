@@ -41,12 +41,28 @@ public:
     CHIP_ERROR HandleStep(const StepDirectionEnum & direction, const uint16_t & numberOfSteps,
                           const Optional<Globals::ThreeLevelAutoEnum> & speed) override;
 
-    // ------------------------------------------------------------------
-    // Get attribute methods
+private:
+    EndpointId mEndpoint;
+
+};
 
 class ClosureDimensionManager
 {
 public:
+
+    enum Action_t
+    {
+        LOCK_ACTION = 0,
+        UNLOCK_ACTION,
+        UNLATCH_ACTION,
+
+        INVALID_ACTION
+    } Action;
+
+    typedef void (*Callback_fn_initiated)(Action_t, int32_t aActor);
+    typedef void (*Callback_fn_completed)(Action_t);
+    void SetCallbacks(Callback_fn_initiated aActionInitiated_CB, Callback_fn_completed aActionCompleted_CB);
+
     ClosureDimensionManager(EndpointId endpoint) :
         mEndpoint(endpoint), mContext(mEndpoint), mDelegate(mEndpoint), mLogic(mDelegate, mContext), mInterface(mEndpoint, mLogic)
     {}
@@ -60,12 +76,14 @@ public:
 private:
     const ClusterConformance kConformance = { .featureMap = 0, .supportsOverflow = false };
 
-    // Need the following so can determine which features are supported
-    ClosureDimension::Instance * mpClosureDimensionInstance = nullptr;
-    bool IsManualLatch();
-    bool IsDeviceReadytoMove();
+    EndpointId mEndpoint;
+    MatterContext mContext;
+    ClosureDimensionDelegate mDelegate;
+    ClusterLogic mLogic;
+    Interface mInterface;
 
-    static ClosureDimensionManager sClosureCtrlMgr;
+    Callback_fn_initiated mActionInitiated_CB;
+    Callback_fn_completed mActionCompleted_CB;
 };
 
 inline ClosureDimensionManager & ClosureCtrlMgr()
