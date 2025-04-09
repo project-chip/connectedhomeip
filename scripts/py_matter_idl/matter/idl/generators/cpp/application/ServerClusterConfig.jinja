@@ -20,7 +20,7 @@ namespace StaticApplicationConfig {
 {% if config.feature_bitmap_type -%}
 using FeatureBitmapType = Feature;
 {%- else -%}
-using FeatureBitmapType = NoFeatureFlagsDefined;
+using FeatureBitmapType = Clusters::StaticApplicationConfig::NoFeatureFlagsDefined;
 {%- endif %}
 
 inline constexpr std::array<Clusters::StaticApplicationConfig::ClusterConfiguration<FeatureBitmapType>, {{config.endpoint_configs | length}}> kFixedClusterConfig = { {

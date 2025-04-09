@@ -15,7 +15,7 @@ namespace Clusters {
 namespace WakeOnLan {
 namespace StaticApplicationConfig {
 
-using FeatureBitmapType = NoFeatureFlagsDefined;
+using FeatureBitmapType = Clusters::StaticApplicationConfig::NoFeatureFlagsDefined;
 
 inline constexpr std::array<Clusters::StaticApplicationConfig::ClusterConfiguration<FeatureBitmapType>, 1> kFixedClusterConfig = { {
     {
