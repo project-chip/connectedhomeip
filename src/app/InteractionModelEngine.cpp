@@ -1834,7 +1834,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandFlags(co
 
     // Command that is marked as having a large payload must be sent over a
     // session that supports it.
-    if (entry.flags.Has(DataModel::CommandQualityFlags::kLargeMessage) &&
+    if (entry.HasFlags(DataModel::CommandQualityFlags::kLargeMessage) &&
         !CurrentExchange()->GetSessionHandle()->AllowsLargePayload())
     {
         return Status::InvalidAction;
