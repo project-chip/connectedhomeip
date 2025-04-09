@@ -56,7 +56,11 @@ class TC_ACL_2_4(MatterBaseTest):
                      "Result is SUCCESS, value is stored as F1"),
             TestStep(3, "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute",
                      "Result is SUCCESS, value is list of AccessControlEntryStruct containing 1 element with admin entry N1"),
-            TestStep(4, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute with 3 elements (N1 admin, N2 view, N3 operate)", "Result is SUCCESS"),
+            TestStep(4, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute with 3 elements:\n" +
+                    "1. Admin entry (N1, privilege: Administer, authMode: CASE)\n" +
+                    "2. View entry (subjects: [111, 222, 333, 444], privilege: View, authMode: Group, targets: [{Cluster: 11}, {Endpoint: 22}])\n" +
+                    "3. Operate entry (subjects: [555, 666, 777, 888], privilege: Operate, authMode: Group, targets: [{Cluster: 55}, {Endpoint: 66}])",
+                    "Result is SUCCESS"),
             TestStep(5, "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute",
                      "Result is SUCCESS, value is list of AccessControlEntryStruct containing 3 elements"),
             TestStep(6, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute with modified entries (N1 admin, N2 manage, N3 admin)", "Result is SUCCESS"),
@@ -83,8 +87,8 @@ class TC_ACL_2_4(MatterBaseTest):
             TestStep(20, "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute",
                      "Result is SUCCESS, value contains MAXSUBJECTS random node IDs"),
             TestStep(21, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute with 4 valid CATs as subjects in the last entry", "Result is SUCCESS"),
-            TestStep(22, "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute",
-                     "Result is SUCCESS, value is list of AccessControlEntryStruct containing 2 elements with last element having 4 valid CATs as subjects),
+            TestStep(22, "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute", 
+                    "Result is SUCCESS, value is list of AccessControlEntryStruct containing 2 elements with last element having 4 valid CATs as subjects"),
             TestStep(23, "TH1 reads DUT Endpoint 0 AccessControl cluster TargetsPerAccessControlEntry attribute",
                      "Result is SUCCESS, value is stored as MAXTARGETS"),
             TestStep(24, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute with max targets", "Result is SUCCESS"),
@@ -1433,7 +1437,7 @@ class TC_ACL_2_4(MatterBaseTest):
         except Exception as e:
             self.print_step("Got expected error for an invalid CAT as subject", str(e))
 
-        # Step 37: Test fabric-scoped node ID (should fail)
+        # Step 37: Test invalid Group Node ID (should fail)
         self.step(37)
         fabric_scoped_id_acl = [
             # Admin entry (unchanged)
@@ -1444,11 +1448,11 @@ class TC_ACL_2_4(MatterBaseTest):
                 targets=NullValue,
                 fabricIndex=f1
             ),
-            # Entry with fabric-scoped node ID (should fail)
+            # Entry with invalid Group Node ID (should fail)
             Clusters.AccessControl.Structs.AccessControlEntryStruct(
                 privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,
                 authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-                subjects=[0xFFFFFFFFFFFF0000],  # Fabric-scoped node ID
+                subjects=[0xFFFFFFFFFFFF0000],  # invalid Group Node ID
                 targets=NullValue,
                 fabricIndex=f1
             )
@@ -1460,9 +1464,9 @@ class TC_ACL_2_4(MatterBaseTest):
                 [(0, acl_attribute(value=fabric_scoped_id_acl))]
             )
             asserts.assert_equal(result[0].Status, Status.ConstraintError,
-                                 "Write ACL with fabric-scoped node ID should fail with CONSTRAINT_ERROR")
+                                 "Write ACL with invalid Group Node ID should fail with CONSTRAINT_ERROR")
         except Exception as e:
-            self.print_step("Got expected error for fabric-scoped node ID", str(e))
+            self.print_step("Got expected error for invalid Group Node ID", str(e))
 
         # Step 38: Test empty target (should fail)
         self.step(38)
