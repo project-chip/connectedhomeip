@@ -61,9 +61,9 @@ class TC_OVENOPSTATE_2_3(MatterBaseTest, TC_OPSTATE_BASE):
 
     @async_test_body
     async def test_TC_OVENOPSTATE_2_3(self):
-        endpoint = self.get_endpoint(default=1)
-
-        await self.TEST_TC_OPSTATE_BASE_2_3(endpoint=endpoint)
+        # Oven Op State explicitly excludes support for Pause/Resume
+        # Do nothing
+        return
 
 
 if __name__ == "__main__":
