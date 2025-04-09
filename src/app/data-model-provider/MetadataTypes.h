@@ -173,13 +173,13 @@ _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wconversion\""
             std::underlying_type_t<Access::Privilege> writePrivilege : 5;
         };
 
-        // Static ASSERT to check size of mask type "attribute_entry_mask_t".
+        // Static ASSERT to check size of mask type "attribute_entry_mask_t"
         static_assert(sizeof(attribute_entry_mask_t) <= 4, "Size of attribute_entry_mask_t is not as expected.");
 
         attribute_entry_mask_t mask;
     };
 
-    // Static ASSERT to check size of AttributeEntry.
+    // Static ASSERT to check size of AttributeEntry
     static_assert(sizeof(AttributeEntry) <= 8, "Size of AttributeEntry is not as expected.");
 
     // Bitmask values for different Command qualities.
@@ -242,7 +242,7 @@ _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wconversion\""
             std::underlying_type_t<Access::Privilege> invokePrivilege : 5;
         };
 
-        // Static ASSERT to check size of mask type "accepted_command_entry_mask_t".
+        // Static ASSERT to check size of mask type "accepted_command_entry_mask_t"
         static_assert(sizeof(accepted_command_entry_mask_t) <= 4, "Size of accepted_command_entry_mask_t is not as expected.");
 
         accepted_command_entry_mask_t mask;
