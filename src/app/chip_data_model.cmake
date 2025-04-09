@@ -123,7 +123,7 @@ function(chip_configure_data_model APP_TARGET)
             "app/PluginApplicationCallbacks.h"
             "app/callback-stub.cpp"
             "app/cluster-callbacks.cpp"
-            "app/ember-cluster-config/{{server_cluster_name}}.h"
+            "app/static-cluster-config/{{server_cluster_name}}.h"
             OUTPUT_PATH APP_GEN_DIR
             OUTPUT_FILES APP_GEN_FILES
         )
