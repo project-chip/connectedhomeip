@@ -30,6 +30,7 @@
 #endif // DISPLAY_ENABLED
 
 #include <ClosureAppCommonMain.h>
+#include <ClosureDimensionManager.h>
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -66,6 +67,7 @@ using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Silabs;
 using namespace ::chip::DeviceLayer::Internal;
 using namespace chip::TLV;
+using chip::app::Clusters::ClosureDimension::ClosureDimensionManager;
 
 namespace chip {
 namespace app {
@@ -80,6 +82,9 @@ static chip::BitMask<Feature> sFeatureMap(Feature::kCalibration);
 } // namespace chip
 
 AppTask AppTask::sAppTask;
+constexpr const uint8_t kNamespaceClosurePanel = 0x45;
+constexpr const uint8_t kNamespaceLift         = 0x00;
+constexpr const uint8_t kNamespaceTilt         = 0x01;
 
 EndpointId GetClosureDeviceEndpointId()
 {
@@ -90,10 +95,41 @@ void ApplicationInit()
 {
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     SILABS_LOG("==================================================");
-    SILABS_LOG("Closure-app ClosureControl starting. featureMap 0x%08lx", ClosureControl::sFeatureMap.Raw());
+    SILABS_LOG("Closure-app ClosureControl and ClosureDimension starting. featureMap 0x%08lx", ClosureControl::sFeatureMap.Raw());
     ClosureApplicationInit();
     SILABS_LOG("==================================================");
+
+    ClosureDimensionManager ep2(2);
+    ClosureDimensionManager ep3(3);
+
+    const Clusters::Descriptor::Structs::SemanticTagStruct::Type gEp2TagList[] = {
+        { .namespaceID = kNamespaceClosurePanel,
+          .tag         = kNamespaceLift,
+          .label       = chip::MakeOptional(DataModel::Nullable<chip::CharSpan>("ClosurePanel.Lift"_span)) },
+    };
+    const Clusters::Descriptor::Structs::SemanticTagStruct::Type gEp3TagList[] = {
+        { .namespaceID = kNamespaceClosurePanel,
+          .tag         = kNamespaceTilt,
+          .label       = chip::MakeOptional(DataModel::Nullable<chip::CharSpan>("ClosurePanel.Tilt"_span)) },
+    };
+
+    ep2.Init();
+    ep3.Init();
+
+    ep2.SetCallbacks(AppTask::ActionInitiated, AppTask::ActionCompleted);
+    ep3.SetCallbacks(AppTask::ActionInitiated, AppTask::ActionCompleted);
+
+    SetTagList(/* endpoint= */ 2, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp2TagList));
+    SetTagList(/* endpoint= */ 3, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp3TagList));
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+}
+
+void AppTask::ActionInitiated(ClosureDimensionManager::Action_t aAction, int32_t aActor)
+{
+}
+
+void AppTask::ActionCompleted(ClosureDimensionManager::Action_t aAction)
+{
 }
 
 void ApplicationShutdown()
