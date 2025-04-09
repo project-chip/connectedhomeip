@@ -2482,6 +2482,8 @@
 				0382FA2C2992F06C00247BBB /* Commands.cpp in Sources */,
 				B4E2621E2AA0D02D00DBA5BC /* WaitForCommissioneeCommand.mm in Sources */,
 				7567A2062D7A1FFF00D91529 /* ServerClusterInterfaceRegistry.cpp in Sources */,
+				7567A2102DA5ABCF00D91529 /* DefaultServerCluster.cpp in Sources */,
+				7567A2122DA5ABCF00D91529 /* ServerClusterInterface.cpp in Sources */,
 				03F430A7299410C000166449 /* ExamplePersistentStorage.cpp in Sources */,
 				B45373AA2A9FE73400807602 /* WebSocketServer.cpp in Sources */,
 				B4E262162AA0CF1C00DBA5BC /* RemoteDataModelLogger.mm in Sources */,
