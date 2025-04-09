@@ -32,6 +32,14 @@
 #define VIDEO_STREAM_GST_DEST_PORT 5000
 #define AUDIO_STREAM_GST_DEST_PORT 5001
 
+#define MAX_CONTENT_BUFFER_SIZE_BYTES (1024)
+#define MAX_ENCODED_PIXEL_RATE  (10000)
+#define MAX_CONCURRENT_VIDEO_ENCODERS (1)
+#define MAX_NETWORK_BANDWIDTH_MBPS (64)
+#define MICROPHONE_MIN_LEVEL (1)
+#define MICROPHONE_MAX_LEVEL (254)
+#define INVALID_SPKR_LEVEL (0)
+
 namespace Camera {
 
 class CameraDevice : public CameraDeviceInterface, public CameraDeviceInterface::CameraHALInterface
@@ -71,19 +79,49 @@ public:
     // Stop snapshot stream
     CameraError StopSnapshotStream(uint16_t streamID);
 
+    uint8_t GetMaxConcurrentVideoEncoders();
+
+    uint32_t GetMaxEncodedPixelRate();
+
     VideoSensorParamsStruct & GetVideoSensorParams();
 
     bool GetNightVisionCapable();
 
     VideoResolutionStruct & GetMinViewport();
 
-    uint8_t GetMaxConcurrentVideoEncoders();
+    uint32_t GetMaxContentBufferSize();
 
-    uint32_t GetMaxEncodedPixelRate();
+    uint32_t GetMaxNetworkBandwidth();
 
-    uint16_t GetFrameRate();
+    uint16_t GetCurrentFrameRate();
 
-    void SetHDRMode(bool hdrMode);
+    CameraError SetHDRMode(bool hdrMode);
+
+    // Currently, defaulting to not supporting speaker.
+    bool HasSpeaker() { return false; }
+
+    // Mute/Unmute speaker.
+    CameraError SetSpeakerMute(bool muteSpeaker) { return CameraError::ERROR_NOT_IMPLEMENTED; }
+
+    // Set speaker volume level.
+    CameraError SetSpeakerVolume(uint8_t speakerVol) { return CameraError::ERROR_NOT_IMPLEMENTED; }
+
+    // Get the speaker max and min levels.
+    uint8_t GetSpeakerMaxLevel() { return INVALID_SPKR_LEVEL; }
+    uint8_t GetSpeakerMinLevel() { return INVALID_SPKR_LEVEL; }
+
+    // Does camera have a microphone
+    bool HasMicrophone() { return true; }
+
+    // Mute/Unmute microphone.
+    CameraError SetMicrophoneMute(bool muteMicrophone);
+
+    // Set microphone volume level.
+    CameraError SetMicrophoneVolume(uint8_t microphoneVol);
+
+    // Get the microphone max and min levels.
+    uint8_t GetMicrophoneMaxLevel() { return MICROPHONE_MAX_LEVEL; }
+    uint8_t GetMicrophoneMinLevel() { return MICROPHONE_MIN_LEVEL; }
 
     std::vector<VideoStream> & GetAvailableVideoStreams() { return videoStreams; }
 
@@ -116,6 +154,14 @@ private:
     NetworkStreamSource mNetworkVideoSource;
     NetworkStreamSource mNetworkAudioSource;
     MediaController mMediaController;
+
+    uint16_t mCurrentVideoFrameRate = 0;
+    bool mHDREnabled = false;
+    bool mMicrophoneMuted = false;
+    uint8_t mMicrophoneMinLevel = MICROPHONE_MIN_LEVEL;
+    uint8_t mMicrophoneMaxLevel = MICROPHONE_MAX_LEVEL;
+    uint8_t mMicrophoneVol = MICROPHONE_MIN_LEVEL;
+
 };
 
 } // namespace Camera

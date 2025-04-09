@@ -43,21 +43,29 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
     // Fetch all initialization parameters for CameraAVStreamMgmt Server
     BitFlags<Feature> features;
     features.Set(Feature::kSnapshot);
+    features.Set(Feature::kVideo);
+    if (mCameraDevice->GetCameraHALInterface().HasMicrophone())
+    {
+        features.Set(Feature::kAudio);
+    }
+
     BitFlags<OptionalAttribute> optionalAttrs;
     optionalAttrs.Set(chip::app::Clusters::CameraAvStreamManagement::OptionalAttribute::kNightVision);
     optionalAttrs.Set(chip::app::Clusters::CameraAvStreamManagement::OptionalAttribute::kNightVisionIllum);
+
     uint32_t maxConcurrentVideoEncoders  = mCameraDevice->GetCameraHALInterface().GetMaxConcurrentVideoEncoders();
     uint32_t maxEncodedPixelRate         = mCameraDevice->GetCameraHALInterface().GetMaxEncodedPixelRate();
     VideoSensorParamsStruct sensorParams = mCameraDevice->GetCameraHALInterface().GetVideoSensorParams();
     bool nightVisionCapable              = mCameraDevice->GetCameraHALInterface().GetNightVisionCapable();
     VideoResolutionStruct minViewport    = mCameraDevice->GetCameraHALInterface().GetMinViewport();
     std::vector<RateDistortionTradeOffStruct> rateDistortionTradeOffPoints = {};
-    uint32_t maxContentBufferSize                                          = 1024;
+
+    uint32_t maxContentBufferSize = mCameraDevice->GetCameraHALInterface().GetMaxContentBufferSize();
     AudioCapabilitiesStruct micCapabilities{};
     AudioCapabilitiesStruct spkrCapabilities{};
     TwoWayTalkSupportTypeEnum twowayTalkSupport               = TwoWayTalkSupportTypeEnum::kNotSupported;
     std::vector<SnapshotParamsStruct> supportedSnapshotParams = {};
-    uint32_t maxNetworkBandwidth                              = 64;
+    uint32_t maxNetworkBandwidth                              = mCameraDevice->GetCameraHALInterface().GetMaxNetworkBandwidth();
     std::vector<StreamUsageEnum> supportedStreamUsages        = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording };
 
     // Instantiate the CameraAVStreamMgmt Server
@@ -65,6 +73,9 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
         mCameraDevice->GetCameraAVStreamMgmtDelegate(), mEndpoint, features, optionalAttrs, maxConcurrentVideoEncoders,
         maxEncodedPixelRate, sensorParams, nightVisionCapable, minViewport, rateDistortionTradeOffPoints, maxContentBufferSize,
         micCapabilities, spkrCapabilities, twowayTalkSupport, supportedSnapshotParams, maxNetworkBandwidth, supportedStreamUsages);
+
+    // Set the attribute defaults
+    mAVStreamMgmtServerPtr->SetHDRModeEnabled(false);
 }
 
 void CameraApp::InitCameraDeviceClusters()
