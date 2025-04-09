@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2023 Project CHIP Authors
+#    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,6 +28,7 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
+#       --endpoint 1
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -35,12 +36,14 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
+import random
 from typing import Any
 
 import chip.clusters as Clusters
+from chip.interaction_model import Status
 from chip.testing.matter_asserts import assert_valid_uint8
-from matter_testing_infrastructure.chip.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body,
-                                                                       default_matter_test_main)
+from matter_testing_infrastructure.chip.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main,
+                                                                       has_feature, run_if_endpoint_matches)
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
@@ -52,14 +55,16 @@ class TC_FAN_2_4(MatterBaseTest):
 
     def steps_TC_FAN_2_4(self):
         return [TestStep(1, "[FC] Commissioning already done.", is_commissioning=True),
-                TestStep(2, "[FC] TH checks the DUT for support of the Wind feature (WND).",
-                         "If the DUT does not support the feature, the test is skipped."),
-                TestStep(3, "[FC] TH reads from the DUT the WindSupport attribute.",
+                TestStep(2, "[FC] TH reads from the DUT the WindSupport attribute.",
                          "Verify that the WindSupport attribute value is of uint8 type. Verify that the WindSupport attribute's value is between 1 and 3 inclusive."),
-                TestStep(4, "[FC] TH reads from the DUT the WindSetting attribute.",
+                TestStep(3, "[FC] TH reads from the DUT the WindSetting attribute.",
                          "Verify that the WindSetting attribute value is of uint8 type. Verify that the WindSetting attribute's value is between 0 and 3 inclusive"),
-                TestStep(5, "[FC] TH checks that WindSetting is conformant with WindSupport.",
+                TestStep(4, "[FC] TH checks that WindSetting is conformant with WindSupport.",
                          "Verify that all bits set in WindSetting are also set in WindSupport."),
+                TestStep(5, "[FC] TH writes a valid bit from WindSupport to WindSetting.",
+                         "Device shall return SUCCESS."),
+                TestStep(6, "[FC] TH reads the WindSetting attribute.",
+                         "Verify that the proper bit was set from the previous step."),
                 ]
 
     async def read_setting(self, attribute: Any) -> Any:
@@ -78,60 +83,83 @@ class TC_FAN_2_4(MatterBaseTest):
         cluster = Clusters.Objects.FanControl
         return await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=cluster, attribute=attribute)
 
-    def pics_TC_FAN_2_4(self) -> list[str]:
-        return ["FAN.S"]
+    async def write_setting(self, attribute, value) -> Status:
+        result = await self.default_controller.WriteAttribute(self.dut_node_id, [(self.endpoint, attribute(value))])
+        write_status = result[0].Status
+        write_status_success = (write_status == Status.Success)
+        asserts.assert_true(write_status_success,
+                            f"[FC] {attribute.__name__} write did not return a result of SUCCESS ({write_status.name}), value: {value}")
+        return write_status
 
-    @async_test_body
+    @staticmethod
+    def get_random_wind_setting(wind_support: int, wind_support_range: range) -> int:
+        """
+        Returns a random valid WinddSetting based on the given WindSupport bitmask.
+        """
+        valid_wind_setting_values = [i for i in wind_support_range if (i & wind_support) == i]
+        return random.choice(valid_wind_setting_values)
+
+    def pics_TC_FAN_2_4(self) -> list[str]:
+        return ["FAN.S.F03"]
+
+    @run_if_endpoint_matches(has_feature(Clusters.FanControl, Clusters.FanControl.Bitmaps.Feature.kWind))
     async def test_TC_FAN_2_4(self):
         # Setup
         self.endpoint = self.get_endpoint(default=1)
         cluster = Clusters.FanControl
         attr = cluster.Attributes
-        wind_feature = cluster.Bitmaps.Feature.kWind
+        valid_wind_support_range = range(1, 4)
+        valid_wind_setting_range = range(0, 4)
 
         # *** STEP 1 ***
         # Commissioning already done
         self.step(1)
 
         # *** STEP 2 ***
-        # TH checks the DUT for support of the Wind feature (WND)
-        #  - If the DUT does not support the feature, the test is skipped
-        self.step(2)
-        supports_wind = await self.feature_guard(self.endpoint, cluster, wind_feature)
-        if not supports_wind:
-            logger.info("[Fc] The Wind (WND) feature must be supported by the DUT for this test, skipping test.")
-            self.skip_all_remaining_steps()
-
-        # *** STEP 3 ***
         # TH reads from the DUT the WindSupport attribute
-        self.step(3)
+        self.step(2)
         wind_support = await self.read_setting(attr.WindSupport)
 
         # Verify that the WindSupport attribute value is of uint8 type
         assert_valid_uint8(wind_support, "WindSupport")
 
         # Verify that the WindSupport attribute's value is between 1 and 3 inclusive
-        asserts.assert_in(wind_support, range(
-            1, 4), f"[FC] WindSupport attribute value ({wind_support}) is not between 1 and 3 inclusive")
+        asserts.assert_in(wind_support, valid_wind_support_range,
+                          f"[FC] WindSupport attribute value ({wind_support}) is not between 1 and 3 inclusive")
 
-        # *** STEP 4 ***
+        # *** STEP 3 ***
         # TH reads from the DUT the WindSetting attribute
-        self.step(4)
+        self.step(3)
         wind_setting = await self.read_setting(attr.WindSetting)
 
         # Verify that the WindSetting attribute value is of uint8 type
         assert_valid_uint8(wind_setting, "WindSetting")
 
         # Verify that the WindSetting attribute's value is between 0 and 3 inclusive
-        asserts.assert_in(wind_setting, range(
-            0, 4), f"[FC] WindSetting attribute value ({wind_setting}) is not between 0 and 3 inclusive")
+        asserts.assert_in(wind_setting, valid_wind_setting_range,
+                          f"[FC] WindSetting attribute value ({wind_setting}) is not between 0 and 3 inclusive")
 
-        # *** STEP 5 ***
+        # *** STEP 4 ***
         # TH checks that WindSetting is conformant with WindSupport
         # Verify that all bits set in WindSetting are also set in WindSupport
-        self.step(5)
+        self.step(4)
         is_wind_conformant = (wind_setting & wind_support) == wind_setting
         asserts.assert_true(is_wind_conformant, "[FC] WindSetting contains unsupported bits; it is not conformant with WindSupport")
+
+        # *** STEP 5 ***
+        # TH writes a valid bit from WindSupport to WindSetting
+        # Device shall return SUCCESS
+        self.step(5)
+        wind_setting_write = self.get_random_wind_setting(wind_support, valid_wind_support_range)
+        await self.write_setting(attr.WindSetting, wind_setting_write)
+
+        # *** STEP 6 ***
+        # TH reads the WindSetting attribute
+        # Verify that the proper bit was set from the previous step
+        self.step(6)
+        wind_setting_read = await self.read_setting(attr.WindSetting)
+        asserts.assert_equal(wind_setting_read, wind_setting_write,
+                             f"[FC] WindSetting attribute value ({wind_setting_read}) does not match the expected value ({wind_setting_write})")
 
 
 if __name__ == "__main__":
