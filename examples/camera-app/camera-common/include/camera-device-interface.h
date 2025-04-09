@@ -23,6 +23,8 @@
 #include <app/clusters/webrtc-transport-provider-server/webrtc-transport-provider-server.h>
 #include <media-controller.h>
 
+#include "transport/transport.h"
+
 using chip::app::Clusters::CameraAvStreamManagement::AudioStreamStruct;
 using chip::app::Clusters::CameraAvStreamManagement::ImageSnapshot;
 using chip::app::Clusters::CameraAvStreamManagement::SnapshotStreamStruct;

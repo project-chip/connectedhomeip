@@ -24,7 +24,7 @@
 class WebrtcTransport : public Transport
 {
 public:
-    WebrtcTransport(unsigned long peerID, uint16_t sessionID);
+    WebrtcTransport(uint16_t sessionID, uint64_t nodeID);
 
     ~WebrtcTransport();
 
@@ -50,8 +50,8 @@ private:
     // Dummy implementation to indicate if audio can be sent
     bool mCanSendAudio = true;
 
-    unsigned long mPeerID;
     uint16_t msessionID;
+    uint64_t nodeID;
 
     void RegisterToMediaController();
 };

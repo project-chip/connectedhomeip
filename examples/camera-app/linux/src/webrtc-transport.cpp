@@ -16,13 +16,16 @@
  *    limitations under the License.
  */
 
+#include <iostream>
 #include <transport/webrtc-transport.h>
 
-WebrtcTransport::WebrtcTransport(unsigned long peerID, uint16_t sessionID)
+WebrtcTransport::WebrtcTransport(uint16_t sessionID, uint64_t nodeID)
 {
-    peerID    = peerID;
     sessionID = sessionID;
+    nodeID    = nodeID;
 }
+
+WebrtcTransport::~WebrtcTransport() {}
 
 void WebrtcTransport::RegisterToMediaController()
 {
@@ -32,7 +35,7 @@ void WebrtcTransport::RegisterToMediaController()
 // Dummy implementation of SendVideo method
 void WebrtcTransport::SendVideo(const char * data, size_t size, uint16_t videoStreamID)
 {
-    // Placeholder for actual WebRTC implementation to send video data
+    std::cout << "Sending video data of size: " << size << " bytes." << std::endl;
 }
 
 // Dummy implementation of SendAudio method
