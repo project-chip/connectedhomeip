@@ -13,18 +13,20 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace FanControl {
-namespace EmberApplicationConfig {
+namespace StaticApplicationConfig {
 
 using FeatureBitmapType = Feature;
 
-inline constexpr std::array<EmberApplicationConfig::ClusterConfiguration<FeatureBitmapType>, 1> kEmberClusterConfig = { {
+inline constexpr std::array<ClusterConfiguration<FeatureBitmapType>, 1> kClusterConfig = { {
     {
         .endpointNumber = 1,
         .featureMap = BitFlags<FeatureBitmapType> {
             FeatureBitmapType::kMultiSpeed, // feature bit 0x1
             FeatureBitmapType::kAuto, // feature bit 0x2
             FeatureBitmapType::kRocking, // feature bit 0x4
-            FeatureBitmapType::kWind// feature bit 0x8
+            FeatureBitmapType::kWind, // feature bit 0x8
+            FeatureBitmapType::kStep, // feature bit 0x10
+            FeatureBitmapType::kAirflowDirection// feature bit 0x20
         },
     },
 } };

@@ -13,18 +13,28 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace Identify {
-namespace EmberApplicationConfig {
+namespace StaticApplicationConfig {
 
 using FeatureBitmapType = NoFeatureFlagsDefined;
 
-inline constexpr std::array<EmberApplicationConfig::ClusterConfiguration<FeatureBitmapType>, 2> kEmberClusterConfig = { {
+inline constexpr std::array<ClusterConfiguration<FeatureBitmapType>, 4> kClusterConfig = { {
     {
-        .endpointNumber = 0,
+        .endpointNumber = 1,
         .featureMap = BitFlags<FeatureBitmapType> {
         },
     },
     {
-        .endpointNumber = 1,
+        .endpointNumber = 2,
+        .featureMap = BitFlags<FeatureBitmapType> {
+        },
+    },
+    {
+        .endpointNumber = 3,
+        .featureMap = BitFlags<FeatureBitmapType> {
+        },
+    },
+    {
+        .endpointNumber = 4,
         .featureMap = BitFlags<FeatureBitmapType> {
         },
     },

@@ -13,17 +13,18 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace Thermostat {
-namespace EmberApplicationConfig {
+namespace StaticApplicationConfig {
 
 using FeatureBitmapType = Feature;
 
-inline constexpr std::array<EmberApplicationConfig::ClusterConfiguration<FeatureBitmapType>, 1> kEmberClusterConfig = { {
+inline constexpr std::array<ClusterConfiguration<FeatureBitmapType>, 1> kClusterConfig = { {
     {
         .endpointNumber = 1,
         .featureMap = BitFlags<FeatureBitmapType> {
             FeatureBitmapType::kHeating, // feature bit 0x1
             FeatureBitmapType::kCooling, // feature bit 0x2
-            FeatureBitmapType::kAutomode// feature bit 0x20
+            FeatureBitmapType::kAutoMode, // feature bit 0x20
+            FeatureBitmapType::kPresets// feature bit 0x100
         },
     },
 } };

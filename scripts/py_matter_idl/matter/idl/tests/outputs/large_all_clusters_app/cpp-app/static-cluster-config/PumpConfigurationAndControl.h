@@ -13,14 +13,19 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace PumpConfigurationAndControl {
-namespace EmberApplicationConfig {
+namespace StaticApplicationConfig {
 
-using FeatureBitmapType = NoFeatureFlagsDefined;
+using FeatureBitmapType = Feature;
 
-inline constexpr std::array<EmberApplicationConfig::ClusterConfiguration<FeatureBitmapType>, 1> kEmberClusterConfig = { {
+inline constexpr std::array<ClusterConfiguration<FeatureBitmapType>, 1> kClusterConfig = { {
     {
         .endpointNumber = 1,
         .featureMap = BitFlags<FeatureBitmapType> {
+            FeatureBitmapType::kConstantPressure, // feature bit 0x1
+            FeatureBitmapType::kCompensatedPressure, // feature bit 0x2
+            FeatureBitmapType::kConstantFlow, // feature bit 0x4
+            FeatureBitmapType::kConstantSpeed, // feature bit 0x8
+            FeatureBitmapType::kConstantTemperature// feature bit 0x10
         },
     },
 } };

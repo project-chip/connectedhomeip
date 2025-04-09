@@ -13,15 +13,15 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace ModeSelect {
-namespace EmberApplicationConfig {
+namespace StaticApplicationConfig {
 
 using FeatureBitmapType = Feature;
 
-inline constexpr std::array<EmberApplicationConfig::ClusterConfiguration<FeatureBitmapType>, 1> kEmberClusterConfig = { {
+inline constexpr std::array<ClusterConfiguration<FeatureBitmapType>, 1> kClusterConfig = { {
     {
         .endpointNumber = 1,
         .featureMap = BitFlags<FeatureBitmapType> {
-            FeatureBitmapType::kDeponoff// feature bit 0x1
+            FeatureBitmapType::kOnOff// feature bit 0x1
         },
     },
 } };

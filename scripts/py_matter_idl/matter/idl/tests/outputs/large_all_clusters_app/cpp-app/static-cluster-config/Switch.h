@@ -13,15 +13,33 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace Switch {
-namespace EmberApplicationConfig {
+namespace StaticApplicationConfig {
 
 using FeatureBitmapType = Feature;
 
-inline constexpr std::array<EmberApplicationConfig::ClusterConfiguration<FeatureBitmapType>, 1> kEmberClusterConfig = { {
+inline constexpr std::array<ClusterConfiguration<FeatureBitmapType>, 3> kClusterConfig = { {
     {
         .endpointNumber = 1,
         .featureMap = BitFlags<FeatureBitmapType> {
             FeatureBitmapType::kLatchingSwitch// feature bit 0x1
+        },
+    },
+    {
+        .endpointNumber = 3,
+        .featureMap = BitFlags<FeatureBitmapType> {
+            FeatureBitmapType::kMomentarySwitch, // feature bit 0x2
+            FeatureBitmapType::kMomentarySwitchLongPress, // feature bit 0x8
+            FeatureBitmapType::kMomentarySwitchMultiPress, // feature bit 0x10
+            FeatureBitmapType::kActionSwitch// feature bit 0x20
+        },
+    },
+    {
+        .endpointNumber = 4,
+        .featureMap = BitFlags<FeatureBitmapType> {
+            FeatureBitmapType::kMomentarySwitch, // feature bit 0x2
+            FeatureBitmapType::kMomentarySwitchRelease, // feature bit 0x4
+            FeatureBitmapType::kMomentarySwitchLongPress, // feature bit 0x8
+            FeatureBitmapType::kMomentarySwitchMultiPress// feature bit 0x10
         },
     },
 } };
