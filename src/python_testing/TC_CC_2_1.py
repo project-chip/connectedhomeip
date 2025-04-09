@@ -224,23 +224,6 @@ class TC_CC_2_1(MatterBaseTest):
                                         f"Attribute {attribute} with value {attr_val} is out of range (max): {max_len}")
             return attr_val
 
-    def _verify_for_numberofprimaries_value(self, numberofprimaries_value: Optional[int] = None, numberofprimaries_condition: int = 0) -> bool:
-        """Verify the numbrofprimaries attribute value against the condition. Return the status to skip tests.
-        Args:
-            numberofprimaries_value (Optional[int], optional): _description_. Defaults to None.
-            numberofprimaries_condition (int, optional): _description_. Defaults to 0.
-        Returns:
-            bool: Return the status of skipping verification.
-        """
-        skip_tests = False
-        logger.info(
-            f"Verifying the value of numberofprimaries {numberofprimaries_value} is greater than {numberofprimaries_condition} ?")
-        # is not equal or greater than
-        if numberofprimaries_value < numberofprimaries_condition:
-            skip_tests = True
-
-        return skip_tests
-
     def _verify_first_4bits(self, numa, numb):
         # get the first 4 bits and compare them
         tmp_a = numa & (2**4-1)
@@ -350,14 +333,14 @@ class TC_CC_2_1(MatterBaseTest):
             logger.info(f"Fetched Primaries attributes {primariesfound}")
             asserts.assert_equal(numberofprimaries_value, primariesfound,
                                  "NumberOfPrimaries does not match with the Primaries found in the cluster.")
-            # Verify for numberofprimaries section
+            # Verify for NumberOfPrimaries section
             # We are at step 24 before all the number of primaries checks
             current_step = 24
-
             # range is defined from 1-6
             for primariesindex in range(1, 7):
-                skip_steps_verifynp = self._verify_for_numberofprimaries_value(numberofprimaries_value, primariesindex)
-                if skip_steps_verifynp:
+                logger.info(
+                    f"Skip if the test index {primariesindex} is graeter than NumberOfPrimaries {numberofprimaries_value} ?")
+                if primariesindex > numberofprimaries_value:
                     # Skip the 3 steps
                     logger.info(f"Skipping for NumberOfPrimaries {primariesindex}")
                     for i in range(1, 4):
