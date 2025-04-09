@@ -295,7 +295,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::SetZoomMax(uint8_t aZoomMax)
  * Only set the value if the Feature Flag is set.
  * It is entirely possible for a mutator to be called with a parameter that has no value.  Case in point an invoke of
  * MPTZSetPosition, this will be handled and the attributes updated if at least one of the three pan, tilt, or zoom have a value,
- * with all three parms passed through once validation is complete. An empty value is just ignored.
+ * with all three params passed through once validation is complete. An empty value is just ignored.
  */
 void CameraAvSettingsUserLevelMgmtServer::SetPan(Optional<int16_t> aPan)
 {
@@ -371,31 +371,36 @@ bool CameraAvSettingsUserLevelMgmtServer::KnownVideoStreamID(uint16_t aVideoStre
 
 /**
  * Helper function for setting the next preset ID to use in advance of reception of an MPTZSavePreset.
- * The method loops over all possible saved presets (up the the defined Max), if the preset ID is in use,
+ * The method loops over the range of possible IDs, starting with the current ID, if the preset ID is in use,
  * it continues to the next possible value, looping back to 1. The checking is needed as the preset IDs aren't
  * solely server generated, they can also be provided by a client.
  * If there are no free presets (which will happen if all slots are taken), the value is not updated.
  */
 void CameraAvSettingsUserLevelMgmtServer::UpdatePresetID()
 {
+   uint8_t nextIDToCheck = mCurrentPresetID;
+   ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: UpdatePresetID. Current Preset is %d.",
+                 mEndpointId, mCurrentPresetID);
+                 
+   do {
+    nextIDToCheck = static_cast<uint8_t>((nextIDToCheck % mMaxPresets) +1);
 
-    // Has the next possible incremented ID been used by a user set Preset?
+    // Have we lapped back round to where we started?  If so, break
     //
-    uint8_t nextIDToCheck = (mCurrentPresetID == mMaxPresets) ? 1 : static_cast<uint8_t>(mCurrentPresetID + 1);
-    ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: UpdatePresetID. Current Preset is %d. Next to Check is %d.",
-                  mEndpointId, mCurrentPresetID, nextIDToCheck);
-
-    for (uint8_t i = 1; i <= mMaxPresets; i++)
-    {
-        auto it = std::find_if(mMptzPresetHelpers.begin(), mMptzPresetHelpers.end(),
-                               [=](const MPTZPresetHelper & mptzph) { return mptzph.GetPresetID() == nextIDToCheck; });
-        if (it == mMptzPresetHelpers.end())
-        {
-            mCurrentPresetID = nextIDToCheck;
-            break;
-        }
-        nextIDToCheck++;
+    if (nextIDToCheck == mCurrentPresetID) {
+        break;
     }
+
+    auto it = std::find_if(mMptzPresetHelpers.begin(), mMptzPresetHelpers.end(),
+                          [=](const MPTZPresetHelper & mptzph) { return mptzph.GetPresetID() == nextIDToCheck; });
+    if (it == mMptzPresetHelpers.end())
+    {
+        mCurrentPresetID = nextIDToCheck;
+        break;
+    }           
+   } while (true);
+
+   ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Updated PresetID is %d.", mEndpointId, mCurrentPresetID);
 }
 
 /**
@@ -842,14 +847,14 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRelativeMove(HandlerContext 
             return;
         }
 
-        // If we're here, then we'll also have an existing Pan value in MPTZPosition. The zoom values are constrained such that
+        // If we're here, then we'll also have an existing Zoom value in MPTZPosition. The zoom values are constrained such that
         // we won't overflow newZoomValue
         //
-        int16_t newZoomValue = static_cast<int16_t>(mMptzPosition.zoom.Value() + zoomDeltaValue);
+        int newZoomValue = static_cast<int>(mMptzPosition.zoom.Value() + zoomDeltaValue);
 
         if (newZoomValue > mZoomMax)
         {
-            newZoomValue = static_cast<int16_t>(mZoomMax);
+            newZoomValue = static_cast<int>(mZoomMax);
         }
         if (newZoomValue < 1)
         {
@@ -906,7 +911,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZMoveToPreset(HandlerContext 
 
     // Verify the provided presetID is within spec limits
     //
-    if (preset > mMaxPresets)
+    if ((preset > mMaxPresets) || (preset < 1))
     {
         ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Preset provided is out of range. Preset: %d", mEndpointId, preset);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
@@ -929,7 +934,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZMoveToPreset(HandlerContext 
     if (it == mMptzPresetHelpers.end())
     {
         ChipLogError(Zcl,
-                     "CameraAVSettingsUserLevelMgmt[ep=%d]: No matching presets, MoveToPreset not possible for provide preset: %d",
+                     "CameraAVSettingsUserLevelMgmt[ep=%d]: No matching presets, MoveToPreset not possible for provided preset: %d",
                      mEndpointId, preset);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
         return;
@@ -973,12 +978,13 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZSavePreset(HandlerContext & 
     Optional<uint8_t> preset  = commandData.presetID;
     chip::CharSpan presetName = commandData.name;
     uint8_t presetToUse       = mCurrentPresetID;
+    bool newPresetValue       = true;
 
     // Do we have a user provided preset ID? If yes, is it in range?
     //
     if (preset.HasValue())
     {
-        if (preset.Value() > mMaxPresets)
+        if ((preset.Value() > mMaxPresets) || (preset.Value() < 1))
         {
             ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Provided preset ID is out of range. Preset: %d", mEndpointId,
                          preset.Value());
@@ -993,7 +999,11 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZSavePreset(HandlerContext & 
     auto it = std::find_if(mMptzPresetHelpers.begin(), mMptzPresetHelpers.end(),
                            [presetToUse](const MPTZPresetHelper & mptzph) { return mptzph.GetPresetID() == presetToUse; });
 
-    bool newPresetValue = (it == mMptzPresetHelpers.end());
+    // The new preset indicator may be reset to false only if the current preset results in an entry from the current known set and
+    // there was a provided preset.  
+    // It is possible that mCurrentPresetID equates to a current preset in cases where the collection of presets is full
+    //
+    newPresetValue = !((it != mMptzPresetHelpers.end()) && (preset.HasValue()));
 
     if (newPresetValue)
     {
@@ -1043,8 +1053,14 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZSavePreset(HandlerContext & 
         *it = aMptzPresetHelper;
     }
 
-    // Update the current preset ID to the next available
-    UpdatePresetID();
+    // Update the current preset ID to the next available only if we actually used the current value.  A user provided preset
+    // could any value between 1 and MaxPresets
+    //
+    if (presetToUse == mCurrentPresetID)
+    {
+        UpdatePresetID();
+    }
+
     MarkDirty(Attributes::MPTZPresets::Id);
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Success);
@@ -1057,7 +1073,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRemovePreset(HandlerContext 
 
     // Verify the provided presetID is within spec limits
     //
-    if (presetToRemove > mMaxPresets)
+    if ((presetToRemove > mMaxPresets) || (presetToRemove < 1))
     {
         ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Preset to remove is out of range. Preset: %d", mEndpointId,
                      presetToRemove);
@@ -1123,13 +1139,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleDPTZSetViewport(HandlerContext &
     // Call the delegate
     Status status = mDelegate->DPTZSetViewport(videoStreamID, viewport);
 
-    if (status != Status::Success)
-    {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
-        return;
-    }
-
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Success);
+    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
 void CameraAvSettingsUserLevelMgmtServer::HandleDPTZRelativeMove(HandlerContext & ctx,
@@ -1167,12 +1177,6 @@ void CameraAvSettingsUserLevelMgmtServer::HandleDPTZRelativeMove(HandlerContext 
 
     // Call the delegate
     Status status = mDelegate->DPTZRelativeMove(videoStreamID, deltaX, deltaY, zoomDelta);
-
-    if (status != Status::Success)
-    {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
-        return;
-    }
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
