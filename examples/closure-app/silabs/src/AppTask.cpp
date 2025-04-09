@@ -99,6 +99,7 @@ void ApplicationInit()
     ClosureApplicationInit();
     SILABS_LOG("==================================================");
 
+    SILABS_LOG("Closure-app Dimesnion Manager updated starting");
     ClosureDimensionManager ep2(2);
     ClosureDimensionManager ep3(3);
 
@@ -116,10 +117,23 @@ void ApplicationInit()
     ep2.Init();
     ep3.Init();
 
+    ep2.SetCallbacks(AppTask::ActionInitiated, AppTask::ActionCompleted);
+    ep3.SetCallbacks(AppTask::ActionInitiated, AppTask::ActionCompleted);
+
     SetTagList(/* endpoint= */ 2, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp2TagList));
     SetTagList(/* endpoint= */ 3, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp3TagList));
 
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+}
+
+void AppTask::ActionInitiated(ClosureDimensionManager::Action_t aAction, int32_t aActor)
+{
+
+}
+
+void AppTask::ActionCompleted(ClosureDimensionManager::Action_t aAction)
+{
+
 }
 
 void ApplicationShutdown()
