@@ -381,7 +381,7 @@ void CameraAvSettingsUserLevelMgmtServer::UpdatePresetID()
    uint8_t nextIDToCheck = mCurrentPresetID;
    ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: UpdatePresetID. Current Preset is %d.",
                  mEndpointId, mCurrentPresetID);
-                 
+
    do {
     nextIDToCheck = static_cast<uint8_t>((nextIDToCheck % mMaxPresets) +1);
 
@@ -397,7 +397,7 @@ void CameraAvSettingsUserLevelMgmtServer::UpdatePresetID()
     {
         mCurrentPresetID = nextIDToCheck;
         break;
-    }           
+    }
    } while (true);
 
    ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Updated PresetID is %d.", mEndpointId, mCurrentPresetID);
@@ -1000,7 +1000,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZSavePreset(HandlerContext & 
                            [presetToUse](const MPTZPresetHelper & mptzph) { return mptzph.GetPresetID() == presetToUse; });
 
     // The new preset indicator may be reset to false only if the current preset results in an entry from the current known set and
-    // there was a provided preset.  
+    // there was a provided preset.
     // It is possible that mCurrentPresetID equates to a current preset in cases where the collection of presets is full
     //
     newPresetValue = !((it != mMptzPresetHelpers.end()) && (preset.HasValue()));
