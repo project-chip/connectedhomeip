@@ -23,7 +23,7 @@ using FeatureBitmapType = Feature;
 using FeatureBitmapType = NoFeatureFlagsDefined;
 {%- endif %}
 
-inline constexpr std::array<ClusterConfiguration<FeatureBitmapType>, {{config.endpoint_configs | length}}> kClusterConfig = { {
+inline constexpr std::array<Clusters::StaticApplicationConfig::ClusterConfiguration<FeatureBitmapType>, {{config.endpoint_configs | length}}> kClusterConfig = { {
 {%- for endpoint_config in config.endpoint_configs %}
     {
         .endpointNumber = {{ endpoint_config.endpoint_number }},

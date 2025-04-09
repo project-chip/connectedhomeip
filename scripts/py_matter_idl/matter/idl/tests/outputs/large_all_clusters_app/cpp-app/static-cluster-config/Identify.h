@@ -17,7 +17,7 @@ namespace StaticApplicationConfig {
 
 using FeatureBitmapType = NoFeatureFlagsDefined;
 
-inline constexpr std::array<ClusterConfiguration<FeatureBitmapType>, 4> kClusterConfig = { {
+inline constexpr std::array<Clusters::StaticApplicationConfig::ClusterConfiguration<FeatureBitmapType>, 4> kClusterConfig = { {
     {
         .endpointNumber = 1,
         .featureMap = BitFlags<FeatureBitmapType> {
