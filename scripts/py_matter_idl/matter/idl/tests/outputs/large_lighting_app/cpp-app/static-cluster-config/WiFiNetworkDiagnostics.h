@@ -21,6 +21,8 @@ inline constexpr std::array<Clusters::StaticApplicationConfig::ClusterConfigurat
     {
         .endpointNumber = 0,
         .featureMap = BitFlags<FeatureBitmapType> {
+            FeatureBitmapType::kPacketCounts, // feature bit 0x1
+            FeatureBitmapType::kErrorCounts// feature bit 0x2
         },
     },
 } };
