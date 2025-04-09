@@ -53,49 +53,81 @@ class TC_ACL_2_4(MatterBaseTest):
     def steps_TC_ACL_2_4(self) -> list[TestStep]:
         steps = [
             TestStep(1, "TH1 commissions DUT using admin node ID N1", is_commissioning=True),
-            TestStep(2, "TH1 reads DUT Endpoint 0 OperationalCredentials cluster CurrentFabricIndex attribute", "Result is SUCCESS, value is stored as F1"),
-            TestStep(3, "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute", "Result is SUCCESS, value is list of AccessControlEntryStruct containing 1 element with admin entry N1"),
+            TestStep(2, "TH1 reads DUT Endpoint 0 OperationalCredentials cluster CurrentFabricIndex attribute",
+                     "Result is SUCCESS, value is stored as F1"),
+            TestStep(3, "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute",
+                     "Result is SUCCESS, value is list of AccessControlEntryStruct containing 1 element with admin entry N1"),
             TestStep(4, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute with 3 elements (N1 admin, N2 view, N3 operate)", "Result is SUCCESS"),
-            TestStep(5, "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute", "Result is SUCCESS, value is list of AccessControlEntryStruct containing 3 elements"),
+            TestStep(5, "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute",
+                     "Result is SUCCESS, value is list of AccessControlEntryStruct containing 3 elements"),
             TestStep(6, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute with modified entries (N1 admin, N2 manage, N3 admin)", "Result is SUCCESS"),
-            TestStep(7, "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute", "Result is SUCCESS, value is list of AccessControlEntryStruct containing 3 elements with updated privileges"),
+            TestStep(7, "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute",
+                     "Result is SUCCESS, value is list of AccessControlEntryStruct containing 3 elements with updated privileges"),
             TestStep(8, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute with updated targets", "Result is SUCCESS"),
-            TestStep(9, "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute", "Result is SUCCESS, value is list of AccessControlEntryStruct containing 3 elements with updated targets"),
+            TestStep(9, "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute",
+                     "Result is SUCCESS, value is list of AccessControlEntryStruct containing 3 elements with updated targets"),
             TestStep(10, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute with null subjects", "Result is SUCCESS"),
-            TestStep(11, "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute", "Result is SUCCESS, value is list of AccessControlEntryStruct containing 3 elements with null subjects"),
+            TestStep(11, "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute",
+                     "Result is SUCCESS, value is list of AccessControlEntryStruct containing 3 elements with null subjects"),
             TestStep(12, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute with null targets", "Result is SUCCESS"),
-            TestStep(13, "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute", "Result is SUCCESS, value is list of AccessControlEntryStruct containing 3 elements with null targets"),
+            TestStep(13, "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute",
+                     "Result is SUCCESS, value is list of AccessControlEntryStruct containing 3 elements with null targets"),
             TestStep(14, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute with 2 elements", "Result is SUCCESS"),
-            TestStep(15, "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute", "Result is SUCCESS, value is list of AccessControlEntryStruct containing 2 elements"),
+            TestStep(15, "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute",
+                     "Result is SUCCESS, value is list of AccessControlEntryStruct containing 2 elements"),
             TestStep(16, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute with ProxyView privilege", "Result is SUCCESS"),
-            TestStep(17, "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute", "Result is SUCCESS, value is list of AccessControlEntryStruct containing 2 elements with ProxyView privilege"),
-            TestStep(18, "TH1 reads DUT Endpoint 0 AccessControl cluster SubjectsPerAccessControlEntry attribute", "Result is SUCCESS, value is stored as MAXSUBJECTS"),
+            TestStep(17, "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute",
+                     "Result is SUCCESS, value is list of AccessControlEntryStruct containing 2 elements with ProxyView privilege"),
+            TestStep(18, "TH1 reads DUT Endpoint 0 AccessControl cluster SubjectsPerAccessControlEntry attribute",
+                     "Result is SUCCESS, value is stored as MAXSUBJECTS"),
             TestStep(19, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute with max subjects", "Result is SUCCESS"),
-            TestStep(20, "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute", "Result is SUCCESS, value contains MAXSUBJECTS random node IDs"),
+            TestStep(20, "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute",
+                     "Result is SUCCESS, value contains MAXSUBJECTS random node IDs"),
             TestStep(21, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute with specific subjects", "Result is SUCCESS"),
-            TestStep(22, "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute", "Result is SUCCESS, value contains the specified subjects"),
-            TestStep(23, "TH1 reads DUT Endpoint 0 AccessControl cluster TargetsPerAccessControlEntry attribute", "Result is SUCCESS, value is stored as MAXTARGETS"),
+            TestStep(22, "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute",
+                     "Result is SUCCESS, value contains the specified subjects"),
+            TestStep(23, "TH1 reads DUT Endpoint 0 AccessControl cluster TargetsPerAccessControlEntry attribute",
+                     "Result is SUCCESS, value is stored as MAXTARGETS"),
             TestStep(24, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute with max targets", "Result is SUCCESS"),
-            TestStep(25, "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute", "Result is SUCCESS, value contains MAXTARGETS targets"),
-            TestStep(26, "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlEntriesPerFabric attribute", "Result is SUCCESS, value is stored as MAXENTRIES"),
+            TestStep(25, "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute",
+                     "Result is SUCCESS, value contains MAXTARGETS targets"),
+            TestStep(26, "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlEntriesPerFabric attribute",
+                     "Result is SUCCESS, value is stored as MAXENTRIES"),
             TestStep(27, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute with MAXENTRIES elements", "Result is SUCCESS"),
-            TestStep(28, "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute", "Result is SUCCESS, value contains MAXENTRIES elements"),
-            TestStep(29, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing PASE auth mode", "Result is SUCCESS for first element, CONSTRAINT_ERROR for second element"),
-            TestStep(30, "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute", "Result is SUCCESS, value contains only the admin entry"),
-            TestStep(31, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing Group auth mode for admin", "Result is SUCCESS for first element, CONSTRAINT_ERROR for second element"),
-            TestStep(32, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing invalid privilege", "Result is SUCCESS for first element, CONSTRAINT_ERROR for second element"),
-            TestStep(33, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing invalid auth mode", "Result is SUCCESS for first element, CONSTRAINT_ERROR for second element"),
-            TestStep(34, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing invalid subject ID 0", "Result is SUCCESS for first element, CONSTRAINT_ERROR for second element"),
-            TestStep(35, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing max node ID", "Result is SUCCESS for first element, CONSTRAINT_ERROR for second element"),
-            TestStep(36, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing group ID range", "Result is SUCCESS for first element, CONSTRAINT_ERROR for second element"),
-            TestStep(37, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing fabric-scoped node ID", "Result is SUCCESS for first element, CONSTRAINT_ERROR for second element"),
-            TestStep(38, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing empty target", "Result is SUCCESS for first element, CONSTRAINT_ERROR for second element"),
-            TestStep(39, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing invalid cluster ID", "Result is SUCCESS for first element, CONSTRAINT_ERROR for second element"),
-            TestStep(40, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing invalid endpoint ID", "Result is SUCCESS for first element, CONSTRAINT_ERROR for second element"),
-            TestStep(41, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing invalid device type", "Result is SUCCESS for first element, CONSTRAINT_ERROR for second element"),
-            TestStep(42, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing endpoint with device type", "Result is SUCCESS for first element, CONSTRAINT_ERROR for second element"),
-            TestStep(43, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing all target fields", "Result is SUCCESS for first element, CONSTRAINT_ERROR for second element"),
-            TestStep(44, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute value is an empty list", "Result is SUCCESS (note since all ACL entries removed, cannot perform more operations)"),
+            TestStep(28, "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute",
+                     "Result is SUCCESS, value contains MAXENTRIES elements"),
+            TestStep(29, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing PASE auth mode",
+                     "Result is SUCCESS for first element, CONSTRAINT_ERROR for second element"),
+            TestStep(30, "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute",
+                     "Result is SUCCESS, value contains only the admin entry"),
+            TestStep(31, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing Group auth mode for admin",
+                     "Result is SUCCESS for first element, CONSTRAINT_ERROR for second element"),
+            TestStep(32, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing invalid privilege",
+                     "Result is SUCCESS for first element, CONSTRAINT_ERROR for second element"),
+            TestStep(33, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing invalid auth mode",
+                     "Result is SUCCESS for first element, CONSTRAINT_ERROR for second element"),
+            TestStep(34, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing invalid subject ID 0",
+                     "Result is SUCCESS for first element, CONSTRAINT_ERROR for second element"),
+            TestStep(35, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing max node ID",
+                     "Result is SUCCESS for first element, CONSTRAINT_ERROR for second element"),
+            TestStep(36, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing group ID range",
+                     "Result is SUCCESS for first element, CONSTRAINT_ERROR for second element"),
+            TestStep(37, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing fabric-scoped node ID",
+                     "Result is SUCCESS for first element, CONSTRAINT_ERROR for second element"),
+            TestStep(38, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing empty target",
+                     "Result is SUCCESS for first element, CONSTRAINT_ERROR for second element"),
+            TestStep(39, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing invalid cluster ID",
+                     "Result is SUCCESS for first element, CONSTRAINT_ERROR for second element"),
+            TestStep(40, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing invalid endpoint ID",
+                     "Result is SUCCESS for first element, CONSTRAINT_ERROR for second element"),
+            TestStep(41, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing invalid device type",
+                     "Result is SUCCESS for first element, CONSTRAINT_ERROR for second element"),
+            TestStep(42, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing endpoint with device type",
+                     "Result is SUCCESS for first element, CONSTRAINT_ERROR for second element"),
+            TestStep(43, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing all target fields",
+                     "Result is SUCCESS for first element, CONSTRAINT_ERROR for second element"),
+            TestStep(44, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute value is an empty list",
+                     "Result is SUCCESS (note since all ACL entries removed, cannot perform more operations)"),
         ]
         return steps
 
@@ -110,8 +142,8 @@ class TC_ACL_2_4(MatterBaseTest):
         oc_cluster = Clusters.OperationalCredentials
         cfi_attribute = oc_cluster.Attributes.CurrentFabricIndex
         f1 = await self.read_single_attribute_check_success(
-            endpoint=0, 
-            cluster=oc_cluster, 
+            endpoint=0,
+            cluster=oc_cluster,
             attribute=cfi_attribute
         )
         self.print_step("CurrentFabricIndex", f1)
@@ -126,7 +158,7 @@ class TC_ACL_2_4(MatterBaseTest):
             attribute=acl_attribute
         )
         self.print_step("Initial ACL", initial_acl)
-        
+
         # Verify initial ACL contains single admin entry
         asserts.assert_equal(len(initial_acl), 1, "Initial ACL should contain exactly 1 entry")
         asserts.assert_equal(initial_acl[0].privilege, Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister)
@@ -205,7 +237,7 @@ class TC_ACL_2_4(MatterBaseTest):
             attribute=acl_attribute
         )
         self.print_step("Read ACL", read_acl)
-        
+
         # Verify ACL contents match what we wrote
         asserts.assert_equal(len(read_acl), 3, "ACL should contain exactly 3 entries")
         # Verify each entry matches what we wrote
@@ -214,16 +246,16 @@ class TC_ACL_2_4(MatterBaseTest):
             asserts.assert_equal(entry.authMode, new_acl[i].authMode)
             asserts.assert_equal(entry.subjects, new_acl[i].subjects)
             asserts.assert_equal(entry.fabricIndex, new_acl[i].fabricIndex)
-            
+
             # Handle targets verification differently based on whether it's nullable
             if isinstance(new_acl[i].targets, Nullable):
-                asserts.assert_true(isinstance(entry.targets, Nullable), 
-                    f"Entry {i} targets should be Nullable")
+                asserts.assert_true(isinstance(entry.targets, Nullable),
+                                    f"Entry {i} targets should be Nullable")
             else:
-                asserts.assert_false(isinstance(entry.targets, Nullable), 
-                    f"Entry {i} targets should not be Nullable")
+                asserts.assert_false(isinstance(entry.targets, Nullable),
+                                     f"Entry {i} targets should not be Nullable")
                 asserts.assert_equal(len(entry.targets), len(new_acl[i].targets),
-                    f"Entry {i} should have same number of targets")
+                                     f"Entry {i} should have same number of targets")
                 for j, target in enumerate(entry.targets):
                     # Only verify non-null fields
                     if not isinstance(new_acl[i].targets[j].cluster, Nullable):
@@ -298,7 +330,7 @@ class TC_ACL_2_4(MatterBaseTest):
             attribute=acl_attribute
         )
         self.print_step("Read Modified ACL", read_modified_acl)
-        
+
         # Verify modified ACL contents
         asserts.assert_equal(len(read_modified_acl), 3, "ACL should contain exactly 3 entries")
         for i, entry in enumerate(read_modified_acl):
@@ -307,14 +339,14 @@ class TC_ACL_2_4(MatterBaseTest):
             asserts.assert_equal(entry.authMode, modified_acl[i].authMode)
             asserts.assert_equal(entry.subjects, modified_acl[i].subjects)
             asserts.assert_equal(entry.fabricIndex, modified_acl[i].fabricIndex)
-            
+
             # Verify targets field
             if isinstance(modified_acl[i].targets, Nullable):
-                asserts.assert_true(isinstance(entry.targets, Nullable), 
-                    f"Entry {i} targets should be Nullable")
+                asserts.assert_true(isinstance(entry.targets, Nullable),
+                                    f"Entry {i} targets should be Nullable")
             else:
-                asserts.assert_false(isinstance(entry.targets, Nullable), 
-                    f"Entry {i} targets should not be Nullable")
+                asserts.assert_false(isinstance(entry.targets, Nullable),
+                                     f"Entry {i} targets should not be Nullable")
                 # Only verify targets if they're not Nullable
                 for j, target in enumerate(entry.targets):
                     expected_target = modified_acl[i].targets[j]
@@ -388,8 +420,8 @@ class TC_ACL_2_4(MatterBaseTest):
                 self.dut_node_id,
                 [(0, acl_attribute(value=updated_targets_acl))]
             )
-            asserts.assert_equal(result[0].Status, Status.Success, 
-                "Write ACL with updated targets should succeed")
+            asserts.assert_equal(result[0].Status, Status.Success,
+                                 "Write ACL with updated targets should succeed")
         except Exception as e:
             self.print_step("Error writing updated targets ACL", str(e))
             asserts.fail(f"Failed to write updated targets ACL: {e}")
@@ -402,62 +434,62 @@ class TC_ACL_2_4(MatterBaseTest):
             attribute=acl_attribute
         )
         self.print_step("Read Updated Targets ACL", read_updated_targets_acl)
-        
+
         # Verify updated targets ACL contents
         asserts.assert_equal(len(read_updated_targets_acl), 3, "ACL should contain exactly 3 entries")
-        
+
         for i, entry in enumerate(read_updated_targets_acl):
             expected_entry = updated_targets_acl[i]
             self.print_step(f"Verifying entry {i}", "")
-            
+
             # Verify basic fields
             asserts.assert_equal(entry.privilege, expected_entry.privilege,
-                f"Entry {i} privilege mismatch")
+                                 f"Entry {i} privilege mismatch")
             asserts.assert_equal(entry.authMode, expected_entry.authMode,
-                f"Entry {i} authMode mismatch")
+                                 f"Entry {i} authMode mismatch")
             asserts.assert_equal(entry.subjects, expected_entry.subjects,
-                f"Entry {i} subjects mismatch")
+                                 f"Entry {i} subjects mismatch")
             asserts.assert_equal(entry.fabricIndex, expected_entry.fabricIndex,
-                f"Entry {i} fabricIndex mismatch")
-            
+                                 f"Entry {i} fabricIndex mismatch")
+
             # Verify targets field
             if isinstance(expected_entry.targets, Nullable):
                 self.print_step(f"Entry {i} expecting Nullable targets", "")
                 asserts.assert_true(isinstance(entry.targets, Nullable),
-                    f"Entry {i} targets should be Nullable")
+                                    f"Entry {i} targets should be Nullable")
             else:
                 self.print_step(f"Entry {i} expecting non-Nullable targets", "")
                 asserts.assert_false(isinstance(entry.targets, Nullable),
-                    f"Entry {i} targets should not be Nullable")
-                
+                                     f"Entry {i} targets should not be Nullable")
+
                 # Verify each target in the entry
                 for j, target in enumerate(entry.targets):
                     expected_target = expected_entry.targets[j]
                     self.print_step(f"Verifying target {j} in entry {i}", "")
-                    
+
                     # Verify cluster field
                     if isinstance(expected_target.cluster, Nullable):
                         asserts.assert_true(isinstance(target.cluster, Nullable),
-                            f"Entry {i} Target {j} cluster should be Nullable")
+                                            f"Entry {i} Target {j} cluster should be Nullable")
                     else:
                         asserts.assert_equal(target.cluster, expected_target.cluster,
-                            f"Entry {i} Target {j} cluster mismatch")
-                    
+                                             f"Entry {i} Target {j} cluster mismatch")
+
                     # Verify endpoint field
                     if isinstance(expected_target.endpoint, Nullable):
                         asserts.assert_true(isinstance(target.endpoint, Nullable),
-                            f"Entry {i} Target {j} endpoint should be Nullable")
+                                            f"Entry {i} Target {j} endpoint should be Nullable")
                     else:
                         asserts.assert_equal(target.endpoint, expected_target.endpoint,
-                            f"Entry {i} Target {j} endpoint mismatch")
-                    
+                                             f"Entry {i} Target {j} endpoint mismatch")
+
                     # Verify deviceType field
                     if isinstance(expected_target.deviceType, Nullable):
                         asserts.assert_true(isinstance(target.deviceType, Nullable),
-                            f"Entry {i} Target {j} deviceType should be Nullable")
+                                            f"Entry {i} Target {j} deviceType should be Nullable")
                     else:
                         asserts.assert_equal(target.deviceType, expected_target.deviceType,
-                            f"Entry {i} Target {j} deviceType mismatch")
+                                             f"Entry {i} Target {j} deviceType mismatch")
 
         # Step 10: Write ACL with null subjects
         self.step(10)
@@ -516,7 +548,7 @@ class TC_ACL_2_4(MatterBaseTest):
                 [(0, acl_attribute(value=null_subjects_acl))]
             )
             asserts.assert_equal(result[0].Status, Status.Success,
-                "Write ACL with null subjects should succeed")
+                                 "Write ACL with null subjects should succeed")
         except Exception as e:
             self.print_step("Error writing null subjects ACL", str(e))
             asserts.fail(f"Failed to write null subjects ACL: {e}")
@@ -529,32 +561,32 @@ class TC_ACL_2_4(MatterBaseTest):
             attribute=acl_attribute
         )
         self.print_step("Read Null Subjects ACL", read_null_subjects_acl)
-        
+
         # Verify null subjects ACL contents
         asserts.assert_equal(len(read_null_subjects_acl), 3, "ACL should contain exactly 3 entries")
         for i, entry in enumerate(read_null_subjects_acl):
             expected_entry = null_subjects_acl[i]
-            
+
             # Verify basic fields
             asserts.assert_equal(entry.privilege, expected_entry.privilege,
-                f"Entry {i} privilege mismatch")
+                                 f"Entry {i} privilege mismatch")
             asserts.assert_equal(entry.authMode, expected_entry.authMode,
-                f"Entry {i} authMode mismatch")
+                                 f"Entry {i} authMode mismatch")
             asserts.assert_equal(entry.fabricIndex, expected_entry.fabricIndex,
-                f"Entry {i} fabricIndex mismatch")
-            
+                                 f"Entry {i} fabricIndex mismatch")
+
             # Verify subjects field
             if isinstance(expected_entry.subjects, Nullable):
                 asserts.assert_true(isinstance(entry.subjects, Nullable),
-                    f"Entry {i} subjects should be Nullable")
+                                    f"Entry {i} subjects should be Nullable")
             else:
                 asserts.assert_equal(entry.subjects, expected_entry.subjects,
-                    f"Entry {i} subjects mismatch")
-            
+                                     f"Entry {i} subjects mismatch")
+
             # Verify targets field using the same pattern as before
             if isinstance(expected_entry.targets, Nullable):
                 asserts.assert_true(isinstance(entry.targets, Nullable),
-                    f"Entry {i} targets should be Nullable")
+                                    f"Entry {i} targets should be Nullable")
             else:
                 for j, target in enumerate(entry.targets):
                     expected_target = expected_entry.targets[j]
@@ -562,12 +594,12 @@ class TC_ACL_2_4(MatterBaseTest):
                         asserts.assert_true(isinstance(target.cluster, Nullable), "Cluster should be Nullable")
                     else:
                         asserts.assert_equal(target.cluster, expected_target.cluster)
-                    
+
                     if isinstance(expected_target.endpoint, Nullable):
                         asserts.assert_true(isinstance(target.endpoint, Nullable), "Endpoint should be Nullable")
                     else:
                         asserts.assert_equal(target.endpoint, expected_target.endpoint)
-                    
+
                     if isinstance(expected_target.deviceType, Nullable):
                         asserts.assert_true(isinstance(target.deviceType, Nullable), "Device type should be Nullable")
                     else:
@@ -608,7 +640,7 @@ class TC_ACL_2_4(MatterBaseTest):
                 [(0, acl_attribute(value=null_targets_acl))]
             )
             asserts.assert_equal(result[0].Status, Status.Success,
-                "Write ACL with null targets should succeed")
+                                 "Write ACL with null targets should succeed")
         except Exception as e:
             self.print_step("Error writing null targets ACL", str(e))
             asserts.fail(f"Failed to write null targets ACL: {e}")
@@ -621,25 +653,25 @@ class TC_ACL_2_4(MatterBaseTest):
             attribute=acl_attribute
         )
         self.print_step("Read Null Targets ACL", read_null_targets_acl)
-        
+
         # Verify null targets ACL contents
         asserts.assert_equal(len(read_null_targets_acl), 3, "ACL should contain exactly 3 entries")
         for i, entry in enumerate(read_null_targets_acl):
             expected_entry = null_targets_acl[i]
-            
+
             # Verify basic fields
             asserts.assert_equal(entry.privilege, expected_entry.privilege,
-                f"Entry {i} privilege mismatch")
+                                 f"Entry {i} privilege mismatch")
             asserts.assert_equal(entry.authMode, expected_entry.authMode,
-                f"Entry {i} authMode mismatch")
+                                 f"Entry {i} authMode mismatch")
             asserts.assert_equal(entry.subjects, expected_entry.subjects,
-                f"Entry {i} subjects mismatch")
+                                 f"Entry {i} subjects mismatch")
             asserts.assert_equal(entry.fabricIndex, expected_entry.fabricIndex,
-                f"Entry {i} fabricIndex mismatch")
-            
+                                 f"Entry {i} fabricIndex mismatch")
+
             # Verify targets field
             asserts.assert_true(isinstance(entry.targets, Nullable),
-                f"Entry {i} targets should be Nullable")
+                                f"Entry {i} targets should be Nullable")
 
         # Step 14: Write ACL with 2 elements
         self.step(14)
@@ -668,7 +700,7 @@ class TC_ACL_2_4(MatterBaseTest):
                 [(0, acl_attribute(value=two_element_acl))]
             )
             asserts.assert_equal(result[0].Status, Status.Success,
-                "Write ACL with 2 elements should succeed")
+                                 "Write ACL with 2 elements should succeed")
         except Exception as e:
             self.print_step("Error writing two element ACL", str(e))
             asserts.fail(f"Failed to write two element ACL: {e}")
@@ -681,31 +713,31 @@ class TC_ACL_2_4(MatterBaseTest):
             attribute=acl_attribute
         )
         self.print_step("Read Two Element ACL", read_two_element_acl)
-        
+
         # Verify two element ACL contents
         asserts.assert_equal(len(read_two_element_acl), 2, "ACL should contain exactly 2 entries")
         for i, entry in enumerate(read_two_element_acl):
             expected_entry = two_element_acl[i]
-            
+
             # Verify basic fields
             asserts.assert_equal(entry.privilege, expected_entry.privilege,
-                f"Entry {i} privilege mismatch")
+                                 f"Entry {i} privilege mismatch")
             asserts.assert_equal(entry.authMode, expected_entry.authMode,
-                f"Entry {i} authMode mismatch")
+                                 f"Entry {i} authMode mismatch")
             asserts.assert_equal(entry.fabricIndex, expected_entry.fabricIndex,
-                f"Entry {i} fabricIndex mismatch")
-            
+                                 f"Entry {i} fabricIndex mismatch")
+
             # Verify subjects field
             if isinstance(expected_entry.subjects, Nullable):
                 asserts.assert_true(isinstance(entry.subjects, Nullable),
-                    f"Entry {i} subjects should be Nullable")
+                                    f"Entry {i} subjects should be Nullable")
             else:
                 asserts.assert_equal(entry.subjects, expected_entry.subjects,
-                    f"Entry {i} subjects mismatch")
-            
+                                     f"Entry {i} subjects mismatch")
+
             # Verify targets field
             asserts.assert_true(isinstance(entry.targets, Nullable),
-                f"Entry {i} targets should be Nullable")
+                                f"Entry {i} targets should be Nullable")
 
         # Step 16: Write ACL with ProxyView privilege
         self.step(16)
@@ -734,7 +766,7 @@ class TC_ACL_2_4(MatterBaseTest):
                 [(0, acl_attribute(value=proxy_view_acl))]
             )
             asserts.assert_equal(result[0].Status, Status.Success,
-                "Write ACL with ProxyView privilege should succeed")
+                                 "Write ACL with ProxyView privilege should succeed")
         except Exception as e:
             self.print_step("Error writing ProxyView ACL", str(e))
             asserts.fail(f"Failed to write ProxyView ACL: {e}")
@@ -747,31 +779,31 @@ class TC_ACL_2_4(MatterBaseTest):
             attribute=acl_attribute
         )
         self.print_step("Read ProxyView ACL", read_proxy_view_acl)
-        
+
         # Verify ProxyView ACL contents
         asserts.assert_equal(len(read_proxy_view_acl), 2, "ACL should contain exactly 2 entries")
         for i, entry in enumerate(read_proxy_view_acl):
             expected_entry = proxy_view_acl[i]
-            
+
             # Verify basic fields
             asserts.assert_equal(entry.privilege, expected_entry.privilege,
-                f"Entry {i} privilege mismatch")
+                                 f"Entry {i} privilege mismatch")
             asserts.assert_equal(entry.authMode, expected_entry.authMode,
-                f"Entry {i} authMode mismatch")
+                                 f"Entry {i} authMode mismatch")
             asserts.assert_equal(entry.fabricIndex, expected_entry.fabricIndex,
-                f"Entry {i} fabricIndex mismatch")
-            
+                                 f"Entry {i} fabricIndex mismatch")
+
             # Verify subjects field
             if isinstance(expected_entry.subjects, Nullable):
                 asserts.assert_true(isinstance(entry.subjects, Nullable),
-                    f"Entry {i} subjects should be Nullable")
+                                    f"Entry {i} subjects should be Nullable")
             else:
                 asserts.assert_equal(entry.subjects, expected_entry.subjects,
-                    f"Entry {i} subjects mismatch")
-            
+                                     f"Entry {i} subjects mismatch")
+
             # Verify targets field
             asserts.assert_true(isinstance(entry.targets, Nullable),
-                f"Entry {i} targets should be Nullable")
+                                f"Entry {i} targets should be Nullable")
 
         # Step 18: Read SubjectsPerAccessControlEntry attribute
         self.step(18)
@@ -812,7 +844,7 @@ class TC_ACL_2_4(MatterBaseTest):
                 [(0, acl_attribute(value=max_subjects_acl))]
             )
             asserts.assert_equal(result[0].Status, Status.Success,
-                "Write ACL with max subjects should succeed")
+                                 "Write ACL with max subjects should succeed")
         except Exception as e:
             self.print_step("Error writing max subjects ACL", str(e))
             asserts.fail(f"Failed to write max subjects ACL: {e}")
@@ -825,31 +857,31 @@ class TC_ACL_2_4(MatterBaseTest):
             attribute=acl_attribute
         )
         self.print_step("Read Max Subjects ACL", read_max_subjects_acl)
-        
+
         # Verify max subjects ACL contents
         asserts.assert_equal(len(read_max_subjects_acl), 2, "ACL should contain exactly 2 entries")
         for i, entry in enumerate(read_max_subjects_acl):
             expected_entry = max_subjects_acl[i]
-            
+
             # Verify basic fields
             asserts.assert_equal(entry.privilege, expected_entry.privilege,
-                f"Entry {i} privilege mismatch")
+                                 f"Entry {i} privilege mismatch")
             asserts.assert_equal(entry.authMode, expected_entry.authMode,
-                f"Entry {i} authMode mismatch")
+                                 f"Entry {i} authMode mismatch")
             asserts.assert_equal(entry.fabricIndex, expected_entry.fabricIndex,
-                f"Entry {i} fabricIndex mismatch")
-            
+                                 f"Entry {i} fabricIndex mismatch")
+
             # Verify subjects field
             if isinstance(expected_entry.subjects, Nullable):
                 asserts.assert_true(isinstance(entry.subjects, Nullable),
-                    f"Entry {i} subjects should be Nullable")
+                                    f"Entry {i} subjects should be Nullable")
             else:
                 asserts.assert_equal(entry.subjects, expected_entry.subjects,
-                    f"Entry {i} subjects mismatch")
-            
+                                     f"Entry {i} subjects mismatch")
+
             # Verify targets field
             asserts.assert_true(isinstance(entry.targets, Nullable),
-                f"Entry {i} targets should be Nullable")
+                                f"Entry {i} targets should be Nullable")
 
         # Step 21: Write ACL with specific subjects
         self.step(21)
@@ -884,7 +916,7 @@ class TC_ACL_2_4(MatterBaseTest):
                 [(0, acl_attribute(value=specific_subjects_acl))]
             )
             asserts.assert_equal(result[0].Status, Status.Success,
-                "Write ACL with specific subjects should succeed")
+                                 "Write ACL with specific subjects should succeed")
         except Exception as e:
             self.print_step("Error writing specific subjects ACL", str(e))
             asserts.fail(f"Failed to write specific subjects ACL: {e}")
@@ -897,7 +929,7 @@ class TC_ACL_2_4(MatterBaseTest):
             attribute=acl_attribute
         )
         self.print_step("Read Specific Subjects ACL", read_specific_subjects_acl)
-        
+
         # Verify specific subjects ACL contents
         asserts.assert_equal(len(read_specific_subjects_acl), 2, "ACL should contain exactly 2 entries")
         for i, entry in enumerate(read_specific_subjects_acl):
@@ -946,7 +978,7 @@ class TC_ACL_2_4(MatterBaseTest):
                     deviceType=i + 1  # Ensure non-zero deviceType
                 )
             random_targets.append(target)
-        
+
         max_targets_acl = [
             # Admin entry (unchanged)
             Clusters.AccessControl.Structs.AccessControlEntryStruct(
@@ -972,7 +1004,7 @@ class TC_ACL_2_4(MatterBaseTest):
                 [(0, acl_attribute(value=max_targets_acl))]
             )
             asserts.assert_equal(result[0].Status, Status.Success,
-                "Write ACL with max targets should succeed")
+                                 "Write ACL with max targets should succeed")
         except Exception as e:
             self.print_step("Error writing max targets ACL", str(e))
             asserts.fail(f"Failed to write max targets ACL: {e}")
@@ -985,61 +1017,61 @@ class TC_ACL_2_4(MatterBaseTest):
             attribute=acl_attribute
         )
         self.print_step("Read Max Targets ACL", read_max_targets_acl)
-        
+
         # Verify max targets ACL contents
         asserts.assert_equal(len(read_max_targets_acl), 2, "ACL should contain exactly 2 entries")
         for i, entry in enumerate(read_max_targets_acl):
             expected_entry = max_targets_acl[i]
             self.print_step(f"Verifying entry {i}", "")
-            
+
             # Verify basic fields
             asserts.assert_equal(entry.privilege, expected_entry.privilege,
-                f"Entry {i} privilege mismatch")
+                                 f"Entry {i} privilege mismatch")
             asserts.assert_equal(entry.authMode, expected_entry.authMode,
-                f"Entry {i} authMode mismatch")
+                                 f"Entry {i} authMode mismatch")
             asserts.assert_equal(entry.fabricIndex, expected_entry.fabricIndex,
-                f"Entry {i} fabricIndex mismatch")
-            
+                                 f"Entry {i} fabricIndex mismatch")
+
             # Verify subjects field
             if isinstance(expected_entry.subjects, Nullable):
                 asserts.assert_true(isinstance(entry.subjects, Nullable),
-                    f"Entry {i} subjects should be Nullable")
+                                    f"Entry {i} subjects should be Nullable")
             else:
                 asserts.assert_equal(entry.subjects, expected_entry.subjects,
-                    f"Entry {i} subjects mismatch")
-            
+                                     f"Entry {i} subjects mismatch")
+
             # Verify targets field
             if isinstance(expected_entry.targets, Nullable):
                 asserts.assert_true(isinstance(entry.targets, Nullable),
-                    f"Entry {i} targets should be Nullable")
+                                    f"Entry {i} targets should be Nullable")
             else:
                 asserts.assert_equal(len(entry.targets), len(expected_entry.targets),
-                    f"Entry {i} should have same number of targets")
+                                     f"Entry {i} should have same number of targets")
                 for j, target in enumerate(entry.targets):
                     expected_target = expected_entry.targets[j]
                     self.print_step(f"Verifying target {j} in entry {i}", "")
-                    
+
                     # For each target field, verify either the value matches or both are Nullable
                     if isinstance(expected_target.cluster, Nullable):
                         asserts.assert_true(isinstance(target.cluster, Nullable),
-                            f"Entry {i} Target {j} cluster should be Nullable")
+                                            f"Entry {i} Target {j} cluster should be Nullable")
                     else:
                         asserts.assert_equal(target.cluster, expected_target.cluster,
-                            f"Entry {i} Target {j} cluster mismatch")
-                    
+                                             f"Entry {i} Target {j} cluster mismatch")
+
                     if isinstance(expected_target.endpoint, Nullable):
                         asserts.assert_true(isinstance(target.endpoint, Nullable),
-                            f"Entry {i} Target {j} endpoint should be Nullable")
+                                            f"Entry {i} Target {j} endpoint should be Nullable")
                     else:
                         asserts.assert_equal(target.endpoint, expected_target.endpoint,
-                            f"Entry {i} Target {j} endpoint mismatch")
-                    
+                                             f"Entry {i} Target {j} endpoint mismatch")
+
                     if isinstance(expected_target.deviceType, Nullable):
                         asserts.assert_true(isinstance(target.deviceType, Nullable),
-                            f"Entry {i} Target {j} deviceType should be Nullable")
+                                            f"Entry {i} Target {j} deviceType should be Nullable")
                     else:
                         asserts.assert_equal(target.deviceType, expected_target.deviceType,
-                            f"Entry {i} Target {j} deviceType mismatch")
+                                             f"Entry {i} Target {j} deviceType mismatch")
 
         # Step 26: Read AccessControlEntriesPerFabric attribute
         self.step(26)
@@ -1063,7 +1095,7 @@ class TC_ACL_2_4(MatterBaseTest):
                 fabricIndex=f1
             )
         ]
-        
+
         # Add remaining entries up to MAXENTRIES
         for i in range(1, max_entries):
             entry = Clusters.AccessControl.Structs.AccessControlEntryStruct(
@@ -1081,7 +1113,7 @@ class TC_ACL_2_4(MatterBaseTest):
                 [(0, acl_attribute(value=max_entries_acl))]
             )
             asserts.assert_equal(result[0].Status, Status.Success,
-                "Write ACL with max entries should succeed")
+                                 "Write ACL with max entries should succeed")
         except Exception as e:
             self.print_step("Error writing max entries ACL", str(e))
             asserts.fail(f"Failed to write max entries ACL: {e}")
@@ -1094,30 +1126,30 @@ class TC_ACL_2_4(MatterBaseTest):
             attribute=acl_attribute
         )
         self.print_step("Read Max Entries ACL", read_max_entries_acl)
-        
+
         # Verify max entries ACL contents
         asserts.assert_equal(len(read_max_entries_acl), max_entries,
-            f"ACL should contain exactly {max_entries} entries")
+                             f"ACL should contain exactly {max_entries} entries")
         for i, entry in enumerate(read_max_entries_acl):
             expected_entry = max_entries_acl[i]
             self.print_step(f"Verifying entry {i}", "")
-            
+
             asserts.assert_equal(entry.privilege, expected_entry.privilege,
-                f"Entry {i} privilege mismatch")
+                                 f"Entry {i} privilege mismatch")
             asserts.assert_equal(entry.authMode, expected_entry.authMode,
-                f"Entry {i} authMode mismatch")
+                                 f"Entry {i} authMode mismatch")
             asserts.assert_equal(entry.fabricIndex, expected_entry.fabricIndex,
-                f"Entry {i} fabricIndex mismatch")
-            
+                                 f"Entry {i} fabricIndex mismatch")
+
             if isinstance(expected_entry.subjects, Nullable):
                 asserts.assert_true(isinstance(entry.subjects, Nullable),
-                    f"Entry {i} subjects should be Nullable")
+                                    f"Entry {i} subjects should be Nullable")
             else:
                 asserts.assert_equal(entry.subjects, expected_entry.subjects,
-                    f"Entry {i} subjects mismatch")
-            
+                                     f"Entry {i} subjects mismatch")
+
             asserts.assert_true(isinstance(entry.targets, Nullable),
-                f"Entry {i} targets should be Nullable")
+                                f"Entry {i} targets should be Nullable")
 
         # First reset ACL to only admin entry
         self.step(29)
@@ -1139,7 +1171,7 @@ class TC_ACL_2_4(MatterBaseTest):
                 [(0, acl_attribute(value=admin_only_acl))]
             )
             asserts.assert_equal(result[0].Status, Status.Success,
-                "Write admin-only ACL should succeed")
+                                 "Write admin-only ACL should succeed")
         except Exception as e:
             self.print_step("Error resetting to admin-only ACL", str(e))
             asserts.fail(f"Failed to reset to admin-only ACL: {e}")
@@ -1151,7 +1183,7 @@ class TC_ACL_2_4(MatterBaseTest):
             attribute=acl_attribute
         )
         asserts.assert_equal(len(read_admin_only), 1,
-            "ACL should contain only admin entry after reset")
+                             "ACL should contain only admin entry after reset")
 
         # Now test PASE auth mode (should fail)
         pase_acl = [
@@ -1180,7 +1212,7 @@ class TC_ACL_2_4(MatterBaseTest):
             )
             # Should fail with CONSTRAINT_ERROR
             asserts.assert_equal(result[0].Status, Status.ConstraintError,
-                "Write ACL with PASE auth mode should fail with CONSTRAINT_ERROR")
+                                 "Write ACL with PASE auth mode should fail with CONSTRAINT_ERROR")
         except Exception as e:
             # Expected failure
             self.print_step("Got expected error for PASE auth mode", str(e))
@@ -1193,16 +1225,16 @@ class TC_ACL_2_4(MatterBaseTest):
             attribute=acl_attribute
         )
         self.print_step("Read ACL after PASE attempt", read_after_pase_acl)
-        
+
         # Verify only admin entry remains
         asserts.assert_equal(len(read_after_pase_acl), 1,
-            "ACL should contain only admin entry")
+                             "ACL should contain only admin entry")
         admin_entry = read_after_pase_acl[0]
         asserts.assert_equal(admin_entry.privilege,
-            Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
-            "Entry should have admin privilege")
+                             Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
+                             "Entry should have admin privilege")
         asserts.assert_equal(admin_entry.subjects, [self.th1.nodeId],
-            "Entry should have admin node ID")
+                             "Entry should have admin node ID")
 
         # After each constraint error test
         verify_acl = await self.read_single_attribute_check_success(
@@ -1212,10 +1244,10 @@ class TC_ACL_2_4(MatterBaseTest):
         )
         asserts.assert_equal(len(verify_acl), 1, "ACL should contain only admin entry after failed operation")
         asserts.assert_equal(verify_acl[0].privilege,
-            Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
-            "Remaining entry must be admin")
+                             Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
+                             "Remaining entry must be admin")
         asserts.assert_equal(verify_acl[0].subjects, [self.th1.nodeId],
-            "Admin entry must have correct node ID")
+                             "Admin entry must have correct node ID")
 
         # Step 31: Test Group auth mode for admin (should fail)
         self.step(31)
@@ -1244,7 +1276,7 @@ class TC_ACL_2_4(MatterBaseTest):
                 [(0, acl_attribute(value=group_admin_acl))]
             )
             asserts.assert_equal(result[0].Status, Status.ConstraintError,
-                "Write ACL with Group auth mode for admin should fail with CONSTRAINT_ERROR")
+                                 "Write ACL with Group auth mode for admin should fail with CONSTRAINT_ERROR")
         except Exception as e:
             self.print_step("Got expected error for Group auth mode admin", str(e))
 
@@ -1275,7 +1307,7 @@ class TC_ACL_2_4(MatterBaseTest):
                 [(0, acl_attribute(value=invalid_privilege_acl))]
             )
             asserts.assert_equal(result[0].Status, Status.ConstraintError,
-                "Write ACL with invalid privilege should fail with CONSTRAINT_ERROR")
+                                 "Write ACL with invalid privilege should fail with CONSTRAINT_ERROR")
         except Exception as e:
             self.print_step("Got expected error for invalid privilege", str(e))
 
@@ -1306,7 +1338,7 @@ class TC_ACL_2_4(MatterBaseTest):
                 [(0, acl_attribute(value=invalid_auth_mode_acl))]
             )
             asserts.assert_equal(result[0].Status, Status.ConstraintError,
-                "Write ACL with invalid auth mode should fail with CONSTRAINT_ERROR")
+                                 "Write ACL with invalid auth mode should fail with CONSTRAINT_ERROR")
         except Exception as e:
             self.print_step("Got expected error for invalid auth mode", str(e))
 
@@ -1337,7 +1369,7 @@ class TC_ACL_2_4(MatterBaseTest):
                 [(0, acl_attribute(value=invalid_subject_acl))]
             )
             asserts.assert_equal(result[0].Status, Status.ConstraintError,
-                "Write ACL with invalid subject ID should fail with CONSTRAINT_ERROR")
+                                 "Write ACL with invalid subject ID should fail with CONSTRAINT_ERROR")
         except Exception as e:
             self.print_step("Got expected error for invalid subject ID", str(e))
 
@@ -1368,7 +1400,7 @@ class TC_ACL_2_4(MatterBaseTest):
                 [(0, acl_attribute(value=max_node_id_acl))]
             )
             asserts.assert_equal(result[0].Status, Status.ConstraintError,
-                "Write ACL with max node ID should fail with CONSTRAINT_ERROR")
+                                 "Write ACL with max node ID should fail with CONSTRAINT_ERROR")
         except Exception as e:
             self.print_step("Got expected error for max node ID", str(e))
 
@@ -1399,7 +1431,7 @@ class TC_ACL_2_4(MatterBaseTest):
                 [(0, acl_attribute(value=group_id_range_acl))]
             )
             asserts.assert_equal(result[0].Status, Status.ConstraintError,
-                "Write ACL with invalid group ID range should fail with CONSTRAINT_ERROR")
+                                 "Write ACL with invalid group ID range should fail with CONSTRAINT_ERROR")
         except Exception as e:
             self.print_step("Got expected error for invalid group ID range", str(e))
 
@@ -1430,7 +1462,7 @@ class TC_ACL_2_4(MatterBaseTest):
                 [(0, acl_attribute(value=fabric_scoped_id_acl))]
             )
             asserts.assert_equal(result[0].Status, Status.ConstraintError,
-                "Write ACL with fabric-scoped node ID should fail with CONSTRAINT_ERROR")
+                                 "Write ACL with fabric-scoped node ID should fail with CONSTRAINT_ERROR")
         except Exception as e:
             self.print_step("Got expected error for fabric-scoped node ID", str(e))
 
@@ -1467,7 +1499,7 @@ class TC_ACL_2_4(MatterBaseTest):
                 [(0, acl_attribute(value=empty_target_acl))]
             )
             asserts.assert_equal(result[0].Status, Status.ConstraintError,
-                "Write ACL with empty target should fail with CONSTRAINT_ERROR")
+                                 "Write ACL with empty target should fail with CONSTRAINT_ERROR")
         except Exception as e:
             self.print_step("Got expected error for empty target", str(e))
 
@@ -1504,7 +1536,7 @@ class TC_ACL_2_4(MatterBaseTest):
                 [(0, acl_attribute(value=invalid_cluster_acl))]
             )
             asserts.assert_equal(result[0].Status, Status.ConstraintError,
-                "Write ACL with invalid cluster ID should fail with CONSTRAINT_ERROR")
+                                 "Write ACL with invalid cluster ID should fail with CONSTRAINT_ERROR")
         except Exception as e:
             self.print_step("Got expected error for invalid cluster ID", str(e))
 
@@ -1541,7 +1573,7 @@ class TC_ACL_2_4(MatterBaseTest):
                 [(0, acl_attribute(value=invalid_endpoint_acl))]
             )
             asserts.assert_equal(result[0].Status, Status.ConstraintError,
-                "Write ACL with invalid endpoint ID should fail with CONSTRAINT_ERROR")
+                                 "Write ACL with invalid endpoint ID should fail with CONSTRAINT_ERROR")
         except Exception as e:
             self.print_step("Got expected error for invalid endpoint ID", str(e))
 
@@ -1578,7 +1610,7 @@ class TC_ACL_2_4(MatterBaseTest):
                 [(0, acl_attribute(value=invalid_device_type_acl))]
             )
             asserts.assert_equal(result[0].Status, Status.ConstraintError,
-                "Write ACL with invalid device type should fail with CONSTRAINT_ERROR")
+                                 "Write ACL with invalid device type should fail with CONSTRAINT_ERROR")
         except Exception as e:
             self.print_step("Got expected error for invalid device type", str(e))
 
@@ -1615,7 +1647,7 @@ class TC_ACL_2_4(MatterBaseTest):
                 [(0, acl_attribute(value=endpoint_with_device_type_acl))]
             )
             asserts.assert_equal(result[0].Status, Status.ConstraintError,
-                "Write ACL with both endpoint and device type should fail with CONSTRAINT_ERROR")
+                                 "Write ACL with both endpoint and device type should fail with CONSTRAINT_ERROR")
         except Exception as e:
             self.print_step("Got expected error for endpoint with device type", str(e))
 
@@ -1652,7 +1684,7 @@ class TC_ACL_2_4(MatterBaseTest):
                 [(0, acl_attribute(value=all_target_fields_acl))]
             )
             asserts.assert_equal(result[0].Status, Status.ConstraintError,
-                "Write ACL with all target fields should fail with CONSTRAINT_ERROR")
+                                 "Write ACL with all target fields should fail with CONSTRAINT_ERROR")
         except Exception as e:
             self.print_step("Got expected error for all target fields", str(e))
 
@@ -1676,7 +1708,7 @@ class TC_ACL_2_4(MatterBaseTest):
                 [(0, acl_attribute(value=admin_only_acl))]
             )
             asserts.assert_equal(result[0].Status, Status.Success,
-                "Write admin-only ACL should succeed")
+                                 "Write admin-only ACL should succeed")
             self.print_step("Successfully reset ACL to admin-only entry", "")
         except Exception as e:
             self.print_step("Error writing admin-only ACL", str(e))
@@ -1689,12 +1721,13 @@ class TC_ACL_2_4(MatterBaseTest):
             attribute=acl_attribute
         )
         asserts.assert_equal(len(final_acl), 1,
-            "ACL should contain exactly one admin entry")
+                             "ACL should contain exactly one admin entry")
         asserts.assert_equal(final_acl[0].privilege,
-            Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
-            "Remaining entry should have admin privilege")
+                             Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
+                             "Remaining entry should have admin privilege")
         asserts.assert_equal(final_acl[0].subjects, [self.th1.nodeId],
-            "Entry should have admin node ID")
+                             "Entry should have admin node ID")
+
 
 if __name__ == "__main__":
     default_matter_test_main()
