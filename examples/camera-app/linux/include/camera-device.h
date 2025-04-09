@@ -101,7 +101,8 @@ private:
     void InitializeAudioStreams();
     void InitializeSnapshotStreams();
 
-    GstElement * CreateVideoPipeline(const std::string & pipelineString, CameraError & error);
+    GstElement * CreateVideoPipeline(const std::string & device, int width, int height, int framerate, CameraError & error);
+    GstElement * CreateAudioPipeline(const std::string & device, int channels, int sampleRate, CameraError & error);
     GstElement * CreateSnapshotPipeline(const std::string & device, int width, int height, int quality, int frameRate,
                                         const std::string & filename, CameraError & error);
     CameraError SetV4l2Control(uint32_t controlId, int value);
