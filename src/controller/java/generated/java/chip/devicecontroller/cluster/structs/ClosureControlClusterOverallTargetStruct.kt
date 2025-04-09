@@ -24,14 +24,14 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class ClosureControlClusterOverallTargetStruct(
-  val tagPosition: Optional<UInt>,
-  val tagLatch: Optional<UInt>,
+  val position: Optional<UInt>,
+  val latch: Optional<UInt>,
   val speed: Optional<UInt>,
 ) {
   override fun toString(): String = buildString {
     append("ClosureControlClusterOverallTargetStruct {\n")
-    append("\ttagPosition : $tagPosition\n")
-    append("\ttagLatch : $tagLatch\n")
+    append("\tposition : $position\n")
+    append("\tlatch : $latch\n")
     append("\tspeed : $speed\n")
     append("}\n")
   }
@@ -39,13 +39,13 @@ class ClosureControlClusterOverallTargetStruct(
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      if (tagPosition.isPresent) {
-        val opttagPosition = tagPosition.get()
-        put(ContextSpecificTag(TAG_TAG_POSITION), opttagPosition)
+      if (position.isPresent) {
+        val optposition = position.get()
+        put(ContextSpecificTag(TAG_POSITION), optposition)
       }
-      if (tagLatch.isPresent) {
-        val opttagLatch = tagLatch.get()
-        put(ContextSpecificTag(TAG_TAG_LATCH), opttagLatch)
+      if (latch.isPresent) {
+        val optlatch = latch.get()
+        put(ContextSpecificTag(TAG_LATCH), optlatch)
       }
       if (speed.isPresent) {
         val optspeed = speed.get()
@@ -56,21 +56,21 @@ class ClosureControlClusterOverallTargetStruct(
   }
 
   companion object {
-    private const val TAG_TAG_POSITION = 0
-    private const val TAG_TAG_LATCH = 1
+    private const val TAG_POSITION = 0
+    private const val TAG_LATCH = 1
     private const val TAG_SPEED = 2
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ClosureControlClusterOverallTargetStruct {
       tlvReader.enterStructure(tlvTag)
-      val tagPosition =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_TAG_POSITION))) {
-          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_TAG_POSITION)))
+      val position =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_POSITION))) {
+          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_POSITION)))
         } else {
           Optional.empty()
         }
-      val tagLatch =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_TAG_LATCH))) {
-          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_TAG_LATCH)))
+      val latch =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_LATCH))) {
+          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_LATCH)))
         } else {
           Optional.empty()
         }
@@ -83,7 +83,7 @@ class ClosureControlClusterOverallTargetStruct(
 
       tlvReader.exitContainer()
 
-      return ClosureControlClusterOverallTargetStruct(tagPosition, tagLatch, speed)
+      return ClosureControlClusterOverallTargetStruct(position, latch, speed)
     }
   }
 }

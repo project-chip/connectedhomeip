@@ -39,6 +39,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Chime
     - Camera AV Stream Management
     - Commissioner Control
+    - Commodity Price
     - Energy EVSE
     - Energy EVSE Mode
     - Device Energy Management
@@ -51,6 +52,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Water Heater Management
     - Water Heater Mode
     - WebRTC Transport Provider
+    - WebRTC Transport Requestor
     - General Commissioning
     - General Diagnostics
     - Software Diagnostics

@@ -297,3 +297,8 @@ void MatterOtaSoftwareUpdateRequestorPluginServerInitCallback()
 {
     AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
 }
+
+void MatterOtaSoftwareUpdateRequestorPluginServerShutdownCallback()
+{
+    AttributeAccessInterfaceRegistry::Instance().Unregister(&gAttrAccess);
+}
