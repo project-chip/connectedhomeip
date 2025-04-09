@@ -3374,7 +3374,7 @@ cluster LaundryWasherMode = 81 {
     kWhites = 16387;
   }
 
-  struct ModeTagStruct {
+  shared struct ModeTagStruct {
     optional vendor_id mfgCode = 0;
     enum16 value = 1;
   }
@@ -3427,7 +3427,7 @@ cluster RefrigeratorAndTemperatureControlledCabinetMode = 82 {
     kRapidFreeze = 16385;
   }
 
-  struct ModeTagStruct {
+  shared struct ModeTagStruct {
     optional vendor_id mfgCode = 0;
     enum16 value = 1;
   }
@@ -3698,7 +3698,7 @@ cluster DishwasherMode = 89 {
     kLight = 16386;
   }
 
-  struct ModeTagStruct {
+  shared struct ModeTagStruct {
     optional vendor_id mfgCode = 0;
     enum16 value = 1;
   }
@@ -3942,7 +3942,7 @@ cluster MicrowaveOvenMode = 94 {
     kDefrost = 16385;
   }
 
-  struct ModeTagStruct {
+  shared struct ModeTagStruct {
     optional vendor_id mfgCode = 0;
     enum16 value = 1;
   }
@@ -11810,3 +11810,4 @@ cluster SampleMei = 4294048800 {
   /** Command that takes two uint8 arguments and returns their sum. */
   command AddArguments(AddArgumentsRequest): AddArgumentsResponse = 2;
 }
+

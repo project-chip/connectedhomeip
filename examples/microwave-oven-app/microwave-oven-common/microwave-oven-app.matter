@@ -1401,7 +1401,7 @@ cluster MicrowaveOvenMode = 94 {
     kDefrost = 16385;
   }
 
-  struct ModeTagStruct {
+  shared struct ModeTagStruct {
     optional vendor_id mfgCode = 0;
     enum16 value = 1;
   }
@@ -1835,3 +1835,5 @@ endpoint 1 {
     handle command OperationalCommandResponse;
   }
 }
+
+
