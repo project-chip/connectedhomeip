@@ -355,7 +355,7 @@ class HostBuilder(GnBuilder):
                  chip_casting_simplified: Optional[bool] = None,
                  disable_shell=False,
                  use_googletest=False,
-                 terms_and_conditions_required: Optional[bool] = None, chip_enable_nfc_based_commissioning = None,
+                 terms_and_conditions_required: Optional[bool] = None, chip_enable_nfc_based_commissioning=None,
                  ):
         super(HostBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
