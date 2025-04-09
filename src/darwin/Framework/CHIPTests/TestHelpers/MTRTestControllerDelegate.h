@@ -1,6 +1,5 @@
-/*
- *    Copyright (c) 2024 Project CHIP Authors
- *    All rights reserved.
+/**
+ *    Copyright (c) 2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,9 +13,19 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/ConcreteAttributePath.h>
 
-void MatterReportingAttributeChangeCallback(const chip::app::ConcreteAttributePath & aPath)
-{
-    // TODO: should we add logic to track these calls for test purposes?
-}
+#import <Foundation/Foundation.h>
+#import <Matter/Matter.h>
+#import <XCTest/XCTest.h>
+
+NS_ASSUME_NONNULL_BEGIN
+
+@interface MTRTestControllerDelegate : NSObject <MTRDeviceControllerDelegate>
+- (instancetype)initWithExpectation:(XCTestExpectation *)expectation newNodeID:(NSNumber *)newNodeID;
+
+@property (nonatomic, strong, readonly) XCTestExpectation * expectation;
+@property (nonatomic, strong, readonly) NSNumber * deviceID;
+@property (nonatomic, nullable, strong) NSString * countryCode;
+@end
+
+NS_ASSUME_NONNULL_END
