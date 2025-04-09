@@ -21,6 +21,8 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/closure-dimension-server/closure-dimension-delegate.h>
 #include <app/clusters/closure-dimension-server/closure-dimension-server.h>
+#include <app/clusters/closure-dimension-server/closure-dimension-cluster-logic.h>
+#include <app/clusters/closure-dimension-server/closure-dimension-matter-context.h>
 
 #include <lib/core/CHIPError.h>
 #include <protocols/interaction_model/StatusCode.h>
@@ -43,13 +45,11 @@ public:
 
 private:
     EndpointId mEndpoint;
-
 };
 
 class ClosureDimensionManager
 {
 public:
-
     enum Action_t
     {
         LOCK_ACTION = 0,
@@ -73,7 +73,24 @@ public:
         return CHIP_NO_ERROR;
     }
 
+    bool SupportsLimitMonitoring() const;
+    int32_t GetLimitRangeMin() const;
+    int32_t GetLimitRangeMax() const;
+    uint16_t GetCurrentPosition() const;
+    void MoveToPosition(uint16_t position);
+    void SetSpeed(Globals::ThreeLevelAutoEnum speedMode);
+    ClusterLogic getLogic(){
+        return mLogic;
+    }
+    ClusterConformance getConformance(){
+        return kConformance;
+    }
+    static ClosureDimensionManager GetManagerInstance(){
+        return sManager;
+    }
+
 private:
+    static ClosureDimensionManager sManager;
     const ClusterConformance kConformance = { .featureMap = 0, .supportsOverflow = false };
 
     EndpointId mEndpoint;
@@ -82,6 +99,10 @@ private:
     ClusterLogic mLogic;
     Interface mInterface;
 
+    int32_t mLimitMin = 0;
+    int32_t mLimitMax = 10000;
+    uint16_t mCurrentPosition = 0;
+    Globals::ThreeLevelAutoEnum mCurrentSpeed = Globals::ThreeLevelAutoEnum::kAuto;
     Callback_fn_initiated mActionInitiated_CB;
     Callback_fn_completed mActionCompleted_CB;
 };

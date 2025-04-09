@@ -17,6 +17,8 @@
  */
 #include <ClosureDimensionManager.h>
 #include <app/clusters/closure-dimension-server/closure-dimension-server.h>
+#include <app/clusters/closure-dimension-server/closure-dimension-cluster-objects.h>
+#include <app/clusters/closure-dimension-server/closure-dimension-cluster-logic.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 using namespace chip;
@@ -25,6 +27,31 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ClosurDimesnion;
 
 using Protocols::InteractionModel::Status;
+
+ClosureDimensionManager ClosureDimensionManager::sManager();
+
+void ClosureDimensionManager::MoveToPosition(uint16_t position)
+{
+    // Send command to actuator or update internal state
+    ChipLogProgress(AppServer, "Moving to position: %u", position);
+
+    GenericCurrentStateStruct currState;
+    currState.position.SetValue(position);
+
+    // TODO : Update Cluster attribute
+    ClosureDimensionManager::GetManagerInstance().getLogic().SetCurrentState(currState);
+
+    mCurrentPosition = position;
+    // setcallback()
+}
+
+// Update speed in internal state or send to motor controller
+void ClosureDimensionManager::SetSpeed(Globals::ThreeLevelAutoEnum speedMode)
+{
+    // TODO : Update Cluster attribute as well
+    mCurrentSpeed = speedMode;
+}
+
 
 CHIP_ERROR ClosureDimensionDelegate::HandleSetTarget(const Optional<Percent100ths> & pos, const Optional<TargetLatchEnum> & latch,
                                                      const Optional<Globals::ThreeLevelAutoEnum> & speed)
@@ -100,21 +127,53 @@ CHIP_ERROR ClosureDimensionManager::EndCurrentErrorListRead()
 CHIP_ERROR ClosureDimensionDelegate::HandleStep(const StepDirectionEnum & direction, const uint16_t & numberOfSteps,
                                                 const Optional<Globals::ThreeLevelAutoEnum> & speed)
 {
-
-    // Convert step to position delta
-    int32_t stepSize = 100; // Each step = 1%
-    int32_t delta    = numberOfSteps * stepSize;
-
-    if (direction == StepDirectionEnum::kDecrease)
+    // Check if Direction is valid
+    if (direction != StepDirectionEnum::kIncrease && direction != StepDirectionEnum::kDecrease)
     {
-        delta = -delta;
+        ChipLogError(AppServer, "Invalid direction value");
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    // Get current position from your actuator or state
-    uint16_t currentPos = 0;
-    //int32_t newPos      = std::clamp(static_cast<int32_t>(currentPos) + delta, 0, 10000);
+    if (!numberOfSteps) // NumberOfSteps == 0 -> ignore and return success
+    {
+        return CHIP_NO_ERROR;
+    }
 
-    // TODO: MoveToPosition
+    VerifyOrReturnValue(numberOfSteps != 0, CHIP_NO_ERROR);
+
+    // Check if Speed is valid, assuming some validation function is defined
+    VerifyOrReturnError(Clusters::EnsureKnownEnumValue(speed.Value()) != Globals::ThreeLevelAutoEnum::kUnknownEnumValue,
+                CHIP_ERROR_INVALID_ARGUMENT);
+
+    ClusterState state = ClosureDimensionManager::GetManagerInstance().getLogic().GetState();  // mLogic.GetState();
+
+    // Convert step to position delta
+    int32_t delta    = numberOfSteps * state.stepValue;
+    int32_t newPos   = 0;
+
+    // Get current position
+    uint16_t currentPos = state.currentState.position.HasValue() ? static_cast<uint16_t>(state.currentState.position.Value()) : 0; // 0 - 10000
+
+    bool limitSupported = ClosureDimensionManager::GetManagerInstance().getConformance().HasFeature(Feature::kLimitation) ? true : false;
+
+    switch (direction)
+    {
+        case StepDirectionEnum::kDecrease:
+            newPos = currentPos - delta;
+            newPos = limitSupported ? std::max(newPos, static_cast<int32_t>(state.limitRange.min)) : std::max(newPos, (int32_t)0);
+            break;
+        case StepDirectionEnum::kIncrease:
+            newPos = currentPos + delta;
+            newPos = limitSupported ? std::min(newPos, static_cast<int32_t>(state.limitRange.min)) : std::min(newPos, (int32_t)10000);
+            break;
+        default:
+            // Should never reach here due to earlier VerifyOrReturnError check
+            ChipLogError(AppServer, "Unhandled StepDirectionEnum value");
+            return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    // Set new position
+    ClosureDimensionManager::GetManagerInstance().MoveToPosition(static_cast<uint16_t>(newPos));
 
     if (speed.HasValue())
     {
