@@ -1001,7 +1001,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZSavePreset(HandlerContext & 
                            [presetToUse](const MPTZPresetHelper & mptzph) { return mptzph.GetPresetID() == presetToUse; });
 
     // If the current preset ID results in an entry from the current known set and there was a provided preset then we're updating
-    // an existing preset.  Only check for exhausting max presets if we're NOT updating. 
+    // an existing preset.  Only check for exhausting max presets if we're NOT updating.
     // It is possible that mCurrentPresetID equates to a current preset in cases where the collection of presets is full
     //
     bool updatingExistingPreset = (it != mMptzPresetHelpers.end()) && (preset.HasValue());
@@ -1039,7 +1039,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZSavePreset(HandlerContext & 
     aMptzPresetHelper.SetName(presetName);
     aMptzPresetHelper.SetMptzPosition(mMptzPosition);
 
-    // If an update, replace what is at the iterator, otherwise add to the set as tis is new 
+    // If an update, replace what is at the iterator, otherwise add to the set as tis is new
     //
     if (updatingExistingPreset)
     {
