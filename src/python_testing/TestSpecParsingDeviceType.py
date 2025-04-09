@@ -23,6 +23,7 @@ from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
 from chip.testing.spec_parsing import (PrebuiltDataModelDirectory, build_xml_clusters, build_xml_device_types,
                                        parse_single_device_type)
 from chip.tlv import uint
+from fake_device_builder import create_minimal_dt
 from jinja2 import Template
 from mobly import asserts
 from TC_DeviceConformance import DeviceConformanceTests
@@ -145,17 +146,11 @@ class TestSpecParsingDeviceType(MatterBaseTest):
         self.test.xml_device_types = self.xml_device_types
         self.test.xml_clusters = self.xml_clusters
 
-        resp = Attribute.AsyncReadTransaction.ReadResponse({}, [], {})
-        desc = Clusters.Descriptor
-        server_list_attr = Clusters.Descriptor.Attributes.ServerList
-        device_type_list_attr = Clusters.Descriptor.Attributes.DeviceTypeList
-        device_type_list = [Clusters.Descriptor.Structs.DeviceTypeStruct(
-            deviceType=device_type_id, revision=self.xml_device_types[device_type_id].revision)]
-        server_list = [k for k, v in self.xml_device_types[device_type_id].server_clusters.items(
-        ) if conformance_allowed(v.conformance(0, [], []), False)]
-        resp.attributes = {1: {desc: {device_type_list_attr: device_type_list, server_list_attr: server_list}}}
+        endpoint = create_minimal_dt(self.xml_clusters, self.xml_device_types, device_type_id, is_tlv_endpoint=False)
+        endpoint_tlv = create_minimal_dt(self.xml_clusters, self.xml_device_types, device_type_id, is_tlv_endpoint=True)
 
-        self.test.endpoints = resp.attributes
+        self.test.endpoints = {1: endpoint}
+        self.test.endpoints_tlv = {1: endpoint_tlv}
 
     # Test with temp sensor with temp sensor, identify and descriptor
     def test_ts_minimal_clusters(self):
