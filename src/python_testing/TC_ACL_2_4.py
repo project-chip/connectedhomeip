@@ -1214,8 +1214,7 @@ class TC_ACL_2_4(MatterBaseTest):
             asserts.assert_equal(result[0].Status, Status.ConstraintError,
                                  "Write ACL with PASE auth mode should fail with CONSTRAINT_ERROR")
         except Exception as e:
-            # Expected failure
-            self.print_step("Got expected error for PASE auth mode", str(e))
+            asserts.fail(f"Got unexpected error for PASE auth mode {str(e)}")
 
         # Step 30: Read and verify ACL after failed PASE write
         self.step(30)
