@@ -432,17 +432,8 @@ class TC_CGEN_2_2(MatterBaseTest):
         logger.info('Step #15 - TH2 successfully establish PASE session completed')
 
         self.step(16)
-        logger.info('Step #16 - TH2 Generating a new CSR to update the root certificate...')
-        # Flow generates a new TrustedRootCertificate - Request CSR (Certificate Signing Request)
-        cmd = self.cluster_opcreds.Commands.CSRRequest(CSRNonce=random.randbytes(32), isForUpdateNOC=False)
-        th2_csr = await self.send_single_cmd(dev_ctrl=TH2, node_id=newNodeId, cmd=cmd)
-
-        # Flow generates a new TrustedRootCertificate - Isue the certificates
-        th2_certs_new = await TH2.IssueNOCChain(th2_csr, newNodeId)
-        th2_new_root_cert = th2_certs_new.rcacBytes
-
-        # Flow generates a new TrustedRootCertificate - Send command to add new trusted root certificate
-        cmd = self.cluster_opcreds.Commands.AddTrustedRootCertificate(th2_new_root_cert)
+        # # Re-use TrustedRootCertificate created in step #5 - Send command to add new trusted root certificate
+        cmd = self.cluster_opcreds.Commands.AddTrustedRootCertificate(new_root_cert)
         resp = await self.send_single_cmd(dev_ctrl=TH2, node_id=newNodeId, cmd=cmd)
 
         self.step(17)
@@ -606,8 +597,8 @@ class TC_CGEN_2_2(MatterBaseTest):
         logger.info(f'Step #29: ArmFailSafeResponse with ErrorCode as OK({resp.errorCode})')
 
         self.step(30)
-        # Reused TrustedRootCertificate created in step #27 - Send command to add new trusted root certificate
-        cmd = self.cluster_opcreds.Commands.AddTrustedRootCertificate(th2_new_root_cert)
+        # Re-use TrustedRootCertificate created in step #5 - Send command to add new trusted root certificate
+        cmd = self.cluster_opcreds.Commands.AddTrustedRootCertificate(new_root_cert)
         resp = await self.send_single_cmd(dev_ctrl=self.default_controller, node_id=self.dut_node_id, cmd=cmd)
 
         self.step(31)
