@@ -41,7 +41,7 @@ struct ClusterConfiguration
     BitFlags<FeatureEnumType> featureMap;
 };
 
-} // namespace EmberApplicationConfig
+} // namespace StaticApplicationConfig
 } // namespace Clusters
 } // namespace app
 } // namespace chip
