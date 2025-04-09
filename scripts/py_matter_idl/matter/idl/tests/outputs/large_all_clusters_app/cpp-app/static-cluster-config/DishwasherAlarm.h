@@ -30,5 +30,5 @@ inline constexpr std::array<Clusters::StaticApplicationConfig::ClusterConfigurat
 } // namespace DishwasherAlarm
 } // namespace Clusters
 } // namespace app
-} // namespace namespace chip
+} // namespace chip
 

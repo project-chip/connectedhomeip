@@ -31,5 +31,5 @@ inline constexpr std::array<Clusters::StaticApplicationConfig::ClusterConfigurat
 } // namespace LaundryWasherControls
 } // namespace Clusters
 } // namespace app
-} // namespace namespace chip
+} // namespace chip
 

@@ -34,5 +34,5 @@ inline constexpr std::array<Clusters::StaticApplicationConfig::ClusterConfigurat
 } // namespace Binding
 } // namespace Clusters
 } // namespace app
-} // namespace namespace chip
+} // namespace chip
 

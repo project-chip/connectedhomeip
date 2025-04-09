@@ -31,5 +31,5 @@ inline constexpr std::array<Clusters::StaticApplicationConfig::ClusterConfigurat
 } // namespace SmokeCoAlarm
 } // namespace Clusters
 } // namespace app
-} // namespace namespace chip
+} // namespace chip
 

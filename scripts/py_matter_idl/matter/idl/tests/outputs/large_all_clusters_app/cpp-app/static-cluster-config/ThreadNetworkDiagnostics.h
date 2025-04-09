@@ -33,5 +33,5 @@ inline constexpr std::array<Clusters::StaticApplicationConfig::ClusterConfigurat
 } // namespace ThreadNetworkDiagnostics
 } // namespace Clusters
 } // namespace app
-} // namespace namespace chip
+} // namespace chip
 

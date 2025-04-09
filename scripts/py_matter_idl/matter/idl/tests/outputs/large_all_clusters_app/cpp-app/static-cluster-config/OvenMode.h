@@ -29,5 +29,5 @@ inline constexpr std::array<Clusters::StaticApplicationConfig::ClusterConfigurat
 } // namespace OvenMode
 } // namespace Clusters
 } // namespace app
-} // namespace namespace chip
+} // namespace chip
 

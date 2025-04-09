@@ -48,5 +48,5 @@ inline constexpr std::array<Clusters::StaticApplicationConfig::ClusterConfigurat
 } // namespace Switch
 } // namespace Clusters
 } // namespace app
-} // namespace namespace chip
+} // namespace chip
 

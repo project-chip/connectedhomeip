@@ -35,5 +35,5 @@ inline constexpr std::array<Clusters::StaticApplicationConfig::ClusterConfigurat
 } // namespace NetworkCommissioning
 } // namespace Clusters
 } // namespace app
-} // namespace namespace chip
+} // namespace chip
 

@@ -29,5 +29,5 @@ inline constexpr std::array<Clusters::StaticApplicationConfig::ClusterConfigurat
 } // namespace OtaSoftwareUpdateRequestor
 } // namespace Clusters
 } // namespace app
-} // namespace namespace chip
+} // namespace chip
 

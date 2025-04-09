@@ -29,5 +29,5 @@ inline constexpr std::array<Clusters::StaticApplicationConfig::ClusterConfigurat
 } // namespace AdministratorCommissioning
 } // namespace Clusters
 } // namespace app
-} // namespace namespace chip
+} // namespace chip
 

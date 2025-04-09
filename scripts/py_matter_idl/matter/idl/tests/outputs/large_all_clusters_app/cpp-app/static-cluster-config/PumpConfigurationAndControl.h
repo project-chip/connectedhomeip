@@ -34,5 +34,5 @@ inline constexpr std::array<Clusters::StaticApplicationConfig::ClusterConfigurat
 } // namespace PumpConfigurationAndControl
 } // namespace Clusters
 } // namespace app
-} // namespace namespace chip
+} // namespace chip
 
