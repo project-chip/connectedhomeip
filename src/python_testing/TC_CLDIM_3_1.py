@@ -178,7 +178,7 @@ class TC_CLDIM_3_1(MatterBaseTest):
         else:
             logging.info("CurrentState attribute is not supported. Skipping step 3d.")
 
-        # STEP 4a: Set Speed to Medium if supported
+        # STEP 4a: If Speed feature is not supported, skip step 4b to 4e
         self.step("4a")
         if not is_speed_supported:
             logging.info("Speed feature is not supported. Skipping steps 4b to 4e.")
@@ -273,7 +273,7 @@ class TC_CLDIM_3_1(MatterBaseTest):
         else:
             logging.info("CurrentState attribute is not supported. Skipping step 5d.")
 
-        # STEP 6a: Set Position to MaxPosition and Speed to High if supported
+        # STEP 6a: If Speed feature is not supported, skip step 6b to 6e
         self.step("6a")
         if not is_speed_supported:
             logging.info("Speed feature is not supported. Skipping steps 6b to 6e.")
