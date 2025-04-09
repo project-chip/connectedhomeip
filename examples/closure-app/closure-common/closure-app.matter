@@ -2787,6 +2787,7 @@ endpoint 1 {
   }
 
   server cluster ClosureControl {
+    callback attribute countdownTime;
     ram      attribute mainState;
     callback attribute currentErrorList;
     callback attribute overallState;
@@ -2797,7 +2798,9 @@ endpoint 1 {
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
 
+    handle command Stop;
     handle command MoveTo;
+    handle command Calibrate;
   }
 }
 
