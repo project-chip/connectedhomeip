@@ -234,5 +234,27 @@ private:
     CommandHandlerInterface * mNext = nullptr;
 };
 
+template <ClusterId... ClusterIds>
+class CommandHandlerInterfaceShim : CommandHandlerInterface
+{
+
+
+    // Implements new interface
+    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
+                                         DataModel::ListBuilder<DataModel::AcceptedCommandEntry> & builder) override
+    {
+        while (EnumerateAcceptedCommands)
+        {
+            Get
+        }
+        
+    }
+
+    virtual CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+}
+
 } // namespace app
 } // namespace chip
