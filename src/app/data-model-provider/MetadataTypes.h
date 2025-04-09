@@ -27,10 +27,11 @@
 _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wconversion\"") _Pragma("GCC diagnostic ignored \"-Wnarrowing\"")
 #define EndBitFieldInit_1 _Pragma("GCC diagnostic pop")
 #define StartBitFieldInit_2
-_Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wconversion\"") _Pragma("GCC diagnostic ignored \"-Wnarrowing\"")
+    _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wconversion\"")
+        _Pragma("GCC diagnostic ignored \"-Wnarrowing\"")
 #define EndBitFieldInit_2 _Pragma("GCC diagnostic pop")
 
-    namespace chip
+            namespace chip
 {
     namespace app {
     namespace DataModel {
