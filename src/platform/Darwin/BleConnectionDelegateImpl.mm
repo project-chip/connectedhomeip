@@ -361,7 +361,7 @@ namespace DeviceLayer {
     }
 
     const uint8_t * bytes = (const uint8_t *) [serviceData bytes];
-    if ([serviceData length] != sizeof(ChipBLEDeviceIdentificationInfo) && [serviceData length] != sizeof(ChipBLEDeviceNetworkRecoveryIdentificationInfo)) {
+    if ([serviceData length] != sizeof(ChipBLEDeviceIdentificationInfo)) {
         NSMutableString * hexString = [NSMutableString stringWithCapacity:([serviceData length] * 2)];
         for (NSUInteger i = 0; i < [serviceData length]; i++) {
             [hexString appendString:[NSString stringWithFormat:@"%02lx", (unsigned long) bytes[i]]];
@@ -384,9 +384,19 @@ namespace DeviceLayer {
         return;
     }
 
-    if ([self isConnecting] && opCode == 0) {
-        uint16_t discriminator = (bytes[1] | (bytes[2] << 8)) & 0xfff;
+    if (opCode == 1) {
+        auto delegate = _scannerDelegate;
+        if (delegate) {
+            ChipBLEDeviceNetworkRecoveryIdentificationInfo info;
+            memcpy(&info, [serviceData bytes], sizeof(info));
+            delegate->OnBleScanAdd(BleConnObjectFromCBPeripheral(peripheral), info);
+        }
+        return;
+    }
+    
+    uint16_t discriminator = (bytes[1] | (bytes[2] << 8)) & 0xfff;
 
+    if ([self isConnecting]) {
         if (![self checkDiscriminator:discriminator]) {
             ChipLogError(Ble,
                 "A device (%p) with a matching Matter UUID has been discovered but the service data discriminator not match our "
@@ -646,17 +656,9 @@ namespace DeviceLayer {
     if (delegate) {
         for (CBPeripheral * cachedPeripheral in _cachedPeripherals) {
             NSData * serviceData = _cachedPeripherals[cachedPeripheral][@"data"];
-            const uint8_t * bytes = (const uint8_t *) [serviceData bytes];
-            uint8_t opCode = bytes[0];
-            if (opCode == 0) {
-                ChipBLEDeviceIdentificationInfo info;
-                memcpy(&info, [serviceData bytes], sizeof(info));
-                delegate->OnBleScanAdd(BleConnObjectFromCBPeripheral(cachedPeripheral), info);
-            } else if (opCode == 1) {
-                ChipBLEDeviceNetworkRecoveryIdentificationInfo info;
-                memcpy(&info, [serviceData bytes], sizeof(info));
-                delegate->OnBleScanAdd(BleConnObjectFromCBPeripheral(cachedPeripheral), info);
-            }
+            ChipBLEDeviceIdentificationInfo info;
+            memcpy(&info, [serviceData bytes], sizeof(info));
+            delegate->OnBleScanAdd(BleConnObjectFromCBPeripheral(cachedPeripheral), info);
         }
         _scannerDelegate = delegate;
     }
@@ -679,16 +681,12 @@ namespace DeviceLayer {
     CBPeripheral * peripheral = nil;
     for (CBPeripheral * cachedPeripheral in _cachedPeripherals) {
         NSData * serviceData = _cachedPeripherals[cachedPeripheral][@"data"];
-        const uint8_t * bytes = (const uint8_t *) [serviceData bytes];
-        uint8_t opCode = bytes[0];
-        if (opCode == 0) {
-            ChipBLEDeviceIdentificationInfo info;
-            memcpy(&info, [serviceData bytes], sizeof(info));
+        ChipBLEDeviceIdentificationInfo info;
+        memcpy(&info, [serviceData bytes], sizeof(info));
 
-            if ([self checkDiscriminator:info.GetDeviceDiscriminator()]) {
-                peripheral = cachedPeripheral;
-                break;
-            }
+        if ([self checkDiscriminator:info.GetDeviceDiscriminator()]) {
+            peripheral = cachedPeripheral;
+            break;
         }
     }
 
@@ -719,9 +717,6 @@ namespace DeviceLayer {
 {
     dispatch_source_t timeoutTimer;
 
-    const uint8_t * bytes = (const uint8_t *) [data bytes];
-    uint8_t opCode = bytes[0];
-
     bool shouldLogData = true;
     if ([_cachedPeripherals objectForKey:peripheral]) {
         shouldLogData = ![data isEqualToData:_cachedPeripherals[peripheral][@"data"]];
@@ -734,15 +729,10 @@ namespace DeviceLayer {
         ChipLogProgress(Ble, "Adding peripheral %p to the cache", peripheral);
         auto delegate = _scannerDelegate;
         if (delegate) {
-            if (opCode == 0) {
-                ChipBLEDeviceIdentificationInfo info;
-                memcpy(&info, bytes, sizeof(info));
-                delegate->OnBleScanAdd(BleConnObjectFromCBPeripheral(peripheral), info);
-            } else if (opCode == 1) {
-                ChipBLEDeviceNetworkRecoveryIdentificationInfo info;
-                memcpy(&info, bytes, sizeof(info));
-                delegate->OnBleScanAdd(BleConnObjectFromCBPeripheral(peripheral), info);
-            }
+            ChipBLEDeviceIdentificationInfo info;
+            auto bytes = (const uint8_t *) [data bytes];
+            memcpy(&info, bytes, sizeof(info));
+            delegate->OnBleScanAdd(BleConnObjectFromCBPeripheral(peripheral), info);
         }
 
         timeoutTimer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, _workQueue);
@@ -766,8 +756,9 @@ namespace DeviceLayer {
         @"timer" : timeoutTimer,
     };
 
-    if (shouldLogData && opCode == 0) {
+    if (shouldLogData) {
         ChipBLEDeviceIdentificationInfo info;
+        auto bytes = (const uint8_t *) [data bytes];
         memcpy(&info, bytes, sizeof(info));
 
         ChipLogProgress(Ble, "  - Version: %u", info.GetAdvertisementVersion());
