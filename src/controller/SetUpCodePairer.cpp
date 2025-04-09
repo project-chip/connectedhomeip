@@ -267,14 +267,19 @@ CHIP_ERROR SetUpCodePairer::StartDiscoverOverWiFiPAF(SetupPayload & payload)
     WiFiPAF::WiFiPAFSession sessionInfo = { .role          = WiFiPAF::WiFiPafRole::kWiFiPafRole_Subscriber,
                                             .nodeId        = mRemoteId,
                                             .discriminator = discriminator };
-    ReturnErrorOnFailure(
-        DeviceLayer::ConnectivityMgr().GetWiFiPAF()->AddPafSession(WiFiPAF::PafInfoAccess::kAccNodeInfo, sessionInfo));
+    WiFiPAF::WiFiPAFLayer & pafLayer    = WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer();
+    ReturnErrorOnFailure(pafLayer.AddPafSession(WiFiPAF::PafInfoAccess::kAccNodeInfo, sessionInfo));
     CHIP_ERROR err = DeviceLayer::ConnectivityMgr().WiFiPAFSubscribe(discriminator, (void *) this, OnWiFiPAFSubscribeComplete,
                                                                      OnWiFiPAFSubscribeError);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Commissioning discovery over WiFiPAF failed, err = %" CHIP_ERROR_FORMAT, err.Format());
         mWaitingForDiscovery[kWiFiPAFTransport] = false;
+    }
+    WiFiPAF::WiFiPAFSession * pSession = pafLayer.GetPAFInfo(WiFiPAF::PafInfoAccess::kAccNodeId, sessionInfo);
+    if (pSession != nullptr)
+    {
+        mPafSubscribeId = pSession->id;
     }
     return err;
 #else
@@ -285,8 +290,13 @@ CHIP_ERROR SetUpCodePairer::StartDiscoverOverWiFiPAF(SetupPayload & payload)
 CHIP_ERROR SetUpCodePairer::StopConnectOverWiFiPAF()
 {
     mWaitingForDiscovery[kWiFiPAFTransport] = false;
+
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    DeviceLayer::ConnectivityMgr().WiFiPAFCancelIncompleteSubscribe();
+    if (mPafSubscribeId != WiFiPAF::kUndefinedWiFiPafSessionId)
+    {
+        DeviceLayer::ConnectivityMgr().WiFiPAFCancelSubscribe(mPafSubscribeId);
+        mPafSubscribeId = WiFiPAF::kUndefinedWiFiPafSessionId;
+    }
 #endif
     return CHIP_NO_ERROR;
 }
@@ -504,6 +514,7 @@ void SetUpCodePairer::NotifyCommissionableDeviceDiscovered(const Dnssd::CommonRe
 
 bool SetUpCodePairer::StopPairing(NodeId remoteId)
 {
+    StopConnectOverWiFiPAF();
     VerifyOrReturnValue(mRemoteId != kUndefinedNodeId, false);
     VerifyOrReturnValue(remoteId == kUndefinedNodeId || remoteId == mRemoteId, false);
 
@@ -552,7 +563,6 @@ void SetUpCodePairer::ResetDiscoveryState()
     StopConnectOverBle();
     StopConnectOverIP();
     StopConnectOverSoftAP();
-    StopConnectOverWiFiPAF();
 
     // Just in case any of those failed to reset the waiting state properly.
     for (auto & waiting : mWaitingForDiscovery)

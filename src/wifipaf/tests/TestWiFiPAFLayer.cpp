@@ -194,8 +194,6 @@ TEST_F(TestWiFiPAFLayer, CheckRunAsCommissioner)
     EXPECT_NE(newEndPoint, nullptr);
     SetEndPoint(newEndPoint);
     newEndPoint->mState = WiFiPAFEndPoint::kState_Ready;
-    SetWiFiPAFState(State::kInitialized);
-    EXPECT_EQ(GetWiFiPAFState(), State::kInitialized);
 
     EXPECT_EQ(newEndPoint->StartConnect(), CHIP_NO_ERROR);
     EXPECT_EQ(AddPafSession(PafInfoAccess::kAccSessionId, sessionInfo), CHIP_NO_ERROR);

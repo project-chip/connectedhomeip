@@ -28,11 +28,13 @@ typedef enum
     kWiFiPafRole_Subscriber = 1
 } WiFiPafRole;
 
-inline constexpr uint32_t kUndefinedWiFiPafSessionId = UINT32_MAX;
+typedef uint32_t PafSessionId_t;
+inline constexpr PafSessionId_t kUndefinedWiFiPafSessionId = UINT32_MAX;
+
 struct WiFiPAFSession
 {
     WiFiPafRole role;
-    uint32_t id;
+    PafSessionId_t id;
     uint32_t peer_id;
     uint8_t peer_addr[6];
     NodeId nodeId;
