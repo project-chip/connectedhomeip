@@ -9053,9 +9053,6 @@ PICS:
     - label: "Does the DUT support testing the Running(0x01) operational state"
       id: OVENOPSTATE.S.M.ST_RUNNING
 
-    - label: "Does the DUT support testing the Paused(0x02) operational state"
-      id: OVENOPSTATE.S.M.ST_PAUSED
-
     - label: "Does the DUT support testing the Error(0x03) operational state?"
       id: OVENOPSTATE.S.M.ST_ERROR
 
@@ -9104,17 +9101,12 @@ PICS:
       id: OVENOPSTATE.S.E01
 
     #Server Commands Received
-    - label: "Does the device implement receiving the Pause command?"
-      id: OVENOPSTATE.S.C00.Rsp
 
     - label: "Does the device implement receiving the Stop command?"
       id: OVENOPSTATE.S.C01.Rsp
 
     - label: "Does the device implement receiving the Start command?"
       id: OVENOPSTATE.S.C02.Rsp
-
-    - label: "Does the device implement receiving the Resume command?"
-      id: OVENOPSTATE.S.C03.Rsp
 
     #Commands generated
     - label:
