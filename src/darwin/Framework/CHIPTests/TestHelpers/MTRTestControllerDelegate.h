@@ -1,6 +1,5 @@
-/*
+/**
  *    Copyright (c) 2025 Project CHIP Authors
- *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,34 +14,18 @@
  *    limitations under the License.
  */
 
-#include "camera-app.h"
-#include "camera-device.h"
-#include <AppMain.h>
-#include <platform/CHIPDeviceConfig.h>
+#import <Foundation/Foundation.h>
+#import <Matter/Matter.h>
+#import <XCTest/XCTest.h>
 
-using namespace chip;
-using namespace chip::app;
-using namespace chip::app::Clusters;
-using namespace Camera;
+NS_ASSUME_NONNULL_BEGIN
 
-CameraDevice gCameraDevice;
+@interface MTRTestControllerDelegate : NSObject <MTRDeviceControllerDelegate>
+- (instancetype)initWithExpectation:(XCTestExpectation *)expectation newNodeID:(NSNumber *)newNodeID;
 
-void ApplicationInit()
-{
-    ChipLogProgress(Camera, "Matter Camera Linux App: ApplicationInit()");
-    CameraAppInit(&gCameraDevice);
-}
+@property (nonatomic, strong, readonly) XCTestExpectation * expectation;
+@property (nonatomic, strong, readonly) NSNumber * deviceID;
+@property (nonatomic, nullable, strong) NSString * countryCode;
+@end
 
-void ApplicationShutdown()
-{
-    CameraAppShutdown();
-}
-
-int main(int argc, char * argv[])
-{
-    VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
-
-    ChipLinuxAppMainLoop();
-
-    return 0;
-}
+NS_ASSUME_NONNULL_END
