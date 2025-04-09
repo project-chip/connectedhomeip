@@ -57,10 +57,10 @@ class TC_ACL_2_4(MatterBaseTest):
             TestStep(3, "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute",
                      "Result is SUCCESS, value is list of AccessControlEntryStruct containing 1 element with admin entry N1"),
             TestStep(4, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute with 3 elements:\n" +
-                    "1. Admin entry (N1, privilege: Administer, authMode: CASE)\n" +
-                    "2. View entry (subjects: [111, 222, 333, 444], privilege: View, authMode: Group, targets: [{Cluster: 11}, {Endpoint: 22}])\n" +
-                    "3. Operate entry (subjects: [555, 666, 777, 888], privilege: Operate, authMode: Group, targets: [{Cluster: 55}, {Endpoint: 66}])",
-                    "Result is SUCCESS"),
+                     "1. Admin entry (N1, privilege: Administer, authMode: CASE)\n" +
+                     "2. View entry (subjects: [111, 222, 333, 444], privilege: View, authMode: Group, targets: [{Cluster: 11}, {Endpoint: 22}])\n" +
+                     "3. Operate entry (subjects: [555, 666, 777, 888], privilege: Operate, authMode: Group, targets: [{Cluster: 55}, {Endpoint: 66}])",
+                     "Result is SUCCESS"),
             TestStep(5, "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute",
                      "Result is SUCCESS, value is list of AccessControlEntryStruct containing 3 elements"),
             TestStep(6, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute with modified entries (N1 admin, N2 manage, N3 admin)", "Result is SUCCESS"),
@@ -87,8 +87,8 @@ class TC_ACL_2_4(MatterBaseTest):
             TestStep(20, "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute",
                      "Result is SUCCESS, value contains MAXSUBJECTS random node IDs"),
             TestStep(21, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute with 4 valid CATs as subjects in the last entry", "Result is SUCCESS"),
-            TestStep(22, "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute", 
-                    "Result is SUCCESS, value is list of AccessControlEntryStruct containing 2 elements with last element having 4 valid CATs as subjects"),
+            TestStep(22, "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute",
+                     "Result is SUCCESS, value is list of AccessControlEntryStruct containing 2 elements with last element having 4 valid CATs as subjects"),
             TestStep(23, "TH1 reads DUT Endpoint 0 AccessControl cluster TargetsPerAccessControlEntry attribute",
                      "Result is SUCCESS, value is stored as MAXTARGETS"),
             TestStep(24, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute with max targets", "Result is SUCCESS"),
@@ -1421,7 +1421,7 @@ class TC_ACL_2_4(MatterBaseTest):
             Clusters.AccessControl.Structs.AccessControlEntryStruct(
                 privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,
                 authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-                subjects=[0xFFFFFFFD00000000],  # Invalid CAT 
+                subjects=[0xFFFFFFFD00000000],  # Invalid CAT
                 targets=NullValue,
                 fabricIndex=f1
             )
