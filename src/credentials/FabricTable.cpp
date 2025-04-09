@@ -2201,9 +2201,11 @@ CHIP_ERROR FabricTable::FetchVVSC(FabricIndex fabricIndex, MutableByteSpan & out
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR FabricTable::SignVIDVerificationRequest(FabricIndex fabricIndex, const ByteSpan & clientChallenge, const ByteSpan & attestationChallenge, SignVIDVerificationResponseData &outResponse)
+CHIP_ERROR FabricTable::SignVIDVerificationRequest(FabricIndex fabricIndex, const ByteSpan & clientChallenge,
+                                                   const ByteSpan & attestationChallenge,
+                                                   SignVIDVerificationResponseData & outResponse)
 {
-    FabricInfo* fabricInfo = GetMutableFabricByIndex(fabricIndex);
+    FabricInfo * fabricInfo = GetMutableFabricByIndex(fabricIndex);
     VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     P256PublicKey rootPublicKey;
@@ -2211,38 +2213,38 @@ CHIP_ERROR FabricTable::SignVIDVerificationRequest(FabricIndex fabricIndex, cons
 
     // Step 1: Generate FabricBindingMessage for given fabric.
     uint8_t fabricBindingMessageBuffer[kVendorFabricBindingMessageV1Size];
-    MutableByteSpan fabricBindingMessageSpan{fabricBindingMessageBuffer};
+    MutableByteSpan fabricBindingMessageSpan{ fabricBindingMessageBuffer };
 
-    ReturnErrorOnFailure(GenerateVendorFabricBindingMessage(FabricBindingVersion::kVersion1, rootPublicKey, fabricInfo->GetFabricId(),
-      static_cast<uint16_t>(fabricInfo->GetVendorId()), fabricBindingMessageSpan));
+    ReturnErrorOnFailure(
+        GenerateVendorFabricBindingMessage(FabricBindingVersion::kVersion1, rootPublicKey, fabricInfo->GetFabricId(),
+                                           static_cast<uint16_t>(fabricInfo->GetVendorId()), fabricBindingMessageSpan));
     VerifyOrReturnError(fabricBindingMessageSpan.size() == kVendorFabricBindingMessageV1Size, CHIP_ERROR_INTERNAL);
 
     // Step 2: Recover VIDVerificationStatement, if any.
     uint8_t vidVerificationStatementBuffer[kVendorIdVerificationStatementV1Size];
-    MutableByteSpan vidVerificationStatementSpan{vidVerificationStatementBuffer};
+    MutableByteSpan vidVerificationStatementSpan{ vidVerificationStatementBuffer };
 
     ReturnErrorOnFailure(FetchVIDVerificationStatement(fabricIndex, vidVerificationStatementSpan));
 
     // Step 3: Generate VidVerificationToBeSigned
     uint8_t vidVerificationTbsBuffer[kVendorIdVerificationTbsV1MaxSize];
-    MutableByteSpan vidVerificationTbsSpan{vidVerificationTbsBuffer};
+    MutableByteSpan vidVerificationTbsSpan{ vidVerificationTbsBuffer };
 
     P256ECDSASignature signature;
     auto signatureBuffer = Platform::ScopedMemoryBufferWithSize<uint8_t>();
     VerifyOrReturnError(signatureBuffer.Calloc(signature.Capacity()), CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    ReturnErrorOnFailure(GenerateVendorIdVerificationToBeSigned(fabricIndex, clientChallenge,
-      attestationChallenge,
-      fabricBindingMessageSpan,
-      vidVerificationStatementSpan, vidVerificationTbsSpan));
+    ReturnErrorOnFailure(GenerateVendorIdVerificationToBeSigned(fabricIndex, clientChallenge, attestationChallenge,
+                                                                fabricBindingMessageSpan, vidVerificationStatementSpan,
+                                                                vidVerificationTbsSpan));
 
     // Step 4: Sign the statement with the operational key.
     ReturnErrorOnFailure(SignWithOpKeypair(fabricIndex, vidVerificationTbsSpan, signature));
     memcpy(signatureBuffer.Get(), signature.Bytes(), signature.Capacity());
 
-    outResponse.fabricIndex = fabricIndex;
+    outResponse.fabricIndex          = fabricIndex;
     outResponse.fabricBindingVersion = fabricBindingMessageSpan[0];
-    outResponse.signature = std::move(signatureBuffer);
+    outResponse.signature            = std::move(signatureBuffer);
 
     return CHIP_NO_ERROR;
 }

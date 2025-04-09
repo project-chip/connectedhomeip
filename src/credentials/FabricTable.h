@@ -661,7 +661,8 @@ public:
      * This includes returning a pending one if one exists.
      *
      * @param fabricIndex - Fabric index for which to find a VIDVerificationStatement
-     * @param outVIDVerificationStatement - Buffer to receive the VIDVerificationstatement. Must be large enough for the maximum size.
+     * @param outVIDVerificationStatement - Buffer to receive the VIDVerificationstatement. Must be large enough for the maximum
+     * size.
      *
      * @retval CHIP_NO_ERROR on success, **including if missing**.
      * @retval other CHIP_ERROR value on internal errors
@@ -1096,7 +1097,8 @@ public:
      * @retval CHIP_NO_ERROR on success
      * @retval CHIP_ERROR_INVALID_ARGUMENT if the fabricIndex or clientChallenge is incorrectly formatted.
      */
-    CHIP_ERROR SignVIDVerificationRequest(FabricIndex fabricIndex, const ByteSpan & clientChallenge, const ByteSpan & attestationChallenge, SignVIDVerificationResponseData &outResponse);
+    CHIP_ERROR SignVIDVerificationRequest(FabricIndex fabricIndex, const ByteSpan & clientChallenge,
+                                          const ByteSpan & attestationChallenge, SignVIDVerificationResponseData & outResponse);
 
 private:
     enum class StateFlags : uint16_t
@@ -1286,11 +1288,11 @@ private:
 
 } // namespace chip
 
-
 // [[ref_SignVIDVerificationRequest]]
 // === SignVIDVerificationRequest Command
 
-// This command SHALL be used to request that the server authenticate the fabric associated with the FabricIndex given by generating the response described in <<ref_FabricTableVendorIdVerificationProcedure>>.
+// This command SHALL be used to request that the server authenticate the fabric associated with the FabricIndex given by generating
+// the response described in <<ref_FabricTableVendorIdVerificationProcedure>>.
 
 // [options="header",valign="middle"]
 // |===
@@ -1305,14 +1307,17 @@ private:
 
 // ==== Effect on Receipt
 
-// If the FabricIndex field contains a fabric index which does not have an associated entry in the <<ref_Fabrics,Fabrics>> attribute, then the command SHALL fail with a status code of CONSTRAINT_ERROR.
+// If the FabricIndex field contains a fabric index which does not have an associated entry in the <<ref_Fabrics,Fabrics>>
+// attribute, then the command SHALL fail with a status code of CONSTRAINT_ERROR.
 
-// Otherwise, if no other errors have occurred, the command SHALL generate a <<ref_SignVIDVerificationResponse,SignVIDVerificationResponse>>.
+// Otherwise, if no other errors have occurred, the command SHALL generate a
+// <<ref_SignVIDVerificationResponse,SignVIDVerificationResponse>>.
 
 // [[ref_SignVIDVerificationResponse]]
 // === SignVIDVerificationResponse Command
 
-// This command SHALL contain the response of the <<ref_SignVIDVerificationRequest,SignVIDVerificationRequest>>, computed as described below.
+// This command SHALL contain the response of the <<ref_SignVIDVerificationRequest,SignVIDVerificationRequest>>, computed as
+// described below.
 
 // [options="header",valign="middle"]
 // |===

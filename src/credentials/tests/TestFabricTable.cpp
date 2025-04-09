@@ -206,10 +206,11 @@ const FabricInfo * FindFabric(FabricTable & fabricTable, ByteSpan rootPublicKey,
     return fabricTable.FindFabric(key, fabricId);
 }
 
-CHIP_ERROR VerifySignatureWithNocPublicKey(FabricTable & fabricTable, FabricIndex fabricIndex, ByteSpan message, ByteSpan signatureBytes)
+CHIP_ERROR VerifySignatureWithNocPublicKey(FabricTable & fabricTable, FabricIndex fabricIndex, ByteSpan message,
+                                           ByteSpan signatureBytes)
 {
     uint8_t nocCertBuf[kMaxCHIPCertLength];
-    MutableByteSpan nocCertSpan{nocCertBuf};
+    MutableByteSpan nocCertSpan{ nocCertBuf };
 
     ReturnErrorOnFailure(fabricTable.FetchNOCCert(fabricIndex, nocCertSpan));
 
@@ -239,9 +240,10 @@ struct TestFabricTable : public ::testing::Test
     }
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 
-    FabricIndex CreateBasicFabricForVidVerification(FabricTable & fabricTable, Crypto::P256SerializedKeypair & rootKeyForTest, FabricId fabricId, uint16_t vendorId)
+    FabricIndex CreateBasicFabricForVidVerification(FabricTable & fabricTable, Crypto::P256SerializedKeypair & rootKeyForTest,
+                                                    FabricId fabricId, uint16_t vendorId)
     {
-        constexpr NodeId kNodeId  = 1;
+        constexpr NodeId kNodeId = 1;
 
         Credentials::TestOnlyLocalCertificateAuthority fabricCertAuthority;
         VerifyOrDie(fabricCertAuthority.Init(rootKeyForTest).IsSuccess());
@@ -250,7 +252,8 @@ struct TestFabricTable : public ::testing::Test
         MutableByteSpan csrSpan{ csrBuf };
         VerifyOrDie(fabricTable.AllocatePendingOperationalKey(chip::NullOptional, csrSpan) == CHIP_NO_ERROR);
 
-        VerifyOrDie(fabricCertAuthority.SetIncludeIcac(true).GenerateNocChain(fabricId, kNodeId, csrSpan).GetStatus() == CHIP_NO_ERROR);
+        VerifyOrDie(fabricCertAuthority.SetIncludeIcac(true).GenerateNocChain(fabricId, kNodeId, csrSpan).GetStatus() ==
+                    CHIP_NO_ERROR);
         ByteSpan rcac = fabricCertAuthority.GetRcac();
         ByteSpan icac = fabricCertAuthority.GetIcac();
         ByteSpan noc  = fabricCertAuthority.GetNoc();
@@ -3132,10 +3135,9 @@ TEST_F(TestFabricTable, VidVerificationSigningWorksWithoutVvs)
             0xe1, 0x22, 0x15, 0x28, 0x96, 0x71, 0xbf, 0x33, 0x96, 0xff, 0x97, 0xf6, 0xb6, 0x21, 0xb2, 0xac,
         });
 
-        memcpy(rootKeyForTestSerialized.Bytes(), kTestCert_Root02_PublicKey.data(),
-            kTestCert_Root02_PublicKey.size());
-        memcpy(rootKeyForTestSerialized.Bytes() + kTestCert_Root02_PublicKey.size(),
-            kTestCert_Root02_PrivateKey.data(), kTestCert_Root02_PrivateKey.size());
+        memcpy(rootKeyForTestSerialized.Bytes(), kTestCert_Root02_PublicKey.data(), kTestCert_Root02_PublicKey.size());
+        memcpy(rootKeyForTestSerialized.Bytes() + kTestCert_Root02_PublicKey.size(), kTestCert_Root02_PrivateKey.data(),
+               kTestCert_Root02_PrivateKey.size());
         rootKeyForTestSerialized.SetLength(rootKeyForTestSerialized.Capacity());
     }
 
@@ -3151,7 +3153,8 @@ TEST_F(TestFabricTable, VidVerificationSigningWorksWithoutVvs)
     constexpr uint16_t kVendorId1 = 0xFFF1u;
 
     {
-        FabricIndex fabricIndex1 = CreateBasicFabricForVidVerification(fabricTable, rootKeyForTestSerialized, kFabricId1, kVendorId1);
+        FabricIndex fabricIndex1 =
+            CreateBasicFabricForVidVerification(fabricTable, rootKeyForTestSerialized, kFabricId1, kVendorId1);
         ASSERT_EQ(fabricIndex1, 1u);
         ASSERT_EQ(fabricTable.FabricCount(), 1u);
     }
@@ -3160,7 +3163,8 @@ TEST_F(TestFabricTable, VidVerificationSigningWorksWithoutVvs)
     constexpr FabricId kFabricId2 = 0xA1A2A3A4A5A6A7A8;
     constexpr uint16_t kVendorId2 = 0xFFF2u;
     {
-        FabricIndex fabricIndex2 = CreateBasicFabricForVidVerification(fabricTable, rootKeyForTestSerialized, kFabricId2, kVendorId2);
+        FabricIndex fabricIndex2 =
+            CreateBasicFabricForVidVerification(fabricTable, rootKeyForTestSerialized, kFabricId2, kVendorId2);
         ASSERT_EQ(fabricIndex2, 2u);
         ASSERT_EQ(fabricTable.FabricCount(), 2u);
     }
@@ -3181,23 +3185,26 @@ TEST_F(TestFabricTable, VidVerificationSigningWorksWithoutVvs)
         };
         ByteSpan kClientChallengeSpan1{ kClientChallenge1 };
 
-        ASSERT_EQ(fabricTable.SignVIDVerificationRequest(kFabricIndex1, kClientChallengeSpan1, kAttestationChallengeSpan1, responseData1), CHIP_NO_ERROR);
+        ASSERT_EQ(
+            fabricTable.SignVIDVerificationRequest(kFabricIndex1, kClientChallengeSpan1, kAttestationChallengeSpan1, responseData1),
+            CHIP_NO_ERROR);
 
         EXPECT_EQ(responseData1.fabricBindingVersion, to_underlying(Crypto::FabricBindingVersion::kVersion1));
         EXPECT_EQ(responseData1.fabricIndex, kFabricIndex1);
 
         const uint8_t kExpectedUnderlyingTbs1[126] = {
-            0x01, 0xa1, 0xa2, 0xa3, 0xa4, 0xa5, 0xa6, 0xa7, 0xa8, 0xa9, 0xaa, 0xab, 0xac, 0xad, 0xae, 0xaf,
-            0xb0, 0xb1, 0xb2, 0xb3, 0xb4, 0xb5, 0xb6, 0xb7, 0xb8, 0xb9, 0xba, 0xbb, 0xbc, 0xbd, 0xbe, 0xbf,
-            0xc0, 0x90, 0x4b, 0x82, 0xe6, 0x6e, 0x98, 0x57, 0x85, 0xb4, 0xa3, 0xff, 0x18, 0xc2, 0x59, 0x47,
-            0xf3, 0x01, 0x01, 0x04, 0x27, 0x50, 0x0b, 0x20, 0x60, 0x52, 0xce, 0x33, 0x77, 0x6c, 0x63, 0x08,
-            0x3f, 0x1c, 0xf1, 0x03, 0x6e, 0xa4, 0xcc, 0x7f, 0xfd, 0x61, 0x7c, 0x17, 0x6d, 0x4c, 0xad, 0xf5,
-            0x51, 0xbb, 0xb4, 0xb0, 0xd9, 0x97, 0xca, 0xe5, 0x55, 0xdb, 0xf9, 0xbc, 0xa8, 0x56, 0xe4, 0xcc,
-            0x7a, 0x8e, 0xde, 0x91, 0xe0, 0xa7, 0x33, 0xe1, 0x67, 0xc0, 0x41, 0x67, 0xa6, 0xc2, 0xc9, 0xfa,
-            0x48, 0xf1, 0x4f, 0x0b, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0xff, 0xf1,
-          };
+            0x01, 0xa1, 0xa2, 0xa3, 0xa4, 0xa5, 0xa6, 0xa7, 0xa8, 0xa9, 0xaa, 0xab, 0xac, 0xad, 0xae, 0xaf, 0xb0, 0xb1,
+            0xb2, 0xb3, 0xb4, 0xb5, 0xb6, 0xb7, 0xb8, 0xb9, 0xba, 0xbb, 0xbc, 0xbd, 0xbe, 0xbf, 0xc0, 0x90, 0x4b, 0x82,
+            0xe6, 0x6e, 0x98, 0x57, 0x85, 0xb4, 0xa3, 0xff, 0x18, 0xc2, 0x59, 0x47, 0xf3, 0x01, 0x01, 0x04, 0x27, 0x50,
+            0x0b, 0x20, 0x60, 0x52, 0xce, 0x33, 0x77, 0x6c, 0x63, 0x08, 0x3f, 0x1c, 0xf1, 0x03, 0x6e, 0xa4, 0xcc, 0x7f,
+            0xfd, 0x61, 0x7c, 0x17, 0x6d, 0x4c, 0xad, 0xf5, 0x51, 0xbb, 0xb4, 0xb0, 0xd9, 0x97, 0xca, 0xe5, 0x55, 0xdb,
+            0xf9, 0xbc, 0xa8, 0x56, 0xe4, 0xcc, 0x7a, 0x8e, 0xde, 0x91, 0xe0, 0xa7, 0x33, 0xe1, 0x67, 0xc0, 0x41, 0x67,
+            0xa6, 0xc2, 0xc9, 0xfa, 0x48, 0xf1, 0x4f, 0x0b, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0xff, 0xf1,
+        };
 
-        EXPECT_EQ(VerifySignatureWithNocPublicKey(fabricTable, kFabricIndex1, ByteSpan{kExpectedUnderlyingTbs1}, responseData1.signature.Span()), CHIP_NO_ERROR);
+        EXPECT_EQ(VerifySignatureWithNocPublicKey(fabricTable, kFabricIndex1, ByteSpan{ kExpectedUnderlyingTbs1 },
+                                                  responseData1.signature.Span()),
+                  CHIP_NO_ERROR);
     }
 
     FabricTable::SignVIDVerificationResponseData responseData2;
@@ -3215,23 +3222,26 @@ TEST_F(TestFabricTable, VidVerificationSigningWorksWithoutVvs)
         };
         ByteSpan kClientChallengeSpan2{ kClientChallenge2 };
 
-        ASSERT_EQ(fabricTable.SignVIDVerificationRequest(kFabricIndex2, kClientChallengeSpan2, kAttestationChallengeSpan2, responseData2), CHIP_NO_ERROR);
+        ASSERT_EQ(
+            fabricTable.SignVIDVerificationRequest(kFabricIndex2, kClientChallengeSpan2, kAttestationChallengeSpan2, responseData2),
+            CHIP_NO_ERROR);
 
         EXPECT_EQ(responseData2.fabricBindingVersion, to_underlying(Crypto::FabricBindingVersion::kVersion1));
         EXPECT_EQ(responseData2.fabricIndex, kFabricIndex2);
 
         const uint8_t kExpectedUnderlyingTbs2[126] = {
-            0x01, 0xc1, 0xc2, 0xc3, 0xc4, 0xc5, 0xc6, 0xc7, 0xc8, 0xc9, 0xca, 0xcb, 0xcc, 0xcd, 0xce, 0xcf,
-            0xd0, 0xd1, 0xd2, 0xd3, 0xd4, 0xd5, 0xd6, 0xd7, 0xd8, 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xde, 0xdf,
-            0xe0, 0x14, 0x5f, 0x2e, 0xf3, 0x9e, 0x3e, 0x4f, 0xfc, 0xf5, 0x64, 0x9c, 0x09, 0x09, 0xcb, 0xc8,
-            0xe4, 0x02, 0x01, 0x04, 0x27, 0x50, 0x0b, 0x20, 0x60, 0x52, 0xce, 0x33, 0x77, 0x6c, 0x63, 0x08,
-            0x3f, 0x1c, 0xf1, 0x03, 0x6e, 0xa4, 0xcc, 0x7f, 0xfd, 0x61, 0x7c, 0x17, 0x6d, 0x4c, 0xad, 0xf5,
-            0x51, 0xbb, 0xb4, 0xb0, 0xd9, 0x97, 0xca, 0xe5, 0x55, 0xdb, 0xf9, 0xbc, 0xa8, 0x56, 0xe4, 0xcc,
-            0x7a, 0x8e, 0xde, 0x91, 0xe0, 0xa7, 0x33, 0xe1, 0x67, 0xc0, 0x41, 0x67, 0xa6, 0xc2, 0xc9, 0xfa,
-            0x48, 0xf1, 0x4f, 0x0b, 0xa1, 0xa2, 0xa3, 0xa4, 0xa5, 0xa6, 0xa7, 0xa8, 0xff, 0xf2,
-          };
+            0x01, 0xc1, 0xc2, 0xc3, 0xc4, 0xc5, 0xc6, 0xc7, 0xc8, 0xc9, 0xca, 0xcb, 0xcc, 0xcd, 0xce, 0xcf, 0xd0, 0xd1,
+            0xd2, 0xd3, 0xd4, 0xd5, 0xd6, 0xd7, 0xd8, 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xde, 0xdf, 0xe0, 0x14, 0x5f, 0x2e,
+            0xf3, 0x9e, 0x3e, 0x4f, 0xfc, 0xf5, 0x64, 0x9c, 0x09, 0x09, 0xcb, 0xc8, 0xe4, 0x02, 0x01, 0x04, 0x27, 0x50,
+            0x0b, 0x20, 0x60, 0x52, 0xce, 0x33, 0x77, 0x6c, 0x63, 0x08, 0x3f, 0x1c, 0xf1, 0x03, 0x6e, 0xa4, 0xcc, 0x7f,
+            0xfd, 0x61, 0x7c, 0x17, 0x6d, 0x4c, 0xad, 0xf5, 0x51, 0xbb, 0xb4, 0xb0, 0xd9, 0x97, 0xca, 0xe5, 0x55, 0xdb,
+            0xf9, 0xbc, 0xa8, 0x56, 0xe4, 0xcc, 0x7a, 0x8e, 0xde, 0x91, 0xe0, 0xa7, 0x33, 0xe1, 0x67, 0xc0, 0x41, 0x67,
+            0xa6, 0xc2, 0xc9, 0xfa, 0x48, 0xf1, 0x4f, 0x0b, 0xa1, 0xa2, 0xa3, 0xa4, 0xa5, 0xa6, 0xa7, 0xa8, 0xff, 0xf2,
+        };
 
-        EXPECT_EQ(VerifySignatureWithNocPublicKey(fabricTable, kFabricIndex2, ByteSpan{kExpectedUnderlyingTbs2}, responseData2.signature.Span()), CHIP_NO_ERROR);
+        EXPECT_EQ(VerifySignatureWithNocPublicKey(fabricTable, kFabricIndex2, ByteSpan{ kExpectedUnderlyingTbs2 },
+                                                  responseData2.signature.Span()),
+                  CHIP_NO_ERROR);
     }
 }
 
@@ -3255,10 +3265,9 @@ TEST_F(TestFabricTable, VidVerificationSigningFailsOnBadInput)
             0xe1, 0x22, 0x15, 0x28, 0x96, 0x71, 0xbf, 0x33, 0x96, 0xff, 0x97, 0xf6, 0xb6, 0x21, 0xb2, 0xac,
         });
 
-        memcpy(rootKeyForTestSerialized.Bytes(), kTestCert_Root02_PublicKey.data(),
-            kTestCert_Root02_PublicKey.size());
-        memcpy(rootKeyForTestSerialized.Bytes() + kTestCert_Root02_PublicKey.size(),
-            kTestCert_Root02_PrivateKey.data(), kTestCert_Root02_PrivateKey.size());
+        memcpy(rootKeyForTestSerialized.Bytes(), kTestCert_Root02_PublicKey.data(), kTestCert_Root02_PublicKey.size());
+        memcpy(rootKeyForTestSerialized.Bytes() + kTestCert_Root02_PublicKey.size(), kTestCert_Root02_PrivateKey.data(),
+               kTestCert_Root02_PrivateKey.size());
         rootKeyForTestSerialized.SetLength(rootKeyForTestSerialized.Capacity());
     }
 
@@ -3272,10 +3281,11 @@ TEST_F(TestFabricTable, VidVerificationSigningFailsOnBadInput)
     // Add a basic fabric, don't care about NodeID.
     constexpr FabricId kFabricId1 = 0x1122334455667788;
     constexpr uint16_t kVendorId1 = 0xFFF1u;
-    FabricIndex kFabricIndex1 = 1u;
+    FabricIndex kFabricIndex1     = 1u;
 
     {
-        FabricIndex fabricIndex1 = CreateBasicFabricForVidVerification(fabricTable, rootKeyForTestSerialized, kFabricId1, kVendorId1);
+        FabricIndex fabricIndex1 =
+            CreateBasicFabricForVidVerification(fabricTable, rootKeyForTestSerialized, kFabricId1, kVendorId1);
         ASSERT_EQ(fabricIndex1, kFabricIndex1);
         ASSERT_EQ(fabricTable.FabricCount(), 1u);
     }
@@ -3296,27 +3306,36 @@ TEST_F(TestFabricTable, VidVerificationSigningFailsOnBadInput)
         FabricTable::SignVIDVerificationResponseData responseData;
 
         FabricIndex kNonExistentFabricIndex = 123u;
-        ASSERT_EQ(fabricTable.SignVIDVerificationRequest(kNonExistentFabricIndex, kClientChallengeSpan, kAttestationChallengeSpan, responseData), CHIP_ERROR_INVALID_ARGUMENT);
+        ASSERT_EQ(fabricTable.SignVIDVerificationRequest(kNonExistentFabricIndex, kClientChallengeSpan, kAttestationChallengeSpan,
+                                                         responseData),
+                  CHIP_ERROR_INVALID_ARGUMENT);
     }
 
-    // Invalid attestationChallenge size should fail. Only check too small as the underlying data copied will be caught by just the signature failing.
+    // Invalid attestationChallenge size should fail. Only check too small as the underlying data copied will be caught by just the
+    // signature failing.
     {
         FabricTable::SignVIDVerificationResponseData responseData;
 
-        ByteSpan attestationChallengeTooSmall{kAttestationChallengeSpan.data(), kAttestationChallengeSpan.size() - 1};
-        ASSERT_EQ(fabricTable.SignVIDVerificationRequest(kFabricIndex1, kClientChallengeSpan, attestationChallengeTooSmall, responseData), CHIP_ERROR_INVALID_ARGUMENT);
+        ByteSpan attestationChallengeTooSmall{ kAttestationChallengeSpan.data(), kAttestationChallengeSpan.size() - 1 };
+        ASSERT_EQ(
+            fabricTable.SignVIDVerificationRequest(kFabricIndex1, kClientChallengeSpan, attestationChallengeTooSmall, responseData),
+            CHIP_ERROR_INVALID_ARGUMENT);
     }
 
     // Invalid client challenge size should fail.
     {
         FabricTable::SignVIDVerificationResponseData responseData;
 
-        ByteSpan clientChallengeTooSmall{kClientChallengeSpan.data(), kClientChallengeSpan.size() - 1};
-        ASSERT_EQ(fabricTable.SignVIDVerificationRequest(kFabricIndex1, clientChallengeTooSmall, kAttestationChallengeSpan, responseData), CHIP_ERROR_INVALID_ARGUMENT);
+        ByteSpan clientChallengeTooSmall{ kClientChallengeSpan.data(), kClientChallengeSpan.size() - 1 };
+        ASSERT_EQ(
+            fabricTable.SignVIDVerificationRequest(kFabricIndex1, clientChallengeTooSmall, kAttestationChallengeSpan, responseData),
+            CHIP_ERROR_INVALID_ARGUMENT);
 
         uint8_t clientChallengeBigBuffer[Crypto::kVendorIdVerificationClientChallengeSize + 1];
-        ByteSpan clientChallengeTooBig{clientChallengeBigBuffer};
-        ASSERT_EQ(fabricTable.SignVIDVerificationRequest(kFabricIndex1, clientChallengeTooBig, kAttestationChallengeSpan, responseData), CHIP_ERROR_INVALID_ARGUMENT);
+        ByteSpan clientChallengeTooBig{ clientChallengeBigBuffer };
+        ASSERT_EQ(
+            fabricTable.SignVIDVerificationRequest(kFabricIndex1, clientChallengeTooBig, kAttestationChallengeSpan, responseData),
+            CHIP_ERROR_INVALID_ARGUMENT);
     }
 }
 
