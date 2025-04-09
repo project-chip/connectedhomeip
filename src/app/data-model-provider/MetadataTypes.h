@@ -23,9 +23,12 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/BitFlags.h>
 
-#define StartBitFieldInit
+#define StartBitFieldInit_1
 _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wconversion\"") _Pragma("GCC diagnostic ignored \"-Wnarrowing\"")
-#define EndBitFieldInit _Pragma("GCC diagnostic pop")
+#define EndBitFieldInit_1 _Pragma("GCC diagnostic pop")
+#define StartBitFieldInit_2
+_Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wconversion\"") _Pragma("GCC diagnostic ignored \"-Wnarrowing\"")
+#define EndBitFieldInit_2 _Pragma("GCC diagnostic pop")
 
     namespace chip
 {
@@ -93,7 +96,7 @@ _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wconversion\""
     {
         AttributeId attributeId;
 
-        StartBitFieldInit // Start disabling conversion and narrowing warnings
+        StartBitFieldInit_1 // Start disabling conversion and narrowing warnings
 
             // Constructor
             constexpr AttributeEntry(
@@ -120,7 +123,7 @@ _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wconversion\""
                          : static_cast<AttributeQualityFlags>(mask.flags &= ~(chip::to_underlying(f) & ((1 << 7) - 1)));
         }
 
-        EndBitFieldInit // Start enabling conversion and narrowing warnings
+        EndBitFieldInit_1 // Start enabling conversion and narrowing warnings
 
             // Getter for mask.readPrivilege
             constexpr Access::Privilege
@@ -190,7 +193,7 @@ _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wconversion\""
     {
         CommandId commandId;
 
-        StartBitFieldInit // Start disabling conversion and narrowing warnings
+        StartBitFieldInit_2 // Start disabling conversion and narrowing warnings
 
             // Constructor
             constexpr AcceptedCommandEntry(
@@ -214,7 +217,7 @@ _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wconversion\""
             return isSet ? SetFlags(f) : static_cast<CommandQualityFlags>(mask.flags &= ~(chip::to_underlying(f) & ((1 << 3) - 1)));
         }
 
-        EndBitFieldInit // Start enabling conversion and narrowing warnings
+        EndBitFieldInit_2 // Start enabling conversion and narrowing warnings
 
             // Getter for mask.invokePrivilege
             constexpr Access::Privilege
@@ -260,5 +263,7 @@ _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wconversion\""
     } // namespace app
 } // namespace chip
 
-#undef StartBitFieldInit
-#undef EndBitFieldInit
+#undef StartBitFieldInit_1
+#undef EndBitFieldInit_1
+#undef StartBitFieldInit_2
+#undef EndBitFieldInit_2
