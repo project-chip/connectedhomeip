@@ -1,10 +1,9 @@
 # src/python_testing/matter_testing_infrastructure/chip/typings/chip/testing/decorators.pyi
 
-from typing import TYPE_CHECKING, Callable, Any
+from typing import TYPE_CHECKING, Callable
 from enum import IntFlag
 
 # Assume types from chip.clusters can be imported.
-import chip.clusters as Clusters
 from chip.clusters import Attribute
 from chip.clusters import ClusterObjects as ClusterObjects
 
@@ -32,7 +31,7 @@ def has_feature(cluster: ClusterObjects.ClusterObjectDescriptor, feature: IntFla
 
 # Forward reference MatterBaseTest using string to avoid circular import issues if necessary
 if TYPE_CHECKING:
-    from chip.testing.matter_testing import MatterBaseTest
+    pass
 
 
 def async_test_body(body: Callable) -> Callable: ...
