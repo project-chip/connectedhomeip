@@ -15,6 +15,7 @@ cluster {{asUpperCamelCase name}} = {{!}}
 
   {{/global_attribute_default}}
   {{#zcl_enums}}
+  {{#if has_more_than_one_cluster~}} shared {{/if~}}
   enum {{asUpperCamelCase name preserveAcronyms=true}} : enum{{multiply size 8}} {
     {{#zcl_enum_items}}
     k{{asUpperCamelCase label preserveAcronyms=true}} = {{value}};
@@ -23,6 +24,7 @@ cluster {{asUpperCamelCase name}} = {{!}}
 
   {{/zcl_enums}}
   {{#zcl_bitmaps}}
+  {{#if has_more_than_one_cluster~}} shared {{/if~}}
   bitmap {{asUpperCamelCase name preserveAcronyms=true}} : bitmap{{multiply size 8}} {
     {{#zcl_bitmap_items}}
     k{{asUpperCamelCase label preserveAcronyms=true}} = {{asHex mask}};

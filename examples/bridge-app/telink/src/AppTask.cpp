@@ -387,14 +387,6 @@ void HandleDeviceStatusChanged(Device * dev, Device::Changed_t itemChangedMask)
     }
 }
 
-bool emberAfActionsClusterInstantActionCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                                const Clusters::Actions::Commands::InstantAction::DecodableType & commandData)
-{
-    // No actions are implemented, just return status NotFound.
-    commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::NotFound);
-    return true;
-}
-
 CHIP_ERROR AppTask::Init(void)
 {
     SetExampleButtonCallbacks(LightingActionEventHandler);

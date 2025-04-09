@@ -37,7 +37,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-tizen:115
+            image: ghcr.io/project-chip/chip-build-tizen:125
             options: --user root
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
@@ -64,7 +64,7 @@ jobs:
                           --enable-flashbundle \
                           --target tizen-arm-all-clusters \
                           --target tizen-arm-chip-tool-ubsan \
-                          --target tizen-arm-light-with-ui \
+                          --target tizen-arm64-light-with-ui \
                           build \
                           --copy-artifacts-to out/artifacts \
                       "

@@ -149,8 +149,11 @@ CHIP_ERROR DnssdServer::SetEphemeralDiscriminator(Optional<uint16_t> discriminat
 template <class AdvertisingParams>
 void DnssdServer::AddICDKeyToAdvertisement(AdvertisingParams & advParams)
 {
-    VerifyOrDieWithMsg(mICDManager != nullptr, Discovery,
-                       "Invalid pointer to the ICDManager which is required for the LIT operating mode");
+    if (mICDManager == nullptr)
+    {
+        ChipLogError(Discovery, "Invalid pointer to the ICDManager which is required for adding Dnssd advertisement key");
+        return;
+    }
 
     Dnssd::ICDModeAdvertise ICDModeToAdvertise = Dnssd::ICDModeAdvertise::kNone;
     // Only advertise the ICD key if the device can operate as a LIT
@@ -207,7 +210,7 @@ CHIP_ERROR DnssdServer::AdvertiseOperational()
                                        .SetPort(GetSecuredPort())
                                        .SetInterfaceId(GetInterfaceId())
                                        .SetLocalMRPConfig(GetLocalMRPConfig().std_optional())
-                                       .EnableIpV4(true);
+                                       .EnableIpV4(SecuredIPv4PortMatchesIPv6Port());
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
         AddICDKeyToAdvertisement(advertiseParameters);
@@ -234,7 +237,7 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
     auto advertiseParameters = chip::Dnssd::CommissionAdvertisingParameters()
                                    .SetPort(commissionableNode ? GetSecuredPort() : GetUnsecuredPort())
                                    .SetInterfaceId(GetInterfaceId())
-                                   .EnableIpV4(true);
+                                   .EnableIpV4(!commissionableNode || SecuredIPv4PortMatchesIPv6Port());
     advertiseParameters.SetCommissionAdvertiseMode(commissionableNode ? chip::Dnssd::CommssionAdvertiseMode::kCommissionableNode
                                                                       : chip::Dnssd::CommssionAdvertiseMode::kCommissioner);
 

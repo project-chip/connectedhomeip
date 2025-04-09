@@ -30,6 +30,6 @@ executable("qrcodetool") {
   public_deps = [
     "${chip_root}/src/lib/support",
     "${chip_root}/src/platform/logging:stdio",
-    "${chip_root}/src/setup_payload",
+    "${chip_root}/src/setup_payload:setup_payload_helper",
   ]
 }
