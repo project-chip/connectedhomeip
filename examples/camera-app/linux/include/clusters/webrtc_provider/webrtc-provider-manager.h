@@ -18,11 +18,12 @@
 
 #pragma once
 
+#include "camera-device-interface.h"
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app/CASESessionManager.h>
 #include <app/clusters/webrtc-transport-provider-server/webrtc-transport-provider-server.h>
 #include <rtc/rtc.hpp>
-#include <webrtc-transport.h>
+#include <transport/webrtc-transport.h>
 #include <unordered_map>
 
 namespace Camera {
@@ -39,6 +40,8 @@ public:
     void Init();
 
     void CloseConnection();
+
+    void SetCameraDeviceHAL(CameraDeviceInterface::CameraHALInterface * aCameraDeviceHAL);
 
     CHIP_ERROR HandleSolicitOffer(const OfferRequestArgs & args,
                                   chip::app::Clusters::WebRTCTransportProvider::WebRTCSessionStruct & outSession,
@@ -69,6 +72,8 @@ private:
 
     void ScheduleAnswerSend();
 
+    void RegisterWebrtcTransport(uint16_t sessionId);
+
     CHIP_ERROR SendAnswerCommand(chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle);
 
     static void OnDeviceConnected(void * context, chip::Messaging::ExchangeManager & exchangeMgr,
@@ -89,7 +94,13 @@ private:
 
     chip::Callback::Callback<chip::OnDeviceConnected> mOnConnectedCallback;
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnConnectionFailureCallback;
-    std::unordered_map<uint16_t, WebrtcTransport*> webrtcTransportMap;
+
+    std::unordered_map<uint16_t, WebrtcTransport *> webrtcTransportMap;
+
+    uint16_t videoStreamID;
+    uint16_t audioStreamID;
+
+    CameraDeviceInterface::CameraHALInterface * mCameraDeviceHAL = nullptr;
 };
 
 } // namespace Camera

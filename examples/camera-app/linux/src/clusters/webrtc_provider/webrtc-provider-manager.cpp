@@ -92,10 +92,25 @@ void WebRTCProviderManager::CloseConnection()
     }
 }
 
+void WebRTCProviderManager::SetCameraDeviceHAL(CameraDeviceInterface::CameraHALInterface * aCameraDeviceHAL)
+{
+    mCameraDeviceHAL = aCameraDeviceHAL;
+}
+
 CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & args, WebRTCSessionStruct & outSession,
                                                      bool & outDeferredOffer)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+void WebRTCProviderManager::RegisterWebrtcTransport(uint16_t sessionId)
+{
+    if (webrtcTransportMap.find(sessionId) == webrtcTransportMap.end())
+    {
+        return;
+    }
+
+    mCameraDeviceHAL->RegisterTransport(webrtcTransportMap[sessionId], videoStreamID, audioStreamID);
 }
 
 CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestArgs & args, WebRTCSessionStruct & outSession)
@@ -120,6 +135,7 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
         else
         {
             outSession.videoStreamID = args.videoStreamId.Value();
+	    videoStreamID = outSession.videoStreamID;
         }
     }
     else
@@ -138,6 +154,7 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
         else
         {
             outSession.audioStreamID = args.audioStreamId.Value();
+	    audioStreamID = outSession.audioStreamID;
         }
     }
     else
@@ -147,8 +164,9 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
 
     if (webrtcTransportMap.find(args.sessionId) == webrtcTransportMap.end())
     {
-        webrtcTransportMap[args.sessionId] = new WebrtcTransport(peerId.GetNodeId(), args.sessionId);
+        webrtcTransportMap[args.sessionId] = new WebrtcTransport(args.sessionId, peerId.GetNodeId());
     }
+
     // Process the SDP Offer, begin the ICE Candidate gathering phase, create the SDP Answer, and invoke Answer.
     mPeerId                = ScopedNodeId(args.peerNodeId, args.fabricIndex);
     mOriginatingEndpointId = args.originatingEndpointId;
