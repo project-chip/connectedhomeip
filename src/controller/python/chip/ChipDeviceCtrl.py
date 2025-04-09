@@ -665,6 +665,9 @@ class ChipDeviceControllerBase():
 
         Returns:
             bool: True if is connected, False if not connected.
+
+        Raises: 
+            RuntimeError: If '_isActive' is False (from the call to CheckIsActive).
         '''
         self.CheckIsActive()
 
@@ -675,7 +678,7 @@ class ChipDeviceControllerBase():
 
     async def ConnectBLE(self, discriminator: int, setupPinCode: int, nodeid: int, isShortDiscriminator: bool = False) -> int:
         '''
-        Connect to a BLE device using the given discriminator and setup pin code.
+        Connect to a BLE device via PASE using the given discriminator and setup pin code.
 
         Returns:
             Effective Node ID of the device (as defined by the assigned NOC)
