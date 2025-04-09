@@ -104,8 +104,8 @@ _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wconversion\""
                 AttributeId id = 0,                                                             // attributeId initial value,
                                                                                                 // this could be altered later
                 AttributeQualityFlags attrQualityFlags = AttributeQualityFlags::kListAttribute, // mask.flags initial value
-                Access::Privilege readPriv             = Access::Privilege::kView,              // mask.readPrivilege initial value
-                Access::Privilege writePriv            = Access::Privilege::kView               // mask.writePrivilege initial value
+                Access::Privilege readPriv             = Access::Privilege::kNoPrivilege,       // mask.readPrivilege initial value
+                Access::Privilege writePriv            = Access::Privilege::kNoPrivilege        // mask.writePrivilege initial value
                 ) :
             attributeId{ id },
             mask{ to_underlying(attrQualityFlags) & ((1 << 7) - 1), // Narrowing expression to 7 bits
@@ -139,7 +139,7 @@ _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wconversion\""
         constexpr bool HasFlags(AttributeQualityFlags f) const { return (mask.flags & chip::to_underlying(f)) != 0; }
 
         constexpr bool ReadAllowed() const { return mask.readPrivilege != to_underlying(Access::Privilege::kNoPrivilege); }
-        constexpr bool WriteAllowed() const { return mask.writePrivilege != to_underlying(Access::Privilege::kNoPrivilege); }
+        constexpr bool WriteAllowed() const { return mask.writePrivilege != to_underlying(Access::Privilege::kView); }
 
     private:
         struct attribute_entry_mask_t
