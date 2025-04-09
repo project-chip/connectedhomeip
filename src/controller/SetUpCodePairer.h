@@ -173,6 +173,7 @@ private:
     static void OnDiscoveredDeviceOverBleError(void * appState, CHIP_ERROR err);
 #endif // CONFIG_NETWORK_LAYER_BLE
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    WiFiPAF::PafSessionId_t mPafSubscribeId = WiFiPAF::kUndefinedWiFiPafSessionId;
     void OnDiscoveredDeviceOverWifiPAF();
     void OnWifiPAFDiscoveryError(CHIP_ERROR err);
     static void OnWiFiPAFSubscribeComplete(void * appState);

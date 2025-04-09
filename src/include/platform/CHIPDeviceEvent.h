@@ -392,15 +392,15 @@ typedef void (*AsyncWorkFunct)(intptr_t arg);
 #include <ble/Ble.h>
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+#include <wifipaf/WiFiPAFRole.h>
+#endif
+
 #include <inet/InetInterface.h>
 #include <lib/support/LambdaBridge.h>
 #include <system/SystemEvent.h>
 #include <system/SystemLayer.h>
 #include <system/SystemPacketBuffer.h>
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-#include <wifipaf/WiFiPAFRole.h>
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 
 namespace chip {
 namespace DeviceLayer {
