@@ -225,7 +225,7 @@ CHIP_ERROR MTROTAImageTransferHandler::OnTransferSessionBegin(const TransferSess
 
     dispatch_async(delegateQueue, ^{
         if ([strongDelegate respondsToSelector:@selector
-                (handleBDXTransferSessionBeginForNodeID:controller:fileDesignator:offset:completion:)]) {
+                            (handleBDXTransferSessionBeginForNodeID:controller:fileDesignator:offset:completion:)]) {
             [strongDelegate handleBDXTransferSessionBeginForNodeID:nodeId
                                                         controller:controller
                                                     fileDesignator:fileDesignator
