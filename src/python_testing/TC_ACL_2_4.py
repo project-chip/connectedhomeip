@@ -62,12 +62,12 @@ class TC_ACL_2_4(MatterBaseTest):
             TestStep(6, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute with modified entries (N1 admin, N2 manage, N3 admin)", "Result is SUCCESS"),
             TestStep(7, "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute",
                      "Result is SUCCESS, value is list of AccessControlEntryStruct containing 3 elements with updated privileges"),
-            TestStep(8, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute with updated targets", "Result is SUCCESS"),
+            TestStep(8, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute with updated entries", "Result is SUCCESS"),
             TestStep(9, "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute",
-                     "Result is SUCCESS, value is list of AccessControlEntryStruct containing 3 elements with updated targets"),
-            TestStep(10, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute with null subjects", "Result is SUCCESS"),
+                     "Result is SUCCESS, value is list of AccessControlEntryStruct containing 3 elements with updated entries"),
+            TestStep(10, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute with null subjects in the last 2 elements ", "Result is SUCCESS"),
             TestStep(11, "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute",
-                     "Result is SUCCESS, value is list of AccessControlEntryStruct containing 3 elements with null subjects"),
+                     "Result is SUCCESS, value is list of AccessControlEntryStruct containing 3 elements with null subjects in the last 2 elements"),
             TestStep(12, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute with null targets", "Result is SUCCESS"),
             TestStep(13, "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute",
                      "Result is SUCCESS, value is list of AccessControlEntryStruct containing 3 elements with null targets"),
@@ -76,15 +76,15 @@ class TC_ACL_2_4(MatterBaseTest):
                      "Result is SUCCESS, value is list of AccessControlEntryStruct containing 2 elements"),
             TestStep(16, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute with ProxyView privilege", "Result is SUCCESS"),
             TestStep(17, "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute",
-                     "Result is SUCCESS, value is list of AccessControlEntryStruct containing 2 elements with ProxyView privilege"),
+                     "Result is SUCCESS, value is list of AccessControlEntryStruct containing 2 elements with ProxyView privilege for the last element"),
             TestStep(18, "TH1 reads DUT Endpoint 0 AccessControl cluster SubjectsPerAccessControlEntry attribute",
                      "Result is SUCCESS, value is stored as MAXSUBJECTS"),
             TestStep(19, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute with max subjects", "Result is SUCCESS"),
             TestStep(20, "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute",
                      "Result is SUCCESS, value contains MAXSUBJECTS random node IDs"),
-            TestStep(21, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute with specific subjects", "Result is SUCCESS"),
+            TestStep(21, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute with 4 valid CATs as subjects in the last entry", "Result is SUCCESS"),
             TestStep(22, "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute",
-                     "Result is SUCCESS, value contains the specified subjects"),
+                     "Result is SUCCESS, value is list of AccessControlEntryStruct containing 2 elements with last element having 4 valid CATs as subjects),
             TestStep(23, "TH1 reads DUT Endpoint 0 AccessControl cluster TargetsPerAccessControlEntry attribute",
                      "Result is SUCCESS, value is stored as MAXTARGETS"),
             TestStep(24, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute with max targets", "Result is SUCCESS"),
@@ -92,14 +92,14 @@ class TC_ACL_2_4(MatterBaseTest):
                      "Result is SUCCESS, value contains MAXTARGETS targets"),
             TestStep(26, "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlEntriesPerFabric attribute",
                      "Result is SUCCESS, value is stored as MAXENTRIES"),
-            TestStep(27, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute with MAXENTRIES elements", "Result is SUCCESS"),
+            TestStep(27, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute with a list of MAXENTRIES elements", "Result is SUCCESS"),
             TestStep(28, "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute",
-                     "Result is SUCCESS, value contains MAXENTRIES elements"),
+                     "Result is SUCCESS, value is list of AccessControlEntryStruct containing MAXENTRIES elements"),
             TestStep(29, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing PASE auth mode",
                      "Result is SUCCESS for first element, CONSTRAINT_ERROR for second element"),
             TestStep(30, "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute",
                      "Result is SUCCESS, value contains only the admin entry"),
-            TestStep(31, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing Group auth mode for admin",
+            TestStep(31, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing invalid combination of Group auth mode with admin privilege",
                      "Result is SUCCESS for first element, CONSTRAINT_ERROR for second element"),
             TestStep(32, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing invalid privilege",
                      "Result is SUCCESS for first element, CONSTRAINT_ERROR for second element"),
@@ -109,9 +109,9 @@ class TC_ACL_2_4(MatterBaseTest):
                      "Result is SUCCESS for first element, CONSTRAINT_ERROR for second element"),
             TestStep(35, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing max node ID",
                      "Result is SUCCESS for first element, CONSTRAINT_ERROR for second element"),
-            TestStep(36, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing group ID range",
+            TestStep(36, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing an invalid CAT as subject",
                      "Result is SUCCESS for first element, CONSTRAINT_ERROR for second element"),
-            TestStep(37, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing fabric-scoped node ID",
+            TestStep(37, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing invalid Group Node ID",
                      "Result is SUCCESS for first element, CONSTRAINT_ERROR for second element"),
             TestStep(38, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing empty target",
                      "Result is SUCCESS for first element, CONSTRAINT_ERROR for second element"),
@@ -121,9 +121,9 @@ class TC_ACL_2_4(MatterBaseTest):
                      "Result is SUCCESS for first element, CONSTRAINT_ERROR for second element"),
             TestStep(41, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing invalid device type",
                      "Result is SUCCESS for first element, CONSTRAINT_ERROR for second element"),
-            TestStep(42, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing endpoint with device type",
+            TestStep(42, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing an invalid target entry containing both endpoint and device type fields in the same entry",
                      "Result is SUCCESS for first element, CONSTRAINT_ERROR for second element"),
-            TestStep(43, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing all target fields",
+            TestStep(43, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute testing an invalid target entry containing endpoint, device type and cluster fields in the same entry",
                      "Result is SUCCESS for first element, CONSTRAINT_ERROR for second element"),
             TestStep(44, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute value is an empty list",
                      "Result is SUCCESS (note since all ACL entries removed, cannot perform more operations)"),
@@ -1402,7 +1402,7 @@ class TC_ACL_2_4(MatterBaseTest):
         except Exception as e:
             self.print_step("Got expected error for max node ID", str(e))
 
-        # Step 36: Test group ID range (should fail)
+        # Step 36: Test invalid CAT (Case-Authenticated Tag) as subject (should fail)
         self.step(36)
         group_id_range_acl = [
             # Admin entry (unchanged)
@@ -1417,7 +1417,7 @@ class TC_ACL_2_4(MatterBaseTest):
             Clusters.AccessControl.Structs.AccessControlEntryStruct(
                 privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,
                 authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-                subjects=[0xFFFFFFFD00000000],  # Invalid group ID range
+                subjects=[0xFFFFFFFD00000000],  # Invalid CAT 
                 targets=NullValue,
                 fabricIndex=f1
             )
@@ -1429,9 +1429,9 @@ class TC_ACL_2_4(MatterBaseTest):
                 [(0, acl_attribute(value=group_id_range_acl))]
             )
             asserts.assert_equal(result[0].Status, Status.ConstraintError,
-                                 "Write ACL with invalid group ID range should fail with CONSTRAINT_ERROR")
+                                 "Write ACL with an invalid CAT as subject should fail with CONSTRAINT_ERROR")
         except Exception as e:
-            self.print_step("Got expected error for invalid group ID range", str(e))
+            self.print_step("Got expected error for an invalid CAT as subject", str(e))
 
         # Step 37: Test fabric-scoped node ID (should fail)
         self.step(37)
