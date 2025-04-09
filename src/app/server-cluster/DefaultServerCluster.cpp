@@ -37,31 +37,31 @@ constexpr std::array<AttributeEntry, 5> kGlobalAttributeEntries{ {
         Globals::Attributes::ClusterRevision::Id,
         BitFlags<AttributeQualityFlags>(),
         Access::Privilege::kView,
-        Access::Privilege::kView,
+        Access::Privilege::kNoPrivilege,
     },
     {
         Globals::Attributes::FeatureMap::Id,
         BitFlags<AttributeQualityFlags>(),
         Access::Privilege::kView,
-        Access::Privilege::kView,
+        Access::Privilege::kNoPrivilege,
     },
     {
         Globals::Attributes::AttributeList::Id,
         BitFlags<AttributeQualityFlags>(AttributeQualityFlags::kListAttribute),
         Access::Privilege::kView,
-        Access::Privilege::kView,
+        Access::Privilege::kNoPrivilege,
     },
     {
         Globals::Attributes::AcceptedCommandList::Id,
         BitFlags<AttributeQualityFlags>(AttributeQualityFlags::kListAttribute),
         Access::Privilege::kView,
-        Access::Privilege::kView,
+        Access::Privilege::kNoPrivilege,
     },
     {
         Globals::Attributes::GeneratedCommandList::Id,
         BitFlags<AttributeQualityFlags>(AttributeQualityFlags::kListAttribute),
         Access::Privilege::kView,
-        Access::Privilege::kView,
+        Access::Privilege::kNoPrivilege,
     },
 } };
 

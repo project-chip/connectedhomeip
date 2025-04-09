@@ -138,12 +138,10 @@ _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wconversion\""
 
         constexpr bool HasFlags(AttributeQualityFlags f) const { return (mask.flags & chip::to_underlying(f)) != 0; }
 
-        constexpr bool ReadAllowed() const { return mask.readPrivilege != to_underlying(kNoPrivilege); }
-        constexpr bool WriteAllowed() const { return mask.writePrivilege != to_underlying(kNoPrivilege); }
+        constexpr bool ReadAllowed() const { return mask.readPrivilege != to_underlying(Access::Privilege::kNoPrivilege); }
+        constexpr bool WriteAllowed() const { return mask.writePrivilege != to_underlying(Access::Privilege::kNoPrivilege); }
 
     private:
-        // zero is not a valid privilege, just a default initial value for privileges
-        static constexpr Access::Privilege kNoPrivilege{ 0 };
 
         struct attribute_entry_mask_t
         {

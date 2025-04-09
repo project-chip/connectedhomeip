@@ -28,11 +28,12 @@ namespace Access {
 // ProxyView, and Operate).
 enum class Privilege : uint8_t
 {
-    kView       = 1 << 0,
-    kProxyView  = 1 << 1,
-    kOperate    = 1 << 2,
-    kManage     = 1 << 3,
-    kAdminister = 1 << 4
+    kNoPrivilege = 0, // Zero is not a valid privilege, just a default initial value.
+    kView        = 1 << 0,
+    kProxyView   = 1 << 1,
+    kOperate     = 1 << 2,
+    kManage      = 1 << 3,
+    kAdminister  = 1 << 4
 };
 
 } // namespace Access

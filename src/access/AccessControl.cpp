@@ -66,6 +66,8 @@ bool CheckRequestPrivilegeAgainstEntryPrivilege(Privilege requestPrivilege, Priv
         return requestPrivilege == Privilege::kAdminister || requestPrivilege == Privilege::kManage ||
             requestPrivilege == Privilege::kOperate || requestPrivilege == Privilege::kView ||
             requestPrivilege == Privilege::kProxyView;
+    case Privilege::kNoPrivilege:
+        return false;
     }
     return false;
 }
@@ -169,6 +171,8 @@ char GetPrivilegeStringForLogging(Privilege privilege)
         return 'm';
     case Privilege::kAdminister:
         return 'a';
+    case Privilege::kNoPrivilege:
+        return 'u';
     }
     return 'u';
 }
