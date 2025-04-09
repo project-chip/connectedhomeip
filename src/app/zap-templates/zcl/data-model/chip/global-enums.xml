@@ -33,6 +33,12 @@ TODO: Make these structures global rather than defining them for each cluster.
     <item name="RollbackWrite" value="0x02"/>
   </enum>
 
+  <enum name="PowerThresholdSourceEnum" type="enum8">
+    <item name="Contract" value="0x00"/>
+    <item name="Regulator" value="0x01"/>
+    <item name="Equipment" value="0x02"/>
+  </enum>
+
   <enum name="ThreeLevelAutoEnum" type="enum8">
     <item name="Auto" value="0x00"/>
     <item name="Low" value="0x01"/>

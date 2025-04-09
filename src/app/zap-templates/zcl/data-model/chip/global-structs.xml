@@ -29,6 +29,12 @@ limitations under the License.
     <item fieldId="2" name="AreaType"        type="AreaTypeTag"              isNullable="true"  optional="false"/>
   </struct>
 
+  <struct name="PowerThresholdStruct" apiMaturity="provisional">
+    <item fieldId="0" name="PowerThreshold" type="int64s" optional="true"/>
+    <item fieldId="1" name="ApparentPowerThreshold" type="int64s" optional="true"/>
+    <item fieldId="2" name="PowerThresholdSource" type="PowerThresholdSourceEnum" isNullable="true" min="0x00" max="0x02"/>
+  </struct>
+
   <!--
     These are test global items (no cluster attached) for testing only.
     Their usage is defined for UnitTestCluster only.
