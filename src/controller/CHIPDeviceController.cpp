@@ -703,6 +703,7 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, co
                                                        Optional<Dnssd::CommonResolutionData> resolutionData)
 {
     MATTER_TRACE_SCOPE("EstablishPASEConnection", "DeviceCommissioner");
+    mNFCCommissioning = false;
     return mSetUpCodePairer.PairDevice(remoteDeviceId, setUpCode, SetupCodePairerBehaviour::kPaseOnly, discoveryType,
                                        resolutionData);
 }
@@ -722,6 +723,8 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
 
     VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mDeviceInPASEEstablishment == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    mNFCCommissioning = (params.GetPeerAddress().GetTransportType() == Transport::Type::kNfc);
 
     // TODO(#13940): We need to specify the peer address for BLE transport in bindings.
     if (params.GetPeerAddress().GetTransportType() == Transport::Type::kBle ||
@@ -2066,6 +2069,18 @@ void DeviceCommissioner::SendCommissioningCompleteCallbacks(NodeId nodeId, const
     }
 }
 
+void DeviceCommissioner::ContinueCommissioningOverOperationalNetwork(void)
+{
+    ChipLogProgress(Controller, "DeviceCommissioner::ContinueCommissioningOverOperationalNetwork");
+
+    // This method is meaningful only for the state kWaitForDeviceInstallation
+    VerifyOrReturn(mCommissioningStage == kWaitForDeviceInstallation);
+
+    // Device is ready for 2nd phase on the operational network.
+    // We can advance to next step
+    CommissioningStageComplete(CHIP_NO_ERROR);
+}
+
 void DeviceCommissioner::CommissioningStageComplete(CHIP_ERROR err, CommissioningDelegate::CommissioningReport report)
 {
     // Once this stage is complete, reset mDeviceBeingCommissioned - this will be reset when the delegate calls the next step.
@@ -2296,6 +2311,8 @@ void DeviceCommissioner::ContinueReadingCommissioningInfo(const CommissioningPar
                                                 Clusters::GeneralCommissioning::Attributes::RegulatoryConfig::Id));
         VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::GeneralCommissioning::Id,
                                                 Clusters::GeneralCommissioning::Attributes::LocationCapability::Id));
+        VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::GeneralCommissioning::Id,
+                                                Clusters::GeneralCommissioning::Attributes::IsCommissioningWithoutPower::Id));
 
         // Basic Information: VID and PID for device attestation purposes
         VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::BasicInformation::Id,
@@ -2458,6 +2475,13 @@ CHIP_ERROR DeviceCommissioner::ParseGeneralCommissioningInfo(ReadCommissioningIn
     {
         ChipLogError(Controller, "Ignoring failure to read SupportsConcurrentConnection: %" CHIP_ERROR_FORMAT, err.Format());
         info.supportsConcurrentConnection = true; // default to true (concurrent), not a fatal error
+    }
+
+    err = mAttributeCache->Get<SupportsConcurrentConnection::TypeInfo>(kRootEndpointId, info.general.isCommissioningWithoutPower);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Ignoring failure to read IsCommissioningWithoutPower: %" CHIP_ERROR_FORMAT, err.Format());
+        info.general.isCommissioningWithoutPower = false; // default to false, not a fatal error
     }
 
     return return_err;
@@ -3877,6 +3901,14 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         CommissioningStageComplete(CHIP_NO_ERROR);
         return;
     }
+
+    case CommissioningStage::kWaitForDeviceInstallation: {
+        // Nothing to do. Wait until the user confirms that he has installed the device and powered it up
+        // Failsafe timer is not an issue because it is suspended between the 1st commissioning phase over NFC
+        //  and the start of the second phase, on the operational network.
+        return;
+    }
+
     case CommissioningStage::kFindOperationalForStayActive:
     case CommissioningStage::kFindOperationalForCommissioningComplete: {
         // If there is an error, CommissioningStageComplete will be called from OnDeviceConnectionFailureFn.
