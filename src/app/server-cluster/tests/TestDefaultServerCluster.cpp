@@ -120,9 +120,9 @@ TEST(TestDefaultServerCluster, AttributesDefault)
     // first 2 are normal, the rest are list
     for (size_t i = 0; i < 5; i++)
     {
-        ASSERT_EQ(data[i].flags.Has(AttributeQualityFlags::kListAttribute), (i >= 2));
-        ASSERT_EQ(data[i].readPrivilege, Access::Privilege::kView);
-        ASSERT_FALSE(data[i].writePrivilege.has_value());
+        ASSERT_EQ(data[i].HasFlags(AttributeQualityFlags::kListAttribute), (i >= 2));
+        ASSERT_EQ(data[i].GetReadPrivilege(), Access::Privilege::kView);
+        ASSERT_FALSE(data[i].WriteAllowed());
     }
 }
 
