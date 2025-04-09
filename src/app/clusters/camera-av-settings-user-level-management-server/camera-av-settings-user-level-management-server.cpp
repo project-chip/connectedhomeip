@@ -378,29 +378,31 @@ bool CameraAvSettingsUserLevelMgmtServer::KnownVideoStreamID(uint16_t aVideoStre
  */
 void CameraAvSettingsUserLevelMgmtServer::UpdatePresetID()
 {
-   uint8_t nextIDToCheck = mCurrentPresetID;
-   ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: UpdatePresetID. Current Preset is %d.",
-                 mEndpointId, mCurrentPresetID);
+    uint8_t nextIDToCheck = mCurrentPresetID;
+    ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: UpdatePresetID. Current Preset is %d.", mEndpointId,
+                  mCurrentPresetID);
 
-   do {
-    nextIDToCheck = static_cast<uint8_t>((nextIDToCheck % mMaxPresets) +1);
-
-    // Have we lapped back round to where we started?  If so, break
-    //
-    if (nextIDToCheck == mCurrentPresetID) {
-        break;
-    }
-
-    auto it = std::find_if(mMptzPresetHelpers.begin(), mMptzPresetHelpers.end(),
-                          [=](const MPTZPresetHelper & mptzph) { return mptzph.GetPresetID() == nextIDToCheck; });
-    if (it == mMptzPresetHelpers.end())
+    do
     {
-        mCurrentPresetID = nextIDToCheck;
-        break;
-    }
-   } while (true);
+        nextIDToCheck = static_cast<uint8_t>((nextIDToCheck % mMaxPresets) + 1);
 
-   ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Updated PresetID is %d.", mEndpointId, mCurrentPresetID);
+        // Have we lapped back round to where we started?  If so, break
+        //
+        if (nextIDToCheck == mCurrentPresetID)
+        {
+            break;
+        }
+
+        auto it = std::find_if(mMptzPresetHelpers.begin(), mMptzPresetHelpers.end(),
+                               [=](const MPTZPresetHelper & mptzph) { return mptzph.GetPresetID() == nextIDToCheck; });
+        if (it == mMptzPresetHelpers.end())
+        {
+            mCurrentPresetID = nextIDToCheck;
+            break;
+        }
+    } while (true);
+
+    ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Updated PresetID is %d.", mEndpointId, mCurrentPresetID);
 }
 
 /**
