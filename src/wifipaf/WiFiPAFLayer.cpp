@@ -173,8 +173,6 @@ CHIP_ERROR PAFTransportCapabilitiesRequestMessage::Decode(const PacketBufferHand
     VerifyOrReturnError(CAPABILITIES_MSG_CHECK_BYTE_1 == chip::Encoding::Read8(p), WIFIPAF_ERROR_INVALID_MESSAGE);
     VerifyOrReturnError(CAPABILITIES_MSG_CHECK_BYTE_2 == chip::Encoding::Read8(p), WIFIPAF_ERROR_INVALID_MESSAGE);
 
-    static_assert(kCapabilitiesRequestSupportedVersionsLength == sizeof(msg.mSupportedProtocolVersions),
-                  "Expected capability sizes and storage must match");
     for (unsigned char & version : msg.mSupportedProtocolVersions)
     {
         version = chip::Encoding::Read8(p);
@@ -283,11 +281,6 @@ CHIP_ERROR WiFiPAFLayer::OnWiFiPAFMsgRxComplete(WiFiPAFSession & RxInfo, System:
         return mWiFiPAFTransport->WiFiPAFMessageReceived(RxInfo, std::move(msg));
     }
     return CHIP_ERROR_INCORRECT_STATE;
-}
-
-void WiFiPAFLayer::SetWiFiPAFState(State state)
-{
-    mAppState = state;
 }
 
 CHIP_ERROR WiFiPAFLayer::SendMessage(WiFiPAF::WiFiPAFSession & TxInfo, chip::System::PacketBufferHandle && msg)
@@ -456,7 +449,7 @@ CHIP_ERROR WiFiPAFLayer::AddPafSession(PafInfoAccess accType, WiFiPAFSession & S
         case PafInfoAccess::kAccNodeInfo:
             pPafSession->nodeId        = SessionInfo.nodeId;
             pPafSession->discriminator = SessionInfo.discriminator;
-            ChipLogProgress(WiFiPAF, "WiFiPAF: Add session with nodeId: %lu, disc: %x, sessions", SessionInfo.nodeId,
+            ChipLogProgress(WiFiPAF, "WiFiPAF: Add session with nodeId: %lu, disc: %x", SessionInfo.nodeId,
                             SessionInfo.discriminator);
             return CHIP_NO_ERROR;
         case PafInfoAccess::kAccSessionId:
@@ -473,20 +466,16 @@ CHIP_ERROR WiFiPAFLayer::AddPafSession(PafInfoAccess accType, WiFiPAFSession & S
 
 CHIP_ERROR WiFiPAFLayer::RmPafSession(PafInfoAccess accType, WiFiPAFSession & SessionInfo)
 {
-    uint8_t i;
-    WiFiPAFSession * pPafSession;
-
-    for (i = 0; i < WIFIPAF_LAYER_NUM_PAF_ENDPOINTS; i++)
+    for (WiFiPAFSession & PafSession : mPafInfoVect)
     {
-        pPafSession = &mPafInfoVect[i];
         switch (accType)
         {
         case PafInfoAccess::kAccSessionId:
-            if (pPafSession->id == SessionInfo.id)
+            if (PafSession.id == SessionInfo.id)
             {
-                ChipLogProgress(WiFiPAF, "Removing session with id: %u", pPafSession->id);
+                ChipLogProgress(WiFiPAF, "Removing session with id: %u", PafSession.id);
                 // Clear the slot
-                CleanPafInfo(*pPafSession);
+                CleanPafInfo(PafSession);
                 return CHIP_NO_ERROR;
             }
             break;
@@ -500,37 +489,33 @@ CHIP_ERROR WiFiPAFLayer::RmPafSession(PafInfoAccess accType, WiFiPAFSession & Se
 
 WiFiPAFSession * WiFiPAFLayer::GetPAFInfo(PafInfoAccess accType, WiFiPAFSession & SessionInfo)
 {
-    uint8_t i;
-    WiFiPAFSession * pPafSession = nullptr;
-
-    for (i = 0; i < WIFIPAF_LAYER_NUM_PAF_ENDPOINTS; i++)
+    for (WiFiPAFSession & PafSession : mPafInfoVect)
     {
-        pPafSession = &mPafInfoVect[i];
-        if (pPafSession->role == kWiFiPafRole_Publisher)
+        if (PafSession.role == kWiFiPafRole_Publisher)
         {
-            if (pPafSession->id != kUndefinedWiFiPafSessionId)
-                return pPafSession;
+            if (PafSession.id != kUndefinedWiFiPafSessionId)
+                return &PafSession;
             else
                 continue;
         }
         switch (accType)
         {
         case PafInfoAccess::kAccSessionId:
-            if (pPafSession->id == SessionInfo.id)
+            if (PafSession.id == SessionInfo.id)
             {
-                return pPafSession;
+                return &PafSession;
             }
             break;
         case PafInfoAccess::kAccNodeId:
-            if (pPafSession->nodeId == SessionInfo.nodeId)
+            if (PafSession.nodeId == SessionInfo.nodeId)
             {
-                return pPafSession;
+                return &PafSession;
             }
             break;
         case PafInfoAccess::kAccDisc:
-            if (pPafSession->discriminator == SessionInfo.discriminator)
+            if (PafSession.discriminator == SessionInfo.discriminator)
             {
-                return pPafSession;
+                return &PafSession;
             }
             break;
         default:

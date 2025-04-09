@@ -72,20 +72,23 @@
 #endif // WIFIPAF_CONNECTION_UNINITIALIZED
 
 /**
+ *  @def WIFIPAF_CONFIG_IMMEDIATE_ACK_WINDOW_THRESHOLD
+ *
+ *  @brief
+ *    If an end point's receive window drops equal to or below this value, it will send an immediate acknowledgement
+ *    packet to re-open its window instead of waiting for the send-ack timer to expire.
+ *
+ */
+#define WIFIPAF_CONFIG_IMMEDIATE_ACK_WINDOW_THRESHOLD 1
+
+/**
  *  @def PAF_MAX_RECEIVE_WINDOW_SIZE
  *
  *  @brief
  *    This is the maximum allowed size of a PAF end point's receive window, defined as the number of fragments the
- *    end point may reliably receive without PAF-layer acknowledgement. This value should be no larger than the floor
- *    of ONE-HALF the total number of slots or buffers reserved. The PAFTP layer reserves all of these buffers for its
- *    own use - one half for incoming writes or indications, and the other half for incoming confirmations.
+ *    end point may reliably receive without PAF-layer acknowledgement.
  *
- *    This value must be greater than 1, or race condition avoidance logic will prevent send the on remote device. This
- *    logic prevents any send with no piggybacked ack when the receiver's window has only 1 slot open. Without this
- *    logic, simultaneous data transmissions could fill both receiver's windows, leaving no room for the acks required
- *    to re-open them. Both senders would wedge, and the PAFTP connection would stall.
- *
- *    This value must also exceed (WIFIPAF_CONFIG_IMMEDIATE_ACK_WINDOW_THRESHOLD + 1), or ***immediate*** stand-alone
+ *    This value must exceed (WIFIPAF_CONFIG_IMMEDIATE_ACK_WINDOW_THRESHOLD + 1), or ***immediate*** stand-alone
  *    acks will forever be sent without delay in response to one another as each peer's window size dips below
  *    WIFIPAF_CONFIG_IMMEDIATE_ACK_WINDOW_THRESHOLD with receipt of any single message fragment.
  *
@@ -97,8 +100,8 @@
 #define PAF_MAX_RECEIVE_WINDOW_SIZE 6
 #endif
 
-#if (PAF_MAX_RECEIVE_WINDOW_SIZE < 3)
-#error "PAF_MAX_RECEIVE_WINDOW_SIZE must be greater than 2 for PAF transport protocol stability."
+#if (PAF_MAX_RECEIVE_WINDOW_SIZE < (WIFIPAF_CONFIG_IMMEDIATE_ACK_WINDOW_THRESHOLD + 1))
+#error "PAF_MAX_RECEIVE_WINDOW_SIZE must be greater or equal than 2."
 #endif
 
 /**

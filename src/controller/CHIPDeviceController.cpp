@@ -536,6 +536,12 @@ CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
 #if CONFIG_NETWORK_LAYER_BLE
     mSetUpCodePairer.SetBleLayer(mSystemState->BleLayer());
 #endif // CONFIG_NETWORK_LAYER_BLE
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    for (WiFiPAF::PafSessionId_t & pafSessionId : mPafSessionId)
+    {
+        pafSessionId = WiFiPAF::kUndefinedWiFiPafSessionId;
+    }
+#endif
 
     return CHIP_NO_ERROR;
 }
@@ -572,8 +578,14 @@ void DeviceCommissioner::Shutdown()
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().Shutdown(
-        [](uint32_t id, WiFiPAF::WiFiPafRole role) { DeviceLayer::ConnectivityMgr().WiFiPAFShutdown(id, role); });
+    for (WiFiPAF::PafSessionId_t & pafSessionId : mPafSessionId)
+    {
+        if (pafSessionId != WiFiPAF::kUndefinedWiFiPafSessionId)
+        {
+            DeviceLayer::ConnectivityMgr().WiFiPAFCancelSubscribe(pafSessionId);
+            pafSessionId = WiFiPAF::kUndefinedWiFiPafSessionId;
+        }
+    }
 #endif
 
     // Release everything from the commissionee device pool here.
@@ -828,8 +840,13 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     if (params.GetPeerAddress().GetTransportType() == Transport::Type::kWiFiPAF)
     {
-        if (DeviceLayer::ConnectivityMgr().GetWiFiPAF()->GetWiFiPAFState() != WiFiPAF::State::kConnected)
+        auto nodeId                            = params.GetPeerAddress().GetRemoteId();
+        WiFiPAF::WiFiPAFLayer & pafLayer       = WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer();
+        WiFiPAF::WiFiPAFSession chkSessionInfo = { .nodeId = nodeId };
+        WiFiPAF::WiFiPAFSession * pChkSession  = pafLayer.GetPAFInfo(WiFiPAF::PafInfoAccess::kAccNodeId, chkSessionInfo);
+        if (pChkSession == nullptr)
         {
+            // The PAF session has not existed
             ChipLogProgress(Controller, "WiFi-PAF: Subscribing to the NAN-USD devices, nodeId: %lu",
                             params.GetPeerAddress().GetRemoteId());
             if (!DeviceLayer::ConnectivityMgrImpl().IsWiFiManagementStarted())
@@ -838,7 +855,6 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
                 ExitNow(CHIP_ERROR_INTERNAL);
             }
             mRendezvousParametersForDeviceDiscoveredOverWiFiPAF = params;
-            auto nodeId                                         = params.GetPeerAddress().GetRemoteId();
             const SetupDiscriminator connDiscriminator(params.GetSetupDiscriminator().value());
             VerifyOrReturnValue(!connDiscriminator.IsShortDiscriminator(), CHIP_ERROR_INVALID_ARGUMENT,
                                 ChipLogError(Controller, "Error, Long discriminator is required"));
@@ -846,10 +862,21 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
             WiFiPAF::WiFiPAFSession sessionInfo = { .role          = WiFiPAF::WiFiPafRole::kWiFiPafRole_Subscriber,
                                                     .nodeId        = nodeId,
                                                     .discriminator = discriminator };
-            ReturnErrorOnFailure(
-                DeviceLayer::ConnectivityMgr().GetWiFiPAF()->AddPafSession(WiFiPAF::PafInfoAccess::kAccNodeInfo, sessionInfo));
-            DeviceLayer::ConnectivityMgr().WiFiPAFSubscribe(discriminator, reinterpret_cast<void *>(this),
-                                                            OnWiFiPAFSubscribeComplete, OnWiFiPAFSubscribeError);
+            ReturnErrorOnFailure(pafLayer.AddPafSession(WiFiPAF::PafInfoAccess::kAccNodeInfo, sessionInfo));
+            ReturnErrorOnFailure(DeviceLayer::ConnectivityMgr().WiFiPAFSubscribe(
+                discriminator, reinterpret_cast<void *>(this), OnWiFiPAFSubscribeComplete, OnWiFiPAFSubscribeError));
+            WiFiPAF::WiFiPAFSession * pSession = pafLayer.GetPAFInfo(WiFiPAF::PafInfoAccess::kAccNodeId, sessionInfo);
+            if (pSession != nullptr)
+            {
+                for (WiFiPAF::PafSessionId_t & pafSessionId : mPafSessionId)
+                {
+                    if (pafSessionId == WiFiPAF::kUndefinedWiFiPafSessionId)
+                    {
+                        pafSessionId = pSession->id;
+                        break;
+                    }
+                }
+            }
             ExitNow(CHIP_NO_ERROR);
         }
     }
