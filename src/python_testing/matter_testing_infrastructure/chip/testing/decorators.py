@@ -25,7 +25,7 @@ import asyncio
 import logging
 from enum import IntFlag
 from functools import partial
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING, Callable, Any
 
 import chip.clusters as Clusters
 from chip.clusters import Attribute
@@ -95,7 +95,8 @@ def _has_attribute(wildcard: Clusters.Attribute.AsyncReadTransaction.ReadRespons
         ValueError: If AttributeList value is not a list type
         KeyError: If attribute's cluster_id is not found in ALL_CLUSTERS
     """
-    cluster = ClusterObjects.ALL_CLUSTERS[attribute.cluster_id]
+    # Cast result to Any to satisfy mypy about subsequent .Attributes access
+    cluster: Any = ClusterObjects.ALL_CLUSTERS[attribute.cluster_id]
 
     if endpoint not in wildcard.attributes:
         return False
@@ -153,7 +154,8 @@ def _has_command(wildcard: Clusters.Attribute.AsyncReadTransaction.ReadResponse,
         ValueError: If AcceptedCommandList value is not a list type
         KeyError: If command's cluster_id is not found in ALL_CLUSTERS
     """
-    cluster = ClusterObjects.ALL_CLUSTERS[command.cluster_id]
+    # Cast result to Any to satisfy mypy about subsequent .Attributes access
+    cluster: Any = ClusterObjects.ALL_CLUSTERS[command.cluster_id]
 
     if endpoint not in wildcard.attributes:
         return False
