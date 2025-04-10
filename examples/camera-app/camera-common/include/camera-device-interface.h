@@ -225,7 +225,7 @@ public:
         virtual uint8_t GetMicrophoneVolume()                          = 0;
 
         virtual void SetHDRMode(bool hdrMode) = 0;
-        
+
         // Get the microphone max and min levels.
         virtual uint8_t GetMicrophoneMaxLevel() = 0;
         virtual uint8_t GetMicrophoneMinLevel() = 0;
@@ -233,11 +233,11 @@ public:
         virtual int16_t GetPanMin() = 0;
 
         virtual int16_t GetPanMax() = 0;
-    
+
         virtual int16_t GetTiltMin() = 0;
-    
+
         virtual int16_t GetTiltMax() = 0;
-    
+
         virtual uint8_t GetZoomMax() = 0;
     };
 
