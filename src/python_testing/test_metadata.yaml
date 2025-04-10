@@ -5,6 +5,8 @@ not_automated:
       reason: Code/Test not being used or not shared code for any other tests
     - name: TC_CNET_4_4.py
       reason: It has no CI execution block, is not executed in CI
+    - name: TC_CNET_4_10.py
+      reason: It has no CI execution block, is not executed in CI
     - name: TC_DGGEN_3_2.py
       reason:
           src/python_testing/test_testing/test_TC_DGGEN_3_2.py is the Unit test
