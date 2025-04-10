@@ -141,6 +141,6 @@ class TC_CHANNEL_5_9(MatterBaseTest):
             asserts.assert_equal(updated_identifier.lower(), match_str.lower(), "Channel did not update to expected value")
         else:
             self.skip_step("4")
-            
+
        if __name__ == "__main__":
         default_matter_test_main()
