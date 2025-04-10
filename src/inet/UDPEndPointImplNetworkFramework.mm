@@ -32,7 +32,11 @@
 
 #define INET_PORTSTRLEN 6
 
-#define NETWORK_FRAMEWORK_DEBUG 0
+#define NETWORK_FRAMEWORK_DEBUG 1
+
+#if NETWORK_FRAMEWORK_DEBUG
+#include <arpa/inet.h>
+#endif // NETWORK_FRAMEWORK_DEBUG
 
 namespace {
 constexpr uint64_t kSendTimeoutInSeconds = 10 * NSEC_PER_SEC;
@@ -200,6 +204,8 @@ namespace Inet {
         mParameters = nw_parameters_create_secure_udp(configure_tls, NW_PARAMETERS_DEFAULT_CONFIGURATION);
         VerifyOrReturnError(nullptr != mParameters, CHIP_ERROR_INVALID_ARGUMENT, ReleaseAll());
 
+        nw_parameters_set_reuse_local_address(mParameters, true);
+
         // Note: The ConfigureProtocol function uses nw_ip_options_set_version to set the IP version for this endpoint.
         //
         // This works as expected when the IPAddress is specified. However, when using a wildcard address (chip::Inet::IPAddressType::kAny)
@@ -257,8 +263,7 @@ namespace Inet {
 
     uint16_t UDPEndPointImplNetworkFramework::GetBoundPort() const
     {
-        __auto_type endpoint = nw_parameters_copy_local_endpoint(mParameters);
-        return nw_endpoint_get_port(endpoint);
+        return nw_listener_get_port(mListener);
     }
 
     CHIP_ERROR UDPEndPointImplNetworkFramework::ListenImpl()
@@ -435,7 +440,6 @@ namespace Inet {
         const IPAddress & aAddress, uint16_t aPort, InterfaceId interfaceIndex)
     {
         char addrStr[IPAddress::kMaxStringLength + 1 /*%*/ + InterfaceId::kMaxIfNameLength + 1 /*null terminator */];
-        char portStr[INET_PORTSTRLEN];
 
         // Note: aAddress.ToString will return the IPv6 Any address if the address type is Any, but that's not what
         // we want if the local endpoint is IPv4.
@@ -459,14 +463,14 @@ namespace Inet {
             }
         }
 
+        char portStr[INET_PORTSTRLEN];
         snprintf(portStr, sizeof(portStr), "%u", aPort);
 
-        char * target = addrStr;
-
 #if NETWORK_FRAMEWORK_DEBUG
-        ChipLogError(Inet, "Create endpoint for ip(%s) port(%s)", target, portStr);
+        ChipLogError(Inet, "Create endpoint for ip(%s) port(%s)", addrStr, portStr);
 #endif
-        return nw_endpoint_create_host(target, portStr);
+
+        return nw_endpoint_create_host(addrStr, portStr);
     }
 
     CHIP_ERROR UDPEndPointImplNetworkFramework::GetConnection(const IPPacketInfo * aPktInfo)
@@ -563,6 +567,8 @@ namespace Inet {
 
         if (CHIP_NO_ERROR != err) {
             mListener = nullptr;
+            mListenerSemaphore = nullptr;
+            mListenerQueue = nullptr;
         }
 
         return err;
@@ -571,7 +577,6 @@ namespace Inet {
     CHIP_ERROR UDPEndPointImplNetworkFramework::StartConnection(nw_connection_t aConnection)
     {
         __block CHIP_ERROR err = CHIP_NO_ERROR;
-
         nw_connection_set_queue(aConnection, mConnectionQueue);
 
         nw_connection_set_state_changed_handler(aConnection, ^(nw_connection_state_t state, nw_error_t error) {
@@ -619,7 +624,9 @@ namespace Inet {
 
             mConnection = aConnection;
             HandleDataReceived(mConnection);
+            return CHIP_NO_ERROR;
         }
+
         return err;
     }
 
