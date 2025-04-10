@@ -233,7 +233,7 @@ namespace Inet {
         mConnectionSemaphore = dispatch_semaphore_create(0);
         VerifyOrReturnError(nullptr != mConnectionSemaphore, CHIP_ERROR_NO_MEMORY, ReleaseAll());
 
-        mSystemQueue = static_cast<System::LayerSocketsLoop &>(GetSystemLayer()).GetDispatchQueue();
+        mSystemQueue = static_cast<System::LayerDispatch &>(GetSystemLayer()).GetDispatchQueue();
         mAddrType = addressType;
         mConnection = nullptr;
         mWorkFlagStrong = Platform::MakeShared<WorkFlag>();
