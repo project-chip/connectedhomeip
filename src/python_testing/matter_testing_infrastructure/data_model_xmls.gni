@@ -649,8 +649,8 @@ data_model_XMLS_1_5_in_progress = [
   "${chip_root}/data_model/1.5_in_progress/clusters/ICDManagement.xml",
   "${chip_root}/data_model/1.5_in_progress/clusters/Identify.xml",
   "${chip_root}/data_model/1.5_in_progress/clusters/IlluminanceMeasurement.xml",
+  "${chip_root}/data_model/1.5_in_progress/clusters/JointFabricAdministratorCluster.xml",
   "${chip_root}/data_model/1.5_in_progress/clusters/JointFabricDatastoreCluster.xml",
-  "${chip_root}/data_model/1.5_in_progress/clusters/JointFabricPKICluster.xml",
   "${chip_root}/data_model/1.5_in_progress/clusters/KeypadInput.xml",
   "${chip_root}/data_model/1.5_in_progress/clusters/Label-Cluster.xml",
   "${chip_root}/data_model/1.5_in_progress/clusters/LaundryDryerControls.xml",
@@ -707,7 +707,6 @@ data_model_XMLS_1_5_in_progress = [
   "${chip_root}/data_model/1.5_in_progress/clusters/TemperatureMeasurement.xml",
   "${chip_root}/data_model/1.5_in_progress/clusters/Thermostat.xml",
   "${chip_root}/data_model/1.5_in_progress/clusters/ThermostatUserInterfaceConfiguration.xml",
-  "${chip_root}/data_model/1.5_in_progress/clusters/ThreadBorderRouterDiagnostics.xml",
   "${chip_root}/data_model/1.5_in_progress/clusters/ThreadBorderRouterManagement.xml",
   "${chip_root}/data_model/1.5_in_progress/clusters/ThreadNetworkDirectory.xml",
   "${chip_root}/data_model/1.5_in_progress/clusters/TimeSync.xml",
@@ -836,7 +835,6 @@ data_model_XMLS_1_5_in_progress = [
   "${chip_root}/data_model/1.5_in_progress/namespaces/Namespace-PowerSource.xml",
   "${chip_root}/data_model/1.5_in_progress/namespaces/Namespace-Refrigerator.xml",
   "${chip_root}/data_model/1.5_in_progress/namespaces/Namespace-RoomAirConditioner.xml",
-  "${chip_root}/data_model/1.5_in_progress/namespaces/Namespace-Switches.xml",
   "${chip_root}/data_model/1.5_in_progress/namespaces/Namespace-Switches.xml",
 ]
 
