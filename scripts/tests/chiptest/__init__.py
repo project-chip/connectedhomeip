@@ -143,7 +143,7 @@ def _GetExtraSlowTests() -> Set[str]:
 def _GetInDevelopmentTests() -> Set[str]:
     """Tests that fail in YAML for some reason."""
     return {
-        "TestSystemCommissioner", # just testing
+        "TestSystemCommissioner",  # just testing
         "Test_TC_PSCFG_1_1.yaml",  # Power source configuration cluster is deprecated and removed from all-clusters
         "Test_TC_PSCFG_2_1.yaml",  # Power source configuration cluster is deprecated and removed from all-clusters
         "Test_TC_PSCFG_2_2.yaml",  # Power source configuration cluster is deprecated and removed from all-clusters
@@ -171,7 +171,7 @@ def _GetChipToolUnsupportedTests() -> Set[str]:
 def _GetDarwinFrameworkToolUnsupportedTests() -> Set[str]:
     """Tests that fail in darwin-framework-tool for some reason"""
     return {
-        "TestSystemCommissioner", # just testing
+        "TestSystemCommissioner",  # just testing
         "DL_LockUnlock",  # darwin-framework-tool does not currently support reading or subscribing to Events
         "DL_UsersAndCredentials",  # darwin-framework-tool does not currently support reading or subscribing to Events
         "Test_AddNewFabricFromExistingFabric",  # darwin-framework-tool does not support the GetCommissionerRootCertificate command.
