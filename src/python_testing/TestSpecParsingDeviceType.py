@@ -318,22 +318,24 @@ class TestSpecParsingDeviceType(MatterBaseTest):
         self.test.xml_device_types = self.xml_device_types
         self.test.xml_clusters = self.xml_clusters
 
-        if bad_device_id:
-            known_ids = list(self.test.xml_device_types.keys())
-            device_type_id = [a for a in range(min(known_ids), max(known_ids)) if a not in known_ids][0]
-        else:
-            device_type_id = 0x0302
-
-        resp = Attribute.AsyncReadTransaction.ReadResponse({}, [], {})
         if no_descriptor:
-            resp.attributes = {1: {}}
+            self.test.endpoints = {1: {}}
+            self.test.endpoints_tlv = {1: {}}
         else:
-            desc = Clusters.Descriptor
-            server_list_attr = Clusters.Descriptor.Attributes.ServerList
-            device_type_list_attr = Clusters.Descriptor.Attributes.DeviceTypeList
-            device_type_list = [Clusters.Descriptor.Structs.DeviceTypeStruct(deviceType=device_type_id, revision=2)]
-            resp.attributes = {1: {desc: {device_type_list_attr: device_type_list, server_list_attr: server_list}}}
-        self.test.endpoints = resp.attributes
+            # build the temperature sensor device type
+            attrs = create_minimal_dt(xml_device_types=self.xml_device_types, xml_clusters=self.xml_clusters,
+                                      device_type_id=0x302, is_tlv_endpoint=False)
+            attrs_tlv = create_minimal_dt(
+                xml_device_types=self.xml_device_types, xml_clusters=self.xml_clusters, device_type_id=0x302, is_tlv_endpoint=True)
+            # override with the desired device type id
+            if bad_device_id:
+                known_ids = list(self.test.xml_device_types.keys())
+                device_type_id = [a for a in range(min(known_ids), max(known_ids)) if a not in known_ids][0]
+                device_type_list = [Clusters.Descriptor.Structs.DeviceTypeStruct(deviceType=device_type_id, revision=2)]
+                attrs[Clusters.Descriptor][Clusters.Descriptor.deviceTypeList] = device_type_list
+                # note - not populating the TLV for this since it's not used.
+            self.test.endpoints = {1: attrs}
+            self.test.endpoints_tlv = {1: attrs_tlv}
 
     def create_good_device(self, device_type_id: int) -> DeviceConformanceTests:
         self.test = DeviceConformanceTests()

@@ -65,7 +65,7 @@ def create_minimal_dt(xml_clusters: dict[uint, XmlCluster], xml_device_types: di
     device_type_revision = xml_device_types[device_type_id].revision
 
     for s in required_servers:
-        endpoint[s] = _create_minimal_cluster(xml_clusters, s)
+        endpoint[s if is_tlv_endpoint else Clusters.ClusterObjects.ALL_CLUSTERS[s]] = _create_minimal_cluster(xml_clusters, s)
 
     # Descriptor
     attr = Clusters.Descriptor.Attributes
