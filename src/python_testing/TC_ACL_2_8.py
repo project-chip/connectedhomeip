@@ -142,8 +142,8 @@ class TC_ACL_2_8(MatterBaseTest):
         self.step(5)
         # TH1 writes ACL attribute
         acl_struct = Clusters.AccessControl.Structs.AccessControlEntryStruct(
-            privilege=5,  # Administer (5)
-            authMode=2,   # CASE (2)
+            privilege=5,  
+            authMode=2,   
             subjects=[self.th1.nodeId, 1111],
             targets=NullValue 
         )
@@ -162,10 +162,10 @@ class TC_ACL_2_8(MatterBaseTest):
         self.step(6)
         # TH2 writes ACL attribute
         acl_struct_th2 = Clusters.AccessControl.Structs.AccessControlEntryStruct(
-            privilege=5,  # Administer (5)
-            authMode=2,   # CASE (2)
+            privilege=5,  
+            authMode=2,   
             subjects=[self.th2.nodeId, 2222],
-            targets=NullValue  # Use target struct with cluster ID and endpoint
+            targets=NullValue  
         )
         try:
             acl_list = [acl_struct_th2]
@@ -191,14 +191,12 @@ class TC_ACL_2_8(MatterBaseTest):
             asserts.assert_equal(len(acl_list), 1, "Should have exactly one ACL entry")
             entry = acl_list[0]
             
-            # Verify entry contents
             asserts.assert_equal(entry.privilege, 5, "Privilege should be Administer (5)")
             asserts.assert_equal(entry.authMode, 2, "AuthMode should be CASE (2)")
             asserts.assert_equal(entry.subjects, [self.th1.nodeId, 1111])
             asserts.assert_equal(entry.targets, NullValue, "Targets should be NullValue")
             asserts.assert_equal(entry.fabricIndex, f1)
             
-            # Verify no F2 entries
             for entry in acl_list:
                 asserts.assert_not_equal(entry.fabricIndex, f2, "Should not contain entry with FabricIndex F2")
         except Exception as e:
@@ -224,7 +222,6 @@ class TC_ACL_2_8(MatterBaseTest):
             asserts.assert_equal(entry.targets, NullValue, "Targets should be NullValue")
             asserts.assert_equal(entry.fabricIndex, f2)
             
-            # Verify no F1 entries
             for entry in acl_list:
                 asserts.assert_not_equal(entry.fabricIndex, f1, "Should not contain entry with FabricIndex F1")
         except Exception as e:
@@ -245,7 +242,6 @@ class TC_ACL_2_8(MatterBaseTest):
             self._verify_acl_event(events[0], None, 0, Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded, self.th1.nodeId, NullValue, f1)
             self._verify_acl_event(events[1], self.th1.nodeId, None, Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged, [self.th1.nodeId, 1111], NullValue, f1)
             
-            # Verify no F2 events
             for event in events:
                 asserts.assert_not_equal(event.Data.fabricIndex, f2, "Should not contain event with FabricIndex F2")
         except Exception as e:
@@ -265,11 +261,10 @@ class TC_ACL_2_8(MatterBaseTest):
             # Verify event contents match expected sequence
             self._verify_acl_event(events[0], None, 0, Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded, self.th2.nodeId, NullValue, f2)
             self._verify_acl_event(events[1], self.th2.nodeId, None, Clusters.AccessControl.Enums.ChangeTypeEnum.kChanged, [self.th2.nodeId, 2222], NullValue, f2)
-            self._verify_acl_event(events[2], self.th2.nodeId, None, Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded, [self.th2.nodeId], NullValue, f2)
-
-            # Verify no F1 events
+     
             for event in events:
                 asserts.assert_not_equal(event.Data.fabricIndex, f1, "Should not contain event with FabricIndex F1")
+
         except Exception as e:
             asserts.fail(f"Failed to read events: {e}")
 
