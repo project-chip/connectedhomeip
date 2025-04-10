@@ -16,39 +16,36 @@
  *    limitations under the License.
  */
 
-#include <iostream>
+#include <lib/support/logging/CHIPLogging.h>
 #include <transport/webrtc-transport.h>
 
 WebrtcTransport::WebrtcTransport(uint16_t sessionID, uint64_t nodeID, std::shared_ptr<rtc::PeerConnection> mPeerConnection)
 {
-    sessionID = sessionID;
-    nodeID    = nodeID;
-    peerConnection = mPeerConnection;
-    timestamp = 0;
-    std::cout << "constructor of WebrtcTransport";
+    ChipLogProgress(Camera, "WebrtcTransport created for sessionID: %u", sessionID);
+    sessionID            = sessionID;
+    nodeID               = nodeID;
+    peerConnection       = mPeerConnection;
+    timestamp            = 0;
     const rtc::SSRC ssrc = 42;
-    media = rtc::Description::Video("video", rtc::Description::Direction::SendOnly);
+    media                = rtc::Description::Video("video", rtc::Description::Direction::SendOnly);
     media.addH264Codec(96);
     media.setBitrate(3000);
     media.addSSRC(ssrc, "video-send");
-    track = peerConnection->addTrack(media);
-    auto rtpConfig = std::make_shared<rtc::RtpPacketizationConfig>(ssrc, "video-send", 96, rtc::H264RtpPacketizer::ClockRate);
+    track           = peerConnection->addTrack(media);
+    auto rtpConfig  = std::make_shared<rtc::RtpPacketizationConfig>(ssrc, "video-send", 96, rtc::H264RtpPacketizer::ClockRate);
     auto packetizer = std::make_shared<rtc::H264RtpPacketizer>(rtpConfig);
     track->setMediaHandler(packetizer);
 }
 
-WebrtcTransport::~WebrtcTransport() {}
-
-void WebrtcTransport::RegisterToMediaController()
+WebrtcTransport::~WebrtcTransport()
 {
-    // Placeholder for actual WebRTC implementation to register to media controller
+    ChipLogProgress(Camera, "WebrtcTransport destroyed for sessionID: %u", sessionID);
 }
 
-// Dummy implementation of SendVideo method
 void WebrtcTransport::SendVideo(const char * data, size_t size, uint16_t videoStreamID)
 {
-    std::cout << "Sending video data of size: " << size << " bytes." << std::endl;
-    auto *b = reinterpret_cast<const std::byte*>(data);
+    // ChipLogProgress(Camera, "Sending video data of size: %u bytes", (int)size);
+    auto * b           = reinterpret_cast<const std::byte *>(data);
     rtc::binary sample = {};
     sample.assign(b, b + size);
     int sampleDuration_us = 1000 * 1000 / 30;
