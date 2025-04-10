@@ -448,20 +448,18 @@ class TC_FAN_3_1(MatterBaseTest):
             #   occurred and it triggered an update in the corresponding attribute(s)
             # - Verify the correct progression of the attribute(s) value(s)
             if write_status == Status.Success:
-                # queue = self.attribute_subscription.attribute_queue.queue
-
                 # Attribute to update check
                 attr_to_update_value_current, attr_to_update_value_previous = await self.verify_attribute_success(
-                    init_settings, attr_to_update_value_current, attr_to_update_value_previous, iteration, True)
+                    init_settings, attr_to_update_value_previous, iteration, True)
 
                 # Attribute to verify check
                 attr_to_verify_value_current, attr_to_verify_value_previous = await self.verify_attribute_success(
-                    init_settings, attr_to_verify_value_current, attr_to_verify_value_previous, iteration, False)
+                    init_settings, attr_to_verify_value_previous, iteration, False)
 
                 # SpeedSetting attribute check (if present)
                 if self.supports_multispeed:
                     speed_setting_current, speed_setting_previous = await self.verify_attribute_success(
-                        init_settings, speed_setting_current, speed_setting_previous, iteration, False, attribute.SpeedSetting)
+                        init_settings, speed_setting_previous, iteration, False, attribute.SpeedSetting)
 
             # If the write status is INVALID_IN_STATE, it means no write operation occurred
             # Verify that the current attribute value is equal to the previous value
@@ -476,7 +474,7 @@ class TC_FAN_3_1(MatterBaseTest):
                 if self.supports_multispeed:
                     await self.verify_attribute_invalid_in_state(init_settings, speed_setting_current, speed_setting_previous, iteration)
 
-        logging.info("[FC] *** Attribute(s) update and verification successful")
+        logging.info("[FC] *** Attribute(s) data dependency verification successful")
 
     async def verify_attribute_invalid_in_state(self, init_settings, attr_to_verify_value_current, attr_to_verify_value_previous, iteration, self_verify: bool = False, optional_setting: ClusterObjects.ClusterAttributeDescriptor = None) -> None:
         """
@@ -512,7 +510,7 @@ class TC_FAN_3_1(MatterBaseTest):
         asserts.assert_equal(attr_to_verify_value_current, attr_to_verify_value_previous,
                              f"[FC] Current {attr_to_verify.__name__} attribute value ({attr_to_verify_value_current}) must be equal to the previous value ({attr_to_verify_value_previous})")
 
-    async def verify_attribute_success(self, init_settings, attr_to_verify_value_current, attr_to_verify_value_previous, iteration, self_verify: bool = False, optional_setting: ClusterObjects.ClusterAttributeDescriptor = None) -> tuple[Any, Any]:
+    async def verify_attribute_success(self, init_settings, attr_to_verify_value_previous, iteration, self_verify: bool = False, optional_setting: ClusterObjects.ClusterAttributeDescriptor = None) -> tuple[Any, Any]:
         """
         Verifies the correct progression of the current and previous values of the attribute to verify.
 
