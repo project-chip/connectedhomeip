@@ -51,12 +51,10 @@ private:
     // Dummy implementation to indicate if audio can be sent
     bool mCanSendAudio = true;
 
-    uint16_t msessionID;
+    uint16_t sessionID;
     uint64_t nodeID;
     uint32_t timestamp;
     std::shared_ptr<rtc::PeerConnection> peerConnection;
     std::shared_ptr<rtc::Track> track;
     rtc::Description::Video media;
-
-    void RegisterToMediaController();
 };

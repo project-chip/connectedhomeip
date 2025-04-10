@@ -66,7 +66,7 @@ void WebRTCProviderManager::RegisterWebrtcTransport(uint16_t sessionId)
         return;
     }
 
-    mCameraDeviceHAL->RegisterTransport(webrtcTransportMap[sessionId], 1, 0/*videoStreamID, audioStreamID*/);
+    mCameraDeviceHAL->RegisterTransport(webrtcTransportMap[sessionId], videoStreamID, audioStreamID);
 }
 
 CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestArgs & args, WebRTCSessionStruct & outSession,
@@ -92,6 +92,7 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
         else
         {
             outSession.videoStreamID = args.videoStreamId.Value();
+            videoStreamID            = outSession.videoStreamID.Value();
         }
     }
     else
@@ -110,6 +111,7 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
         else
         {
             outSession.audioStreamID = args.audioStreamId.Value();
+            audioStreamID            = outSession.audioStreamID.Value();
         }
     }
     else
@@ -117,12 +119,10 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
         outSession.audioStreamID.SetNull();
     }
 
-    if (args.videoStreamId.HasValue())
-        if (!args.videoStreamId.Value().IsNull())
-            videoStreamID = 1;//args.videoStreamId.Value();
-    if (args.audioStreamId.HasValue())
-        if (!args.audioStreamId.Value().IsNull())
-           audioStreamID = 1;//args.audioStreamId.Value();
+    if (webrtcTransportMap.find(args.sessionId) == webrtcTransportMap.end())
+    {
+        webrtcTransportMap[args.sessionId] = new WebrtcTransport(args.sessionId, peerId.GetNodeId(), mPeerConnection);
+    }
 
     // Process the SDP Offer, begin the ICE Candidate gathering phase, create the SDP Answer, and invoke Answer.
     CloseConnection();
@@ -177,11 +177,6 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
     });
 
     mPeerConnection->setRemoteDescription(args.sdp);
-
-    if (webrtcTransportMap.find(args.sessionId) == webrtcTransportMap.end())
-    {
-        webrtcTransportMap[args.sessionId] = new WebrtcTransport(args.sessionId, peerId.GetNodeId(), mPeerConnection);
-    }
 
     return CHIP_NO_ERROR;
 }
