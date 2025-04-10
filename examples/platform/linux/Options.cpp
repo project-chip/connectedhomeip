@@ -109,6 +109,7 @@ enum
     kDeviceOption_TestEventTriggerEnableKey,
     kTraceTo,
     kOptionSimulateNoInternalTime,
+    kDeviceOption_StorageSpace
 #if defined(PW_RPC_ENABLED)
     kOptionRpcServerPort,
 #endif
@@ -175,6 +176,7 @@ OptionDef sDeviceOptionDefs[] = {
 #endif
     { "command", kArgumentRequired, kDeviceOption_Command },
     { "PICS", kArgumentRequired, kDeviceOption_PICS },
+    { "storage-space", kArgumentRequired, kDeviceOption_StorageSpace },
     { "KVS", kArgumentRequired, kDeviceOption_KVS },
     { "interface-id", kArgumentRequired, kDeviceOption_InterfaceId },
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
@@ -309,6 +311,9 @@ const char * sDeviceOptionHelp =
     "\n"
     "  --PICS <filepath>\n"
     "       A file containing PICS items.\n"
+    "\n"
+    "  --storage-space <dirpath>\n"
+    "       A folder to store factory data, configs, counters\n"
     "\n"
     "  --KVS <filepath>\n"
     "       A file to store Key Value Store items.\n"
@@ -618,6 +623,10 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
 
     case kDeviceOption_PICS:
         LinuxDeviceOptions::GetInstance().PICS = aValue;
+        break;
+
+    case kDeviceOption_StorageSpace:
+        LinuxDeviceOptions::GetInstance().StorageSpace = aValue;
         break;
 
     case kDeviceOption_KVS:

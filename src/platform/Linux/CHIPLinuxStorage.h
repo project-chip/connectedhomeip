@@ -49,15 +49,27 @@
 #define LOCALSTATEDIR "/tmp"
 #endif
 
+#ifndef FATCONFFILE
+#define FATCONFFILE "/chip_factory.ini"
+#endif
+
+#ifndef SYSCONFFILE
+#define SYSCONFFILE "/chip_config.ini"
+#endif
+
+#ifndef LOCALSTATEFILE
+#define LOCALSTATEFILE "/chip_counters.ini"
+#endif
+
 #define CHIP_DEFAULT_FACTORY_PATH                                                                                                  \
-    FATCONFDIR "/"                                                                                                                 \
-               "chip_factory.ini"
+    FATCONFDIR                                                                                                                     \
+    FATCONFFILE
 #define CHIP_DEFAULT_CONFIG_PATH                                                                                                   \
-    SYSCONFDIR "/"                                                                                                                 \
-               "chip_config.ini"
+    SYSCONFDIR                                                                                                                     \
+    SYSCONFFILE
 #define CHIP_DEFAULT_DATA_PATH                                                                                                     \
-    LOCALSTATEDIR "/"                                                                                                              \
-                  "chip_counters.ini"
+    LOCALSTATEDIR                                                                                                                  \
+    LOCALSTATEFILE
 
 namespace chip {
 namespace DeviceLayer {
