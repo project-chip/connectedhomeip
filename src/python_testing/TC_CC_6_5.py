@@ -57,7 +57,7 @@ MAX_STARTUP_COLOR_TEMP = 0xfeff
 
 class TC_CC_6_5(MatterBaseTest):
     """Test case for Color Control Cluster's StartUpColorTemperatureMireds functionality.
-    
+
     This test verifies the Color Temperature StartUpColorTemperatureMireds functionality 
     of the Color Control Cluster server as specified in section 4.2.18.
     """
@@ -110,14 +110,14 @@ class TC_CC_6_5(MatterBaseTest):
         """Set up the test environment and establish secure connection with DUT."""
         super().setup_test()
         self.TH1 = self.default_controller
-        
+
         try:
             await self.TH1.ResolveNode(self.dut_node_id)
         except Exception as e:
             self.logger.warning(
                 f"Resolving node {self.dut_node_id} failed, continuing test: {e}"
             )
-        
+
         if not self.TH1.HasSecureSessionToNode(self.dut_node_id):
             raise Exception(
                 f"Secure session to node {self.dut_node_id} could not be established."
@@ -126,7 +126,7 @@ class TC_CC_6_5(MatterBaseTest):
     @async_test_body
     async def test_TC_CC_6_5(self):
         """Execute the main test steps for TC_CC_6_5.
-        
+
         Tests the Color Control Cluster's StartUpColorTemperatureMireds functionality
         through a series of read/write operations and power cycle verification.
         """
@@ -203,7 +203,7 @@ class TC_CC_6_5(MatterBaseTest):
                 self.dut_node_id,
                 [(attributes.StartUpColorTemperatureMireds)]
             )
-            
+
             # Verify value constraints
             if startup_color_temp.value is not None:
                 asserts.assert_true(
