@@ -379,6 +379,11 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
           "${_app_root}/clusters/${cluster}/${cluster}.h",
         ]
+      } else if (cluster == "commodity-price-server") {
+        sources += [
+          "${_app_root}/clusters/${cluster}/${cluster}.cpp",
+          "${_app_root}/clusters/${cluster}/${cluster}.h",
+        ]
       } else if (cluster == "energy-evse-server") {
         sources += [
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
@@ -463,6 +468,11 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/closure-control-cluster-objects.h",
         ]
       } else if (cluster == "camera-av-stream-management-server") {
+        sources += [
+          "${_app_root}/clusters/${cluster}/${cluster}.cpp",
+          "${_app_root}/clusters/${cluster}/${cluster}.h",
+        ]
+      } else if (cluster == "camera-av-settings-user-level-management-server") {
         sources += [
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
           "${_app_root}/clusters/${cluster}/${cluster}.h",

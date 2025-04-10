@@ -109,10 +109,10 @@ public:
         ErrorCallback errorCallback, MTRDeviceResubscriptionScheduledHandler resubscriptionCallback,
         SubscriptionEstablishedHandler subscriptionEstablishedHandler, OnDoneHandler onDoneHandler,
         UnsolicitedMessageFromPublisherHandler unsolicitedMessageFromPublisherHandler, ReportBeginHandler reportBeginHandler,
-        ReportEndHandler reportEndHandler)
+        ReportEndHandler reportEndHandler, CASESessionEstablishedHandler caseSessionHandler)
         : MTRBaseSubscriptionCallback(attributeReportCallback, eventReportCallback, errorCallback, resubscriptionCallback,
             subscriptionEstablishedHandler, onDoneHandler, unsolicitedMessageFromPublisherHandler, reportBeginHandler,
-            reportEndHandler)
+            reportEndHandler, caseSessionHandler)
     {
     }
 
@@ -459,6 +459,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 @synthesize estimatedSubscriptionLatency = _estimatedSubscriptionLatency;
 //@synthesize lock = _lock;
 //@synthesize persistedClusterData = _persistedClusterData;
+@synthesize lastSubscriptionIPAddress = _lastSubscriptionIPAddress;
 
 - (instancetype)initWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController_Concrete *)controller
 {
@@ -2109,6 +2110,33 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 #endif
 }
 
+- (void)_handleCASESessionEstablished:(const SessionHandle &)session
+{
+    assertChipStackLockedByCurrentThread();
+
+    if (!session->IsSecureSession()) {
+        MTR_LOG_ERROR("%@ CASE session is not a secure session?", self);
+        return;
+    }
+
+    auto peerAddress = session->AsSecureSession()->GetPeerAddress();
+    if (peerAddress.GetTransportType() != Transport::Type::kUdp && peerAddress.GetTransportType() != Transport::Type::kTcp) {
+        MTR_LOG_ERROR("%@ CASE session with unexpected transport type %d",
+            self, to_underlying(peerAddress.GetTransportType()));
+        return;
+    }
+
+    auto ipAddress = peerAddress.GetIPAddress();
+    char buf[Inet::IPAddress::kMaxStringLength];
+    ipAddress.ToString(buf);
+    MTR_LOG("%@ Using CASE session to IP %s for subscription", self, buf);
+
+    {
+        std::lock_guard lock(_lock);
+        _lastSubscriptionIPAddress = ipAddress;
+    }
+}
+
 - (BOOL)_interestedPaths:(NSArray * _Nullable)interestedPaths includesAttributePath:(MTRAttributePath *)attributePath
 {
     for (id interestedPath in interestedPaths) {
@@ -2822,6 +2850,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                                return;
                            }
 
+                           [self _handleCASESessionEstablished:session.Value()];
+
                            auto callback = std::make_unique<SubscriptionCallback>(
                                ^(NSArray * value) {
                                    mtr_strongify(self);
@@ -2947,6 +2977,13 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
                                        [self _handleReportEnd];
                                    });
+                               },
+                               ^(const SessionHandle & session) {
+                                   mtr_strongify(self);
+                                   VerifyOrReturn(self, MTR_LOG_DEBUG("CASE session established callback called back with nil MTRDevice"));
+
+                                   MTR_LOG("%@ got CASE session established", self);
+                                   [self _handleCASESessionEstablished:session];
                                });
 
                            // Set up a cluster state cache.  We just want this for the logic it has for
@@ -4808,6 +4845,12 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     // We know our _deviceController is actually an MTRDeviceController_Concrete, since that's what
     // gets passed to initWithNodeID.
     return static_cast<MTRDeviceController_Concrete *>(_deviceController);
+}
+
+- (std::optional<chip::Inet::IPAddress>)lastSubscriptionIPAddress
+{
+    std::lock_guard lock(_lock);
+    return _lastSubscriptionIPAddress;
 }
 
 @end
