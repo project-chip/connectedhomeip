@@ -75,6 +75,11 @@ CameraDevice::~CameraDevice()
     }
 }
 
+void CameraDevice::RegisterTransport(Transport * transport, uint16_t videoStreamID, uint16_t audioStreamID)
+{
+    mMediaController.RegisterTransport(transport, videoStreamID, audioStreamID);
+}
+
 CameraError CameraDevice::InitializeCameraDevice()
 {
     static bool gstreamerInitialized = false;
