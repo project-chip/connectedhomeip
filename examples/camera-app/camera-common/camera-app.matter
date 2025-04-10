@@ -2169,11 +2169,7 @@ provisional cluster CameraAvStreamManagement = 1361 {
     kJPEG = 0;
   }
 
-<<<<<<< HEAD
   shared enum StreamUsageEnum : enum8 {
-=======
-  enum StreamUsageEnum : enum8 {
->>>>>>> 0d4f9fefb9 (add push av cluster to camera-app and some fixes)
     kInternal = 0;
     kRecording = 1;
     kAnalysis = 2;
@@ -2209,10 +2205,7 @@ provisional cluster CameraAvStreamManagement = 1361 {
     kWatermark = 0x40;
     kOnScreenDisplay = 0x80;
     kLocalStorage = 0x100;
-<<<<<<< HEAD
     kHighDynamicRange = 0x200;
-=======
->>>>>>> 0d4f9fefb9 (add push av cluster to camera-app and some fixes)
   }
 
   struct VideoResolutionStruct {
@@ -2281,74 +2274,24 @@ provisional cluster CameraAvStreamManagement = 1361 {
   struct VideoSensorParamsStruct {
     int16u sensorWidth = 0;
     int16u sensorHeight = 1;
-<<<<<<< HEAD
     int16u maxFPS = 2;
     optional int16u maxHDRFPS = 3;
   }
 
   shared struct ViewportStruct {
-=======
-    boolean HDRCapable = 2;
-    int16u maxFPS = 3;
-    int16u maxHDRFPS = 4;
-  }
-
-  struct ViewportStruct {
->>>>>>> 0d4f9fefb9 (add push av cluster to camera-app and some fixes)
     int16u x1 = 0;
     int16u y1 = 1;
     int16u x2 = 2;
     int16u y2 = 3;
   }
 
-<<<<<<< HEAD
-=======
-  info event VideoStreamChanged = 0 {
-    int16u videoStreamID = 0;
-    optional StreamUsageEnum streamUsage = 1;
-    optional VideoCodecEnum videoCodec = 2;
-    optional int16u minFrameRate = 3;
-    optional int16u maxFrameRate = 4;
-    optional VideoResolutionStruct minResolution = 5;
-    optional VideoResolutionStruct maxResolution = 6;
-    optional int32u minBitRate = 7;
-    optional int32u maxBitRate = 8;
-    optional int16u minFragmentLen = 9;
-    optional int16u maxFragmentLen = 10;
-  }
-
-  info event AudioStreamChanged = 1 {
-    int16u audioStreamID = 0;
-    optional StreamUsageEnum streamUsage = 1;
-    optional AudioCodecEnum audioCodec = 2;
-    optional int8u channelCount = 3;
-    optional int32u sampleRate = 4;
-    optional int32u bitRate = 5;
-    optional int8u bitDepth = 6;
-  }
-
-  info event SnapshotStreamChanged = 2 {
-    int16u snapshotStreamID = 0;
-    optional ImageCodecEnum imageCodec = 1;
-    optional int16u frameRate = 2;
-    optional int32u bitRate = 3;
-    optional VideoResolutionStruct minResolution = 4;
-    optional VideoResolutionStruct maxResolution = 5;
-    optional int8u quality = 6;
-  }
-
->>>>>>> 0d4f9fefb9 (add push av cluster to camera-app and some fixes)
   readonly attribute optional int8u maxConcurrentVideoEncoders = 0;
   readonly attribute optional int32u maxEncodedPixelRate = 1;
   readonly attribute optional VideoSensorParamsStruct videoSensorParams = 2;
   readonly attribute optional boolean nightVisionCapable = 3;
   readonly attribute optional VideoResolutionStruct minViewport = 4;
   readonly attribute optional RateDistortionTradeOffPointsStruct rateDistortionTradeOffPoints[] = 5;
-<<<<<<< HEAD
   readonly attribute int32u maxContentBufferSize = 6;
-=======
-  readonly attribute optional int32u maxContentBufferSize = 6;
->>>>>>> 0d4f9fefb9 (add push av cluster to camera-app and some fixes)
   readonly attribute optional AudioCapabilitiesStruct microphoneCapabilities = 7;
   readonly attribute optional AudioCapabilitiesStruct speakerCapabilities = 8;
   readonly attribute optional TwoWayTalkSupportTypeEnum twoWayTalkSupport = 9;
@@ -2356,11 +2299,7 @@ provisional cluster CameraAvStreamManagement = 1361 {
   readonly attribute int32u maxNetworkBandwidth = 11;
   readonly attribute optional int16u currentFrameRate = 12;
   attribute access(read: manage, write: manage) optional boolean HDRModeEnabled = 13;
-<<<<<<< HEAD
   readonly attribute StreamUsageEnum supportedStreamUsages[] = 14;
-=======
-  readonly attribute fabric_idx fabricsUsingCamera[] = 14;
->>>>>>> 0d4f9fefb9 (add push av cluster to camera-app and some fixes)
   readonly attribute optional VideoStreamStruct allocatedVideoStreams[] = 15;
   readonly attribute optional AudioStreamStruct allocatedAudioStreams[] = 16;
   readonly attribute optional SnapshotStreamStruct allocatedSnapshotStreams[] = 17;
@@ -2728,121 +2667,6 @@ provisional cluster Chime = 1366 {
   readonly attribute int16u clusterRevision = 65533;
 
   command PlayChimeSound(): DefaultSuccess = 0;
-}
-
-/** This Cluster is used to manage TLS Client Certificates and to provision
-      TLS endpoints with enough information to facilitate subsequent connection. */
-provisional cluster TlsCertificateManagement = 2049 {
-  revision 1;
-
-  struct TLSCertStruct {
-    int16u caid = 0;
-    long_octet_string<3000> certificate = 1;
-  }
-
-  struct TLSClientCertificateDetailStruct {
-    int16u ccdid = 0;
-    long_octet_string<3000> clientCertificate = 1;
-    octet_string intermediateCertificates[] = 2;
-  }
-
-  readonly attribute int8u maxRootCertificates = 0;
-  readonly attribute int8u currentRootCertificates = 1;
-  readonly attribute int8u maxClientCertificates = 2;
-  readonly attribute int8u currentClientCertificates = 3;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct ProvisionRootCertificateRequest {
-    long_octet_string<3000> certificate = 0;
-    nullable int16u caid = 1;
-  }
-
-  response struct ProvisionRootCertificateResponse = 1 {
-    int16u caid = 0;
-  }
-
-  request struct FindRootCertificateRequest {
-    nullable int16u caid = 0;
-  }
-
-  response struct FindRootCertificateResponse = 3 {
-    TLSCertStruct certificateDetails[] = 0;
-  }
-
-  request struct LookupRootCertificateRequest {
-    octet_string<64> fingerprint = 0;
-  }
-
-  response struct LookupRootCertificateResponse = 5 {
-    int16u caid = 0;
-  }
-
-  request struct RemoveRootCertificateRequest {
-    int16u caid = 0;
-  }
-
-  request struct TLSClientCSRRequest {
-    octet_string nonce = 0;
-  }
-
-  response struct TLSClientCSRResponse = 8 {
-    int16u ccdid = 0;
-    octet_string csr = 1;
-    octet_string nonce = 2;
-  }
-
-  request struct ProvisionClientCertificateRequest {
-    int16u ccdid = 0;
-    TLSClientCertificateDetailStruct clientCertificateDetails = 1;
-  }
-
-  response struct ProvisionClientCertificateResponse = 10 {
-    int16u ccdid = 0;
-  }
-
-  request struct FindClientCertificateRequest {
-    int16u ccdid = 0;
-  }
-
-  response struct FindClientCertificateResponse = 12 {
-    TLSClientCertificateDetailStruct certificateDetails[] = 0;
-  }
-
-  request struct LookupClientCertificateRequest {
-    octet_string<64> fingerprint = 0;
-  }
-
-  response struct LookupClientCertificateResponse = 14 {
-    int16u ccdid = 0;
-  }
-
-  request struct RemoveClientCertificateRequest {
-    int16u ccdid = 0;
-  }
-
-  /** This command SHALL provision the provided certificate for the passed in CAID. */
-  command access(invoke: administer) ProvisionRootCertificate(ProvisionRootCertificateRequest): ProvisionRootCertificateResponse = 0;
-  /** This command SHALL return the TLSCertStruct for the passed in CAID. */
-  command FindRootCertificate(FindRootCertificateRequest): FindRootCertificateResponse = 2;
-  /** This command SHALL return the CAID for the passed in fingerprint. */
-  command LookupRootCertificate(LookupRootCertificateRequest): LookupRootCertificateResponse = 4;
-  /** This command SHALL be generated to request the server removes the certificate provisioned to the provided Certificate Authority ID. */
-  command access(invoke: administer) RemoveRootCertificate(RemoveRootCertificateRequest): DefaultSuccess = 6;
-  /** This command SHALL be generated to request the Node generates a Certificate Signing Request. */
-  command access(invoke: administer) TLSClientCSR(TLSClientCSRRequest): TLSClientCSRResponse = 7;
-  /** This command SHALL be generated to request the Node provisions the provided Client Certificate Details. */
-  command access(invoke: administer) ProvisionClientCertificate(ProvisionClientCertificateRequest): ProvisionClientCertificateResponse = 9;
-  /** This command SHALL return the TLSClientCertificateDetailStruct for the passed in CCDID. */
-  command FindClientCertificate(FindClientCertificateRequest): FindClientCertificateResponse = 11;
-  /** This command SHALL return the CCDID for the passed in Fingerprint. */
-  command LookupClientCertificate(LookupClientCertificateRequest): LookupClientCertificateResponse = 13;
-  /** This command SHALL be generated to request the Node removes the certificate provisioned to the provided Client Certificate Details ID. */
-  command access(invoke: administer) RemoveClientCertificate(RemoveClientCertificateRequest): DefaultSuccess = 15;
 }
 
 endpoint 0 {
@@ -3362,33 +3186,6 @@ endpoint 1 {
 
     handle command PlayChimeSound;
   }
-
-  server cluster TlsCertificateManagement {
-    ram      attribute maxRootCertificates;
-    ram      attribute currentRootCertificates;
-    ram      attribute maxClientCertificates;
-    ram      attribute currentClientCertificates;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
-
-    handle command ProvisionRootCertificate;
-    handle command ProvisionRootCertificateResponse;
-    handle command FindRootCertificate;
-    handle command FindRootCertificateResponse;
-    handle command LookupRootCertificate;
-    handle command LookupRootCertificateResponse;
-    handle command RemoveRootCertificate;
-    handle command TLSClientCSR;
-    handle command TLSClientCSRResponse;
-    handle command ProvisionClientCertificate;
-    handle command ProvisionClientCertificateResponse;
-    handle command FindClientCertificate;
-    handle command FindClientCertificateResponse;
-    handle command LookupClientCertificate;
-    handle command LookupClientCertificateResponse;
-    handle command RemoveClientCertificate;
-  }
 }
+
+
