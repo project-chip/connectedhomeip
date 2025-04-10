@@ -32,7 +32,11 @@
 
 #define INET_PORTSTRLEN 6
 
-#define NETWORK_FRAMEWORK_DEBUG 0
+#define NETWORK_FRAMEWORK_DEBUG 1
+
+#if NETWORK_FRAMEWORK_DEBUG
+#include <arpa/inet.h>
+#endif // NETWORK_FRAMEWORK_DEBUG
 
 namespace {
 constexpr uint64_t kSendTimeoutInSeconds = 10 * NSEC_PER_SEC;
@@ -432,38 +436,101 @@ namespace Inet {
         const IPAddress & aAddress, uint16_t aPort, InterfaceId interfaceIndex)
     {
         char addrStr[IPAddress::kMaxStringLength + 1 /*%*/ + InterfaceId::kMaxIfNameLength + 1 /*null terminator */];
-        char portStr[INET_PORTSTRLEN];
 
-        // Note: aAddress.ToString will return the IPv6 Any address if the address type is Any, but that's not what
-        // we want if the local endpoint is IPv4.
+        // When aPort == 0, we want the system to assign an ephemeral port.
+        // However, Network.framework does not directly support binding to port 0
+        // and then retrieving the assigned port like BSD sockets do.
+        //
+        // To work around this, we manually create a temporary socket, bind it
+        // to port 0, and call getsockname() to obtain the actual port assigned by the OS.
+        // We then construct a sockaddr with this assigned port and use it to
+        // create a nw_endpoint_t via nw_endpoint_create_address.
+        //
+        // This allows us to later pass the endpoint to Network.framework APIs
+        // (via nw_parameters_set_local_endpoint) and bind to a known, system-assigned port.
+        if (aPort == 0) {
 #if INET_CONFIG_ENABLE_IPV4
-        if (aAddressType == IPAddressType::kIPv4 && aAddress.Type() == IPAddressType::kAny) {
-            const IPAddress anyAddr = IPAddress(aAddress.ToIPv4());
-            anyAddr.ToString(addrStr);
-        } else
-#endif // INET_CONFIG_ENABLE_IPV4
-        {
-            aAddress.ToString(addrStr);
-            if (interfaceIndex != InterfaceId::Null()) {
-                char interface[InterfaceId::kMaxIfNameLength + 1] = {}; // +1 to prepend '%'
-                interface[0] = '%';
-                interface[1] = 0;
-                CHIP_ERROR err = interfaceIndex.GetInterfaceName(interface + 1, sizeof(interface) - 1);
-                if (err != CHIP_NO_ERROR) {
-                    Platform::CopyString(interface, sizeof(interface), "%(err)");
-                }
-                strncat(addrStr, interface, sizeof(addrStr) - strlen(addrStr) - 1);
-            }
-        }
+            if (aAddressType == IPAddressType::kIPv4 && aAddress.Type() == IPAddressType::kAny) {
+                int fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+                sockaddr_in addr = {};
+                addr.sin_family = AF_INET;
+                addr.sin_port = 0; // system assigns
+                addr.sin_addr = aAddress.ToIPv4();
 
-        snprintf(portStr, sizeof(portStr), "%u", aPort);
+                bind(fd, (sockaddr *) &addr, sizeof(addr));
 
-        char * target = addrStr;
+                socklen_t len = sizeof(addr);
+                getsockname(fd, (sockaddr *) &addr, &len);
+                aPort = ntohs(addr.sin_port);
+                close(fd);
+
+                addr.sin_port = htons(aPort);
 
 #if NETWORK_FRAMEWORK_DEBUG
-        ChipLogError(Inet, "Create endpoint for ip(%s) port(%s)", target, portStr);
+                inet_ntop(AF_INET, &addr.sin_addr, addrStr, sizeof(addrStr));
+                ChipLogError(Inet, "Create endpoint (IPv4) for ip(%s) port(%u)", addrStr, aPort);
 #endif
-        return nw_endpoint_create_host(target, portStr);
+                return nw_endpoint_create_address((sockaddr *) &addr);
+            } else
+#endif
+            {
+                int fd = socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP);
+                sockaddr_in6 addr6 = {};
+                addr6.sin6_family = AF_INET6;
+                addr6.sin6_port = 0; // system assigns
+                addr6.sin6_addr = aAddress.ToIPv6();
+
+                if (interfaceIndex != InterfaceId::Null()) {
+                    addr6.sin6_scope_id = interfaceIndex.GetPlatformInterface();
+                }
+
+                bind(fd, (sockaddr *) &addr6, sizeof(addr6));
+
+                socklen_t len = sizeof(addr6);
+                getsockname(fd, (sockaddr *) &addr6, &len);
+                aPort = ntohs(addr6.sin6_port);
+                close(fd);
+
+                addr6.sin6_port = htons(aPort);
+
+#if NETWORK_FRAMEWORK_DEBUG
+                inet_ntop(AF_INET6, &addr6.sin6_addr, addrStr, sizeof(addrStr));
+                ChipLogError(Inet, "Create endpoint (IPv6) for ip(%s%%%u) port(%u)", addrStr, addr6.sin6_scope_id, aPort);
+#endif
+                return nw_endpoint_create_address((sockaddr *) &addr6);
+            }
+        } else {
+            // Note: aAddress.ToString will return the IPv6 Any address if the address type is Any, but that's not what
+            // we want if the local endpoint is IPv4.
+#if INET_CONFIG_ENABLE_IPV4
+            if (aAddressType == IPAddressType::kIPv4 && aAddress.Type() == IPAddressType::kAny) {
+                const IPAddress anyAddr = IPAddress(aAddress.ToIPv4());
+                anyAddr.ToString(addrStr);
+            } else
+#endif // INET_CONFIG_ENABLE_IPV4
+            {
+                aAddress.ToString(addrStr);
+                if (interfaceIndex != InterfaceId::Null()) {
+                    char interface[InterfaceId::kMaxIfNameLength + 1] = {}; // +1 to prepend '%'
+                    interface[0] = '%';
+                    interface[1] = 0;
+                    CHIP_ERROR err = interfaceIndex.GetInterfaceName(interface + 1, sizeof(interface) - 1);
+                    if (err != CHIP_NO_ERROR) {
+                        Platform::CopyString(interface, sizeof(interface), "%(err)");
+                    }
+                    strncat(addrStr, interface, sizeof(addrStr) - strlen(addrStr) - 1);
+                }
+            }
+
+            char portStr[INET_PORTSTRLEN];
+            snprintf(portStr, sizeof(portStr), "%u", aPort);
+
+#if NETWORK_FRAMEWORK_DEBUG
+            ChipLogError(Inet, "Create endpoint for ip(%s) port(%s)", addrStr, portStr);
+#endif
+
+            return nw_endpoint_create_host(addrStr, portStr);
+        }
     }
 
     CHIP_ERROR UDPEndPointImplNetworkFramework::GetConnection(const IPPacketInfo * aPktInfo)
