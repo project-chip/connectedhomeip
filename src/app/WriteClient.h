@@ -280,7 +280,7 @@ public:
     /**
      *  Returns true if the WriteRequest is Chunked.
      */
-    bool IsWriteRequestChunked() { return mIsWriteRequestChunked; };
+    bool IsWriteRequestChunked() const { return mIsWriteRequestChunked; };
 
 private:
     friend class TestWriteInteraction;
@@ -303,6 +303,8 @@ private:
     CHIP_ERROR ProcessWriteResponseMessage(System::PacketBufferHandle && payload);
     CHIP_ERROR ProcessAttributeStatusIB(AttributeStatusIB::Parser & aAttributeStatusIB);
     const char * GetStateStr() const;
+    CHIP_ERROR EnsureListStarted(const ConcreteDataAttributePath & attributePath);
+    CHIP_ERROR EnsureListEnded();
 
     /**
      *  Encode an attribute value that can be directly encoded using DataModel::Encode.
@@ -329,39 +331,6 @@ private:
         VerifyOrReturnError((writer = GetAttributeDataIBTLVWriter()) != nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorOnFailure(
             DataModel::EncodeForWrite(*writer, chip::TLV::ContextTag(chip::app::AttributeDataIB::Tag::kData), value));
-        ReturnErrorOnFailure(FinishAttributeIB());
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR EnsureListStarted(const ConcreteDataAttributePath & attributePath)
-    {
-        chip::TLV::TLVWriter * writer = nullptr;
-
-        TLV::TLVType outerType;
-
-        ReturnErrorOnFailure(
-            mMessageWriter.ReserveBuffer(kReservedSizeForEndOfListContainer + kReservedSizeForEndOfAttributeDataIB));
-
-        ReturnErrorOnFailure(PrepareAttributeIB(attributePath));
-        VerifyOrReturnError((writer = GetAttributeDataIBTLVWriter()) != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        ReturnErrorOnFailure(
-            writer->StartContainer(chip::TLV::ContextTag(chip::app::AttributeDataIB::Tag::kData), TLV::kTLVType_Array, outerType));
-
-        VerifyOrReturnError(outerType == kAttributeDataIBType, CHIP_ERROR_INCORRECT_STATE);
-
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR EnsureListEnded()
-    {
-        chip::TLV::TLVWriter * writer = nullptr;
-        VerifyOrReturnError((writer = GetAttributeDataIBTLVWriter()) != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-        // In the event of Chunking (we have a CHIP_ERROR_NO_MEMORY), we need to Unreserve two more Bytes in order to be able to
-        // Append EndOfContainer of the List + EndOfContainer of the AttributeDataIB.
-        ReturnErrorOnFailure(writer->UnreserveBuffer(kReservedSizeForEndOfListContainer + kReservedSizeForEndOfAttributeDataIB));
-        ReturnErrorOnFailure(writer->EndContainer(kAttributeDataIBType));
         ReturnErrorOnFailure(FinishAttributeIB());
 
         return CHIP_NO_ERROR;
