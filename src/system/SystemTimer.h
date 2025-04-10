@@ -92,7 +92,9 @@ private:
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
     friend class LayerImplSelect;
+    friend class LayerImplDispatch;
     dispatch_source_t mTimerSource = nullptr;
+    bool mIsResumed                = false;
 #elif CHIP_SYSTEM_CONFIG_USE_LIBEV
     friend class LayerImplSelect;
     struct ev_timer mLibEvTimer;
