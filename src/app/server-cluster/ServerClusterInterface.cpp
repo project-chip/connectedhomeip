@@ -1,5 +1,6 @@
 /*
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -13,21 +14,22 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-#pragma once
-
-#include <cstdint>
-#include <optional>
-#include <system/SystemClock.h>
+#include <app/server-cluster/ServerClusterInterface.h>
 
 namespace chip {
-namespace Platform {
+namespace app {
 
-std::optional<uint16_t> GetUserDefaultDnssdSRPTimeoutInMSecs();
+bool ServerClusterInterface::PathsContains(const ConcreteClusterPath & path)
+{
+    for (const auto & myPath : GetPaths())
+    {
+        if (path == myPath)
+        {
+            return true;
+        }
+    }
+    return false;
+}
 
-std::optional<System::Clock::Milliseconds16> GetUserDefaultBDXThrottleIntervalForThread();
-
-std::optional<uint8_t> GetUserDefaultBDXThreadFramesPerBlock();
-
-} // namespace Platform
+} // namespace app
 } // namespace chip
