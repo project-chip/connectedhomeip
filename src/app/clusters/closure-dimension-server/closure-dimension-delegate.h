@@ -26,6 +26,8 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace ClosureDimension {
+    
+using Protocols::InteractionModel::Status;
 
 /** @brief
  *    Defines methods for implementing application-specific logic for the Closure Dimension Cluster.
@@ -44,7 +46,7 @@ public:
      * @param [in] speed Target speed to be set
      * @return CHIP_NO_ERROR when succesfully implemented or return error.
      */
-    virtual CHIP_ERROR HandleSetTarget(const Optional<Percent100ths> & pos, const Optional<TargetLatchEnum> & latch,
+    virtual Status HandleSetTarget(const Optional<Percent100ths> & pos, const Optional<TargetLatchEnum> & latch,
                                        const Optional<Globals::ThreeLevelAutoEnum> & speed) = 0;
 
     /**
@@ -54,7 +56,7 @@ public:
      * @param [in] speed speed of each step
      * @return CHIP_NO_ERROR when succesfully implemented or return error.
      */
-    virtual CHIP_ERROR HandleStep(const StepDirectionEnum & direction, const uint16_t & numberOfSteps,
+    virtual Status HandleStep(const StepDirectionEnum & direction, const uint16_t & numberOfSteps,
                                   const Optional<Globals::ThreeLevelAutoEnum> & speed) = 0;
 };
 

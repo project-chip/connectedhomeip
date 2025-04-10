@@ -52,7 +52,7 @@
  * AppTask Declaration
  *********************************************************/
 
-using chip::app::Clusters::ClosureDimension::ClosureDimensionManager;
+using chip::app::Clusters::ClosureDimension::ClosureDimensionDelegate;
 
 class AppTask : public BaseApplication
 {
@@ -80,8 +80,8 @@ public:
      *                  SL_SIMPLE_BUTTON_RELEASED or SL_SIMPLE_BUTTON_DISABLED
      */
     static void ButtonEventHandler(uint8_t button, uint8_t btnAction);
-    static void ActionInitiated(ClosureDimensionManager::Action_t aAction, int32_t aActor);
-    static void ActionCompleted(ClosureDimensionManager::Action_t aAction);
+    static void ActionInitiated(ClosureDimensionDelegate::Action_t aAction);
+    static void ActionCompleted(ClosureDimensionDelegate::Action_t aAction);
 
 private:
     static AppTask sAppTask;
