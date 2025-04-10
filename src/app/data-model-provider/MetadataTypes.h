@@ -139,7 +139,7 @@ _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wconversion\""
         constexpr bool HasFlags(AttributeQualityFlags f) const { return (mask.flags & chip::to_underlying(f)) != 0; }
 
         constexpr bool ReadAllowed() const { return mask.readPrivilege != to_underlying(Access::Privilege::kNoPrivilege); }
-        constexpr bool WriteAllowed() const { return mask.writePrivilege != to_underlying(Access::Privilege::kView); }
+        constexpr bool WriteAllowed() const { return mask.writePrivilege != to_underlying(Access::Privilege::kNoPrivilege); }
 
     private:
         struct attribute_entry_mask_t
