@@ -134,6 +134,12 @@ static_library("Darwin") {
       "BleUtils.mm",
     ]
   }
+
+  if (is_debug) {
+    defines = [ "MDNS_DEBUG=1" ]
+  } else {
+    defines = [ "MDNS_DEBUG=0" ]
+  }
 }
 
 source_set("tracing") {
