@@ -49,6 +49,9 @@ CameraDevice::CameraDevice()
 
     // Set the CameraHALInterface in CameraAVStreamManager.
     mCameraAVStreamManager.SetCameraDeviceHAL(this);
+
+    // Set the CameraHALInterface in PushAVTransportManager.
+    // mPushAVTransportManager.SetCameraDeviceHAL(this);
 }
 
 CameraDevice::~CameraDevice()
@@ -57,6 +60,11 @@ CameraDevice::~CameraDevice()
     {
         close(videoDeviceFd);
     }
+}
+
+void CameraDevice::RegisterTransport(Transport * transport, uint16_t videoStreamID, uint16_t audioStreamID)
+{
+    mMediaController.RegisterTransport(transport, videoStreamID, audioStreamID);
 }
 
 CameraError CameraDevice::InitializeCameraDevice()

@@ -43,6 +43,9 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
     // Fetch all initialization parameters for CameraAVStreamMgmt Server
     BitFlags<Feature> features;
     features.Set(Feature::kSnapshot);
+    features.Set(Feature::kVideo);
+    features.Set(Feature::kAudio);
+
     BitFlags<OptionalAttribute> optionalAttrs;
     optionalAttrs.Set(chip::app::Clusters::CameraAvStreamManagement::OptionalAttribute::kNightVision);
     optionalAttrs.Set(chip::app::Clusters::CameraAvStreamManagement::OptionalAttribute::kNightVisionIllum);
