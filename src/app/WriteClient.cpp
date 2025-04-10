@@ -248,6 +248,37 @@ CHIP_ERROR WriteClient::PutSinglePreencodedAttributeWritePayload(const chip::app
     return err;
 }
 
+CHIP_ERROR WriteClient::EnsureListStarted(const ConcreteDataAttributePath & attributePath)
+{
+    chip::TLV::TLVWriter * writer = nullptr;
+
+    TLV::TLVType outerType;
+
+    ReturnErrorOnFailure(mMessageWriter.ReserveBuffer(kReservedSizeForEndOfListContainer + kReservedSizeForEndOfAttributeDataIB));
+
+    ReturnErrorOnFailure(PrepareAttributeIB(attributePath));
+    VerifyOrReturnError((writer = GetAttributeDataIBTLVWriter()) != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(
+        writer->StartContainer(chip::TLV::ContextTag(chip::app::AttributeDataIB::Tag::kData), TLV::kTLVType_Array, outerType));
+
+    VerifyOrReturnError(outerType == kAttributeDataIBType, CHIP_ERROR_INCORRECT_STATE);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR WriteClient::EnsureListEnded()
+{
+    chip::TLV::TLVWriter * writer = nullptr;
+    VerifyOrReturnError((writer = GetAttributeDataIBTLVWriter()) != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    // In the event of Chunking (we have a CHIP_ERROR_NO_MEMORY), we need to Unreserve two more Bytes in order to be able to
+    // Append EndOfContainer of the List + EndOfContainer of the AttributeDataIB.
+    ReturnErrorOnFailure(writer->UnreserveBuffer(kReservedSizeForEndOfListContainer + kReservedSizeForEndOfAttributeDataIB));
+    ReturnErrorOnFailure(writer->EndContainer(kAttributeDataIBType));
+
+    return FinishAttributeIB();
+}
+
 CHIP_ERROR
 WriteClient::TryPutPreencodedAttributeWritePayloadIntoList(const chip::app::ConcreteDataAttributePath & attributePath,
                                                            TLV::TLVReader & valueReader, bool & outChunkingNeeded,
@@ -354,9 +385,7 @@ CHIP_ERROR WriteClient::PutPreencodedAttribute(const ConcreteDataAttributePath &
 
         while ((err = valueReader.Next()) == CHIP_NO_ERROR)
         {
-            currentItemCount++;
-
-            if (currentItemCount > encodedItemCount)
+            if (currentItemCount++ < encodedItemCount)
             {
                 // Element already encoded via `TryPutPreencodedAttributeWritePayloadIntoList`
                 continue;
