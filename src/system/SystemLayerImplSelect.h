@@ -95,6 +95,7 @@ public:
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
     void SetDispatchQueue(dispatch_queue_t dispatchQueue) override { mDispatchQueue = dispatchQueue; };
     dispatch_queue_t GetDispatchQueue() override { return mDispatchQueue; };
+    void HandleDispatchQueueEvents(Clock::Timeout timeout) override{};
     void HandleTimerComplete(TimerList::Node * timer);
 #elif CHIP_SYSTEM_CONFIG_USE_LIBEV
     virtual void SetLibEvLoop(struct ev_loop * aLibEvLoopP) override { mLibEvLoopP = aLibEvLoopP; };
