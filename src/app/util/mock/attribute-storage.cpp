@@ -394,44 +394,6 @@ unsigned emberAfMetadataStructureGeneration()
 }
 
 namespace chip {
-namespace app {
-
-EndpointId EnabledEndpointsWithServerCluster::operator*() const
-{
-    return emberAfEndpointFromIndex(mEndpointIndex);
-}
-
-EnabledEndpointsWithServerCluster::EnabledEndpointsWithServerCluster(ClusterId clusterId) :
-    mEndpointCount(emberAfEndpointCount()), mClusterId(clusterId)
-{
-    EnsureMatchingEndpoint();
-}
-
-EnabledEndpointsWithServerCluster & EnabledEndpointsWithServerCluster::operator++()
-{
-    ++mEndpointIndex;
-    EnsureMatchingEndpoint();
-    return *this;
-}
-
-void EnabledEndpointsWithServerCluster::EnsureMatchingEndpoint()
-{
-    for (; mEndpointIndex < mEndpointCount; ++mEndpointIndex)
-    {
-        if (!emberAfEndpointIndexIsEnabled(mEndpointIndex))
-        {
-            continue;
-        }
-
-        if (emberAfContainsServerFromIndex(mEndpointIndex, mClusterId))
-        {
-            break;
-        }
-    }
-}
-
-} // namespace app
-
 namespace Test {
 
 void ResetVersion()
