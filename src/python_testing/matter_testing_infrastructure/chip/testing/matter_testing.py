@@ -956,15 +956,10 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         """
 
-        app_name_pattern = re.compile("^\/.+\_\d+$")
-
         if app_pipe_name is None:
             app_pipe_name = self.matter_test_config.app_pipe
         if app_pid is None:
             app_pid = self.matter_test_config.app_pid
-
-        logger.info(f"PIPE NAME: {app_pipe_name}")
-        is_full_pipe_path = False if app_name_pattern.match(app_pipe_name) is None else True
 
         if not isinstance(app_pipe_name, str):
             raise TypeError("The named pipe must be provided as a string value")
@@ -978,15 +973,13 @@ class MatterBaseTest(base_test.BaseTestClass):
         import os
         dut_ip = os.getenv('LINUX_DUT_IP')
 
-        if not is_full_pipe_path:
-            # Checks for concatenate app_pipe and app_pid
-            if not isinstance(app_pid, int):
-                raise TypeError("The --app-pid flag is not instance of int")
-
-            # Verify we have a valid app-id
-            if app_pid == 0:
-                asserts.fail("app_pid is 0 , is the flag --app-pid set?. app-id flag must be set in order to write to pipe.")
-            app_pipe_name = app_pipe_name + str(app_pid)
+        # Checks for concatenate app_pipe and app_pid
+        if not isinstance(app_pid, int):
+            raise TypeError("The --app-pid flag is not instance of int")
+        # Verify we have a valid app-id
+        if app_pid == 0:
+            asserts.fail("app_pid is 0 , is the flag --app-pid set?. app-id flag must be set in order to write to pipe.")
+        app_pipe_name = app_pipe_name + str(app_pid)
 
         if dut_ip is None:
             if not os.path.exists(app_pipe_name):
