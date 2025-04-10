@@ -22,6 +22,7 @@
 #include "camera-device-interface.h"
 #include "chime-manager.h"
 #include "webrtc-provider-manager.h"
+#include "push-av-transport-manager.h"
 
 #include "default-media-controller.h"
 #include "network-stream-source.h"
@@ -77,13 +78,13 @@ public:
     chip::app::Clusters::WebRTCTransportProvider::Delegate & GetWebRTCProviderDelegate();
     chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtDelegate & GetCameraAVStreamMgmtDelegate();
     chip::app::Clusters::CameraAvSettingsUserLevelManagement::Delegate & GetCameraAVSettingsUserLevelMgmtDelegate();
-
+    chip::app::Clusters::PushAvStreamTransport::PushAvStreamTransportDelegate & GetPushAVDelegate();
     MediaController & GetMediaController();
 
     CameraDevice();
     ~CameraDevice();
 
-    void RegisterTransport(Transport * transport, uint16_t videoStreamID, uint16_t audioStreamID);
+    void RegisterTransport(camera::Transport * transport, uint16_t videoStreamID, uint16_t audioStreamID);
 
     CameraDeviceInterface::CameraHALInterface & GetCameraHALInterface() { return *this; }
 
@@ -225,6 +226,7 @@ private:
     // Various cluster server delegates
     ChimeManager mChimeManager;
     WebRTCProviderManager mWebRTCProviderManager;
+    PushAVTransportManager mPushAVTransportManager;
 
     chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamManager mCameraAVStreamManager;
     chip::app::Clusters::CameraAvSettingsUserLevelManagement::CameraAVSettingsUserLevelManager mCameraAVSettingsUserLevelManager;
