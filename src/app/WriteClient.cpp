@@ -290,7 +290,6 @@ WriteClient::TryPutPreencodedAttributeWritePayloadIntoList(const chip::app::Conc
 // TODO #38287 Add Unit Tests for PutPreencodedAttribute and for TryPutPreencodedAttributeWritePayloadIntoList.
 CHIP_ERROR WriteClient::PutPreencodedAttribute(const ConcreteDataAttributePath & attributePath, const TLV::TLVReader & data)
 {
-
     // ListIndex is missing and the data is an array -- we are writing a whole list.
     if (!attributePath.IsListOperation() && data.GetType() == TLV::TLVType::kTLVType_Array)
     {
@@ -316,7 +315,6 @@ CHIP_ERROR WriteClient::PutPreencodedAttribute(const ConcreteDataAttributePath &
         {
             ReturnErrorOnFailure(EnsureMessage());
             ReturnErrorOnFailure(EncodeSingleAttributeDataIB(path, DataModel::List<uint8_t>()));
-            encodedItemCount = 0;
         }
         else
         {
