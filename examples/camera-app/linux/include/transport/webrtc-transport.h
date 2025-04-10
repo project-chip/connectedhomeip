@@ -19,12 +19,13 @@
 #pragma once
 
 #include "transport.h"
+#include <rtc/rtc.hpp>
 
 // Derived class for WebRTC transport
 class WebrtcTransport : public Transport
 {
 public:
-    WebrtcTransport(uint16_t sessionID, uint64_t nodeID);
+    WebrtcTransport(uint16_t sessionID, uint64_t nodeID, std::shared_ptr<rtc::PeerConnection> mPeerConnection);
 
     ~WebrtcTransport();
 
@@ -52,6 +53,10 @@ private:
 
     uint16_t msessionID;
     uint64_t nodeID;
+    uint32_t timestamp;
+    std::shared_ptr<rtc::PeerConnection> peerConnection;
+    std::shared_ptr<rtc::Track> track;
+    rtc::Description::Video media;
 
     void RegisterToMediaController();
 };
