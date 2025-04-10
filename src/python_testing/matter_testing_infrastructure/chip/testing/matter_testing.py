@@ -929,7 +929,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         except AttributeError:
             return test
 
-    def write_to_app_pipe(self, command_dict: dict, app_pipe_name: Optional[str] = None, app_pid: Optional[int] = None):
+    def write_to_app_pipe(self, command_dict: dict, app_pipe_prefix: Optional[str] = None, app_pid: Optional[int] = None):
         """
         Send an out-of-band command to a Matter app.
         Args:
@@ -956,12 +956,12 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         """
 
-        if app_pipe_name is None:
-            app_pipe_name = self.matter_test_config.app_pipe
+        if app_pipe_prefix is None:
+            app_pipe_prefix = self.matter_test_config.app_pipe_prefix
         if app_pid is None:
             app_pid = self.matter_test_config.app_pid
 
-        if not isinstance(app_pipe_name, str):
+        if not isinstance(app_pipe_prefix, str):
             raise TypeError("The named pipe must be provided as a string value")
 
         if not isinstance(command_dict, dict):
@@ -979,7 +979,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         # Verify we have a valid app-id
         if app_pid == 0:
             asserts.fail("app_pid is 0 , is the flag --app-pid set?. app-id flag must be set in order to write to pipe.")
-        app_pipe_name = app_pipe_name + str(app_pid)
+        app_pipe_name = app_pipe_prefix + str(app_pid)
 
         if dut_ip is None:
             if not os.path.exists(app_pipe_name):
@@ -1875,6 +1875,7 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
     config.endpoint = args.endpoint  # This can be None, the get_endpoint function allows the tests to supply a default
     config.app_pid = 0 if args.app_pid is None else args.app_pid
     config.app_pipe = args.app_pipe
+    config.app_pipe_prefix = args.app_pipe_prefix
     config.fail_on_skipped_tests = args.fail_on_skipped
 
     config.controller_node_id = args.controller_node_id
@@ -1933,6 +1934,8 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
     basic_group.add_argument('--endpoint', type=int, default=None, help="Endpoint under test")
     basic_group.add_argument('--app-pid', type=int, default=0, help="The PID of the app against which the test is going to run")
     basic_group.add_argument('--app-pipe', type=str, default=None, help="The path of the app to send an out-of-band command")
+    basic_group.add_argument('--app-pipe_prefix', type=str, default=None,
+                             help="The path prefix of the app to send an out-of-band command")
     basic_group.add_argument('--timeout', type=int, help="Test timeout in seconds")
     basic_group.add_argument("--PICS", help="PICS file path", type=str)
 

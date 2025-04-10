@@ -30,7 +30,7 @@
 #       --discriminator 1234
 #       --passcode 20202021
 #       --endpoint 1
-#       --app-pipe /tmp/chip_rvc_fifo_
+#       --app-pipe_prefix /tmp/chip_rvc_fifo_
 #       --int-arg PIXIT.RVCRUNM.MODE_A:1
 #       --int-arg PIXIT.RVCRUNM.MODE_B:2
 #       --trace-to json:${TRACE_TEST_JSON}.json

@@ -30,7 +30,7 @@
 #       --passcode 20202021
 #       --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values
 #       --endpoint 1
-#       --app-pipe /tmp/chip_rvc_fifo_
+#       --app-pipe_prefix /tmp/chip_rvc_fifo_
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true

@@ -27,7 +27,7 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --endpoint 1
-#       --app-pipe /tmp/chip_all_clusters_fifo_
+#       --app-pipe_prefix /tmp/chip_all_clusters_fifo_
 #       --bool-arg simulate_occupancy:true
 #     factory-reset: true
 #     quiet: true
