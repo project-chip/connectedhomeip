@@ -36,18 +36,13 @@
 # Standard library imports
 import asyncio
 
-# Third-party imports
-from mobly import asserts
-
 # Local/Matter imports
 import chip.clusters as Clusters
 from chip.interaction_model import Status
-from matter_testing_infrastructure.chip.testing.matter_testing import (
-    MatterBaseTest,
-    TestStep,
-    async_test_body,
-    default_matter_test_main,
-)
+from matter_testing_infrastructure.chip.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body,
+                                                                       default_matter_test_main)
+# Third-party imports
+from mobly import asserts
 
 # Constants
 BOOT_WAIT_TIME = 10  # seconds
