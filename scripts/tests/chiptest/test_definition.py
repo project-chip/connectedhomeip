@@ -335,26 +335,35 @@ class TestDefinition:
         tool_storage_dir = None
 
         try:
+            port = None
             if self.target == TestTarget.ALL_CLUSTERS:
                 target_app = paths.all_clusters_app
             elif self.target == TestTarget.TV:
                 target_app = paths.tv_app
+                port = 5541
             elif self.target == TestTarget.LOCK:
                 target_app = paths.lock_app
+                port = 5542
             elif self.target == TestTarget.FABRIC_SYNC:
                 target_app = paths.fabric_bridge_app
+                port = 5543
             elif self.target == TestTarget.OTA:
                 target_app = paths.ota_requestor_app
+                port = 5544
             elif self.target == TestTarget.BRIDGE:
                 target_app = paths.bridge_app
             elif self.target == TestTarget.LIT_ICD:
                 target_app = paths.lit_icd_app
+                port = 5545
             elif self.target == TestTarget.MWO:
                 target_app = paths.microwave_oven_app
+                port = 5546
             elif self.target == TestTarget.RVC:
                 target_app = paths.rvc_app
+                port = 5547
             elif self.target == TestTarget.NETWORK_MANAGER:
                 target_app = paths.network_manager_app
+                port = 5548
             else:
                 raise Exception("Unknown test target - "
                                 "don't know which application to run")
@@ -403,7 +412,10 @@ class TestDefinition:
                 setupCode = '${SETUP_PAYLOAD}'
             else:
                 app = apps_register.get('default')
-                app.start()
+                if port:
+                    app.start({'--secured-device-port': str(port)})
+                else:
+                    app.start()
                 setupCode = app.setupCode
 
             if test_runtime == TestRunTime.CHIP_REPL_PYTHON:
