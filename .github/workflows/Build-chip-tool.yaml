@@ -37,7 +37,7 @@ jobs:
       - name: Build chip-tool using ./gn_build.sh
         run: |
           source scripts/activate.sh && \
-          ./gn_build.sh && \
+          ./gn_build_example.sh && \
           ls -lah out/debug/standalone
 
       - name: Upload build artifacts
