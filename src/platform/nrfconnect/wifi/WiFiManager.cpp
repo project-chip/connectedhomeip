@@ -584,6 +584,7 @@ void WiFiManager::DisconnectHandler(Platform::UniquePtr<uint8_t> data, size_t le
         const wifi_status * status = reinterpret_cast<const wifi_status *>(rawData);
         uint16_t reason;
 
+        ChipLogProgress(DeviceLayer, "WiFi station disconnected, reason: %d", status->disconn_reason);
         switch (status->disconn_reason)
         {
         case WIFI_REASON_DISCONN_UNSPECIFIED:
@@ -616,7 +617,6 @@ void WiFiManager::NotifyDisconnected(uint16_t reason)
 {
     SetLastDisconnectReason(reason);
 
-    ChipLogProgress(DeviceLayer, "WiFi station disconnected");
     mWiFiState = WIFI_STATE_DISCONNECTED;
     PostConnectivityStatusChange(kConnectivity_Lost);
 
