@@ -428,6 +428,8 @@ private:
 
             if (err == CHIP_ERROR_NO_MEMORY || err == CHIP_ERROR_BUFFER_TOO_SMALL)
             {
+                // Rollback through the attributeDataIB, which also resets the Builder's error state.
+                // This returns the object to the state it was in before attempting to encode the list item.
                 attributeDataIB.Rollback(backupWriter);
                 outChunkingNeeded = true;
                 break;
