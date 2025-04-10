@@ -72,7 +72,7 @@ Span<const DataModel::AttributeEntry> DefaultServerCluster::GlobalAttributes()
     return { kGlobalAttributeEntries.data(), kGlobalAttributeEntries.size() };
 }
 
-DefaultServerCluster::DefaultServerCluster()
+DefaultServerCluster::DefaultServerCluster(const ConcreteClusterPath & path) : mPath(path)
 {
     // SPEC - 7.10.3. Cluster Data Version
     //   A cluster data version SHALL be initialized randomly when it is first published.
@@ -85,10 +85,10 @@ CHIP_ERROR DefaultServerCluster::Attributes(const ConcreteClusterPath & path, Da
     return builder.ReferenceExisting(GlobalAttributes());
 }
 
-CHIP_ERROR DefaultServerCluster::Startup(ServerClusterContext * context)
+CHIP_ERROR DefaultServerCluster::Startup(ServerClusterContext & context)
 {
     VerifyOrReturnError(mContext == nullptr, CHIP_ERROR_ALREADY_INITIALIZED);
-    mContext = context;
+    mContext = &context;
     return CHIP_NO_ERROR;
 }
 
@@ -102,11 +102,10 @@ void DefaultServerCluster::NotifyAttributeChanged(AttributeId attributeId)
     IncreaseDataVersion();
 
     VerifyOrReturn(mContext != nullptr);
-    const ConcreteClusterPath path = GetPath();
-    mContext->interactionContext->dataModelChangeListener->MarkDirty({ path.mEndpointId, path.mClusterId, attributeId });
+    mContext->interactionContext->dataModelChangeListener->MarkDirty({ mPath.mEndpointId, mPath.mClusterId, attributeId });
 }
 
-BitFlags<ClusterQualityFlags> DefaultServerCluster::GetClusterFlags() const
+BitFlags<ClusterQualityFlags> DefaultServerCluster::GetClusterFlags(const ConcreteClusterPath &) const
 {
     return {};
 }

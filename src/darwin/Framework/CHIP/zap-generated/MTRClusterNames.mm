@@ -216,6 +216,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeWaterHeaterManagementID:
         result = @"WaterHeaterManagement";
         break;
+    case MTRClusterIDTypeCommodityPriceID:
+        result = @"CommodityPrice";
+        break;
     case MTRClusterIDTypeDemandResponseLoadControlID:
         result = @"DemandResponseLoadControl";
         break;
@@ -251,6 +254,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
         break;
     case MTRClusterIDTypeClosureControlID:
         result = @"ClosureControl";
+        break;
+    case MTRClusterIDTypeClosureDimensionID:
+        result = @"ClosureDimension";
         break;
     case MTRClusterIDTypeServiceAreaID:
         result = @"ServiceArea";
@@ -393,6 +399,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeChimeID:
         result = @"Chime";
         break;
+    case MTRClusterIDTypeCommodityTariffID:
+        result = @"CommodityTariff";
+        break;
     case MTRClusterIDTypeEcosystemInformationID:
         result = @"EcosystemInformation";
         break;
@@ -404,6 +413,12 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
         break;
     case MTRClusterIDTypeTLSClientManagementID:
         result = @"TLSClientManagement";
+        break;
+    case MTRClusterIDTypeMeterIdentificationID:
+        result = @"MeterIdentification";
+        break;
+    case MTRClusterIDTypeCommodityMeteringID:
+        result = @"CommodityMetering";
         break;
     case MTRClusterIDTypeUnitTestingID:
         result = @"UnitTesting";
@@ -1917,6 +1932,14 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeActiveNetworkFaultsListID:
             result = @"ActiveNetworkFaultsList";
+            break;
+
+        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeExtAddressID:
+            result = @"ExtAddress";
+            break;
+
+        case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeRloc16ID:
+            result = @"Rloc16";
             break;
 
         case MTRAttributeIDTypeClusterThreadNetworkDiagnosticsAttributeGeneratedCommandListID:
@@ -3598,10 +3621,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
         switch (attributeID) {
 
             // Cluster ScenesManagement attributes
-        case MTRAttributeIDTypeClusterScenesManagementAttributeLastConfiguredByID:
-            result = @"LastConfiguredBy";
-            break;
-
         case MTRAttributeIDTypeClusterScenesManagementAttributeSceneTableSizeID:
             result = @"SceneTableSize";
             break;
@@ -4092,6 +4111,53 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             break;
 
         case MTRAttributeIDTypeClusterWaterHeaterManagementAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeCommodityPriceID:
+
+        switch (attributeID) {
+
+            // Cluster CommodityPrice attributes
+        case MTRAttributeIDTypeClusterCommodityPriceAttributeTariffUnitID:
+            result = @"TariffUnit";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityPriceAttributeCurrencyID:
+            result = @"Currency";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityPriceAttributeCurrentPriceID:
+            result = @"CurrentPrice";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityPriceAttributePriceForecastID:
+            result = @"PriceForecast";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityPriceAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityPriceAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityPriceAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityPriceAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityPriceAttributeClusterRevisionID:
             result = @"ClusterRevision";
             break;
 
@@ -4951,26 +5017,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"OverallTarget";
             break;
 
-        case MTRAttributeIDTypeClusterClosureControlAttributeRestingProcedureID:
-            result = @"RestingProcedure";
-            break;
-
-        case MTRAttributeIDTypeClusterClosureControlAttributeTriggerConditionID:
-            result = @"TriggerCondition";
-            break;
-
-        case MTRAttributeIDTypeClusterClosureControlAttributeTriggerPositionID:
-            result = @"TriggerPosition";
-            break;
-
-        case MTRAttributeIDTypeClusterClosureControlAttributeWaitingDelayID:
-            result = @"WaitingDelay";
-            break;
-
-        case MTRAttributeIDTypeClusterClosureControlAttributeKickoffTimerID:
-            result = @"KickoffTimer";
-            break;
-
         case MTRAttributeIDTypeClusterClosureControlAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
@@ -4988,6 +5034,81 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             break;
 
         case MTRAttributeIDTypeClusterClosureControlAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeClosureDimensionID:
+
+        switch (attributeID) {
+
+            // Cluster ClosureDimension attributes
+        case MTRAttributeIDTypeClusterClosureDimensionAttributeCurrentID:
+            result = @"Current";
+            break;
+
+        case MTRAttributeIDTypeClusterClosureDimensionAttributeTargetID:
+            result = @"Target";
+            break;
+
+        case MTRAttributeIDTypeClusterClosureDimensionAttributeResolutionID:
+            result = @"Resolution";
+            break;
+
+        case MTRAttributeIDTypeClusterClosureDimensionAttributeStepValueID:
+            result = @"StepValue";
+            break;
+
+        case MTRAttributeIDTypeClusterClosureDimensionAttributeUnitID:
+            result = @"Unit";
+            break;
+
+        case MTRAttributeIDTypeClusterClosureDimensionAttributeUnitRangeID:
+            result = @"UnitRange";
+            break;
+
+        case MTRAttributeIDTypeClusterClosureDimensionAttributeLimitRangeID:
+            result = @"LimitRange";
+            break;
+
+        case MTRAttributeIDTypeClusterClosureDimensionAttributeTranslationDirectionID:
+            result = @"TranslationDirection";
+            break;
+
+        case MTRAttributeIDTypeClusterClosureDimensionAttributeRotationAxisID:
+            result = @"RotationAxis";
+            break;
+
+        case MTRAttributeIDTypeClusterClosureDimensionAttributeOverflowID:
+            result = @"Overflow";
+            break;
+
+        case MTRAttributeIDTypeClusterClosureDimensionAttributeModulationTypeID:
+            result = @"ModulationType";
+            break;
+
+        case MTRAttributeIDTypeClusterClosureDimensionAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterClosureDimensionAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterClosureDimensionAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterClosureDimensionAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterClosureDimensionAttributeClusterRevisionID:
             result = @"ClusterRevision";
             break;
 
@@ -8194,6 +8315,113 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
         }
         break;
 
+    case MTRClusterIDTypeCommodityTariffID:
+
+        switch (attributeID) {
+
+            // Cluster CommodityTariff attributes
+        case MTRAttributeIDTypeClusterCommodityTariffAttributeTariffInfoID:
+            result = @"TariffInfo";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityTariffAttributeTariffUnitID:
+            result = @"TariffUnit";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityTariffAttributeStartDateID:
+            result = @"StartDate";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityTariffAttributeDayEntriesID:
+            result = @"DayEntries";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityTariffAttributeDayPatternsID:
+            result = @"DayPatterns";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityTariffAttributeCalendarPeriodsID:
+            result = @"CalendarPeriods";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityTariffAttributeIndividualDaysID:
+            result = @"IndividualDays";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityTariffAttributeCurrentDayID:
+            result = @"CurrentDay";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityTariffAttributeNextDayID:
+            result = @"NextDay";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityTariffAttributeCurrentDayEntryID:
+            result = @"CurrentDayEntry";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityTariffAttributeCurrentDayEntryDateID:
+            result = @"CurrentDayEntryDate";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityTariffAttributeNextDayEntryID:
+            result = @"NextDayEntry";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityTariffAttributeNextDayEntryDateID:
+            result = @"NextDayEntryDate";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityTariffAttributeTariffComponentsID:
+            result = @"TariffComponents";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityTariffAttributeTariffPeriodsID:
+            result = @"TariffPeriods";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityTariffAttributeCurrentTariffComponentsID:
+            result = @"CurrentTariffComponents";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityTariffAttributeNextTariffComponentsID:
+            result = @"NextTariffComponents";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityTariffAttributeDefaultRandomizationOffsetID:
+            result = @"DefaultRandomizationOffset";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityTariffAttributeDefaultRandomizationTypeID:
+            result = @"DefaultRandomizationType";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityTariffAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityTariffAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityTariffAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityTariffAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityTariffAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeEcosystemInformationID:
 
         switch (attributeID) {
@@ -8345,6 +8573,100 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             break;
 
         case MTRAttributeIDTypeClusterTLSClientManagementAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeMeterIdentificationID:
+
+        switch (attributeID) {
+
+            // Cluster MeterIdentification attributes
+        case MTRAttributeIDTypeClusterMeterIdentificationAttributeMeterTypeID:
+            result = @"MeterType";
+            break;
+
+        case MTRAttributeIDTypeClusterMeterIdentificationAttributePointOfDeliveryID:
+            result = @"PointOfDelivery";
+            break;
+
+        case MTRAttributeIDTypeClusterMeterIdentificationAttributeMeterSerialNumberID:
+            result = @"MeterSerialNumber";
+            break;
+
+        case MTRAttributeIDTypeClusterMeterIdentificationAttributeProtocolVersionID:
+            result = @"ProtocolVersion";
+            break;
+
+        case MTRAttributeIDTypeClusterMeterIdentificationAttributePowerThresholdID:
+            result = @"PowerThreshold";
+            break;
+
+        case MTRAttributeIDTypeClusterMeterIdentificationAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterMeterIdentificationAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterMeterIdentificationAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterMeterIdentificationAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterMeterIdentificationAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeCommodityMeteringID:
+
+        switch (attributeID) {
+
+            // Cluster CommodityMetering attributes
+        case MTRAttributeIDTypeClusterCommodityMeteringAttributeMeteredQuantityID:
+            result = @"MeteredQuantity";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityMeteringAttributeMeteredQuantityTimestampID:
+            result = @"MeteredQuantityTimestamp";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityMeteringAttributeMeasurementTypeID:
+            result = @"MeasurementType";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityMeteringAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityMeteringAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityMeteringAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityMeteringAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityMeteringAttributeClusterRevisionID:
             result = @"ClusterRevision";
             break;
 
@@ -9390,12 +9712,12 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
             result = @"AddTrustedRootCertificate";
             break;
 
-        case MTRCommandIDTypeClusterOperationalCredentialsCommandSetVidVerificationStatementID:
-            result = @"SetVidVerificationStatement";
+        case MTRCommandIDTypeClusterOperationalCredentialsCommandSetVIDVerificationStatementID:
+            result = @"SetVIDVerificationStatement";
             break;
 
-        case MTRCommandIDTypeClusterOperationalCredentialsCommandSignVidVerificationRequestID:
-            result = @"SignVidVerificationRequest";
+        case MTRCommandIDTypeClusterOperationalCredentialsCommandSignVIDVerificationRequestID:
+            result = @"SignVIDVerificationRequest";
             break;
 
         default:
@@ -9930,6 +10252,24 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
         }
         break;
 
+    case MTRClusterIDTypeCommodityPriceID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterCommodityPriceCommandGetDetailedPriceRequestID:
+            result = @"GetDetailedPriceRequest";
+            break;
+
+        case MTRCommandIDTypeClusterCommodityPriceCommandGetDetailedForecastRequestID:
+            result = @"GetDetailedForecastRequest";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeDemandResponseLoadControlID:
 
         switch (commandID) {
@@ -10268,12 +10608,22 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
             result = @"Calibrate";
             break;
 
-        case MTRCommandIDTypeClusterClosureControlCommandConfigureFallbackID:
-            result = @"ConfigureFallback";
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeClosureDimensionID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterClosureDimensionCommandSetTargetID:
+            result = @"SetTarget";
             break;
 
-        case MTRCommandIDTypeClusterClosureControlCommandCancelFallbackID:
-            result = @"CancelFallback";
+        case MTRCommandIDTypeClusterClosureDimensionCommandStepID:
+            result = @"Step";
             break;
 
         default:
@@ -11240,6 +11590,24 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
         }
         break;
 
+    case MTRClusterIDTypeCommodityTariffID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterCommodityTariffCommandGetTariffComponentID:
+            result = @"GetTariffComponent";
+            break;
+
+        case MTRCommandIDTypeClusterCommodityTariffCommandGetDayEntryID:
+            result = @"GetDayEntry";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeEcosystemInformationID:
 
         switch (commandID) {
@@ -11329,6 +11697,26 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
         case MTRCommandIDTypeClusterTLSClientManagementCommandRemoveEndpointID:
             result = @"RemoveEndpoint";
             break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeMeterIdentificationID:
+
+        switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeCommodityMeteringID:
+
+        switch (commandID) {
 
         default:
             result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
@@ -11872,8 +12260,8 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
             result = @"NOCResponse";
             break;
 
-        case MTRCommandIDTypeClusterOperationalCredentialsCommandSignVidVerificationResponseID:
-            result = @"SignVidVerificationResponse";
+        case MTRCommandIDTypeClusterOperationalCredentialsCommandSignVIDVerificationResponseID:
+            result = @"SignVIDVerificationResponse";
             break;
 
         default:
@@ -12292,6 +12680,24 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
         }
         break;
 
+    case MTRClusterIDTypeCommodityPriceID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterCommodityPriceCommandGetDetailedPriceResponseID:
+            result = @"GetDetailedPriceResponse";
+            break;
+
+        case MTRCommandIDTypeClusterCommodityPriceCommandGetDetailedForecastResponseID:
+            result = @"GetDetailedForecastResponse";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeDemandResponseLoadControlID:
 
         switch (commandID) {
@@ -12443,6 +12849,16 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
         break;
 
     case MTRClusterIDTypeClosureControlID:
+
+        switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeClosureDimensionID:
 
         switch (commandID) {
 
@@ -13030,6 +13446,24 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
         }
         break;
 
+    case MTRClusterIDTypeCommodityTariffID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterCommodityTariffCommandGetTariffComponentResponseID:
+            result = @"GetTariffComponentResponse";
+            break;
+
+        case MTRCommandIDTypeClusterCommodityTariffCommandGetDayEntryResponseID:
+            result = @"GetDayEntryResponse";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeEcosystemInformationID:
 
         switch (commandID) {
@@ -13099,6 +13533,26 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
         case MTRCommandIDTypeClusterTLSClientManagementCommandFindEndpointResponseID:
             result = @"FindEndpointResponse";
             break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeMeterIdentificationID:
+
+        switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeCommodityMeteringID:
+
+        switch (commandID) {
 
         default:
             result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
@@ -14148,6 +14602,25 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
         }
         break;
 
+    case MTRClusterIDTypeCommodityPriceID:
+
+        switch (eventID) {
+
+            // Cluster CommodityPrice events
+        case MTREventIDTypeClusterCommodityPriceEventPriceChangeID:
+            result = @"PriceChange";
+            break;
+
+        case MTREventIDTypeClusterCommodityPriceEventForecastChangeID:
+            result = @"ForecastChange";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeDemandResponseLoadControlID:
 
         switch (eventID) {
@@ -14340,6 +14813,16 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
         break;
 
     case MTRClusterIDTypeClosureControlID:
+
+        switch (eventID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeClosureDimensionID:
 
         switch (eventID) {
 
@@ -14931,6 +15414,16 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
         }
         break;
 
+    case MTRClusterIDTypeCommodityTariffID:
+
+        switch (eventID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeEcosystemInformationID:
 
         switch (eventID) {
@@ -14967,6 +15460,26 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
         break;
 
     case MTRClusterIDTypeTLSClientManagementID:
+
+        switch (eventID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeMeterIdentificationID:
+
+        switch (eventID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeCommodityMeteringID:
 
         switch (eventID) {
 

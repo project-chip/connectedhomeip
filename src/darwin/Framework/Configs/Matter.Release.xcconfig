@@ -1,0 +1,8 @@
+#include "Matter.xcconfig"
+
+// Hide @protected ivar offset symbols, they are visible only in Debug
+// builds where TAPI knows to expect them because it reads Project headers.
+LDFLAGS_UNEXPORTS = $(inherited) -Wl,-unexported_symbol,"_OBJC_IVAR_*"
+
+// Include override file last, if it exists
+#include? "Matter.Release.override.xcconfig"
