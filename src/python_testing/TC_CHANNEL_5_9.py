@@ -1,3 +1,4 @@
+#
 #    Copyright (c) 2024 Project CHIP Authors
 #    All rights reserved.
 #
@@ -30,10 +31,10 @@
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
-import logging
 
-from chip.clusters import Objects as Clusters
+import logging
 from chip.interaction_model import Status
+from chip.clusters import Objects as Clusters
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, pics
 from mobly import asserts
 
@@ -77,7 +78,7 @@ class TC_CHANNEL_5_9(MatterBaseTest):
 
     def extract_channel_identifier(self, channel):
         """Returns a prioritized match string from the channel struct as per spec."""
-        # Priority:NAME > Identifier > AffiliateCallSign > CallSign > Major.Minor
+        # Priority: NAME > Identifier > AffiliateCallSign > CallSign > Major.Minor
         if getattr(channel, "name", None):
             return channel.name
         if getattr(channel, "identifier", None):
@@ -103,13 +104,13 @@ class TC_CHANNEL_5_9(MatterBaseTest):
             channel_list = await self.read_channel_list(endpoint)
             asserts.assert_is_instance(channel_list, list, "ChannelList must be a list.")
             logging.info(f"Available channels: {channel_list}")
-         # Filter out channels that don't have any matchable identifiers
+            # Filter out channels that don't have any matchable identifiers
             valid_channels = [ch for ch in channel_list if self.extract_channel_identifier(ch)]
             asserts.assert_true(len(valid_channels) >= 2, "Need at least 2 valid channels for test.")
         else:
             self.skip_step("1")
 
-         # Step 2: Read the CurrentChannel attribute to store current state before switching
+        # Step 2: Read the CurrentChannel attribute to store current state before switching
         if pics("CHANNEL.S.A0002"):
             self.step("2")
             current_channel = await self.read_current_channel(endpoint)
@@ -118,7 +119,7 @@ class TC_CHANNEL_5_9(MatterBaseTest):
         else:
             self.skip_step("2")
 
-         # Step 3: Send ChangeChannel command with a different valid Match string than current
+        # Step 3: Send ChangeChannel command with a different valid Match string than current
         if pics("CHANNEL.S.C00.Rsp"):
             self.step("3")
             selected_channel = next(
@@ -133,7 +134,7 @@ class TC_CHANNEL_5_9(MatterBaseTest):
         else:
             self.skip_step("3")
 
-         # Step 4: Read CurrentChannel again to verify it has updated to the newly selected channel
+        # Step 4: Read CurrentChannel again to verify it has updated to the newly selected channel
         if pics("CHANNEL.S.A0002"):
             self.step("4")
             updated_channel = await self.read_current_channel(endpoint)
@@ -143,5 +144,6 @@ class TC_CHANNEL_5_9(MatterBaseTest):
         else:
             self.skip_step("4")
 
-       if __name__ == "__main__":
-        default_matter_test_main()
+
+if __name__ == "__main__":
+    default_matter_test_main()
