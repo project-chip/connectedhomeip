@@ -24,7 +24,6 @@
 
 #include "media-controller.h"
 #include "network-stream-source.h"
-#include "transport/transport.h"
 #include <protocols/interaction_model/StatusCode.h>
 
 #include <gst/gst.h>
@@ -43,8 +42,6 @@ public:
 
     CameraDevice();
     ~CameraDevice();
-
-    void RegisterTransport(Transport * transport, uint16_t videoStreamID, uint16_t audioStreamID);
 
     CameraDeviceInterface::CameraHALInterface & GetCameraHALInterface() { return *this; }
 
