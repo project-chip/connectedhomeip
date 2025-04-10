@@ -384,7 +384,7 @@ bool LockManager::GetUser(chip::EndpointId endpointId, uint16_t userIndex, Ember
 
     VerifyOrReturnValue(userInStorage.currentCredentialCount <= kMaxCredentialsPerUser, false);
 
-    VerifyOrReturnValue(userInStorage.userNameSize <= DOOR_LOCK_MAX_USER_NAME_SIZE, false);
+    VerifyOrReturnValue(userInStorage.userNameSize <= user.userName.size(), false);
 
     // Copy username data from storage to the output parameter
     memmove(user.userName.data(), userInStorage.userName, userInStorage.userNameSize);
@@ -547,7 +547,7 @@ bool LockManager::GetCredential(chip::EndpointId endpointId, uint16_t credential
         return false;
     }
 
-    VerifyOrReturnValue(credentialInStorage.credentialDataSize <= kMaxCredentialSize, false);
+    VerifyOrReturnValue(credentialInStorage.credentialDataSize <= credential.credentialData.size(), false);
 
     // Copy credential data from storage to the output parameter
     memmove(credential.credentialData.data(), credentialInStorage.credentialData, credentialInStorage.credentialDataSize);
@@ -928,42 +928,44 @@ bool LockManager::setLockState(chip::EndpointId endpointId, const Nullable<chip:
             ChipLogError(Zcl, "Unable to get the user - internal error [endpointId=%d,userIndex=%lu]", endpointId, userIndex);
             return false;
         }
-        // Loop through each credential attached to the user
-        for (uint32_t userCredentialIndex = 0; userCredentialIndex < user.credentials.size(); userCredentialIndex++)
+
+        if (user.userStatus == UserStatusEnum::kOccupiedEnabled)
         {
-            // If the current credential is a pin type, then check it against pin input. Otherwise ignore
-            if (user.credentials.data()[userCredentialIndex].credentialType == CredentialTypeEnum::kPin)
+            // Loop through each credential attached to the user
+            for (auto & userCredential : user.credentials)
             {
-                EmberAfPluginDoorLockCredentialInfo credential;
-
-                if (!GetCredential(endpointId, user.credentials.data()[userCredentialIndex].credentialIndex,
-                                   user.credentials.data()[userCredentialIndex].credentialType, credential))
+                // If the current credential is a pin type, then check it against pin input. Otherwise ignore
+                if (userCredential.credentialType == CredentialTypeEnum::kPin)
                 {
-                    ChipLogError(Zcl, "Unable to get credential: app error [endpointId=%d,credentialType=%u,credentialIndex=%d]",
-                                 endpointId, to_underlying(user.credentials.data()[userCredentialIndex].credentialType),
-                                 user.credentials.data()[userCredentialIndex].credentialIndex);
-                    return false;
-                }
+                    EmberAfPluginDoorLockCredentialInfo credential;
 
-                if (credential.status == DlCredentialStatus::kOccupied)
-                {
-
-                    // See if credential retrieved from storage matches the provided PIN
-                    if (credential.credentialData.data_equal(pin.Value()))
+                    if (!GetCredential(endpointId, userCredential.credentialIndex, userCredential.credentialType, credential))
                     {
-                        ChipLogDetail(Zcl,
-                                      "Lock App: specified PIN code was found in the database, setting lock state to "
-                                      "\"%s\" [endpointId=%d]",
-                                      lockStateToString(lockState), endpointId);
+                        ChipLogError(Zcl,
+                                     "Unable to get credential: app error [endpointId=%d,credentialType=%u,credentialIndex=%d]",
+                                     endpointId, to_underlying(userCredential.credentialType), userCredential.credentialIndex);
+                        return false;
+                    }
 
-                        LockOpCredentials userCredential[] = { { CredentialTypeEnum::kPin,
-                                                                 user.credentials.data()[userCredentialIndex].credentialIndex } };
-                        auto userCredentials               = MakeNullable<List<const LockOpCredentials>>(userCredential);
+                    if (credential.status == DlCredentialStatus::kOccupied)
+                    {
 
-                        DoorLockServer::Instance().SetLockState(endpointId, lockState, OperationSourceEnum::kRemote, userIndex,
-                                                                userCredentials, fabricIdx, nodeId);
+                        // See if credential retrieved from storage matches the provided PIN
+                        if (credential.credentialData.data_equal(pin.Value()))
+                        {
+                            ChipLogDetail(Zcl,
+                                          "Lock App: specified PIN code was found in the database, setting lock state to "
+                                          "\"%s\" [endpointId=%d]",
+                                          lockStateToString(lockState), endpointId);
 
-                        return true;
+                            LockOpCredentials userCred[] = { { CredentialTypeEnum::kPin, userCredential.credentialIndex } };
+                            auto userCredentials         = MakeNullable<List<const LockOpCredentials>>(userCred);
+
+                            DoorLockServer::Instance().SetLockState(endpointId, lockState, OperationSourceEnum::kRemote, userIndex,
+                                                                    userCredentials, fabricIdx, nodeId);
+
+                            return true;
+                        }
                     }
                 }
             }

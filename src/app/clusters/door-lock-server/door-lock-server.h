@@ -774,7 +774,7 @@ struct EmberAfPluginDoorLockCredentialInfo
 #if DOOR_LOCK_USE_LOCAL_BUFFER
     chip::MutableByteSpan credentialData; /**< Credential data bytes. */
 #else
-    chip::ByteSpan credentialData; /**< Credential data bytes. */
+    chip::ByteSpan credentialData;                  /**< Credential data bytes. */
 #endif
     DlAssetSource creationSource;
     chip::FabricIndex createdBy; /**< Index of the fabric that created the user. */
