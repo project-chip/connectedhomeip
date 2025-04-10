@@ -149,7 +149,7 @@ std::optional<DataModel::ActionReturnStatus> CodegenDataModelProvider::InvokeCom
         return cluster->InvokeCommand(request, input_arguments, handler);
     }
 
-    gCodegenServerCluster.InvokeCommand(request, input_arguments, handler);
+    return gCodegenServerCluster.InvokeCommand(request, input_arguments, handler);
 }
 
 CHIP_ERROR CodegenDataModelProvider::Endpoints(DataModel::ListBuilder<DataModel::EndpointEntry> & builder)
