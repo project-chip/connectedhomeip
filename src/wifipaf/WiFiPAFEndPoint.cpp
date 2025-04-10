@@ -801,7 +801,7 @@ CHIP_ERROR WiFiPAFEndPoint::GetPktSn(Encoding::LittleEndian::Reader & reader, Se
     }
     // Always has header flag
     SnOffset += kTransferProtocolHeaderFlagsSize;
-    if (rxFlags.Has(WiFiPAFTP::HeaderFlags::kManagementOpcode)) // Has Mgmt_Op
+    if (rxFlags.Has(WiFiPAFTP::HeaderFlags::kManagementOpcode))
     {
         SnOffset += kTransferProtocolMgmtOpSize;
     }
