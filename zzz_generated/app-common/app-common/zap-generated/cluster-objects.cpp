@@ -960,6 +960,160 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
 } // namespace AtomicAttributeStatusStruct
 
+namespace AttributionData {
+CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    return DoEncode(aWriter, aTag, NullOptional);
+}
+
+CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
+{
+    return DoEncode(aWriter, aTag, MakeOptional(aAccessingFabricIndex));
+}
+
+CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const
+{
+    bool includeSensitive = !aAccessingFabricIndex.HasValue() || (aAccessingFabricIndex.Value() == fabricIndex);
+
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+
+    encoder.Encode(to_underlying(Fields::kContextInformation), contextInformation);
+    if (includeSensitive)
+    {
+        encoder.Encode(to_underlying(Fields::kSourceContext), sourceContext);
+    }
+    if (includeSensitive)
+    {
+        encoder.Encode(to_underlying(Fields::kNodeID), nodeID);
+    }
+    if (includeSensitive)
+    {
+        encoder.Encode(to_underlying(Fields::kGroupID), groupID);
+    }
+    encoder.Encode(to_underlying(Fields::kSystemTimeStamp), systemTimeStamp);
+    encoder.Encode(to_underlying(Fields::kEpochTimeStamp), epochTimeStamp);
+    if (aAccessingFabricIndex.HasValue())
+    {
+        encoder.Encode(to_underlying(Fields::kFabricIndex), fabricIndex);
+    }
+
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kContextInformation))
+        {
+            err = DataModel::Decode(reader, contextInformation);
+        }
+        else if (__context_tag == to_underlying(Fields::kSourceContext))
+        {
+            err = DataModel::Decode(reader, sourceContext);
+        }
+        else if (__context_tag == to_underlying(Fields::kNodeID))
+        {
+            err = DataModel::Decode(reader, nodeID);
+        }
+        else if (__context_tag == to_underlying(Fields::kGroupID))
+        {
+            err = DataModel::Decode(reader, groupID);
+        }
+        else if (__context_tag == to_underlying(Fields::kSystemTimeStamp))
+        {
+            err = DataModel::Decode(reader, systemTimeStamp);
+        }
+        else if (__context_tag == to_underlying(Fields::kEpochTimeStamp))
+        {
+            err = DataModel::Decode(reader, epochTimeStamp);
+        }
+        else if (__context_tag == to_underlying(Fields::kFabricIndex))
+        {
+            err = DataModel::Decode(reader, fabricIndex);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace AttributionData
+
+namespace SuppliedAttributionData {
+CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    return DoEncode(aWriter, aTag, NullOptional);
+}
+
+CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
+{
+    return DoEncode(aWriter, aTag, MakeOptional(aAccessingFabricIndex));
+}
+
+CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const
+{
+
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+
+    encoder.Encode(to_underlying(Fields::kContextInformation), contextInformation);
+    encoder.Encode(to_underlying(Fields::kSourceContext), sourceContext);
+    if (aAccessingFabricIndex.HasValue())
+    {
+        encoder.Encode(to_underlying(Fields::kFabricIndex), fabricIndex);
+    }
+
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kContextInformation))
+        {
+            err = DataModel::Decode(reader, contextInformation);
+        }
+        else if (__context_tag == to_underlying(Fields::kSourceContext))
+        {
+            err = DataModel::Decode(reader, sourceContext);
+        }
+        else if (__context_tag == to_underlying(Fields::kFabricIndex))
+        {
+            err = DataModel::Decode(reader, fabricIndex);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace SuppliedAttributionData
+
 } // namespace Structs
 } // namespace Globals
 
@@ -3887,6 +4041,10 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, specificationVersion);
     case Attributes::MaxPathsPerInvoke::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, maxPathsPerInvoke);
+    case Attributes::DeviceLocation::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, deviceLocation);
+    case Attributes::ConfigurationVersion::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, configurationVersion);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, generatedCommandList);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():

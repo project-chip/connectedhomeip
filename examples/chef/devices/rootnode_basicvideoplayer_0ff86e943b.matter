@@ -276,6 +276,22 @@ struct AtomicAttributeStatusStruct {
   status statusCode = 1;
 }
 
+fabric_scoped struct AttributionData {
+  enum8 contextInformation = 0;
+  optional fabric_sensitive int32u sourceContext = 1;
+  optional fabric_sensitive node_id nodeID = 2;
+  optional fabric_sensitive group_id groupID = 3;
+  optional systime_ms systemTimeStamp = 4;
+  optional posix_ms epochTimeStamp = 5;
+  fabric_idx fabricIndex = 254;
+}
+
+fabric_scoped struct SuppliedAttributionData {
+  enum8 contextInformation = 0;
+  optional int32u sourceContext = 1;
+  fabric_idx fabricIndex = 254;
+}
+
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
 cluster Identify = 3 {
   revision 4;
@@ -685,7 +701,7 @@ cluster AccessControl = 31 {
       Commissioning and operational determination of Node characteristics, such as Vendor ID, Product ID and serial number,
       which apply to the whole Node. Also allows setting user device information such as location. */
 cluster BasicInformation = 40 {
-  revision 3;
+  revision 5;
 
   enum ColorEnum : enum8 {
     kBlack = 0;
@@ -768,6 +784,8 @@ cluster BasicInformation = 40 {
   readonly attribute optional ProductAppearanceStruct productAppearance = 20;
   readonly attribute int32u specificationVersion = 21;
   readonly attribute int16u maxPathsPerInvoke = 22;
+  attribute access(write: administer) optional nullable LocationDescriptorStruct deviceLocation = 23;
+  readonly attribute int32u configurationVersion = 24;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;

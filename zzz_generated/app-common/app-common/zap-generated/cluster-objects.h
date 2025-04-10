@@ -554,6 +554,82 @@ using DecodableType = Type;
 
 } // namespace AtomicAttributeStatusStruct
 
+namespace AttributionData {
+enum class Fields : uint8_t
+{
+    kContextInformation = 0,
+    kSourceContext      = 1,
+    kNodeID             = 2,
+    kGroupID            = 3,
+    kSystemTimeStamp    = 4,
+    kEpochTimeStamp     = 5,
+    kFabricIndex        = 254,
+};
+
+struct Type
+{
+public:
+    uint8_t contextInformation = static_cast<uint8_t>(0);
+    Optional<uint32_t> sourceContext;
+    Optional<chip::NodeId> nodeID;
+    Optional<chip::GroupId> groupID;
+    Optional<uint64_t> systemTimeStamp;
+    Optional<uint64_t> epochTimeStamp;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = true;
+
+    auto GetFabricIndex() const { return fabricIndex; }
+
+    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
+
+    CHIP_ERROR EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
+
+private:
+    CHIP_ERROR DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const;
+};
+
+using DecodableType = Type;
+
+} // namespace AttributionData
+
+namespace SuppliedAttributionData {
+enum class Fields : uint8_t
+{
+    kContextInformation = 0,
+    kSourceContext      = 1,
+    kFabricIndex        = 254,
+};
+
+struct Type
+{
+public:
+    uint8_t contextInformation = static_cast<uint8_t>(0);
+    Optional<uint32_t> sourceContext;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = true;
+
+    auto GetFabricIndex() const { return fabricIndex; }
+
+    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
+
+    CHIP_ERROR EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
+
+private:
+    CHIP_ERROR DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const;
+};
+
+using DecodableType = Type;
+
+} // namespace SuppliedAttributionData
+
 } // namespace Structs
 
 namespace Attributes {
@@ -4253,6 +4329,32 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxPathsPerInvoke
+namespace DeviceLocation {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::Nullable<chip::app::Clusters::Globals::Structs::LocationDescriptorStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::Nullable<chip::app::Clusters::Globals::Structs::LocationDescriptorStruct::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::Nullable<chip::app::Clusters::Globals::Structs::LocationDescriptorStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BasicInformation::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DeviceLocation::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace DeviceLocation
+namespace ConfigurationVersion {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BasicInformation::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ConfigurationVersion::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ConfigurationVersion
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -4315,6 +4417,8 @@ struct TypeInfo
         Attributes::ProductAppearance::TypeInfo::DecodableType productAppearance;
         Attributes::SpecificationVersion::TypeInfo::DecodableType specificationVersion = static_cast<uint32_t>(0);
         Attributes::MaxPathsPerInvoke::TypeInfo::DecodableType maxPathsPerInvoke       = static_cast<uint16_t>(0);
+        Attributes::DeviceLocation::TypeInfo::DecodableType deviceLocation;
+        Attributes::ConfigurationVersion::TypeInfo::DecodableType configurationVersion = static_cast<uint32_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
