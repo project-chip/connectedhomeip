@@ -65,7 +65,7 @@ constexpr uint16_t kMaxBdxBlockSize = 1024;
 
 constexpr uint8_t kMaxThreadFramesPerBdxBlock = 6;
 
-static uint16_t ComputeBdxBlockSizeForThread(uint8_t framesPerBlock)
+static constexpr uint16_t ComputeBDXBlockSizeForThread(uint8_t framesPerBlock)
 {
     return 74 + (framesPerBlock - 1) * 95 - 38;
 }
@@ -136,7 +136,7 @@ CHIP_ERROR MTROTAImageTransferHandler::Init(Messaging::ExchangeContext * exchang
 
     uint16_t blockSize;
     if (mIsPeerNodeAKnownThreadDevice) {
-        blockSize = ComputeBdxBlockSizeForThread(Platform::GetUserDefaultBDXThreadFramesPerBlock().value_or(kMaxThreadFramesPerBdxBlock));
+        blockSize = ComputeBDXBlockSizeForThread(Platform::GetUserDefaultBDXThreadFramesPerBlock().value_or(kMaxThreadFramesPerBdxBlock));
     } else {
         blockSize = kMaxBdxBlockSize;
     }
