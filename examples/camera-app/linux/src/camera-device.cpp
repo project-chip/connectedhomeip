@@ -621,8 +621,15 @@ CameraError CameraDevice::SetHDRMode(bool hdrMode)
     return CameraError::SUCCESS;
 }
 
+CameraError CameraDevice::SetViewport(const ViewportStruct & viewPort)
+{
+    mViewport = viewPort;
+
+    return CameraError::SUCCESS;
+}
+
 // Mute/Unmute microphone.
-CameraError CameraDevice::SetMicrophoneMute(bool muteMicrophone)
+CameraError CameraDevice::SetMicrophoneMuted(bool muteMicrophone)
 {
     mMicrophoneMuted = muteMicrophone;
 

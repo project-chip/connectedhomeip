@@ -33,7 +33,7 @@
 #define AUDIO_STREAM_GST_DEST_PORT 5001
 
 #define MAX_CONTENT_BUFFER_SIZE_BYTES (1024)
-#define MAX_ENCODED_PIXEL_RATE  (10000)
+#define MAX_ENCODED_PIXEL_RATE (10000)
 #define MAX_CONCURRENT_VIDEO_ENCODERS (1)
 #define MAX_NETWORK_BANDWIDTH_MBPS (64)
 #define MICROPHONE_MIN_LEVEL (1)
@@ -96,12 +96,16 @@ public:
     uint16_t GetCurrentFrameRate();
 
     CameraError SetHDRMode(bool hdrMode);
+    bool GetHDRMode() { return mHDREnabled; }
+
+    CameraError SetViewport(const ViewportStruct & viewPort);
+    const ViewportStruct & GetViewport() { return mViewport; }
 
     // Currently, defaulting to not supporting speaker.
     bool HasSpeaker() { return false; }
 
     // Mute/Unmute speaker.
-    CameraError SetSpeakerMute(bool muteSpeaker) { return CameraError::ERROR_NOT_IMPLEMENTED; }
+    CameraError SetSpeakerMuted(bool muteSpeaker) { return CameraError::ERROR_NOT_IMPLEMENTED; }
 
     // Set speaker volume level.
     CameraError SetSpeakerVolume(uint8_t speakerVol) { return CameraError::ERROR_NOT_IMPLEMENTED; }
@@ -114,10 +118,12 @@ public:
     bool HasMicrophone() { return true; }
 
     // Mute/Unmute microphone.
-    CameraError SetMicrophoneMute(bool muteMicrophone);
+    CameraError SetMicrophoneMuted(bool muteMicrophone);
+    bool GetMicrophoneMuted() { return mMicrophoneMuted; }
 
     // Set microphone volume level.
     CameraError SetMicrophoneVolume(uint8_t microphoneVol);
+    uint8_t GetMicrophoneVolume() { return mMicrophoneVol; }
 
     // Get the microphone max and min levels.
     uint8_t GetMicrophoneMaxLevel() { return MICROPHONE_MAX_LEVEL; }
@@ -155,13 +161,13 @@ private:
     NetworkStreamSource mNetworkAudioSource;
     MediaController mMediaController;
 
-    uint16_t mCurrentVideoFrameRate = 0;
-    bool mHDREnabled = false;
-    bool mMicrophoneMuted = false;
-    uint8_t mMicrophoneMinLevel = MICROPHONE_MIN_LEVEL;
-    uint8_t mMicrophoneMaxLevel = MICROPHONE_MAX_LEVEL;
-    uint8_t mMicrophoneVol = MICROPHONE_MIN_LEVEL;
-
+    uint16_t mCurrentVideoFrameRate                                         = 0;
+    bool mHDREnabled                                                        = false;
+    bool mMicrophoneMuted                                                   = false;
+    uint8_t mMicrophoneMinLevel                                             = MICROPHONE_MIN_LEVEL;
+    uint8_t mMicrophoneMaxLevel                                             = MICROPHONE_MAX_LEVEL;
+    uint8_t mMicrophoneVol                                                  = MICROPHONE_MIN_LEVEL;
+    chip::app::Clusters::CameraAvStreamManagement::ViewportStruct mViewport = { 325, 585, 2244, 1664 };
 };
 
 } // namespace Camera

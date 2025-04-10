@@ -27,6 +27,7 @@ using chip::app::Clusters::CameraAvStreamManagement::SnapshotStreamStruct;
 using chip::app::Clusters::CameraAvStreamManagement::VideoResolutionStruct;
 using chip::app::Clusters::CameraAvStreamManagement::VideoSensorParamsStruct;
 using chip::app::Clusters::CameraAvStreamManagement::VideoStreamStruct;
+using chip::app::Clusters::CameraAvStreamManagement::ViewportStruct;
 
 struct VideoStream
 {
@@ -186,11 +187,20 @@ public:
         // Enable/Disable High Dynamic Range mode.
         virtual CameraError SetHDRMode(bool hdrMode) = 0;
 
+        // Get the current camera HDR mode.
+        virtual bool GetHDRMode() = 0;
+
         // Does camera have a speaker
         virtual bool HasSpeaker() = 0;
 
+        // Set the viewport for all streams
+        virtual CameraError SetViewport(const ViewportStruct & viewPort) = 0;
+
+        // Get the current camera viewport.
+        virtual const ViewportStruct & GetViewport() = 0;
+
         // Mute/Unmute speaker.
-        virtual CameraError SetSpeakerMute(bool muteSpeaker) = 0;
+        virtual CameraError SetSpeakerMuted(bool muteSpeaker) = 0;
 
         // Set speaker volume level.
         virtual CameraError SetSpeakerVolume(uint8_t speakerVol) = 0;
@@ -203,10 +213,12 @@ public:
         virtual bool HasMicrophone() = 0;
 
         // Mute/Unmute microphone.
-        virtual CameraError SetMicrophoneMute(bool muteMicrophone) = 0;
+        virtual CameraError SetMicrophoneMuted(bool muteMicrophone) = 0;
+        virtual bool GetMicrophoneMuted()                           = 0;
 
         // Set microphone volume level.
         virtual CameraError SetMicrophoneVolume(uint8_t microphoneVol) = 0;
+        virtual uint8_t GetMicrophoneVolume()                          = 0;
 
         // Get the microphone max and min levels.
         virtual uint8_t GetMicrophoneMaxLevel() = 0;

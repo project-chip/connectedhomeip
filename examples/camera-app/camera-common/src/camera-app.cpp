@@ -49,6 +49,8 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
         features.Set(Feature::kAudio);
     }
 
+    features.Set(Feature::kHighDynamicRange);
+
     BitFlags<OptionalAttribute> optionalAttrs;
     optionalAttrs.Set(chip::app::Clusters::CameraAvStreamManagement::OptionalAttribute::kNightVision);
     optionalAttrs.Set(chip::app::Clusters::CameraAvStreamManagement::OptionalAttribute::kNightVisionIllum);
@@ -73,9 +75,15 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
         mCameraDevice->GetCameraAVStreamMgmtDelegate(), mEndpoint, features, optionalAttrs, maxConcurrentVideoEncoders,
         maxEncodedPixelRate, sensorParams, nightVisionCapable, minViewport, rateDistortionTradeOffPoints, maxContentBufferSize,
         micCapabilities, spkrCapabilities, twowayTalkSupport, supportedSnapshotParams, maxNetworkBandwidth, supportedStreamUsages);
+}
 
+void CameraApp::InitializeCameraAVStreamMgmt()
+{
     // Set the attribute defaults
-    mAVStreamMgmtServerPtr->SetHDRModeEnabled(false);
+    mAVStreamMgmtServerPtr->SetHDRModeEnabled(mCameraDevice->GetCameraHALInterface().GetHDRMode());
+    mAVStreamMgmtServerPtr->SetViewport(mCameraDevice->GetCameraHALInterface().GetViewport());
+
+    mAVStreamMgmtServerPtr->Init();
 }
 
 void CameraApp::InitCameraDeviceClusters()
@@ -85,7 +93,7 @@ void CameraApp::InitCameraDeviceClusters()
 
     mChimeServerPtr->Init();
 
-    mAVStreamMgmtServerPtr->Init();
+    InitializeCameraAVStreamMgmt();
 }
 
 static constexpr EndpointId kCameraEndpointId = 1;
