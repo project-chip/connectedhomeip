@@ -936,12 +936,12 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
     return device_types, problems
 
 
-def build_xml_device_types(data_model_directory: typing.Union[PrebuiltDataModelDirectory, Traversable]) -> tuple[dict[int, XmlDeviceType], list[ProblemNotice]]:
+def build_xml_device_types(data_model_directory: typing.Union[PrebuiltDataModelDirectory, Traversable], cluster_definition_xml: Optional[dict[uint, XmlCluster]] = None) -> tuple[dict[int, XmlDeviceType], list[ProblemNotice]]:
     top = get_data_model_directory(data_model_directory, DataModelLevel.kDeviceType)
     device_types: dict[int, XmlDeviceType] = {}
     problems: list[ProblemNotice] = []
-    if not cluster_definitions_xml:
-        cluster_definitions_xml, _ = build_xml_clusters(data_model_directory)
+    if not cluster_definition_xml:
+        cluster_definition_xml, _ = build_xml_clusters(data_model_directory)
 
     found_xmls = 0
 
@@ -952,7 +952,7 @@ def build_xml_device_types(data_model_directory: typing.Union[PrebuiltDataModelD
         found_xmls += 1
         with file.open('r', encoding="utf8") as xml:
             root = ElementTree.parse(xml).getroot()
-            tmp_device_types, tmp_problems = parse_single_device_type(root)
+            tmp_device_types, tmp_problems = parse_single_device_type(root, cluster_definition_xml)
             problems = problems + tmp_problems
             device_types.update(tmp_device_types)
 
