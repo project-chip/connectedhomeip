@@ -74,9 +74,20 @@ Davis, CA 95616, USA
     <tag id="0x0006" name="Previous">
       <description>e.g. select previous scene</description>
     </tag>
-    <tag id="0x0007" name="Enter/OK/Select"/>
+    <tag id="0x0007" name="EnterOkSelect">
+      <description>Enter/OK/Select function</description>
+    </tag>
     <tag id="0x0008" name="Custom">
       <description>Textual description provided in Label field</description>
+    </tag>
+    <tag id="0x0009" name="Open">
+      <description>e.g. open window covering</description>
+    </tag>
+    <tag id="0x000A" name="Close">
+      <description>e.g. close window covering</description>
+    </tag>
+    <tag id="0x000B" name="Stop">
+      <description>e.g. stop moving window covering</description>
     </tag>
   </tags>
 </namespace>

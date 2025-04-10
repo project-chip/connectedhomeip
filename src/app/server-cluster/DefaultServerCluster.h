@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <app/ConcreteClusterPath.h>
 #include <app/server-cluster/ServerClusterInterface.h>
 #include <optional>
 
@@ -26,17 +27,16 @@ namespace app {
 /// to make it easier to implement spec-compliant classes.
 ///
 /// In particular it does:
+///   - handles a SINGLE cluster path that is set at construction time
 ///   - maintains a data version and provides `IncreaseDataVersion`. Ensures this
 ///     version is spec-compliant initialized (with a random value)
 ///   - Provides default implementations for most virtual methods EXCEPT:
 ///       - ReadAttribute (since that one needs to handle featuremap and revision)
-///       - GetClusterId (since every implementation is for different clusters)
-///
 ///
 class DefaultServerCluster : public ServerClusterInterface
 {
 public:
-    DefaultServerCluster();
+    DefaultServerCluster(const ConcreteClusterPath & path);
     ~DefaultServerCluster() override = default;
 
     //////////////////////////// ServerClusterInterface implementation ////////////////////////////////////////
@@ -49,8 +49,10 @@ public:
     CHIP_ERROR Startup(ServerClusterContext & context) override;
     void Shutdown() override;
 
-    [[nodiscard]] DataVersion GetDataVersion() const override { return mDataVersion; }
-    [[nodiscard]] BitFlags<DataModel::ClusterQualityFlags> GetClusterFlags() const override;
+    [[nodiscard]] Span<const ConcreteClusterPath> GetPaths() const override { return { &mPath, 1 }; }
+
+    [[nodiscard]] DataVersion GetDataVersion(const ConcreteClusterPath &) const override { return mDataVersion; }
+    [[nodiscard]] BitFlags<DataModel::ClusterQualityFlags> GetClusterFlags(const ConcreteClusterPath &) const override;
 
     /// Default implementation errors out with an unsupported write on every attribute.
     DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
@@ -86,6 +88,7 @@ public:
     static Span<const DataModel::AttributeEntry> GlobalAttributes();
 
 protected:
+    const ConcreteClusterPath mPath;
     ServerClusterContext * mContext = nullptr;
 
     void IncreaseDataVersion() { mDataVersion++; }
